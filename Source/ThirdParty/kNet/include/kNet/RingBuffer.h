@@ -33,7 +33,7 @@ public:
 	}
 
 	/// Returns the total number of bytes that this RingBuffer can contain.
-	int Capacity() const { return data.size(); }
+	int Capacity() const { return (int)data.size(); }
 
 	/// Returns the number of bytes filled in the ring buffer.
 	int Size() const { return end - start; }
@@ -95,10 +95,10 @@ public:
 	}
 
 	/// Returns the total number of bytes that can be filled in this structure after compacting.
-	int TotalFreeBytesLeft() const { return data.size() - Size(); }
+	int TotalFreeBytesLeft() const { return (int)data.size() - Size(); }
 
 	/// Returns the number of bytes that can be added to this structure contiguously, without having to compact.
-	int ContiguousFreeBytesLeft() const { return data.size() - end; }
+	int ContiguousFreeBytesLeft() const { return (int)data.size() - end; }
 
 private:
 	std::vector<char> data;

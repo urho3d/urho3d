@@ -14,13 +14,12 @@
 
 /** @file BoostThread.cpp
 	@brief */
+#ifdef KNET_USE_BOOST
 
 #include <cassert>
 #include <exception>
 
-#ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
-#endif
 
 #include "kNet/DebugMemoryLeakCheck.h"
 
@@ -94,7 +93,7 @@ void Thread::Sleep(int msecs)
 
 ThreadId Thread::Id()
 {
-#if defined(WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
+#if defined(_WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
 	HANDLE threadHandle = (HANDLE)thread.native_handle();
 	if (threadHandle == NULL)
 		return NullThreadId();
@@ -109,7 +108,7 @@ ThreadId Thread::Id()
 
 ThreadId Thread::CurrentThreadId()
 {
-#if defined(WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
+#if defined(_WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
 	// On Windows, don't rely on Boost, since it is known to improperly read thread ids at least on Boost 1.40.0.
 	return GetCurrentThreadId();
 #else
@@ -119,7 +118,7 @@ ThreadId Thread::CurrentThreadId()
 
 ThreadId Thread::NullThreadId()
 {
-#if defined(WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
+#if defined(_WIN32) && !defined(KNET_ENABLE_WINXP_SUPPORT)
 	return 0;
 #else
 	return boost::thread::id();
@@ -127,3 +126,5 @@ ThreadId Thread::NullThreadId()
 }
 
 } // ~kNet
+
+#endif // ~KNET_USE_BOOST

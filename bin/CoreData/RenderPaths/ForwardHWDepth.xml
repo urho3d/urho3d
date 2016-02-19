@@ -1,0 +1,14 @@
+<renderpath>
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
+    <command type="clear" depth="1.0" output="depth" />
+    <command type="scenepass" pass="shadow" output="depth" />
+    <command type="clear" color="fog" depthstencil="depth" />
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" depthstencil="depth" />
+    <command type="forwardlights" pass="light" depthstencil="depth" />
+    <command type="scenepass" pass="postopaque" depthstencil="depth" />
+    <command type="scenepass" pass="refract" depthstencil="depth">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth"  />
+    <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
+</renderpath>

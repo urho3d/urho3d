@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ class UIElement;
 ///     - Controlling a physics object's movement by applying forces
 class SceneReplication : public Sample
 {
-    OBJECT(SceneReplication);
+    URHO3D_OBJECT(SceneReplication, Sample);
 
 public:
     /// Construct.

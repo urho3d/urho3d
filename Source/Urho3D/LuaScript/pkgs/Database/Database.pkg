@@ -1,0 +1,37 @@
+$#include "Database/Database.h"
+
+enum DBAPI
+{
+    DBAPI_SQLITE = 0,
+    DBAPI_ODBC
+};
+
+class Database : public Object
+{
+    DbConnection* Connect(const String connectionString);
+    void Disconnect(DbConnection* connection);
+    bool IsPooling() const;
+    unsigned GetPoolSize() const;
+    void SetPoolSize(unsigned poolSize);
+
+    tolua_readonly tolua_property__is_set bool pooling;
+    tolua_property__get_set unsigned poolSize;
+};
+
+DBAPI DatabaseGetAPI @ GetDBAPI();
+
+Database* GetDatabase();
+tolua_readonly tolua_property__get_set Database* database;
+
+${
+#define DatabaseGetAPI Database::GetAPI
+
+#define TOLUA_DISABLE_tolua_DatabaseLuaAPI_GetDatabase00
+static int tolua_DatabaseLuaAPI_GetDatabase00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Database>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_database_ptr
+#define tolua_get_database_ptr tolua_DatabaseLuaAPI_GetDatabase00
+$}

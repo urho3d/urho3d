@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ class Scene;
 ///     - Creating a Model resource and its buffer data from scratch
 class DynamicGeometry : public Sample
 {
-    OBJECT(DynamicGeometry);
+    URHO3D_OBJECT(DynamicGeometry, Sample);
 
 public:
     /// Construct.

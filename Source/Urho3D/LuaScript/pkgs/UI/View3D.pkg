@@ -1,0 +1,37 @@
+$#include "UI/View3D.h"
+
+class View3D : public Window
+{
+    View3D();
+    ~View3D();
+
+    void SetView(Scene* scene, Camera* camera, bool ownScene = true);
+    void SetFormat(unsigned format);
+    void SetAutoUpdate(bool enable);
+    void QueueUpdate();
+    
+    unsigned GetFormat() const;
+    bool GetAutoUpdate() const;
+    Scene* GetScene() const;
+    Node* GetCameraNode() const;
+    Texture2D* GetRenderTexture() const;
+    Texture2D* GetDepthTexture() const;
+    Viewport* GetViewport() const;
+    
+    tolua_property__get_set unsigned format;
+    tolua_property__get_set bool autoUpdate;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_View3D_new00
+static int tolua_UILuaAPI_View3D_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<View3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_View3D_new00_local
+static int tolua_UILuaAPI_View3D_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<View3D>(tolua_S);
+}
+$}

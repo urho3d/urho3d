@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -70,6 +70,7 @@ public:
 	// Memory management
 	virtual int AddRef() const;
 	virtual int Release() const;
+	virtual int ShutDownAndRelease();
 
 	// Engine properties
 	virtual int     SetEngineProperty(asEEngineProp property, asPWORD value);
@@ -166,14 +167,14 @@ public:
 	virtual void                  *CreateScriptObjectCopy(void *obj, const asIObjectType *type);
 	virtual void                  *CreateUninitializedScriptObject(const asIObjectType *type);
 	virtual asIScriptFunction     *CreateDelegate(asIScriptFunction *func, void *obj);
-	virtual void                   AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type);
+	virtual int                    AssignScriptObject(void *dstObj, void *srcObj, const asIObjectType *type);
 	virtual void                   ReleaseScriptObject(void *obj, const asIObjectType *type);
 	virtual void                   AddRefScriptObject(void *obj, const asIObjectType *type);
-	// TODO: interface: Should have a method void *CastObject(void *obj, asIObjectType *fromType, asIObjectType *toType); 
-	//                  For script objects it should simply check if the object implements or derives from the toType
-	//                  For application objects it should look for ref cast behaviours and call the matching one
-	//                  Once implemented the IsHandleCompatibleWithObject should be removed from the engine
+	virtual int                    RefCastObject(void *obj, asIObjectType *fromType, asIObjectType *toType, void **newPtr, bool useOnlyImplicitCast = false);
+#ifdef AS_DEPRECATED
+	// Deprecated since 2.30.0, 2014-11-04
 	virtual bool                   IsHandleCompatibleWithObject(void *obj, int objTypeId, int handleTypeId) const;
+#endif
 	virtual asILockableSharedBool *GetWeakRefFlagOfScriptObject(void *obj, const asIObjectType *type) const;
 
 	// Context pooling
@@ -182,7 +183,7 @@ public:
 	virtual int               SetContextCallbacks(asREQUESTCONTEXTFUNC_t requestCtx, asRETURNCONTEXTFUNC_t returnCtx, void *param = 0);
 
 	// String interpretation
-	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, int *tokenLength = 0) const;
+	virtual asETokenClass ParseToken(const char *string, size_t stringLength = 0, asUINT *tokenLength = 0) const;
 
 	// Garbage collection
 	virtual int  GarbageCollect(asDWORD flags = asGC_FULL_CYCLE, asUINT numIterations = 1);
@@ -199,6 +200,7 @@ public:
 	virtual void  SetContextUserDataCleanupCallback(asCLEANCONTEXTFUNC_t callback, asPWORD type);
 	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback, asPWORD type);
 	virtual void  SetObjectTypeUserDataCleanupCallback(asCLEANOBJECTTYPEFUNC_t callback, asPWORD type);
+	virtual void  SetScriptObjectUserDataCleanupCallback(asCLEANSCRIPTOBJECTFUNC_t callback, asPWORD type);
 
 //===========================================================
 // internal methods
@@ -236,16 +238,16 @@ public:
 	bool  CallObjectMethodRetBool(void *obj, int func) const;
 	int   CallObjectMethodRetInt(void *obj, int func) const;
 	void *CallObjectMethodRetPtr(void *obj, int func) const;
+	void *CallObjectMethodRetPtr(void *obj, int param1, asCScriptFunction *func) const;
 	void  CallGlobalFunction(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
 	bool  CallGlobalFunctionRetBool(void *param1, void *param2, asSSystemFunctionInterface *func, asCScriptFunction *desc) const;
 
 	void ConstructScriptObjectCopy(void *mem, void *obj, asCObjectType *type);
 
-	void CleanupAfterDiscardModule();
+	void DeleteDiscardedModules();
 
-	int  ClearUnusedTypes();
 	void RemoveTemplateInstanceType(asCObjectType *t);
-	void RemoveTypeAndRelatedFromList(asCArray<asCObjectType*> &types, asCObjectType *ot);
+	void RemoveTypeAndRelatedFromList(asCMap<asCObjectType*,char> &types, asCObjectType *ot);
 
 	asCConfigGroup *FindConfigGroupForFunction(int funcId) const;
 	asCConfigGroup *FindConfigGroupForGlobalVar(int gvarId) const;
@@ -279,8 +281,9 @@ public:
 	int  GetFactoryIdByDecl(const asCObjectType *ot, const char *decl);
 
 	int  GetNextScriptFunctionId();
-	void SetScriptFunction(asCScriptFunction *func);
-	void FreeScriptFunctionId(int id);
+	void AddScriptFunction(asCScriptFunction *func);
+	void RemoveScriptFunction(asCScriptFunction *func);
+	void RemoveFuncdef(asCScriptFunction *func);
 
 	int ConfigError(int err, const char *funcName, const char *arg1, const char *arg2);
 
@@ -290,11 +293,14 @@ public:
 	void               RemoveFromTypeIdMap(asCObjectType *type);
 
 	bool               IsTemplateType(const char *name) const;
-	asCObjectType     *GetTemplateInstanceType(asCObjectType *templateType, asCArray<asCDataType> &subTypes);
+	asCObjectType     *GetTemplateInstanceType(asCObjectType *templateType, asCArray<asCDataType> &subTypes, asCModule *requestingModule);
 	asCScriptFunction *GenerateTemplateFactoryStub(asCObjectType *templateType, asCObjectType *templateInstanceType, int origFactoryId);
 	bool               GenerateNewTemplateFunction(asCObjectType *templateType, asCObjectType *templateInstanceType, asCScriptFunction *templateFunc, asCScriptFunction **newFunc);
-	void               OrphanTemplateInstances(asCObjectType *subType);
 	asCDataType        DetermineTypeForTemplate(const asCDataType &orig, asCObjectType *tmpl, asCObjectType *ot);
+	bool               RequireTypeReplacement(asCDataType &type, asCObjectType *templateType);
+
+	asCModule         *FindNewOwnerForSharedType(asCObjectType *type, asCModule *mod);
+	asCModule         *FindNewOwnerForSharedFunc(asCScriptFunction *func, asCModule *mod);
 
 	// String constants
 	// TODO: Must free unused string constants, thus the ref count for each must be tracked
@@ -303,13 +309,14 @@ public:
 
 	// Global property management
 	asCGlobalProperty *AllocateGlobalProperty();
-	void FreeUnusedGlobalProperties();
+	void RemoveGlobalProperty(asCGlobalProperty *prop);
 
 	int GetScriptSectionNameIndex(const char *name);
 
 	// Namespace management
 	asSNameSpace *AddNameSpace(const char *name);
-	asSNameSpace *FindNameSpace(const char *name);
+	asSNameSpace *FindNameSpace(const char *name) const;
+	asSNameSpace *GetParentNameSpace(asSNameSpace *ns) const;
 
 //===========================================================
 // internal properties
@@ -321,14 +328,12 @@ public:
 	asCObjectType   *defaultArrayObjectType;
 	asCObjectType    scriptTypeBehaviours;
 	asCObjectType    functionBehaviours;
-	asCObjectType    objectTypeBehaviours;
-	asCObjectType    globalPropertyBehaviours;
 
 	// Registered interface
 	asCArray<asCObjectType *>         registeredObjTypes;
 	asCArray<asCObjectType *>         registeredTypeDefs;
 	asCArray<asCObjectType *>         registeredEnums;
-	asCSymbolTable<asCGlobalProperty> registeredGlobalProps; // TODO: memory savings: Since there can be only one property with the same name a simpler symbol table should be used
+	asCSymbolTable<asCGlobalProperty> registeredGlobalProps; // increases ref count // TODO: memory savings: Since there can be only one property with the same name a simpler symbol table should be used
 	asCSymbolTable<asCScriptFunction> registeredGlobalFuncs;
 	asCArray<asCScriptFunction *>     registeredFuncDefs;
 	asCArray<asCObjectType *>         registeredTemplateTypes;
@@ -336,7 +341,7 @@ public:
 	bool configFailed;
 
 	// Stores all registered types except funcdefs
-	asCMap<asSNameSpaceNamePair, asCObjectType*> allRegisteredTypes;  
+	asCMap<asSNameSpaceNamePair, asCObjectType*> allRegisteredTypes; // increases ref count
 
 	// Dummy types used to name the subtypes in the template objects 
 	asCArray<asCObjectType *>      templateSubTypes;
@@ -344,53 +349,69 @@ public:
 	// Store information about template types
 	// This list will contain all instances of templates, both registered specialized 
 	// types and those automacially instantiated from scripts
-	asCArray<asCObjectType *>      templateInstanceTypes;
+	asCArray<asCObjectType *>      templateInstanceTypes; // increases ref count
 
 	// Store information about list patterns
-	asCArray<asCObjectType *>      listPatternTypes;
+	asCArray<asCObjectType *>      listPatternTypes; // increases ref count
 
 	// Stores all global properties, both those registered by application, and those declared by scripts.
 	// The id of a global property is the index in this array.
-	asCArray<asCGlobalProperty *> globalProperties;
+	asCArray<asCGlobalProperty *> globalProperties; // increases ref count
+	asCArray<int>                 freeGlobalPropertyIds;
 
 	// This map is used to quickly find a property by its memory address
 	// It is used principally during building, cleanup, and garbage detection for script functions
-	asCMap<void*, asCGlobalProperty*> varAddressMap;
-
-	asCArray<int>                 freeGlobalPropertyIds;
+	asCMap<void*, asCGlobalProperty*> varAddressMap; // doesn't increase ref count
 
 	// Stores all functions, i.e. registered functions, script functions, class methods, behaviours, etc.
-	asCArray<asCScriptFunction *> scriptFunctions;
+	asCArray<asCScriptFunction *> scriptFunctions;       // doesn't increase ref count
 	asCArray<int>                 freeScriptFunctionIds;
 	asCArray<asCScriptFunction *> signatureIds;
 
 	// An array with all module imported functions
-	asCArray<sBindInfo *>  importedFunctions;
+	asCArray<sBindInfo *>  importedFunctions; // doesn't increase ref count
 	asCArray<int>          freeImportedFunctionIdxs;
 
-	// These resources must be protected for multiple accesses
+	// Synchronized
 	mutable asCAtomic      refCount;
+	// Synchronized with engineRWLock
+	// This array holds all live script modules
 	asCArray<asCModule *>  scriptModules;
+	// Synchronized with engineRWLock
+	// This is a pointer to the last module that was requested. It is used for performance 
+	// improvement, since it is common that the same module is accessed many times in a row
 	asCModule             *lastModule;
+	// Synchronized with engineRWLock
+	// This flag is true if a script is currently being compiled. It is used to prevent multiple
+	// threads from requesting builds at the same time (without blocking)
 	bool                   isBuilding;
+	// Synchronized with engineRWLock
+	// This array holds modules that have been discard (thus are no longer visible to the application)
+	// but cannot yet be deleted due to having external references to some of the entities in them
+	asCArray<asCModule *>  discardedModules;
+	// This flag is set to true during compilations of scripts (or loading pre-compiled scripts) 
+	// to delay the validation of template types until the subtypes have been fully declared 
 	bool                   deferValidationOfTemplateTypes;
 
 	// Tokenizer is instantiated once to share resources
 	asCTokenizer tok;
 
-	// Stores script declared object types
-	asCArray<asCObjectType *> classTypes;
+	// Stores shared script declared types (classes, interfaces, enums)
+	asCArray<asCObjectType *> sharedScriptTypes; // increases ref count
 	// This array stores the template instances types that have been automatically generated from template types
 	asCArray<asCObjectType *> generatedTemplateTypes;
 	// Stores the funcdefs
-	asCArray<asCScriptFunction *> funcDefs;
+	// TODO: redesign: Only shared funcdefs should be stored here
+	//                 a funcdef becomes shared if all arguments and the return type are shared (or application registered)
+	asCArray<asCScriptFunction *> funcDefs; // doesn't increase ref count
 
 	// Stores the names of the script sections for debugging purposes
 	asCArray<asCString *> scriptSectionNames;
 
 	// Type identifiers
-	mutable int                       typeIdSeqNbr;
-	mutable asCMap<int, asCDataType*> mapTypeIdToDataType;
+	mutable int                             typeIdSeqNbr;
+	mutable asCMap<int, asCObjectType*>     mapTypeIdToObjectType;
+	mutable asCMap<int, asCScriptFunction*> mapTypeIdToFunction;
 
 	// Garbage collector
 	asCGarbageCollector gc;
@@ -438,16 +459,18 @@ public:
 	// User data
 	asCArray<asPWORD>       userData;
 
-	struct SEngineClean   { asPWORD type; asCLEANENGINEFUNC_t     cleanFunc; };
-	asCArray<SEngineClean>   cleanEngineFuncs;
-	struct SModuleClean   { asPWORD type; asCLEANMODULEFUNC_t     cleanFunc; };
-	asCArray<SModuleClean>   cleanModuleFuncs;
-	struct SContextClean  { asPWORD type; asCLEANCONTEXTFUNC_t    cleanFunc; };
-	asCArray<SContextClean>  cleanContextFuncs;
-	struct SFunctionClean { asPWORD type; asCLEANFUNCTIONFUNC_t   cleanFunc; };
-	asCArray<SFunctionClean> cleanFunctionFuncs;
-	struct SObjTypeClean  { asPWORD type; asCLEANOBJECTTYPEFUNC_t cleanFunc; };
-	asCArray<SObjTypeClean>  cleanObjectTypeFuncs;
+	struct SEngineClean    { asPWORD type; asCLEANENGINEFUNC_t      cleanFunc; };
+	asCArray<SEngineClean>    cleanEngineFuncs;
+	struct SModuleClean    { asPWORD type; asCLEANMODULEFUNC_t      cleanFunc; };
+	asCArray<SModuleClean>    cleanModuleFuncs;
+	struct SContextClean   { asPWORD type; asCLEANCONTEXTFUNC_t     cleanFunc; };
+	asCArray<SContextClean>   cleanContextFuncs;
+	struct SFunctionClean  { asPWORD type; asCLEANFUNCTIONFUNC_t    cleanFunc; };
+	asCArray<SFunctionClean>  cleanFunctionFuncs;
+	struct SObjTypeClean   { asPWORD type; asCLEANOBJECTTYPEFUNC_t  cleanFunc; };
+	asCArray<SObjTypeClean>   cleanObjectTypeFuncs;
+	struct SScriptObjClean { asPWORD type; asCLEANSCRIPTOBJECTFUNC_t cleanFunc; };
+	asCArray<SScriptObjClean> cleanScriptObjectFuncs;
 
 	// Synchronization for threads
 	DECLAREREADWRITELOCK(mutable engineRWLock)
@@ -475,11 +498,21 @@ public:
 		bool   alwaysImplDefaultConstruct;
 		int    compilerWarnings;
 		bool   disallowValueAssignForRefType;
+		// TODO: 3.0.0: Remove the alterSyntaxNamedArgs
 		int    alterSyntaxNamedArgs;
+		bool   disableIntegerDivision;
+		bool   disallowEmptyListElements;
+		// TODO: 3.0.0: Remove the privatePropAsProtected
+		bool   privatePropAsProtected;
 	} ep;
 
 	// This flag is to allow a quicker shutdown when releasing the engine
 	bool shuttingDown;
+
+	// This flag is set when the engine's destructor is called, this is to 
+	// avoid recursive calls if an object happens to increment/decrement
+	// the ref counter during shutdown
+	bool inDestructor;
 };
 
 END_AS_NAMESPACE

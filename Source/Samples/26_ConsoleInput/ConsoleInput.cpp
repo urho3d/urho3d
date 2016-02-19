@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,23 +20,22 @@
 // THE SOFTWARE.
 //
 
-#include "Button.h"
-#include "Console.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "EngineEvents.h"
-#include "Input.h"
-#include "Log.h"
-#include "ProcessUtils.h"
-#include "Random.h"
-#include "Timer.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Core/Timer.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineEvents.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/Log.h>
+#include <Urho3D/UI/Button.h>
 
 #include "ConsoleInput.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(ConsoleInput)
+URHO3D_DEFINE_APPLICATION_MAIN(ConsoleInput)
 
 // Hunger level descriptions
 String hungerLevels[] = {
@@ -66,11 +65,11 @@ void ConsoleInput::Start()
     Sample::Start();
 
     // Subscribe to console commands and the frame update
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
-    SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
+    SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(ConsoleInput, HandleConsoleCommand));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ConsoleInput, HandleUpdate));
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(ConsoleInput, HandleEscKeyDown));
 
     // Hide logo to make room for the console
     SetLogoVisible(false);
@@ -270,5 +269,5 @@ void ConsoleInput::HandleInput(const String& input)
 void ConsoleInput::Print(const String& output)
 {
     // Logging appears both in the engine console and stdout
-    LOGRAW(output + "\n");
+    URHO3D_LOGRAW(output + "\n");
 }

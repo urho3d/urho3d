@@ -1,0 +1,23 @@
+$#include "Math/StringHash.h"
+
+class StringHash
+{
+    StringHash();
+    StringHash(const StringHash& rhs);
+    StringHash(const char* str);            // This works for Lua string and Urho3D:String
+    explicit StringHash(unsigned value);
+    ~StringHash();
+
+    StringHash operator + (const StringHash& rhs) const;
+    bool operator ==(const StringHash& rhs) const;
+    bool operator < (const StringHash& rhs) const;
+    operator bool () const;
+    unsigned Value() const;
+    String ToString() const;
+    unsigned ToHash() const;
+
+    static unsigned Calculate(const char* str);
+    static const StringHash ZERO;
+
+    tolua_readonly tolua_property__no_prefix unsigned value;
+};

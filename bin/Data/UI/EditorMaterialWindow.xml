@@ -1,0 +1,392 @@
+<element type="Window">
+    <attribute name="Name" value="MaterialWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Material editor" />
+            <attribute name="Auto Localizable" value="true" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element type="View3D">
+        <attribute name="Name" value="MaterialPreview" />
+        <attribute name="Texture" value="Texture2D;" />
+        <attribute name="Use Derived Opacity" value="false" />
+        <attribute name="Is Resizable" value="true" />
+        <attribute name="Fixed Height Resizing" value="true" />
+        <attribute name="Resize Border" value="0 6 0 6" />
+        <element type="DropDownList">
+            <attribute name="Name" value="ModelPreview" />
+            <attribute name="Min Size" value="80 16" />
+            <attribute name="Max Size" value="80 16" />
+            <attribute name="Resize Popup" value="true" />
+            <attribute name="Horiz Alignment" value="Right" />
+            <attribute name="Vert Alignment" value="Bottom" />
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Box" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Sphere" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Plane" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cylinder" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Cone" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="TeaPot" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>                           
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Name" value="NameContainer" />
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element type="ListView" style="PanelView">
+        <attribute name="Min Size" value="0 60" />
+        <element type="BorderImage" internal="true">
+            <element internal="true">
+                <element style="Panel">
+                    <element type="Text">
+                        <attribute name="Text" value="Techniques" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element type="ListView">
+                        <attribute name="Name" value="TechniqueList" />
+                        <attribute name="Min Size" value="0 100" />
+                    </element>
+                    <element>
+                        <attribute name="Name" value="TechniqueButtonContainer" />
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="4" />
+                        <element type="Button">
+                            <attribute name="Name" value="NewTechniqueButton" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                        <element type="Button">
+                            <attribute name="Name" value="DeleteTechniqueButton" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                        <element type="Button">
+                            <attribute name="Name" value="SortTechniquesButton" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="Sort" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="Panel">
+                    <element type="Text">
+                        <attribute name="Text" value="Textures" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element type="ListView">
+                        <attribute name="Name" value="TextureList" />
+                        <attribute name="Min Size" value="0 180" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="Panel">
+                    <element type="Text">
+                        <attribute name="Text" value="Shader parameters" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element type="ListView">
+                        <attribute name="Name" value="ShaderParameterList" />
+                        <attribute name="Min Size" value="0 120" />
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 17" />
+                        <attribute name="Max Size" value="2147483647 17" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="4" />
+                        <element type="LineEdit">
+                            <attribute name="Name" value="ParameterNameEdit" />
+                        </element>
+                        <element type="DropDownList">
+                            <attribute name="Name" value="NewParameterDropDown" />
+                            <attribute name="Min Size" value="50 17" />
+                            <attribute name="Max Size" value="50 17" />
+                            <attribute name="Resize Popup" value="false" />
+                            <element internal="true">
+                                <attribute name="Is Visible" value="false" />
+                            </element>
+                            <element type="Text">
+                                <attribute name="Text" value="New" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                            <element type="Window" internal="true" popup="true" style="none">
+                                <element type="ListView" internal="true" style="none">
+                                    <element type="BorderImage" internal="true" style="none">
+                                        <element internal="true" style="none">
+                                            <attribute name="Layout Border" value="0 0 4 0" />
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Float" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Vector2" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Vector3" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Vector4" />
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                        <element type="Button">
+                            <attribute name="Name" value="DeleteParameterButton" />
+                            <attribute name="Min Size" value="50 17" />
+                            <attribute name="Max Size" value="50 17" />
+                            <attribute name="Layout Mode" value="Vertical" />
+                            <attribute name="Layout Border" value="1 1 1 1" />
+                            <element type="Text">
+                                <attribute name="Text" value="Del" />
+                                <attribute name="Auto Localizable" value="true" />
+                                <attribute name="Text Alignment" value="Center" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="Panel">
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Constant bias" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="ConstantBiasEdit" />
+                        </element>
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Slope bias" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="SlopeBiasEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Render order" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="RenderOrderEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="8" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Cull mode" />
+                        </element>
+                        <element type="DropDownList">
+                            <attribute name="Name" value="CullModeEdit" />
+                            <attribute name="Resize Popup" value="true" />
+                            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                            <element type="Window" internal="true" popup="true" style="none">
+                                <element type="ListView" internal="true" style="none">
+                                    <element type="BorderImage" internal="true" style="none">
+                                        <element internal="true" style="none">
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="None" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="CCW" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="CW" />
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="8" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Shadow cull" />
+                        </element>
+                        <element type="DropDownList">
+                            <attribute name="Name" value="ShadowCullModeEdit" />
+                            <attribute name="Resize Popup" value="true" />
+                            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                            <element type="Window" internal="true" popup="true" style="none">
+                                <element type="ListView" internal="true" style="none">
+                                    <element type="BorderImage" internal="true" style="none">
+                                        <element internal="true" style="none">
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="None" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="CCW" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="CW" />
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="8" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Fill mode" />
+                        </element>
+                        <element type="DropDownList">
+                            <attribute name="Name" value="FillModeEdit" />
+                            <attribute name="Resize Popup" value="true" />
+                            <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                            <element type="Window" internal="true" popup="true" style="none">
+                                <element type="ListView" internal="true" style="none">
+                                    <element type="BorderImage" internal="true" style="none">
+                                        <element internal="true" style="none">
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Solid" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Wireframe" />
+                                            </element>
+                                            <element type="Text" style="FileSelectorFilterText">
+                                                <attribute name="Text" value="Point" />
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
+        <attribute name="Name" value="ButtonContainer" />
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <attribute name="Layout Spacing" value="4" />
+        <element type="Button">
+            <attribute name="Name" value="NewButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="New" />
+                <attribute name="Auto Localizable" value="true" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="RevertButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Revert" />
+                <attribute name="Auto Localizable" value="true" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="SaveButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Save" />
+                <attribute name="Auto Localizable" value="true" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+        <element type="Button">
+            <attribute name="Name" value="SaveAsButton" />
+            <attribute name="Layout Mode" value="Horizontal" />
+            <attribute name="Layout Border" value="1 1 1 1" />
+            <element type="Text">
+                <attribute name="Text" value="Save as" />
+                <attribute name="Auto Localizable" value="true" />
+                <attribute name="Text Alignment" value="Center" />
+            </element>
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+</element>

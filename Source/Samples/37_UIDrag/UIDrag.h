@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,11 +34,11 @@ namespace Urho3D
 /// This sample demonstrates:
 ///     - Creating GUI elements from C++
 ///     - Loading GUI Style from xml
-///     - Subscribing to GUI events and handling them.
-///     - Using the drag edit of a LineEdit.
+///     - Subscribing to GUI drag events and handling them
+///     - Working with GUI elements with specific tags.
 class UIDrag : public Sample
 {
-    OBJECT(UIDrag);
+    URHO3D_OBJECT(UIDrag, Sample);
 
 public:
     /// Construct.
@@ -58,14 +58,10 @@ protected:
     }
 
 private:
-    /// Construct the scene content.
-    void CreateScene();
-    /// Construct the GUI
+    /// Construct the GUI.
     void CreateGUI();
     /// Construct an instruction text to the UI.
     void CreateInstructions();
-    /// Set up a viewport for displaying the scene.
-    void SetupViewport();
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
 

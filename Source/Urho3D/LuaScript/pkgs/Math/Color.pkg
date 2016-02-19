@@ -1,0 +1,63 @@
+$#include "Math/Color.h"
+
+class Color
+{
+    Color();
+    Color(const Color& color);
+    Color(const Color& color, float a);
+    Color(float r, float g, float b);
+    Color(float r, float g, float b, float a);
+    ~Color();
+
+    bool operator ==(const Color& rhs) const;
+    Color operator * (float rhs) const;
+    Color operator + (const Color& rhs);
+
+    unsigned ToUInt() const;
+    Vector3 ToHSL() const;
+    Vector3 ToHSV() const;
+    void FromHSL(float h, float s, float l, float a);
+    void FromHSV(float h, float s, float v, float a);
+
+    Vector3 ToVector3() const;
+    Vector4 ToVector4() const;
+
+    float SumRGB() const;
+    float Average() const;
+
+    float Luma() const;
+    float Chroma() const;
+    float Hue() const;
+    float SaturationHSL() const;
+    float SaturationHSV() const;
+    float Value() const;
+    float Lightness() const;
+
+    float MaxRGB() const;
+    float MinRGB() const;
+    float Range() const;
+
+    void Clip(bool clipAlpha = false);
+    void Invert(bool invertAlpha = false);
+    Color Lerp(const Color& rhs, float t) const;
+    Color Abs() const;
+    bool Equals(const Color& rhs) const;
+
+    String ToString() const;
+
+    float r_ @ r;
+    float g_ @ g;
+    float b_ @ b;
+    float a_ @ a;
+
+    static const Color WHITE;
+    static const Color GRAY;
+    static const Color BLACK;
+    static const Color RED;
+    static const Color GREEN;
+    static const Color BLUE;
+    static const Color CYAN;
+    static const Color MAGENTA;
+    static const Color YELLOW;
+    static const Color TRANSPARENT;
+};

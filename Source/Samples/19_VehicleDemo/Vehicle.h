@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Controls.h"
-#include "LogicComponent.h"
+#include <Urho3D/Input/Controls.h>
+#include <Urho3D/Scene/LogicComponent.h>
 
 namespace Urho3D
 {
@@ -49,7 +49,7 @@ const float MAX_WHEEL_ANGLE = 22.5f;
 /// Vehicle component, responsible for physical movement according to controls.
 class Vehicle : public LogicComponent
 {
-    OBJECT(Vehicle)
+    URHO3D_OBJECT(Vehicle, LogicComponent)
 
 public:
     /// Construct.

@@ -1,0 +1,3 @@
+<technique vs="Unlit" ps="Unlit" vsdefines="NOUV" >
+    <pass name="alpha" depthwrite="false" blend="add" />
+</technique>

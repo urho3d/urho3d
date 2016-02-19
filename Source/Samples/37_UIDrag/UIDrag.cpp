@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,17 @@
 // THE SOFTWARE.
 //
 
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UIEvents.h>
+
 #include "UIDrag.h"
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "Zone.h"
-#include "Drawable2D.h"
-#include "Log.h"
+#include <Urho3D/DebugNew.h>
 
-#include "UIEvents.h"
-#include "Text.h"
-#include "UIElement.h"
-#include "Button.h"
-
-#include "DebugNew.h"
-#include "Log.h"
-
-DEFINE_APPLICATION_MAIN(UIDrag)
+URHO3D_DEFINE_APPLICATION_MAIN(UIDrag)
 
 UIDrag::UIDrag(Context* context) :
     Sample(context)
@@ -56,37 +42,17 @@ void UIDrag::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Create the scene content
-    CreateScene();
+    // Set mouse visible
+    String platform = GetPlatform();
+    if (platform != "Android" && platform != "iOS")
+        GetSubsystem<Input>()->SetMouseVisible(true);
 
     // Create the UI content
     CreateGUI();
     CreateInstructions();
 
-    // Setup the viewport for displaying the scene
-    SetupViewport();
-
     // Hook up to the frame update events
     SubscribeToEvents();
-}
-
-void UIDrag::CreateScene()
-{
-    scene_ = new Scene(context_);
-    scene_->CreateComponent<Octree>();
-
-    // Create camera node
-    cameraNode_ = scene_->CreateChild("Camera");
-    // Set camera's position
-    cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
-
-    Camera* camera = cameraNode_->CreateComponent<Camera>();
-    camera->SetOrthographic(true);
-
-    Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-
-    GetSubsystem<Input>()->SetMouseVisible(true);
 }
 
 void UIDrag::CreateGUI()
@@ -107,10 +73,13 @@ void UIDrag::CreateGUI()
         b->SetSize(300, 100);
         b->SetPosition(IntVector2(50*i, 50*i));
 
-        SubscribeToEvent(b, E_DRAGMOVE, HANDLER(UIDrag, HandleDragMove));
-        SubscribeToEvent(b, E_DRAGBEGIN, HANDLER(UIDrag, HandleDragBegin));
-        SubscribeToEvent(b, E_DRAGCANCEL, HANDLER(UIDrag, HandleDragCancel));
-        SubscribeToEvent(b, E_DRAGEND, HANDLER(UIDrag, HandleDragEnd));
+        if (i % 2 == 0)
+            b->AddTag("SomeTag");
+
+        SubscribeToEvent(b, E_DRAGMOVE, URHO3D_HANDLER(UIDrag, HandleDragMove));
+        SubscribeToEvent(b, E_DRAGBEGIN, URHO3D_HANDLER(UIDrag, HandleDragBegin));
+        SubscribeToEvent(b, E_DRAGCANCEL, URHO3D_HANDLER(UIDrag, HandleDragCancel));
+        SubscribeToEvent(b, E_DRAGEND, URHO3D_HANDLER(UIDrag, HandleDragEnd));
 
         {
             Text* t = new Text(context_);
@@ -145,7 +114,6 @@ void UIDrag::CreateGUI()
         Text* t = new Text(context_);
         root->AddChild(t);
         t->SetStyle("Text");
-        t->SetText("Touch "+ String(i));
         t->SetName("Touch "+ String(i));
         t->SetVisible(false);
     }
@@ -158,8 +126,11 @@ void UIDrag::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Drag on the buttons to move them around.\nMulti- button drag also supported.");
+    instructionText->SetText("Drag on the buttons to move them around.\n"
+                             "Touch input allows also multi-drag.\n"
+                             "Press SPACE to show/hide tagged UI elements.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    instructionText->SetTextAlignment(HA_CENTER);
 
     // Position the text relative to the screen center
     instructionText->SetHorizontalAlignment(HA_CENTER);
@@ -167,20 +138,9 @@ void UIDrag::CreateInstructions()
     instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
-void UIDrag::SetupViewport()
-{
-    Renderer* renderer = GetSubsystem<Renderer>();
-
-    // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
-    SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
-    renderer->SetViewport(0, viewport);
-}
-
 void UIDrag::SubscribeToEvents()
 {
-    SubscribeToEvent(E_UPDATE, HANDLER(UIDrag, HandleUpdate));
-    // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
-    UnsubscribeFromEvent(E_SCENEUPDATE);
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(UIDrag, HandleUpdate));
 }
 
 void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
@@ -248,6 +208,7 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text* t = (Text*)root->GetChild("Touch " + String(i));
         TouchState* ts = input->GetTouch(i);
+        t->SetText("Touch " + String(ts->touchID_));
 
         IntVector2 pos = ts->position_;
         pos.y_ -= 30;
@@ -260,5 +221,16 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text* t = (Text*)root->GetChild("Touch " + String(i));
         t->SetVisible(false);
+    }
+    
+    if (input->GetKeyPress(KEY_SPACE))
+    {
+        PODVector<UIElement*> elements;
+        root->GetChildrenWithTag(elements, "SomeTag");
+        for (PODVector<UIElement*>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+        {
+            UIElement* element = *i;
+            element->SetVisible(!element->IsVisible());
+        }
     }
 }

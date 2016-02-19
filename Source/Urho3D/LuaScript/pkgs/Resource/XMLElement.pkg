@@ -1,0 +1,90 @@
+$#include "Resource/XMLElement.h"
+
+class XMLElement
+{
+    XMLElement CreateChild(const String name);
+    bool RemoveChild(const XMLElement& element);
+    bool RemoveChild(const String name);
+    bool RemoveChildren(const String name = String::EMPTY);
+    bool RemoveAttribute(const String name = String::EMPTY);
+
+    bool SetValue(const String value);
+    bool SetAttribute(const String name, const String value);
+    bool SetAttribute(const String value);
+    bool SetBool(const String name, bool value);
+    bool SetBoundingBox(const BoundingBox& value);
+    bool SetColor(const String name, const Color& value);
+    bool SetFloat(const String name, float value);
+    bool SetDouble(const String name, double value);
+    bool SetUInt(const String name, unsigned value);
+    bool SetInt(const String name, int value);
+    bool SetIntRect(const String name, const IntRect& value);
+    bool SetIntVector2(const String name, const IntVector2& value);
+    bool SetRect(const String name, const Rect& value);
+    bool SetQuaternion(const String name, const Quaternion& value);
+    bool SetString(const String name, const String value);
+    bool SetVariant(const Variant& value);
+    bool SetVariantValue(const Variant& value);
+    bool SetResourceRef(const ResourceRef& value);
+    bool SetResourceRefList(const ResourceRefList& value);
+    // bool SetVariantVector(const VariantVector& value);
+    // bool SetVariantMap(const VariantMap& value);
+    bool SetVector2(const String name, const Vector2& value);
+    bool SetVector3(const String name, const Vector3& value);
+    bool SetVector4(const String name, const Vector4& value);
+    bool SetVectorVariant(const String name, const Variant& value);
+    bool SetMatrix3(const String name, const Matrix3& value);
+    bool SetMatrix3x4(const String name, const Matrix3x4& value);
+    bool SetMatrix4(const String name, const Matrix4& value);
+
+    bool IsNull() const;
+    bool NotNull() const;
+    operator bool () const;
+    String GetName() const;
+    bool HasChild(const String name) const;
+    XMLElement GetChild(const String name = String::EMPTY) const;
+    XMLElement GetNext(const String name = String::EMPTY) const;
+    XMLElement GetParent() const;
+    unsigned GetNumAttributes() const;
+    bool HasAttribute(const String name) const;
+    String GetValue() const;
+    String GetAttribute(const String name = String::EMPTY) const;
+    String GetAttributeLower(const String name) const;
+    String GetAttributeUpper(const String name) const;
+    Vector<String> GetAttributeNames() const;
+    bool GetBool(const String name) const;
+    BoundingBox GetBoundingBox() const;
+    Color GetColor(const String name) const;
+    float GetFloat(const String name) const;
+    double GetDouble(const String name) const;
+    unsigned GetUInt(const String name) const;
+    int GetInt(const String name) const;
+    IntRect GetIntRect(const String name) const;
+    IntVector2 GetIntVector2(const String name) const;
+    Rect GetRect(const String name) const;
+    Quaternion GetQuaternion(const String name) const;
+    Variant GetVariant() const;
+    Variant GetVariantValue(VariantType type) const;
+    ResourceRef GetResourceRef() const;
+    ResourceRefList GetResourceRefList() const;
+    // VariantVector GetVariantVector() const;
+    VariantMap GetVariantMap() const;
+    Vector2 GetVector2(const String name) const;
+    Vector3 GetVector3(const String name) const;
+    Vector4 GetVector4(const String name) const;
+    Vector4 GetVector(const String name) const;
+    // Variant GetVectorVariant(const String name) const;
+    Matrix3 GetMatrix3(const String name) const;
+    Matrix3x4 GetMatrix3x4(const String name) const;
+    Matrix4 GetMatrix4(const String name) const;
+    XMLFile* GetFile() const;
+
+    static const XMLElement EMPTY;
+
+    tolua_readonly tolua_property__is_set bool null;
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set XMLElement parent;
+    tolua_readonly tolua_property__get_set String value;
+    tolua_readonly tolua_property__get_set unsigned numAttributes;
+    tolua_readonly tolua_property__get_set XMLFile* file;
+};

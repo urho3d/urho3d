@@ -15,8 +15,6 @@
 /** @file NetworkWorkerThread.cpp
 	@brief */
 
-// Modified by Lasse Oorni for Urho3D
-
 #include <utility>
 
 #ifdef KNET_USE_BOOST
@@ -48,7 +46,7 @@ void NetworkWorkerThread::AddConnection(MessageConnection *connection)
 	workThread.Hold();
 	Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
 	lock->push_back(connection);
-	LOG(LogVerbose, "Added connection %p to NetworkWorkerThread.", connection);
+	KNET_LOG(LogVerbose, "Added connection %p to NetworkWorkerThread.", connection);
 	workThread.Resume();
 }
 
@@ -62,11 +60,11 @@ void NetworkWorkerThread::RemoveConnection(MessageConnection *connection)
 		if ((*lock)[i] == connection)
 		{
 			lock->erase(lock->begin() + i);
-			LOG(LogVerbose, "NetworkWorkerThread::RemoveConnection: Connection %p removed.", connection);
+			KNET_LOG(LogVerbose, "NetworkWorkerThread::RemoveConnection: Connection %p removed.", connection);
 			workThread.Resume();
 			return;
 		}
-	LOG(LogError, "NetworkWorkerThread::RemoveConnection called for a nonexisting connection %p!", connection);
+	KNET_LOG(LogError, "NetworkWorkerThread::RemoveConnection called for a nonexisting connection %p!", connection);
 	workThread.Resume();
 }
 
@@ -75,7 +73,7 @@ void NetworkWorkerThread::AddServer(NetworkServer *server)
 	workThread.Hold();
 	Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
 	lock->push_back(server);
-	LOG(LogVerbose, "Added server %p to NetworkWorkerThread.", server);
+	KNET_LOG(LogVerbose, "Added server %p to NetworkWorkerThread.", server);
 	workThread.Resume();
 }
 
@@ -85,19 +83,18 @@ void NetworkWorkerThread::RemoveServer(NetworkServer *server)
 
 	PolledTimer timer;
 	Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
-	float lockWait = timer.MSecsElapsed();
-	LOG(LogWaits, "NetworkWorkerThread::RemoveServer: Waited %f msecs to lock servers list.",
-		lockWait);
+	KNET_LOG(LogWaits, "NetworkWorkerThread::RemoveServer: Waited %f msecs to lock servers list.",
+		timer.MSecsElapsed());
 
 	for(size_t i = 0; i < lock->size(); ++i)
 		if ((*lock)[i] == server)
 		{
 			lock->erase(lock->begin() + i);
-			LOG(LogVerbose, "NetworkWorkerThread::RemoveServer: Server %p removed.", server);
+			KNET_LOG(LogVerbose, "NetworkWorkerThread::RemoveServer: Server %p removed.", server);
 			workThread.Resume();
 			return;
 		}
-	LOG(LogError, "NetworkWorkerThread::RemoveServer called for a nonexisting server %p!", server);
+	KNET_LOG(LogError, "NetworkWorkerThread::RemoveServer called for a nonexisting server %p!", server);
 	workThread.Resume();
 }
 
@@ -114,7 +111,7 @@ void NetworkWorkerThread::StopThread()
 		Lockable<std::vector<NetworkServer *> >::LockType lock = servers.Acquire();
 		for(size_t i = 0; i < lock->size(); ++i)
 		{
-			LOG(LogError, "NetworkWorkerThread::StopThread: Warning: NetworkServer %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
+			KNET_LOG(LogError, "NetworkWorkerThread::StopThread: Warning: NetworkServer %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
 			(*lock)[i]->SetWorkerThread(0);
 		}
 	}
@@ -122,7 +119,7 @@ void NetworkWorkerThread::StopThread()
 		Lockable<std::vector<MessageConnection *> >::LockType lock = connections.Acquire();
 		for(size_t i = 0; i < lock->size(); ++i)
 		{
-			LOG(LogError, "NetworkWorkerThread::StopThread: Warning: MessageConnection %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
+			KNET_LOG(LogError, "NetworkWorkerThread::StopThread: Warning: MessageConnection %p was not detached from workerThread %p prior to stopping the thread!.", (*lock)[i], this);
 			(*lock)[i]->SetWorkerThread(0);
 		}
 	}
@@ -149,7 +146,7 @@ void NetworkWorkerThread::MainLoop()
 	assert(!falseEvent.IsNull());
 	assert(falseEvent.Test() == false);
 
-	LOG(LogInfo, "NetworkWorkerThread starting main loop.");
+	KNET_LOG(LogInfo, "NetworkWorkerThread starting main loop.");
 
 	std::vector<MessageConnection*> connectionList;
 	std::vector<NetworkServer*> serverList;
@@ -173,8 +170,7 @@ void NetworkWorkerThread::MainLoop()
 		// which does not support aborting from the wait if the thread is signalled to interrupt and quit/join. To fix
 		// this, should add a custom "interrupt Event" into the WaitArray to wake the thread up when it is supposed to be killed.
 		// For now, just sleep only small periods of time at once to make this issue not a problem at application exit time.
-        // Urho3D: changed smaller for potentially less network latency
-		const int maxWaitTime = 10; // msecs. ///\todo Make this a lot larger, like, 2000msecs, once the thread interrupts are handled in Sleep and EventArray::Wait.
+		const int maxWaitTime = 50; // msecs. ///\todo Make this a lot larger, like, 2000msecs, once the thread interrupts are handled in Sleep and EventArray::Wait.
 		int waitTime = maxWaitTime;
 
 		waitEvents.Clear();
@@ -192,7 +188,7 @@ void NetworkWorkerThread::MainLoop()
 				connection.UpdateConnection();
 			} catch(const NetException &e)
 			{
-				LOG(LogError, (std::string("kNet::NetException thrown when processing UpdateConnection() for client connection: ") + e.what()).c_str());
+				KNET_LOG(LogError, (std::string("kNet::NetException thrown when processing UpdateConnection() for client connection: ") + e.what()).c_str());
 				if (connection.GetSocket())
 					connection.GetSocket()->Close();
 			}
@@ -301,7 +297,7 @@ void NetworkWorkerThread::MainLoop()
 						connection->SendOutPackets();
 				} catch(const NetException &e)
 				{
-					LOG(LogError, (std::string("kNet::NetException thrown when processing client connection: ") + e.what()).c_str());
+					KNET_LOG(LogError, (std::string("kNet::NetException thrown when processing client connection: ") + e.what()).c_str());
 					if (connection->GetSocket())
 						connection->GetSocket()->Close();
 				}
@@ -309,7 +305,7 @@ void NetworkWorkerThread::MainLoop()
 			else // A UDP server received a message.
 			{
 				int socketIndex = index - connectionList.size() * 2;
-				if (serverList.size() > 0)
+				if (!serverList.empty())
 				{
 					NetworkServer &server = *serverList[0]; ///\bug In case of multiple servers, this is not correct!
 					std::vector<Socket *> &listenSockets = server.ListenSockets();
@@ -320,19 +316,19 @@ void NetworkWorkerThread::MainLoop()
 							server.ReadUDPSocketData(listenSockets[socketIndex]);
 						} catch(const NetException &e)
 						{
-							LOG(LogError, (std::string("kNet::NetException thrown when reading server socket: ") + e.what()).c_str());
+							KNET_LOG(LogError, (std::string("kNet::NetException thrown when reading server socket: ") + e.what()).c_str());
 							///\todo Could Close(0) the connection here.
 						}
 					}
 					else
 					{
-						LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: Cannot find server socket to read from: EventArray::Wait returned index %d (socketIndex %d), but "
+						KNET_LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: Cannot find server socket to read from: EventArray::Wait returned index %d (socketIndex %d), but "
 							"serverList.size()=%d, connectionList.size()=%d!", index, socketIndex, (int)serverList.size(), (int)connectionList.size());
 					}
 				}
 				else
 				{
-					LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: EventArray::Wait returned index %d (socketIndex %d), but "
+					KNET_LOG(LogError, "NetworkWorkerThread::MainLoop: Warning: EventArray::Wait returned index %d (socketIndex %d), but "
 						"serverList.size()=%d, connectionList.size()=%d!", index, socketIndex, (int)serverList.size(), (int)connectionList.size());
 				}
 			}
@@ -348,12 +344,12 @@ void NetworkWorkerThread::MainLoop()
 				writeWaitConnections[i]->SendOutPackets();
 			} catch(const NetException &e)
 			{
-				LOG(LogError, (std::string("kNet::NetException thrown when sending out a network message: ") + e.what()).c_str());
+				KNET_LOG(LogError, (std::string("kNet::NetException thrown when sending out a network message: ") + e.what()).c_str());
 			}
 		}
 	}
 	falseEvent.Close();
-	LOG(LogInfo, "NetworkWorkerThread quit.");
+	KNET_LOG(LogInfo, "NetworkWorkerThread quit.");
 }
 
 } // ~kNet

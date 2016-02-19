@@ -9,7 +9,7 @@
 -- the author has no obligation to provide maintenance, support, updates,
 -- enhancements, or modifications.
 
-
+-- Modified by Yao Wei Tjong for Urho3D
 
 -- Package class
 -- Represents the whole package being bound.
@@ -108,7 +108,7 @@ end
 function classPackage:preamble ()
  output('/*\n')
  output('** Lua binding: '..self.name..'\n')
- output('** Generated automatically by '..TOLUA_VERSION..' on '..date()..'.\n')
+ -- output('** Generated automatically by '..TOLUA_VERSION..' on '..date()..'.\n')  -- Urho3D: generation timestamp is already tracked by git
  output('*/\n\n')
 
 	output('#ifndef __cplusplus\n')
@@ -198,7 +198,7 @@ end
 -- write header file
 function classPackage:header ()
  output('/*\n') output('** Lua binding: '..self.name..'\n')
- output('** Generated automatically by '..TOLUA_VERSION..' on '..date()..'.\n')
+ -- output('** Generated automatically by '..TOLUA_VERSION..' on '..date()..'.\n')  -- Urho3D: generation timestamp is already tracked by git
  output('*/\n\n')
 
  if not flags.h then
@@ -322,7 +322,7 @@ function prep(file)
       table.insert(chunk, string.sub(line, 3) .. "\n")
      else
       local last = 1
-      for text, expr, index in string.gfind(line, "(.-)$(%b())()") do 
+      for text, expr, index in string.gfind(line, "(.-)$(%b())()") do
         last = index
         if text ~= "" then
           table.insert(chunk, string.format('table.insert(__ret, %q )', text))

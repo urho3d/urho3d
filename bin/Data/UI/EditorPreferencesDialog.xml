@@ -1,0 +1,405 @@
+<element type="Window">
+    <attribute name="Name" value="EditorPrefsDialog" />
+    <attribute name="Min Size" value="440 0" />
+    <attribute name="Max Size" value="440 2147483647" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="0 6 0 6" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Editor preferences" />
+            <attribute name="Auto Localizable" value="true" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element type="ListView" style="PanelView">
+        <attribute name="Min Size" value="0 60" />
+        <element type="BorderImage" internal="true">
+            <element internal="true">
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Language" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="LanguageSelector" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <element type="Text">
+                        <attribute name="Text" value="User interface" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Minimum opacity" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="UIMinOpacity" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Maximum opacity" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="UIMaxOpacity" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <element type="Text">
+                        <attribute name="Text" value="Hierarchy" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ShowInternalUIElement" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Show internal UI-elements" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ShowTemporaryObject" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Show temporary objects" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Text label color" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="40 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Node item" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NodeItemTextColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NodeItemTextColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NodeItemTextColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="40 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Component item" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ComponentItemTextColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ComponentItemTextColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ComponentItemTextColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <element type="Text">
+                        <attribute name="Text" value="Attribute inspector" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ShowNonEditableAttribute" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Show non-editable attributes" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Text label color" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="40 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Original attribute" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="OriginalAttributeTextColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="OriginalAttributeTextColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="OriginalAttributeTextColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="40 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Modified attribute" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ModifiedAttributeTextColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ModifiedAttributeTextColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ModifiedAttributeTextColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="40 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Non-editable attribute" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NonEditableAttributeTextColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NonEditableAttributeTextColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NonEditableAttributeTextColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <element type="Text">
+                        <attribute name="Text" value="View" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Ambient color" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneAmbientColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneAmbientColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneAmbientColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Fog color" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneFogColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneFogColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneFogColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Fog start" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneFogStart" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Fog end" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultZoneFogEnd" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ShowGrid" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Show grid" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="Grid2DMode" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="2D grid mode" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Grid size" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridSize" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Grid subdivisions" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridSubdivisions" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Grid scale" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridScale" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Grid color" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Border" value="20 0 0 0" />
+                    <element type="Text">
+                        <attribute name="Text" value="Grid subdivision color" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridSubdivisionColor.r" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridSubdivisionColor.g" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="GridSubdivisionColor.b" />
+                        <attribute name="Min Size" value="50 0" />
+                        <attribute name="Max Size" value="50 2147483647" />
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+</element>

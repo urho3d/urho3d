@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2014 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,4 +30,4 @@ define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
 setup_main_executable ()
 
 # Setup test cases
-add_test (NAME ${TARGET_NAME} COMMAND ${TARGET_NAME} -timeout ${URHO3D_TEST_TIME_OUT})
+setup_test ()

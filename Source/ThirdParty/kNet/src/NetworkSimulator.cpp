@@ -12,8 +12,10 @@
    See the License for the specific language governing permissions and
    limitations under the License. */
 
+// Modified by Lasse Oorni for Urho3D
+
+// Urho3D: MessageConnection.h already includes NetworkSimulator.h, make sure WS2Include.h is included before windows.h / winsock.h
 #include "kNet/MessageConnection.h"
-#include "kNet/NetworkSimulator.h"
 
 namespace kNet
 {
@@ -23,19 +25,20 @@ NetworkSimulator::NetworkSimulator()
 packetLossRate(0),
 constantPacketSendDelay(0),
 uniformRandomPacketSendDelay(0),
-owner(0),
+packetDuplicationRate(0.f),
+corruptionType(CorruptDatagram),
 corruptMessageId(0),
 corruptToggleBitsRate(0),
-corruptionType(CorruptDatagram),
 corruptMinBits(0),
-corruptMaxBits(0)
+corruptMaxBits(0),
+owner(0)
 {
 }
 
 NetworkSimulator::~NetworkSimulator()
 {
 	if (queuedBuffers.size() > 0)
-		LOG(LogError, "NetworkSimulator: Leaked %d buffers with improper NetworkSimulator teardown!", (int)queuedBuffers.size());
+		KNET_LOG(LogError, "NetworkSimulator: Leaked %d buffers with improper NetworkSimulator teardown!", (int)queuedBuffers.size());
 }
 
 /// Generates a float in half-open interval [0, 1[.

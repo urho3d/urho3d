@@ -1,0 +1,35 @@
+$#include "Scene/ObjectAnimation.h"
+
+enum WrapMode
+{
+    WM_LOOP = 0,
+    WM_ONCE,
+    WM_CLAMP,
+};
+
+class ObjectAnimation : Resource
+{
+    ObjectAnimation();
+    virtual ~ObjectAnimation();
+    
+    void AddAttributeAnimation(const String name, ValueAnimation* attributeAnimation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
+    void RemoveAttributeAnimation(const String name);
+    void RemoveAttributeAnimation(ValueAnimation* attributeAnimation);
+    ValueAnimation* GetAttributeAnimation(const String name) const;
+    WrapMode GetAttributeAnimationWrapMode(const String name) const;
+    float GetAttributeAnimationSpeed(const String name) const;
+};
+
+${
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_ObjectAnimation_new00
+static int tolua_SceneLuaAPI_ObjectAnimation_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ObjectAnimation>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_SceneLuaAPI_ObjectAnimation_new00_local
+static int tolua_SceneLuaAPI_ObjectAnimation_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ObjectAnimation>(tolua_S);
+}
+$}

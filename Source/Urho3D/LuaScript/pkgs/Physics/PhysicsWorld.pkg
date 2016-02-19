@@ -1,0 +1,142 @@
+$#include "Physics/PhysicsWorld.h"
+
+struct PhysicsRaycastResult
+{
+    PhysicsRaycastResult();
+    ~PhysicsRaycastResult();
+    
+    Vector3 position_ @ position;
+    Vector3 normal_ @ normal;
+    float distance_ @ distance;
+    float hitFraction_ @ hitFraction;
+    RigidBody* body_ @ body;
+};
+
+class PhysicsWorld : public Component
+{
+    void Update(float timeStep);
+    void UpdateCollisions();
+    void SetFps(int fps);
+    void SetGravity(const Vector3& gravity);
+    void SetMaxSubSteps(int num);
+    void SetNumIterations(int num);
+    void SetUpdateEnabled(bool enable);
+    void SetInterpolation(bool enable);
+    void SetInternalEdge(bool enable);
+    void SetSplitImpulse(bool enable);
+    void SetMaxNetworkAngularVelocity(float velocity);
+
+    // void Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast @ Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented @ RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside PhysicsRaycastResult PhysicsWorldConvexCast @ ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+
+    // void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere @ GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox @ GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody @ GetRigidBodies(const RigidBody* body);
+    // void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetCollidingBodies @ GetCollidingBodies(const RigidBody* body);
+
+    void DrawDebugGeometry(bool depthTest);
+    void RemoveCachedGeometry(Model* model);
+
+    Vector3 GetGravity() const;
+    int GetMaxSubSteps() const;
+    int GetNumIterations() const;
+    bool IsUpdateEnabled() const;
+    bool GetInterpolation() const;
+    bool GetInternalEdge() const;
+    bool GetSplitImpulse() const;
+    int GetFps() const;
+    float GetMaxNetworkAngularVelocity() const;
+
+    tolua_property__get_set Vector3 gravity;
+    tolua_property__get_set int maxSubSteps;
+    tolua_property__get_set int numIterations;
+    tolua_property__is_set bool updateEnabled;
+    tolua_property__get_set bool interpolation;
+    tolua_property__get_set bool internalEdge;
+    tolua_property__get_set bool splitImpulse;
+    tolua_property__get_set int fps;
+    tolua_property__get_set float maxNetworkAngularVelocity;
+};
+
+${
+static const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    static PODVector<PhysicsRaycastResult> result;
+    result.Clear();
+    physicsWorld->Raycast(result, ray, maxDistance, collisionMask);
+    return result;
+}
+
+static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PhysicsRaycastResult result;
+    physicsWorld->RaycastSingle(result, ray, maxDistance, collisionMask);
+    return result;
+}
+
+static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PhysicsRaycastResult result;
+    physicsWorld->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask);
+    return result;
+}
+
+PhysicsRaycastResult PhysicsWorldSphereCast(PhysicsWorld* physicsWorld, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PhysicsRaycastResult result;
+    physicsWorld->SphereCast(result, ray, radius, maxDistance, collisionMask);
+    return result;
+}
+
+PhysicsRaycastResult PhysicsWorldConvexCast(PhysicsWorld* physicsWorld, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    PhysicsRaycastResult result;
+    physicsWorld->ConvexCast(result, shape, startPos, startRot, endPos, endRot, collisionMask);
+    return result;
+}
+
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere(PhysicsWorld* physicsWorld, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetRigidBodies(result, sphere, collisionMask);
+    return result;
+}
+
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox(PhysicsWorld* physicsWorld, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetRigidBodies(result, box, collisionMask);
+    return result;
+}
+
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody(PhysicsWorld* physicsWorld, const RigidBody* body)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetRigidBodies(result, body);
+    return result;
+}
+
+static const PODVector<RigidBody*>& PhysicsWorldGetCollidingBodies(PhysicsWorld* physicsWorld, const RigidBody* body)
+{
+    static PODVector<RigidBody*> result;
+    result.Clear();
+    physicsWorld->GetCollidingBodies(result, body);
+    return result;
+}
+
+$}

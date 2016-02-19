@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -44,6 +44,14 @@
 #include "as_context.h"
 
 BEGIN_AS_NAMESPACE
+
+// ref: Member Function Pointers and the Fastest Possible C++ Delegates
+//      describes the structure of class method pointers for most compilers
+//      http://www.codeproject.com/Articles/7150/Member-Function-Pointers-and-the-Fastest-Possible
+
+// ref: The code comments for ItaniumCXXABI::EmitLoadOfMemberFunctionPointer in the LLVM compiler
+//      describes the structure for class method pointers on Itanium and arm64 ABI
+//      http://clang.llvm.org/doxygen/CodeGen_2ItaniumCXXABI_8cpp_source.html#l00937
 
 int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *objForThiscall, asSSystemFunctionInterface *internal)
 {
@@ -104,8 +112,7 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 			{
 #ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 				return asNOT_SUPPORTED;
-#endif
-
+#else
 				if( objForThiscall == 0 )
 					return asINVALID_ARG;
 
@@ -114,6 +121,7 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 					thisCallConv = ICC_THISCALL_OBJFIRST;
 				else //if( base == asCALL_THISCALL_OBJLAST )
 					thisCallConv = ICC_THISCALL_OBJLAST;
+#endif
 			}
 
 			internal->callConv = thisCallConv;
@@ -122,10 +130,11 @@ int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, 
 				internal->callConv = (internalCallConv)(thisCallConv + 2);
 #endif
 			internal->baseOffset = ( int )MULTI_BASE_OFFSET(ptr);
-#if defined(AS_ARM) && defined(__GNUC__)
+#if (defined(AS_ARM) || defined(AS_MIPS)) && (defined(__GNUC__) || defined(AS_PSVITA))
 			// As the least significant bit in func is used to switch to THUMB mode
 			// on ARM processors, the LSB in the __delta variable is used instead of
 			// the one in __pfn on ARM processors.
+			// MIPS also appear to use the base offset to indicate virtual method.
 			if( (size_t(internal->baseOffset) & 1) )
 				internal->callConv = (internalCallConv)(thisCallConv + 2);
 #endif
@@ -158,6 +167,49 @@ int PrepareSystemFunctionGeneric(asCScriptFunction *func, asSSystemFunctionInter
 
 	// Calculate the size needed for the parameters
 	internal->paramSize = func->GetSpaceNeededForArguments();
+
+	// Prepare the clean up instructions for the function arguments
+	internal->cleanArgs.SetLength(0);
+	int offset = 0;
+	for( asUINT n = 0; n < func->parameterTypes.GetLength(); n++ )
+	{
+		asCDataType &dt = func->parameterTypes[n];
+
+		if( dt.IsObject() && !dt.IsReference() )
+		{
+			asSTypeBehaviour *beh = &dt.GetObjectType()->beh;
+			if( dt.GetObjectType()->flags & asOBJ_REF )
+			{
+				asASSERT( (dt.GetObjectType()->flags & asOBJ_NOCOUNT) || beh->release );
+				if( beh->release )
+				{
+					asSSystemFunctionInterface::SClean clean;
+					clean.op  = 0; // call release
+					clean.ot  = dt.GetObjectType();
+					clean.off = short(offset);
+					internal->cleanArgs.PushLast(clean);
+				}
+			}
+			else
+			{
+				asSSystemFunctionInterface::SClean clean;
+				clean.op  = 1; // call free
+				clean.ot  = dt.GetObjectType();
+				clean.off = short(offset);
+
+				// Call the destructor then free the memory
+				if( beh->destruct )
+					clean.op = 2; // call destruct, then free
+
+				internal->cleanArgs.PushLast(clean);
+			}
+		}
+
+		if( dt.IsObject() && !dt.IsObjectHandle() && !dt.IsReference() )
+			offset += AS_PTR_SIZE;
+		else
+			offset += dt.GetSizeOnStackDWords();
+	}
 
 	return 0;
 }
@@ -282,7 +334,7 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 				engine->WriteMessage("", 0, 0, asMSGTYPE_INFORMATION, func->GetDeclarationStr().AddressOf());
 
 				asCString str;
-				str.Format(TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL, func->returnType.Format().AddressOf());
+				str.Format(TXT_DONT_SUPPORT_RET_TYPE_s_BY_VAL, func->returnType.Format(func->nameSpace).AddressOf());
 				engine->WriteMessage("", 0, 0, asMSGTYPE_ERROR, str.AddressOf());
 				engine->ConfigError(asINVALID_CONFIGURATION, 0, 0, 0);
 			}
@@ -390,15 +442,55 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 		}
 	}
 
-	// Verify if the function has any registered autohandles
-	internal->hasAutoHandles = false;
-	for( n = 0; n < internal->paramAutoHandles.GetLength(); n++ )
+	// Prepare the clean up instructions for the function arguments
+	internal->cleanArgs.SetLength(0);
+	int offset = 0;
+	for( n = 0; n < func->parameterTypes.GetLength(); n++ )
 	{
-		if( internal->paramAutoHandles[n] )
+		asCDataType &dt = func->parameterTypes[n];
+
+#if defined(COMPLEX_OBJS_PASSED_BY_REF) || defined(AS_LARGE_OBJS_PASSED_BY_REF)
+		bool needFree = false;
+#ifdef COMPLEX_OBJS_PASSED_BY_REF
+		if( dt.GetObjectType() && dt.GetObjectType()->flags & COMPLEX_MASK ) needFree = true;
+#endif
+#ifdef AS_LARGE_OBJS_PASSED_BY_REF
+		if( dt.GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ) needFree = true;
+#endif
+		if( needFree &&
+			dt.IsObject() &&
+			!dt.IsObjectHandle() && 
+			!dt.IsReference() )
 		{
-			internal->hasAutoHandles = true;
-			break;
+			asSSystemFunctionInterface::SClean clean;
+			clean.op  = 1; // call free
+			clean.ot  = dt.GetObjectType();
+			clean.off = short(offset);
+
+#ifndef AS_CALLEE_DESTROY_OBJ_BY_VAL
+			// If the called function doesn't destroy objects passed by value we must do so here
+			asSTypeBehaviour *beh = &dt.GetObjectType()->beh;
+			if( beh->destruct )
+				clean.op = 2; // call destruct, then free
+#endif
+
+			internal->cleanArgs.PushLast(clean);
 		}
+#endif
+
+		if( n < internal->paramAutoHandles.GetLength() && internal->paramAutoHandles[n] )
+		{
+			asSSystemFunctionInterface::SClean clean;
+			clean.op  = 0; // call release
+			clean.ot  = dt.GetObjectType();
+			clean.off = short(offset);
+			internal->cleanArgs.PushLast(clean);
+		}
+
+		if( dt.IsObject() && !dt.IsObjectHandle() && !dt.IsReference() )
+			offset += AS_PTR_SIZE;
+		else
+			offset += dt.GetSizeOnStackDWords();
 	}
 #endif // !defined(AS_MAX_PORTABILITY)
 	return 0;
@@ -406,13 +498,14 @@ int PrepareSystemFunction(asCScriptFunction *func, asSSystemFunctionInterface *i
 
 #ifdef AS_MAX_PORTABILITY
 
-int CallSystemFunction(int id, asCContext *context, void *objectPointer)
+int CallSystemFunction(int id, asCContext *context)
 {
 	asCScriptEngine *engine = context->m_engine;
-	asSSystemFunctionInterface *sysFunc = engine->scriptFunctions[id]->sysFuncIntf;
+	asCScriptFunction *func = engine->scriptFunctions[id];
+	asSSystemFunctionInterface *sysFunc = func->sysFuncIntf;
 	int callConv = sysFunc->callConv;
 	if( callConv == ICC_GENERIC_FUNC || callConv == ICC_GENERIC_METHOD )
-		return context->CallGeneric(id, objectPointer);
+		return context->CallGeneric(func);
 
 	context->SetInternalException(TXT_INVALID_CALLING_CONVENTION);
 
@@ -436,17 +529,15 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 // args       - This is the function arguments, which are packed as in AngelScript
 // retPointer - This points to a the memory buffer where the return object is to be placed, if the function returns the value in memory rather than in registers
 // retQW2     - This output parameter should be used if the function returns a value larger than 64bits in registers
+// secondObj  - This is the object pointer that the proxy method should invoke its method on when the call convention is THISCALL_OBJFIRST/LAST
 //
 // Return value:
 //
 // The function should return the value that is returned in registers. 
-//
-// When thiscall functors are enabled (!AS_NO_THISCALL_FUNCTOR_METHOD) the 
-// obj argument is a an array of 2 void* holding the two possible this pointers
-asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2);
+asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, void *obj, asDWORD *args, void *retPointer, asQWORD &retQW2, void *secondObj);
 
 
-int CallSystemFunction(int id, asCContext *context, void *objectPointer)
+int CallSystemFunction(int id, asCContext *context)
 {
 	asCScriptEngine            *engine  = context->m_engine;
 	asCScriptFunction          *descr   = engine->scriptFunctions[id];
@@ -454,7 +545,7 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 
 	int callConv = sysFunc->callConv;
 	if( callConv == ICC_GENERIC_FUNC || callConv == ICC_GENERIC_METHOD )
-		return context->CallGeneric(id, objectPointer);
+		return context->CallGeneric(descr);
 
 	asQWORD  retQW             = 0;
 	asQWORD  retQW2            = 0;
@@ -464,6 +555,7 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 
 #ifdef AS_NO_THISCALL_FUNCTOR_METHOD
 	void    *obj               = 0;
+	void    *secondObj         = 0;
 
 	if( callConv >= ICC_THISCALL )
 	{
@@ -471,11 +563,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 		{
 			// This class method is being called as if it is a global function
 			obj = sysFunc->objForThiscall;
-			asASSERT( objectPointer == 0 );
-		}
-		else if( objectPointer )
-		{
-			obj = objectPointer;
 		}
 		else
 		{
@@ -491,10 +578,11 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 			}
 
 			// Add the base offset for multiple inheritance
-#if defined(__GNUC__) && defined(AS_ARM)
+#if (defined(__GNUC__) && (defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
 			// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
 			// and the whole offset is thus shifted one bit left to keep the original
 			// offset resolution
+			// MIPS also work like ARM in this regard
 			obj = (void*)(asPWORD(obj) + (sysFunc->baseOffset>>1));
 #else
 			obj = (void*)(asPWORD(obj) + sysFunc->baseOffset);
@@ -510,7 +598,8 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	//                 objForArg is the object pointer that should be passed as argument when using OBJFIRST or OBJLAST
 
 	// Used to save two object pointers with THISCALL_OBJLAST or THISCALL_OBJFIRST
-	void* objectsPtrs[2] = { 0, 0 };
+	void *obj               = 0;
+	void *secondObj         = 0;
 
 	if( callConv >= ICC_THISCALL )
 	{
@@ -521,55 +610,54 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 		{
 			asASSERT( sysFunc->objForThiscall != 0 );
 			// This class method is being called as object method (sysFunc->objForThiscall must be set).
-			objectsPtrs[0] = sysFunc->objForThiscall;
+			obj = sysFunc->objForThiscall;
 			continueCheckIndex = 1;
 		}
 		else if( sysFunc->objForThiscall )
 		{
 			// This class method is being called as if it is a global function
-			objectsPtrs[0] = sysFunc->objForThiscall;
+			obj = sysFunc->objForThiscall;
 			continueCheck = false;
-			asASSERT( objectPointer == 0 );
 		}
 
 		if( continueCheck )
 		{
 			void *tempPtr = 0;
-			if( objectPointer )
+
+			// The object pointer should be popped from the context stack
+			popSize += AS_PTR_SIZE;
+
+			// Check for null pointer
+			tempPtr = (void*)*(asPWORD*)(args);
+			if( tempPtr == 0 )
 			{
-				tempPtr = objectPointer;
+				context->SetInternalException(TXT_NULL_POINTER_ACCESS);
+				return 0;
 			}
-			else
-			{
-				// The object pointer should be popped from the context stack
-				popSize += AS_PTR_SIZE;
 
-				// Check for null pointer
-				tempPtr = (void*)*(asPWORD*)(args);
-				if( tempPtr == 0 )
-				{
-					context->SetInternalException(TXT_NULL_POINTER_ACCESS);
-					return 0;
-				}
-
-				// Add the base offset for multiple inheritance
-#if defined(__GNUC__) && defined(AS_ARM)
-				// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
-				// and the whole offset is thus shifted one bit left to keep the original
-				// offset resolution
-				tempPtr = (void*)(asPWORD(tempPtr) + (sysFunc->baseOffset>>1));
+			// Add the base offset for multiple inheritance
+#if (defined(__GNUC__) && (defined(AS_ARM) || defined(AS_MIPS))) || defined(AS_PSVITA)
+			// On GNUC + ARM the lsb of the offset is used to indicate a virtual function
+			// and the whole offset is thus shifted one bit left to keep the original
+			// offset resolution
+			// MIPS also work like ARM in this regard
+			tempPtr = (void*)(asPWORD(tempPtr) + (sysFunc->baseOffset>>1));
 #else
-				tempPtr = (void*)(asPWORD(tempPtr) + sysFunc->baseOffset);
+			tempPtr = (void*)(asPWORD(tempPtr) + sysFunc->baseOffset);
 #endif
 
-				// Skip the object pointer
-				args += AS_PTR_SIZE;
-			}
+			// Skip the object pointer
+			args += AS_PTR_SIZE;
 
-			objectsPtrs[continueCheckIndex] = tempPtr;
+			if( continueCheckIndex )
+				secondObj = tempPtr;
+			else
+			{
+				asASSERT( obj == 0 );
+				obj = tempPtr;
+			}
 		}
 	}
-	void *obj = &objectsPtrs[0]; // Get the pointer to first element
 #endif // AS_NO_THISCALL_FUNCTOR_METHOD
 
 	if( descr->DoesReturnOnStack() )
@@ -592,7 +680,7 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	context->m_callingSystemFunction = descr;
 	bool cppException = false;
 #ifdef AS_NO_EXCEPTIONS
-	retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2);
+	retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2, secondObj);
 #else
 	// This try/catch block is to catch potential exception that may 
 	// be thrown by the registered function. The implementation of the
@@ -601,7 +689,7 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	// executed in case of an exception.
 	try
 	{
-		retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2);
+		retQW = CallSystemFunctionNative(context, descr, obj, args, sysFunc->hostReturnInMemory ? retPointer : 0, retQW2, secondObj);
 	}
 	catch(...)
 	{
@@ -613,51 +701,6 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 	}
 #endif
 	context->m_callingSystemFunction = 0;
-
-#if defined(COMPLEX_OBJS_PASSED_BY_REF) || defined(AS_LARGE_OBJS_PASSED_BY_REF)
-	if( sysFunc->takesObjByVal )
-	{
-		// Need to free the complex objects passed by value, but that the 
-		// calling convention implicitly passes by reference behind the scene as the 
-		// calling function is the owner of that memory.
-
-		// args is pointing to the first real argument as used in CallSystemFunctionNative,
-		// i.e. hidden arguments such as the object pointer and return address have already 
-		// been skipped.
-
-		int spos = 0;
-		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
-		{
-			bool needFree = false;
-			asCDataType &dt = descr->parameterTypes[n];
-#ifdef COMPLEX_OBJS_PASSED_BY_REF
-			if( dt.GetObjectType() && dt.GetObjectType()->flags & COMPLEX_MASK ) needFree = true;
-#endif
-#ifdef AS_LARGE_OBJS_PASSED_BY_REF
-			if( dt.GetSizeInMemoryDWords() >= AS_LARGE_OBJ_MIN_SIZE ) needFree = true;
-#endif
-			if( needFree &&
-				dt.IsObject() &&
-				!dt.IsObjectHandle() && 
-				!dt.IsReference() )
-			{
-				void *obj = (void*)*(asPWORD*)&args[spos];
-				spos += AS_PTR_SIZE;
-
-#ifndef AS_CALLEE_DESTROY_OBJ_BY_VAL
-				// If the called function doesn't destroy objects passed by value we must do so here
-				asSTypeBehaviour *beh = &dt.GetObjectType()->beh;
-				if( beh->destruct )
-					engine->CallObjectMethod(obj, beh->destruct);
-#endif
-
-				engine->CallFree(obj);
-			}
-			else
-				spos += dt.GetSizeOnStackDWords();
-		}
-	}
-#endif
 
 	// Store the returned value in our stack
 	if( descr->returnType.IsObject() && !descr->returnType.IsReference() )
@@ -777,27 +820,44 @@ int CallSystemFunction(int id, asCContext *context, void *objectPointer)
 			context->m_regs.valueRegister = retQW;
 	}
 
-	// Release autohandles in the arguments
-	if( sysFunc->hasAutoHandles )
+	// Clean up arguments
+	const asUINT cleanCount = sysFunc->cleanArgs.GetLength();
+	if( cleanCount )
 	{
 		args = context->m_regs.stackPointer;
-		if( callConv >= ICC_THISCALL && !objectPointer )
+
+		// Skip the hidden argument for the return pointer
+		// TODO: runtime optimize: This check and increment should have been done in PrepareSystemFunction
+		if( descr->DoesReturnOnStack() )
 			args += AS_PTR_SIZE;
 
-		int spos = 0;
-		for( asUINT n = 0; n < descr->parameterTypes.GetLength(); n++ )
-		{
-			if( sysFunc->paramAutoHandles[n] && *(asPWORD*)&args[spos] != 0 )
-			{
-				// Call the release method on the type
-				engine->CallObjectMethod((void*)*(asPWORD*)&args[spos], descr->parameterTypes[n].GetObjectType()->beh.release);
-				*(asPWORD*)&args[spos] = 0;
-			}
+		// Skip the object pointer on the stack
+		// TODO: runtime optimize: This check and increment should have been done in PrepareSystemFunction
+		if( callConv >= ICC_THISCALL && sysFunc->objForThiscall == 0 )
+			args += AS_PTR_SIZE;
 
-			if( descr->parameterTypes[n].IsObject() && !descr->parameterTypes[n].IsObjectHandle() && !descr->parameterTypes[n].IsReference() )
-				spos += AS_PTR_SIZE;
-			else
-				spos += descr->parameterTypes[n].GetSizeOnStackDWords();
+		asSSystemFunctionInterface::SClean *clean = sysFunc->cleanArgs.AddressOf();
+		for( asUINT n = 0; n < cleanCount; n++, clean++ )
+		{
+			void **addr = (void**)&args[clean->off];
+			if( clean->op == 0 )
+			{
+				if( *addr != 0 )
+				{
+					engine->CallObjectMethod(*addr, clean->ot->beh.release);
+					*addr = 0;
+				}
+			}
+			else 
+			{
+				asASSERT( clean->op == 1 || clean->op == 2 );
+				asASSERT( *addr );
+
+				if( clean->op == 2 )
+					engine->CallObjectMethod(*addr, clean->ot->beh.destruct);
+				
+				engine->CallFree(*addr);
+			}
 		}
 	}
 

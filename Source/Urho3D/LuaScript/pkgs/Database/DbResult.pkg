@@ -1,0 +1,14 @@
+$#include "Database/DbResult.h"
+
+class DbResult
+{
+    unsigned GetNumColumns() const;
+    unsigned GetNumRows() const;
+    long GetNumAffectedRows() const;
+//    const Vector<String>& GetColumns() const;
+//    const Vector<VariantVector>& GetRows() const;
+
+    tolua_readonly tolua_property__get_set unsigned numColumns;
+    tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_readonly tolua_property__get_set long numAffectedRows;
+};

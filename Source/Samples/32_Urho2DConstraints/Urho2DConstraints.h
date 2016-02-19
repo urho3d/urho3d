@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ namespace Urho3D
 ///     - Setting the background color for the scene
 class Urho2DConstraints : public Sample
 {
-    OBJECT(Urho2DConstraints);
+    URHO3D_OBJECT(Urho2DConstraints, Sample);
 
 public:
     /// Construct.

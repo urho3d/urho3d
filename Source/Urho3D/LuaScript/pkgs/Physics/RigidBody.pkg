@@ -1,0 +1,110 @@
+$#include "Physics/RigidBody.h"
+
+enum CollisionEventMode
+{
+    COLLISION_NEVER = 0,
+    COLLISION_ACTIVE,
+    COLLISION_ALWAYS
+};
+
+class RigidBody : public Component
+{
+    void SetMass(float mass);
+    void SetPosition(const Vector3& position);
+    void SetRotation(const Quaternion& rotation);
+    void SetTransform(const Vector3& position, const Quaternion& rotation);
+    void SetLinearVelocity(const Vector3& velocity);
+    void SetLinearFactor(const Vector3& factor);
+    void SetLinearRestThreshold(float threshold);
+    void SetLinearDamping(float damping);
+    void SetAngularVelocity(const Vector3& angularVelocity);
+    void SetAngularFactor(const Vector3& factor);
+    void SetAngularRestThreshold(float threshold);
+    void SetAngularDamping(float factor);
+    void SetFriction(float friction);
+    void SetAnisotropicFriction(const Vector3& friction);
+    void SetRollingFriction(float friction);
+    void SetRestitution(float restitution);
+    void SetContactProcessingThreshold(float threshold);
+    void SetCcdRadius(float radius);
+    void SetCcdMotionThreshold(float threshold);
+    void SetUseGravity(bool enable);
+    void SetGravityOverride(const Vector3& gravity);
+    void SetKinematic(bool enable);
+    void SetTrigger(bool enable);
+    void SetCollisionLayer(unsigned layer);
+    void SetCollisionMask(unsigned mask);
+    void SetCollisionLayerAndMask(unsigned layer, unsigned mask);
+    void SetCollisionEventMode(CollisionEventMode mode);
+    void DisableMassUpdate();
+    void EnableMassUpdate();
+
+    void ApplyForce(const Vector3& force);
+    void ApplyForce(const Vector3& force, const Vector3& position);
+    void ApplyTorque(const Vector3& torque);
+    void ApplyImpulse(const Vector3& impulse);
+    void ApplyImpulse(const Vector3& impulse, const Vector3& position);
+    void ApplyTorqueImpulse(const Vector3& torque);
+    void ResetForces();
+    void Activate();
+    void ReAddBodyToWorld();
+    
+    PhysicsWorld* GetPhysicsWorld() const;
+    float GetMass() const;
+    Vector3 GetPosition() const;
+    Quaternion GetRotation() const;
+    Vector3 GetLinearVelocity() const;
+    Vector3 GetLinearFactor() const;
+    Vector3 GetVelocityAtPoint(const Vector3& position) const;
+    float GetLinearRestThreshold() const;
+    float GetLinearDamping() const;
+    Vector3 GetAngularVelocity() const;
+    Vector3 GetAngularFactor() const;
+    float GetAngularRestThreshold() const;
+    float GetAngularDamping() const;
+    float GetFriction() const;
+    Vector3 GetAnisotropicFriction() const;
+    float GetRollingFriction() const;
+    float GetRestitution() const;
+    float GetContactProcessingThreshold() const;
+    float GetCcdRadius() const;
+    float GetCcdMotionThreshold() const;
+    bool GetUseGravity() const;
+    const Vector3& GetGravityOverride() const;
+    const Vector3& GetCenterOfMass() const;
+    bool IsKinematic() const;
+    bool IsTrigger() const;
+    bool IsActive() const;
+    unsigned GetCollisionLayer() const;
+    unsigned GetCollisionMask() const;
+    CollisionEventMode GetCollisionEventMode() const;
+
+    tolua_readonly tolua_property__get_set PhysicsWorld* physicsWorld;
+    tolua_property__get_set float mass;
+    tolua_property__get_set Vector3 position;
+    tolua_property__get_set Quaternion rotation;
+    tolua_property__get_set Vector3 linearVelocity;
+    tolua_property__get_set Vector3 linearFactor;
+    tolua_property__get_set float linearRestThreshold;
+    tolua_property__get_set float linearDamping;
+    tolua_property__get_set Vector3 angularVelocity;
+    tolua_property__get_set Vector3 angularFactor;
+    tolua_property__get_set float angularRestThreshold;
+    tolua_property__get_set float angularDamping;
+    tolua_property__get_set float friction;
+    tolua_property__get_set Vector3 anisotropicFriction;
+    tolua_property__get_set float rollingFriction;
+    tolua_property__get_set float restitution;
+    tolua_property__get_set float contactProcessingThreshold;
+    tolua_property__get_set float ccdRadius;
+    tolua_property__get_set float ccdMotionThreshold;
+    tolua_property__get_set bool useGravity;
+    tolua_property__get_set Vector3& gravityOverride;
+    tolua_readonly tolua_property__get_set Vector3& centerOfMass;
+    tolua_property__is_set bool kinematic;
+    tolua_property__is_set bool trigger;
+    tolua_readonly tolua_property__is_set bool active;
+    tolua_property__get_set unsigned collisionLayer;
+    tolua_property__get_set unsigned collisionMask;
+    tolua_property__get_set CollisionEventMode collisionEventMode;
+};

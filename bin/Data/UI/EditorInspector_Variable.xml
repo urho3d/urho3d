@@ -1,0 +1,63 @@
+<element>
+    <attribute name="Name" value="VariableContainer" />
+    <attribute name="Max Size" value="2147483647 17" />
+    <attribute name="Layout Mode" value="Horizontal" />
+    <attribute name="Layout Spacing" value="4" />
+    <element type="LineEdit">
+        <attribute name="Name" value="VarNameEdit" />
+    </element>
+    <element type="DropDownList">
+        <attribute name="Name" value="NewVarDropDown" />
+        <attribute name="Min Size" value="50 17" />
+        <attribute name="Max Size" value="50 17" />
+        <attribute name="Resize Popup" value="false" />
+        <element internal="true">
+            <attribute name="Is Visible" value="false" />
+        </element>
+        <element type="Text">
+            <attribute name="Text" value="New" />
+            <attribute name="Auto Localizable" value="true" />
+            <attribute name="Text Alignment" value="Center" />
+        </element>
+        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+        <element type="Window" internal="true" popup="true" style="none">
+            <element type="ListView" internal="true" style="none">
+                <element type="BorderImage" internal="true" style="none">
+                    <element internal="true" style="none">
+                        <attribute name="Layout Border" value="0 0 4 0" />
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="Int" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="Bool" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="Float" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="String" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="Vector3" />
+                        </element>
+                        <element type="Text" style="EditorEnumAttributeText">
+                            <attribute name="Text" value="Color" />
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+    <element type="Button">
+        <attribute name="Name" value="DeleteVarButton" />
+        <attribute name="Min Size" value="50 17" />
+        <attribute name="Max Size" value="50 17" />
+        <attribute name="Layout Mode" value="Vertical" />
+        <attribute name="Layout Border" value="1 1 1 1" />
+        <element type="Text">
+            <attribute name="Text" value="Del" />
+            <attribute name="Auto Localizable" value="true" />
+            <attribute name="Text Alignment" value="Center" />
+        </element>
+    </element>
+</element>

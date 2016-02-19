@@ -1,0 +1,31 @@
+$#include "Graphics/Skeleton.h"
+
+struct Bone
+{
+    Bone();
+    ~Bone();
+    
+    String name_ @ name;
+    StringHash nameHash_ @ nameHash;
+    unsigned parentIndex_ @ parentIndex;
+    Vector3 initialPosition_ @ initialPosition;
+    Quaternion initialRotation_ @ initialRotation;
+    Vector3 initialScale_ @ initialScale;
+    Matrix3x4 offsetMatrix_ @ offsetMatrix;
+    bool animated_ @ animated;
+    unsigned char collisionMask_ @ collisionMask;
+    float radius_ @ radius;
+    BoundingBox boundingBox_ @ boundingBox;
+    Node* node_ @ node;
+};
+
+class Skeleton
+{
+    unsigned GetNumBones() const;
+    Bone* GetRootBone();
+    Bone* GetBone(const String name);
+    Bone* GetBone(unsigned index);
+    
+    tolua_readonly tolua_property__get_set unsigned numBones;
+    tolua_readonly tolua_property__get_set Bone* rootBone;
+};

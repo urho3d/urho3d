@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include "Application.h"
+#include <Urho3D/Engine/Application.h>
 
 using namespace Urho3D;
 
 /// Urho3DPlayer application runs a script specified on the command line.
 class Urho3DPlayer : public Application
 {
-    OBJECT(Urho3DPlayer);
+    URHO3D_OBJECT(Urho3DPlayer, Application);
 
 public:
     /// Construct.

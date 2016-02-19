@@ -1,0 +1,60 @@
+$#include "UI/DropDownList.h"
+
+class DropDownList : public Menu
+{
+    DropDownList();
+    ~DropDownList();
+    
+    void AddItem(UIElement* item);
+    void InsertItem(unsigned index, UIElement* item);
+    void RemoveItem(UIElement* item);
+    void RemoveItem(unsigned index);
+    void RemoveAllItems();
+    void SetSelection(unsigned index);
+    
+    void SetPlaceholderText(const String text);
+    
+    void SetResizePopup(bool enable);
+   
+    unsigned GetNumItems() const;
+    UIElement* GetItem(unsigned index) const;
+    
+    // PODVector<UIElement*> GetItems() const;
+    tolua_outside const PODVector<UIElement*>& DropDownListGetItems @ GetItems() const;
+    
+    unsigned GetSelection() const;
+    UIElement* GetSelectedItem() const;
+    ListView* GetListView() const;
+    UIElement* GetPlaceholder() const;
+    const String GetPlaceholderText() const;
+    bool GetResizePopup() const;
+    
+    tolua_readonly tolua_property__get_set unsigned numItems;
+    tolua_property__get_set unsigned selection;
+    tolua_readonly tolua_property__get_set UIElement* selectedItem;
+    tolua_readonly tolua_property__get_set ListView* listView;
+    tolua_readonly tolua_property__get_set UIElement* placeholder;
+    tolua_property__get_set String placeholderText;
+    tolua_property__get_set bool resizePopup;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_DropDownList_new00
+static int tolua_UILuaAPI_DropDownList_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<DropDownList>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_DropDownList_new00_local
+static int tolua_UILuaAPI_DropDownList_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<DropDownList>(tolua_S);
+}
+
+static const PODVector<UIElement*>& DropDownListGetItems(const DropDownList* list)
+{
+    static PODVector<UIElement*> items;
+    items = list->GetItems();
+    return items;
+}
+$}

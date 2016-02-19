@@ -1,0 +1,814 @@
+<element type="Window">
+    <attribute name="Name" value="ParticleEffectWindow" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="6 6 6 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Particle editor" />
+            <attribute name="Auto Localizable" value="true" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element>
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element>
+            <attribute name="Layout Mode" value="Vertical" />
+            <element type="View3D">
+                <attribute name="Name" value="ParticleEffectPreview" />
+                <attribute name="Use Derived Opacity" value="false" />
+            </element>
+            <element type="BorderImage" style="EditorDivider" />
+            <element>
+                <attribute name="Layout Mode" value="Horizontal" />
+                <attribute name="Min Size" value="0 16" />
+                <attribute name="Max Size" value="2147483647 16" />
+                <attribute name="Layout Spacing" value="4" />
+                <element type="Button">
+                    <attribute name="Name" value="ResetViewport" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="Reset Viewport" />
+                        <attribute name="Auto Localizable" value="true" />
+                        <attribute name="Text Alignment" value="Center" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorVerticalDivider" />
+                <element>
+                    <attribute name="Min Size" value="0 16" />
+                    <attribute name="Max Size" value="2147483647 16" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Spacing" value="10" />
+                    <element type="Text" style="EditorAttributeText">
+                        <attribute name="Text" value="Show Grid" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="1" />
+                        <element type="CheckBox">
+                            <attribute name="Name" value="ShowGrid" />
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+        <element type="BorderImage" style="EditorVerticalDivider" />
+        <element>
+            <attribute name="Layout Mode" value="Vertical" />
+            <element>
+                <attribute name="Min Size" value="0 16" />
+                <attribute name="Max Size" value="2147483647 16" />
+                <attribute name="Layout Mode" value="Horizontal" />
+                <attribute name="Name" value="NameContainer" />
+            </element>
+            <element type="BorderImage" style="EditorDivider" />
+            <element type="ListView" style="PanelView">
+                <attribute name="Min Size" value="0 60" />
+                <element type="BorderImage" internal="true">
+                    <element internal="true">
+                        <element style="Panel">
+                            <element type="Text">
+                                <attribute name="Text" value="Initial" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <!-- Initial Attributes -->
+                        <element>
+                            <!-- Constant Force -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Constant Force" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ConstantForceX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ConstantForceY" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ConstantForceZ" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Direction Min -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Direction (min)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMinX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMinY" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMinZ" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Direction Max -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Direction (max)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMaxX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMaxY" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DirectionMaxZ" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Damping Force -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Damping Force" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="DampingForce" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Active Time -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Active Time" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ActiveTime" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Inactive Time -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Inactive Time" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="InactiveTime" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Min Particle Size -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Particle Size (min)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ParticleSizeMinX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ParticleSizeMinY" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Max Particle Size -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Particle Size (max)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ParticleSizeMaxX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="ParticleSizeMaxY" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Time To Live -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Time To Live" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="TimeToLiveMin" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="TimeToLiveMax" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Velocity -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Velocity" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="VelocityMin" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="VelocityMax" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Rotation -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Rotation" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="RotationMin" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="RotationMax" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Rotation Speed -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Rotation Speed" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="RotationSpeedMin" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="RotationSpeedMax" />
+                                </element>
+                            </element>
+                        </element>
+                        <!-- End of Initial Attributes -->
+                        <element type="BorderImage" style="EditorDivider" />
+                        <element style="Panel">
+                            <element type="Text">
+                                <attribute name="Text" value="Variation" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <!-- Variation Attributes -->
+                        <element>
+                            <!-- Size Addition -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Size (add)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="SizeAdd" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Size Multiplication -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Size (multiply)" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="SizeMultiply" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Animation LOD bias -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Animation LOD bias" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="AnimationLodBias" />
+                                </element>
+                            </element>
+                        </element>
+                        <!-- End of Variation Attributes -->
+                        <element type="BorderImage" style="EditorDivider" />
+                        <element>
+                            <!-- Color Frames -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Color Frames" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <element type="ListView" style="PanelView">
+                            <attribute name="Name" value="ColorFrameListView" />
+                            <attribute name="Highlight Mode" value="Always" />
+                            <attribute name="Min Size" value="0 100" />
+                        </element>
+                        <element>
+                            <attribute name="Name" value="ColorFrameButtonContainer" />
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="4" />
+
+                            <element type="Button">
+                                <attribute name="Name" value="NewColorFrame" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="New" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                            <element type="Button">
+                                <attribute name="Name" value="RemoveColorFrame" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="Remove" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                            <element type="Button">
+                                <attribute name="Name" value="ColorFrameSort" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="Sort" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                        </element>
+                        <element type="BorderImage" style="EditorDivider" />
+                        <element>
+                            <!-- Texture Frames -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Texture Frames" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <element type="ListView" style="PanelView">
+                            <attribute name="Name" value="TextureFrameListView" />
+                            <attribute name="Min Size" value="0 100" />
+                        </element>
+                        <element>
+                            <attribute name="Name" value="TextureFrameButtonContainer" />
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="4" />
+
+                            <element type="Button">
+                                <attribute name="Name" value="NewTextureFrame" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="New" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                            <element type="Button">
+                                <attribute name="Name" value="RemoveTextureFrame" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="Remove" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                            <element type="Button">
+                                <attribute name="Name" value="TextureFrameSort" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Border" value="1 1 1 1" />
+                                <element type="Text">
+                                    <attribute name="Text" value="Sort" />
+                                    <attribute name="Text Alignment" value="Center" />
+                                    <attribute name="Auto Localizable" value="true" />
+                                </element>
+                            </element>
+                        </element>
+                        <element type="BorderImage" style="EditorDivider" />
+                        <element style="Panel">
+                            <element type="Text">
+                                <attribute name="Text" value="Emitter" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <!-- Emitter Attributes -->
+                        <element>
+                            <!-- Num Particles -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Number of Particles" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="NumParticles" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Emitter Size -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Emitter Size" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="EmitterSizeX" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="EmitterSizeY" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="EmitterSizeZ" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Emission Rate -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Emission Rate" />
+                            </element>
+                            <element>
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="1" />
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="EmissionRateMin" />
+                                </element>
+                                <element type="LineEdit">
+                                    <attribute name="Name" value="EmissionRateMax" />
+                                </element>
+                            </element>
+                        </element>
+                        <element>
+                            <!-- Emitter Shape -->
+                            <attribute name="Min Size" value="0 16" />
+                            <attribute name="Max Size" value="2147483647 16" />
+                            <attribute name="Layout Mode" value="Horizontal" />
+                            <attribute name="Layout Spacing" value="10" />
+                            <element type="Text" style="EditorAttributeText">
+                                <attribute name="Text" value="Emitter Shape" />
+                            </element>
+                            <element type="DropDownList">
+                                <attribute name="Name" value="EmitterShape" />
+                                <attribute name="Resize Popup" value="true" />
+                                <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                                <element type="Window" internal="true" popup="true" style="none">
+                                    <element type="ListView" internal="true" style="none">
+                                        <element type="BorderImage" internal="true" style="none">
+                                            <element internal="true" style="none">
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Sphere" />
+                                                </element>
+                                                <element type="Text" style="FileSelectorFilterText">
+                                                    <attribute name="Text" value="Box" />
+                                                </element>
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                        <!-- End of Renderer Attributes -->
+                        <element type="BorderImage" style="EditorDivider" />
+                        <element style="Panel">
+                            <element type="Text">
+                                <attribute name="Text" value="Renderer" />
+                                <attribute name="Auto Localizable" value="true" />
+                            </element>
+                        </element>
+                        <element style="Panel">
+                            <!-- Emitter Attributes -->
+                            <element>
+                                <!-- Material -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Material" />
+                                </element>
+                                <element>
+                                    <attribute name="Name" value="ParticleMaterialContainer" />
+                                    <attribute name="Min Size" value="0 16" />
+                                    <attribute name="Max Size" value="2147483647 16" />
+                                    <attribute name="Layout Mode" value="Horizontal" />
+                                    <attribute name="Layout Spacing" value="1" />
+                                </element>
+                            </element>
+                            <element>
+                                <!-- Scaled -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Scaled" />
+                                </element>
+                                <element>
+                                    <attribute name="Min Size" value="0 16" />
+                                    <attribute name="Max Size" value="2147483647 16" />
+                                    <attribute name="Layout Mode" value="Horizontal" />
+                                    <attribute name="Layout Spacing" value="1" />
+                                    <element type="CheckBox">
+                                        <attribute name="Name" value="Scaled" />
+                                    </element>
+                                </element>
+                            </element>
+                            <element>
+                                <!-- Sorted -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Sorted" />
+                                </element>
+                                <element>
+                                    <attribute name="Min Size" value="0 16" />
+                                    <attribute name="Max Size" value="2147483647 16" />
+                                    <attribute name="Layout Mode" value="Horizontal" />
+                                    <attribute name="Layout Spacing" value="1" />
+                                    <element type="CheckBox">
+                                        <attribute name="Name" value="Sorted" />
+                                    </element>
+                                </element>
+                            </element>
+                            <element>
+                                <!-- Relative -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Relative Transform" />
+                                </element>
+                                <element>
+                                    <attribute name="Min Size" value="0 16" />
+                                    <attribute name="Max Size" value="2147483647 16" />
+                                    <attribute name="Layout Mode" value="Horizontal" />
+                                    <attribute name="Layout Spacing" value="1" />
+                                    <element type="CheckBox">
+                                        <attribute name="Name" value="Relative" />
+                                    </element>
+                                </element>
+                            </element>
+                            <element>
+                                <!-- Face Camera Mode -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Face Camera Mode" />
+                                </element>
+                                <element type="DropDownList">
+                                    <attribute name="Name" value="FaceCameraMode" />
+                                    <attribute name="Resize Popup" value="true" />
+                                    <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                                    <element type="Window" internal="true" popup="true" style="none">
+                                        <element type="ListView" internal="true" style="none">
+                                            <element type="BorderImage" internal="true" style="none">
+                                                <element internal="true" style="none">
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="None" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Rotate XYZ" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Rotate Y" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="LookAt XYZ" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="LookAt Y" />
+                                                    </element>
+                                                    <element type="Text" style="FileSelectorFilterText">
+                                                        <attribute name="Text" value="Direction" />
+                                                    </element>
+                                                </element>
+                                            </element>
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+
+                            <!-- End of Renderer Attributes -->
+                        </element>
+
+                    </element>
+                </element>
+            </element>
+            <element type="BorderImage" style="EditorDivider" />
+            <element>
+                <attribute name="Name" value="ButtonContainer" />
+                <attribute name="Min Size" value="0 16" />
+                <attribute name="Max Size" value="2147483647 16" />
+                <attribute name="Layout Mode" value="Horizontal" />
+                <attribute name="Layout Spacing" value="4" />
+                <element type="Button">
+                    <attribute name="Name" value="NewButton" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="New" />
+                        <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                </element>
+                <element type="Button">
+                    <attribute name="Name" value="RevertButton" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="Revert" />
+                        <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                </element>
+                <element type="Button">
+                    <attribute name="Name" value="SaveButton" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="Save" />
+                        <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                </element>
+                <element type="Button">
+                    <attribute name="Name" value="SaveAsButton" />
+                    <attribute name="Layout Mode" value="Horizontal" />
+                    <attribute name="Layout Border" value="1 1 1 1" />
+                    <element type="Text">
+                        <attribute name="Text" value="Save as" />
+                        <attribute name="Text Alignment" value="Center" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+</element>

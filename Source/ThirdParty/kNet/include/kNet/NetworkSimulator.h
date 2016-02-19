@@ -18,6 +18,7 @@
 
 #include "kNetFwd.h"
 #include "PolledTimer.h"
+#include "Types.h"
 #include <vector>
 
 #include <cstring>
@@ -59,7 +60,7 @@ public:
 
 	/// If corruptionType == CorruptMessageType, this field specifies a single specific message type ID which
 	/// will be subjected to corruption. Default: 0. No message has the ID 0, i.e. this effectively means "disabled".
-	int corruptMessageId;
+	message_id_t corruptMessageId;
 
 	/// Rate in % of the datagrams to corrupt. Default: 0.
 	float corruptToggleBitsRate;

@@ -17,22 +17,33 @@ void ApplyAttributes();
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -41,8 +52,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -71,12 +80,17 @@ AnimationState GetAnimationState(uint) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 float GetMorphWeight(uint) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
@@ -85,18 +99,25 @@ void RemoveAnimationState(Animation);
 void RemoveAnimationState(AnimationState);
 void RemoveAnimationState(const String&);
 void RemoveAnimationState(uint);
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetMorphWeights();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetMorphWeight(uint, float);
+void UpdateBoneBoundingBox();
 
 // Properties:
 bool animationEnabled;
@@ -108,8 +129,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -176,29 +195,40 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAnimation(AnimationSet2D, const String&, LoopMode2D = LM_DEFAULT);
 void SetAnimation(const String&, LoopMode2D = LM_DEFAULT);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
+float alpha;
 String animation;
 bool animationEnabled;
 AnimationSet2D animationSet;
@@ -207,8 +237,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -216,12 +244,15 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
+String entity;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -244,11 +275,13 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 float speed;
+Sprite2D sprite;
 bool temporary;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -260,23 +293,25 @@ uint zoneMask;
 class Animation
 {
 // Methods:
+void AddTrigger(const AnimationTriggerPoint&);
 void AddTrigger(float, bool, const Variant&);
+AnimationTrack CreateTrack(const String&);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
+bool RemoveAllTracks();
 void RemoveAllTriggers();
+bool RemoveTrack(const String&);
 void RemoveTrigger(uint);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
 String animationName;
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
-/* readonly */
 float length;
 /* readonly */
 uint memoryUse;
@@ -287,6 +322,7 @@ uint numTriggers;
 /* readonly */
 int refs;
 /* readonly */
+Array<AnimationTrack> tracks;
 Array<AnimationTriggerPoint> triggers;
 /* readonly */
 StringHash type;
@@ -294,22 +330,6 @@ StringHash type;
 String typeName;
 /* readonly */
 uint useTimer;
-/* readonly */
-int weakRefs;
-};
-
-class Animation2D
-{
-
-// Properties:
-/* readonly */
-float length;
-/* readonly */
-bool looped;
-/* readonly */
-String name;
-/* readonly */
-int refs;
 /* readonly */
 int weakRefs;
 };
@@ -326,39 +346,54 @@ AnimationState GetAnimationState(const String&) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetAutoFade(const String&) const;
 float GetFadeTarget(const String&) const;
+float GetFadeTime(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint8 GetLayer(const String&) const;
 float GetLength(const String&) const;
 bool GetLooped(const String&) const;
+bool GetRemoveOnCompletion(const String&);
 float GetSpeed(const String&) const;
 float GetTime(const String&) const;
 float GetWeight(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool IsAtEnd(const String&) const;
 bool IsFadingIn(const String&) const;
 bool IsFadingOut(const String&) const;
 bool IsPlaying(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 bool Play(const String&, uint8, bool, float = 0.0f);
 bool PlayExclusive(const String&, uint8, bool, float = 0.0f);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 bool SetAutoFade(const String&, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 bool SetLayer(const String&, uint8);
 bool SetLooped(const String&, bool);
+bool SetRemoveOnCompletion(const String&, bool);
 bool SetSpeed(const String&, float);
 bool SetStartBone(const String&, const String&);
 bool SetTime(const String&, float);
@@ -375,8 +410,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -400,11 +433,22 @@ String typeName;
 int weakRefs;
 };
 
+class AnimationKeyFrame
+{
+
+// Properties:
+Vector3 position;
+Quaternion rotation;
+Vector3 scale;
+float time;
+};
+
 class AnimationSet2D
 {
 // Methods:
-Animation2D GetAnimation(const String&) const;
-Animation2D GetAnimation(uint) const;
+String GetAnimation(uint) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -412,8 +456,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -470,6 +512,23 @@ int weakRefs;
 float weight;
 };
 
+class AnimationTrack
+{
+// Methods:
+void AddKeyFrame(const AnimationKeyFrame&);
+void InsertKeyFrame(uint, const AnimationKeyFrame&);
+void RemoveAllKeyFrames();
+void RemoveKeyFrame(uint);
+
+// Properties:
+uint8 channelMask;
+Array<AnimationKeyFrame> keyFrames;
+String name;
+StringHash nameHash;
+/* readonly */
+uint numKeyFrames;
+};
+
 class AnimationTriggerPoint
 {
 
@@ -519,14 +578,15 @@ VariantType type;
 class Audio
 {
 // Methods:
+bool HasMasterGain(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Play();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetMode(int, int, bool, bool = true);
 void Stop();
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -566,6 +626,7 @@ class Billboard
 
 // Properties:
 Color color;
+Vector3 direction;
 bool enabled;
 Vector3 position;
 float rotation;
@@ -582,24 +643,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -609,8 +681,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -679,6 +749,8 @@ class BorderImage
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -689,13 +761,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -703,6 +781,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -711,22 +790,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -735,6 +821,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -754,8 +841,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -809,6 +894,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -839,6 +925,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -852,6 +940,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -869,9 +959,12 @@ void Define(const Sphere&);
 void Define(const Vector3&);
 void Define(const Vector3&, const Vector3&);
 void Define(float, float);
+bool Defined() const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
+Intersection IsInsideFast(const BoundingBox&) const;
+Intersection IsInsideFast(const Sphere&) const;
 void Merge(const BoundingBox&);
 void Merge(const Frustum&);
 void Merge(const Polyhedron&);
@@ -887,7 +980,6 @@ BoundingBox Transformed(const Matrix3x4&) const;
 // Properties:
 /* readonly */
 Vector3 center;
-bool defined;
 /* readonly */
 Vector3 halfSize;
 Vector3 max;
@@ -900,6 +992,8 @@ class Button
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -910,13 +1004,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -924,6 +1024,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -932,22 +1033,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -956,6 +1064,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -978,8 +1087,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -1033,6 +1140,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -1069,6 +1177,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -1083,6 +1193,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -1095,28 +1207,39 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetDistance(const Vector3&) const;
 float GetDistanceSquared(const Vector3&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Ray GetScreenRay(float, float) const;
 Frustum GetSplitFrustum(float, float) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 Vector3 ScreenToWorldPoint(const Vector3&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetOrthoSize(const Vector2&);
 Vector2 WorldToScreenPoint(const Vector3&) const;
 
@@ -1129,8 +1252,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoAspectRatio;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 Plane clipPlane;
@@ -1197,6 +1318,8 @@ class CheckBox
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -1207,13 +1330,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -1221,6 +1350,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -1229,22 +1359,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCheckedOffset(int, int);
 void SetDeepEnabled(bool);
@@ -1254,6 +1391,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -1273,8 +1411,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -1330,6 +1466,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -1360,6 +1497,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -1374,6 +1513,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -1386,24 +1527,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCenter(float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetSize(float, float);
 
 // Properties:
@@ -1414,8 +1566,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1462,24 +1612,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<Vector2> GetVertices() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertex(uint, const Vector2&);
 void SetVertices(Array<Vector2>);
 const Vector2& GetVertex(uint) const;
@@ -1491,8 +1652,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1539,24 +1698,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCenter(float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -1565,8 +1735,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1613,23 +1781,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertices(const Vector2&, const Vector2&);
 
 // Properties:
@@ -1639,8 +1818,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1687,24 +1864,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<Vector2> GetVertices() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetVertex(uint, const Vector2&);
 void SetVertices(Array<Vector2>);
 const Vector2& GetVertex(uint) const;
@@ -1716,8 +1904,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1763,22 +1949,32 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetBox(const Vector3&, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetCapsule(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
@@ -1787,9 +1983,10 @@ void SetConvexHull(Model, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), cons
 void SetCustomConvexHull(CustomGeometry, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetCustomTriangleMesh(CustomGeometry, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetCylinder(float, float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetSphere(float, const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 void SetStaticPlane(const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
-void SetTerrain();
+void SetTerrain(uint = 0);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTriangleMesh(Model, uint = 0, const Vector3& = Vector3 ( 1 , 1 , 1 ), const Vector3& = Vector3 ( ), const Quaternion& = Quaternion ( ));
 
@@ -1800,8 +1997,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -1842,23 +2037,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -1867,8 +2073,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 int categoryBits;
@@ -1961,23 +2165,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -1986,8 +2201,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -2015,6 +2228,8 @@ class Connection
 {
 // Methods:
 void Disconnect(int = 0);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0);
 void SendPackageToClient(PackageFile);
@@ -2026,7 +2241,9 @@ String ToString() const;
 /* readonly */
 String address;
 /* readonly */
-StringHash baseType;
+float bytesInPerSec;
+/* readonly */
+float bytesOutPerSec;
 /* readonly */
 String category;
 /* readonly */
@@ -2041,18 +2258,27 @@ String downloadName;
 /* readonly */
 float downloadProgress;
 VariantMap identity;
+/* readonly */
+float lastHeardTime;
 bool logStatistics;
 /* readonly */
 uint numDownloads;
+/* readonly */
+float packetsInPerSec;
+/* readonly */
+float packetsOutPerSec;
 /* readonly */
 uint16 port;
 Vector3 position;
 /* readonly */
 int refs;
 Quaternion rotation;
+/* readonly */
+float roundTripTime;
 Scene scene;
 /* readonly */
 bool sceneLoaded;
+uint8 timeStamp;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -2065,6 +2291,8 @@ class Console
 {
 // Methods:
 void CopySelectedRows() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void Toggle();
 void UpdateElements();
@@ -2073,8 +2301,6 @@ void UpdateElements();
 bool autoVisibleOnError;
 /* readonly */
 BorderImage background;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -2110,23 +2336,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2137,8 +2374,6 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* writeonly */
 Vector3 axis;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 float cfm;
@@ -2186,23 +2421,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2211,8 +2457,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2248,23 +2492,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2273,8 +2528,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2314,23 +2567,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2340,8 +2604,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2379,23 +2641,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2404,8 +2677,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2444,23 +2715,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 float angularOffset;
@@ -2470,8 +2752,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2511,23 +2791,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2536,8 +2827,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2577,23 +2866,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2604,8 +2904,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 Vector2 axis;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2647,23 +2945,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2672,8 +2981,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2714,23 +3021,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2740,8 +3058,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2783,23 +3099,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -2808,8 +3135,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2848,23 +3173,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2874,8 +3210,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2913,23 +3247,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Vector2 anchor;
@@ -2940,8 +3285,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 Vector2 axis;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool collideConnected;
@@ -2989,14 +3332,226 @@ float pitch;
 float yaw;
 };
 
+class CrowdAgent
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetTarget();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+/* readonly */
+Vector3 actualVelocity;
+/* readonly */
+CrowdAgentState agentState;
+bool animationEnabled;
+/* readonly */
+bool arrived;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+String category;
+/* readonly */
+Vector3 desiredVelocity;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float height;
+/* readonly */
+uint id;
+/* readonly */
+bool inCrowd;
+float maxAccel;
+float maxSpeed;
+NavigationPushiness navigationPushiness;
+NavigationQuality navigationQuality;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+uint obstacleAvoidanceType;
+/* readonly */
+Vector3 position;
+uint queryFilterType;
+float radius;
+/* readonly */
+int refs;
+/* readonly */
+bool requestedTarget;
+/* readonly */
+CrowdAgentRequestedTarget requestedTargetType;
+Vector3 targetPosition;
+/* readonly */
+CrowdAgentTargetState targetState;
+Vector3 targetVelocity;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+bool updateNodePosition;
+/* readonly */
+int weakRefs;
+};
+
+class CrowdManager
+{
+// Methods:
+void ApplyAttributes();
+const CrowdObstacleAvoidanceParams& GetObstacleAvoidanceParams(uint);
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Vector3 FindNearestPoint(const Vector3&, int);
+Array<CrowdAgent> GetAgents(Node = null, bool = true);
+float GetAreaCost(uint, uint);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+float GetDistanceToWall(const Vector3&, float, int);
+uint16 GetExcludeFlags(uint);
+uint16 GetIncludeFlags(uint);
+bool GetInterceptNetworkUpdate(const String&) const;
+Vector3 GetRandomPoint(int);
+Vector3 GetRandomPointInCircle(const Vector3&, float, int);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3);
+Vector3 Raycast(const Vector3&, const Vector3&, int);
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetCrowdTarget(Node = null);
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+void SetAreaCost(uint, uint, float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetCrowdTarget(const Vector3&, Node = null);
+void SetCrowdVelocity(const Vector3&, Node = null);
+void SetExcludeFlags(uint, uint16);
+void SetIncludeFlags(uint, uint16);
+void SetInterceptNetworkUpdate(const String&, bool);
+void SetObstacleAvoidanceParams(uint, const CrowdObstacleAvoidanceParams&);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float maxAgentRadius;
+int maxAgents;
+NavigationMesh navMesh;
+/* readonly */
+Node node;
+/* readonly */
+Array<uint> numAreas;
+/* readonly */
+uint numAttributes;
+/* readonly */
+uint numObstacleAvoidanceTypes;
+/* readonly */
+uint numQueryFilterTypes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class CrowdObstacleAvoidanceParams
+{
+
+// Properties:
+uint8 adaptiveDepth;
+uint8 adaptiveDivs;
+uint8 adaptiveRings;
+uint8 gridSize;
+float horizTime;
+float velBias;
+float weightCurVel;
+float weightDesVel;
+float weightSide;
+float weightToi;
+};
+
 class Cursor
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
 void DefineShape(CursorShape, Texture, const IntRect&, const IntVector2&);
+void DefineShape(const String&, Texture, const IntRect&, const IntVector2&);
 void DisableLayoutUpdate();
 IntVector2 ElementToScreen(const IntVector2&);
 void EnableLayoutUpdate();
@@ -3004,13 +3559,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -3018,6 +3579,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -3026,22 +3588,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -3050,11 +3619,14 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
 void SetPosition(int, int);
+void SetShape(CursorShape);
+void SetShape(const String&);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
@@ -3069,8 +3641,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -3124,6 +3694,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -3151,10 +3722,12 @@ UIElement root;
 /* readonly */
 IntVector2 screenPosition;
 bool selected;
-CursorShape shape;
+String shape;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -3169,6 +3742,8 @@ bool useSystemShapes;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -3191,25 +3766,36 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 CustomGeometryVertex GetVertex(uint, uint);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3218,8 +3804,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3280,10 +3864,78 @@ Vector4 tangent;
 Vector2 texCoord;
 };
 
+class Database
+{
+// Methods:
+DbConnection Connect(const String&);
+void Disconnect(DbConnection);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+String category;
+uint poolSize;
+/* readonly */
+bool pooling;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class DbConnection
+{
+// Methods:
+DbResult Execute(const String&, bool = false);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+bool connected;
+/* readonly */
+String connectionString;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class DbResult
+{
+
+// Properties:
+/* readonly */
+Array<String> columns;
+/* readonly */
+int64 numAffectedRows;
+/* readonly */
+uint numColumns;
+/* readonly */
+uint numRows;
+/* readonly */
+Array<Array<Variant>> row;
+};
+
 class DebugHud
 {
 // Methods:
 void ClearAppStats();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void ResetAppStats(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAppStats(const String&, const String&);
@@ -3294,10 +3946,10 @@ void Update();
 
 // Properties:
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
 XMLFile defaultStyle;
+/* readonly */
+Text memoryText;
 uint mode;
 /* readonly */
 Text modeText;
@@ -3322,10 +3974,13 @@ class DebugRenderer
 {
 // Methods:
 void AddBoundingBox(const BoundingBox&, const Color&, bool = true);
+void AddCircle(const Vector3&, const Vector3&, float, const Color&, int = 64, bool = true);
+void AddCross(const Vector3&, float, const Color&, bool = true);
 void AddFrustum(const Frustum&, const Color&, bool = true);
 void AddLine(const Vector3&, const Vector3&, const Color&, bool = true);
 void AddNode(Node, float = 1.0, bool = true);
 void AddPolyhedron(const Polyhedron&, const Color&, bool = true);
+void AddQuad(const Vector3&, float, float, const Color&, bool = true);
 void AddSkeleton(Skeleton, const Color&, bool = true);
 void AddSphere(const Sphere&, const Color&, bool = true);
 void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true);
@@ -3334,23 +3989,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3359,8 +4025,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -3393,26 +4057,37 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllDecals();
+void RemoveAttributeAnimation(const String&);
 void RemoveDecals(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3421,8 +4096,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3482,6 +4155,7 @@ bool ReadBool();
 BoundingBox ReadBoundingBox();
 int8 ReadByte();
 Color ReadColor();
+double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
@@ -3507,6 +4181,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -3556,24 +4231,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3582,8 +4268,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3632,24 +4316,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -3658,9 +4353,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
-BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -3677,7 +4369,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -3691,7 +4382,6 @@ int orderInLayer;
 int refs;
 float shadowDistance;
 uint shadowMask;
-Sprite2D sprite;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -3710,6 +4400,8 @@ class DropDownList
 // Methods:
 void AddChild(UIElement);
 void AddItem(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -3720,14 +4412,20 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement);
 bool IsInside(IntVector2, bool);
@@ -3736,6 +4434,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -3745,25 +4444,32 @@ void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
 void RemoveAllItems();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveItem(UIElement);
 void RemoveItem(uint);
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAccelerator(int, int);
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -3772,6 +4478,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -3799,8 +4506,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -3856,6 +4561,7 @@ bool internal;
 /* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 /* readonly */
@@ -3904,6 +4610,8 @@ bool showPopup;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -3918,8 +4626,117 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
+};
+
+class DynamicNavigationMesh
+{
+// Methods:
+void ApplyAttributes();
+bool Build();
+bool Build(const BoundingBox&);
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool);
+Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+float GetAreaCost(uint) const;
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool GetInterceptNetworkUpdate(const String&) const;
+Vector3 GetRandomPoint();
+Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
+Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+void SetAreaCost(uint, float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+float agentHeight;
+float agentMaxClimb;
+float agentMaxSlope;
+float agentRadius;
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+BoundingBox boundingBox;
+/* readonly */
+String category;
+float cellHeight;
+float cellSize;
+float detailSampleDistance;
+float detailSampleMaxError;
+bool drawNavAreas;
+bool drawObstacles;
+bool drawOffMeshConnections;
+float edgeMaxError;
+float edgeMaxLength;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+bool initialized;
+bool maxLayers;
+uint maxObstacles;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+IntVector2 numTiles;
+ObjectAnimation objectAnimation;
+Vector3 padding;
+NavmeshPartitionType partitionType;
+/* readonly */
+int refs;
+float regionMergeSize;
+float regionMinSize;
+bool temporary;
+int tileSize;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
 };
 
 class Engine
@@ -3931,13 +4748,13 @@ void DumpMemory();
 void DumpProfiler();
 void DumpResources(bool = false);
 void Exit();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void RunFrame();
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 bool autoExit;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -3965,12 +4782,15 @@ class File
 {
 // Methods:
 void Close();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Open(const String&, FileMode = FILE_READ);
 Array<uint8> Read(uint);
 bool ReadBool();
 BoundingBox ReadBoundingBox();
 int8 ReadByte();
 Color ReadColor();
+double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
@@ -3996,6 +4816,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 uint Write(Array<uint8>);
@@ -4003,6 +4824,7 @@ bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
 bool WriteByte(int8);
 bool WriteColor(const Color&);
+bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
@@ -4028,10 +4850,9 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4063,14 +4884,14 @@ int weakRefs;
 class FileSelector
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetButtonTexts(const String&, const String&);
 void SetFilters(Array<String>, uint);
 void UpdateElements();
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 Button cancelButton;
 /* readonly */
@@ -4118,6 +4939,8 @@ bool DirExists(const String&) const;
 bool FileExists(const String&) const;
 String GetAppPreferencesDir(const String&, const String&) const;
 uint GetLastModifiedTime(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Rename(const String&, const String&);
 Array<String> ScanDir(const String&, const String&, uint, bool) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -4129,8 +4952,6 @@ int SystemRun(const String&, Array<String>);
 uint SystemRunAsync(const String&, Array<String>);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 String currentDir;
@@ -4164,19 +4985,19 @@ class Font
 {
 // Methods:
 IntVector2 GetTotalGlyphOffset(int) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File, int, bool = false);
-bool SaveXML(VectorBuffer&, int, bool = false);
-bool SaveXML(const String&, int, bool = false);
+bool SaveXML(File, int, bool = false, const String& = "\t");
+bool SaveXML(VectorBuffer&, int, bool = false, const String& = "\t");
+bool SaveXML(const String&, int, bool = false, const String& = "\t");
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
 IntVector2 absoluteGlyphOffset;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4206,6 +5027,8 @@ float Distance(const Vector3&) const;
 Intersection IsInside(const BoundingBox&);
 Intersection IsInside(const Sphere&);
 Intersection IsInside(const Vector3&);
+Intersection IsInsideFast(const BoundingBox&) const;
+Intersection IsInsideFast(const Sphere&) const;
 void Transform(const Matrix3&);
 void Transform(const Matrix3x4&);
 Frustum Transformed(const Matrix3&) const;
@@ -4216,12 +5039,57 @@ Frustum Transformed(const Matrix3x4&) const;
 Array<Vector3> vertices;
 };
 
+class Geometry
+{
+// Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetDrawRange(PrimitiveType, uint, uint, bool = true);
+bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true);
+void SetIndexBuffer(IndexBuffer);
+bool SetVertexBuffer(uint, VertexBuffer, uint = MASK_DEFAULT);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+bool empty;
+IndexBuffer indexBuffer;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexStart;
+float lodDistance;
+uint numVertexBuffers;
+/* readonly */
+PrimitiveType primitiveType;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+Array<VertexBuffer> vertexBuffers;
+/* readonly */
+uint vertexCount;
+/* readonly */
+Array<uint> vertexElementMasks;
+/* readonly */
+uint vertexStart;
+/* readonly */
+int weakRefs;
+};
+
 class Graphics
 {
 // Methods:
 void BeginDumpShaders(const String&);
 void Close();
 void EndDumpShaders();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void Maximize();
 void Minimize();
 void PrecacheShaders(File);
@@ -4235,7 +5103,7 @@ bool ToggleFullscreen();
 
 // Properties:
 /* readonly */
-StringHash baseType;
+String apiName;
 /* readonly */
 bool borderless;
 /* readonly */
@@ -4247,7 +5115,6 @@ IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
 bool flushGPU;
-bool forceSM2;
 /* readonly */
 bool fullscreen;
 /* readonly */
@@ -4270,6 +5137,8 @@ uint numBatches;
 uint numPrimitives;
 String orientations;
 /* readonly */
+bool readableDepthSupport;
+/* readonly */
 int refs;
 /* readonly */
 bool resizable;
@@ -4280,8 +5149,6 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
-/* readonly */
-bool sm3Support;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -4308,6 +5175,7 @@ bool ReadBool();
 BoundingBox ReadBoundingBox();
 int8 ReadByte();
 Color ReadColor();
+double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
@@ -4333,6 +5201,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
 
 // Properties:
@@ -4378,6 +5247,8 @@ uint GetPixelInt(int, int) const;
 uint GetPixelInt(int, int, int) const;
 Color GetPixelTrilinear(float, float, float) const;
 Image GetSubimage(const IntRect&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool LoadColorLUT(File);
@@ -4385,10 +5256,10 @@ bool LoadColorLUT(VectorBuffer&);
 bool Resize(int, int);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-void SaveBMP(const String&) const;
-void SaveJPG(const String&, int) const;
-void SavePNG(const String&) const;
-void SaveTGA(const String&) const;
+bool SaveBMP(const String&) const;
+bool SaveJPG(const String&, int) const;
+bool SavePNG(const String&) const;
+bool SaveTGA(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetPixel(int, int, const Color&);
 void SetPixel(int, int, int, const Color&);
@@ -4399,13 +5270,17 @@ bool SetSize(int, int, uint);
 
 // Properties:
 /* readonly */
-StringHash baseType;
+bool array;
 /* readonly */
 String category;
 /* readonly */
 uint components;
 /* readonly */
 bool compressed;
+/* readonly */
+CompressedFormat compressedFormat;
+/* readonly */
+bool cubemap;
 /* readonly */
 int depth;
 /* readonly */
@@ -4414,7 +5289,11 @@ int height;
 uint memoryUse;
 String name;
 /* readonly */
+uint numCompressedLevels;
+/* readonly */
 int refs;
+/* readonly */
+bool sRGB;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -4427,6 +5306,37 @@ int weakRefs;
 int width;
 };
 
+class IndexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, bool, bool = false);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint indexCount;
+/* readonly */
+uint indexSize;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class Input
 {
 // Methods:
@@ -4437,21 +5347,23 @@ String GetKeyName(int) const;
 int GetScancodeFromKey(int) const;
 int GetScancodeFromName(const String&) const;
 String GetScancodeName(int) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 uint LoadGestures(File);
 uint LoadGestures(VectorBuffer&);
 bool RecordGesture();
 void RemoveAllGestures();
 bool RemoveGesture(uint);
 bool RemoveScreenJoystick(int);
+void ResetMouseVisible();
 bool SaveGesture(File, uint);
 bool SaveGesture(VectorBuffer&, uint);
 bool SaveGestures(File);
 bool SaveGestures(VectorBuffer&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetMouseVisible(bool, bool = false);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4471,6 +5383,7 @@ Array<bool> mouseButtonDown;
 /* readonly */
 Array<bool> mouseButtonPress;
 bool mouseGrabbed;
+MouseMode mouseMode;
 /* readonly */
 IntVector2 mouseMove;
 /* readonly */
@@ -4549,17 +5462,17 @@ int y;
 class JSONFile
 {
 // Methods:
-JSONValue CreateRoot(JSONValueType = JSON_ANY);
-JSONValue GetRoot(JSONValueType = JSON_ANY);
+JSONValue& GetRoot();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
+bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -4567,6 +5480,8 @@ uint memoryUse;
 String name;
 /* readonly */
 int refs;
+/* readonly */
+JSONValue root;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -4580,100 +5495,40 @@ int weakRefs;
 class JSONValue
 {
 // Methods:
-void AddBool(bool);
-void AddColor(const Color&);
-void AddFloat(float);
-void AddInt(int);
-void AddIntRect(const IntRect&);
-void AddIntVector2(const IntVector2&);
-void AddMatrix3(const Matrix3&);
-void AddMatrix3x4(const Matrix3x4&);
-void AddMatrix4(const Matrix4&);
-void AddQuaternion(const Quaternion&);
-void AddResourceRef(const ResourceRef&);
-void AddResourceRefList(const ResourceRefList&);
-void AddString(const String);
-void AddVariant(const Variant&);
-void AddVariantValue(const Variant&);
-void AddVector2(const Vector2&);
-void AddVector3(const Vector3&);
-void AddVector4(const Vector4&);
-void AddVectorVariant(const Variant&);
-JSONValue CreateChild(JSONValueType = JSON_OBJECT);
-JSONValue CreateChild(const String&, JSONValueType = JSON_OBJECT);
-bool GetBool(const String&) const;
-bool GetBool(uint) const;
-JSONValue GetChild(const String&, JSONValueType = JSON_ANY) const;
-JSONValue GetChild(uint, JSONValueType = JSON_ANY) const;
-Array<String> GetChildNames() const;
-Color GetColor(const String&) const;
-Color GetColor(uint) const;
-float GetFloat(const String&) const;
-float GetFloat(uint) const;
-int GetInt(const String&) const;
-int GetInt(uint) const;
-IntRect GetIntRect(const String&) const;
-IntRect GetIntRect(uint) const;
-IntVector2 GetIntVector2(const String&) const;
-IntVector2 GetIntVector2(uint) const;
-Matrix3 GetMatrix3(const String&) const;
-Matrix3 GetMatrix3(uint) const;
-Matrix3x4 GetMatrix3x4(const String&) const;
-Matrix3x4 GetMatrix3x4(uint) const;
-Matrix4 GetMatrix4(const String&) const;
-Matrix4 GetMatrix4(uint) const;
-Quaternion GetQuaternion(const String&) const;
-Quaternion GetQuaternion(uint) const;
-ResourceRef GetResourceRef(const String&) const;
-ResourceRef GetResourceRef(uint) const;
-ResourceRefList GetResourceRefList(const String&) const;
-ResourceRefList GetResourceRefList(uint) const;
-String GetString(const String&) const;
-String GetString(uint) const;
-Array<String> GetValueNames() const;
-Variant GetVariant(const String&) const;
-Variant GetVariant(uint) const;
-Variant GetVariantValue(const String&, VariantType) const;
-Variant GetVariantValue(uint, VariantType) const;
-Vector2 GetVector2(const String&) const;
-Vector2 GetVector2(uint) const;
-Vector3 GetVector3(const String&) const;
-Vector3 GetVector3(uint) const;
-Vector4 GetVector4(const String&) const;
-Vector4 GetVector4(uint) const;
-Variant GetVectorVariant(const String&) const;
-Variant GetVectorVariant(uint) const;
-void SetBool(const String&, bool);
-void SetColor(const String&, const Color&);
-void SetFloat(const String&, float);
-void SetInt(const String&, int);
-void SetIntRect(const String&, const IntRect&);
-void SetIntVector2(const String&, const IntVector2&);
-void SetMatrix3(const String&, const Matrix3&);
-void SetMatrix3x4(const String&, const Matrix3x4&);
-void SetMatrix4(const String&, const Matrix4&);
-void SetQuaternion(const String&, const Quaternion&);
-void SetResourceRef(const String&, const ResourceRef&);
-void SetResourceRefList(const String&, const ResourceRefList&);
-void SetString(const String&, const String);
-void SetVariant(const String&, const Variant&);
-void SetVariantValue(const String&, const Variant&);
-void SetVector2(const String&, const Vector2&);
-void SetVector3(const String&, const Vector3&);
-void SetVector4(const String&, const Vector4&);
-void SetVectorVariant(const String&, const Variant&);
+void Clear();
+bool Contains(const String&) const;
+void Erase(const String&);
+void Erase(uint, uint = 1);
+bool GetBool() const;
+double GetDouble() const;
+float GetFloat() const;
+int GetInt() const;
+uint GetUInt() const;
+void Insert(uint, const JSONValue&);
+const JSONValue& Get(const String&) const;
+void Pop();
+void Push(const JSONValue&);
+void Resize(uint);
+void Set(const String&, const JSONValue&);
+const String& GetString() const;
 
 // Properties:
 /* readonly */
 bool isArray;
 /* readonly */
+bool isBool;
+/* readonly */
 bool isNull;
+/* readonly */
+bool isNumber;
 /* readonly */
 bool isObject;
 /* readonly */
-bool notNull;
+bool isString;
 /* readonly */
 uint size;
+/* readonly */
+JSONValueType valueType;
 };
 
 class JoystickState
@@ -4708,24 +5563,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -4735,8 +5601,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 float brightness;
@@ -4808,6 +5672,8 @@ class LineEdit
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -4818,13 +5684,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -4832,6 +5704,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -4840,22 +5713,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -4864,6 +5744,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -4883,8 +5764,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -4944,6 +5823,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -4975,6 +5855,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 String text;
 bool textCopyable;
@@ -4994,6 +5876,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5004,6 +5888,8 @@ class ListView
 void AddChild(UIElement);
 void AddItem(UIElement);
 void AddSelection(uint);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeSelection(int, bool);
@@ -5019,14 +5905,20 @@ uint FindItem(UIElement);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<UIElement> GetItems() const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 void InsertItem(uint, UIElement, UIElement = null);
 bool IsExpanded(uint) const;
@@ -5037,6 +5929,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -5046,31 +5939,39 @@ void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
 void RemoveAllItems();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
 void RemoveItem(UIElement, uint = 0);
 void RemoveItem(uint);
+void RemoveObjectAnimation();
 void RemoveSelection(uint);
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -5095,9 +5996,9 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+bool autoDisableChildren;
+float autoDisableThreshold;
 int baseIndent;
-/* readonly */
-StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -5155,6 +6056,7 @@ bool internal;
 /* readonly */
 Array<UIElement> items;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -5203,6 +6105,8 @@ Array<uint> selections;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -5218,8 +6122,44 @@ ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
+};
+
+class Localization
+{
+// Methods:
+String Get(const String&);
+String GetLanguage(int);
+int GetLanguageIndex(const String&);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void LoadJSON(const JSONValue&);
+void LoadJSONFile(const String&);
+void Reset();
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetLanguage(const String&);
+void SetLanguage(int);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+String language;
+/* readonly */
+int languageIndex;
+/* readonly */
+int numLanguages;
+/* readonly */
+int refs;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
 };
 
 class Log
@@ -5228,6 +6168,8 @@ class Log
 void Close();
 void Debug(const String&);
 void Error(const String&);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void Info(const String&);
 void Open(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -5235,8 +6177,6 @@ void Warning(const String&);
 void Write(const String&, bool = false);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -5258,14 +6198,19 @@ class Material
 {
 // Methods:
 Material Clone(const String& = String ( )) const;
+Pass GetPass(uint, const String&);
 ValueAnimation GetShaderParameterAnimation(const String&) const;
 float GetShaderParameterAnimationSpeed(const String&) const;
 WrapMode GetShaderParameterAnimationWrapMode(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
+bool Load(const JSONValue&);
 bool Load(const XMLElement&);
 void RemoveShaderParameter(const String&);
 bool Save(File) const;
+bool Save(JSONValue&) const;
 bool Save(VectorBuffer&) const;
 bool Save(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -5279,11 +6224,10 @@ void SortTechniques();
 
 // Properties:
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
 CullMode cullMode;
 BiasParameters depthBias;
+FillMode fillMode;
 /* readonly */
 uint memoryUse;
 String name;
@@ -5292,6 +6236,8 @@ uint numTechniques;
 bool occlusion;
 /* readonly */
 int refs;
+uint8 renderOrder;
+Scene scene;
 /* readonly */
 Array<String> shaderParameterNames;
 Array<Variant> shaderParameters;
@@ -5309,6 +6255,25 @@ String typeName;
 uint useTimer;
 /* readonly */
 int weakRefs;
+};
+
+class Matrix2
+{
+// Methods:
+bool Equals(const Matrix2&) const;
+Matrix2 Inverse() const;
+Vector2 Scale() const;
+Matrix2 Scaled(const Vector2&) const;
+void SetScale(const Vector2&);
+void SetScale(float);
+String ToString() const;
+Matrix2 Transpose() const;
+
+// Properties:
+float m00;
+float m01;
+float m10;
+float m11;
 };
 
 class Matrix3
@@ -5409,6 +6374,8 @@ class Menu
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -5419,13 +6386,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -5433,6 +6406,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -5441,23 +6415,30 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAccelerator(int, int);
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -5466,6 +6447,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -5493,8 +6475,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -5548,6 +6528,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -5587,6 +6568,8 @@ bool showPopup;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -5601,6 +6584,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -5608,11 +6593,11 @@ int width;
 class MessageBox
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 String message;
@@ -5633,25 +6618,25 @@ class Model
 {
 // Methods:
 Model Clone(const String& = String ( )) const;
+Geometry GetGeometry(uint, uint) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetGeometry(uint, uint, Geometry);
 
 // Properties:
-/* readonly */
-StringHash baseType;
-/* readonly */
 BoundingBox boundingBox;
 /* readonly */
 String category;
+Array<Vector3> geometryCenters;
 /* readonly */
 uint memoryUse;
 String name;
-/* readonly */
 uint numGeometries;
-/* readonly */
 Array<uint> numGeometryLodLevels;
 /* readonly */
 uint numMorphs;
@@ -5669,6 +6654,77 @@ uint useTimer;
 int weakRefs;
 };
 
+class NavArea
+{
+// Methods:
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+
+// Properties:
+bool animationEnabled;
+uint areaID;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+BoundingBox boundingBox;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+/* readonly */
+BoundingBox worldBoundingBox;
+};
+
 class Navigable
 {
 // Methods:
@@ -5677,23 +6733,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -5702,8 +6769,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -5738,31 +6803,44 @@ void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 Array<Vector3> FindPath(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+float GetAreaCost(uint) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), uint = 3);
+Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+void SetAreaCost(uint, float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 float agentHeight;
@@ -5776,8 +6854,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-StringHash baseType;
-/* readonly */
 BoundingBox boundingBox;
 /* readonly */
 String category;
@@ -5785,6 +6861,8 @@ float cellHeight;
 float cellSize;
 float detailSampleDistance;
 float detailSampleMaxError;
+bool drawNavAreas;
+bool drawOffMeshConnections;
 float edgeMaxError;
 float edgeMaxLength;
 bool enabled;
@@ -5802,6 +6880,7 @@ uint numAttributes;
 IntVector2 numTiles;
 ObjectAnimation objectAnimation;
 Vector3 padding;
+NavmeshPartitionType partitionType;
 /* readonly */
 int refs;
 float regionMergeSize;
@@ -5828,6 +6907,8 @@ void BroadcastRemoteEvent(const String&, bool, const VariantMap& = VariantMap ( 
 bool CheckRemoteEvent(const String&) const;
 bool Connect(const String&, uint16, Scene, const VariantMap& = VariantMap ( ));
 void Disconnect(int = 0);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 HttpRequest MakeHttpRequest(const String&, const String& = String ( ), Array<String> = null, const String& = String ( ));
 void RegisterRemoteEvent(const String&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
@@ -5839,8 +6920,6 @@ void UnregisterRemoteEvent(const String&) const;
 
 // Properties:
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
 /* readonly */
 Array<Connection> clientConnections;
@@ -5851,6 +6930,8 @@ int refs;
 Connection serverConnection;
 /* readonly */
 bool serverRunning;
+int simulatedLatency;
+float simulatedPacketLoss;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -5868,23 +6949,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool alwaysUpdateOwner;
@@ -5895,8 +6987,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 float basePriority;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 float distanceFactor;
@@ -5926,6 +7016,8 @@ class Node
 {
 // Methods:
 void AddChild(Node, uint = M_MAX_UNSIGNED);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 Node Clone(CreateMode = REPLICATED);
 Component CloneComponent(Component, CreateMode, uint = 0);
@@ -5937,6 +7029,7 @@ ScriptObject CreateScriptObject(const String&, const String&, CreateMode = REPLI
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 Node GetChild(const String&, bool = false) const;
@@ -5944,31 +7037,44 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
-Component GetComponent(const String&) const;
+Array<Node> GetChildrenWithTag(const String&, bool = false) const;
+Component GetComponent(const String&, bool = false) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
+Component GetParentComponent(const String&, bool = false) const;
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 Vector3 LocalToWorld(const Vector3&) const;
 Vector3 LocalToWorld(const Vector4&) const;
 Vector2 LocalToWorld2D(const Vector2&) const;
 bool LookAt(const Vector3&, const Vector3& = Vector3 ( 0 , 1 , 0 ), TransformSpace = TS_WORLD);
+void MarkDirty();
 void MarkNetworkUpdate() const;
 void Pitch(float, TransformSpace = TS_LOCAL);
 void Remove();
 void RemoveAllChildren();
 void RemoveAllComponents();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(Node);
 void RemoveChildren(bool, bool, bool);
 void RemoveComponent(Component);
 void RemoveComponent(const String&);
 void RemoveComponents(bool, bool);
+void RemoveComponents(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
@@ -5978,19 +7084,25 @@ void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(File);
+bool SaveJSON(JSONValue&) const;
+bool SaveJSON(VectorBuffer&);
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void Scale(const Vector3&);
 void Scale(float);
 void Scale2D(const Vector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
@@ -6020,8 +7132,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6060,6 +7170,8 @@ Vector2 scale2D;
 Scene scene;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Array<String> tags;
 bool temporary;
 /* readonly */
 Matrix3x4 transform;
@@ -6091,11 +7203,11 @@ Vector3 worldUp;
 class Object
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6115,6 +7227,8 @@ void AddAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 void RemoveAttributeAnimation(ValueAnimation);
@@ -6126,8 +7240,6 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 // Properties:
 /* readonly */
 Array<Variant> attributeAnimations;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6149,41 +7261,43 @@ int weakRefs;
 Array<Variant> wrapModes;
 };
 
-class Octree
+class Obstacle
 {
 // Methods:
-void AddManualDrawable(Drawable);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
-void DrawDebugGeometry(bool) const;
+void DrawDebugGeometry(bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-Array<Node> GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
-Array<Node> GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-Array<RayQueryResult> Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const;
-RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
-void RemoveManualDrawable(Drawable);
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetSize(const BoundingBox&, uint);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6193,7 +7307,87 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-StringHash baseType;
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+float height;
+/* readonly */
+uint id;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+ObjectAnimation objectAnimation;
+/* readonly */
+uint obstacleId;
+float radius;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
+class Octree
+{
+// Methods:
+void AddManualDrawable(Drawable);
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+void DrawDebugGeometry(bool) const;
+Array<Drawable> GetAllDrawables(uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+Array<Drawable> GetDrawables(const BoundingBox&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Frustum&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+Array<Drawable> GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK);
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+Array<RayQueryResult> Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const;
+RayQueryResult RaycastSingle(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveManualDrawable(Drawable);
+void RemoveObjectAnimation();
+void ResetToDefault();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+void SetSize(const BoundingBox&, uint);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
 /* readonly */
 String category;
 bool enabled;
@@ -6229,33 +7423,43 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
+uint areaID;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 bool bidirectional;
 /* readonly */
 String category;
@@ -6265,6 +7469,7 @@ bool enabledEffective;
 Node endPoint;
 /* readonly */
 uint id;
+uint mask;
 /* readonly */
 Node node;
 /* readonly */
@@ -6287,13 +7492,13 @@ class PackageFile
 // Methods:
 bool Exists(const String&) const;
 Array<String> GetEntryNames() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Open(const String&, uint = 0) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool compressed() const;
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6317,32 +7522,43 @@ int weakRefs;
 class ParticleEffect
 {
 // Methods:
+void AddColorFrame(ColorFrame);
+void AddColorTime(Color&, float);
+void AddTextureFrame(TextureFrame);
+void AddTextureTime(Rect&, float);
 ColorFrame GetColorFrame(uint) const;
 TextureFrame GetTextureFrame(uint) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
+bool Load(const XMLElement&);
+void RemoveColorFrame(uint);
+void RemoveTextureFrame(uint);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool Save(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetColorFrame(uint, ColorFrame) const;
-void SetTextureFrame(uint, TextureFrame) const;
+void SetColorFrame(uint, ColorFrame);
+void SetTextureFrame(uint, TextureFrame);
+void SortColorFrames();
+void SortTextureFrames();
 
 // Properties:
 float activeTime;
 float animationLodBias;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 Vector3 constantForce;
 float dampingForce;
 Vector3 emitterSize;
 EmitterType emitterType;
+FaceCameraMode faceCameraMode;
 float inactiveTime;
 Material material;
 Vector3 maxDirection;
 float maxEmissionRate;
-Vector3 maxParticleSize;
+Vector2 maxParticleSize;
 float maxRotation;
 float maxRotationSpeed;
 float maxTimeToLive;
@@ -6357,10 +7573,8 @@ float minRotationSpeed;
 float minTimeToLive;
 float minVelocity;
 String name;
-/* readonly */
 uint numColorFrames;
 uint numParticles;
-/* readonly */
 uint numTextureFrames;
 /* readonly */
 int refs;
@@ -6383,6 +7597,8 @@ int weakRefs;
 class ParticleEffect2D
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -6390,8 +7606,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -6419,27 +7633,38 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllParticles();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void Reset();
 void ResetEmissionTimer();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6449,8 +7674,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -6513,24 +7736,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -6539,8 +7773,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -6559,7 +7791,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -6601,7 +7832,6 @@ String pixelShader;
 String pixelShaderDefines;
 /* readonly */
 int refs;
-bool sm3;
 String vertexShader;
 String vertexShaderDefines;
 /* readonly */
@@ -6615,6 +7845,7 @@ class PhysicsRaycastResult
 /* readonly */
 RigidBody body;
 float distance;
+float hitFraction;
 Vector3 normal;
 Vector3 position;
 };
@@ -6640,30 +7871,43 @@ void DrawDebugGeometry(bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+Array<RigidBody> GetCollidingBodies(RigidBody);
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<RigidBody> GetRigidBodies(RigidBody);
 Array<RigidBody> GetRigidBodies(const BoundingBox&, uint = 0xffff);
 Array<RigidBody> GetRigidBodies(const Sphere&, uint = 0xffff);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-Array<PhysicsRaycastResult> Raycast(const Ray&, float = M_INFINITY, uint = 0xffff);
-PhysicsRaycastResult RaycastSingle(const Ray&, float = M_INFINITY, uint = 0xffff);
+Array<PhysicsRaycastResult> Raycast(const Ray&, float, uint = 0xffff);
+PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff);
+PhysicsRaycastResult RaycastSingleSegmented(const Ray&, float, float, uint = 0xffff);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveCachedGeometry(Model);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-PhysicsRaycastResult SphereCast(const Ray&, float, float = M_INFINITY, uint = 0xffff);
+void SetInterceptNetworkUpdate(const String&, bool);
+PhysicsRaycastResult SphereCast(const Ray&, float, float, uint = 0xffff);
 void Update(float);
 void UpdateCollisions();
 
@@ -6674,8 +7918,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -6702,6 +7944,7 @@ bool temporary;
 StringHash type;
 /* readonly */
 String typeName;
+bool updateEnabled;
 /* readonly */
 int weakRefs;
 };
@@ -6715,28 +7958,39 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Array<RigidBody2D> GetRigidBodies(const Rect&, uint = 0xffff);
 RigidBody2D GetRigidBody(const Vector2&, uint = 0xffff);
 RigidBody2D GetRigidBody(int, int, uint = 0xffff);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 Array<PhysicsRaycastResult2D> Raycast(const Vector2&, const Vector2&, uint = 0xffff);
 PhysicsRaycastResult2D RaycastSingle(const Vector2&, const Vector2&, uint = 0xffff);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool allowSleeping;
@@ -6747,8 +8001,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoClearForces;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool continuousPhysics;
@@ -6777,6 +8029,7 @@ bool temporary;
 StringHash type;
 /* readonly */
 String typeName;
+bool updateEnabled;
 uint velocityIterations;
 bool warmStarting;
 /* readonly */
@@ -6847,15 +8100,18 @@ int weakRefs;
 class Quaternion
 {
 // Methods:
+Quaternion Conjugate() const;
 float DotProduct(const Quaternion&) const;
 bool Equals(const Quaternion&) const;
 void FromAngleAxis(float, const Vector3&);
 void FromAxes(const Vector3&, const Vector3&, const Vector3&);
 void FromEulerAngles(float, float, float);
-bool FromLookRotation(const Vector3&, const Vector3&);
+bool FromLookRotation(const Vector3&, const Vector3& = Vector3 ( 0.0 , 1.0 , 0.0 ));
+void FromRotationMatrix(const Matrix3&);
 void FromRotationTo(const Vector3&, const Vector3&);
 Quaternion Inverse() const;
 bool IsNaN() const;
+float LengthSquared() const;
 Quaternion Nlerp(Quaternion, float, bool) const;
 void Normalize();
 Quaternion Normalized() const;
@@ -6869,6 +8125,8 @@ Vector3 eulerAngles;
 float pitch;
 /* readonly */
 float roll;
+/* readonly */
+Matrix3 rotationMatrix;
 float w;
 float x;
 float y;
@@ -6885,6 +8143,7 @@ void Define(const Vector3&, const Vector3&);
 float Distance(const Vector3&) const;
 float HitDistance(const BoundingBox&) const;
 float HitDistance(const Frustum&, bool = true) const;
+float HitDistance(const Plane&) const;
 float HitDistance(const Sphere&) const;
 float HitDistance(const Vector3&, const Vector3&, const Vector3&) const;
 Vector3 Project(const Vector3&) const;
@@ -6907,6 +8166,7 @@ Node node;
 Vector3 normal;
 Vector3 position;
 uint subObject;
+Vector2 textureUV;
 };
 
 class Rect
@@ -6916,6 +8176,7 @@ void Clear();
 void Clip(const Rect&);
 void Define(const Vector2&);
 void Define(const Vector2&, const Vector2&);
+bool Defined() const;
 bool Equals(const Rect&) const;
 Intersection IsInside(const Vector2&) const;
 void Merge(const Rect&);
@@ -6926,7 +8187,6 @@ Vector4 ToVector4() const;
 float bottom;
 /* readonly */
 Vector2 center;
-bool defined;
 /* readonly */
 Vector2 halfSize;
 float left;
@@ -6983,16 +8243,20 @@ class RenderPathCommand
 {
 // Methods:
 void RemoveShaderParameter(const String&);
+void SetOutput(uint, const String&, CubeMapFace = FACE_POSITIVE_X);
 
 // Properties:
+BlendMode blendMode;
 Color clearColor;
 float clearDepth;
 uint clearFlags;
 uint clearStencil;
+String depthStencilName;
 bool enabled;
 bool markToStencil;
 String metadata;
 uint numOutputs;
+Array<CubeMapFace> outputFaces;
 Array<String> outputNames;
 String pass;
 String pixelShaderDefines;
@@ -7034,6 +8298,7 @@ class RenderTargetInfo
 {
 
 // Properties:
+bool cubemap;
 bool enabled;
 bool filtered;
 uint format;
@@ -7049,13 +8314,14 @@ class Renderer
 {
 // Methods:
 void DrawDebugGeometry(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void ReloadShaders() const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetDefaultRenderPath(XMLFile);
+void SetVSMShadowParameters(float, float);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7071,7 +8337,6 @@ bool drawShadows;
 bool dynamicInstancing;
 bool hdrRendering;
 int materialQuality;
-int maxInstanceTriangles;
 int maxOccluderTriangles;
 int maxShadowMaps;
 int maxSortedInstances;
@@ -7099,16 +8364,19 @@ int occlusionBufferSize;
 int refs;
 bool reuseShadowMaps;
 int shadowMapSize;
-int shadowQuality;
+ShadowQuality shadowQuality;
+float shadowSoftness;
 bool specularLighting;
 int textureAnisotropy;
 TextureFilterMode textureFilterMode;
 int textureQuality;
+bool threadedOcclusion;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
 Array<Viewport> viewports;
+Vector2 vsmShadowParameters;
 /* readonly */
 int weakRefs;
 };
@@ -7116,6 +8384,8 @@ int weakRefs;
 class Resource
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -7123,8 +8393,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7146,15 +8414,20 @@ class ResourceCache
 {
 // Methods:
 bool AddManualResource(Resource);
-void AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(PackageFile, uint = M_MAX_UNSIGNED);
+bool AddPackageFile(const String&, uint = M_MAX_UNSIGNED);
 bool AddResourceDir(const String&, uint = M_MAX_UNSIGNED);
 bool BackgroundLoadResource(const String&, const String&, bool = true);
 bool Exists(const String&) const;
+Resource GetExistingResource(StringHash, const String&);
+Resource GetExistingResource(const String&, const String&);
 File GetFile(const String&);
 String GetPreferredResourceDir(const String&) const;
 Resource GetResource(StringHash, const String&, bool = true);
 Resource GetResource(const String&, const String&, bool = true);
 String GetResourceFileName(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void ReleaseAllResources(bool = false);
 void ReleaseResource(const String&, const String&, bool = false);
 void ReleaseResources(StringHash, bool = false);
@@ -7172,13 +8445,11 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 // Properties:
 bool autoReloadResources;
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
 int finishBackgroundResourcesMs;
-Array<uint> memoryBudget;
+Array<uint64> memoryBudget;
 /* readonly */
-Array<uint> memoryUse;
+Array<uint64> memoryUse;
 /* readonly */
 uint numBackgroundLoadResources;
 /* readonly */
@@ -7193,7 +8464,7 @@ bool seachPackagesFirst;
 /* writeonly */
 bool searchPackagesFirst;
 /* readonly */
-uint totalMemoryUse;
+uint64 totalMemoryUse;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -7241,27 +8512,38 @@ void EnableMassUpdate();
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetVelocityAtPoint(const Vector3&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void ReAddBodyToWorld();
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetForces();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetCollisionLayerAndMask(uint, uint);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetTransform(const Vector3&, const Quaternion&);
 
 // Properties:
@@ -7278,8 +8560,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 float ccdMotionThreshold;
@@ -7340,23 +8620,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool allowSleep;
@@ -7368,8 +8659,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool awake;
-/* readonly */
-StringHash baseType;
 BodyType2D bodyType;
 bool bullet;
 /* readonly */
@@ -7408,6 +8697,8 @@ class Scene
 // Methods:
 void AddChild(Node, uint = M_MAX_UNSIGNED);
 void AddRequiredPackageFile(PackageFile);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void Clear(bool = true, bool = true);
 void ClearRequiredPackageFiles();
@@ -7420,6 +8711,7 @@ ScriptObject CreateScriptObject(const String&, const String&, CreateMode = REPLI
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 Node GetChild(const String&, bool = false) const;
@@ -7427,17 +8719,28 @@ Array<Node> GetChildren(bool = false) const;
 Array<Node> GetChildrenWithComponent(const String&, bool = false) const;
 Array<Node> GetChildrenWithScript(bool = false) const;
 Array<Node> GetChildrenWithScript(const String&, bool = false) const;
-Component GetComponent(const String&) const;
-Component GetComponent(uint);
+Array<Node> GetChildrenWithTag(const String&, bool = false) const;
+Component GetComponent(const String&, bool = false) const;
+Component GetComponent(uint) const;
 Array<Component> GetComponents() const;
 Array<Component> GetComponents(const String&, bool = false) const;
-Node GetNode(uint);
+bool GetInterceptNetworkUpdate(const String&) const;
+Node GetNode(uint) const;
+Array<Node> GetNodesWithTag(const String&) const;
 Component GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0);
+Component GetParentComponent(const String&, bool = false) const;
 ScriptObject GetScriptObject() const;
 ScriptObject GetScriptObject(const String&) const;
 bool HasComponent(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&);
 Node Instantiate(File, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
+Node InstantiateJSON(File, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
+Node InstantiateJSON(JSONFile, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
+Node InstantiateJSON(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
+Node InstantiateJSON(const JSONValue&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateXML(File, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateXML(XMLFile, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
@@ -7446,6 +8749,9 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadAsync(File, LoadMode = LOAD_SCENE_AND_RESOURCES);
 bool LoadAsyncXML(File, LoadMode = LOAD_SCENE_AND_RESOURCES);
+bool LoadJSON(File);
+bool LoadJSON(VectorBuffer&);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(const XMLElement&, bool = false);
@@ -7459,12 +8765,17 @@ void RegisterVar(const String&);
 void Remove();
 void RemoveAllChildren();
 void RemoveAllComponents();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(Node);
 void RemoveChildren(bool, bool, bool);
 void RemoveComponent(Component);
 void RemoveComponent(const String&);
 void RemoveComponents(bool, bool);
+void RemoveComponents(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
 void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
@@ -7473,17 +8784,23 @@ void RotateAround(const Vector3&, const Quaternion&, TransformSpace = TS_LOCAL);
 void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(File, const String& = "\t");
+bool SaveJSON(JSONValue&) const;
+bool SaveJSON(VectorBuffer&, const String& = "\t");
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void Scale(const Vector3&);
 void Scale(float);
 void Scale2D(const Vector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
@@ -7525,8 +8842,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7576,6 +8891,8 @@ Vector2 scale2D;
 ScriptObject scriptObject;
 float smoothingConstant;
 float snapThreshold;
+/* readonly */
+Array<String> tags;
 bool temporary;
 float timeScale;
 /* readonly */
@@ -7609,13 +8926,13 @@ Vector3 worldUp;
 class Script
 {
 // Methods:
-void DumpAPI(DumpMode = DOXYGEN);
+void DumpAPI(DumpMode = DOXYGEN, const String& = String ( ));
 bool Execute(const String&);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 Scene defaultScene;
@@ -7635,9 +8952,10 @@ class ScriptFile
 {
 // Methods:
 void ClearDelayedExecute(const String& = String ( ));
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
-bool Execute(const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
+bool Execute(const String&, const Array<Variant> = null);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -7645,8 +8963,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -7672,31 +8988,42 @@ class ScriptInstance
 void ApplyAttributes();
 void ClearDelayedExecute(const String& = String ( ));
 bool CreateObject(ScriptFile, const String&);
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
 void DrawDebugGeometry(DebugRenderer, bool);
-bool Execute(const String&);
-bool Execute(const String&, const Array<Variant>);
+bool Execute(const String&, const Array<Variant> = null);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasMethod(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool IsA(const String&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -7705,8 +9032,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 String className;
@@ -7742,6 +9067,8 @@ class ScrollBar
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeValue(float);
@@ -7753,13 +9080,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -7767,6 +9100,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -7775,28 +9109,36 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -7820,8 +9162,6 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
 Button backButton;
-/* readonly */
-StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -7874,6 +9214,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -7910,6 +9251,8 @@ Slider slider;
 bool sortChildren;
 float stepFactor;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -7923,6 +9266,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -7931,6 +9276,8 @@ class ScrollView
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -7941,13 +9288,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -7955,6 +9308,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -7963,28 +9317,36 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -8008,8 +9370,6 @@ Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoDisableChildren;
 float autoDisableThreshold;
-/* readonly */
-StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -8061,6 +9421,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -8098,6 +9459,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -8113,6 +9476,8 @@ ScrollBar verticalScrollBar;
 IntVector2 viewPosition;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -8123,17 +9488,23 @@ class Serializable
 void ApplyAttributes();
 Variant GetAttribute(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void RemoveInstanceDefault();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetAttribute(const String&, const Variant&);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 /* readonly */
@@ -8141,8 +9512,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -8166,6 +9535,7 @@ bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
 bool WriteByte(int8);
 bool WriteColor(const Color&);
+bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
@@ -8191,6 +9561,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 };
 
 class Skeleton
@@ -8217,24 +9588,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -8243,8 +9625,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -8297,6 +9677,8 @@ class Slider
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ChangeValue(float);
@@ -8308,13 +9690,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -8322,6 +9710,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -8330,22 +9719,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -8354,6 +9750,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -8373,8 +9770,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 IntRect border;
 bool bringToBack;
@@ -8430,6 +9825,7 @@ bool internal;
 /* readonly */
 BorderImage knob;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -8463,6 +9859,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 bool tiled;
@@ -8478,6 +9876,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -8490,23 +9890,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Update(float, float);
 
 // Properties:
@@ -8516,8 +9927,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8550,6 +9959,8 @@ int weakRefs;
 class Sound
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -8557,8 +9968,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -8597,23 +10006,34 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -8622,8 +10042,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8655,10 +10073,15 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Play(Sound);
@@ -8666,16 +10089,22 @@ void Play(Sound, float);
 void Play(Sound, float, float);
 void Play(Sound, float, float, float);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Stop();
 
 // Properties:
@@ -8688,8 +10117,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8711,7 +10138,7 @@ bool playing;
 int refs;
 /* readonly */
 Sound sound;
-SoundType soundType;
+String soundType;
 bool temporary;
 /* readonly */
 float timePosition;
@@ -8731,10 +10158,15 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Play(Sound);
@@ -8742,18 +10174,24 @@ void Play(Sound, float);
 void Play(Sound, float, float);
 void Play(Sound, float, float, float);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAngleAttenuation(float, float);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDistanceAttenuation(float, float, float);
+void SetInterceptNetworkUpdate(const String&, bool);
 void Stop();
 
 // Properties:
@@ -8766,8 +10204,6 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoRemove;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -8794,7 +10230,7 @@ int refs;
 float rolloffFactor;
 /* readonly */
 Sound sound;
-SoundType soundType;
+String soundType;
 bool temporary;
 /* readonly */
 float timePosition;
@@ -8815,10 +10251,13 @@ void Define(const Frustum&);
 void Define(const Polyhedron&);
 void Define(const Sphere&);
 void Define(const Vector3&, float);
+bool Defined() const;
 float Distance(const Vector3&) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
+Intersection IsInsideFast(const BoundingBox&) const;
+Intersection IsInsideFast(const Sphere&) const;
 void Merge(const BoundingBox&);
 void Merge(const Frustum&);
 void Merge(const Sphere&);
@@ -8826,7 +10265,6 @@ void Merge(const Vector3&);
 
 // Properties:
 Vector3 center;
-bool defined;
 float radius;
 };
 
@@ -8856,27 +10294,40 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetPoint(float) const;
+Vector3 GetPosition() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Move(float);
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveControlPoint(Node);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void Reset();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
+void SetPosition(float);
 
 // Properties:
 bool animationEnabled;
@@ -8885,8 +10336,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 Node controlledNode;
@@ -8899,11 +10348,12 @@ InterpolationMode interpolationMode;
 /* readonly */
 bool isFinished;
 /* readonly */
+float length;
+/* readonly */
 Node node;
 /* readonly */
 uint numAttributes;
 ObjectAnimation objectAnimation;
-Vector3 position;
 /* readonly */
 int refs;
 float speed;
@@ -8920,6 +10370,8 @@ class Sprite
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -8927,18 +10379,25 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -8947,26 +10406,34 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetFullImageRect();
 void SetHotSpot(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
@@ -8986,8 +10453,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 bool bringToBack;
 bool bringToFront;
@@ -9033,6 +10498,8 @@ Vector2 scale;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 Texture texture;
 /* readonly */
@@ -9045,6 +10512,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -9052,6 +10521,8 @@ int width;
 class Sprite2D
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -9059,8 +10530,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 Vector2 hotSpot;
@@ -9087,6 +10556,8 @@ class SpriteSheet2D
 // Methods:
 void DefineSprite(const String&, const IntRect&, const Vector2& = Vector2 ( 0.5f , 0.5f ), const IntVector2& = IntVector2 :: ZERO);
 Sprite2D GetSprite(const String&);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -9094,8 +10565,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -9124,26 +10593,37 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool IsInside(const Vector3&) const;
 bool IsInsideLocal(const Vector3&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9152,8 +10632,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9211,26 +10689,37 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllInstanceNodes();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveInstanceNode(Node);
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9239,8 +10728,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9302,35 +10789,45 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetFlip(bool, bool);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
+float alpha;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BlendMode blendMode;
 /* readonly */
 BoundingBox boundingBox;
@@ -9338,12 +10835,14 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+Material customMaterial;
 float drawDistance;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 bool flipX;
 bool flipY;
+Vector2 hotSpot;
 /* readonly */
 uint id;
 /* readonly */
@@ -9351,7 +10850,6 @@ bool inView;
 int layer;
 uint lightMask;
 float lodBias;
-Material material;
 uint maxLights;
 /* readonly */
 Node node;
@@ -9371,6 +10869,7 @@ bool temporary;
 StringHash type;
 /* readonly */
 String typeName;
+bool useHotSpot;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -9403,7 +10902,7 @@ String Replaced(const String&, const String&, bool = true) const;
 String Replaced(uint8, uint8, bool = true) const;
 void Resize(uint);
 void SetUTF8FromLatin1(const String&);
-Array<String> Split(uint8) const;
+Array<String> Split(uint8, bool = false) const;
 bool StartsWith(const String&, bool = true) const;
 String Substring(uint) const;
 String Substring(uint, uint) const;
@@ -9411,6 +10910,7 @@ String SubstringUTF8(uint) const;
 String SubstringUTF8(uint, uint) const;
 bool ToBool() const;
 Color ToColor() const;
+double ToDouble() const;
 float ToFloat() const;
 int ToInt() const;
 IntRect ToIntRect() const;
@@ -9450,20 +10950,20 @@ uint value;
 class Technique
 {
 // Methods:
-Pass CreatePass(StringHash);
-Pass GetPass(StringHash);
-Pass GetSupportedPass(StringHash);
-bool HasPass(StringHash) const;
+Pass CreatePass(const String&);
+Pass GetPass(const String&);
+Pass GetSupportedPass(const String&);
+bool HasPass(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
-void RemovePass(StringHash);
+void RemovePass(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool desktop;
@@ -9473,12 +10973,11 @@ String name;
 /* readonly */
 uint numPasses;
 /* readonly */
-Array<StringHash> passTypes;
+Array<String> passNames;
 /* readonly */
 Array<Pass> passes;
 /* readonly */
 int refs;
-bool sm3;
 /* readonly */
 bool supported;
 /* readonly */
@@ -9509,26 +11008,37 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetHeight(const Vector3&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 IntVector2 WorldToHeightMap(const Vector3&) const;
 
 // Properties:
@@ -9538,8 +11048,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 bool castShadows;
 /* readonly */
 String category;
@@ -9554,6 +11062,7 @@ uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
+uint maxLodLevels;
 /* readonly */
 Node node;
 /* readonly */
@@ -9565,6 +11074,7 @@ IntVector2 numVertices;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
+uint occlusionLodLevel;
 int patchSize;
 /* readonly */
 Array<TerrainPatch> patches;
@@ -9593,24 +11103,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9619,8 +11140,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9665,6 +11184,8 @@ class Text
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 void ClearSelection();
@@ -9676,13 +11197,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -9690,6 +11217,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -9698,22 +11226,29 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
@@ -9722,6 +11257,7 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 bool SetFont(Font, int);
 bool SetFont(const String&, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -9742,8 +11278,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
+bool autoLocalizable;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -9802,6 +11337,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -9846,6 +11382,8 @@ uint selectionStart;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 String text;
 HorizontalAlignment textAlignment;
@@ -9861,6 +11399,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 bool wordwrap;
@@ -9874,27 +11414,38 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 bool SetFont(Font, int);
 bool SetFont(const String&, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 bool animationEnabled;
@@ -9903,8 +11454,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 BoundingBox boundingBox;
 bool castShadows;
@@ -9981,6 +11530,8 @@ class Texture
 {
 // Methods:
 void ClearDataLost();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -9991,11 +11542,11 @@ void SetNumLevels(uint);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* readonly */
-StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10036,6 +11587,9 @@ class Texture2D
 {
 // Methods:
 void ClearDataLost();
+Image GetImage() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -10048,11 +11602,11 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* readonly */
-StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10095,6 +11649,8 @@ class Texture3D
 {
 // Methods:
 void ClearDataLost();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -10102,16 +11658,16 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* readonly */
-StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10133,8 +11689,6 @@ Array<int> mipsToSkip;
 String name;
 /* readonly */
 int refs;
-/* readonly */
-RenderSurface renderSurface;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -10154,6 +11708,8 @@ class TextureCube
 {
 // Methods:
 void ClearDataLost();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -10166,11 +11722,11 @@ bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 Texture backupTexture;
-/* readonly */
-StringHash baseType;
 Color borderColor;
 /* readonly */
 String category;
+/* readonly */
+uint components;
 /* readonly */
 bool compressed;
 /* readonly */
@@ -10242,25 +11798,36 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 bool PositionToTileIndex(int&, int&, const Vector2&) const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 Vector2 TileIndexToPosition(int, int) const;
 
 // Properties:
@@ -10270,8 +11837,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 bool enabled;
@@ -10323,28 +11888,39 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
 TileMapObject2D GetObject(uint) const;
 Node GetObjectNode(uint) const;
 Tile2D GetTile(int, int) const;
 Node GetTileNode(int, int) const;
 bool HasProperty(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 const String& GetProperty(const String&) const;
 
 // Properties:
@@ -10355,10 +11931,7 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 /* readonly */
-StringHash baseType;
-/* readonly */
 String category;
-/* writeonly */
 int drawOrder;
 bool enabled;
 /* readonly */
@@ -10380,8 +11953,6 @@ uint numObjects;
 ObjectAnimation objectAnimation;
 /* readonly */
 int refs;
-/* readonly */
-int rrawOrder;
 bool temporary;
 /* readonly */
 StringHash type;
@@ -10427,11 +11998,11 @@ int weakRefs;
 class Time
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -10466,6 +12037,8 @@ void Reset();
 class TmxFile2D
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -10473,8 +12046,6 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -10496,6 +12067,8 @@ class ToolTip
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -10506,13 +12079,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -10520,6 +12099,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -10528,28 +12108,36 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -10569,8 +12157,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -10620,6 +12206,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -10650,6 +12237,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -10661,6 +12250,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -10687,6 +12278,8 @@ void DebugDraw(UIElement);
 UIElement GetElementAt(const IntVector2&, bool = true);
 UIElement GetElementAt(int, int, bool = true);
 bool HasModalElement() const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsDragging() const;
 UIElement LoadLayout(File);
 UIElement LoadLayout(File, XMLFile);
@@ -10698,11 +12291,11 @@ bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetFocusElement(UIElement, bool = false);
+void SetHeight(float);
+void SetWidth(float);
 const Array<UIElement> GetDragElements();
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 String clipBoardText;
@@ -10725,6 +12318,7 @@ bool nonFocusedMouseWheel;
 int refs;
 /* readonly */
 UIElement root;
+float scale;
 /* readonly */
 StringHash type;
 /* readonly */
@@ -10740,6 +12334,8 @@ class UIElement
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -10750,13 +12346,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -10764,6 +12366,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -10772,28 +12375,36 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -10813,8 +12424,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -10863,6 +12472,7 @@ int indentSpacing;
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -10893,6 +12503,8 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
 TraversalMode traversalMode;
 /* readonly */
@@ -10905,6 +12517,8 @@ VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -10912,6 +12526,8 @@ int width;
 class ValueAnimation
 {
 // Methods:
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Save(File) const;
@@ -10921,8 +12537,6 @@ void SetEventFrame(float, const String&, const VariantMap& = VariantMap ( ));
 void SetKeyFrame(float, const Variant&);
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 InterpMethod interpolationMethod;
@@ -10951,11 +12565,13 @@ const Color& GetColor() const;
 void FromString(VariantType, const String&);
 void FromString(const String&, const String&);
 bool GetBool() const;
-VectorBuffer GetBuffer() const;
+double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
 RefCounted GetPtr() const;
+ScriptObject GetScriptObject() const;
 StringHash GetStringHash() const;
+Array<String> GetStringVector() const;
 uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
@@ -10972,6 +12588,7 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
+const VectorBuffer GetBuffer() const;
 
 // Properties:
 /* readonly */
@@ -11005,7 +12622,9 @@ Array<Variant> values;
 class Vector2
 {
 // Methods:
+Vector2 Abs() const;
 float AbsDotProduct(const Vector2&) const;
+float Angle(const Vector2&) const;
 float DotProduct(const Vector2&) const;
 bool Equals(const Vector2&) const;
 bool IsNaN() const;
@@ -11028,6 +12647,7 @@ float y;
 class Vector3
 {
 // Methods:
+Vector3 Abs() const;
 float AbsDotProduct(const Vector3&) const;
 float Angle(const Vector3&) const;
 Vector3 CrossProduct(const Vector3&) const;
@@ -11054,6 +12674,7 @@ float z;
 class Vector4
 {
 // Methods:
+Vector4 Abs() const;
 float AbsDotProduct(const Vector4&) const;
 float DotProduct(const Vector4&) const;
 bool Equals(const Vector4&) const;
@@ -11079,6 +12700,7 @@ bool ReadBool();
 BoundingBox ReadBoundingBox();
 int8 ReadByte();
 Color ReadColor();
+double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
@@ -11104,6 +12726,7 @@ VariantMap ReadVariantMap();
 Vector2 ReadVector2();
 Vector3 ReadVector3();
 Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
 void Resize(uint);
 uint Seek(uint);
 void SetData(Deserializer, uint);
@@ -11112,6 +12735,7 @@ bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
 bool WriteByte(int8);
 bool WriteColor(const Color&);
+bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
@@ -11137,6 +12761,7 @@ bool WriteVariantMap(const VariantMap&);
 bool WriteVector2(const Vector2&);
 bool WriteVector3(const Vector3&);
 bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
 
 // Properties:
 /* readonly */
@@ -11151,10 +12776,45 @@ uint position;
 uint size;
 };
 
+class VertexBuffer
+{
+// Methods:
+VectorBuffer GetData();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(VectorBuffer&);
+bool SetDataRange(VectorBuffer&, uint, uint, bool = false);
+void SetSize(uint, uint, bool = false);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+bool dynamic;
+/* readonly */
+uint elementMask;
+/* readonly */
+int refs;
+bool shadowed;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+uint vertexCount;
+/* readonly */
+uint vertexSize;
+/* readonly */
+int weakRefs;
+};
+
 class View3D
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -11165,13 +12825,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -11179,6 +12845,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -11188,28 +12855,38 @@ void MarkNetworkUpdate() const;
 void QueueUpdate();
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -11219,7 +12896,7 @@ void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
 bool SetStyle(const XMLElement&);
 bool SetStyleAuto(XMLFile = null);
-void SetView(Scene, Camera);
+void SetView(Scene, Camera, bool = true);
 void UpdateLayout();
 const Variant& GetVar(const StringHash&);
 
@@ -11231,8 +12908,8 @@ Array<Variant> attributeDefaults;
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
 bool autoUpdate;
-/* readonly */
-StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -11280,14 +12957,18 @@ FocusMode focusMode;
 uint format;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -11330,7 +13011,11 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;
@@ -11344,6 +13029,8 @@ VerticalAlignment verticalAlignment;
 Viewport viewport;
 bool visible;
 /* readonly */
+bool visibleEffective;
+/* readonly */
 int weakRefs;
 int width;
 };
@@ -11352,17 +13039,18 @@ class Viewport
 {
 // Methods:
 Ray GetScreenRay(int, int) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 Vector3 ScreenToWorldPoint(int, int, float) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetRenderPath(XMLFile);
 Vector2 WorldToScreenPoint(const Vector3&) const;
 
 // Properties:
-/* readonly */
-StringHash baseType;
 Camera camera;
 /* readonly */
 String category;
+Camera cullCamera;
 bool drawDebug;
 IntRect rect;
 /* readonly */
@@ -11395,6 +13083,8 @@ class Window
 {
 // Methods:
 void AddChild(UIElement);
+void AddTag(const String&);
+void AddTags(const String&, int8 = ';');
 void ApplyAttributes();
 void BringToFront();
 UIElement CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED);
@@ -11405,13 +13095,19 @@ uint FindChild(UIElement) const;
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 UIElement GetChild(const String&, bool = false) const;
 UIElement GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const;
 Array<UIElement> GetChildren(bool = false) const;
+Array<UIElement> GetChildrenWithTag(const String&, bool = false) const;
 UIElement GetElementEventSender() const;
+bool GetInterceptNetworkUpdate(const String&) const;
 uint GetNumChildren(bool) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool HasTag(const String&) const;
 void InsertChild(uint, UIElement);
 bool IsInside(IntVector2, bool);
 bool IsInsideCombined(IntVector2, bool);
@@ -11419,6 +13115,7 @@ bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadChildXML(XMLFile, XMLFile = null);
 bool LoadChildXML(const XMLElement&, XMLFile = null, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(File);
 bool LoadXML(VectorBuffer&);
 bool LoadXML(XMLFile, XMLFile);
@@ -11427,28 +13124,38 @@ bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
 void RemoveAllChildren();
+void RemoveAllTags();
+void RemoveAttributeAnimation(const String&);
 void RemoveChild(UIElement, uint = 0);
 void RemoveChild(uint);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+bool RemoveTag(const String&);
 void ResetDeepEnabled();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
-bool SaveXML(File);
-bool SaveXML(VectorBuffer&);
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(File, const String& = "\t");
+bool SaveXML(VectorBuffer&, const String& = "\t");
 bool SaveXML(XMLElement&) const;
 IntVector2 ScreenToElement(const IntVector2&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAlignment(HorizontalAlignment, VerticalAlignment);
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetDeepEnabled(bool);
 void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
+void SetFullImageRect();
+void SetHoverOffset(int, int);
+void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
 void SetMaxSize(int, int);
 void SetMinSize(int, int);
@@ -11468,8 +13175,8 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
+BlendMode blendMode;
+IntRect border;
 bool bringToBack;
 bool bringToFront;
 /* readonly */
@@ -11512,14 +13219,18 @@ bool focus;
 FocusMode focusMode;
 int height;
 HorizontalAlignment horizontalAlignment;
+IntVector2 hoverOffset;
 /* readonly */
 bool hovering;
+IntRect imageBorder;
+IntRect imageRect;
 int indent;
 int indentSpacing;
 /* readonly */
 int indentWidth;
 bool internal;
 IntRect layoutBorder;
+Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
 int maxHeight;
@@ -11558,7 +13269,11 @@ bool selected;
 IntVector2 size;
 bool sortChildren;
 String style;
+/* readonly */
+Array<String> tags;
 bool temporary;
+Texture texture;
+bool tiled;
 TraversalMode traversalMode;
 /* readonly */
 StringHash type;
@@ -11569,6 +13284,8 @@ bool useDerivedOpacity;
 VariantMap vars;
 VerticalAlignment verticalAlignment;
 bool visible;
+/* readonly */
+bool visibleEffective;
 /* readonly */
 int weakRefs;
 int width;
@@ -11586,8 +13303,11 @@ bool GetBool(const String&) const;
 BoundingBox GetBoundingBox() const;
 XMLElement GetChild(const String& = String ( )) const;
 Color GetColor(const String&) const;
+double GetDouble(const String&) const;
 float GetFloat(const String&) const;
 int GetInt(const String&) const;
+IntRect GetIntRect(const String&) const;
+IntVector2 GetIntVector2(const String&) const;
 Matrix3 GetMatrix3(const String&) const;
 Matrix3x4 GetMatrix3x4(const String&) const;
 Matrix4 GetMatrix4(const String&) const;
@@ -11619,8 +13339,11 @@ bool SetAttribute(const String&, const String&);
 bool SetBool(const String&, bool);
 bool SetBoundingBox(const BoundingBox&);
 bool SetColor(const String&, const Color&);
+bool SetDouble(const String&, double);
 bool SetFloat(const String&, float);
 bool SetInt(const String&, int);
+bool SetIntRect(const String&, const IntRect&);
+bool SetIntVector2(const String&, const IntVector2&);
 bool SetMatrix3(const String&, const Matrix3&);
 bool SetMatrix3x4(const String&, const Matrix3x4&);
 bool SetMatrix4(const String&, const Matrix4&);
@@ -11661,18 +13384,19 @@ class XMLFile
 XMLElement CreateRoot(const String&);
 bool FromString(const String&);
 XMLElement GetRoot(const String& = String ( ));
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 void Patch(XMLElement);
 void Patch(XMLFile);
 bool Save(File) const;
+bool Save(File, const String&) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
-String ToString() const;
+String ToString(const String& = String ( "\t" )) const;
 
 // Properties:
-/* readonly */
-StringHash baseType;
 /* readonly */
 String category;
 /* readonly */
@@ -11731,24 +13455,35 @@ void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
 ValueAnimation GetAttributeAnimation(const String&) const;
 float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
+bool GetInterceptNetworkUpdate(const String&) const;
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsInView(Camera) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
 void Remove();
+void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
+void RemoveObjectAnimation();
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
 void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
 void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
 Color ambientColor;
@@ -11763,8 +13498,6 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-/* readonly */
-StringHash baseType;
 BoundingBox boundingBox;
 bool castShadows;
 /* readonly */
@@ -11833,8 +13566,8 @@ BLEND_SUBTRACTALPHA,
 enum BodyType2D
 {
 BT_STATIC,
-BT_DYNAMIC,
 BT_KINEMATIC,
+BT_DYNAMIC,
 };
 
 enum CollisionEventMode
@@ -11853,6 +13586,20 @@ CMP_LESS,
 CMP_LESSEQUAL,
 CMP_GREATER,
 CMP_GREATEREQUAL,
+};
+
+enum CompressedFormat
+{
+CF_NONE,
+CF_RGBA,
+CF_DXT1,
+CF_DXT3,
+CF_DXT5,
+CF_ETC1,
+CF_PVRTC_RGB_2BPP,
+CF_PVRTC_RGBA_2BPP,
+CF_PVRTC_RGB_4BPP,
+CF_PVRTC_RGBA_4BPP,
 };
 
 enum ConstraintType
@@ -11877,6 +13624,31 @@ REPLICATED,
 LOCAL,
 };
 
+enum CrowdAgentRequestedTarget
+{
+CA_REQUESTEDTARGET_NONE,
+CA_REQUESTEDTARGET_POSITION,
+CA_REQUESTEDTARGET_VELOCITY,
+};
+
+enum CrowdAgentState
+{
+CA_STATE_INVALID,
+CA_STATE_WALKING,
+CA_STATE_OFFMESH,
+};
+
+enum CrowdAgentTargetState
+{
+CA_TARGET_NONE,
+CA_TARGET_FAILED,
+CA_TARGET_VALID,
+CA_TARGET_REQUESTING,
+CA_TARGET_WAITINGFORQUEUE,
+CA_TARGET_WAITINGFORPATH,
+CA_TARGET_VELOCITY,
+};
+
 enum CubeMapFace
 {
 FACE_POSITIVE_X,
@@ -11897,13 +13669,23 @@ CULL_CW,
 enum CursorShape
 {
 CS_NORMAL,
+CS_IBEAM,
+CS_CROSS,
 CS_RESIZEVERTICAL,
 CS_RESIZEDIAGONAL_TOPRIGHT,
 CS_RESIZEHORIZONTAL,
 CS_RESIZEDIAGONAL_TOPLEFT,
+CS_RESIZE_ALL,
 CS_ACCEPTDROP,
 CS_REJECTDROP,
 CS_BUSY,
+CS_BUSY_ARROW,
+};
+
+enum DBAPI
+{
+DBAPI_SQLITE,
+DBAPI_ODBC,
 };
 
 enum DumpMode
@@ -11931,6 +13713,7 @@ FC_ROTATE_XYZ,
 FC_ROTATE_Y,
 FC_LOOKAT_XYZ,
 FC_LOOKAT_Y,
+FC_DIRECTION,
 };
 
 enum FileMode
@@ -11986,6 +13769,9 @@ IM_SPLINE,
 enum InterpolationMode
 {
 BEZIER_CURVE,
+CATMULL_ROM_CURVE,
+LINEAR_CURVE,
+CATMULL_ROM_FULL_CURVE,
 };
 
 enum Intersection
@@ -11997,9 +13783,12 @@ INSIDE,
 
 enum JSONValueType
 {
-JSON_ANY,
-JSON_OBJECT,
+JSON_NULL,
+JSON_BOOL,
+JSON_NUMBER,
+JSON_STRING,
 JSON_ARRAY,
+JSON_OBJECT,
 };
 
 enum LayoutMode
@@ -12028,6 +13817,34 @@ enum LoopMode2D
 LM_DEFAULT,
 LM_FORCE_LOOPED,
 LM_FORCE_CLAMPED,
+};
+
+enum MouseMode
+{
+MM_ABSOLUTE,
+MM_RELATIVE,
+MM_WRAP,
+MM_FREE,
+};
+
+enum NavigationPushiness
+{
+NAVIGATIONPUSHINESS_LOW,
+NAVIGATIONPUSHINESS_MEDIUM,
+NAVIGATIONPUSHINESS_HIGH,
+};
+
+enum NavigationQuality
+{
+NAVIGATIONQUALITY_LOW,
+NAVIGATIONQUALITY_MEDIUM,
+NAVIGATIONQUALITY_HIGH,
+};
+
+enum NavmeshPartitionType
+{
+NAVMESH_PARTITION_WATERSHED,
+NAVMESH_PARTITION_MONOTONE,
 };
 
 enum Orientation
@@ -12065,6 +13882,7 @@ enum RayQueryLevel
 RAY_AABB,
 RAY_OBB,
 RAY_TRIANGLE,
+RAY_TRIANGLE_UV,
 };
 
 enum RenderCommandSortMode
@@ -12081,6 +13899,7 @@ CMD_SCENEPASS,
 CMD_QUAD,
 CMD_FORWARDLIGHTS,
 CMD_LIGHTVOLUMES,
+CMD_RENDERUI,
 };
 
 enum RenderSurfaceUpdateMode
@@ -12097,6 +13916,16 @@ SIZE_VIEWPORTDIVISOR,
 SIZE_VIEWPORTMULTIPLIER,
 };
 
+enum ShadowQuality
+{
+SHADOWQUALITY_SIMPLE_16BIT,
+SHADOWQUALITY_SIMPLE_24BIT,
+SHADOWQUALITY_PCF_16BIT,
+SHADOWQUALITY_PCF_24BIT,
+SHADOWQUALITY_VSM,
+SHADOWQUALITY_BLUR_VSM,
+};
+
 enum ShapeType
 {
 SHAPE_BOX,
@@ -12108,15 +13937,6 @@ SHAPE_CONE,
 SHAPE_TRIANGLEMESH,
 SHAPE_CONVEXHULL,
 SHAPE_TERRAIN,
-};
-
-enum SoundType
-{
-SOUND_EFFECT,
-SOUND_AMBIENT,
-SOUND_VOICE,
-SOUND_MUSIC,
-SOUND_MASTER,
 };
 
 enum TextEffect
@@ -12153,20 +13973,22 @@ FILTER_DEFAULT,
 enum TextureUnit
 {
 TU_DIFFUSE,
+TU_ALBEDOBUFFER,
 TU_NORMAL,
+TU_NORMALBUFFER,
 TU_SPECULAR,
 TU_EMISSIVE,
 TU_ENVIRONMENT,
 TU_LIGHTRAMP,
 TU_LIGHTSHAPE,
 TU_SHADOWMAP,
+TU_CUSTOM1,
+TU_CUSTOM2,
+TU_VOLUMEMAP,
 TU_FACESELECT,
 TU_INDIRECTION,
-TU_ALBEDOBUFFER,
-TU_NORMALBUFFER,
 TU_DEPTHBUFFER,
 TU_LIGHTBUFFER,
-TU_VOLUMEMAP,
 TU_ZONE,
 MAX_MATERIAL_TEXTURE_UNITS,
 MAX_TEXTURE_UNITS,
@@ -12235,6 +14057,8 @@ VAR_PTR,
 VAR_MATRIX3,
 VAR_MATRIX3X4,
 VAR_MATRIX4,
+VAR_DOUBLE,
+VAR_STRINGVECTOR,
 };
 
 enum VerticalAlignment
@@ -12266,8 +14090,7 @@ VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float Cos(float);
 uint CountSetBits(uint);
 VectorBuffer DecompressVectorBuffer(VectorBuffer&);
-void DelayedExecute(float, bool, const String&);
-void DelayedExecute(float, bool, const String&, const Array<Variant>);
+void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
 bool Equals(float, float);
 void ErrorDialog(const String&, const String&);
 float Floor(float);
@@ -12279,12 +14102,16 @@ Object GetEventSender();
 String GetExtension(const String&, bool = true);
 String GetFileName(const String&);
 String GetFileNameAndExtension(const String&, bool = false);
+String GetFileSizeString(uint64);
 uint GetFloat16Format();
 uint GetFloat32Format();
 uint GetFormat(const String&);
 String GetInternalPath(const String&);
+uint GetLinearDepthFormat();
 uint GetLuminanceAlphaFormat();
 uint GetLuminanceFormat();
+uint GetMaxBones();
+String GetMiniDumpDir();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
 Array<String> GetObjectCategories();
@@ -12301,7 +14128,10 @@ uint GetRGBFormat();
 uint GetRGFloat16Format();
 uint GetRGFloat32Format();
 uint GetRandomSeed();
+uint GetReadableDepthFormat();
 String GetTextureUnitName(TextureUnit);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
 bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
 bool IsDigit(uint);
@@ -12337,6 +14167,7 @@ String RemoveTrailingSlash(const String&);
 String ReplaceExtension(const String&, const String&);
 uint SDBMHash(uint, uint8);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetMiniDumpDir(const String&);
 void SetRandomSeed(uint);
 float Sign(float);
 float Sin(float);
@@ -12354,17 +14185,21 @@ void UnsubscribeFromAllEventsExcept(Array<String>);
 void UnsubscribeFromEvent(Object, const String&);
 void UnsubscribeFromEvent(const String&);
 void UnsubscribeFromEvents(Object);
+bool WriteDrawablesToOBJ(Array<Drawable>, File, bool, bool, bool = false);
 
 // Global properties
+DBAPI DBAPI;
 Audio audio;
 ResourceCache cache;
 Console console;
+Database database;
 DebugHud debugHud;
 DebugRenderer debugRenderer;
 Engine engine;
 FileSystem fileSystem;
 Graphics graphics;
 Input input;
+Localization localization;
 Log log;
 Network network;
 Node node;
@@ -12391,6 +14226,12 @@ uint AM_NODEIDVECTOR;
 uint AM_NOEDIT;
 Color BLACK;
 Color BLUE;
+uint8 CHANNEL_POSITION;
+uint8 CHANNEL_ROTATION;
+uint8 CHANNEL_SCALE;
+uint CLEAR_COLOR;
+uint CLEAR_DEPTH;
+uint CLEAR_STENCIL;
 int CONTROLLER_AXIS_LEFTX;
 int CONTROLLER_AXIS_LEFTY;
 int CONTROLLER_AXIS_RIGHTX;
@@ -12418,6 +14259,8 @@ uint DD_SOURCE;
 uint DD_SOURCE_AND_TARGET;
 uint DD_TARGET;
 uint DEBUGHUD_SHOW_ALL;
+uint DEBUGHUD_SHOW_ALL_MEMORY;
+uint DEBUGHUD_SHOW_MEMORY;
 uint DEBUGHUD_SHOW_MODE;
 uint DEBUGHUD_SHOW_NONE;
 uint DEBUGHUD_SHOW_PROFILER;
@@ -12426,8 +14269,8 @@ uint DEFAULT_LIGHTMASK;
 uint DEFAULT_VIEWMASK;
 uint DRAWABLE_ANY;
 uint DRAWABLE_GEOMETRY;
+uint DRAWABLE_GEOMETRY2D;
 uint DRAWABLE_LIGHT;
-uint DRAWABLE_PROXYGEOMETRY;
 uint DRAWABLE_ZONE;
 uint FIRST_LOCAL_ID;
 uint FIRST_REPLICATED_ID;
@@ -12557,6 +14400,22 @@ int LOG_INFO;
 int LOG_NONE;
 int LOG_WARNING;
 Color MAGENTA;
+uint MASK_BLENDINDICES;
+uint MASK_BLENDWEIGHTS;
+uint MASK_COLOR;
+uint MASK_CUBETEXCOORD1;
+uint MASK_CUBETEXCOORD2;
+uint MASK_DEFAULT;
+uint MASK_INSTANCEMATRIX1;
+uint MASK_INSTANCEMATRIX2;
+uint MASK_INSTANCEMATRIX3;
+uint MASK_NONE;
+uint MASK_NORMAL;
+uint MASK_OBJECTINDEX;
+uint MASK_POSITION;
+uint MASK_TANGENT;
+uint MASK_TEXCOORD1;
+uint MASK_TEXCOORD2;
 int MOUSEB_LEFT;
 int MOUSEB_MIDDLE;
 int MOUSEB_RIGHT;
@@ -12831,10 +14690,11 @@ int SCANCODE_Z;
 uint SCAN_DIRS;
 uint SCAN_FILES;
 uint SCAN_HIDDEN;
-int SHADOWQUALITY_HIGH_16BIT;
-int SHADOWQUALITY_HIGH_24BIT;
-int SHADOWQUALITY_LOW_16BIT;
-int SHADOWQUALITY_LOW_24BIT;
+String SOUND_AMBIENT;
+String SOUND_EFFECT;
+String SOUND_MASTER;
+String SOUND_MUSIC;
+String SOUND_VOICE;
 Color TRANSPARENT;
 uint VO_DISABLE_OCCLUSION;
 uint VO_DISABLE_SHADOWS;
@@ -12842,3 +14702,4 @@ uint VO_LOW_MATERIAL_QUALITY;
 uint VO_NONE;
 Color WHITE;
 Color YELLOW;
+VariantMap globalVars;

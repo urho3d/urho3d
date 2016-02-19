@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,38 +20,36 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "AnimationController.h"
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Controls.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "UI.h"
-#include "Zone.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Controls.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
 
 #include "Character.h"
 #include "CharacterDemo.h"
 #include "Touch.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(CharacterDemo)
+URHO3D_DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
     Sample(context),
@@ -243,10 +241,10 @@ void CharacterDemo::CreateInstructions()
 void CharacterDemo::SubscribeToEvents()
 {
     // Subscribe to Update event for setting the character controls before physics simulation
-    SubscribeToEvent(E_UPDATE, HANDLER(CharacterDemo, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(CharacterDemo, HandleUpdate));
 
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(CharacterDemo, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(CharacterDemo, HandlePostUpdate));
 
     // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
@@ -305,6 +303,8 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             }
             // Limit pitch
             character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+            // Set rotation already here so that it's updated every rendering frame instead of every physics frame
+            character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
 
             // Switch between 1st and 3rd person
             if (input->GetKeyPress('F'))
@@ -331,9 +331,6 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                     character_ = characterNode->GetComponent<Character>();
             }
         }
-
-        // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-        character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
     }
 }
 
