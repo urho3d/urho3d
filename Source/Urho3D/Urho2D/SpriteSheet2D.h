@@ -53,6 +53,8 @@ public:
 
     /// Return texture.
     Texture2D* GetTexture() const { return texture_; }
+    /// Set texture
+    void SetTexture(SharedPtr<Texture2D>texture);
 
     /// Return sprite.
     Sprite2D* GetSprite(const String& name) const;

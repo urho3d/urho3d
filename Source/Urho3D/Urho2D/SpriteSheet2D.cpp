@@ -90,6 +90,12 @@ bool SpriteSheet2D::EndLoad()
     return false;
 }
 
+void SpriteSheet2D::SetTexture(SharedPtr<Texture2D>texture)
+{
+    loadTextureName_.Clear();
+    texture_ = texture;
+}
+
 Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
 {
     HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
