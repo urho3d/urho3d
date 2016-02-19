@@ -444,18 +444,7 @@ bool TmxFile2D::EndLoad()
 
 bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
 {
-    if (orientation == "orthogonal")
-        info_.orientation_ = O_ORTHOGONAL;
-    else if (orientation == "isometric")
-        info_.orientation_ = O_ISOMETRIC;
-    else if (orientation == "staggered")
-        info_.orientation_ = O_STAGGERED;
-    else
-    {
-        URHO3D_LOGERROR("Unsupported orientation type " + orientation);
-        return false;
-    }
-
+    info_.orientation_ = orientation;
     info_.width_ = width;
     info_.height_ = height;
     info_.tileWidth_ = tileWidth * PIXEL_SIZE;
