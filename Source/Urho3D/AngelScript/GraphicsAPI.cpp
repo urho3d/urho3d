@@ -536,6 +536,15 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint GetMaxBones()", asFUNCTION(Graphics::GetMaxBones), asCALL_CDECL);
 }
 
+static Technique* TechniqueClone(const String& cloneName, Technique* ptr)
+{
+    SharedPtr<Technique> clone = ptr->Clone(cloneName);
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
+}
+
 static Material* MaterialClone(const String& cloneName, Material* ptr)
 {
     SharedPtr<Material> clone = ptr->Clone(cloneName);
@@ -813,6 +822,7 @@ static void RegisterMaterial(asIScriptEngine* engine)
     RegisterResource<Technique>(engine, "Technique");
     engine->RegisterObjectMethod("Technique", "Pass@+ CreatePass(const String&in)", asMETHOD(Technique, CreatePass), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "void RemovePass(const String&in)", asMETHOD(Technique, RemovePass), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Technique", "Technique@ Clone(const String&in cloneName = String()) const", asFUNCTION(TechniqueClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Technique", "bool HasPass(const String&in) const", asMETHODPR(Technique, HasPass, (const String&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "Pass@+ GetPass(const String&in)", asMETHODPR(Technique, GetPass, (const String&) const, Pass*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Technique", "Pass@+ GetSupportedPass(const String&in)", asMETHODPR(Technique, GetSupportedPass, (const String&) const, Pass*), asCALL_THISCALL);

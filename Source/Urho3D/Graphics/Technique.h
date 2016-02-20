@@ -176,6 +176,8 @@ public:
     void RemovePass(const String& passName);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
+    /// Clone the technique. Passes will be deep copied to allow independent modification.
+    SharedPtr<Technique> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
