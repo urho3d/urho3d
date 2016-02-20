@@ -6,35 +6,34 @@
 #include "DeferredGBuffer.hlsl"
 
 void VS(float4 iPos : POSITION,
-#ifdef DIRLIGHT
-	out float2 oScreenPos : TEXCOORD0,
-#else
-	out float4 oScreenPos : TEXCOORD0,
-#endif
-	out float3 oFarRay : TEXCOORD1,
-#ifdef ORTHO
-	out float3 oNearRay : TEXCOORD2,
-#endif
-	out float4 oPos : OUTPOSITION)
+    #ifdef DIRLIGHT
+        out float2 oScreenPos : TEXCOORD0,
+    #else
+        out float4 oScreenPos : TEXCOORD0,
+    #endif
+    out float3 oFarRay : TEXCOORD1,
+    #ifdef ORTHO
+        out float3 oNearRay : TEXCOORD2,
+    #endif
+    out float4 oPos : OUTPOSITION)
 {
-	float4x3 modelMatrix = iModelMatrix;
-	float3 worldPos = GetWorldPos(modelMatrix);
-	oPos = GetClipPos(worldPos);
-#ifdef DIRLIGHT
-	oScreenPos = GetScreenPosPreDiv(oPos);
-	oFarRay = GetFarRay(oPos);
-#ifdef ORTHO
-	oNearRay = GetNearRay(oPos);
-#endif
-#else
-	oScreenPos = GetScreenPos(oPos);
-	oFarRay = GetFarRay(oPos) * oPos.w;
-#ifdef ORTHO
-	oNearRay = GetNearRay(oPos) * oPos.w;
-#endif
-#endif
+    float4x3 modelMatrix = iModelMatrix;
+    float3 worldPos = GetWorldPos(modelMatrix);
+    oPos = GetClipPos(worldPos);
+    #ifdef DIRLIGHT
+        oScreenPos = GetScreenPosPreDiv(oPos);
+        oFarRay = GetFarRay(oPos);
+        #ifdef ORTHO
+            oNearRay = GetNearRay(oPos);
+        #endif
+    #else
+        oScreenPos = GetScreenPos(oPos);
+        oFarRay = GetFarRay(oPos) * oPos.w;
+        #ifdef ORTHO
+            oNearRay = GetNearRay(oPos) * oPos.w;
+        #endif
+    #endif
 }
-
 
 void PS(
     #ifdef DIRLIGHT
@@ -46,9 +45,9 @@ void PS(
     #ifdef ORTHO
         float3 iNearRay : TEXCOORD2,
     #endif
-
+    #ifdef PBR
         float2 iFragPos : VPOS,
-
+    #endif
     out float4 oColor : OUTCOLOR0)
 {
     // If rendering a directional light quad, optimize out the w divide
@@ -78,7 +77,7 @@ void PS(
         float4 normalInput = Sample2DProj(NormalBuffer, iScreenPos);
     #endif
     
- 
+    #ifdef PBR
         float3 normal = DecodeGBufferNormal(normalInput.xy, iFarRay);
         const float roughness = normalInput.b;
         #ifdef DIRLIGHT
@@ -95,7 +94,9 @@ void PS(
             albedoInput.a = 1;
         #endif
         albedoInput.a = 1.0;
-
+    #else
+        float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
+    #endif
     
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;
@@ -124,14 +125,15 @@ void PS(
         const float ndh = max(0.0, dot(normal, Hn));
         const float ndl = max(0.0, dot(normal, lightDir));
         const float ndv = max(1e-5, dot(normal, toCamera));
+		const float ldh = saturate(dot(lightDir, Hn));
         
-        const float3 diffuseTerm = LambertianDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh) * lightColor * diff;
-        const float3 fresnelTerm = SchlickFresnel(specColor, vdh);
-        const float distTerm = GGXDistribution(ndh, roughness);
-        const float visTerm = SchlickVisibility(ndl, ndv, roughness);
+        float3 diffuseTerm = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, ldh) * lightColor * diff;
+        float3 fresnelTerm = SchlickFresnel(specColor, vdh);
+        float distTerm = GGXDistribution(ndh, roughness);
+        float visTerm = SchlickVisibility(ndl, ndv, roughness);
         
         oColor.a = 1;
-        oColor.rgb = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);
+		oColor.rgb = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);
     #else
         #ifdef SPECULAR
             float spec = GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);

@@ -1,5 +1,5 @@
 <renderpath>
-      <rendertarget name="albedo" sizedivisor="1 1" format="rgba16f" filter="false" srgb="true"/>
+    <rendertarget name="albedo" sizedivisor="1 1" format="rgba16f" filter="false" srgb="true"/>
     <rendertarget name="normal" sizedivisor="1 1" format="rgba16f" filter="false"/>
     <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
     <command type="clear" color="fog" depth="1.0" stencil="0" depthstencil="depth" />
@@ -9,7 +9,7 @@
         <output index="1" name="albedo" />
         <output index="2" name="normal" />
     </command>
-    <command type="lightvolumes" vs="DeferredLight" ps="DeferredLight" vsdefines="PBR" psdefines="HWDEPTH PBR DEFERRED" depthstencil="depth">
+    <command type="lightvolumes" vs="DeferredLight" ps="DeferredLight" depthstencil="depth" psdefines="DEFERRED IBL PBR HWDEPTH" vsdefines="PBR">
         <texture unit="albedo" name="albedo" />
         <texture unit="normal" name="normal" />
         <texture unit="depth" name="depth" />
