@@ -33,6 +33,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
+#include <rapidjson/allocators.h>
 
 #include "../DebugNew.h"
 
@@ -200,7 +201,7 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             {
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
-                rapidjsonValue.AddMember(name, value, allocator);
+                rapidjsonValue.AddMember(rapidjson::Value::StringRefType(name, i->first_.Length()), value, allocator);
                 ToRapidjsonValue(rapidjsonValue[name], i->second_, allocator);
             }
         }
@@ -222,7 +223,8 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     ToRapidjsonValue(document, root_, document.GetAllocator());
 
     StringBuffer buffer;
-    PrettyWriter<StringBuffer> writer(buffer, &(document.GetAllocator()));
+    PrettyWriter < StringBuffer,rapidjson::UTF8<>,rapidjson::UTF8<>,rapidjson::MemoryPoolAllocator<> > 
+        writer(buffer, &(document.GetAllocator()));
     writer.SetIndent(!indendation.Empty() ? indendation.Front() : '\0', indendation.Length());
 
     document.Accept(writer);
