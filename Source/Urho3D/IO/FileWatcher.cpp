@@ -88,7 +88,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 #if defined(URHO3D_FILEWATCHER) && defined(URHO3D_THREADING)
 #ifdef _WIN32
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
-    
+
     dirHandle_ = (void*)CreateFileW(
         WString(nativePath).CString(),
         FILE_LIST_DIRECTORY,
@@ -97,13 +97,13 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
         0);
-    
+
     if (dirHandle_ != INVALID_HANDLE_VALUE)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
         Run();
-        
+
         URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
@@ -162,14 +162,14 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         URHO3D_LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
         return false;
     }
-    
+
     watcher_ = CreateFileWatcher(pathName.CString(), watchSubDirs);
     if (watcher_)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
         Run();
-        
+
         URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
@@ -195,8 +195,9 @@ void FileWatcher::StopWatching()
         shouldRun_ = false;
 
         // Create and delete a dummy file to make sure the watcher loop terminates
-        // This is not required with iNotify
-#if !defined(__linux__)
+        // This is only required on Windows platform
+        // TODO: Remove this temp write approach as it depends on user write privilege
+#ifdef _WIN32
         String dummyFileName = path_ + "dummy.tmp";
         File file(context_, dummyFileName, FILE_WRITE);
         file.Close();
@@ -204,8 +205,11 @@ void FileWatcher::StopWatching()
             fileSystem_->Delete(dummyFileName);
 #endif
 
-        // Remove watch - On linux this will cause read() to return with
-        // the IN_IGNORED flag set
+#if defined(__APPLE__) && !defined(IOS)
+        // Our implementation of file watcher requires the thread to be stopped first before closing the watcher
+        Stop();
+#endif
+
 #ifdef _WIN32
         CloseHandle((HANDLE)dirHandle_);
 #elif defined(__linux__)
@@ -215,9 +219,10 @@ void FileWatcher::StopWatching()
 #elif defined(__APPLE__) && !defined(IOS)
         CloseFileWatcher(watcher_);
 #endif
-        // Join thread *after* removing watch as to avoid getting stuck in
-        // read()
+
+#ifndef __APPLE__
         Stop();
+#endif
 
         URHO3D_LOGDEBUG("Stopped watching path " + path_);
         path_.Clear();
@@ -235,7 +240,7 @@ void FileWatcher::ThreadFunction()
 #ifdef _WIN32
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
-    
+
     while (shouldRun_)
     {
         if (ReadDirectoryChangesW((HANDLE)dirHandle_,
@@ -249,11 +254,11 @@ void FileWatcher::ThreadFunction()
             0))
         {
             unsigned offset = 0;
-            
+
             while (offset < bytesFilled)
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
-                
+
                 if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME)
                 {
                     String fileName;
@@ -261,11 +266,11 @@ void FileWatcher::ThreadFunction()
                     const wchar_t* end = src + record->FileNameLength / 2;
                     while (src < end)
                         fileName.AppendUTF8(String::DecodeUTF16(src));
-                    
+
                     fileName = GetInternalPath(fileName);
                     AddChange(fileName);
                 }
-                
+
                 if (!record->NextEntryOffset)
                     break;
                 else
