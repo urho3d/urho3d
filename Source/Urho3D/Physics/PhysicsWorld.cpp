@@ -271,7 +271,7 @@ void PhysicsWorld::Update(float timeStep)
     while (!delayedWorldTransforms_.Empty())
     {
         for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
-             i != delayedWorldTransforms_.End(); ++i)
+             i != delayedWorldTransforms_.End();)
         {
             const DelayedWorldTransform& transform = i->second_;
 
@@ -279,8 +279,10 @@ void PhysicsWorld::Update(float timeStep)
             if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
             {
                 transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
-                delayedWorldTransforms_.Erase(i);
+                i = delayedWorldTransforms_.Erase(i);
             }
+            else
+                ++i;
         }
     }
 }
