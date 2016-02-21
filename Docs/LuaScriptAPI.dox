@@ -4160,15 +4160,44 @@ Properties:
 
 Methods:
 
+- void SetBlendMode(BlendMode mode)
+- void SetDepthTestMode(CompareMode mode)
+- void SetLightingMode(PassLightingMode mode)
+- void SetDepthWrite(bool enable)
+- void SetAlphaMask(bool enable)
+- void SetIsDesktop(bool enable)
+- void SetVertexShader(const String name)
+- void SetPixelShader(const String name)
+- void SetVertexShaderDefines(const String defines)
+- void SetPixelShaderDefines(const String defines)
+- void ReleaseShaders()
+- const String GetName() const
+- unsigned GetIndex() const
+- BlendMode GetBlendMode() const
+- CompareMode GetDepthTestMode() const
+- PassLightingMode GetLightingMode() const
+- bool GetDepthWrite() const
+- bool GetAlphaMask() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
+- const String GetVertexShaderDefines() const
+- const String GetPixelShaderDefines() const
 
 Properties:
 
+- String name (readonly)
+- unsigned index (readonly)
+- BlendMode blendMode
+- CompareMode depthTestMode
+- PassLightingMode lightingMode
+- bool depthWrite
+- bool alphaMask
 - bool desktop (readonly)
-- const String vertexShader (readonly)
-- const String pixelShader (readonly)
+- String vertexShader
+- String pixelShader
+- String vertexShaderDefines
+- String pixelShaderDefines
 
 <a name="Class_PhysicsRaycastResult"></a>
 ### PhysicsRaycastResult
@@ -5731,6 +5760,11 @@ Properties:
 
 Methods:
 
+- void SetIsDesktop(bool enable)
+- Pass* CreatePass(const String passName)
+- void RemovePass(const String passName)
+- void ReleaseShaders()
+- Technique* Clone(const String cloneName = String::EMPTY) const
 - bool HasPass(const String type) const
 - Pass* GetPass(const String type) const
 - Pass* GetSupportedPass(const String type) const

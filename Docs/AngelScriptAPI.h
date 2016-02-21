@@ -10950,6 +10950,7 @@ uint value;
 class Technique
 {
 // Methods:
+Technique Clone(const String& = String ( )) const;
 Pass CreatePass(const String&);
 Pass GetPass(const String&);
 Pass GetSupportedPass(const String&);
