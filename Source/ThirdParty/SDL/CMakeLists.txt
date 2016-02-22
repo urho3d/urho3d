@@ -83,6 +83,8 @@ else ()
     # On Linux, make sure development libraries exist, and use their include file directories
     if (RPI)
         file (GLOB VIDEO_DRIVER_C_FILES src/video/raspberry/*.c src/core/linux/*.c)
+        # Break fix to support building SDL on Raspbian Jessie - the __USE_EXTERN_INLINE is defined in Jessie causing stdlib.h to look for bits/stdlib-bsearch.h which is not in the default include search path
+        include_directories (${SYSROOT}/usr/include/arm-linux-gnueabihf)    # This should work for native build as well because SYSROOT variable is empty when not cross-compiling
     else ()
         find_package (OpenGL REQUIRED)
         include_directories (${OpenGL_INCLUDE_DIRS})
