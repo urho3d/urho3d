@@ -12,9 +12,25 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Optionally install libpulse-dev (Deb) or pulseaudio-libs-devel (RH) to enable SDL support for PulseAudio. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
+- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries. Optionally install the following development libraries to enable support for the corresponding software components:
+  + %Database server (disabled by default even when installed, use URHO3D_DATABASE_ODBC build option to enable):
+    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager.
+    - unixodbc-dev (Debian-based) unixODBC-devel (RedHat-based) for ODBC driver manager. *Recommended*
+  + Display server:
+    - libdirectfb-dev (DB-based only) for direct frame buffer (DirectFB).
+    - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
+    - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
+  + %Sound server:
+    - arts-devel (RedHat-based only) for analog real time synthesizer (aRts).
+    - libaudio-dev (Debian-based only) for network audio system (NAS).
+    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for enlightened sound daemon (ESounD).
+    - libfusionsound-dev (DB-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND(_SHARED) build option to enable.
+    - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio. *Recommended*
+    - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
+  + Misc.:
+    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for touchscreen input.
 
-- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libasound2-dev, libudev-dev. On Pidora: alsa-lib-devel, systemd-devel.
+- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libevdev2, libasound2-dev, and libudev-dev. On Pidora: libevdev, alsa-lib-devel, and systemd-devel. The same list of optional development libraries listed above for Linux can also be installed on Raspberry Pi system to enable support for the corresponding software components.
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
@@ -216,7 +232,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above.
 
-For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
+For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. You may pass the optional RPI_ABI build option to specifically target for the Raspberry Pi 2. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
 

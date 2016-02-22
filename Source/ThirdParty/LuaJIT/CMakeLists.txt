@@ -423,7 +423,7 @@ if (WIN32)
 else ()
     set (LJVM_BOUT lj_vm.S)
     enable_language (ASM)
-    if (URHO3D_DEFAULT_64BIT AND NOT URHO3D_64BIT)  # Not the compiler native ABI, this could only happen on multilib-capable compilers
+    if (NATIVE_64BIT AND NOT URHO3D_64BIT)  # Not the compiler native ABI, this could only happen on multilib-capable compilers
         set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
     endif ()
     if (APPLE)

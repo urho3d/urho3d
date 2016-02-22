@@ -41,7 +41,7 @@ if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
 endif ()
 
-# Rightfully we could have performed this inside a CMake/iOS toolchain file but we don't have one nor need for one
+# Rightfully we could have performed this inside a CMake/iOS toolchain file but we don't have one nor need for one for now
 if (IOS)
     set (CMAKE_CROSSCOMPILING TRUE)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
@@ -56,8 +56,8 @@ if (IOS)
     endif ()
     set (CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES)
     if (DEFINED ENV{TRAVIS})
-        # TODO: recheck this again later
-        # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty, something is wrong with Travis-CI OSX worker
+        # TODO: recheck this again and remove this workaround later
+        # Ensure the CMAKE_OSX_DEPLOYMENT_TARGET is set to empty, something is wrong with Travis-CI OSX CI environment at the moment
         set (CMAKE_OSX_DEPLOYMENT_TARGET)
         unset (CMAKE_OSX_DEPLOYMENT_TARGET CACHE)
     endif ()
@@ -72,45 +72,12 @@ elseif (XCODE)
 endif ()
 
 # Define all supported build options
+include (CheckCompilerToolchain)
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 mark_as_advanced (URHO3D_C++11)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-if (NOT DEFINED URHO3D_DEFAULT_64BIT)  # Only do this once in the initial configure step
-    if (MSVC)
-        # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
-        if (CMAKE_GENERATOR MATCHES Win64)
-            set (URHO3D_DEFAULT_64BIT 1)
-        else ()
-            set (URHO3D_DEFAULT_64BIT 0)
-        endif ()
-    else ()
-        # On non-MSVC compiler, default to build 64-bit when the chosen compiler toolchain in the build tree has a 64-bit build environment
-        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
-        string (REGEX MATCH "#define +__(x86_64|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-        if (matched)
-            set (URHO3D_DEFAULT_64BIT 1)
-        else ()
-            set (URHO3D_DEFAULT_64BIT 0)
-        endif ()
-        # The 'ANDROID' CMake variable is already set by android.toolchain.cmake when it is being used for cross-compiling Android
-        # When ANDROID is true and ARM is not then we are targeting Android on Intel Atom
-        string (REGEX MATCH "#define +__(arm|aarch64)__ +1" matched "${PREDEFINED_MACROS}")
-        if (matched OR IOS)     # Assume iOS is always on ARM for now
-            set (ARM TRUE)
-        else ()
-            set (ARM FALSE)
-        endif ()
-        set (ARM ${ARM} CACHE INTERNAL "Targeting ARM platform")
-        # The other arm platform that Urho3D supports that is not Android/iOS is Raspberry Pi at the moment
-        if (ARM AND NOT ANDROID AND NOT IOS)
-            # Set the CMake variable here instead of in raspberrypi.toolchain.cmake because Raspberry Pi can be built natively too on the Raspberry-Pi device itself
-            set (RPI TRUE CACHE INTERNAL "Setup build for Raspberry Pi platform")
-        endif ()
-    endif ()
-    set (URHO3D_DEFAULT_64BIT ${URHO3D_DEFAULT_64BIT} CACHE INTERNAL "Default value for URHO3D_64BIT build option")
-endif ()
-cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${URHO3D_DEFAULT_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT WEB" ${URHO3D_DEFAULT_64BIT})
+cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT WEB" FALSE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
@@ -149,8 +116,6 @@ if (RPI)
     find_package (VideoCore REQUIRED)
     include_directories (${VIDEOCORE_INCLUDE_DIRS})
 endif ()
-# Need to perform the CPU SIMD instruction extensions check for Urho3D project as well as downstream projects using this common module
-include (CheckCpuInstructionExtensions)
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
     # The URHO3D_OPENGL option is not available on non-Windows platforms as they should always use OpenGL, i.e. URHO3D_OPENGL variable will always be forced to TRUE
@@ -170,16 +135,21 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set the default to true for all the platforms that support SSE extension except specificially stated otherwise below
     if (HAVE_SSE OR HAVE_SSE2)
         set (URHO3D_DEFAULT_SSE TRUE)
+        if (MINGW)
+            # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+            if (COMPILER_VERSION VERSION_LESS 4.9.1)
+                message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+                set (URHO3D_DEFAULT_SSE FALSE)
+            endif ()
+        endif ()
     else ()
-        # The older MinGW compiler versions should automatically fail the SSE/SSE extension check, so does the Emscripten compiler toolchain
-        # TODO: Revisit this again for Emscripten when the SIMD.js specification is already widely adopted by browsers
         set (URHO3D_DEFAULT_SSE FALSE)
     endif ()
     cmake_dependent_option (URHO3D_SSE "Enable SSE/SSE2 instruction set (Web and Intel platforms only including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
     cmake_dependent_option (URHO3D_3DNOW "Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support" ${HAVE_3DNOW} "NOT WIN32 AND NOT APPLE AND NOT WEB AND NOT ARM AND NOT URHO3D_SSE" FALSE)
     cmake_dependent_option (URHO3D_MMX "Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support" ${HAVE_MMX} "NOT WIN32 AND NOT APPLE AND NOT WEB AND NOT ARM AND NOT URHO3D_64BIT AND NOT URHO3D_SSE AND NOT URHO3D_3DNOW" FALSE)
-    option (URHO3D_ALTIVEC "Enable AltiVec instruction set" ${HAVE_ALTIVEC})
-    mark_as_advanced (URHO3D_ALTIVEC)   # For completeness sake - this option is intentionally not documented as we do not officially support PowerPC (probably never will)
+    # For completeness sake - this option is intentionally not documented as we do not officially support PowerPC (yet)
+    cmake_dependent_option (URHO3D_ALTIVEC "Enable AltiVec instruction set (PowerPC only)" ${HAVE_ALTIVEC} POWERPC FALSE)
     cmake_dependent_option (URHO3D_LUAJIT "Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)" FALSE "NOT WEB" FALSE)
     cmake_dependent_option (URHO3D_LUAJIT_AMALG "Enable LuaJIT amalgamated build (LuaJIT only)" FALSE "URHO3D_LUAJIT" FALSE)
     cmake_dependent_option (URHO3D_SAFE_LUA "Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)" FALSE "URHO3D_LUA OR URHO3D_LUAJIT" FALSE)
@@ -518,8 +488,7 @@ if (URHO3D_C++11)
                 endif ()
             endforeach ()
             if (NOT GCC_EXIT_CODE EQUAL 0)
-                execute_process (COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-                message (FATAL_ERROR "Your GCC version ${GCC_VERSION} is too old to enable C++11 standard")
+                message (FATAL_ERROR "Your GCC version ${COMPILER_VERSION} is too old to enable C++11 standard")
             endif ()
         endif ()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -592,6 +561,7 @@ else ()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
     if (NOT ANDROID)    # Most of the flags are already setup in android.toolchain.cmake module
         if (RPI)
+            # The configuration is done here instead of in raspberrypi.toolchain.cmake file because we also support native build which does not use that file at all
             add_definitions (-DRPI)
             set (RPI_CFLAGS "-pipe -mfloat-abi=hard -Wno-psabi")    # We only support armhf distros, so turn on hard-float by default
             if (RPI_ABI MATCHES ^armeabi-v7a)
@@ -630,7 +600,7 @@ else ()
                     endif ()
                     # Not the compiler native ABI, this could only happen on multilib-capable compilers
                     # We don't add the ABI flag for Xcode because it automatically passes '-arch i386' compiler flag when targeting 32 bit which does the same thing as '-m32'
-                    if (URHO3D_DEFAULT_64BIT)
+                    if (NATIVE_64BIT)
                         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
                         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
                     endif ()
@@ -656,11 +626,11 @@ else ()
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DISABLE_SSE_FLAG} -m3dnow")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DISABLE_SSE_FLAG} -m3dnow")
                 endif ()
-            endif ()
-            # For completeness sake only as we do not support PowerPC
-            if (URHO3D_ALTIVEC)
-                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -maltivec")
-                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec")
+                # For completeness sake only as we do not support PowerPC (yet)
+                if (URHO3D_ALTIVEC)
+                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -maltivec")
+                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -maltivec")
+                endif ()
             endif ()
         endif ()
         if (WEB)

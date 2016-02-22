@@ -170,7 +170,7 @@ else ()
     set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
-        if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
+        if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL NATIVE_64BIT)
             break ()
         endif ()
         # Set to search in 'lib' or 'lib64' based on the ABI being tested

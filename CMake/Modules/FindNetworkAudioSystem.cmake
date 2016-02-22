@@ -20,23 +20,23 @@
 # THE SOFTWARE.
 #
 
-# Find Esound development library
+# Find NetworkAudioSystem development library
 #
-#  ESOUND_FOUND
-#  ESOUND_INCLUDE_DIRS
-#  ESOUND_LIBRARIES
+#  NAS_FOUND
+#  NAS_INCLUDE_DIRS
+#  NAS_LIBRARIES
 #
 
 if (URHO3D_64BIT)
-    set (ESOUND_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
+    set (NAS_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
 else ()
-    set (ESOUND_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
+    set (NAS_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
 endif ()
 
-find_path (ESOUND_INCLUDE_DIRS NAMES esd.h DOC "Esound include directory")
-find_library (ESOUND_LIBRARIES NAMES esd PATHS ${ESOUND_LIB_SEARCH_PATH} DOC "Esound library")
+find_path (NAS_INCLUDE_DIRS NAMES audio/audiolib.h nas/audiolib.h DOC "NetworkAudioSystem include directory")
+find_library (NAS_LIBRARIES NAMES audio PATHS ${NAS_LIB_SEARCH_PATH} DOC "NetworkAudioSystem library")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (Esound REQUIRED_VARS ESOUND_LIBRARIES ESOUND_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Esound development library")
+find_package_handle_standard_args (NetworkAudioSystem REQUIRED_VARS NAS_LIBRARIES NAS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find NetworkAudioSystem development library")
 
-mark_as_advanced (ESOUND_INCLUDE_DIRS ESOUND_LIBRARIES)
+mark_as_advanced (NAS_INCLUDE_DIRS NAS_LIBRARIES)
