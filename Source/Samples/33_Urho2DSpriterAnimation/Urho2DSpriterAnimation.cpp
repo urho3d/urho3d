@@ -128,7 +128,7 @@ void Urho2DSpriterAnimation::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 4.0f;
+    const float MOVE_SPEED = 400.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))
