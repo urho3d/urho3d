@@ -147,8 +147,8 @@ bool Sprite2D::GetDrawRectangle(Rect& rect, const Vector2& hotSpot, bool flipX, 
     if (rectangle_.Width() == 0 || rectangle_.Height() == 0)
         return false;
 
-    float width = (float)rectangle_.Width() * PIXEL_SIZE;
-    float height = (float)rectangle_.Height() * PIXEL_SIZE;
+    float width = (float)rectangle_.Width();
+    float height = (float)rectangle_.Height();
 
     float hotSpotX = flipX ? (1.0f - hotSpot.x_) : hotSpot.x_;
     float hotSpotY = flipY ? (1.0f - hotSpot.y_) : hotSpot.y_;

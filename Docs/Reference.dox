@@ -2088,7 +2088,7 @@ C++:
     Node* cameraNode = scene_->CreateChild("Camera"); // Create camera node
     Camera* camera = cameraNode->CreateComponent<Camera>(); // Create camera
     camera->SetOrthographic(true); // Set camera orthographic
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE); // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera->SetOrthoSize((float)graphics->GetHeight()); // Set camera ortho size
 \endcode
 
 AngelScript:
@@ -2096,7 +2096,7 @@ AngelScript:
     Node@ cameraNode = scene_.CreateChild("Camera"); // Create camera node
     Camera@ camera = cameraNode.CreateComponent("Camera"); // Create camera
     camera.orthographic = true; // Set camera orthographic
-    camera.orthoSize = graphics.height * PIXEL_SIZE; // Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera.orthoSize = graphics.height; // Set camera ortho size
 \endcode
 
 Lua:
@@ -2104,7 +2104,7 @@ Lua:
     cameraNode = scene_:CreateChild("Camera") -- Create camera node
     local camera = cameraNode:CreateComponent("Camera") -- Create camera
     camera.orthographic = true -- Set camera orthographic
-    camera.orthoSize = graphics.height * PIXEL_SIZE -- Set camera ortho size (the value of PIXEL_SIZE is 0.01)
+    camera.orthoSize = graphics.height -- Set camera ortho size
 \endcode
 
 To zoom in/out, use \ref Camera::SetZoom "SetZoom()".
@@ -2343,7 +2343,7 @@ A map is defined by its:
 - orientation: Urho2D supports both orthogonal (flat) and isometric (strict iso 2.5D and staggered iso) tile maps. Orientation can be retrieved with \ref TileMapInfo2D::orientation_ "orientation_" attribute (O_ORTHOGONAL for ortho, O_ISOMETRIC for iso and O_STAGGERED for staggered)
 - width and height expressed as a number of tiles in the map: use \ref TileMapInfo2D::width_ "width_" and \ref TileMapInfo2D::height_ "height_" attributes to access these values
 - width and height expressed in Urho2D space: use \ref TileMapInfo2D::GetMapWidth "GetMapWidth()" and \ref TileMapInfo2D::GetMapHeight "GetMapHeight()" to access these values which are useful to set the camera's position for example
-- tile width and tile height as the size in pixels of the tiles in the map (equates to Tiled width/height * PIXEL_SIZE): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
+- tile width and tile height as the size in pixels of the tiles in the map (equates to Tiled width/height): use \ref TileMapInfo2D::tileWidth_ "tileWidth_" and \ref TileMapInfo2D::tileHeight_ "tileHeight_" attributes to access these values
 
 Two convenient functions are provided to convert Tiled index to/from Urho2D space:
 - \ref TileMap2D::TileIndexToPosition "TileIndexToPosition()" to convert tile index to Urho position

@@ -36,8 +36,6 @@
 namespace Urho3D
 {
 
-extern const float PIXEL_SIZE;
-
 TmxLayer2D::TmxLayer2D(TmxFile2D* tmxFile, TileMapLayerType2D type) :
     tmxFile_(tmxFile),
     type_(type)
@@ -182,7 +180,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
         case OT_RECTANGLE:
         case OT_ELLIPSE:
             object->position_ = info.ConvertPosition(Vector2(position.x_, position.y_ + size.y_));
-            object->size_ = Vector2(size.x_ * PIXEL_SIZE, size.y_ * PIXEL_SIZE);
+            object->size_ = Vector2(size.x_, size.y_);
             break;
 
         case OT_TILE:
@@ -192,7 +190,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
 
             if (objectElem.HasAttribute("width") || objectElem.HasAttribute("height"))
             {
-                object->size_ = Vector2(size.x_ * PIXEL_SIZE, size.y_ * PIXEL_SIZE);
+                object->size_ = Vector2(size.x_, size.y_);
             }
             else if (object->sprite_)
             {
@@ -393,8 +391,8 @@ bool TmxFile2D::EndLoad()
 
     info_.width_ = rootElem.GetInt("width");
     info_.height_ = rootElem.GetInt("height");
-    info_.tileWidth_ = rootElem.GetFloat("tilewidth") * PIXEL_SIZE;
-    info_.tileHeight_ = rootElem.GetFloat("tileheight") * PIXEL_SIZE;
+    info_.tileWidth_ = rootElem.GetFloat("tilewidth");
+    info_.tileHeight_ = rootElem.GetFloat("tileheight");
 
     for (unsigned i = 0; i < layers_.Size(); ++i)
         delete layers_[i];

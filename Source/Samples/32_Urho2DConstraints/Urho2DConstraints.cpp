@@ -108,7 +108,7 @@ void Urho2DConstraints::CreateScene()
     camera_->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera_->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera_->SetOrthoSize((float)graphics->GetHeight());
     camera_->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen

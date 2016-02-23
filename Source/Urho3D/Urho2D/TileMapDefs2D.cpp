@@ -30,8 +30,6 @@
 
 namespace Urho3D
 {
-extern URHO3D_API const float PIXEL_SIZE;
-
 float TileMapInfo2D::GetMapWidth() const
 {
     return width_ * tileWidth_;
@@ -51,17 +49,17 @@ Vector2 TileMapInfo2D::ConvertPosition(const Vector2& position) const
     {
     case O_ISOMETRIC:
         {
-            Vector2 index = position * PIXEL_SIZE / tileHeight_;
+            Vector2 index = position / tileHeight_;
             return Vector2((width_ + index.x_ - index.y_) * tileWidth_ * 0.5f,
                 (height_ * 2.0f - index.x_ - index.y_) * tileHeight_ * 0.5f);
         }
 
     case O_STAGGERED:
-        return Vector2(position.x_ * PIXEL_SIZE, GetMapHeight() - position.y_ * PIXEL_SIZE);
+        return Vector2(position.x_, GetMapHeight() - position.y_);
 
     case O_ORTHOGONAL:
     default:
-        return Vector2(position.x_ * PIXEL_SIZE, GetMapHeight() - position.y_ * PIXEL_SIZE);
+        return Vector2(position.x_, GetMapHeight() - position.y_);
     }
 
     return Vector2::ZERO;

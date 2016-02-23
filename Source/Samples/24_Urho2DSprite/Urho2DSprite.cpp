@@ -85,7 +85,7 @@ void Urho2DSprite::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight());
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     // Get sprite
@@ -93,8 +93,8 @@ void Urho2DSprite::CreateScene()
     if (!sprite)
         return;
 
-    float halfWidth = graphics->GetWidth() * 0.5f * PIXEL_SIZE;
-    float halfHeight = graphics->GetHeight() * 0.5f * PIXEL_SIZE;
+    float halfWidth = graphics->GetWidth() * 0.5f;
+    float halfHeight = graphics->GetHeight() * 0.5f;
 
     for (unsigned i = 0; i < NUM_SPRITES; ++i)
     {
@@ -211,8 +211,8 @@ void Urho2DSprite::HandleUpdate(StringHash eventType, VariantMap& eventData)
     MoveCamera(timeStep);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    float halfWidth = (float)graphics->GetWidth() * 0.5f * PIXEL_SIZE;
-    float halfHeight = (float)graphics->GetHeight() * 0.5f * PIXEL_SIZE;
+    float halfWidth = (float)graphics->GetWidth() * 0.5f;
+    float halfHeight = (float)graphics->GetHeight() * 0.5f;
 
     for (unsigned i = 0; i < spriteNodes_.Size(); ++i)
     {

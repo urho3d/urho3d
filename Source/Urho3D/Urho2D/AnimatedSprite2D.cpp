@@ -470,7 +470,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         if (flipX_ != flipY_)
             angle = -angle;
 
-        Matrix3x4 localTransform(position * PIXEL_SIZE, 
+        Matrix3x4 localTransform(position, 
             Quaternion(angle), 
             Vector3(info.scaleX_, info.scaleY_, 1.0f));
 

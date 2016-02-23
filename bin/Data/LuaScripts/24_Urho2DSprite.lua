@@ -40,7 +40,7 @@ function CreateScene()
     cameraNode.position = Vector3(0.0, 0.0, -10.0)
     local camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-    camera.orthoSize = graphics.height * PIXEL_SIZE
+    camera.orthoSize = graphics.height
 
     local sprite = cache:GetResource("Sprite2D", "Urho2D/Aster.png")
     if sprite == nil then
@@ -49,8 +49,8 @@ function CreateScene()
 
     local spriteNodes = {}
     local NUM_SPRITES = 200
-    local halfWidth = graphics.width * PIXEL_SIZE * 0.5
-    local halfHeight = graphics.height * PIXEL_SIZE * 0.5
+    local halfWidth = graphics.width * 0.5
+    local halfHeight = graphics.height * 0.5
     for i = 1, NUM_SPRITES do
         local spriteNode = scene_:CreateChild("StaticSprite2D")
         spriteNode.position = Vector3(Random(-halfWidth, halfWidth), Random(-halfHeight, halfHeight), 0.0)

@@ -28,7 +28,7 @@
 namespace Urho3D
 {
 
-class Drawable2D; 
+class Drawable2D;
 class Renderer2D;
 class Texture2D;
 class VertexBuffer;
@@ -61,9 +61,6 @@ struct SourceBatch2D
     /// Vertices.
     Vector<Vertex2D> vertices_;
 };
-
-/// Pixel size (equal 0.01f).
-extern URHO3D_API const float PIXEL_SIZE;
 
 /// Base class for 2D visible components.
 class URHO3D_API Drawable2D : public Drawable
