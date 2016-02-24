@@ -51,7 +51,7 @@ struct AnimationKeyFrame
 };
 
 /// Skeletal animation track, stores keyframes of a single bone.
-struct AnimationTrack
+struct URHO3D_API AnimationTrack
 {
     /// Construct.
     AnimationTrack() :
@@ -69,7 +69,7 @@ struct AnimationTrack
     void RemoveKeyFrame(unsigned index);
     /// Remove all keyframes.
     void RemoveAllKeyFrames();
-    
+
     /// Return keyframe at index, or null if not found.
     AnimationKeyFrame* GetKeyFrame(unsigned index);
     /// Return number of keyframes.
