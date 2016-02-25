@@ -384,6 +384,54 @@ before_script:
 script: ELAPSED=$SECONDS rake ci && if [ $PACKAGE_UPLOAD ]; then ELAPSED=$SECONDS rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then ELAPSED=$SECONDS rake ci_emscripten_samples_update; fi; fi
 after_script: rake ci_teardown_cache
 
+---
+
+branch: {name: VS-troubleshoot-CI, active: yes, appveyor: yes, last_job: 'x64:SHARED'}
+version: '{build}'
+platform: x64
+clone_depth: 50
+environment:
+  SF_KEY:
+    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
+  SF_API:
+    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+# Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
+  build_tree: Build
+  config: Release
+  excluded_sample: 'PLATFORM=x64 01_HelloWorld,02_HelloGUI,03_Sprites,04_StaticScene,05_AnimatingScene,06_SkeletalAnimation,07_Billboards,08_Decals,09_MultipleViewports,10_RenderToTexture,11_Physics,12_PhysicsStressTest,13_Ragdolls,14_SoundEffects,15_Navigation,16_Chat,17_SceneReplication,18_CharacterDemo,19_VehicleDemo,20_HugeObjectCount,21_AngelScriptIntegration,22_LuaIntegration,23_Water,24_Urho2DSprite,25_Urho2DParticle,26_ConsoleInput,27_Urho2DPhysics,28_Urho2DPhysicsRope,29_SoundSynthesis,30_LightAnimation,31_MaterialAnimation,32_Urho2DConstraints,33_Urho2DSpriterAnimation,34_DynamicGeometry,35_SignedDistanceFieldText,36_Urho2DTileMap,37_UIDrag,38_SceneAndUILoad,40_Localization,41_DatabaseDemo'
+# We cannot afford to have a large matrix on AppVeyor at the moment
+  URHO3D_D3D11: 1
+  matrix:
+    - URHO3D_LIB_TYPE: STATIC
+    - URHO3D_LIB_TYPE: SHARED
+install:
+  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+        {
+          $env:PACKAGE_UPLOAD = "1";
+          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
+          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
+        }
+        else
+        {
+          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
+        }
+build_script:
+  - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
+# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
+  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
+test: off
+artifacts:
+  - path: Build\*.zip
+deploy: off
+on_finish:
+  - cd Build && ctest -VV
+  - cd Build && ctest -VV
+  - cd Build && ctest -VV
+  - cd Build && ctest -VV
+  - cd Build && ctest -VV
+
 ...
 
 # vi: set ts=2 sw=2 expandtab:
