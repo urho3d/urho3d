@@ -36,7 +36,6 @@
 namespace Urho3D
 {
 
-extern const float PIXEL_SIZE;
 extern const char* URHO2D_CATEGORY;
 
 TileMap2D::TileMap2D(Context* context) :

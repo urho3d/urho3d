@@ -45,7 +45,7 @@ void CreateScene()
 
     Camera@ camera = cameraNode.CreateComponent("Camera");
     camera.orthographic = true;
-    camera.orthoSize = graphics.height * PIXEL_SIZE;
+    camera.orthoSize = graphics.height;
     camera.zoom = 1.5f * Min(graphics.width / 1280.0f, graphics.height / 800.0f); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.5) is set for full visibility at 1280x800 resolution)
 
     AnimationSet2D@ spriterAnimationSet = cache.GetResource("AnimationSet2D", "Urho2D/imp/imp.scml");

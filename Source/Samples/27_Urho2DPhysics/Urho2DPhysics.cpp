@@ -86,7 +86,7 @@ void Urho2DPhysics::CreateScene()
     camera->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera->SetOrthoSize((float)graphics->GetHeight());
     camera->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     // Create 2D physics world component
@@ -98,7 +98,7 @@ void Urho2DPhysics::CreateScene()
 
     // Create ground.
     Node* groundNode = scene_->CreateChild("Ground");
-    groundNode->SetPosition(Vector3(0.0f, -3.0f, 0.0f));
+    groundNode->SetPosition(Vector3(0.0f, -300.0f, 0.0f));
     groundNode->SetScale(Vector3(200.0f, 1.0f, 0.0f));
 
     // Create 2D rigid body for gound
@@ -110,14 +110,14 @@ void Urho2DPhysics::CreateScene()
     // Create box collider for ground
     CollisionBox2D* groundShape = groundNode->CreateComponent<CollisionBox2D>();
     // Set box size
-    groundShape->SetSize(Vector2(0.32f, 0.32f));
+    groundShape->SetSize(Vector2(32.0f, 32.0f));
     // Set friction
     groundShape->SetFriction(0.5f);
 
     for (unsigned i = 0; i < NUM_OBJECTS; ++i)
     {
         Node* node  = scene_->CreateChild("RigidBody");
-        node->SetPosition(Vector3(Random(-0.1f, 0.1f), 5.0f + i * 0.4f, 0.0f));
+        node->SetPosition(Vector3(Random(-0.1f, 0.1f), 5.0f + i * 0.4f, 0.0f) * 100.0f);
 
         // Create rigid body
         RigidBody2D* body = node->CreateComponent<RigidBody2D>();
@@ -132,7 +132,7 @@ void Urho2DPhysics::CreateScene()
             // Create box
             CollisionBox2D* box = node->CreateComponent<CollisionBox2D>();
             // Set size
-            box->SetSize(Vector2(0.32f, 0.32f));
+            box->SetSize(Vector2(32.0f, 32.0f));
             // Set density
             box->SetDensity(1.0f);
             // Set friction
@@ -147,7 +147,7 @@ void Urho2DPhysics::CreateScene()
             // Create circle
             CollisionCircle2D* circle = node->CreateComponent<CollisionCircle2D>();
             // Set radius
-            circle->SetRadius(0.16f);
+            circle->SetRadius(16.0f);
             // Set density
             circle->SetDensity(1.0f);
             // Set friction.
@@ -192,7 +192,7 @@ void Urho2DPhysics::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 4.0f;
+    const float MOVE_SPEED = 400.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))

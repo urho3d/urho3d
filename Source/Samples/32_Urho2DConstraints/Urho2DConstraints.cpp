@@ -108,7 +108,7 @@ void Urho2DConstraints::CreateScene()
     camera_->SetOrthographic(true);
 
     Graphics* graphics = GetSubsystem<Graphics>();
-    camera_->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera_->SetOrthoSize((float)graphics->GetHeight());
     camera_->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
@@ -127,7 +127,7 @@ void Urho2DConstraints::CreateScene()
         if (!dummyBody)
             dummyBody = edgeBody; // Mark first edge as dummy body (used by mouse pick)
         CollisionEdge2D* edgeShape = edgeNode->CreateComponent<CollisionEdge2D>();
-        edgeShape->SetVertices(Vector2(i*2.5f -5.0f, -3.0f), Vector2(i*2.5f -5.0f, 3.0f));
+        edgeShape->SetVertices(Vector2(i*2.5f -5.0f, -3.0f) * 100.0f, Vector2(i*2.5f -5.0f, 3.0f) * 100.0f);
         edgeShape->SetFriction(0.5f); // Set friction
     }
 
@@ -136,7 +136,7 @@ void Urho2DConstraints::CreateScene()
         Node* edgeNode = scene_->CreateChild("HorizontalEdge");
         /*RigidBody2D* edgeBody = */edgeNode->CreateComponent<RigidBody2D>();
         CollisionEdge2D* edgeShape = edgeNode->CreateComponent<CollisionEdge2D>();
-        edgeShape->SetVertices(Vector2(-5.0f, j*2.0f -3.0f), Vector2(5.0f, j*2.0f -3.0f));
+        edgeShape->SetVertices(Vector2(-5.0f, j*2.0f -3.0f) * 100.0f, Vector2(5.0f, j*2.0f -3.0f) * 100.0f);
         edgeShape->SetFriction(0.5f); // Set friction
     }
 
@@ -144,7 +144,7 @@ void Urho2DConstraints::CreateScene()
 
     // Create a box (will be cloned later)
     Node* box  = scene_->CreateChild("Box");
-    box->SetPosition(Vector3(0.8f, -2.0f, 0.0f));
+    box->SetPosition(Vector3(80.0f, -200.0f, 0.0f));
     StaticSprite2D* boxSprite = box->CreateComponent<StaticSprite2D>();
     boxSprite->SetSprite(cache->GetResource<Sprite2D>("Urho2D/Box.png"));
     RigidBody2D* boxBody = box->CreateComponent<RigidBody2D>();
@@ -152,14 +152,14 @@ void Urho2DConstraints::CreateScene()
     boxBody->SetLinearDamping(0.0f);
     boxBody->SetAngularDamping(0.0f);
     CollisionBox2D* shape = box->CreateComponent<CollisionBox2D>(); // Create box shape
-    shape->SetSize(Vector2(0.32f, 0.32f)); // Set size
+    shape->SetSize(Vector2(32.0f, 32.0f)); // Set size
     shape->SetDensity(1.0f); // Set shape density (kilograms per meter squared)
     shape->SetFriction(0.5f); // Set friction
     shape->SetRestitution(0.1f); // Set restitution (slight bounce)
 
     // Create a ball (will be cloned later)
     Node* ball  = scene_->CreateChild("Ball");
-    ball->SetPosition(Vector3(1.8f, -2.0f, 0.0f));
+    ball->SetPosition(Vector3(180.0f, -200.0f, 0.0f));
     StaticSprite2D* ballSprite = ball->CreateComponent<StaticSprite2D>();
     ballSprite->SetSprite(cache->GetResource<Sprite2D>("Urho2D/Ball.png"));
     RigidBody2D* ballBody = ball->CreateComponent<RigidBody2D>();
@@ -167,14 +167,14 @@ void Urho2DConstraints::CreateScene()
     ballBody->SetLinearDamping(0.0f);
     ballBody->SetAngularDamping(0.0f);
     CollisionCircle2D* ballShape = ball->CreateComponent<CollisionCircle2D>(); // Create circle shape
-    ballShape->SetRadius(0.16f); // Set radius
+    ballShape->SetRadius(16.0f); // Set radius
     ballShape->SetDensity(1.0f); // Set shape density (kilograms per meter squared)
     ballShape->SetFriction(0.5f); // Set friction
     ballShape->SetRestitution(0.6f); // Set restitution: make it bounce
 
     // Create a polygon
     Node* polygon = scene_->CreateChild("Polygon");
-    polygon->SetPosition(Vector3(1.6f, -2.0f, 0.0f));
+    polygon->SetPosition(Vector3(160.0f, -200.0f, 0.0f));
     polygon->SetScale(0.7f);
     StaticSprite2D* polygonSprite = polygon->CreateComponent<StaticSprite2D>();
     polygonSprite->SetSprite(cache->GetResource<Sprite2D>("Urho2D/Aster.png"));
@@ -183,12 +183,12 @@ void Urho2DConstraints::CreateScene()
     CollisionPolygon2D* polygonShape = polygon->CreateComponent<CollisionPolygon2D>();
     // TODO: create from PODVector<Vector2> using SetVertices()
     polygonShape->SetVertexCount(6); // Set number of vertices (mandatory when using SetVertex())
-    polygonShape->SetVertex(0, Vector2(-0.8f, -0.3f));
-    polygonShape->SetVertex(1, Vector2(0.5f, -0.8f));
-    polygonShape->SetVertex(2, Vector2(0.8f, -0.3f));
-    polygonShape->SetVertex(3, Vector2(0.8f, 0.5f));
-    polygonShape->SetVertex(4, Vector2(0.5f, 0.9f));
-    polygonShape->SetVertex(5, Vector2(-0.5f, 0.7f));
+    polygonShape->SetVertex(0, Vector2(-0.8f, -0.3f) * 100.0f);
+    polygonShape->SetVertex(1, Vector2(0.5f, -0.8f) * 100.0f);
+    polygonShape->SetVertex(2, Vector2(0.8f, -0.3f) * 100.0f);
+    polygonShape->SetVertex(3, Vector2(0.8f, 0.5f) * 100.0f);
+    polygonShape->SetVertex(4, Vector2(0.5f, 0.9f) * 100.0f);
+    polygonShape->SetVertex(5, Vector2(-0.5f, 0.7f) * 100.0f);
     polygonShape->SetDensity(1.0f); // Set shape density (kilograms per meter squared)
     polygonShape->SetFriction(0.3f); // Set friction
     polygonShape->SetRestitution(0.0f); // Set restitution (no bounce)
@@ -198,8 +198,8 @@ void Urho2DConstraints::CreateScene()
     Node* boxDistanceNode = box->Clone();
     Node* ballDistanceNode = ball->Clone();
     RigidBody2D* ballDistanceBody = ballDistanceNode->GetComponent<RigidBody2D>();
-    boxDistanceNode->SetPosition(Vector3(-4.5f, 2.0f, 0.0f));
-    ballDistanceNode->SetPosition(Vector3(-3.0f, 2.0f, 0.0f));
+    boxDistanceNode->SetPosition(Vector3(-450.0f, 200.0f, 0.0f));
+    ballDistanceNode->SetPosition(Vector3(-300.0f, 200.0f, 0.0f));
 
     ConstraintDistance2D* constraintDistance = boxDistanceNode->CreateComponent<ConstraintDistance2D>(); // Apply ConstraintDistance2D to box
     constraintDistance->SetOtherBody(ballDistanceBody); // Constrain ball to box
@@ -213,8 +213,8 @@ void Urho2DConstraints::CreateScene()
     CreateFlag("ConstraintFriction2D", 0.03f, 1.0f); // Display Text3D flag
     Node* boxFrictionNode = box->Clone();
     Node* ballFrictionNode = ball->Clone();
-    boxFrictionNode->SetPosition(Vector3(0.5f, 0.0f, 0.0f));
-    ballFrictionNode->SetPosition(Vector3(1.5f, 0.0f, 0.0f));
+    boxFrictionNode->SetPosition(Vector3(50.0f, 0.0f, 0.0f));
+    ballFrictionNode->SetPosition(Vector3(150.0f, 0.0f, 0.0f));
 
     ConstraintFriction2D* constraintFriction = boxFrictionNode->CreateComponent<ConstraintFriction2D>(); // Apply ConstraintDistance2D to box
     constraintFriction->SetOtherBody(ballFrictionNode->GetComponent<RigidBody2D>()); // Constraint ball to box
@@ -228,12 +228,12 @@ void Urho2DConstraints::CreateScene()
     Node* baseNode = box->Clone();
     RigidBody2D* tempBody = baseNode->GetComponent<RigidBody2D>(); // Get body to make it static
     tempBody->SetBodyType(BT_STATIC);
-    baseNode->SetPosition(Vector3(-3.7f, -2.5f, 0.0f));
+    baseNode->SetPosition(Vector3(-3.7f, -2.5f, 0.0f) * 100.0f);
     Node* ball1Node = ball->Clone();
-    ball1Node->SetPosition(Vector3(-4.5f, -2.0f, 0.0f));
+    ball1Node->SetPosition(Vector3(-4.5f, -2.0f, 0.0f) * 100.0f);
     RigidBody2D* ball1Body = ball1Node->GetComponent<RigidBody2D>();
     Node* ball2Node = ball->Clone();
-    ball2Node->SetPosition(Vector3(-3.0f, -2.0f, 0.0f));
+    ball2Node->SetPosition(Vector3(-3.0f, -2.0f, 0.0f) * 100.0f);
     RigidBody2D* ball2Body = ball2Node->GetComponent<RigidBody2D>();
 
     ConstraintRevolute2D* gear1 = baseNode->CreateComponent<ConstraintRevolute2D>(); // Apply constraint to baseBox
@@ -255,13 +255,13 @@ void Urho2DConstraints::CreateScene()
     CreateFlag("ConstraintWheel2Ds compound", -2.45f, -1.0f); // Display Text3D flag
     Node* car = box->Clone();
     car->SetScale(Vector3(4.0f, 1.0f, 0.0f));
-    car->SetPosition(Vector3(-1.2f, -2.3f, 0.0f));
+    car->SetPosition(Vector3(-120.0f, -230.0f, 0.0f));
     StaticSprite2D* tempSprite = car->GetComponent<StaticSprite2D>(); // Get car Sprite in order to draw it on top
     tempSprite->SetOrderInLayer(0); // Draw car on top of the wheels (set to -1 to draw below)
     Node* ball1WheelNode = ball->Clone();
-    ball1WheelNode->SetPosition(Vector3(-1.6f, -2.5f, 0.0f));
+    ball1WheelNode->SetPosition(Vector3(-1.6f, -2.5f, 0.0f) * 100.0f);
     Node* ball2WheelNode = ball->Clone();
-    ball2WheelNode->SetPosition(Vector3(-0.8f, -2.5f, 0.0f));
+    ball2WheelNode->SetPosition(Vector3(-0.8f, -2.5f, 0.0f) * 100.0f);
 
     ConstraintWheel2D* wheel1 = car->CreateComponent<ConstraintWheel2D>();
     wheel1->SetOtherBody(ball1WheelNode->GetComponent<RigidBody2D>());
@@ -285,8 +285,8 @@ void Urho2DConstraints::CreateScene()
     tempBody = boxMotorNode->GetComponent<RigidBody2D>(); // Get body to make it static
     tempBody->SetBodyType(BT_STATIC);
     Node* ballMotorNode = ball->Clone();
-    boxMotorNode->SetPosition(Vector3(3.8f, -2.1f, 0.0f));
-    ballMotorNode->SetPosition(Vector3(3.8f, -1.5f, 0.0f));
+    boxMotorNode->SetPosition(Vector3(3.8f, -2.1f, 0.0f) * 100.0f);
+    ballMotorNode->SetPosition(Vector3(3.8f, -1.5f, 0.0f) * 100.0f);
 
     ConstraintMotor2D* constraintMotor = boxMotorNode->CreateComponent<ConstraintMotor2D>();
     constraintMotor->SetOtherBody(ballMotorNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -306,13 +306,13 @@ void Urho2DConstraints::CreateScene()
     tempBody = boxPrismaticNode->GetComponent<RigidBody2D>(); // Get body to make it static
     tempBody->SetBodyType(BT_STATIC);
     Node* ballPrismaticNode = ball->Clone();
-    boxPrismaticNode->SetPosition(Vector3(3.3f, 2.5f, 0.0f));
-    ballPrismaticNode->SetPosition(Vector3(4.3f, 2.0f, 0.0f));
+    boxPrismaticNode->SetPosition(Vector3(3.3f, 2.5f, 0.0f) * 100.0f);
+    ballPrismaticNode->SetPosition(Vector3(4.3f, 2.0f, 0.0f) * 100.0f);
 
     ConstraintPrismatic2D* constraintPrismatic = boxPrismaticNode->CreateComponent<ConstraintPrismatic2D>();
     constraintPrismatic->SetOtherBody(ballPrismaticNode->GetComponent<RigidBody2D>()); // Constrain ball to box
     constraintPrismatic->SetAxis(Vector2(1.0f, 1.0f)); // Slide from [0,0] to [1,1]
-    constraintPrismatic->SetAnchor(Vector2(4.0f, 2.0f));
+    constraintPrismatic->SetAnchor(Vector2(4.0f, 2.0f) * 100.0f);
     constraintPrismatic->SetLowerTranslation(-1.0f);
     constraintPrismatic->SetUpperTranslation(0.5f);
     constraintPrismatic->SetEnableLimit(true);
@@ -323,8 +323,8 @@ void Urho2DConstraints::CreateScene()
     CreateFlag("ConstraintPulley2D", 0.03f, 3.0f); // Display Text3D flag
     Node* boxPulleyNode = box->Clone();
     Node* ballPulleyNode = ball->Clone();
-    boxPulleyNode->SetPosition(Vector3(0.5f, 2.0f, 0.0f));
-    ballPulleyNode->SetPosition(Vector3(2.0f, 2.0f, 0.0f));
+    boxPulleyNode->SetPosition(Vector3(0.5f, 2.0f, 0.0f) * 100.0f);
+    ballPulleyNode->SetPosition(Vector3(2.0f, 2.0f, 0.0f) * 100.0f);
 
     ConstraintPulley2D* constraintPulley = boxPulleyNode->CreateComponent<ConstraintPulley2D>(); // Apply constraint to box
     constraintPulley->SetOtherBody(ballPulleyNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -340,8 +340,8 @@ void Urho2DConstraints::CreateScene()
     tempBody = boxRevoluteNode->GetComponent<RigidBody2D>(); // Get body to make it static
     tempBody->SetBodyType(BT_STATIC);
     Node* ballRevoluteNode = ball->Clone();
-    boxRevoluteNode->SetPosition(Vector3(-2.0f, 1.5f, 0.0f));
-    ballRevoluteNode->SetPosition(Vector3(-1.0f, 2.0f, 0.0f));
+    boxRevoluteNode->SetPosition(Vector3(-2.0f, 1.5f, 0.0f) * 100.0f);
+    ballRevoluteNode->SetPosition(Vector3(-1.0f, 2.0f, 0.0f) * 100.0f);
 
     ConstraintRevolute2D* constraintRevolute = boxRevoluteNode->CreateComponent<ConstraintRevolute2D>(); // Apply constraint to box
     constraintRevolute->SetOtherBody(ballRevoluteNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -359,8 +359,8 @@ void Urho2DConstraints::CreateScene()
     tempBody = boxRopeNode->GetComponent<RigidBody2D>();
     tempBody->SetBodyType(BT_STATIC);
     Node* ballRopeNode = ball->Clone();
-    boxRopeNode->SetPosition(Vector3(-3.7f, 0.7f, 0.0f));
-    ballRopeNode->SetPosition(Vector3(-4.5f, 0.0f, 0.0f));
+    boxRopeNode->SetPosition(Vector3(-3.7f, 0.7f, 0.0f) * 100.0f);
+    ballRopeNode->SetPosition(Vector3(-4.5f, 0.0f, 0.0f) * 100.0f);
 
     ConstraintRope2D* constraintRope = boxRopeNode->CreateComponent<ConstraintRope2D>();
     constraintRope->SetOtherBody(ballRopeNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -372,8 +372,8 @@ void Urho2DConstraints::CreateScene()
     CreateFlag("ConstraintWeld2D", -2.45f, 1.0f); // Display Text3D flag
     Node* boxWeldNode = box->Clone();
     Node* ballWeldNode = ball->Clone();
-    boxWeldNode->SetPosition(Vector3(-0.5f, 0.0f, 0.0f));
-    ballWeldNode->SetPosition(Vector3(-2.0f, 0.0f, 0.0f));
+    boxWeldNode->SetPosition(Vector3(-0.5f, 0.0f, 0.0f) * 100.0f);
+    ballWeldNode->SetPosition(Vector3(-2.0f, 0.0f, 0.0f) * 100.0f);
 
     ConstraintWeld2D* constraintWeld = boxWeldNode->CreateComponent<ConstraintWeld2D>();
     constraintWeld->SetOtherBody(ballWeldNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -385,8 +385,8 @@ void Urho2DConstraints::CreateScene()
     CreateFlag("ConstraintWheel2D",  2.53f, 1.0f); // Display Text3D flag
     Node* boxWheelNode = box->Clone();
     Node* ballWheelNode = ball->Clone();
-    boxWheelNode->SetPosition(Vector3(3.8f, 0.0f, 0.0f));
-    ballWheelNode->SetPosition(Vector3(3.8f, 0.9f, 0.0f));
+    boxWheelNode->SetPosition(Vector3(3.8f, 0.0f, 0.0f) * 100.0f);
+    ballWheelNode->SetPosition(Vector3(3.8f, 0.9f, 0.0f) * 100.0f);
 
     ConstraintWheel2D* constraintWheel = boxWheelNode->CreateComponent<ConstraintWheel2D>();
     constraintWheel->SetOtherBody(ballWheelNode->GetComponent<RigidBody2D>()); // Constrain ball to box
@@ -403,7 +403,7 @@ void Urho2DConstraints::CreateScene()
 void Urho2DConstraints::CreateFlag(const String& text, float x, float y) // Used to create Tex3D flags
 {
     Node* flagNode = scene_->CreateChild("Flag");
-    flagNode->SetPosition(Vector3(x, y, 0.0f));
+    flagNode->SetPosition(Vector3(x * 100.0f, y * 100.0f, 0.0f));
     Text3D* flag3D = flagNode->CreateComponent<Text3D>(); // We use Text3D in order to make the text affected by zoom (so that it sticks to 2D)
     flag3D->SetText(text);
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -436,7 +436,7 @@ void Urho2DConstraints::MoveCamera(float timeStep)
     Input* input = GetSubsystem<Input>();
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 4.0f;
+    const float MOVE_SPEED = 400.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input->GetKeyDown('W'))

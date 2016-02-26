@@ -36,7 +36,7 @@ function CreateScene()
     cameraNode.position = Vector3(0, 0, 0) -- Note that Z setting is discarded; use camera.zoom instead (see MoveCamera() below for example)
     camera = cameraNode:CreateComponent("Camera")
     camera.orthographic = true
-    camera.orthoSize = graphics.height * PIXEL_SIZE
+    camera.orthoSize = graphics.height
     camera.zoom = 1.2 * Min(graphics.width / 1280, graphics.height / 800) -- Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
     renderer:SetViewport(0, Viewport:new(scene_, camera))
     renderer.defaultZone.fogColor = Color(0.1, 0.1, 0.1) -- Set background color for the scene

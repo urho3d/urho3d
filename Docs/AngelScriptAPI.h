@@ -14433,7 +14433,6 @@ int M_MIN_INT;
 uint M_MIN_UNSIGNED;
 float M_PI;
 float M_RADTODEG;
-float PIXEL_SIZE;
 int QUALITY_HIGH;
 int QUALITY_LOW;
 int QUALITY_MAX;
