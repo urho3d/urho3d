@@ -31,6 +31,8 @@
 
 #include <JO/jo_jpeg.h>
 #include <SDL/SDL_surface.h>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
 
