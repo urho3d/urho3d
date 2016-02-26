@@ -297,7 +297,7 @@ task :ci do
       samples = pairs.pop.split ','
       matched = true
       pairs.each { |pair|
-        kv = pair.split '=='
+        kv = pair.split '='
         matched = false if ENV[kv.first] != kv.last
       }
       samples.each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if matched
