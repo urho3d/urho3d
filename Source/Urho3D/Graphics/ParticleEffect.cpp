@@ -226,12 +226,12 @@ bool ParticleEffect::Load(const XMLElement& source)
     if (source.HasChild("activetime"))
         activeTime_ = source.GetChild("activetime").GetFloat("value");
     if (activeTime_ < 0.0f)
-        activeTime_ = M_INFINITY;
+        activeTime_ = std::numeric_limits<float>::infinity();
 
     if (source.HasChild("inactivetime"))
         inactiveTime_ = source.GetChild("inactivetime").GetFloat("value");
     if (inactiveTime_ < 0.0f)
-        inactiveTime_ = M_INFINITY;
+        inactiveTime_ = std::numeric_limits<float>::infinity();
 
     if (source.HasChild("emissionrate"))
         GetFloatMinMax(source.GetChild("emissionrate"), emissionRateMin_, emissionRateMax_);

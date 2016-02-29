@@ -384,7 +384,7 @@ void WorkQueue::ReturnToPool(SharedPtr<WorkItem>& item)
         item->end_ = 0;
         item->aux_ = 0;
         item->workFunction_ = 0;
-        item->priority_ = M_MAX_UNSIGNED;
+        item->priority_ = std::numeric_limits<unsigned>::max();
         item->sendEvent_ = false;
         item->completed_ = false;
 

@@ -287,7 +287,7 @@ bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& m
         return false;
     }
 
-    minVertex = M_MAX_UNSIGNED;
+    minVertex = std::numeric_limits<unsigned>::max();
     unsigned maxVertex = 0;
 
     if (indexSize_ == sizeof(unsigned))

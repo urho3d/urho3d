@@ -45,7 +45,7 @@ extern const char* GEOMETRY_CATEGORY;
 
 StaticModel::StaticModel(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
-    occlusionLodLevel_(M_MAX_UNSIGNED),
+    occlusionLodLevel_(std::numeric_limits<unsigned>::max()),
     materialsAttr_(Material::GetTypeStatic())
 {
 }
@@ -69,7 +69,7 @@ void StaticModel::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, std::numeric_limits<unsigned>::max(), AM_DEFAULT);
 }
 
 void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -90,11 +90,11 @@ void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQuer
         float distance = localRay.HitDistance(boundingBox_);
         Vector3 normal = -query.ray_.direction_;
         Vector2 geometryUV;
-        unsigned hitBatch = M_MAX_UNSIGNED;
+        unsigned hitBatch = std::numeric_limits<unsigned>::max();
 
         if (level >= RAY_TRIANGLE && distance < query.maxDistance_)
         {
-            distance = M_INFINITY;
+            distance = std::numeric_limits<float>::infinity();
 
             for (unsigned i = 0; i < batches_.Size(); ++i)
             {
@@ -418,7 +418,7 @@ void StaticModel::ResetLodLevels()
     }
 
     // Find out the real LOD levels on next geometry update
-    lodDistance_ = M_INFINITY;
+    lodDistance_ = std::numeric_limits<float>::infinity();
 }
 
 void StaticModel::CalculateLodLevels()

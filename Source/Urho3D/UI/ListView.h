@@ -108,9 +108,9 @@ public:
     UIElement* GetItem(unsigned index) const;
     /// Return all items.
     PODVector<UIElement*> GetItems() const;
-    /// Return index of item, or M_MAX_UNSIGNED If not found.
+    /// Return index of item, or std::numeric_limits<unsigned>::max() If not found.
     unsigned FindItem(UIElement* item) const;
-    /// Return first selected index, or M_MAX_UNSIGNED if none selected.
+    /// Return first selected index, or std::numeric_limits<unsigned>::max() if none selected.
     unsigned GetSelection() const;
 
     /// Return all selected indices.

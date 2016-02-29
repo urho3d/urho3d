@@ -2,17 +2,10 @@ $#include "Math/MathDefs.h"
 
 static const float M_PI;
 static const float M_HALF_PI;
-static const int M_MIN_INT;
-static const int M_MAX_INT;
-static const unsigned M_MIN_UNSIGNED;
-static const unsigned M_MAX_UNSIGNED;
 
-static const float M_EPSILON;
-static const float M_LARGE_EPSILON;
 static const float M_MIN_NEARCLIP;
 static const float M_MAX_FOV;
 static const float M_LARGE_VALUE;
-static const float M_INFINITY;
 static const float M_DEGTORAD;
 static const float M_DEGTORAD_2;
 static const float M_RADTODEG;

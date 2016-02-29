@@ -34,10 +34,10 @@ static const unsigned DRAWABLE_LIGHT = 0x2;
 static const unsigned DRAWABLE_ZONE = 0x4;
 static const unsigned DRAWABLE_GEOMETRY2D = 0x8;
 static const unsigned DRAWABLE_ANY = 0xff;
-static const unsigned DEFAULT_VIEWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_LIGHTMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_SHADOWMASK = M_MAX_UNSIGNED;
-static const unsigned DEFAULT_ZONEMASK = M_MAX_UNSIGNED;
+static const unsigned DEFAULT_VIEWMASK = std::numeric_limits<unsigned>::max();
+static const unsigned DEFAULT_LIGHTMASK = std::numeric_limits<unsigned>::max();
+static const unsigned DEFAULT_SHADOWMASK = std::numeric_limits<unsigned>::max();
+static const unsigned DEFAULT_ZONEMASK = std::numeric_limits<unsigned>::max();
 static const int MAX_VERTEX_LIGHTS = 4;
 static const float ANIMATION_LOD_BASESCALE = 2500.0f;
 

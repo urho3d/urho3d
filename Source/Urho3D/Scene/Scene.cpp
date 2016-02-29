@@ -648,13 +648,13 @@ void Scene::SetUpdateEnabled(bool enable)
 
 void Scene::SetTimeScale(float scale)
 {
-    timeScale_ = Max(scale, M_EPSILON);
+    timeScale_ = Max(scale, std::numeric_limits<float>::epsilon());
     Node::MarkNetworkUpdate();
 }
 
 void Scene::SetSmoothingConstant(float constant)
 {
-    smoothingConstant_ = Max(constant, M_EPSILON);
+    smoothingConstant_ = Max(constant, std::numeric_limits<float>::epsilon());
     Node::MarkNetworkUpdate();
 }
 

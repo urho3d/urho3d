@@ -244,7 +244,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
         unsigned index = 0;
         unsigned numInstances = value[index++].GetUInt();
         // Prevent crash on entering negative value in the editor
-        if (numInstances > M_MAX_INT)
+        if (numInstances > std::numeric_limits<signed>::max())
             numInstances = 0;
 
         controlPointIdsAttr_.Push(numInstances);
@@ -270,7 +270,7 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
 
 void SplinePath::SetControlledIdAttr(unsigned value)
 {
-    if (value > 0 && value < M_MAX_UNSIGNED)
+    if (value > 0 && value < std::numeric_limits<unsigned>::max())
 
         controlledIdAttr_ = value;
     dirty_ = true;

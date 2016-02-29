@@ -144,7 +144,7 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
         result.distance_ = distance;
         result.drawable_ = this;
         result.node_ = GetNode();
-        result.subObject_ = M_MAX_UNSIGNED;
+        result.subObject_ = std::numeric_limits<unsigned>::max();
         results.Push(result);
     }
 }
@@ -210,7 +210,7 @@ void Drawable::SetShadowDistance(float distance)
 
 void Drawable::SetLodBias(float bias)
 {
-    lodBias_ = Max(bias, M_EPSILON);
+    lodBias_ = Max(bias, std::numeric_limits<float>::epsilon());
     MarkNetworkUpdate();
 }
 
@@ -563,7 +563,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
 
                 // Amount by which to offset indices in the OBJ vs their values in the Urho3D geometry, basically the lowest index value
                 // Compensates for the above vertex writing which doesn't write ALL vertices, just the used ones
-                unsigned int indexOffset = M_MAX_INT;
+                unsigned int indexOffset = std::numeric_limits<signed>::max();
                 for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx++)
                 {
                     if (indexSize == 2)

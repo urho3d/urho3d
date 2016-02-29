@@ -120,7 +120,7 @@ static RayQueryResult OctreeRaycastSingle(const Octree* octree, const Ray& ray, 
         RayQueryResult empty;
         empty.position_ = Vector3::ZERO;
         empty.normal_ = Vector3::ZERO;
-        empty.distance_ = M_INFINITY;
+        empty.distance_ = std::numeric_limits<float>::infinity();
         empty.subObject_ = 0;
         return empty;
     }

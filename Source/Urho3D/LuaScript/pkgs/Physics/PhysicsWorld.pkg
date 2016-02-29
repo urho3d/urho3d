@@ -26,21 +26,21 @@ class PhysicsWorld : public Component
     void SetSplitImpulse(bool enable);
     void SetMaxNetworkAngularVelocity(float velocity);
 
-    // void Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast @ Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    // void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented @ RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
-    // void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside PhysicsRaycastResult PhysicsWorldConvexCast @ ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast @ Raycast(const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    // void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingle @ RaycastSingle(const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    // void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented @ RaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    // void SphereCast(PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside PhysicsRaycastResult PhysicsWorldSphereCast @ SphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    // void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside PhysicsRaycastResult PhysicsWorldConvexCast @ ConvexCast(CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = std::numeric_limits<unsigned>::max());
 
-    // void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere @ GetRigidBodies(const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED);
-    // void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
-    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox @ GetRigidBodies(const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED);
+    // void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere @ GetRigidBodies(const Sphere& sphere, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    // void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox @ GetRigidBodies(const BoundingBox& box, unsigned collisionMask = std::numeric_limits<unsigned>::max());
     // void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
     tolua_outside const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBody @ GetRigidBodies(const RigidBody* body);
     // void GetCollidingBodies(PODVector<RigidBody*>& result, const RigidBody* body);
@@ -71,7 +71,7 @@ class PhysicsWorld : public Component
 };
 
 ${
-static const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+static const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     static PODVector<PhysicsRaycastResult> result;
     result.Clear();
@@ -79,35 +79,35 @@ static const PODVector<PhysicsRaycastResult>& PhysicsWorldRaycast(PhysicsWorld* 
     return result;
 }
 
-static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+static PhysicsRaycastResult PhysicsWorldRaycastSingle(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     PhysicsRaycastResult result;
     physicsWorld->RaycastSingle(result, ray, maxDistance, collisionMask);
     return result;
 }
 
-static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(PhysicsWorld* physicsWorld, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     PhysicsRaycastResult result;
     physicsWorld->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask);
     return result;
 }
 
-PhysicsRaycastResult PhysicsWorldSphereCast(PhysicsWorld* physicsWorld, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED)
+PhysicsRaycastResult PhysicsWorldSphereCast(PhysicsWorld* physicsWorld, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     PhysicsRaycastResult result;
     physicsWorld->SphereCast(result, ray, radius, maxDistance, collisionMask);
     return result;
 }
 
-PhysicsRaycastResult PhysicsWorldConvexCast(PhysicsWorld* physicsWorld, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_MAX_UNSIGNED)
+PhysicsRaycastResult PhysicsWorldConvexCast(PhysicsWorld* physicsWorld, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot, const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     PhysicsRaycastResult result;
     physicsWorld->ConvexCast(result, shape, startPos, startRot, endPos, endRot, collisionMask);
     return result;
 }
 
-static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere(PhysicsWorld* physicsWorld, const Sphere& sphere, unsigned collisionMask = M_MAX_UNSIGNED)
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere(PhysicsWorld* physicsWorld, const Sphere& sphere, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     static PODVector<RigidBody*> result;
     result.Clear();
@@ -115,7 +115,7 @@ static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesSphere(PhysicsWorl
     return result;
 }
 
-static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox(PhysicsWorld* physicsWorld, const BoundingBox& box, unsigned collisionMask = M_MAX_UNSIGNED)
+static const PODVector<RigidBody*>& PhysicsWorldGetRigidBodiesBox(PhysicsWorld* physicsWorld, const BoundingBox& box, unsigned collisionMask = std::numeric_limits<unsigned>::max())
 {
     static PODVector<RigidBody*> result;
     result.Clear();

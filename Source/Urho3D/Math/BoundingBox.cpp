@@ -108,8 +108,8 @@ void BoundingBox::Clip(const BoundingBox& box)
 
     if (min_.x_ > max_.x_ || min_.y_ > max_.y_ || min_.z_ > max_.z_)
     {
-        min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
-        max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+        min_ = Vector3(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
+        max_ = Vector3(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
     }
 }
 

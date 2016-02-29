@@ -45,8 +45,8 @@ class URHO3D_API BoundingBox
 public:
     /// Construct with zero size.
     BoundingBox() :
-        min_(M_INFINITY, M_INFINITY, M_INFINITY),
-        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
+        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
+        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
     {
     }
 
@@ -88,32 +88,32 @@ public:
 
     /// Construct from an array of vertices.
     BoundingBox(const Vector3* vertices, unsigned count) :
-        min_(M_INFINITY, M_INFINITY, M_INFINITY),
-        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
+        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
+        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
     {
         Define(vertices, count);
     }
 
     /// Construct from a frustum.
     BoundingBox(const Frustum& frustum) :
-        min_(M_INFINITY, M_INFINITY, M_INFINITY),
-        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
+        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
+        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
     {
         Define(frustum);
     }
 
     /// Construct from a polyhedron.
     BoundingBox(const Polyhedron& poly) :
-        min_(M_INFINITY, M_INFINITY, M_INFINITY),
-        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
+        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
+        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
     {
         Define(poly);
     }
 
     /// Construct from a sphere.
     BoundingBox(const Sphere& sphere) :
-        min_(M_INFINITY, M_INFINITY, M_INFINITY),
-        max_(-M_INFINITY, -M_INFINITY, -M_INFINITY)
+        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
+        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
     {
         Define(sphere);
     }
@@ -244,18 +244,18 @@ public:
     void Clear()
     {
 #ifdef URHO3D_SSE
-        _mm_storeu_ps(&min_.x_, _mm_set1_ps(M_INFINITY));
-        _mm_storeu_ps(&max_.x_, _mm_set1_ps(-M_INFINITY));
+        _mm_storeu_ps(&min_.x_, _mm_set1_ps(std::numeric_limits<float>::infinity()));
+        _mm_storeu_ps(&max_.x_, _mm_set1_ps(-std::numeric_limits<float>::infinity()));
 #else
-        min_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
-        max_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+        min_ = Vector3( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity());
+        max_ = Vector3(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
 #endif
     }
 
     /// Return true if this bounding box is defined via a previous call to Define() or Merge().
     bool Defined() const
     {
-        return min_.x_ != M_INFINITY;
+        return min_.x_ != std::numeric_limits<float>::infinity();
     }
 
     /// Return center.

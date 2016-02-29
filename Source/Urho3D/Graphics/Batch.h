@@ -134,14 +134,14 @@ struct BatchGroup : public Batch
 {
     /// Construct with defaults.
     BatchGroup() :
-        startIndex_(M_MAX_UNSIGNED)
+        startIndex_(std::numeric_limits<unsigned>::max())
     {
     }
 
     /// Construct from a batch.
     BatchGroup(const Batch& batch) :
         Batch(batch),
-        startIndex_(M_MAX_UNSIGNED)
+        startIndex_(std::numeric_limits<unsigned>::max())
     {
     }
 
@@ -170,7 +170,7 @@ struct BatchGroup : public Batch
 
     /// Instance data.
     PODVector<InstanceData> instances_;
-    /// Instance stream start index, or M_MAX_UNSIGNED if transforms not pre-set.
+    /// Instance stream start index, or std::numeric_limits<unsigned>::max() if transforms not pre-set.
     unsigned startIndex_;
 };
 

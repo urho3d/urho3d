@@ -51,8 +51,8 @@ ValueAnimation::ValueAnimation(Context* context) :
     splineTension_(0.5f),
     valueType_(VAR_NONE),
     interpolatable_(false),
-    beginTime_(M_INFINITY),
-    endTime_(-M_INFINITY),
+    beginTime_(std::numeric_limits<float>::infinity()),
+    endTime_(-std::numeric_limits<float>::infinity()),
     splineTangentsDirty_(false)
 {
 }
@@ -258,8 +258,8 @@ void ValueAnimation::SetValueType(VariantType valueType)
 
     keyFrames_.Clear();
     eventFrames_.Clear();
-    beginTime_ = M_INFINITY;
-    endTime_ = -M_INFINITY;
+    beginTime_ = std::numeric_limits<float>::infinity();
+    endTime_ = -std::numeric_limits<float>::infinity();
 }
 
 void ValueAnimation::SetOwner(void* owner)

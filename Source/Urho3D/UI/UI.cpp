@@ -233,7 +233,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
 
         // Adopt modal root as parent
         modalElement->SetVar(VAR_ORIGINAL_PARENT, currParent);
-        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : M_MAX_UNSIGNED);
+        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : std::numeric_limits<unsigned>::max());
         modalElement->SetParent(rootModalElement_);
 
         // If it is a popup element, bring along its top-level parent
@@ -248,7 +248,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
                 originElement->SetVar(VAR_PARENT_CHANGED, element);
                 UIElement* oriParent = element->GetParent();
                 element->SetVar(VAR_ORIGINAL_PARENT, oriParent);
-                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : M_MAX_UNSIGNED);
+                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : std::numeric_limits<unsigned>::max());
                 element->SetParent(rootModalElement_);
             }
         }
@@ -618,7 +618,7 @@ UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
 UIElement* UI::GetFrontElement() const
 {
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
-    int maxPriority = M_MIN_INT;
+    int maxPriority = std::numeric_limits<signed>::min();
     UIElement* front = 0;
 
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
@@ -1171,7 +1171,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             if (!HasModalElement())
                 SetFocusElement(0);
             SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
-            
+
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
                 SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
         }
@@ -1796,7 +1796,7 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
 
 void UI::SetScale(float scale)
 {
-    uiScale_ = Max(scale, M_EPSILON);
+    uiScale_ = Max(scale, std::numeric_limits<float>::epsilon());
     Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics)
     {

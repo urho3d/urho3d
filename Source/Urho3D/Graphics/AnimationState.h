@@ -103,11 +103,11 @@ public:
     float GetBoneWeight(const String& name) const;
     /// Return per-bone blending weight by name.
     float GetBoneWeight(StringHash nameHash) const;
-    /// Return track index with matching bone node, or M_MAX_UNSIGNED if not found.
+    /// Return track index with matching bone node, or std::numeric_limits<unsigned>::max() if not found.
     unsigned GetTrackIndex(Node* node) const;
-    /// Return track index by bone name, or M_MAX_UNSIGNED if not found.
+    /// Return track index by bone name, or std::numeric_limits<unsigned>::max() if not found.
     unsigned GetTrackIndex(const String& name) const;
-    /// Return track index by bone name hash, or M_MAX_UNSIGNED if not found.
+    /// Return track index by bone name hash, or std::numeric_limits<unsigned>::max() if not found.
     unsigned GetTrackIndex(StringHash nameHash) const;
 
     /// Return whether weight is nonzero.

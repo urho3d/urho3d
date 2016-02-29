@@ -378,7 +378,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     }
 
     // Set default passes
-    gBufferPassIndex_ = M_MAX_UNSIGNED;
+    gBufferPassIndex_ = std::numeric_limits<unsigned>::max();
     basePassIndex_ = Technique::GetPassIndex("base");
     alphaPassIndex_ = Technique::GetPassIndex("alpha");
     lightPassIndex_ = Technique::GetPassIndex("light");
@@ -801,8 +801,8 @@ void View::GetDrawables()
         octree_->GetDrawables(query);
     }
 
-    highestZonePriority_ = M_MIN_INT;
-    int bestPriority = M_MIN_INT;
+    highestZonePriority_ = std::numeric_limits<signed>::min();
+    int bestPriority = std::numeric_limits<signed>::min();
     Node* cameraNode = cullCamera_->GetNode();
     Vector3 cameraPos = cameraNode->GetWorldPosition();
 
@@ -833,7 +833,7 @@ void View::GetDrawables()
     if (!cameraZoneOverride_)
     {
         Vector3 farClipPos = cameraPos + cameraNode->GetWorldDirection() * Vector3(0.0f, 0.0f, cullCamera_->GetFarClip());
-        bestPriority = M_MIN_INT;
+        bestPriority = std::numeric_limits<signed>::min();
 
         for (PODVector<Zone*>::Iterator i = zones_.Begin(); i != zones_.End(); ++i)
         {
@@ -885,7 +885,7 @@ void View::GetDrawables()
 
             result.geometries_.Clear();
             result.lights_.Clear();
-            result.minZ_ = M_INFINITY;
+            result.minZ_ = std::numeric_limits<float>::infinity();
             result.maxZ_ = 0.0f;
         }
 
@@ -897,7 +897,7 @@ void View::GetDrawables()
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = std::numeric_limits<unsigned>::max();
             item->workFunction_ = CheckVisibilityWork;
             item->aux_ = this;
 
@@ -912,13 +912,13 @@ void View::GetDrawables()
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(std::numeric_limits<unsigned>::max());
     }
 
     // Combine lights, geometries & scene Z range from the threads
     geometries_.Clear();
     lights_.Clear();
-    minZ_ = M_INFINITY;
+    minZ_ = std::numeric_limits<float>::infinity();
     maxZ_ = 0.0f;
 
     if (sceneResults_.Size() > 1)
@@ -942,7 +942,7 @@ void View::GetDrawables()
         Swap(lights_, result.lights_);
     }
 
-    if (minZ_ == M_INFINITY)
+    if (minZ_ == std::numeric_limits<float>::infinity())
         minZ_ = 0.0f;
 
     // Sort the lights to brightest/closest first, and per-vertex lights first so that per-vertex base pass can be evaluated first
@@ -980,7 +980,7 @@ void View::ProcessLights()
     for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
     {
         SharedPtr<WorkItem> item = queue->GetFreeItem();
-        item->priority_ = M_MAX_UNSIGNED;
+        item->priority_ = std::numeric_limits<unsigned>::max();
         item->workFunction_ = ProcessLightWork;
         item->aux_ = this;
 
@@ -992,7 +992,7 @@ void View::ProcessLights()
     }
 
     // Ensure all lights have been processed before proceeding
-    queue->Complete(M_MAX_UNSIGNED);
+    queue->Complete(std::numeric_limits<unsigned>::max());
 }
 
 void View::GetLightBatches()
@@ -1286,7 +1286,7 @@ void View::UpdateGeometries()
             if (command.type_ == CMD_SCENEPASS)
             {
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
+                item->priority_ = std::numeric_limits<unsigned>::max();
                 item->workFunction_ =
                     command.sortMode_ == SORT_FRONTTOBACK ? SortBatchQueueFrontToBackWork : SortBatchQueueBackToFrontWork;
                 item->start_ = &batchQueues_[command.passIndex_];
@@ -1297,7 +1297,7 @@ void View::UpdateGeometries()
         for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
         {
             SharedPtr<WorkItem> lightItem = queue->GetFreeItem();
-            lightItem->priority_ = M_MAX_UNSIGNED;
+            lightItem->priority_ = std::numeric_limits<unsigned>::max();
             lightItem->workFunction_ = SortLightQueueWork;
             lightItem->start_ = &(*i);
             queue->AddWorkItem(lightItem);
@@ -1305,7 +1305,7 @@ void View::UpdateGeometries()
             if (i->shadowSplits_.Size())
             {
                 SharedPtr<WorkItem> shadowItem = queue->GetFreeItem();
-                shadowItem->priority_ = M_MAX_UNSIGNED;
+                shadowItem->priority_ = std::numeric_limits<unsigned>::max();
                 shadowItem->workFunction_ = SortShadowQueueWork;
                 shadowItem->start_ = &(*i);
                 queue->AddWorkItem(shadowItem);
@@ -1340,7 +1340,7 @@ void View::UpdateGeometries()
                     end = start + drawablesPerItem;
 
                 SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
+                item->priority_ = std::numeric_limits<unsigned>::max();
                 item->workFunction_ = UpdateDrawableGeometriesWork;
                 item->aux_ = const_cast<FrameInfo*>(&frame_);
                 item->start_ = &(*start);
@@ -1357,7 +1357,7 @@ void View::UpdateGeometries()
     }
 
     // Finally ensure all threaded work has completed
-    queue->Complete(M_MAX_UNSIGNED);
+    queue->Complete(std::numeric_limits<unsigned>::max());
     geometriesUpdated_ = true;
 }
 
@@ -1380,7 +1380,7 @@ void View::GetLitBatches(Drawable* drawable, LightBatchQueue& lightQueue, BatchQ
             continue;
 
         // Do not create pixel lit forward passes for materials that render into the G-buffer
-        if (gBufferPassIndex_ != M_MAX_UNSIGNED && tech->HasPass(gBufferPassIndex_))
+        if (gBufferPassIndex_ != std::numeric_limits<unsigned>::max() && tech->HasPass(gBufferPassIndex_))
             continue;
 
         Batch destBatch(srcBatch);
@@ -2023,8 +2023,8 @@ void View::AllocateScreenBuffers()
 
         if (rtInfo.sizeMode_ == SIZE_VIEWPORTDIVISOR)
         {
-            width = (float)viewSize_.x_ / Max(width, M_EPSILON);
-            height = (float)viewSize_.y_ / Max(height, M_EPSILON);
+            width = (float)viewSize_.x_ / Max(width, std::numeric_limits<float>::epsilon());
+            height = (float)viewSize_.y_ / Max(height, std::numeric_limits<float>::epsilon());
         }
         else if (rtInfo.sizeMode_ == SIZE_VIEWPORTMULTIPLIER)
         {
@@ -2395,7 +2395,7 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
         Ray extrusionRay(center, center);
 
         float extrusionDistance = shadowCamera->GetFarClip();
-        float originalDistance = Clamp(center.Length(), M_EPSILON, extrusionDistance);
+        float originalDistance = Clamp(center.Length(), std::numeric_limits<float>::epsilon(), extrusionDistance);
 
         // Because of the perspective, the bounding box must also grow when it is extruded to the distance
         float sizeFactor = extrusionDistance / originalDistance;
@@ -2690,7 +2690,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
 void View::FindZone(Drawable* drawable)
 {
     Vector3 center = drawable->GetWorldBoundingBox().Center();
-    int bestPriority = M_MIN_INT;
+    int bestPriority = std::numeric_limits<signed>::min();
     Zone* newZone = 0;
 
     // If bounding box center is in view, the zone assignment is conclusive also for next frames. Otherwise it is temporary

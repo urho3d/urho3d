@@ -52,7 +52,7 @@ static const NavigationPushiness DEFAULT_AGENT_NAVIGATION_PUSHINESS = NAVIGATION
 
 static const unsigned SCOPE_NAVIGATION_QUALITY_PARAMS = 1;
 static const unsigned SCOPE_NAVIGATION_PUSHINESS_PARAMS = 2;
-static const unsigned SCOPE_BASE_PARAMS = M_MAX_UNSIGNED & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
+static const unsigned SCOPE_BASE_PARAMS = std::numeric_limits<unsigned>::max() & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
 
 static const char* crowdAgentRequestedTargetTypeNames[] = {
     "none",

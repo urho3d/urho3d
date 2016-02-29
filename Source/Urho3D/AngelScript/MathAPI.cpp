@@ -31,6 +31,16 @@
 namespace Urho3D
 {
 
+// These used to be in MathDefs.h. They aren't used anywhere any more, but are
+// required for the scripting API
+static const float M_INFINITY = std::numeric_limits<float>::infinity();
+static const float M_EPSILON = std::numeric_limits<float>::epsilon();
+static const float M_LARGE_EPSILON = std::numeric_limits<float>::epsilon() * 5;
+static const signed M_MIN_INT = std::numeric_limits<signed>::min();
+static const signed M_MAX_INT = std::numeric_limits<signed>::max();
+static const unsigned M_MIN_UNSIGNED = std::numeric_limits<unsigned>::min();
+static const unsigned M_MAX_UNSIGNED = std::numeric_limits<unsigned>::max();
+
 static void RegisterMathFunctions(asIScriptEngine* engine)
 {
     engine->RegisterEnum("Intersection");

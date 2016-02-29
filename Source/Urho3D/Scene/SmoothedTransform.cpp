@@ -64,7 +64,7 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
             if (delta > squaredSnapThreshold)
                 constant = 1.0f;
 
-            if (delta < M_EPSILON || constant >= 1.0f)
+            if (delta < std::numeric_limits<float>::epsilon() || constant >= 1.0f)
             {
                 position = targetPosition_;
                 smoothingMask_ &= ~SMOOTH_POSITION;
@@ -78,7 +78,7 @@ void SmoothedTransform::Update(float constant, float squaredSnapThreshold)
         if (smoothingMask_ & SMOOTH_ROTATION)
         {
             float delta = (rotation - targetRotation_).LengthSquared();
-            if (delta < M_EPSILON || constant >= 1.0f)
+            if (delta < std::numeric_limits<float>::epsilon() || constant >= 1.0f)
             {
                 rotation = targetRotation_;
                 smoothingMask_ &= ~SMOOTH_ROTATION;

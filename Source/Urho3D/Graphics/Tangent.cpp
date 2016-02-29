@@ -47,7 +47,7 @@ void GenerateTangents(void* vertexData, unsigned vertexSize, const void* indexDa
 {
     // Tangent generation from
     // http://www.terathon.com/code/tangent.html
-    unsigned minVertex = M_MAX_UNSIGNED;
+    unsigned minVertex = std::numeric_limits<unsigned>::max();
     unsigned maxVertex = 0;
     unsigned char* vertices = (unsigned char*)vertexData;
 

@@ -272,7 +272,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
     for (unsigned i = 0; i < bones.Size(); ++i)
     {
         // Skip if bone contains no skinned geometry
-        if (bones[i].radius_ < M_EPSILON && bones[i].boundingBox_.Size().LengthSquared() < M_EPSILON)
+        if (bones[i].radius_ < std::numeric_limits<float>::epsilon() && bones[i].boundingBox_.Size().LengthSquared() < std::numeric_limits<float>::epsilon())
             continue;
 
         Node* boneNode = bones[i].node_;
@@ -286,7 +286,7 @@ void DebugRenderer::AddSkeleton(const Skeleton& skeleton, const Color& color, bo
         Node* parentNode = boneNode->GetParent();
 
         // If bone has a parent defined, and it also skins geometry, draw a line to it. Else draw the bone as a point
-        if (parentNode && (bones[j].radius_ >= M_EPSILON || bones[j].boundingBox_.Size().LengthSquared() >= M_EPSILON))
+        if (parentNode && (bones[j].radius_ >= std::numeric_limits<float>::epsilon() || bones[j].boundingBox_.Size().LengthSquared() >= std::numeric_limits<float>::epsilon()))
             end = parentNode->GetWorldPosition();
         else
             end = start;

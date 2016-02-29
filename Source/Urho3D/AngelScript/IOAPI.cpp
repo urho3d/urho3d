@@ -248,7 +248,7 @@ static int FileSystemSystemRun(const String& fileName, CScriptArray* srcArgument
 static unsigned FileSystemSystemRunAsync(const String& fileName, CScriptArray* srcArguments, FileSystem* ptr)
 {
     if (!srcArguments)
-        return M_MAX_UNSIGNED;
+        return std::numeric_limits<unsigned>::max();
 
     unsigned numArguments = srcArguments->GetSize();
     Vector<String> destArguments(numArguments);
