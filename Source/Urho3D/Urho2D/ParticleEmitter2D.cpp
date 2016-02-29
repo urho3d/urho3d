@@ -128,12 +128,12 @@ void ParticleEmitter2D::SetBlendMode(BlendMode blendMode)
 
 void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
 {
-    maxParticles = (unsigned)Max(maxParticles, 1);
+    maxParticles = Max(maxParticles, unsigned(1));
 
     particles_.Resize(maxParticles);
     sourceBatches_[0].vertices_.Reserve(maxParticles * 4);
 
-    numParticles_ = Min(maxParticles, numParticles_);
+    numParticles_ = Min(signed(maxParticles), numParticles_);
 }
 
 ParticleEffect2D* ParticleEmitter2D::GetEffect() const

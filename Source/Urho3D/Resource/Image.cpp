@@ -269,7 +269,7 @@ bool Image::BeginLoad(Deserializer& source)
         // DDS compressed format
         DDSurfaceDesc2 ddsd;
         source.Read(&ddsd, sizeof(ddsd));
-        
+
         // DDS DX10+
         const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
         DDSHeader10 dxgiHeader;
@@ -277,7 +277,7 @@ bool Image::BeginLoad(Deserializer& source)
             source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
         unsigned fourCC = ddsd.ddpfPixelFormat_.dwFourCC_;
-        
+
         // If the DXGI header is available then remap formats and check sRGB
         if (hasDXGI)
         {
@@ -366,27 +366,27 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned blocksWide = (ddsd.dwWidth_ + 3) / 4;
             unsigned blocksHeight = (ddsd.dwHeight_ + 3) / 4;
             dataSize = blocksWide * blocksHeight * blockSize;
-            
+
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
             {
-                blocksWide = (Max(x, 1) + 3) / 4;
-                blocksHeight = (Max(y, 1) + 3) / 4;
-                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1);
+                blocksWide = (Max(x, unsigned(1)) + 3) / 4;
+                blocksHeight = (Max(y, unsigned(1)) + 3) / 4;
+                dataSize += blockSize * blocksWide * blocksHeight * Max(z, unsigned(1));
             }
         }
         else
         {
-            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1);
+            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, unsigned(1));
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
-                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1) * Max(y, 1) * Max(z, 1);
+                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, unsigned(1)) * Max(y, unsigned(1)) * Max(z, unsigned(1));
         }
 
         // Do not use a shared ptr here, in case nothing is refcounting the image outside this function.
@@ -407,7 +407,7 @@ bool Image::BeginLoad(Deserializer& source)
             currentImage->numCompressedLevels_ = ddsd.dwMipMapCount_;
             if (!currentImage->numCompressedLevels_)
                 currentImage->numCompressedLevels_ = 1;
-            
+
             // Memory use needs to be exact per image as it's used for verifying the data size in GetCompressedLevel()
             // even though it would be more proper for the first image to report the size of all siblings combined
             currentImage->SetMemoryUse(dataSize);
@@ -422,7 +422,7 @@ bool Image::BeginLoad(Deserializer& source)
                 currentImage = nextImage;
             }
         }
-        
+
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
@@ -457,7 +457,7 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(gMask, gShiftL, gShiftR)
                 ADJUSTSHIFT(bMask, bShiftL, bShiftR)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
-                
+
                 SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
 
                 switch (sourcePixelByteSize)

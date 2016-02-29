@@ -89,7 +89,7 @@ void CrowdManager::RegisterObject(Context* context)
 void CrowdManager::ApplyAttributes()
 {
     // Values from Editor, saved-file, or network must be checked before applying
-    maxAgents_ = (unsigned)Max(1, maxAgents_);
+    maxAgents_ = Max(unsigned(1), maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
     bool navMeshChange = false;
@@ -251,7 +251,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned queryFilterType = 0;
-    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), DT_CROWD_MAX_QUERY_FILTER_TYPE) : 0;
+    numQueryFilterTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), unsigned(DT_CROWD_MAX_QUERY_FILTER_TYPE)) : 0;
 
     while (queryFilterType < numQueryFilterTypes_)
     {
@@ -262,7 +262,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
             filter->setIncludeFlags((unsigned short)value[index++].GetUInt());
             filter->setExcludeFlags((unsigned short)value[index++].GetUInt());
             unsigned prevNumAreas = numAreas_[queryFilterType];
-            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), DT_MAX_AREAS);
+            numAreas_[queryFilterType] = Min(value[index++].GetUInt(), unsigned(DT_MAX_AREAS));
 
             // Must loop thru based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
             if (index + prevNumAreas <= value.Size())
@@ -320,7 +320,7 @@ void CrowdManager::SetObstacleAvoidanceTypesAttr(const VariantVector& value)
 
     unsigned index = 0;
     unsigned obstacleAvoidanceType = 0;
-    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS) : 0;
+    numObstacleAvoidanceTypes_ = index < value.Size() ? Min(value[index++].GetUInt(), unsigned(DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS)) : 0;
 
     while (obstacleAvoidanceType < numObstacleAvoidanceTypes_)
     {
@@ -388,7 +388,7 @@ Vector3 CrowdManager::GetRandomPointInCircle(const Vector3& center, float radius
     if (randomRef)
         *randomRef = 0;
     return crowd_ && navigationMesh_ ?
-        navigationMesh_->GetRandomPointInCircle(center, radius, Vector3(crowd_->getQueryExtents()), 
+        navigationMesh_->GetRandomPointInCircle(center, radius, Vector3(crowd_->getQueryExtents()),
             crowd_->getFilter(queryFilterType), randomRef) : center;
 }
 
@@ -399,7 +399,7 @@ float CrowdManager::GetDistanceToWall(const Vector3& point, float radius, int qu
     if (hitNormal)
         *hitNormal = Vector3::DOWN;
     return crowd_ && navigationMesh_ ?
-        navigationMesh_->GetDistanceToWall(point, radius, Vector3(crowd_->getQueryExtents()), crowd_->getFilter(queryFilterType), 
+        navigationMesh_->GetDistanceToWall(point, radius, Vector3(crowd_->getQueryExtents()), crowd_->getFilter(queryFilterType),
             hitPos, hitNormal) : radius;
 }
 
