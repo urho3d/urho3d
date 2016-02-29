@@ -111,37 +111,51 @@ inline T Clamp(T value, T min, T max)
 template <class T>
 inline T SmoothStep(T lhs, T rhs, T t)
 {
-    t = Clamp((t - lhs) / (rhs - lhs), 0.0, 1.0); // Saturate t
+    t = Clamp((t - lhs) / (rhs - lhs), T(0.0), T(1.0)); // Saturate t
     return t * t * (3.0 - 2.0 * t);
 }
 
-/// Return sine of an angle in degrees.
-inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
-inline double Sin(double angle) { return sin(angle * M_DEGTORAD); }
+/// Return sine of an angle in degrees. Uses sinf() for floats, sin() for
+/// everything else
+template <class T>
+inline T Sin(T angle) { return sin(angle * M_DEGTORAD); }
+template <> inline float Sin<float>(float angle) { return sinf(angle * M_DEGTORAD); }
 
-/// Return cosine of an angle in degrees.
-inline float Cos(float angle) { return cosf(angle * M_DEGTORAD); }
-inline double Cos(double angle) { return cos(angle * M_DEGTORAD); }
+/// Return cosine of an angle in degrees. Uses cosf() for floats, cos() for
+/// everything else
+template <class T>
+inline T Cos(T angle) { return cos(angle * M_DEGTORAD); }
+template <> inline float Cos<float>(float angle) { return cosf(angle * M_DEGTORAD); }
 
-/// Return tangent of an angle in degrees.
-inline float Tan(float angle) { return tanf(angle * M_DEGTORAD); }
-inline double Tan(double angle) { return tan(angle * M_DEGTORAD); }
+/// Return tangent of an angle in degrees. Uses tanf() for floats, tan() for
+/// everything else
+template <class T>
+inline T Tan(T angle) { return tan(angle * M_DEGTORAD); }
+template <> inline float Tan<float>(float angle) { return tanf(angle * M_DEGTORAD); }
 
-/// Return arc sine in degrees.
-inline float Asin(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
-inline double Asin(double x) { return M_RADTODEG * asin(Clamp(x, -1.0, 1.0)); }
+/// Return arc sine in degrees. Uses asinf() for floats, asin() for everything
+/// else
+template <class T>
+inline T Asin(T x) { return M_RADTODEG * asin(Clamp(x, -1.0, 1.0)); }
+template <> inline float Asin<float>(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
 
-/// Return arc cosine in degrees.
-inline float Acos(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
-inline double Acos(double x) { return M_RADTODEG * acos(Clamp(x, -1.0, 1.0)); }
+/// Return arc cosine in degrees. Uses acosf() for floats, acos() for
+/// everything else
+template <class T>
+inline T Acos(T x) { return M_RADTODEG * acos(Clamp(x, -1.0, 1.0)); }
+template <> inline float Acos<float>(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
 
-/// Return arc tangent in degrees.
-inline float Atan(float x) { return M_RADTODEG * atanf(x); }
-inline double Atan(double x) { return M_RADTODEG * atan(x); }
+/// Return arc tangent in degrees. Uses atanf() for floats, atan() for
+/// everything else
+template <class T>
+inline T Atan(T x) { return M_RADTODEG * atan(x); }
+template <> inline float Atan<float>(float x) { return M_RADTODEG * atanf(x); }
 
-/// Return arc tangent of y/x in degrees.
-inline float Atan2(float y, float x) { return M_RADTODEG * atan2f(y, x); }
-inline double Atan2(double y, double x) { return M_RADTODEG * atan2(y, x); }
+/// Return arc tangent of y/x in degrees. Uses atan2f() for floats, atan2()
+/// for everything else
+template <class T>
+inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
+template <> inline float Atan2<float>(float y, float x) { return M_RADTODEG * atan2f(y, x); }
 
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
