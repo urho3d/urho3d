@@ -33,9 +33,9 @@ namespace Urho3D
 const float M_INFINITY      = M_LIMITS<float>   ::Infinity;
 const float M_EPSILON       = M_LIMITS<float>   ::Epsilon;
 const float M_LARGE_EPSILON = M_LIMITS<float>   ::LargeEpsilon;
-const float M_MIN_INT       = M_LIMITS<signed>  ::Min;
-const float M_MAX_INT       = M_LIMITS<signed>  ::Max;
-const float M_MIN_UNSIGNED  = M_LIMITS<unsigned>::Min;
-const float M_MAX_UNSIGNED  = M_LIMITS<unsigned>::Max;
+const signed M_MIN_INT       = M_LIMITS<signed>  ::Min;
+const signed M_MAX_INT       = M_LIMITS<signed>  ::Max;
+const unsigned M_MIN_UNSIGNED  = M_LIMITS<unsigned>::Min;
+const unsigned M_MAX_UNSIGNED  = M_LIMITS<unsigned>::Max;
 
 } // namespace Urho3D

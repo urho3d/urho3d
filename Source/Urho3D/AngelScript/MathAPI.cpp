@@ -29,6 +29,8 @@
 #include "../Math/Matrix2.h"
 #include "../Math/Internal/Script/ScriptSpecificMathDefs.h"
 
+#include <stdio.h>
+
 namespace Urho3D
 {
 

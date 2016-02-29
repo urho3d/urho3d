@@ -28,9 +28,9 @@ namespace Urho3D
 extern const float M_INFINITY;
 extern const float M_EPSILON;
 extern const float M_LARGE_EPSILON;
-extern const float M_MIN_INT;
-extern const float M_MAX_INT;
-extern const float M_MIN_UNSIGNED;
-extern const float M_MAX_UNSIGNED;
+extern const signed M_MIN_INT;
+extern const signed M_MAX_INT;
+extern const unsigned M_MIN_UNSIGNED;
+extern const unsigned M_MAX_UNSIGNED;
 
 } // namespace Urho3D
