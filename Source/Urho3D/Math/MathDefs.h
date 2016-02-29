@@ -26,6 +26,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <limits>
 
 namespace Urho3D
 {
@@ -57,25 +58,28 @@ enum Intersection
 };
 
 /// Check whether two floating point values are equal within accuracy.
-inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
+template <class T>
+inline bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<T>::epsilon() >= rhs && lhs - std::numeric_limits<T>::epsilon() <= rhs; }
 
-/// Linear interpolation between two float values.
-inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+/// Linear interpolation between two values.
+template <class T>
+inline T Lerp(T lhs, T rhs, T t) { return lhs * (1.0 - t) + rhs * t; }
 
-/// Linear interpolation between two double values.
-inline double Lerp(double lhs, double rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+/// Return the smaller of two values.
+template <class T>
+inline T Min(T lhs, T rhs) { return lhs < rhs ? lhs : rhs; }
 
-/// Return the smaller of two floats.
-inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
+/// Return the larger of two values.
+template <class T>
+inline T Max(T lhs, T rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return the larger of two floats.
-inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
-
-/// Return absolute value of a float.
-inline float Abs(float value) { return value >= 0.0f ? value : -value; }
+/// Return absolute value of a value
+template <class T>
+inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 
 /// Return the sign of a float (-1, 0 or 1.)
-inline float Sign(float value) { return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f); }
+template <class T>
+inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
 /// Check whether a floating point value is NaN.
 /// Use a workaround for GCC, see https://github.com/urho3d/Urho3D/issues/655
@@ -92,7 +96,8 @@ inline bool IsNaN(float value)
 #endif
 
 /// Clamp a float to a range.
-inline float Clamp(float value, float min, float max)
+template <class T>
+inline T Clamp(T value, T min, T max)
 {
     if (value < min)
         return min;
@@ -103,52 +108,40 @@ inline float Clamp(float value, float min, float max)
 }
 
 /// Smoothly damp between values.
-inline float SmoothStep(float lhs, float rhs, float t)
+template <class T>
+inline T SmoothStep(T lhs, T rhs, T t)
 {
-    t = Clamp((t - lhs) / (rhs - lhs), 0.0f, 1.0f); // Saturate t
-    return t * t * (3.0f - 2.0f * t);
+    t = Clamp((t - lhs) / (rhs - lhs), 0.0, 1.0); // Saturate t
+    return t * t * (3.0 - 2.0 * t);
 }
 
 /// Return sine of an angle in degrees.
 inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
+inline double Sin(double angle) { return sin(angle * M_DEGTORAD); }
 
 /// Return cosine of an angle in degrees.
 inline float Cos(float angle) { return cosf(angle * M_DEGTORAD); }
+inline double Cos(double angle) { return cos(angle * M_DEGTORAD); }
 
 /// Return tangent of an angle in degrees.
 inline float Tan(float angle) { return tanf(angle * M_DEGTORAD); }
+inline double Tan(double angle) { return tan(angle * M_DEGTORAD); }
 
 /// Return arc sine in degrees.
 inline float Asin(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
+inline double Asin(double x) { return M_RADTODEG * asin(Clamp(x, -1.0, 1.0)); }
 
 /// Return arc cosine in degrees.
 inline float Acos(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
+inline double Acos(double x) { return M_RADTODEG * acos(Clamp(x, -1.0, 1.0)); }
 
 /// Return arc tangent in degrees.
 inline float Atan(float x) { return M_RADTODEG * atanf(x); }
+inline double Atan(double x) { return M_RADTODEG * atan(x); }
 
 /// Return arc tangent of y/x in degrees.
 inline float Atan2(float y, float x) { return M_RADTODEG * atan2f(y, x); }
-
-/// Return the smaller of two integers.
-inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
-
-/// Return the larger of two integers.
-inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
-
-/// Return absolute value of an integer
-inline int Abs(int value) { return value >= 0 ? value : -value; }
-
-/// Clamp an integer to a range.
-inline int Clamp(int value, int min, int max)
-{
-    if (value < min)
-        return min;
-    else if (value > max)
-        return max;
-    else
-        return value;
-}
+inline double Atan2(double y, double x) { return M_RADTODEG * atan2(y, x); }
 
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
