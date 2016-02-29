@@ -285,8 +285,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
         float fogEnd = Min(zone_->GetFogEnd(), farClip);
-        if (fogStart >= fogEnd * (1.0f - M_LIMITS<float>::Epsilon * 5))
-            fogStart = fogEnd * (1.0f - M_LIMITS<float>::Epsilon * 5);
+        if (fogStart >= fogEnd * (1.0f - M_LIMITS<float>::LargeEpsilon))
+            fogStart = fogEnd * (1.0f - M_LIMITS<float>::LargeEpsilon);
         float fogRange = Max(fogEnd - fogStart, M_LIMITS<float>::Epsilon);
         Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
 

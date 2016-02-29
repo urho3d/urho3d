@@ -14,22 +14,22 @@ class Text : public UIElement
 
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    
+
     void SetText(const String text);
-    
+
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
-    void SetSelection(unsigned start, unsigned length = std::numeric_limits<unsigned>::max());
+    void SetSelection(unsigned start, unsigned length = M_LIMITS<unsigned>::Max);
     void ClearSelection();
     void SetSelectionColor(const Color& color);
     void SetHoverColor(const Color& color);
     void SetTextEffect(TextEffect textEffect);
     void SetEffectColor(const Color& effectColor);
-    
+
     bool GetAutoLocalizable() const;
     void SetAutoLocalizable(bool enable);
-    
+
     Font* GetFont() const;
     int GetFontSize() const;
     const String GetText() const;
@@ -48,10 +48,10 @@ class Text : public UIElement
     int GetRowWidth(unsigned index) const;
     IntVector2 GetCharPosition(unsigned index);
     IntVector2 GetCharSize(unsigned index);
-    
+
     void SetEffectDepthBias(float bias);
     float GetEffectDepthBias() const;
-    
+
     tolua_property__get_set Font* font;
     tolua_readonly tolua_property__get_set int fontSize;
     tolua_property__get_set String text;
