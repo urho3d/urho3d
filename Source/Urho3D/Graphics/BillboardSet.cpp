@@ -186,7 +186,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     // Calculate scaled distance for animation LOD
     float scale = GetWorldBoundingBox().Size().DotProduct(DOT_SCALE);
     // If there are no billboards, the size becomes zero, and LOD'ed updates no longer happen. Disable LOD in that case
-    if (scale > std::numeric_limits<float>::epsilon())
+    if (scale > M_LIMITS<float>::Epsilon)
         lodDistance_ = frame.camera_->GetLodDistance(distance_, scale, lodBias_);
     else
         lodDistance_ = 0.0f;
@@ -236,7 +236,7 @@ void BillboardSet::SetMaterial(Material* material)
 void BillboardSet::SetNumBillboards(unsigned num)
 {
     // Prevent negative value being assigned from the editor
-    if (num > std::numeric_limits<signed>::max())
+    if (num > M_LIMITS<signed>::Max)
         num = 0;
     if (num > MAX_BILLBOARDS)
         num = MAX_BILLBOARDS;

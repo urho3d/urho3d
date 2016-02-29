@@ -468,11 +468,11 @@ void Node::SetScale(const Vector3& scale)
     // Prevent exact zero scale e.g. from momentary edits as this may cause division by zero
     // when decomposing the world transform matrix
     if (scale_.x_ == 0.0f)
-        scale_.x_ = std::numeric_limits<float>::epsilon();
+        scale_.x_ = M_LIMITS<float>::Epsilon;
     if (scale_.y_ == 0.0f)
-        scale_.y_ = std::numeric_limits<float>::epsilon();
+        scale_.y_ = M_LIMITS<float>::Epsilon;
     if (scale_.z_ == 0.0f)
-        scale_.z_ = std::numeric_limits<float>::epsilon();
+        scale_.z_ = M_LIMITS<float>::Epsilon;
 
     MarkDirty();
     MarkNetworkUpdate();

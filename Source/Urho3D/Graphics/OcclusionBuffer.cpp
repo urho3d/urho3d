@@ -222,14 +222,14 @@ void OcclusionBuffer::DrawTriangles()
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = std::numeric_limits<unsigned>::max();
+            item->priority_ = M_LIMITS<unsigned>::Max;
             item->workFunction_ = DrawOcclusionBatchWork;
             item->aux_ = this;
             item->start_ = &(*i);
             queue->AddWorkItem(item);
         }
 
-        queue->Complete(std::numeric_limits<unsigned>::max());
+        queue->Complete(M_LIMITS<unsigned>::Max);
 
         MergeBuffers();
         depthHierarchyDirty_ = true;

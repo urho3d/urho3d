@@ -289,7 +289,7 @@ public:
     /// Return a divisor value based on intensity for calculating the sort value.
     float GetIntensityDivisor(float attenuation = 1.0f) const
     {
-        return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + std::numeric_limits<float>::epsilon();
+        return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_LIMITS<float>::Epsilon;
     }
 
     /// Set ramp texture attribute.

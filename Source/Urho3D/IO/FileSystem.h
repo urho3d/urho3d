@@ -59,9 +59,9 @@ public:
     int SystemCommand(const String& commandLine, bool redirectStdOutToLog = false);
     /// Run a specific program, block until it exits and return the exit code. Will fail if any allowed paths are defined.
     int SystemRun(const String& fileName, const Vector<String>& arguments);
-    /// Run a program using the command interpreter asynchronously. Return a request ID or std::numeric_limits<unsigned>::max() if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
+    /// Run a program using the command interpreter asynchronously. Return a request ID or M_LIMITS<unsigned>::Max if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
     unsigned SystemCommandAsync(const String& commandLine);
-    /// Run a specific program asynchronously. Return a request ID or std::numeric_limits<unsigned>::max() if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
+    /// Run a specific program asynchronously. Return a request ID or M_LIMITS<unsigned>::Max if failed. The exit code will be posted together with the request ID in an AsyncExecFinished event. Will fail if any allowed paths are defined.
     unsigned SystemRunAsync(const String& fileName, const Vector<String>& arguments);
     /// Open a file in an external program, with mode such as "edit" optionally specified. Will fail if any allowed paths are defined.
     bool SystemOpen(const String& fileName, const String& mode = String::EMPTY);

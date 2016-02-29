@@ -611,7 +611,7 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
             XMLElement lod = lods.GetChild("lodgenerated");
             while (lod)
             {
-                float distance = std::numeric_limits<float>::epsilon();
+                float distance = M_LIMITS<float>::Epsilon;
                 if (lod.HasAttribute("fromdepthsquared"))
                     distance = sqrtf(lod.GetFloat("fromdepthsquared"));
                 if (lod.HasAttribute("value"))
@@ -1094,7 +1094,7 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
 
     while (oldTriangles.Size())
     {
-        unsigned bestTriangle = std::numeric_limits<unsigned>::max();
+        unsigned bestTriangle = M_LIMITS<unsigned>::Max;
         float bestTriangleScore = -1.0f;
 
         // Find the best triangle at this point
@@ -1113,7 +1113,7 @@ void OptimizeIndices(ModelSubGeometryLodLevel* subGeom, ModelVertexBuffer* vb, M
             }
         }
 
-        if (bestTriangle == std::numeric_limits<unsigned>::max())
+        if (bestTriangle == M_LIMITS<unsigned>::Max)
         {
             PrintLine("Could not find next triangle, aborting index optimization");
             return;

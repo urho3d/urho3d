@@ -33,7 +33,7 @@ namespace Urho3D
 class Octree;
 
 static const int NUM_OCTANTS = 8;
-static const unsigned ROOT_INDEX = std::numeric_limits<unsigned>::max();
+static const unsigned ROOT_INDEX = M_LIMITS<unsigned>::Max;
 
 /// %Octree octant
 class URHO3D_API Octant

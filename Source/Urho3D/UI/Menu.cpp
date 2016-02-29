@@ -167,7 +167,7 @@ bool Menu::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanc
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : std::numeric_limits<unsigned>::max();
+        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_LIMITS<unsigned>::Max;
         UIElement* child = 0;
 
         if (!internalElem)
@@ -303,7 +303,7 @@ void Menu::ShowPopup(bool enable)
         popup_->SetVisible(true);
         // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
         // Rather just force priority to max
-        popup_->SetPriority(std::numeric_limits<signed>::max());
+        popup_->SetPriority(M_LIMITS<signed>::Max);
     }
     else
     {

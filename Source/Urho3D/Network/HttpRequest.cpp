@@ -49,7 +49,7 @@ HttpRequest::HttpRequest(const String& url, const String& verb, const Vector<Str
 {
     // Size of response is unknown, so just set maximum value. The position will also be changed
     // to maximum value once the request is done, signaling end for Deserializer::IsEof().
-    size_ = std::numeric_limits<unsigned>::max();
+    size_ = M_LIMITS<unsigned>::Max;
 
     URHO3D_LOGDEBUG("HTTP " + verb_ + " request to URL " + url_);
 
@@ -286,7 +286,7 @@ unsigned HttpRequest::CheckEofAndAvailableSize()
 {
     unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
     if (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !bytesAvailable))
-        position_ = std::numeric_limits<unsigned>::max();
+        position_ = M_LIMITS<unsigned>::Max;
     return bytesAvailable;
 }
 

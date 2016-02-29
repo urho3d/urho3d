@@ -793,8 +793,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LogQuiet"] = true;
             else if (argument == "log" && !value.Empty())
             {
-                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, std::numeric_limits<unsigned>::max());
-                if (logLevel != std::numeric_limits<unsigned>::max())
+                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, M_LIMITS<unsigned>::Max);
+                if (logLevel != M_LIMITS<unsigned>::Max)
                 {
                     ret["LogLevel"] = logLevel;
                     ++i;

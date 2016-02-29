@@ -108,7 +108,7 @@ public:
     /// The text will be automatically translated. The text value used as string identifier.
     void SetAutoLocalizable(bool enable);
     /// Set selection. When length is not provided, select until the text ends.
-    void SetSelection(unsigned start, unsigned length = std::numeric_limits<unsigned>::max());
+    void SetSelection(unsigned start, unsigned length = M_LIMITS<unsigned>::Max);
     /// Clear selection.
     void ClearSelection();
     /// Set selection background color. Color with 0 alpha (default) disables.

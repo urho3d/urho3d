@@ -801,7 +801,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
     unsigned index = 0;
     unsigned numStates = index < value.Size() ? value[index++].GetUInt() : 0;
     // Prevent negative or overly large value being assigned from the editor
-    if (numStates > std::numeric_limits<signed>::max())
+    if (numStates > M_LIMITS<signed>::Max)
         numStates = 0;
     if (numStates > MAX_ANIMATION_STATES)
         numStates = MAX_ANIMATION_STATES;
@@ -1049,9 +1049,9 @@ void AnimatedModel::FinalizeBoneBoundingBoxes()
     // to the bounding box and making it artificially large
     for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
     {
-        if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < std::numeric_limits<float>::epsilon())
+        if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < M_LIMITS<float>::Epsilon)
             i->collisionMask_ &= ~BONECOLLISION_BOX;
-        if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < std::numeric_limits<float>::epsilon())
+        if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_LIMITS<float>::Epsilon)
             i->collisionMask_ &= ~BONECOLLISION_SPHERE;
     }
 }

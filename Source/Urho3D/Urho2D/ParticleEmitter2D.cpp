@@ -277,8 +277,8 @@ void ParticleEmitter2D::Update(float timeStep)
     Vector3 worldPosition = GetNode()->GetWorldPosition();
     float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
 
-    boundingBoxMinPoint_ = Vector3(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-    boundingBoxMaxPoint_ = Vector3(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
+    boundingBoxMinPoint_ = Vector3(M_LIMITS<float>::Infinity, M_LIMITS<float>::Infinity, M_LIMITS<float>::Infinity);
+    boundingBoxMaxPoint_ = Vector3(-M_LIMITS<float>::Infinity, -M_LIMITS<float>::Infinity, -M_LIMITS<float>::Infinity);
 
     int particleIndex = 0;
     while (particleIndex < numParticles_)

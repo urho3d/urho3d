@@ -215,7 +215,7 @@ void AnimationState::SetBoneWeight(unsigned index, float weight, bool recursive)
             for (unsigned i = 0; i < children.Size(); ++i)
             {
                 unsigned childTrackIndex = GetTrackIndex(children[i]);
-                if (childTrackIndex != std::numeric_limits<unsigned>::max())
+                if (childTrackIndex != M_LIMITS<unsigned>::Max)
                     SetBoneWeight(childTrackIndex, weight, true);
             }
         }
@@ -400,7 +400,7 @@ unsigned AnimationState::GetTrackIndex(const String& name) const
             return i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 unsigned AnimationState::GetTrackIndex(Node* node) const
@@ -411,7 +411,7 @@ unsigned AnimationState::GetTrackIndex(Node* node) const
             return i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
@@ -423,7 +423,7 @@ unsigned AnimationState::GetTrackIndex(StringHash nameHash) const
             return i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 float AnimationState::GetLength() const

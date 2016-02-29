@@ -367,7 +367,7 @@ public:
         float lenSquared = LengthSquared();
         if (lenSquared == 1.0f)
             return Conjugate();
-        else if (lenSquared >= std::numeric_limits<float>::epsilon())
+        else if (lenSquared >= M_LIMITS<float>::epsilon())
             return Conjugate() * (1.0f / lenSquared);
         else
             return IDENTITY;

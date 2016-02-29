@@ -271,7 +271,7 @@ bool Console::PopulateInterpreter()
         names.Push((*iter)->GetTypeName());
     Sort(names.Begin(), names.End());
 
-    unsigned selection = std::numeric_limits<unsigned>::max();
+    unsigned selection = M_LIMITS<unsigned>::Max;
     for (unsigned i = 0; i < names.Size(); ++i)
     {
         const String& name = names[i];
@@ -289,7 +289,7 @@ bool Console::PopulateInterpreter()
     interpreters_->SetEnabled(enabled);
     interpreters_->SetFocusMode(enabled ? FM_FOCUSABLE_DEFOCUSABLE : FM_NOTFOCUSABLE);
 
-    if (selection == std::numeric_limits<unsigned>::max())
+    if (selection == M_LIMITS<unsigned>::Max)
     {
         selection = 0;
         commandInterpreter_ = names[selection];

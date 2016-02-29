@@ -53,7 +53,7 @@ struct FontGlyph
     short offsetY_;
     /// Horizontal advance.
     short advanceX_;
-    /// Texture page. std::numeric_limits<unsigned>::max() if not yet resident on any texture.
+    /// Texture page. M_LIMITS<unsigned>::Max if not yet resident on any texture.
     unsigned page_;
     /// Used flag.
     bool used_;

@@ -105,7 +105,7 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
                 result.distance_ = distance;
                 result.drawable_ = this;
                 result.node_ = node_;
-                result.subObject_ = std::numeric_limits<unsigned>::max();
+                result.subObject_ = M_LIMITS<unsigned>::Max;
                 results.Push(result);
             }
         }

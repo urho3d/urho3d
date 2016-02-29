@@ -733,11 +733,11 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
                     else
                     {
                         URHO3D_LOGERRORF("Unsupported key binding: %s", key.CString());
-                        keyBinding = std::numeric_limits<signed>::max();
+                        keyBinding = M_LIMITS<signed>::Max;
                     }
                 }
 
-                if (keyBinding != std::numeric_limits<signed>::max())
+                if (keyBinding != M_LIMITS<signed>::Max)
                     element->SetVar(VAR_BUTTON_KEY_BINDING, keyBinding);
             }
 

@@ -39,7 +39,7 @@ struct ShaderParameter
     /// Construct with defaults.
     ShaderParameter() :
         type_(VS),
-        register_(std::numeric_limits<unsigned>::max()),
+        register_(M_LIMITS<unsigned>::Max),
         regCount_(0)
     {
     }

@@ -43,7 +43,7 @@ LineEdit::LineEdit(Context* context) :
     lastFont_(0),
     lastFontSize_(0),
     cursorPosition_(0),
-    dragBeginCursor_(std::numeric_limits<unsigned>::max()),
+    dragBeginCursor_(M_LIMITS<unsigned>::Max),
     cursorBlinkRate_(1.0f),
     cursorBlinkTimer_(0.0f),
     maxLength_(0),
@@ -121,7 +121,7 @@ void LineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screen
     if (button == MOUSEB_LEFT && cursorMovable_)
     {
         unsigned pos = GetCharIndex(position);
-        if (pos != std::numeric_limits<unsigned>::max())
+        if (pos != M_LIMITS<unsigned>::Max)
         {
             SetCursorPosition(pos);
             text_->ClearSelection();
@@ -151,7 +151,7 @@ void LineEdit::OnDragMove(const IntVector2& position, const IntVector2& screenPo
     {
         unsigned start = dragBeginCursor_;
         unsigned current = GetCharIndex(position);
-        if (start != std::numeric_limits<unsigned>::max() && current != std::numeric_limits<unsigned>::max())
+        if (start != M_LIMITS<unsigned>::Max && current != M_LIMITS<unsigned>::Max)
         {
             if (start < current)
                 text_->SetSelection(start, current - start);
@@ -633,7 +633,7 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
             return (unsigned)i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)

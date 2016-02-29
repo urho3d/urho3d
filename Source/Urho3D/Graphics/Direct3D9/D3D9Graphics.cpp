@@ -434,7 +434,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (resolutions.Size())
         {
             unsigned best = 0;
-            unsigned bestError = std::numeric_limits<unsigned>::max();
+            unsigned bestError = M_LIMITS<unsigned>::Max;
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
@@ -1322,7 +1322,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if ((unsigned)(size_t)shaderParameterSources_[group] == std::numeric_limits<unsigned>::max() || shaderParameterSources_[group] != source)
+    if ((unsigned)(size_t)shaderParameterSources_[group] == M_LIMITS<unsigned>::Max || shaderParameterSources_[group] != source)
     {
         shaderParameterSources_[group] = source;
         return true;
@@ -1343,19 +1343,19 @@ bool Graphics::HasTextureUnit(TextureUnit unit)
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
-    shaderParameterSources_[group] = (const void*)std::numeric_limits<unsigned>::max();
+    shaderParameterSources_[group] = (const void*)M_LIMITS<unsigned>::Max;
 }
 
 void Graphics::ClearParameterSources()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        shaderParameterSources_[i] = (const void*)std::numeric_limits<unsigned>::max();
+        shaderParameterSources_[i] = (const void*)M_LIMITS<unsigned>::Max;
 }
 
 void Graphics::ClearTransformSources()
 {
-    shaderParameterSources_[SP_CAMERA] = (const void*)std::numeric_limits<unsigned>::max();
-    shaderParameterSources_[SP_OBJECT] = (const void*)std::numeric_limits<unsigned>::max();
+    shaderParameterSources_[SP_CAMERA] = (const void*)M_LIMITS<unsigned>::Max;
+    shaderParameterSources_[SP_OBJECT] = (const void*)M_LIMITS<unsigned>::Max;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
@@ -2695,8 +2695,8 @@ void Graphics::ResetCachedState()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = std::numeric_limits<unsigned>::max();
-    stencilWriteMask_ = std::numeric_limits<unsigned>::max();
+    stencilCompareMask_ = M_LIMITS<unsigned>::Max;
+    stencilWriteMask_ = M_LIMITS<unsigned>::Max;
     useClipPlane_ = false;
     impl_->blendEnable_ = FALSE;
     impl_->srcBlend_ = D3DBLEND_ONE;

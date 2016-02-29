@@ -52,7 +52,7 @@ ScrollView::ScrollView(Context* context) :
     ignoreEvents_(false),
     resizeContentWidth_(false),
     scrollDeceleration_(30.0f),
-    scrollSnapEpsilon_(std::numeric_limits<float>::epsilon()),
+    scrollSnapEpsilon_(M_LIMITS<float>::Epsilon),
     scrollTouchDown_(false),
     barScrolling_(false),
     autoDisableChildren_(false),
@@ -104,7 +104,7 @@ void ScrollView::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Page Step", GetPageStep, SetPageStep, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Show/Hide Scrollbars", GetScrollBarsAutoVisible, SetScrollBarsAutoVisible, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scroll Deceleration", GetScrollDeceleration, SetScrollDeceleration, float, 30.0f, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, std::numeric_limits<float>::epsilon(), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Scroll Snap Epsilon", GetScrollSnapEpsilon, SetScrollSnapEpsilon, float, M_LIMITS<float>::Epsilon, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Disable Children", GetAutoDisableChildren, SetAutoDisableChildren, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Auto Disable Threshold", GetAutoDisableThreshold, SetAutoDisableThreshold, float, 25.0f, AM_FILE);
 }
@@ -272,8 +272,8 @@ void ScrollView::OnResize()
     if (scrollBarsAutoVisible_)
     {
         ignoreEvents_ = true;
-        horizontalScrollBar_->SetVisible(horizontalScrollBar_->GetRange() > std::numeric_limits<float>::epsilon());
-        verticalScrollBar_->SetVisible(verticalScrollBar_->GetRange() > std::numeric_limits<float>::epsilon());
+        horizontalScrollBar_->SetVisible(horizontalScrollBar_->GetRange() > M_LIMITS<float>::Epsilon);
+        verticalScrollBar_->SetVisible(verticalScrollBar_->GetRange() > M_LIMITS<float>::Epsilon);
         ignoreEvents_ = false;
 
         UpdatePanelSize();
@@ -647,7 +647,7 @@ void ScrollView::ScrollSmooth(float timeStep)
                 touchScrollSpeed_.x_ = 0;
             }
 
-            if (horizontalScrollBar_->GetValue() >= horizontalScrollBar_->GetRange() - std::numeric_limits<float>::epsilon())
+            if (horizontalScrollBar_->GetValue() >= horizontalScrollBar_->GetRange() - M_LIMITS<float>::Epsilon)
             {
                 // Stop movement when we reach end of scroll
                 touchScrollSpeed_.x_ = 0;
@@ -661,7 +661,7 @@ void ScrollView::ScrollSmooth(float timeStep)
                 touchScrollSpeed_.x_ = 0;
             }
 
-            if (horizontalScrollBar_->GetValue() <= std::numeric_limits<float>::epsilon())
+            if (horizontalScrollBar_->GetValue() <= M_LIMITS<float>::Epsilon)
             {
                 // Stop movement when we reach end of scroll
                 touchScrollSpeed_.x_ = 0;
@@ -678,7 +678,7 @@ void ScrollView::ScrollSmooth(float timeStep)
                 touchScrollSpeed_.y_ = 0;
             }
 
-            if (verticalScrollBar_->GetValue() >= verticalScrollBar_->GetRange() - std::numeric_limits<float>::epsilon())
+            if (verticalScrollBar_->GetValue() >= verticalScrollBar_->GetRange() - M_LIMITS<float>::Epsilon)
             {
                 // Stop movement when we reach end of scroll
                 touchScrollSpeed_.y_ = 0;
@@ -692,7 +692,7 @@ void ScrollView::ScrollSmooth(float timeStep)
                 touchScrollSpeed_.y_ = 0;
             }
 
-            if (verticalScrollBar_->GetValue() <= std::numeric_limits<float>::epsilon())
+            if (verticalScrollBar_->GetValue() <= M_LIMITS<float>::Epsilon)
             {
                 // Stop movement when we reach end of scroll
                 touchScrollSpeed_.y_ = 0;

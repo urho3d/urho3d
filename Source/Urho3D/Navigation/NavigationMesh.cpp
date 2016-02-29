@@ -247,35 +247,35 @@ void NavigationMesh::SetTileSize(int size)
 
 void NavigationMesh::SetCellSize(float size)
 {
-    cellSize_ = Max(size, std::numeric_limits<float>::epsilon());
+    cellSize_ = Max(size, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetCellHeight(float height)
 {
-    cellHeight_ = Max(height, std::numeric_limits<float>::epsilon());
+    cellHeight_ = Max(height, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetAgentHeight(float height)
 {
-    agentHeight_ = Max(height, std::numeric_limits<float>::epsilon());
+    agentHeight_ = Max(height, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetAgentRadius(float radius)
 {
-    agentRadius_ = Max(radius, std::numeric_limits<float>::epsilon());
+    agentRadius_ = Max(radius, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetAgentMaxClimb(float maxClimb)
 {
-    agentMaxClimb_ = Max(maxClimb, std::numeric_limits<float>::epsilon());
+    agentMaxClimb_ = Max(maxClimb, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
@@ -289,42 +289,42 @@ void NavigationMesh::SetAgentMaxSlope(float maxSlope)
 
 void NavigationMesh::SetRegionMinSize(float size)
 {
-    regionMinSize_ = Max(size, std::numeric_limits<float>::epsilon());
+    regionMinSize_ = Max(size, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetRegionMergeSize(float size)
 {
-    regionMergeSize_ = Max(size, std::numeric_limits<float>::epsilon());
+    regionMergeSize_ = Max(size, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetEdgeMaxLength(float length)
 {
-    edgeMaxLength_ = Max(length, std::numeric_limits<float>::epsilon());
+    edgeMaxLength_ = Max(length, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetEdgeMaxError(float error)
 {
-    edgeMaxError_ = Max(error, std::numeric_limits<float>::epsilon());
+    edgeMaxError_ = Max(error, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetDetailSampleDistance(float distance)
 {
-    detailSampleDistance_ = Max(distance, std::numeric_limits<float>::epsilon());
+    detailSampleDistance_ = Max(distance, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }
 
 void NavigationMesh::SetDetailSampleMaxError(float error)
 {
-    detailSampleMaxError_ = Max(error, std::numeric_limits<float>::epsilon());
+    detailSampleMaxError_ = Max(error, M_LIMITS<float>::Epsilon);
 
     MarkNetworkUpdate();
 }

@@ -86,7 +86,7 @@ void ToolTip::Update(float timeStep)
             SetVisible(true);
             // BringToFront() is unreliable in this case as it takes into account only input-enabled elements.
             // Rather just force priority to max
-            SetPriority(std::numeric_limits<signed>::max());
+            SetPriority(M_LIMITS<signed>::Max);
         }
     }
     else

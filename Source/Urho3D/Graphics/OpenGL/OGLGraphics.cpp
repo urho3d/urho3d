@@ -376,7 +376,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (resolutions.Size())
         {
             unsigned best = 0;
-            unsigned bestError = std::numeric_limits<unsigned>::max();
+            unsigned bestError = M_LIMITS<unsigned>::Max;
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
@@ -695,8 +695,8 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
         SetColorWrite(true);
     if (flags & CLEAR_DEPTH && !oldDepthWrite)
         SetDepthWrite(true);
-    if (flags & CLEAR_STENCIL && stencilWriteMask_ != std::numeric_limits<unsigned>::max())
-        glStencilMask(std::numeric_limits<unsigned>::max());
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_LIMITS<unsigned>::Max)
+        glStencilMask(M_LIMITS<unsigned>::Max);
 
     unsigned glFlags = 0;
     if (flags & CLEAR_COLOR)
@@ -728,7 +728,7 @@ void Graphics::Clear(unsigned flags, const Color& color, float depth, unsigned s
     SetScissorTest(false);
     SetColorWrite(oldColorWrite);
     SetDepthWrite(oldDepthWrite);
-    if (flags & CLEAR_STENCIL && stencilWriteMask_ != std::numeric_limits<unsigned>::max())
+    if (flags & CLEAR_STENCIL && stencilWriteMask_ != M_LIMITS<unsigned>::Max)
         glStencilMask(stencilWriteMask_);
 }
 
@@ -2302,7 +2302,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
                 BindColorAttachment(j, GL_TEXTURE_2D, 0);
                 i->second_.colorAttachments_[j] = 0;
                 // Mark drawbuffer bits to need recalculation
-                i->second_.drawBuffers_ = std::numeric_limits<unsigned>::max();
+                i->second_.drawBuffers_ = M_LIMITS<unsigned>::Max;
             }
         }
         if (i->second_.depthAttachment_ == surface)
@@ -3135,8 +3135,8 @@ void Graphics::ResetCachedState()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = std::numeric_limits<unsigned>::max();
-    stencilWriteMask_ = std::numeric_limits<unsigned>::max();
+    stencilCompareMask_ = M_LIMITS<unsigned>::Max;
+    stencilWriteMask_ = M_LIMITS<unsigned>::Max;
     useClipPlane_ = false;
     lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;

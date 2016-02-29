@@ -128,7 +128,7 @@ void StaticModelGroup::ProcessRayQuery(const RayOctreeQuery& query, PODVector<Ra
 
             if (level == RAY_TRIANGLE && distance < query.maxDistance_)
             {
-                distance = std::numeric_limits<float>::infinity();
+                distance = M_LIMITS<float>::Infinity;
 
                 for (unsigned j = 0; j < batches_.Size(); ++j)
                 {
@@ -329,7 +329,7 @@ void StaticModelGroup::SetNodeIDsAttr(const VariantVector& value)
         unsigned index = 0;
         unsigned numInstances = value[index++].GetUInt();
         // Prevent crash on entering negative value in the editor
-        if (numInstances > std::numeric_limits<signed>::max())
+        if (numInstances > M_LIMITS<signed>::Max)
             numInstances = 0;
 
         nodeIDsAttr_.Push(numInstances);

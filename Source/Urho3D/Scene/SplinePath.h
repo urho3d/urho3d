@@ -55,7 +55,7 @@ public:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     /// Add a Node to the SplinePath as a Control Point.
-    void AddControlPoint(Node* point, unsigned index = std::numeric_limits<unsigned>::max());
+    void AddControlPoint(Node* point, unsigned index = M_LIMITS<unsigned>::Max);
     /// Remove a Node Control Point from the SplinePath.
     void RemoveControlPoint(Node* point);
     /// Clear the Control Points from the SplinePath.

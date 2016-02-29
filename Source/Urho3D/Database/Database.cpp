@@ -33,7 +33,7 @@ Database::Database(Context* context_) :
 #ifdef ODBC_3_OR_LATER
     poolSize_(0)
 #else
-    poolSize_(std::numeric_limits<unsigned>::max())
+    poolSize_(M_LIMITS<unsigned>::Max)
 #endif
 {
 }

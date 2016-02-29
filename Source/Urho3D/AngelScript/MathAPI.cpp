@@ -31,16 +31,6 @@
 namespace Urho3D
 {
 
-// These used to be in MathDefs.h. They aren't used anywhere any more, but are
-// required for the scripting API
-static const float M_INFINITY = std::numeric_limits<float>::infinity();
-static const float M_EPSILON = std::numeric_limits<float>::epsilon();
-static const float M_LARGE_EPSILON = std::numeric_limits<float>::epsilon() * 5;
-static const signed M_MIN_INT = std::numeric_limits<signed>::min();
-static const signed M_MAX_INT = std::numeric_limits<signed>::max();
-static const unsigned M_MIN_UNSIGNED = std::numeric_limits<unsigned>::min();
-static const unsigned M_MAX_UNSIGNED = std::numeric_limits<unsigned>::max();
-
 static void RegisterMathFunctions(asIScriptEngine* engine)
 {
     engine->RegisterEnum("Intersection");
@@ -48,19 +38,19 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterEnumValue("Intersection", "INTERSECTS", INTERSECTS);
     engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
 
-    engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
-    engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
-    engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
+    engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_LIMITS<float>::Infinity);
+    engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_LIMITS<float>::Epsilon);
+    engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LIMITS<float>::LargeEpsilon);
     engine->RegisterGlobalProperty("const float M_LARGE_VALUE", (void*)&M_LARGE_VALUE);
     engine->RegisterGlobalProperty("const float M_DEGTORAD", (void*)&M_DEGTORAD);
     engine->RegisterGlobalProperty("const float M_DEGTORAD_2", (void*)&M_DEGTORAD_2);
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
     engine->RegisterGlobalProperty("const float M_PI", (void*)&M_PI);
     engine->RegisterGlobalProperty("const float M_HALF_PI", (void*)&M_HALF_PI);
-    engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
-    engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
-    engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
-    engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
+    engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_LIMITS<signed>::Min);
+    engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_LIMITS<signed>::Max);
+    engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_LIMITS<unsigned>::Min);
+    engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_LIMITS<unsigned>::Max);
 
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);

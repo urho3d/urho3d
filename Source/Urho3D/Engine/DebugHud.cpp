@@ -58,7 +58,7 @@ static const char* shadowQualityTexts[] =
 
 DebugHud::DebugHud(Context* context) :
     Object(context),
-    profilerMaxDepth_(std::numeric_limits<unsigned>::max()),
+    profilerMaxDepth_(M_LIMITS<unsigned>::Max),
     profilerInterval_(1000),
     useRendererStats_(false),
     mode_(DEBUGHUD_SHOW_NONE)

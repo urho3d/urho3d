@@ -33,8 +33,8 @@ class URHO3D_API Rect
 public:
     /// Construct an undefined rect.
     Rect() :
-        min_( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity()),
-        max_(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity())
+        min_( M_LIMITS<float>::Infinity,  M_LIMITS<float>::Infinity),
+        max_(-M_LIMITS<float>::Infinity, -M_LIMITS<float>::Infinity)
     {
     }
 
@@ -136,8 +136,8 @@ public:
     /// Clear to undefined state.
     void Clear()
     {
-        min_ = Vector2( std::numeric_limits<float>::infinity(),  std::numeric_limits<float>::infinity());
-        max_ = Vector2(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
+        min_ = Vector2( M_LIMITS<float>::Infinity,  M_LIMITS<float>::Infinity);
+        max_ = Vector2(-M_LIMITS<float>::Infinity, -M_LIMITS<float>::Infinity);
     }
 
     /// Clip with another rect.
@@ -146,7 +146,7 @@ public:
     /// Return true if this rect is defined via a previous call to Define() or Merge().
     bool Defined() const
     {
-        return min_.x_ != std::numeric_limits<float>::infinity();
+        return min_.x_ != M_LIMITS<float>::Infinity;
     }
 
     /// Return center.

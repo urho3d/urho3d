@@ -147,16 +147,16 @@ public:
 
     /// Perform a physics world raycast and return all hits.
     void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
-        unsigned collisionMask = std::numeric_limits<unsigned>::max());
+        unsigned collisionMask = M_LIMITS<unsigned>::Max);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
-        unsigned collisionMask = std::numeric_limits<unsigned>::max());
+        unsigned collisionMask = M_LIMITS<unsigned>::Max);
     /// Return rigid body at point.
-    RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_LIMITS<unsigned>::Max);
     /// Return rigid body at screen point.
-    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_LIMITS<unsigned>::Max);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = std::numeric_limits<unsigned>::max());
+    void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_LIMITS<unsigned>::Max);
 
     /// Return whether physics world will automatically simulate during scene update.
     bool IsUpdateEnabled() const { return updateEnabled_; }

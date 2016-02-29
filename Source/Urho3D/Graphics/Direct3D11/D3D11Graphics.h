@@ -220,7 +220,7 @@ public:
     /// Set stencil test.
     void SetStencilTest
         (bool enable, CompareMode mode = CMP_ALWAYS, StencilOp pass = OP_KEEP, StencilOp fail = OP_KEEP, StencilOp zFail = OP_KEEP,
-            unsigned stencilRef = 0, unsigned compareMask = std::numeric_limits<unsigned>::max(), unsigned writeMask = std::numeric_limits<unsigned>::max());
+            unsigned stencilRef = 0, unsigned compareMask = M_LIMITS<unsigned>::Max, unsigned writeMask = M_LIMITS<unsigned>::Max);
     /// Set a custom clipping plane. The plane is specified in world space, but is dependent on the view and projection matrices.
     void SetClipPlane(bool enable, const Plane& clipPlane = Plane::UP, const Matrix3x4& view = Matrix3x4::IDENTITY,
         const Matrix4& projection = Matrix4::IDENTITY);

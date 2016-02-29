@@ -45,7 +45,7 @@ Vector3 Ray::ClosestPoint(const Ray& ray) const
     float d2121 = p21.DotProduct(p21);
 
     float d = d2121 * d4343 - d4321 * d4321;
-    if (Abs(d) < std::numeric_limits<float>::epsilon())
+    if (Abs(d) < M_LIMITS<float>::Epsilon)
         return origin_;
     float n = d1343 * d4321 - d1321 * d4343;
     float a = n / d;
@@ -56,29 +56,29 @@ Vector3 Ray::ClosestPoint(const Ray& ray) const
 float Ray::HitDistance(const Plane& plane) const
 {
     float d = plane.normal_.DotProduct(direction_);
-    if (Abs(d) >= std::numeric_limits<float>::epsilon())
+    if (Abs(d) >= M_LIMITS<float>::Epsilon)
     {
         float t = -(plane.normal_.DotProduct(origin_) + plane.d_) / d;
         if (t >= 0.0f)
             return t;
         else
-            return std::numeric_limits<float>::infinity();
+            return M_LIMITS<float>::Infinity;
     }
     else
-        return std::numeric_limits<float>::infinity();
+        return M_LIMITS<float>::Infinity;
 }
 
 float Ray::HitDistance(const BoundingBox& box) const
 {
     // If undefined, no hit (infinite distance)
     if (!box.Defined())
-        return std::numeric_limits<float>::infinity();
+        return M_LIMITS<float>::Infinity;
 
     // Check for ray origin being inside the box
     if (box.IsInside(origin_))
         return 0.0f;
 
-    float dist = std::numeric_limits<float>::infinity();
+    float dist = M_LIMITS<float>::Infinity;
 
     // Check for intersecting in the X-direction
     if (origin_.x_ < box.min_.x_ && direction_.x_ > 0.0f)
@@ -150,7 +150,7 @@ float Ray::HitDistance(const BoundingBox& box) const
 float Ray::HitDistance(const Frustum& frustum, bool solidInside) const
 {
     float maxOutside = 0.0f;
-    float minInside = std::numeric_limits<float>::infinity();
+    float minInside = M_LIMITS<float>::Infinity;
     bool allInside = true;
 
     for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
@@ -172,7 +172,7 @@ float Ray::HitDistance(const Frustum& frustum, bool solidInside) const
     else if (maxOutside <= minInside)
         return maxOutside;
     else
-        return std::numeric_limits<float>::infinity();
+        return M_LIMITS<float>::Infinity;
 }
 
 float Ray::HitDistance(const Sphere& sphere) const
@@ -192,7 +192,7 @@ float Ray::HitDistance(const Sphere& sphere) const
 
     // No solution
     if (d < 0.0f)
-        return std::numeric_limits<float>::infinity();
+        return M_LIMITS<float>::Infinity;
 
     // Get the nearer solution
     float dSqrt = sqrtf(d);
@@ -214,7 +214,7 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
     // Calculate determinant & check backfacing
     Vector3 p(direction_.CrossProduct(edge2));
     float det = edge1.DotProduct(p);
-    if (det >= std::numeric_limits<float>::epsilon())
+    if (det >= M_LIMITS<float>::Epsilon)
     {
         // Calculate u & v parameters and test
         Vector3 t(origin_ - v0);
@@ -241,15 +241,15 @@ float Ray::HitDistance(const Vector3& v0, const Vector3& v1, const Vector3& v2, 
         }
     }
 
-    return std::numeric_limits<float>::infinity();
+    return M_LIMITS<float>::Infinity;
 }
 
 float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned vertexStart, unsigned vertexCount,
     Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
 {
-    float nearest = std::numeric_limits<float>::infinity();
+    float nearest = M_LIMITS<float>::Infinity;
     const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexStride;
-    unsigned index = 0, nearestIdx = std::numeric_limits<unsigned>::max();
+    unsigned index = 0, nearestIdx = M_LIMITS<unsigned>::Max;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : 0;
 
@@ -269,7 +269,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
 
     if (outUV)
     {
-        if (nearestIdx == std::numeric_limits<unsigned>::max())
+        if (nearestIdx == M_LIMITS<unsigned>::Max)
             *outUV = Vector2::ZERO;
         else
         {
@@ -288,7 +288,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, unsigned v
 float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void* indexData, unsigned indexSize,
     unsigned indexStart, unsigned indexCount, Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
 {
-    float nearest = std::numeric_limits<float>::infinity();
+    float nearest = M_LIMITS<float>::Infinity;
     const unsigned char* vertices = (const unsigned char*)vertexData;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : 0;
@@ -371,8 +371,8 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
 
 bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned vertexStart, unsigned vertexCount) const
 {
-    float currentFrontFace = std::numeric_limits<float>::infinity();
-    float currentBackFace = std::numeric_limits<float>::infinity();
+    float currentFrontFace = M_LIMITS<float>::Infinity;
+    float currentBackFace = M_LIMITS<float>::Infinity;
     const unsigned char* vertices = ((const unsigned char*)vertexData) + vertexStart * vertexSize;
     unsigned index = 0;
 
@@ -383,17 +383,17 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
         const Vector3& v2 = *((const Vector3*)(&vertices[(index + 2) * vertexSize]));
         float frontFaceDistance = HitDistance(v0, v1, v2);
         float backFaceDistance = HitDistance(v2, v1, v0);
-        currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : std::numeric_limits<float>::infinity(), currentFrontFace);
+        currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_LIMITS<float>::Infinity, currentFrontFace);
         // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
         // checking reversed frontfaces
-        currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : std::numeric_limits<float>::infinity(), currentBackFace);
+        currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_LIMITS<float>::Infinity, currentBackFace);
         index += 3;
     }
 
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
     // (ray doesnt hit either) by this conditional
-    if (currentFrontFace != std::numeric_limits<float>::infinity() || currentBackFace != std::numeric_limits<float>::infinity())
+    if (currentFrontFace != M_LIMITS<float>::Infinity || currentBackFace != M_LIMITS<float>::Infinity)
         return currentBackFace < currentFrontFace;
 
     // It is still possible for two triangles to be equally distant from the triangle, however, this is extremely unlikely.
@@ -404,8 +404,8 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
 bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize,
     unsigned indexStart, unsigned indexCount) const
 {
-    float currentFrontFace = std::numeric_limits<float>::infinity();
-    float currentBackFace = std::numeric_limits<float>::infinity();
+    float currentFrontFace = M_LIMITS<float>::Infinity;
+    float currentBackFace = M_LIMITS<float>::Infinity;
     const unsigned char* vertices = (const unsigned char*)vertexData;
 
     // 16-bit indices
@@ -421,10 +421,10 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
             float frontFaceDistance = HitDistance(v0, v1, v2);
             float backFaceDistance = HitDistance(v2, v1, v0);
-            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : std::numeric_limits<float>::infinity(), currentFrontFace);
+            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_LIMITS<float>::Infinity, currentFrontFace);
             // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
             // checking reversed frontfaces
-            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : std::numeric_limits<float>::infinity(), currentBackFace);
+            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_LIMITS<float>::Infinity, currentBackFace);
             indices += 3;
         }
     }
@@ -441,10 +441,10 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
             const Vector3& v2 = *((const Vector3*)(&vertices[indices[2] * vertexSize]));
             float frontFaceDistance = HitDistance(v0, v1, v2);
             float backFaceDistance = HitDistance(v2, v1, v0);
-            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : std::numeric_limits<float>::infinity(), currentFrontFace);
+            currentFrontFace = Min(frontFaceDistance > 0.0f ? frontFaceDistance : M_LIMITS<float>::Infinity, currentFrontFace);
             // A backwards face is just a regular one, with the vertices in the opposite order. This essentially checks backfaces by
             // checking reversed frontfaces
-            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : std::numeric_limits<float>::infinity(), currentBackFace);
+            currentBackFace = Min(backFaceDistance > 0.0f ? backFaceDistance : M_LIMITS<float>::Infinity, currentBackFace);
             indices += 3;
         }
     }
@@ -452,7 +452,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
     // (ray doesn't hit either) by this conditional
-    if (currentFrontFace != std::numeric_limits<float>::infinity() || currentBackFace != std::numeric_limits<float>::infinity())
+    if (currentFrontFace != M_LIMITS<float>::Infinity || currentBackFace != M_LIMITS<float>::Infinity)
         return currentBackFace < currentFrontFace;
 
     // It is still possible for two triangles to be equally distant from the triangle, however, this is extremely unlikely.

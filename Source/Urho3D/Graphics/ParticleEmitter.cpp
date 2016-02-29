@@ -46,7 +46,7 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     periodTimer_(0.0f),
     emissionTimer_(0.0f),
     lastTimeStep_(0.0f),
-    lastUpdateFrameNumber_(std::numeric_limits<unsigned>::max()),
+    lastUpdateFrameNumber_(M_LIMITS<unsigned>::Max),
     emitting_(true),
     needUpdate_(false),
     serializeParticles_(true),
@@ -281,7 +281,7 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
 void ParticleEmitter::SetNumParticles(unsigned num)
 {
     // Prevent negative value being assigned from the editor
-    if (num > std::numeric_limits<signed>::max())
+    if (num > M_LIMITS<signed>::Max)
         num = 0;
     if (num > MAX_BILLBOARDS)
         num = MAX_BILLBOARDS;
@@ -439,7 +439,7 @@ void ParticleEmitter::OnSceneSet(Scene* scene)
 bool ParticleEmitter::EmitNewParticle()
 {
     unsigned index = GetFreeParticle();
-    if (index == std::numeric_limits<unsigned>::max())
+    if (index == M_LIMITS<unsigned>::Max)
         return false;
     assert(index < particles_.Size());
     Particle& particle = particles_[index];
@@ -519,7 +519,7 @@ unsigned ParticleEmitter::GetFreeParticle() const
             return i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)

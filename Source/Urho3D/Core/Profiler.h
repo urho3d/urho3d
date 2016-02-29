@@ -211,7 +211,7 @@ public:
     void BeginInterval();
 
     /// Return profiling data as text output.
-    String PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = std::numeric_limits<unsigned>::max()) const;
+    String PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_LIMITS<unsigned>::Max) const;
     /// Return the current profiling block.
     const ProfilerBlock* GetCurrentBlock() { return current_; }
     /// Return the root profiling block.

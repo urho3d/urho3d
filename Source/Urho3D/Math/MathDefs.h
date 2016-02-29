@@ -34,12 +34,61 @@ namespace Urho3D
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
 static const float M_HALF_PI = M_PI * 0.5f;
+
 static const float M_MIN_NEARCLIP = 0.01f;
 static const float M_MAX_FOV = 160.0f;
 static const float M_LARGE_VALUE = 100000000.0f;
 static const float M_DEGTORAD = M_PI / 180.0f;
 static const float M_DEGTORAD_2 = M_PI / 360.0f;    // M_DEGTORAD / 2.f
 static const float M_RADTODEG = 1.0f / M_DEGTORAD;
+
+/*!
+ * Provides information on limits of the given datatype.
+ * Example:
+ * int myInt = M_LIMITS<int>::Max;
+ *
+ * If the datatype is a floating point number, the additional members Infinity,
+ * Epsilon, and LargeEpsilon will be available.
+ */
+template <class T>
+struct M_LIMITS
+{
+    static const T Min;
+    static const T Max;
+};
+template <class T> const T M_LIMITS<T>::Min = std::numeric_limits<T>::min();
+template <class T> const T M_LIMITS<T>::Max = std::numeric_limits<T>::max();
+
+// Specialize for float, double and long double types. These must be exported
+// and defined in a compilation unit because they no longer depend on template
+// parameters. See MathDefs.cpp
+template <>
+struct URHO3D_API M_LIMITS<float>
+{
+    static const float Min;
+    static const float Max;
+    static const float Infinity;
+    static const float Epsilon;
+    static const float LargeEpsilon;
+};
+template <>
+struct URHO3D_API M_LIMITS<double>
+{
+    static const double Min;
+    static const double Max;
+    static const double Infinity;
+    static const double Epsilon;
+    static const double LargeEpsilon;
+};
+template <>
+struct URHO3D_API M_LIMITS<long double>
+{
+    static const long double Min;
+    static const long double Max;
+    static const long double Infinity;
+    static const long double Epsilon;
+    static const long double LargeEpsilon;
+};
 
 /// Intersection test result.
 enum Intersection

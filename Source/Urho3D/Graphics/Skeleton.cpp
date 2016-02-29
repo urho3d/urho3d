@@ -31,7 +31,7 @@ namespace Urho3D
 {
 
 Skeleton::Skeleton() :
-    rootBoneIndex_(std::numeric_limits<unsigned>::max())
+    rootBoneIndex_(M_LIMITS<unsigned>::Max)
 {
 }
 
@@ -125,7 +125,7 @@ void Skeleton::SetRootBoneIndex(unsigned index)
 void Skeleton::ClearBones()
 {
     bones_.Clear();
-    rootBoneIndex_ = std::numeric_limits<unsigned>::max();
+    rootBoneIndex_ = M_LIMITS<unsigned>::Max;
 }
 
 void Skeleton::Reset()

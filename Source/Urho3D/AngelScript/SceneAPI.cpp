@@ -296,7 +296,7 @@ static void RegisterSmoothedTransform(asIScriptEngine* engine)
 static void RegisterSplinePath(asIScriptEngine* engine)
 {
     RegisterComponent<SplinePath>(engine, "SplinePath");
-    engine->RegisterObjectMethod("SplinePath", "void AddControlPoint(Node@+ point, uint index = std::numeric_limits<unsigned>::max())", asMETHOD(SplinePath, AddControlPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("SplinePath", "void AddControlPoint(Node@+ point, uint index = M_LIMITS<unsigned>::Max)", asMETHOD(SplinePath, AddControlPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void RemoveControlPoint(Node@+ point)", asMETHOD(SplinePath, RemoveControlPoint), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void ClearControlPoints()", asMETHOD(SplinePath, ClearControlPoints), asCALL_THISCALL);
     engine->RegisterObjectMethod("SplinePath", "void set_interpolationMode(InterpolationMode)", asMETHOD(SplinePath, SetInterpolationMode), asCALL_THISCALL);

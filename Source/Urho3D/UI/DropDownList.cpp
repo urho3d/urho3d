@@ -155,7 +155,7 @@ void DropDownList::OnSetEditable()
 
 void DropDownList::AddItem(UIElement* item)
 {
-    InsertItem(std::numeric_limits<unsigned>::max(), item);
+    InsertItem(M_LIMITS<unsigned>::Max, item);
 }
 
 void DropDownList::InsertItem(unsigned index, UIElement* item)
@@ -163,7 +163,7 @@ void DropDownList::InsertItem(unsigned index, UIElement* item)
     listView_->InsertItem(index, item);
 
     // If there was no selection, set to the first
-    if (GetSelection() == std::numeric_limits<unsigned>::max())
+    if (GetSelection() == M_LIMITS<unsigned>::Max)
         SetSelection(0);
 }
 
@@ -342,7 +342,7 @@ void DropDownList::HandleListViewKey(StringHash eventType, VariantMap& eventData
 void DropDownList::HandleSelectionChanged(StringHash eventType, VariantMap& eventData)
 {
     // Display the place holder text when there is no selection, however, the place holder text is only visible when the place holder itself is set to visible
-    placeholder_->GetChild(0)->SetVisible(GetSelection() == std::numeric_limits<unsigned>::max());
+    placeholder_->GetChild(0)->SetVisible(GetSelection() == M_LIMITS<unsigned>::Max);
 }
 
 }

@@ -213,12 +213,12 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     // If either shift or ctrl held down, add to selection if multiselect enabled
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
-    int delta = std::numeric_limits<signed>::max();
+    int delta = M_LIMITS<signed>::Max;
     int pageDirection = 1;
 
     if (numItems)
     {
-        if (selection != std::numeric_limits<unsigned>::max() && qualifiers & QUAL_CTRL && key == KEY_C)
+        if (selection != M_LIMITS<unsigned>::Max && qualifiers & QUAL_CTRL && key == KEY_C)
         {
             CopySelectedItemsToClipboard();
             return;
@@ -228,7 +228,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         {
         case KEY_LEFT:
         case KEY_RIGHT:
-            if (selection != std::numeric_limits<unsigned>::max() && hierarchyMode_)
+            if (selection != M_LIMITS<unsigned>::Max && hierarchyMode_)
             {
                 Expand(selection, key == KEY_RIGHT);
                 return;
@@ -238,7 +238,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
-            if (selection != std::numeric_limits<unsigned>::max() && hierarchyMode_)
+            if (selection != M_LIMITS<unsigned>::Max && hierarchyMode_)
             {
                 ToggleExpand(selection);
                 return;
@@ -260,7 +260,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
-                if (selection == std::numeric_limits<unsigned>::max())
+                if (selection == M_LIMITS<unsigned>::Max)
                     selection = 0;      // Assume as if first item is selected
                 int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
                 unsigned newSelection = selection;
@@ -298,7 +298,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         }
     }
 
-    if (delta != std::numeric_limits<signed>::max())
+    if (delta != M_LIMITS<signed>::Max)
     {
         ChangeSelection(delta, additive);
         return;
@@ -325,7 +325,7 @@ void ListView::OnResize()
 
 void ListView::AddItem(UIElement* item)
 {
-    InsertItem(std::numeric_limits<unsigned>::max(), item);
+    InsertItem(M_LIMITS<unsigned>::Max, item);
 }
 
 void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
@@ -821,11 +821,11 @@ PODVector<UIElement*> ListView::GetItems() const
 unsigned ListView::FindItem(UIElement* item) const
 {
     if (!item)
-        return std::numeric_limits<unsigned>::max();
+        return M_LIMITS<unsigned>::Max;
 
     // Early-out by checking if the item belongs to the listview hierarchy at all
     if (item->GetParent() != contentElement_)
-        return std::numeric_limits<unsigned>::max();
+        return M_LIMITS<unsigned>::Max;
 
     const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
 
@@ -854,13 +854,13 @@ unsigned ListView::FindItem(UIElement* item) const
             return i;
     }
 
-    return std::numeric_limits<unsigned>::max();
+    return M_LIMITS<unsigned>::Max;
 }
 
 unsigned ListView::GetSelection() const
 {
     if (selections_.Empty())
-        return std::numeric_limits<unsigned>::max();
+        return M_LIMITS<unsigned>::Max;
     else
         return GetSelections().Front();
 }

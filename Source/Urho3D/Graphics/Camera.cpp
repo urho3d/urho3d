@@ -163,7 +163,7 @@ void Camera::SetAspectRatio(float aspectRatio)
 
 void Camera::SetZoom(float zoom)
 {
-    zoom_ = Max(zoom, std::numeric_limits<float>::epsilon());
+    zoom_ = Max(zoom, M_LIMITS<float>::Epsilon);
     frustumDirty_ = true;
     projectionDirty_ = true;
     MarkNetworkUpdate();
@@ -171,7 +171,7 @@ void Camera::SetZoom(float zoom)
 
 void Camera::SetLodBias(float bias)
 {
-    lodBias_ = Max(bias, std::numeric_limits<float>::epsilon());
+    lodBias_ = Max(bias, M_LIMITS<float>::Epsilon);
     MarkNetworkUpdate();
 }
 
@@ -525,7 +525,7 @@ float Camera::GetDistanceSquared(const Vector3& worldPos) const
 
 float Camera::GetLodDistance(float distance, float scale, float bias) const
 {
-    float d = Max(lodBias_ * bias * scale * zoom_, std::numeric_limits<float>::epsilon());
+    float d = Max(lodBias_ * bias * scale * zoom_, M_LIMITS<float>::Epsilon);
     if (!orthographic_)
         return distance / d;
     else

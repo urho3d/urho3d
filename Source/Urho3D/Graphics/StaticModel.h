@@ -68,7 +68,7 @@ public:
     void SetMaterial(Material* material);
     /// Set material on one geometry. Return true if successful.
     bool SetMaterial(unsigned index, Material* material);
-    /// Set occlusion LOD level. By default (std::numeric_limits<unsigned>::max()) same as visible.
+    /// Set occlusion LOD level. By default (M_LIMITS<unsigned>::Max) same as visible.
     void SetOcclusionLodLevel(unsigned level);
     /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
     void ApplyMaterialList(const String& fileName = String::EMPTY);

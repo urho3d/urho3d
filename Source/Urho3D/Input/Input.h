@@ -47,7 +47,7 @@ class Serializer;
 class UIElement;
 class XMLFile;
 
-const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(std::numeric_limits<signed>::min(), std::numeric_limits<signed>::min());
+const IntVector2 MOUSE_POSITION_OFFSCREEN = IntVector2(M_LIMITS<signed>::Min, M_LIMITS<signed>::Min);
 
 /// %Input state for a finger touch.
 struct TouchState
