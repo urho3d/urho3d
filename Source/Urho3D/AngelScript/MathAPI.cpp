@@ -27,6 +27,7 @@
 #include "../Math/Polyhedron.h"
 #include "../Math/Ray.h"
 #include "../Math/Matrix2.h"
+#include "../Math/Internal/Script/ScriptSpecificMathDefs.h"
 
 namespace Urho3D
 {
@@ -38,19 +39,19 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterEnumValue("Intersection", "INTERSECTS", INTERSECTS);
     engine->RegisterEnumValue("Intersection", "INSIDE", INSIDE);
 
-    engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_LIMITS<float>::Infinity);
-    engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_LIMITS<float>::Epsilon);
-    engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LIMITS<float>::LargeEpsilon);
+    engine->RegisterGlobalProperty("const float M_INFINITY", (void*)&M_INFINITY);
+    engine->RegisterGlobalProperty("const float M_EPSILON", (void*)&M_EPSILON);
+    engine->RegisterGlobalProperty("const float M_LARGE_EPSILON", (void*)&M_LARGE_EPSILON);
     engine->RegisterGlobalProperty("const float M_LARGE_VALUE", (void*)&M_LARGE_VALUE);
     engine->RegisterGlobalProperty("const float M_DEGTORAD", (void*)&M_DEGTORAD);
     engine->RegisterGlobalProperty("const float M_DEGTORAD_2", (void*)&M_DEGTORAD_2);
     engine->RegisterGlobalProperty("const float M_RADTODEG", (void*)&M_RADTODEG);
     engine->RegisterGlobalProperty("const float M_PI", (void*)&M_PI);
     engine->RegisterGlobalProperty("const float M_HALF_PI", (void*)&M_HALF_PI);
-    engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_LIMITS<signed>::Min);
-    engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_LIMITS<signed>::Max);
-    engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_LIMITS<unsigned>::Min);
-    engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_LIMITS<unsigned>::Max);
+    engine->RegisterGlobalProperty("const int M_MIN_INT", (void*)&M_MIN_INT);
+    engine->RegisterGlobalProperty("const int M_MAX_INT", (void*)&M_MAX_INT);
+    engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
+    engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
 
     engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);

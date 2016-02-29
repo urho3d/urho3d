@@ -1,4 +1,5 @@
 $pfile "Math/MathDefs.pkg"
+$pfile "Math/ScriptSpecificMathDefs.pkg"
 $pfile "Math/BoundingBox.pkg"
 $pfile "Math/Color.pkg"
 $pfile "Math/Frustum.pkg"

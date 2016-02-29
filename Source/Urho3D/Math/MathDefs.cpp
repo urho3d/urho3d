@@ -21,7 +21,6 @@
 //
 
 #include "MathDefs.h"
-#include "Internal/Lua/LuaMathDefs.h"
 
 namespace Urho3D
 {
@@ -44,17 +43,5 @@ const long double M_LIMITS<long double>::Max = std::numeric_limits<long double>:
 const long double M_LIMITS<long double>::Infinity = std::numeric_limits<long double>::infinity();
 const long double M_LIMITS<long double>::Epsilon = std::numeric_limits<long double>::epsilon();
 const long double M_LIMITS<long double>::LargeEpsilon = std::numeric_limits<long double>::epsilon() * 5;
-
-// Required for Lua bindings. These aren't declared in MathDefs.h (so the rest
-// of the engine can't use them). Instead they are declared as extern variables
-// in Internal/Lua/LuaMathDefs.h. The Lua bindings include that header file
-// so they can be exposed to Lua scripts.
-const float M_INFINITY      = M_LIMITS<float>   ::Infinity;
-const float M_EPSILON       = M_LIMITS<float>   ::Epsilon;
-const float M_LARGE_EPSILON = M_LIMITS<float>   ::LargeEpsilon;
-const float M_MIN_INT       = M_LIMITS<signed>  ::Min;
-const float M_MAX_INT       = M_LIMITS<signed>  ::Max;
-const float M_MIN_UNSIGNED  = M_LIMITS<unsigned>::Min;
-const float M_MAX_UNSIGNED  = M_LIMITS<unsigned>::Max;
 
 } // namespace Urho3D
