@@ -147,7 +147,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
     float w = h / light->GetAspectRatio();
     spotProj.m00_ = w;
     spotProj.m11_ = h;
-    spotProj.m22_ = 1.0f / Max(light->GetRange(), M_LIMITS<float>::Epsilon);
+    spotProj.m22_ = 1.0f / Max(light->GetRange(), Limits<float>::Epsilon);
     spotProj.m32_ = 1.0f;
 
 #ifdef URHO3D_OPENGL
@@ -285,9 +285,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
         float fogEnd = Min(zone_->GetFogEnd(), farClip);
-        if (fogStart >= fogEnd * (1.0f - M_LIMITS<float>::LargeEpsilon))
-            fogStart = fogEnd * (1.0f - M_LIMITS<float>::LargeEpsilon);
-        float fogRange = Max(fogEnd - fogStart, M_LIMITS<float>::Epsilon);
+        if (fogStart >= fogEnd * (1.0f - Limits<float>::LargeEpsilon))
+            fogStart = fogEnd * (1.0f - Limits<float>::LargeEpsilon);
+        float fogRange = Max(fogEnd - fogStart, Limits<float>::Epsilon);
         Vector4 fogParams(fogEnd / farClip, farClip / fogRange, 0.0f, 0.0f);
 
         Node* zoneNode = zone_->GetNode();
@@ -295,7 +295,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         {
             Vector3 worldFogHeightVec = zoneNode->GetWorldTransform() * Vector3(0.0f, zone_->GetFogHeight(), 0.0f);
             fogParams.z_ = worldFogHeightVec.y_;
-            fogParams.w_ = zone_->GetFogHeightScale() / Max(zoneNode->GetWorldScale().y_, M_LIMITS<float>::Epsilon);
+            fogParams.w_ = zone_->GetFogHeightScale() / Max(zoneNode->GetWorldScale().y_, Limits<float>::Epsilon);
         }
 
         graphics->SetShaderParameter(PSP_FOGPARAMS, fogParams);
@@ -317,7 +317,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
             graphics->SetShaderParameter(VSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
 
-            float atten = 1.0f / Max(light->GetRange(), M_LIMITS<float>::Epsilon);
+            float atten = 1.0f / Max(light->GetRange(), Limits<float>::Epsilon);
             graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
 
             if (graphics->HasShaderParameter(VSP_LIGHTMATRICES))
@@ -526,7 +526,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 if (type == LIGHT_DIRECTIONAL)
                     invRange = 0.0f;
                 else
-                    invRange = 1.0f / Max(vertexLight->GetRange(), M_LIMITS<float>::Epsilon);
+                    invRange = 1.0f / Max(vertexLight->GetRange(), Limits<float>::Epsilon);
                 if (type == LIGHT_SPOT)
                 {
                     cutoff = Cos(vertexLight->GetFov() * 0.5f);
@@ -641,7 +641,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
     {
         // Draw as individual objects if instancing not supported or could not fill the instancing buffer
         VertexBuffer* instanceBuffer = renderer->GetInstancingBuffer();
-        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == M_LIMITS<unsigned>::Max)
+        if (!instanceBuffer || geometryType_ != GEOM_INSTANCED || startIndex_ == Limits<unsigned>::Max)
         {
             Batch::Prepare(view, camera, false, allowDepthWrite);
 
@@ -733,7 +733,7 @@ void BatchQueue::SortFrontToBack()
         }
         else
         {
-            float minDistance = M_LIMITS<float>::Infinity;
+            float minDistance = Limits<float>::Infinity;
             for (PODVector<InstanceData>::ConstIterator j = i->second_.instances_.Begin(); j != i->second_.instances_.End(); ++j)
                 minDistance = Min(minDistance, j->distance_);
             i->second_.distance_ = minDistance;

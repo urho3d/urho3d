@@ -92,7 +92,7 @@ class Node : public Animatable
 
     Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
 
-    void AddChild(Node* node, unsigned index = M_LIMITS<unsigned>::Max);
+    void AddChild(Node* node, unsigned index = Limits<unsigned>::Max);
     void RemoveChild(Node* node);
     void RemoveAllChildren();
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);

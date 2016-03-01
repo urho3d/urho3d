@@ -233,7 +233,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
 
         // Adopt modal root as parent
         modalElement->SetVar(VAR_ORIGINAL_PARENT, currParent);
-        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : M_LIMITS<unsigned>::Max);
+        modalElement->SetVar(VAR_ORIGINAL_CHILD_INDEX, currParent ? currParent->FindChild(modalElement) : Limits<unsigned>::Max);
         modalElement->SetParent(rootModalElement_);
 
         // If it is a popup element, bring along its top-level parent
@@ -248,7 +248,7 @@ bool UI::SetModalElement(UIElement* modalElement, bool enable)
                 originElement->SetVar(VAR_PARENT_CHANGED, element);
                 UIElement* oriParent = element->GetParent();
                 element->SetVar(VAR_ORIGINAL_PARENT, oriParent);
-                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : M_LIMITS<unsigned>::Max);
+                element->SetVar(VAR_ORIGINAL_CHILD_INDEX, oriParent ? oriParent->FindChild(element) : Limits<unsigned>::Max);
                 element->SetParent(rootModalElement_);
             }
         }
@@ -618,7 +618,7 @@ UIElement* UI::GetElementAt(int x, int y, bool enabledOnly)
 UIElement* UI::GetFrontElement() const
 {
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
-    int maxPriority = M_LIMITS<signed>::Min;
+    int maxPriority = Limits<signed>::Min;
     UIElement* front = 0;
 
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
@@ -1796,7 +1796,7 @@ IntVector2 UI::SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSe
 
 void UI::SetScale(float scale)
 {
-    uiScale_ = Max(scale, M_LIMITS<float>::Epsilon);
+    uiScale_ = Max(scale, Limits<float>::Epsilon);
     Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics)
     {

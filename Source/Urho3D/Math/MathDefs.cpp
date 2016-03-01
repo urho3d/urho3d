@@ -25,23 +25,23 @@
 namespace Urho3D
 {
 
-// M_LIMITS for floating point types
-const float M_LIMITS<float>::Min = std::numeric_limits<float>::min();
-const float M_LIMITS<float>::Max = std::numeric_limits<float>::max();
-const float M_LIMITS<float>::Infinity = std::numeric_limits<float>::infinity();
-const float M_LIMITS<float>::Epsilon = std::numeric_limits<float>::epsilon();
-const float M_LIMITS<float>::LargeEpsilon = std::numeric_limits<float>::epsilon() * 5;
+// Limits for floating point types
+const float Limits<float>::Min = std::numeric_limits<float>::min();
+const float Limits<float>::Max = std::numeric_limits<float>::max();
+const float Limits<float>::Infinity = std::numeric_limits<float>::infinity();
+const float Limits<float>::Epsilon = std::numeric_limits<float>::epsilon();
+const float Limits<float>::LargeEpsilon = std::numeric_limits<float>::epsilon() * 5;
 
-const double M_LIMITS<double>::Min = std::numeric_limits<double>::min();
-const double M_LIMITS<double>::Max = std::numeric_limits<double>::max();
-const double M_LIMITS<double>::Infinity = std::numeric_limits<double>::infinity();
-const double M_LIMITS<double>::Epsilon = std::numeric_limits<double>::epsilon();
-const double M_LIMITS<double>::LargeEpsilon = std::numeric_limits<double>::epsilon() * 5;
+const double Limits<double>::Min = std::numeric_limits<double>::min();
+const double Limits<double>::Max = std::numeric_limits<double>::max();
+const double Limits<double>::Infinity = std::numeric_limits<double>::infinity();
+const double Limits<double>::Epsilon = std::numeric_limits<double>::epsilon();
+const double Limits<double>::LargeEpsilon = std::numeric_limits<double>::epsilon() * 5;
 
-const long double M_LIMITS<long double>::Min = std::numeric_limits<long double>::min();
-const long double M_LIMITS<long double>::Max = std::numeric_limits<long double>::max();
-const long double M_LIMITS<long double>::Infinity = std::numeric_limits<long double>::infinity();
-const long double M_LIMITS<long double>::Epsilon = std::numeric_limits<long double>::epsilon();
-const long double M_LIMITS<long double>::LargeEpsilon = std::numeric_limits<long double>::epsilon() * 5;
+const long double Limits<long double>::Min = std::numeric_limits<long double>::min();
+const long double Limits<long double>::Max = std::numeric_limits<long double>::max();
+const long double Limits<long double>::Infinity = std::numeric_limits<long double>::infinity();
+const long double Limits<long double>::Epsilon = std::numeric_limits<long double>::epsilon();
+const long double Limits<long double>::LargeEpsilon = std::numeric_limits<long double>::epsilon() * 5;
 
 } // namespace Urho3D

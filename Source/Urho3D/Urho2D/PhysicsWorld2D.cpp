@@ -460,7 +460,7 @@ public:
         result_(result),
         startPoint_(startPoint),
         collisionMask_(collisionMask),
-        minDistance_(M_LIMITS<float>::Infinity)
+        minDistance_(Limits<float>::Infinity)
     {
     }
 
@@ -556,7 +556,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
     PointQueryCallback callback(ToB2Vec2(point), collisionMask);
 
     b2AABB b2Aabb;
-    Vector2 delta(M_LIMITS<float>::Epsilon, M_LIMITS<float>::Epsilon);
+    Vector2 delta(Limits<float>::Epsilon, Limits<float>::Epsilon);
     b2Aabb.lowerBound = ToB2Vec2(point - delta);
     b2Aabb.upperBound = ToB2Vec2(point + delta);
 
@@ -618,7 +618,7 @@ void PhysicsWorld2D::GetRigidBodies(PODVector<RigidBody2D*>& results, const Rect
     AabbQueryCallback callback(results, collisionMask);
 
     b2AABB b2Aabb;
-    Vector2 delta(M_LIMITS<float>::Epsilon, M_LIMITS<float>::Epsilon);
+    Vector2 delta(Limits<float>::Epsilon, Limits<float>::Epsilon);
     b2Aabb.lowerBound = ToB2Vec2(aabb.min_ - delta);
     b2Aabb.upperBound = ToB2Vec2(aabb.max_ + delta);
 

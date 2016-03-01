@@ -159,26 +159,26 @@ public:
     void SetMaxNetworkAngularVelocity(float velocity);
     /// Perform a physics world raycast and return all hits.
     void Raycast
-        (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+        (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = Limits<unsigned>::Max);
     /// Perform a physics world raycast and return the closest hit.
-    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+    void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = Limits<unsigned>::Max);
     /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
-    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = Limits<unsigned>::Max);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast
-        (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+        (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = Limits<unsigned>::Max);
     /// Perform a physics world swept convex test using a user-supplied collision shape and return the first hit.
     void ConvexCast(PhysicsRaycastResult& result, CollisionShape* shape, const Vector3& startPos, const Quaternion& startRot,
-        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = Limits<unsigned>::Max);
     /// Perform a physics world swept convex test using a user-supplied Bullet collision shape and return the first hit.
     void ConvexCast(PhysicsRaycastResult& result, btCollisionShape* shape, const Vector3& startPos, const Quaternion& startRot,
-        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+        const Vector3& endPos, const Quaternion& endRot, unsigned collisionMask = Limits<unsigned>::Max);
     /// Invalidate cached collision geometry for a model.
     void RemoveCachedGeometry(Model* model);
     /// Return rigid bodies by a sphere query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+    void GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask = Limits<unsigned>::Max);
     /// Return rigid bodies by a box query.
-    void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+    void GetRigidBodies(PODVector<RigidBody*>& result, const BoundingBox& box, unsigned collisionMask = Limits<unsigned>::Max);
     /// Return rigid bodies by contact test with the specified body. It needs to be active to return all contacts reliably.
     void GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body);
     /// Return rigid bodies that have been in collision with the specified body on the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.

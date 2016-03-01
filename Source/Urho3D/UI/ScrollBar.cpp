@@ -184,7 +184,7 @@ void ScrollBar::SetScrollStep(float step)
 
 void ScrollBar::SetStepFactor(float factor)
 {
-    stepFactor_ = Max(factor, M_LIMITS<float>::Epsilon);
+    stepFactor_ = Max(factor, Limits<float>::Epsilon);
 }
 
 void ScrollBar::StepBack()

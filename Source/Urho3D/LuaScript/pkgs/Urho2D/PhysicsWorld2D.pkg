@@ -29,14 +29,14 @@ class PhysicsWorld2D : Component
     void SetVelocityIterations(int velocityIterations);
     void SetPositionIterations(int positionIterations);
 
-    // void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    tolua_outside const PODVector<PhysicsRaycastResult2D>& PhysicsWorld2DRaycast @ Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    // void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    tolua_outside PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle @ RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    // void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = M_LIMITS<unsigned>::Max);
-    tolua_outside const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies @ GetRigidBodies(const Rect& aabb, unsigned collisionMask = M_LIMITS<unsigned>::Max);
+    // void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max);
+    tolua_outside const PODVector<PhysicsRaycastResult2D>& PhysicsWorld2DRaycast @ Raycast(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max);
+    // void RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max);
+    tolua_outside PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle @ RaycastSingle(const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max);
+    RigidBody2D* GetRigidBody(const Vector2& point, unsigned collisionMask = Limits<unsigned>::Max);
+    RigidBody2D* GetRigidBody(int screenX, int screenY, unsigned collisionMask = Limits<unsigned>::Max);
+    // void GetRigidBodies(PODVector<RigidBody2D*>& result, const Rect& aabb, unsigned collisionMask = Limits<unsigned>::Max);
+    tolua_outside const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies @ GetRigidBodies(const Rect& aabb, unsigned collisionMask = Limits<unsigned>::Max);
 
     bool IsUpdateEnabled() const;
     bool GetDrawShape() const;
@@ -70,7 +70,7 @@ class PhysicsWorld2D : Component
 };
 
 ${
-const PODVector<PhysicsRaycastResult2D>& PhysicsWorld2DRaycast(PhysicsWorld2D* physicsWorld, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max)
+const PODVector<PhysicsRaycastResult2D>& PhysicsWorld2DRaycast(PhysicsWorld2D* physicsWorld, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max)
 {
     static PODVector<PhysicsRaycastResult2D> results;
     results.Clear();
@@ -78,14 +78,14 @@ const PODVector<PhysicsRaycastResult2D>& PhysicsWorld2DRaycast(PhysicsWorld2D* p
     return results;
 }
 
-PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle(PhysicsWorld2D* physicsWorld, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = M_LIMITS<unsigned>::Max)
+PhysicsRaycastResult2D PhysicsWorld2DRaycastSingle(PhysicsWorld2D* physicsWorld, const Vector2& startPoint, const Vector2& endPoint, unsigned collisionMask = Limits<unsigned>::Max)
 {
     PhysicsRaycastResult2D result;
     physicsWorld->RaycastSingle(result, startPoint, endPoint, collisionMask);
     return result;
 }
 
-const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies(PhysicsWorld2D* physicsWorld, const Rect& aabb, unsigned collisionMask = M_LIMITS<unsigned>::Max)
+const PODVector<RigidBody2D*>& PhysicsWorld2DGetRigidBodies(PhysicsWorld2D* physicsWorld, const Rect& aabb, unsigned collisionMask = Limits<unsigned>::Max)
 {
     static PODVector<RigidBody2D*> results;
     results.Clear();

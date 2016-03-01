@@ -312,7 +312,7 @@ public:
     /// Bring UI element to front.
     void BringToFront();
     /// Create and add a child element and return it.
-    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = M_LIMITS<unsigned>::Max);
+    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = Limits<unsigned>::Max);
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -325,10 +325,10 @@ public:
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// Find child index. Return M_LIMITS<unsigned>::Max if not found.
+    /// Find child index. Return Limits<unsigned>::Max if not found.
     unsigned FindChild(UIElement* element) const;
     /// Set parent element. Same as parent->InsertChild(index, this).
-    void SetParent(UIElement* parent, unsigned index = M_LIMITS<unsigned>::Max);
+    void SetParent(UIElement* parent, unsigned index = Limits<unsigned>::Max);
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
@@ -352,7 +352,7 @@ public:
     void RemoveAllTags();
 
     /// Template version of creating a child element.
-    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_LIMITS<unsigned>::Max);
+    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = Limits<unsigned>::Max);
 
     /// Return name.
     const String& GetName() const { return name_; }

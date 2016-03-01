@@ -20,7 +20,7 @@ class Text : public UIElement
     void SetTextAlignment(HorizontalAlignment align);
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
-    void SetSelection(unsigned start, unsigned length = M_LIMITS<unsigned>::Max);
+    void SetSelection(unsigned start, unsigned length = Limits<unsigned>::Max);
     void ClearSelection();
     void SetSelectionColor(const Color& color);
     void SetHoverColor(const Color& color);

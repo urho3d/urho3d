@@ -99,7 +99,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
 
             if (level == RAY_TRIANGLE && distance < query.maxDistance_)
             {
-                distance = M_LIMITS<float>::Infinity;
+                distance = Limits<float>::Infinity;
 
                 for (unsigned i = 0; i < batches_.Size(); ++i)
                 {
@@ -125,7 +125,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
                 result.distance_ = distance;
                 result.drawable_ = this;
                 result.node_ = node_;
-                result.subObject_ = M_LIMITS<unsigned>::Max;
+                result.subObject_ = Limits<unsigned>::Max;
                 results.Push(result);
             }
         }

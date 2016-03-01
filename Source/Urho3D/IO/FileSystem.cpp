@@ -200,7 +200,7 @@ public:
     {
         // Increment ID for next request
         ++requestID;
-        if (requestID == M_LIMITS<unsigned>::Max)
+        if (requestID == Limits<unsigned>::Max)
             requestID = 1;
     }
 
@@ -398,11 +398,11 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     else
     {
         URHO3D_LOGERROR("Executing an external command is not allowed");
-        return M_LIMITS<unsigned>::Max;
+        return Limits<unsigned>::Max;
     }
 #else
     URHO3D_LOGERROR("Can not execute an asynchronous command as threading is disabled");
-    return M_LIMITS<unsigned>::Max;
+    return Limits<unsigned>::Max;
 #endif
 }
 
@@ -419,11 +419,11 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     else
     {
         URHO3D_LOGERROR("Executing an external command is not allowed");
-        return M_LIMITS<unsigned>::Max;
+        return Limits<unsigned>::Max;
     }
 #else
     URHO3D_LOGERROR("Can not run asynchronously as threading is disabled");
-    return M_LIMITS<unsigned>::Max;
+    return Limits<unsigned>::Max;
 #endif
 }
 

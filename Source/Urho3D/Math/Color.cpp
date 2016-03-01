@@ -233,7 +233,7 @@ float Color::Hue(float min, float max) const
     float chroma = max - min;
 
     // If chroma equals zero, hue is undefined
-    if (chroma <= M_LIMITS<float>::Epsilon)
+    if (chroma <= Limits<float>::Epsilon)
         return 0.0f;
 
     // Calculate and return hue
@@ -252,7 +252,7 @@ float Color::Hue(float min, float max) const
 float Color::SaturationHSV(float min, float max) const
 {
     // Avoid div-by-zero: result undefined
-    if (max <= M_LIMITS<float>::Epsilon)
+    if (max <= Limits<float>::Epsilon)
         return 0.0f;
 
     // Saturation equals chroma:value ratio
@@ -262,7 +262,7 @@ float Color::SaturationHSV(float min, float max) const
 float Color::SaturationHSL(float min, float max) const
 {
     // Avoid div-by-zero: result undefined
-    if (max <= M_LIMITS<float>::Epsilon || min >= 1.0f - M_LIMITS<float>::Epsilon)
+    if (max <= Limits<float>::Epsilon || min >= 1.0f - Limits<float>::Epsilon)
         return 0.0f;
 
     // Chroma = max - min, lightness = (max + min) * 0.5

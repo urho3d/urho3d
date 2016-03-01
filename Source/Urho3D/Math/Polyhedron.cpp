@@ -186,7 +186,7 @@ void Polyhedron::Clip(const Plane& plane)
         {
             // Then add the vertex which is closest to the last added
             const Vector3& lastAdded = outFace_.Back();
-            float bestDistance = M_LIMITS<float>::Infinity;
+            float bestDistance = Limits<float>::Infinity;
             unsigned bestIndex = 0;
 
             for (unsigned i = 0; i < clippedVertices_.Size(); ++i)

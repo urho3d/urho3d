@@ -90,7 +90,7 @@ Terrain::Terrain(Context* context) :
     lastPatchSize_(0),
     numLodLevels_(1),
     maxLodLevels_(MAX_LOD_LEVELS),
-    occlusionLodLevel_(M_LIMITS<unsigned>::Max),
+    occlusionLodLevel_(Limits<unsigned>::Max),
     smoothing_(false),
     visible_(true),
     castShadows_(false),
@@ -137,7 +137,7 @@ void Terrain::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_LIMITS<unsigned>::Max, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, Limits<unsigned>::Max, AM_DEFAULT);
 }
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)

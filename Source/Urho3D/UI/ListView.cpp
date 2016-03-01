@@ -213,12 +213,12 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
 
     // If either shift or ctrl held down, add to selection if multiselect enabled
     bool additive = multiselect_ && qualifiers & (QUAL_SHIFT | QUAL_CTRL);
-    int delta = M_LIMITS<signed>::Max;
+    int delta = Limits<signed>::Max;
     int pageDirection = 1;
 
     if (numItems)
     {
-        if (selection != M_LIMITS<unsigned>::Max && qualifiers & QUAL_CTRL && key == KEY_C)
+        if (selection != Limits<unsigned>::Max && qualifiers & QUAL_CTRL && key == KEY_C)
         {
             CopySelectedItemsToClipboard();
             return;
@@ -228,7 +228,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         {
         case KEY_LEFT:
         case KEY_RIGHT:
-            if (selection != M_LIMITS<unsigned>::Max && hierarchyMode_)
+            if (selection != Limits<unsigned>::Max && hierarchyMode_)
             {
                 Expand(selection, key == KEY_RIGHT);
                 return;
@@ -238,7 +238,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_RETURN:
         case KEY_RETURN2:
         case KEY_KP_ENTER:
-            if (selection != M_LIMITS<unsigned>::Max && hierarchyMode_)
+            if (selection != Limits<unsigned>::Max && hierarchyMode_)
             {
                 ToggleExpand(selection);
                 return;
@@ -260,7 +260,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         case KEY_PAGEDOWN:
             {
                 // Convert page step to pixels and see how many items have to be skipped to reach that many pixels
-                if (selection == M_LIMITS<unsigned>::Max)
+                if (selection == Limits<unsigned>::Max)
                     selection = 0;      // Assume as if first item is selected
                 int stepPixels = ((int)(pageStep_ * scrollPanel_->GetHeight())) - contentElement_->GetChild(selection)->GetHeight();
                 unsigned newSelection = selection;
@@ -298,7 +298,7 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
         }
     }
 
-    if (delta != M_LIMITS<signed>::Max)
+    if (delta != Limits<signed>::Max)
     {
         ChangeSelection(delta, additive);
         return;
@@ -325,7 +325,7 @@ void ListView::OnResize()
 
 void ListView::AddItem(UIElement* item)
 {
-    InsertItem(M_LIMITS<unsigned>::Max, item);
+    InsertItem(Limits<unsigned>::Max, item);
 }
 
 void ListView::InsertItem(unsigned index, UIElement* item, UIElement* parentItem)
@@ -821,11 +821,11 @@ PODVector<UIElement*> ListView::GetItems() const
 unsigned ListView::FindItem(UIElement* item) const
 {
     if (!item)
-        return M_LIMITS<unsigned>::Max;
+        return Limits<unsigned>::Max;
 
     // Early-out by checking if the item belongs to the listview hierarchy at all
     if (item->GetParent() != contentElement_)
-        return M_LIMITS<unsigned>::Max;
+        return Limits<unsigned>::Max;
 
     const Vector<SharedPtr<UIElement> >& children = contentElement_->GetChildren();
 
@@ -854,13 +854,13 @@ unsigned ListView::FindItem(UIElement* item) const
             return i;
     }
 
-    return M_LIMITS<unsigned>::Max;
+    return Limits<unsigned>::Max;
 }
 
 unsigned ListView::GetSelection() const
 {
     if (selections_.Empty())
-        return M_LIMITS<unsigned>::Max;
+        return Limits<unsigned>::Max;
     else
         return GetSelections().Front();
 }

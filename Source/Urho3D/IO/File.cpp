@@ -201,7 +201,7 @@ bool File::Open(const String& fileName, FileMode mode)
     fseek((FILE*)handle_, 0, SEEK_END);
     long size = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
-    if (size > M_LIMITS<unsigned>::Max)
+    if (size > Limits<unsigned>::Max)
     {
         URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
         Close();

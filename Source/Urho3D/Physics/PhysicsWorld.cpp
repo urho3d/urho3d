@@ -355,7 +355,7 @@ void PhysicsWorld::Raycast(PODVector<PhysicsRaycastResult>& result, const Ray& r
 {
     URHO3D_PROFILE(PhysicsRaycast);
 
-    if (maxDistance >= M_LIMITS<float>::Infinity)
+    if (maxDistance >= Limits<float>::Infinity)
         URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::AllHitsRayResultCallback
@@ -383,7 +383,7 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
 {
     URHO3D_PROFILE(PhysicsRaycastSingle);
 
-    if (maxDistance >= M_LIMITS<float>::Infinity)
+    if (maxDistance >= Limits<float>::Infinity)
         URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btCollisionWorld::ClosestRayResultCallback
@@ -405,7 +405,7 @@ void PhysicsWorld::RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, f
     {
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
         result.body_ = 0;
     }
@@ -415,7 +415,7 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
 {
     URHO3D_PROFILE(PhysicsRaycastSingleSegmented);
 
-    if (maxDistance >= M_LIMITS<float>::Infinity)
+    if (maxDistance >= Limits<float>::Infinity)
         URHO3D_LOGWARNING("Infinite maxDistance in physics raycast is not supported");
 
     btVector3 start = ToBtVector3(ray.origin_);
@@ -453,7 +453,7 @@ void PhysicsWorld::RaycastSingleSegmented(PhysicsRaycastResult& result, const Ra
     // Didn't hit anything
     result.position_ = Vector3::ZERO;
     result.normal_ = Vector3::ZERO;
-    result.distance_ = M_LIMITS<float>::Infinity;
+    result.distance_ = Limits<float>::Infinity;
     result.hitFraction_ = 0.0f;
     result.body_ = 0;
 }
@@ -462,7 +462,7 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
 {
     URHO3D_PROFILE(PhysicsSphereCast);
 
-    if (maxDistance >= M_LIMITS<float>::Infinity)
+    if (maxDistance >= Limits<float>::Infinity)
         URHO3D_LOGWARNING("Infinite maxDistance in physics sphere cast is not supported");
 
     btSphereShape shape(radius);
@@ -489,7 +489,7 @@ void PhysicsWorld::SphereCast(PhysicsRaycastResult& result, const Ray& ray, floa
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
     }
 }
@@ -503,7 +503,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
         return;
     }
@@ -544,7 +544,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
         return;
     }
@@ -555,7 +555,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
         return;
     }
@@ -583,7 +583,7 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
         result.body_ = 0;
         result.position_ = Vector3::ZERO;
         result.normal_ = Vector3::ZERO;
-        result.distance_ = M_LIMITS<float>::Infinity;
+        result.distance_ = Limits<float>::Infinity;
         result.hitFraction_ = 0.0f;
     }
 }

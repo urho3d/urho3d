@@ -45,25 +45,25 @@ static const float M_RADTODEG = 1.0f / M_DEGTORAD;
 /*!
  * Provides information on limits of the given datatype.
  * Example:
- * int myInt = M_LIMITS<int>::Max;
+ * int myInt = Limits<int>::Max;
  *
  * If the datatype is a floating point number, the additional members Infinity,
  * Epsilon, and LargeEpsilon will be available.
  */
 template <class T>
-struct M_LIMITS
+struct Limits
 {
     static const T Min;
     static const T Max;
 };
-template <class T> const T M_LIMITS<T>::Min = std::numeric_limits<T>::min();
-template <class T> const T M_LIMITS<T>::Max = std::numeric_limits<T>::max();
+template <class T> const T Limits<T>::Min = std::numeric_limits<T>::min();
+template <class T> const T Limits<T>::Max = std::numeric_limits<T>::max();
 
 // Specialize for float, double and long double types. These must be exported
 // and defined in a compilation unit because they no longer depend on template
 // parameters. See MathDefs.cpp
 template <>
-struct URHO3D_API M_LIMITS<float>
+struct URHO3D_API Limits<float>
 {
     static const float Min;
     static const float Max;
@@ -72,7 +72,7 @@ struct URHO3D_API M_LIMITS<float>
     static const float LargeEpsilon;
 };
 template <>
-struct URHO3D_API M_LIMITS<double>
+struct URHO3D_API Limits<double>
 {
     static const double Min;
     static const double Max;
@@ -81,7 +81,7 @@ struct URHO3D_API M_LIMITS<double>
     static const double LargeEpsilon;
 };
 template <>
-struct URHO3D_API M_LIMITS<long double>
+struct URHO3D_API Limits<long double>
 {
     static const long double Min;
     static const long double Max;

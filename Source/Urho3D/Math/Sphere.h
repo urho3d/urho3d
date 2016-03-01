@@ -38,7 +38,7 @@ public:
     /// Construct undefined.
     Sphere() :
         center_(Vector3::ZERO),
-        radius_(-M_LIMITS<float>::Infinity)
+        radius_(-Limits<float>::Infinity)
     {
     }
 
@@ -152,7 +152,7 @@ public:
     void Clear()
     {
         center_ = Vector3::ZERO;
-        radius_ = -M_LIMITS<float>::Infinity;
+        radius_ = -Limits<float>::Infinity;
     }
 
     /// Return true if this sphere is defined via a previous call to Define() or Merge().

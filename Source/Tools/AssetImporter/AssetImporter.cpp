@@ -734,7 +734,7 @@ void CollectAnimations(OutModel* model)
             {
                 aiNodeAnim* channel = anim->mChannels[j];
                 String channelName = FromAIString(channel->mNodeName);
-                if (GetBoneIndex(*model, channelName) != M_LIMITS<unsigned>::Max)
+                if (GetBoneIndex(*model, channelName) != Limits<unsigned>::Max)
                 {
                     modelBoneFound = true;
                     break;
@@ -766,7 +766,7 @@ void BuildBoneCollisionInfo(OutModel& model)
             aiBone* bone = mesh->mBones[j];
             String boneName = FromAIString(bone->mName);
             unsigned boneIndex = GetBoneIndex(model, boneName);
-            if (boneIndex == M_LIMITS<unsigned>::Max)
+            if (boneIndex == Limits<unsigned>::Max)
                 continue;
             for (unsigned k = 0; k < bone->mNumWeights; ++k)
             {
@@ -1050,7 +1050,7 @@ void BuildAndSaveAnimations(OutModel* model)
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
-        if (ticksPerSecond < M_LIMITS<float>::Epsilon)
+        if (ticksPerSecond < Limits<float>::Epsilon)
             ticksPerSecond = defaultTicksPerSecond_;
         float tickConversion = 1.0f / ticksPerSecond;
 
@@ -1084,7 +1084,7 @@ void BuildAndSaveAnimations(OutModel* model)
             if (model)
             {
                 unsigned boneIndex = GetBoneIndex(*model, channelName);
-                if (boneIndex == M_LIMITS<unsigned>::Max)
+                if (boneIndex == Limits<unsigned>::Max)
                 {
                     PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
                     outAnim->RemoveTrack(channelName);
@@ -1611,7 +1611,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
     {
         /// \hack New Assimp behavior - some materials may return 0 opacity, which is invisible.
         /// Revert to full opacity in that case
-        if (floatVal < M_LIMITS<float>::Epsilon)
+        if (floatVal < Limits<float>::Epsilon)
             floatVal = 1.0f;
 
         if (floatVal < 1.0f)
@@ -1898,7 +1898,7 @@ unsigned GetMeshIndex(aiMesh* mesh)
         if (scene_->mMeshes[i] == mesh)
             return i;
     }
-    return M_LIMITS<unsigned>::Max;
+    return Limits<unsigned>::Max;
 }
 
 unsigned GetBoneIndex(OutModel& model, const String& boneName)
@@ -1908,7 +1908,7 @@ unsigned GetBoneIndex(OutModel& model, const String& boneName)
         if (boneName == model.bones_[i]->mName.data)
             return i;
     }
-    return M_LIMITS<unsigned>::Max;
+    return Limits<unsigned>::Max;
 }
 
 aiBone* GetMeshBone(OutModel& model, const String& boneName)
@@ -1971,7 +1971,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             aiBone* bone = mesh->mBones[i];
             String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
-            if (globalIndex == M_LIMITS<unsigned>::Max)
+            if (globalIndex == Limits<unsigned>::Max)
                 ErrorExit("Bone " + boneName + " not found");
             boneMappings[i] = globalIndex;
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
@@ -1989,7 +1989,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             aiBone* bone = mesh->mBones[i];
             String boneName = FromAIString(bone->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
-            if (globalIndex == M_LIMITS<unsigned>::Max)
+            if (globalIndex == Limits<unsigned>::Max)
                 ErrorExit("Bone " + boneName + " not found");
             for (unsigned j = 0; j < bone->mNumWeights; ++j)
             {
@@ -2010,7 +2010,7 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
             while (blendWeights[i].Size() > 4)
             {
                 unsigned lowestIndex = 0;
-                float lowest = M_LIMITS<float>::Infinity;
+                float lowest = Limits<float>::Infinity;
                 for (unsigned j = 0; j < blendWeights[i].Size(); ++j)
                 {
                     if (blendWeights[i][j] < lowest)

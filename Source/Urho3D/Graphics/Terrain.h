@@ -59,7 +59,7 @@ public:
     void SetSpacing(const Vector3& spacing);
     /// Set maximum number of LOD levels for terrain patches. This can be between 1-4.
     void SetMaxLodLevels(unsigned levels);
-    /// Set LOD level used for terrain patch occlusion. By default (M_LIMITS<unsigned>::Max) the coarsest. Since the LOD level used needs to be fixed, using finer LOD levels may result in false positive occlusion in cases where the actual rendered geometry is coarser, so use with caution.
+    /// Set LOD level used for terrain patch occlusion. By default (Limits<unsigned>::Max) the coarsest. Since the LOD level used needs to be fixed, using finer LOD levels may result in false positive occlusion in cases where the actual rendered geometry is coarser, so use with caution.
     void SetOcclusionLodLevel(unsigned level);
     /// Set smoothing of heightmap.
     void SetSmoothing(bool enable);

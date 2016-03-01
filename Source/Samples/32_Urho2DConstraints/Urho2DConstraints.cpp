@@ -507,7 +507,7 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
 {
     Input* input = GetSubsystem<Input>();
     PhysicsWorld2D* physicsWorld = scene_->GetComponent<PhysicsWorld2D>();
-    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(input->GetMousePosition().x_, input->GetMousePosition().y_, M_LIMITS<unsigned>::Max); // Raycast for RigidBody2Ds to pick
+    RigidBody2D* rigidBody = physicsWorld->GetRigidBody(input->GetMousePosition().x_, input->GetMousePosition().y_, Limits<unsigned>::Max); // Raycast for RigidBody2Ds to pick
     if (rigidBody)
     {
         pickedNode = rigidBody->GetNode();

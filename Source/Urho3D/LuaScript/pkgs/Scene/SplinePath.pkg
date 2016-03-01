@@ -2,7 +2,7 @@ $#include "Scene/SplinePath.h"
 
 class SplinePath : public Component
 {
-    void AddControlPoint(Node* point, unsigned index = M_LIMITS<unsigned>::Max);
+    void AddControlPoint(Node* point, unsigned index = Limits<unsigned>::Max);
     void RemoveControlPoint(Node* point);
     void ClearControlPoints();
     void SetInterpolationMode(InterpolationMode mode);
