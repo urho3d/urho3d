@@ -138,7 +138,8 @@ environment:
 # Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
   build_tree: Build
   config: Release
-  excluded_sample: PLATFORM=x64\ 01_HelloWorld,02_HelloGUI,03_Sprites,04_StaticScene,05_AnimatingScene,06_SkeletalAnimation,07_Billboards,08_Decals,09_MultipleViewports,10_RenderToTexture,11_Physics,12_PhysicsStressTest,13_Ragdolls,14_SoundEffects,15_Navigation,16_Chat,17_SceneReplication,18_CharacterDemo,19_VehicleDemo,20_HugeObjectCount,21_AngelScriptIntegration,22_LuaIntegration,23_Water,24_Urho2DSprite,25_Urho2DParticle,26_ConsoleInput,27_Urho2DPhysics,28_Urho2DPhysicsRope,29_SoundSynthesis,30_LightAnimation,31_MaterialAnimation,32_Urho2DConstraints,33_Urho2DSpriterAnimation,34_DynamicGeometry,35_SignedDistanceFieldText,36_Urho2DTileMap,37_UIDrag,38_SceneAndUILoad,40_Localization,41_DatabaseDemo
+  excluded_sample: PLATFORM=x64 01_HelloWorld,02_HelloGUI,03_Sprites,04_StaticScene,05_AnimatingScene,06_SkeletalAnimation,07_Billboards,08_Decals,09_MultipleViewports,10_RenderToTexture,11_Physics,12_PhysicsStressTest,13_Ragdolls,14_SoundEffects,15_Navigation,16_Chat,17_SceneReplication,18_CharacterDemo,19_VehicleDemo,20_HugeObjectCount,21_AngelScriptIntegration,22_LuaIntegration,23_Water,24_Urho2DSprite,25_Urho2DParticle,26_ConsoleInput,27_Urho2DPhysics,28_Urho2DPhysicsRope,29_SoundSynthesis,30_LightAnimation,31_MaterialAnimation,32_Urho2DConstraints,33_Urho2DSpriterAnimation,34_DynamicGeometry,35_SignedDistanceFieldText,36_Urho2DTileMap,37_UIDrag,38_SceneAndUILoad,40_Localization,41_DatabaseDemo
+  ARGS: -VV
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
   matrix:
@@ -165,12 +166,6 @@ test: off
 artifacts:
   - path: Build\*.zip
 deploy: off
-on_finish:
-  - cd Build && ctest -C Debug -VV
-  - cd Build && ctest -C Debug -VV
-  - cd Build && ctest -C Debug -VV
-  - cd Build && ctest -C Debug -VV
-  - cd Build && ctest -C Debug -VV
 
 ---
 
