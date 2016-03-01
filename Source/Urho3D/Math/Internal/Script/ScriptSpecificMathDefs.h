@@ -25,12 +25,12 @@ namespace Urho3D
 
 // These aren't defined any more on the C++ side of things, but are still
 // required to exist in scripts. See Math/MathDefs.cpp for their definitions.
-extern const float M_INFINITY;
-extern const float M_EPSILON;
-extern const float M_LARGE_EPSILON;
-extern const signed M_MIN_INT;
-extern const signed M_MAX_INT;
-extern const unsigned M_MIN_UNSIGNED;
-extern const unsigned M_MAX_UNSIGNED;
+URHO3D_API extern const float M_INFINITY;
+URHO3D_API extern const float M_EPSILON;
+URHO3D_API extern const float M_LARGE_EPSILON;
+URHO3D_API extern const signed M_MIN_INT;
+URHO3D_API extern const signed M_MAX_INT;
+URHO3D_API extern const unsigned M_MIN_UNSIGNED;
+URHO3D_API extern const unsigned M_MAX_UNSIGNED;
 
 } // namespace Urho3D

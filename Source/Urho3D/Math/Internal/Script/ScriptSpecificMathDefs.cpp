@@ -30,11 +30,11 @@ namespace Urho3D
 // of the engine can't use them). Instead they are declared as extern variables
 // in Internal/Script/ScriptSpecificMathDefs.h. The Lua bindings include that
 // header file so they can be exposed to Lua scripts.
-const float M_INFINITY      = Limits<float>   ::Infinity;
-const float M_EPSILON       = Limits<float>   ::Epsilon;
-const float M_LARGE_EPSILON = Limits<float>   ::LargeEpsilon;
-const signed M_MIN_INT       = Limits<signed>  ::Min;
-const signed M_MAX_INT       = Limits<signed>  ::Max;
+const float    M_INFINITY      = Limits<float>   ::Infinity;
+const float    M_EPSILON       = Limits<float>   ::Epsilon;
+const float    M_LARGE_EPSILON = Limits<float>   ::LargeEpsilon;
+const signed   M_MIN_INT       = Limits<signed>  ::Min;
+const signed   M_MAX_INT       = Limits<signed>  ::Max;
 const unsigned M_MIN_UNSIGNED  = Limits<unsigned>::Min;
 const unsigned M_MAX_UNSIGNED  = Limits<unsigned>::Max;
 
