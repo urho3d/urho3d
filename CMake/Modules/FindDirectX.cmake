@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# For MSVC compiler, find Microsoft Direct3D installation in Windows SDK or in June 2010 DirectX SDK or later
+# For MSVC compiler, find Microsoft DirectX installation in Windows SDK or in June 2010 DirectX SDK or later
 # For MinGW compiler, assume MinGW not only comes with the necessary headers & libraries but also has the headers & libraries directories in its default search path
 # (use 'echo |$MINGW_PREFIX-gcc -v -E -' and '$MINGW_PREFIX-gcc -print-search-dirs', respectively, to double check)
 #
@@ -106,8 +106,8 @@ else ()
     set (FAIL_MESSAGE "Could NOT find Direct3D using DirectX SDK search paths")
 endif ()
 
-# DIRECT3D_INCLUDE_DIRS is not required for Windows SDK, it is required for DirectX SDK but it is implied when DIRECT3D_LIBRARIES can be set
+# DIRECT3D_INCLUDE_DIRS is not required for Windows SDK, it is required for DirectX SDK but it is implied when DIRECT3D_LIBRARIES can be set, so we just check on DIRECT3D_LIBRARIES variable
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (Direct3D REQUIRED_VARS DIRECT3D_LIBRARIES FAIL_MESSAGE ${FAIL_MESSAGE})
+find_package_handle_standard_args (DirectX REQUIRED_VARS DIRECT3D_LIBRARIES FAIL_MESSAGE ${FAIL_MESSAGE})
 
 mark_as_advanced (DIRECT3D_INCLUDE_DIRS DIRECT3D_LIBRARIES)

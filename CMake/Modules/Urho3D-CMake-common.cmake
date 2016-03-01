@@ -459,12 +459,12 @@ if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
 endif ()
 
 if (WIN32)
-    # Find Direct3D include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
-    # even if using OpenGL instead of Direct3D, but do not make Direct3D REQUIRED in that case
+    # Find DirectX include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
+    # even if using OpenGL instead of Direct3D, but do not make DirectX REQUIRED in that case
     if (NOT URHO3D_OPENGL)
-        find_package (Direct3D REQUIRED)
+        find_package (DirectX REQUIRED)
     else ()
-        find_package (Direct3D)
+        find_package (DirectX)
     endif ()
     if (DIRECT3D_INCLUDE_DIRS)
         include_directories (${DIRECT3D_INCLUDE_DIRS})

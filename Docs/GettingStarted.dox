@@ -12,25 +12,27 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries. Optionally install the following development libraries to enable support for the corresponding software components:
+- For Linux, install one or more of the development packages from each software component category below. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
   + %Database server (disabled by default even when installed, use URHO3D_DATABASE_ODBC build option to enable):
-    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager.
-    - unixodbc-dev (Debian-based) unixODBC-devel (RedHat-based) for ODBC driver manager. *Recommended*
+    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager. Mutually exclusive with ODBC driver manager.
+    - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager. Mutually exclusive with iODBC driver manager. *Recommended but optional*
   + Display server:
-    - libdirectfb-dev (DB-based only) for direct frame buffer (DirectFB).
+    - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB).
     - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
     - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
+    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11. *Recommended*
   + %Sound server:
-    - arts-devel (RedHat-based only) for analog real time synthesizer (aRts).
-    - libaudio-dev (Debian-based only) for network audio system (NAS).
-    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for enlightened sound daemon (ESounD).
+    - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux Sound Architecture (ALSA).
+    - arts-devel (RedHat-based only) for Analog Real Time Synthesizer (aRts).
+    - libaudio-dev (Debian-based only) for Network Audio System (NAS).
+    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened Sound Eaemon (ESounD).
     - libfusionsound-dev (DB-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND(_SHARED) build option to enable.
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio. *Recommended*
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Misc.:
-    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for touchscreen input.
+    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for touchscreen input. *Optional*
 
-- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libevdev2, libasound2-dev, and libudev-dev. On Pidora: libevdev, alsa-lib-devel, and systemd-devel. The same list of optional development libraries listed above for Linux can also be installed on Raspberry Pi system to enable support for the corresponding software components.
+- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libevdev2 and libudev-dev. On Pidora: libevdev and systemd-devel. The same list of optional development libraries listed above for Linux can also be installed on Raspberry Pi system to enable support for the corresponding software components. However, for display server the recommendation is to use Broadcom Video Core that comes preinstalled with Raspbian or Pidora.
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
@@ -523,7 +525,11 @@ In your own project root directory, create a main CMakeLists.txt file and add th
 
 \code
 # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-cmake_minimum_required (VERSION 2.8.6)
+if (WIN32)
+    cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
+else ()
+    cmake_minimum_required (VERSION 2.8.6)
+endif ()
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)

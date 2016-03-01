@@ -277,28 +277,26 @@ set_option(FUSIONSOUND         "Use FusionSound audio driver" OFF)
 dep_option(FUSIONSOUND_SHARED  "Dynamically load fusionsound audio support" ON "FUSIONSOUND" OFF)
 set_option(VIDEO_DUMMY         "Use dummy video driver" ON)
 set_option(VIDEO_OPENGL        "Include OpenGL support" ON)
-# Urho3D - hide OpenGLES option for MinGW platform because it does not have the necessary header file to build OpenGLES video driver
+# Urho3D - hide OpenGLES option from MinGW platform because it does not have the necessary header file to build OpenGLES video driver
 dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "NOT MINGW" OFF)
 set_option(PTHREADS            "Use POSIX threads for multi-threading" ${SDL_PTHREADS_ENABLED_BY_DEFAULT})
 dep_option(PTHREADS_SEM        "Use pthread semaphores" ON "PTHREADS" OFF)
 set_option(SDL_DLOPEN          "Use dlopen for shared object loading" ${SDL_DLOPEN_ENABLED_BY_DEFAULT})
-set_option(OSS                 "Support the OSS audio API" ${UNIX_SYS})
-# Urho3D - hide ALSA option for Android platform (TODO: probably can consider to use external/tinyalsa implementation for Android)
+# Urho3D - hide Linux-specific audio driver options from Android platform
+dep_option(OSS                 "Support the OSS audio API" ON "${UNIX_SYS} AND NOT ANDROID" OFF)
 dep_option(ALSA                "Support the ALSA audio API" ON "UNIX_SYS AND NOT ANDROID" OFF)
 dep_option(ALSA_SHARED         "Dynamically load ALSA audio support" ON "ALSA" OFF)
-# Urho3D - hide ESD option for Android platform
 dep_option(ESD                 "Support the Enlightened Sound Daemon" ON "UNIX_SYS AND NOT ANDROID" OFF)
 dep_option(ESD_SHARED          "Dynamically load ESD audio support" ON "ESD" OFF)
-# Urho3D - hide PulseAudio option for Android platform
 dep_option(PULSEAUDIO          "Use PulseAudio" ON "UNIX_SYS AND NOT ANDROID" OFF)
 dep_option(PULSEAUDIO_SHARED   "Dynamically load PulseAudio support" ON "PULSEAUDIO" OFF)
-# Urho3D - hide aRts option for Android platform
 dep_option(ARTS                "Support the Analog Real Time Synthesizer" ON "UNIX_SYS AND NOT ANDROID" OFF)
 dep_option(ARTS_SHARED         "Dynamically load aRts audio support" ON "ARTS" OFF)
-set_option(NAS                 "Support the NAS audio API" ${UNIX_SYS})
-set_option(NAS_SHARED          "Dynamically load NAS audio API" ${UNIX_SYS})
-set_option(SNDIO               "Support the sndio audio API" ${UNIX_SYS})
-set_option(RPATH               "Use an rpath when linking SDL" ${UNIX_SYS})
+dep_option(NAS                 "Support the NAS audio API" ON "UNIX_SYS AND NOT ANDROID" OFF)
+dep_option(NAS_SHARED          "Dynamically load NAS audio API" ON NAS OFF)
+dep_option(SNDIO               "Support the Roar audio API" ON "${UNIX_SYS} AND NOT ANDROID" OFF)
+# Urho3D - commented out RPATH as an option because Urho3D is configured to always use RPATH, so init the variable to always TRUE
+set (RPATH TRUE)
 set_option(CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" OFF)
 set_option(INPUT_TSLIB         "Use the Touchscreen library for input" ${UNIX_SYS})
 set_option(VIDEO_X11           "Use X11 video driver" ${UNIX_SYS})
@@ -307,7 +305,7 @@ dep_option(WAYLAND_SHARED      "Dynamically load Wayland support" ON "VIDEO_WAYL
 dep_option(VIDEO_WAYLAND_QT_TOUCH  "QtWayland server support for Wayland video driver" ON "VIDEO_WAYLAND" OFF)
 dep_option(VIDEO_MIR           "Use Mir video driver" ON UNIX_SYS OFF)
 dep_option(MIR_SHARED          "Dynamically load Mir support" ON "VIDEO_MIR" OFF)
-# Urho3D - only enable VIDEO_RPI on Raspberry-Pi platform
+# Urho3D - only make VIDEO_RPI option available on Raspberry-Pi platform
 dep_option(VIDEO_RPI           "Use Raspberry Pi video driver" ON RPI OFF)
 dep_option(X11_SHARED          "Dynamically load X11 support" ON "VIDEO_X11" OFF)
 set(SDL_X11_OPTIONS Xcursor Xinerama XInput Xrandr Xscrnsaver XShape Xvm)
@@ -317,7 +315,15 @@ foreach(_SUB ${SDL_X11_OPTIONS})
 endforeach()
 set_option(VIDEO_COCOA         "Use Cocoa video driver" ${APPLE})
 set_option(DIRECTX             "Use DirectX for Windows audio/video" ${WINDOWS})
-set_option(RENDER_D3D          "Enable the Direct3D render driver" ${WINDOWS})
+# Urho3D - commented out RENDER_D3D as an option to avoid potential conflict with our URHO3D_OPENGL and URHO3D_D3D11 build options on Windows platform
+#          Instead just initialize the variable according to our build options
+if (WINDOWS)
+  if (URHO3D_OPENGL)
+    set (RENDER_D3D FALSE)
+  else ()
+    set (RENDER_D3D TRUE)
+  endif ()
+endif ()
 set_option(VIDEO_VIVANTE       "Use Vivante EGL video driver" ${UNIX_SYS})
 
 # TODO: We should (should we?) respect cmake's ${BUILD_SHARED_LIBS} flag here
@@ -914,7 +920,7 @@ elseif(WINDOWS)
   file(GLOB CORE_SOURCES ${SDL2_SOURCE_DIR}/src/core/windows/*.c)
   set(SOURCE_FILES ${SOURCE_FILES} ${CORE_SOURCES})
 
-# Urho3D - commented out MSVC-specific compiler flags setup as we have configured MSVC compiler flags globally in Urho3D common module
+  # Urho3D - commented out MSVC-specific compiler flags setup as we have configured MSVC compiler flags globally in Urho3D common module
 
   # Check for DirectX
   if(DIRECTX)
