@@ -116,9 +116,11 @@ task :make do
       elsif /unfilter=\W*?(?<unfilter_value>\w+)/ =~ option
         unfilter = !(/(?:true|yes|1)/i =~ unfilter_value).nil?
       elsif /verbosity=.*/ =~ option
-        # The verbosity option is only applicable for msbuild, useful to specify the verbosity of the msbuild
-        build_options = "#{build_options} /#{option.gsub(/=/, ':')}"
-        unfilter = true
+        # The verbosity option is only applicable for msbuild when building RUN_TESTS, useful to specify the verbosity of the test output
+        if ARGV.include?('target=RUN_TESTS')
+          build_options = "#{build_options} /#{option.gsub(/=/, ':')}"
+          unfilter = true
+        end
       elsif /(?:build_tree|numjobs)=.*/ !~ option
         build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
       end
@@ -525,10 +527,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
-  # Skip if there are more commits since this one or if this is a release build
-  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH'])
-  base_branch = matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch || ENV['APPVEYOR_PULL_REQUEST_NUMBER'] ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST'] || ENV['APPVEYOR_PULL_REQUEST_NUMBER']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
+  # Skip if the mirror branch has been forced pushed remotely or when we are performing a release (in case we need to rerun the job to recreate the package)
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch" unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}` == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']) && !ENV['RELEASE_TAG']
   system "git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git"
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
 end
