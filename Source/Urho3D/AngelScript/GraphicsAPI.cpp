@@ -210,6 +210,26 @@ static bool TextureCubeSetData(CubeMapFace face, Image* image, bool useAlpha, Te
     return ptr->SetData(face, SharedPtr<Image>(image), useAlpha);
 }
 
+static Image* TextureCubeGetImage(CubeMapFace face, TextureCube* texCube)
+{
+    Image* rawImage = new Image(texCube->GetContext());
+    const unsigned texSize = texCube->GetDataSize(texCube->GetWidth(), texCube->GetHeight());
+    const unsigned format = texCube->GetFormat();
+
+    if (format == Graphics::GetRGBAFormat())
+        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 4);
+    else if (format == Graphics::GetRGBFormat())
+        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 3);
+    else
+    {
+        delete rawImage;
+        return 0;
+    }
+
+    texCube->GetData(face, 0, rawImage->GetData());
+    return rawImage;
+}
+
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
 {
     new(ptr) RenderTargetInfo();
@@ -514,6 +534,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     RegisterTexture<TextureCube>(engine, "TextureCube");
     engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "bool SetData(CubeMapFace, Image@+, bool useAlpha = false)", asFUNCTION(TextureCubeSetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("TextureCube", "Image@+ GetImage(CubeMapFace) const", asFUNCTION(TextureCubeGetImage), asCALL_CDECL_OBJLAST); 
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
 
     engine->RegisterGlobalFunction("uint GetAlphaFormat()", asFUNCTION(Graphics::GetAlphaFormat), asCALL_CDECL);
