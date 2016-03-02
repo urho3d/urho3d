@@ -92,7 +92,7 @@ task :make do
   cmake_build_options = ''
   build_options = ''
   unfilter = false
-  ['config', 'target', 'sdk', 'ARCHS'].each { |var|
+  ['config', 'target', 'sdk', 'ARCHS', 'ARGS', 'unfilter', 'verbosity'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -109,8 +109,16 @@ task :make do
     else
       if /(?:config|target)=.*/ =~ option
         cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
-      elsif /ARCHS=.*/ =~ option    # This option is only applicable for xcodebuild, useful to specify a non-default arch to build when in Debug build configuration where ONLY_ACTIVE_ARCH is set to YES
+      elsif /(?:ARCHS|ARGS)=.*/ =~ option
+        # The ARCHS option is only applicable for xcodebuild, useful to specify a non-default arch to build when in Debug build configuration where ONLY_ACTIVE_ARCH is set to YES
+        # The ARGS option is only applicable for make, useful to pass extra arguments while building a specific target, e.g. ARGS=-VV when the target is 'test' to turn on extra verbose mode
         build_options = "#{build_options} #{option}"
+      elsif /unfilter=\W*?(?<unfilter_value>\w+)/ =~ option
+        unfilter = !(/(?:true|yes|1)/i =~ unfilter_value).nil?
+      elsif /verbosity=.*/ =~ option
+        # The verbosity option is only applicable for msbuild, useful to specify the verbosity of the msbuild
+        build_options = "#{build_options} /#{option.gsub(/=/, ':')}"
+        unfilter = true
       elsif /(?:build_tree|numjobs)=.*/ !~ option
         build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
       end
@@ -518,11 +526,11 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
-  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'])
+  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH'])
   base_branch = matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch || ENV['APPVEYOR_PULL_REQUEST_NUMBER'] ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST'] || ENV['APPVEYOR_PULL_REQUEST_NUMBER']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
+  system "git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git"
+  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
 end
 
 # Usage: NOT intended to be used manually
