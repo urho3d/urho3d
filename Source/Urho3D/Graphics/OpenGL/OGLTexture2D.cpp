@@ -402,13 +402,13 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-#ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
+#ifndef GL_ES_VERSION_2_0
     if (!dest)
     {
         URHO3D_LOGERROR("Null destination for getting data");
@@ -437,6 +437,16 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
 #else
+    // Special case on GLES: if the texture is a rendertarget, can make it current and use glReadPixels()
+    if (usage_ == TEXTURE_RENDERTARGET)
+    {
+        graphics_->SetRenderTarget(0, const_cast<Texture2D*>(this));
+        // Ensure the FBO is current; this viewport is actually never rendered to
+        graphics_->SetViewport(IntRect(0, 0, width_, height_));
+        glReadPixels(0, 0, width_, height_, GetExternalFormat(format_), GetDataType(format_), dest);
+        return true;
+    }
+
     URHO3D_LOGERROR("Getting texture data not supported");
     return false;
 #endif
