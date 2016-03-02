@@ -11709,6 +11709,7 @@ class TextureCube
 {
 // Methods:
 void ClearDataLost();
+Image GetImage(CubeMapFace) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
