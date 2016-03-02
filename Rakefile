@@ -92,7 +92,7 @@ task :make do
   cmake_build_options = ''
   build_options = ''
   unfilter = false
-  ['config', 'target', 'sdk', 'ARCHS'].each { |var|
+  ['config', 'target', 'sdk', 'ARCHS', 'ARGS', 'unfilter', 'verbosity'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -109,8 +109,16 @@ task :make do
     else
       if /(?:config|target)=.*/ =~ option
         cmake_build_options = "#{cmake_build_options} --#{option.gsub(/=/, ' ')}"
-      elsif /ARCHS=.*/ =~ option    # This option is only applicable for xcodebuild, useful to specify a non-default arch to build when in Debug build configuration where ONLY_ACTIVE_ARCH is set to YES
+      elsif /(?:ARCHS|ARGS)=.*/ =~ option
+        # The ARCHS option is only applicable for xcodebuild, useful to specify a non-default arch to build when in Debug build configuration where ONLY_ACTIVE_ARCH is set to YES
+        # The ARGS option is only applicable for make, useful to pass extra arguments while building a specific target, e.g. ARGS=-VV when the target is 'test' to turn on extra verbose mode
         build_options = "#{build_options} #{option}"
+      elsif /unfilter=\W*?(?<unfilter_value>\w+)/ =~ option
+        unfilter = !(/(?:true|yes|1)/i =~ unfilter_value).nil?
+      elsif /verbosity=.*/ =~ option
+        # The verbosity option is only applicable for msbuild, useful to specify the verbosity of the msbuild
+        build_options = "#{build_options} /#{option.gsub(/=/, ':')}"
+        unfilter = true
       elsif /(?:build_tree|numjobs)=.*/ !~ option
         build_options = "#{build_options} #{/=/ =~ option ? '-' + option.gsub(/=/, ' ') : option}"
       end
@@ -249,7 +257,7 @@ task :git_subtree do
     when 'add'
       abort 'Usage: rake git subtree add subdir=</path/to/subdir/to/be/split> remote=<name> baseline=<commit|branch|tag>' unless ENV['subdir'] && ENV['remote'] && ENV['baseline']
       ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
-      system "git push -fu #{ENV['remote']} #{ENV['rebased_branch']} && git rm -r #{ENV['subdir']} && git commit -qm 'Replace #{ENV['subdir']} subdirectory with subtree.' && git subtree add --prefix #{ENV['subdir']} #{ENV['remote']} #{ENV['rebased_branch']} --squash" or abort
+      system "git push -u #{ENV['remote']} #{ENV['rebased_branch']} && git rm -r #{ENV['subdir']} && git commit -qm 'Replace #{ENV['subdir']} subdirectory with subtree.' && git subtree add --prefix #{ENV['subdir']} #{ENV['remote']} #{ENV['rebased_branch']} --squash" or abort
     when 'push'
       abort 'Usage: rake git subtree push subdir=</path/to/subdir/to/be/split> remote=<name> baseline=<commit|branch|tag>' unless ENV['subdir'] && ENV['remote'] && ENV['baseline']
       ENV['rebased_branch'] = "#{Pathname.new(ENV['baseline']).basename}-#{ENV['rebased_branch_suffix'] || 'modified-for-urho3d'}"
@@ -290,8 +298,22 @@ task :ci do
     next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ ENV['TRAVIS_BRANCH'] }.any?
   end
   # Obtain our custom data, if any
-  data = YAML::load(File.open('.travis.yml'))['data']
-  data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"].each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample'] && data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"]
+  if ENV['APPVEYOR']
+    # AppVeyor does not provide job number environment variable in the same semantics as TRAVIS_JOB_NUMBER nor it supports custom data in its .appveyor.yml document
+    if ENV['excluded_sample']
+      pairs = ENV['excluded_sample'].split
+      samples = pairs.pop.split ','
+      matched = true
+      pairs.each { |pair|
+        kv = pair.split '='
+        matched = false if ENV[kv.first] != kv.last
+      }
+      samples.each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if matched
+    end
+  else
+    data = YAML::load(File.open('.travis.yml'))['data']
+    data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"].each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if data && data['excluded_sample'] && data['excluded_sample']["##{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"]
+  end
   # Unshallow the clone's history when necessary
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
     system "bash -c 'git fetch --unshallow'" or abort 'Failed to unshallow cloned repository'
@@ -495,7 +517,7 @@ task :ci_create_mirrors do
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = get_root_commit_and_recipients().last unless notifications['email']['recipients']
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; File.open('.travis.yml.doc', 'w') { |file| file.write doc.to_yaml }; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv .travis.yml.doc .travis.yml && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc['on_finish'] = [*doc['on_finish']] << "if \"%PLATFORM%:%URHO3D_LIB_TYPE%\" == \"#{branch['last_job']}\" rake ci_delete_mirror"; doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; if ENV['TRAVIS']; replaced_content = File.read("#{doc_name}.new").gsub(/! /, ''); File.open("#{doc_name}.new", 'w') { |file| file.puts replaced_content }; end; end; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
   # Push pending commits if any
   system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
@@ -504,11 +526,11 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if there are more commits since this one or if this is a release build
-  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'])
+  matched = /(.*)-[^-]+-[^-]+$/.match(ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH'])
   base_branch = matched ? matched[1] : 'master'  # Assume 'master' is the default branch name
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
-  system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git'
-  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH']} mirror branch"
+  abort "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch" unless `git fetch -qf origin #{/^PR #/ =~ base_branch || ENV['APPVEYOR_PULL_REQUEST_NUMBER'] ? %Q{+refs/pull/#{ENV['TRAVIS_PULL_REQUEST'] || ENV['APPVEYOR_PULL_REQUEST_NUMBER']}/merge'} : base_branch}; git log -1 --pretty=format:'%H' FETCH_HEAD` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
+  system "git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git"
+  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
 end
 
 # Usage: NOT intended to be used manually
