@@ -528,7 +528,12 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if the mirror branch has been forced pushed remotely or when we are performing a release (in case we need to rerun the job to recreate the package)
-  abort "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch" unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}` == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']) && !ENV['RELEASE_TAG']
+  unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
+    # Do not use "abort" here because AppVeyor, unlike Travis, also handles the exit status of the processes invoked in the "on_finish" section of the .appveyor.yml
+    # Using "abort" may incorrectly (or correctly, depends on your POV) report the whole CI as failed when the CI mirror branch deletion is being skipped
+    STDERR.puts "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
+    next
+  end
   system "git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git"
   system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
 end
