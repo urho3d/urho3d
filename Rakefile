@@ -296,8 +296,9 @@ task :ci do
   $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
   # Skip if only performing CI for selected branches and the current branch is not in the list
   unless ENV['RELEASE_TAG']
+    next if ENV['TRAVIS'] && /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
-    next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ ENV['TRAVIS_BRANCH'] }.any?
+    next if matched && !matched[1].split(/[ ,]/).reject!(&:empty?).map { |i| /#{i}/ =~ (ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']) }.any?
   end
   # Obtain our custom data, if any
   if ENV['APPVEYOR']
@@ -367,7 +368,8 @@ task :ci do
     # Alternate the scaffolding location between Travis CI and AppVeyor for test coverage; Travis CI uses build tree while AppVeyor using source tree
     # First scaffolding test uses absolute path while second test uses relative path, also for test converage
     # First test - create a new project on the fly that uses newly installed Urho3D SDK
-    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? 'C:/projects/urho3d/' : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/urho3d/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
+    org = (ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_PROJECT_SLUG']).split('/').first
+    Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? "C:/projects/#{org}/" : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/#{org}/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
       puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
       # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
       system "bash -c '#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
@@ -504,6 +506,7 @@ task :ci_create_mirrors do
   annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
   # Determine which CI mirror branches to be auto created
   unless ENV['RELEASE_TAG']
+    skip_travis = /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
     ci_only = matched ? matched[1].split(/[ ,]/).reject!(&:empty?) : nil
     if ci_only
@@ -519,7 +522,7 @@ task :ci_create_mirrors do
   stream = YAML::load_stream(File.open('.travis.yml'))
   notifications = stream[0]['notifications']
   notifications['email']['recipients'] = get_root_commit_and_recipients().last unless notifications['email']['recipients']
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc['on_finish'] = [*doc['on_finish']] << "if \"%PLATFORM%:%URHO3D_LIB_TYPE%\" == \"#{branch['last_job']}\" rake ci_delete_mirror"; doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; if ENV['TRAVIS']; replaced_content = File.read("#{doc_name}.new").gsub(/! /, ''); File.open("#{doc_name}.new", 'w') { |file| file.puts replaced_content }; end; end; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; lastjob = doc['matrix'] && doc['matrix']['include'] ? doc['matrix']['include'].length : (doc['env']['matrix'] ? doc['env']['matrix'].length : 1); doc['after_script'] = [*doc['after_script']] << (lastjob == 1 ? '%s' : "if [ ${TRAVIS_JOB_NUMBER##*.} == #{lastjob} ]; then %s; fi") % 'rake ci_delete_mirror'; doc['notifications'] = notifications unless doc['notifications']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc['on_finish'] = [*doc['on_finish']] << "if \"%PLATFORM%:%URHO3D_LIB_TYPE%\" == \"#{branch['last_job']}\" rake ci_delete_mirror"; doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; if ENV['TRAVIS']; replaced_content = File.read("#{doc_name}.new").gsub(/! /, ''); File.open("#{doc_name}.new", 'w') { |file| file.puts replaced_content }; end; end; puts "Creating #{ci_branch} mirror branch..."; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch} >/dev/null 2>&1 && git checkout -q -" or abort "Failed to create #{ci_branch} mirror branch" }
   # Push pending commits if any
   system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
@@ -528,14 +531,14 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if the mirror branch has been forced pushed remotely or when we are performing a release (in case we need to rerun the job to recreate the package)
-  unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}` == `git show -s --format='%H' #{ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']}`.rstrip && !ENV['RELEASE_TAG']
+  unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}`.gsub(/'/, '') == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']).chop && !ENV['RELEASE_TAG']
     # Do not use "abort" here because AppVeyor, unlike Travis, also handles the exit status of the processes invoked in the "on_finish" section of the .appveyor.yml
     # Using "abort" may incorrectly (or correctly, depends on your POV) report the whole CI as failed when the CI mirror branch deletion is being skipped
-    STDERR.puts "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
+    $stderr.puts "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
     next
   end
-  system "git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git"
-  system "git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
+  system "bash -c 'git config user.name #{ENV['GIT_NAME']} && git config user.email #{ENV['GIT_EMAIL']} && git remote set-url --push origin https://#{ENV['GH_TOKEN']}@github.com/#{ENV['TRAVIS_REPO_SLUG'] || ENV['APPVEYOR_REPO_NAME']}.git'"
+  system "bash -c 'git push -qf origin --delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} >/dev/null 2>&1'" or abort "Failed to delete #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
 end
 
 # Usage: NOT intended to be used manually

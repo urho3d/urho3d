@@ -26,6 +26,12 @@ platform:
   - x64
 clone_depth: 50
 environment:
+  GIT_NAME:
+    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
+  GIT_EMAIL:
+    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
+  GH_TOKEN:
+    secure: i0IY2jTTJqkU4vuta8aXP06B4cVUWVAC/NvRMqK11/gk1eb1gJgLk5/BRcohOkrX
   SF_KEY:
     secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
   SF_API:
@@ -52,6 +58,7 @@ install:
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
 build_script:
+  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
 # Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
   - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
