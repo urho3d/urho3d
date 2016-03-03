@@ -31,7 +31,7 @@ environment:
   GIT_EMAIL:
     secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
   GH_TOKEN:
-    secure: i0IY2jTTJqkU4vuta8aXP06B4cVUWVAC/NvRMqK11/gk1eb1gJgLk5/BRcohOkrX
+    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
   SF_KEY:
     secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
   SF_API:
