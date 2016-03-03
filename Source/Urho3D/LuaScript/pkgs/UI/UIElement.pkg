@@ -133,7 +133,7 @@ class UIElement : public Animatable
     void EnableLayoutUpdate();
     void BringToFront();
 
-    UIElement* CreateChild(const String type, const String name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild(const String type, const String name = String::EMPTY, unsigned index = Limits<unsigned>::Max);
 
     void AddChild(UIElement* element);
     void InsertChild(unsigned index, UIElement* element);
@@ -142,7 +142,7 @@ class UIElement : public Animatable
     void RemoveAllChildren();
     void Remove();
     unsigned FindChild(UIElement* element) const;
-    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
+    void SetParent(UIElement* parent, unsigned index = Limits<unsigned>::Max);
     void SetVar(StringHash key, const Variant& value);
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);

@@ -74,7 +74,7 @@ void CascadeParameters::Validate()
 {
     for (unsigned i = 0; i < MAX_CASCADE_SPLITS; ++i)
         splits_[i] = Max(splits_[i], 0.0f);
-    fadeStart_ = Clamp(fadeStart_, M_EPSILON, 1.0f);
+    fadeStart_ = Clamp(fadeStart_, Limits<float>::Epsilon, 1.0f);
 }
 
 void FocusParameters::Validate()
@@ -214,7 +214,7 @@ void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResul
     result.distance_ = distance;
     result.drawable_ = this;
     result.node_ = node_;
-    result.subObject_ = M_MAX_UNSIGNED;
+    result.subObject_ = Limits<unsigned>::Max;
     results.Push(result);
 }
 
@@ -315,7 +315,7 @@ void Light::SetFov(float fov)
 
 void Light::SetAspectRatio(float aspectRatio)
 {
-    aspectRatio_ = Max(aspectRatio, M_EPSILON);
+    aspectRatio_ = Max(aspectRatio, Limits<float>::Epsilon);
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
@@ -500,7 +500,7 @@ void Light::SetIntensitySortValue(float distance)
         if (lightType_ != LIGHT_DIRECTIONAL)
             sortValue_ = Max(distance, M_MIN_NEARCLIP) / GetIntensityDivisor();
         else
-            sortValue_ = M_EPSILON / GetIntensityDivisor();
+            sortValue_ = Limits<float>::Epsilon / GetIntensityDivisor();
     }
     else
     {
@@ -545,7 +545,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             float maxAngle = tanf(fov_ * M_DEGTORAD * 0.5f);
             float spotFactor = Min(spotAngle / maxAngle, 1.0f);
             // We do not know the actual range attenuation ramp, so take only spot attenuation into account
-            float att = Max(1.0f - spotFactor * spotFactor, M_EPSILON);
+            float att = Max(1.0f - spotFactor * spotFactor, Limits<float>::Epsilon);
             sortValue_ = 1.0f / GetIntensityDivisor(att);
         }
         break;
@@ -558,7 +558,7 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
             Ray lightRay(lightPos, lightDir);
             float distance = lightRay.HitDistance(box);
             float normDistance = distance / range_;
-            float att = Max(1.0f - normDistance * normDistance, M_EPSILON);
+            float att = Max(1.0f - normDistance * normDistance, Limits<float>::Epsilon);
             sortValue_ = 1.0f / GetIntensityDivisor(att);
         }
         break;

@@ -74,8 +74,8 @@ struct FrameBufferObject
     FrameBufferObject() :
         fbo_(0),
         depthAttachment_(0),
-        readBuffers_(M_MAX_UNSIGNED),
-        drawBuffers_(M_MAX_UNSIGNED)
+        readBuffers_(Limits<unsigned>::Max),
+        drawBuffers_(Limits<unsigned>::Max)
     {
         for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
             colorAttachments_[i] = 0;

@@ -26,6 +26,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <limits>
 
 namespace Urho3D
 {
@@ -33,20 +34,61 @@ namespace Urho3D
 #undef M_PI
 static const float M_PI = 3.14159265358979323846264338327950288f;
 static const float M_HALF_PI = M_PI * 0.5f;
-static const int M_MIN_INT = 0x80000000;
-static const int M_MAX_INT = 0x7fffffff;
-static const unsigned M_MIN_UNSIGNED = 0x00000000;
-static const unsigned M_MAX_UNSIGNED = 0xffffffff;
 
-static const float M_EPSILON = 0.000001f;
-static const float M_LARGE_EPSILON = 0.00005f;
 static const float M_MIN_NEARCLIP = 0.01f;
 static const float M_MAX_FOV = 160.0f;
 static const float M_LARGE_VALUE = 100000000.0f;
-static const float M_INFINITY = (float)HUGE_VAL;
 static const float M_DEGTORAD = M_PI / 180.0f;
 static const float M_DEGTORAD_2 = M_PI / 360.0f;    // M_DEGTORAD / 2.f
 static const float M_RADTODEG = 1.0f / M_DEGTORAD;
+
+/*!
+ * Provides information on limits of the given datatype.
+ * Example:
+ * int myInt = Limits<int>::Max;
+ *
+ * If the datatype is a floating point number, the additional members Infinity,
+ * Epsilon, and LargeEpsilon will be available.
+ */
+template <class T>
+struct Limits
+{
+    static const T Min;
+    static const T Max;
+};
+template <class T> const T Limits<T>::Min = std::numeric_limits<T>::min();
+template <class T> const T Limits<T>::Max = std::numeric_limits<T>::max();
+
+// Specialize for float, double and long double types. These must be exported
+// and defined in a compilation unit because they no longer depend on template
+// parameters. See MathDefs.cpp
+template <>
+struct URHO3D_API Limits<float>
+{
+    static const float Min;
+    static const float Max;
+    static const float Infinity;
+    static const float Epsilon;
+    static const float LargeEpsilon;
+};
+template <>
+struct URHO3D_API Limits<double>
+{
+    static const double Min;
+    static const double Max;
+    static const double Infinity;
+    static const double Epsilon;
+    static const double LargeEpsilon;
+};
+template <>
+struct URHO3D_API Limits<long double>
+{
+    static const long double Min;
+    static const long double Max;
+    static const long double Infinity;
+    static const long double Epsilon;
+    static const long double LargeEpsilon;
+};
 
 /// Intersection test result.
 enum Intersection
@@ -57,25 +99,28 @@ enum Intersection
 };
 
 /// Check whether two floating point values are equal within accuracy.
-inline bool Equals(float lhs, float rhs) { return lhs + M_EPSILON >= rhs && lhs - M_EPSILON <= rhs; }
+template <class T>
+inline bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<T>::epsilon() >= rhs && lhs - std::numeric_limits<T>::epsilon() <= rhs; }
 
-/// Linear interpolation between two float values.
-inline float Lerp(float lhs, float rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+/// Linear interpolation between two values.
+template <class T>
+inline T Lerp(T lhs, T rhs, T t) { return lhs * (1.0 - t) + rhs * t; }
 
-/// Linear interpolation between two double values.
-inline double Lerp(double lhs, double rhs, float t) { return lhs * (1.0f - t) + rhs * t; }
+/// Return the smaller of two values.
+template <class T>
+inline T Min(T lhs, T rhs) { return lhs < rhs ? lhs : rhs; }
 
-/// Return the smaller of two floats.
-inline float Min(float lhs, float rhs) { return lhs < rhs ? lhs : rhs; }
+/// Return the larger of two values.
+template <class T>
+inline T Max(T lhs, T rhs) { return lhs > rhs ? lhs : rhs; }
 
-/// Return the larger of two floats.
-inline float Max(float lhs, float rhs) { return lhs > rhs ? lhs : rhs; }
-
-/// Return absolute value of a float.
-inline float Abs(float value) { return value >= 0.0f ? value : -value; }
+/// Return absolute value of a value
+template <class T>
+inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 
 /// Return the sign of a float (-1, 0 or 1.)
-inline float Sign(float value) { return value > 0.0f ? 1.0f : (value < 0.0f ? -1.0f : 0.0f); }
+template <class T>
+inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
 /// Check whether a floating point value is NaN.
 /// Use a workaround for GCC, see https://github.com/urho3d/Urho3D/issues/655
@@ -92,7 +137,8 @@ inline bool IsNaN(float value)
 #endif
 
 /// Clamp a float to a range.
-inline float Clamp(float value, float min, float max)
+template <class T>
+inline T Clamp(T value, T min, T max)
 {
     if (value < min)
         return min;
@@ -103,52 +149,54 @@ inline float Clamp(float value, float min, float max)
 }
 
 /// Smoothly damp between values.
-inline float SmoothStep(float lhs, float rhs, float t)
+template <class T>
+inline T SmoothStep(T lhs, T rhs, T t)
 {
-    t = Clamp((t - lhs) / (rhs - lhs), 0.0f, 1.0f); // Saturate t
-    return t * t * (3.0f - 2.0f * t);
+    t = Clamp((t - lhs) / (rhs - lhs), T(0.0), T(1.0)); // Saturate t
+    return t * t * (3.0 - 2.0 * t);
 }
 
-/// Return sine of an angle in degrees.
-inline float Sin(float angle) { return sinf(angle * M_DEGTORAD); }
+/// Return sine of an angle in degrees. Uses sinf() for floats, sin() for
+/// everything else
+template <class T>
+inline T Sin(T angle) { return sin(angle * M_DEGTORAD); }
+template <> inline float Sin<float>(float angle) { return sinf(angle * M_DEGTORAD); }
 
-/// Return cosine of an angle in degrees.
-inline float Cos(float angle) { return cosf(angle * M_DEGTORAD); }
+/// Return cosine of an angle in degrees. Uses cosf() for floats, cos() for
+/// everything else
+template <class T>
+inline T Cos(T angle) { return cos(angle * M_DEGTORAD); }
+template <> inline float Cos<float>(float angle) { return cosf(angle * M_DEGTORAD); }
 
-/// Return tangent of an angle in degrees.
-inline float Tan(float angle) { return tanf(angle * M_DEGTORAD); }
+/// Return tangent of an angle in degrees. Uses tanf() for floats, tan() for
+/// everything else
+template <class T>
+inline T Tan(T angle) { return tan(angle * M_DEGTORAD); }
+template <> inline float Tan<float>(float angle) { return tanf(angle * M_DEGTORAD); }
 
-/// Return arc sine in degrees.
-inline float Asin(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc sine in degrees. Uses asinf() for floats, asin() for everything
+/// else
+template <class T>
+inline T Asin(T x) { return M_RADTODEG * asin(Clamp(x, -1.0, 1.0)); }
+template <> inline float Asin<float>(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
 
-/// Return arc cosine in degrees.
-inline float Acos(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc cosine in degrees. Uses acosf() for floats, acos() for
+/// everything else
+template <class T>
+inline T Acos(T x) { return M_RADTODEG * acos(Clamp(x, -1.0, 1.0)); }
+template <> inline float Acos<float>(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
 
-/// Return arc tangent in degrees.
-inline float Atan(float x) { return M_RADTODEG * atanf(x); }
+/// Return arc tangent in degrees. Uses atanf() for floats, atan() for
+/// everything else
+template <class T>
+inline T Atan(T x) { return M_RADTODEG * atan(x); }
+template <> inline float Atan<float>(float x) { return M_RADTODEG * atanf(x); }
 
-/// Return arc tangent of y/x in degrees.
-inline float Atan2(float y, float x) { return M_RADTODEG * atan2f(y, x); }
-
-/// Return the smaller of two integers.
-inline int Min(int lhs, int rhs) { return lhs < rhs ? lhs : rhs; }
-
-/// Return the larger of two integers.
-inline int Max(int lhs, int rhs) { return lhs > rhs ? lhs : rhs; }
-
-/// Return absolute value of an integer
-inline int Abs(int value) { return value >= 0 ? value : -value; }
-
-/// Clamp an integer to a range.
-inline int Clamp(int value, int min, int max)
-{
-    if (value < min)
-        return min;
-    else if (value > max)
-        return max;
-    else
-        return value;
-}
+/// Return arc tangent of y/x in degrees. Uses atan2f() for floats, atan2()
+/// for everything else
+template <class T>
+inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
+template <> inline float Atan2<float>(float y, float x) { return M_RADTODEG * atan2f(y, x); }
 
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)

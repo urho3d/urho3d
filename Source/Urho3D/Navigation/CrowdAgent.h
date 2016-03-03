@@ -190,7 +190,7 @@ protected:
 
 private:
     /// Update Detour crowd agent parameter.
-    void UpdateParameters(unsigned scope = M_MAX_UNSIGNED);
+    void UpdateParameters(unsigned scope = Limits<unsigned>::Max);
     /// Add agent into crowd.
     int AddAgentToCrowd(bool force = false);
     /// Remove agent from crowd.

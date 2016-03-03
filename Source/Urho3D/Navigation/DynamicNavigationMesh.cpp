@@ -668,7 +668,7 @@ void DynamicNavigationMesh::SetMaxLayers(unsigned maxLayers)
 {
     // Set 3 as a minimum due to the tendency of layers to be constructed inside the hollow space of stacked objects
     // That behavior is unlikely to be expected by the end user
-    maxLayers_ = Max(3, Min(maxLayers, TILECACHE_MAXLAYERS));
+    maxLayers_ = Max((unsigned)3, Min(maxLayers, (unsigned)TILECACHE_MAXLAYERS));
 }
 
 int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z, TileCacheData* tiles)

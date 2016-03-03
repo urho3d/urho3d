@@ -226,7 +226,7 @@ class URHO3D_API RayOctreeQuery
 public:
     /// Construct with ray and query parameters.
     RayOctreeQuery(PODVector<RayQueryResult>& result, const Ray& ray, RayQueryLevel level = RAY_TRIANGLE,
-        float maxDistance = M_INFINITY, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
+        float maxDistance = Limits<float>::Infinity, unsigned char drawableFlags = DRAWABLE_ANY, unsigned viewMask = DEFAULT_VIEWMASK) :
         result_(result),
         ray_(ray),
         drawableFlags_(drawableFlags),

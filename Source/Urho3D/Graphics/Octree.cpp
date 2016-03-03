@@ -394,7 +394,7 @@ void Octree::Update(const FrameInfo& frame)
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = Limits<unsigned>::Max;
             item->workFunction_ = UpdateDrawablesWork;
             item->aux_ = const_cast<FrameInfo*>(&frame);
 
@@ -409,7 +409,7 @@ void Octree::Update(const FrameInfo& frame)
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(Limits<unsigned>::Max);
         scene->EndThreadedUpdate();
     }
 
@@ -513,7 +513,7 @@ void Octree::RaycastSingle(RayOctreeQuery& query) const
     Sort(rayQueryDrawables_.Begin(), rayQueryDrawables_.End(), CompareDrawables);
 
     // Then do the actual test according to the query, and early-out as possible
-    float closestHit = M_INFINITY;
+    float closestHit = Limits<float>::Infinity;
     for (PODVector<Drawable*>::Iterator i = rayQueryDrawables_.Begin(); i != rayQueryDrawables_.End(); ++i)
     {
         Drawable* drawable = *i;

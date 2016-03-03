@@ -52,7 +52,7 @@ static const NavigationPushiness DEFAULT_AGENT_NAVIGATION_PUSHINESS = NAVIGATION
 
 static const unsigned SCOPE_NAVIGATION_QUALITY_PARAMS = 1;
 static const unsigned SCOPE_NAVIGATION_PUSHINESS_PARAMS = 2;
-static const unsigned SCOPE_BASE_PARAMS = M_MAX_UNSIGNED & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
+static const unsigned SCOPE_BASE_PARAMS = Limits<unsigned>::Max & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
 
 static const char* crowdAgentRequestedTargetTypeNames[] = {
     "none",
@@ -125,8 +125,8 @@ void CrowdAgent::ApplyAttributes()
     maxSpeed_ = Max(0.f, maxSpeed_);
     radius_ = Max(0.f, radius_);
     height_ = Max(0.f, height_);
-    queryFilterType_ = Min(queryFilterType_, DT_CROWD_MAX_QUERY_FILTER_TYPE - 1);
-    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1);
+    queryFilterType_ = Min(queryFilterType_, unsigned(DT_CROWD_MAX_QUERY_FILTER_TYPE - 1));
+    obstacleAvoidanceType_ = Min(obstacleAvoidanceType_, unsigned(DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS - 1));
 
     UpdateParameters();
 

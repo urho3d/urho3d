@@ -338,8 +338,8 @@ void Texture::UpdateParameters()
     samplerDesc.AddressW = d3dAddressMode[addressMode_[2]];
     samplerDesc.MaxAnisotropy = graphics_->GetTextureAnisotropy();
     samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-    samplerDesc.MinLOD = -M_INFINITY;
-    samplerDesc.MaxLOD = M_INFINITY;
+    samplerDesc.MinLOD = -Limits<float>::Infinity;
+    samplerDesc.MaxLOD = Limits<float>::Infinity;
     memcpy(&samplerDesc.BorderColor, borderColor_.Data(), 4 * sizeof(float));
 
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);

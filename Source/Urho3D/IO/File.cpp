@@ -201,7 +201,7 @@ bool File::Open(const String& fileName, FileMode mode)
     fseek((FILE*)handle_, 0, SEEK_END);
     long size = ftell((FILE*)handle_);
     fseek((FILE*)handle_, 0, SEEK_SET);
-    if (size > M_MAX_UNSIGNED)
+    if (size > Limits<unsigned>::Max)
     {
         URHO3D_LOGERRORF("Could not open file %s which is larger than 4GB", fileName.CString());
         Close();
@@ -400,7 +400,7 @@ unsigned File::Seek(unsigned position)
         {
             unsigned char skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
-                Read(skipBuffer, (unsigned)Min((int)position - position_, (int)SKIP_BUFFER_SIZE));
+                Read(skipBuffer, (unsigned)Min((int)position - (int)position_, (int)SKIP_BUFFER_SIZE));
         }
         else
             URHO3D_LOGERROR("Seeking backward in a compressed file is not supported");

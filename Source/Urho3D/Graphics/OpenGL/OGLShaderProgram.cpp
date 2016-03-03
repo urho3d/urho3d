@@ -56,7 +56,7 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+        parameterSources_[i] = (const void*)Limits<unsigned>::Max;
 }
 
 ShaderProgram::~ShaderProgram()
@@ -179,7 +179,7 @@ bool ShaderProgram::Link()
             String name(uniformName, (unsigned)nameLength);
 
             unsigned blockIndex = glGetUniformBlockIndex(object_, name.CString());
-            unsigned group = M_MAX_UNSIGNED;
+            unsigned group = Limits<unsigned>::Max;
 
             // Try to recognize the use of the buffer from its name
             for (unsigned j = 0; j < MAX_SHADER_PARAMETER_GROUPS; ++j)
@@ -192,7 +192,7 @@ bool ShaderProgram::Link()
             }
 
             // If name is not recognized, search for a digit in the name and use that as the group index
-            if (group == M_MAX_UNSIGNED)
+            if (group == Limits<unsigned>::Max)
             {
                 for (unsigned j = 1; j < name.Length(); ++j)
                 {
@@ -339,7 +339,7 @@ bool ShaderProgram::NeedParameterUpdate(ShaderParameterGroup group, const void* 
     if (globalFrameNumber != frameNumber_)
     {
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-            parameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+            parameterSources_[i] = (const void*)Limits<unsigned>::Max;
         frameNumber_ = globalFrameNumber;
     }
 
@@ -381,11 +381,11 @@ void ShaderProgram::ClearParameterSource(ShaderParameterGroup group)
     bool useIndividual = !constantBuffers_[group].Get() || !constantBuffers_[group + MAX_SHADER_PARAMETER_GROUPS].Get();
 
     if (useBuffer)
-        globalParameterSources[group] = (const void*)M_MAX_UNSIGNED;
+        globalParameterSources[group] = (const void*)Limits<unsigned>::Max;
     if (useIndividual)
-        parameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+        parameterSources_[group] = (const void*)Limits<unsigned>::Max;
 #else
-    parameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+    parameterSources_[group] = (const void*)Limits<unsigned>::Max;
 #endif
 }
 
@@ -397,13 +397,13 @@ void ShaderProgram::ClearParameterSources()
 
 #ifndef GL_ES_VERSION_2_0
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        globalParameterSources[i] = (const void*)M_MAX_UNSIGNED;
+        globalParameterSources[i] = (const void*)Limits<unsigned>::Max;
 #endif
 }
 
 void ShaderProgram::ClearGlobalParameterSource(ShaderParameterGroup group)
 {
-    globalParameterSources[group] = (const void*)M_MAX_UNSIGNED;
+    globalParameterSources[group] = (const void*)Limits<unsigned>::Max;
 }
 
 }

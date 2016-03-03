@@ -409,7 +409,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (resolutions.Size())
         {
             unsigned best = 0;
-            unsigned bestError = M_MAX_UNSIGNED;
+            unsigned bestError = Limits<unsigned>::Max;
 
             for (unsigned i = 0; i < resolutions.Size(); ++i)
             {
@@ -917,7 +917,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         {
             vertexDeclarationDirty_ = true;
 
-            if (firstDirtyVB_ == M_MAX_UNSIGNED)
+            if (firstDirtyVB_ == Limits<unsigned>::Max)
                 firstDirtyVB_ = lastDirtyVB_ = i;
             else
             {
@@ -1038,7 +1038,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (vsBuffer != impl_->constantBuffers_[VS][i])
             {
                 impl_->constantBuffers_[VS][i] = vsBuffer;
-                shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+                shaderParameterSources_[i] = (const void*)Limits<unsigned>::Max;
                 vsBuffersChanged = true;
             }
 
@@ -1047,7 +1047,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             if (psBuffer != impl_->constantBuffers_[PS][i])
             {
                 impl_->constantBuffers_[PS][i] = psBuffer;
-                shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+                shaderParameterSources_[i] = (const void*)Limits<unsigned>::Max;
                 psBuffersChanged = true;
             }
         }
@@ -1245,7 +1245,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
+    if ((unsigned)(size_t)shaderParameterSources_[group] == Limits<unsigned>::Max || shaderParameterSources_[group] != source)
     {
         shaderParameterSources_[group] = source;
         return true;
@@ -1266,19 +1266,19 @@ bool Graphics::HasTextureUnit(TextureUnit unit)
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
-    shaderParameterSources_[group] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[group] = (const void*)Limits<unsigned>::Max;
 }
 
 void Graphics::ClearParameterSources()
 {
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        shaderParameterSources_[i] = (const void*)M_MAX_UNSIGNED;
+        shaderParameterSources_[i] = (const void*)Limits<unsigned>::Max;
 }
 
 void Graphics::ClearTransformSources()
 {
-    shaderParameterSources_[SP_CAMERA] = (const void*)M_MAX_UNSIGNED;
-    shaderParameterSources_[SP_OBJECT] = (const void*)M_MAX_UNSIGNED;
+    shaderParameterSources_[SP_CAMERA] = (const void*)Limits<unsigned>::Max;
+    shaderParameterSources_[SP_OBJECT] = (const void*)Limits<unsigned>::Max;
 }
 
 void Graphics::SetTexture(unsigned index, Texture* texture)
@@ -1301,7 +1301,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
     if (texture != textures_[index])
     {
-        if (firstDirtyTexture_ == M_MAX_UNSIGNED)
+        if (firstDirtyTexture_ == Limits<unsigned>::Max)
             firstDirtyTexture_ = lastDirtyTexture_ = index;
         else
         {
@@ -2467,8 +2467,8 @@ void Graphics::ResetCachedState()
     stencilFail_ = OP_KEEP;
     stencilZFail_ = OP_KEEP;
     stencilRef_ = 0;
-    stencilCompareMask_ = M_MAX_UNSIGNED;
-    stencilWriteMask_ = M_MAX_UNSIGNED;
+    stencilCompareMask_ = Limits<unsigned>::Max;
+    stencilWriteMask_ = Limits<unsigned>::Max;
     useClipPlane_ = false;
     renderTargetsDirty_ = true;
     texturesDirty_ = true;
@@ -2478,11 +2478,11 @@ void Graphics::ResetCachedState()
     rasterizerStateDirty_ = true;
     scissorRectDirty_ = true;
     stencilRefDirty_ = true;
-    blendStateHash_ = M_MAX_UNSIGNED;
-    depthStateHash_ = M_MAX_UNSIGNED;
-    rasterizerStateHash_ = M_MAX_UNSIGNED;
-    firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
-    firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
+    blendStateHash_ = Limits<unsigned>::Max;
+    depthStateHash_ = Limits<unsigned>::Max;
+    rasterizerStateHash_ = Limits<unsigned>::Max;
+    firstDirtyTexture_ = lastDirtyTexture_ = Limits<unsigned>::Max;
+    firstDirtyVB_ = lastDirtyVB_ = Limits<unsigned>::Max;
     dirtyConstantBuffers_.Clear();
 }
 
@@ -2511,7 +2511,7 @@ void Graphics::PrepareDraw()
         renderTargetsDirty_ = false;
     }
 
-    if (texturesDirty_ && firstDirtyTexture_ < M_MAX_UNSIGNED)
+    if (texturesDirty_ && firstDirtyTexture_ < Limits<unsigned>::Max)
     {
         // Set also VS textures to enable vertex texture fetch to work the same way as on OpenGL
         impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
@@ -2523,18 +2523,18 @@ void Graphics::PrepareDraw()
         impl_->deviceContext_->PSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
             &impl_->samplers_[firstDirtyTexture_]);
 
-        firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
+        firstDirtyTexture_ = lastDirtyTexture_ = Limits<unsigned>::Max;
         texturesDirty_ = false;
     }
 
     if (vertexDeclarationDirty_ && vertexShader_ && vertexShader_->GetByteCode().Size())
     {
-        if (firstDirtyVB_ < M_MAX_UNSIGNED)
+        if (firstDirtyVB_ < Limits<unsigned>::Max)
         {
             impl_->deviceContext_->IASetVertexBuffers(firstDirtyVB_, lastDirtyVB_ - firstDirtyVB_ + 1,
                 &impl_->vertexBuffers_[firstDirtyVB_], &impl_->vertexSizes_[firstDirtyVB_], &impl_->vertexOffsets_[firstDirtyVB_]);
 
-            firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
+            firstDirtyVB_ = lastDirtyVB_ = Limits<unsigned>::Max;
         }
 
         unsigned long long newVertexDeclarationHash = 0;
@@ -2598,7 +2598,7 @@ void Graphics::PrepareDraw()
                 i = impl_->blendStates_.Insert(MakePair(newBlendStateHash, newBlendState));
             }
 
-            impl_->deviceContext_->OMSetBlendState(i->second_, 0, M_MAX_UNSIGNED);
+            impl_->deviceContext_->OMSetBlendState(i->second_, 0, Limits<unsigned>::Max);
             blendStateHash_ = newBlendStateHash;
         }
 
@@ -2677,7 +2677,7 @@ void Graphics::PrepareDraw()
                 stateDesc.CullMode = d3dCullMode[cullMode_];
                 stateDesc.FrontCounterClockwise = FALSE;
                 stateDesc.DepthBias = scaledDepthBias;
-                stateDesc.DepthBiasClamp = M_INFINITY;
+                stateDesc.DepthBiasClamp = Limits<float>::Infinity;
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;
                 stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;

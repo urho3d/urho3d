@@ -226,12 +226,12 @@ bool ParticleEffect::Load(const XMLElement& source)
     if (source.HasChild("activetime"))
         activeTime_ = source.GetChild("activetime").GetFloat("value");
     if (activeTime_ < 0.0f)
-        activeTime_ = M_INFINITY;
+        activeTime_ = Limits<float>::Infinity;
 
     if (source.HasChild("inactivetime"))
         inactiveTime_ = source.GetChild("inactivetime").GetFloat("value");
     if (inactiveTime_ < 0.0f)
-        inactiveTime_ = M_INFINITY;
+        inactiveTime_ = Limits<float>::Infinity;
 
     if (source.HasChild("emissionrate"))
         GetFloatMinMax(source.GetChild("emissionrate"), emissionRateMin_, emissionRateMax_);
@@ -435,7 +435,7 @@ void ParticleEffect::SetMaterial(Material* material)
 
 void ParticleEffect::SetNumParticles(unsigned num)
 {
-    numParticles_ = (unsigned)Max(0, num);
+    numParticles_ = Max(unsigned(0), num);
 }
 
 void ParticleEffect::SetUpdateInvisible(bool enable)

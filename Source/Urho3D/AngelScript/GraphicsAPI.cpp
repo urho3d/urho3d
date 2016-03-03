@@ -1865,7 +1865,7 @@ static RayQueryResult OctreeRaycastSingle(const Ray& ray, RayQueryLevel level, f
         RayQueryResult empty;
         empty.position_ = Vector3::ZERO;
         empty.normal_ = Vector3::ZERO;
-        empty.distance_ = M_INFINITY;
+        empty.distance_ = Limits<float>::Infinity;
         empty.subObject_ = 0;
         return empty;
     }

@@ -675,7 +675,7 @@ void Engine::ApplyFrameLimit()
     int maxFps = maxFps_;
     Input* input = GetSubsystem<Input>();
     if (input && !input->HasFocus())
-        maxFps = Min(maxInactiveFps_, maxFps);
+        maxFps = Min(signed(maxInactiveFps_), maxFps);
 
     long long elapsed = 0;
 
@@ -798,8 +798,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["LogQuiet"] = true;
             else if (argument == "log" && !value.Empty())
             {
-                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, M_MAX_UNSIGNED);
-                if (logLevel != M_MAX_UNSIGNED)
+                unsigned logLevel = GetStringListIndex(value.CString(), logLevelPrefixes, Limits<unsigned>::Max);
+                if (logLevel != Limits<unsigned>::Max)
                 {
                     ret["LogLevel"] = logLevel;
                     ++i;

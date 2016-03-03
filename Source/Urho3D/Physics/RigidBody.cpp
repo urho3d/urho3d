@@ -49,7 +49,7 @@ static const float DEFAULT_FRICTION = 0.5f;
 static const float DEFAULT_RESTITUTION = 0.0f;
 static const float DEFAULT_ROLLING_FRICTION = 0.0f;
 static const unsigned DEFAULT_COLLISION_LAYER = 0x1;
-static const unsigned DEFAULT_COLLISION_MASK = M_MAX_UNSIGNED;
+static const unsigned DEFAULT_COLLISION_MASK = Limits<unsigned>::Max;
 
 static const char* collisionEventModeNames[] =
 {

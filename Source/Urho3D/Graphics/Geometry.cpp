@@ -41,7 +41,7 @@ Geometry::Geometry(Context* context) :
     indexCount_(0),
     vertexStart_(0),
     vertexCount_(0),
-    positionBufferIndex_(M_MAX_UNSIGNED),
+    positionBufferIndex_(Limits<unsigned>::Max),
     rawVertexSize_(0),
     rawElementMask_(0),
     rawIndexSize_(0),
@@ -369,7 +369,7 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
                ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
     }
 
-    return M_INFINITY;
+    return Limits<float>::Infinity;
 }
 
 bool Geometry::IsInside(const Ray& ray) const
@@ -398,7 +398,7 @@ void Geometry::GetPositionBufferIndex()
     }
 
     // No vertex buffer with positions
-    positionBufferIndex_ = M_MAX_UNSIGNED;
+    positionBufferIndex_ = Limits<unsigned>::Max;
 }
 
 }

@@ -263,7 +263,7 @@ Renderer::Renderer(Context* context) :
     mobileShadowBiasAdd_(0.0001f),
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
-    shadersChangedFrameNumber_(M_MAX_UNSIGNED),
+    shadersChangedFrameNumber_(Limits<unsigned>::Max),
     hdrRendering_(false),
     specularLighting_(true),
     drawShadows_(true),
@@ -1385,7 +1385,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
             lightDist = light->GetFrustum().Distance(cameraPos);
 
         // If the camera is actually inside the light volume, do not draw to stencil as it would waste fillrate
-        if (lightDist < M_EPSILON)
+        if (lightDist < Limits<float>::Epsilon)
         {
             graphics_->SetStencilTest(false);
             return;

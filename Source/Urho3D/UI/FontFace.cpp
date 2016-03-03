@@ -35,7 +35,7 @@ namespace Urho3D
 {
 
 FontGlyph::FontGlyph() :
-    page_(M_MAX_UNSIGNED),
+    page_(Limits<unsigned>::Max),
     used_(false)
 {
 }

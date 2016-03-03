@@ -64,8 +64,8 @@ void Rect::Clip(const Rect& rect)
 
     if (min_.x_ > max_.x_ || min_.y_ > max_.y_)
     {
-        min_ = Vector2(M_INFINITY, M_INFINITY);
-        max_ = Vector2(-M_INFINITY, -M_INFINITY);
+        min_ = Vector2(Limits<float>::Infinity, Limits<float>::Infinity);
+        max_ = Vector2(-Limits<float>::Infinity, -Limits<float>::Infinity);
     }
 }
 

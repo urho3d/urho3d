@@ -264,7 +264,7 @@ Variant Spline::LinearInterpolation(const Variant& lhs, const Variant& rhs, floa
     case VAR_COLOR:
         return lhs.GetColor().Lerp(rhs.GetColor(), t);
     case VAR_DOUBLE:
-        return Lerp(lhs.GetDouble(), rhs.GetDouble(), t);
+        return Lerp(lhs.GetDouble(), rhs.GetDouble(), double(t));
     default:
         return Variant::EMPTY;
     }

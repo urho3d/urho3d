@@ -92,7 +92,7 @@ class Node : public Animatable
 
     Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0);
 
-    void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED);
+    void AddChild(Node* node, unsigned index = Limits<unsigned>::Max);
     void RemoveChild(Node* node);
     void RemoveAllChildren();
     void RemoveChildren(bool removeReplicated, bool removeLocal, bool recursive);
@@ -200,7 +200,7 @@ class Node : public Animatable
     const StringVector& GetTags() const;
 
     // void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
-    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     tolua_readonly tolua_property__get_set unsigned ID;
     tolua_property__get_set String name;

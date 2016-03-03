@@ -71,7 +71,7 @@ void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
     Vector3 normEnd = end.Normalized();
     float d = normStart.DotProduct(normEnd);
 
-    if (d > -1.0f + M_EPSILON)
+    if (d > -1.0f + Limits<float>::Epsilon)
     {
         Vector3 c = normStart.CrossProduct(normEnd);
         float s = sqrtf((1.0f + d) * 2.0f);
@@ -85,7 +85,7 @@ void Quaternion::FromRotationTo(const Vector3& start, const Vector3& end)
     else
     {
         Vector3 axis = Vector3::RIGHT.CrossProduct(normStart);
-        if (axis.Length() < M_EPSILON)
+        if (axis.Length() < Limits<float>::Epsilon)
             axis = Vector3::UP.CrossProduct(normStart);
 
         FromAngleAxis(180.f, axis);
@@ -155,7 +155,7 @@ bool Quaternion::FromLookRotation(const Vector3& direction, const Vector3& upDir
 
     Vector3 v = forward.CrossProduct(upDirection);
     // If direction & upDirection are parallel and crossproduct becomes zero, use FromRotationTo() fallback
-    if (v.LengthSquared() >= M_EPSILON)
+    if (v.LengthSquared() >= Limits<float>::Epsilon)
     {
         v.Normalize();
         Vector3 up = v.CrossProduct(forward);

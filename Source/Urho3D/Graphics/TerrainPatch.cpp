@@ -105,7 +105,7 @@ void TerrainPatch::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQue
                 result.distance_ = distance;
                 result.drawable_ = this;
                 result.node_ = node_;
-                result.subObject_ = M_MAX_UNSIGNED;
+                result.subObject_ = Limits<unsigned>::Max;
                 results.Push(result);
             }
         }
@@ -280,13 +280,13 @@ void TerrainPatch::OnWorldBoundingBoxUpdate()
 unsigned TerrainPatch::GetCorrectedLodLevel(unsigned lodLevel)
 {
     if (north_)
-        lodLevel = (unsigned)Min((int)lodLevel, north_->GetLodLevel() + 1);
+        lodLevel = Min(lodLevel, north_->GetLodLevel() + 1);
     if (south_)
-        lodLevel = (unsigned)Min((int)lodLevel, south_->GetLodLevel() + 1);
+        lodLevel = Min(lodLevel, south_->GetLodLevel() + 1);
     if (west_)
-        lodLevel = (unsigned)Min((int)lodLevel, west_->GetLodLevel() + 1);
+        lodLevel = Min(lodLevel, west_->GetLodLevel() + 1);
     if (east_)
-        lodLevel = (unsigned)Min((int)lodLevel, east_->GetLodLevel() + 1);
+        lodLevel = Min(lodLevel, east_->GetLodLevel() + 1);
 
     return lodLevel;
 }

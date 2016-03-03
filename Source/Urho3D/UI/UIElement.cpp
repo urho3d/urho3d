@@ -122,7 +122,7 @@ UIElement::UIElement(Context* context) :
     dragButtonCount_(0),
     size_(IntVector2::ZERO),
     minSize_(IntVector2::ZERO),
-    maxSize_(M_MAX_INT, M_MAX_INT),
+    maxSize_(Limits<signed>::Max, Limits<signed>::Max),
     childOffset_(IntVector2::ZERO),
     horizontalAlignment_(HA_LEFT),
     verticalAlignment_(VA_TOP),
@@ -155,7 +155,7 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(Limits<signed>::Max, Limits<signed>::Max), AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
         horizontalAlignments, HA_LEFT, AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
@@ -251,7 +251,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         String typeName = childElem.GetAttribute("type");
         if (typeName.Empty())
             typeName = "UIElement";
-        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+        unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : Limits<unsigned>::Max;
         UIElement* child = 0;
 
         if (!internalElem)
@@ -303,7 +303,7 @@ bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bo
     String typeName = childElem.GetAttribute("type");
     if (typeName.Empty())
         typeName = "UIElement";
-    unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
+    unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : Limits<unsigned>::Max;
     UIElement* child = CreateChild(typeName, String::EMPTY, index);
 
     if (child)
@@ -802,7 +802,7 @@ void UIElement::SetPriority(int priority)
 {
     if (priority_ == priority)
         return;
-    
+
     priority_ = priority;
     if (parent_)
         parent_->sortOrderDirty_ = true;
@@ -1180,7 +1180,7 @@ void UIElement::BringToFront()
     // elements and those which have the BringToBack flag set
     HashSet<int> usedPriorities;
 
-    int maxPriority = M_MIN_INT;
+    int maxPriority = Limits<signed>::Min;
     const Vector<SharedPtr<UIElement> >& rootChildren = root->GetChildren();
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = rootChildren.Begin(); i != rootChildren.End(); ++i)
     {
@@ -1188,15 +1188,15 @@ void UIElement::BringToFront()
         if (other->IsEnabled() && other->bringToBack_ && other != ptr)
         {
             int priority = other->GetPriority();
-            // M_MAX_INT is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
-            if (priority == M_MAX_INT)
+            // Limits<signed>::Max is used by popups and tooltips. Disregard these to avoid an "arms race" with the priorities
+            if (priority == Limits<signed>::Max)
                 continue;
             usedPriorities.Insert(priority);
             maxPriority = Max(priority, maxPriority);
         }
     }
 
-    if (maxPriority != M_MIN_INT && maxPriority >= ptr->GetPriority())
+    if (maxPriority != Limits<signed>::Min && maxPriority >= ptr->GetPriority())
     {
         ptr->SetPriority(maxPriority);
 
@@ -1234,7 +1234,7 @@ UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned 
 
 void UIElement::AddChild(UIElement* element)
 {
-    InsertChild(M_MAX_UNSIGNED, element);
+    InsertChild(Limits<unsigned>::Max, element);
 }
 
 void UIElement::InsertChild(unsigned index, UIElement* element)
@@ -1374,7 +1374,7 @@ void UIElement::Remove()
 unsigned UIElement::FindChild(UIElement* element) const
 {
     Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Find(SharedPtr<UIElement>(element));
-    return i != children_.End() ? (unsigned)(i - children_.Begin()) : M_MAX_UNSIGNED;
+    return i != children_.End() ? (unsigned)(i - children_.Begin()) : Limits<unsigned>::Max;
 }
 
 void UIElement::SetParent(UIElement* parent, unsigned index)
@@ -1471,14 +1471,14 @@ bool UIElement::IsVisibleEffective() const
 {
     bool visible = visible_;
     const UIElement* element = parent_;
-    
+
     // Traverse the parent chain
     while (visible && element)
     {
         visible &= element->visible_;
         element = element->parent_;
     }
-    
+
     return visible;
 }
 
@@ -1965,8 +1965,8 @@ int UIElement::CalculateLayoutParentSize(const PODVector<int>& sizes, int begin,
     for (unsigned i = 0; i < sizes.Size(); ++i)
     {
         // If calculating maximum size, and the default is specified, do not overflow it
-        if (sizes[i] == M_MAX_INT)
-            return M_MAX_INT;
+        if (sizes[i] == Limits<signed>::Max)
+            return Limits<signed>::Max;
         width += sizes[i] + spacing;
     }
     // The last spacing is not needed

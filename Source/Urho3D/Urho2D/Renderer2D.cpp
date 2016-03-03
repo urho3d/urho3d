@@ -347,7 +347,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         for (int i = 0; i < numWorkItems; ++i)
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
-            item->priority_ = M_MAX_UNSIGNED;
+            item->priority_ = Limits<unsigned>::Max;
             item->workFunction_ = CheckDrawableVisibility;
             item->aux_ = this;
 
@@ -362,7 +362,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
             start = end;
         }
 
-        queue->Complete(M_MAX_UNSIGNED);
+        queue->Complete(Limits<unsigned>::Max);
     }
 
     ViewBatchInfo2D& viewBatchInfo = viewBatchInfos_[camera];
@@ -445,7 +445,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
         Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
         sourceBatch->distance_ = camera->GetDistance(worldPos);
     }
-    
+
     Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
@@ -454,7 +454,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     unsigned iCount = 0;
     unsigned vStart = 0;
     unsigned vCount = 0;
-    float distance = M_INFINITY;
+    float distance = Limits<float>::Infinity;
 
     for (unsigned b = 0; b < sourceBatches.Size(); ++b)
     {
@@ -472,7 +472,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
                 iCount = 0;
                 vStart += vCount;
                 vCount = 0;
-                distance = M_INFINITY;
+                distance = Limits<float>::Infinity;
             }
 
             currMaterial = material;
@@ -491,7 +491,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material,
     unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance)
 {
     if (!material || indexCount == 0 || vertexCount == 0)

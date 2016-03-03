@@ -160,7 +160,7 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     // Typo in pex file
     FinishParticleSizeVariance_ = ReadFloat(rootElem, "FinishParticleSizeVariance");
 
-    duration_ = M_INFINITY;
+    duration_ = Limits<float>::Infinity;
     if (rootElem.HasChild("duration"))
     {
         float duration = ReadFloat(rootElem, "duration");
@@ -265,7 +265,7 @@ bool ParticleEffect2D::Save(Serializer& dest) const
     WriteFloat(rootElem, "FinishParticleSizeVariance", FinishParticleSizeVariance_);
 
     float duration = duration_;
-    if (duration == M_INFINITY)
+    if (duration == Limits<float>::Infinity)
         duration = -1.0f;
     WriteFloat(rootElem, "duration", duration);
     WriteInt(rootElem, "emitterType", (int)emitterType_);

@@ -76,7 +76,7 @@ public:
     UIElement* GetItem(unsigned index) const;
     /// Return all items.
     PODVector<UIElement*> GetItems() const;
-    /// Return selection index, or M_MAX_UNSIGNED if none selected.
+    /// Return selection index, or Limits<unsigned>::Max if none selected.
     unsigned GetSelection() const;
     /// Return selected item, or null if none selected.
     UIElement* GetSelectedItem() const;

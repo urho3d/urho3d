@@ -45,8 +45,8 @@ Sample::Sample(Context* context) :
     yaw_(0.0f),
     pitch_(0.0f),
     touchEnabled_(false),
-    screenJoystickIndex_(M_MAX_UNSIGNED),
-    screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
+    screenJoystickIndex_(Limits<unsigned>::Max),
+    screenJoystickSettingsIndex_(Limits<unsigned>::Max),
     paused_(false)
 {
 }
@@ -232,7 +232,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             paused_ = !paused_;
 
             Input* input = GetSubsystem<Input>();
-            if (screenJoystickSettingsIndex_ == M_MAX_UNSIGNED)
+            if (screenJoystickSettingsIndex_ == Limits<unsigned>::Max)
             {
                 // Lazy initialization
                 ResourceCache* cache = GetSubsystem<ResourceCache>();

@@ -90,7 +90,7 @@ Terrain::Terrain(Context* context) :
     lastPatchSize_(0),
     numLodLevels_(1),
     maxLodLevels_(MAX_LOD_LEVELS),
-    occlusionLodLevel_(M_MAX_UNSIGNED),
+    occlusionLodLevel_(Limits<unsigned>::Max),
     smoothing_(false),
     visible_(true),
     castShadows_(false),
@@ -137,7 +137,7 @@ void Terrain::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, Limits<unsigned>::Max, AM_DEFAULT);
 }
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -193,12 +193,12 @@ void Terrain::SetSpacing(const Vector3& spacing)
 
 void Terrain::SetMaxLodLevels(unsigned levels)
 {
-    levels = Clamp((int)levels, 1, MAX_LOD_LEVELS);
+    levels = Clamp(levels, unsigned(1), MAX_LOD_LEVELS);
     if (levels != maxLodLevels_)
     {
         maxLodLevels_ = levels;
         lastPatchSize_ = 0; // Force full recreate
-        
+
         CreateGeometry();
         MarkNetworkUpdate();
     }
@@ -210,7 +210,7 @@ void Terrain::SetOcclusionLodLevel(unsigned level)
     {
         occlusionLodLevel_ = level;
         lastPatchSize_ = 0; // Force full recreate
-        
+
         CreateGeometry();
         MarkNetworkUpdate();
     }
@@ -519,7 +519,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
         const IntVector2& coords = patch->GetCoordinates();
         int lodExpand = (1 << (occlusionLevel)) - 1;
         int halfLodExpand = (1 << (occlusionLevel)) / 2;
-        
+
         for (int z = 0; z <= patchSize_; ++z)
         {
             for (int x = 0; x <= patchSize_; ++x)
@@ -537,7 +537,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *positionData++ = position.z_;
 
                 box.Merge(position);
-                
+
                 // For vertices that are part of the occlusion LOD, calculate the minimum height in the neighborhood
                 // to prevent false positive occlusion due to inaccuracy between occlusion LOD & visible LOD
                 float minHeight = position.y_;
@@ -656,8 +656,8 @@ void Terrain::SetPatchSizeAttr(int value)
 
 void Terrain::SetMaxLodLevelsAttr(unsigned value)
 {
-    value = Clamp((int)value, 1, MAX_LOD_LEVELS);
-    
+    value = Clamp(value, unsigned(1), MAX_LOD_LEVELS);
+
     if (value != maxLodLevels_)
     {
         maxLodLevels_ = value;

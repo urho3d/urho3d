@@ -123,7 +123,7 @@ protected:
     void UpdateText();
     /// Update cursor position and restart cursor blinking.
     void UpdateCursor();
-    /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
+    /// Return char index corresponding to position within element, or Limits<unsigned>::Max if not found.
     unsigned GetCharIndex(const IntVector2& position);
 
     /// Text element.

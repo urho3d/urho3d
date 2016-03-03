@@ -312,7 +312,7 @@ public:
     /// Bring UI element to front.
     void BringToFront();
     /// Create and add a child element and return it.
-    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    UIElement* CreateChild(StringHash type, const String& name = String::EMPTY, unsigned index = Limits<unsigned>::Max);
     /// Add a child element.
     void AddChild(UIElement* element);
     /// Insert a child element into a specific position in the child list.
@@ -325,10 +325,10 @@ public:
     void RemoveAllChildren();
     /// Remove from the parent element. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// Find child index. Return M_MAX_UNSIGNED if not found.
+    /// Find child index. Return Limits<unsigned>::Max if not found.
     unsigned FindChild(UIElement* element) const;
     /// Set parent element. Same as parent->InsertChild(index, this).
-    void SetParent(UIElement* parent, unsigned index = M_MAX_UNSIGNED);
+    void SetParent(UIElement* parent, unsigned index = Limits<unsigned>::Max);
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
     /// Mark as internally (programmatically) created. Used when an element composes itself out of child elements.
@@ -352,7 +352,7 @@ public:
     void RemoveAllTags();
 
     /// Template version of creating a child element.
-    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = Limits<unsigned>::Max);
 
     /// Return name.
     const String& GetName() const { return name_; }
@@ -452,7 +452,7 @@ public:
 
     /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
-    
+
     /// Return whether element is effectively visible (parent element chain is visible.)
     bool IsVisibleEffective() const;
 
@@ -579,7 +579,7 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
-    
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();

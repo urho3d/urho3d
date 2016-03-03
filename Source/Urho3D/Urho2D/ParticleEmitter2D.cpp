@@ -128,12 +128,12 @@ void ParticleEmitter2D::SetBlendMode(BlendMode blendMode)
 
 void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
 {
-    maxParticles = (unsigned)Max(maxParticles, 1);
+    maxParticles = Max(maxParticles, unsigned(1));
 
     particles_.Resize(maxParticles);
     sourceBatches_[0].vertices_.Reserve(maxParticles * 4);
 
-    numParticles_ = Min(maxParticles, numParticles_);
+    numParticles_ = Min(signed(maxParticles), numParticles_);
 }
 
 ParticleEffect2D* ParticleEmitter2D::GetEffect() const
@@ -277,8 +277,8 @@ void ParticleEmitter2D::Update(float timeStep)
     Vector3 worldPosition = GetNode()->GetWorldPosition();
     float worldScale = GetNode()->GetWorldScale().x_ * PIXEL_SIZE;
 
-    boundingBoxMinPoint_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
-    boundingBoxMaxPoint_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
+    boundingBoxMinPoint_ = Vector3(Limits<float>::Infinity, Limits<float>::Infinity, Limits<float>::Infinity);
+    boundingBoxMaxPoint_ = Vector3(-Limits<float>::Infinity, -Limits<float>::Infinity, -Limits<float>::Infinity);
 
     int particleIndex = 0;
     while (particleIndex < numParticles_)

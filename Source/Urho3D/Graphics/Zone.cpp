@@ -283,7 +283,7 @@ void Zone::UpdateAmbientGradient()
         }
 
         // Gradient start position: get the highest priority zone that is not this zone
-        int bestPriority = M_MIN_INT;
+        int bestPriority = Limits<signed>::Min;
         Zone* bestZone = 0;
         for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)
         {
@@ -307,7 +307,7 @@ void Zone::UpdateAmbientGradient()
             PointOctreeQuery query(reinterpret_cast<PODVector<Drawable*>&>(result), maxZPosition, DRAWABLE_ZONE);
             octant_->GetRoot()->GetDrawables(query);
         }
-        bestPriority = M_MIN_INT;
+        bestPriority = Limits<signed>::Min;
         bestZone = 0;
 
         for (PODVector<Zone*>::ConstIterator i = result.Begin(); i != result.End(); ++i)

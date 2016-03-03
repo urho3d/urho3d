@@ -271,7 +271,7 @@ void Slider::Page(const IntVector2& position, bool pressed)
 
     // Start transmitting repeated pages after the initial press
     if (selected_ && pressed && repeatRate_ > 0.0f &&
-        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
+        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0.0f, Abs(offset) / length))
         repeatTimer_.Reset();
     else
         pressed = false;

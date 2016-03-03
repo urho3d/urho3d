@@ -573,6 +573,7 @@ endif ()
 if (MSVC)
     # VS-specific setup
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions (-DNOMINMAX)  # don't use min/max macros on windows, they conflict with std::numeric_limits<T>::min/max
     # Note: All CMAKE_xxx_FLAGS variables are not in list context (although they should be)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS-")
