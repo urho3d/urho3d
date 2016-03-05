@@ -1252,6 +1252,10 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
     RegisterStaticModel<AnimatedModel>(engine, "AnimatedModel", false);
 
+    engine->RegisterEnum("AnimationBlendingMode");
+    engine->RegisterEnumValue("AnimationBlendingMode", "ABM_OVERRIDE", ABM_OVERRIDE);
+    engine->RegisterEnumValue("AnimationBlendingMode", "ABM_ADDITIVE", ABM_ADDITIVE);
+
     engine->RegisterObjectBehaviour("AnimationState", asBEHAVE_FACTORY, "AnimationState@+ f(Node@+, Animation@+)", asFUNCTION(ConstructAnimationState), asCALL_CDECL);
     engine->RegisterObjectMethod("AnimationState", "void AddWeight(float)", asMETHOD(AnimationState, AddWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void AddTime(float)", asMETHOD(AnimationState, AddTime), asCALL_THISCALL);
@@ -1269,6 +1273,8 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "bool get_looped() const", asMETHOD(AnimationState, IsLooped), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_weight(float)", asMETHOD(AnimationState, SetWeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_weight() const", asMETHOD(AnimationState, GetWeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "void set_blendingMode(AnimationBlendingMode)", asMETHOD(AnimationState, SetBlendingMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationState", "AnimationBlendingMode get_blendingMode() const", asMETHOD(AnimationState, GetBlendingMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_time(float)", asMETHOD(AnimationState, SetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_time() const", asMETHOD(AnimationState, GetTime), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "void set_layer(uint8)", asMETHOD(AnimationState, SetLayer), asCALL_THISCALL);
