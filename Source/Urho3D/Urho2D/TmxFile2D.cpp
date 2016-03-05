@@ -442,6 +442,17 @@ bool TmxFile2D::EndLoad()
     return true;
 }
 
+bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
+{
+    if(layers_.Size()>0) return false;
+    info_.orientation_ = orientation;
+    info_.width_ = width;
+    info_.height_ = height;
+    info_.tileWidth_ = tileWidth * PIXEL_SIZE;
+    info_.tileHeight_ = tileHeight * PIXEL_SIZE;
+    return true;
+}
+
 Sprite2D* TmxFile2D::GetTileSprite(int gid) const
 {
     HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = gidToSpriteMapping_.Find(gid);
@@ -465,6 +476,23 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
         return 0;
 
     return layers_[index];
+}
+
+void TmxFile2D::AddLayer(unsigned index, TmxLayer2D *layer)
+{
+    if(index > layers_.Size())
+    {
+        layers_.Push(layer);
+    }
+    else // index <= layers_.size()
+    {
+        layers_.Insert(index, layer);
+    }
+}
+
+void TmxFile2D::AddLayer(TmxLayer2D *layer)
+{
+    layers_.Push(layer);
 }
 
 
