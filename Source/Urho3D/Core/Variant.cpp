@@ -366,7 +366,7 @@ void Variant::SetBuffer(const void* data, unsigned size)
         memcpy(&buffer[0], data, size);
 }
 
-const VectorBuffer Variant::GetVectorBuffer() const
+VectorBuffer Variant::GetVectorBuffer() const
 {
     return VectorBuffer(type_ == VAR_BUFFER ? *reinterpret_cast<const PODVector<unsigned char>*>(&value_) : emptyBuffer);
 }

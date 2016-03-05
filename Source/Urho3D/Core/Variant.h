@@ -960,7 +960,7 @@ public:
     }
 
     /// Return %VectorBuffer containing the buffer or empty on type mismatch.
-    const VectorBuffer GetVectorBuffer() const;
+    VectorBuffer GetVectorBuffer() const;
 
     /// Return void pointer or null on type mismatch. RefCounted pointer will be converted.
     void* GetVoidPtr() const
