@@ -255,7 +255,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 
 \page SceneModel Scene model
 
-Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID, and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
+Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID + optionally tag(s) and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
 
 \section SceneModel_Components Components
 
@@ -280,13 +280,17 @@ Components created into the Scene itself have a special role: to implement scene
 
 "Ordinary" components like Light, Camera or StaticModel should not be created directly into the Scene, but rather into child nodes.
 
-\section SceneModel_Identification Identification and scene hierarchy
+\section SceneModel_Identification Identification
 
 Unlike nodes, components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
 
-When created, both nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
+When created, both nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNode "GetNode()" and \ref Scene::GetComponent "GetComponent()". This is much faster than for example doing recursive name-based scene node queries.
 
-There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
+%String tags can be optionally assigned into scene nodes to aid in identification. See e.g. the functions \ref Node::AddTag "AddTag()", \ref Node::RemoveTag "RemoveTag()" and \ref Node::SetTags "SetTags()". Nodes with a specific tag can be queried from the Scene by calling the \ref Scene::GetNodesWithTag "GetNodesWithTag()" function.
+
+\section SceneModel_Hierarchy Scene hierarchy
+
+There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and in which nodes to place any logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
 
 Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details. Note that Scene's own transform is purposefully ignored as an optimization when calculating world derived transforms of child nodes, so changing it has no effect and it should be left as it is (position at origin, no rotation, no scaling.)
 
@@ -1916,7 +1920,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 
 The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
-Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
+Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data, and the possibility to add tags for identification: see \ref UIElement::AddTag "AddTag()", \ref UIElement::RemoveTag "RemoveTag()", \ref UIElement::SetTags "SetTags()" and \ref UIElement::GetChildrenWithTag "GetChildrenWithTag()".
 
 To allow the elements react to mouse input, either a mouse cursor element must be defined using \ref UI::SetCursor "SetCursor()" or the operating system mouse cursor must be set visible from the Input subsystem.
 

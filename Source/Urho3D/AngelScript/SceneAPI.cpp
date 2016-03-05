@@ -167,9 +167,9 @@ static bool SceneLoadXMLVectorBuffer(VectorBuffer& buffer, Scene* ptr)
 
 static CScriptArray* SceneGetNodesWithTag(const String& tag, Scene* ptr)
 {
-	PODVector<Node*> nodes;
-	ptr->GetNodesWithTag(nodes, tag);
-	return VectorToHandleArray<Node>(nodes, "Array<Node@>");
+    PODVector<Node*> nodes;
+    ptr->GetNodesWithTag(nodes, tag);
+    return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static bool SceneLoadJSONVectorBuffer(VectorBuffer& buffer, Scene* ptr)
@@ -357,16 +357,16 @@ static void RegisterScene(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Scene", "void AddRequiredPackageFile(PackageFile@+)", asMETHOD(Scene, AddRequiredPackageFile), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void ClearRequiredPackageFiles()", asMETHOD(Scene, ClearRequiredPackageFiles), asCALL_THISCALL);
  
-	engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHOD(Scene, RegisterVar), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void RegisterVar(const String&in)", asMETHOD(Scene, RegisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterVar(const String&in)", asMETHOD(Scene, UnregisterVar), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void UnregisterAllVars(const String&in)", asMETHOD(Scene, UnregisterAllVars), asCALL_THISCALL);
 
-	engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetNodesWithTag(const String&in) const", asFUNCTION(SceneGetNodesWithTag), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Scene", "Array<Node@>@ GetNodesWithTag(const String&in) const", asFUNCTION(SceneGetNodesWithTag), asCALL_CDECL_OBJLAST);
 
-	engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint) const", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "Component@+ GetComponent(uint) const", asMETHODPR(Scene, GetComponent, (unsigned) const, Component*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "Node@+ GetNode(uint) const", asMETHOD(Scene, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "const String& GetVarName(StringHash) const", asMETHOD(Scene, GetVarName), asCALL_THISCALL);
-	engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Scene", "void Update(float)", asMETHOD(Scene, Update), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_updateEnabled(bool)", asMETHOD(Scene, SetUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "bool get_updateEnabled() const", asMETHOD(Scene, IsUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Scene", "void set_timeScale(float)", asMETHOD(Scene, SetTimeScale), asCALL_THISCALL);
