@@ -90,19 +90,10 @@ bool SpriteSheet2D::EndLoad()
     return false;
 }
 
-void SpriteSheet2D::SetTexture(SharedPtr<Texture2D>texture)
+void SpriteSheet2D::SetTexture(Texture2D* texture)
 {
     loadTextureName_.Clear();
     texture_ = texture;
-}
-
-Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
-{
-    HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
-    if (i == spriteMapping_.End())
-        return 0;
-
-    return i->second_;
 }
 
 void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& offset)
@@ -122,6 +113,15 @@ void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, c
     sprite->SetSpriteSheet(this);
 
     spriteMapping_[name] = sprite;
+}
+
+Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
+{
+    HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
+    if (i == spriteMapping_.End())
+        return 0;
+
+    return i->second_;
 }
 
 bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)

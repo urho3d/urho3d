@@ -168,11 +168,17 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return Tilemap information.
-    const TileMapInfo2D& GetInfo() const { return info_; }
-
     /// Set Tilemap information.
     bool SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight);
+
+    /// Add layer at index, if index > number of layers then append to end.
+    void AddLayer(unsigned index, TmxLayer2D *layer);
+
+    /// Append layer to end.
+    void AddLayer(Urho3D::TmxLayer2D* layer);
+
+    /// Return Tilemap information.
+    const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
@@ -185,12 +191,6 @@ public:
 
     /// Return layer at index.
     const TmxLayer2D* GetLayer(unsigned index) const;
-
-    /// Add Layer at index, if index>GetNumLayers() then append to end.
-    void AddLayer(unsigned index, TmxLayer2D *layer);
-
-    /// Append layer to end.
-    void AddLayer(Urho3D::TmxLayer2D* layer);
 
 private:
     /// Load TSX file.

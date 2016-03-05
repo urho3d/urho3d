@@ -51,16 +51,16 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return texture.
-    Texture2D* GetTexture() const { return texture_; }
-    /// Set texture
-    void SetTexture(SharedPtr<Texture2D>texture);
-
-    /// Return sprite.
-    Sprite2D* GetSprite(const String& name) const;
+    /// Set texture.
+    void SetTexture(Texture2D* texture);
     /// Define sprite.
     void DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot = Vector2(0.5f, 0.5f),
         const IntVector2& offset = IntVector2::ZERO);
+
+    /// Return texture.
+    Texture2D* GetTexture() const { return texture_; }
+    /// Return sprite.
+    Sprite2D* GetSprite(const String& name) const;
 
     /// Return sprite mapping.
     const HashMap<String, SharedPtr<Sprite2D> >& GetSpriteMapping() const { return spriteMapping_; }
