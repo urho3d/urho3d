@@ -95,6 +95,7 @@ aiNode* rootNode_ = 0;
 String inputName_;
 String resourcePath_;
 String outPath_;
+String outName_;
 bool useSubdirs_ = true;
 bool localIDs_ = false;
 bool saveBinary_ = false;
@@ -401,6 +402,7 @@ void Run(const Vector<String>& arguments)
             outFile = GetInternalPath(arguments[2]);
 
         inputName_ = GetFileName(inFile);
+        outName_ = outFile;
         outPath_ = GetPath(outFile);
 
         if (resourcePath_.Empty())
@@ -616,21 +618,49 @@ void CollectBones(OutModel& model, bool animationOnly)
         }
     }
 
-    // If we find multiple root nodes, try to remedy by using their parent instead
+    // If we find multiple root nodes, try to remedy by going back in the parent chain and finding a common parent
     if (rootNodes.Size() > 1)
     {
-        aiNode* commonParent = (*rootNodes.Begin())->mParent;
         for (HashSet<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
         {
-            if (*i != commonParent)
+            aiNode* commonParent = (*i);
+
+            while (commonParent)
             {
-                if (!commonParent || (*i)->mParent != commonParent)
-                    ErrorExit("Skeleton with multiple root nodes found, not supported");
+                unsigned found = 0;
+                for (HashSet<aiNode*>::Iterator j = rootNodes.Begin(); j != rootNodes.End(); ++j)
+                {
+                    if (i == j)
+                        continue;
+                    aiNode* parent = *j;
+                    while (parent)
+                    {
+                        if (parent == commonParent)
+                        {
+                            ++found;
+                            break;
+                        }
+                        parent = parent->mParent;
+                    }
+                }
+
+                if (found >= rootNodes.Size() - 1)
+                {
+                    PrintLine("Multiple roots initially found, using new root node " + FromAIString(commonParent->mName));
+                    rootNodes.Clear();
+                    rootNodes.Insert(commonParent);
+                    necessary.Insert(commonParent);
+                    break;
+                }
+
+                commonParent = commonParent->mParent;
             }
+
+            if (rootNodes.Size() == 1)
+                break; // Succeeded
         }
-        rootNodes.Clear();
-        rootNodes.Insert(commonParent);
-        necessary.Insert(commonParent);
+        if (rootNodes.Size() > 1)
+            ErrorExit("Skeleton with multiple root nodes found, not supported");
     }
 
     if (rootNodes.Empty())
@@ -789,10 +819,17 @@ void BuildBoneCollisionInfo(OutModel& model)
 void BuildAndSaveModel(OutModel& model)
 {
     if (!model.rootNode_)
-        ErrorExit("Null root node for model");
+    {
+        PrintLine("Null root node for model, skipping model save");
+        return;
+    }
+
     String rootNodeName = FromAIString(model.rootNode_->mName);
     if (!model.meshes_.Size())
-        ErrorExit("No geometries found starting from node " + rootNodeName);
+    {
+        PrintLine("No geometries found starting from node " + rootNodeName + ", skipping model save");
+        return;
+    }
 
     PrintLine("Writing model " + rootNodeName);
 
@@ -1046,7 +1083,7 @@ void BuildAndSaveAnimations(OutModel* model)
         if (model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
-            animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
+            animOutName = outPath_ + GetFileName(outName_) + "_" + SanitateAssetName(animName) + ".ani";
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
