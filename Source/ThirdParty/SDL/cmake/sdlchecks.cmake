@@ -1076,7 +1076,7 @@ endmacro()
 macro(CheckRPI)
   if(VIDEO_RPI)
     # Urho3D - bug fix - when cross-compiling the headers are rooted
-    # Urho3D - TODO - move the find_package(VideoCore REQUIRED) call from Urho3D common module to here
+    # Urho3D - TODO - move the find_package(VideoCore REQUIRED) call from Urho3D common module to here later after we have refactored the library dependency handling
     listtostr (VIDEOCORE_INCLUDE_DIRS VIDEO_RPI_INCLUDE_FLAGS "-I")
     listtostr (VIDEOCORE_LIBRARIES VIDEO_RPI_LIBRARY_FLAGS "-L")
     set(CMAKE_REQUIRED_FLAGS "${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS}")

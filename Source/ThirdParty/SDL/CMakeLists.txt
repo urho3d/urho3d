@@ -195,10 +195,10 @@ endif()
 
 # Urho3D - commented out compiler/linker flags setup as we have configured all our compiler/linker flags as we want globally
 
-# Those are used for pkg-config and friends, so that the SDL2.pc, sdl2-config,
-# etc. are created correctly.
-set(SDL_LIBS "-lSDL2")
-set(SDL_CFLAGS "")
+# Those are used for pkg-config and friends, so that the SDL2.pc, sdl2-config, # etc. are created correctly.
+# Urho3D - we do not use these variables for pkg-config setup for SDL library but we may need them later for Urho3D library
+set (SDL_LIBS)
+set (SDL_CFLAGS)
 
 # Emscripten toolchain has a nonempty default value for this, and the checks
 # in this file need to change that, so remember the original value, and
@@ -314,9 +314,12 @@ foreach(_SUB ${SDL_X11_OPTIONS})
   dep_option(${_OPT}           "Enable ${_SUB} support" ON "VIDEO_X11" OFF)
 endforeach()
 set_option(VIDEO_COCOA         "Use Cocoa video driver" ${APPLE})
-set_option(DIRECTX             "Use DirectX for Windows audio/video" ${WINDOWS})
+# Urho3D - only make DIRECTX option available on Windows platform when URHO3D_OPENGL is enabled
+if (WINDOWS)
+  dep_option(DIRECTX             "Use DirectX for Windows audio/video" ON URHO3D_OPENGL ON)
+endif ()
 # Urho3D - commented out RENDER_D3D as an option to avoid potential conflict with our URHO3D_OPENGL and URHO3D_D3D11 build options on Windows platform
-#          Instead just initialize the variable according to our build options
+#          Instead just initialize the variable according to our build options; Urho3D also by default disables the SDL renderer subsystem
 if (WINDOWS)
   if (URHO3D_OPENGL)
     set (RENDER_D3D FALSE)
@@ -924,34 +927,8 @@ elseif(WINDOWS)
 
   # Check for DirectX
   if(DIRECTX)
-    if(DEFINED MSVC_VERSION AND NOT ${MSVC_VERSION} LESS 1700)
-        set(USE_WINSDK_DIRECTX TRUE)
-    endif()
-    if(NOT CMAKE_COMPILER_IS_MINGW AND NOT USE_WINSDK_DIRECTX)
-      if("$ENV{DXSDK_DIR}" STREQUAL "")
-        message_error("DIRECTX requires the \$DXSDK_DIR environment variable to be set")
-      endif()
-      set(CMAKE_REQUIRED_FLAGS "/I\"$ENV{DXSDK_DIR}\\Include\"")
-    endif()
-
-    # Urho3D - simplify the check for xinput.h
-    check_include_file(xinput.h HAVE_XINPUT_H)
-    check_include_file(d3d9.h HAVE_D3D_H)
-    check_include_file(d3d11_1.h HAVE_D3D11_H)
-    check_include_file(ddraw.h HAVE_DDRAW_H)
-    check_include_file(dsound.h HAVE_DSOUND_H)
-    check_include_file(dinput.h HAVE_DINPUT_H)
-    check_include_file(xaudio2.h HAVE_XAUDIO2_H)
-    check_include_file(dxgi.h HAVE_DXGI_H)
-    if(HAVE_D3D_H OR HAVE_D3D11_H OR HAVE_DDRAW_H OR HAVE_DSOUND_H OR HAVE_DINPUT_H OR HAVE_XAUDIO2_H)
-      set(HAVE_DIRECTX TRUE)
-      if(NOT CMAKE_COMPILER_IS_MINGW AND NOT USE_WINSDK_DIRECTX)
-      # TODO: change $ENV{DXSDL_DIR} to get the path from the include checks
-        link_directories($ENV{DXSDK_DIR}\\lib\\${PROCESSOR_ARCH})
-        include_directories($ENV{DXSDK_DIR}\\Include)
-      endif()
-    endif()
-    set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+    # Urho3D - bug fix - use our own FindDirectX.cmake module which does not rely on DXSDK_DIR environment variable directly when DirectX SDK is being used
+    # Urho3D - TODO - move the find_package(DirectX) call from Urho3D common module to here later after we have refactored the library dependency handling
   endif()
 
   if(SDL_AUDIO)
@@ -991,6 +968,8 @@ elseif(WINDOWS)
       set(HAVE_RENDER_D3D TRUE)
     endif()
     set(HAVE_SDL_VIDEO TRUE)
+    # Urho3D - bug fix - we are going to need this later when we refactor the library dependency handling
+    list (APPEND EXTRA_LIBS ${DIRECT3D_LIBRARIES})    # Empty when none of the D3D components is used
   endif()
 
   if(SDL_THREADS)
@@ -1093,14 +1072,8 @@ elseif(WINDOWS)
     endif()
   endif()
 
-  file(GLOB VERSION_SOURCES ${SDL2_SOURCE_DIR}/src/main/windows/*.rc)
-  file(GLOB SDLMAIN_SOURCES ${SDL2_SOURCE_DIR}/src/main/windows/*.c)
-  if(MINGW OR CYGWIN)
-    list(APPEND EXTRA_LIBS mingw32)
-    list(APPEND EXTRA_LDFLAGS "-mwindows")
-    set(SDL_CFLAGS "${SDL_CFLAGS} -Dmain=SDL_main")
-    list(APPEND SDL_LIBS "-lmingw32" "-lSDL2main" "-mwindows")
-  endif()
+  # Urho3D - commented out adding main entry point for Windows platform
+  # Urho3D - commented out '-mwindows' linker flags setup as it appears to be automatically added by CMake; also commented out 'mingw32' library dependency as it does not appear to be needed, at least that the case for MinGW
 elseif(APPLE)
   # TODO: rework this for proper MacOS X, iOS and Darwin support
 
@@ -1171,6 +1144,7 @@ elseif(APPLE)
   endif()
 
   # Actually load the frameworks at the end so we don't duplicate include.
+  # Urho3D - TODO - this list in complete, do this when we refactor the library dependency handling
   if(SDL_FRAMEWORK_COREVIDEO)
     find_library(COREVIDEO CoreVideo)
     list(APPEND EXTRA_LIBS ${COREVIDEO})
@@ -1288,9 +1262,7 @@ if(NOT HAVE_SDL_TIMERS)
   set(SOURCE_FILES ${SOURCE_FILES} ${TIMER_SOURCES})
 endif()
 
-if(NOT SDLMAIN_SOURCES)
-  file(GLOB SDLMAIN_SOURCES ${SDL2_SOURCE_DIR}/src/main/dummy/*.c)
-endif()
+# Urho3D - commented out inclusion of dummy main
 
 # Append the -MMD -MT flags
 # if(DEPENDENCY_TRACKING)
@@ -1318,7 +1290,7 @@ set(EXTRA_CFLAGS ${_EXTRA_CFLAGS})
 
 # Compat helpers for the configuration files
 if(NOT WINDOWS OR CYGWIN)
-# Urho3D - commeted out the call to updaterev.sh script as it won't work on any platform as it assumes hg to be the version source control which is not the case in our case
+  # Urho3D - commeted out the call to updaterev.sh script as it won't work on any platform as it assumes hg to be the version source control which is not true in our case
 
   set(prefix ${CMAKE_INSTALL_PREFIX})
   set(exec_prefix "\${prefix}")
@@ -1349,10 +1321,8 @@ if(NOT WINDOWS OR CYGWIN)
   listtostr(SDL_LIBS _SDL_LIBS)
   set(SDL_LIBS ${_SDL_LIBS})
 
-  # MESSAGE(STATUS "SDL_LIBS: ${SDL_LIBS}")
-  # MESSAGE(STATUS "SDL_STATIC_LIBS: ${SDL_STATIC_LIBS}")
-
-# Urho3D - commented out pkg-config configuration file generation
+  # Urho3D - commented out pkg-config configuration file generation
+  # Urho3D - TODO - utilize the populated variables for pkg-config configuration file generation for Urho3D.pc
 endif()
 
 # Urho3D - restore the original CMake global settings
@@ -1400,16 +1370,13 @@ message(STATUS "")
 message(STATUS " Build Shared Library: ${SDL_SHARED}")
 message(STATUS " Build Static Library: ${SDL_STATIC}")
 message(STATUS "")
-if(UNIX)
-  message(STATUS "If something was not detected, although the libraries")
-  message(STATUS "were installed, then make sure you have set the")
-  message(STATUS "CFLAGS and LDFLAGS environment variables correctly.")
-  message(STATUS "")
-endif()
+# Urho3D - commented out messages informing user to set the CFLAGS and LDFLAGS environment variables to workaround detection problems, our modified version does not support that
 endif (NOT SDL_INFO_ECHOED_STATUS)
 
 # Ensure that the extra cflags are used at compile time
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
+
+# Urho3D - commented out targets defined by original CMakeLists.txt, instead we setup our own target that meets our own needs
 
 # Urho3D - use Emscripten's own SDL2 port
 if (WEB)
@@ -1433,5 +1400,3 @@ if (ANDROID)
   install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
   install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h)
 endif ()
-
-# Urho3D - commented out other targets

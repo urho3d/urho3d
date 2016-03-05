@@ -17,7 +17,7 @@ Although all required third-party libraries are included as source code, there a
     - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager. Mutually exclusive with ODBC driver manager.
     - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager. Mutually exclusive with iODBC driver manager. *Recommended but optional*
   + Display server:
-    - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB).
+    - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
     - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
     - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
     - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11. *Recommended*
@@ -25,8 +25,8 @@ Although all required third-party libraries are included as source code, there a
     - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux Sound Architecture (ALSA).
     - arts-devel (RedHat-based only) for Analog Real Time Synthesizer (aRts).
     - libaudio-dev (Debian-based only) for Network Audio System (NAS).
-    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened Sound Eaemon (ESounD).
-    - libfusionsound-dev (DB-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND(_SHARED) build option to enable.
+    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened Sound Daemon (ESounD).
+    - libfusionsound-dev (Debian-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND build option to enable.
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio. *Recommended*
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Misc.:

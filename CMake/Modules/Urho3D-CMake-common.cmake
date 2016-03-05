@@ -459,15 +459,19 @@ if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
 endif ()
 
 if (WIN32)
-    # Find DirectX include & library directories in MS Windows SDK or DirectX SDK. They may also be required by SDL
-    # even if using OpenGL instead of Direct3D, but do not make DirectX REQUIRED in that case
+    set (DIRECTX_REQUIRED_COMPONENTS)
+    set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XAudio2 XInput)
     if (NOT URHO3D_OPENGL)
-        find_package (DirectX REQUIRED)
-    else ()
-        find_package (DirectX)
+        if (URHO3D_D3D11)
+            list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D11)
+        else ()
+            list (APPEND DIRECTX_REQUIRED_COMPONENTS D3D)
+        endif ()
     endif ()
-    if (DIRECT3D_INCLUDE_DIRS)
-        include_directories (${DIRECT3D_INCLUDE_DIRS})
+    find_package (DirectX REQUIRED ${DIRECTX_REQUIRED_COMPONENTS} OPTIONAL_COMPONENTS ${DIRECTX_OPTIONAL_COMPONENTS})
+    if (DIRECTX_FOUND)
+        include_directories (${DIRECTX_INCLUDE_DIRS})   # These variables may be empty when WinSDK or MinGW is being used
+        link_directories (${DIRECTX_LIBRARY_DIRS})
     endif ()
 endif ()
 
@@ -1132,7 +1136,7 @@ macro (setup_executable)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
             COMMENT "Scp-ing ${TARGET_NAME} executable to target system")
     endif ()
-    if (DIRECT3D_DLL AND NOT URHO3D_OPENGL AND NOT ARG_NODEPS AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    if (DIRECT3D_DLL AND NOT ARG_NODEPS AND CMAKE_RUNTIME_OUTPUT_DIRECTORY)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif ()
@@ -1543,14 +1547,7 @@ macro (define_dependency_libs TARGET)
                 list (APPEND LIBS GL)
             endif ()
         elseif (DIRECT3D_LIBRARIES)
-            # Check if the libs are using absolute path
-            list (GET DIRECT3D_LIBRARIES 0 FIRST_LIB)
-            if (IS_ABSOLUTE ${FIRST_LIB})
-                list (APPEND ABSOLUTE_PATH_LIBS ${DIRECT3D_LIBRARIES})
-            else ()
-                # Assume the libraries are found from default directories
-                list (APPEND LIBS ${DIRECT3D_LIBRARIES})
-            endif ()
+            list (APPEND LIBS ${DIRECT3D_LIBRARIES})
         endif ()
 
         # Database

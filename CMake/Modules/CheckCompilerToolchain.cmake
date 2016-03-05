@@ -62,7 +62,7 @@ endmacro ()
 if (MSVC)
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     # TODO: revisit this later because VS may use Clang as compiler in the future
-    if (CMAKE_GENERATOR MATCHES Win64)
+    if (CMAKE_CL_64)
         set (NATIVE_64BIT 1)
     else ()
         set (NATIVE_64BIT 0)
