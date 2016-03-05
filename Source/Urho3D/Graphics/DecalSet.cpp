@@ -258,7 +258,7 @@ void DecalSet::SetMaterial(Material* material)
 void DecalSet::SetMaxVertices(unsigned num)
 {
     // Never expand to 32 bit indices
-    num = (unsigned)Clamp((int)num, MIN_VERTICES, MAX_VERTICES);
+    num = (unsigned)Clamp(num, MIN_VERTICES, MAX_VERTICES);
 
     if (num != maxVertices_)
     {

@@ -400,7 +400,7 @@ unsigned File::Seek(unsigned position)
         {
             unsigned char skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
-                Read(skipBuffer, (unsigned)Min((int)position - position_, (int)SKIP_BUFFER_SIZE));
+                Read(skipBuffer, Min(position - position_, SKIP_BUFFER_SIZE));
         }
         else
             URHO3D_LOGERROR("Seeking backward in a compressed file is not supported");

@@ -47,6 +47,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
+static const unsigned MIN_LOD_LEVELS = 1;
 static const unsigned MAX_LOD_LEVELS = 4;
 static const int DEFAULT_PATCH_SIZE = 32;
 static const int MIN_PATCH_SIZE = 4;
@@ -193,7 +194,7 @@ void Terrain::SetSpacing(const Vector3& spacing)
 
 void Terrain::SetMaxLodLevels(unsigned levels)
 {
-    levels = Clamp((int)levels, 1, MAX_LOD_LEVELS);
+    levels = Clamp(levels, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     if (levels != maxLodLevels_)
     {
         maxLodLevels_ = levels;
@@ -656,7 +657,7 @@ void Terrain::SetPatchSizeAttr(int value)
 
 void Terrain::SetMaxLodLevelsAttr(unsigned value)
 {
-    value = Clamp((int)value, 1, MAX_LOD_LEVELS);
+    value = Clamp(value, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     
     if (value != maxLodLevels_)
     {

@@ -89,7 +89,7 @@ void CrowdManager::RegisterObject(Context* context)
 void CrowdManager::ApplyAttributes()
 {
     // Values from Editor, saved-file, or network must be checked before applying
-    maxAgents_ = (unsigned)Max(1, maxAgents_);
+    maxAgents_ = Max(1, maxAgents_);
     maxAgentRadius_ = Max(0.f, maxAgentRadius_);
 
     bool navMeshChange = false;

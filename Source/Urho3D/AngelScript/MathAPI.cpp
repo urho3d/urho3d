@@ -52,17 +52,17 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
 
-    engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Asin(float)", asFUNCTION(Asin), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Acos(float)", asFUNCTION(Acos), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Atan(float)", asFUNCTION(Atan), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTION(Atan2), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Asin(float)", asFUNCTION(Asin<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Acos(float)", asFUNCTION(Acos<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Atan(float)", asFUNCTION(Atan<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTION(Atan2<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Abs(float)", asFUNCTIONPR(Abs, (float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Sign(float)", asFUNCTION(Sign), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Sign(float)", asFUNCTION(Sign<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Pow(float, float)", asFUNCTION(powf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Min(float, float)", asFUNCTIONPR(Min, (float, float), float), asCALL_CDECL);
@@ -70,7 +70,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Max(float, float)", asFUNCTIONPR(Max, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("int Max(int, int)", asFUNCTIONPR(Max, (int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Clamp(float, float, float)", asFUNCTIONPR(Clamp, (float, float, float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float SmoothStep(float, float, float)", asFUNCTION(SmoothStep), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float SmoothStep(float, float, float)", asFUNCTION(SmoothStep<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("int Clamp(int, int, int)", asFUNCTIONPR(Clamp, (int, int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Lerp(float, float, float)", asFUNCTIONPR(Lerp, (float, float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Mod(float, float)", asFUNCTION(fmodf), asCALL_CDECL);

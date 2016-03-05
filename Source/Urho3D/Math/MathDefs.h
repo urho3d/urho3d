@@ -22,6 +22,13 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4018) // Signed/unsigned mismatch
+#pragma warning(disable:4244) // Conversion from 'double' to 'float'
+#pragma warning(disable:4702) // unreachable code
+#endif
+
 #include "../Math/Random.h"
 
 #include <cstdlib>
@@ -62,16 +69,16 @@ template <class T>
 inline bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<T>::epsilon() >= rhs && lhs - std::numeric_limits<T>::epsilon() <= rhs; }
 
 /// Linear interpolation between two values.
-template <class T>
-inline T Lerp(T lhs, T rhs, T t) { return lhs * (1.0 - t) + rhs * t; }
+template <class T, class U>
+inline T Lerp(T lhs, T rhs, U t) { return lhs * (1.0 - t) + rhs * t; }
 
 /// Return the smaller of two values.
-template <class T>
-inline T Min(T lhs, T rhs) { return lhs < rhs ? lhs : rhs; }
+template <class T, class U>
+inline T Min(T lhs, U rhs) { return lhs < rhs ? lhs : rhs; }
 
 /// Return the larger of two values.
-template <class T>
-inline T Max(T lhs, T rhs) { return lhs > rhs ? lhs : rhs; }
+template <class T, class U>
+inline T Max(T lhs, U rhs) { return lhs > rhs ? lhs : rhs; }
 
 /// Return absolute value of a value
 template <class T>
@@ -95,7 +102,7 @@ inline bool IsNaN(float value)
 
 #endif
 
-/// Clamp a float to a range.
+/// Clamp a number to a range.
 template <class T>
 inline T Clamp(T value, T min, T max)
 {
@@ -251,3 +258,7 @@ inline float HalfToFloat(unsigned short value)
 }
 
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

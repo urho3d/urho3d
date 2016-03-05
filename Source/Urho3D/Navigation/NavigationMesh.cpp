@@ -529,7 +529,7 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     FindPath(navPathPoints, start, end, extents, filter);
 
     dest.Clear();
-    for (int i = 0; i < navPathPoints.Size(); ++i)
+    for (unsigned i = 0; i < navPathPoints.Size(); ++i)
         dest.Push(navPathPoints[i].position_);
 }
 
