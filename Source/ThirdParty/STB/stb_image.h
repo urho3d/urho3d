@@ -1,219 +1,4 @@
-/* stb_image - v2.10 - public domain image loader - http://nothings.org/stb_image.h
-                                     no warranty implied; use at your own risk
-
-   Do this:
-      #define STB_IMAGE_IMPLEMENTATION
-   before you include this file in *one* C or C++ file to create the implementation.
-
-   // i.e. it should look like this:
-   #include ...
-   #include ...
-   #include ...
-   #define STB_IMAGE_IMPLEMENTATION
-   #include "stb_image.h"
-
-   You can #define STBI_ASSERT(x) before the #include to avoid using assert.h.
-   And #define STBI_MALLOC, STBI_REALLOC, and STBI_FREE to avoid using malloc,realloc,free
-
-
-   QUICK NOTES:
-      Primarily of interest to game developers and other people who can
-          avoid problematic images and only need the trivial interface
-
-      JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib)
-      PNG 1/2/4/8-bit-per-channel (16 bpc not supported)
-
-      TGA (not sure what subset, if a subset)
-      BMP non-1bpp, non-RLE
-      PSD (composited view only, no extra channels, 8/16 bit-per-channel)
-
-      GIF (*comp always reports as 4-channel)
-      HDR (radiance rgbE format)
-      PIC (Softimage PIC)
-      PNM (PPM and PGM binary only)
-
-      Animated GIF still needs a proper API, but here's one way to do it:
-          http://gist.github.com/urraka/685d9a6340b26b830d49
-
-      - decode from memory or through FILE (define STBI_NO_STDIO to remove code)
-      - decode from arbitrary I/O callbacks
-      - SIMD acceleration on x86/x64 (SSE2) and ARM (NEON)
-
-   Full documentation under "DOCUMENTATION" below.
-
-
-   Revision 2.00 release notes:
-
-      - Progressive JPEG is now supported.
-
-      - PPM and PGM binary formats are now supported, thanks to Ken Miller.
-
-      - x86 platforms now make use of SSE2 SIMD instructions for
-        JPEG decoding, and ARM platforms can use NEON SIMD if requested.
-        This work was done by Fabian "ryg" Giesen. SSE2 is used by
-        default, but NEON must be enabled explicitly; see docs.
-
-        With other JPEG optimizations included in this version, we see
-        2x speedup on a JPEG on an x86 machine, and a 1.5x speedup
-        on a JPEG on an ARM machine, relative to previous versions of this
-        library. The same results will not obtain for all JPGs and for all
-        x86/ARM machines. (Note that progressive JPEGs are significantly
-        slower to decode than regular JPEGs.) This doesn't mean that this
-        is the fastest JPEG decoder in the land; rather, it brings it
-        closer to parity with standard libraries. If you want the fastest
-        decode, look elsewhere. (See "Philosophy" section of docs below.)
-
-        See final bullet items below for more info on SIMD.
-
-      - Added STBI_MALLOC, STBI_REALLOC, and STBI_FREE macros for replacing
-        the memory allocator. Unlike other STBI libraries, these macros don't
-        support a context parameter, so if you need to pass a context in to
-        the allocator, you'll have to store it in a global or a thread-local
-        variable.
-
-      - Split existing STBI_NO_HDR flag into two flags, STBI_NO_HDR and
-        STBI_NO_LINEAR.
-            STBI_NO_HDR:     suppress implementation of .hdr reader format
-            STBI_NO_LINEAR:  suppress high-dynamic-range light-linear float API
-
-      - You can suppress implementation of any of the decoders to reduce
-        your code footprint by #defining one or more of the following
-        symbols before creating the implementation.
-
-            STBI_NO_JPEG
-            STBI_NO_PNG
-            STBI_NO_BMP
-            STBI_NO_PSD
-            STBI_NO_TGA
-            STBI_NO_GIF
-            STBI_NO_HDR
-            STBI_NO_PIC
-            STBI_NO_PNM   (.ppm and .pgm)
-
-      - You can request *only* certain decoders and suppress all other ones
-        (this will be more forward-compatible, as addition of new decoders
-        doesn't require you to disable them explicitly):
-
-            STBI_ONLY_JPEG
-            STBI_ONLY_PNG
-            STBI_ONLY_BMP
-            STBI_ONLY_PSD
-            STBI_ONLY_TGA
-            STBI_ONLY_GIF
-            STBI_ONLY_HDR
-            STBI_ONLY_PIC
-            STBI_ONLY_PNM   (.ppm and .pgm)
-
-         Note that you can define multiples of these, and you will get all
-         of them ("only x" and "only y" is interpreted to mean "only x&y").
-
-       - If you use STBI_NO_PNG (or _ONLY_ without PNG), and you still
-         want the zlib decoder to be available, #define STBI_SUPPORT_ZLIB
-
-      - Compilation of all SIMD code can be suppressed with
-            #define STBI_NO_SIMD
-        It should not be necessary to disable SIMD unless you have issues
-        compiling (e.g. using an x86 compiler which doesn't support SSE
-        intrinsics or that doesn't support the method used to detect
-        SSE2 support at run-time), and even those can be reported as
-        bugs so I can refine the built-in compile-time checking to be
-        smarter.
-
-      - The old STBI_SIMD system which allowed installing a user-defined
-        IDCT etc. has been removed. If you need this, don't upgrade. My
-        assumption is that almost nobody was doing this, and those who
-        were will find the built-in SIMD more satisfactory anyway.
-
-      - RGB values computed for JPEG images are slightly different from
-        previous versions of stb_image. (This is due to using less
-        integer precision in SIMD.) The C code has been adjusted so
-        that the same RGB values will be computed regardless of whether
-        SIMD support is available, so your app should always produce
-        consistent results. But these results are slightly different from
-        previous versions. (Specifically, about 3% of available YCbCr values
-        will compute different RGB results from pre-1.49 versions by +-1;
-        most of the deviating values are one smaller in the G channel.)
-
-      - If you must produce consistent results with previous versions of
-        stb_image, #define STBI_JPEG_OLD and you will get the same results
-        you used to; however, you will not get the SIMD speedups for
-        the YCbCr-to-RGB conversion step (although you should still see
-        significant JPEG speedup from the other changes).
-
-        Please note that STBI_JPEG_OLD is a temporary feature; it will be
-        removed in future versions of the library. It is only intended for
-        near-term back-compatibility use.
-
-
-   Latest revision history:
-      2.10  (2016-01-22) avoid warning introduced in 2.09
-      2.09  (2016-01-16) 16-bit TGA; comments in PNM files; STBI_REALLOC_SIZED
-      2.08  (2015-09-13) fix to 2.07 cleanup, reading RGB PSD as RGBA
-      2.07  (2015-09-13) partial animated GIF support
-                         limited 16-bit PSD support
-                         minor bugs, code cleanup, and compiler warnings
-      2.06  (2015-04-19) fix bug where PSD returns wrong '*comp' value
-      2.05  (2015-04-19) fix bug in progressive JPEG handling, fix warning
-      2.04  (2015-04-15) try to re-enable SIMD on MinGW 64-bit
-      2.03  (2015-04-12) additional corruption checking
-                         stbi_set_flip_vertically_on_load
-                         fix NEON support; fix mingw support
-      2.02  (2015-01-19) fix incorrect assert, fix warning
-      2.01  (2015-01-17) fix various warnings
-      2.00b (2014-12-25) fix STBI_MALLOC in progressive JPEG
-      2.00  (2014-12-25) optimize JPEG, including x86 SSE2 & ARM NEON SIMD
-                         progressive JPEG
-                         PGM/PPM support
-                         STBI_MALLOC,STBI_REALLOC,STBI_FREE
-                         STBI_NO_*, STBI_ONLY_*
-                         GIF bugfix
-      1.48  (2014-12-14) fix incorrectly-named assert()
-      1.47  (2014-12-14) 1/2/4-bit PNG support (both grayscale and paletted)
-                         optimize PNG
-                         fix bug in interlaced PNG with user-specified channel count
-
-   See end of file for full revision history.
-
-
- ============================    Contributors    =========================
-
- Image formats                          Extensions, features
-    Sean Barrett (jpeg, png, bmp)          Jetro Lauha (stbi_info)
-    Nicolas Schulz (hdr, psd)              Martin "SpartanJ" Golini (stbi_info)
-    Jonathan Dummer (tga)                  James "moose2000" Brown (iPhone PNG)
-    Jean-Marc Lienher (gif)                Ben "Disch" Wenger (io callbacks)
-    Tom Seddon (pic)                       Omar Cornut (1/2/4-bit PNG)
-    Thatcher Ulrich (psd)                  Nicolas Guillemot (vertical flip)
-    Ken Miller (pgm, ppm)                  Richard Mitton (16-bit PSD)
-    urraka@github (animated gif)           Junggon Kim (PNM comments)
-                                           Daniel Gibson (16-bit TGA)
-
- Optimizations & bugfixes
-    Fabian "ryg" Giesen
-    Arseny Kapoulkine
-
- Bug & warning fixes
-    Marc LeBlanc            David Woo          Guillaume George   Martins Mozeiko
-    Christpher Lloyd        Martin Golini      Jerry Jansson      Joseph Thomson
-    Dave Moore              Roy Eltham         Hayaki Saito       Phil Jordan
-    Won Chun                Luke Graham        Johan Duparc       Nathan Reed
-    the Horde3D community   Thomas Ruf         Ronny Chevalier    Nick Verigakis
-    Janez Zemva             John Bartholomew   Michal Cichon      svdijk@github
-    Jonathan Blow           Ken Hamada         Tero Hanninen      Baldur Karlsson
-    Laurent Gomila          Cort Stratton      Sergio Gonzalez    romigrou@github
-    Aruelien Pocheville     Thibault Reuille   Cass Everitt
-    Ryamond Barbiero        Paul Du Bois       Engin Manap
-    Blazej Dariusz Roszkowski
-    Michaelangel007@github
-
-
-LICENSE
-
-This software is in the public domain. Where that dedication is not
-recognized, you are granted a perpetual, irrevocable license to copy,
-distribute, and modify this file as you see fit.
-
-*/
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 #ifndef STBI_INCLUDE_STB_IMAGE_H
 #define STBI_INCLUDE_STB_IMAGE_H
@@ -648,6 +433,11 @@ typedef unsigned char validate_uint32[sizeof(stbi__uint32)==4 ? 1 : -1];
 #define STBI__X86_TARGET
 #endif
 
+// Urho3D: do not use SIMD instructions if both URHO3D_SSE and URHO3D_NEON are disabled
+#if !defined(URHO3D_SSE) && !defined(URHO3D_NEON)
+#define STBI_NO_SIMD
+#endif
+
 #if defined(__GNUC__) && (defined(STBI__X86_TARGET) || defined(STBI__X64_TARGET)) && !defined(__SSE2__) && !defined(STBI_NO_SIMD)
 // NOTE: not clear do we actually need this for the 64-bit path?
 // gcc doesn't support sse2 intrinsics unless you compile with -msse2,
@@ -723,8 +513,8 @@ static int stbi__sse2_available()
 #endif
 #endif
 
-// ARM NEON
-#if defined(STBI_NO_SIMD) && defined(STBI_NEON)
+// ARM NEON # Urho3D - ensure the target platform supports NEON intrinsic instructions
+#if (defined(STBI_NO_SIMD) || !defined(__ARM_NEON__)) && defined(STBI_NEON)
 #undef STBI_NEON
 #endif
 
