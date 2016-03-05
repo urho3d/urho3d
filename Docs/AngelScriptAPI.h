@@ -12566,6 +12566,7 @@ const Color& GetColor() const;
 void FromString(VariantType, const String&);
 void FromString(const String&, const String&);
 bool GetBool() const;
+VectorBuffer GetBuffer() const;
 double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
@@ -12589,7 +12590,6 @@ const VariantMap& GetVariantMap() const;
 const Vector2& GetVector2() const;
 const Vector3& GetVector3() const;
 const Vector4& GetVector4() const;
-const VectorBuffer GetBuffer() const;
 
 // Properties:
 /* readonly */

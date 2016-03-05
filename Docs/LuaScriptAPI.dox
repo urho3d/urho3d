@@ -6647,7 +6647,7 @@ Methods:
 - const Color& GetColor() const
 - const String GetString() const
 - const PODVector<unsigned char>& GetRawBuffer() const
-- const VectorBuffer GetBuffer() const
+- VectorBuffer GetBuffer() const
 - void* GetVoidPtr(const char* type) const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
