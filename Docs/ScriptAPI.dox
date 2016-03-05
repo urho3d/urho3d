@@ -11799,7 +11799,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- Texture2D@ texture // readonly
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly

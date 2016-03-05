@@ -10572,7 +10572,6 @@ uint memoryUse;
 String name;
 /* readonly */
 int refs;
-/* readonly */
 Texture2D texture;
 /* readonly */
 StringHash type;

@@ -5643,11 +5643,16 @@ Properties:
 
 Methods:
 
+- void SetTexture(Texture2D* texture)
 - Texture2D* GetTexture() const
 - Sprite2D* GetSprite(const String name) const
 - void DefineSprite(const String name, const IntRect& rectangle)
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot)
 - void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& originSize)
+
+Properties:
+
+- Texture2D* texture
 
 <a name="Class_StaticModel"></a>
 ### StaticModel : Drawable
