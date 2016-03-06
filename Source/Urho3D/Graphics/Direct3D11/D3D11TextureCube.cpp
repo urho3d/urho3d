@@ -538,7 +538,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         // Create the texture when face 0 is being loaded, assume rest of the faces are same size & format
         if (!face)
         {
-            SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+            SetNumLevels(Max((levels - mipsToSkip), 1U));
             SetSize(width, format);
         }
         else

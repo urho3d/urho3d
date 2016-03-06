@@ -405,7 +405,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         height /= (1 << mipsToSkip);
         depth /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, depth, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)

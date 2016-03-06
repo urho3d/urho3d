@@ -45,9 +45,9 @@ static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const int MAX_LIGHT_SPLITS = 6;
 #ifdef DESKTOP_GRAPHICS
-static const int MAX_CASCADE_SPLITS = 4;
+static const unsigned MAX_CASCADE_SPLITS = 4;
 #else
-static const int MAX_CASCADE_SPLITS = 1;
+static const unsigned MAX_CASCADE_SPLITS = 1;
 #endif
 
 /// Shadow depth bias parameters.

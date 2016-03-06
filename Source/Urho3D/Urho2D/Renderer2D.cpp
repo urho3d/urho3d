@@ -134,7 +134,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
     for (HashMap<Camera*, ViewBatchInfo2D>::ConstIterator i = viewBatchInfos_.Begin(); i != viewBatchInfos_.End(); ++i)
     {
         if (i->second_.batchUpdatedFrameNumber_ == frame_.frameNumber_)
-            indexCount = (unsigned)Max((int)indexCount, (int)i->second_.indexCount_);
+            indexCount = Max(indexCount, i->second_.indexCount_);
     }
 
     // Fill index buffer

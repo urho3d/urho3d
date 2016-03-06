@@ -2295,11 +2295,9 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
         URHO3D_LOGD3DERROR("Failed to create D3D11 swap chain", hr);
         return false;
     }
-    else if (impl_->swapChain_)
-    {
-        multiSample_ = multiSample;
-        return true;
-    }
+
+    multiSample_ = multiSample;
+    return true;
 }
 
 bool Graphics::UpdateSwapChain(int width, int height)

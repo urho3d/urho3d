@@ -175,7 +175,7 @@ void DatabaseDemo::HandleInput(const String& input)
         if (input.StartsWith("set") && tokens.Size() > 1)
         {
             if (setting == "maxrows")
-                maxRows_ = (unsigned)Max(ToUInt(tokens[1]), 1);
+                maxRows_ = Max(ToUInt(tokens[1]), 1U);
             else if (setting == "connstr")
             {
                 String newConnectionString(input.Substring(input.Find(" ", input.Find("connstr")) + 1));

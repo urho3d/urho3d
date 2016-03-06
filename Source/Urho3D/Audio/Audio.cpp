@@ -128,7 +128,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     stereo_ = obtained.channels == 2;
     sampleSize_ = (unsigned)(stereo_ ? sizeof(int) : sizeof(short));
     // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
-    fragmentSize_ = (unsigned)Min((int)NextPowerOfTwo((unsigned)(mixRate >> 6)), (int)obtained.samples);
+    fragmentSize_ = Min(NextPowerOfTwo((unsigned)(mixRate >> 6)), (unsigned)obtained.samples);
     mixRate_ = obtained.freq;
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
@@ -258,7 +258,7 @@ void Audio::MixOutput(void* dest, unsigned samples)
     while (samples)
     {
         // If sample count exceeds the fragment (clip buffer) size, split the work
-        unsigned workSamples = (unsigned)Min((int)samples, (int)fragmentSize_);
+        unsigned workSamples = Min(samples, fragmentSize_);
         unsigned clipSamples = workSamples;
         if (stereo_)
             clipSamples <<= 1;

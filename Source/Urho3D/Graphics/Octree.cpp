@@ -370,7 +370,7 @@ void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 
     Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = (unsigned)Max((int)numLevels, 1);
+    numLevels_ = Max(numLevels, 1U);
 }
 
 void Octree::Update(const FrameInfo& frame)

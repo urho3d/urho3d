@@ -128,7 +128,7 @@ void ParticleEmitter2D::SetBlendMode(BlendMode blendMode)
 
 void ParticleEmitter2D::SetMaxParticles(unsigned maxParticles)
 {
-    maxParticles = Max(maxParticles, 1);
+    maxParticles = Max(maxParticles, 1U);
 
     particles_.Resize(maxParticles);
     sourceBatches_[0].vertices_.Reserve(maxParticles * 4);
@@ -228,7 +228,7 @@ void ParticleEmitter2D::UpdateSourceBatches()
     vertex2.uv_ = textureRect.max_;
     vertex3.uv_ = Vector2(textureRect.max_.x_, textureRect.min_.y_);
 
-    for (int i = 0; i < numParticles_; ++i)
+    for (unsigned i = 0; i < numParticles_; ++i)
     {
         Particle2D& p = particles_[i];
 
@@ -280,7 +280,7 @@ void ParticleEmitter2D::Update(float timeStep)
     boundingBoxMinPoint_ = Vector3(M_INFINITY, M_INFINITY, M_INFINITY);
     boundingBoxMaxPoint_ = Vector3(-M_INFINITY, -M_INFINITY, -M_INFINITY);
 
-    int particleIndex = 0;
+    unsigned particleIndex = 0;
     while (particleIndex < numParticles_)
     {
         Particle2D& particle = particles_[particleIndex];
@@ -323,7 +323,7 @@ void ParticleEmitter2D::Update(float timeStep)
 
 bool ParticleEmitter2D::EmitParticle(const Vector3& worldPosition, float worldAngle, float worldScale)
 {
-    if (numParticles_ >= effect_->GetMaxParticles() || numParticles_ >= (int)particles_.Size())
+    if (numParticles_ >= (unsigned)effect_->GetMaxParticles() || numParticles_ >= particles_.Size())
         return false;
 
     float lifespan = effect_->GetParticleLifeSpan() + effect_->GetParticleLifespanVariance() * Random(-1.0f, 1.0f);

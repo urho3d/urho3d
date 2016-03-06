@@ -177,7 +177,7 @@ bool Serializer::WriteString(const String& value)
 bool Serializer::WriteFileID(const String& value)
 {
     bool success = true;
-    unsigned length = (unsigned)Min((int)value.Length(), 4);
+    unsigned length = Min(value.Length(), 4U);
 
     success &= Write(value.CString(), length) == length;
     for (unsigned i = value.Length(); i < 4; ++i)

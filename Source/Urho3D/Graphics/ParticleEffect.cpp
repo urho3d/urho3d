@@ -435,7 +435,7 @@ void ParticleEffect::SetMaterial(Material* material)
 
 void ParticleEffect::SetNumParticles(unsigned num)
 {
-    numParticles_ = Max(0, num);
+    numParticles_ = Max(0U, num);
 }
 
 void ParticleEffect::SetUpdateInvisible(bool enable)

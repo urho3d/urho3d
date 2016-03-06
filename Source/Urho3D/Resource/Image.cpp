@@ -373,20 +373,20 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
             {
-                blocksWide = (Max(x, 1) + 3) / 4;
-                blocksHeight = (Max(y, 1) + 3) / 4;
-                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1);
+                blocksWide = (Max(x, 1U) + 3) / 4;
+                blocksHeight = (Max(y, 1U) + 3) / 4;
+                dataSize += blockSize * blocksWide * blocksHeight * Max(z, 1U);
             }
         }
         else
         {
-            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1);
+            dataSize = (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * ddsd.dwWidth_ * ddsd.dwHeight_ * Max(ddsd.dwDepth_, 1U);
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
             unsigned z = ddsd.dwDepth_ / 2;
             for (unsigned level = ddsd.dwMipMapCount_; level > 1; x /= 2, y /= 2, z /= 2, --level)
-                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1) * Max(y, 1) * Max(z, 1);
+                dataSize += (ddsd.ddpfPixelFormat_.dwRGBBitCount_ / 8) * Max(x, 1U) * Max(y, 1U) * Max(z, 1U);
         }
 
         // Do not use a shared ptr here, in case nothing is refcounting the image outside this function.

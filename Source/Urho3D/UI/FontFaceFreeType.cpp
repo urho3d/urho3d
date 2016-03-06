@@ -412,23 +412,23 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
             if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
             {
-                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
+                for (int y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
+                    for (int x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = (unsigned char)((src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0);
                 }
             }
             else
             {
-                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
+                for (int y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
+                    for (int x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = src[x];
                 }
             }

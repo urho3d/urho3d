@@ -337,7 +337,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)

@@ -531,7 +531,7 @@ void Text::UpdateText(bool onResize)
                             printToText_.Pop();
                         }
                         printText_.Push('\n');
-                        printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
+                        printToText_.Push(Min(i, unicodeText_.Size() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -557,7 +557,7 @@ void Text::UpdateText(bool onResize)
                 else
                 {
                     printText_.Push('\n');
-                    printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
+                    printToText_.Push(Min(i, unicodeText_.Size() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }

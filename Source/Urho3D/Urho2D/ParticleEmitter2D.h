@@ -143,8 +143,8 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Num particles.
-    int numParticles_;
+    /// Nummber of particles.
+    unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
     /// Emit particle time

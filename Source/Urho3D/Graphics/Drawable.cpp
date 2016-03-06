@@ -563,11 +563,11 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
 
                 // Amount by which to offset indices in the OBJ vs their values in the Urho3D geometry, basically the lowest index value
                 // Compensates for the above vertex writing which doesn't write ALL vertices, just the used ones
-                int indexOffset = M_MAX_INT;
+                unsigned indexOffset = M_MAX_INT;
                 for (unsigned indexIdx = indexStart; indexIdx < indexStart + indexCount; indexIdx++)
                 {
                     if (indexSize == 2)
-                        indexOffset = Min(indexOffset, *((unsigned short*)(indexData + indexIdx * indexSize)));
+                        indexOffset = Min(indexOffset, (unsigned)*((unsigned short*)(indexData + indexIdx * indexSize)));
                     else
                         indexOffset = Min(indexOffset, *((unsigned*)(indexData + indexIdx * indexSize)));
                 }

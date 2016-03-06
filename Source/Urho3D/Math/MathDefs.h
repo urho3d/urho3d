@@ -24,7 +24,6 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable:4018) // Signed/unsigned mismatch
 #pragma warning(disable:4244) // Conversion from 'double' to 'float'
 #pragma warning(disable:4702) // unreachable code
 #endif

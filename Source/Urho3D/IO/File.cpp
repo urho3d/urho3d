@@ -281,12 +281,12 @@ unsigned File::Read(void* dest, unsigned size)
         {
             if (readBufferOffset_ >= readBufferSize_)
             {
-                readBufferSize_ = Min((int)size_ - position_, (int)READ_BUFFER_SIZE);
+                readBufferSize_ = Min(size_ - position_, READ_BUFFER_SIZE);
                 readBufferOffset_ = 0;
                 SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
             }
 
-            unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -327,7 +327,7 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferOffset_ = 0;
             }
 
-            unsigned copySize = (unsigned)Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;

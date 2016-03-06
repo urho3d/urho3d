@@ -334,7 +334,7 @@ void Connection::SendPackages()
             HashMap<StringHash, PackageUpload>::Iterator current = i++;
             PackageUpload& upload = current->second_;
             unsigned fragmentSize =
-                (unsigned)Min((int)(upload.file_->GetSize() - upload.file_->GetPosition()), (int)PACKAGE_FRAGMENT_SIZE);
+                Min((upload.file_->GetSize() - upload.file_->GetPosition()), PACKAGE_FRAGMENT_SIZE);
             upload.file_->Read(buffer, fragmentSize);
 
             msg_.Clear();
