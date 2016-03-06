@@ -198,11 +198,18 @@ public:
     void PrecalculateLevels();
 
 private:
-    /// Decode an image using stb_image.
-    static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components);
+    /// Decode an image using either stb_image or libwebp (if enabled).
+#ifdef URHO3D_WEBP
+    static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components, Urho3D::String& error, bool& isWEBP);
+#else
+    static unsigned char* GetImageData(Deserializer& source, int& width, int& height, unsigned& components, Urho3D::String& error);
+#endif
     /// Free an image file's pixel data.
+#ifdef URHO3D_WEBP 
+    static void FreeImageData(unsigned char* pixelData, bool isWEBP); // isWEBP is required to call the right deallocation function
+#else
     static void FreeImageData(unsigned char* pixelData);
-
+#endif
     /// Width.
     int width_;
     /// Height.
