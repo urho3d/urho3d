@@ -31,12 +31,11 @@
 
 #include <JO/jo_jpeg.h>
 #include <SDL/SDL_surface.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB/stb_image.h>
 #include <STB/stb_image_write.h>
-
 #include "../DebugNew.h"
-
-extern "C" unsigned char* stbi_write_png_to_mem(unsigned char* pixels, int stride_bytes, int x, int y, int n, int* out_len);
 
 #ifndef MAKEFOURCC
 #define MAKEFOURCC(ch0, ch1, ch2, ch3) ((unsigned)(ch0) | ((unsigned)(ch1) << 8) | ((unsigned)(ch2) << 16) | ((unsigned)(ch3) << 24))
@@ -2045,5 +2044,5 @@ void Image::FreeImageData(unsigned char* pixelData)
 
     stbi_image_free(pixelData);
 }
-
+ 
 }
