@@ -169,9 +169,9 @@ Urho3D uses the following third-party libraries:
 - Recast/Detour (http://code.google.com/p/recastnavigation/)
 - SDL 2.0.3 (http://www.libsdl.org/)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
-- stb_image 2.05 (http://nothings.org/)
-- stb_image_write 0.98 (http://nothings.org/)
-- stb_vorbis 1.05 (http://nothings.org/)
+- stb_image 2.10 (http://nothings.org/)
+- stb_image_write 1.01 (http://nothings.org/)
+- stb_vorbis 1.07 (http://nothings.org/)
 - SQLite 3.8.10.2 (https://www.sqlite.org/)
 - tolua++ 1.0.93 (http://www.codenix.com/~tolua)
 
