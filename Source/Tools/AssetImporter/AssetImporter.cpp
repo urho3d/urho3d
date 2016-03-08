@@ -928,6 +928,9 @@ void BuildAndSaveModel(OutModel& model)
         PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
             String(validFaces * 3) + " indices");
 
+        if (model.bones_.Size() > 0 && !mesh->HasBones())
+            PrintLine("Warning: model has bones but geometry " + String(i) + " has no skinning information");
+
         unsigned char* vertexData = vb->GetShadowData();
         unsigned char* indexData = ib->GetShadowData();
 
