@@ -1392,6 +1392,8 @@
 		"it":"Colore"
 	},
 	"Tags":{
-		"en":"Tags"
+		"en":"Tags",
+		"fr":"Étiquettes",
+		"it":"Etichette"
 	}
 }
