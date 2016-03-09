@@ -78,6 +78,8 @@ public:
 private:
     /// Reset scene.
     void ResetScene();
+    /// Handle render surface update event. Queue the texture for update in case the View3D is visible and automatic update is enabled.
+    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;
