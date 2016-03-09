@@ -156,7 +156,7 @@ unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 String GetMaterialTextureName(const String& nameIn);
@@ -169,7 +169,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
 void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
     const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights);
-unsigned GetElementMask(aiMesh* mesh);
+unsigned GetElementMask(aiMesh* mesh, bool isSkinned);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
@@ -587,6 +587,16 @@ void CollectBones(OutModel& model, bool animationOnly)
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
 
+    bool haveSkinnedMeshes = false;
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        if (model.meshes_[i]->HasBones())
+        {
+            haveSkinnedMeshes = true;
+            break;
+        }
+    }
+
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
@@ -616,7 +626,28 @@ void CollectBones(OutModel& model, bool animationOnly)
             if (rootNodes.Find(rootNode) == rootNodes.End())
                 rootNodes.Insert(rootNode);
         }
+
+        // When model is partially skinned, include the attachment nodes of the rigid meshes in the skeleton
+        if (haveSkinnedMeshes && !mesh->mNumBones)
+        {
+            aiNode* boneNode = meshNode;
+            necessary.Insert(boneNode);
+            rootNode = boneNode;
+
+            for (;;)
+            {
+                boneNode = boneNode->mParent;
+                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
+                    break;
+                rootNode = boneNode;
+                necessary.Insert(boneNode);
+            }
+
+            if (rootNodes.Find(rootNode) == rootNodes.End())
+                rootNodes.Insert(rootNode);
+        }
     }
+
 
     // If we find multiple root nodes, try to remedy by going back in the parent chain and finding a common parent
     if (rootNodes.Size() > 1)
@@ -841,13 +872,13 @@ void BuildAndSaveModel(OutModel& model)
 
     bool combineBuffers = true;
     // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
-    unsigned elementMask = GetElementMask(model.meshes_[0]);
+    unsigned elementMask = GetElementMask(model.meshes_[0], model.bones_.Size() > 0);
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         if (GetNumValidFaces(model.meshes_[i]))
         {
             ++numValidGeometries;
-            if (i > 0 && GetElementMask(model.meshes_[i]) != elementMask)
+            if (i > 0 && GetElementMask(model.meshes_[i], model.bones_.Size() > 0) != elementMask)
                 combineBuffers = false;
         }
     }
@@ -880,7 +911,7 @@ void BuildAndSaveModel(OutModel& model)
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
-        unsigned elementMask = GetElementMask(mesh);
+        unsigned elementMask = GetElementMask(mesh, model.bones_.Size() > 0);
         unsigned validFaces = GetNumValidFaces(mesh);
         if (!validFaces)
             continue;
@@ -954,7 +985,7 @@ void BuildAndSaveModel(OutModel& model)
         Vector<PODVector<float> > blendWeights;
         PODVector<unsigned> boneMappings;
         if (model.bones_.Size())
-            GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
+            GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
         float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
@@ -1985,10 +2016,24 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
             }
         }
     }
+
+    // Fallback for rigid skinning for which actual offset matrix information doesn't exist
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        aiMesh* mesh = model.meshes_[i];
+        aiNode* node = model.meshNodes_[i];
+        if (!mesh->HasBones() && boneName == node->mName.data)
+        {
+            aiMatrix4x4 nodeDerivedInverse = GetMeshBakingTransform(node, model.rootNode_);
+            nodeDerivedInverse.Inverse();
+            return ToMatrix3x4(nodeDerivedInverse);
+        }
+    }
+
     return Matrix3x4::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
@@ -2005,37 +2050,75 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 "that each stay at " + String(maxBones_) + " bones or below."
             );
         }
-        boneMappings.Resize(mesh->mNumBones);
-        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        if (mesh->mNumBones > 0)
         {
-            aiBone* bone = mesh->mBones[i];
-            String boneName = FromAIString(bone->mName);
+            boneMappings.Resize(mesh->mNumBones);
+            for (unsigned i = 0; i < mesh->mNumBones; ++i)
+            {
+                aiBone* bone = mesh->mBones[i];
+                String boneName = FromAIString(bone->mName);
+                unsigned globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == M_MAX_UNSIGNED)
+                    ErrorExit("Bone " + boneName + " not found");
+                boneMappings[i] = globalIndex;
+                for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                {
+                    unsigned vertex = bone->mWeights[j].mVertexId;
+                    blendIndices[vertex].Push(i);
+                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+            // If mesh does not have skinning information, implement rigid skinning so that it stays compatible with AnimatedModel
+            String boneName = FromAIString(meshNode->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-                ErrorExit("Bone " + boneName + " not found");
-            boneMappings[i] = globalIndex;
-            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                PrintLine("Warning: bone " + boneName + " not found, skipping rigid skinning");
+            else
             {
-                unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].Push(i);
-                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                boneMappings.Push(globalIndex);
+                for (unsigned i = 0; i < mesh->mNumVertices; ++i)
+                {
+                    blendIndices[i].Push(0);
+                    blendWeights[i].Push(1.0f);
+                }
             }
         }
     }
     else
     {
-        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        if (mesh->mNumBones > 0)
         {
-            aiBone* bone = mesh->mBones[i];
-            String boneName = FromAIString(bone->mName);
+            for (unsigned i = 0; i < mesh->mNumBones; ++i)
+            {
+                aiBone* bone = mesh->mBones[i];
+                String boneName = FromAIString(bone->mName);
+                unsigned globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == M_MAX_UNSIGNED)
+                    ErrorExit("Bone " + boneName + " not found");
+                for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                {
+                    unsigned vertex = bone->mWeights[j].mVertexId;
+                    blendIndices[vertex].Push(globalIndex);
+                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+            String boneName = FromAIString(meshNode->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-                ErrorExit("Bone " + boneName + " not found");
-            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                PrintLine("Warning: bone " + boneName + " not found, skipping rigid skinning");
+            else
             {
-                unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].Push(globalIndex);
-                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                for (unsigned i = 0; i < mesh->mNumVertices; ++i)
+                {
+                    blendIndices[i].Push(globalIndex);
+                    blendWeights[i].Push(1.0f);
+                }
             }
         }
     }
@@ -2230,7 +2313,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     }
 }
 
-unsigned GetElementMask(aiMesh* mesh)
+unsigned GetElementMask(aiMesh* mesh, bool isSkinned)
 {
     unsigned elementMask = MASK_POSITION;
     if (mesh->HasNormals())
@@ -2243,7 +2326,7 @@ unsigned GetElementMask(aiMesh* mesh)
         elementMask |= MASK_TEXCOORD1;
     if (mesh->GetNumUVChannels() > 1)
         elementMask |= MASK_TEXCOORD2;
-    if (mesh->HasBones())
+    if (isSkinned)
         elementMask |= (MASK_BLENDWEIGHTS | MASK_BLENDINDICES);
     return elementMask;
 }
