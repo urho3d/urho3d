@@ -25,7 +25,7 @@ set (TARGET_NAME sqlite)
 
 # https://www.sqlite.org/compile.html
 add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)
-# Do not use pthread and dl libraries for Emscripten
+# Do not use pthread and dl libraries for Web platform
 if (WEB)
     add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
 endif ()

@@ -167,11 +167,7 @@ else()
   set(UNIX_OR_MAC_SYS OFF)
 endif()
 
-if (UNIX_OR_MAC_SYS AND NOT EMSCRIPTEN) # JavaScript does not yet have threading support, so disable pthreads when building for Emscripten.
-  set(SDL_PTHREADS_ENABLED_BY_DEFAULT ON)
-else()
-  set(SDL_PTHREADS_ENABLED_BY_DEFAULT OFF)
-endif()
+# Urho3D - commented out SDL_PTHREADS_ENABLED_BY_DEFAULT variable setup as it is not being used anymore in our modified version
 
 # Default option knobs
 # Urho3D - commented out OPT_DEF_SSEMATH default variable as the underyling SSEMATH build option is also being commented out by us
@@ -279,7 +275,9 @@ set_option(VIDEO_DUMMY         "Use dummy video driver" ON)
 set_option(VIDEO_OPENGL        "Include OpenGL support" ON)
 # Urho3D - hide OpenGLES option from MinGW platform because it does not have the necessary header file to build OpenGLES video driver
 dep_option(VIDEO_OPENGLES      "Include OpenGL ES support" ON "NOT MINGW" OFF)
-set_option(PTHREADS            "Use POSIX threads for multi-threading" ${SDL_PTHREADS_ENABLED_BY_DEFAULT})
+# Urho3D - commented out PTHREADS as an option to avoid potential conflict with our URHO3D_THREADING build option
+#          Instead just initialize the variable according to our build options
+set (PTHREADS ${URHO3D_THREADING})
 dep_option(PTHREADS_SEM        "Use pthread semaphores" ON "PTHREADS" OFF)
 set_option(SDL_DLOPEN          "Use dlopen for shared object loading" ${SDL_DLOPEN_ENABLED_BY_DEFAULT})
 # Urho3D - hide Linux-specific audio driver options from Android platform
@@ -337,19 +335,16 @@ set(SDL_STATIC ON CACHE BOOL "Build a static version of the library")
 # General source files
 set (SOURCE_FILE_PATTERNS
   ${SDL2_SOURCE_DIR}/src/*.c
+  ${SDL2_SOURCE_DIR}/src/atomic/*.c
 # Urho3D - we always disable dynamic API, so commented out ${SDL2_SOURCE_DIR}/src/dynapi/*.c
   ${SDL2_SOURCE_DIR}/src/libm/*.c
-  ${SDL2_SOURCE_DIR}/src/stdlib/*.c)
-# Urho3D - exclude source files from disabled subsystems
-foreach (_SUB ATOMIC AUDIO CPUINFO EVENTS FILE RENDER THREADS TIMERS VIDEO)
+  ${SDL2_SOURCE_DIR}/src/stdlib/*.c
+  ${SDL2_SOURCE_DIR}/src/thread/*.c
+  ${SDL2_SOURCE_DIR}/src/timer/*.c)
+# Urho3D - exclude source files from disabled subsystems, except SDL_ATOMIC, SDL_THREADS and SDL_TIMERS as SDL always needs them even when they may be just generic or dummy implementations
+foreach (_SUB AUDIO CPUINFO EVENTS FILE RENDER VIDEO)
   string (TOLOWER ${_SUB} _DIR)
   if (${SDL_${_SUB}})
-    # Cater for SDL inconsistency in naming convention
-    if (_DIR STREQUAL threads)
-      set (_DIR thread)
-    elseif (_DIR STREQUAL timers)
-      set (_DIR timer)
-    endif ()
     list (APPEND SOURCE_FILE_PATTERNS ${SDL2_SOURCE_DIR}/src/${_DIR}/*.c)
   endif ()
 endforeach()
@@ -1378,18 +1373,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
 
 # Urho3D - commented out targets defined by original CMakeLists.txt, instead we setup our own target that meets our own needs
 
-# Urho3D - use Emscripten's own SDL2 port
-if (WEB)
-  # Emscripten has its own SDL2 port, so just create a custom target to:
-  #  1) Fetch this SDL2 port from its GitHub repository
-  #  2) Install SDL2 headers to the build tree in the post-build step (Note: current configuration uses our own SDL2 header files instead of the ones provided by Emscripten port for no special reason)
-  # Note that we still have to go through the whole detection logic so that we could generate SDL_config.h correctly
-  add_custom_target (${TARGET_NAME} ALL ${CMAKE_COMMAND} -E touch dummy.cpp && ${CMAKE_CXX_COMPILER} -s USE_SDL=2 -o dummy.html dummy.cpp && ${CMAKE_COMMAND} -E remove dummy.*)
-  set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
-else ()
-  # Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
-  setup_library ()
-endif ()
+# Urho3D - anything below this line is Urho3D specific
+
+# Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
+setup_library ()
 
 # Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant

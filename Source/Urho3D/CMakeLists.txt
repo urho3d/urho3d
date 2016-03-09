@@ -103,13 +103,24 @@ if (TARGET LuaJIT_universal)
     add_custom_command (OUTPUT ${LuaJIT_universal_symbolic}
         COMMAND xcodebuild ARCHS="$(ARCHS)" -target LuaJIT_universal -configuration $(CONFIGURATION)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    set_source_files_properties (${LuaJIT_universal_symbolic} PROPERTIES SYMBOLIC TRUE)
+    list (APPEND SYMBOLIC_SOURCES ${LuaJIT_universal_symbolic})
 endif ()
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
     DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
+if (EMSCRIPTEN)
+    # Emscripten will attempt to generate system libraries in LLVM bitcode (libcxxabi, gl, libc, and dlmalloc) when linking for the very first time
+    # However, currently it does so without any locking resulting in potentially multiple same generation with build system that supports concurrent build processes such as ours
+    # Workaround that by calling Emscripten builder to generate all the required system libraries (in case it is the very first time) ahead of time in an orderly fashion
+    set (EMBUILDER_SYSTEM_LIBS_symbolic EMBUILDER_SYSTEM_LIBS_symbolic)
+    list (APPEND EMSCRIPTEN_SYSTEM_LIBS dlmalloc libc libcxxabi gl)
+    add_custom_command (OUTPUT ${EMBUILDER_SYSTEM_LIBS_symbolic}
+        COMMAND ${EMBUILDER} build ${EMSCRIPTEN_SYSTEM_LIBS})
+    list (APPEND SYMBOLIC_SOURCES ${EMBUILDER_SYSTEM_LIBS_symbolic})
+endif ()
+set_source_files_properties (${SYMBOLIC_SOURCES} PROPERTIES SYMBOLIC TRUE)
 
 # Use the AutoBinder tool to generate source files for binding script subsystems
 if (URHO3D_BINDINGS)
@@ -218,7 +229,7 @@ if (MSVC AND URHO3D_LIB_TYPE STREQUAL SHARED)   # MSVC linker does not have forc
 endif ()
 
 # Aggregate all source files
-list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h ${LuaJIT_universal_symbolic})
+list (APPEND SOURCE_FILES ${GEN_CPP_FILES} ${ALL_OBJ_FILES} librevision.h Urho3D.h ${SYMBOLIC_SOURCES})
 
 # Define dependency libs
 # Add include directories to find the precompiled header, export header, and installed headers from thirdparty libs
@@ -260,7 +271,7 @@ if (NOT ANDROID AND NOT WEB)
     else ()
         message (FATAL_ERROR "The .soversion file is corrupted. It should contain a version number with this format major(0xFFFF).minor(0xFF).patch-level(0xFF). e.g.: 0.1.2")
     endif ()
-elseif (WEB)
+elseif (EMSCRIPTEN)
     # Emscripten does not support generation of shared library in a conventional sense, it just produces "linked" LLVM bitcode
     set (CMAKE_SHARED_LIBRARY_SUFFIX ".bc")
 endif ()
@@ -322,7 +333,7 @@ if (NOT XCODE AND NOT MSVC)
                 COMMAND libtool -static $<TARGET_FILE:${TARGET_NAME}>.engine ${ARCHIVES} -o $<TARGET_FILE:${TARGET_NAME}>
                 COMMAND rm $<TARGET_FILE:${TARGET_NAME}>.engine
                 COMMENT "Merging all archives into a single static library using libtool")
-        elseif (WEB OR CMAKE_BINARY_DIR MATCHES " ")
+        elseif (EMSCRIPTEN OR CMAKE_BINARY_DIR MATCHES " ")
             # Do it the hard way by first extracting the object (bitcode) files and appending them to final archive:
             # a) For Emscripten build as Emscripten emar (llvm-ar) neither takes archives directly as input nor supports MRI-style script
             # b) When the build tree path contains spaces because MRI script does not support spaces in path even with proper escape

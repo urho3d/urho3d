@@ -40,18 +40,39 @@
 #  HAVE_SSE2
 #  HAVE_ALTIVEC
 #
+# Size of various data types listed below:
+#  SIZEOF_<DATATYPE>
+#
+
+set (DATATYPES DOUBLE FLOAT128 FLOAT FLOAT80 INT128 INT LONG LONG_DOUBLE LONG_LONG POINTER PTRDIFF_T SHORT SIZE_T WCHAR_T WINT_T)
 
 if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    if (NOT CC_EXIT_STATUS EQUAL 0)
+        # Some (fake) compiler front-ends do not understand stdin redirection as the other (real) compiler front-ends do, so workaround it by using a dummy input source file
+        execute_process (COMMAND ${CMAKE_COMMAND} -E touch dummy.c)
+        execute_process (COMMAND ${CMAKE_C_COMPILER} dummy.c -E -dM RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E remove dummy.c)
+        if (NOT CC_EXIT_STATUS EQUAL 0)
+            message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler options correctly")
+        endif ()
+    endif ()
     string (REPLACE \n ";" NATIVE_PREDEFINED_MACROS "${NATIVE_PREDEFINED_MACROS}")    # Stringify for string replacement
     set (NATIVE_PREDEFINED_MACROS ${NATIVE_PREDEFINED_MACROS} CACHE INTERNAL "Compiler toolchain native predefined macros")
 endif ()
 
 macro (check_native_define REGEX OUTPUT_VAR)
     if (NOT DEFINED ${OUTPUT_VAR})
-        string (REGEX MATCH "#define +${REGEX} +1" matched "${NATIVE_PREDEFINED_MACROS}")
+        string (REGEX MATCH "#define +${REGEX} +([^;]+)" matched "${NATIVE_PREDEFINED_MACROS}")
         if (matched)
-            set (${OUTPUT_VAR} 1)
+            string (REGEX MATCH "\\(.*\\)" captured "${REGEX}")
+            if (captured)
+                set (GROUP 2)
+            else ()
+                set (GROUP 1)
+            endif ()
+            string (REGEX REPLACE "#define +${REGEX} +([^;]+)" \\${GROUP} matched "${matched}")
+            set (${OUTPUT_VAR} ${matched})
         else ()
             set (${OUTPUT_VAR} 0)
         endif ()
@@ -60,12 +81,16 @@ macro (check_native_define REGEX OUTPUT_VAR)
 endmacro ()
 
 if (MSVC)
+    # Check the size of various data types using CMake check_type_size() macro
+    include (CheckTypeSize)
+    foreach (DATATYPE ${DATATYPES})
+        string (TOLOWER ${DATATYPE} LOWERCASE_DATATYPE)
+        check_type_size (${LOWERCASE_DATATYPE} SIZEOF_${DATATYPE})
+    endforeach ()
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     # TODO: revisit this later because VS may use Clang as compiler in the future
     if (CMAKE_CL_64)
         set (NATIVE_64BIT 1)
-    else ()
-        set (NATIVE_64BIT 0)
     endif ()
     # Determine MSVC compiler version based on CMake informational variables
     if (NOT DEFINED COMPILER_VERSION)
@@ -96,8 +121,15 @@ if (MSVC)
         set (COMPILER_VERSION ${COMPILER_VERSION} CACHE INTERNAL "MSVC Compiler version")
     endif ()
 else ()
-    # On non-MSVC compiler, default to build using native ABI of the chosen compiler toolchain in the build tree
-    check_native_define ("__(x86_|aarch|ppc|PPC|powerpc|POWERPC)64__" NATIVE_64BIT)
+    # Check the size of various data types based on the compiler define instead of using CMake check_type_size() macro as it may not work across all compilers (e.g. Emscripten)
+    foreach (DATATYPE ${DATATYPES})
+        check_native_define (__SIZEOF_${DATATYPE}__ SIZEOF_${DATATYPE})
+        set (HAVE_SIZEOF_${DATATYPE} TRUE CACHE INTERNAL "Result of __SIZEOF_${DATATYPE}__")    # Suppress subsequent check_type_size() from being executed
+    endforeach ()
+    # Determine the native ABI based on the size of pointer
+    if (SIZEOF_POINTER EQUAL 8)
+        set (NATIVE_64BIT 1)
+    endif ()
     # Android arm64 compiler only emits __aarch64__ while iOS arm64 emits __aarch64__, __arm64__, and __arm__; for armv7a all emit __arm__
     check_native_define ("__(arm|aarch64)__" ARM)
     # For completeness sake as currently we do not support PowerPC (yet)
@@ -117,7 +149,15 @@ endif ()
 macro (check_extension CPU_INSTRUCTION_EXTENSION)
     string (TOUPPER "${CPU_INSTRUCTION_EXTENSION}" UCASE_EXT_NAME)   # Stringify to guard against empty variable
     if (NOT DEFINED HAVE_${UCASE_EXT_NAME})
-        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -m${CPU_INSTRUCTION_EXTENSION} -E -dM - OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -m${CPU_INSTRUCTION_EXTENSION} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        if (NOT CC_EXIT_STATUS EQUAL 0)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E touch dummy.c)
+            execute_process (COMMAND ${CMAKE_C_COMPILER} dummy.c -m${CPU_INSTRUCTION_EXTENSION} -E -dM RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+            execute_process (COMMAND ${CMAKE_COMMAND} -E remove dummy.c)
+            if (NOT CC_EXIT_STATUS EQUAL 0)
+                message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler options correctly")
+            endif ()
+        endif ()
         if (NOT ${ARGN} STREQUAL "")
             set (EXPECTED_MACRO ${ARGN})
         else ()
@@ -156,7 +196,7 @@ if (NOT ARM)
 endif ()
 
 # Explicitly set the variable to 1 when it is defined and truthy or 0 when it is not defined or falsy
-foreach (VAR HAVE_MMX HAVE_3DNOW HAVE_SSE HAVE_SSE2 HAVE_ALTIVEC)
+foreach (VAR NATIVE_64BIT HAVE_MMX HAVE_3DNOW HAVE_SSE HAVE_SSE2 HAVE_ALTIVEC)
     if (${VAR})
         set (${VAR} 1)
     else ()
