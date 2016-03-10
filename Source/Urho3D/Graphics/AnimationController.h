@@ -130,7 +130,7 @@ public:
     /// Set whether an animation auto-removes on completion.
     bool SetRemoveOnCompletion(const String& name, bool removeOnCompletion);
     /// Set animation blending mode. Return true on success.
-    bool SetBlendingMode(const String& name, AnimationBlendingMode mode);
+    bool SetBlendMode(const String& name, AnimationBlendMode mode);
 
     /// Return whether an animation is active. Note that non-looping animations that are being clamped at the end also return true.
     bool IsPlaying(const String& name) const;
@@ -153,7 +153,7 @@ public:
     /// Return animation looping.
     bool IsLooped(const String& name) const;
     /// Return animation blending mode.
-    AnimationBlendingMode GetBlendingMode(const String& name) const;
+    AnimationBlendMode GetBlendMode(const String& name) const;
     /// Return animation length.
     float GetLength(const String& name) const;
     /// Return animation speed.

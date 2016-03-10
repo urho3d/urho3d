@@ -1,8 +1,8 @@
 $#include "Graphics/AnimationState.h"
 
-enum AnimationBlendingMode
+enum AnimationBlendMode
 {
-    ABM_OVERRIDE = 0,
+    ABM_LERP = 0,
     ABM_ADDITIVE
 };
 
@@ -22,7 +22,7 @@ class AnimationState
     void AddWeight(float delta);
     void AddTime(float delta);
     void SetLayer(unsigned char layer);
-    void SetBlendingMode(AnimationBlendingMode mode);
+    void SetBlendMode(AnimationBlendMode mode);
 
     Animation* GetAnimation() const;
     Bone* GetStartBone() const;
@@ -37,7 +37,7 @@ class AnimationState
     float GetTime() const;
     float GetLength() const;
     unsigned char GetLayer() const;
-    AnimationBlendingMode GetBlendingMode() const;
+    AnimationBlendMode GetBlendMode() const;
 
     tolua_readonly tolua_property__get_set Animation* animation;
     tolua_property__get_set Bone* startBone;
@@ -47,4 +47,5 @@ class AnimationState
     tolua_property__get_set float time;
     tolua_readonly tolua_property__get_set float length;
     tolua_property__get_set unsigned char layer;
+    tolua_property__get_set AnimationBlendMode blendMode;
 };

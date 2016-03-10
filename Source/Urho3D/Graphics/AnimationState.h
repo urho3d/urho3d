@@ -37,9 +37,11 @@ struct AnimationTrack;
 struct Bone;
 
 /// %Animation blending mode.
-enum AnimationBlendingMode
+enum AnimationBlendMode
 {
-    ABM_OVERRIDE = 0,
+    // Lerp blending (default)
+    ABM_LERP = 0,
+    // Additive blending based on difference from bind pose
     ABM_ADDITIVE
 };
 
@@ -81,7 +83,7 @@ public:
     /// Set blending weight.
     void SetWeight(float weight);
     /// Set blending mode.
-    void SetBlendingMode(AnimationBlendingMode mode);
+    void SetBlendMode(AnimationBlendMode mode);
     /// Set time position. Does not fire animation triggers.
     void SetTime(float time);
     /// Set per-bone blending weight by track index. Default is 1.0 (full), is multiplied  with the state's blending weight when applying the animation. Optionally recurses to child bones.
@@ -129,7 +131,7 @@ public:
     float GetWeight() const { return weight_; }
 
     /// Return blending mode.
-    AnimationBlendingMode GetBlendingMode() const { return blendingMode_; }
+    AnimationBlendMode GetBlendMode() const { return blendingMode_; }
 
     /// Return time position.
     float GetTime() const { return time_; }
@@ -170,7 +172,7 @@ private:
     /// Blending layer.
     unsigned char layer_;
     /// Blending mode.
-    AnimationBlendingMode blendingMode_;
+    AnimationBlendMode blendingMode_;
 };
 
 }

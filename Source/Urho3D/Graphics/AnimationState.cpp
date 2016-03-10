@@ -53,7 +53,7 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     weight_(0.0f),
     time_(0.0f),
     layer_(0),
-    blendingMode_(ABM_OVERRIDE)
+    blendingMode_(ABM_LERP)
 {
     // Set default start bone (use all tracks.)
     SetStartBone(0);
@@ -67,7 +67,7 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
     weight_(1.0f),
     time_(0.0f),
     layer_(0),
-    blendingMode_(ABM_OVERRIDE)
+    blendingMode_(ABM_LERP)
 {
     if (animation_)
     {
@@ -180,7 +180,7 @@ void AnimationState::SetWeight(float weight)
     }
 }
 
-void AnimationState::SetBlendingMode(AnimationBlendingMode mode)
+void AnimationState::SetBlendMode(AnimationBlendMode mode)
 {
     if (model_)
     {
@@ -475,7 +475,7 @@ void AnimationState::ApplyToNodes()
 {
     // When applying to a node hierarchy, can only use full weight (nothing to blend to)
     for (Vector<AnimationStateTrack>::Iterator i = stateTracks_.Begin(); i != stateTracks_.End(); ++i)
-        ApplyTrack(*i, 1.0, false);
+        ApplyTrack(*i, 1.0f, false);
 }
 
 void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, bool silent)
@@ -535,32 +535,36 @@ void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, b
             newScale = keyFrame->scale_;
     }
     
-    if (!Equals(weight, 1.0f)) // not full weight
-    {
-        if (channelMask & CHANNEL_POSITION)
-            newPosition = node->GetPosition().Lerp(newPosition, weight);
-        if (channelMask & CHANNEL_ROTATION)
-            newRotation = node->GetRotation().Slerp(newRotation, weight);
-        if (channelMask & CHANNEL_SCALE)
-            newScale = node->GetScale().Lerp(newScale, weight);
-    }
-    
-    if (blendingMode_ == ABM_ADDITIVE) // not ABM_OVERRIDE
+    if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
         if (channelMask & CHANNEL_POSITION)
         {
             Vector3 delta = newPosition - stateTrack.bone_->initialPosition_;
-            newPosition = node->GetPosition() + delta;
+            newPosition = node->GetPosition() + delta * weight;
         }
         if (channelMask & CHANNEL_ROTATION)
         {
             Quaternion delta = newRotation * stateTrack.bone_->initialRotation_.Inverse();
             newRotation = (delta * node->GetRotation()).Normalized();
+            if (!Equals(weight, 1.0f))
+                newRotation = node->GetRotation().Slerp(newRotation, weight);
         }
         if (channelMask & CHANNEL_SCALE)
         {
             Vector3 delta = newScale - stateTrack.bone_->initialScale_;
-            newScale = node->GetScale() + delta;
+            newScale = node->GetScale() + delta * weight;
+        }
+    }
+    else
+    {
+        if (!Equals(weight, 1.0f)) // not full weight
+        {
+            if (channelMask & CHANNEL_POSITION)
+                newPosition = node->GetPosition().Lerp(newPosition, weight);
+            if (channelMask & CHANNEL_ROTATION)
+                newRotation = node->GetRotation().Slerp(newRotation, weight);
+            if (channelMask & CHANNEL_SCALE)
+                newScale = node->GetScale().Lerp(newScale, weight);
         }
     }
     
