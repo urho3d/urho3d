@@ -393,6 +393,17 @@ bool AnimationController::SetLooped(const String& name, bool enable)
     return true;
 }
 
+bool AnimationController::SetBlendingMode(const String& name, AnimationBlendingMode mode)
+{
+    AnimationState* state = GetAnimationState(name);
+    if (!state)
+        return false;
+
+    state->SetBlendingMode(mode);
+    MarkNetworkUpdate();
+    return true;
+}
+
 bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
 {
     unsigned index;
@@ -482,6 +493,12 @@ bool AnimationController::IsLooped(const String& name) const
 {
     AnimationState* state = GetAnimationState(name);
     return state ? state->IsLooped() : false;
+}
+
+AnimationBlendingMode AnimationController::GetBlendingMode(const String& name) const
+{
+    AnimationState* state = GetAnimationState(name);
+    return state ? state->GetBlendingMode() : ABM_OVERRIDE;
 }
 
 float AnimationController::GetLength(const String& name) const
