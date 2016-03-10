@@ -2774,6 +2774,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
+- AnimationBlendMode GetBlendMode(const String&) const
 - float GetFadeTarget(const String&) const
 - float GetFadeTime(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2814,6 +2815,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
+- bool SetBlendMode(const String&, AnimationBlendMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
@@ -2904,6 +2906,7 @@ Methods:
 Properties:
 
 - Animation@ animation // readonly
+- AnimationBlendMode blendMode
 - float[] boneWeights
 - bool enabled // readonly
 - uint8 layer
@@ -14401,6 +14404,12 @@ Properties:
 - Texture@ zoneTexture
 
 \section ScriptAPI_Enums Enumerations
+
+### AnimationBlendMode
+
+- ABM_LERP
+- ABM_ADDITIVE
+
 
 ### BlendMode
 

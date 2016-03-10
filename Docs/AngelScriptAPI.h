@@ -350,6 +350,7 @@ float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetAutoFade(const String&) const;
+AnimationBlendMode GetBlendMode(const String&) const;
 float GetFadeTarget(const String&) const;
 float GetFadeTime(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
@@ -390,6 +391,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 bool SetAutoFade(const String&, float);
+bool SetBlendMode(const String&, AnimationBlendMode);
 void SetInterceptNetworkUpdate(const String&, bool);
 bool SetLayer(const String&, uint8);
 bool SetLooped(const String&, bool);
@@ -492,6 +494,7 @@ void SetBoneWeight(uint, float, bool = false);
 // Properties:
 /* readonly */
 Animation animation;
+AnimationBlendMode blendMode;
 Array<float> boneWeights;
 /* readonly */
 bool enabled;
@@ -13550,6 +13553,12 @@ Texture zoneTexture;
 };
 
 // Enumerations
+
+enum AnimationBlendMode
+{
+ABM_LERP,
+ABM_ADDITIVE,
+};
 
 enum BlendMode
 {

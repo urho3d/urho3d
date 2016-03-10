@@ -381,6 +381,7 @@ Methods:
 - bool SetTime(const String name, float time)
 - bool SetWeight(const String name, float weight)
 - bool SetLooped(const String name, bool enable)
+- bool SetBlendMode(const String name, AnimationBlendMode mode)
 - bool SetSpeed(const String name, float speed)
 - bool SetAutoFade(const String name, float fadeOutTime)
 - bool SetRemoveOnCompletion(const String name, bool removeOnCompletion)
@@ -394,6 +395,7 @@ Methods:
 - float GetTime(const String name) const
 - float GetWeight(const String name) const
 - bool IsLooped(const String name) const
+- AnimationBlendMode GetBlendMode(const String name) const
 - float GetLength(const String name) const
 - float GetSpeed(const String name) const
 - float GetFadeTarget(const String name) const
@@ -447,6 +449,7 @@ Methods:
 - void AddWeight(float delta)
 - void AddTime(float delta)
 - void SetLayer(char layer)
+- void SetBlendMode(AnimationBlendMode mode)
 - Animation* GetAnimation() const
 - Bone* GetStartBone() const
 - float GetBoneWeight(const String name) const
@@ -460,6 +463,7 @@ Methods:
 - float GetTime() const
 - float GetLength() const
 - char GetLayer() const
+- AnimationBlendMode GetBlendMode() const
 
 Properties:
 
@@ -471,6 +475,7 @@ Properties:
 - float time
 - float length (readonly)
 - char layer
+- AnimationBlendMode blendMode
 
 <a name="Class_AnimationTrack"></a>
 ### AnimationTrack
@@ -7219,6 +7224,11 @@ Properties:
 
 \section LuaScriptAPI_Enums Enumerations
 
+### AnimationBlendMode
+
+- int ABM_LERP
+- int ABM_ADDITIVE
+
 ### BlendMode
 
 - int BLEND_REPLACE
@@ -7365,6 +7375,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_DIRECTION
 
 ### FaceCameraMode
 
@@ -7373,7 +7384,6 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
-- int FC_DIRECTION
 
 ### FileMode
 
