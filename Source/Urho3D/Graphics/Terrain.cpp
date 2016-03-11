@@ -1096,7 +1096,7 @@ void Terrain::CreateIndexData()
                     indices.Push((unsigned short)((z + 2 * skip) * row + x));
                     indices.Push((unsigned short)((z + skip) * row + x + skip));
                     indices.Push((unsigned short)(z * row + x));
-                    if (x < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
+                    if (z < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
                     {
                         indices.Push((unsigned short)((z + 2 * skip) * row + x));
                         indices.Push((unsigned short)((z + 2 * skip) * row + x + skip));
