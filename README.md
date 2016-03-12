@@ -81,6 +81,7 @@ Urho3D development, contributions and bugfixes by:
 - reattiva
 - rifai
 - skaiware
+- ssinai1
 - svifylabs
 - szamq
 - thebluefish
