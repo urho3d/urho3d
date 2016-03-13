@@ -223,13 +223,12 @@ else ()
         if (URHO3D_COMPILE_RESULT)
             break ()    # Use the cached result instead of redoing try_run() each time
         elseif (URHO3D_LIBRARIES)
-            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT)
-                set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
+            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB OR XCODE) AND NOT ABI_64BIT)
+                set (COMPILER_32BIT_FLAG -m32)
             endif ()
             # Below variables are loop invariant but there is no harm to keep them here
-            if (IOS)
-                set (IOS_FLAGS -DCMAKE_MACOSX_BUNDLE=1 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0)
-            elseif (ANDROID)
+            if (ANDROID)
+                # TODO - remove this hard-coding when we do the library dependency refactoring
                 set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
             elseif (WIN32)
                 set (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED ${CMAKE_TRY_COMPILE_CONFIGURATION})
@@ -256,14 +255,15 @@ else ()
             # Workaround it by just doing try_compile() and fake the run output which is anyway the case for all the cross-compiling cases
             if (EMSCRIPTEN)
                 try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                    CMAKE_FLAGS -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE}
+                    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CMAKE_REQUIRED_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE}
                     OUTPUT_VARIABLE TRY_COMPILE_OUT)
                 set (TRY_RUN_OUT ${URHO3D_RUN_RESULT__TRYRUN_OUTPUT})
             else ()
+                set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
                 while (NOT URHO3D_COMPILE_RESULT)
                     # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
                     try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                        CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
                         COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
                     if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
                         # Give a second chance for MSVC to use static runtime flag

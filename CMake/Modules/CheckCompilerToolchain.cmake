@@ -40,14 +40,12 @@
 #  HAVE_SSE2
 #  HAVE_ALTIVEC
 #
-# Size of various data types listed below:
-#  SIZEOF_<DATATYPE>
-#
-
-set (DATATYPES DOUBLE FLOAT128 FLOAT FLOAT80 INT128 INT LONG LONG_DOUBLE LONG_LONG POINTER PTRDIFF_T SHORT SIZE_T WCHAR_T WINT_T)
 
 if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
-    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    if (IOS OR TVOS)
+        set (ARCH_FLAGS -arch arm64)    # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+    endif ()
+    execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
     if (NOT CC_EXIT_STATUS EQUAL 0)
         # Some (fake) compiler front-ends do not understand stdin redirection as the other (real) compiler front-ends do, so workaround it by using a dummy input source file
         execute_process (COMMAND ${CMAKE_COMMAND} -E touch dummy.c)
@@ -81,12 +79,6 @@ macro (check_native_define REGEX OUTPUT_VAR)
 endmacro ()
 
 if (MSVC)
-    # Check the size of various data types using CMake check_type_size() macro
-    include (CheckTypeSize)
-    foreach (DATATYPE ${DATATYPES})
-        string (TOLOWER ${DATATYPE} LOWERCASE_DATATYPE)
-        check_type_size (${LOWERCASE_DATATYPE} SIZEOF_${DATATYPE})
-    endforeach ()
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     # TODO: revisit this later because VS may use Clang as compiler in the future
     if (CMAKE_CL_64)
@@ -121,12 +113,8 @@ if (MSVC)
         set (COMPILER_VERSION ${COMPILER_VERSION} CACHE INTERNAL "MSVC Compiler version")
     endif ()
 else ()
-    # Check the size of various data types based on the compiler define instead of using CMake check_type_size() macro as it may not work across all compilers (e.g. Emscripten)
-    foreach (DATATYPE ${DATATYPES})
-        check_native_define (__SIZEOF_${DATATYPE}__ SIZEOF_${DATATYPE})
-        set (HAVE_SIZEOF_${DATATYPE} TRUE CACHE INTERNAL "Result of __SIZEOF_${DATATYPE}__")    # Suppress subsequent check_type_size() from being executed
-    endforeach ()
     # Determine the native ABI based on the size of pointer
+    check_native_define (__SIZEOF_POINTER__ SIZEOF_POINTER)
     if (SIZEOF_POINTER EQUAL 8)
         set (NATIVE_64BIT 1)
     endif ()
