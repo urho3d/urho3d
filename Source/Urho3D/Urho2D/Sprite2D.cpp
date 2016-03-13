@@ -169,8 +169,8 @@ bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX, bool flipY) const
     rect.min_.x_ = rectangle_.left_ * invWidth + edgeOffset_;
     rect.max_.x_ = rectangle_.right_ * invWidth - edgeOffset_;
 
-    rect.min_.y_ = rectangle_.bottom_ * invHeight + edgeOffset_;
-    rect.max_.y_ = rectangle_.top_ * invHeight - edgeOffset_;
+    rect.min_.y_ = rectangle_.bottom_ * invHeight - edgeOffset_;
+    rect.max_.y_ = rectangle_.top_ * invHeight + edgeOffset_;
 
     if (flipX)
         Swap(rect.min_.x_, rect.max_.x_);
