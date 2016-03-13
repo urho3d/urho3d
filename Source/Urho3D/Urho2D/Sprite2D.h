@@ -58,6 +58,8 @@ public:
     void SetOffset(const IntVector2& offset);
     /// Set sprite sheet.
     void SetSpriteSheet(SpriteSheet2D* spriteSheet);
+    /// Set texture edge offset.
+    void SetTextureEdgeOffset(float offset);
 
     /// Return texture.
     Texture2D* GetTexture() const { return texture_; }
@@ -73,6 +75,9 @@ public:
 
     /// Return sprite sheet.
     SpriteSheet2D* GetSpriteSheet() const { return spriteSheet_; }
+
+    /// Return texture edge offset
+    float GetTextureEdgeOffset() const { return edgeOffset_; }
 
     /// Return draw rectangle.
     bool GetDrawRectangle(Rect& rect, bool flipX = false, bool flipY = false) const;
@@ -99,6 +104,8 @@ private:
     WeakPtr<SpriteSheet2D> spriteSheet_;
     /// Texture used while loading.
     SharedPtr<Texture2D> loadTexture_;
+    /// Offset to fix texture edge bleeding.
+    float edgeOffset_;
 };
 
 }
