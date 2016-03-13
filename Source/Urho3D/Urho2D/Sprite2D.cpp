@@ -38,7 +38,8 @@ namespace Urho3D
 Sprite2D::Sprite2D(Context* context) :
     Resource(context),
     hotSpot_(0.5f, 0.5f),
-    offset_(0, 0)
+    offset_(0, 0),
+    edgeOffset_(0.0001f)
 {
 
 }
@@ -137,6 +138,11 @@ void Sprite2D::SetSpriteSheet(SpriteSheet2D* spriteSheet)
     spriteSheet_ = spriteSheet;
 }
 
+void Sprite2D::SetTextureEdgeOffset(float offset)
+{
+    edgeOffset_ = offset;
+}
+
 bool Sprite2D::GetDrawRectangle(Rect& rect, bool flipX, bool flipY) const
 {
     return GetDrawRectangle(rect, hotSpot_, flipX, flipY);
@@ -169,11 +175,11 @@ bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX, bool flipY) const
     float invWidth = 1.0f / (float)texture_->GetWidth();
     float invHeight = 1.0f / (float)texture_->GetHeight();
 
-    rect.min_.x_ = rectangle_.left_ * invWidth;
-    rect.max_.x_ = rectangle_.right_ * invWidth;
+    rect.min_.x_ = rectangle_.left_ * invWidth + edgeOffset_;
+    rect.max_.x_ = rectangle_.right_ * invWidth - edgeOffset_;
 
-    rect.min_.y_ = rectangle_.bottom_ * invHeight;
-    rect.max_.y_ = rectangle_.top_ * invHeight;
+    rect.min_.y_ = rectangle_.bottom_ * invHeight + edgeOffset_;
+    rect.max_.y_ = rectangle_.top_ * invHeight - edgeOffset_;
 
     if (flipX)
         Swap(rect.min_.x_, rect.max_.x_);
