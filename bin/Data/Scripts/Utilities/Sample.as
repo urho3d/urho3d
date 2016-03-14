@@ -18,6 +18,7 @@ Node@ cameraNode; // Camera scene node
 float yaw = 0.0f; // Camera yaw angle
 float pitch = 0.0f; // Camera pitch angle
 const float TOUCH_SENSITIVITY = 2;
+MouseMode useMouseMode_ = MM_ABSOLUTE;
 
 void SampleStart()
 {
@@ -27,6 +28,9 @@ void SampleStart()
     else if (input.numJoysticks == 0)
         // On desktop platform, do not detect touch when we already got a joystick
         SubscribeToEvent("TouchBegin", "HandleTouchBegin");
+
+    // Initiate the mouse mode settings
+    InitMouseMode();
 
     // Create logo
     CreateLogo();
@@ -58,6 +62,22 @@ void InitTouchInput()
     }
     screenJoystickIndex = input.AddScreenJoystick(layout, cache.GetResource("XMLFile", "UI/DefaultStyle.xml"));
     input.screenJoystickVisible[0] = true;
+}
+
+void InitMouseMode()
+{
+    if (GetPlatform() != "Web")
+    {
+        if (useMouseMode_ != MM_ABSOLUTE && (console !is null || !console.visible))
+        {
+            input.mouseMode = useMouseMode_;
+        }
+    }
+    else
+    {
+        input.mouseVisible = true;
+        SubscribeToEvent("MouseDown", "HandleMouseModeRequest");
+    }
 }
 
 void SetLogoVisible(bool enable)
@@ -132,10 +152,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Close console (if open) or exit when ESC is pressed
     if (key == KEY_ESC)
     {
-        if (!console.visible)
-            engine.Exit();
-        else
+        if (console.visible)
             console.visible = false;
+        else
+        {
+            if (GetPlatform() == "Web")
+                input.mouseMode = MM_FREE;
+            else
+                engine.Exit();
+        }
     }
 
     // Toggle console with F1
@@ -286,4 +311,13 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     // On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput();
     UnsubscribeFromEvent("TouchBegin");
+}
+
+// If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+void HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (console !is null || console.visible || useMouseMode_ != MM_RELATIVE)
+        return;
+    if (input.mouseMode != MM_RELATIVE)
+        input.mouseMode = MM_RELATIVE;
 }

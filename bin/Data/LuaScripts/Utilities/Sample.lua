@@ -19,6 +19,7 @@ yaw = 0 -- Camera yaw angle
 pitch = 0 -- Camera pitch angle
 TOUCH_SENSITIVITY = 2
 debugHudMode = 0
+useMouseMode_ = MM_ABSOLUTE
 
 function SampleStart()
     if GetPlatform() == "Android" or GetPlatform() == "iOS" or input.touchEmulation then
@@ -28,6 +29,9 @@ function SampleStart()
         -- On desktop platform, do not detect touch when we already got a joystick
         SubscribeToEvent("TouchBegin", "HandleTouchBegin")
     end
+
+    -- Initiate the mouse mode settings
+    InitMouseMode()
 
     -- Create logo
     CreateLogo()
@@ -56,6 +60,17 @@ function InitTouchInput()
     end
     screenJoystickIndex = input:AddScreenJoystick(layout, cache:GetResource("XMLFile", "UI/DefaultStyle.xml"))
     input:SetScreenJoystickVisible(screenJoystickSettingsIndex, true)
+end
+
+function InitMouseMode()
+    if GetPlatform() ~= "Web" then
+        if useMouseMode_ ~= MM_ABSOLUTE and (console ~= nil or not console.visible) then
+            input.mouseMode = useMouseMode_
+        end
+    else
+        input.mouseVisible = true
+        SubscribeToEvent("MouseDown", "HandleMouseModeRequest")
+    end
 end
 
 function SetLogoVisible(enable)
@@ -126,10 +141,14 @@ function HandleKeyDown(eventType, eventData)
     local key = eventData["Key"]:GetInt()
     -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
-        if not console:IsVisible() then
-            engine:Exit()
-        else
+        if console:IsVisible() then
             console:SetVisible(false)
+        else
+            if GetPlatform() == "Web" then
+                input.mouseMode = MM_FREE;
+            else
+                engine:Exit();
+            end
         end
 
     elseif key == KEY_F1 then
@@ -259,6 +278,17 @@ function HandleTouchBegin(eventType, eventData)
     -- On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput()
     UnsubscribeFromEvent("TouchBegin")
+end
+
+-- If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+function HandleMouseModeRequest(eventType, eventData)
+    if console ~= nil or console.visible or useMouseMode_ ~= MM_RELATIVE then
+        return
+    end
+
+    if input.mouseMode ~= MM_RELATIVE then
+        input.mouseMode = MM_RELATIVE
+    end
 end
 
 -- Create empty XML patch instructions for screen joystick layout if none defined
