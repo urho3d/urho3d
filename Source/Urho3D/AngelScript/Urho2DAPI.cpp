@@ -73,6 +73,8 @@ static void RegisterSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite2D", "const Vector2& get_hotSpot() const", asMETHOD(Sprite2D, GetHotSpot), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "void set_offset(const IntVector2&in)", asMETHOD(Sprite2D, SetOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "const IntVector2& get_offset() const", asMETHOD(Sprite2D, GetOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_textureEdgeOffset(float)", asMETHOD(Sprite2D, SetTextureEdgeOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "float get_textureEdgeOffset() const", asMETHOD(Sprite2D, GetTextureEdgeOffset), asCALL_THISCALL);
 }
 
 static void RegisterSpriteSheet2D(asIScriptEngine* engine)
