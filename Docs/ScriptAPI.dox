@@ -11775,6 +11775,7 @@ Properties:
 - IntRect rectangle
 - int refs // readonly
 - Texture2D@ texture
+- float textureEdgeOffset
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly

@@ -5628,11 +5628,13 @@ Methods:
 - void SetRectangle(const IntRect& rectangle)
 - void SetHotSpot(const Vector2& hotSpot)
 - void SetOffset(const IntVector2& offset)
+- void SetTextureEdgeOffset(float offset)
 - void SetSpriteSheet(SpriteSheet2D* spriteSheet)
 - Texture2D* GetTexture() const
 - const IntRect& GetRectangle() const
 - const Vector2& GetHotSpot() const
 - const IntVector2& GetOffset() const
+- float GetTextureEdgeOffset() const
 - SpriteSheet2D* GetSpriteSheet() const
 
 Properties:
@@ -5641,6 +5643,7 @@ Properties:
 - IntRect rectangle
 - Vector2 hotSpot
 - IntVector2 offset
+- float textureEdgeOffset
 - SpriteSheet2D* spriteSheet
 
 <a name="Class_SpriteSheet2D"></a>

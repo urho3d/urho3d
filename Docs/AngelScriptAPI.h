@@ -10544,6 +10544,7 @@ IntRect rectangle;
 /* readonly */
 int refs;
 Texture2D texture;
+float textureEdgeOffset;
 /* readonly */
 StringHash type;
 /* readonly */
