@@ -356,7 +356,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="6 2 6 2" />
         <attribute name="Image Rect" value="48 0 64 16" />
-        <attribute name="Border" value="6 2 2 2" />
+        <attribute name="Border" value="4 4 4 4" />
     </element>
     <element type="ToolTipText" style="Text">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />
