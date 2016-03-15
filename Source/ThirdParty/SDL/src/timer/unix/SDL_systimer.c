@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,6 +28,7 @@
 #include <errno.h>
 
 #include "SDL_timer.h"
+#include "SDL_assert.h"
 
 /* The clock_gettime provides monotonous time, so we should use it if
    it's available. The clock_gettime function is behind ifdef
@@ -45,6 +46,15 @@
 #endif
 #ifdef __APPLE__
 #include <mach/mach_time.h>
+#endif
+
+/* Use CLOCK_MONOTONIC_RAW, if available, which is not subject to adjustment by NTP */
+#if HAVE_CLOCK_GETTIME
+#ifdef CLOCK_MONOTONIC_RAW
+#define SDL_MONOTONIC_CLOCK CLOCK_MONOTONIC_RAW
+#else
+#define SDL_MONOTONIC_CLOCK CLOCK_MONOTONIC
+#endif
 #endif
 
 /* The first ticks value of the application */
@@ -68,7 +78,7 @@ SDL_TicksInit(void)
 
     /* Set first ticks value */
 #if HAVE_CLOCK_GETTIME
-    if (clock_gettime(CLOCK_MONOTONIC, &start_ts) == 0) {
+    if (clock_gettime(SDL_MONOTONIC_CLOCK, &start_ts) == 0) {
         has_monotonic_time = SDL_TRUE;
     } else
 #elif defined(__APPLE__)
@@ -100,20 +110,21 @@ SDL_GetTicks(void)
     if (has_monotonic_time) {
 #if HAVE_CLOCK_GETTIME
         struct timespec now;
-        clock_gettime(CLOCK_MONOTONIC, &now);
+        clock_gettime(SDL_MONOTONIC_CLOCK, &now);
         ticks = (now.tv_sec - start_ts.tv_sec) * 1000 + (now.tv_nsec -
                                                  start_ts.tv_nsec) / 1000000;
 #elif defined(__APPLE__)
         uint64_t now = mach_absolute_time();
-        ticks = (((now - start_mach) * mach_base_info.numer) / mach_base_info.denom) / 1000000;
+        ticks = (Uint32)((((now - start_mach) * mach_base_info.numer) / mach_base_info.denom) / 1000000);
+#else
+        SDL_assert(SDL_FALSE);
+        ticks = 0;
 #endif
     } else {
         struct timeval now;
 
         gettimeofday(&now, NULL);
-        ticks =
-            (now.tv_sec - start_tv.tv_sec) * 1000 + (now.tv_usec -
-                                                  start_tv.tv_usec) / 1000;
+        ticks = (Uint32)((now.tv_sec - start_tv.tv_sec) * 1000 + (now.tv_usec - start_tv.tv_usec) / 1000);
     }
     return (ticks);
 }
@@ -130,12 +141,15 @@ SDL_GetPerformanceCounter(void)
 #if HAVE_CLOCK_GETTIME
         struct timespec now;
 
-        clock_gettime(CLOCK_MONOTONIC, &now);
+        clock_gettime(SDL_MONOTONIC_CLOCK, &now);
         ticks = now.tv_sec;
         ticks *= 1000000000;
         ticks += now.tv_nsec;
 #elif defined(__APPLE__)
         ticks = mach_absolute_time();
+#else
+        SDL_assert(SDL_FALSE);
+        ticks = 0;
 #endif
     } else {
         struct timeval now;

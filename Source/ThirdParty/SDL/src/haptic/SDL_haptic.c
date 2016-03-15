@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -343,7 +343,7 @@ SDL_HapticClose(SDL_Haptic * haptic)
     }
 
     /* Check if it's still in use */
-    if (--haptic->ref_count < 0) {
+    if (--haptic->ref_count > 0) {
         return;
     }
 
@@ -845,3 +845,4 @@ SDL_HapticRumbleStop(SDL_Haptic * haptic)
     return SDL_HapticStopEffect(haptic, haptic->rumble_id);
 }
 
+/* vi: set ts=4 sw=4 expandtab: */

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,13 +36,51 @@
 char *
 SDL_GetBasePath(void)
 {
-    TCHAR path[MAX_PATH];
-    const DWORD len = GetModuleFileName(NULL, path, SDL_arraysize(path));
-    size_t i;
+    typedef DWORD (WINAPI *GetModuleFileNameExW_t)(HANDLE, HMODULE, LPWSTR, DWORD);
+    GetModuleFileNameExW_t pGetModuleFileNameExW;
+    DWORD buflen = 128;
+    WCHAR *path = NULL;
+    HANDLE psapi = LoadLibrary(L"psapi.dll");
+    char *retval = NULL;
+    DWORD len = 0;
+    int i;
 
-    SDL_assert(len < SDL_arraysize(path));
+    if (!psapi) {
+        WIN_SetError("Couldn't load psapi.dll");
+        return NULL;
+    }
+
+    pGetModuleFileNameExW = (GetModuleFileNameExW_t)GetProcAddress(psapi, "GetModuleFileNameExW");
+    if (!pGetModuleFileNameExW) {
+        WIN_SetError("Couldn't find GetModuleFileNameExW");
+        FreeLibrary(psapi);
+        return NULL;
+    }
+
+    while (SDL_TRUE) {
+        void *ptr = SDL_realloc(path, buflen * sizeof (WCHAR));
+        if (!ptr) {
+            SDL_free(path);
+            FreeLibrary(psapi);
+            SDL_OutOfMemory();
+            return NULL;
+        }
+
+        path = (WCHAR *) ptr;
+
+        len = pGetModuleFileNameExW(GetCurrentProcess(), NULL, path, buflen);
+        if (len != buflen) {
+            break;
+        }
+
+        /* buffer too small? Try again. */
+        buflen *= 2;
+    }
+
+    FreeLibrary(psapi);
 
     if (len == 0) {
+        SDL_free(path);
         WIN_SetError("Couldn't locate our .exe");
         return NULL;
     }
@@ -55,7 +93,11 @@ SDL_GetBasePath(void)
 
     SDL_assert(i > 0); /* Should have been an absolute path. */
     path[i+1] = '\0';  /* chop off filename. */
-    return WIN_StringToUTF8(path);
+
+    retval = WIN_StringToUTF8(path);
+    SDL_free(path);
+
+    return retval;
 }
 
 char *

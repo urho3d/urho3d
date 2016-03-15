@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -572,6 +572,12 @@ SDLTest_PrintPixelFormat(Uint32 format)
     case SDL_PIXELFORMAT_YVYU:
         fprintf(stderr, "YVYU");
         break;
+    case SDL_PIXELFORMAT_NV12:
+        fprintf(stderr, "NV12");
+        break;
+    case SDL_PIXELFORMAT_NV21:
+        fprintf(stderr, "NV21");
+        break;
     default:
         fprintf(stderr, "0x%8.8x", format);
         break;
@@ -886,7 +892,7 @@ SDLTest_CommonInit(SDLTest_CommonState * state)
                             break;
                         }
                     }
-                    if (m == n) {
+                    if (m == -1) {
                         fprintf(stderr,
                                 "Couldn't find render driver named %s",
                                 state->renderdriver);
@@ -1099,8 +1105,8 @@ SDLTest_PrintEvent(SDL_Event * event)
                 event->button.windowID);
         break;
     case SDL_MOUSEWHEEL:
-        SDL_Log("SDL EVENT: Mouse: wheel scrolled %d in x and %d in y in window %d",
-                event->wheel.x, event->wheel.y, event->wheel.windowID);
+        SDL_Log("SDL EVENT: Mouse: wheel scrolled %d in x and %d in y (reversed: %d) in window %d",
+                event->wheel.x, event->wheel.y, event->wheel.direction, event->wheel.windowID);
         break;
     case SDL_JOYDEVICEADDED:
         SDL_Log("SDL EVENT: Joystick index %d attached",
@@ -1197,6 +1203,22 @@ SDLTest_PrintEvent(SDL_Event * event)
                 event->tfinger.x, event->tfinger.y,
                 event->tfinger.dx, event->tfinger.dy, event->tfinger.pressure);
         break;
+    case SDL_DOLLARGESTURE:
+        SDL_Log("SDL_EVENT: Dollar gesture detect: %"SDL_PRIs64, (Sint64) event->dgesture.gestureId);
+        break;
+    case SDL_DOLLARRECORD:
+        SDL_Log("SDL_EVENT: Dollar gesture record: %"SDL_PRIs64, (Sint64) event->dgesture.gestureId);
+        break;
+    case SDL_MULTIGESTURE:
+        SDL_Log("SDL_EVENT: Multi gesture fingers: %d", event->mgesture.numFingers);
+        break;
+
+    case SDL_RENDER_DEVICE_RESET:
+        SDL_Log("SDL EVENT: render device reset");
+        break;
+    case SDL_RENDER_TARGETS_RESET:
+        SDL_Log("SDL EVENT: render targets reset");
+        break;
 
     case SDL_QUIT:
         SDL_Log("SDL EVENT: Quit requested");
@@ -1205,7 +1227,7 @@ SDLTest_PrintEvent(SDL_Event * event)
         SDL_Log("SDL EVENT: User event %d", event->user.code);
         break;
     default:
-        SDL_Log("Unknown event %d", event->type);
+        SDL_Log("Unknown event %04x", event->type);
         break;
     }
 }
@@ -1372,6 +1394,14 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
                     }
                 }
             }
+            if (withShift) {
+                SDL_Window *current_win = SDL_GetKeyboardFocus();
+                if (current_win) {
+                    const SDL_bool shouldCapture = (SDL_GetWindowFlags(current_win) & SDL_WINDOW_MOUSE_CAPTURE) == 0;
+                    const int rc = SDL_CaptureMouse(shouldCapture);
+                    SDL_Log("%sapturing mouse %s!\n", shouldCapture ? "C" : "Unc", (rc == 0) ? "succeeded" : "failed");
+                }
+            }
             break;
         case SDLK_v:
             if (withControl) {
@@ -1469,6 +1499,19 @@ SDLTest_CommonEvent(SDLTest_CommonState * state, SDL_Event * event, int *done)
                     const SDL_bool b = ((flags & SDL_WINDOW_BORDERLESS) != 0) ? SDL_TRUE : SDL_FALSE;
                     SDL_SetWindowBordered(window, b);
                 }
+            }
+            break;
+        case SDLK_a:
+            if (withControl) {
+                /* Ctrl-A reports absolute mouse position. */
+                int x, y;
+                const Uint32 mask = SDL_GetGlobalMouseState(&x, &y);
+                SDL_Log("ABSOLUTE MOUSE: (%d, %d)%s%s%s%s%s\n", x, y,
+                        (mask & SDL_BUTTON_LMASK) ? " [LBUTTON]" : "",
+                        (mask & SDL_BUTTON_MMASK) ? " [MBUTTON]" : "",
+                        (mask & SDL_BUTTON_RMASK) ? " [RBUTTON]" : "",
+                        (mask & SDL_BUTTON_X1MASK) ? " [X2BUTTON]" : "",
+                        (mask & SDL_BUTTON_X2MASK) ? " [X2BUTTON]" : "");
             }
             break;
         case SDLK_0:

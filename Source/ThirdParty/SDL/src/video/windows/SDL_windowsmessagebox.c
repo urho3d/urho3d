@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -297,9 +297,12 @@ static WIN_DialogData *CreateDialogData(int w, int h, const char *caption)
 
         /* Font size - convert to logical font size for dialog parameter. */
         {
-            HDC ScreenDC = GetDC(0);
-            WordToPass = (WORD)(-72 * NCM.lfMessageFont.lfHeight / GetDeviceCaps(ScreenDC, LOGPIXELSY));
-            ReleaseDC(0, ScreenDC);
+            HDC ScreenDC = GetDC(NULL);
+            int LogicalPixelsY = GetDeviceCaps(ScreenDC, LOGPIXELSY);
+            if (!LogicalPixelsY) /* This can happen if the application runs out of GDI handles */
+                LogicalPixelsY = 72;
+            WordToPass = (WORD)(-72 * NCM.lfMessageFont.lfHeight / LogicalPixelsY);
+            ReleaseDC(NULL, ScreenDC);
         }
 
         if (!AddDialogData(dialog, &WordToPass, 2)) {

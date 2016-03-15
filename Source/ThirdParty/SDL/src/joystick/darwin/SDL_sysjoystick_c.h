@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,6 +21,7 @@
 #include "../../SDL_internal.h"
 
 #ifndef SDL_JOYSTICK_IOKIT_H
+#define SDL_JOYSTICK_IOKIT_H
 
 #include <IOKit/hid/IOHIDLib.h>
 
@@ -58,12 +59,10 @@ struct joystick_hwdata
     recElement *firstButton;
     recElement *firstHat;
 
-    int removed;
-    int uncentered;
+    SDL_bool removed;
 
     int instance_id;
     SDL_JoystickGUID guid;
-    Uint8 send_open_event;      /* 1 if we need to send an Added event for this device */
 
     struct joystick_hwdata *pNext;      /* next device */
 };

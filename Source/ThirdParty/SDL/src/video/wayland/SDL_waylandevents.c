@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,8 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Alex Fuller for Urho3D
 
 #include "../../SDL_internal.h"
 
@@ -51,6 +53,10 @@ struct SDL_WaylandInput {
     struct wl_keyboard *keyboard;
     SDL_WindowData *pointer_focus;
     SDL_WindowData *keyboard_focus;
+
+    /* Last motion location */
+    wl_fixed_t sx_w;
+    wl_fixed_t sy_w;
 
     struct {
         struct xkb_keymap *keymap;
@@ -86,7 +92,7 @@ pointer_handle_enter(void *data, struct wl_pointer *pointer,
         /* enter event for a window we've just destroyed */
         return;
     }
-    
+
     /* This handler will be called twice in Wayland 1.4
      * Once for the window surface which has valid user data
      * and again for the mouse cursor surface which does not have valid user data
@@ -94,7 +100,7 @@ pointer_handle_enter(void *data, struct wl_pointer *pointer,
      */
 
     window = (SDL_WindowData *)wl_surface_get_user_data(surface);
-    
+
     if (window) {
         input->pointer_focus = window;
         SDL_SetMouseFocus(window->sdlwindow);
@@ -119,11 +125,51 @@ pointer_handle_motion(void *data, struct wl_pointer *pointer,
 {
     struct SDL_WaylandInput *input = data;
     SDL_WindowData *window = input->pointer_focus;
-    int sx = wl_fixed_to_int(sx_w);
-    int sy = wl_fixed_to_int(sy_w);
+    input->sx_w = sx_w;
+    input->sy_w = sy_w;
     if (input->pointer_focus) {
+        const int sx = wl_fixed_to_int(sx_w);
+        const int sy = wl_fixed_to_int(sy_w);
         SDL_SendMouseMotion(window->sdlwindow, 0, 0, sx, sy);
     }
+}
+
+static SDL_bool
+ProcessHitTest(struct SDL_WaylandInput *input, uint32_t serial)
+{
+    SDL_WindowData *window_data = input->pointer_focus;
+    SDL_Window *window = window_data->sdlwindow;
+
+    if (window->hit_test) {
+        const SDL_Point point = { wl_fixed_to_int(input->sx_w), wl_fixed_to_int(input->sy_w) };
+        const SDL_HitTestResult rc = window->hit_test(window, &point, window->hit_test_data);
+        static const uint32_t directions[] = {
+            WL_SHELL_SURFACE_RESIZE_TOP_LEFT, WL_SHELL_SURFACE_RESIZE_TOP,
+            WL_SHELL_SURFACE_RESIZE_TOP_RIGHT, WL_SHELL_SURFACE_RESIZE_RIGHT,
+            WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT, WL_SHELL_SURFACE_RESIZE_BOTTOM,
+            WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT, WL_SHELL_SURFACE_RESIZE_LEFT
+        };
+        switch (rc) {
+            case SDL_HITTEST_DRAGGABLE:
+                wl_shell_surface_move(window_data->shell_surface, input->seat, serial);
+                return SDL_TRUE;
+
+            case SDL_HITTEST_RESIZE_TOPLEFT:
+            case SDL_HITTEST_RESIZE_TOP:
+            case SDL_HITTEST_RESIZE_TOPRIGHT:
+            case SDL_HITTEST_RESIZE_RIGHT:
+            case SDL_HITTEST_RESIZE_BOTTOMRIGHT:
+            case SDL_HITTEST_RESIZE_BOTTOM:
+            case SDL_HITTEST_RESIZE_BOTTOMLEFT:
+            case SDL_HITTEST_RESIZE_LEFT:
+                wl_shell_surface_resize(window_data->shell_surface, input->seat, serial, directions[rc - SDL_HITTEST_RESIZE_TOPLEFT]);
+                return SDL_TRUE;
+
+            default: return SDL_FALSE;
+        }
+    }
+
+    return SDL_FALSE;
 }
 
 static void
@@ -134,11 +180,14 @@ pointer_handle_button(void *data, struct wl_pointer *pointer, uint32_t serial,
     SDL_WindowData *window = input->pointer_focus;
     enum wl_pointer_button_state state = state_w;
     uint32_t sdl_button;
-    
+
     if  (input->pointer_focus) {
         switch (button) {
             case BTN_LEFT:
                 sdl_button = SDL_BUTTON_LEFT;
+                if (ProcessHitTest(data, serial)) {
+                    return;  /* don't pass this event on to app. */
+                }
                 break;
             case BTN_MIDDLE:
                 sdl_button = SDL_BUTTON_MIDDLE;
@@ -184,7 +233,7 @@ pointer_handle_axis(void *data, struct wl_pointer *pointer,
                 return;
         }
 
-        SDL_SendMouseWheel(window->sdlwindow, 0, x, y);
+        SDL_SendMouseWheel(window->sdlwindow, 0, x, y, SDL_MOUSEWHEEL_NORMAL);
     }
 }
 
@@ -246,7 +295,14 @@ keyboard_handle_enter(void *data, struct wl_keyboard *keyboard,
                       struct wl_array *keys)
 {
     struct SDL_WaylandInput *input = data;
-    SDL_WindowData *window = wl_surface_get_user_data(surface);
+    SDL_WindowData *window;
+
+    if (!surface) {
+        /* enter event for a window we've just destroyed */
+        return;
+    }
+
+    window = wl_surface_get_user_data(surface);
 
     input->keyboard_focus = window;
     window->keyboard_device = input;
@@ -281,7 +337,7 @@ keyboard_handle_key(void *data, struct wl_keyboard *keyboard,
         // TODO when do we get WL_KEYBOARD_KEY_STATE_REPEAT?
         if (scancode != SDL_SCANCODE_UNKNOWN)
             SDL_SendKeyboardKey(state == WL_KEYBOARD_KEY_STATE_PRESSED ?
-                                SDL_PRESSED : SDL_RELEASED, scancode);
+                                SDL_PRESSED : SDL_RELEASED, (Uint32)(key), scancode);
     }
 
     if (!window || window->keyboard_device != input || !input->xkb.state)
@@ -364,7 +420,8 @@ Wayland_display_add_input(SDL_VideoData *d, uint32_t id)
 
     input->display = d;
     input->seat = wl_registry_bind(d->registry, id, &wl_seat_interface, 1);
-
+    input->sx_w = wl_fixed_from_int(0);
+    input->sy_w = wl_fixed_from_int(0);
     d->input = input;
 
     wl_seat_add_listener(input->seat, &seat_listener, input);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -66,7 +66,7 @@ PSP_Create()
     SDL_GLDriverData *gldata;
     int status;
 
-    /* Check if pandora could be initialized */
+    /* Check if PSP could be initialized */
     status = PSP_Available();
     if (status == 0) {
         /* PSP could not be used */
@@ -80,7 +80,7 @@ PSP_Create()
         return NULL;
     }
 
-    /* Initialize internal Pandora specific data */
+    /* Initialize internal PSP specific data */
     phdata = (SDL_VideoData *) SDL_calloc(1, sizeof(SDL_VideoData));
     if (phdata == NULL) {
         SDL_OutOfMemory();

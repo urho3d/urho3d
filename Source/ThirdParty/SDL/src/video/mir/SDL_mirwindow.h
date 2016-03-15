@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -63,7 +63,7 @@ MIR_RestoreWindow(_THIS, SDL_Window* window);
 extern SDL_bool
 MIR_GetWindowWMInfo(_THIS, SDL_Window* window, SDL_SysWMinfo* info);
 
-#endif /* _SDL_mirwindow */
+#endif /* _SDL_mirwindow_h */
 
 /* vi: set ts=4 sw=4 expandtab: */
 

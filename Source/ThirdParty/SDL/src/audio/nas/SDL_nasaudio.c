@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -276,7 +276,7 @@ find_device(_THIS, int nch)
 }
 
 static int
-NAS_OpenDevice(_THIS, const char *devname, int iscapture)
+NAS_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 {
     AuElement elms[3];
     int buffer_size;

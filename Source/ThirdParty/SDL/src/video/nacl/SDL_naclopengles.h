@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,11 +18,21 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+#include "../../SDL_internal.h"
 
-extern int DirectInputHaptic_MaybeAddDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int DirectInputHaptic_MaybeRemoveDevice(const DIDEVICEINSTANCE *pdidInstance);
-extern int XInputHaptic_MaybeAddDevice(const DWORD dwUserid);
-extern int XInputHaptic_MaybeRemoveDevice(const DWORD dwUserid);
+#ifndef _SDL_naclgl_h
+#define _SDL_naclgl_h
+
+extern int NACL_GLES_LoadLibrary(_THIS, const char *path);
+extern void *NACL_GLES_GetProcAddress(_THIS, const char *proc);
+extern void NACL_GLES_UnloadLibrary(_THIS);
+extern SDL_GLContext NACL_GLES_CreateContext(_THIS, SDL_Window * window);
+extern int NACL_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
+extern int NACL_GLES_SetSwapInterval(_THIS, int interval);
+extern int NACL_GLES_GetSwapInterval(_THIS);
+extern void NACL_GLES_SwapWindow(_THIS, SDL_Window * window);
+extern void NACL_GLES_DeleteContext(_THIS, SDL_GLContext context);
+
+#endif /* _SDL_naclgl_h */
 
 /* vi: set ts=4 sw=4 expandtab: */
-

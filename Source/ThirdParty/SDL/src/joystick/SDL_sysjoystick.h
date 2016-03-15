@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,9 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "../SDL_internal.h"
+
+#ifndef _SDL_sysjoystick_h
+#define _SDL_sysjoystick_h
 
 /* This is the system specific header for the SDL joystick API */
 
@@ -50,8 +53,8 @@ struct _SDL_Joystick
 
     int ref_count;              /* Reference count for multiple opens */
 
-    Uint8 closed;               /* 1 if this device is no longer valid */
-    Uint8 uncentered;           /* 1 if this device needs to have its state reset to 0 */
+    SDL_bool force_recentering; /* SDL_TRUE if this device needs to have its state reset to 0 */
+    SDL_JoystickPowerLevel epowerlevel; /* power level of this joystick, SDL_JOYSTICK_POWER_UNKNOWN if not supported */
     struct _SDL_Joystick *next; /* pointer to next joystick we have allocated */
 };
 
@@ -68,9 +71,6 @@ extern int SDL_SYS_NumJoysticks();
 /* Function to cause any queued joystick insertions to be processed */
 extern void SDL_SYS_JoystickDetect();
 
-/* Function to determine if the joystick loop needs to run right now */
-extern SDL_bool SDL_SYS_JoystickNeedsPolling();
-
 /* Function to get the device-dependent name of a joystick */
 extern const char *SDL_SYS_JoystickNameForDeviceIndex(int device_index);
 
@@ -78,14 +78,14 @@ extern const char *SDL_SYS_JoystickNameForDeviceIndex(int device_index);
 extern SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index);
 
 /* Function to open a joystick for use.
-   The joystick to open is specified by the index field of the joystick.
+   The joystick to open is specified by the device index.
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
 extern int SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index);
 
 /* Function to query if the joystick is currently attached
- *   It returns 1 if attached, 0 otherwise.
+ * It returns SDL_TRUE if attached, SDL_FALSE otherwise.
  */
 extern SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick * joystick);
 
@@ -108,10 +108,11 @@ extern SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID(int device_index);
 /* Function to return the stable GUID for a opened joystick */
 extern SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick);
 
-#if defined(SDL_JOYSTICK_DINPUT) || defined(SDL_JOYSTICK_XINPUT)
-/* Function to get the current instance id of the joystick located at device_index */
-extern SDL_bool SDL_SYS_IsXInputDeviceIndex( int device_index );
-extern SDL_bool SDL_SYS_IsXInputJoystick(SDL_Joystick * joystick);
+#if SDL_JOYSTICK_XINPUT
+/* Function returns SDL_TRUE if this device is an XInput gamepad */
+extern SDL_bool SDL_SYS_IsXInputGamepad_DeviceIndex(int device_index);
 #endif
+
+#endif /* _SDL_sysjoystick_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

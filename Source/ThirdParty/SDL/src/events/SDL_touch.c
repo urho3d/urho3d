@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -145,12 +145,15 @@ SDL_AddTouch(SDL_TouchID touchID, const char *name)
     }
 
     SDL_touchDevices = touchDevices;
-    index = SDL_num_touch++;
+    index = SDL_num_touch;
 
     SDL_touchDevices[index] = (SDL_Touch *) SDL_malloc(sizeof(*SDL_touchDevices[index]));
     if (!SDL_touchDevices[index]) {
         return SDL_OutOfMemory();
     }
+
+    /* Added touch to list */
+    ++SDL_num_touch;
 
     /* we're setting the touch properties */
     SDL_touchDevices[index]->id = touchID;

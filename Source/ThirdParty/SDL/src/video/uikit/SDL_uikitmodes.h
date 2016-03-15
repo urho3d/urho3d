@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,19 +25,17 @@
 
 #include "SDL_uikitvideo.h"
 
-typedef struct
-{
-    UIScreen *uiscreen;
-    CGFloat scale;
-} SDL_DisplayData;
+@interface SDL_DisplayData : NSObject
 
-typedef struct
-{
-    UIScreenMode *uiscreenmode;
-    CGFloat scale;
-} SDL_DisplayModeData;
+@property (nonatomic, strong) UIScreen *uiscreen;
 
-extern BOOL SDL_UIKit_supports_multiple_displays;
+@end
+
+@interface SDL_DisplayModeData : NSObject
+
+@property (nonatomic, strong) UIScreenMode *uiscreenmode;
+
+@end
 
 extern SDL_bool UIKit_IsDisplayLandscape(UIScreen *uiscreen);
 

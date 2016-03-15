@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,5 +33,6 @@ double SDL_uclibc_pow(double x, double y);
 double SDL_uclibc_scalbn(double x, int n);
 double SDL_uclibc_sin(double x);
 double SDL_uclibc_sqrt(double x);
+double SDL_uclibc_tan(double x);
 
 /* vi: set ts=4 sw=4 expandtab: */

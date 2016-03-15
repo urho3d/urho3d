@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,17 +25,18 @@
  * udevadm info --query=all -n input/event3 (for a keyboard, mouse, etc)
  * udevadm info --query=property -n input/event2
  */
-
 #include "SDL_udev.h"
 
 #ifdef SDL_USE_LIBUDEV
 
-static char* SDL_UDEV_LIBS[] = { "libudev.so.1", "libudev.so.0" };
+#include <linux/input.h>
+
+#include "SDL.h"
+
+static const char* SDL_UDEV_LIBS[] = { "libudev.so.1", "libudev.so.0" };
 
 #define _THIS SDL_UDEV_PrivateData *_this
 static _THIS = NULL;
-
-#include "SDL.h"
 
 static SDL_bool SDL_UDEV_load_sym(const char *fn, void **addr);
 static int SDL_UDEV_load_syms(void);
@@ -64,7 +65,9 @@ SDL_UDEV_load_syms(void)
     SDL_UDEV_SYM(udev_device_get_action);
     SDL_UDEV_SYM(udev_device_get_devnode);
     SDL_UDEV_SYM(udev_device_get_subsystem);
+    SDL_UDEV_SYM(udev_device_get_parent_with_subsystem_devtype);
     SDL_UDEV_SYM(udev_device_get_property_value);
+    SDL_UDEV_SYM(udev_device_get_sysattr_value);
     SDL_UDEV_SYM(udev_device_new_from_syspath);
     SDL_UDEV_SYM(udev_device_unref);
     SDL_UDEV_SYM(udev_enumerate_add_match_property);
@@ -274,6 +277,111 @@ SDL_UDEV_LoadLibrary(void)
     return retval;
 }
 
+#define BITS_PER_LONG           (sizeof(unsigned long) * 8)
+#define NBITS(x)                ((((x)-1)/BITS_PER_LONG)+1)
+#define OFF(x)                  ((x)%BITS_PER_LONG)
+#define BIT(x)                  (1UL<<OFF(x))
+#define LONG(x)                 ((x)/BITS_PER_LONG)
+#define test_bit(bit, array)    ((array[LONG(bit)] >> OFF(bit)) & 1)
+
+static void get_caps(struct udev_device *dev, struct udev_device *pdev, const char *attr, unsigned long *bitmask, size_t bitmask_len)
+{
+    const char *value;
+    char text[4096];
+    char *word;
+    int i;
+    unsigned long v;
+
+    SDL_memset(bitmask, 0, bitmask_len*sizeof(*bitmask));
+    value = _this->udev_device_get_sysattr_value(pdev, attr);
+    if (!value) {
+        return;
+    }
+
+    SDL_strlcpy(text, value, sizeof(text));
+    i = 0;
+    while ((word = SDL_strrchr(text, ' ')) != NULL) {
+        v = SDL_strtoul(word+1, NULL, 16);
+        if (i < bitmask_len) {
+            bitmask[i] = v;
+        }
+        ++i;
+        *word = '\0';
+    }
+    v = SDL_strtoul(text, NULL, 16);
+    if (i < bitmask_len) {
+        bitmask[i] = v;
+    }
+}
+
+static int
+guess_device_class(struct udev_device *dev)
+{
+    int devclass = 0;
+    struct udev_device *pdev;
+    unsigned long bitmask_ev[NBITS(EV_MAX)];
+    unsigned long bitmask_abs[NBITS(ABS_MAX)];
+    unsigned long bitmask_key[NBITS(KEY_MAX)];
+    unsigned long bitmask_rel[NBITS(REL_MAX)];
+    unsigned long keyboard_mask;
+
+    /* walk up the parental chain until we find the real input device; the
+     * argument is very likely a subdevice of this, like eventN */
+    pdev = dev;
+    while (pdev && !_this->udev_device_get_sysattr_value(pdev, "capabilities/ev")) {
+        pdev = _this->udev_device_get_parent_with_subsystem_devtype(pdev, "input", NULL);
+    }
+    if (!pdev) {
+        return 0;
+    }
+
+    get_caps(dev, pdev, "capabilities/ev", bitmask_ev, SDL_arraysize(bitmask_ev));
+    get_caps(dev, pdev, "capabilities/abs", bitmask_abs, SDL_arraysize(bitmask_abs));
+    get_caps(dev, pdev, "capabilities/rel", bitmask_rel, SDL_arraysize(bitmask_rel));
+    get_caps(dev, pdev, "capabilities/key", bitmask_key, SDL_arraysize(bitmask_key));
+
+    if (test_bit(EV_ABS, bitmask_ev) &&
+        test_bit(ABS_X, bitmask_abs) && test_bit(ABS_Y, bitmask_abs)) {
+        if (test_bit(BTN_STYLUS, bitmask_key) || test_bit(BTN_TOOL_PEN, bitmask_key)) {
+            ; /* ID_INPUT_TABLET */
+        } else if (test_bit(BTN_TOOL_FINGER, bitmask_key) && !test_bit(BTN_TOOL_PEN, bitmask_key)) {
+            ; /* ID_INPUT_TOUCHPAD */
+        } else if (test_bit(BTN_MOUSE, bitmask_key)) {
+            devclass |= SDL_UDEV_DEVICE_MOUSE; /* ID_INPUT_MOUSE */
+        } else if (test_bit(BTN_TOUCH, bitmask_key)) {
+            ; /* ID_INPUT_TOUCHSCREEN */
+        }
+
+        if (test_bit(BTN_TRIGGER, bitmask_key) ||
+            test_bit(BTN_A, bitmask_key) ||
+            test_bit(BTN_1, bitmask_key) ||
+            test_bit(ABS_RX, bitmask_abs) ||
+            test_bit(ABS_RY, bitmask_abs) ||
+            test_bit(ABS_RZ, bitmask_abs) ||
+            test_bit(ABS_THROTTLE, bitmask_abs) ||
+            test_bit(ABS_RUDDER, bitmask_abs) ||
+            test_bit(ABS_WHEEL, bitmask_abs) ||
+            test_bit(ABS_GAS, bitmask_abs) ||
+            test_bit(ABS_BRAKE, bitmask_abs)) {
+            devclass |= SDL_UDEV_DEVICE_JOYSTICK; /* ID_INPUT_JOYSTICK */
+        }
+    }
+
+    if (test_bit(EV_REL, bitmask_ev) &&
+        test_bit(REL_X, bitmask_rel) && test_bit(REL_Y, bitmask_rel) &&
+        test_bit(BTN_MOUSE, bitmask_key)) {
+        devclass |= SDL_UDEV_DEVICE_MOUSE; /* ID_INPUT_MOUSE */
+    }
+
+    /* the first 32 bits are ESC, numbers, and Q to D; if we have any of
+     * those, consider it a keyboard device; do not test KEY_RESERVED, though */
+    keyboard_mask = 0xFFFFFFFE;
+    if ((bitmask_key[0] & keyboard_mask) != 0)
+        devclass |= SDL_UDEV_DEVICE_KEYBOARD; /* ID_INPUT_KEYBOARD */
+
+    return devclass;
+}
+
 static void 
 device_event(SDL_UDEV_deviceevent type, struct udev_device *dev) 
 {
@@ -292,6 +400,8 @@ device_event(SDL_UDEV_deviceevent type, struct udev_device *dev)
     if (SDL_strcmp(subsystem, "sound") == 0) {
         devclass = SDL_UDEV_DEVICE_SOUND;
     } else if (SDL_strcmp(subsystem, "input") == 0) {
+        /* udev rules reference: http://cgit.freedesktop.org/systemd/systemd/tree/src/udev/udev-builtin-input_id.c */
+        
         val = _this->udev_device_get_property_value(dev, "ID_INPUT_JOYSTICK");
         if (val != NULL && SDL_strcmp(val, "1") == 0 ) {
             devclass |= SDL_UDEV_DEVICE_JOYSTICK;
@@ -302,13 +412,34 @@ device_event(SDL_UDEV_deviceevent type, struct udev_device *dev)
             devclass |= SDL_UDEV_DEVICE_MOUSE;
         }
 
-        val = _this->udev_device_get_property_value(dev, "ID_INPUT_KEYBOARD");
+        /* The undocumented rule is:
+           - All devices with keys get ID_INPUT_KEY
+           - From this subset, if they have ESC, numbers, and Q to D, it also gets ID_INPUT_KEYBOARD
+           
+           Ref: http://cgit.freedesktop.org/systemd/systemd/tree/src/udev/udev-builtin-input_id.c#n183
+        */
+        val = _this->udev_device_get_property_value(dev, "ID_INPUT_KEY");
         if (val != NULL && SDL_strcmp(val, "1") == 0 ) {
             devclass |= SDL_UDEV_DEVICE_KEYBOARD;
         }
 
         if (devclass == 0) {
-            return;
+            /* Fall back to old style input classes */
+            val = _this->udev_device_get_property_value(dev, "ID_CLASS");
+            if (val != NULL) {
+                if (SDL_strcmp(val, "joystick") == 0) {
+                    devclass = SDL_UDEV_DEVICE_JOYSTICK;
+                } else if (SDL_strcmp(val, "mouse") == 0) {
+                    devclass = SDL_UDEV_DEVICE_MOUSE;
+                } else if (SDL_strcmp(val, "kbd") == 0) {
+                    devclass = SDL_UDEV_DEVICE_KEYBOARD;
+                } else {
+                    return;
+                }
+            } else {
+                /* We could be linked with libudev on a system that doesn't have udev running */
+                devclass = guess_device_class(dev);
+            }
         }
     } else {
         return;
@@ -338,6 +469,9 @@ SDL_UDEV_Poll(void)
         action = _this->udev_device_get_action(dev);
 
         if (SDL_strcmp(action, "add") == 0) {
+            /* Wait for the device to finish initialization */
+            SDL_Delay(100);
+
             device_event(SDL_UDEV_DEVICEADDED, dev);
         } else if (SDL_strcmp(action, "remove") == 0) {
             device_event(SDL_UDEV_DEVICEREMOVED, dev);
