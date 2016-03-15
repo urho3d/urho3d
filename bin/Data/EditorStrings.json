@@ -1396,5 +1396,29 @@
 		"ru":"Теги",
 		"fr":"Étiquettes",
 		"it":"Etichette"
+	},
+	"Export scene to OBJ...":{
+		"en":"Export scene to OBJ...",
+		"ru":"Экспортировать сцену в OBJ..."
+	},
+	"Export selected to OBJ...":{
+		"en":"Export selected to OBJ...",
+		"ru":"Экспортировать выбранное в OBJ..."
+	},
+	"Reset transform":{
+		"en":"Reset transform",
+		"ru":"Сбросить трансформации"
+	},
+	"Show components icons":{
+		"en":"Show components icons",
+		"ru":"Показывать значки компонентов"
+	},
+	"Render Zone Cubemap":{
+		"en":"Render Zone Cubemap",
+		"ru":"Отренедерить зону в Cubemap"
+	},
+	"Show Grid":{
+		"en":"Show Grid",
+		"ru":"Показывать сетку"
 	}
 }
