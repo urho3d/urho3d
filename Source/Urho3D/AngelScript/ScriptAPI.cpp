@@ -84,6 +84,24 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     return instance->GetScriptObject();
 }
 
+static void SetGlobalVariable(const String& key, Variant value)
+{
+    ScriptFile* file = GetScriptContextFile();
+    if(file)
+        file->SetGlobalVariable(key, value);
+}
+
+
+static Variant GetGlobalVariable(const String& key)
+{
+    ScriptFile* file = GetScriptContextFile();
+    if(file)
+        return file->GetGlobalVariable(key);
+    else
+        return Variant();
+}
+
+
 static void RegisterScriptFile(asIScriptEngine* engine)
 {
     RegisterResource<ScriptFile>(engine, "ScriptFile");
@@ -92,6 +110,8 @@ static void RegisterScriptFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ScriptFile", "void ClearDelayedExecute(const String&in declaration = String())", asMETHOD(ScriptFile, ClearDelayedExecute), asCALL_THISCALL);
     engine->RegisterObjectMethod("ScriptFile", "bool get_compiled() const", asMETHOD(ScriptFile, IsCompiled), asCALL_THISCALL);
     engine->RegisterGlobalFunction("ScriptFile@+ get_scriptFile()", asFUNCTION(GetScriptContextFile), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetGlobalVariable(const  String&in, Variant&in)", asFUNCTION(SetGlobalVariable), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Variant GetGlobalVariable(const String&in)", asFUNCTION(GetGlobalVariable), asCALL_CDECL);
 }
 
 static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
@@ -276,7 +296,6 @@ static void RegisterScript(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", asMETHOD(Script, SetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", asMETHOD(Script, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Script@+ get_script()", asFUNCTION(GetScript), asCALL_CDECL);
-    engine->RegisterGlobalProperty("VariantMap globalVars", &Script::globalVars);
 }
 
 static void RegisterScriptObject(asIScriptEngine* engine)
