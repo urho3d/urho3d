@@ -671,7 +671,7 @@ void Renderer::Update(float timeStep)
             // Set also the view for the debug renderer already here, so that it can use culling
             /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
             DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
-            if (debug)
+            if (debug && viewport->GetDrawDebug())
                 debug->SetView(viewport->GetCamera());
         }
 
