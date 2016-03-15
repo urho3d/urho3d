@@ -198,6 +198,17 @@ Object* Context::GetSubsystem(StringHash type) const
         return 0;
 }
 
+Variant Context::GetGlobalVariable(StringHash key)
+{
+    return globalVariables_[key];
+}
+
+void Context::SetGlobalVariable(StringHash key, Variant value)
+{
+    globalVariables_[key] = value;
+}
+
+
 Object* Context::GetEventSender() const
 {
     if (!eventSenders_.Empty())

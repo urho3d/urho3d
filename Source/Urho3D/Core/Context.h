@@ -78,6 +78,12 @@ public:
 
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
+    
+    /// Return global variable based on key
+    Variant GetGlobalVariable(StringHash key) ;
+
+    /// Set global variable with the respective key and value
+    void SetGlobalVariable(StringHash key, Variant value);
 
     /// Return all subsystems.
     const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
@@ -181,6 +187,8 @@ private:
     EventHandler* eventHandler_;
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
+    /// Variant map for global variables that can persist throughout application execution.
+    VariantMap globalVariables_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
