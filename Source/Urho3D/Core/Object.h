@@ -133,9 +133,11 @@ public:
     /// Return execution context.
     Context* GetContext() const { return context_; }
     /// Return global variable based on key
-    Variant GetGlobalVariable(StringHash key) ;
+    const Variant& GetGlobalVar(StringHash key) const;
+    /// Return all global variables
+    const VariantMap& GetGlobalVars() const;
     /// Set global variable with the respective key and value
-    void SetGlobalVariable(StringHash key, Variant value);
+    void SetGlobalVar(StringHash key, const Variant& value);
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
     /// Return active event sender. Null outside event handling.

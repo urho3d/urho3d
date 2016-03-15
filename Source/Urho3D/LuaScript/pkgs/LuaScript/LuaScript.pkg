@@ -16,8 +16,9 @@ void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventDat
 void LuaScriptSetExecuteConsoleCommands @ SetExecuteConsoleCommands(bool enable);
 bool LuaScriptGetExecuteConsoleCommands @ GetExecuteConsoleCommands();
 
-void LuaScriptSetGlobalVariable @ SetGlobalVariable(const String key, Variant value);
-Variant LuaScriptGetGlobalVariable @ GetGlobalVariable(const String key);
+void LuaScriptSetGlobalVar @ SetGlobalVar(const String key, Variant value);
+Variant LuaScriptGetGlobalVar @ GetGlobalVar(const String key);
+VariantMap& LuaScriptGetGlobalVars @ GetGlobalVars();
 
 ${
 static LuaScript* GetLuaScript(lua_State* L)
@@ -36,8 +37,9 @@ static LuaScript* GetLuaScript(lua_State* L)
 #define LuaScriptSetExecuteConsoleCommands GetLuaScript(tolua_S)->SetExecuteConsoleCommands
 #define LuaScriptGetExecuteConsoleCommands GetLuaScript(tolua_S)->GetExecuteConsoleCommands
 
-#define LuaScriptSetGlobalVariable GetLuaScript(tolua_S)->SetGlobalVariable
-#define LuaScriptGetGlobalVariable GetLuaScript(tolua_S)->GetGlobalVariable
+#define LuaScriptSetGlobalVar GetLuaScript(tolua_S)->SetGlobalVar
+#define LuaScriptGetGlobalVar GetLuaScript(tolua_S)->GetGlobalVar
+#define LuaScriptGetGlobalVars GetLuaScript(tolua_S)->GetGlobalVars
 
 static bool tolua_isfunctionorurho3dstring(lua_State* L, int lo, int def, tolua_Error* err)
 {
