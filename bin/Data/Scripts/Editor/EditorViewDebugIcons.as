@@ -56,9 +56,9 @@ Array<String> ComponentTypes = {"Light",
 Array<BillboardSet@> debugIconsSet(ICON_COUNT);
 Node@ debugIconsNode = null;
 int stepDebugIconsUpdate = 100; //ms
-int timeToNextDebugIconsUpdate = 0;
+uint timeToNextDebugIconsUpdate = 0;
 int stepDebugIconsUpdateSplinePath = 1000; //ms
-int timeToNextDebugIconsUpdateSplinePath = 0;
+uint timeToNextDebugIconsUpdateSplinePath = 0;
 const int splinePathResolution = 16;
 const float splineStep = 1.0f / splinePathResolution;
 bool debugIconsShow = true;
@@ -149,7 +149,7 @@ void UpdateViewDebugIcons()
             {
 
                 // Fill with new data
-                for(int i=0;i<nodes.length; i++)
+                for(uint i = 0;i < nodes.length; i++)
                 {
                     Component@ component = nodes[i].GetComponent(ComponentTypes[iconType]);
                     if (component is null) continue;

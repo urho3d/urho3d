@@ -1088,9 +1088,9 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 
                 if (item_.vars[TYPE_VAR] == ITEM_NODE)
                 {
-                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
-                    if (node !is null)
-                        nodeList.Push(node);
+                    Node@ n = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    if (n !is null)
+                        nodeList.Push(n);
                 }
             }
         }

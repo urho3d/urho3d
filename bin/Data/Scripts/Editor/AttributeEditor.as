@@ -314,7 +314,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         CreateDragSlider(attrEdit);
         // If the attribute is a counter for things like billboards or animation states, disable apply at each change
-        if (info.name.Find(" Count", 0, false) == -1)
+        if (info.name.Find(" Count", 0, false) == NPOS)
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target
@@ -677,8 +677,8 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 // Reevaluate each name in the list
                 for (uint i = 0; i < values.length; ++i)
                 {
-                    ResourceRefList refList = values[i].GetResourceRefList();
-                    if (subIndex >= refList.length || refList.names[subIndex] != firstName)
+                    ResourceRefList rList = values[i].GetResourceRefList();
+                    if (subIndex >= rList.length || rList.names[subIndex] != firstName)
                     {
                         nameSameValue = false;
                         break;
@@ -699,7 +699,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 break;
 
             Variant firstValue = vector[subIndex];
-            bool sameValue = true;
+            bool sameVal = true;
             Array<Variant> varValues;
 
             // Reevaluate each variant in the vector
@@ -711,16 +711,16 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                     Variant value = vector[subIndex];
                     varValues.Push(value);
                     if (value != firstValue)
-                        sameValue = false;
+                        sameVal = false;
                 }
                 else
-                    sameValue = false;
+                    sameVal = false;
             }
 
             // The individual variant in the list is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo info;
             info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
+            LoadAttributeEditor(parent, firstValue, info, editable, sameVal, varValues);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -739,7 +739,7 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 varName = keys[subIndex].ToString(); // Use hexadecimal if nothing else is available
 
             Variant firstValue = map[keys[subIndex]];
-            bool sameValue = true;
+            bool sameVal = true;
             Array<Variant> varValues;
 
             // Reevaluate each variant in the map
@@ -751,16 +751,16 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                     Variant value = map[keys[subIndex]];
                     varValues.Push(value);
                     if (value != firstValue)
-                       sameValue = false;
+                       sameVal = false;
                 }
                 else
-                    sameValue = false;
+                    sameVal = false;
             }
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
             AttributeInfo info;
             info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
+            LoadAttributeEditor(parent, firstValue, info, editable, sameVal, varValues);
         }
     }
     else
