@@ -1253,10 +1253,10 @@ bool SceneRenderZoneCubemaps()
     Array<Zone@> capturedThisCall;
     bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
     
-    for (int i = 0; i < selectedNodes.length; ++i)
+    for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
-        for (int z = 0; z < zones.length; ++z)
+        for (uint z = 0; z < zones.length; ++z)
         {
             Zone@ zone = cast<Zone>(zones[z]);
             if (zone !is null)
@@ -1267,7 +1267,7 @@ bool SceneRenderZoneCubemaps()
         }
     }
     
-    for (int i = 0; i < selectedComponents.length; ++i)
+    for (uint i = 0; i < selectedComponents.length; ++i)
     {
         Zone@ zone = cast<Zone>(selectedComponents[i]);
         if (zone !is null)

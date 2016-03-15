@@ -151,7 +151,7 @@ void ChangeNodeViewMask(Node@ node, EditActionGroup@ group, int mask)
     Array<Component@> components = node.GetComponents();
     if (components.length > 0) 
     {
-        for (int componentIndex = 0; componentIndex < components.length; componentIndex++) 
+        for (uint componentIndex = 0; componentIndex < components.length; componentIndex++) 
         {
             Component@ component = components[componentIndex];
             Drawable@ drawable = cast<Drawable>(component);
@@ -191,7 +191,7 @@ void EstablishBitMaskToSelectedNodes()
     // Group for storing undo actions
     EditActionGroup group;
     
-    for (int indexNode = 0; indexNode < selectedNodes.length; indexNode++) 
+    for (uint indexNode = 0; indexNode < selectedNodes.length; indexNode++) 
     {
         Node@ node = selectedNodes[indexNode];
         if (node !is null) 
@@ -209,7 +209,7 @@ void EstablishBitMaskToSelectedNodes()
             Array<Node@> children = node.GetChildren(true);
             if (children.length > 0) 
             {
-                for (int i =0; i < children.length; i++) 
+                for (uint i = 0; i < children.length; i++) 
                 {
                     ChangeNodeViewMask(children[i], group, mask);
                 }

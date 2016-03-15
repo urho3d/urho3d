@@ -821,10 +821,10 @@ class ApplyUIElementStyleAction : EditAction
                 XMLElement rootElem = elementData.root;
                 uint index = rootElem.GetUInt("index");
                 uint listItemIndex = rootElem.GetUInt("listItemIndex");
-                UIElement@ element = parent.children[index];
+                UIElement@ elem = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
-                UpdateHierarchyItem(listItemIndex, element, parentItem);
-                SetUIElementModified(element);
+                UpdateHierarchyItem(listItemIndex, elem, parentItem);
+                SetUIElementModified(elem);
                 hierarchyUpdateSelections.Push(listItemIndex);
             }
 

@@ -2435,8 +2435,11 @@ static void StringSetUTF8FromLatin1(const String& src, String& str)
     str.SetUTF8FromLatin1(src.CString());
 }
 
+static const unsigned NPOS = String::NPOS; // workaround for GCC
+
 void RegisterString(asIScriptEngine *engine)
 {
+    engine->RegisterGlobalProperty("const uint NPOS", (void*)&NPOS);
     engine->RegisterObjectType("String", sizeof(String), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterStringFactory("String", asFUNCTION(StringFactory), asCALL_CDECL);
     engine->RegisterObjectBehaviour("String", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructString), asCALL_CDECL_OBJLAST);

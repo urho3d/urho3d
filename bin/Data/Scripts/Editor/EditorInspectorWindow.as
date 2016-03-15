@@ -709,7 +709,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
     {
         // 1. Add established tags from current editable UIElement to menu
         Array<String> elementTags = editUIElement.tags;
-        for (int i =0; i < elementTags.length; i++) 
+        for (uint i = 0; i < elementTags.length; i++) 
         {
             bool isHasTag = editUIElement.HasTag(elementTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
@@ -718,7 +718,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         // 2. Add default tags
         Array<String> stdTags = defaultTags.Split(';');
-        for (int i=0; i < stdTags.length; i++) 
+        for (uint i= 0; i < stdTags.length; i++) 
         {
             bool isHasTag = editUIElement.HasTag(stdTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
@@ -733,7 +733,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
     {
         // 1. Add established tags from Node to menu
         Array<String> nodeTags = editNode.tags;
-        for (int i =0; i < nodeTags.length; i++) 
+        for (uint i = 0; i < nodeTags.length; i++) 
         {
             bool isHasTag = editNode.HasTag(nodeTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
@@ -742,7 +742,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         Array<String> sceneTags = editorScene.tags;
         // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
-        for (int i =0; i < sceneTags.length; i++)
+        for (uint i = 0; i < sceneTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(sceneTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
@@ -755,7 +755,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         // 3. Add default tags
         Array<String> stdTags = defaultTags.Split(';');
-        for (int i=0; i<stdTags.length; i++)
+        for (uint i = 0; i < stdTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(stdTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.

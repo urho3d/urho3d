@@ -16,7 +16,7 @@ void PrepareZonesForCubeRendering()
         return;
         
     Array<Component@>@ zones = editorScene.GetComponents("Zone", true);
-    for (int i = 0; i < zones.length; ++i)
+    for (uint i = 0; i < zones.length; ++i)
     {
         Zone@ srcZone = cast<Zone>(zones[i]);
         if (zones[i].enabled)
@@ -55,12 +55,12 @@ void PrepareZonesForCubeRendering()
 void UnprepareZonesForCubeRendering()
 {
     // Clean up the clones
-    for (int i = 0; i < cloneZones.length; ++i)
+    for (uint i = 0; i < cloneZones.length; ++i)
         cloneZones[i].Remove();
     cloneZones.Clear();
         
     // Reenable anyone we disabled
-    for (int i = 0; i < disabledZones.length; ++i)
+    for (uint i = 0; i < disabledZones.length; ++i)
         disabledZones[i].enabled = true;
     disabledZones.Clear();
     
