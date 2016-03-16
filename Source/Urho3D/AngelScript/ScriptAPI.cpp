@@ -276,7 +276,6 @@ static void RegisterScript(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", asMETHOD(Script, SetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", asMETHOD(Script, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Script@+ get_script()", asFUNCTION(GetScript), asCALL_CDECL);
-    engine->RegisterGlobalProperty("VariantMap globalVars", &Script::globalVars);
 }
 
 static void RegisterScriptObject(asIScriptEngine* engine)

@@ -102,8 +102,6 @@ public:
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
 
-    /// Variant map for global variables that can persist through a script program reload.
-    static VariantMap globalVars;
 
 private:
     /// Increase script nesting level.

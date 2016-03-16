@@ -198,6 +198,17 @@ Object* Context::GetSubsystem(StringHash type) const
         return 0;
 }
 
+const Variant& Context::GetGlobalVar(StringHash key) const
+{
+    VariantMap::ConstIterator i = globalVars_.Find(key);
+    return i != globalVars_.End() ? i->second_ : Variant::EMPTY;
+}
+
+void Context::SetGlobalVar(StringHash key, const Variant& value)
+{
+    globalVars_[key] = value;
+}
+
 Object* Context::GetEventSender() const
 {
     if (!eventSenders_.Empty())

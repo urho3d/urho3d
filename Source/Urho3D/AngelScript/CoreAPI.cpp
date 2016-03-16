@@ -911,6 +911,21 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
+static void SetGlobalVar(const String& key, Variant value)
+{
+    GetScriptContext()->SetGlobalVar(key, value);
+}
+
+static Variant GetGlobalVar(const String& key)
+{
+    return GetScriptContext()->GetGlobalVar(key);
+}
+
+static VariantMap& GetGlobalVars()
+{
+    return const_cast<VariantMap&>(GetScriptContext()->GetGlobalVars());
+}
+
 void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
@@ -938,6 +953,9 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(HasSubscribedToSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(StringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetGlobalVar(const  String&in, Variant&in)", asFUNCTION(SetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Variant GetGlobalVar(const String&in)", asFUNCTION(GetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("VariantMap& get_globalVars()", asFUNCTION(GetGlobalVars), asCALL_CDECL);
 
     engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<RefCounted>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructWeakHandle), asCALL_CDECL_OBJLAST);

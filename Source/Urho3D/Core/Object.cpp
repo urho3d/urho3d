@@ -393,6 +393,21 @@ VariantMap& Object::GetEventDataMap() const
     return context_->GetEventDataMap();
 }
 
+const Variant& Object::GetGlobalVar(StringHash key) const
+{
+    return context_->GetGlobalVar(key);
+}
+
+const VariantMap& Object::GetGlobalVars() const 
+{ 
+    return context_->GetGlobalVars(); 
+}
+
+void Object::SetGlobalVar(StringHash key, const Variant& value)
+{
+    context_->SetGlobalVar(key, value);
+}
+
 Object* Object::GetSubsystem(StringHash type) const
 {
     return context_->GetSubsystem(type);
