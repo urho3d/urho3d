@@ -51,6 +51,7 @@ Urho3D development, contributions and bugfixes by:
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish
+- BlueMagnificent
 - Enhex
 - Firegorilla
 - Lumak
