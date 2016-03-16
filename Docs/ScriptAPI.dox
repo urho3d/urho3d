@@ -14965,6 +14965,7 @@ Properties:
 - uint GetFloat16Format()
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
+- Variant GetGlobalVar(const String&)
 - String GetInternalPath(const String&)
 - uint GetLinearDepthFormat()
 - uint GetLuminanceAlphaFormat()
@@ -15026,6 +15027,7 @@ Properties:
 - String ReplaceExtension(const String&, const String&)
 - uint SDBMHash(uint, uint8)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetGlobalVar(const String&, Variant&)
 - void SetMiniDumpDir(const String&)
 - void SetRandomSeed(uint)
 - float Sign(float)
@@ -15055,6 +15057,7 @@ Properties:
 - DebugRenderer@ debugRenderer
 - Engine@ engine
 - FileSystem@ fileSystem
+- VariantMap globalVars
 - Graphics@ graphics
 - Input@ input
 - Localization@ localization
@@ -15559,7 +15562,6 @@ Properties:
 - uint VO_NONE
 - Color WHITE
 - Color YELLOW
-- VariantMap globalVars
 */
 
 }
