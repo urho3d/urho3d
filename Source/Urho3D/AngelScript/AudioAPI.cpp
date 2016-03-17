@@ -86,6 +86,10 @@ void RegisterAudio(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Audio", "void SetMode(int, int, bool, bool interpolate = true)", asMETHOD(Audio, SetMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool Play()", asMETHOD(Audio, Play), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void Stop()", asMETHOD(Audio, Stop), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void PauseSoundType(const String&in)", asMETHOD(Audio, PauseSoundType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void ResumeSoundType(const String&in)", asMETHOD(Audio, ResumeSoundType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "void ResumeAll()", asMETHOD(Audio, ResumeAll), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Audio", "bool IsSoundTypePaused(const String&in)", asMETHOD(Audio, IsSoundTypePaused), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "void set_masterGain(const String&in, float)", asMETHOD(Audio, SetMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "float get_masterGain(const String&in) const", asMETHOD(Audio, GetMasterGain), asCALL_THISCALL);
     engine->RegisterObjectMethod("Audio", "bool HasMasterGain(const String&in) const", asMETHOD(Audio, HasMasterGain), asCALL_THISCALL);
