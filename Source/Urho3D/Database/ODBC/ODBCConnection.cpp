@@ -25,6 +25,12 @@
 #include "../../Database/DatabaseEvents.h"
 #include "../../IO/Log.h"
 
+#ifdef _WIN32
+// Needs to be included above sql.h for windows
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 #include <sqlext.h>
 
 namespace Urho3D
