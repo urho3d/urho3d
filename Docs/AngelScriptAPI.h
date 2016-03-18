@@ -584,7 +584,11 @@ class Audio
 bool HasMasterGain(const String&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool IsSoundTypePaused(const String&);
+void PauseSoundType(const String&);
 bool Play();
+void ResumeAll();
+void ResumeSoundType(const String&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetMode(int, int, bool, bool = true);
 void Stop();
