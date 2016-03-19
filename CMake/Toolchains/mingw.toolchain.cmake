@@ -82,14 +82,11 @@ if (NOT MINGW_SYSROOT)
     if (DEFINED ENV{MINGW_SYSROOT})
         file (TO_CMAKE_PATH $ENV{MINGW_SYSROOT} MINGW_SYSROOT)
     else ()
-        get_filename_component (NAME ${MINGW_PREFIX} NAME)
-        if (EXISTS /usr/${NAME}/sys-root)
-            # Redhat based system
-            set (MINGW_SYSROOT /usr/${NAME}/sys-root/mingw)
-        else ()
-            # Debian based system
-            set (MINGW_SYSROOT /usr/${NAME})
-        endif ()
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE find_mingw_sysroot_output ERROR_QUIET)
+        file (STRINGS ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output MINGW_SYSROOT REGEX _mingw\\.h)
+        string (REGEX REPLACE "^[^ ]* *(.*)/include.*$" \\1 MINGW_SYSROOT "${MINGW_SYSROOT}")  # Stringify for string replacement
+        string (REPLACE "\\ " " " MINGW_SYSROOT "${MINGW_SYSROOT}")
+        execute_process (COMMAND ${CMAKE_COMMAND} -E remove find_mingw_sysroot_output)
     endif ()
     if (NOT EXISTS ${MINGW_SYSROOT})
         message (FATAL_ERROR "Could not find MinGW system root. "
