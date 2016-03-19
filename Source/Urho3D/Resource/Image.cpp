@@ -1116,9 +1116,9 @@ void Image::ClearInt(unsigned uintColor)
 
     if (components_ == 4)
     {
-        uint32_t color = uintColor;
-        uint32_t* data = (uint32_t*)GetData();
-        uint32_t* data_end = (uint32_t*)(GetData() + width_ * height_ * depth_ * components_);
+        unsigned color = uintColor;
+        unsigned* data = (unsigned*)GetData();
+        unsigned* data_end = (unsigned*)(GetData() + width_ * height_ * depth_ * components_);
         for (; data < data_end; ++data)
             *data = color;
     }

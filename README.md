@@ -70,6 +70,7 @@ Urho3D development, contributions and bugfixes by:
 - att
 - celeron55
 - cosmy1
+- damu
 - dragonCASTjosh
 - feltech
 - hdunderscore

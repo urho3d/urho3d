@@ -114,7 +114,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
 #elif defined(__linux__)
     int flags = IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO;
-    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (uint32_t)flags);
+    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (unsigned)flags);
 
     if (handle < 0)
     {
@@ -140,7 +140,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 // Don't watch ./ or ../ sub-directories
                 if (!subDirFullPath.EndsWith("./"))
                 {
-                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (uint32_t)flags);
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (unsigned)flags);
                     if (handle < 0)
                         URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
                     else
