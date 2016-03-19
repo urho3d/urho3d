@@ -154,7 +154,6 @@ void UpdateViewDebugIcons()
                     Component@ component = nodes[i].GetComponent(ComponentTypes[iconType]);
                     if (component is null) continue;
 
-                    Billboard@ bb = null;
                     Color finalIconColor = debugIconsColors[ICON_COLOR_DEFAULT];
                     float distance = (camPos - nodes[i].worldPosition).length;
                     if (isOrthographic) distance = debugIconsOrthoDistance;
@@ -202,7 +201,7 @@ void UpdateViewDebugIcons()
                     }
                     else
                     {
-                        bb = debugIconsSet[iconType].billboards[i];
+                        Billboard@ bb = debugIconsSet[iconType].billboards[i];
                         bb.size = ClampToIconMaxSize(Max(debugIconsSize * distance, debugIconsSize));
 
                         if (iconType==ICON_PARTICLE_EMITTER)
