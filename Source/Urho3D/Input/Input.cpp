@@ -161,7 +161,7 @@ void EmscriptenInput::RequestPointerLock(MouseMode mode, bool suppressEvent)
 {
     requestedMouseMode_ = mode;
     suppressMouseModeEvent_ = suppressEvent;
-    emscripten_request_pointerlock(NULL, false);
+    emscripten_request_pointerlock(NULL, true);
 }
 
 void EmscriptenInput::ExitPointerLock(bool suppressEvent)
@@ -212,7 +212,7 @@ EM_BOOL EmscriptenInput::HandlePointerLockChange(int eventType, const Emscripten
         // Pointer Lock is now active
         inputInst->emscriptenPointerLock_ = true;
         inputInst->emscriptenEnteredPointerLock_ = true;
-        inputInst->SetMouseModeEmscripten(requestedMouseMode_, suppressMouseModeEvent_);
+        inputInst->SetMouseModeEmscriptenFinal(requestedMouseMode_, suppressMouseModeEvent_);
     }
     else
     {
@@ -220,9 +220,9 @@ EM_BOOL EmscriptenInput::HandlePointerLockChange(int eventType, const Emscripten
         inputInst->emscriptenPointerLock_ = false;
 
         if (inputInst->mouseMode_ == MM_RELATIVE)
-            inputInst->SetMouseModeEmscripten(MM_FREE, suppressMouseModeEvent_);
+            inputInst->SetMouseModeEmscriptenFinal(MM_FREE, suppressMouseModeEvent_);
         else if (inputInst->mouseMode_ == MM_ABSOLUTE)
-            inputInst->SetMouseModeEmscripten(MM_ABSOLUTE, suppressMouseModeEvent_);
+            inputInst->SetMouseModeEmscriptenFinal(MM_ABSOLUTE, suppressMouseModeEvent_);
 
         inputInst->emscriptenExitingPointerLock_ = false;
     }
@@ -252,7 +252,7 @@ EM_BOOL EmscriptenInput::HandleFocusChange(int eventType, const EmscriptenFocusE
 {
     Input* const inputInst = (Input*)userData;
 
-    inputInst->suppressNextMouseMove_ = true;
+    inputInst->SuppressNextMouseMove();
 
     if (eventType == EMSCRIPTEN_EVENT_FOCUSOUT)
         inputInst->LoseFocus();
@@ -278,7 +278,7 @@ EM_BOOL EmscriptenInput::HandleMouseJump(int eventType, const EmscriptenMouseEve
     }
 
     if (suppress)
-        inputInst->suppressNextMouseMove_ = true;
+        inputInst->SuppressNextMouseMove();
 
     return EM_FALSE;
 }
@@ -331,7 +331,9 @@ Input::Input(Context* context) :
     lastMouseGrabbed_(false),
     mouseMode_(MM_ABSOLUTE),
     lastMouseMode_(MM_ABSOLUTE),
-#ifdef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
+    sdlMouseRelative_(false),
+#else
     emscriptenPointerLock_(false),
     emscriptenEnteredPointerLock_(false),
     emscriptenExitingPointerLock_(false),
@@ -375,11 +377,18 @@ void Input::Update()
     URHO3D_PROFILE(UpdateInput);
 
 #ifndef __EMSCRIPTEN__
+    bool mouseMoved = false;
+    if (mouseMove_ != IntVector2::ZERO)
+        mouseMoved = true;
+
     ResetInputAccumulation();
 
     SDL_Event evt;
     while (SDL_PollEvent(&evt))
         HandleSDLEvent(&evt);
+
+    if (suppressNextMouseMove_ && (mouseMove_ != IntVector2::ZERO || mouseMoved))
+        UnsuppressMouseMove();
 #endif
 
     // Check for focus change this frame
@@ -412,8 +421,10 @@ void Input::Update()
     // Handle mouse mode MM_WRAP
     if (mouseVisible_ && mouseMode_ == MM_WRAP)
     {
+        IntVector2 windowPos = graphics_->GetWindowPosition();
         IntVector2 mpos;
-        SDL_GetMouseState(&mpos.x_, &mpos.y_);
+        SDL_GetGlobalMouseState(&mpos.x_, &mpos.y_);
+        mpos -= windowPos;
 
         const int buffer = 5;
         const int width = graphics_->GetWidth() - buffer * 2;
@@ -447,7 +458,7 @@ void Input::Update()
         if (warp)
         {
             SetMousePosition(mpos);
-            SDL_FlushEvent(SDL_MOUSEMOTION);
+            SuppressNextMouseMove();
         }
     }
 #else
@@ -455,10 +466,8 @@ void Input::Update()
         return;
 #endif
 
-    // Check for relative mode mouse move
-    // Note that Emscripten will use SDL mouse move events for relative mode instead
 #ifndef __EMSCRIPTEN__
-    if (!touchEmulation_ && (graphics_->GetExternalWindow() || ((!mouseVisible_ && mouseMode_ != MM_FREE) && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
+    if (!touchEmulation_ && (graphics_->GetExternalWindow() || ((!sdlMouseRelative_ && !mouseVisible_ && mouseMode_ != MM_FREE) && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #else
     if (!touchEmulation_ && !emscriptenPointerLock_ && (graphics_->GetExternalWindow() || (!mouseVisible_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))))
 #endif
@@ -472,19 +481,14 @@ void Input::Update()
         else
         {
             // Recenter the mouse cursor manually after move
-            const IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-            if (mousePosition != center)
-            {
-                SetMousePosition(center);
-                lastMousePosition_ = center;
-            }
+            CenterMousePosition();
         }
 #else
         if (mouseMode_ == MM_ABSOLUTE || mouseMode_ == MM_FREE)
             lastMousePosition_ = mousePosition;
 
         if (emscriptenExitingPointerLock_)
-            suppressNextMouseMove_ = true;
+            SuppressNextMouseMove();
 #endif
         // Send mouse move event if necessary
         if (mouseMove_ != IntVector2::ZERO)
@@ -505,14 +509,11 @@ void Input::Update()
             }
         }
     }
-
 #ifndef __EMSCRIPTEN__
-    // Suppress all mouse movement this tick
-    if (suppressNextMouseMove_ && mouseMove_ != IntVector2::ZERO)
+    else if (!touchEmulation_ && !mouseVisible_ && sdlMouseRelative_ && inputFocus_ && (flags & SDL_WINDOW_MOUSE_FOCUS))
     {
-        lastMousePosition_ = GetMousePosition();
-        mouseMove_ = IntVector2::ZERO;
-        suppressNextMouseMove_ = false;
+        // Keep the cursor trapped in window.
+        CenterMousePosition();
     }
 #endif
 }
@@ -530,6 +531,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
     {
         if (!suppressEvent)
             lastMouseVisible_ = enable;
+
         enable = false;
     }
 
@@ -537,8 +539,6 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
 #ifndef RPI
     if (enable != mouseVisible_)
     {
-        mouseVisible_ = enable;
-
         if (initialized_)
         {
             // External windows can only support visible mouse cursor
@@ -550,71 +550,72 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
                 return;
             }
 
-            if (!mouseVisible_ && inputFocus_)
+            if (!enable && inputFocus_)
             {
 #ifndef __EMSCRIPTEN__
-                lastVisibleMousePosition_ = GetMousePosition();
-                if (mouseMode_ != MM_FREE)
-                {
-                    // Recenter the mouse cursor manually when hiding it to avoid erratic mouse move for one frame
-                    IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-                    SetMousePosition(center);
-                    lastMousePosition_ = center;
-                }
+                if (mouseVisible_)
+                    lastVisibleMousePosition_ = GetMousePosition();
+
+                if (mouseMode_ == MM_ABSOLUTE)
+                    SetMouseModeAbsolute(SDL_TRUE);
 #else
                 if (mouseMode_ == MM_ABSOLUTE && !emscriptenPointerLock_)
-                {
-                    UI* ui = GetSubsystem<UI>();
-                    Cursor* cursor = ui->GetCursor();
-                    if (!cursor)
-                    {
-                        mouseVisible_ = true;
-                        SDL_ShowCursor(SDL_TRUE);
-                    }
-
-                    emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);
-                }
+                    emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);      
 #endif
-                if (mouseVisible_ == enable)
-                    SDL_ShowCursor(SDL_FALSE);
+                SDL_ShowCursor(SDL_FALSE);
+                mouseVisible_ = false;
             }
-            else
+            else if (mouseMode_ != MM_RELATIVE)
             {
-                SDL_ShowCursor(SDL_TRUE);
                 SetMouseGrabbed(false, suppressEvent);
+                
+                SDL_ShowCursor(SDL_TRUE);
+                mouseVisible_ = true;
+
 #ifndef __EMSCRIPTEN__
+                if (mouseMode_ == MM_ABSOLUTE)
+                    SetMouseModeAbsolute(SDL_FALSE);
+
+                // Update cursor position
                 UI* ui = GetSubsystem<UI>();
                 Cursor* cursor = ui->GetCursor();
                 // If the UI Cursor was visible, use that position instead of last visible OS cursor position
                 if (cursor && cursor->IsVisible())
                 {
                     IntVector2 pos = cursor->GetScreenPosition();
-                    if (pos.x_ != MOUSE_POSITION_OFFSCREEN.x_ &&
-                        pos.y_ != MOUSE_POSITION_OFFSCREEN.y_)
+                    if (pos != MOUSE_POSITION_OFFSCREEN)
+                    {
                         SetMousePosition(pos);
-                    lastMousePosition_ = pos;
+                        lastMousePosition_ = pos;
+                    }
                 }
                 else
                 {
-                    if (lastVisibleMousePosition_.x_ != MOUSE_POSITION_OFFSCREEN.x_ &&
-                        lastVisibleMousePosition_.y_ != MOUSE_POSITION_OFFSCREEN.y_)
+                    if (lastVisibleMousePosition_ != MOUSE_POSITION_OFFSCREEN)
+                    {
                         SetMousePosition(lastVisibleMousePosition_);
-                    lastMousePosition_ = lastVisibleMousePosition_;
+                        lastMousePosition_ = lastVisibleMousePosition_;
+                    } 
                 }
 #else
-                emscriptenInput_->ExitPointerLock(suppressEvent);
+                if (mouseMode_ == MM_ABSOLUTE && emscriptenPointerLock_)
+                    emscriptenInput_->ExitPointerLock(suppressEvent);
 #endif
             }
         }
 
-        if (!suppressEvent && mouseVisible_ != startMouseVisible)
+        if (mouseVisible_ != startMouseVisible)
         {
-            lastMouseVisible_ = mouseVisible_;
-            using namespace MouseVisibleChanged;
+            SuppressNextMouseMove();
+            if (!suppressEvent)
+            {
+                lastMouseVisible_ = mouseVisible_;
+                using namespace MouseVisibleChanged;
 
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_VISIBLE] = mouseVisible_;
-            SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+                VariantMap& eventData = GetEventDataMap();
+                eventData[P_VISIBLE] = mouseVisible_;
+                SendEvent(E_MOUSEVISIBLECHANGED, eventData);
+            }
         }
     }
 #endif
@@ -664,7 +665,7 @@ void Input::SetMouseVisibleEmscripten(bool enable, bool suppressEvent)
         lastMouseVisible_ = mouseVisible_;
 }
 
-void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
+void Input::SetMouseModeEmscriptenFinal(MouseMode mode, bool suppressEvent)
 {
     if (!suppressEvent)
         lastMouseMode_ = mode;
@@ -675,14 +676,16 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
     {
         if (emscriptenPointerLock_)
         {
-            SetMouseGrabbed(true, suppressEvent);
             SetMouseVisibleEmscripten(false, suppressEvent);
         }
         else
         {
-            SetMouseGrabbed(false, suppressEvent);
             SetMouseVisibleEmscripten(true, suppressEvent);
         }
+
+        UI* const ui = GetSubsystem<UI>();
+        Cursor* const cursor = ui->GetCursor();
+        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
     }
     else if (mode == MM_RELATIVE && emscriptenPointerLock_)
     {
@@ -693,14 +696,74 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
     {
         SetMouseGrabbed(false, suppressEvent);
     }
-    suppressNextMouseMove_ = true;
+
+    SuppressNextMouseMove();
 
     if (!suppressEvent)
     {
         VariantMap& eventData = GetEventDataMap();
         eventData[MouseModeChanged::P_MODE] = mode;
-        eventData[MouseModeChanged::P_MOUSELOCK] = IsMouseLocked();
+        eventData[MouseModeChanged::P_MOUSELOCKED] = IsMouseLocked();
         SendEvent(E_MOUSEMODECHANGED, eventData);
+    }
+}
+
+void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
+{
+    if (mode != mouseMode_)
+        SuppressNextMouseMove();
+
+    const MouseMode previousMode = mouseMode_;
+    mouseMode_ = mode;
+
+    UI* const ui = GetSubsystem<UI>();
+    Cursor* const cursor = ui->GetCursor();
+
+    // Handle changing from previous mode
+    if (previousMode == MM_RELATIVE)
+        ResetMouseVisible();
+
+    // Handle changing to new mode
+    if (mode == MM_FREE)
+    {
+        // Attempt to cancel pending pointer-lock requests
+        emscriptenInput_->ExitPointerLock(suppressEvent);
+        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+    }
+    else if (mode == MM_ABSOLUTE)
+    {
+        if (!mouseVisible_)
+        {
+            if (emscriptenPointerLock_)
+            {
+                SetMouseVisibleEmscripten(false, suppressEvent);
+            }
+            else
+            {
+                if (!cursor)
+                    SetMouseVisible(true, suppressEvent);
+                // Deferred mouse mode change to pointer-lock callback
+                mouseMode_ = previousMode;
+                emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);
+            }
+
+            SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+        }
+    }
+    else if (mode == MM_RELATIVE)
+    {
+        if (emscriptenPointerLock_)
+        {
+            SetMouseVisibleEmscripten(false, true);
+            SetMouseGrabbed(!(cursor && cursor->IsVisible()), suppressEvent);
+        }
+        else
+        {
+            // Defer mouse mode change to pointer-lock callback
+            SetMouseGrabbed(false, true);
+            mouseMode_ = previousMode;
+            emscriptenInput_->RequestPointerLock(MM_RELATIVE, suppressEvent);
+        }
     }
 }
 #endif
@@ -715,86 +778,80 @@ void Input::SetMouseGrabbed(bool grab, bool suppressEvent)
 
 void Input::ResetMouseGrabbed()
 {
-    mouseGrabbed_ = lastMouseGrabbed_;
+    SetMouseGrabbed(lastMouseGrabbed_, true);
 }
+
+
+#ifndef __EMSCRIPTEN__
+void Input::SetMouseModeAbsolute(SDL_bool enable)
+{
+    SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+
+    SDL_SetWindowGrab(window, enable);
+}
+
+void Input::SetMouseModeRelative(SDL_bool enable)
+{
+    SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+
+    int result = SDL_SetRelativeMouseMode(enable);
+    sdlMouseRelative_ = enable && (result == 0);
+
+    if (result == -1)
+        SDL_SetWindowGrab(window, enable);
+}
+#endif
 
 void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
 {
-    if (mode != mouseMode_)
-        suppressNextMouseMove_ = true;
-
     const MouseMode previousMode = mouseMode_;
-    mouseMode_ = mode;
-    SDL_Window* const window = graphics_->GetImpl()->GetWindow();
 
-    UI* const ui = GetSubsystem<UI>();
-    Cursor* const cursor = ui->GetCursor();
-
-    // Handle changing from previous mode
-    if (previousMode == MM_RELATIVE)
-        ResetMouseVisible();
-
-    // Handle changing to new mode
-    if (mode == MM_FREE)
-    {
-        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
-#ifndef __EMSCRIPTEN__
-        SDL_SetWindowGrab(window, SDL_FALSE);
+#ifdef __EMSCRIPTEN__
+    SetMouseModeEmscripten(mode, suppressEvent);
 #else
-        // Attempt to cancel pending pointer-lock requests
-        emscriptenInput_->ExitPointerLock(suppressEvent);
-#endif
-    }
-    else if (mode == MM_ABSOLUTE)
+    if (mode != mouseMode_)
     {
-#ifndef __EMSCRIPTEN__
-        SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
-        SDL_SetWindowGrab(window, SDL_FALSE);
-#else
-        if (!mouseVisible_)
+        SuppressNextMouseMove();
+
+        mouseMode_ = mode;
+        SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+
+        UI* const ui = GetSubsystem<UI>();
+        Cursor* const cursor = ui->GetCursor();
+
+        // Handle changing from previous mode
+        if (previousMode == MM_ABSOLUTE)
         {
-            if (emscriptenPointerLock_)
-            {
-                SetMouseVisibleEmscripten(false, suppressEvent);
-                SetMouseGrabbed(true, suppressEvent);
-            }
-            else
-            {
-                if (!cursor)
-                    SetMouseVisible(true, suppressEvent);
-                // Deferred mouse mode change to pointer-lock callback
-                mouseMode_ = previousMode;
-                emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);
-            }
+            if (!mouseVisible_)
+                SetMouseModeAbsolute(SDL_FALSE);
         }
-#endif
-    }
-    else if (mode == MM_RELATIVE)
-    {
-#ifndef __EMSCRIPTEN__
-        SDL_SetWindowGrab(window, SDL_TRUE);
-        SetMouseGrabbed(true, suppressEvent);
-        SetMouseVisible(false, true);
-#else
-        if (emscriptenPointerLock_)
+        if (previousMode == MM_RELATIVE)
+        {
+            SetMouseModeRelative(SDL_FALSE);
+            ResetMouseVisible();
+        }
+        else if (previousMode == MM_WRAP)
+            SDL_SetWindowGrab(window, SDL_FALSE);
+
+        // Handle changing to new mode
+        if (mode == MM_ABSOLUTE)
+        {
+            if (!mouseVisible_)
+                SetMouseModeAbsolute(SDL_TRUE);
+        }
+        else if (mode == MM_RELATIVE)
+        {
+            SetMouseVisible(false, true);
+            SetMouseModeRelative(SDL_TRUE);
+        }
+        else if (mode == MM_WRAP)
         {
             SetMouseGrabbed(true, suppressEvent);
-            SetMouseVisibleEmscripten(false, true);
+            SDL_SetWindowGrab(window, SDL_TRUE);
         }
-        else
-        {
-            // Defer mouse mode change to pointer-lock callback
-            mouseMode_ = previousMode;
-            emscriptenInput_->RequestPointerLock(MM_RELATIVE, suppressEvent);
-        }
-#endif
-    }
-#ifndef __EMSCRIPTEN__
-    else if (mode == MM_WRAP)
-    {
-        SetMouseGrabbed(true, suppressEvent);
-        /// \todo When SDL 2.0.4 is integrated, use SDL_CaptureMouse() and global mouse functions for MM_WRAP mode.
-        SDL_SetWindowGrab(window, SDL_TRUE);
+
+        if (mode != MM_WRAP)
+            SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
     }
 #endif
 
@@ -806,7 +863,7 @@ void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
         {
             VariantMap& eventData = GetEventDataMap();
             eventData[MouseModeChanged::P_MODE] = mode;
-            eventData[MouseModeChanged::P_MOUSELOCK] = IsMouseLocked();
+            eventData[MouseModeChanged::P_MOUSELOCKED] = IsMouseLocked();
             SendEvent(E_MOUSEMODECHANGED, eventData);
         }
     }
@@ -1386,7 +1443,7 @@ bool Input::IsMouseLocked() const
 #ifdef __EMSCRIPTEN__
     return emscriptenPointerLock_;
 #else
-    return mouseMode_ == MM_RELATIVE || (mouseMode_ == MM_ABSOLUTE && !mouseVisible_);
+    return !((mouseMode_ == MM_ABSOLUTE && mouseVisible_) || mouseMode_ == MM_FREE);
 #endif
 }
 
@@ -1430,6 +1487,7 @@ void Input::Initialize()
 #ifdef __EMSCRIPTEN__
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Input, HandleEndFrame));
 #endif
+    
     URHO3D_LOGINFO("Initialized input");
 }
 
@@ -1480,7 +1538,7 @@ void Input::GainFocus()
     SetMouseMode(mm, true);
 #endif
 
-    suppressNextMouseMove_ = true;
+    SuppressNextMouseMove();
 
     // Re-establish mouse cursor hiding as necessary
     if (!mouseVisible_)
@@ -1713,6 +1771,29 @@ void Input::SetMousePosition(const IntVector2& position)
     SDL_WarpMouseInWindow(graphics_->GetImpl()->GetWindow(), position.x_, position.y_);
 }
 
+void Input::CenterMousePosition()
+{
+    const IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
+    if (GetMousePosition() != center)
+    {
+        SetMousePosition(center);
+        lastMousePosition_ = center;
+    }
+}
+
+void Input::SuppressNextMouseMove()
+{
+    suppressNextMouseMove_ = true;
+    mouseMove_ = IntVector2::ZERO;
+}
+
+void Input::UnsuppressMouseMove()
+{
+    suppressNextMouseMove_ = false;
+    mouseMove_ = IntVector2::ZERO;
+    lastMousePosition_ = GetMousePosition();
+}
+
 void Input::HandleSDLEvent(void* sdlEvent)
 {
     SDL_Event& evt = *static_cast<SDL_Event*>(sdlEvent);
@@ -1820,10 +1901,8 @@ void Input::HandleSDLEvent(void* sdlEvent)
         break;
 
     case SDL_MOUSEMOTION:
-        // Emscripten will use SDL mouse move events for relative mode, as repositioning the mouse and
-        // measuring distance from window center is not supported
 #ifndef __EMSCRIPTEN__
-        if ((mouseVisible_ || mouseMode_ == MM_FREE) && !touchEmulation_)
+        if ((sdlMouseRelative_ || mouseVisible_ || mouseMode_ == MM_FREE) && !touchEmulation_)
 #else
         if ((mouseVisible_ || emscriptenPointerLock_ || mouseMode_ == MM_FREE) && !touchEmulation_)
 #endif
@@ -1831,7 +1910,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 #ifdef __EMSCRIPTEN__
             if (emscriptenExitingPointerLock_)
             {
-                suppressNextMouseMove_ = true;
+                SuppressNextMouseMove();
                 break;
             }
 #endif
@@ -1898,7 +1977,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
             if (!mouseVisible_)
-                suppressNextMouseMove_ = true;
+                SuppressNextMouseMove();
         }
         break;
 
@@ -1951,7 +2030,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             // Finger touch may move the mouse cursor. Suppress next mouse move when cursor hidden to prevent jumps
             if (!mouseVisible_)
-                suppressNextMouseMove_ = true;
+                SuppressNextMouseMove();
         }
         break;
 
@@ -2240,9 +2319,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes
     if (!mouseVisible_ && mouseMode_ != MM_FREE && !inResize_)
     {
-        IntVector2 center(graphics_->GetWidth() / 2, graphics_->GetHeight() / 2);
-        SetMousePosition(center);
-        lastMousePosition_ = center;
+        CenterMousePosition();
         focusedThisFrame_ = true;
     }
     else
@@ -2277,11 +2354,7 @@ void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 void Input::HandleEndFrame(StringHash eventType, VariantMap& eventData)
 {
     if (suppressNextMouseMove_ && mouseMove_ != IntVector2::ZERO)
-    {
-        mouseMove_ = IntVector2::ZERO;
-        lastMousePosition_ = GetMousePosition();
-        suppressNextMouseMove_ = false;
-    }
+        UnsuppressMouseMove();
 
     ResetInputAccumulation();
 }

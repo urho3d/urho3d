@@ -328,6 +328,12 @@ private:
     void SetMouseWheel(int delta);
     /// Internal function to set the mouse cursor position.
     void SetMousePosition(const IntVector2& position);
+    /// Center the mouse position.
+    void CenterMousePosition();
+    /// Suppress next mouse movement.
+    void SuppressNextMouseMove();
+    /// Unsuppress mouse movement.
+    void UnsuppressMouseMove();
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle frame start event.
@@ -337,11 +343,18 @@ private:
     /// Handle SDL event.
     void HandleSDLEvent(void* sdlEvent);
 
-#ifdef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
+    /// Set SDL mouse mode relative.
+    void SetMouseModeRelative(SDL_bool enable);
+    /// Set SDL mouse mode absolute.
+    void SetMouseModeAbsolute(SDL_bool enable);
+#else
     /// Set whether the operating system mouse cursor is visible (Emscripten platform only).
     void SetMouseVisibleEmscripten(bool enable, bool suppressEvent = false);
-    /// Set mouse mode (Emscripten platform only).
-    void SetMouseModeEmscripten(MouseMode mode, bool suppressEvent = false);
+    /// Set mouse mode final resolution (Emscripten platform only).
+    void SetMouseModeEmscriptenFinal(MouseMode mode, bool suppressEvent = false);
+    /// SetMouseMode  (Emscripten platform only).
+    void SetMouseModeEmscripten(MouseMode mode, bool suppressEvent);
     /// Handle frame end event.
     void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 #endif
@@ -394,6 +407,10 @@ private:
     MouseMode mouseMode_;
     /// The last mouse mode set by SetMouseMode.
     MouseMode lastMouseMode_;
+#ifndef __EMSCRIPTEN__
+    /// Flag to determine whether SDL mouse relative was used.
+    bool sdlMouseRelative_;
+#endif
     /// Touch emulation mode flag.
     bool touchEmulation_;
     /// Input focus flag.
