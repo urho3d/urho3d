@@ -485,7 +485,7 @@ desc 'Update web samples to GitHub Pages'
 task :ci_emscripten_samples_update do
   $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
   next if timeup
-  puts '"Updating Web samples in main website...'
+  puts 'Updating Web samples in main website...'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   system "rsync -a --delete --exclude tool --exclude *.pak ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
   update_web_samples_data or abort 'Failed to update Web json data file'
@@ -535,7 +535,7 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if the mirror branch has been forced pushed remotely or when we are performing a release (in case we need to rerun the job to recreate the package)
-  unless `git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}`.gsub(/'/, '') == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']).chop && !ENV['RELEASE_TAG']
+  unless `get fetch && git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}`.gsub(/'/, '') == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']).chop && !ENV['RELEASE_TAG']
     # Do not use "abort" here because AppVeyor, unlike Travis, also handles the exit status of the processes invoked in the "on_finish" section of the .appveyor.yml
     # Using "abort" may incorrectly (or correctly, depends on your POV) report the whole CI as failed when the CI mirror branch deletion is being skipped
     $stderr.puts "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
