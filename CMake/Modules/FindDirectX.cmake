@@ -212,7 +212,7 @@ endif ()
 
 # For now take shortcut for the other DirectX components by just checking on the headers and not the libraries
 include (CheckIncludeFiles)
-include (CheckIncludeFile)
+include (CheckIncludeFileCXX)
 foreach (NAME ${DIRECTX_HEADERS})
     string (REPLACE . _ BASE_NAME ${NAME})
     string (TOUPPER ${BASE_NAME} UPCASE_NAME)
@@ -220,7 +220,7 @@ foreach (NAME ${DIRECTX_HEADERS})
         # Workaround an issue in finding xinput.h using check_include_file() as it depends on windows.h but not included it by itself in WinSDK
         check_include_files (windows.h\;${NAME} HAVE_${UPCASE_NAME})
     else ()
-        check_include_file (${NAME} HAVE_${UPCASE_NAME})
+        check_include_file_cxx (${NAME} HAVE_${UPCASE_NAME})
     endif ()
 endforeach ()
 if (HAVE_D3D9_H)
