@@ -548,12 +548,6 @@ bool Serializable::SaveXML(XMLElement& dest) const
 
 bool Serializable::SaveJSON(JSONValue& dest) const
 {
-    if (dest.IsNull())
-    {
-        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination JSON value");
-        return false;
-    }
-
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;
