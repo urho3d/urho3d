@@ -610,7 +610,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             unsigned color = billboard.color_.ToUInt();
 
             float rotationMatrix[2][2];
-            sincosf_fast(billboard.rotation_*M_DEGTORAD, &rotationMatrix[0][1], &rotationMatrix[0][0]);
+            sincosf_fast(billboard.rotation_ * M_DEGTORAD, &rotationMatrix[0][1], &rotationMatrix[0][0]);
             rotationMatrix[1][0] = -rotationMatrix[0][1];
             rotationMatrix[1][1] = rotationMatrix[0][0];
 
@@ -663,7 +663,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             unsigned color = billboard.color_.ToUInt();
 
             float rot2D[2][2];
-            sincosf_fast(billboard.rotation_*M_DEGTORAD, &rot2D[0][1], &rot2D[0][0]);
+            sincosf_fast(billboard.rotation_ * M_DEGTORAD, &rot2D[0][1], &rot2D[0][0]);
             rot2D[1][0] = -rot2D[0][1];
             rot2D[1][1] = rot2D[0][0];
 
