@@ -509,6 +509,34 @@ void BillboardSet::UpdateBufferSize()
     indexBuffer_->ClearDataLost();
 }
 
+// based on the Low precision sine/cosine from http://lab.polygonal.de/?p=205.
+void sincosf_fast(float x, float* sin, float* cos)
+{
+    // always wrap input angle to -PI..PI
+    x = fmodf(x, M_PI*2);
+    if (x < -3.14159265f)
+        x += 6.28318531f;
+    else
+    if (x >  3.14159265f)
+        x -= 6.28318531f;
+
+    // compute sine
+    if (x < 0)
+        *sin = 1.27323954f * x + 0.405284735f * x * x;
+    else
+        *sin = 1.27323954f * x - 0.405284735f * x * x;
+
+    //compute cosine: sin(x + PI/2) = cos(x)
+    x += 1.57079632f;
+    if (x >  3.14159265f)
+        x -= 6.28318531f;
+
+    if (x < 0)
+        *cos = 1.27323954f * x + 0.405284735f * x * x;
+    else
+        *cos = 1.27323954f * x - 0.405284735f * x * x;
+}
+
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
@@ -582,7 +610,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             unsigned color = billboard.color_.ToUInt();
 
             float rotationMatrix[2][2];
-            sincosf(billboard.rotation_*M_DEGTORAD, &rotationMatrix[0][1], &rotationMatrix[0][0]);
+            sincosf_fast(billboard.rotation_*M_DEGTORAD, &rotationMatrix[0][1], &rotationMatrix[0][0]);
             rotationMatrix[1][0] = -rotationMatrix[0][1];
             rotationMatrix[1][1] = rotationMatrix[0][0];
 
@@ -635,7 +663,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             unsigned color = billboard.color_.ToUInt();
 
             float rot2D[2][2];
-            sincosf(billboard.rotation_*M_DEGTORAD, &rot2D[0][1], &rot2D[0][0]);
+            sincosf_fast(billboard.rotation_*M_DEGTORAD, &rot2D[0][1], &rot2D[0][0]);
             rot2D[1][0] = -rot2D[0][1];
             rot2D[1][1] = rot2D[0][0];
 
