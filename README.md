@@ -83,6 +83,8 @@ Urho3D development, contributions and bugfixes by:
 - rasteron
 - reattiva
 - rifai
+- rikorin
+- r-ku
 - skaiware
 - ssinai1
 - svifylabs
