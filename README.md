@@ -77,6 +77,7 @@ Urho3D development, contributions and bugfixes by:
 - lvshiling
 - marynate
 - mightyCelu
+- neat3d
 - nemerle
 - ninjastone
 - raould
