@@ -705,12 +705,12 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             // Reevaluate each variant in the vector
             for (uint i = 0; i < values.length; ++i)
             {
-                Array<Variant>@ vector = values[i].GetVariantVector();
-                if (subIndex < vector.length)
+                Array<Variant>@ vec = values[i].GetVariantVector();
+                if (subIndex < vec.length)
                 {
-                    Variant value = vector[subIndex];
-                    varValues.Push(value);
-                    if (value != firstValue)
+                    Variant v = vec[subIndex];
+                    varValues.Push(v);
+                    if (v != firstValue)
                         sameVal = false;
                 }
                 else
@@ -718,9 +718,9 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             }
 
             // The individual variant in the list is not an attribute of the serializable, the structure is reused for convenience
-            AttributeInfo info;
-            info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameVal, varValues);
+            AttributeInfo ai;
+            ai.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, ai, editable, sameVal, varValues);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -745,12 +745,12 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             // Reevaluate each variant in the map
             for (uint i = 0; i < values.length; ++i)
             {
-                VariantMap map = values[i].GetVariantMap();
-                if (map.Contains(keys[subIndex]))
+                VariantMap m = values[i].GetVariantMap();
+                if (m.Contains(keys[subIndex]))
                 {
-                    Variant value = map[keys[subIndex]];
-                    varValues.Push(value);
-                    if (value != firstValue)
+                    Variant v = m[keys[subIndex]];
+                    varValues.Push(v);
+                    if (v != firstValue)
                        sameVal = false;
                 }
                 else
@@ -758,9 +758,9 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
             }
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
-            AttributeInfo info;
-            info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameVal, varValues);
+            AttributeInfo ai;
+            ai.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, ai, editable, sameVal, varValues);
         }
     }
     else
@@ -768,31 +768,31 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         Array<Array<String> > coordinates;
         for (uint i = 0; i < values.length; ++i)
         {
-            Variant value = values[i];
+            Variant v = values[i];
 
             // Convert Quaternion value to Vector3 value first
             if (type == VAR_QUATERNION)
-                value = value.GetQuaternion().eulerAngles;
+                v = v.GetQuaternion().eulerAngles;
 
-            coordinates.Push(value.ToString().Split(' '));
+            coordinates.Push(v.ToString().Split(' '));
         }
         for (uint i = 0; i < coordinates[0].length; ++i)
         {
-            String value = coordinates[0][i];
+            String str = coordinates[0][i];
             bool coordinateSameValue = true;
             if (!sameValue)
             {
                 // Reevaluate each coordinate
                 for (uint j = 1; j < coordinates.length; ++j)
                 {
-                    if (coordinates[j][i] != value)
+                    if (coordinates[j][i] != str)
                     {
                         coordinateSameValue = false;
                         break;
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[i + 1], value, coordinateSameValue), editable && coordinateSameValue);
+            SetEditable(SetValue(parent.children[i + 1], str, coordinateSameValue), editable && coordinateSameValue);
         }
     }
 }
@@ -827,7 +827,6 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     }
     else if (info.type == VAR_VARIANTMAP)
     {
-        VariantMap map = serializables[0].attributes[index].GetVariantMap();
         StringHash key(parent.vars["Key"].GetUInt());
         for (uint i = 0; i < serializables.length; ++i)
         {
@@ -877,8 +876,8 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
         FillValue(values, Variant(attrEdit.text.Trimmed()));
     else if (type == VAR_BOOL)
     {
-        CheckBox@ attrEdit = parent.children[1];
-        FillValue(values, Variant(attrEdit.checked));
+        CheckBox@ cb = parent.children[1];
+        FillValue(values, Variant(cb.checked));
     }
     else if (type == VAR_FLOAT)
         FillValue(values, Variant(attrEdit.text.ToFloat()));
@@ -900,16 +899,16 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
             FillValue(values, Variant(attrEdit.text.ToInt()));
         else
         {
-            DropDownList@ attrEdit = parent.children[1];
-            FillValue(values, Variant(attrEdit.selection));
+            DropDownList@ ddl = parent.children[1];
+            FillValue(values, Variant(ddl.selection));
         }
     }
     else if (type == VAR_RESOURCEREF)
     {
-        LineEdit@ attrEdit = parent.children[0];
+        LineEdit@ le = parent.children[0];
         ResourceRef ref;
-        ref.name = attrEdit.text.Trimmed();
-        ref.type = StringHash(attrEdit.vars[TYPE_VAR].GetUInt());
+        ref.name = le.text.Trimmed();
+        ref.type = StringHash(le.vars[TYPE_VAR].GetUInt());
         FillValue(values, Variant(ref));
     }
     else
