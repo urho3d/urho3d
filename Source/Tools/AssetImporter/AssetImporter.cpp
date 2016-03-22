@@ -124,7 +124,7 @@ HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
-// for subset animation import usage.
+// For subset animation import usage
 float importStartTime_ = 0.0f;
 float importEndTime_ = 0.0f;
 
@@ -248,9 +248,9 @@ void Run(const Vector<String>& arguments)
             "-ct         Check and do not overwrite if texture exists\n"
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
-			"-bp         Move bones to bind pose before saving model\n"
-			"-split <start> <end> (animation model only)\n"
-			"            Split animation, will only import from start frame to end frame \n"
+            "-bp         Move bones to bind pose before saving model\n"
+            "-split <start> <end> (animation model only)\n"
+            "            Split animation, will only import from start frame to end frame\n"
         );
     }
 
@@ -396,15 +396,15 @@ void Run(const Vector<String>& arguments)
                 checkUniqueModel_ = false;
             else if (argument == "bp")
                 moveToBindPose_ = true;
-			else if (argument == "split")
-			{
-				String value2 = i + 2 < arguments.Size() ? arguments[i + 2] : String::EMPTY;
-				if (value.Length() && value2.Length() && (value[0] != '-') && (value2[0] != '-'))
-				{
-					importStartTime_	= ::atof(value.CString());
-					importEndTime_		= ::atof(value2.CString());
-				}
-			}
+            else if (argument == "split")
+            {
+                String value2 = i + 2 < arguments.Size() ? arguments[i + 2] : String::EMPTY;
+                if (value.Length() && value2.Length() && (value[0] != '-') && (value2[0] != '-'))
+                {
+                    importStartTime_ = ToFloat(value);
+                    importEndTime_ = ToFloat(value2);
+                }
+            }
         }
     }
 
@@ -1126,8 +1126,9 @@ void BuildAndSaveAnimations(OutModel* model)
         String animName = FromAIString(anim->mName);
         String animOutName;
 
-		if (importEndTime_ == 0.0f) // if -split is disable, set the end time to duration.
-			importEndTime_ = duration;
+        // If no animation split specified, set the end time to duration
+        if (importEndTime_ == 0.0f)
+            importEndTime_ = duration;
 
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
@@ -1155,9 +1156,9 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
-		if (startTime > importStartTime_)
-			importStartTime_ = startTime;
-		duration =importEndTime_ - importStartTime_;
+        if (startTime > importStartTime_)
+            importStartTime_ = startTime;
+        duration = importEndTime_ - importStartTime_;
 
         SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
@@ -1313,11 +1314,11 @@ void BuildAndSaveAnimations(OutModel* model)
                     kf.rotation_ = ToQuaternion(rot);
                 if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-				if (kf.time_ >= importStartTime_ && kf.time_ <= importEndTime_)
-				{
-					kf.time_ = (kf.time_ - importStartTime_) * tickConversion;
-					track->keyFrames_.Push(kf);
-				}
+                if (kf.time_ >= importStartTime_ && kf.time_ <= importEndTime_)
+                {
+                    kf.time_ = (kf.time_ - importStartTime_) * tickConversion;
+                    track->keyFrames_.Push(kf);
+                }
             }
         }
 
