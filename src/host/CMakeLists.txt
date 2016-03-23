@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
+    elseif (WIN32)
+        cmake_minimum_required (VERSION 3.2.3)
     else ()
         cmake_minimum_required (VERSION 2.8.6)
     endif ()

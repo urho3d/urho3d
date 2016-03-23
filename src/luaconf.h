@@ -1,6 +1,6 @@
 /*
 ** Configuration header.
-** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 // Modified by Yao Wei Tjong for Urho3D
@@ -40,7 +40,7 @@
 #endif
 #define LUA_LROOT	"/usr/local"
 #define LUA_LUADIR	"/lua/5.1/"
-#define LUA_LJDIR	"/luajit-2.1.0-beta1/"
+#define LUA_LJDIR	"/luajit-2.1.0-beta2/"
 
 #ifdef LUA_ROOT
 #define LUA_JROOT	LUA_ROOT

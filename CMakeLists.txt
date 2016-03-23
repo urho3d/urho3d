@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
+    elseif (WIN32)
+        cmake_minimum_required (VERSION 3.2.3)
     else ()
         cmake_minimum_required (VERSION 2.8.6)
     endif ()
@@ -266,6 +268,12 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
 
     # Makefile: Files and pathnames
     set (DASM_ARCH ${TARGET_LJARCH})
+    find_string ("LJ_LE (1)" LITTLE_ENDIAN)
+    if (LITTLE_ENDIAN)
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D ENDIAN_LE)
+    else ()
+        set (DASM_AFLAGS ${DASM_AFLAGS} -D ENDIAN_BE)
+    endif ()
     find_string ("LJ_ARCH_BITS ([^\\n]*)" ARCH_BITS)    # Workaround for "LJ_ARCH_BITS (.*?)\\n" as CMake does not understand non-greedy quantifier
     if (ARCH_BITS EQUAL 64)
         set (DASM_AFLAGS ${DASM_AFLAGS} -D P64)
@@ -359,6 +367,11 @@ if (NOT MSVC)
         # Original Makefile only sets this flags for 64-bit iOS, but we set it for arm64 in general instead
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
     endif ()
+    if (XCODE)
+        # We need to nullify the color-diagnostics flag configured earlier in our CMake common module to prevent Clang erroneously considered warnings in building LuaJIT_universal custom target as error markers
+        # Even though without this correction the LuaJIT_universal custom target would build just fine, the error markers in Xcode may give a wrong signal to user
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-color-diagnostics")
+    endif ()
 endif ()
 
 # Makefile: Build mode handling
@@ -418,7 +431,7 @@ if (WIN32)
 else ()
     set (LJVM_BOUT lj_vm.S)
     enable_language (ASM)
-    if (URHO3D_DEFAULT_64BIT AND NOT URHO3D_64BIT)  # Not the compiler native ABI, this could only happen on multilib-capable compilers
+    if (NATIVE_64BIT AND NOT URHO3D_64BIT)  # Not the compiler native ABI, this could only happen on multilib-capable compilers
         set (CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
     endif ()
     if (APPLE)
@@ -443,7 +456,7 @@ else ()
     set (LJCORE_C src/lj_gc.c src/lj_err.c src/lj_char.c src/lj_bc.c src/lj_obj.c src/lj_buf.c
         src/lj_str.c src/lj_tab.c src/lj_func.c src/lj_udata.c src/lj_meta.c src/lj_debug.c
         src/lj_state.c src/lj_dispatch.c src/lj_vmevent.c src/lj_vmmath.c src/lj_strscan.c
-        src/lj_strfmt.c src/lj_api.c src/lj_profile.c
+        src/lj_strfmt.c src/lj_strfmt_num.c src/lj_api.c src/lj_profile.c
         src/lj_lex.c src/lj_parse.c src/lj_bcread.c src/lj_bcwrite.c src/lj_load.c
         src/lj_ir.c src/lj_opt_mem.c src/lj_opt_fold.c src/lj_opt_narrow.c
         src/lj_opt_dce.c src/lj_opt_loop.c src/lj_opt_split.c src/lj_opt_sink.c
@@ -480,44 +493,47 @@ if (XCODE AND NOT ARCH)    # These variables are used to control the recursion a
             list (APPEND LUAJIT_PASSTHRU_OPTS -D${LUAJIT_OPT}=${${LUAJIT_OPT}})
         endif ()
     endforeach ()
-    # There is a CMake bug where a mere reference to a target using generator-expression would cause it to be added as dependency, we have to use another hack to workaround this bug
+    # There is a CMake bug where a mere reference to a target using generator-expression would cause it to be added as dependency, we have to use a hack to workaround this bug
     if (IOS)
         set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND})
         ExternalProject_Add (${TARGET_NAME}_i386
             SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
             CMAKE_ARGS -DARCH=i386 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} -DURHO3D_64BIT=0 ${LUAJIT_PASSTHRU_OPTS} ${IOS_FIX} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG> -- -sdk iphonesimulator)
         if (URHO3D_64BIT)
+            # 64-bit iOS universal binary contains all the archs: arm64 and armv7 (iPhoneOS), and x86_64 and i386 (iPhoneSimulator)
             ExternalProject_Add (${TARGET_NAME}_x86_64
                 SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
                 CMAKE_ARGS -DARCH=x86_64 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} ${LUAJIT_PASSTHRU_OPTS} ${IOS_FIX} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG> -- -sdk iphonesimulator)
             add_custom_target (${TARGET_NAME}_universal-iphonesimulator
-                COMMAND if lipo -info ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a 2>/dev/null |egrep -cq 'i386.*x86_64|x86_64.*i386'\; then echo Already a Mach-O universal binary library\; else for arch in _x86_64 _i386\; do xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION)\; done && lipo -create -output ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a{,.x86_64,.i386}\; fi
+                COMMAND if [ '$(CONFIGURATION)' == 'Debug' ]\; then if [ '$(ARCHS)' == 'x86_64' ]\; then rm -f ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a && arch=x86_64\; else arch=i386\; fi && xcodebuild -target ${TARGET_NAME}_$$arch -configuration $(CONFIGURATION) && cp -p ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a{.$$arch,}\; elif lipo -info ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a 2>/dev/null |egrep -cq 'i386.*x86_64|x86_64.*i386'\; then echo Already a Mach-O universal binary library\; else for arch in _x86_64 _i386\; do xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION)\; done && lipo -create -output ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a{,.x86_64,.i386}\; fi
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
             ExternalProject_Add (${TARGET_NAME}_armv7
                 SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
                 CMAKE_ARGS -DARCH=armv7 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} -DURHO3D_64BIT=0 ${LUAJIT_PASSTHRU_OPTS} ${IOS_FIX} BUILD_COMMAND "" INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install --config $<CONFIG>)
             add_custom_target (${TARGET_NAME}_universal-iphoneos
-                COMMAND if lipo -info ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a 2>/dev/null |egrep -cq 'armv7.*arm64|arm64.*armv7'\; then echo Already a Mach-O universal binary library\; else for arch in \"\" _armv7\; do xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION)\; done && mv ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{,.arm64} && lipo -create -output ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{.new,.arm64,.armv7} && mv ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{.new,}\; fi
+                COMMAND if [ '$(CONFIGURATION)' == 'Debug' ]\; then if [ '$(ARCHS)' == 'arm64' ]\; then rm -f ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a && arch=\; else arch=_armv7\; fi && xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION) && if [ $$arch ]\; then cp -p ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{.armv7,}\; fi\; elif lipo -info ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a 2>/dev/null |egrep -cq 'armv7.*arm64|arm64.*armv7'\; then echo Already a Mach-O universal binary library\; else for arch in \"\" _armv7\; do xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION)\; done && mv ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{,.arm64} && lipo -create -output ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphoneos/lib${TARGET_NAME}.a{,.arm64,.armv7}\; fi
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
         else ()
+            # 32-bit iOS uversal binary contains both armv7 (iPhoneOS) and i386 (iPhoneSimulator) archs
             add_custom_target (${TARGET_NAME}_universal-iphonesimulator
-                COMMAND xcodebuild -target ${TARGET_NAME}_i386 -configuration $(CONFIGURATION) && (mv ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a{.i386,} 2>/dev/null || true)
+                COMMAND xcodebuild -target ${TARGET_NAME}_i386 -configuration $(CONFIGURATION) && cp -p ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>-iphonesimulator/lib${TARGET_NAME}.a{.i386,}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
             add_custom_target (${TARGET_NAME}_universal-iphoneos
                 COMMAND xcodebuild -target ${TARGET_NAME} -configuration $(CONFIGURATION)
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
         endif ()
         add_custom_target (${TARGET_NAME}_universal ALL
-            DEPENDS ${TARGET_NAME}_universal-iphoneos ${TARGET_NAME}_universal-iphonesimulator
+            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ] || echo '$(ARCHS)' |grep -cq arm\; then xcodebuild ARCHS="$(ARCHS)" -target ${TARGET_NAME}_universal-iphoneos -configuration $(CONFIGURATION)\; fi
+            COMMAND if [ '$(CONFIGURATION)' != 'Debug' ] || echo '$(ARCHS)' |grep -cq 86\; then xcodebuild ARCHS="$(ARCHS)" -target ${TARGET_NAME}_universal-iphonesimulator -configuration $(CONFIGURATION)\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary LuaJIT library")
     elseif (URHO3D_64BIT)
+        # 64-bit OSX universal binary contains both x86_86 and i386 archs
         ExternalProject_Add (${TARGET_NAME}_i386
             SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
             CMAKE_ARGS -DARCH=i386 -DINSTALL_ARCHIVE_DIR=${CMAKE_CURRENT_BINARY_DIR} -DURHO3D_64BIT=0 ${LUAJIT_PASSTHRU_OPTS})
         add_custom_target (${TARGET_NAME}_universal ALL
-            COMMAND if lipo -info $<TARGET_FILE:${TARGET_NAME}> 2>/dev/null |egrep -cq 'i386.*x86_64|x86_64.*i386'\; then echo $<TARGET_FILE:${TARGET_NAME}> is already a Mach-O universal binary library\; else xcodebuild -target ${TARGET_NAME}_i386 -configuration $(CONFIGURATION) && lipo -create -output $<TARGET_FILE:${TARGET_NAME}>{.new,.i386,} && mv $<TARGET_FILE:${TARGET_NAME}>{.new,}\; fi
-            DEPENDS ${TARGET_NAME}  # Although the bug mentioned above would have caused the referenced target to be added as dependency already, we still declare the dependency explicitly here as we really need it (just in case this bug is fixed later)
+            COMMAND if [ '$(CONFIGURATION)' == 'Debug' ]\; then if [ '$(ARCHS)' == 'x86_64' ]\; then rm -f ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>/lib${TARGET_NAME}.a && arch=\; else arch=_i386\; fi && xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION) && if [ $$arch ]\; then cp -p ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>/lib${TARGET_NAME}.a{.i386,}\; fi\; elif lipo -info ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>/lib${TARGET_NAME}.a 2>/dev/null |egrep -cq 'i386.*x86_64|x86_64.*i386'\; then echo Already a Mach-O universal binary library\; else for arch in \"\" _i386\; do xcodebuild -target ${TARGET_NAME}$$arch -configuration $(CONFIGURATION)\; done && mv ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>/lib${TARGET_NAME}.a{,.x86_64} && lipo -create -output ${CMAKE_BINARY_DIR}/Source/ThirdParty/${TARGET_NAME}/$<CONFIG>/lib${TARGET_NAME}.a{,.x86_64,.i386}\; fi
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Creating Mach-O universal binary LuaJIT library")
     endif ()
@@ -537,7 +553,9 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
     set (SOURCE_FILES src/luajit.c)
 
     # Define dependency libs
-    set (LIBS LuaJIT)
+    if (NOT TARGET LuaJIT_universal)
+        set (LIBS LuaJIT)
+    endif ()
     if (NOT MSVC)
         list (APPEND LIBS m)
     endif ()
@@ -547,6 +565,7 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
     adjust_target_name ()   # Adjust to intended target output name
     if (TARGET LuaJIT_universal)
         add_dependencies (${TARGET_NAME} LuaJIT_universal)
+        target_link_libraries (${TARGET_NAME} ${CMAKE_BINARY_DIR}/Source/ThirdParty/LuaJIT/$<CONFIG>/libLuaJIT.a)   # This is a hack as CMake does not allow custom target in generator-expression, like $<TARGET_FILE:LuaJIT_universal>
     endif ()
 
     # Define post build steps
