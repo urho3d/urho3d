@@ -172,7 +172,11 @@ inline void SinCos(float angle, float& sin, float& cos)
     sin = sinf(angleRadians);
     cos = cosf(angleRadians);
 #else
-    sincosf(angleRadians, &sin, &cos);
+    #ifdef __APPLE__
+        __sincosf(angleRadians, &sin, &cos);
+    #else
+        sincosf(angleRadians, &sin, &cos);
+    #endif
 #endif
 }
 
