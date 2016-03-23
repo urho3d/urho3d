@@ -1,6 +1,6 @@
 /*
 ** Target architecture selection.
-** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_ARCH_H
@@ -295,6 +295,28 @@
 #define LJ_ARCH_NAME		"mips"
 #define LJ_ARCH_ENDIAN		LUAJIT_BE
 #endif
+
+#if !defined(LJ_ARCH_HASFPU)
+#ifdef __mips_soft_float
+#define LJ_ARCH_HASFPU		0
+#else
+#define LJ_ARCH_HASFPU		1
+#endif
+#endif
+
+/* Temporarily disable features until the code has been merged. */
+#if !defined(LUAJIT_NO_UNWIND) && __GNU_COMPACT_EH__
+#define LUAJIT_NO_UNWIND	1
+#endif
+
+#if !defined(LJ_ABI_SOFTFP)
+#ifdef __mips_soft_float
+#define LJ_ABI_SOFTFP		1
+#else
+#define LJ_ABI_SOFTFP		0
+#endif
+#endif
+
 #define LJ_ARCH_BITS		32
 #define LJ_TARGET_MIPS		1
 #define LJ_TARGET_EHRETREG	4
@@ -302,14 +324,7 @@
 #define LJ_TARGET_MASKSHIFT	1
 #define LJ_TARGET_MASKROT	1
 #define LJ_TARGET_UNIFYROT	2	/* Want only IR_BROR. */
-#define LJ_ARCH_NUMMODE		LJ_NUMMODE_SINGLE
-
-#if !defined(LJ_ARCH_HASFPU) && defined(__mips_soft_float)
-#define LJ_ARCH_HASFPU		0
-#endif
-#if !defined(LJ_ABI_SOFTFP) && defined(__mips_soft_float)
-#define LJ_ABI_SOFTFP		1
-#endif
+#define LJ_ARCH_NUMMODE		LJ_NUMMODE_DUAL
 
 #if _MIPS_ARCH_MIPS32R2
 #define LJ_ARCH_VERSION		20
@@ -496,7 +511,7 @@
 #endif
 
 /* Various workarounds for embedded operating systems or weak C runtimes. */
-#if (defined(__ANDROID__) && !defined(LJ_TARGET_X86ORX64)) || defined(__symbian__) || LJ_TARGET_XBOX360 || LJ_TARGET_WINDOWS
+#if defined(__ANDROID__) || defined(__symbian__) || LJ_TARGET_XBOX360 || LJ_TARGET_WINDOWS
 #define LUAJIT_NO_LOG2
 #endif
 #if defined(__symbian__) || LJ_TARGET_WINDOWS
