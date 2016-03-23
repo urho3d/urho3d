@@ -1,3 +1,53 @@
+# v2.12.4
+
+Resolves a possible crash with `SQLDescribeParam()`. In Progress OpenEdge 11 driver setting the
+nullableptr argument to null causes a crash. This does not affect SQLite or MySQL drivers.
+
+Thanks to [@AndrewJD79](https://github.com/AndrewJD79) for finding and diagnosing the issue!
+
+# v2.12.3
+
+Unicode: Resolves a major issue with BLOB datatype handling for BINARY and TEXT columns.
+
+# v2.12.2
+
+Resolves a major issue with BLOB datatype handling for BINARY and TEXT columns.
+
+# v2.12.1
+
+Resolves a Travis-CI build issue.
+
+# v2.12.0
+
+Major work undertaken by Mateusz Łoskot provides new features and a host of bug fixes throughout.
+Refactoring work moves nanodbc away from platform dependent `wchar_t` in favor of `char16_t` or in the
+case of iODBC with unicode build enabled, `char32_t`. Boost.Test dropped in this version, in favor of Catch.
+
+## New Features
+
+- Converts usages of `wstring` and `wchar_t` to `u16string` and `char16_t`.
+- Enable iODBC + Unicode support with `u32string` types.
+- Add example program `table_schema.cpp`.
+- Add `dbms_name()` and `dbms_version()` methods to `connection` class.
+
+## Testing
+
+- Migrates tests from Boost.Test to Catch framework.
+- Enables unicode tests on travis-ci.
+- Syncs `Dockerfile` and `Vagrantfile`; adds quick usage docs for vagrant.
+- Switch Dockerfile over to `ubuntu:precise` (default).
+- Improve `odbc_test.cpp` to cope with DBMS variations.
+
+## Bug Fixes
+
+- Fix compiler warnings while building with VS2015.
+- Add missing optional `schema_name` parameter to usage info.
+- Workaround for VS2015 bug in `std::codecvt` for `char16_t`.
+- Fix retrieval of variable-length data in parts.
+- Fix `catalog::columns::is_nullable()` to handle valid `NULL`.
+- Fix check of total of characters required to display `SQL_DATE`.
+- Fix `SELECT` result sorting with `NULL` values involved.
+
 # v2.11.3
 
 - Fixes segmentation fault issue with unixODBC on Linux systems.
