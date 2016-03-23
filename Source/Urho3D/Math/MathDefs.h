@@ -163,6 +163,19 @@ template <class T>
 inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
 template <> inline float Atan2<float>(float y, float x) { return M_RADTODEG * atan2f(y, x); }
 
+/// Calculate both sine and cosine, with angle in degrees.
+inline void SinCos(float angle, float& sin, float& cos)
+{
+    float angleRadians = angle * M_DEGTORAD;
+    // glibc can be assumed to have the sincosf() function, while MSVC doesn't
+#ifndef __GNUC__
+    sin = sinf(angleRadians);
+    cos = cosf(angleRadians);
+#else
+    sincosf(angleRadians, &sin, &cos);
+#endif
+}
+
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
 {
