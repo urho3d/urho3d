@@ -112,14 +112,14 @@ namespace nanodbc
     //! \brief Assertion.
     //!
     //! By default, nanodbc uses C \c assert() for internal assertions.
-    //! User can override it by defining NANODBC_ASSERT(expr) macro
+    //! User can override it by defining \c NANODBC_ASSERT(expr) macro
     //! in the nanodbc.h file and customizing it as desired,
     //! before building the library.
     //!
     //! \code{.cpp}
     //! #ifdef _DEBUG
-    //! #include <crtdbg.h>
-    //! #define NANODBC_ASSERT _ASSERTE
+    //!     #include <crtdbg.h>
+    //!     #define NANODBC_ASSERT _ASSERTE
     //! #endif
     //! \endcode
     #define NANODBC_ASSERT(expression) assert(expression)
@@ -130,30 +130,34 @@ namespace nanodbc
 // You must explicitly request Unicode support by defining NANODBC_USE_UNICODE at compile time.
 #ifndef DOXYGEN
     #ifdef NANODBC_USE_UNICODE
-        typedef std::wstring string_type;
+        #ifdef NANODBC_USE_IODBC_WIDE_STRINGS
+            typedef std::u32string string_type;
+        #else
+            typedef std::u16string string_type;
+        #endif
     #else
         typedef std::string string_type;
     #endif // NANODBC_USE_UNICODE
 
     #if defined(_WIN64)
-        // LLP64 machine, Windows
+        // LLP64 machine: Windows
         typedef std::int64_t null_type;
     #elif !defined(_WIN64) && defined(__LP64__)
-        // LP64 machine, OS X or Linux
+        // LP64 machine: OS X or Linux
         typedef long null_type;
     #else
         // 32-bit machine
         typedef long null_type;
     #endif
 #else
-    //! string_type will be std::wstring if NANODBC_USE_UNICODE is defined, otherwise std::string.
+    //! \c string_type will be \c std::u16string or \c std::32string if \c NANODBC_USE_UNICODE is defined, otherwise \c std::string.
     typedef unspecified-type string_type;
-    //! null_type will be int64_t for 64-bit compilations, otherwise long.
+    //! \c null_type will be \c int64_t for 64-bit compilations, otherwise \c long.
     typedef unspecified-type null_type;
 #endif // DOXYGEN
 
 #if defined(_MSC_VER) && _MSC_VER <= 1800
-    // These versions of Visual C++ do not yet support noexcept or std::move.
+    // These versions of Visual C++ do not yet support \c noexcept or \c std::move.
     #define NANODBC_NOEXCEPT
     #define NANODBC_NO_MOVE_CTOR
 #else
@@ -176,10 +180,10 @@ namespace nanodbc
 //! \addtogroup exceptions Exception types
 //! \brief Possible error conditions.
 //!
-//! Specific errors such as type_incompatible_error, null_access_error, and index_range_error can arise
-//! from improper use of the nanodbc library. The general database_error is for all other situations
+//! Specific errors such as \c type_incompatible_error, \c null_access_error, and \c index_range_error can arise
+//! from improper use of the nanodbc library. The general \c database_error is for all other situations
 //! in which the ODBC driver or C API reports an error condition. The explanatory string for database_error
-//! will, if possible, contain a diagnostic message obtained from SQLGetDiagRec().
+//! will, if possible, contain a diagnostic message obtained from \c SQLGetDiagRec().
 //! @{
 
 //! \brief Type incompatible.
@@ -846,6 +850,16 @@ public:
 
     //! \brief Returns the native ODBC environment handle.
     void* native_env_handle() const;
+
+    //! \brief Returns name of the DBMS product.
+    //! Returns the ODBC information type SQL_DBMS_NAME of the DBMS product
+    //! accesssed by the driver via the current connection.
+    string_type dbms_name() const;
+
+    //! \brief Returns version of the DBMS product.
+    //! Returns the ODBC information type SQL_DBMS_VER of the DBMS product
+    //! accesssed by the driver via the current connection.
+    string_type dbms_version() const;
 
     //! \brief Returns the name of the ODBC driver.
     //! \throws database_error
