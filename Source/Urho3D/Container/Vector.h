@@ -941,11 +941,6 @@ private:
     }
 };
 
-}
-
-namespace std
-{
-
 template <class T> typename Urho3D::Vector<T>::ConstIterator begin(const Urho3D::Vector<T>& v) { return v.Begin(); }
 
 template <class T> typename Urho3D::Vector<T>::ConstIterator end(const Urho3D::Vector<T>& v) { return v.End(); }
