@@ -131,7 +131,7 @@ Urho3D uses the following third-party libraries:
 - LZ4 (http://code.google.com/p/lz4/)
 - MojoShader (http://icculus.org/mojoshader/)
 - Mustache 1.0 (http://mustache.github.io/, https://github.com/kainjow/Mustache)
-- nanodbc 2.11.3+ (http://lexicalunit.github.io/nanodbc/)
+- nanodbc 2.12.4 (http://lexicalunit.github.io/nanodbc/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
 - pugixml 1.5 (http://pugixml.org/)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson/)
