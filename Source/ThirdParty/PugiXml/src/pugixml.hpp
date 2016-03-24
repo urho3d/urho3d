@@ -1220,7 +1220,10 @@ namespace pugi
 	public:
 		// Default constructor; constructs empty XPath node
 		xpath_node();
-		
+		// Modified by YaoWT for Urho3D
+		// Copy constructor from another xpath_node
+		xpath_node(const xpath_node& rhs);
+
 		// Construct XPath node from XML node/attribute
 		xpath_node(const xml_node& node);
 		xpath_node(const xml_attribute& attribute, const xml_node& parent);
