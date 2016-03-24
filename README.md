@@ -133,7 +133,7 @@ Urho3D uses the following third-party libraries:
 - Mustache 1.0 (http://mustache.github.io/, https://github.com/kainjow/Mustache)
 - nanodbc 2.12.4 (http://lexicalunit.github.io/nanodbc/)
 - Open Asset Import Library (http://assimp.sourceforge.net/)
-- pugixml 1.5 (http://pugixml.org/)
+- pugixml 1.7 (http://pugixml.org/)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson/)
 - Recast/Detour (https://github.com/memononen/recastnavigation/)
 - SDL 2.0.4 (http://www.libsdl.org/)
