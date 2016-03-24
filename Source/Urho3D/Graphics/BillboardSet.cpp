@@ -509,32 +509,38 @@ void BillboardSet::UpdateBufferSize()
     indexBuffer_->ClearDataLost();
 }
 
-// based on the Low precision sine/cosine from http://lab.polygonal.de/?p=205.
-void sincosf_fast(float x, float* sin, float* cos)
+void SinCosFFast(float x, float* sin, float* cos)
 {
-    // always wrap input angle to -PI..PI
-    x = fmodf(x, M_PI*2);
-    if (x < -3.14159265f)
-        x += 6.28318531f;
-    else
-    if (x >  3.14159265f)
-        x -= 6.28318531f;
+    if (x < -360.0f)    // wrap input angle to -360..360
+        x = fmodf(x,360);
+    else if (x > 360.0f)
+        x = fmodf(x,360);
 
-    // compute sine
+    if (x < -180.0f)    // wrap input angle to -180..180
+        x += 360.0f;
+    else if (x >  180.0f)
+        x -= 360.0f;
+
+    // compute sine and cosine: sin(x + 90°) = cos(x)
+    if (x < 0)      // -180<=x<0
+    {
+        *sin = 0.02222222222f * x + 0.0001234567901f * x * x;
+
+        x += 90.0f; // -90<=x<90
+    }
+    else            // 0<=x<=180
+    {
+        *sin = 0.02222222222f * x - 0.0001234567901f * x * x;
+
+        x += 90.0f; // 90<=x<=270
+        if (x >  180.0f)
+            x -= 360.0f;
+    }
+
     if (x < 0)
-        *sin = 1.27323954f * x + 0.405284735f * x * x;
+        *cos = 0.02222222222f * x + 0.0001234567901f * x * x;
     else
-        *sin = 1.27323954f * x - 0.405284735f * x * x;
-
-    //compute cosine: sin(x + PI/2) = cos(x)
-    x += 1.57079632f;
-    if (x >  3.14159265f)
-        x -= 6.28318531f;
-
-    if (x < 0)
-        *cos = 1.27323954f * x + 0.405284735f * x * x;
-    else
-        *cos = 1.27323954f * x - 0.405284735f * x * x;
+        *cos = 0.02222222222f * x - 0.0001234567901f * x * x;
 }
 
 void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
