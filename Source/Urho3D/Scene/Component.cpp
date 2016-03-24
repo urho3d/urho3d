@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Resource/JSONValue.h"
 #include "../Scene/Component.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
@@ -35,7 +36,6 @@
 #endif
 
 #include "../DebugNew.h"
-#include "../Resource/JSONValue.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:6293)
