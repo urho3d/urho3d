@@ -328,8 +328,8 @@ bool FontFaceFreeType::CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, in
         FT_Error error = FT_Load_Char(face, charCode, loadMode_);
         if (!error)
         {
-            int width = Max(RoundToPixels(slot->metrics.width), static_cast<int>(slot->bitmap.width));
-            int height = Max(RoundToPixels(slot->metrics.height), static_cast<int>(slot->bitmap.rows));
+            int width = Max(RoundToPixels(slot->metrics.width), (int)slot->bitmap.width);
+            int height = Max(RoundToPixels(slot->metrics.height), (int)slot->bitmap.rows);
             int x, y;
             if (!allocator.Allocate(width + 1, height + 1, x, y))
                 return false;
@@ -373,8 +373,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     if (!error)
     {
         // Note: position within texture will be filled later
-        fontGlyph.width_ = (short)Max(RoundToPixels(slot->metrics.width), static_cast<int>(slot->bitmap.width));
-        fontGlyph.height_ = (short)Max(RoundToPixels(slot->metrics.height), static_cast<int>(slot->bitmap.rows));
+        fontGlyph.width_ = (short)Max(RoundToPixels(slot->metrics.width), (int)slot->bitmap.width);
+        fontGlyph.height_ = (short)Max(RoundToPixels(slot->metrics.height), (int)slot->bitmap.rows);
         fontGlyph.offsetX_ = (short)(RoundToPixels(slot->metrics.horiBearingX));
         fontGlyph.offsetY_ = (short)(ascender_ - RoundToPixels(slot->metrics.horiBearingY));
         fontGlyph.advanceX_ = (short)(slot->metrics.horiAdvance >> 6);
