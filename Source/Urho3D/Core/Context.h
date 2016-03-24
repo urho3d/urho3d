@@ -40,6 +40,11 @@ public:
     /// Destruct.
     ~Context();
 
+    /// Create an object by type. Return pointer to it or null if no factory found.
+    template <class T> inline SharedPtr<T> CreateObject()
+    {
+        return StaticCast<T>(CreateObject(T::GetTypeStatic()));
+    }
     /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(StringHash objectType);
     /// Register a factory for an object type.

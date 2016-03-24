@@ -124,6 +124,9 @@ HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
+// For subset animation import usage
+float importStartTime_ = 0.0f;
+float importEndTime_ = 0.0f;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -246,6 +249,8 @@ void Run(const Vector<String>& arguments)
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
             "-bp         Move bones to bind pose before saving model\n"
+            "-split <start> <end> (animation model only)\n"
+            "            Split animation, will only import from start frame to end frame\n"
         );
     }
 
@@ -391,6 +396,15 @@ void Run(const Vector<String>& arguments)
                 checkUniqueModel_ = false;
             else if (argument == "bp")
                 moveToBindPose_ = true;
+            else if (argument == "split")
+            {
+                String value2 = i + 2 < arguments.Size() ? arguments[i + 2] : String::EMPTY;
+                if (value.Length() && value2.Length() && (value[0] != '-') && (value2[0] != '-'))
+                {
+                    importStartTime_ = ToFloat(value);
+                    importEndTime_ = ToFloat(value2);
+                }
+            }
         }
     }
 
@@ -1112,6 +1126,10 @@ void BuildAndSaveAnimations(OutModel* model)
         String animName = FromAIString(anim->mName);
         String animOutName;
 
+        // If no animation split specified, set the end time to duration
+        if (importEndTime_ == 0.0f)
+            importEndTime_ = duration;
+
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
         if (model)
@@ -1138,7 +1156,9 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
-        duration -= startTime;
+        if (startTime > importStartTime_)
+            importStartTime_ = startTime;
+        duration = importEndTime_ - importStartTime_;
 
         SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
@@ -1254,11 +1274,11 @@ void BuildAndSaveAnimations(OutModel* model)
 
                 // Get time for the keyframe. Adjust with animation's start time
                 if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
-                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime);
                 else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
-                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime);
                 else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
-                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime);
 
                 // Make sure time stays positive
                 kf.time_ = Max(kf.time_, 0.0f);
@@ -1294,8 +1314,11 @@ void BuildAndSaveAnimations(OutModel* model)
                     kf.rotation_ = ToQuaternion(rot);
                 if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-
-                track->keyFrames_.Push(kf);
+                if (kf.time_ >= importStartTime_ && kf.time_ <= importEndTime_)
+                {
+                    kf.time_ = (kf.time_ - importStartTime_) * tickConversion;
+                    track->keyFrames_.Push(kf);
+                }
             }
         }
 

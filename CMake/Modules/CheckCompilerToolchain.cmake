@@ -144,8 +144,10 @@ if (NOT ARM)
         endforeach ()
     else ()
         check_extension (mmx)
-        check_extension (sse)
-        check_extension (sse2)
+        if (NOT EMSCRIPTEN)     # Emscripten does not support SSE/SSE2 (yet) now but erroneously responding positively to our probe, so skip them for Emscripten for now
+            check_extension (sse)
+            check_extension (sse2)
+        endif ()
      endif ()
     # As newer CPUs from AMD do not support 3DNow! anymore, we cannot make any assumption for 3DNow! extension check
     # Don't bother with this check on AppleClang and MSVC compiler toolchains (Urho3D only supports CPU with SSE2 on the asscoiated platforms anyway)

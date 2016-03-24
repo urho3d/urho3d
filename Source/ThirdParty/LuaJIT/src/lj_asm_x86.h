@@ -1,6 +1,6 @@
 /*
 ** x86/x64 IR assembler (SSA IR -> machine code).
-** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 /* -- Guard handling ------------------------------------------------------ */
@@ -531,7 +531,7 @@ static void asm_gencall(ASMState *as, const CCallInfo *ci, IRRef *args)
 static void asm_setupresult(ASMState *as, IRIns *ir, const CCallInfo *ci)
 {
   RegSet drop = RSET_SCRATCH;
-  int hiop = (LJ_32 && (ir+1)->o == IR_HIOP);
+  int hiop = (LJ_32 && (ir+1)->o == IR_HIOP && !irt_isnil((ir+1)->t));
   if ((ci->flags & CCI_NOFPRCLOBBER))
     drop &= ~RSET_FPR;
   if (ra_hasreg(ir->r))

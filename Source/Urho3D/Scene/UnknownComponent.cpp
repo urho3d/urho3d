@@ -218,12 +218,6 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
 
 bool UnknownComponent::SaveJSON(JSONValue& dest) const
 {
-    if (dest.IsNull())
-    {
-        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination element");
-        return false;
-    }
-
     if (!useXML_)
         URHO3D_LOGWARNING("UnknownComponent loaded in binary mode, attributes will be empty for JSON save");
 
