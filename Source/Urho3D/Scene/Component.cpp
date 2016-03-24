@@ -35,7 +35,7 @@
 #endif
 
 #include "../DebugNew.h"
-#include "./Resource/JSONValue.h"
+#include "../Resource/JSONValue.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:6293)
