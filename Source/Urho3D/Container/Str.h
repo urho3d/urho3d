@@ -475,7 +475,7 @@ public:
     static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
     static unsigned DecodeUTF16(const wchar_t*& src);
-    #endif
+#endif
 
     /// Return length of a C string.
     static unsigned CStringLength(const char* str)
