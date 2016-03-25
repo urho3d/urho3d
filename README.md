@@ -32,8 +32,8 @@ Urho3D development, contributions and bugfixes by:
 - Gunnar Kriik
 - Ali Kämäräinen
 - Pete Leigh
-- Thorbjørn Lindeijer
 - Frode 'Modanung' Lindeijer
+- Thorbjørn Lindeijer
 - Xavier Maupeu
 - Jonne Nauha
 - Paul Noome
