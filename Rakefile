@@ -327,7 +327,7 @@ task :ci do
     system "bash -c 'git fetch --unshallow'" or abort 'Failed to unshallow cloned repository'
   end
   # Show CMake version
-  system "bash -c 'echo && cmake --version && echo'" or abort 'Failed to find CMake'
+  system "bash -c 'cmake --version && echo'" or abort 'Failed to find CMake'
   # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
   ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
@@ -642,8 +642,11 @@ def timeup
     puts; $stdout.flush
     return nil
   end
-  elapsed_time = (Time.now - $start_time) / 60.0
-  puts "\n=== Checkpoint reached, elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds ===\n\n" unless $already_timeup
+  current_time = Time.now
+  elapsed_time = (current_time - $start_time) / 60.0
+  lap_time = $split_time ? (current_time - $split_time) / 60.0 : 0.0
+  $split_time = current_time
+  puts "\n=== Checkpoint reached, elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds, lap time: #{lap_time.to_i} minutes #{((lap_time - lap_time.to_i) * 60.0).round} seconds ===\n\n" unless $already_timeup
   $stdout.flush
   return $already_timeup = elapsed_time > 40.0
 end
