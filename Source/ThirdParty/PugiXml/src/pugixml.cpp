@@ -11,6 +11,8 @@
  * Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef SOURCE_PUGIXML_CPP
 #define SOURCE_PUGIXML_CPP
 
@@ -11658,11 +11660,11 @@ namespace pugi
 	{
 	}
 		
-	// Modified by YaoWT for Urho3D
+	// Urho3D - copy constructor from another xpath_node
 	PUGI__FN xpath_node::xpath_node(const xpath_node& rhs) : _node(rhs._node), _attribute(rhs._attribute)
 	{
 	}
-		
+
 	PUGI__FN xpath_node::xpath_node(const xml_node& node_): _node(node_)
 	{
 	}

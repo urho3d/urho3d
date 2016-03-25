@@ -11,6 +11,8 @@
  * Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef PUGIXML_VERSION
 // Define version macro; evaluates to major * 100 + minor so that it's safe to use in less-than comparisons
 #	define PUGIXML_VERSION 170
@@ -1220,8 +1222,7 @@ namespace pugi
 	public:
 		// Default constructor; constructs empty XPath node
 		xpath_node();
-		// Modified by YaoWT for Urho3D
-		// Copy constructor from another xpath_node
+		// Urho3D - copy constructor from another xpath_node
 		xpath_node(const xpath_node& rhs);
 
 		// Construct XPath node from XML node/attribute
