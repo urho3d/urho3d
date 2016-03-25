@@ -297,7 +297,8 @@ end
 # Usage: NOT intended to be used manually
 desc 'Configure, build, and test Urho3D project'
 task :ci do
-  $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
+  $start_time = Time.now - ENV['ELAPSED'].to_i if ENV['ELAPSED']
+  next if timeup    # Measure the VM overhead
   # Skip if only performing CI for selected branches and the current branch is not in the list
   unless ENV['RELEASE_TAG']
     next if ENV['TRAVIS'] && /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
@@ -339,6 +340,7 @@ task :ci do
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
   system "bash -c 'rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1'" or abort 'Failed to configure Urho3D library build'
+  next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
     android_prepare_device ENV['AVD'], ENV['ANDROID_ABI'] or abort 'Failed to prepare Android (virtual) device for test run'
@@ -440,7 +442,7 @@ desc 'Update site on GitHub Pages (and source tree on GitHub while we are at it)
 task :ci_site_update do
   # Skip when :ci rake task was skipped
   next unless File.exist?('../Build/CMakeCache.txt')
-  $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
+  $start_time = Time.now - ENV['ELAPSED'].to_i if ENV['ELAPSED']
   next if timeup
   puts "Updating site...\n\n"
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
@@ -483,7 +485,7 @@ end
 # Usage: NOT intended to be used manually
 desc 'Update web samples to GitHub Pages'
 task :ci_emscripten_samples_update do
-  $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
+  $start_time = Time.now - ENV['ELAPSED'].to_i if ENV['ELAPSED']
   next if timeup
   puts 'Updating Web samples in main website...'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
@@ -535,7 +537,7 @@ end
 desc 'Delete CI mirror branch'
 task :ci_delete_mirror do
   # Skip if the mirror branch has been forced pushed remotely or when we are performing a release (in case we need to rerun the job to recreate the package)
-  unless `git fetch && git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}`.gsub(/'/, '') == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']).chop && !ENV['RELEASE_TAG']
+  unless `git fetch -qf origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} && git log -1 --pretty=format:'%H' origin/#{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']}`.gsub(/'/, '') == (ENV['TRAVIS_COMMIT'] || ENV['APPVEYOR_REPO_COMMIT']).chop && !ENV['RELEASE_TAG']
     # Do not use "abort" here because AppVeyor, unlike Travis, also handles the exit status of the processes invoked in the "on_finish" section of the .appveyor.yml
     # Using "abort" may incorrectly (or correctly, depends on your POV) report the whole CI as failed when the CI mirror branch deletion is being skipped
     $stderr.puts "Skipped deleting #{ENV['TRAVIS_BRANCH'] || ENV['APPVEYOR_REPO_BRANCH']} mirror branch"
@@ -554,7 +556,7 @@ task :ci_package_upload do
   ENV['config'] = 'Release' if ENV['XCODE']
   # Skip when :ci rake task was skipped
   next unless File.exist?("#{ENV['build_tree']}/CMakeCache.txt")
-  $start_time = Time.now - ENV['ELAPSED'].to_i - 30 if ENV['ELAPSED']   # Adjustment for rounding up to the next nearest minute
+  $start_time = Time.now - ENV['ELAPSED'].to_i if ENV['ELAPSED']
   next if timeup
   # Generate the documentation if necessary
   if ENV['SITE_UPDATE']
@@ -640,10 +642,10 @@ def timeup
     puts; $stdout.flush
     return nil
   end
-  elapsed_time = (Time.now - $start_time) / 60
-  puts "\n=== Checkpoint reached, elapsed time: #{elapsed_time.to_i} minutes ===\n\n" unless $already_timeup
+  elapsed_time = (Time.now - $start_time) / 60.0
+  puts "\n=== Checkpoint reached, elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds ===\n\n" unless $already_timeup
   $stdout.flush
-  return $already_timeup = elapsed_time > 40
+  return $already_timeup = elapsed_time > 40.0
 end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'

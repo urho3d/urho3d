@@ -337,7 +337,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
-osx_image: xcode7.1
+osx_image: xcode7.3
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -370,6 +370,15 @@ before_script:
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
+  # Scouting
+  - echo 'whereis java' && whereis java
+  - echo 'java -version' && java -version
+  - echo 'whereis javac' && whereis javac
+  - echo 'javac -version' && javac -version
+  - echo 'ls -ltr /Library/Java/JavaVirtualMachines' && ls -ltr /Library/Java/JavaVirtualMachines
+  - echo 'ls -ltr /System/Library/Frameworks/JavaVM.framework/Versions' && ls -ltr /System/Library/Frameworks/JavaVM.framework/Versions
+  - echo 'ls -ltr $(brew --cache)' && ls -ltr $(brew --cache)
+  # End scouting
 script: ELAPSED=$SECONDS rake ci && if [ $PACKAGE_UPLOAD ]; then ELAPSED=$SECONDS rake ci_package_upload; fi
 after_script: rake ci_teardown_cache
 
