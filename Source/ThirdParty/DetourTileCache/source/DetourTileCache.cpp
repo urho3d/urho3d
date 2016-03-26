@@ -1,4 +1,4 @@
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and cosmy1 for Urho3D
 
 #include "DetourTileCache.h"
 #include "DetourTileCacheBuilder.h"
