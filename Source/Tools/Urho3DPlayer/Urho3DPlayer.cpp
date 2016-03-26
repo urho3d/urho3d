@@ -38,6 +38,10 @@
 
 #include <Urho3D/DebugNew.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 URHO3D_DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
 Urho3DPlayer::Urho3DPlayer(Context* context) :
@@ -48,7 +52,7 @@ Urho3DPlayer::Urho3DPlayer(Context* context) :
 void Urho3DPlayer::Setup()
 {
     FileSystem* filesystem = GetSubsystem<FileSystem>();
-
+#ifndef __EMSCRIPTEN__
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
@@ -68,6 +72,71 @@ void Urho3DPlayer::Setup()
     String scriptFileName;
     if (arguments.Size() && arguments[0][0] != '-')
         scriptFileName_ = GetInternalPath(arguments[0]);
+#else
+    // Allow different samples to be loaded based on query string, eg:
+    // http://example.com/Urho3DPlayer.html?sample=4
+    
+    String defaultSample = "01_HelloWorld";
+    String samples[] = {
+        defaultSample, // zero index, default sample to show.
+        "01_HelloWorld",
+        "02_HelloGUI",
+        "03_Sprites",
+        "04_StaticScene",
+        "05_AnimatingScene",
+        "06_SkeletalAnimation",
+        "07_Billboards",
+        "08_Decals",
+        "09_MultipleViewports",
+        "10_RenderToTexture",
+        "11_Physics",
+        "12_PhysicsStressTest",
+        "13_Ragdolls",
+        "14_SoundEffects",
+        "15_Navigation",
+        defaultSample, // 16_Chat -- Emscripten unsupported
+        defaultSample, // 17_SceneReplication -- Emscripten unsupported
+        "18_CharacterDemo",
+        "19_VehicleDemo",
+        "20_HugeObjectCount",
+        defaultSample, // 21_AngelScriptIntegration -- Lua unsupported
+        defaultSample, // 22_LuaIntegration -- Lua unsupported
+        "23_Water",
+        "24_Urho2DSprite",
+        "25_Urho2DParticle",
+        "26_ConsoleInput",
+        "27_Urho2DPhysics",
+        "28_Urho2DPhysicsRope",
+        "29_SoundSynthesis",
+        "30_LightAnimation",
+        "31_MaterialAnimation",
+        "32_Urho2DConstraints",
+        "33_Urho2DSpriterAnimation",
+        "34_DynamicGeometry",
+        "35_SignedDistanceFieldText",
+        "36_Urho2DTileMap",
+        "37_UIDrag",
+        "38_SceneAndUILoad",
+        "39_CrowdNavigation",
+        "40_Localization"
+    };
+
+    unsigned sampleIndex = EM_ASM_INT_V({
+        var sample = parseInt(location.search.split('sample=')[1]);
+        if (isNaN(sample)) {
+            return 0;
+        }
+        else {
+            return sample;
+        }
+    });
+    sampleIndex %= 41;
+    
+    scriptFileName_ = GetInternalPath("LuaScripts/" +samples[sampleIndex] + ".lua");
+    engineParameters_["WindowWidth"] = 1024;
+    engineParameters_["WindowHeight"] = 768;
+    engineParameters_["FullScreen"] = false;
+#endif
 
     // Show usage if not found
     if (scriptFileName_.Empty())
