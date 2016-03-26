@@ -46,6 +46,7 @@ environment:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
 install:
+  - rake ci_timer
   - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
         if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
         {
@@ -62,7 +63,7 @@ build_script:
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
 # Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
   - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && rake ci_timer
 test: off
 artifacts:
   - path: Build\*.zip
