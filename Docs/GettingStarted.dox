@@ -30,7 +30,7 @@ Although all required third-party libraries are included as source code, there a
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio. *Recommended*
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Misc.:
-    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for touchscreen input. *Optional*
+    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this. *Optional*
 
 - For Raspberry Pi, the following development packages need to be installed. On Raspbian: libevdev2 and libudev-dev. On Pidora: libevdev and systemd-devel. The same list of optional development libraries listed above for Linux can also be installed on Raspberry Pi system to enable support for the corresponding software components. However, for display server the recommendation is to use Broadcom Video Core that comes preinstalled with Raspbian or Pidora.
 
@@ -144,7 +144,7 @@ A number of build options can be defined when invoking the build scripts or when
 |ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 9 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
-|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW cross-compiling build only)|
+|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|

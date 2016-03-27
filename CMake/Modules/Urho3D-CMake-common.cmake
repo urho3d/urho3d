@@ -25,7 +25,7 @@ set (URHO3D_BUILD_CONFIGURATIONS Release RelWithDebInfo Debug)
 set (DOC_STRING "Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug")
 if (CMAKE_CONFIGURATION_TYPES)
     # For multi-configurations generator, such as VS and Xcode
-    set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING "${DOC_STRING}" FORCE)
+    set (CMAKE_CONFIGURATION_TYPES ${URHO3D_BUILD_CONFIGURATIONS} CACHE STRING ${DOC_STRING} FORCE)
     unset (CMAKE_BUILD_TYPE)
 else ()
     # For single-configuration generator, such as Unix Makefile generator
@@ -33,12 +33,14 @@ else ()
         # If not specified then default to Release
         set (CMAKE_BUILD_TYPE Release)
     endif ()
-    set (CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "${DOC_STRING}" FORCE)
+    set (CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING ${DOC_STRING} FORCE)
 endif ()
 
 # Define other useful variables not defined by CMake
 if (CMAKE_GENERATOR STREQUAL Xcode)
     set (XCODE TRUE)
+elseif (CMAKE_GENERATOR STREQUAL Ninja)
+    set (NINJA TRUE)
 endif ()
 
 # Rightfully we could have performed this inside a CMake/iOS toolchain file but we don't have one nor need for one for now
@@ -79,7 +81,6 @@ endif ()
 include (CheckCompilerToolchain)
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
-mark_as_advanced (URHO3D_C++11)
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT RPI AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})
 cmake_dependent_option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE "NOT WEB" FALSE)
@@ -117,6 +118,7 @@ else ()
 endif ()
 # For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RPI)
+    # TODO: this logic is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling
     find_package (VideoCore REQUIRED)
     include_directories (${VIDEOCORE_INCLUDE_DIRS})
 endif ()
@@ -243,7 +245,7 @@ else ()
 endif ()
 if (MINGW AND CMAKE_CROSSCOMPILING)
     set (MINGW_PREFIX "" CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)")
-    set (MINGW_SYSROOT "" CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)")
+    set (MINGW_SYSROOT "" CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected")
     # When cross-compiling then we are most probably in Unix-alike host environment which should not have problem to handle long include dirs
     # This change is required to keep ccache happy because it does not like the CMake generated include response file
     foreach (lang C CXX)
@@ -465,7 +467,7 @@ if (URHO3D_DATABASE_SQLITE OR URHO3D_DATABASE_ODBC)
     add_definitions (-DURHO3D_DATABASE)
 endif ()
 
-# The script below is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling, until then ensure the DirectX package is not being searched again in external projects such as when building LuaJIT library
+# TODO: The logic below is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling, until then ensure the DirectX package is not being searched again in external projects such as when building LuaJIT library
 if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     set (DIRECTX_REQUIRED_COMPONENTS)
     set (DIRECTX_OPTIONAL_COMPONENTS DInput DSound XAudio2 XInput)
@@ -703,7 +705,7 @@ else ()
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-        if (CMAKE_GENERATOR STREQUAL Ninja OR "$ENV{USE_CCACHE}")
+        if (NINJA OR "$ENV{USE_CCACHE}")    # Stringify to guard against undefined environment variable
             # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics -Qunused-arguments")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
@@ -1514,7 +1516,7 @@ macro (define_dependency_libs TARGET)
         else ()
             # Linux
             if (NOT WEB)
-                list (APPEND LIBS dl m)
+                list (APPEND LIBS dl m rt)
             endif ()
             if (RPI)
                 list (APPEND ABSOLUTE_PATH_LIBS ${VIDEOCORE_LIBRARIES})
@@ -1825,7 +1827,7 @@ if (IOS)
     if (CMAKE_VERSION VERSION_LESS 2.8.12)
         # Due to a bug in the CMake/Xcode generator (fixed in 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
         # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\/Contents\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
+        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\\/Contents\\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
     endif ()
     # TODO: can be removed when CMake minimum required has reached 3.4
     if (CMAKE_VERSION VERSION_LESS 3.4)

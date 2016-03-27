@@ -20,23 +20,19 @@
 # THE SOFTWARE.
 #
 
-# Find NetworkAudioSystem development library
+# Find Open Sound System development library
 #
-#  NAS_FOUND
-#  NAS_INCLUDE_DIRS
-#  NAS_LIBRARIES
+#  OSS_FOUND
+#  OSS_INCLUDE_DIRS
+#  OSS_LIBRARIES
+#  OSS_USE_WORKAROUND_HEADER
 #
 
-if (URHO3D_64BIT)
-    set (NAS_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
-else ()
-    set (NAS_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
-endif ()
-
-find_path (NAS_INCLUDE_DIRS NAMES audio/audiolib.h nas/audiolib.h DOC "NetworkAudioSystem include directory")
-find_library (NAS_LIBRARIES NAMES audio PATHS ${NAS_LIB_SEARCH_PATH} DOC "NetworkAudioSystem library")
+find_path (OSS_INCLUDE_DIRS NAMES sys/soundcard.h soundcard.h PATH_SUFFIXES uClibc DOC "OSS include directory")
+find_library (OSS_LIBRARIES NAMES OSSlib ossaudio DOC "OSS library")
+find_file (OSS_USE_WORKAROUND_HEADER NAMES soundcard.h DOC "OSS use workaround header")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (NAS REQUIRED_VARS NAS_LIBRARIES NAS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find NetworkAudioSystem development library")
+find_package_handle_standard_args (OSS REQUIRED_VARS OSS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find OSS development library")
 
-mark_as_advanced (NAS_INCLUDE_DIRS NAS_LIBRARIES)
+mark_as_advanced (OSS_INCLUDE_DIRS OSS_LIBRARIES OSS_USE_WORKAROUND_HEADER)

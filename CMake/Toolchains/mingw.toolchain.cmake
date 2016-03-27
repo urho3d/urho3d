@@ -93,7 +93,7 @@ if (NOT MINGW_SYSROOT)
             "Use MINGW_SYSROOT environment variable or build option to specify the location of system root.")
     endif ()
     set (MINGW_PREFIX ${MINGW_PREFIX} CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)" FORCE)
-    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)" FORCE)
+    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected" FORCE)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 

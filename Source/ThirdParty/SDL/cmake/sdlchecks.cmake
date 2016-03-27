@@ -49,7 +49,7 @@ macro (get_soname SONAME LIB)
     get_filename_component (REALPATH ${${LIB}} REALPATH)
     get_filename_component (BASENAME ${REALPATH} NAME)
     if (BASENAME MATCHES \\.so)  # Extract soname from basename
-      string (REGEX REPLACE "(\\.[^.]+).*$" \\1 ${SONAME} "${BASENAME}")  # Stringify for string replacement
+      string (REGEX REPLACE "(\\.so\\.[^.]+).*$" \\1 ${SONAME} "${BASENAME}")  # Stringify for string replacement
     else ()
       set (${SONAME} ${BASENAME})  # If it is not .so (e.g. .dylib) then use whatever the basename is
     endif ()
@@ -57,70 +57,68 @@ macro (get_soname SONAME LIB)
 endmacro ()
 
 macro(CheckDLOPEN)
- # Urho3D - bug fix - to be consistent with the rest of the check macros here, only do the check when the feature is actually wanted
- if (SDL_LOADSO AND SDL_DLOPEN)
-  check_function_exists(dlopen HAVE_DLOPEN)
-  if(NOT HAVE_DLOPEN)
-    foreach(_LIBNAME dl tdl)
-      check_library_exists("${_LIBNAME}" "dlopen" "" DLOPEN_LIB)
-      if(DLOPEN_LIB)
-        list(APPEND EXTRA_LIBS ${_LIBNAME})
-        set(_DLLIB ${_LIBNAME})
-        set(HAVE_DLOPEN TRUE)
-        break()
+  # Urho3D - bug fix - to be consistent with the rest of the check macros here, only do the check when the feature is actually wanted
+  if (SDL_LOADSO)
+    # Urho3D - bypass the checks for Emscripten as they don't work but assume it is supported (https://github.com/kripken/emscripten/wiki/Linking#dlopen-dynamic-linking)
+    if (EMSCRIPTEN)
+      set (HAVE_DLOPEN TRUE)
+    else ()
+      # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable
+      check_function_exists(dlopen DLOPEN_FOUND)
+      if(NOT DLOPEN_FOUND)
+        foreach(_LIBNAME dl tdl)
+          check_library_exists("${_LIBNAME}" "dlopen" "" DLOPEN_LIB_${_LIBNAME}_FOUND)
+          if(DLOPEN_LIB_${_LIBNAME}_FOUND)
+            list(APPEND EXTRA_LIBS ${_LIBNAME})
+            set(_DLLIB ${_LIBNAME})
+            set(DLOPEN_FOUND TRUE)
+            break()
+          endif()
+        endforeach()
       endif()
-    endforeach()
-  endif()
-
-  if(HAVE_DLOPEN)
-    if(_DLLIB)
-      set(CMAKE_REQUIRED_LIBRARIES ${_DLLIB})
+      if(DLOPEN_FOUND)
+        if(_DLLIB)
+          set(CMAKE_REQUIRED_LIBRARIES ${_DLLIB})
+        endif()
+        check_c_source_compiles("
+           #include <dlfcn.h>
+           int main(int argc, char **argv) {
+             void *handle = dlopen(\"\", RTLD_NOW);
+             const char *loaderror = (char *) dlerror();
+           }" HAVE_DLOPEN)
+        set(CMAKE_REQUIRED_LIBRARIES)
+      endif()
+    endif ()
+    if(HAVE_DLOPEN)
+      set(SDL_LOADSO_DLOPEN 1)
+      set(HAVE_SDL_DLOPEN TRUE)
+      file(GLOB DLOPEN_SOURCES ${SDL2_SOURCE_DIR}/src/loadso/dlopen/*.c)
+      set(SOURCE_FILES ${SOURCE_FILES} ${DLOPEN_SOURCES})
+      set(HAVE_SDL_LOADSO TRUE)
     endif()
-    check_c_source_compiles("
-       #include <dlfcn.h>
-       int main(int argc, char **argv) {
-         void *handle = dlopen(\"\", RTLD_NOW);
-         const char *loaderror = (char *) dlerror();
-       }" HAVE_DLOPEN)
-    set(CMAKE_REQUIRED_LIBRARIES)
-  endif()
-
-  if (HAVE_DLOPEN)
-    set(SDL_LOADSO_DLOPEN 1)
-    set(HAVE_SDL_DLOPEN TRUE)
-    file(GLOB DLOPEN_SOURCES ${SDL2_SOURCE_DIR}/src/loadso/dlopen/*.c)
-    set(SOURCE_FILES ${SOURCE_FILES} ${DLOPEN_SOURCES})
-    set(HAVE_SDL_LOADSO TRUE)
-  endif()
- endif ()
+  endif ()
 endmacro()
 
 # Requires:
 # - n/a
 macro(CheckOSS)
   if(OSS)
-    set(OSS_HEADER_FILE "sys/soundcard.h")
-    check_c_source_compiles("
-        #include <sys/soundcard.h>
-        int main() { int arg = SNDCTL_DSP_SETFRAGMENT; }" OSS_FOUND)
-    if(NOT OSS_FOUND)
-      set(OSS_HEADER_FILE "soundcard.h")
-      check_c_source_compiles("
-          #include <soundcard.h>
-          int main() { int arg = SNDCTL_DSP_SETFRAGMENT; }" OSS_FOUND)
-    endif()
-
+    # Urho3D - bug fix - should use different variables for different checks, however, we replace the whole checks with find_package() approach for consistency sake
+    find_package (OSS)
     if(OSS_FOUND)
+      include_directories (${OSS_INCLUDE_DIRS})
+      if (OSS_LIBRARIES)
+        get_filename_component(NAME_WE ${OSS_LIBRARIES} NAME_WE)
+        string (REGEX REPLACE ^lib "" NAME_WE "${NAME_WE}")    # Stringify for string replacement
+        list(APPEND EXTRA_LIBS ${NAME_WE})
+      endif ()
       set(HAVE_OSS TRUE)
       file(GLOB OSS_SOURCES ${SDL2_SOURCE_DIR}/src/audio/dsp/*.c)
-      if(OSS_HEADER_FILE STREQUAL "soundcard.h")
+      if(OSS_USE_WORKAROUND_HEADER)
         set(SDL_AUDIO_DRIVER_OSS_SOUNDCARD_H 1)
       endif()
       set(SDL_AUDIO_DRIVER_OSS 1)
       set(SOURCE_FILES ${SOURCE_FILES} ${OSS_SOURCES})
-      if(NETBSD OR OPENBSD)
-        list(APPEND EXTRA_LIBS ossaudio)
-      endif()
       set(HAVE_SDL_AUDIO TRUE)
     endif()
   endif()
@@ -164,7 +162,7 @@ macro(CheckALSA)
 endmacro()
 
 # Requires:
-# - PkgCheckModules
+# - n/a
 # Optional:
 # - PULSEAUDIO_SHARED opt
 # - HAVE_DLOPEN opt
@@ -196,7 +194,7 @@ macro(CheckPulseAudio)
 endmacro()
 
 # Requires:
-# - PkgCheckModules
+# - n/a
 # Optional:
 # - ESD_SHARED opt
 # - HAVE_DLOPEN opt
@@ -320,7 +318,7 @@ macro(CheckSNDIO)
 endmacro()
 
 # Requires:
-# - PkgCheckModules
+# - n/a
 # Optional:
 # - FUSIONSOUND_SHARED opt
 # - HAVE_DLOPEN opt
@@ -395,9 +393,11 @@ macro(CheckX11)
 
       check_function_exists("shmat" HAVE_SHMAT)
       if(NOT HAVE_SHMAT)
-        check_library_exists(ipc shmat "" HAVE_SHMAT)
-        if(HAVE_SHMAT)
+        # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable
+        check_library_exists(ipc shmat "" HAVE_SHMAT_IN_IPC)
+        if(HAVE_SHMAT_IN_IPC)
           list(APPEND EXTRA_LIBS ipc)
+          set (HAVE_SHMAT TRUE)
         endif()
         if(NOT HAVE_SHMAT)
           add_definitions(-DNO_SHARED_MEMORY)
@@ -538,7 +538,6 @@ endmacro()
 
 # Requires:
 # - EGL
-# - PkgCheckModules
 # Optional:
 # - MIR_SHARED opt
 # - HAVE_DLOPEN opt
@@ -574,7 +573,6 @@ endmacro()
 
 # Requires:
 # - EGL
-# - PkgCheckModules
 # Optional:
 # - WAYLAND_SHARED opt
 # - HAVE_DLOPEN opt
@@ -620,7 +618,7 @@ endmacro()
 # Urho3D - commented out CheckCOCOA macro as it does not perform any check at all, moved the code to SDL's CMakeLists.txt
 
 # Requires:
-# - PkgCheckModules
+# - n/a
 # Optional:
 # - DIRECTFB_SHARED opt
 # - HAVE_DLOPEN opt
@@ -1053,10 +1051,7 @@ endmacro()
 macro(CheckRPI)
   if(VIDEO_RPI)
     # Urho3D - bug fix - when cross-compiling the headers are rooted
-    # Urho3D - TODO - move the find_package(VideoCore REQUIRED) call from Urho3D common module to here later after we have refactored the library dependency handling
-    listtostr (VIDEOCORE_INCLUDE_DIRS VIDEO_RPI_INCLUDE_FLAGS "-I")
-    listtostr (VIDEOCORE_LIBRARIES VIDEO_RPI_LIBRARY_FLAGS "-L")
-    set(CMAKE_REQUIRED_FLAGS "${VIDEO_RPI_INCLUDE_FLAGS} ${VIDEO_RPI_LIBRARY_FLAGS} ${ORIG_CMAKE_REQUIRED_FLAGS}")
+    set(CMAKE_REQUIRED_FLAGS "${VIDEO_RPI_INCLUDE_FLAGS} ${ORIG_CMAKE_REQUIRED_FLAGS}")
     # Urho3D - bug fix - commented out CMAKE_REQUIRED_LIBRARIES as it actually causes the detection to fail
     check_c_source_compiles("
         #include <bcm_host.h>
@@ -1069,8 +1064,6 @@ macro(CheckRPI)
       file(GLOB VIDEO_RPI_SOURCES ${SDL2_SOURCE_DIR}/src/video/raspberry/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${VIDEO_RPI_SOURCES})
       list (APPEND EXTRA_LIBS bcm_host)
-      # Urho3D - bug fix - adjust the header search path for subsequent for EGL and OpenGLES2 checks
-      list (APPEND CMAKE_REQUIRED_INCLUDES ${VIDEOCORE_INCLUDE_DIRS})   # This global setting will be reset later to its previous value in SDL/CMakeLists.txt
     endif(SDL_VIDEO AND HAVE_VIDEO_RPI)
   endif(VIDEO_RPI)
 endmacro(CheckRPI)
