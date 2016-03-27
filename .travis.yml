@@ -118,9 +118,9 @@ before_script:
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
   - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - rake ci_setup_cache
-script: rake ci && if [ $SITE_UPDATE ]; then rake ci_site_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi
+script: rake ci && if [ $SITE_UPDATE ]; then rake ci_site_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script:
-  - rake ci_timer && rake ci_teardown_cache
+  - rake ci_teardown_cache
   - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
@@ -285,8 +285,8 @@ before_script:
   - if [ "$ANDROID_ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
-after_script: rake ci_timer && rake ci_teardown_cache
+script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+after_script: rake ci_teardown_cache
 
 ---
 
@@ -330,8 +330,8 @@ before_script:
   - if [ ${TRAVIS_JOB_NUMBER##*.} -lt $PACKAGE_JOB_END ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${RPI_PREFIX%/*}:$PATH
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
-after_script: rake ci_timer && rake ci_teardown_cache
+script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+after_script: rake ci_teardown_cache
 
 ---
 
@@ -371,8 +371,8 @@ before_script:
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi
-after_script: rake ci_timer && rake ci_teardown_cache
+script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+after_script: rake ci_teardown_cache
 
 ---
 
@@ -409,8 +409,8 @@ before_script:
   - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi; fi
-after_script: rake ci_timer && rake ci_teardown_cache
+script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi; fi && rake ci_timer
+after_script: rake ci_teardown_cache
 
 ...
 
