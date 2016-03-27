@@ -29,6 +29,9 @@ function Start()
     -- Create the user interface
     CreateUI()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
+
     -- Subscribe to UI and network events
     SubscribeToEvents()
 end

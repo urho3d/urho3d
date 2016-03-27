@@ -19,10 +19,13 @@ void Start()
     String platform = GetPlatform();
     if (platform != "Android" and platform != "iOS")
         input.mouseVisible = true;
-    
+
     // Create the UI content
     CreateGUI();
     CreateInstructions();
+
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE);
 
     // Hook up to the frame update events
     SubscribeToEvents();
@@ -92,8 +95,8 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Drag on the buttons to move them around.\n" + 
-                           "Touch input allows also multi-drag.\n" + 
+    instructionText.text = "Drag on the buttons to move them around.\n" +
+                           "Touch input allows also multi-drag.\n" +
                            "Press SPACE to show/hide tagged UI elements.";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     instructionText.textAlignment = HA_CENTER;
@@ -164,7 +167,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         Text@ t = root.GetChild("Touch " + String(i));
         TouchState@ ts = input.touches[i];
         t.text = "Touch "+ String(ts.touchID);
-        
+
         IntVector2 pos = ts.position;
         pos.y -= 30;
 
@@ -177,7 +180,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         Text@ t = root.GetChild("Touch " + String(i));
         t.visible = false;
     }
-    
+
     if (input.keyPress[KEY_SPACE])
     {
         Array<UIElement@>@ elements = root.GetChildrenWithTag("SomeTag");

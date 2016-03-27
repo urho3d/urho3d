@@ -29,9 +29,6 @@ void SampleStart()
         // On desktop platform, do not detect touch when we already got a joystick
         SubscribeToEvent("TouchBegin", "HandleTouchBegin");
 
-    // Initiate the mouse mode settings
-    InitMouseMode();
-
     // Create logo
     CreateLogo();
 
@@ -43,6 +40,9 @@ void SampleStart()
 
     // Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown");
+
+    // Subscribe key up event
+    SubscribeToEvent("KeyUp", "HandleKeyUp");
 
     // Subscribe scene update event
     SubscribeToEvent("SceneUpdate", "HandleSceneUpdate");
@@ -64,19 +64,27 @@ void InitTouchInput()
     input.screenJoystickVisible[0] = true;
 }
 
-void InitMouseMode()
+void SampleInitMouseMode(MouseMode mode)
 {
+  useMouseMode_ = mode;
+
     if (GetPlatform() != "Web")
     {
-        if (useMouseMode_ != MM_ABSOLUTE && (console !is null || !console.visible))
-        {
-            input.mouseMode = useMouseMode_;
-        }
+      if (useMouseMode_ == MM_FREE)
+          input.mouseVisible = true;
+
+      if (useMouseMode_ != MM_ABSOLUTE)
+      {
+          input.mouseMode = useMouseMode_;
+          if (console.visible)
+              input.SetMouseMode(MM_ABSOLUTE, true);
+      }
     }
     else
     {
         input.mouseVisible = true;
         SubscribeToEvent("MouseDown", "HandleMouseModeRequest");
+        SubscribeToEvent("MouseModeChanged", "HandleMouseModeChange");
     }
 }
 
@@ -145,7 +153,7 @@ void CreateConsoleAndDebugHud()
     debugHud.defaultStyle = xmlFile;
 }
 
-void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 
@@ -157,14 +165,23 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
         {
             if (GetPlatform() == "Web")
-                input.mouseMode = MM_FREE;
+            {
+                input.mouseVisible = true;
+                if (useMouseMode_ != MM_ABSOLUTE)
+                    input.mouseMode = MM_FREE;
+            }
             else
                 engine.Exit();
         }
     }
+}
+
+void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    int key = eventData["Key"].GetInt();
 
     // Toggle console with F1
-    else if (key == KEY_F1)
+    if (key == KEY_F1)
         console.Toggle();
 
     // Toggle debug HUD with F2
@@ -316,8 +333,19 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 // If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
 void HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
 {
-    if (console !is null || console.visible || useMouseMode_ != MM_RELATIVE)
+    if (console !is null && console.visible)
         return;
-    if (input.mouseMode != MM_RELATIVE)
-        input.mouseMode = MM_RELATIVE;
+
+    if (useMouseMode_ == MM_ABSOLUTE)
+        input.mouseVisible = false;
+    else if (useMouseMode_ == MM_FREE)
+        input.mouseVisible = true;
+
+    input.mouseMode = useMouseMode_;
+}
+
+void HandleMouseModeChange(StringHash eventType, VariantMap& eventData)
+{
+    bool mouseLocked = eventData["MouseLocked"].GetBool();
+    input.SetMouseVisible(!mouseLocked);
 }

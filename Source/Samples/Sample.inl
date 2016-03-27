@@ -87,9 +87,6 @@ void Sample::Start()
     // Create console and debug HUD
     CreateConsoleAndDebugHud();
 
-    // Initiate the mouse mode settings
-    InitMouseMode();
-
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(Sample, HandleKeyDown));
     // Subscribe key up event
@@ -122,8 +119,10 @@ void Sample::InitTouchInput()
     input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
 }
 
-void Sample::InitMouseMode()
+void Sample::InitMouseMode(MouseMode mode)
 {
+    useMouseMode_ = mode;
+
     Input* input = GetSubsystem<Input>();
 
     if (GetPlatform() != "Web")
@@ -132,16 +131,18 @@ void Sample::InitMouseMode()
             input->SetMouseVisible(true);
 
         Console* console = GetSubsystem<Console>();
-        if (useMouseMode_ != MM_ABSOLUTE && (!console || !console->IsVisible()))
+        if (useMouseMode_ != MM_ABSOLUTE)
         {
             input->SetMouseMode(useMouseMode_);
+            if (console && console->IsVisible())
+                input->SetMouseMode(MM_ABSOLUTE, true);
         }
     }
     else
     {
         input->SetMouseVisible(true);
-         SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Sample, HandleMouseModeRequest));
-         SubscribeToEvent(E_MOUSEMODECHANGED, URHO3D_HANDLER(Sample, HandleMouseModeChange));
+        SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Sample, HandleMouseModeRequest));
+        SubscribeToEvent(E_MOUSEMODECHANGED, URHO3D_HANDLER(Sample, HandleMouseModeChange));
     }
 }
 
@@ -422,6 +423,6 @@ void Sample::HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
 void Sample::HandleMouseModeChange(StringHash eventType, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
-    bool mouseLocked = eventData[MouseModeChanged::P_MOUSELOCK].GetBool();
+    bool mouseLocked = eventData[MouseModeChanged::P_MOUSELOCKED].GetBool();
     input->SetMouseVisible(!mouseLocked);
 }

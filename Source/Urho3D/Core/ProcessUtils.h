@@ -59,7 +59,7 @@ URHO3D_API const Vector<String>& ParseArguments(int argc, char** argv);
 URHO3D_API const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 URHO3D_API String GetConsoleInput();
-/// Return the runtime platform identifier, one of "Windows", "Linux", "Mac OS X", "Android", "iOS" or "Raspberry Pi".
+/// Return the runtime platform identifier, one of "Windows", "Linux", "Mac OS X", "Android", "iOS", "Web" or "Raspberry Pi".
 URHO3D_API String GetPlatform();
 /// Return the number of physical CPU cores.
 URHO3D_API unsigned GetNumPhysicalCPUs();

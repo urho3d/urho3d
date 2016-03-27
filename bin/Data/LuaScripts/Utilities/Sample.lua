@@ -29,10 +29,6 @@ function SampleStart()
         -- On desktop platform, do not detect touch when we already got a joystick
         SubscribeToEvent("TouchBegin", "HandleTouchBegin")
     end
-
-    -- Initiate the mouse mode settings
-    InitMouseMode()
-
     -- Create logo
     CreateLogo()
 
@@ -44,6 +40,9 @@ function SampleStart()
 
     -- Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown")
+
+    -- Subscribe key up event
+    SubscribeToEvent("KeyUp", "HandleKeyUp")
 
     -- Subscribe scene update event
     SubscribeToEvent("SceneUpdate", "HandleSceneUpdate")
@@ -62,14 +61,24 @@ function InitTouchInput()
     input:SetScreenJoystickVisible(screenJoystickSettingsIndex, true)
 end
 
-function InitMouseMode()
+function SampleInitMouseMode(mode)
+    useMouseMode_ = mode
     if GetPlatform() ~= "Web" then
-        if useMouseMode_ ~= MM_ABSOLUTE and (console ~= nil or not console.visible) then
+        if useMouseMode_ == MM_FREE then
+            input.mouseVisible = true
+        end
+
+        if useMouseMode_ ~= MM_ABSOLUTE then
             input.mouseMode = useMouseMode_
+
+            if console ~= nil and console.visible then
+                input:SetMouseMode(MM_ABSOLUTE, true)
+            end
         end
     else
         input.mouseVisible = true
         SubscribeToEvent("MouseDown", "HandleMouseModeRequest")
+        SubscribeToEvent("MouseModeChanged", "HandleMouseModeChange")
     end
 end
 
@@ -137,7 +146,7 @@ function CreateConsoleAndDebugHud()
     debugHud.defaultStyle = uiStyle
 end
 
-function HandleKeyDown(eventType, eventData)
+function HandleKeyUp(eventType, eventData)
     local key = eventData["Key"]:GetInt()
     -- Close console (if open) or exit when ESC is pressed
     if key == KEY_ESC then
@@ -145,15 +154,22 @@ function HandleKeyDown(eventType, eventData)
             console:SetVisible(false)
         else
             if GetPlatform() == "Web" then
-                input.mouseMode = MM_FREE;
+                input.mouseVisible = true;
+                if (useMouseMode_ ~= MM_ABSOLUTE) then
+                    input.mouseMode = MM_FREE;
+                end
             else
                 engine:Exit();
             end
         end
+    end
+end
 
-    elseif key == KEY_F1 then
+function HandleKeyDown(eventType, eventData)
+    local key = eventData["Key"]:GetInt()
+
+    if key == KEY_F1 then
         console:Toggle()
-
     elseif key == KEY_F2 then
         if debugHud:GetMode() == DEBUGHUD_SHOW_ALL_MEMORY or debugHud:GetMode() == 0 then
             debugHud:SetMode(DEBUGHUD_SHOW_ALL)
@@ -282,13 +298,23 @@ end
 
 -- If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
 function HandleMouseModeRequest(eventType, eventData)
-    if console ~= nil or console.visible or useMouseMode_ ~= MM_RELATIVE then
+    if console ~= nil and console.visible then
         return
     end
 
-    if input.mouseMode ~= MM_RELATIVE then
-        input.mouseMode = MM_RELATIVE
+    if input.mouseMode == MM_ABSOLUTE then
+        input.mouseVisible = false
+    elseif useMouseMode_ == MM_FREE then
+        input.mouseVisible = true
     end
+
+    input.mouseMode = useMouseMode_
+end
+
+-- If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+function HandleMouseModeChange(eventType, eventData)
+    mouseLocked = eventData["MouseLocked"]:GetBool()
+    input.mouseVisible = not mouseLocked;
 end
 
 -- Create empty XML patch instructions for screen joystick layout if none defined

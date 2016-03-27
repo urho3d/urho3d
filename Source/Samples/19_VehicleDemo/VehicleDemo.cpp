@@ -76,6 +76,9 @@ void VehicleDemo::Start()
 
     // Subscribe to necessary events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void VehicleDemo::CreateScene()

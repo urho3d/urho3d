@@ -71,7 +71,7 @@ protected:
     /// Initialize touch input on mobile platform.
     void InitTouchInput();
     /// Initialize mouse mode on non-web platform.
-    void InitMouseMode();
+    void InitMouseMode(MouseMode mode);
     /// Control logo visibility.
     void SetLogoVisible(bool enable);
 

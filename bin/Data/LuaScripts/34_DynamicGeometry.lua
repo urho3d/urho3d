@@ -30,6 +30,9 @@ function Start()
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Hook up to the frame update events
     SubscribeToEvents()
 end
@@ -98,11 +101,11 @@ function CreateScene()
             table.insert(animatingBuffers, cloneModel:GetGeometry(0, 0):GetVertexBuffer(0))
         end
     end
-    
+
     -- Finally create one model (pyramid shape) and a StaticModel to display it from scratch
     -- Note: there are duplicated vertices to enable face normals. We will calculate normals programmatically
     local numVertices = 18
-        
+
     local vertexData = {
         -- Position          Normal
         0.0, 0.5, 0.0,       0.0, 0.0, 0.0,
@@ -129,7 +132,7 @@ function CreateScene()
         -0.5, -0.5, 0.5,     0.0, 0.0, 0.0,
         -0.5, -0.5, -0.5,    0.0, 0.0, 0.0
     }
-    
+
     local indexData = {
         0, 1, 2,
         3, 4, 5,
@@ -280,8 +283,8 @@ function AnimateObjects(timeStep)
             -- If there are duplicate vertices, animate them in phase of the original
             local phase = startPhase + vertexDuplicates[j] * 10.0
             local src = originalVertices[j]
-            local dest = Vector3(src.x * (1.0 + 0.1 * Sin(phase)), 
-                src.y * (1.0 + 0.1 * Sin(phase + 60.0)), 
+            local dest = Vector3(src.x * (1.0 + 0.1 * Sin(phase)),
+                src.y * (1.0 + 0.1 * Sin(phase + 60.0)),
                 src.z * (1.0 + 0.1 * Sin(phase + 120.0)))
 
             -- Write position

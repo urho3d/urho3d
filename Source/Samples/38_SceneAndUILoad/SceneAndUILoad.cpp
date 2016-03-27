@@ -59,6 +59,9 @@ void SceneAndUILoad::Start()
 
     // Subscribe to global events for camera movement
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void SceneAndUILoad::CreateScene()
