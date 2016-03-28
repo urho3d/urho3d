@@ -375,69 +375,69 @@ void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 
 void Octree::Update(const FrameInfo& frame)
 {
-        PODVector<Drawable*> drawableUpdatesUpdating_[2];
+    PODVector<Drawable*> drawableUpdatesUpdating_[2];
+    Scene* scene = GetScene();
+    if (scene && scene->IsThreadedUpdate())
+    {
+        MutexLock lock(octreeMutex_);
+        drawableUpdatesUpdating_[0].Swap(drawableUpdates_);
+    }
+    else
+    {
+        drawableUpdatesUpdating_[0].Swap(drawableUpdates_);
+    };
+    
+    // Let drawables update themselves before reinsertion. This can be used for animation
+    if (!drawableUpdatesUpdating_[0].Empty())
+    {
+        URHO3D_PROFILE(UpdateDrawables);
+        
+        // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
+        // (for example physics objects) should not perform non-threadsafe work when marked dirty
         Scene* scene = GetScene();
-        if (scene && scene->IsThreadedUpdate())
-        {
-            MutexLock lock(octreeMutex_);
-            drawableUpdatesUpdating_[0].Swap(drawableUpdates_);
-        }
-        else
-        {
-            drawableUpdatesUpdating_[0].Swap(drawableUpdates_);
-        };
+        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        scene->BeginThreadedUpdate();
         
-        // Let drawables update themselves before reinsertion. This can be used for animation
-        if (!drawableUpdatesUpdating_[0].Empty())
+        int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
+        int drawablesPerItem = Max((int)(drawableUpdatesUpdating_[0].Size() / numWorkItems), 1);
+        
+        PODVector<Drawable*>::Iterator start = drawableUpdatesUpdating_[0].Begin();
+        // Create a work item for each thread
+        for (int i = 0; i < numWorkItems; ++i)
         {
-            URHO3D_PROFILE(UpdateDrawables);
+            SharedPtr<WorkItem> item = queue->GetFreeItem();
+            item->priority_ = M_MAX_UNSIGNED;
+            item->workFunction_ = UpdateDrawablesWork;
+            item->aux_ = const_cast<FrameInfo*>(&frame);
             
-            // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
-            // (for example physics objects) should not perform non-threadsafe work when marked dirty
-            Scene* scene = GetScene();
-            WorkQueue* queue = GetSubsystem<WorkQueue>();
-            scene->BeginThreadedUpdate();
+            PODVector<Drawable*>::Iterator end = drawableUpdatesUpdating_[0].End();
+            if (i < numWorkItems - 1 && end - start > drawablesPerItem)
+                end = start + drawablesPerItem;
             
-            int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
-            int drawablesPerItem = Max((int)(drawableUpdatesUpdating_[0].Size() / numWorkItems), 1);
+            item->start_ = &(*start);
+            item->end_ = &(*end);
+            queue->AddWorkItem(item);
             
-            PODVector<Drawable*>::Iterator start = drawableUpdatesUpdating_[0].Begin();
-            // Create a work item for each thread
-            for (int i = 0; i < numWorkItems; ++i)
-            {
-                SharedPtr<WorkItem> item = queue->GetFreeItem();
-                item->priority_ = M_MAX_UNSIGNED;
-                item->workFunction_ = UpdateDrawablesWork;
-                item->aux_ = const_cast<FrameInfo*>(&frame);
-                
-                PODVector<Drawable*>::Iterator end = drawableUpdatesUpdating_[0].End();
-                if (i < numWorkItems - 1 && end - start > drawablesPerItem)
-                    end = start + drawablesPerItem;
-                
-                item->start_ = &(*start);
-                item->end_ = &(*end);
-                queue->AddWorkItem(item);
-                
-                start = end;
-            }
-            
-            queue->Complete(M_MAX_UNSIGNED);
-            scene->EndThreadedUpdate();
+            start = end;
         }
         
+        queue->Complete(M_MAX_UNSIGNED);
+        scene->EndThreadedUpdate();
+    }
+    
+    
+    
+    
+    // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
+    if (scene)
+    {
+        using namespace SceneDrawableUpdateFinished;
         
-        
-        
-        // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
-        if (scene)
-        {
-            using namespace SceneDrawableUpdateFinished;
-            
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_SCENE] = scene;
-            eventData[P_TIMESTEP] = frame.timeStep_;
-            scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
-        }
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_SCENE] = scene;
+        eventData[P_TIMESTEP] = frame.timeStep_;
+        scene->SendEvent(E_SCENEDRAWABLEUPDATEFINISHED, eventData);
+    }
     
     if (scene && scene->IsThreadedUpdate())
     {
@@ -450,7 +450,7 @@ void Octree::Update(const FrameInfo& frame)
     };
     for(int idx=0;idx<2;idx++)
     {
-    // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
+        // Reinsert drawables that have been moved or resized, or that have been newly added to the octree and do not sit inside
         // the proper octant yet
         if (!drawableUpdatesUpdating_[idx].Empty())
         {
