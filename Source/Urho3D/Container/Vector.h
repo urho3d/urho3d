@@ -27,6 +27,9 @@
 #include <cassert>
 #include <cstring>
 #include <new>
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -66,7 +69,16 @@ public:
     {
         *this = vector;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    Vector(const std::initializer_list<T>& list) : Vector()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Push(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~Vector()
     {
