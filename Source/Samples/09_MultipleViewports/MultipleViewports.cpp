@@ -68,6 +68,9 @@ void MultipleViewports::Start()
 
     // Hook up to the frame update and render post-update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_ABSOLUTE);
 }
 
 void MultipleViewports::CreateScene()

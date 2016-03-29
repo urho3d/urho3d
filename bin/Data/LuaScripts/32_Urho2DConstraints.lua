@@ -20,6 +20,8 @@ function Start()
     CreateScene()
     input.mouseVisible = true -- Show mouse cursor
     CreateInstructions()
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
     SubscribeToEvents()
 end
 

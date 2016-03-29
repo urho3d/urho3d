@@ -51,7 +51,7 @@ void Urho2DParticle::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Set mouse visibile
+    // Set mouse visible
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -66,6 +66,9 @@ void Urho2DParticle::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+    
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DParticle::CreateScene()

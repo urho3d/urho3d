@@ -20,6 +20,9 @@ function Start()
     -- Setup the viewports for displaying the scene
     SetupViewports()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Hook up to the frame update and render post-update events
     SubscribeToEvents()
 end

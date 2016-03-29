@@ -24,6 +24,9 @@ function Start()
     CreateGUI()
     CreateInstructions()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
+
     -- Hook up to the frame update events
     SubscribeToEvents()
 end
@@ -162,7 +165,7 @@ function HandleUpdate(eventType, eventData)
         t:SetVisible(false)
         i = i + 1
     end
-    
+
     if input:GetKeyPress(KEY_SPACE) then
         elements = ui.root:GetChildrenWithTag("SomeTag")
         for i, element in ipairs(elements) do

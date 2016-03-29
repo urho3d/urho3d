@@ -65,6 +65,9 @@ void LightAnimation::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void LightAnimation::CreateScene()

@@ -213,6 +213,7 @@ URHO3D_EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
 URHO3D_EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
 {
     URHO3D_PARAM(P_MODE, Mode);                    // MouseMode
+    URHO3D_PARAM(P_MOUSELOCKED, MouseLocked);      // bool
 }
 
 /// Application exit requested.

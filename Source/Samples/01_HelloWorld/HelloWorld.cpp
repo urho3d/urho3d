@@ -51,6 +51,9 @@ void HelloWorld::Start()
     // like the ScreenMode event sent by the Graphics subsystem when opening the application window. To catch those as well we
     // could subscribe in the constructor instead.
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void HelloWorld::CreateText()

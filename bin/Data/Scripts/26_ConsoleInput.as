@@ -58,6 +58,9 @@ void Start()
     // Show OS mouse cursor
     input.mouseVisible = true;
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE);
+
     // Open the operating system console window (for stdin / stdout) if not open yet
     // Do not open in fullscreen, as this would cause constant device loss
     if (!graphics.fullscreen)

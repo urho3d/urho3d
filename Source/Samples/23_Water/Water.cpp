@@ -70,6 +70,9 @@ void Water::Start()
 
     // Hook up to the frame update event
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void Water::CreateScene()

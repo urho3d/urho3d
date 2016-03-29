@@ -75,6 +75,9 @@ void Chat::Start()
 
     // Subscribe to UI and network events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Chat::CreateUI()

@@ -79,6 +79,9 @@ void DatabaseDemo::Start()
     // Show OS mouse cursor
     GetSubsystem<Input>()->SetMouseVisible(true);
 
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
+
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();
 

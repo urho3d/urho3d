@@ -41,6 +41,9 @@ function Start()
     -- Create the UI content
     CreateInstructions()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Subscribe to necessary events
     SubscribeToEvents()
 end

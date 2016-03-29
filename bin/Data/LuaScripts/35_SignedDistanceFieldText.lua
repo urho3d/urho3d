@@ -20,6 +20,9 @@ function Start()
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Hook up to the frame update events
     SubscribeToEvents()
 end
@@ -84,7 +87,7 @@ function CreateScene()
             mushroomTitleText.textEffect = TE_STROKE
             mushroomTitleText.effectColor = Color(0.5, 0.5, 0.5)
         end
-        
+
         mushroomTitleText:SetAlignment(HA_CENTER, VA_CENTER)
     end
 
