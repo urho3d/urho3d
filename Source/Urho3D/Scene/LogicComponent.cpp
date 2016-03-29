@@ -205,6 +205,13 @@ void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
 {
     using namespace PhysicsPreStep;
 
+    // Execute user-defined delayed start function before first fixed update if not called yet
+    if (!delayedStartCalled_)
+    {
+        DelayedStart();
+        delayedStartCalled_ = true;
+    }
+
     // Execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());
 }

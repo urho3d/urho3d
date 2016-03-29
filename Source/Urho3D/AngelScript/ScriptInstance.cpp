@@ -816,6 +816,13 @@ void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& even
     if (!scriptObject_)
         return;
 
+    // Execute delayed start before first fixed update if not called yet
+    if (methods_[METHOD_DELAYEDSTART])
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
+    }
+
     using namespace PhysicsPreStep;
 
     VariantVector parameters;

@@ -683,6 +683,14 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
 
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Execute delayed start before first fixed update if not called yet
+    if (scriptObjectMethods_[LSOM_DELAYEDSTART])
+    {
+        if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
+            scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+    }
+
     using namespace PhysicsPreStep;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 
