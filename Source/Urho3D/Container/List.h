@@ -23,6 +23,9 @@
 #pragma once
 
 #include "../Container/ListBase.h"
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
 namespace Urho3D
 {
@@ -185,7 +188,16 @@ public:
         head_ = tail_ = ReserveNode();
         *this = list;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    List(const std::initializer_list<T>& list) : List()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Push(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~List()
     {
