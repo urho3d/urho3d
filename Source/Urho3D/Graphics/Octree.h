@@ -208,6 +208,8 @@ private:
 
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;
+    /// Drawable objects that were inserted during threaded update phase.
+    PODVector<Drawable*> threadedDrawableUpdates_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Ray query temporary list of drawables.
