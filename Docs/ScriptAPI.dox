@@ -251,6 +251,7 @@ namespace Urho3D
 
 ### MouseModeChanged
 - %Mode : MouseMode
+- %MouseLocked : bool
 
 ### ExitRequested
 
@@ -7168,12 +7169,16 @@ Methods:
 - void RemoveAllGestures()
 - bool RemoveGesture(uint)
 - bool RemoveScreenJoystick(int)
+- void ResetMouseGrabbed()
+- void ResetMouseMode()
 - void ResetMouseVisible()
 - bool SaveGesture(File@, uint)
 - bool SaveGesture(VectorBuffer&, uint)
 - bool SaveGestures(File@)
 - bool SaveGestures(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetMouseGrabbed(bool, bool = false)
+- void SetMouseMode(MouseMode, bool = false)
 - void SetMouseVisible(bool, bool = false)
 
 Properties:
@@ -7188,6 +7193,7 @@ Properties:
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
 - bool mouseGrabbed
+- bool mouseLocked // readonly
 - MouseMode mouseMode
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly

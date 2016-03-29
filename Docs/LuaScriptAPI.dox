@@ -2694,8 +2694,9 @@ Methods:
 
 - void SetToggleFullscreen(bool enable)
 - void SetMouseVisible(bool enable, bool suppressEvent = false)
-- void SetMouseGrabbed(bool grab)
-- void SetMouseMode(MouseMode mode)
+- void SetMouseGrabbed(bool grab, bool suppressEvent = false)
+- void SetMouseMode(MouseMode mode, bool suppressEvent = false)
+- bool IsMouseLocked()
 - int AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0)
 - bool RemoveScreenJoystick(int id)
 - void SetScreenJoystickVisible(int id, bool enable)
@@ -2763,6 +2764,7 @@ Properties:
 - bool touchEmulation
 - bool mouseVisible
 - bool mouseGrabbed
+- bool mouseLocked (readonly)
 - bool focus (readonly)
 - bool minimized (readonly)
 

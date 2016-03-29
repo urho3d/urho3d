@@ -5362,12 +5362,16 @@ bool RecordGesture();
 void RemoveAllGestures();
 bool RemoveGesture(uint);
 bool RemoveScreenJoystick(int);
+void ResetMouseGrabbed();
+void ResetMouseMode();
 void ResetMouseVisible();
 bool SaveGesture(File, uint);
 bool SaveGesture(VectorBuffer&, uint);
 bool SaveGestures(File);
 bool SaveGestures(VectorBuffer&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetMouseGrabbed(bool, bool = false);
+void SetMouseMode(MouseMode, bool = false);
 void SetMouseVisible(bool, bool = false);
 
 // Properties:
@@ -5390,6 +5394,8 @@ Array<bool> mouseButtonDown;
 /* readonly */
 Array<bool> mouseButtonPress;
 bool mouseGrabbed;
+/* readonly */
+bool mouseLocked;
 MouseMode mouseMode;
 /* readonly */
 IntVector2 mouseMove;
