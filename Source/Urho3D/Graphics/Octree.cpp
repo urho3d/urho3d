@@ -327,7 +327,6 @@ Octree::~Octree()
 {
     // Reset root pointer from all child octants now so that they do not move their drawables to root
     drawableUpdates_.Clear();
-    drawableReinsertions_.Clear();
     ResetRoot();
 }
 
