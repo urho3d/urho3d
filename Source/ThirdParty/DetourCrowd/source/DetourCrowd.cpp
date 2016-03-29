@@ -16,7 +16,7 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
+// Modified by Lasse Oorni, Yao Wei Tjong and cosmy1 for Urho3D
 
 #define _USE_MATH_DEFINES
 #include <string.h>
@@ -346,6 +346,9 @@ dtCrowd::dtCrowd() :
 	m_velocitySampleCount(0),
 	m_navquery(0)
 {
+	// Urho3D: initialize all class members
+	memset(&m_ext, 0, sizeof(m_ext));
+	memset(&m_obstacleQueryParams, 0, sizeof(m_obstacleQueryParams));
 }
 
 dtCrowd::~dtCrowd()

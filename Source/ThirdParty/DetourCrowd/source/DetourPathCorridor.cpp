@@ -16,6 +16,8 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+// Modified by cosmy1 for Urho3D
+
 #include <string.h>
 #include "DetourPathCorridor.h"
 #include "DetourNavMeshQuery.h"
@@ -202,6 +204,9 @@ dtPathCorridor::dtPathCorridor() :
 	m_npath(0),
 	m_maxPath(0)
 {
+	// Urho3D: initialize all class members
+	memset(&m_pos, 0, sizeof(m_pos));
+	memset(&m_target, 0, sizeof(m_target));
 }
 
 dtPathCorridor::~dtPathCorridor()
