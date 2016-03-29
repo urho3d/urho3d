@@ -138,12 +138,12 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
     {
         spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
 
-        if (animationSet_->GetSpriterData()->entities_.Empty())
+        if (!animationSet_->GetSpriterData()->entities_.Empty())
         {
             // If entity is empty use first entity in spriter
             if (entity_.Empty())
                 entity_ = animationSet_->GetSpriterData()->entities_[0]->name_;
-            spriterInstance_->SetEntity(entity_.CString());
+            spriterInstance_->SetEntity(entity_);
         }
     }
 
