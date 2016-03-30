@@ -83,9 +83,6 @@ bool ResetScene()
     }
     else
         messageBoxCallback = null;
-        
-    // Clear stored script attributes
-    scriptAttributes.Clear();
 
     suppressSceneChanges = true;
 
@@ -200,9 +197,6 @@ bool LoadScene(const String&in fileName)
         MessageBox("Could not open file.\n" + fileName);
         return false;
     }
-    
-    // Reset stored script attributes.
-    scriptAttributes.Clear();
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -247,9 +241,6 @@ bool LoadScene(const String&in fileName)
     CreateGizmo();
     CreateGrid();
     SetActiveViewport(viewports[0]);
-
-    // Store all ScriptInstance and LuaScriptInstance attributes
-    UpdateScriptInstances();
 
     return loaded;
 }

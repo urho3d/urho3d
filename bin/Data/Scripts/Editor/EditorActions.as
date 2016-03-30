@@ -410,8 +410,6 @@ class EditAttributeAction : EditAction
                 SetUIElementModified(target);
             else
                 SetSceneModified();
-                
-            EditScriptAttributes(target, attrIndex);
         }
     }
 
@@ -431,8 +429,6 @@ class EditAttributeAction : EditAction
                 SetUIElementModified(target);
             else
                 SetSceneModified();
-                
-            EditScriptAttributes(target, attrIndex);
         }
     }
 }
