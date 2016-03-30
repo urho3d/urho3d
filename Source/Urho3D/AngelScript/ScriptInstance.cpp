@@ -93,6 +93,14 @@ void ScriptInstance::RegisterObject(Context* context)
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
+    // Update stored script attributes if being manipulated while the actual object doesn't exist
+    if (!scriptObject_ && storedAttributes_.Size())
+    {
+        HashMap<String, Variant>::Iterator i = storedAttributes_.Find(attr.name_);
+        if (i != storedAttributes_.End())
+            i->second_ = src;
+    }
+
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
     {
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
@@ -675,6 +683,41 @@ void ScriptInstance::GetScriptAttributes()
     }
 }
 
+void ScriptInstance::StoreScriptAttributes()
+{
+    if (!scriptObject_)
+        return;
+
+    storedAttributes_.Clear();
+
+    for (unsigned i = 0; i < attributeInfos_.Size(); ++i)
+    {
+        const AttributeInfo& attr = attributeInfos_[i];
+        if (attr.ptr_)
+            storedAttributes_[attr.name_] = GetAttribute(i);
+    }
+}
+
+void ScriptInstance::RestoreScriptAttributes()
+{
+    if (!scriptObject_)
+        return;
+
+    for (unsigned i = 0; i < attributeInfos_.Size(); ++i)
+    {
+        const AttributeInfo& attr = attributeInfos_[i];
+        if (attr.ptr_)
+        {
+            HashMap<String, Variant>::ConstIterator j = storedAttributes_.Find(attr.name_);
+            if (j != storedAttributes_.End())
+                SetAttribute(i, j->second_);
+        }
+    }
+
+    // Clear after restoring once. If the attributes are no longer in use (script code has changed) they are forgotten now
+    storedAttributes_.Clear();
+}
+
 void ScriptInstance::UpdateEventSubscription()
 {
     Scene* scene = GetScene();
@@ -863,13 +906,17 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
 {
+    StoreScriptAttributes();
     ReleaseObject();
 }
 
 void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     if (!className_.Empty())
+    {
         CreateObject();
+        RestoreScriptAttributes();
+    }
 }
 
 Context* GetScriptContext()
