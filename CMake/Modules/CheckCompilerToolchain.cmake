@@ -83,10 +83,7 @@ if (MSVC)
     # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
     set (NATIVE_64BIT ${CMAKE_CL_64})
     # Determine MSVC compiler version based on CMake informational variables
-    if (NOT DEFINED COMPILER_VERSION)
-        string (REGEX REPLACE "^.*Visual Studio ([0-9]+\\.[0-9]+).*$" \\1 COMPILER_VERSION "${CMAKE_C_COMPILER}")    # Stringify for string replacement
-        set (COMPILER_VERSION ${COMPILER_VERSION} CACHE INTERNAL "MSVC Compiler version")
-    endif ()
+    set (COMPILER_VERSION ${MSVC_VERSION})
 else ()
     # Determine the native ABI based on the size of pointer
     check_native_define (__SIZEOF_POINTER__ SIZEOF_POINTER)
