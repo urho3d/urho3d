@@ -40,6 +40,17 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
     endif ()
 endif ()
 
+# Check sincosf support
+include(CheckFunctionExists)
+CHECK_FUNCTION_EXISTS(sincosf HAVE_SINCOSF)
+CHECK_FUNCTION_EXISTS(__sincosf HAVE_UNDERSCORE_SINCOSF)
+if (HAVE_SINCOSF)
+    add_definitions (-DHAVE_SINCOSF)
+endif ()
+if (HAVE_UNDERSCORE_SINCOSF)
+    add_definitions (-DHAVE_UNDERSCORE_SINCOSF)
+endif ()
+
 add_definitions (-DURHO3D_IS_BUILDING)
 if (ODBC_VERSION AND NOT ODBC_VERSION VERSION_LESS 3)
     add_definitions (-DODBC_3_OR_LATER)
