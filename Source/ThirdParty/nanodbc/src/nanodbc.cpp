@@ -211,8 +211,13 @@ namespace
             #if defined(_MSC_VER) && (_MSC_VER == 1900)
                 // Workaround for confirmed bug in VS2015.
                 // See: https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error
-                auto p = reinterpret_cast<wide_char_t const*>(in.data());
-                out = std::wstring_convert<NANODBC_CODECVT_TYPE<wide_char_t>, wide_char_t>().to_bytes(p, p + in.size());
+                #ifdef NANODBC_USE_IODBC_WIDE_STRINGS
+                    auto p = reinterpret_cast<int32_t const*>(in.data());
+                    out = std::wstring_convert<NANODBC_CODECVT_TYPE<int32_t>, int32_t>().to_bytes(p, p + in.size());
+                #else
+                    auto p = reinterpret_cast<int16_t const*>(in.data());
+                    out = std::wstring_convert<NANODBC_CODECVT_TYPE<int16_t>, int16_t>().to_bytes(p, p + in.size());
+                #endif
             #else
                 out = std::wstring_convert<NANODBC_CODECVT_TYPE<wide_char_t>, wide_char_t>().to_bytes(in);
             #endif
@@ -228,8 +233,13 @@ namespace
             #elif defined(_MSC_VER) && (_MSC_VER == 1900)
                 // Workaround for confirmed bug in VS2015.
                 // See: https://social.msdn.microsoft.com/Forums/en-US/8f40dcd8-c67f-4eba-9134-a19b9178e481/vs-2015-rc-linker-stdcodecvt-error
-                auto s = std::wstring_convert<NANODBC_CODECVT_TYPE<wide_char_t>, wide_char_t>().from_bytes(in);
-                auto p = reinterpret_cast<wide_char_t const*>(s.data());
+                #ifdef NANODBC_USE_IODBC_WIDE_STRINGS
+                    auto s = std::wstring_convert<NANODBC_CODECVT_TYPE<int32_t>, int32_t>().from_bytes(in);
+                    auto p = reinterpret_cast<int32_t const*>(s.data());
+                #else
+                    auto s = std::wstring_convert<NANODBC_CODECVT_TYPE<int16_t>, int16_t>().from_bytes(in);
+                    auto p = reinterpret_cast<int16_t const*>(s.data());
+                #endif
                 out.assign(p, p + s.size());
             #else
                 out = std::wstring_convert<NANODBC_CODECVT_TYPE<wide_char_t>, wide_char_t>().from_bytes(in);
