@@ -164,15 +164,6 @@ static const D3D11_FILL_MODE d3dFillMode[] =
     D3D11_FILL_WIREFRAME // Point fill mode not supported
 };
 
-static unsigned GetD3DColor(const Color& color)
-{
-    unsigned r = (unsigned)(Clamp(color.r_ * 255.0f, 0.0f, 255.0f));
-    unsigned g = (unsigned)(Clamp(color.g_ * 255.0f, 0.0f, 255.0f));
-    unsigned b = (unsigned)(Clamp(color.b_ * 255.0f, 0.0f, 255.0f));
-    unsigned a = (unsigned)(Clamp(color.a_ * 255.0f, 0.0f, 255.0f));
-    return (((a) & 0xff) << 24) | (((r) & 0xff) << 16) | (((g) & 0xff) << 8) | ((b) & 0xff);
-}
-
 static void GetD3DPrimitiveType(unsigned elementCount, PrimitiveType type, unsigned& primitiveCount,
     D3D_PRIMITIVE_TOPOLOGY& d3dPrimitiveType)
 {
