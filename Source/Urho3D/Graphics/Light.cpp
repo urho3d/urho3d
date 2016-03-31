@@ -44,6 +44,8 @@ extern const char* SCENE_CATEGORY;
 
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
 static const float DEFAULT_RANGE = 10.0f;
+static const float DEFAULT_WIDTH = 0.0f;
+static const float DEFAULT_LENGTH = 0.0f;
 static const float DEFAULT_LIGHT_FOV = 30.0f;
 static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_BRIGHTNESS = 1.0f;
@@ -93,6 +95,8 @@ Light::Light(Context* context) :
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
+	width_(DEFAULT_WIDTH),
+	length_(DEFAULT_LENGTH),
     fov_(DEFAULT_LIGHT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
@@ -119,6 +123,8 @@ void Light::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
+	URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, float, DEFAULT_WIDTH, AM_DEFAULT);
+	URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, DEFAULT_LENGTH, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Attenuation Texture", GetRampTextureAttr, SetRampTextureAttr, ResourceRef,
@@ -263,6 +269,14 @@ void Light::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
         case LIGHT_POINT:
             debug->AddSphere(Sphere(node_->GetWorldPosition(), range_), color, depthTest);
+			if (length_ > 0)
+			{
+				debug->AddCylinder(node_->GetWorldPosition(), width_, length_, color - color.GRAY, depthTest);
+			}
+			else
+			{
+				debug->AddSphere(Sphere(node_->GetWorldPosition(), width_), color - color.GRAY, depthTest);
+			}
             break;
         }
     }
@@ -304,6 +318,20 @@ void Light::SetRange(float range)
     range_ = Max(range, 0.0f);
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
+}
+
+void Light::SetWidth(float width)
+{
+	width_ = Max(width, 0.0f);
+	OnMarkedDirty(node_);
+	MarkNetworkUpdate();
+}
+
+void Light::SetLength(float length)
+{
+	length_ = Max(length, 0.0f);
+	OnMarkedDirty(node_);
+	MarkNetworkUpdate();
 }
 
 void Light::SetFov(float fov)

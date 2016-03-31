@@ -83,6 +83,9 @@ bool ResetScene()
     }
     else
         messageBoxCallback = null;
+        
+    // Clear stored script attributes
+    scriptAttributes.Clear();
 
     suppressSceneChanges = true;
 
@@ -197,6 +200,9 @@ bool LoadScene(const String&in fileName)
         MessageBox("Could not open file.\n" + fileName);
         return false;
     }
+    
+    // Reset stored script attributes.
+    scriptAttributes.Clear();
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -241,6 +247,9 @@ bool LoadScene(const String&in fileName)
     CreateGizmo();
     CreateGrid();
     SetActiveViewport(viewports[0]);
+
+    // Store all ScriptInstance and LuaScriptInstance attributes
+    UpdateScriptInstances();
 
     return loaded;
 }
@@ -1244,10 +1253,10 @@ bool SceneRenderZoneCubemaps()
     Array<Zone@> capturedThisCall;
     bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
     
-    for (uint i = 0; i < selectedNodes.length; ++i)
+    for (int i = 0; i < selectedNodes.length; ++i)
     {
         Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
-        for (uint z = 0; z < zones.length; ++z)
+        for (int z = 0; z < zones.length; ++z)
         {
             Zone@ zone = cast<Zone>(zones[z]);
             if (zone !is null)
@@ -1258,7 +1267,7 @@ bool SceneRenderZoneCubemaps()
         }
     }
     
-    for (uint i = 0; i < selectedComponents.length; ++i)
+    for (int i = 0; i < selectedComponents.length; ++i)
     {
         Zone@ zone = cast<Zone>(selectedComponents[i]);
         if (zone !is null)

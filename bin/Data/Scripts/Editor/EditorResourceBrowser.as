@@ -266,7 +266,7 @@ void CreateResourceFilterUI()
     sorted.Sort();
     sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNKNOWN, ResourceTypeName(RESOURCE_TYPE_UNKNOWN)) );
     sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNUSABLE,  ResourceTypeName(RESOURCE_TYPE_UNUSABLE)) );
-    uint halfColumns = uint( Ceil( float(sorted.length) / float(columns) ) );
+    int halfColumns = Ceil( float(sorted.length) / float(columns) );
 
     for (uint i = 0; i < sorted.length; ++i)
     {

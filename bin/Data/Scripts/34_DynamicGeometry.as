@@ -27,9 +27,6 @@ void Start()
     // Setup the viewport for displaying the scene
     SetupViewport();
 
-    // Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_RELATIVE);
-
     // Hook up to the frame update events
     SubscribeToEvents();
 }
@@ -37,7 +34,7 @@ void Start()
 void CreateScene()
 {
     scene_ = Scene();
-
+    
     // Create the Octree component to the scene so that drawable objects can be rendered. Use default volume
     // (-1000, -1000, -1000) to (1000, 1000, 1000)
     scene_.CreateComponent("Octree");
@@ -49,7 +46,7 @@ void CreateScene()
     zone.fogColor = Color(0.2, 0.2, 0.2);
     zone.fogStart = 200.0;
     zone.fogEnd = 300.0;
-
+    
     // Create a directional light
     Node@ lightNode = scene_.CreateChild("DirectionalLight");
     lightNode.direction = Vector3(-0.6, -1.0, -0.8); // The direction vector does not need to be normalized
@@ -57,7 +54,7 @@ void CreateScene()
     light.lightType = LIGHT_DIRECTIONAL;
     light.color = Color(0.4, 1.0, 0.4);
     light.specularIntensity = 1.5;
-
+    
     // Get the original model and its unmodified vertices, which are used as source data for the animation
     Model@ originalModel = cache.GetResource("Model", "Models/Box.mdl");
     if (originalModel is null)
@@ -106,12 +103,12 @@ void CreateScene()
             animatingBuffers.Push(cloneModel.GetGeometry(0, 0).vertexBuffers[0]);
         }
     }
-
+    
     // Finally create one model (pyramid shape) and a StaticModel to display it from scratch
     // Note: there are duplicated vertices to enable face normals. We will calculate normals programmatically
     {
         const uint numVertices = 18;
-
+        
         float[] vertexData = {
             // Position          Normal
             0.0, 0.5, 0.0,       0.0, 0.0, 0.0,
@@ -138,7 +135,7 @@ void CreateScene()
             -0.5, -0.5, 0.5,     0.0, 0.0, 0.0,
             -0.5, -0.5, -0.5,    0.0, 0.0, 0.0
         };
-
+        
         const uint16[] indexData = {
             0, 1, 2,
             3, 4, 5,
@@ -147,7 +144,7 @@ void CreateScene()
             12, 13, 14,
             15, 16, 17
         };
-
+        
         // Calculate face normals now
         for (uint i = 0; i < numVertices; i += 3)
         {
@@ -268,13 +265,13 @@ void MoveCamera(float timeStep)
 void AnimateObjects(float timeStep)
 {
     animTime += timeStep * 100.0;
-
+    
     // Repeat for each of the cloned vertex buffers
     for (uint i = 0; i < animatingBuffers.length; ++i)
     {
         float startPhase = animTime + i * 30.0;
         VertexBuffer@ buffer = animatingBuffers[i];
-
+        
         // Need to prepare a VectorBuffer with all data (positions, normals, uvs...)
         VectorBuffer newData;
         uint numVertices = buffer.vertexCount;
@@ -288,7 +285,7 @@ void AnimateObjects(float timeStep)
             dest.x = src.x * (1.0 + 0.1 * Sin(phase));
             dest.y = src.y * (1.0 + 0.1 * Sin(phase + 60.0));
             dest.z = src.z * (1.0 + 0.1 * Sin(phase + 120.0));
-
+            
             // Write position
             newData.WriteVector3(dest);
             // Copy other vertex elements
@@ -296,7 +293,7 @@ void AnimateObjects(float timeStep)
             for (uint k = 12; k < vertexSize; k += 4)
                 newData.WriteFloat(originalVertexData.ReadFloat());
         }
-
+        
         buffer.SetData(newData);
     }
 }

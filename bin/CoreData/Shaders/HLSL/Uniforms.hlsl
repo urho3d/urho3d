@@ -22,8 +22,6 @@ uniform float4 cGBufferOffsets;
 uniform float3 cLightDir;
 uniform float4 cLightPos;
 uniform float4x3 cModel;
-uniform float4x3 cView;
-uniform float4x3 cViewInv;
 uniform float4x4 cViewProj;
 uniform float4 cUOffset;
 uniform float4 cVOffset;
@@ -52,6 +50,8 @@ uniform float2 cGBufferInvSize;
 uniform float4 cLightColor;
 uniform float4 cLightPosPS;
 uniform float3 cLightDirPS;
+uniform float cLightWidthPS;
+uniform float cLightLengthPS;
 uniform float4 cMatDiffColor;
 uniform float3 cMatEmissiveColor;
 uniform float3 cMatEnvMapColor;
@@ -64,8 +64,9 @@ uniform float2 cShadowIntensity;
 uniform float2 cShadowMapInvSize;
 uniform float4 cShadowSplits;
 uniform float4x4 cLightMatricesPS[4];
-#ifdef VSM_SHADOW
-uniform float2 cVSMShadowParams;
+#ifdef PBR
+    uniform float cRoughnessPS; 
+	uniform float cMetallicPS;
 #endif
 #endif
 
@@ -91,8 +92,6 @@ cbuffer CameraVS : register(b1)
     float4 cDepthMode;
     float3 cFrustumSize;
     float4 cGBufferOffsets;
-    float4x3 cView;
-    float4x3 cViewInv;
     float4x4 cViewProj;
     float4 cClipPlane;
 }
@@ -165,12 +164,13 @@ cbuffer LightPS : register(b3)
     float4 cLightColor;
     float4 cLightPosPS;
     float3 cLightDirPS;
+    float cLightWidthPS;
+    float cLightLengthPS;
     float4 cShadowCubeAdjust;
     float4 cShadowDepthFade;
     float2 cShadowIntensity;
     float2 cShadowMapInvSize;
     float4 cShadowSplits;
-    float2 cVSMShadowParams;
     float4x4 cLightMatricesPS[4];
 }
 
@@ -181,6 +181,11 @@ cbuffer MaterialPS : register(b4)
     float3 cMatEmissiveColor;
     float3 cMatEnvMapColor;
     float4 cMatSpecColor;
+    #ifdef PBR
+        float cRoughnessPS;
+		float cMetallicPS;
+
+    #endif
 }
 #endif
 

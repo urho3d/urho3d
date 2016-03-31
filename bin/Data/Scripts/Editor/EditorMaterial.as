@@ -86,6 +86,9 @@ void InitMaterialPreview()
     zone.fogStart = 10.0;
     zone.fogEnd = 100.0;
 
+    //Texture@ zoneTexture = cache.GetResource("Texture", "Texture/Skybox2.xml");
+    zone.zoneTexture = cache.GetResource("TextureCube", "TextureS/Skybox2.xml");
+
     previewCameraNode = previewScene.CreateChild("PreviewCamera");
     previewCameraNode.position = Vector3(0, 0, -1.5);
     Camera@ camera = previewCameraNode.CreateComponent("Camera");

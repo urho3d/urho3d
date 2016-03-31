@@ -13,9 +13,6 @@ function Start()
     -- Create "Hello World" Text
     CreateText()
 
-    -- Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE)
-
     -- Finally, hook-up this HelloWorld instance to handle update events
     SubscribeToEvents()
 end

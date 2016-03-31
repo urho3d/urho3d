@@ -21,9 +21,6 @@ void Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
-
-    // Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE);
 }
 
 void CreateSprites()

@@ -410,6 +410,8 @@ class EditAttributeAction : EditAction
                 SetUIElementModified(target);
             else
                 SetSceneModified();
+                
+            EditScriptAttributes(target, attrIndex);
         }
     }
 
@@ -429,6 +431,8 @@ class EditAttributeAction : EditAction
                 SetUIElementModified(target);
             else
                 SetSceneModified();
+                
+            EditScriptAttributes(target, attrIndex);
         }
     }
 }
@@ -817,10 +821,10 @@ class ApplyUIElementStyleAction : EditAction
                 XMLElement rootElem = elementData.root;
                 uint index = rootElem.GetUInt("index");
                 uint listItemIndex = rootElem.GetUInt("listItemIndex");
-                UIElement@ elem = parent.children[index];
+                UIElement@ element = parent.children[index];
                 UIElement@ parentItem = hierarchyList.items[GetListIndex(parent)];
-                UpdateHierarchyItem(listItemIndex, elem, parentItem);
-                SetUIElementModified(elem);
+                UpdateHierarchyItem(listItemIndex, element, parentItem);
+                SetUIElementModified(element);
                 hierarchyUpdateSelections.Push(listItemIndex);
             }
 

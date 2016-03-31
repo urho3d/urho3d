@@ -1,0 +1,9 @@
+<cubemap>
+    <face name="output_skybox_posx.tga" />
+    <face name="output_skybox_negx.tga" />
+    <face name="output_skybox_posy.tga" />
+    <face name="output_skybox_negy.tga" />
+    <face name="output_skybox_posz.tga" />
+    <face name="output_skybox_negz.tga" />
+    <quality low="0" />
+</cubemap>

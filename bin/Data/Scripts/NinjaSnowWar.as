@@ -496,7 +496,6 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (!gameScene.updateEnabled)
         {
             SetMessage("PAUSED");
-            audio.PauseSoundType(SOUND_EFFECT);
             
             // Open the settings joystick only if the controls screen joystick was already open
             if (screenJoystickID >= 0)
@@ -511,7 +510,6 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
         {
             SetMessage("");
-            audio.ResumeSoundType(SOUND_EFFECT);
 
             // Hide the settings joystick
             if (screenJoystickSettingsID >= 0)

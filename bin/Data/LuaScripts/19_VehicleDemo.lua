@@ -20,6 +20,7 @@ local MAX_WHEEL_ANGLE = 22.5
 local vehicleNode = nil
 
 function Start()
+
     -- Execute the common startup for samples
     SampleStart()
 
@@ -31,9 +32,6 @@ function Start()
 
     -- Create the UI content
     CreateInstructions()
-
-    -- Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_RELATIVE)
 
     -- Subscribe to necessary events
     SubscribeToEvents()

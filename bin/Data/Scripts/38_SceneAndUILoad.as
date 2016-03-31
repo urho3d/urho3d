@@ -19,10 +19,7 @@ void Start()
 
     // Setup the viewport for displaying the scene
     SetupViewport();
-
-    // Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_RELATIVE);
-
+    
     // Subscribe to global events for camera movement
     SubscribeToEvents();
 }
@@ -108,14 +105,8 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
 void MoveCamera(float timeStep)
 {
-    input.mouseVisible = input.mouseMode != MM_RELATIVE;
-    bool mouseDown = input.mouseButtonDown[MOUSEB_RIGHT];
-
-    // Override the MM_RELATIVE mouse grabbed settings, to allow interaction with UI
-    input.mouseGrabbed = mouseDown;
-
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = !mouseDown;
+    ui.cursor.visible = !input.mouseButtonDown[MOUSEB_RIGHT];
 
     // Do not move if the UI has a focused element
     if (ui.focusElement !is null)

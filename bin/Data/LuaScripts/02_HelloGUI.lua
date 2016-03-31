@@ -34,9 +34,6 @@ function Start()
 
     -- Create a draggable Fish
     CreateDraggableFish()
-
-    -- Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE)
 end
 
 function InitControls()

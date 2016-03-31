@@ -35,9 +35,6 @@ void Start()
 
     // Create a draggable Fish
     CreateDraggableFish();
-
-    // Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE);
 }
 
 void InitControls()

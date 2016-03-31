@@ -326,6 +326,8 @@ extern URHO3D_API const StringHash PSP_FOGPARAMS;
 extern URHO3D_API const StringHash PSP_GBUFFERINVSIZE;
 extern URHO3D_API const StringHash PSP_LIGHTCOLOR;
 extern URHO3D_API const StringHash PSP_LIGHTDIR;
+extern URHO3D_API const StringHash PSP_LIGHTWIDTH;
+extern URHO3D_API const StringHash PSP_LIGHTLENGTH;
 extern URHO3D_API const StringHash PSP_LIGHTPOS;
 extern URHO3D_API const StringHash PSP_MATDIFFCOLOR;
 extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR;
@@ -340,6 +342,8 @@ extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
 extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
+extern URHO3D_API const StringHash PSP_ROUGHNESS;
+extern URHO3D_API const StringHash PSP_METALLIC;
 
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
