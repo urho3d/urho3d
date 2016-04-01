@@ -26,11 +26,6 @@ uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
 uint elementContainerIndex = M_MAX_UNSIGNED;
 
-// Script Attribute session storage
-VariantMap scriptAttributes;
-const uint SCRIPTINSTANCE_ATTRIBUTE_IGNORE = 5;
-const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
-
 // Node or UIElement hash-to-varname reverse mapping
 VariantMap globalVarNames;
 bool inspectorLocked = false;
@@ -259,9 +254,6 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     if (fullUpdate)
         DeleteAllContainers();
 
-    // Update all ScriptInstances/LuaScriptInstances
-    UpdateScriptInstances();
-
     if (!editNodes.empty)
     {
         UIElement@ container = GetNodeContainer();
@@ -393,61 +385,6 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     // Adjust size and position of manual-layout UI-elements, e.g. icons panel
     if (fullUpdate)
         HandleWindowLayoutUpdated();
-}
-
-void UpdateScriptInstances()
-{
-    Array<Component@>@ components = scene.GetComponents("ScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
-
-    components = scene.GetComponents("LuaScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
-}
-
-String GetComponentAttributeHash(Component@ component, uint index)
-{
-    // We won't consider the main attributes, as they won't reset when an error occurs.
-    if (component.typeName == "ScriptInstance")
-    {
-        if (index <= SCRIPTINSTANCE_ATTRIBUTE_IGNORE)
-            return "";
-    }
-    else
-    {
-        if (index <= LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE)
-            return "";
-    }
-    AttributeInfo attributeInfo = component.attributeInfos[index];
-    Variant attribute = component.attributes[index];
-    return String(component.id) + "-" + attributeInfo.name + "-" + attribute.typeName;
-}
-
-void UpdateScriptAttributes(Component@ component)
-{
-    for (uint i = Min(SCRIPTINSTANCE_ATTRIBUTE_IGNORE, LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE) + 1; i < component.numAttributes; i++)
-    {
-        Variant attribute = component.attributes[i];
-        // Component/node ID's are always unique within a scene, based on a simple increment.
-        // This makes for a simple method of mapping a components attributes unique and consistent.
-        // We will also use the type name in the hash to be able to recall and differentiate type changes.
-        String hash = GetComponentAttributeHash(component, i);
-        if (hash.empty)
-            continue;
-
-        if (!scriptAttributes.Contains(hash))
-        {
-            // set the initial value to the default value.
-            scriptAttributes[hash] = attribute;
-        }
-        else
-        {
-            // recall the previously stored value
-            component.attributes[i] = scriptAttributes[hash];
-        }
-    }
-    component.ApplyAttributes();
 }
 
 /// Update the attribute list of the node container.
@@ -709,7 +646,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
     {
         // 1. Add established tags from current editable UIElement to menu
         Array<String> elementTags = editUIElement.tags;
-        for (int i =0; i < elementTags.length; i++) 
+        for (uint i = 0; i < elementTags.length; i++) 
         {
             bool isHasTag = editUIElement.HasTag(elementTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
@@ -718,7 +655,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         // 2. Add default tags
         Array<String> stdTags = defaultTags.Split(';');
-        for (int i=0; i < stdTags.length; i++) 
+        for (uint i= 0; i < stdTags.length; i++) 
         {
             bool isHasTag = editUIElement.HasTag(stdTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
@@ -733,7 +670,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
     {
         // 1. Add established tags from Node to menu
         Array<String> nodeTags = editNode.tags;
-        for (int i =0; i < nodeTags.length; i++) 
+        for (uint i = 0; i < nodeTags.length; i++) 
         {
             bool isHasTag = editNode.HasTag(nodeTags[i]);
             String taggedIndicator = (isHasTag ? Indicator : "");
@@ -742,7 +679,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         Array<String> sceneTags = editorScene.tags;
         // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
-        for (int i =0; i < sceneTags.length; i++)
+        for (uint i = 0; i < sceneTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(sceneTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
@@ -755,7 +692,7 @@ void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
 
         // 3. Add default tags
         Array<String> stdTags = defaultTags.Split(';');
-        for (int i=0; i<stdTags.length; i++)
+        for (uint i = 0; i < stdTags.length; i++)
         {
             bool isHasTag = editNode.HasTag(stdTags[i]);
             // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.

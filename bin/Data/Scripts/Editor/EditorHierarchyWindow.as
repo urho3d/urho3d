@@ -60,7 +60,7 @@ void CreateHierarchyWindow()
     hierarchyWindow = LoadEditorUI("UI/EditorHierarchyWindow.xml");
     hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
-    int height = Min(ui.root.height - 60, 460);
+    int height = Min(ui.root.height - 60, 500);
     hierarchyWindow.SetSize(300, height);
     hierarchyWindow.SetPosition(35, 100);
     hierarchyWindow.opacity = uiMaxOpacity;
@@ -475,7 +475,7 @@ String GetNodeTitle(Node@ node)
         ret = node.typeName;
     else
         ret = node.name;
-    
+
     if (showID)
     {
         if (node.id >= FIRST_LOCAL_ID)
@@ -1088,9 +1088,9 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 
                 if (item_.vars[TYPE_VAR] == ITEM_NODE)
                 {
-                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
-                    if (node !is null)
-                        nodeList.Push(node);
+                    Node@ n = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    if (n !is null)
+                        nodeList.Push(n);
                 }
             }
         }

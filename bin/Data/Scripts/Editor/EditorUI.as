@@ -10,8 +10,8 @@ Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
-float stepColoringGroupUpdate = 100; // ms
-float timeToNextColoringGroupUpdate = 0;
+uint stepColoringGroupUpdate = 100; // ms
+uint timeToNextColoringGroupUpdate = 0;
 
 const StringHash UI_ELEMENT_TYPE("UIElement");
 const StringHash WINDOW_TYPE("Window");
@@ -462,12 +462,12 @@ void CreateMenuBar()
             if (objectCategories[i] == "UI")
                 continue;
 
-            Menu@ menu = CreateMenuItem(objectCategories[i], null, SHOW_POPUP_INDICATOR);
-            Window@ popup = CreatePopup(menu);
+            Menu@ m = CreateMenuItem(objectCategories[i], null, SHOW_POPUP_INDICATOR);
+            Window@ p = CreatePopup(m);
             String[] componentTypes = GetObjectsByCategory(objectCategories[i]);
             for (uint j = 0; j < componentTypes.length; ++j)
-                popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent, 0, 0, "", true, "Create " + componentTypes[j]));
-            childPopup.AddChild(menu);
+                p.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent, 0, 0, "", true, "Create " + componentTypes[j]));
+            childPopup.AddChild(m);
         }
         FinalizedPopupMenu(childPopup);
         popup.AddChild(childMenu);

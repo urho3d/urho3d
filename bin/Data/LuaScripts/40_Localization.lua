@@ -21,6 +21,9 @@ function Start()
 
     -- Init the user interface
     CreateGUI()
+
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
 end
 
 function InitLocalizationSystem()
@@ -173,4 +176,3 @@ function HandleChangeLanguage(eventType, eventData)
 
     -- A text on the button "Press this button" changes automatically
 end
-

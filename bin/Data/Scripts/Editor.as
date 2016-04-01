@@ -45,6 +45,9 @@ void Start()
 
     // Disable Editor auto exit, check first if it is OK to exit
     engine.autoExit = false;
+    // Pause completely when minimized to save OS resources, reduce defocused framerate
+    engine.pauseMinimized = true;
+    engine.maxInactiveFps = 10;
     // Enable console commands from the editor script
     script.defaultScriptFile = scriptFile;
     // Enable automatic resource reloading
