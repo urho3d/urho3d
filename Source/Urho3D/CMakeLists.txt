@@ -41,14 +41,16 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
 endif ()
 
 # Check sincosf support
-include(CheckFunctionExists)
-CHECK_FUNCTION_EXISTS(sincosf HAVE_SINCOSF)
-CHECK_FUNCTION_EXISTS(__sincosf HAVE_UNDERSCORE_SINCOSF)
+include (CheckLibraryExists)
+check_library_exists (m sincosf "" HAVE_SINCOSF)
 if (HAVE_SINCOSF)
     add_definitions (-DHAVE_SINCOSF)
-endif ()
-if (HAVE_UNDERSCORE_SINCOSF)
-    add_definitions (-DHAVE_UNDERSCORE_SINCOSF)
+else ()
+    include (CheckFunctionExists)
+    check_function_exists (__sincosf HAVE_UNDERSCORE_SINCOSF)
+    if (HAVE_UNDERSCORE_SINCOSF)
+        add_definitions (-DHAVE_UNDERSCORE_SINCOSF)
+    endif ()
 endif ()
 
 add_definitions (-DURHO3D_IS_BUILDING)
@@ -422,7 +424,7 @@ install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CU
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
 # Remove those defines that are only used for building the library and not needed by library user
-list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU URHO3D_IS_BUILDING ODBC_3_OR_LATER ASSET_DIR_INDICATOR)
+list (REMOVE_ITEM URHO3D_COMPILE_DEFINITIONS HAVE_STDINT_H GLEW_STATIC GLEW_NO_GLU HAVE_SINCOSF HAVE_UNDERSCORE_SINCOSF URHO3D_IS_BUILDING ODBC_3_OR_LATER ASSET_DIR_INDICATOR)
 if (ABSOLUTE_PATH_LIBS)
     string (REPLACE ";" "\" \"" URHO3D_ABS_PATH_LIBS "\"${ABSOLUTE_PATH_LIBS}\"")   # Note: need to always "stringify" a variable in list context for replace to work correctly, besides the list could be empty
     string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" URHO3D_ABS_PATH_LIBS "${URHO3D_ABS_PATH_LIBS}")
