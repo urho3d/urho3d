@@ -30,18 +30,18 @@
         return diffuseColor * nDotL;
     }
     
-	vec3 BurleyDiffuse(in vec3 diffuseColor, in float roughness, in float nDotV, in float nDotL, in float vDotH)
-	{
+    vec3 BurleyDiffuse(in vec3 diffuseColor, in float roughness, in float nDotV, in float nDotL, in float vDotH)
+    {
         
-		float energyBias = mix(0, 0.5, roughness);
-		float energyFactor = mix(1.0, 1.0 / 1.51, roughness);
-		float fd90 = energyBias + 2.0 * vDotH * vDotH * roughness;
-		float f0 = 1.0;
-		float lightScatter = f0 + (fd90 - f0) * pow(1.0f - nDotL, 5.0f);
-		float viewScatter = f0 + (fd90 - f0) * pow(1.0f - nDotV, 5.0f);
-		
-		return diffuseColor * lightScatter * viewScatter * energyFactor;
-	}
+        float energyBias = mix(0, 0.5, roughness);
+        float energyFactor = mix(1.0, 1.0 / 1.51, roughness);
+        float fd90 = energyBias + 2.0 * vDotH * vDotH * roughness;
+        float f0 = 1.0;
+        float lightScatter = f0 + (fd90 - f0) * pow(1.0f - nDotL, 5.0f);
+        float viewScatter = f0 + (fd90 - f0) * pow(1.0f - nDotV, 5.0f);
+        
+        return diffuseColor * lightScatter * viewScatter * energyFactor;
+    }
 /// Fresnel Terms
 
     /// Fresnel factor
