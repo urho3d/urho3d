@@ -4,11 +4,11 @@
 	<attribute name="Time Scale" value="1" />
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
-	<attribute name="Elapsed Time" value="33.9491" />
-	<attribute name="Next Replicated Node ID" value="142" />
-	<attribute name="Next Replicated Component ID" value="159" />
-	<attribute name="Next Local Node ID" value="16777231" />
-	<attribute name="Next Local Component ID" value="16777384" />
+	<attribute name="Elapsed Time" value="36.5494" />
+	<attribute name="Next Replicated Node ID" value="144" />
+	<attribute name="Next Replicated Component ID" value="163" />
+	<attribute name="Next Local Node ID" value="16777234" />
+	<attribute name="Next Local Component ID" value="16777420" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -164,7 +164,7 @@
 			<attribute name="Variables" />
 			<component type="StaticModel" id="25">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;Materials/PBR/EmssivePannel.xml" />
+				<attribute name="Material" value="Material;Materials/PBR/Roughness5.xml" />
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
@@ -248,7 +248,7 @@
 			<attribute name="Variables" />
 			<component type="StaticModel" id="31">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;Materials/PBR/EmssivePannel.xml" />
+				<attribute name="Material" value="Material;Materials/PBR/Roughness5.xml" />
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
@@ -1055,7 +1055,7 @@
 			<attribute name="Name" value="Sun" />
 			<attribute name="Tags" />
 			<attribute name="Position" value="0 0 0" />
-			<attribute name="Rotation" value="0.998683 1.86019e-09 9.55696e-11 -0.0513071" />
+			<attribute name="Rotation" value="1 0 2.77556e-17 0" />
 			<attribute name="Scale" value="1 1 1" />
 			<attribute name="Variables" />
 			<component type="ScriptInstance" id="134">
@@ -1083,30 +1083,13 @@
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="" />
 			<attribute name="Tags" />
-			<attribute name="Position" value="-3.31218 8.26835 -26.3623" />
+			<attribute name="Position" value="-4.84718 8.26835 -24.4161" />
 			<attribute name="Rotation" value="1 0 0 0" />
 			<attribute name="Scale" value="1 1 1" />
 			<attribute name="Variables" />
 			<component type="Light" id="145">
-				<attribute name="Color" value="0.988281 0.334826 0.0113449 1" />
-				<attribute name="Brightness Multiplier" value="0.24" />
-				<attribute name="Range" value="5" />
-				<attribute name="Light Shape Texture" value="TextureCube;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="130">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-6.38053 8.26835 -25.6424" />
-			<attribute name="Rotation" value="1 0 0 0" />
-			<attribute name="Scale" value="1 1 1" />
-			<attribute name="Variables" />
-			<component type="Light" id="144">
-				<attribute name="Color" value="0.988281 0.334826 0.0113449 1" />
-				<attribute name="Brightness Multiplier" value="0.24" />
-				<attribute name="Range" value="5" />
+				<attribute name="Brightness Multiplier" value="0.42" />
+				<attribute name="Range" value="4.34" />
 				<attribute name="Light Shape Texture" value="TextureCube;" />
 				<attribute name="Cast Shadows" value="true" />
 			</component>
@@ -1157,20 +1140,6 @@
 			<component type="StaticModel" id="98">
 				<attribute name="Model" value="Model;Models/Sphere.mdl" />
 				<attribute name="Material" value="Material;Materials/PBR/Roughness10.xml" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="94">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Sphere" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-0.502993 2.84736 4.61852" />
-			<attribute name="Rotation" value="1 0 0 0" />
-			<attribute name="Scale" value="1 1 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="103">
-				<attribute name="Model" value="Model;Models/Sphere.mdl" />
-				<attribute name="Material" value="Material;Materials/PBR/EmssivePannel.xml" />
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
@@ -1304,7 +1273,7 @@
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="Sphere" />
 			<attribute name="Tags" />
-			<attribute name="Position" value="-3.09644 2.84736 4.61852" />
+			<attribute name="Position" value="-2.34362 2.84736 4.61852" />
 			<attribute name="Rotation" value="1 0 0 0" />
 			<attribute name="Scale" value="1 1 1" />
 			<attribute name="Variables" />
@@ -1318,7 +1287,7 @@
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="Sphere" />
 			<attribute name="Tags" />
-			<attribute name="Position" value="-1.82979 2.84736 4.61852" />
+			<attribute name="Position" value="-1.07697 2.84736 4.61852" />
 			<attribute name="Rotation" value="1 0 0 0" />
 			<attribute name="Scale" value="1 1 1" />
 			<attribute name="Variables" />
@@ -1376,8 +1345,8 @@
 			<component type="Text3D" id="155">
 				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 				<attribute name="Font Size" value="15" />
-				<attribute name="Text" value="Metallic Value    &lt;-0.0  -&gt;.0" />
-				<attribute name="Width" value="231" />
+				<attribute name="Text" value="Metallic Value    &lt;-0.0  -&gt;1.0" />
+				<attribute name="Width" value="236" />
 			</component>
 		</node>
 	</node>
