@@ -69,8 +69,6 @@ extern URHO3D_API const StringHash PSP_GBUFFERINVSIZE("GBufferInvSize");
 extern URHO3D_API const StringHash PSP_LIGHTCOLOR("LightColor");
 extern URHO3D_API const StringHash PSP_LIGHTDIR("LightDirPS");
 extern URHO3D_API const StringHash PSP_LIGHTPOS("LightPosPS");
-extern URHO3D_API const StringHash PSP_LIGHTWIDTH("LightWidthPS");
-extern URHO3D_API const StringHash PSP_LIGHTLENGTH("LightLengthPS");
 extern URHO3D_API const StringHash PSP_MATDIFFCOLOR("MatDiffColor");
 extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR("MatEmissiveColor");
 extern URHO3D_API const StringHash PSP_MATENVMAPCOLOR("MatEnvMapColor");

@@ -181,10 +181,6 @@ public:
     void SetBrightness(float brightness);
     /// Set range.
     void SetRange(float range);
-	/// Set width of the light
-	void SetWidth(float width);
-	/// Set length of the light.
-	void SetLength(float length);
 	/// Set spotlight field of view.
     void SetFov(float fov);
     /// Set spotlight aspect ratio.
@@ -233,12 +229,6 @@ public:
 
     /// Return range.
     float GetRange() const { return range_; }
-
-	/// Return the size of the light.
-	float GetWidth() const { return width_; }
-
-	/// Return the length of the light.
-	float GetLength() const { return length_; }
 
     /// Return spotlight field of view.
     float GetFov() const { return fov_; }
@@ -340,10 +330,6 @@ private:
     float brightness_;
     /// Range.
     float range_;
-	/// Width of the light.
-	float width_;
-	/// Length of the light.
-	float length_;
     /// Spotlight field of view.
     float fov_;
     /// Spotlight aspect ratio.
