@@ -92,7 +92,7 @@ Light::Light(Context* context) :
     lightQueue_(0),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
-	range_(DEFAULT_RANGE),
+    range_(DEFAULT_RANGE),
     fov_(DEFAULT_LIGHT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
