@@ -181,7 +181,7 @@ public:
     void SetBrightness(float brightness);
     /// Set range.
     void SetRange(float range);
-	/// Set spotlight field of view.
+    /// Set spotlight field of view.
     void SetFov(float fov);
     /// Set spotlight aspect ratio.
     void SetAspectRatio(float aspectRatio);

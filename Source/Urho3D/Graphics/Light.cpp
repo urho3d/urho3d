@@ -43,7 +43,7 @@ namespace Urho3D
 extern const char* SCENE_CATEGORY;
 
 static const LightType DEFAULT_LIGHTTYPE = LIGHT_POINT;
-static const float DEFAULT_LENGTH = 0.0f;
+static const float DEFAULT_RANGE = 10.0f;
 static const float DEFAULT_LIGHT_FOV = 30.0f;
 static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_BRIGHTNESS = 1.0f;
@@ -92,7 +92,7 @@ Light::Light(Context* context) :
     lightQueue_(0),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
-	length_(DEFAULT_LENGTH),
+	range_(DEFAULT_RANGE),
     fov_(DEFAULT_LIGHT_FOV),
     aspectRatio_(1.0f),
     fadeDistance_(0.0f),
