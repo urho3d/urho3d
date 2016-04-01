@@ -4,6 +4,8 @@
 #include "ScreenPos.glsl"
 #include "Lighting.glsl"
 #include "Fog.glsl"
+#include "BRDF.glsl"
+#include "IBL.glsl"
 
 #ifdef NORMALMAP
     varying vec4 vTexCoord;
@@ -118,12 +120,25 @@ void PS()
         diffColor *= vColor;
     #endif
     
-    // Get material specular albedo
-    #ifdef SPECMAP
-        vec3 specColor = cMatSpecColor.rgb * texture2D(sSpecMap, vTexCoord.xy).rgb;
-    #else
-        vec3 specColor = cMatSpecColor.rgb;
+    #ifdef METALIC
+        vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
+        
+        float roughness = max(0.04, roughMetalSrc.r);
+        roughness += cRoughnessPS;
+        roughness = pow(roughness, 2);
+        
+        float metalness = clamp(roughMetalSrc.g + cMetallicPS, 0.01,1.0);
+    #else 
+        float roughness = cRoughnessPS;
+        roughness = pow(roughness, 2);
+        float metalness = clamp(cMetallicPS, 0.01, 1.0);
+
     #endif
+    vec3 specColor = max(diffColor.rgb * metalness, vec3(0.08, 0.08, 0.08));
+    specColor *= cMatSpecColor.rgb;
+    diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
+
+    roughness = clamp(roughness, 0.1, 1.0);
 
     // Get normal
     #ifdef NORMALMAP
@@ -161,8 +176,21 @@ void PS()
         #endif
     
         #ifdef SPECULAR
-            float spec = GetSpecular(normal, cCameraPosPS - vWorldPos.xyz, lightDir, cMatSpecColor.a);
-            finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
+            vec3 cameraDir = normalize(cCameraPosPS - vWorldPos.xyz);
+            
+            vec3 Hn = normalize(cameraDir + lightDir);
+            float vdh = clamp(dot(cameraDir, Hn), 0.0, 1.0);
+            float ndh = clamp(dot(normal, Hn), 0.0, 1.0);
+            float ndl = clamp(dot(normal, lightDir), 0.0, 1.0);
+            float ndv = clamp(dot(normal, cameraDir), 0.0, 1.0);;
+           
+            vec3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
+
+            vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
+            float distTerm = GGXDistribution(ndh, roughness);
+            float visTerm = SchlickVisibility(ndl, ndv, roughness);
+
+            finalColor = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
@@ -190,6 +218,14 @@ void PS()
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
             finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor * diffColor.rgb;
         #endif
+
+        vec3 toCamera = normalize(vWorldPos.xyz - cCameraPosPS);
+        vec3 reflection = normalize(reflect(toCamera, normal));
+        
+        vec3 cubeColor = vVertexLight.rgb;
+        vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
+        finalColor.rgb += LinearFromSRGB(iblColor * cubeColor);
+
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;
@@ -223,6 +259,15 @@ void PS()
 
             finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
+
+        vec3 toCamera = normalize(vWorldPos.xyz - cCameraPosPS);
+        vec3 reflection = normalize(reflect(toCamera, normal));
+        
+        vec3 cubeColor = vVertexLight.rgb;
+        vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
+
+        float gamma = 10;
+        finalColor.rgb += LinearFromSRGB(iblColor * (cubeColor + gamma));
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;

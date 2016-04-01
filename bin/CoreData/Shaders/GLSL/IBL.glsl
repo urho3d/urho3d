@@ -85,7 +85,21 @@
             return accumulatedColor / IMPORTANCE_SAMPLES;
         }
             
-        
+        /// Epic's approximation, convenient outside of mobile as well - very tolerant of 'lazy' IBL such as unfiltered mips
+        /// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
+        ///     specColor: specular color of the fragment
+        ///     roughness: surface roughness
+        ///     nDotV: dot product of normal and view vectors
+        vec3 EnvBRDFApprox(in vec3 specColor, in float roughness, in float nDotV )
+        {            
+            vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
+            vec4 c1 = vec4(1.0, 0.0425, 1.0, -0.04 );
+            vec4 r = roughness * c0 + c1;
+            float a004 = min( r.x * r.x, exp2( -9.28 * nDotV)) * r.x + r.y;
+            vec2 AB = vec2( -1.04, 1.04) * a004 + r.zw;
+            return specColor * AB.x + AB.y;
+            }
+
         /// Calculate IBL contributation
         ///     reflectVec: reflection vector for cube sampling
         ///     wsNormal: surface normal in word space
@@ -94,8 +108,19 @@
         ///     ambientOcclusion: ambient occlusion
         vec3 ImageBasedLighting(in vec3 reflectVec, in vec3 wsNormal, in vec3 toCamera, in vec3 specular, in float roughness, out vec3 reflectionCubeColor)
         {    
-           reflectionCubeColor.rgb = textureCube(sZoneCubeMap, wsNormal, 9.6).rgb;
-
-           return ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
+            reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
+            vec3 Hn = normalize(-toCamera + wsNormal);
+            float vdh = clamp(dot(-toCamera, Hn), 0.0, 1.0);
+            float ndv = clamp(dot(-toCamera, wsNormal), 0.0, 1.0);
+            
+            float smoothness = 1.0 - roughness;
+            float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
+            
+            vec3 cube =  ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
+            reflectionCubeColor = textureCube(sZoneCubeMap, wsNormal, 9.6).rgb;
+            
+            vec3 environmentSpecular = EnvBRDFApprox(specular, roughness, ndv);
+          
+            return environmentSpecular * cube;
         }
 #endif

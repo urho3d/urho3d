@@ -1,5 +1,16 @@
 #ifdef COMPILEPS
 
+    vec3 LinearToSRGB(vec3 c)
+    {
+        float power = 2.2;
+        return pow(c, vec3(power, power, power));
+    }
+
+    vec3 LinearFromSRGB(vec3 c)
+    {
+        float power = 1.0 / 2.2;
+        return pow(c, vec3(power, power, power));
+    } 
  /// Diffuse factors
 
     /// Oren-Nayar diffuse factor

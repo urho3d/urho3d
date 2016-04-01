@@ -63,14 +63,14 @@ uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;
 uniform vec3 cLightDirPS;
 uniform vec4 cLightPosPS;
-uniform float cLightWidthPS;
-uniform float cLightLengthPS;
 uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
 uniform vec4 cMatSpecColor;
-uniform float cRoughnessPS;
-uniform float cMetallicPS;
+#ifdef PBR
+    uniform float cRoughnessPS;
+    uniform float cMetallicPS;
+#endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform vec4 cShadowCubeAdjust;
@@ -80,10 +80,8 @@ uniform vec2 cShadowMapInvSize;
 uniform vec4 cShadowSplits;
 uniform mat4 cLightMatricesPS[4];
 #ifdef VSM_SHADOW
-    uniform vec2 cVSMShadowParams;
+uniform vec2 cVSMShadowParams;
 #endif
-
-
 #endif
 
 #else
@@ -182,8 +180,6 @@ uniform LightPS
     vec4 cLightColor;
     vec4 cLightPosPS;
     vec3 cLightDirPS;
-    float cLightWidthPS;
-    float cLightLengthPS;
     vec4 cShadowCubeAdjust;
     vec4 cShadowDepthFade;
     vec2 cShadowIntensity;
@@ -202,8 +198,10 @@ uniform MaterialPS
     vec3 cMatEmissiveColor;
     vec3 cMatEnvMapColor;
     vec4 cMatSpecColor;
-    float cRoughnessPS;
-    float cMetallicPS;
+    #ifdef PBR
+        float cRoughnessPS;
+        float cMetallicPS;
+    #endif
 };
 #endif
 
