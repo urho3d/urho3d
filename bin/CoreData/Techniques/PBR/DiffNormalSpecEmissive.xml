@@ -1,4 +1,4 @@
-<technique vs="LitSolid" ps="LitSolid" psdefines="DIFFMAP">
+<technique vs="PBRLitSolid" ps="PBRLitSolid" psdefines="DIFFMAP">
     <pass name="base" psdefines="EMISSIVEMAP" />
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP SPECMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP SPECMAP" />

@@ -1,5 +1,15 @@
 #ifdef COMPILEPS
 	#ifdef PBR
+		float3 LinearToSRGB(float3 c)
+		{
+			return pow(c, 2.2);
+		}
+
+		float3 LinearFromSRGB(float3 c)
+		{
+			return pow(c, 1.0 / 2.2);
+		}
+
 	    float3 OrenNayarDiffuse(in float3 diffuseColor, in float roughness, in float nDotV, in float nDotL, in float vDotH)
 	    {
 	        float rough2 = roughness * roughness;

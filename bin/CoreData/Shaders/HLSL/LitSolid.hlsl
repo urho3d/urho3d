@@ -4,8 +4,6 @@
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
 #include "Fog.hlsl"
-#include "BDRF.hlsl"
-#include "IBL.hlsl"
 
 void VS(float4 iPos : POSITION,
     #ifndef BILLBOARD
@@ -20,7 +18,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #ifdef NORMALMAP
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -30,7 +28,7 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD2,
     #endif
-    #ifdef BILLBOARD
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
     #ifndef NORMALMAP
@@ -54,7 +52,7 @@ void VS(float4 iPos : POSITION,
     #else
         out float3 oVertexLight : TEXCOORD4,
         out float4 oScreenPos : TEXCOORD5,
-        #if defined(ENVCUBEMAP) || defined(IBL)
+        #ifdef ENVCUBEMAP
             out float3 oReflectionVec : TEXCOORD6,
         #endif
         #if defined(LIGHTMAP) || defined(AO)
@@ -132,7 +130,7 @@ void VS(float4 iPos : POSITION,
         
         oScreenPos = GetScreenPos(oPos);
 
-        #if defined(ENVCUBEMAP) || defined(IBL)
+        #ifdef ENVCUBEMAP
             oReflectionVec = worldPos - cCameraPos;
         #endif
     #endif
@@ -154,13 +152,13 @@ void PS(
         #ifdef SPOTLIGHT
             float4 iSpotPos : TEXCOORD5,
         #endif
-        #ifdef CUBEMASK
+        #ifdef POINTLIGHT
             float3 iCubeMaskVec : TEXCOORD5,
         #endif
     #else
         float3 iVertexLight : TEXCOORD4,
         float4 iScreenPos : TEXCOORD5,
-        #if defined(ENVCUBEMAP) || defined(IBL)
+        #ifdef ENVCUBEMAP
             float3 iReflectionVec : TEXCOORD6,
         #endif
         #if defined(LIGHTMAP) || defined(AO)
@@ -180,23 +178,17 @@ void PS(
         out float4 oAlbedo : OUTCOLOR1,
         out float4 oNormal : OUTCOLOR2,
         out float4 oDepth : OUTCOLOR3,
-        #ifdef PBR
-            #ifndef D3D11
-                float2 iFragPos : VPOS,
-            #else
-                float4 iFragPos : SV_Position,
-            #endif
-        #endif
     #endif
     out float4 oColor : OUTCOLOR0)
 {
+    // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffColor = cMatDiffColor * Sample2D(DiffMap, iTexCoord.xy);
-        
+        float4 diffInput = Sample2D(DiffMap, iTexCoord.xy);
         #ifdef ALPHAMASK
-            if (diffColor.a < 0.5)
+            if (diffInput.a < 0.5)
                 discard;
         #endif
+        float4 diffColor = cMatDiffColor * diffInput;
     #else
         float4 diffColor = cMatDiffColor;
     #endif
@@ -205,60 +197,8 @@ void PS(
         diffColor *= iColor;
     #endif
 
-    #ifdef PBR
-		
-        #ifdef SPECMAP // SPECULAR
-            float4 specSample = Sample2D(SpecGlossMap, iTexCoord.xy);
-            float3 specColor = specSample.rgb;
-
-            #ifdef ROUGHNESS
-                float roughness = max(0.04, specSample.a);
-            #else
-                float roughness = max(0.04, 1.0 - specSample.a);
-                roughness *= roughness;
-            #endif            
-
-			roughness += cRoughnessPS;
-             roughness = pow(roughness, 2);
-            specColor *= cMatSpecColor.rgb; // mix in externally defined color
-
-        #elif METALIC // METALNESS
-            float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
-
-            #ifdef ROUGHNESS
-                float roughness = max(0.04, roughMetalSrc.r);
-            #else
-                float roughness = max(0.04, 1.0 - roughMetalSrc.r);
-                roughness *= roughness;
-            #endif
-
-			roughness += cRoughnessPS;
-             roughness = pow(roughness, 2);
-            float metalness = clamp(roughMetalSrc.g + cMetallicPS, 0.0, 1.0);
-            
-            float3 f0 = lerp(float3(0.03,0.03,0.03), diffColor.rgb, metalness);
-            float3 specColor = max(diffColor.rgb * metalness, f0);
-            specColor *= cMatSpecColor.rgb;
-            diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
-		#else
-			float roughness = cRoughnessPS;
-            roughness *= roughness;
-              roughness = pow(roughness, 2);
-			float metalness = cMetallicPS;
-
-            metalness = clamp(metalness, 0.01, 1.0);
-		 
-            float f0 = lerp(float3(0.03,0.03,0.03), diffColor.rgb, metalness).r;
-			float3 specColor = max(diffColor.rgb * metalness, float3(0.08, 0.08, 0.08));
-			specColor *= cMatSpecColor.rgb;
-			diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
-        #endif
-		
-       
-		roughness = clamp(roughness, 0.01, 1.0);
-        
     // Get material specular albedo
-    #elif defined(SPECMAP)
+    #ifdef SPECMAP
         float3 specColor = cMatSpecColor.rgb * Sample2D(SpecMap, iTexCoord.xy).rgb;
     #else
         float3 specColor = cMatSpecColor.rgb;
@@ -286,11 +226,11 @@ void PS(
         float3 finalColor;
 
         float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
-        
+
         #ifdef SHADOW
             diff *= GetShadow(iShadowPos, iWorldPos.w);
         #endif
-     
+
         #if defined(SPOTLIGHT)
             lightColor = iSpotPos.w > 0.0 ? Sample2DProj(LightSpotMap, iSpotPos).rgb * cLightColor.rgb : 0.0;
         #elif defined(CUBEMASK)
@@ -299,44 +239,11 @@ void PS(
             lightColor = cLightColor.rgb;
         #endif
     
-        #ifdef PBR
-            float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
-            float3 lightVec = lightDir;
-
-            float areaLight = 1;
-            // #if defined(POINTLIGHT)               
-            //     areaLight = AreaLight(lightVec, toCamera, normal, cLightPosPS.xyz - iWorldPos.xyz, roughness);
-            // #endif
-           
-            float3 diffHn = normalize(toCamera + lightDir);
-             float diffvdh = max(0.0, dot(toCamera, diffHn));
-             float diffndl = max(0.0, dot(normal, lightDir));
-             float diffndv = max(1e-5, dot(normal, toCamera));
-           
-            float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, diffndv, diffndl, diffvdh) * diff * lightColor.rgb;
-         
-
-            float3 Hn = normalize(toCamera + lightVec);
-            float vdh = max(0.0, dot(toCamera, Hn));
-            float ndh = max(0.0, dot(normal, Hn));
-            float ndl = max(0.0, dot(normal, lightVec));
-            float ndv = max(1e-5, dot(normal, toCamera));
-           
-
-            float3 fresnelTerm = SchlickGaussianFresnel(f0, vdh) ;
-            float distTerm = GGXDistribution(ndh, roughness) * areaLight;
-            float visTerm = SchlickVisibility(ndl, ndv, roughness);
-
-            finalColor = (diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff ;
-            finalColor.rgb = LinearFromSRGB(finalColor.rgb);
-
+        #ifdef SPECULAR
+            float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
+            finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
         #else
-            #ifdef SPECULAR
-                float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
-                finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
-            #else
-                finalColor = diff * lightColor * diffColor.rgb;
-            #endif
+            finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
         #ifdef AMBIENT
@@ -347,9 +254,6 @@ void PS(
             oColor = float4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(PREPASS)
-        #ifdef PBR //Prevent compilation of a PBR material
-            PBR is not supported for light prepass
-        #endif
         // Fill light pre-pass G-Buffer
         float specPower = cMatSpecColor.a / 255.0;
 
@@ -362,32 +266,9 @@ void PS(
 
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
-           #ifdef IBL
-               const float aoFactor = Sample2D(EmissiveMap, iTexCoord).r;
-           #else
-               // If using AO, the vertex light ambient is black, calculate occluded ambient here
-               finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
-           #endif
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
         #endif
-        
-        #if defined(PBR) && defined(IBL)
-        
-            const float3 toCamera = normalize(iWorldPos.xyz - cCameraPosPS);
-
-		    const float3 reflection = normalize(reflect(toCamera, normal));
-            float3 cubeColor = iVertexLight.rgb;
-            //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
-            float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
-
-            float horizonOcclusion = 1.3;
-            float horizon = saturate(1 + horizonOcclusion * dot(reflection, normal));
-            horizon *= horizon;
-            
-                                    
-            finalColor += LinearFromSRGB(iblColor);
-            
-        #endif
-        
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
@@ -400,27 +281,16 @@ void PS(
             finalColor += cMatEmissiveColor;
         #endif
 
-        #if defined(PBR)
-             oColor = float4(GetFog(finalColor, fogFactor), 1.0);
-            oAlbedo = fogFactor * float4(diffColor.rgb, metalness);
-            oNormal = float4(normal * 0.5 + 0.5, roughness);
-            oDepth = iWorldPos.w;
-        #else
-            oColor = float4(GetFog(finalColor, fogFactor), 1.0);
-            oAlbedo = fogFactor * float4(diffColor.rgb, -50);
-            oNormal = float4(normal * 0.5 + 0.5, specPower);
-            oDepth = iWorldPos.w;
-        #endif
+        oColor = float4(GetFog(finalColor, fogFactor), 1.0);
+        oAlbedo = fogFactor * float4(diffColor.rgb, specIntensity);
+        oNormal = float4(normal * 0.5 + 0.5, specPower);
+        oDepth = iWorldPos.w;
     #else
         // Ambient & per-vertex lighting
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
-           #if defined(PBR) && defined(IBL)
-               float aoFactor = Sample2D(EmissiveMap, iTexCoord).r;
-           #else
-               // If using AO, the vertex light ambient is black, calculate occluded ambient here
-               finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
-           #endif
+            // If using AO, the vertex light ambient is black, calculate occluded ambient here
+            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
         #endif
 
         #ifdef MATERIAL
@@ -429,24 +299,9 @@ void PS(
             float4 lightInput = 2.0 * Sample2DProj(LightBuffer, iScreenPos);
             float3 lightSpecColor = lightInput.a * lightInput.rgb / max(GetIntensity(lightInput.rgb), 0.001);
 
-            finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor - aoFactor * specColor;
+            finalColor += lightInput.rgb * diffColor.rgb + lightSpecColor * specColor;
         #endif
 
-        #if defined(PBR) && defined(IBL)
-            const float3 toCamera = normalize(iWorldPos.xyz - cCameraPosPS);
-
-			const float3 reflection = normalize(reflect(toCamera, normal));
-            float3 cubeColor = iVertexLight.rgb;
-            //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
-            float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
-
-            float horizonOcclusion = 1.3;
-            float horizon = saturate(1 + horizonOcclusion * dot(reflection, normal));
-            horizon *= horizon;
-            
-                                      
-            finalColor += LinearFromSRGB(iblColor);
-        #endif
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
