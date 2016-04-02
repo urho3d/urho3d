@@ -43,7 +43,6 @@
     
     vec3 BurleyDiffuse(in vec3 diffuseColor, in float roughness, in float nDotV, in float nDotL, in float vDotH)
     {
-        
         float energyBias = mix(0, 0.5, roughness);
         float energyFactor = mix(1.0, 1.0 / 1.51, roughness);
         float fd90 = energyBias + 2.0 * vDotH * vDotH * roughness;
