@@ -98,7 +98,7 @@
             float a004 = min( r.x * r.x, exp2( -9.28 * nDotV)) * r.x + r.y;
             vec2 AB = vec2( -1.04, 1.04) * a004 + r.zw;
             return specColor * AB.x + AB.y;
-            }
+        }
 
         /// Calculate IBL contributation
         ///     reflectVec: reflection vector for cube sampling
