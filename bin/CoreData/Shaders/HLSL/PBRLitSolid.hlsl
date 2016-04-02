@@ -274,28 +274,16 @@ void PS(
             float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
             float3 lightVec = lightDir;
 
-            float areaLight = 1;
-            // #if defined(POINTLIGHT)               
-            //     areaLight = AreaLight(lightVec, toCamera, normal, cLightPosPS.xyz - iWorldPos.xyz, roughness);
-            // #endif
-           
-            float3 diffHn = normalize(toCamera + lightDir);
-            float diffvdh = max(0.0, dot(toCamera, diffHn));
-            float diffndl = max(0.0, dot(normal, lightDir));
-            float diffndv = max(1e-5, dot(normal, toCamera));
-           
-            float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, diffndv, diffndl, diffvdh) * diff * lightColor.rgb;
-         
-
             float3 Hn = normalize(toCamera + lightVec);
             float vdh = max(0.0, dot(toCamera, Hn));
             float ndh = max(0.0, dot(normal, Hn));
             float ndl = max(0.0, dot(normal, lightVec));
             float ndv = max(1e-5, dot(normal, toCamera));
            
+            float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
 
             float3 fresnelTerm = SchlickGaussianFresnel(f0, vdh) ;
-            float distTerm = GGXDistribution(ndh, roughness) * areaLight;
+            float distTerm = GGXDistribution(ndh, roughness);
             float visTerm = SchlickVisibility(ndl, ndv, roughness);
 
             finalColor = (diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff ;
