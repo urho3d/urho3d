@@ -132,8 +132,10 @@ StringHash ParseTextureTypeName(String name)
         return TextureCube::GetTypeStatic();
     else if (name == "texture3d")
         return Texture3D::GetTypeStatic();
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
     else if (name == "texturearray")
         return Texture2DArray::GetTypeStatic();
+#endif
 
     return 0;
 }
@@ -322,8 +324,10 @@ bool Material::BeginLoadXML(Deserializer& source)
 
                     if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
                     else if (type == Texture2DArray::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
+#endif
                     else
 #endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
@@ -383,8 +387,10 @@ bool Material::BeginLoadJSON(Deserializer& source)
 
                     if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
                     else if (type == Texture2DArray::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
+#endif
                     else
 #endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
@@ -463,8 +469,10 @@ bool Material::Load(const XMLElement& source)
 
                 if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(name));
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
                 else if (type == Texture2DArray::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture2DArray>(name));
+#endif
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(name));
@@ -601,8 +609,10 @@ bool Material::Load(const JSONValue& source)
 
                 if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(textureName));
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
                 else if (type == Texture2DArray::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture2DArray>(textureName));
+#endif
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(textureName));

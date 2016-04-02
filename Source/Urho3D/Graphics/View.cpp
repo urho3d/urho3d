@@ -3067,8 +3067,10 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
         texture = cache->GetExistingResource<TextureCube>(name);
     if (!texture)
         texture = cache->GetExistingResource<Texture3D>(name);
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
     if (!texture)
         texture = cache->GetExistingResource<Texture2DArray>(name);
+#endif
     if (texture)
         return texture;
 
@@ -3086,8 +3088,10 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
 
             if (type == Texture3D::GetTypeStatic())
                 return cache->GetResource<Texture3D>(name);
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
             else if (type == Texture2DArray::GetTypeStatic())
                 return cache->GetResource<Texture2DArray>(name);
+#endif
             else
 #endif
                 return cache->GetResource<TextureCube>(name);
