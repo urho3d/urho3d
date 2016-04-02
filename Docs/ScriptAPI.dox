@@ -2437,6 +2437,7 @@ namespace Urho3D
 <a href="#Class_Text3D"><b>Text3D</b></a>
 <a href="#Class_Texture"><b>Texture</b></a>
 <a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture2DArray"><b>Texture2DArray</b></a>
 <a href="#Class_Texture3D"><b>Texture3D</b></a>
 <a href="#Class_TextureCube"><b>TextureCube</b></a>
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
@@ -12711,6 +12712,53 @@ Properties:
 - TextureFilterMode filterMode
 - uint format // readonly
 - int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
+- int[] mipsToSkip
+- String name
+- int refs // readonly
+- RenderSurface@ renderSurface // readonly
+- bool sRGB
+- StringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
+
+<a name="Class_Texture2DArray"></a>
+
+### Texture2DArray
+
+Methods:
+
+- void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(uint, Image@, bool = false)
+- void SetNumLevels(uint)
+- bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC)
+
+Properties:
+
+- TextureAddressMode[] addressMode
+- Texture@ backupTexture
+- Color borderColor
+- String category // readonly
+- uint components // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
+- TextureFilterMode filterMode
+- uint format // readonly
+- int height // readonly
+- uint layers
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly

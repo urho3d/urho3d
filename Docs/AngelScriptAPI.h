@@ -11659,6 +11659,68 @@ int weakRefs;
 int width;
 };
 
+class Texture2DArray
+{
+// Methods:
+void ClearDataLost();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Load(File);
+bool Load(VectorBuffer&);
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+bool SetData(uint, Image, bool = false);
+void SetNumLevels(uint);
+bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC);
+
+// Properties:
+Array<TextureAddressMode> addressMode;
+Texture backupTexture;
+Color borderColor;
+/* readonly */
+String category;
+/* readonly */
+uint components;
+/* readonly */
+bool compressed;
+/* readonly */
+bool dataLost;
+TextureFilterMode filterMode;
+/* readonly */
+uint format;
+/* readonly */
+int height;
+uint layers;
+/* readonly */
+Array<int> levelHeight;
+/* readonly */
+Array<int> levelWidth;
+/* readonly */
+uint levels;
+/* readonly */
+uint memoryUse;
+Array<int> mipsToSkip;
+String name;
+/* readonly */
+int refs;
+/* readonly */
+RenderSurface renderSurface;
+bool sRGB;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+TextureUsage usage;
+/* readonly */
+uint useTimer;
+/* readonly */
+int weakRefs;
+/* readonly */
+int width;
+};
+
 class Texture3D
 {
 // Methods:
