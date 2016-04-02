@@ -567,6 +567,11 @@ bool Texture2DArray::Create()
 {
     Release();
 
+#ifdef GL_ES_VERSION_2_0
+    URHO3D_LOGERROR("Failed to create 2D array texture, currently unsupported on OpenGL ES 2");
+    return false;
+#else
+
     if (!graphics_ || !width_ || !height_ || !layers_)
         return false;
 
@@ -609,16 +614,15 @@ bool Texture2DArray::Create()
         }
     }
 
-#ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
-#endif
 
     // Set initial parameters, then unbind the texture
     UpdateParameters();
     graphics_->SetTexture(0, 0);
 
     return success;
+#endif
 }
 
 void Texture2DArray::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
