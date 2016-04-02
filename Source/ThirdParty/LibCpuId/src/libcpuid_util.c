@@ -78,16 +78,16 @@ static int score(const struct match_entry_t* entry, const struct cpu_id_t* data,
                  int brand_code, int model_code)
 {
 	int res = 0;
-	if (entry->family	== data->family    ) res++;
-	if (entry->model	== data->model     ) res++;
-	if (entry->stepping	== data->stepping  ) res++;
-	if (entry->ext_family	== data->ext_family) res++;
-	if (entry->ext_model	== data->ext_model ) res++;
-	if (entry->ncores	== data->num_cores ) res++;
-	if (entry->l2cache	== data->l2_cache  ) res++;
-	if (entry->l3cache	== data->l3_cache  ) res++;
-	if (entry->brand_code   == brand_code      ) res++;
-	if (entry->model_code   == model_code      ) res++;
+	if (entry->family	== data->family    ) res += 2;
+	if (entry->model	== data->model     ) res += 2;
+	if (entry->stepping	== data->stepping  ) res += 2;
+	if (entry->ext_family	== data->ext_family) res += 2;
+	if (entry->ext_model	== data->ext_model ) res += 2;
+	if (entry->ncores	== data->num_cores ) res += 2;
+	if (entry->l2cache	== data->l2_cache  ) res += 1;
+	if (entry->l3cache	== data->l3_cache  ) res += 1;
+	if (entry->brand_code   == brand_code      ) res += 2;
+	if (entry->model_code   == model_code      ) res += 2;
 	return res;
 }
 
@@ -129,7 +129,11 @@ void generic_get_cpu_list(const struct match_entry_t* matchtable, int count,
 				break;
 			}
 		if (!good) continue;
+#if defined(_MSC_VER)
+		list->names[n++] = _strdup(matchtable[i].name);
+#else
 		list->names[n++] = strdup(matchtable[i].name);
+#endif
 	}
 	list->num_entries = n;
 }

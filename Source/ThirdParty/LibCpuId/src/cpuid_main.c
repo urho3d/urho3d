@@ -113,13 +113,27 @@ static int get_total_cpus(void)
 #define GET_TOTAL_CPUS_DEFINED
 #endif
 
-#if defined linux || defined __linux__
+#if defined linux || defined __linux__ || defined __sun
 #include <sys/sysinfo.h>
 #include <unistd.h>
  
 static int get_total_cpus(void)
 {
 	return sysconf(_SC_NPROCESSORS_ONLN);
+}
+#define GET_TOTAL_CPUS_DEFINED
+#endif
+
+#if defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__ || defined __bsdi__ || defined __QNX__
+#include <sys/sysctl.h>
+
+static int get_total_cpus(void)
+{
+	int mib[2] = { CTL_HW, HW_NCPU };
+	int ncpus;
+	size_t len = sizeof(ncpus);
+	if (sysctl(mib, 2, &ncpus, &len, (void *) 0, 0) != 0) return 1;
+	return ncpus;
 }
 #define GET_TOTAL_CPUS_DEFINED
 #endif
@@ -170,31 +184,49 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 		{  0, CPU_FEATURE_PNI },
 		{  3, CPU_FEATURE_MONITOR },
 		{  9, CPU_FEATURE_SSSE3 },
+		{ 12, CPU_FEATURE_FMA3 },
 		{ 13, CPU_FEATURE_CX16 },
 		{ 19, CPU_FEATURE_SSE4_1 },
+		{ 21, CPU_FEATURE_X2APIC },
 		{ 23, CPU_FEATURE_POPCNT },
+		{ 28, CPU_FEATURE_AVX },
 		{ 29, CPU_FEATURE_F16C },
+	};
+	const struct feature_map_t matchtable_ebx7[] = {
+		{  3, CPU_FEATURE_BMI1 },
+		{  5, CPU_FEATURE_AVX2 },
+		{  8, CPU_FEATURE_BMI2 },
 	};
 	const struct feature_map_t matchtable_edx81[] = {
 		{ 11, CPU_FEATURE_SYSCALL },
+		{ 27, CPU_FEATURE_RDTSCP },
 		{ 29, CPU_FEATURE_LM },
 	};
 	const struct feature_map_t matchtable_ecx81[] = {
 		{  0, CPU_FEATURE_LAHF_LM },
 	};
+	const struct feature_map_t matchtable_edx87[] = {
+		{  8, CPU_FEATURE_CONSTANT_TSC },
+	};
 	if (raw->basic_cpuid[0][0] >= 1) {
 		match_features(matchtable_edx1, COUNT_OF(matchtable_edx1), raw->basic_cpuid[1][3], data);
 		match_features(matchtable_ecx1, COUNT_OF(matchtable_ecx1), raw->basic_cpuid[1][2], data);
 	}
-	if (raw->ext_cpuid[0][0] >= 1) {
+	if (raw->basic_cpuid[0][0] >= 7) {
+		match_features(matchtable_ebx7, COUNT_OF(matchtable_ebx7), raw->basic_cpuid[7][1], data);
+	}
+	if (raw->ext_cpuid[0][0] >= 0x80000001) {
 		match_features(matchtable_edx81, COUNT_OF(matchtable_edx81), raw->ext_cpuid[1][3], data);
 		match_features(matchtable_ecx81, COUNT_OF(matchtable_ecx81), raw->ext_cpuid[1][2], data);
+	}
+	if (raw->ext_cpuid[0][0] >= 0x80000007) {
+		match_features(matchtable_edx87, COUNT_OF(matchtable_edx87), raw->ext_cpuid[7][3], data);
 	}
 	if (data->flags[CPU_FEATURE_SSE]) {
 		/* apply guesswork to check if the SSE unit width is 128 bit */
 		switch (data->vendor) {
 			case VENDOR_AMD:
-				data->sse_size = (data->ext_family >= 16 && data->ext_family != 23) ? 128 : 64;
+				data->sse_size = (data->ext_family >= 16 && data->ext_family != 17) ? 128 : 64;
 				break;
 			case VENDOR_INTEL:
 				data->sse_size = (data->family == 6 && data->ext_model >= 15) ? 128 : 64;
@@ -207,10 +239,10 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	}
 }
 
-static int cpuid_basic_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
+static cpu_vendor_t cpuid_vendor_identify(const uint32_t *raw_vendor, char *vendor_str)
 {
-	int i, j, basic, xmodel, xfamily, ext;
-	char brandstr[64] = {0};
+	int i;
+	cpu_vendor_t vendor = VENDOR_UNKNOWN;
 	const struct { cpu_vendor_t vendor; char match[16]; }
 	matchtable[NUM_CPU_VENDORS] = {
 		/* source: http://www.sandpile.org/ia32/cpuid.htm */
@@ -225,18 +257,27 @@ static int cpuid_basic_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* dat
 		{ VENDOR_SIS		, "SiS SiS SiS " },
 		{ VENDOR_NSC		, "Geode by NSC" },
 	};
-	
-	memcpy(data->vendor_str + 0, &raw->basic_cpuid[0][1], 4);
-	memcpy(data->vendor_str + 4, &raw->basic_cpuid[0][3], 4);
-	memcpy(data->vendor_str + 8, &raw->basic_cpuid[0][2], 4);
-	data->vendor_str[12] = 0;
+
+	memcpy(vendor_str + 0, &raw_vendor[1], 4);
+	memcpy(vendor_str + 4, &raw_vendor[3], 4);
+	memcpy(vendor_str + 8, &raw_vendor[2], 4);
+	vendor_str[12] = 0;
+
 	/* Determine vendor: */
-	data->vendor = VENDOR_UNKNOWN;
 	for (i = 0; i < NUM_CPU_VENDORS; i++)
-		if (!strcmp(data->vendor_str, matchtable[i].match)) {
-			data->vendor = matchtable[i].vendor;
+		if (!strcmp(vendor_str, matchtable[i].match)) {
+			vendor = matchtable[i].vendor;
 			break;
 		}
+	return vendor;
+}
+
+static int cpuid_basic_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
+{
+	int i, j, basic, xmodel, xfamily, ext;
+	char brandstr[64] = {0};
+	data->vendor = cpuid_vendor_identify(raw->basic_cpuid[0], data->vendor_str);
+
 	if (data->vendor == VENDOR_UNKNOWN)
 		return set_error(ERR_CPU_UNKN);
 	basic = raw->basic_cpuid[0][0];
@@ -294,6 +335,11 @@ static void make_list_from_string(const char* csv, struct cpu_list_t* list)
 
 /* Interface: */
 
+int cpuid_get_total_cpus(void)
+{
+	return get_total_cpus();
+}
+
 int cpuid_present(void)
 {
 	return cpuid_exists_by_eflags();
@@ -347,7 +393,6 @@ int cpuid_serialize_raw_data(struct cpu_raw_data_t* data, const char* filename)
 	if (!f) return set_error(ERR_OPEN);
 	
 	fprintf(f, "version=%s\n", VERSION);
-	fprintf(f, "build_date=%s\n", __DATE__);
 	for (i = 0; i < MAX_CPUID_LEVEL; i++)
 		fprintf(f, "basic_cpuid[%d]=%08x %08x %08x %08x\n", i,
 			data->basic_cpuid[i][0], data->basic_cpuid[i][1],
@@ -505,6 +550,7 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_SSE4_2, "sse4_2" },
 		{ CPU_FEATURE_SYSCALL, "syscall" },
 		{ CPU_FEATURE_XD, "xd" },
+		{ CPU_FEATURE_X2APIC, "x2apic"},
 		{ CPU_FEATURE_MOVBE, "movbe" },
 		{ CPU_FEATURE_POPCNT, "popcnt" },
 		{ CPU_FEATURE_AES, "aes" },
@@ -544,7 +590,14 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_FMA4, "fma4" },
 		{ CPU_FEATURE_TBM, "tbm" },
 		{ CPU_FEATURE_F16C, "f16c" },
-
+		{ CPU_FEATURE_RDRAND, "rdrand" },
+		{ CPU_FEATURE_CPB, "cpb" },
+		{ CPU_FEATURE_APERFMPERF, "aperfmperf" },
+		{ CPU_FEATURE_PFI, "pfi" },
+		{ CPU_FEATURE_PA, "pa" },
+		{ CPU_FEATURE_AVX2, "avx2" },
+		{ CPU_FEATURE_BMI1, "bmi1" },
+		{ CPU_FEATURE_BMI2, "bmi2" },
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {
@@ -568,6 +621,14 @@ const char* cpuid_error(void)
 		{ ERR_BADFMT   , "Bad file format"},
 		{ ERR_NOT_IMP  , "Not implemented"},
 		{ ERR_CPU_UNKN , "Unsupported processor"},
+		{ ERR_NO_RDMSR , "RDMSR instruction is not supported"},
+		{ ERR_NO_DRIVER, "RDMSR driver error (generic)"},
+		{ ERR_NO_PERMS , "No permissions to install RDMSR driver"},
+		{ ERR_EXTRACT  , "Cannot extract RDMSR driver (read only media?)"},
+		{ ERR_HANDLE   , "Bad handle"},
+		{ ERR_INVMSR   , "Invalid MSR"},
+		{ ERR_INVCNB   , "Invalid core number"},
+		{ ERR_HANDLE_R , "Error on handle read"},
 	};
 	unsigned i;
 	for (i = 0; i < COUNT_OF(matchtable); i++)
@@ -592,6 +653,23 @@ libcpuid_warn_fn_t cpuid_set_warn_function(libcpuid_warn_fn_t new_fn)
 void cpuid_set_verbosiness_level(int level)
 {
 	_current_verboselevel = level;
+}
+
+cpu_vendor_t cpuid_get_vendor(void)
+{
+	static cpu_vendor_t vendor = VENDOR_UNKNOWN;
+	uint32_t raw_vendor[4];
+	char vendor_str[VENDOR_STR_MAX];
+
+	if(vendor == VENDOR_UNKNOWN) {
+		if (!cpuid_present())
+			set_error(ERR_NO_CPUID);
+		else {
+			cpu_exec_cpuid(0, raw_vendor);
+			vendor = cpuid_vendor_identify(raw_vendor, vendor_str);
+		}
+	}
+	return vendor;
 }
 
 void cpuid_get_cpu_list(cpu_vendor_t vendor, struct cpu_list_t* list)
