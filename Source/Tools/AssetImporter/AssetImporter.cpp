@@ -974,7 +974,7 @@ void BuildAndSaveModel(OutModel& model)
 
         SharedPtr<Geometry> geom(new Geometry(context_));
 
-        PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
+        PrintLine("Writing geometry " + String(i) + FromAIString(model.meshNodes_[i]->mName) + " with " + String(mesh->mNumVertices) + " vertices " +
             String(validFaces * 3) + " indices");
 
         if (model.bones_.Size() > 0 && !mesh->HasBones())
@@ -1033,6 +1033,8 @@ void BuildAndSaveModel(OutModel& model)
         outModel->SetNumGeometryLodLevels(destGeomIndex, 1);
         outModel->SetGeometry(destGeomIndex, 0, geom);
         outModel->SetGeometryCenter(destGeomIndex, center);
+        outModel->SetGeometryName(destGeomIndex, FromAIString(model.meshNodes_[i]->mName));
+
         if (model.bones_.Size() > maxBones_)
             allBoneMappings.Push(boneMappings);
 

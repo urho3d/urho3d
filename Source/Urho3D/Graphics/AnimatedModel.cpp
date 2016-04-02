@@ -111,6 +111,14 @@ void AnimatedModel::RegisterObject(Context* context)
         Variant::emptyVariantVector, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
+
+    // ATOMIC BEGIN
+
+    URHO3D_ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
+        Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
+
+    // ATOMIC END
+
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
@@ -280,6 +288,33 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         lodDistance_ = newLodDistance;
         CalculateLodLevels();
     }
+
+    // ATOMIC BEGIN
+
+    // Handle mesh hiding
+    if (geometryDisabled_)
+    {
+        for (unsigned i = 0; i < batches_.Size(); ++i)
+        {
+            SourceBatch* batch = &batches_[i];
+            StaticModelGeometryData* data = &geometryData_[i];
+
+            if (batch->geometry_)
+                data->batchGeometry_ = batch->geometry_;
+
+            if (data->enabled_ && !batch->geometry_)
+            {
+                batch->geometry_ = data->batchGeometry_;
+            }
+            else if (!data->enabled_ && batch->geometry_)
+            {
+                data->batchGeometry_ = batch->geometry_;
+                batch->geometry_ = 0;
+            }
+        }
+    }
+
+    // ATOMIC END
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -340,6 +375,8 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         {
             geometries_[i] = geometries[i];
             geometryData_[i].center_ = geometryCenters[i];
+            geometryData_[i].enabled_ = true;
+            geometryData_[i].batchGeometry_ = 0;
         }
 
         // Copy geometry bone mappings
@@ -981,10 +1018,35 @@ void AnimatedModel::AssignBoneNodes()
         i->node_ = boneNode;
     }
 
+    // ATOMIC BEGIN
+
     // If no bones found, this may be a prefab where the bone information was left out.
     // In that case reassign the skeleton now if possible
     if (!boneFound && model_)
-        SetSkeleton(model_->GetSkeleton(), true);
+    {
+        // ATOMIC: instead of calling SetSkeleton which does significant initialization
+        // create the bone nodes here (which also avoids a bone init issue)
+
+        // SetSkeleton(model_->GetSkeleton(), true);
+
+        for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            // Create bones as local, as they are never to be directly synchronized over the network
+            Node* boneNode = node_->CreateChild(i->name_, LOCAL);
+            boneNode->AddListener(this);
+            boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+            i->node_ = boneNode;
+        }
+
+        for (unsigned i = 0; i < bones.Size(); ++i)
+        {
+            unsigned parentIndex = bones[i].parentIndex_;
+            if (parentIndex != i && parentIndex < bones.Size())
+                bones[parentIndex].node_->AddChild(bones[i].node_);
+        }
+    }
+
+    // ATOMIC END
 
     // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
