@@ -46,6 +46,7 @@
 #include "../Graphics/Terrain.h"
 #include "../Graphics/TerrainPatch.h"
 #include "../Graphics/Texture2D.h"
+#include "../Graphics/Texture2DArray.h"
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/Skybox.h"
@@ -199,6 +200,13 @@ static bool Texture2DSetData(Image* image, bool useAlpha, Texture2D* ptr)
 {
     return ptr->SetData(SharedPtr<Image>(image), useAlpha);
 }
+
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
+static bool Texture2DArraySetData(unsigned layer, Image* image, bool useAlpha, Texture2DArray* ptr)
+{
+    return ptr->SetData(layer, SharedPtr<Image>(image), useAlpha);
+}
+#endif
 
 static bool Texture3DSetData(Image* image, bool useAlpha, Texture3D* ptr)
 {
@@ -526,6 +534,15 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Texture2D", "bool SetData(Image@+, bool useAlpha = false)", asFUNCTION(Texture2DSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "Image@+ GetImage() const", asFUNCTION(Texture2DGetImage), asCALL_CDECL_OBJLAST);
+
+#if defined(URHO3D_OPENGL) || defined(URHO3D_D3D11)
+    RegisterTexture<Texture2DArray>(engine, "Texture2DArray");
+    engine->RegisterObjectMethod("Texture2DArray", "bool SetSize(uint, int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2DArray, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2DArray", "bool SetData(uint, Image@+, bool useAlpha = false)", asFUNCTION(Texture2DArraySetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Texture2DArray", "void set_layers(uint)", asMETHOD(Texture2DArray, SetLayers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2DArray", "uint get_layers() const", asMETHOD(Texture2DArray, GetLayers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2DArray", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2DArray, GetRenderSurface), asCALL_THISCALL);
+#endif
 
     RegisterTexture<Texture3D>(engine, "Texture3D");
     engine->RegisterObjectMethod("Texture3D", "bool SetSize(int, int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture3D, SetSize), asCALL_THISCALL);
