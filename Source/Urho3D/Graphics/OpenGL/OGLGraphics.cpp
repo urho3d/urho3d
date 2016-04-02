@@ -82,7 +82,7 @@ extern "C"
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 // Prefer the high-performance GPU on switchable GPU systems
 #include <windows.h>
 extern "C"
