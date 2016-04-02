@@ -49,6 +49,7 @@ class ShaderProgram;
 class ShaderVariation;
 class Texture;
 class Texture2D;
+class Texture2DArray;
 class TextureCube;
 class Vector3;
 class Vector4;

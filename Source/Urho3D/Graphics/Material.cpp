@@ -29,6 +29,7 @@
 #include "../Graphics/Material.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
+#include "../Graphics/Texture2DArray.h"
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../IO/FileSystem.h"
@@ -119,6 +120,38 @@ TextureUnit ParseTextureUnitName(String name)
         URHO3D_LOGERROR("Unknown texture unit name " + name);
 
     return unit;
+}
+
+StringHash ParseTextureTypeName(String name)
+{
+    name = name.ToLower().Trimmed();
+
+    if (name == "texture")
+        return Texture2D::GetTypeStatic();
+    else if (name == "cubemap")
+        return TextureCube::GetTypeStatic();
+    else if (name == "texture3d")
+        return Texture3D::GetTypeStatic();
+    else if (name == "texturearray")
+        return Texture2DArray::GetTypeStatic();
+
+    return 0;
+}
+
+StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
+{
+    StringHash type = 0;
+    if (!cache)
+        return type;
+
+    SharedPtr<File> texXmlFile = cache->GetFile(filename, false);
+    if (texXmlFile.NotNull())
+    {
+        SharedPtr<XMLFile> texXml(new XMLFile(cache->GetContext()));
+        if (texXml->Load(*texXmlFile))
+            type = ParseTextureTypeName(texXml->GetRoot().GetName());
+    }
+    return type;
 }
 
 static TechniqueEntry noEntry;
@@ -275,16 +308,22 @@ bool Material::BeginLoadXML(Deserializer& source)
             while (textureElem)
             {
                 String name = textureElem.GetAttribute("name");
-                // Detect cube maps by file extension: they are defined by an XML file
-                /// \todo Differentiate with 3D textures by actually reading the XML content
+                // Detect cube maps and arrays by file extension: they are defined by an XML file
                 if (GetExtension(name) == ".xml")
                 {
 #ifdef DESKTOP_GRAPHICS
-                    TextureUnit unit = TU_DIFFUSE;
-                    if (textureElem.HasAttribute("unit"))
-                        unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
-                    if (unit == TU_VOLUMEMAP)
+                    StringHash type = ParseTextureTypeXml(cache, name);
+                    if (!type && textureElem.HasAttribute("unit"))
+                    {
+                        TextureUnit unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+                        if (unit == TU_VOLUMEMAP)
+                            type = Texture3D::GetTypeStatic();
+                    }
+
+                    if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else if (type == Texture2DArray::GetTypeStatic())
+                        cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
                     else
 #endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
@@ -330,18 +369,24 @@ bool Material::BeginLoadJSON(Deserializer& source)
             {
                 String unitString = it->first_;
                 String name = it->second_.GetString();
-                // Detect cube maps by file extension: they are defined by an XML file
-                /// \todo Differentiate with 3D textures by actually reading the XML content
+                // Detect cube maps and arrays by file extension: they are defined by an XML file
                 if (GetExtension(name) == ".xml")
                 {
-    #ifdef DESKTOP_GRAPHICS
-                    TextureUnit unit = TU_DIFFUSE;
-                    unit = ParseTextureUnitName(unitString);
+#ifdef DESKTOP_GRAPHICS
+                    StringHash type = ParseTextureTypeXml(cache, name);
+                    if (!type && !unitString.Empty())
+                    {
+                        TextureUnit unit = ParseTextureUnitName(unitString);
+                        if (unit == TU_VOLUMEMAP)
+                            type = Texture3D::GetTypeStatic();
+                    }
 
-                    if (unit == TU_VOLUMEMAP)
+                    if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else if (type == Texture2DArray::GetTypeStatic())
+                        cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
                     else
-    #endif
+#endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
                 }
                 else
@@ -408,13 +453,18 @@ bool Material::Load(const XMLElement& source)
         if (unit < MAX_TEXTURE_UNITS)
         {
             String name = textureElem.GetAttribute("name");
-            // Detect cube maps by file extension: they are defined by an XML file
-            /// \todo Differentiate with 3D textures by actually reading the XML content
+            // Detect cube maps and arrays by file extension: they are defined by an XML file
             if (GetExtension(name) == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
-                if (unit == TU_VOLUMEMAP)
+                StringHash type = ParseTextureTypeXml(cache, name);
+                if (!type && unit == TU_VOLUMEMAP)
+                    type = Texture3D::GetTypeStatic();
+
+                if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(name));
+                else if (type == Texture2DArray::GetTypeStatic())
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(name));
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(name));
@@ -541,13 +591,18 @@ bool Material::Load(const JSONValue& source)
 
         if (unit < MAX_TEXTURE_UNITS)
         {
-            // Detect cube maps by file extension: they are defined by an XML file
-            /// \todo Differentiate with 3D textures by actually reading the XML content
+            // Detect cube maps and arrays by file extension: they are defined by an XML file
             if (GetExtension(textureName) == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
-                if (unit == TU_VOLUMEMAP)
+                StringHash type = ParseTextureTypeXml(cache, textureName);
+                if (!type && unit == TU_VOLUMEMAP)
+                    type = Texture3D::GetTypeStatic();
+
+                if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(textureName));
+                else if (type == Texture2DArray::GetTypeStatic())
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(textureName));
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(textureName));

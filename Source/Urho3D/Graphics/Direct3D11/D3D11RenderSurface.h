@@ -34,6 +34,7 @@ class Texture;
 class URHO3D_API RenderSurface : public RefCounted
 {
     friend class Texture2D;
+    friend class Texture2DArray;
     friend class TextureCube;
 
 public:
