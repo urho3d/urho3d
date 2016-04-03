@@ -41,8 +41,10 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
 endif ()
 
 # Check sincosf support
-include (CheckLibraryExists)
-check_library_exists (m sincosf "" HAVE_SINCOSF)
+if (NOT MSVC)   # There is no chance MSVC would pass this one as it does not have libm
+    include (CheckLibraryExists)
+    check_library_exists (m sincosf "" HAVE_SINCOSF)
+endif ()
 if (HAVE_SINCOSF)
     add_definitions (-DHAVE_SINCOSF)
 else ()

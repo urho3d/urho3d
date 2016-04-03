@@ -93,7 +93,6 @@ if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON))    # Stringify in case RPI_ABI i
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
     set (NEON TRUE)
 endif ()
-cmake_dependent_option (URHO3D_NEON "Enable NEON instruction set (ARM platforms with NEON only)" TRUE "NEON" FALSE)
 if (CMAKE_HOST_WIN32)
     if (NOT DEFINED URHO3D_MKLINK)
         # Test whether the host system is capable of setting up symbolic link
@@ -138,20 +137,10 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # On Windows platform Direct3D11 can be optionally chosen
     # Using Direct3D11 on non-MSVC compiler may require copying and renaming Microsoft official libraries (.lib to .a), else link failures or non-functioning graphics may result
     cmake_dependent_option (URHO3D_D3D11 "Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option" FALSE "WIN32" FALSE)
-    # Set the default to true for all the platforms that support SSE extension except specificially stated otherwise below
-    if (HAVE_SSE OR HAVE_SSE2)
-        set (URHO3D_DEFAULT_SSE TRUE)
-        if (MINGW)
-            # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
-            if (COMPILER_VERSION VERSION_LESS 4.9.1)
-                message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
-                set (URHO3D_DEFAULT_SSE FALSE)
-            endif ()
-        endif ()
-    else ()
-        set (URHO3D_DEFAULT_SSE FALSE)
+    if (NOT ARM)
+        # It is not possible to turn SSE off on 64-bit MSVC and it appears it is also not able to do so safely on 64-bit GCC
+        cmake_dependent_option (URHO3D_SSE "Enable SSE/SSE2 instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${HAVE_SSE2} "NOT URHO3D_64BIT" TRUE)
     endif ()
-    cmake_dependent_option (URHO3D_SSE "Enable SSE/SSE2 instruction set (Web and Intel platforms only including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options" ${URHO3D_DEFAULT_SSE} "NOT ARM" FALSE)
     cmake_dependent_option (URHO3D_3DNOW "Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support" ${HAVE_3DNOW} "NOT WIN32 AND NOT APPLE AND NOT WEB AND NOT ARM AND NOT URHO3D_SSE" FALSE)
     cmake_dependent_option (URHO3D_MMX "Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support" ${HAVE_MMX} "NOT WIN32 AND NOT APPLE AND NOT WEB AND NOT ARM AND NOT URHO3D_64BIT AND NOT URHO3D_SSE AND NOT URHO3D_3DNOW" FALSE)
     # For completeness sake - this option is intentionally not documented as we do not officially support PowerPC (yet)
@@ -199,8 +188,10 @@ else ()
     if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS)
         # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
     endif ()
-    # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
-    if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+    if (CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+        set (URHO3D_SSE ${HAVE_SSE2})
+    else ()
+        # All Urho3D downstream projects require Urho3D library, so find Urho3D library here now
         find_package (Urho3D REQUIRED)
         include_directories (${URHO3D_INCLUDE_DIRS})
     endif ()
@@ -342,9 +333,11 @@ if ($ENV{COVERITY_SCAN_BRANCH})
     add_definitions (-DCOVERITY_SCAN_MODEL)
 endif ()
 
-# Enable NEON instruction set.
-if (URHO3D_NEON)
-    add_definitions (-DURHO3D_NEON -DSTBI_NEON)     # BT_USE_NEON is already being self-defined by Bullet library as appropriate
+# Enable/disable SIMD instruction set for STB image (do it here instead of in the STB CMakeLists.txt because the header files are exposed to Urho3D library user)
+if (NEON AND NOT XCODE)
+    add_definitions (-DSTBI_NEON)       # Cannot define it directory for Xcode due to universal binary support, we define it in the setup_target() macro instead for Xcode
+elseif (NOT URHO3D_SSE)
+    add_definitions (-DSTBI_NO_SIMD)    # GCC/Clang/MinGW will switch this off automatically except MSVC, but no harm to make it explicit for all
 endif ()
 
 # Enable structured exception handling and minidumps on MSVC only.
@@ -564,9 +557,15 @@ if (MSVC)
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     # In Visual Studio, SSE2 flag is redundant if already compiling as 64bit; it is already the default for VS2012 (onward) on 32bit
-    if (URHO3D_SSE AND NOT URHO3D_64BIT AND MSVC_VERSION LESS 1700)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+    # Instead, we must turn SSE/SSE2 off explicitly if user really intends to turn it off
+    if (URHO3D_SSE)
+        if (NOT URHO3D_64BIT AND MSVC_VERSION LESS 1700)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+        endif ()
+    else ()
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /arch:IA32")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:IA32")
     endif ()
     set (CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG")
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
@@ -593,7 +592,7 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${RPI_CFLAGS}")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RPI_CFLAGS}")
         else ()
-            if (NOT XCODE AND NOT WEB)
+            if (URHO3D_SSE AND NOT XCODE AND NOT WEB)
                 # This may influence the effective SSE level when URHO3D_SSE is on as well
                 set (URHO3D_DEPLOYMENT_TARGET native CACHE STRING "Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors")
                 if (NOT URHO3D_DEPLOYMENT_TARGET STREQUAL generic)
@@ -607,38 +606,32 @@ else ()
             # The compiler flags will be added later conditionally when the effective arch is i386 during build time (using XCODE_ATTRIBUTE target property)
             if (NOT XCODE)
                 if (NOT URHO3D_64BIT)
-                    if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
-                        # Clang enables SSE support for i386 ABI by default, so use the '-mno-sse' compiler flag to nullify that and make it consistent with GCC
-                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mno-sse")
-                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-sse")
-                    endif ()
                     # Not the compiler native ABI, this could only happen on multilib-capable compilers
-                    # We don't add the ABI flag for Xcode because it automatically passes '-arch i386' compiler flag when targeting 32 bit which does the same thing as '-m32'
                     if (NATIVE_64BIT)
                         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
                         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+                    endif ()
+                    # The effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options
+                    # The -mfpmath=sse is not set in global scope but it may be set in local scope when building LuaJIT sub-library for x86 arch
+                    if (URHO3D_SSE)
+                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse -msse2")
+                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -msse2")
+                    endif ()
+                endif ()
+                if (NOT URHO3D_SSE)
+                    if (URHO3D_64BIT OR CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+                        # Clang enables SSE support for i386 ABI by default, so use the '-mno-sse' compiler flag to nullify that and make it consistent with GCC
+                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mno-sse")
+                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-sse")
                     endif ()
                     if (URHO3D_MMX)
                         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mmmx")
                         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmmx")
                     endif()
-                    # The effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options
-                    # The -mfpmath=sse is not set in global scope but it may be set in local scope when building LuaJIT sub-library for x86 arch
-                    if (URHO3D_SSE AND HAVE_SSE)
-                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse")
-                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+                    if (URHO3D_3DNOW)
+                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m3dnow")
+                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m3dnow")
                     endif ()
-                    if (URHO3D_SSE AND HAVE_SSE2)
-                        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2")
-                        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
-                    endif ()
-                endif ()
-                if (URHO3D_3DNOW)
-                    if (URHO3D_64BIT)
-                        set (DISABLE_SSE_FLAG -mno-sse)
-                    endif ()
-                    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${DISABLE_SSE_FLAG} -m3dnow")
-                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DISABLE_SSE_FLAG} -m3dnow")
                 endif ()
                 # For completeness sake only as we do not support PowerPC (yet)
                 if (URHO3D_ALTIVEC)
@@ -685,6 +678,7 @@ else ()
                 if (URHO3D_SSE)
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
+                    add_definitions (-DSTBI_MINGW_ENABLE_SSE2)
                 else ()
                     if (DEFINED ENV{TRAVIS})
                         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
@@ -1006,25 +1000,18 @@ macro (setup_target)
         unset (LINK_DEPENDS)
     endif ()
     # Extra compiler flags for Xcode which are dynamically changed based on active arch in order to support Mach-O universal binary targets
+    # We don't add the ABI flag for Xcode because it automatically passes '-arch i386' compiler flag when targeting 32 bit which does the same thing as '-m32'
     if (XCODE)
         # Speed up build when in Debug configuration by building active arch only
         list (FIND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH ATTRIBUTE_ALREADY_SET)
         if (ATTRIBUTE_ALREADY_SET EQUAL -1)
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
         endif ()
-        if (URHO3D_SSE OR URHO3D_NEON)
+        if (URHO3D_SSE OR NEON)
             # When targeting x86 with SSE enabled; or when targeting iOS with NEON enabled as universal binary includes iPhoneSimulator x86 arch too
-            # This is kind of redundant because Clang by default always enable SSE support for both i386 and x86_64 ABIs, still just to be sure
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-msse -msse2 $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-msse -msse2 $(OTHER_CPLUSPLUSFLAGS)")
-        elseif (URHO3D_3DNOW)
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse -m3dnow $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-mno-sse -m3dnow $(OTHER_CPLUSPLUSFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=x86_64] "-mno-sse -m3dnow $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "-mno-sse -m3dnow $(OTHER_CPLUSPLUSFLAGS)")
-        elseif (URHO3D_MMX)
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse -mmmx $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-mno-sse -mmmx $(OTHER_CPLUSPLUSFLAGS)")
+            # Clang by default always enable SSE instruction set for both i386 and x86_64 ABIs, so we only need to take care of special compiler flags/defines for NEON
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[sdk=iphoneos*] "-DSTBI_NEON $(OTHER_CFLAGS)")
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*] "-DSTBI_NEON $(OTHER_CPLUSPLUSFLAGS)")
         else ()
             # Nullify the Clang default so that it is consistent with GCC
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse $(OTHER_CFLAGS)")

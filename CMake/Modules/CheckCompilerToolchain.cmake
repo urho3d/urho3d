@@ -30,7 +30,7 @@
 #  RPI
 #  POWERPC
 #
-# Compiler version in major.minor.patch format:
+# Compiler version in major.minor.patch format, except MSVC where it follows its own format:
 #  COMPILER_VERSION
 #
 # CPU SIMD instruction extensions support:
@@ -140,16 +140,17 @@ if (NOT ARM)
             set (${VAR} 1)
         endforeach ()
     else ()
-        check_extension (mmx)
-        if (NOT EMSCRIPTEN)     # Emscripten does not support SSE/SSE2 (yet) now but erroneously responding positively to our probe, so skip them for Emscripten for now
+        if (MINGW AND COMPILER_VERSION VERSION_LESS 4.9.1)
+            # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+            message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+        elseif (NOT EMSCRIPTEN)     # Emscripten does not support SSE/SSE2 (yet) now but erroneously responding positively to our probe, so skip them for Emscripten for now
             check_extension (sse)
             check_extension (sse2)
         endif ()
-     endif ()
-    # As newer CPUs from AMD do not support 3DNow! anymore, we cannot make any assumption for 3DNow! extension check
-    # Don't bother with this check on AppleClang and MSVC compiler toolchains (Urho3D only supports CPU with SSE2 on the asscoiated platforms anyway)
-    if (NOT APPLE AND NOT MSVC)
-        check_extension (3dnow __3dNOW__)
+        if (NOT APPLE AND NOT WIN32)    # Linux only
+            check_extension (mmx)
+            check_extension (3dnow __3dNOW__)
+        endif ()
     endif ()
     # For completeness sake as currently we do not support PowerPC (yet)
     if (POWERPC)
