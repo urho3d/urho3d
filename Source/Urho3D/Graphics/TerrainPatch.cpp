@@ -54,9 +54,9 @@ TerrainPatch::TerrainPatch(Context* context) :
     coordinates_(IntVector2::ZERO),
     lodLevel_(0)
 {
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
-    maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
-    occlusionGeometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_NORMAL | MASK_TEXCOORD1 | MASK_TANGENT);
+    geometry_->SetVertexBuffer(0, vertexBuffer_);
+    maxLodGeometry_->SetVertexBuffer(0, vertexBuffer_);
+    occlusionGeometry_->SetVertexBuffer(0, vertexBuffer_);
 
     batches_.Resize(1);
     batches_[0].geometry_ = geometry_;
@@ -196,12 +196,12 @@ bool TerrainPatch::DrawOcclusion(OcclusionBuffer* buffer)
     unsigned vertexSize;
     const unsigned char* indexData;
     unsigned indexSize;
-    unsigned elementMask;
+    const PODVector<VertexElement>* elements;
 
-    occlusionGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    occlusionGeometry_->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
     // Check for valid geometry data
-    if (!vertexData || !indexData)
-        return true;
+    if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
+        return false;
 
     // Draw and check for running out of triangles
     return buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, indexData, indexSize, occlusionGeometry_->GetIndexStart(),

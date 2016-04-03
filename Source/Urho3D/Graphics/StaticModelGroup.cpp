@@ -30,6 +30,7 @@
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/StaticModelGroup.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
@@ -246,11 +247,11 @@ bool StaticModelGroup::DrawOcclusion(OcclusionBuffer* buffer)
             unsigned vertexSize;
             const unsigned char* indexData;
             unsigned indexSize;
-            unsigned elementMask;
+            const PODVector<VertexElement>* elements;
 
-            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
             // Check for valid geometry data
-            if (!vertexData || !indexData)
+            if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
                 continue;
 
             unsigned indexStart = geometry->GetIndexStart();

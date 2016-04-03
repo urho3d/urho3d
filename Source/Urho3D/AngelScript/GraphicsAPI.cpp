@@ -750,7 +750,6 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX2", (void*)&MASK_INSTANCEMATRIX2);
     engine->RegisterGlobalProperty("const uint MASK_INSTANCEMATRIX3", (void*)&MASK_INSTANCEMATRIX3);
     engine->RegisterGlobalProperty("const uint MASK_OBJECTINDEX", (void*)&MASK_OBJECTINDEX);
-    engine->RegisterGlobalProperty("const uint MASK_DEFAULT", (void*)&MASK_DEFAULT);
 
     engine->RegisterEnum("PrimitiveType");
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_LIST", TRIANGLE_LIST);
@@ -762,7 +761,7 @@ static void RegisterBuffers(asIScriptEngine* engine)
 
     RegisterObject<VertexBuffer>(engine, "VertexBuffer");
     RegisterObjectConstructor<VertexBuffer>(engine, "VertexBuffer");
-    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, uint, bool dynamic = false)", asMETHOD(VertexBuffer, SetSize), asCALL_THISCALL);
+//    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, uint, bool dynamic = false)", asMETHOD(VertexBuffer, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetData(VectorBuffer&)", asFUNCTION(VertexBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", asFUNCTION(VertexBufferSetDataRange), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "VectorBuffer GetData()", asFUNCTION(VertexBufferGetData), asCALL_CDECL_OBJLAST);
@@ -771,7 +770,6 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHOD(VertexBuffer, IsDynamic), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHOD(VertexBuffer, GetVertexCount), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
-    engine->RegisterObjectMethod("VertexBuffer", "uint get_elementMask() const", asMETHOD(VertexBuffer, GetElementMask), asCALL_THISCALL);
 
     RegisterObject<IndexBuffer>(engine, "IndexBuffer");
     RegisterObjectConstructor<IndexBuffer>(engine, "IndexBuffer");
@@ -789,12 +787,11 @@ static void RegisterBuffers(asIScriptEngine* engine)
     RegisterObjectConstructor<Geometry>(engine, "Geometry");
     engine->RegisterObjectMethod("Geometry", "void set_numVertexBuffers(uint)", asMETHOD(Geometry, SetNumVertexBuffers), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "uint get_numVertexBuffers() const", asMETHOD(Geometry, GetNumVertexBuffers), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Geometry", "bool SetVertexBuffer(uint, VertexBuffer@+, uint elementMask = MASK_DEFAULT)", asMETHOD(Geometry, SetVertexBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Geometry", "bool SetVertexBuffer(uint, VertexBuffer@+)", asMETHOD(Geometry, SetVertexBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "void SetIndexBuffer(IndexBuffer@+)", asMETHOD(Geometry, SetIndexBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "bool SetDrawRange(PrimitiveType, uint, uint, bool getUsedVertexRange = true)", asMETHODPR(Geometry, SetDrawRange, (PrimitiveType, unsigned, unsigned, bool), bool),asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool checkIllegal = true)", asMETHODPR(Geometry, SetDrawRange, (PrimitiveType, unsigned, unsigned, unsigned, unsigned, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "VertexBuffer@+ get_vertexBuffers(uint) const", asMETHOD(Geometry, GetVertexBuffer), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Geometry", "uint get_vertexElementMasks(uint) const", asMETHOD(Geometry, GetVertexElementMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "void set_indexBuffer(IndexBuffer@+)", asMETHOD(Geometry, SetIndexBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "IndexBuffer@+ get_indexBuffer() const", asMETHOD(Geometry, GetIndexBuffer), asCALL_THISCALL);
     engine->RegisterObjectMethod("Geometry", "PrimitiveType get_primitiveType() const", asMETHOD(Geometry, GetPrimitiveType), asCALL_THISCALL);

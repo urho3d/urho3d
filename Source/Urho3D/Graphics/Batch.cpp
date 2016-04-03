@@ -646,7 +646,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
             Batch::Prepare(view, camera, false, allowDepthWrite);
 
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-            graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
+            graphics->SetVertexBuffers(geometry_->GetVertexBuffers());
 
             for (unsigned i = 0; i < instances_.Size(); ++i)
             {
@@ -665,18 +665,15 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
             Vector<SharedPtr<VertexBuffer> >& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
                 geometry_->GetVertexBuffers());
-            PODVector<unsigned>& elementMasks = const_cast<PODVector<unsigned>&>(geometry_->GetVertexElementMasks());
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
-            elementMasks.Push(instanceBuffer->GetElementMask());
 
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-            graphics->SetVertexBuffers(vertexBuffers, elementMasks, startIndex_);
+            graphics->SetVertexBuffers(vertexBuffers, startIndex_);
             graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                 geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
 
             // Remove the instancing buffer & element mask now
             vertexBuffers.Pop();
-            elementMasks.Pop();
         }
     }
 }

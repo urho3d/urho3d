@@ -32,29 +32,40 @@
 namespace Urho3D
 {
 
-const unsigned VertexBuffer::elementSize[] =
+static const VertexElement legacyVertexElements[] =
 {
-    3 * sizeof(float), // Position
-    3 * sizeof(float), // Normal
-    4 * sizeof(unsigned char), // Color
-    2 * sizeof(float), // Texcoord1
-    2 * sizeof(float), // Texcoord2
-    3 * sizeof(float), // Cubetexcoord1
-    3 * sizeof(float), // Cubetexcoord2
-    4 * sizeof(float), // Tangent
-    4 * sizeof(float), // Blendweights
-    4 * sizeof(unsigned char), // Blendindices
-    4 * sizeof(float), // Instancematrix1
-    4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float), // Instancematrix3
-    sizeof(int) // Object index, not supported on D3D9 but allowed for vertex data compatibility
+    {TYPE_VECTOR3, SEM_POSITION, 0, false},     // Position
+    {TYPE_VECTOR3, SEM_NORMAL, 0, false},       // Normal
+    {TYPE_UBYTE4_NORM, SEM_COLOR, 0, false},    // Color
+    {TYPE_VECTOR2, SEM_TEXCOORD, 0, false},     // Texcoord1
+    {TYPE_VECTOR2, SEM_TEXCOORD, 0, false},     // Texcoord2
+    {TYPE_VECTOR3, SEM_TEXCOORD, 0, false},     // Cubetexcoord1
+    {TYPE_VECTOR3, SEM_TEXCOORD, 1, false},     // Cubetexcoord2
+    {TYPE_VECTOR4, SEM_TANGENT, 0, false},      // Tangent
+    {TYPE_VECTOR4, SEM_BLENDWEIGHTS, 0, false}, // Blendweights
+    {TYPE_UBYTE4, SEM_BLENDINDICES, 0, false},  // Blendindices
+    {TYPE_VECTOR4, SEM_TEXCOORD, 4, true},      // Instancematrix1
+    {TYPE_VECTOR4, SEM_TEXCOORD, 5, true},      // Instancematrix2
+    {TYPE_VECTOR4, SEM_TEXCOORD, 6, true},      // Instancematrix3
+    {TYPE_INT, SEM_OBJECTINDEX, 0, false},      // Objectindex
+};
+
+static const unsigned elementTypeSize[] =
+{
+    sizeof(int),
+    sizeof(float),
+    2 * sizeof(float),
+    3 * sizeof(float),
+    4 * sizeof(float),
+    sizeof(unsigned),
+    sizeof(unsigned)
 };
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
     GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
     vertexCount_(0),
-    elementMask_(0),
+    elementHash_(0),
     pool_(D3DPOOL_MANAGED),
     usage_(0),
     lockState_(LOCK_NONE),
@@ -63,8 +74,6 @@ VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     lockScratchData_(0),
     shadowed_(false)
 {
-    UpdateOffsets();
-
     // Force shadowing mode if graphics subsystem does not exist
     if (!graphics_)
         shadowed_ = true;
@@ -129,6 +138,11 @@ void VertexBuffer::SetShadowed(bool enable)
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
+    return SetSize(vertexCount, GetElements(elementMask), dynamic);
+}
+
+bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic)
+{
     Unlock();
 
     if (dynamic)
@@ -143,7 +157,7 @@ bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dyna
     }
 
     vertexCount_ = vertexCount;
-    elementMask_ = elementMask;
+    elements_ = elements;
 
     UpdateOffsets();
 
@@ -323,68 +337,150 @@ bool VertexBuffer::IsDynamic() const
 void VertexBuffer::UpdateOffsets()
 {
     unsigned elementOffset = 0;
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    elementHash_ = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
     {
-        if (elementMask_ & (1 << i))
-        {
-            elementOffset_[i] = elementOffset;
-            elementOffset += elementSize[i];
-        }
-        else
-            elementOffset_[i] = NO_ELEMENT;
+        i->offset_ = elementOffset;
+        elementOffset += elementTypeSize[i->type_];
+        elementHash_ <<= 6;
+        elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
     }
+
     vertexSize_ = elementOffset;
 }
 
-unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex, unsigned useMask)
+const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index) const
 {
-    unsigned long long bufferHash = elementMask_;
-    unsigned long long maskHash;
-    if (useMask == MASK_DEFAULT)
-        maskHash = ((unsigned long long)elementMask_) * 0x100000000ULL;
-    else
-        maskHash = ((unsigned long long)useMask) * 0x100000000ULL;
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
 
-    bufferHash |= maskHash;
-    bufferHash <<= streamIndex * MAX_VERTEX_ELEMENTS;
+    return 0;
+}
 
-    return bufferHash;
+const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    return GetElement(elements, type, semantic, index) != 0;
+}
+
+unsigned VertexBuffer::GetElementMask() const
+{
+    unsigned mask = 0;
+
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->type_ == TYPE_VECTOR2 && i->semantic_ == SEM_TEXCOORD)
+        {
+            if (i->index_ == 0)
+                mask |= MASK_TEXCOORD1;
+            else if (i->index_ == 1)
+                mask |= MASK_TEXCOORD2;
+            else if (i->index_ == 4)
+                mask |= MASK_INSTANCEMATRIX1;
+            else if (i->index_ == 5)
+                mask |= MASK_INSTANCEMATRIX2;
+            else if (i->index_ == 6)
+                mask |= MASK_INSTANCEMATRIX3;
+        }
+        else if (i->type_ == TYPE_VECTOR3)
+        {
+            if (i->semantic_ == SEM_POSITION)
+                mask |= MASK_POSITION;
+            else if (i->semantic_ == SEM_NORMAL)
+                mask |= MASK_NORMAL;
+            else if (i->semantic_ == SEM_TEXCOORD && i->index_ == 0)
+                mask |= MASK_CUBETEXCOORD1;
+            else if (i->semantic_ == SEM_TEXCOORD && i->index_ == 1)
+                mask |= MASK_CUBETEXCOORD2;
+        }
+        else if (i->type_ == TYPE_VECTOR4)
+        {
+            if (i->semantic_ == SEM_TANGENT)
+                mask |= MASK_TANGENT;
+            else if (i->semantic_ == SEM_BLENDWEIGHTS)
+                mask |= MASK_BLENDWEIGHTS;
+        }
+        else if (i->type_ == TYPE_UBYTE4 && i->semantic_ == SEM_BLENDINDICES)
+            mask |= MASK_BLENDINDICES;
+        else if (i->type_ == TYPE_UBYTE4_NORM && i->semantic_ == SEM_COLOR)
+            mask |= MASK_COLOR;
+    }
+
+    return mask;
+}
+
+unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    const VertexElement* element = GetElement(elements, type, semantic, index);
+    return element ? element->offset_ : M_MAX_UNSIGNED;
+}
+
+PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+{
+    PODVector<VertexElement> ret;
+
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
+    {
+        if (elementMask & (1 << i))
+            ret.Push(legacyVertexElements[i]);
+    }
+
+    return ret;
+}
+
+unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
+{
+    unsigned size = 0;
+
+    for (unsigned i = 0; i < elements.Size(); ++i)
+        size += elementTypeSize[elements[i].type_];
+
+    return size;
 }
 
 unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 {
-    unsigned vertexSize = 0;
+    unsigned size = 0;
 
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
         if (elementMask & (1 << i))
-            vertexSize += elementSize[i];
+            size += elementTypeSize[legacyVertexElements[i].type_];
     }
 
-    return vertexSize;
-}
-
-unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement element)
-{
-    unsigned offset = 0;
-
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        if (i == element)
-            break;
-
-        if (elementMask & (1 << i))
-            offset += elementSize[i];
-    }
-
-    return offset;
+    return size;
 }
 
 bool VertexBuffer::Create()
 {
     Release();
 
-    if (!vertexCount_ || !elementMask_)
+    if (!vertexCount_ || elements_.Empty())
         return true;
 
     if (graphics_)

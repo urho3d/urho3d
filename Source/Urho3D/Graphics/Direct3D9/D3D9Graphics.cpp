@@ -913,7 +913,9 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         VertexBuffer* buffer = vertexBuffers_[i];
         if (buffer)
         {
-            if (buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data
+            if (elements.Size() && elements[0].perInstance_)
                 SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
             else
                 SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
@@ -934,34 +936,26 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
     static PODVector<VertexBuffer*> vertexBuffers(1);
-    static PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
-    elementMasks[0] = MASK_DEFAULT;
-    SetVertexBuffers(vertexBuffers, elementMasks);
+    SetVertexBuffers(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
 
-    // Build vertex declaration hash code out of the buffers & masks
+    // Build vertex declaration hash code out of the buffers
     unsigned long long hash = 0;
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
 
-        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
+        hash |= buffers[i]->GetBufferHash(i);
     }
 
     if (hash)
@@ -969,7 +963,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         // If no previous vertex declaration for that hash, create new
         if (!vertexDeclarations_.Contains(hash))
         {
-            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
+            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers));
             if (!newDeclaration->GetDeclaration())
                 return false;
 
@@ -989,10 +983,12 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         VertexBuffer* buffer = 0;
         unsigned offset = 0;
 
-        if (i < buffers.Size())
+        if (i < buffers.Size() && buffers[i])
         {
             buffer = buffers[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data; add instance offset in that case
+            if (elements.Size() && elements[0].perInstance_)
                 offset = instanceOffset * buffer->GetVertexSize();
         }
 
@@ -1012,10 +1008,9 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)

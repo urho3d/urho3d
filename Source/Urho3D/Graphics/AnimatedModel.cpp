@@ -1137,16 +1137,16 @@ void AnimatedModel::CloneGeometries()
             for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
-                unsigned originalMask = original->GetVertexElementMask(k);
 
                 if (clonedVertexBuffers.Contains(originalBuffer))
                 {
                     VertexBuffer* clonedBuffer = clonedVertexBuffers[originalBuffer];
-                    clone->SetVertexBuffer(l++, originalBuffer, originalMask & ~clonedBuffer->GetElementMask());
-                    clone->SetVertexBuffer(l++, clonedBuffer, originalMask & clonedBuffer->GetElementMask());
+                    clone->SetVertexBuffer(l++, originalBuffer);
+                    // Specify the morph buffer at a greater index to override the model's original positions/normals/tangents
+                    clone->SetVertexBuffer(l++, clonedBuffer);
                 }
                 else
-                    clone->SetVertexBuffer(l++, originalBuffer, originalMask);
+                    clone->SetVertexBuffer(l++, originalBuffer);
             }
 
             clone->SetIndexBuffer(original->GetIndexBuffer());
@@ -1166,8 +1166,8 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
     VertexBuffer* srcBuffer)
 {
     unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
-    unsigned normalOffset = srcBuffer->GetElementOffset(ELEMENT_NORMAL);
-    unsigned tangentOffset = srcBuffer->GetElementOffset(ELEMENT_TANGENT);
+    unsigned normalOffset = srcBuffer->GetElementOffset(SEM_NORMAL);
+    unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = srcBuffer->GetVertexSize();
     float* dest = (float*)destVertexData;
     unsigned char* src = (unsigned char*)srcVertexData;
@@ -1367,8 +1367,8 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
 {
     unsigned elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
-    unsigned normalOffset = buffer->GetElementOffset(ELEMENT_NORMAL);
-    unsigned tangentOffset = buffer->GetElementOffset(ELEMENT_TANGENT);
+    unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
+    unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = buffer->GetVertexSize();
 
     unsigned char* srcData = morph.morphData_;

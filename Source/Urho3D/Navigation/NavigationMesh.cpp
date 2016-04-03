@@ -30,6 +30,7 @@
 #include "../Graphics/Model.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/TerrainPatch.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/CrowdAgent.h"
@@ -1081,10 +1082,10 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    unsigned elementMask;
+    const PODVector<VertexElement>* elements;
 
-    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
+    if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         return;
 
     unsigned srcIndexStart = geometry->GetIndexStart();

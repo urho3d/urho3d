@@ -643,8 +643,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
                 unsigned numVbs = origGeometry->GetNumVertexBuffers();
                 for (unsigned k = 0; k < numVbs; ++k)
                 {
-                    cloneGeometry->SetVertexBuffer(k, vbMapping[origGeometry->GetVertexBuffer(k)],
-                        origGeometry->GetVertexElementMask(k));
+                    cloneGeometry->SetVertexBuffer(k, vbMapping[origGeometry->GetVertexBuffer(k)]);
                 }
                 cloneGeometry->SetDrawRange(origGeometry->GetPrimitiveType(), origGeometry->GetIndexStart(),
                     origGeometry->GetIndexCount(), origGeometry->GetVertexStart(), origGeometry->GetVertexCount(), false);

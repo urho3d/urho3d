@@ -537,7 +537,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
         if (!geometries_[i])
         {
             Geometry* geometry = new Geometry(context_);
-            geometry->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1);
+            geometry->SetVertexBuffer(0, vertexBuffer_);
             batches_[i].geometry_ = geometries_[i] = geometry;
         }
 

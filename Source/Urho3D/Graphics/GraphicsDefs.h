@@ -124,8 +124,8 @@ enum LockState
     LOCK_SCRATCH
 };
 
-/// Vertex elements.
-enum VertexElement
+/// Hardcoded legacy vertex elements.
+enum LegacyVertexElement
 {
     ELEMENT_POSITION = 0,
     ELEMENT_NORMAL,
@@ -142,7 +142,68 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX3,
     // Custom 32-bit integer object index. Due to API limitations, not supported on D3D9
     ELEMENT_OBJECTINDEX,
-    MAX_VERTEX_ELEMENTS
+    MAX_LEGACY_VERTEX_ELEMENTS
+};
+
+/// Arbitrary vertex declaration element datatypes.
+enum VertexElementType
+{
+    TYPE_INT = 0,
+    TYPE_FLOAT,
+    TYPE_VECTOR2,
+    TYPE_VECTOR3,
+    TYPE_VECTOR4,
+    TYPE_UBYTE4,
+    TYPE_UBYTE4_NORM
+};
+
+/// Arbitrary vertex declaration element semantics.
+enum VertexElementSemantic
+{
+    SEM_POSITION = 0,
+    SEM_NORMAL,
+    SEM_BINORMAL,
+    SEM_TANGENT,
+    SEM_TEXCOORD,
+    SEM_COLOR,
+    SEM_BLENDWEIGHTS,
+    SEM_BLENDINDICES,
+    SEM_OBJECTINDEX
+};
+
+/// Vertex element description for arbitrary vertex declarations.
+struct URHO3D_API VertexElement
+{
+    /// Default-construct.
+    VertexElement() :
+        type_(TYPE_VECTOR3),
+        semantic_(SEM_POSITION),
+        index_(0),
+        perInstance_(false),
+        offset_(0)
+    {
+    }
+
+    /// Construct with type, semantic, index and whether is per-instance data.
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) :
+        type_(type),
+        semantic_(semantic),
+        index_(index),
+        perInstance_(perInstance),
+        offset_(0)
+    {
+    }
+
+    /// Data type of element.
+    VertexElementType type_;
+    /// Semantic of element.
+    VertexElementSemantic semantic_;
+    /// Semantic index of element, for example multi-texcoords.
+    unsigned char index_;
+    /// Per-instance flag.
+    bool perInstance_;
+    /// Offset of element from vertex start. Filled by VertexBuffer once the vertex declaration is built.
+    unsigned offset_;
 };
 
 /// Texture filtering mode.
@@ -289,7 +350,6 @@ enum ShadowQuality
     SHADOWQUALITY_BLUR_VSM
 };
 
-
 // Inbuilt shader parameters.
 extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
@@ -353,6 +413,7 @@ static const unsigned CLEAR_COLOR = 0x1;
 static const unsigned CLEAR_DEPTH = 0x2;
 static const unsigned CLEAR_STENCIL = 0x4;
 
+// Legacy vertex element bitmasks.
 static const unsigned MASK_NONE = 0x0;
 static const unsigned MASK_POSITION = 0x1;
 static const unsigned MASK_NORMAL = 0x2;
@@ -368,8 +429,6 @@ static const unsigned MASK_INSTANCEMATRIX1 = 0x400;
 static const unsigned MASK_INSTANCEMATRIX2 = 0x800;
 static const unsigned MASK_INSTANCEMATRIX3 = 0x1000;
 static const unsigned MASK_OBJECTINDEX = 0x2000;
-static const unsigned MASK_DEFAULT = 0xffffffff;
-static const unsigned NO_ELEMENT = 0xffffffff;
 
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;

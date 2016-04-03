@@ -81,8 +81,7 @@ BillboardSet::BillboardSet(Context* context) :
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
 {
-    // Vertex buffer doesn't have its format defined yet, so manually define the elements into Geometry now
-    geometry_->SetVertexBuffer(0, vertexBuffer_, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2);
+    geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetIndexBuffer(indexBuffer_);
 
     batches_.Resize(1);

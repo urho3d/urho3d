@@ -717,7 +717,7 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         if (!vb)
             continue;
 
-        unsigned elementMask = geometry->GetVertexElementMask(i);
+        unsigned elementMask = vb->GetElementMask();
         unsigned char* data = vb->GetShadowData();
         if (!data)
             continue;
@@ -729,12 +729,12 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
         }
         if (elementMask & MASK_NORMAL)
         {
-            normalData = data + vb->GetElementOffset(ELEMENT_NORMAL);
+            normalData = data + vb->GetElementOffset(SEM_NORMAL);
             normalStride = vb->GetVertexSize();
         }
         if (elementMask & MASK_BLENDWEIGHTS)
         {
-            skinningData = data + vb->GetElementOffset(ELEMENT_BLENDWEIGHTS);
+            skinningData = data + vb->GetElementOffset(SEM_BLENDWEIGHTS);
             skinningStride = vb->GetVertexSize();
         }
     }
@@ -743,8 +743,8 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     if (!positionData)
     {
         // As a fallback, try to get the geometry's raw vertex/index data
-        unsigned elementMask;
-        geometry->GetRawData(positionData, positionStride, indexData, indexStride, elementMask);
+        const PODVector<VertexElement>* elements;
+        geometry->GetRawData(positionData, positionStride, indexData, indexStride, elements);
         if (!positionData)
         {
             URHO3D_LOGWARNING("Can not add decal, target drawable has no CPU-side geometry data");

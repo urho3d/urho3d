@@ -590,13 +590,13 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        geometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         occlusionGeometry->SetIndexBuffer(indexBuffer_);
         occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
-        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, sizeof(Vector3), MASK_POSITION);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, MASK_POSITION);
     }
 
     patch->ResetLod();
