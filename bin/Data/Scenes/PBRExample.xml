@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="36.5494" />
 	<attribute name="Next Replicated Node ID" value="144" />
 	<attribute name="Next Replicated Component ID" value="163" />
-	<attribute name="Next Local Node ID" value="16777234" />
-	<attribute name="Next Local Component ID" value="16777420" />
+	<attribute name="Next Local Node ID" value="16777237" />
+	<attribute name="Next Local Component ID" value="16777456" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -138,20 +138,6 @@
 			<component type="StaticModel" id="34">
 				<attribute name="Model" value="Model;Models/Plane.mdl" />
 				<attribute name="Material" value="Material;Materials/PBR/Concrete.xml" />
-			</component>
-		</node>
-		<node id="22">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="1.66697 1.83612 3.88357" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="24">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
 		<node id="23">
@@ -308,34 +294,6 @@
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
-		<node id="37">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-4.33303 1.83612 -14.1164" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="39">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="38">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="1.66697 1.83612 0.88357" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="40">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
 		<node id="39">
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="Box" />
@@ -345,20 +303,6 @@
 			<attribute name="Scale" value="3 3 1" />
 			<attribute name="Variables" />
 			<component type="StaticModel" id="41">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="43">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-4.33303 1.83612 -11.1164" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="45">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
 				<attribute name="Material" value="Material;" />
 				<attribute name="Cast Shadows" value="true" />
@@ -415,20 +359,6 @@
 			<attribute name="Scale" value="3 3 1" />
 			<attribute name="Variables" />
 			<component type="StaticModel" id="49">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="48">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="1.66697 1.83612 -8.11643" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="50">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
 				<attribute name="Material" value="Material;" />
 				<attribute name="Cast Shadows" value="true" />
@@ -719,20 +649,6 @@
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
-		<node id="115">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-4.33303 1.83612 -8.11643" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="123">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
 		<node id="123">
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="Box" />
@@ -929,20 +845,6 @@
 				<attribute name="Cast Shadows" value="true" />
 			</component>
 		</node>
-		<node id="117">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="-4.33303 1.83612 -5.11643" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="125">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
 		<node id="118">
 			<attribute name="Is Enabled" value="true" />
 			<attribute name="Name" value="Box" />
@@ -952,20 +854,6 @@
 			<attribute name="Scale" value="3 3 1" />
 			<attribute name="Variables" />
 			<component type="StaticModel" id="126">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="119">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="1.66697 1.83612 -5.11643" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="127">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
 				<attribute name="Material" value="Material;" />
 				<attribute name="Cast Shadows" value="true" />
@@ -994,20 +882,6 @@
 			<attribute name="Scale" value="3 3 1" />
 			<attribute name="Variables" />
 			<component type="StaticModel" id="129">
-				<attribute name="Model" value="Model;Models/Box.mdl" />
-				<attribute name="Material" value="Material;" />
-				<attribute name="Cast Shadows" value="true" />
-			</component>
-		</node>
-		<node id="122">
-			<attribute name="Is Enabled" value="true" />
-			<attribute name="Name" value="Box" />
-			<attribute name="Tags" />
-			<attribute name="Position" value="1.66697 1.83612 -2.11643" />
-			<attribute name="Rotation" value="2.68221e-07 -2.68221e-07 0.707107 0.707107" />
-			<attribute name="Scale" value="3 3 1" />
-			<attribute name="Variables" />
-			<component type="StaticModel" id="130">
 				<attribute name="Model" value="Model;Models/Box.mdl" />
 				<attribute name="Material" value="Material;" />
 				<attribute name="Cast Shadows" value="true" />
@@ -1074,6 +948,7 @@
 				<attribute name="Variables" />
 				<component type="Light" id="4">
 					<attribute name="Light Type" value="Directional" />
+					<attribute name="Brightness Multiplier" value="0.09" />
 					<attribute name="Cast Shadows" value="true" />
 					<attribute name="CSM Splits" value="10 20 30 40" />
 				</component>
@@ -1104,8 +979,9 @@
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="Zone" id="11">
-			<attribute name="Bounding Box Min" value="-10 -10 -5.69" />
-			<attribute name="Zone Texture" value="TextureCube;Textures/Cubemaps//11.xml" />
+			<attribute name="Bounding Box Min" value="-10 -10 -24.53" />
+			<attribute name="Ambient Color" value="0 0 0 1" />
+			<attribute name="Zone Texture" value="TextureCube;Textures/Cubemaps/11.xml" />
 		</component>
 	</node>
 	<node id="12">
@@ -1307,8 +1183,11 @@
 		<attribute name="Scale" value="1 1 1" />
 		<attribute name="Variables" />
 		<component type="Zone" id="137">
-			<attribute name="Bounding Box Max" value="10 10 5" />
-			<attribute name="Zone Texture" value="TextureCube;Textures/Cubemaps//137.xml" />
+			<attribute name="Bounding Box Min" value="-2.36 -2.33 -3.86" />
+			<attribute name="Bounding Box Max" value="3.95 1.66 4.49" />
+			<attribute name="Ambient Color" value="0 0 0 1" />
+			<attribute name="Priority" value="1" />
+			<attribute name="Zone Texture" value="TextureCube;Textures/Cubemaps/137.xml" />
 		</component>
 	</node>
 	<node id="136">
