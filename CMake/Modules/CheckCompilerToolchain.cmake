@@ -141,8 +141,10 @@ if (NOT ARM)
         endforeach ()
     else ()
         if (MINGW AND COMPILER_VERSION VERSION_LESS 4.9.1)
-            # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
-            message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+            if (NOT DEFINED URHO3D_SSE)     # Only give the warning once during initial configuration
+                # Certain MinGW versions fail to compile SSE code. This is the initial guess for known "bad" version range, and can be tightened later
+                message (WARNING "Disabling SSE by default due to MinGW version. It is recommended to upgrade to MinGW with GCC >= 4.9.1. You can also try to re-enable SSE with CMake option -DURHO3D_SSE=1, but this may result in compile errors.")
+            endif ()
         elseif (NOT EMSCRIPTEN)     # Emscripten does not support SSE/SSE2 (yet) now but erroneously responding positively to our probe, so skip them for Emscripten for now
             check_extension (sse)
             check_extension (sse2)
