@@ -121,7 +121,7 @@ void PS()
     #endif
     
     #ifdef METALIC
-        vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
+        vec3 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy).rgb;
         
         float roughness = max(0.04, roughMetalSrc.r);
         roughness += cRoughnessPS;
@@ -191,9 +191,9 @@ void PS()
 
             vec3 diffuseFactor = diffuseTerm;
             vec3 specFactor = distTerm * fresnelTerm * visTerm;
-            finalColor = (diffuseFactor + specFactor) * lightColor * diff;
+            finalColor.rgb = (diffuseFactor + specFactor) * lightColor * diff;
         #else
-            finalColor = diffuseTerm * lightColor;
+            finalColor.rgb = diffuseTerm * lightColor;
         #endif
 
         #ifdef AMBIENT
@@ -225,7 +225,7 @@ void PS()
         
         vec3 cubeColor = vVertexLight.rgb;
         
-        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, 1.0, cubeColor);      
         vec3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);  
 
         float gamma = 0;
@@ -270,7 +270,7 @@ void PS()
         
         vec3 cubeColor = vVertexLight.rgb;
         
-        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor.rgb, 1.0, cubeColor);      
         vec3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);  
 
         float gamma = 0;
