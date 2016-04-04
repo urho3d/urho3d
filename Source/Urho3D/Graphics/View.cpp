@@ -2129,7 +2129,16 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
             float diagonal = box.Size().Length();
             float compare;
             if (!camera->IsOrthographic())
-                compare = diagonal * halfViewSize / occluder->GetDistance();
+            {
+                // Occluders which are near the camera are more useful then occluders at the end of the camera's draw distance
+                float cameraMaxDistanceFraction = occluder->GetDistance() / camera->GetFarClip();
+                compare = diagonal * halfViewSize / (occluder->GetDistance() * cameraMaxDistanceFraction);
+
+                // Give higher priority to occluders which the camera is inside their AABB
+                const Vector3& cameraPos = camera->GetNode() ? camera->GetNode()->GetWorldPosition() : Vector3::ZERO;
+                if (box.IsInside(cameraPos))
+                    compare *= diagonal;    // size^2
+            }
             else
                 compare = diagonal * invOrthoSize;
 
@@ -2137,9 +2146,10 @@ void View::UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera)
                 erase = true;
             else
             {
-                // Store amount of triangles divided by screen size as a sorting key
-                // (best occluders are big and have few triangles)
-                occluder->SetSortValue((float)occluder->GetNumOccluderTriangles() / compare);
+                // Best occluders have big triangles (low density)
+                float density = occluder->GetNumOccluderTriangles() / diagonal;
+                // Lower value is higher priority
+                occluder->SetSortValue(density / compare);
             }
         }
         else
