@@ -80,9 +80,8 @@ void PS(
     roughness = normalInput.a;
     float metalness = clamp(albedoInput.a, 0.1, 1.0);
 
-    float f0 = lerp(float3(0.03,0.03,0.03), albedoInput.rgb, metalness).r;
-    float3 specColor = max(albedoInput.rgb * metalness, float3(0.08, 0.08, 0.08));
-    specColor *= cMatSpecColor.rgb;
+    float3 specColor = lerp(0.08 * cMatSpecColor.rgb, normalInput.rgb, metalness);
+    //specColor *= cMatSpecColor.rgb;
 
     float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     
@@ -106,33 +105,26 @@ void PS(
     #endif
 
     float3 toCamera = normalize(-worldPos);
-    float3 lightVec = lightDir;
- 
-   
-    float3 diffHn = normalize(toCamera + lightDir);
-    float diffvdh = max(0.0, dot(toCamera, diffHn));
-    float diffndl = max(0.0, dot(normal, lightDir));
-    float diffndv = max(1e-5, dot(normal, toCamera));
-  
-    float areaLight = 1;
-    // #if defined(POINTLIGHT)               
-    //     areaLight = AreaLight(lightVec, toCamera, normal, -worldPos + cLightPosPS.xyz, roughness);
-    // #endif
-   
-    float3 diffuseTerm = BurleyDiffuse(albedoInput.rgb, roughness, diffndv, diffndl, diffvdh) * diff * lightColor.rgb;
- 
-
-    float3 Hn = normalize(toCamera + lightVec);
+    
+    float3 Hn = normalize(toCamera + lightDir);
     float vdh = max(0.0, dot(toCamera, Hn));
     float ndh = max(0.0, dot(normal, Hn));
-    float ndl = max(0.0, dot(normal, lightVec));
-    float ndv = max(1e-5, dot(normal, toCamera));
+    float ndl = max(0.0, dot(normal, lightDir));
+    float ndv = abs(dot(normal, toCamera)) + 1e-5;
    
+    float3 diffuseTerm = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh) * diff;
 
-    float3 fresnelTerm = SchlickGaussianFresnel(f0, vdh) ;
-    float distTerm = GGXDistribution(ndh, roughness) * areaLight;
-    float visTerm = SchlickVisibility(ndl, ndv, roughness);
+    #ifdef SPECULAR
+        float3 fresnelTerm = SchlickFresnel(specColor, vdh);
+        float distTerm = GGXDistribution(ndh, roughness);
+        float visTerm = SchlickVisibility(ndl, ndv, roughness);
 
-    oColor.a = 1;
-    oColor.rgb = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);  
+        float3 diffuseFactor = (diffuseTerm);
+        float3 specularFactor =  distTerm * fresnelTerm * visTerm ;
+        oColor.a = 1;
+        oColor.rgb  = (diffuseFactor + specularFactor) * lightColor * diff;
+    #else
+        oColor.a = 1;
+        oColor.rgb  = diffuseTerm * lightColor;
+    #endif
 }

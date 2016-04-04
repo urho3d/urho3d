@@ -214,8 +214,7 @@ void PS(
 
         float metalness = clamp(roughMetalSrc.g + cMetallicPS, 0.0, 1.0);
         
-        float3 f0 = lerp(float3(0.03,0.03,0.03), diffColor.rgb, metalness);
-        float3 specColor = max(diffColor.rgb * metalness, float3(0.08,0.08,0.08));
+        float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
         specColor *= cMatSpecColor.rgb;
         diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #else
@@ -226,8 +225,7 @@ void PS(
 
         metalness = clamp(metalness, 0.01, 1.0);
      
-        float f0 = lerp(float3(0.03,0.03,0.03), diffColor.rgb, metalness).r;
-        float3 specColor = max(diffColor.rgb * metalness, float3(0.08, 0.08, 0.08));
+        float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
         specColor *= cMatSpecColor.rgb;
         diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #endif
@@ -282,12 +280,13 @@ void PS(
            
             float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
 
-            float3 fresnelTerm = SchlickGaussianFresnel(f0, vdh) ;
+            float3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
             float distTerm = GGXDistribution(ndh, roughness);
             float visTerm = SchlickVisibility(ndl, ndv, roughness);
 
-            finalColor = (diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff ;
-            finalColor.rgb = LinearFromSRGB(finalColor.rgb);
+            float3 diffuseFactor = (diffuseTerm);
+            float3 specularFactor =  distTerm * fresnelTerm * visTerm ;
+            finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
         #else
             finalColor = diff * lightColor * diffColor.rgb;
         #endif
@@ -314,11 +313,11 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
-        //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
-        float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, metalness, cubeColor);
-
-        float gamma = 2.2;                        
-        finalColor += LinearFromSRGB(iblColor * (cubeColor));
+        
+        float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
+        float gamma = 0;
+        finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
@@ -357,10 +356,11 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
-        //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
-        float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, metalness, cubeColor);        
-        float gamma = 3;
-        finalColor += LinearFromSRGB((iblColor) * (cubeColor + gamma));
+        
+        float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
+        float gamma = 0;
+        finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
         
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;

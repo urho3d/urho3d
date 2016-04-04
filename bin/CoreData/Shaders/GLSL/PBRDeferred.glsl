@@ -72,8 +72,7 @@ void PS()
     roughness = clamp(normalInput.a, 0.1, 1.0);
     float metalness = clamp(albedoInput.a, 0.1, 1.0);
 
-    vec3 specColor = max(albedoInput.rgb * metalness, vec3(0.08, 0.08, 0.08));
-    //specColor *= cMatSpecColor.rgb;
+     vec3 specColor = mix(0.08 * cMatSpecColor.rgb, albedoInput.rgb, metalness);
 
     vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
 
@@ -117,7 +116,22 @@ void PS()
     float ndh = max(0.0, dot(normal, Hn));
     float ndl = max(0.0, dot(normal, lightVec));
     float ndv = max(1e-5, dot(normal, toCamera));
-   
+
+     #ifdef SPECULAR
+        vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
+        float distTerm = GGXDistribution(ndh, roughness);
+        float visTerm = SchlickVisibility(ndl, ndv, roughness);
+
+        vec3 diffuseFactor = diffuseTerm;
+        vec3 specFactor = distTerm * fresnelTerm * visTerm;
+
+        gl_FragColor.a = 1;
+        gl_FragColor.rgb = (diffuseFactor + specFactor) * lightColor * diff;
+    #else
+        gl_FragColor.a = 1;
+        gl_FragColor.rgb = diffuseTerm * lightColor;
+    #endif
+
 
     vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
     float distTerm = GGXDistribution(ndh, roughness) * areaLight;

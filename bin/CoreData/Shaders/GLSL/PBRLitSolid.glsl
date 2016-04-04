@@ -134,11 +134,10 @@ void PS()
         float metalness = clamp(cMetallicPS, 0.01, 1.0);
 
     #endif
-    vec3 specColor = max(diffColor.rgb * metalness, vec3(0.08, 0.08, 0.08));
-    specColor *= cMatSpecColor.rgb;
+    vec3 specColor = mix(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
 
-    roughness = clamp(roughness, 0.1, 1.0);
+    roughness = clamp(roughness, 0.005, 1.0);
 
     // Get normal
     #ifdef NORMALMAP
@@ -175,24 +174,26 @@ void PS()
             lightColor = cLightColor.rgb;
         #endif
     
+        vec3 cameraDir = normalize(cCameraPosPS - vWorldPos.xyz);
+        
+        vec3 Hn = normalize(cameraDir + lightDir);
+        float vdh = clamp(dot(cameraDir, Hn), 0.0, 1.0);
+        float ndh = clamp(dot(normal, Hn), 0.0, 1.0);
+        float ndl = clamp(dot(normal, lightDir), 0.0, 1.0);
+        float ndv = abs(dot(normal, cameraDir)) + 0.00001;
+       
+        vec3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
+        
         #ifdef SPECULAR
-            vec3 cameraDir = normalize(cCameraPosPS - vWorldPos.xyz);
-            
-            vec3 Hn = normalize(cameraDir + lightDir);
-            float vdh = clamp(dot(cameraDir, Hn), 0.0, 1.0);
-            float ndh = clamp(dot(normal, Hn), 0.0, 1.0);
-            float ndl = clamp(dot(normal, lightDir), 0.0, 1.0);
-            float ndv = clamp(dot(normal, cameraDir), 0.0, 1.0);;
-           
-            vec3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
-
             vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
             float distTerm = GGXDistribution(ndh, roughness);
             float visTerm = SchlickVisibility(ndl, ndv, roughness);
 
-            finalColor = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);
+            vec3 diffuseFactor = diffuseTerm;
+            vec3 specFactor = distTerm * fresnelTerm * visTerm;
+            finalColor = (diffuseFactor + specFactor) * lightColor * diff;
         #else
-            finalColor = diff * lightColor * diffColor.rgb;
+            finalColor = diffuseTerm * lightColor;
         #endif
 
         #ifdef AMBIENT
@@ -223,8 +224,12 @@ void PS()
         vec3 reflection = normalize(reflect(toCamera, normal));
         
         vec3 cubeColor = vVertexLight.rgb;
-        vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
-        finalColor.rgb += LinearFromSRGB(iblColor * cubeColor);
+        
+        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        vec3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);  
+
+        float gamma = 0;
+        finalColor.rgb += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
 
 
         #ifdef ENVCUBEMAP
@@ -264,10 +269,12 @@ void PS()
         vec3 reflection = normalize(reflect(toCamera, normal));
         
         vec3 cubeColor = vVertexLight.rgb;
-        vec3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);
+        
+        vec3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
+        vec3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);  
 
-        float gamma = 10;
-        finalColor.rgb += LinearFromSRGB(iblColor * (cubeColor + gamma));
+        float gamma = 0;
+        finalColor.rgb += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * textureCube(sEnvCubeMap, reflect(vReflectionVec, normal)).rgb;

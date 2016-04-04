@@ -96,10 +96,6 @@
 
     float3 ImageBasedLighting(in float3 reflectVec, in float3 wsNormal, in float3 toCamera, in float3 specular, in float roughness, in float metallic, out float3 reflectionCubeColor)
     {
-        // reflectionCubeColor = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.6)).rgb;
-    
-        // return ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
-
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float3 Hn = normalize(-toCamera + wsNormal);
         const float vdh = saturate(dot(-toCamera, Hn));
@@ -109,12 +105,7 @@
         float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
         
         float3 cube =  ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
-        reflectionCubeColor = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.6)).rgb;
-
-       // float3 environmentSpecular = float3(0.1,0.1,0.1);
-        
-        float3 environmentSpecular = EnvBRDFApprox(specular, roughness, ndv);
       
-        return environmentSpecular * cube;
+        return cube;
     }
 #endif

@@ -117,10 +117,7 @@
             float mipLevel = (1.0 - smoothness * smoothness) * 10.0;
             
             vec3 cube =  ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
-            reflectionCubeColor = textureCube(sZoneCubeMap, wsNormal, 9.6).rgb;
-            
-            vec3 environmentSpecular = EnvBRDFApprox(specular, roughness, ndv);
           
-            return environmentSpecular * cube;
+            return environmentSpecular;
         }
 #endif
