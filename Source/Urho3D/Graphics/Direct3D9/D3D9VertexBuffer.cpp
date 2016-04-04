@@ -34,20 +34,20 @@ namespace Urho3D
 
 static const VertexElement legacyVertexElements[] =
 {
-    {TYPE_VECTOR3, SEM_POSITION, 0, false},     // Position
-    {TYPE_VECTOR3, SEM_NORMAL, 0, false},       // Normal
-    {TYPE_UBYTE4_NORM, SEM_COLOR, 0, false},    // Color
-    {TYPE_VECTOR2, SEM_TEXCOORD, 0, false},     // Texcoord1
-    {TYPE_VECTOR2, SEM_TEXCOORD, 0, false},     // Texcoord2
-    {TYPE_VECTOR3, SEM_TEXCOORD, 0, false},     // Cubetexcoord1
-    {TYPE_VECTOR3, SEM_TEXCOORD, 1, false},     // Cubetexcoord2
-    {TYPE_VECTOR4, SEM_TANGENT, 0, false},      // Tangent
-    {TYPE_VECTOR4, SEM_BLENDWEIGHTS, 0, false}, // Blendweights
-    {TYPE_UBYTE4, SEM_BLENDINDICES, 0, false},  // Blendindices
-    {TYPE_VECTOR4, SEM_TEXCOORD, 4, true},      // Instancematrix1
-    {TYPE_VECTOR4, SEM_TEXCOORD, 5, true},      // Instancematrix2
-    {TYPE_VECTOR4, SEM_TEXCOORD, 6, true},      // Instancematrix3
-    {TYPE_INT, SEM_OBJECTINDEX, 0, false},      // Objectindex
+    VertexElement(TYPE_VECTOR3, SEM_POSITION, 0, false),     // Position
+    VertexElement(TYPE_VECTOR3, SEM_NORMAL, 0, false),       // Normal
+    VertexElement(TYPE_UBYTE4_NORM, SEM_COLOR, 0, false),    // Color
+    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 0, false),     // Texcoord1
+    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 0, false),     // Texcoord2
+    VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 0, false),     // Cubetexcoord1
+    VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 1, false),     // Cubetexcoord2
+    VertexElement(TYPE_VECTOR4, SEM_TANGENT, 0, false),      // Tangent
+    VertexElement(TYPE_VECTOR4, SEM_BLENDWEIGHTS, 0, false), // Blendweights
+    VertexElement(TYPE_UBYTE4, SEM_BLENDINDICES, 0, false),  // Blendindices
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 4, true),      // Instancematrix1
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 5, true),      // Instancematrix2
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 6, true),      // Instancematrix3
+    VertexElement(TYPE_INT, SEM_OBJECTINDEX, 0, false)      // Objectindex
 };
 
 static const unsigned elementTypeSize[] =
