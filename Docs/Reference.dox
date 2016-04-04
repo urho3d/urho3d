@@ -1034,7 +1034,7 @@ OpenGL ES 2.0 has further limitations:
 
 - Custom clip planes are not currently supported.
 
-- 3D textures are not currently supported.
+- 3D and 2D array textures are not currently supported.
 
 \page Materials Materials
 
@@ -1109,16 +1109,16 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 Using cube map textures requires an XML file to define the cube map face images, or a single image with layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
-Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
+Individual face images are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
 \code
 <cubemap>
-    <face name="PositiveX_TextureName" />
-    <face name="NegativeX_TextureName" />
-    <face name="PositiveY_TextureName" />
-    <face name="NegativeY_TextureName" />
-    <face name="PositiveZ_TextureName" />
-    <face name="NegativeZ_TextureName" />
+    <face name="PositiveX_ImageName" />
+    <face name="NegativeX_ImageName" />
+    <face name="PositiveY_ImageName" />
+    <face name="NegativeY_ImageName" />
+    <face name="PositiveZ_ImageName" />
+    <face name="NegativeZ_ImageName" />
 </cubemap>
 \endcode
 
@@ -1126,7 +1126,7 @@ Using a single image texture and a layout is used like this:
 
 \code
 <cubemap>
-    <image name="TextureName" layout="horizontal|horizontalnvidia|horizontalcross|verticalcross|blender" />
+    <image name="ImageName" layout="horizontal|horizontalnvidia|horizontalcross|verticalcross|blender" />
 </cubemap>
 \endcode
 
@@ -1143,6 +1143,18 @@ For the layout definitions, see http://www.cgtextures.com/content.php?action=tut
 \endcode
 
 Using a 3D texture for color correction postprocess (see bin/Data/PostProcess/ColorCorrection.xml) requires the 3D texture to be assigned to the "volume" texture unit, so that the effect knows to load the texture as the correct type. The lookup for the corrected color happens by using the original color's red channel as the X coordinate, the green channel as the Y coordinate, and blue as the Z. Therefore the identity LUT's slices (which shouldn't transform the color at all) grow red from left to right and green from top to bottom, and finally the slices themselves turn blue from left to right.
+
+\section Materials_2DArrayTextures 2D array textures
+
+2D array textures (Texture2DArray class) are available on OpenGL and Direct3D 11. They are also defined via an XML file defining the images to use on each array layer:
+
+\code
+<texturearray>
+    <layer name="Layer1_ImageName" />
+    <layer name="Layer2_ImageName" />
+    <layer name="Layer3_ImageName" />
+</texturearray>
+\endcode
 
 \section Materials_Techniques Techniques and passes
 
