@@ -77,7 +77,7 @@ function SampleInitMouseMode(mode)
         end
     else
         input.mouseVisible = true
-        SubscribeToEvent("MouseDown", "HandleMouseModeRequest")
+        SubscribeToEvent("MouseButtonDown", "HandleMouseModeRequest")
         SubscribeToEvent("MouseModeChanged", "HandleMouseModeChange")
     end
 end

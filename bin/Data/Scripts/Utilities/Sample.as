@@ -83,7 +83,7 @@ void SampleInitMouseMode(MouseMode mode)
     else
     {
         input.mouseVisible = true;
-        SubscribeToEvent("MouseDown", "HandleMouseModeRequest");
+        SubscribeToEvent("MouseButtonDown", "HandleMouseModeRequest");
         SubscribeToEvent("MouseModeChanged", "HandleMouseModeChange");
     }
 }
