@@ -94,7 +94,7 @@
         return min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
     }
 
-    float3 ImageBasedLighting(in float3 reflectVec, in float3 wsNormal, in float3 toCamera, in float3 specular, in float roughness, in float metallic, out float3 reflectionCubeColor)
+    float3 ImageBasedLighting(in float3 reflectVec, in float3 wsNormal, in float3 toCamera, in float3 specular, in float roughness, out float3 reflectionCubeColor)
     {
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float3 Hn = normalize(-toCamera + wsNormal);
