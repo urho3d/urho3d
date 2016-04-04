@@ -1,6 +1,0 @@
-libcpuid
----------
-
-libcpuid provides CPU identification for the x86 (and x86_64).
-For details about the programming API, please see the docs
-on the project's site (http://libcpuid.sourceforge.net/)
