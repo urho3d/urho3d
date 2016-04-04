@@ -235,7 +235,6 @@ namespace Urho3D
 			imGuiStyle.ItemSpacing = style.ItemSpacing;
 			imGuiStyle.ItemInnerSpacing = style.ItemInnerSpacing;
 			imGuiStyle.TouchExtraPadding = style.TouchExtraPadding;
-			imGuiStyle.WindowFillAlphaDefault = style.WindowFillAlphaDefault;
 			imGuiStyle.IndentSpacing = style.IndentSpacing;
 			imGuiStyle.ColumnsMinSpacing = style.ColumnsMinSpacing;
 			imGuiStyle.ScrollbarSize = style.ScrollbarSize;
@@ -288,7 +287,6 @@ namespace Urho3D
 		style->ItemSpacing = ToImVec2(source.GetChild("ItemSpacing").GetAttribute("value"));
 		style->ItemInnerSpacing = ToImVec2(source.GetChild("ItemInnerSpacing").GetAttribute("value"));
 		style->TouchExtraPadding = ToImVec2(source.GetChild("TouchExtraPadding").GetAttribute("value"));
-		style->WindowFillAlphaDefault = source.GetChild("WindowFillAlphaDefault").GetFloat("value");
 		style->IndentSpacing = source.GetChild("IndentSpacing").GetFloat("value");
 		style->ColumnsMinSpacing = source.GetChild("ColumnsMinSpacing").GetFloat("value");
 		style->ScrollbarSize = source.GetChild("ScrollbarSize").GetFloat("value");
@@ -300,7 +298,6 @@ namespace Urho3D
 		style->AntiAliasedLines = source.GetChild("AntiAliasedLines").GetFloat("value");
 		style->AntiAliasedShapes = source.GetChild("AntiAliasedShapes").GetFloat("value");
 		style->CurveTessellationTol = source.GetChild("CurveTessellationTol").GetFloat("value");
-		style->WindowFillAlphaDefault = source.GetChild("WindowFillAlphaDefault").GetFloat("value");
 
 
 		XMLElement colors = source.GetChild("Colors");
@@ -330,7 +327,6 @@ namespace Urho3D
 		dest.CreateChild("ItemSpacing").SetAttribute("value", ToString(style->ItemSpacing));
 		dest.CreateChild("ItemInnerSpacing").SetAttribute("value", ToString(style->ItemInnerSpacing));
 		dest.CreateChild("TouchExtraPadding").SetAttribute("value", ToString(style->TouchExtraPadding));
-		dest.CreateChild("WindowFillAlphaDefault").SetFloat("value", style->WindowFillAlphaDefault);
 		dest.CreateChild("IndentSpacing").SetFloat("value", style->IndentSpacing);
 		dest.CreateChild("ColumnsMinSpacing").SetFloat("value", style->ColumnsMinSpacing);
 		dest.CreateChild("ScrollbarSize").SetFloat("value", style->ScrollbarSize);
@@ -342,7 +338,6 @@ namespace Urho3D
 		dest.CreateChild("AntiAliasedLines").SetFloat("value", style->AntiAliasedLines);
 		dest.CreateChild("AntiAliasedShapes").SetFloat("value", style->AntiAliasedShapes);
 		dest.CreateChild("CurveTessellationTol").SetFloat("value", style->CurveTessellationTol);
-		dest.CreateChild("WindowFillAlphaDefault").SetFloat("value", style->WindowFillAlphaDefault);
 
 		XMLElement colors =dest.CreateChild("Colors");
 		for (unsigned i = 0; i < ImGuiCol_COUNT; i++)

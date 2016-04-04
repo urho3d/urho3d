@@ -21,7 +21,7 @@ namespace ImGui {
 
 		float fs = 1.f;
 #   ifdef IMGUI_INCLUDE_IMGUI_USER_INL
-		fs = ImGui::GetWindowFontScale();   // Internal to <imgui.cpp>
+		fs = GetCurrentWindow()->FontWindowScale;   // Internal to <imgui.cpp>
 #   endif //   IMGUI_INCLUDE_IMGUI_USER_INL
 
 		if (!open) return selectedEntry;
@@ -72,7 +72,7 @@ namespace ImGui {
 				}
 			}
 			if (scrollDownEntryText && needsScrolling) {
-				const float fs = ImGui::GetWindowFontScale();      // Internal to <imgui.cpp>
+				const float fs = ImGui::GetCurrentWindow()->FontWindowScale;      // Internal to <imgui.cpp>
 				ImGui::SetWindowFontScale(fs*0.75f);
 				if (reverseItems ? (startIndex>0) : (endIndex + 1<numEntries)) {
 					const int entryIndex = reverseItems ? -2 : -3;
@@ -1323,7 +1323,7 @@ namespace ImGui {
 				//draw_list->PathFill(window->Color(hovered ? ImGuiCol_HeaderHovered : ImGuiCol_FrameBg));
 				draw_list->PathFill(hovered ? ImColor(100, 100, 150) : selected ? ImColor(120, 120, 140) : ImColor(70, 70, 70));
 
-				ImVec2 text_size = ImGui::GetWindowFont()->CalcTextSizeA(ImGui::GetWindowFontSize(), FLT_MAX, 0.0f, item_label);
+				ImVec2 text_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, 0.0f, item_label);
 				ImVec2 text_pos = ImVec2(
 					center.x + cosf((item_ang_min + item_ang_max) * 0.5f) * (RADIUS_MIN + RADIUS_MAX) * 0.5f - text_size.x * 0.5f,
 					center.y + sinf((item_ang_min + item_ang_max) * 0.5f) * (RADIUS_MIN + RADIUS_MAX) * 0.5f - text_size.y * 0.5f);
