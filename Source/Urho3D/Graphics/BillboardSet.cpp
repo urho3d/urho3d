@@ -626,6 +626,8 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
     } 
     else
     {
+        Vector3 cameraWorldPosition = frame.camera_->GetNode()->GetWorldPosition();
+
         for (unsigned i = 0; i < enabledBillboards; ++i)
         {
             Billboard& billboard = *sortedBillboards_[i];
@@ -649,9 +651,9 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             dest[8] = billboard.uv_.min_.y_;
             dest[9] = -size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
             dest[10] = -size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
-            dest[11] = frame.camera_->GetNode()->GetWorldPosition().x_;
-            dest[12] = frame.camera_->GetNode()->GetWorldPosition().y_;
-            dest[13] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[11] = cameraWorldPosition.x_;
+            dest[12] = cameraWorldPosition.y_;
+            dest[13] = cameraWorldPosition.z_;
             dest[14] = 1.0f;
 
             dest[15] = billboard.position_.x_;
@@ -665,9 +667,9 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             dest[23] = billboard.uv_.min_.y_;
             dest[24] = size.x_ * rot2D[0][0] + size.y_ * rot2D[0][1];
             dest[25] = size.x_ * rot2D[1][0] + size.y_ * rot2D[1][1];
-            dest[26] = frame.camera_->GetNode()->GetWorldPosition().x_;
-            dest[27] = frame.camera_->GetNode()->GetWorldPosition().y_;
-            dest[28] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[26] = cameraWorldPosition.x_;
+            dest[27] = cameraWorldPosition.y_;
+            dest[28] = cameraWorldPosition.z_;
             dest[29] = 1.0f;
 
             dest[30] = billboard.position_.x_;
@@ -681,9 +683,9 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             dest[38] = billboard.uv_.max_.y_;
             dest[39] = size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
             dest[40] = size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
-            dest[41] = frame.camera_->GetNode()->GetWorldPosition().x_;
-            dest[42] = frame.camera_->GetNode()->GetWorldPosition().y_;
-            dest[43] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[41] = cameraWorldPosition.x_;
+            dest[42] = cameraWorldPosition.y_;
+            dest[43] = cameraWorldPosition.z_;
             dest[44] = 1.0f;
 
             dest[45] = billboard.position_.x_;
@@ -697,9 +699,9 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
             dest[53] = billboard.uv_.max_.y_;
             dest[54] = -size.x_ * rot2D[0][0] - size.y_ * rot2D[0][1];
             dest[55] = -size.x_ * rot2D[1][0] - size.y_ * rot2D[1][1];
-            dest[56] = frame.camera_->GetNode()->GetWorldPosition().x_;
-            dest[57] = frame.camera_->GetNode()->GetWorldPosition().y_;
-            dest[58] = frame.camera_->GetNode()->GetWorldPosition().z_;
+            dest[56] = cameraWorldPosition.x_;
+            dest[57] = cameraWorldPosition.y_;
+            dest[58] = cameraWorldPosition.z_;
             dest[59] = 1.0f;
 
             dest += 60;

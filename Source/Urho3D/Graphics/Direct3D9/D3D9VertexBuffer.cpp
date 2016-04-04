@@ -38,7 +38,7 @@ static const VertexElement legacyVertexElements[] =
     VertexElement(TYPE_VECTOR3, SEM_NORMAL, 0, false),       // Normal
     VertexElement(TYPE_UBYTE4_NORM, SEM_COLOR, 0, false),    // Color
     VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 0, false),     // Texcoord1
-    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 0, false),     // Texcoord2
+    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 1, false),     // Texcoord2
     VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 0, false),     // Cubetexcoord1
     VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 1, false),     // Cubetexcoord2
     VertexElement(TYPE_VECTOR4, SEM_TANGENT, 0, false),      // Tangent
@@ -66,6 +66,7 @@ VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementHash_(0),
+    elementMask_(0),
     pool_(D3DPOOL_MANAGED),
     usage_(0),
     lockState_(LOCK_NONE),
@@ -338,6 +339,7 @@ void VertexBuffer::UpdateOffsets()
 {
     unsigned elementOffset = 0;
     elementHash_ = 0;
+    elementMask_ = 0;
 
     for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
     {
@@ -345,6 +347,13 @@ void VertexBuffer::UpdateOffsets()
         elementOffset += elementTypeSize[i->type_];
         elementHash_ <<= 6;
         elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
+
+        for (unsigned j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
+        {
+            const VertexElement& legacy = legacyVertexElements[j];
+            if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
+                elementMask_ |= (1 << j);
+        }
     }
 
     vertexSize_ = elementOffset;
@@ -386,52 +395,6 @@ const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& el
 bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
     return GetElement(elements, type, semantic, index) != 0;
-}
-
-unsigned VertexBuffer::GetElementMask() const
-{
-    unsigned mask = 0;
-
-    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
-    {
-        if (i->type_ == TYPE_VECTOR2 && i->semantic_ == SEM_TEXCOORD)
-        {
-            if (i->index_ == 0)
-                mask |= MASK_TEXCOORD1;
-            else if (i->index_ == 1)
-                mask |= MASK_TEXCOORD2;
-            else if (i->index_ == 4)
-                mask |= MASK_INSTANCEMATRIX1;
-            else if (i->index_ == 5)
-                mask |= MASK_INSTANCEMATRIX2;
-            else if (i->index_ == 6)
-                mask |= MASK_INSTANCEMATRIX3;
-        }
-        else if (i->type_ == TYPE_VECTOR3)
-        {
-            if (i->semantic_ == SEM_POSITION)
-                mask |= MASK_POSITION;
-            else if (i->semantic_ == SEM_NORMAL)
-                mask |= MASK_NORMAL;
-            else if (i->semantic_ == SEM_TEXCOORD && i->index_ == 0)
-                mask |= MASK_CUBETEXCOORD1;
-            else if (i->semantic_ == SEM_TEXCOORD && i->index_ == 1)
-                mask |= MASK_CUBETEXCOORD2;
-        }
-        else if (i->type_ == TYPE_VECTOR4)
-        {
-            if (i->semantic_ == SEM_TANGENT)
-                mask |= MASK_TANGENT;
-            else if (i->semantic_ == SEM_BLENDWEIGHTS)
-                mask |= MASK_BLENDWEIGHTS;
-        }
-        else if (i->type_ == TYPE_UBYTE4 && i->semantic_ == SEM_BLENDINDICES)
-            mask |= MASK_BLENDINDICES;
-        else if (i->type_ == TYPE_UBYTE4_NORM && i->semantic_ == SEM_COLOR)
-            mask |= MASK_COLOR;
-    }
-
-    return mask;
 }
 
 unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)

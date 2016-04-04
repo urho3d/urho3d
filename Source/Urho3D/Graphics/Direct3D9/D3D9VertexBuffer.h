@@ -102,7 +102,7 @@ public:
     unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
 
     /// Return legacy vertex element mask.
-    unsigned GetElementMask() const;
+    unsigned GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.
     unsigned char* GetShadowData() const { return shadowData_.Get(); }
@@ -150,6 +150,8 @@ private:
     PODVector<VertexElement> elements_;
     /// Vertex element hash.
     unsigned long long elementHash_;
+    /// Vertex element legacy bitmask.
+    unsigned elementMask_;
     /// Memory pool.
     unsigned pool_;
     /// Usage type.
