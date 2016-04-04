@@ -84,21 +84,6 @@
             
             return accumulatedColor / IMPORTANCE_SAMPLES;
         }
-            
-        /// Epic's approximation, convenient outside of mobile as well - very tolerant of 'lazy' IBL such as unfiltered mips
-        /// https://www.unrealengine.com/blog/physically-based-shading-on-mobile
-        ///     specColor: specular color of the fragment
-        ///     roughness: surface roughness
-        ///     nDotV: dot product of normal and view vectors
-        vec3 EnvBRDFApprox(in vec3 specColor, in float roughness, in float nDotV )
-        {            
-            vec4 c0 = vec4(-1.0, -0.0275, -0.572, 0.022);
-            vec4 c1 = vec4(1.0, 0.0425, 1.0, -0.04 );
-            vec4 r = roughness * c0 + c1;
-            float a004 = min( r.x * r.x, exp2( -9.28 * nDotV)) * r.x + r.y;
-            vec2 AB = vec2( -1.04, 1.04) * a004 + r.zw;
-            return specColor * AB.x + AB.y;
-        }
 
         /// Calculate IBL contributation
         ///     reflectVec: reflection vector for cube sampling
@@ -118,6 +103,6 @@
             
             vec3 cube =  ImportanceSampling(reflectVec, wsNormal, toCamera, specular, roughness, reflectionCubeColor);
           
-            return environmentSpecular;
+            return cube; 
         }
 #endif
