@@ -1023,19 +1023,20 @@ macro (setup_target)
         unset (TARGET_PROPERTIES)
     endif ()
 
-    # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red as if they are not yet built
-    if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
-        file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
-        get_target_property (LOCATION ${TARGET_NAME} LOCATION)
-        string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
-        get_filename_component (DIRECTORY ${SYMLINK} PATH)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
-    endif ()
-    # Workaround to avoid technical error due to Travis CI build time limit
     if (DEFINED ENV{TRAVIS})
+        # Workaround to avoid technical error due to Travis CI build time limit
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND rake ci_timeup WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    else ()
+        # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red in the Xcode IDE as if they are not yet built
+        if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
+            file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+            get_target_property (LOCATION ${TARGET_NAME} LOCATION)
+            string (REGEX REPLACE "^.*\\$\\(CONFIGURATION\\)" $(CONFIGURATION) SYMLINK ${LOCATION})
+            get_filename_component (DIRECTORY ${SYMLINK} PATH)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+        endif ()
     endif ()
 endmacro ()
 
