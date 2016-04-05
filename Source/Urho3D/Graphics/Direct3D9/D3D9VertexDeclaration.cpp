@@ -88,48 +88,51 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
     declaration_(0)
 {
     PODVector<VertexDeclarationElement> elements;
+    unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (buffers[i])
+        if (!buffers[i])
+            continue;
+
+        const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
+        bool isExisting = false;
+
+        for (unsigned j = 0; j < srcElements.Size(); ++j)
         {
-            const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
-            bool isExisting = false;
+            const VertexElement& srcElement = srcElements[j];
 
-            for (unsigned j = 0; j < srcElements.Size(); ++j)
+            if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                const VertexElement& srcElement = srcElements[j];
-
-                if (srcElement.semantic_ == SEM_OBJECTINDEX)
-                {
-                    URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
-                    continue;
-                }
-
-                // Override existing element if necessary
-                for (unsigned k = 0; k < elements.Size(); ++k)
-                {
-                    if (elements[k].semantic_ == srcElements[j].semantic_ && elements[k].index_ == srcElements[j].index_)
-                    {
-                        isExisting = true;
-                        elements[k].streamIndex_ = i;
-                        elements[k].offset_ = srcElements[j].offset_;
-                        break;
-                    }
-                }
-
-                if (isExisting)
-                    continue;
-
-                VertexDeclarationElement element;
-                element.semantic_ = srcElement.semantic_;
-                element.type_ = srcElement.type_;
-                element.index_ = srcElement.index_;
-                element.streamIndex_ = i;
-                element.offset_ = srcElement.offset_;
-                elements.Push(element);
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                continue;
             }
+
+            // Override existing element if necessary
+            for (unsigned k = 0; k < prevBufferElements; ++k)
+            {
+                if (elements[k].semantic_ == srcElements[j].semantic_ && elements[k].index_ == srcElements[j].index_)
+                {
+                    isExisting = true;
+                    elements[k].streamIndex_ = i;
+                    elements[k].offset_ = srcElements[j].offset_;
+                    break;
+                }
+            }
+
+            if (isExisting)
+                continue;
+
+            VertexDeclarationElement element;
+            element.semantic_ = srcElement.semantic_;
+            element.type_ = srcElement.type_;
+            element.index_ = srcElement.index_;
+            element.streamIndex_ = i;
+            element.offset_ = srcElement.offset_;
+            elements.Push(element);
         }
+
+        prevBufferElements = elements.Size();
     }
 
     Create(graphics, elements);
@@ -139,48 +142,51 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<
     declaration_(0)
 {
     PODVector<VertexDeclarationElement> elements;
+    unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (buffers[i])
+        if (!buffers[i])
+            continue;
+
+        const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
+        bool isExisting = false;
+
+        for (unsigned j = 0; j < srcElements.Size(); ++j)
         {
-            const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
-            bool isExisting = false;
+            const VertexElement& srcElement = srcElements[j];
 
-            for (unsigned j = 0; j < srcElements.Size(); ++j)
+            if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                const VertexElement& srcElement = srcElements[j];
-
-                if (srcElement.semantic_ == SEM_OBJECTINDEX)
-                {
-                    URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
-                    continue;
-                }
-
-                // Override existing element if necessary
-                for (unsigned k = 0; k < elements.Size(); ++k)
-                {
-                    if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
-                    {
-                        isExisting = true;
-                        elements[k].streamIndex_ = i;
-                        elements[k].offset_ = srcElement.offset_;
-                        break;
-                    }
-                }
-
-                if (isExisting)
-                    continue;
-
-                VertexDeclarationElement element;
-                element.semantic_ = srcElement.semantic_;
-                element.type_ = srcElement.type_;
-                element.index_ = srcElement.index_;
-                element.streamIndex_ = i;
-                element.offset_ = srcElement.offset_;
-                elements.Push(element);
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                continue;
             }
+
+            // Override existing element if necessary
+            for (unsigned k = 0; k < prevBufferElements; ++k)
+            {
+                if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
+                {
+                    isExisting = true;
+                    elements[k].streamIndex_ = i;
+                    elements[k].offset_ = srcElement.offset_;
+                    break;
+                }
+            }
+
+            if (isExisting)
+                continue;
+
+            VertexDeclarationElement element;
+            element.semantic_ = srcElement.semantic_;
+            element.type_ = srcElement.type_;
+            element.index_ = srcElement.index_;
+            element.streamIndex_ = i;
+            element.offset_ = srcElement.offset_;
+            elements.Push(element);
         }
+
+        prevBufferElements = elements.Size();
     }
 
     Create(graphics, elements);
