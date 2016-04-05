@@ -335,7 +335,7 @@ endif ()
 
 # Enable/disable SIMD instruction set for STB image (do it here instead of in the STB CMakeLists.txt because the header files are exposed to Urho3D library user)
 if (NEON AND NOT XCODE)
-    add_definitions (-DSTBI_NEON)       # Cannot define it directory for Xcode due to universal binary support, we define it in the setup_target() macro instead for Xcode
+    add_definitions (-DSTBI_NEON)       # Cannot define it directly for Xcode due to universal binary support, we define it in the setup_target() macro instead for Xcode
 elseif (NOT URHO3D_SSE)
     add_definitions (-DSTBI_NO_SIMD)    # GCC/Clang/MinGW will switch this off automatically except MSVC, but no harm to make it explicit for all
 endif ()
@@ -1032,6 +1032,10 @@ macro (setup_target)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
             COMMAND mkdir -p ${DIRECTORY} && ln -sf $<TARGET_FILE:${TARGET_NAME}> ${DIRECTORY}/$<TARGET_FILE_NAME:${TARGET_NAME}>
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+    endif ()
+    # Workaround to avoid technical error due to Travis CI build time limit
+    if (DEFINED ENV{TRAVIS})
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND rake ci_timeup WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     endif ()
 endmacro ()
 

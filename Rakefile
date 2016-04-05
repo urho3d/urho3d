@@ -80,7 +80,8 @@ task :cmake do
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   end
-  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}" or abort
+  system "#{ccache_envvar} ./#{script}#{ENV['OS'] ? '.bat' : '.sh'} \"#{build_tree}\" #{build_options}"
+  exit $?.exitstatus
 end
 
 # Usage: rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
@@ -167,7 +168,8 @@ task :make do
     build_options = "-j#{numjobs}#{build_options}"
     filter = ''
   end
-  system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}" or abort
+  system "cd \"#{build_tree}\" && #{ccache_envvar} cmake --build . #{cmake_build_options} -- #{build_options} #{filter}"
+  exit $?.exitstatus
 end
 
 # Usage: rake android [parameter='--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as'] [intent=.SampleLauncher] [package=com.github.urho3d] [success_indicator='Initialized engine'] [payload='sleep 30'] [api=21] [abi=armeabi-v7a] [avd=test_#{api}_#{abi}] [retries=10] [retry_interval=10] [install]
@@ -350,7 +352,11 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  system "bash -c 'rake make'" or abort 'Failed to build Urho3D library'
+  if !system "bash -c 'rake make'"
+    abort 'Failed to build Urho3D library' unless $?.exitstatus == 2 && timeup
+    $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+    next
+  end
   if ENV['URHO3D_TESTING'] && !timeup
     # Multi-config CMake generators use different test target name than single-config ones for no good reason
     test = "rake make target=#{ENV['OS'] || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
@@ -638,8 +644,14 @@ task :ci_timer do
   timeup
 end
 
+# Usage: NOT Intended to be used manually
+desc 'Check if the time is up'
+task :ci_timeup do
+  abort "Time up!" if timeup true
+end
+
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup
+def timeup quiet = false
   unless File.exists?('start_time.log')
     system 'touch start_time.log split_time.log'
     return nil
@@ -648,7 +660,7 @@ def timeup
   elapsed_time = (current_time - File.atime('start_time.log')) / 60.0
   lap_time = (current_time - File.atime('split_time.log')) / 60.0
   system 'touch split_time.log'
-  puts "\n=== elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds, lap time: #{lap_time.to_i} minutes #{((lap_time - lap_time.to_i) * 60.0).round} seconds ===\n\n" unless File.exists?('already_timeup.log'); $stdout.flush
+  puts "\n=== elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds, lap time: #{lap_time.to_i} minutes #{((lap_time - lap_time.to_i) * 60.0).round} seconds ===\n\n" unless quiet || File.exists?('already_timeup.log'); $stdout.flush
   return system('touch already_timeup.log') if elapsed_time > 40.0
 end
 
