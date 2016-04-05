@@ -132,6 +132,13 @@ void Log::SetQuiet(bool quiet)
 
 void Log::Write(int level, const String& message)
 {
+    // Special case for LOG_RAW level
+    if (level == LOG_RAW)
+    {
+        WriteRaw(message, false);
+        return;
+    }
+
     assert(level >= LOG_DEBUG && level < LOG_NONE);
 
     // If not in the main thread, store message for later processing
