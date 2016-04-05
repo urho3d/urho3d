@@ -185,6 +185,7 @@ namespace Urho3D
 <a href="#Class_Text3D"><b>Text3D</b></a>
 <a href="#Class_Texture"><b>Texture</b></a>
 <a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture2DArray"><b>Texture2DArray</b></a>
 <a href="#Class_Texture3D"><b>Texture3D</b></a>
 <a href="#Class_TextureCube"><b>TextureCube</b></a>
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
@@ -6104,6 +6105,25 @@ Methods:
 
 Properties:
 
+- RenderSurface* renderSurface (readonly)
+
+<a name="Class_Texture2DArray"></a>
+### Texture2DArray : Texture
+
+Methods:
+
+- Texture2DArray() (GC)
+- Texture2DArray* new()
+- void delete()
+- void SetLayers(unsigned layers)
+- bool SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetData(unsigned layer, Image* image, bool useAlpha = false)
+- unsigned GetLayers() const
+- RenderSurface* GetRenderSurface() const
+
+Properties:
+
+- unsigned layers
 - RenderSurface* renderSurface (readonly)
 
 <a name="Class_Texture3D"></a>
