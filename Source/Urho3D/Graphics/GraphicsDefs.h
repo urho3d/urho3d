@@ -206,6 +206,12 @@ struct URHO3D_API VertexElement
     unsigned offset_;
 };
 
+/// Sizes of vertex element types.
+extern URHO3D_API const unsigned ELEMENT_TYPESIZES[];
+
+/// Vertex element definitions for the legacy elements.
+extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[];
+
 /// Texture filtering mode.
 enum TextureFilterMode
 {
