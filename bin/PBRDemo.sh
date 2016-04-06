@@ -10,4 +10,4 @@
 #   Start the server with "./NinjaSnowWar.sh -w -server"
 #   Start the client on the same host with "./NinjaSnowWar.sh -w -nobgm -address `hostname`"
 #
-$(dirname $0)/Urho3DPlayer 42_PBRMaterials.as $@
+$(dirname $0)/Urho3DPlayer Scripts/42_PBRMaterials.as $@
