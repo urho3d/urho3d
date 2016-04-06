@@ -3031,10 +3031,12 @@ void Graphics::PrepareDraw()
 
         for (unsigned i = MAX_VERTEX_STREAMS - 1; i < MAX_VERTEX_STREAMS; --i)
         {
-            if (!vertexBuffers_[i] || !impl_->vertexAttributes_)
+            VertexBuffer* buffer = vertexBuffers_[i];
+            // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
+            // in which case the pointer will be invalid and cause a crash
+            if (!buffer || !buffer->GetGPUObject() || !impl_->vertexAttributes_)
                 continue;
 
-            VertexBuffer* buffer = vertexBuffers_[i];
             const PODVector<VertexElement>& elements = buffer->GetElements();
 
             for (PODVector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
