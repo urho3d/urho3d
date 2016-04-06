@@ -129,7 +129,7 @@ void VS(float4 iPos : POSITION,
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 oVertexLight += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
+
         oScreenPos = GetScreenPos(oPos);
 
         #ifdef ENVCUBEMAP
@@ -205,7 +205,7 @@ void PS(
     #endif
 
     // Get material specular albedo
-    #ifdef METALIC // METALNESS
+    #ifdef METALLIC // METALNESS
         float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
 
         float roughness = max(0.04, roughMetalSrc.r);
@@ -226,17 +226,24 @@ void PS(
         metalness = clamp(metalness, 0.01, 1.0);
      
         float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
+=======
+
+        //float f0 = lerp(float3(0.03,0.03,0.03), diffColor.rgb, metalness).r;
+        float3 specColor = max(diffColor.rgb * metalness, float3(0.08, 0.08, 0.08));
+        float3 f0 = specColor;
+>>>>>>> fe1aa4b... - Fix Metallic typo
         specColor *= cMatSpecColor.rgb;
         diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #endif
-        
-       
+
     roughness = clamp(roughness, 0.01, 1.0);
 
     // Get normal
     #ifdef NORMALMAP
         float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
-        float3 normal = normalize(mul(DecodeNormal(Sample2D(NormalMap, iTexCoord.xy)), tbn));
+        float3 nn = DecodeNormal(Sample2D(NormalMap, iTexCoord.xy));
+        nn.rg *= 1.0;
+        float3 normal = normalize(mul(nn, tbn));
     #else
         float3 normal = normalize(iNormal);
     #endif
@@ -267,18 +274,38 @@ void PS(
         #else
             lightColor = cLightColor.rgb;
         #endif
-    
+
         #ifdef SPECULAR
             float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
             float3 lightVec = lightDir;
 
+<<<<<<< HEAD
+=======
+            float areaLight = 1;
+            // #if defined(POINTLIGHT)
+            //     areaLight = AreaLight(lightVec, toCamera, normal, cLightPosPS.xyz - iWorldPos.xyz, roughness);
+            // #endif
+
+            float3 diffHn = normalize(toCamera + lightDir);
+            float diffvdh = max(0.0, dot(toCamera, diffHn));
+            float diffndl = max(0.0, dot(normal, lightDir));
+            float diffndv = max(1e-5, dot(normal, toCamera));
+
+            float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, diffndv, diffndl, diffvdh) * diff * lightColor.rgb;
+
+
+>>>>>>> fe1aa4b... - Fix Metallic typo
             float3 Hn = normalize(toCamera + lightVec);
             float vdh = max(0.0, dot(toCamera, Hn));
             float ndh = max(0.0, dot(normal, Hn));
             float ndl = max(0.0, dot(normal, lightVec));
             float ndv = max(1e-5, dot(normal, toCamera));
+<<<<<<< HEAD
            
             float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
+=======
+
+>>>>>>> fe1aa4b... - Fix Metallic typo
 
             float3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
             float distTerm = GGXDistribution(ndh, roughness);
@@ -313,11 +340,19 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
+<<<<<<< HEAD
         
         float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
         float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
         float gamma = 0;
         finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
+=======
+        //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
+        float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, metalness, cubeColor);
+
+        float gamma = 2.2;
+        finalColor += LinearFromSRGB(iblColor * (cubeColor));
+>>>>>>> fe1aa4b... - Fix Metallic typo
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
@@ -356,12 +391,21 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
+<<<<<<< HEAD
         
         float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
         float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
         float gamma = 0;
         finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
         
+=======
+        //float3 iblColor = ApproximateSpecularIBL(specColor, roughness, normal, -toCamera);
+        float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, metalness, cubeColor);
+        float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, metalness, cubeColor);
+        float gamma = 0;
+        finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
+
+>>>>>>> fe1aa4b... - Fix Metallic typo
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
