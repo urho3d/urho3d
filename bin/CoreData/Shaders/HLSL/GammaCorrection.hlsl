@@ -3,6 +3,7 @@
 #include "Samplers.hlsl"
 #include "ScreenPos.hlsl"
 #include "PostProcess.hlsl"
+#include "ColorSpace.hlsl"
 
 void VS(float4 iPos : POSITION,
     out float2 oScreenPos : TEXCOORD0,
@@ -18,5 +19,5 @@ void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
     float3 color = Sample2D(DiffMap, iScreenPos).rgb;
-    oColor = float4(ToInverseGamma(color), 1.0);
+    oColor = float4(ToGammaTrue(color), 1.0);
 }

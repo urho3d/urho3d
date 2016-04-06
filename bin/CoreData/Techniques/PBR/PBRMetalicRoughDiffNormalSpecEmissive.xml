@@ -2,7 +2,7 @@
     <pass name="base" psdefines="EMISSIVEMAP"/>
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="material" psdefines="MATERIAL EMISSIVEMAP NORMALMAP" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" psdefines="DEFERRED EMISSIVEMAP NORMALMAP" />
+    <pass name="deferred" psdefines="DEFERRED EMISSIVEMAP NORMALMAP" blend="add"/>
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

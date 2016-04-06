@@ -3,6 +3,7 @@
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
+#include "Constants.hlsl"
 #include "Fog.hlsl"
 #include "BDRF.hlsl"
 #include "IBL.hlsl"
@@ -129,7 +130,7 @@ void VS(float4 iPos : POSITION,
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 oVertexLight += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
+
         oScreenPos = GetScreenPos(oPos);
 
         #ifdef ENVCUBEMAP
@@ -206,46 +207,38 @@ void PS(
 
     // Get material specular albedo
     #ifdef METALIC // METALNESS
-        float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
+        const float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
 
-        float roughness = max(0.04, roughMetalSrc.r);
-        roughness += cRoughnessPS;
-        roughness = pow(roughness, 2);
+        const float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
+        const float metalness = clamp(roughMetalSrc.g + cMetallicPS, METALNESS_FLOOR, 1.0);
 
-        float metalness = clamp(roughMetalSrc.g + cMetallicPS, 0.0, 1.0);
-        
         float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
         specColor *= cMatSpecColor.rgb;
         diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #else
-        float roughness = cRoughnessPS;
-        roughness *= roughness;
-        //roughness = pow(roughness, 2);
-        float metalness = cMetallicPS;
+        const float roughness = clamp(pow(cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
+        const float metalness = clamp(cMetallicPS, METALNESS_FLOOR, 1.0);
 
-        metalness = clamp(metalness, 0.01, 1.0);
-     
         float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
         specColor *= cMatSpecColor.rgb;
         diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #endif
-        
-       
-    roughness = clamp(roughness, 0.01, 1.0);
 
     // Get normal
     #ifdef NORMALMAP
-        float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
-        float3 normal = normalize(mul(DecodeNormal(Sample2D(NormalMap, iTexCoord.xy)), tbn));
+        const float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
+        const float3 nn = DecodeNormal(Sample2D(NormalMap, iTexCoord.xy));
+        //nn.rg *= 2.0;
+        const float3 normal = normalize(mul(nn, tbn));
     #else
-        float3 normal = normalize(iNormal);
+        const float3 normal = normalize(iNormal);
     #endif
 
     // Get fog factor
     #ifdef HEIGHTFOG
-        float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
+        const float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
     #else
-        float fogFactor = GetFogFactor(iWorldPos.w);
+        const float fogFactor = GetFogFactor(iWorldPos.w);
     #endif
 
     #if defined(PERPIXEL)
@@ -267,25 +260,25 @@ void PS(
         #else
             lightColor = cLightColor.rgb;
         #endif
-    
+
         #ifdef SPECULAR
-            float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
-            float3 lightVec = lightDir;
+            const float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
+            const float3 lightVec = lightDir;
 
-            float3 Hn = normalize(toCamera + lightVec);
-            float vdh = max(0.0, dot(toCamera, Hn));
-            float ndh = max(0.0, dot(normal, Hn));
-            float ndl = max(0.0, dot(normal, lightVec));
-            float ndv = max(1e-5, dot(normal, toCamera));
-           
-            float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh) * diff * lightColor.rgb;
+            const float3 Hn = normalize(toCamera + lightVec);
+            const float vdh = max(0.0, dot(toCamera, Hn));
+            const float ndh = max(0.0, dot(normal, Hn));
+            const float ndl = max(0.0, dot(normal, lightVec));
+            const float ndv = max(M_EPSILON, dot(normal, toCamera));
 
-            float3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
-            float distTerm = GGXDistribution(ndh, roughness);
-            float visTerm = SchlickVisibility(ndl, ndv, roughness);
+            const float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
 
-            float3 diffuseFactor = (diffuseTerm);
-            float3 specularFactor =  distTerm * fresnelTerm * visTerm ;
+            const float3 fresnelTerm = Fresnel(specColor, vdh) ;
+            const float distTerm = Distribution(ndh, roughness);
+            const float visTerm = Visibility(ndl, ndv, roughness);
+
+            const float3 diffuseFactor = (diffuseTerm);
+            const float3 specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
             finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
         #else
             finalColor = diff * lightColor * diffColor.rgb;
@@ -300,9 +293,6 @@ void PS(
         #endif
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        float specIntensity = specColor.g;
-        float specPower = cMatSpecColor.a / 255.0;
-
         float3 finalColor = iVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
@@ -313,11 +303,10 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
-        
-        float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
-        float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
-        float gamma = 0;
-        finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
+
+        const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
+        const float gamma = 0;
+        finalColor += iblColor * (cubeColor + gamma);
 
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
@@ -330,10 +319,10 @@ void PS(
         #else
             finalColor += cMatEmissiveColor;
         #endif
-
-        oColor = float4(GetFog(finalColor, fogFactor), 1.0);
-        oAlbedo = fogFactor * float4(diffColor.rgb, specIntensity);
-        oNormal = float4(normal * 0.5 + 0.5, specPower);
+        const float3 spareData = 0; // Can be used to pass more data to deferred renderer
+        oColor = float4(spareData, specColor.r);
+        oAlbedo = float4(diffColor.rgb, specColor.g);
+        oNormal = float4((normal * roughness), specColor.b);
         oDepth = iWorldPos.w;
     #else
         // Ambient & per-vertex lighting
@@ -356,12 +345,13 @@ void PS(
 
         const float3 reflection = normalize(reflect(toCamera, normal));
         float3 cubeColor = iVertexLight.rgb;
-        
-        float3 diffIblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, 1.0, cubeColor);      
-        float3 specIblColor = ImageBasedLighting(reflection, normal, toCamera, specColor, roughness, cubeColor);        
-        float gamma = 0;
-        finalColor += LinearFromSRGB((diffIblColor + specIblColor) * (cubeColor + gamma));
-        
+
+        #ifdef IBL
+          const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
+          const float gamma = 0;
+          finalColor += iblColor * (cubeColor + gamma);
+        #endif
+
         #ifdef ENVCUBEMAP
             finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
         #endif
@@ -374,6 +364,6 @@ void PS(
             finalColor += cMatEmissiveColor;
         #endif
 
-        oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
+        oColor = float4(GetFog((finalColor), fogFactor), diffColor.a);
     #endif
 }
