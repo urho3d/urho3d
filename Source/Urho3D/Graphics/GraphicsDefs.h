@@ -154,7 +154,8 @@ enum VertexElementType
     TYPE_VECTOR3,
     TYPE_VECTOR4,
     TYPE_UBYTE4,
-    TYPE_UBYTE4_NORM
+    TYPE_UBYTE4_NORM,
+    MAX_VERTEX_ELEMENT_TYPES
 };
 
 /// Arbitrary vertex declaration element semantics.
@@ -168,7 +169,8 @@ enum VertexElementSemantic
     SEM_COLOR,
     SEM_BLENDWEIGHTS,
     SEM_BLENDINDICES,
-    SEM_OBJECTINDEX
+    SEM_OBJECTINDEX,
+    MAX_VERTEX_ELEMENT_SEMANTICS
 };
 
 /// Vertex element description for arbitrary vertex declarations.

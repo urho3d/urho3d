@@ -163,11 +163,26 @@ static const unsigned glStencilOps[] =
 };
 #endif
 
-// Remap vertex attributes on OpenGL so that all usually needed attributes including skinning fit to the first 8.
-// This avoids a skinning bug on GLES2 devices which only support 8.
-static const unsigned glVertexAttrIndex[] =
+static const unsigned glElementTypes[] =
 {
-    0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12, 13
+    GL_INT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE
+};
+
+static const unsigned glElementComponents[] =
+{
+    1,
+    1,
+    2,
+    3,
+    4,
+    4,
+    4
 };
 
 #ifdef GL_ES_VERSION_2_0
@@ -845,114 +860,42 @@ void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
     static PODVector<VertexBuffer*> vertexBuffers(1);
-    static PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
-    elementMasks[0] = MASK_DEFAULT;
-    SetVertexBuffers(vertexBuffers, elementMasks);
+    SetVertexBuffers(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
 
-    bool changed = false;
-    unsigned newAttributes = 0;
+    if (instanceOffset != lastInstanceOffset_)
+    {
+        lastInstanceOffset_ = instanceOffset;
+        impl_->vertexBuffersDirty_ = true;
+    }
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         VertexBuffer* buffer = 0;
-        unsigned elementMask = 0;
-
-        if (i < buffers.Size() && buffers[i])
-        {
+        if (i < buffers.Size())
             buffer = buffers[i];
-            if (elementMasks[i] == MASK_DEFAULT)
-                elementMask = buffer->GetElementMask();
-            else
-                elementMask = buffer->GetElementMask() & elementMasks[i];
-        }
-
-        // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && instanceOffset == lastInstanceOffset_ && !changed)
+        if (buffer != vertexBuffers_[i])
         {
-            newAttributes |= elementMask;
-            continue;
+            vertexBuffers_[i] = buffer;
+            impl_->vertexBuffersDirty_ = true;
         }
-
-        vertexBuffers_[i] = buffer;
-        elementMasks_[i] = elementMask;
-        changed = true;
-
-        // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
-        // in which case the pointer will be invalid and cause a crash
-        if (!buffer || !buffer->GetGPUObject())
-            continue;
-
-        SetVBO(buffer->GetGPUObject());
-        unsigned vertexSize = buffer->GetVertexSize();
-
-        for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
-        {
-            unsigned attrIndex = glVertexAttrIndex[j];
-            unsigned elementBit = (unsigned)(1 << j);
-
-            if (elementMask & elementBit)
-            {
-                newAttributes |= elementBit;
-
-                // Enable attribute if not enabled yet
-                if ((impl_->enabledAttributes_ & elementBit) == 0)
-                {
-                    glEnableVertexAttribArray(attrIndex);
-                    impl_->enabledAttributes_ |= elementBit;
-                }
-
-                // Set the attribute pointer. Add instance offset for the instance matrix pointers
-                unsigned offset = (j >= ELEMENT_INSTANCEMATRIX1 && j < ELEMENT_OBJECTINDEX) ? instanceOffset * vertexSize : 0;
-                glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    (GLboolean)VertexBuffer::elementNormalize[j], vertexSize,
-                    reinterpret_cast<const GLvoid*>(buffer->GetElementOffset((VertexElement)j) + offset));
-            }
-        }
-    }
-
-    if (!changed)
-        return true;
-
-    lastInstanceOffset_ = instanceOffset;
-
-    // Now check which vertex attributes should be disabled
-    unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
-    unsigned disableIndex = 0;
-
-    while (disableAttributes)
-    {
-        if (disableAttributes & 1)
-        {
-            glDisableVertexAttribArray(glVertexAttrIndex[disableIndex]);
-            impl_->enabledAttributes_ &= ~(1 << disableIndex);
-        }
-        disableAttributes >>= 1;
-        ++disableIndex;
     }
 
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)
@@ -1088,6 +1031,19 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
+
+    if (shaderProgram_)
+    {
+        impl_->usedVertexAttributes_ = shaderProgram_->GetUsedVertexAttributes();
+        impl_->vertexAttributes_ = &shaderProgram_->GetVertexAttributes();
+    }
+    else
+    {
+        impl_->usedVertexAttributes_ = 0;
+        impl_->vertexAttributes_ = 0;
+    }
+
+    impl_->vertexBuffersDirty_ = true;
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -2776,10 +2732,6 @@ void Graphics::CheckFeatureSupport()
         sRGBSupport_ = true;
         sRGBWriteSupport_ = true;
 
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
-
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &numSupportedRTs);
     }
     else
@@ -2789,14 +2741,6 @@ void Graphics::CheckFeatureSupport()
         anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
         sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
         sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
-
-        // Set up instancing divisors if supported
-        if (instancingSupport_)
-        {
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
-        }
 
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
     }
@@ -2824,12 +2768,6 @@ void Graphics::CheckFeatureSupport()
     // Instancing is in core in WebGL 2, so the extension may not be present anymore. In WebGL 1, find https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
     // TODO: In the distant future, this may break if WebGL 3 is introduced, so either improve the GL_VERSION parsing here, or keep track of which WebGL version we attempted to initialize.
     instancingSupport_ = (strstr((const char *)glGetString(GL_VERSION), "WebGL 2.") != 0) || CheckExtension("ANGLE_instanced_arrays");
-    if (instancingSupport_)
-    {
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX1, 1);
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX2, 1);
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX3, 1);
-    }
 #else
     dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
     etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
@@ -3084,6 +3022,86 @@ void Graphics::PrepareDraw()
         }
 #endif
     }
+
+    if (impl_->vertexBuffersDirty_)
+    {
+        // Go through currently bound vertex buffers and set the attribute pointers that are available & required
+        // Use reverse order so that elements from higher index buffers will override lower index buffers
+        unsigned assignedLocations = 0;
+
+        for (unsigned i = MAX_VERTEX_STREAMS - 1; i < MAX_VERTEX_STREAMS; --i)
+        {
+            if (!vertexBuffers_[i] || !impl_->vertexAttributes_)
+                continue;
+
+            VertexBuffer* buffer = vertexBuffers_[i];
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+
+            for (PODVector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
+            {
+                const VertexElement& element = *j;
+                HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k = 
+                    impl_->vertexAttributes_->Find(MakePair((unsigned char)element.semantic_, element.index_));
+
+                if (k != impl_->vertexAttributes_->End())
+                {
+                    unsigned location = k->second_;
+                    unsigned locationMask = 1 << location;
+                    if (assignedLocations & locationMask)
+                        continue; // Already assigned by higher index vertex buffer
+                    assignedLocations |= locationMask;
+
+                    // Enable attribute if not enabled yet
+                    if (!(impl_->enabledVertexAttributes_ & locationMask))
+                    {
+                        glEnableVertexAttribArray(location);
+                        impl_->enabledVertexAttributes_ |= locationMask;
+                    }
+
+                    // Enable/disable instancing divisor as necessary
+                    unsigned dataStart = element.offset_;
+                    if (element.perInstance_)
+                    {
+                        dataStart += lastInstanceOffset_ * buffer->GetVertexSize();
+                        if (!(impl_->instancingVertexAttributes_ & locationMask))
+                        {
+                            SetVertexAttribDivisor(location, 1);
+                            impl_->instancingVertexAttributes_ |= locationMask;
+                        }
+                    }
+                    else
+                    {
+                        if (impl_->instancingVertexAttributes_ & locationMask)
+                        {
+                            SetVertexAttribDivisor(location, 0);
+                            impl_->instancingVertexAttributes_ &= ~locationMask;
+                        }
+                    }
+
+                    SetVBO(buffer->GetGPUObject());
+                    glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
+                        element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
+                        (const void *)dataStart);
+                }
+            }
+        }
+
+        // Finally disable unnecessary vertex attributes
+        unsigned disableVertexAttributes = impl_->enabledVertexAttributes_ & (~impl_->usedVertexAttributes_);
+        unsigned location = 0;
+        while (disableVertexAttributes)
+        {
+            if (disableVertexAttributes & 1)
+            {
+                glDisableVertexAttribArray(location);
+                impl_->enabledVertexAttributes_ &= ~(1 << location);
+            }
+            ++location;
+            disableVertexAttributes >>= 1;
+        }
+
+        impl_->vertexBuffersDirty_ = false;
+    }
 }
 
 void Graphics::CleanupFramebuffers()
@@ -3149,7 +3167,9 @@ void Graphics::ResetCachedState()
     useClipPlane_ = false;
     lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
-    impl_->enabledAttributes_ = 0;
+    impl_->enabledVertexAttributes_ = 0;
+    impl_->usedVertexAttributes_ = 0;
+    impl_->instancingVertexAttributes_ = 0;
     impl_->boundFBO_ = impl_->systemFBO_;
     impl_->boundVBO_ = 0;
     impl_->boundUBO_ = 0;
@@ -3291,6 +3311,21 @@ bool Graphics::CheckFramebuffer()
     else
 #endif
         return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (gl3Support)
+        glVertexAttribDivisor(location, divisor);
+    else if (instancingSupport_)
+        glVertexAttribDivisorARB(location, divisor);
+#else
+#ifdef __EMSCRIPTEN__
+    if (instancingSupport_)
+        glVertexAttribDivisorANGLE(location, divisor);
+#endif
+#endif
 }
 
 void RegisterGraphicsLibrary(Context* context)
