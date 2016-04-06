@@ -120,13 +120,8 @@ void PS()
         diffColor *= vColor;
     #endif
     
-<<<<<<< HEAD
     #ifdef METALIC
         vec3 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy).rgb;
-=======
-    #ifdef METALLIC
-        vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
->>>>>>> fe1aa4b... - Fix Metallic typo
         
         float roughness = max(0.04, roughMetalSrc.r);
         roughness += cRoughnessPS;
