@@ -48,6 +48,7 @@ enum NavmeshPartitionType
 };
 
 class Geometry;
+class NavArea;
 
 struct FindPathData;
 struct NavBuildData;
