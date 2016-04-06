@@ -324,6 +324,9 @@ protected:
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
     bool drawNavAreas_;
+
+    /// NavAreas for this NavMesh
+    PODVector<Node*> areas_;
 };
 
 /// Register Navigation library objects.
