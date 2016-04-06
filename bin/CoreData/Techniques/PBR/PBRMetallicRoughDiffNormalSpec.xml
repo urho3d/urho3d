@@ -1,0 +1,8 @@
+<technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NORMALMAP" psdefines="NORMALMAP DIFFMAP METALLIC ROUGHNESS PBR IBL">
+    <pass name="base" vsdefines="NORMALMAP" psdefines="NORMALMAP" />
+    <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
+    <pass name="material" psdefines="MATERIAL NORMALMAP" depthtest="equal" depthwrite="false" />
+    <pass name="deferred" psdefines="DEFERRED" />
+    <pass name="depth" vs="Depth" ps="Depth" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" />
+</technique>

@@ -1164,7 +1164,7 @@ void Material::ResetToDefaults()
         return;
 
     SetNumTechniques(1);
-    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
+    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/PBR/PBRNoTexture.xml"));
 
     textures_.Clear();
 
@@ -1176,6 +1176,8 @@ void Material::ResetToDefaults()
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    SetShaderParameter("RoughnessPS", (float) 0.5f);
+    SetShaderParameter("MetallicPS", (float) 0.0f);
     batchedParameterUpdate_ = false;
 
     cullMode_ = CULL_CCW;
