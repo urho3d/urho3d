@@ -584,6 +584,20 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
         pt.flag_ = (NavigationPathPointFlag)pathData_->pathFlags_[i];
         pt.areaID_ = pathData_->pathAreras_[i];
 
+        for (unsigned j = 0; j < areas_.Size(); j++)
+        {
+            NavArea* area = areas_[j]->GetComponent<NavArea>();
+            if (area && area->IsEnabledEffective()) 
+            {
+                BoundingBox bb = area->GetWorldBoundingBox();
+                if (bb.IsInside(pt.position_) == INSIDE)
+                {
+                    pt.areaID_ = (unsigned char)area->GetAreaID();
+                    break;
+                }
+            }
+        }
+
         dest.Push(pt);
     }
 }
@@ -866,6 +880,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     }
 
     // Get nav area volumes
+    node_->GetChildrenWithComponent<NavArea>(areas_, true);
     PODVector<NavArea*> navAreas;
     node_->GetComponents<NavArea>(navAreas, true);
     for (unsigned i = 0; i < navAreas.Size(); ++i)
