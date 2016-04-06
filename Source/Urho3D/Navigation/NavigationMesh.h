@@ -314,19 +314,16 @@ protected:
     int numTilesZ_;
     /// Whole navigation mesh bounding box.
     BoundingBox boundingBox_;
-
     /// Type of the heightfield partitioning.
     NavmeshPartitionType partitionType_;
     /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
-    bool drawNavAreas_;
-
+    bool drawNavAreas_;   
     /// NavAreas for this NavMesh
-    PODVector<Node*> areas_;
+    Vector<WeakPtr<NavArea>> areas_;
 };
 
 /// Register Navigation library objects.
