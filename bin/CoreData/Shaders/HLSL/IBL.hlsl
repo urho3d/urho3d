@@ -10,7 +10,7 @@
         #else
             const float blurFactor = 5.0;
         #endif
-        const float3 Xi3 = normalize(lerp(float3(0,0,1), float3(Xi.xy * blurFactor , 1), a));
+        const float3 Xi3 = lerp(float3(0,0,1), normalize(float3(Xi.xy * blurFactor , 1)), a);
         const float3 XiWS = mul(Xi3, tbn);
         return normalize(N + XiWS);
     }
@@ -77,7 +77,7 @@
 
         const float3 V = normalize(-toCamera);
         const float3 N = normalize(wsNormal);
-        const float ndv = saturate(dot(N, V));
+        const float ndv = saturate(abs(dot(N, V)));
 
         const float specMipLevel = GetMipFromRougness(roughness);
 
@@ -94,11 +94,11 @@
                 const float mipLevel = 9.0;
 
                 const float3 H = ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N);
-                const float3 L = normalize(N + H);
+                const float3 L = 2.0 * dot( V, H ) * H - V;
 
-                const float vdh = saturate(dot(V, H));
-                const float ndh = saturate(dot(N, H));
-                const float ndl = saturate(dot(N, L));
+                const float vdh = saturate(abs(dot(V, H)));
+                const float ndh = saturate(abs(dot(N, H)));
+                const float ndl = saturate(abs(dot(N, L)));
 
                 //if (ndl > 0.0)
                 {
@@ -116,46 +116,47 @@
                 const float rough = roughness;
                 const float mipLevel = specMipLevel;
 
-                const float3 H = normalize(ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N));
-                const float3 L = normalize(2.0 * dot( V, H ) * H - V);
+                const float3 H = ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N);
+                const float3 L = 2.0 * dot( V, H ) * H - V;
                 const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel)));
 
-                const float vdh = saturate(dot(V, H));
-                const float ndh = saturate(dot(N, H));
-                const float ndl = saturate(dot(N, L));
+                const float vdh = saturate(abs(dot(V, H)));
+                const float ndh = saturate(abs(dot(N, H)));
+                const float ndl = saturate(abs(dot(N, L)));
 
-                if (ndl > 0.2)
+                float3 specularTerm = 0.0;
+                float3 pdf = 1.0;
+                float3 lightTerm = 0.0;
+
+                if (ndl > 0.05)
                 {
                     const float3 fresnelTerm = Fresnel(specColor, vdh);
                     const float distTerm = 1.0; // Optimization, this term is mathematically cancelled out  -- Distribution(ndh, roughness);
                     const float visTerm = Visibility(ndl, ndv, rough);
-                    const float3 lightTerm = sampledColor * ndl;
 
-                    const float3 specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-                    const float3 pdf = ImportanceSamplePDF(distTerm, ndh, vdh);
-
-                    specularFactor = lightTerm * specularTerm / pdf;
+                    lightTerm = sampledColor * ndl;
+                    specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
+                    pdf = ImportanceSamplePDF(distTerm, ndh, vdh);
                 }
                 else // reduce artifacts at extreme grazing angles
                 {
-                    const float ndl_ = max(0.01, ndl);
-                    const float ndh_ = max(0.01, ndh);
-                    const float vdh_ = max(0.01, vdh);
-                    const float ndv_ = max(0.01, ndv);
-
-                    const float3 fresnelTerm = Fresnel(specColor, vdh_);
+                    const float3 fresnelTerm = Fresnel(specColor, vdh);
                     const float distTerm = 1.0;//Distribution(ndh_, roughness);
-                    const float visTerm = Visibility(ndl_, ndv_, rough);
-                    const float3 lightTerm = sampledColor * ndl_;
+                    const float visTerm = Visibility(ndl, ndv, rough);
 
-                    const float3 specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl_, ndv_);
-                    float roughFactor = saturate(1.0 - rough);
-                    roughFactor *= roughFactor * roughFactor;
-
-                    specularFactor = sampledColor * fresnelTerm * roughFactor;
+                    lightTerm = sampledColor * ndl;
+                    specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndl);
+                    pdf = 4.0;//ImportanceSamplePDF(distTerm, ndh, vdh);
                 }
 
-                kd = 1.0 - saturate(specularFactor); //energy conservation
+                // energy conservation:
+                // Specular conservation:
+                specularFactor = lightTerm * specularTerm / pdf;
+                specularFactor = max(saturate(normalize(specularFactor) * (length(sampledColor * specColor))), specularFactor);
+
+                // Diffuse conservation:
+                //kd = (sampledColor * specColor)/specularFactor; //energy conservation
+                kd = 1.0 - specularFactor;
             }
             accumulatedColor += specularFactor + diffuseFactor * kd;
         }
