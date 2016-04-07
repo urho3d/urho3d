@@ -940,7 +940,7 @@ See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuf
 
 \section Rendering_Further Further details
 
-See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
+See also \ref VertexBuffers "Vertex buffers", \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
@@ -1035,6 +1035,50 @@ OpenGL ES 2.0 has further limitations:
 - Custom clip planes are not currently supported.
 
 - 3D and 2D array textures are not currently supported.
+
+\page VertexBuffers Vertex buffers
+
+%Geometry data is defined by VertexBuffer objects, which hold a number of vertices of a certain vertex format. For rendering, the data is uploaded to the GPU, but optionally a shadow copy of
+the vertex data can exist in CPU memory, see \ref VertexBuffer::SetShadowed "SetShadowed()" to allow e.g. raycasts into the geometry without having to lock and read GPU memory.
+
+The vertex format can be defined in two ways by two overloads of \ref VertexBuffer::SetSize "SetSize()":
+
+1) With a bitmask representing hardcoded vertex element semantics and datatypes. Each of the following elements may or may not be present, but the order or datatypes may not change. The order is defined by the LegacyVertexElement enum in GraphicsDefs.h, while bitmask defines exist as MASK_POSITION, MASK_NORMAL etc.
+
+- Position (%Vector3)
+- Normal (%Vector3)
+- %Color (unsigned char[4], normalized)
+- Texcoord1 (%Vector2)
+- Texcoord2 (%Vector2)
+- Cubetexcoord1 (%Vector3)
+- Cubetexcoord2 (%Vector3)
+- Tangent (V%ector4)
+- Blendweights (float[4])
+- Blendindices (unsigned char[4])
+- Instancematrix1-3 (%Vector4)
+- %Object index (int, not supported on D3D9)
+
+Note that the texcoord numbers are misleading as the actual texcoord inputs in shaders are zero-based. Instancematrix1-3 are reserved to be used by the engine for instancing and map to
+shader texcoord inputs 4-6.
+
+2) By defining VertexElement structures, which tell the data type, semantic, and zero-based semantic index (for e.g. multiple texcoords), and whether the data is per-vertex or per-instance data.
+This allows to freely define the order and meaning of the elements.
+
+The third parameter of \ref VertexBuffer::SetSize "SetSize()" is whether to create the buffer as static or dynamic. This is a hint to the underlying graphics API how to allocate the buffer data. Dynamic will suit frequent (every frame) modification better, while static has likely better overall performance for world geometry rendering.
+
+After the size and format are defined, the vertex data can be set either by calling \ref VertexBuffer::SetData "SetData()" or locking the vertex buffer for access, writing the data to the memory space returned from the lock, then unlocking when done. Whatever is more appropriate
+
+\section VertexBuffers_MultipleBuffers Multiple vertex buffers
+
+Multiple vertex buffers can be set to the Graphics subsystem at once, or defined into a drawable's Geometry definition for rendering.
+
+In case the buffers both contain the same semantic, for example position, a higher index buffer overrides a lower buffer index. This is used by the AnimatedModel component to apply vertex morphs: it creates a separate clone vertex buffer which overrides the original model's position, normal and tangent data, and assigns it on index 1 while index 0 is the original model's vertex buffer.
+
+A vertex buffer should either only contain per-vertex data, or per-instance data. Instancing in the high-level rendering (Renderer & View classes) works by momentarily appending the instance vertex buffer to the geometry being rendered in an instanced fashion.
+
+\section VertexBuffers_IndexBuffers Index buffers
+
+A vertex buffer is often accompanied by an index buffer (IndexBuffer class) to allow indexed rendering which avoids repeating the same vertices over and over. Its API is similar to vertex buffers, but an index buffer only needs to define the number of indices, whether the indices are 16- or 32-bit (largeIndices flag) and whether the buffer is dynamic.
 
 \page Materials Materials
 
@@ -1290,7 +1334,9 @@ gl_Position = GetClipPos(worldPos);
 
 On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed behind the scenes to the main() function required by GLSL. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
-The uniforms must be prefixed in a certain way so that the engine understands them:
+Vertex shader inputs need to be matched to vertex element semantics to render properly.. In HLSL semantics for inputs are defined in each shader with uppercase words (POSITION, NORMAL, TEXCOORD0 etc.) while in GLSL the default attributes are defined in Transform.glsl and are matched to the vertex element semantics with a case-insensitive string "contains" operation, with an optional number postfix to define the semantic index. For example iTexCoord is the first (semantic index 0) texture coordinate, and iTexCoord1 is the second (semantic index 1).
+
+Uniforms must be prefixed in a certain way so that the engine understands them:
 
 - c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
 - s for texture samplers, for example sDiffMap.
@@ -3174,7 +3220,7 @@ byte[4]    Identifier "USHD"
 
 short      Shader type (0 = vertex, 1 = pixel)
 short      Shader model (4)
-uint       Vertex element mask (0 for pixel shaders)
+uint       Vertex element hash code (0 for pixel shaders)
 
 uint       Number of constant parameters
 
