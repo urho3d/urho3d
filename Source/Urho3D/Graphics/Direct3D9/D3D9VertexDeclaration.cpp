@@ -111,11 +111,11 @@ VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexB
             // Override existing element if necessary
             for (unsigned k = 0; k < prevBufferElements; ++k)
             {
-                if (elements[k].semantic_ == srcElements[j].semantic_ && elements[k].index_ == srcElements[j].index_)
+                if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
                 {
                     isExisting = true;
                     elements[k].streamIndex_ = i;
-                    elements[k].offset_ = srcElements[j].offset_;
+                    elements[k].offset_ = srcElement.offset_;
                     break;
                 }
             }

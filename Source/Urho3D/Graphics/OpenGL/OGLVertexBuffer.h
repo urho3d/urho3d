@@ -72,7 +72,7 @@ public:
     /// Return number of vertices.
     unsigned GetVertexCount() const { return vertexCount_; }
 
-    /// Return vertex size.
+    /// Return vertex size in bytes.
     unsigned GetVertexSize() const { return vertexSize_; }
 
     /// Return vertex elements.

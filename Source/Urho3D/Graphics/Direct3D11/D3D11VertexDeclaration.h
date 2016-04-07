@@ -38,7 +38,7 @@ class URHO3D_API VertexDeclaration : public RefCounted
 {
 public:
     /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers, unsigned* elementMasks);
+    VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** buffers);
     /// Destruct.
     ~VertexDeclaration();
 

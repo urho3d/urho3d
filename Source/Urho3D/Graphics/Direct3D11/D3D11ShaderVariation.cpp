@@ -38,11 +38,24 @@
 namespace Urho3D
 {
 
+const char* ShaderVariation::elementSemanticNames[] =
+{
+    "POSITION",
+    "NORMAL",
+    "BINORMAL",
+    "TANGENT",
+    "TEXCOORD",
+    "COLOR",
+    "BLENDWEIGHT",
+    "BLENDINDICES",
+    "OBJECTINDEX"
+};
+
 ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
     GPUObject(owner->GetSubsystem<Graphics>()),
     owner_(owner),
     type_(type),
-    elementMask_(0)
+    elementHash_(0)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         useTextureUnit_[i] = false;
@@ -150,7 +163,7 @@ void ShaderVariation::Release()
         constantBufferSizes_[i] = 0;
     parameters_.Clear();
     byteCode_.Clear();
-    elementMask_ = 0;
+    elementHash_ = 0;
 }
 
 void ShaderVariation::SetName(const String& name)
@@ -161,6 +174,11 @@ void ShaderVariation::SetName(const String& name)
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
+
+    // Internal mechanism for appending the CLIPPLANE define, prevents runtime (every frame) string manipulation
+    definesClipPlane_ = defines;
+    if (!definesClipPlane_.EndsWith(" CLIPPLANE"))
+        definesClipPlane_ += " CLIPPLANE";
 }
 
 Shader* ShaderVariation::GetOwner() const
@@ -191,7 +209,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     /// \todo Check that shader type and model match
     /*unsigned short shaderType = */file->ReadUShort();
     /*unsigned short shaderModel = */file->ReadUShort();
-    elementMask_ = file->ReadUInt();
+    elementHash_ = file->ReadUInt();
 
     unsigned numParameters = file->ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
@@ -358,14 +376,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
             reflection->GetInputParameterDesc((UINT)i, &paramDesc);
-            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
+            VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
+            if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
-                if (!String::Compare(paramDesc.SemanticName, VertexBuffer::elementSemantics[j], true) &&
-                    paramDesc.SemanticIndex == VertexBuffer::elementSemanticIndices[j])
-                {
-                    elementMask_ |= (1 << j);
-                    break;
-                }
+                elementHash_ <<= 6;
+                elementHash_ += ((int)semantic + 1) * (paramDesc.SemanticIndex + 1);
             }
         }
     }
@@ -424,7 +439,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     file->WriteFileID("USHD");
     file->WriteShort((unsigned short)type_);
     file->WriteShort(4);
-    file->WriteUInt(elementMask_);
+    file->WriteUInt(elementHash_);
 
     file->WriteUInt(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)

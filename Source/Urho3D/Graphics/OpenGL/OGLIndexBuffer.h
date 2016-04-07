@@ -71,7 +71,7 @@ public:
     /// Return number of indices.
     unsigned GetIndexCount() const { return indexCount_; }
 
-    /// Return index size.
+    /// Return index size in bytes.
     unsigned GetIndexSize() const { return indexSize_; }
 
     /// Return used vertex range from index range. Only supported for shadowed buffers.
