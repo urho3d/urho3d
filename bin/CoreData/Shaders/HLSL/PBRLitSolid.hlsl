@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -34,11 +34,11 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #ifndef NORMALMAP
-        out float2 oTexCoord : TEXCOORD0,
-    #else
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
         out float4 oTexCoord : TEXCOORD0,
         out float4 oTangent : TEXCOORD3,
+    #else
+        out float2 oTexCoord : TEXCOORD0,
     #endif
     out float3 oNormal : TEXCOORD1,
     out float4 oWorldPos : TEXCOORD2,
@@ -89,9 +89,9 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 
-    #ifdef NORMALMAP
-        float3 tangent = GetWorldTangent(modelMatrix);
-        float3 bitangent = cross(tangent, oNormal) * iTangent.w;
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+        const float3 tangent = GetWorldTangent(modelMatrix);
+        const float3 bitangent = cross(tangent, oNormal) * iTangent.w;
         oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
         oTangent = float4(tangent, bitangent.z);
     #else
@@ -140,11 +140,11 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(
-    #ifndef NORMALMAP
-        float2 iTexCoord : TEXCOORD0,
-    #else
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
         float4 iTexCoord : TEXCOORD0,
         float4 iTangent : TEXCOORD3,
+    #else
+        float2 iTexCoord : TEXCOORD0,
     #endif
     float3 iNormal : TEXCOORD1,
     float4 iWorldPos : TEXCOORD2,
@@ -225,8 +225,13 @@ void PS(
     #endif
 
     // Get normal
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+        const float3 tangent = normalize(iTangent.xyz);
+        const float3 bitangent = normalize(float3(iTexCoord.zw, iTangent.w));
+        const float3x3 tbn = float3x3(tangent, bitangent, iNormal);
+    #endif
+
     #ifdef NORMALMAP
-        const float3x3 tbn = float3x3(iTangent.xyz, float3(iTexCoord.zw, iTangent.w), iNormal);
         const float3 nn = DecodeNormal(Sample2D(NormalMap, iTexCoord.xy));
         //nn.rg *= 2.0;
         const float3 normal = normalize(mul(nn, tbn));
@@ -293,32 +298,6 @@ void PS(
         #endif
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
-        float3 finalColor = iVertexLight * diffColor.rgb;
-        #ifdef AO
-            // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * cAmbientColor * diffColor.rgb;
-        #endif
-
-        const float3 toCamera = normalize(iWorldPos.xyz - cCameraPosPS);
-
-        const float3 reflection = normalize(reflect(toCamera, normal));
-        float3 cubeColor = iVertexLight.rgb;
-
-        const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
-        const float gamma = 0;
-        finalColor += iblColor * (cubeColor + gamma);
-
-        #ifdef ENVCUBEMAP
-            finalColor += cMatEnvMapColor * SampleCube(EnvCubeMap, reflect(iReflectionVec, normal)).rgb;
-        #endif
-        #ifdef LIGHTMAP
-            finalColor += Sample2D(EmissiveMap, iTexCoord2).rgb * diffColor.rgb;
-        #endif
-        #ifdef EMISSIVEMAP
-            finalColor += cMatEmissiveColor * Sample2D(EmissiveMap, iTexCoord.xy).rgb;
-        #else
-            finalColor += cMatEmissiveColor;
-        #endif
         const float3 spareData = 0; // Can be used to pass more data to deferred renderer
         oColor = float4(spareData, specColor.r);
         oAlbedo = float4(diffColor.rgb, specColor.g);
@@ -347,9 +326,9 @@ void PS(
         float3 cubeColor = iVertexLight.rgb;
 
         #ifdef IBL
-          const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
-          const float gamma = 0;
-          finalColor += iblColor * (cubeColor + gamma);
+            const float3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor, specColor, roughness, cubeColor);
+            const float gamma = 0;
+            finalColor += iblColor * (cubeColor + gamma);
         #endif
 
         #ifdef ENVCUBEMAP

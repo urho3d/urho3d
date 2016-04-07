@@ -1,10 +1,27 @@
 #ifdef COMPILEPS
-    float3 ImportanceSampleGGX(float2 Xi, float Roughness, float3 N)
+
+    float3 ImportanceSampleSimple(in float2 Xi, in float roughness, in float3 T, in float3 B, in float3 N)
     {
-        float a = Roughness * Roughness;
-        float Phi = 2 * M_PI * Xi.x;
-        float CosTheta = sqrt((1 - Xi.y) / (1 + (a*a - 1) * Xi.y));
-        float SinTheta = sqrt(1 - CosTheta * CosTheta);
+        const float a = roughness * roughness;
+        const float3x3 tbn = float3x3(T, B, N);
+        #ifdef D3D11
+            // Better mipmap blending, reduce the blur amount
+            const float blurFactor = 1.0;
+        #else
+            const float blurFactor = 5.0;
+        #endif
+        const float3 Xi3 = normalize(lerp(float3(0,0,1), float3(Xi.xy * blurFactor , 1), a));
+        const float3 XiWS = mul(Xi3, tbn);
+        return normalize(N + XiWS);
+    }
+
+    float3 ImportanceSampleGGX(in float2 Xi, in float roughness, in float3 N)
+    {
+        float a = roughness * roughness;
+        float Phi = 2.0 * M_PI * Xi.x;
+        float CosTheta = (sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y)));
+        float CosTheta2 = max(CosTheta * CosTheta, 1.0);
+        float SinTheta = sqrt(1.0 - CosTheta2);
         float3 H = 0;
         H.x = SinTheta * cos(Phi);
         H.y = SinTheta * sin(Phi);
@@ -52,7 +69,7 @@
     }
 
     // Implementation based on Epics 2013 course notes
-    float3 ImportanceSampling(in float3 reflectVec, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
+    float3 ImportanceSampling(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     {
         reflectionCubeColor = 1.0;
 
@@ -76,8 +93,8 @@
                 const float rough = 1.0;
                 const float mipLevel = 9.0;
 
-                const float3 H = ImportanceSampleGGX(IMPORTANCE_KERNEL[i], rough, N);
-                const float3 L = N + H;
+                const float3 H = ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N);
+                const float3 L = normalize(N + H);
 
                 const float vdh = saturate(dot(V, H));
                 const float ndh = saturate(dot(N, H));
@@ -99,17 +116,16 @@
                 const float rough = roughness;
                 const float mipLevel = specMipLevel;
 
-                const float3 H = ImportanceSampleGGX(IMPORTANCE_KERNEL[i], rough, N);
-                const float3 L = 2 * dot( V, H ) * H - V;
+                const float3 H = normalize(ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N));
+                const float3 L = normalize(2.0 * dot( V, H ) * H - V);
+                const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel)));
 
                 const float vdh = saturate(dot(V, H));
                 const float ndh = saturate(dot(N, H));
                 const float ndl = saturate(dot(N, L));
 
-                if (ndl > 0.05)
+                if (ndl > 0.2)
                 {
-                    const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel)));
-
                     const float3 fresnelTerm = Fresnel(specColor, vdh);
                     const float distTerm = 1.0; // Optimization, this term is mathematically cancelled out  -- Distribution(ndh, roughness);
                     const float visTerm = Visibility(ndl, ndv, rough);
@@ -126,8 +142,6 @@
                     const float ndh_ = max(0.01, ndh);
                     const float vdh_ = max(0.01, vdh);
                     const float ndv_ = max(0.01, ndv);
-
-                    const float3 sampledColor = SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel));
 
                     const float3 fresnelTerm = Fresnel(specColor, vdh_);
                     const float distTerm = 1.0;//Distribution(ndh_, roughness);
@@ -149,7 +163,7 @@
         return (accumulatedColor / IMPORTANCE_SAMPLES);
     }
 
-    float3 ImportanceSamplingSimple(in float3 reflectVec, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
+    float3 ImportanceSamplingSimple(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     {
         reflectionCubeColor = 1.0;
 
@@ -232,8 +246,8 @@
         return min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
     }
 
-    float3 ImageBasedLighting(in float3 reflectVec, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
+    float3 ImageBasedLighting(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     {
-        return ImportanceSampling(reflectVec, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
+        return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
     }
 #endif
