@@ -895,6 +895,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     // Get nav area volumes
     PODVector<NavArea*> navAreas;
     node_->GetComponents<NavArea>(navAreas, true);
+    areas_.Clear();
     for (unsigned i = 0; i < navAreas.Size(); ++i)
     {
         NavArea* area = navAreas[i];
