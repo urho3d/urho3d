@@ -893,7 +893,6 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     }
 
     // Get nav area volumes
-    node_->GetChildrenWithComponent<NavArea>(areas_, true);
     PODVector<NavArea*> navAreas;
     node_->GetComponents<NavArea>(navAreas, true);
     for (unsigned i = 0; i < navAreas.Size(); ++i)
