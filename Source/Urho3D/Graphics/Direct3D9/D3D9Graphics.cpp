@@ -49,6 +49,7 @@
 #include "../../Graphics/Terrain.h"
 #include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/Texture2DArray.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
@@ -2729,6 +2730,7 @@ void RegisterGraphicsLibrary(Context* context)
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
+    Texture2DArray::RegisterObject(context);
     Texture3D::RegisterObject(context);
     TextureCube::RegisterObject(context);
     Camera::RegisterObject(context);
