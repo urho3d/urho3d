@@ -999,7 +999,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                         Quaternion rot(angle, axisVec);
 
                         // Transform from bind-pose relative into absolute
-                        pos = bone->bindPosition_ + bone->bindRotation_ * pos;
+                        pos = bone->bindPosition_ + pos;
                         rot = bone->bindRotation_ * rot;
 
                         newKeyFrame.time_ = keyFrame.GetFloat("time");
