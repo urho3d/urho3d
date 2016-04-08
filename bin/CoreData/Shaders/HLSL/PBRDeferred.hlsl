@@ -53,7 +53,7 @@ void PS(
 {
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
-        float depth = Sample2DLod0(DepthBuffer, iScreenPos).r;
+        float3 depth = Sample2DLod0(DepthBuffer, iScreenPos).r;
         #ifdef HWDEPTH
             depth = ReconstructDepth(depth);
         #endif
@@ -87,8 +87,8 @@ void PS(
     const float3 specColor = float3(specularInput.a, albedoInput.a, normalInput.a);
 
     const float4 projWorldPos = float4(worldPos, 1.0);
-    float3 lightDir;
 
+    float3 lightDir;
     float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
@@ -108,24 +108,22 @@ void PS(
     const float3 lightVec = normalize(lightDir);
 
     const float3 Hn = normalize(toCamera + lightVec);
-    const float vdh = max(0.0, dot(toCamera, Hn));
-    const float ndh = max(0.0, dot(normal, Hn));
-    const float ndl = max(0.0, dot(normal, lightVec));
+    const float vdh = max(M_EPSILON, dot(toCamera, Hn));
+    const float ndh = max(M_EPSILON, dot(normal, Hn));
+    const float ndl = max(M_EPSILON, dot(normal, lightVec));
     const float ndv = max(M_EPSILON, dot(normal, toCamera));
 
-    const float3 diffuseTerm = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
+    const float3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
+    float3 specularFactor = 0;
 
     #ifdef SPECULAR
         const float3 fresnelTerm = Fresnel(specColor, vdh);
         const float distTerm = Distribution(ndh, roughness);
         const float visTerm = Visibility(ndl, ndv, roughness);
 
-        const float3 diffuseFactor = (diffuseTerm);
-        const float3 specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-        oColor.a = 1;
-        oColor.rgb  = (diffuseFactor + specularFactor) * lightColor * diff;
-    #else
-        oColor.a = 1;
-        oColor.rgb  = diff * diffuseTerm * lightColor;
+        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
     #endif
+
+    oColor.a = 1;
+    oColor.rgb  = (diffuseFactor + specularFactor) * lightColor * diff;
 }

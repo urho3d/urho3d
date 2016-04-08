@@ -72,11 +72,11 @@ void VS(float4 iPos : POSITION,
 {
     // Define a 0,0 UV coord if not expected from the vertex data
     #ifdef NOUV
-    float2 iTexCoord = float2(0.0, 0.0);
+        const float2 iTexCoord = float2(0.0, 0.0);
     #endif
 
-    float4x3 modelMatrix = iModelMatrix;
-    float3 worldPos = GetWorldPos(modelMatrix);
+    const float4x3 modelMatrix = iModelMatrix;
+    const float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     oNormal = GetWorldNormal(modelMatrix);
     oWorldPos = float4(worldPos, GetDepth(oPos));
@@ -100,7 +100,7 @@ void VS(float4 iPos : POSITION,
 
     #ifdef PERPIXEL
         // Per-pixel forward lighting
-        float4 projWorldPos = float4(worldPos.xyz, 1.0);
+        const float4 projWorldPos = float4(worldPos.xyz, 1.0);
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
@@ -191,7 +191,7 @@ void PS(
 {
     // Get material diffuse albedo
     #ifdef DIFFMAP
-        float4 diffInput = Sample2D(DiffMap, iTexCoord.xy);
+        const float4 diffInput = Sample2D(DiffMap, iTexCoord.xy);
         #ifdef ALPHAMASK
             if (diffInput.a < 0.5)
                 discard;
@@ -211,18 +211,14 @@ void PS(
 
         const float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
         const float metalness = clamp(roughMetalSrc.g + cMetallicPS, METALNESS_FLOOR, 1.0);
-
-        float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
-        specColor *= cMatSpecColor.rgb;
-        diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #else
         const float roughness = clamp(pow(cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
         const float metalness = clamp(cMetallicPS, METALNESS_FLOOR, 1.0);
-
-        float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
-        specColor *= cMatSpecColor.rgb;
-        diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
     #endif
+
+    float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
+    specColor *= cMatSpecColor.rgb;
+    diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
 
     // Get normal
     #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
@@ -267,12 +263,11 @@ void PS(
         #endif
 
         const float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
-        const float3 lightVec = lightDir;
 
-        const float3 Hn = normalize(toCamera + lightVec);
-        const float vdh = max(0.0, dot(toCamera, Hn));
-        const float ndh = max(0.0, dot(normal, Hn));
-        const float ndl = max(0.0, dot(normal, lightVec));
+        const float3 Hn = normalize(toCamera + lightDir);
+        const float vdh = max(M_EPSILON, dot(toCamera, Hn));
+        const float ndh = max(M_EPSILON, dot(normal, Hn));
+        const float ndl = max(M_EPSILON, dot(normal, lightDir));
         const float ndv = max(M_EPSILON, dot(normal, toCamera));
 
         const float3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
@@ -300,7 +295,7 @@ void PS(
         const float3 spareData = 0; // Can be used to pass more data to deferred renderer
         oColor = float4(spareData, specColor.r);
         oAlbedo = float4(diffColor.rgb, specColor.g);
-        oNormal = float4((normal * roughness), specColor.b);
+        oNormal = float4(normalize(normal) * roughness, specColor.b);
         oDepth = iWorldPos.w;
     #else
         // Ambient & per-vertex lighting
@@ -342,6 +337,6 @@ void PS(
             finalColor += cMatEmissiveColor;
         #endif
 
-        oColor = float4(GetFog((finalColor), fogFactor), diffColor.a);
+        oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }

@@ -1,12 +1,10 @@
 #ifdef COMPILEPS
-
     float3 ImportanceSampleSimple(in float2 Xi, in float roughness, in float3 T, in float3 B, in float3 N)
     {
         const float a = roughness * roughness;
         const float3x3 tbn = float3x3(T, B, N);
-        #ifdef D3D11
-            // Better mipmap blending, reduce the blur amount
-            const float blurFactor = 1.0;
+        #if defined(PBRFAST)
+            const float blurFactor = 0.0;
         #else
             const float blurFactor = 5.0;
         #endif
@@ -15,13 +13,13 @@
         return normalize(N + XiWS);
     }
 
+    // Karis '13
     float3 ImportanceSampleGGX(in float2 Xi, in float roughness, in float3 N)
     {
         float a = roughness * roughness;
         float Phi = 2.0 * M_PI * Xi.x;
         float CosTheta = (sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y)));
-        float CosTheta2 = max(CosTheta * CosTheta, 1.0);
-        float SinTheta = sqrt(1.0 - CosTheta2);
+        float SinTheta = sqrt(1.0 - CosTheta * CosTheta);
         float3 H = 0;
         H.x = SinTheta * cos(Phi);
         H.y = SinTheta * sin(Phi);
@@ -34,6 +32,10 @@
         return TangentX * H.x + TangentY * H.y + N * H.z;
     }
 
+    /// Determine reflection vector based on surface roughness, rougher uses closer to the normal and smoother uses closer to the reflection vector
+    ///     normal: surface normal
+    ///     reflection: vector of reflection off of the surface
+    ///     roughness: surface roughness
     float3 GetSpecularDominantDir(float3 normal, float3 reflection, float roughness)
     {
         const float smoothness = 1.0 - roughness;
@@ -62,11 +64,19 @@
         float2(-0.467004, 0.439687),
     };
 
-    float1 GetMipFromRougness(float roughness)
+    float GetMipFromRougness(float roughness)
     {
         const float smoothness = 1.0 - roughness;
         return (1.0 - smoothness * smoothness) * 10.0;
     }
+
+    /// Perform importance sampling
+    ///     reflectVec: calculated vector of reflection
+    ///     wsNormal: world-space normal of the surface
+    ///     toCamera: direction from the pixel to the camera
+    ///     specular: specular color
+    ///     roughness: surface roughness
+    ///     reflectionCubeColor: output color for diffuse
 
     // Implementation based on Epics 2013 course notes
     float3 ImportanceSampling(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
@@ -102,7 +112,7 @@
 
                 //if (ndl > 0.0)
                 {
-                    const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel)));
+                    const float3 sampledColor = SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel));
 
                     const float3 diffuseTerm = Diffuse(diffColor, rough, ndv, ndl, vdh);
                     const float3 lightTerm = sampledColor;
@@ -118,14 +128,14 @@
 
                 const float3 H = ImportanceSampleSimple(IMPORTANCE_KERNEL[i], rough, tangent, bitangent, N);
                 const float3 L = 2.0 * dot( V, H ) * H - V;
-                const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel)));
+                const float3 sampledColor = SampleCubeLOD(ZoneCubeMap, float4(L, mipLevel));
 
                 const float vdh = saturate(abs(dot(V, H)));
                 const float ndh = saturate(abs(dot(N, H)));
                 const float ndl = saturate(abs(dot(N, L)));
 
                 float3 specularTerm = 0.0;
-                float3 pdf = 1.0;
+                float pdf = 1.0;
                 float3 lightTerm = 0.0;
 
                 if (ndl > 0.05)
@@ -158,11 +168,13 @@
                 //kd = (sampledColor * specColor)/specularFactor; //energy conservation
                 kd = 1.0 - specularFactor;
             }
+
             accumulatedColor += specularFactor + diffuseFactor * kd;
         }
 
         return (accumulatedColor / IMPORTANCE_SAMPLES);
     }
+
 
     float3 ImportanceSamplingSimple(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera,  in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     {
@@ -190,7 +202,7 @@
                 const float3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, wsNormal);
                 const float3 sampleVec = wsNormal + perturb; //perturb by the sample vector
 
-                const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(sampleVec, mipLevel)));
+                const float3 sampledColor = SampleCubeLOD(ZoneCubeMap, float4(sampleVec, mipLevel));
                 const float ndl = saturate(dot(sampleVec, wsNormal));
 
                 const float3 diffuseTerm = Diffuse(diffColor, rough, ndv, ndl, vdh);
@@ -207,7 +219,7 @@
                 const float3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, reflectVec);
                 const float3 sampleVec = reflectVec + perturb; //perturb by the sample vector
 
-                const float3 sampledColor = (SampleCubeLOD(ZoneCubeMap, float4(sampleVec, mipLevel)));
+                const float3 sampledColor = SampleCubeLOD(ZoneCubeMap, float4(sampleVec, mipLevel));
                 const float ndl = saturate(dot(sampleVec, wsNormal));
 
                 const float3 fresnelTerm = SchlickFresnel(specColor, ndh) ;
@@ -215,7 +227,7 @@
                 const float visTerm = SmithGGXVisibility(ndl, ndv, rough);
                 const float3 lightTerm = sampledColor * ndl;
 
-                const float3 pdf = 1.0;//ImportanceSamplePDF(distTerm, ndh, vdh);
+                const float pdf = 1.0;//ImportanceSamplePDF(distTerm, ndh, vdh);
 
                 specularFactor = lightTerm * SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / pdf;
                 specularFactor *= pdf * ndv * (4.0 * ndl * ndv); // hacks
@@ -247,6 +259,12 @@
         return min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
     }
 
+    /// Calculate IBL contributation
+    ///     reflectVec: reflection vector for cube sampling
+    ///     wsNormal: surface normal in word space
+    ///     toCamera: normalized direction from surface point to camera
+    ///     roughness: surface roughness
+    ///     ambientOcclusion: ambient occlusion
     float3 ImageBasedLighting(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     {
         return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
