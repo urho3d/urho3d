@@ -948,6 +948,18 @@ static void RegisterModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Model", "uint get_numMorphs() const", asMETHOD(Model, GetNumMorphs), asCALL_THISCALL);
 }
 
+static CScriptArray* AnimationGetTrackNames(Animation* animation)
+{
+    Vector<String> result;
+
+    const HashMap<StringHash, AnimationTrack>& parameters = animation->GetTracks();
+    for (HashMap<StringHash, AnimationTrack>::ConstIterator i = parameters.Begin(); i != parameters.End(); ++i)
+        result.Push(i->second_.name_);
+
+    Sort(result.Begin(), result.End());
+    return VectorToArray<String>(result, "Array<String>");
+}
+
 static void ConstructAnimationKeyFrame(AnimationKeyFrame* ptr)
 {
     new(ptr)AnimationKeyFrame();
@@ -1052,7 +1064,9 @@ static void RegisterAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void set_length(float)", asMETHOD(Animation, SetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "float get_length() const", asMETHOD(Animation, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ get_tracks(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "Array<String>@ get_trackNames() const", asFUNCTION(AnimationGetTrackNames), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(const String&in)", asMETHODPR(Animation, GetTrack, (const String&), AnimationTrack*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "AnimationTrack@+ GetTrack(StringHash)", asMETHODPR(Animation, GetTrack, (StringHash), AnimationTrack*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "uint get_numTracks() const", asMETHOD(Animation, GetNumTracks), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void set_numTriggers(uint)", asMETHOD(Animation, SetNumTriggers), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "uint get_numTriggers() const", asMETHOD(Animation, GetNumTriggers), asCALL_THISCALL);
@@ -1255,11 +1269,6 @@ static AnimationState* ConstructAnimationState(Node* node, Animation* animation)
     return new AnimationState(node, animation);
 }
 
-static void AnimationStateSetBoneWeight(const String& name, float weight, AnimationState* ptr)
-{
-    ptr->SetBoneWeight(name, weight);
-}
-
 static void RegisterAnimatedModel(asIScriptEngine* engine)
 {
     RegisterRefCounted<AnimationState>(engine, "AnimationState");
@@ -1297,8 +1306,6 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationState", "Node@+ get_node() const", asMETHOD(AnimationState, GetNode), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "bool get_enabled() const", asMETHOD(AnimationState, IsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationState", "float get_length() const", asMETHOD(AnimationState, GetLength), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationState", "void set_boneWeights(const String&in, float)", asFUNCTION(AnimationStateSetBoneWeight), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("AnimationState", "float get_boneWeights(const String&in)", asMETHODPR(AnimationState, GetBoneWeight, (const String&) const, float), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ AddAnimationState(Animation@+)", asMETHOD(AnimatedModel, AddAnimationState), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(Animation@+)", asMETHODPR(AnimatedModel, RemoveAnimationState, (Animation*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "void RemoveAnimationState(const String&in)", asMETHODPR(AnimatedModel, RemoveAnimationState, (const String&), void), asCALL_THISCALL);
