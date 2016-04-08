@@ -36,7 +36,7 @@
     /// Specular BRDF
     float3 CookTorranceBRDF(in float D, in float3 F, in float G, in float NdotL, in float NdotV)
     {
-        return D * F * G / (4.0 *  NdotL * NdotV);
+        return D * F * G / (4.0 *  max(NdotL * NdotV, M_EPSILON));
     }
 
     float3 SpecularBRDF(in float D, in float3 F, in float G, in float NdotL, in float NdotV)

@@ -266,28 +266,27 @@ void PS(
             lightColor = cLightColor.rgb;
         #endif
 
+        const float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
+        const float3 lightVec = lightDir;
+
+        const float3 Hn = normalize(toCamera + lightVec);
+        const float vdh = max(0.0, dot(toCamera, Hn));
+        const float ndh = max(0.0, dot(normal, Hn));
+        const float ndl = max(0.0, dot(normal, lightVec));
+        const float ndv = max(M_EPSILON, dot(normal, toCamera));
+
+        const float3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
+        float3 specularFactor = 0;
+
         #ifdef SPECULAR
-            const float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
-            const float3 lightVec = lightDir;
-
-            const float3 Hn = normalize(toCamera + lightVec);
-            const float vdh = max(0.0, dot(toCamera, Hn));
-            const float ndh = max(0.0, dot(normal, Hn));
-            const float ndl = max(0.0, dot(normal, lightVec));
-            const float ndv = max(M_EPSILON, dot(normal, toCamera));
-
-            const float3 diffuseTerm = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
-
             const float3 fresnelTerm = Fresnel(specColor, vdh) ;
             const float distTerm = Distribution(ndh, roughness);
             const float visTerm = Visibility(ndl, ndv, roughness);
 
-            const float3 diffuseFactor = (diffuseTerm);
-            const float3 specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-            finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
-        #else
-            finalColor = diff * lightColor * diffColor.rgb;
+            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
         #endif
+
+        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
