@@ -1,7 +1,7 @@
-<technique vs="PBRLitSolid" ps="PBRLitSolid" psdefines="DIFFMAP PBR IBL">
+<technique vs="PBRLitSolid" ps="PBRLitSolid"  vsdefines="IBL" psdefines="DIFFMAP PBR IBL">
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="material" psdefines="MATERIAL EMISSIVEMAP" depthtest="equal" depthwrite="false" />
-    <pass name="deferred" psdefines="DEFERRED EMISSIVEMAP" />
+    <pass name="deferred" psdefines="DEFERRED EMISSIVEMAP" blend="add" />
     <pass name="depth" vs="Depth" ps="Depth" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

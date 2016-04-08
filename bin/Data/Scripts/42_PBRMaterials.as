@@ -19,7 +19,7 @@ void Start()
 
     // Setup the viewport for displaying the scene
     SetupViewport();
-    
+
     // Subscribe to global events for camera movement
     SubscribeToEvents();
 }
@@ -57,9 +57,18 @@ void CreateUI()
 
 void SetupViewport()
 {
+    renderer.hdrRendering = true;
+
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     Viewport@ viewport = Viewport(scene_, cameraNode.GetComponent("Camera"));
     renderer.viewports[0] = viewport;
+
+    RenderPath@ effectRenderPath = viewport.renderPath.Clone();
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/BloomHDR.xml"));
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/FXAA2.xml"));
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
+
+    viewport.renderPath = effectRenderPath;
 }
 
 void SubscribeToEvents()
@@ -87,7 +96,7 @@ void MoveCamera(float timeStep)
         return;
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 20.0f;
+    const float MOVE_SPEED = 10.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 

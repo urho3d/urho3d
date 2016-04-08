@@ -1,4 +1,5 @@
 <cubemap>
+    <srgb enable="true" />
     <face name="output_skybox_posx.tga" />
     <face name="output_skybox_negx.tga" />
     <face name="output_skybox_posy.tga" />

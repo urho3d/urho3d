@@ -3,7 +3,9 @@
 #include "Transform.glsl"
 #include "ScreenPos.glsl"
 #include "Lighting.glsl"
+#include "Constants.glsl"
 #include "BRDF.glsl"
+#line 40007
 
 #ifdef DIRLIGHT
     varying vec2 vScreenPos;
@@ -40,10 +42,11 @@ void PS()
 {
     // If rendering a directional light quad, optimize out the w divide
     #ifdef DIRLIGHT
+        vec4 depthInput = texture2D(sDepthBuffer, vScreenPos);
         #ifdef HWDEPTH
-            float depth = ReconstructDepth(texture2D(sDepthBuffer, vScreenPos).r);
+            float depth = ReconstructDepth(depthInput.r);
         #else
-            float depth = DecodeDepth(texture2D(sDepthBuffer, vScreenPos).rgb);
+            float depth = DecodeDepth(depthInput.rgb);
         #endif
         #ifdef ORTHO
             vec3 worldPos = mix(vNearRay, vFarRay, depth);
@@ -52,11 +55,13 @@ void PS()
         #endif
         vec4 albedoInput = texture2D(sAlbedoBuffer, vScreenPos);
         vec4 normalInput = texture2D(sNormalBuffer, vScreenPos);
+        vec4 specularInput = texture2D(sSpecMap, vScreenPos);
     #else
+        vec4 depthInput = texture2DProj(sDepthBuffer, vScreenPos);
         #ifdef HWDEPTH
-            float depth = ReconstructDepth(texture2DProj(sDepthBuffer, vScreenPos).r);
+            float depth = ReconstructDepth(depthInput.r);
         #else
-            float depth = DecodeDepth(texture2DProj(sDepthBuffer, vScreenPos).rgb);
+            float depth = DecodeDepth(depthInput.rgb);
         #endif
         #ifdef ORTHO
             vec3 worldPos = mix(vNearRay, vFarRay, depth) / vScreenPos.w;
@@ -65,21 +70,18 @@ void PS()
         #endif
         vec4 albedoInput = texture2DProj(sAlbedoBuffer, vScreenPos);
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);
+        vec4 specularInput = texture2DProj(sSpecMap, vScreenPos);
     #endif
-    
-    float roughness = 0;
-   
-    roughness = clamp(normalInput.a, 0.1, 1.0);
-    float metalness = clamp(albedoInput.a, 0.1, 1.0);
 
-     vec3 specColor = mix(0.08 * cMatSpecColor.rgb, albedoInput.rgb, metalness);
+    vec3 normal = normalize(normalInput.rgb);
+    float roughness = depthInput.a;//length(normal);
+    //normal = normalize(normal);
 
-    vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
+    vec3 specColor = vec3(specularInput.a, albedoInput.a, normalInput.a);
 
     vec4 projWorldPos = vec4(worldPos, 1.0);
-    vec3 lightColor;
+
     vec3 lightDir;
-    
     float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
@@ -88,56 +90,35 @@ void PS()
 
     #if defined(SPOTLIGHT)
         vec4 spotPos = projWorldPos * cLightMatricesPS[0];
-        lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);
+        vec3 lightColor = spotPos.w > 0.0 ? texture2DProj(sLightSpotMap, spotPos).rgb * cLightColor.rgb : vec3(0.0);
     #elif defined(CUBEMASK)
         mat3 lightVecRot = mat3(cLightMatricesPS[0][0].xyz, cLightMatricesPS[0][1].xyz, cLightMatricesPS[0][2].xyz);
-        lightColor = textureCube(sLightCubeMap, (worldPos - cLightPosPS.xyz) * lightVecRot).rgb * cLightColor.rgb;
+        vec3 lightColor = textureCube(sLightCubeMap, (worldPos - cLightPosPS.xyz) * lightVecRot).rgb * cLightColor.rgb;
     #else
-        lightColor = cLightColor.rgb;
+        vec3 lightColor = cLightColor.rgb;
     #endif
 
     vec3 toCamera = normalize(-worldPos);
     vec3 lightVec = lightDir;
- 
-    vec3 diffHn = normalize(toCamera + lightDir);
-    float diffvdh = max(0.0, dot(toCamera, diffHn));
-    float diffndl = max(0.0, dot(normal, lightDir));
-    float diffndv = max(1e-5, dot(normal, toCamera));
-  
-    float areaLight = 1;
-    // #if defined(POINTLIGHT)               
-    //     areaLight = AreaLight(lightVec, toCamera, normal, -worldPos + cLightPosPS.xyz, roughness);
-    // #endif
-   
-    vec3 diffuseTerm = BurleyDiffuse(albedoInput.rgb, roughness, diffndv, diffndl, diffvdh) * diff * lightColor.rgb;
 
     vec3 Hn = normalize(toCamera + lightVec);
-    float vdh = max(0.0, dot(toCamera, Hn));
-    float ndh = max(0.0, dot(normal, Hn));
-    float ndl = max(0.0, dot(normal, lightVec));
-    float ndv = max(1e-5, dot(normal, toCamera));
+    float vdh = max(M_EPSILON, dot(toCamera, Hn));
+    float ndh = max(M_EPSILON, dot(normal, Hn));
+    float ndl = max(M_EPSILON, dot(normal, lightVec));
+    float ndv = max(M_EPSILON, dot(normal, toCamera));
+
+    vec3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
+    vec3 specularFactor = vec3(0,0,0);
 
      #ifdef SPECULAR
-        vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
-        float distTerm = GGXDistribution(ndh, roughness);
-        float visTerm = SchlickVisibility(ndl, ndv, roughness);
+        vec3 fresnelTerm = Fresnel(specColor, vdh) ;
+        float distTerm = Distribution(ndh, roughness);
+        float visTerm = Visibility(ndl, ndv, roughness);
 
-        vec3 diffuseFactor = diffuseTerm;
-        vec3 specFactor = distTerm * fresnelTerm * visTerm;
-
-        gl_FragColor.a = 1;
-        gl_FragColor.rgb = (diffuseFactor + specFactor) * lightColor * diff;
-    #else
-        gl_FragColor.a = 1;
-        gl_FragColor.rgb = diffuseTerm * lightColor;
+        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
     #endif
 
+    gl_FragColor.a = 1.0;
+    gl_FragColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
 
-    vec3 fresnelTerm = SchlickGaussianFresnel(specColor, vdh) ;
-    float distTerm = GGXDistribution(ndh, roughness) * areaLight;
-    float visTerm = SchlickVisibility(ndl, ndv, roughness);
-
-    gl_FragColor.a = 1;
-    gl_FragColor.rgb = LinearFromSRGB((diffuseTerm + distTerm * visTerm * fresnelTerm * lightColor) * diff);
-        
 }
