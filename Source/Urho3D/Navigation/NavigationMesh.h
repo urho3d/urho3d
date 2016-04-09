@@ -48,6 +48,7 @@ enum NavmeshPartitionType
 };
 
 class Geometry;
+class NavArea;
 
 struct FindPathData;
 struct NavBuildData;
@@ -314,16 +315,16 @@ protected:
     int numTilesZ_;
     /// Whole navigation mesh bounding box.
     BoundingBox boundingBox_;
-
     /// Type of the heightfield partitioning.
     NavmeshPartitionType partitionType_;
     /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
-    bool drawNavAreas_;
+    bool drawNavAreas_;   
+    /// NavAreas for this NavMesh
+    Vector<WeakPtr<NavArea> > areas_;
 };
 
 /// Register Navigation library objects.
