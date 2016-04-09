@@ -90,6 +90,7 @@ class Input : public Object
     unsigned GetNumJoysticks() const;
     JoystickState* GetJoystick(int id);
     JoystickState* GetJoystickByIndex(unsigned index);
+    JoystickState* GetJoystickByName(const String name);
     bool GetToggleFullscreen() const;
     bool GetScreenKeyboardSupport() const;
     bool IsScreenJoystickVisible(int id) const;
