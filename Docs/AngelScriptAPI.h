@@ -486,7 +486,7 @@ void AddTime(float);
 void AddWeight(float);
 void Apply();
 float GetBoneWeight(StringHash) const;
-float GetBoneWeight(uint) const;
+float GetBoneWeight(const String&) const;
 uint GetTrackIndex(StringHash) const;
 uint GetTrackIndex(const String&) const;
 void SetBoneWeight(StringHash, float, bool = false);
@@ -497,6 +497,7 @@ void SetBoneWeight(uint, float, bool = false);
 /* readonly */
 Animation animation;
 AnimationBlendMode blendMode;
+Array<float> boneWeights;
 /* readonly */
 bool enabled;
 uint8 layer;

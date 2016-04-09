@@ -2898,7 +2898,7 @@ Methods:
 - void AddWeight(float)
 - void Apply()
 - float GetBoneWeight(StringHash) const
-- float GetBoneWeight(uint) const
+- float GetBoneWeight(const String&) const
 - uint GetTrackIndex(StringHash) const
 - uint GetTrackIndex(const String&) const
 - void SetBoneWeight(StringHash, float, bool = false)
@@ -2909,6 +2909,7 @@ Properties:
 
 - Animation@ animation // readonly
 - AnimationBlendMode blendMode
+- float[] boneWeights
 - bool enabled // readonly
 - uint8 layer
 - float length // readonly
