@@ -206,7 +206,7 @@ void PS(
     #endif
 
     // Get material specular albedo
-    #ifdef METALIC // METALNESS
+    #ifdef METALLIC // METALNESS
         const float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
 
         const float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
