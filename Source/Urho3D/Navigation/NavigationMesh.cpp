@@ -221,11 +221,9 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         // Draw NavArea components
         if (drawNavAreas_)
         {
-            PODVector<Node*> areas;
-            scene->GetChildrenWithComponent<NavArea>(areas, true);
-            for (unsigned i = 0; i < areas.Size(); ++i)
+            for (unsigned i = 0; i < areas_.Size(); ++i)
             {
-                NavArea* area = areas[i]->GetComponent<NavArea>();
+                NavArea* area = areas_[i];
                 if (area && area->IsEnabledEffective())
                     area->DrawDebugGeometry(debug, depthTest);
             }
@@ -584,9 +582,9 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
         pt.flag_ = (NavigationPathPointFlag)pathData_->pathFlags_[i];
         pt.areaID_ = pathData_->pathAreras_[i];
 
-        // Walk througnt all NavAreas and find nearestest
+        // Walk through all NavAreas and find nearest
         int nearestNavAreaID = -1;
-        float nearestDistance = 999999.0f; // TODO : MAX_FLOAT
+        float nearestDistance = M_LARGE_VALUE;
         for (unsigned j = 0; j < areas_.Size(); j++)
         {
             NavArea* area = areas_[j].Get();
@@ -607,7 +605,7 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
             }
         }
 
-        // if nearestest are find 
+        // if nearest is found
         if (nearestNavAreaID != -1)
             pt.areaID_ = nearestNavAreaID;
 
@@ -899,8 +897,7 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     for (unsigned i = 0; i < navAreas.Size(); ++i)
     {
         NavArea* area = navAreas[i];
-        // Ignore disabled AND any areas that have no meaningful settings
-        if (area->IsEnabledEffective() && area->GetAreaID() != 0)
+        if (area->IsEnabledEffective())
         {
             NavigationGeometryInfo info;
             info.component_ = area;
