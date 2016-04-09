@@ -122,7 +122,7 @@ void PS()
         diffColor *= vColor;
     #endif
 
-    #ifdef METALIC
+    #ifdef METALLIC
         vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
 
         float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);

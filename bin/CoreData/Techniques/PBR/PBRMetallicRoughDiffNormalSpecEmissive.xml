@@ -1,4 +1,4 @@
-<technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NORMALMAP IBL" psdefines="NORMALMAP DIFFMAP METALIC ROUGHNESS PBR IBL">
+<technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NORMALMAP IBL" psdefines="NORMALMAP DIFFMAP METALLIC ROUGHNESS PBR IBL">
     <pass name="base" psdefines="EMISSIVEMAP"/>
     <pass name="light" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="material" psdefines="MATERIAL EMISSIVEMAP NORMALMAP" depthtest="equal" depthwrite="false" />
