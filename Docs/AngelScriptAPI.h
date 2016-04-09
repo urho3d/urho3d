@@ -5386,6 +5386,8 @@ Array<JoystickState> joysticks;
 /* readonly */
 Array<JoystickState> joysticksByIndex;
 /* readonly */
+Array<JoystickState> joysticksByName;
+/* readonly */
 Array<bool> keyDown;
 /* readonly */
 Array<bool> keyPress;
