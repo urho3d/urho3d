@@ -1327,7 +1327,7 @@ static void RegisterAnimatedModel(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedModel", "bool get_updateInvisible() const", asMETHOD(AnimatedModel, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "Skeleton@+ get_skeleton()", asMETHOD(AnimatedModel, GetSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numAnimationStates() const", asMETHOD(AnimatedModel, GetNumAnimationStates), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(uint) const", asMETHODPR(AnimatedModel, GetAnimationState, (unsigned) const, AnimationState*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedModel", "AnimationState@+ get_animationStates(const String&in) const", asMETHODPR(AnimatedModel, GetAnimationState, (const String&) const, AnimationState*), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "uint get_numMorphs() const", asMETHOD(AnimatedModel, GetNumMorphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimatedModel", "const String& get_morphNames(uint) const", asFUNCTION(AnimatedModelGetMorphName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AnimatedModel", "void set_morphWeights(const String&in, float)", asMETHODPR(AnimatedModel, SetMorphWeight, (const String&, float), void), asCALL_THISCALL);
