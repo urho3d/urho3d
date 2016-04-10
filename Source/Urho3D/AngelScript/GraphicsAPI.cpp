@@ -817,6 +817,7 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterObjectProperty("VertexElement", "VertexElementSemantic semantic", offsetof(VertexElement, semantic_));
     engine->RegisterObjectProperty("VertexElement", "uint8 index", offsetof(VertexElement, index_));
     engine->RegisterObjectProperty("VertexElement", "bool perInstance", offsetof(VertexElement, perInstance_));
+    engine->RegisterObjectProperty("VertexElement", "uint offset", offsetof(VertexElement, offset_));
 
     RegisterObject<VertexBuffer>(engine, "VertexBuffer");
     RegisterObjectConstructor<VertexBuffer>(engine, "VertexBuffer");
