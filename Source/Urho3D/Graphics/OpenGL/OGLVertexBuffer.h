@@ -99,7 +99,7 @@ public:
     /// Return buffer hash for building vertex declarations.
     unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
 
-    /// Return legacy vertex element mask.
+    /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
     unsigned GetElementMask() const { return elementMask_; }
 
     /// Return CPU memory shadow data.

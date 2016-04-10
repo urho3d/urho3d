@@ -663,67 +663,97 @@ static const TechniqueEntry& MaterialGetTechniqueEntry(unsigned index, Material*
     return ptr->GetTechniqueEntry(index);
 }
 
-static bool VertexBufferSetData(VectorBuffer& src, VertexBuffer* dest)
+static void ConstructVertexElement(VertexElement* ptr)
+{
+    new(ptr) VertexElement();
+}
+
+static void ConstructVertexElementCopy(const VertexElement& info, VertexElement* ptr)
+{
+    new(ptr) VertexElement(info);
+}
+
+static void ConstructVertexElementParams(VertexElementType type, VertexElementSemantic semantic, unsigned char index, bool perInstance, VertexElement* ptr)
+{
+    new(ptr) VertexElement(type, semantic, index, perInstance);
+}
+
+static void DestructVertexElement(VertexElement* ptr)
+{
+    ptr->~VertexElement();
+}
+
+static bool VertexBufferSetSize(unsigned vertexCount, CScriptArray* arr, bool dynamic, VertexBuffer* ptr)
+{
+    return ptr->SetSize(vertexCount, ArrayToPODVector<VertexElement>(arr), dynamic);
+}
+
+static bool VertexBufferSetData(VectorBuffer& src, VertexBuffer* ptr)
 {
     // Make sure there is enough data
-    if (dest->GetVertexCount() && src.GetSize() >= dest->GetVertexCount() * dest->GetVertexSize())
-        return dest->SetData(&src.GetBuffer()[0]);
+    if (ptr->GetVertexCount() && src.GetSize() >= ptr->GetVertexCount() * ptr->GetVertexSize())
+        return ptr->SetData(&src.GetBuffer()[0]);
     else
         return false;
 }
 
-static bool VertexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, VertexBuffer* dest)
+static bool VertexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, VertexBuffer* ptr)
 {
     // Make sure there is enough data
-    if (dest->GetVertexCount() && src.GetSize() >= count * dest->GetVertexSize())
-        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    if (ptr->GetVertexCount() && src.GetSize() >= count * ptr->GetVertexSize())
+        return ptr->SetDataRange(&src.GetBuffer()[0], start, count, discard);
     else
         return false;
 }
 
-static VectorBuffer VertexBufferGetData(VertexBuffer* src)
+static VectorBuffer VertexBufferGetData(VertexBuffer* ptr)
 {
     VectorBuffer ret;
-    void* data = src->Lock(0, src->GetVertexCount(), false);
+    void* data = ptr->Lock(0, ptr->GetVertexCount(), false);
 
     if (data)
     {
-        ret.Write(data, src->GetVertexCount() * src->GetVertexSize());
+        ret.Write(data, ptr->GetVertexCount() * ptr->GetVertexSize());
         ret.Seek(0);
-        src->Unlock();
+        ptr->Unlock();
     }
 
     return ret;
 }
 
-static bool IndexBufferSetData(VectorBuffer& src, IndexBuffer* dest)
+static CScriptArray* VertexBufferGetElements(VertexBuffer* ptr)
+{
+    return VectorToArray<VertexElement>(ptr->GetElements(), "Array<VertexElement>");
+}
+
+static bool IndexBufferSetData(VectorBuffer& src, IndexBuffer* ptr)
 {
     // Make sure there is enough data
-    if (dest->GetIndexCount() && src.GetSize() >= dest->GetIndexCount() * dest->GetIndexSize())
-        return dest->SetData(&src.GetBuffer()[0]);
+    if (ptr->GetIndexCount() && src.GetSize() >= ptr->GetIndexCount() * ptr->GetIndexSize())
+        return ptr->SetData(&src.GetBuffer()[0]);
     else
         return false;
 }
 
-static bool IndexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, IndexBuffer* dest)
+static bool IndexBufferSetDataRange(VectorBuffer& src, unsigned start, unsigned count, bool discard, IndexBuffer* ptr)
 {
     // Make sure there is enough data
-    if (dest->GetIndexCount() && src.GetSize() >= count * dest->GetIndexSize())
-        return dest->SetDataRange(&src.GetBuffer()[0], start, count, discard);
+    if (ptr->GetIndexCount() && src.GetSize() >= count * ptr->GetIndexSize())
+        return ptr->SetDataRange(&src.GetBuffer()[0], start, count, discard);
     else
         return false;
 }
 
-static VectorBuffer IndexBufferGetData(IndexBuffer* src)
+static VectorBuffer IndexBufferGetData(IndexBuffer* ptr)
 {
     VectorBuffer ret;
-    void* data = src->Lock(0, src->GetIndexCount(), false);
+    void* data = ptr->Lock(0, ptr->GetIndexCount(), false);
 
     if (data)
     {
-        ret.Write(data, src->GetIndexCount() * src->GetIndexSize());
+        ret.Write(data, ptr->GetIndexCount() * ptr->GetIndexSize());
         ret.Seek(0);
-        src->Unlock();
+        ptr->Unlock();
     }
 
     return ret;
@@ -755,9 +785,43 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterEnumValue("PrimitiveType", "LINE_STRIP", LINE_STRIP);
     engine->RegisterEnumValue("PrimitiveType", "TRIANGLE_FAN", TRIANGLE_FAN);
 
+    engine->RegisterEnum("VertexElementType");
+    engine->RegisterEnumValue("VertexElementType", "TYPE_INT", TYPE_INT);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_FLOAT", TYPE_FLOAT);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR2", TYPE_VECTOR2);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR3", TYPE_VECTOR3);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_VECTOR4", TYPE_VECTOR4);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4", TYPE_UBYTE4);
+    engine->RegisterEnumValue("VertexElementType", "TYPE_UBYTE4_NORM", TYPE_UBYTE4_NORM);
+    engine->RegisterEnumValue("VertexElementType", "MAX_VERTEX_ELEMENT_TYPES", MAX_VERTEX_ELEMENT_TYPES);
+
+    engine->RegisterEnum("VertexElementSemantic");
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_POSITION", SEM_POSITION);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_NORMAL", SEM_NORMAL);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BINORMAL", SEM_BINORMAL);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_TANGENT", SEM_TANGENT);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_TEXCOORD", SEM_TEXCOORD);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_COLOR", SEM_COLOR);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BLENDWEIGHTS", SEM_BLENDWEIGHTS);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_BLENDINDICES", SEM_BLENDINDICES);
+    engine->RegisterEnumValue("VertexElementSemantic", "SEM_OBJECTINDEX", SEM_OBJECTINDEX);
+    engine->RegisterEnumValue("VertexElementSemantic", "MAX_VERTEX_ELEMENT_SEMANTICS", MAX_VERTEX_ELEMENT_SEMANTICS);
+
+    engine->RegisterObjectType("VertexElement", sizeof(VertexElement), asOBJ_VALUE | asOBJ_APP_CLASS_C);
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVertexElement), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(const VertexElement&in)", asFUNCTION(ConstructVertexElementCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_CONSTRUCT, "void f(VertexElementType, VertexElementSemantic, uint8 index = 0, bool perInstance = false)", asFUNCTION(ConstructVertexElementParams), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("VertexElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructVertexElement), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexElement", "VertexElement& opAssign(const VertexElement&in)", asMETHODPR(VertexElement, operator =, (const VertexElement&), VertexElement&), asCALL_THISCALL);
+    engine->RegisterObjectProperty("VertexElement", "VertexElementType type", offsetof(VertexElement, type_));
+    engine->RegisterObjectProperty("VertexElement", "VertexElementSemantic semantic", offsetof(VertexElement, semantic_));
+    engine->RegisterObjectProperty("VertexElement", "uint8 index", offsetof(VertexElement, index_));
+    engine->RegisterObjectProperty("VertexElement", "bool perInstance", offsetof(VertexElement, perInstance_));
+
     RegisterObject<VertexBuffer>(engine, "VertexBuffer");
     RegisterObjectConstructor<VertexBuffer>(engine, "VertexBuffer");
-//    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, uint, bool dynamic = false)", asMETHOD(VertexBuffer, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, uint, bool dynamic = false)", asMETHODPR(VertexBuffer, SetSize, (unsigned, unsigned, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, Array<VertexElement>@+, bool dynamic = false)", asFUNCTION(VertexBufferSetSize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetData(VectorBuffer&)", asFUNCTION(VertexBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", asFUNCTION(VertexBufferSetDataRange), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "VectorBuffer GetData()", asFUNCTION(VertexBufferGetData), asCALL_CDECL_OBJLAST);
@@ -766,6 +830,8 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHOD(VertexBuffer, IsDynamic), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexCount() const", asMETHOD(VertexBuffer, GetVertexCount), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "uint get_vertexSize() const", asMETHODPR(VertexBuffer, GetVertexSize, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint get_elementMask() const", asMETHODPR(VertexBuffer, GetElementMask, () const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "Array<VertexElement>@ get_elements() const", asFUNCTION(VertexBufferGetElements), asCALL_CDECL_OBJLAST);
 
     RegisterObject<IndexBuffer>(engine, "IndexBuffer");
     RegisterObjectConstructor<IndexBuffer>(engine, "IndexBuffer");
