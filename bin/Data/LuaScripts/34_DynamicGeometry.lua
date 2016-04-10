@@ -171,7 +171,13 @@ function CreateScene()
 
     -- Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
     vb.shadowed = true
-    vb:SetSize(numVertices, MASK_POSITION + MASK_NORMAL)
+    -- We could use the "legacy" element bitmask for vertex elements for more compact code, but let's demonstrate
+    -- defining the vertex elements explicitly to allow ant element types and order
+    local elements = {
+        VertexElement(TYPE_VECTOR3, SEM_POSITION),
+        VertexElement(TYPE_VECTOR3, SEM_NORMAL)
+    }
+    vb:SetSize(numVertices, elements)
     local temp = VectorBuffer()
     for i = 1, numVertices * 6 do
         temp:WriteFloat(vertexData[i])
