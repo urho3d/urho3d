@@ -223,7 +223,12 @@ void DynamicGeometry::CreateScene()
 
         // Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
         vb->SetShadowed(true);
-        vb->SetSize(numVertices, MASK_POSITION|MASK_NORMAL);
+        // We could use the "legacy" element bitmask for vertex elements for more compact code, but let's demonstrate
+        // defining the vertex elements explicitly to allow ant element types and order
+        PODVector<VertexElement> elements;
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+        vb->SetSize(numVertices, elements);
         vb->SetData(vertexData);
 
         ib->SetShadowed(true);

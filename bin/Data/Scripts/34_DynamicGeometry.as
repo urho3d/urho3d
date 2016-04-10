@@ -170,7 +170,12 @@ void CreateScene()
 
         // Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
         vb.shadowed = true;
-        vb.SetSize(numVertices, MASK_POSITION|MASK_NORMAL);
+        // We could use the "legacy" element bitmask for vertex elements for more compact code, but let's demonstrate
+        // defining the vertex elements explicitly to allow ant element types and order
+        Array<VertexElement> elements;
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+        vb.SetSize(numVertices, elements);
         VectorBuffer temp;
         for (uint i = 0; i < numVertices * 6; ++i)
             temp.WriteFloat(vertexData[i]);
