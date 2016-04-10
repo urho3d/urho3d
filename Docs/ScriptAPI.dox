@@ -2726,8 +2726,6 @@ Methods:
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
 - AnimationTrack@ CreateTrack(const String&)
-- AnimationTrack@ GetTrack(StringHash)
-- AnimationTrack@ GetTrack(const String&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
@@ -2750,7 +2748,7 @@ Properties:
 - uint numTracks // readonly
 - uint numTriggers
 - int refs // readonly
-- String[]@ trackNames // readonly
+- AnimationTrack@[] tracks // readonly
 - AnimationTriggerPoint[] triggers
 - StringHash type // readonly
 - String typeName // readonly
@@ -2898,7 +2896,7 @@ Methods:
 - void AddWeight(float)
 - void Apply()
 - float GetBoneWeight(StringHash) const
-- float GetBoneWeight(const String&) const
+- float GetBoneWeight(uint) const
 - uint GetTrackIndex(StringHash) const
 - uint GetTrackIndex(const String&) const
 - void SetBoneWeight(StringHash, float, bool = false)

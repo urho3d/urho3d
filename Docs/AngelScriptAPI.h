@@ -296,8 +296,6 @@ class Animation
 void AddTrigger(const AnimationTriggerPoint&);
 void AddTrigger(float, bool, const Variant&);
 AnimationTrack CreateTrack(const String&);
-AnimationTrack GetTrack(StringHash);
-AnimationTrack GetTrack(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -324,7 +322,7 @@ uint numTriggers;
 /* readonly */
 int refs;
 /* readonly */
-Array<String> trackNames;
+Array<AnimationTrack> tracks;
 Array<AnimationTriggerPoint> triggers;
 /* readonly */
 StringHash type;
@@ -486,7 +484,7 @@ void AddTime(float);
 void AddWeight(float);
 void Apply();
 float GetBoneWeight(StringHash) const;
-float GetBoneWeight(const String&) const;
+float GetBoneWeight(uint) const;
 uint GetTrackIndex(StringHash) const;
 uint GetTrackIndex(const String&) const;
 void SetBoneWeight(StringHash, float, bool = false);
