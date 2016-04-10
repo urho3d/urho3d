@@ -96,9 +96,6 @@ public:
     /// Return offset of a element with specific type within vertex, or M_MAX_UNSIGNED if element does not exist.
     unsigned GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(type, semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }
 
-    /// Return buffer hash for building vertex declarations.
-    unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
-
     /// Return legacy vertex element mask. Note that both semantic and type must match the legacy element for a mask bit to be set.
     unsigned GetElementMask() const { return elementMask_; }
 
@@ -107,6 +104,9 @@ public:
 
     /// Return shared array pointer to the CPU memory shadow data.
     SharedArrayPtr<unsigned char> GetShadowDataShared() const { return shadowData_; }
+
+    /// Return buffer hash for building vertex declarations. Used internally.
+    unsigned long long GetBufferHash(unsigned streamIndex) { return elementHash_ << (streamIndex * 16); }
 
     /// Return element with specified type and semantic from a vertex element list, or null if does not exist.
     static const VertexElement* GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0);

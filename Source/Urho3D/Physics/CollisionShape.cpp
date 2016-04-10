@@ -108,7 +108,7 @@ public:
             geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elements);
             if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
             {
-                URHO3D_LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
+                URHO3D_LOGWARNING("Skipping geometry with no or unsuitable CPU-side geometry data for triangle mesh collision");
                 continue;
             }
 

@@ -825,7 +825,11 @@ static void RegisterBuffers(asIScriptEngine* engine)
     engine->RegisterObjectMethod("VertexBuffer", "void SetSize(uint, Array<VertexElement>@+, bool dynamic = false)", asFUNCTION(VertexBufferSetSize), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetData(VectorBuffer&)", asFUNCTION(VertexBufferSetData), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("VertexBuffer", "bool SetDataRange(VectorBuffer&, uint, uint, bool discard = false)", asFUNCTION(VertexBufferSetDataRange), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("VertexBuffer", "VectorBuffer GetData()", asFUNCTION(VertexBufferGetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexBuffer", "VectorBuffer GetData() const", asFUNCTION(VertexBufferGetData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementSemantic, uint8 index = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "bool HasElement(VertexElementType, VertexElementSemantic, uint8 index = 0) const", asMETHODPR(VertexBuffer, HasElement, (VertexElementType, VertexElementSemantic, unsigned char) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementSemantic, uint8 index = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod("VertexBuffer", "uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 index = 0) const", asMETHODPR(VertexBuffer, GetElementOffset, (VertexElementType, VertexElementSemantic, unsigned char) const, unsigned), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "void set_shadowed(bool)", asMETHOD(VertexBuffer, SetShadowed), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "bool get_shadowed() const", asMETHOD(VertexBuffer, IsShadowed), asCALL_THISCALL);
     engine->RegisterObjectMethod("VertexBuffer", "bool get_dynamic() const", asMETHOD(VertexBuffer, IsDynamic), asCALL_THISCALL);
