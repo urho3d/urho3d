@@ -78,11 +78,11 @@ enum NavigationPathPointFlag
 
 struct URHO3D_API NavigationPathPoint
 {
-    /// World-space position of the path point
+    /// World-space position of the path point.
     Vector3 position_;
-    /// Detour flag
+    /// Detour flag.
     NavigationPathPointFlag flag_;
-    /// Detour area ID
+    /// Detour area ID.
     unsigned char areaID_;
 };
 
@@ -322,7 +322,7 @@ protected:
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
-    bool drawNavAreas_;   
+    bool drawNavAreas_;
     /// NavAreas for this NavMesh
     Vector<WeakPtr<NavArea> > areas_;
 };
