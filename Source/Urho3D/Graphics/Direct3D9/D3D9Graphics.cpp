@@ -603,6 +603,12 @@ bool Graphics::TakeScreenShot(Image& destImage)
     if (!impl_->device_)
         return false;
 
+    if (IsDeviceLost())
+    {
+        URHO3D_LOGERROR("Can not take screenshot while device is lost");
+        return false;
+    }
+
     D3DSURFACE_DESC surfaceDesc;
     impl_->defaultColorSurface_->GetDesc(&surfaceDesc);
 
