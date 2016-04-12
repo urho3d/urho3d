@@ -3139,15 +3139,20 @@ Urho3D tries to use existing file formats whenever possible, and define custom f
 \verbatim
 Model geometry and vertex morph data
 
-byte[4]    Identifier "UMDL"
+byte[4]    Identifier "UMDL" or "UMD2"
 uint       Number of vertex buffers
 
   For each vertex buffer:
   uint       Vertex count
-  uint       Vertex element mask (determines vertex size)
+  uint       Legacy vertex element mask (determines vertex size)
   uint       Morphable vertex range start index
   uint       Morphable vertex count
   byte[]     Vertex data (vertex count * vertex size)
+
+  In "UMD2" format, the legacy vertex element mask is replaced with the following:
+  uint       Vertex element count
+  uint[]     Descriptions for each vertex element, where
+             bits 0-7 = element data type, bits 8-15 = semantic, bits 16-23 = semantic index
 
 uint    Number of index buffers
 
