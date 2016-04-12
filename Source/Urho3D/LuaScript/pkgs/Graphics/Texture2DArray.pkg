@@ -9,10 +9,8 @@ class Texture2DArray : public Texture
 
     void SetLayers(unsigned layers);
     bool SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    bool SetData(unsigned layer, Image* image, bool useAlpha = false);
 
-    // bool SetData(unsigned layer, SharedPtr<Image> image, bool useAlpha = false);
-    tolua_outside bool Texture2DArraySetData @ SetData(unsigned layer, Image* image, bool useAlpha = false);
-    
     unsigned GetLayers() const;
     RenderSurface* GetRenderSurface() const;
 
@@ -31,15 +29,5 @@ static int tolua_GraphicsLuaAPI_Texture2DArray_new00(lua_State* tolua_S)
 static int tolua_GraphicsLuaAPI_Texture2DArray_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Texture2DArray>(tolua_S);
-}
-
-static bool Texture2DArraySetData(Texture2DArray* texture, unsigned layer, Image* image, bool useAlpha)
-{
-    SharedPtr<Image> imagePtr(image);
-    bool ret = texture->SetData(layer, imagePtr, useAlpha);
-    // Need to safely detach the object from the shared pointer so that the Lua script can manually
-    // delete the object once done
-    imagePtr.Detach();
-    return ret;
 }
 $}

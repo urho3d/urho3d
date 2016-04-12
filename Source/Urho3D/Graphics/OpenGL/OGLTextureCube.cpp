@@ -441,7 +441,7 @@ bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
     return SetData(face, image);
 }
 
-bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
+bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -449,8 +449,9 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -462,7 +463,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         unsigned components = image->GetComponents();
         if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
         {
-            image = image->ConvertToRGBA();
+            mipImage = image->ConvertToRGBA(); image = mipImage;
             if (!image)
                 return false;
             components = image->GetComponents();
@@ -482,7 +483,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -540,7 +541,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();

@@ -57,7 +57,7 @@ public:
     /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
     /// Set data from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool SetData(SharedPtr<Image> image, bool useAlpha = false);
+    bool SetData(Image* image, bool useAlpha = false);
 
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
