@@ -6143,6 +6143,11 @@ Methods:
 
 Methods:
 
+- TextureCube() (GC)
+- TextureCube* new()
+- void delete()
+- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>
