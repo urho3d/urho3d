@@ -1109,7 +1109,7 @@ void Material::ResetToDefaults()
         return;
 
     SetNumTechniques(1);
-    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/PBR/PBRNoTexture.xml"));
+    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
     textures_.Clear();
 
