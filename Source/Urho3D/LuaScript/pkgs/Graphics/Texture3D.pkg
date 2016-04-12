@@ -8,9 +8,7 @@ class Texture3D : public Texture
     ~Texture3D();
 
     bool SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC);
-
-    // bool SetData(SharedPtr<Image> image, bool useAlpha = false);
-    tolua_outside bool Texture3DSetData @ SetData(Image* image, bool useAlpha = false);
+    bool SetData(Image* image, bool useAlpha = false);
 };
 
 ${
@@ -24,15 +22,5 @@ static int tolua_GraphicsLuaAPI_Texture3D_new00(lua_State* tolua_S)
 static int tolua_GraphicsLuaAPI_Texture3D_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<Texture3D>(tolua_S);
-}
-
-static bool Texture3DSetData(Texture3D* texture, Image* image, bool useAlpha)
-{
-    SharedPtr<Image> imagePtr(image);
-    bool ret = texture->SetData(imagePtr, useAlpha);
-    // Need to safely detach the object from the shared pointer so that the Lua script can manually
-    // delete the object once done
-    imagePtr.Detach();
-    return ret;
 }
 $}

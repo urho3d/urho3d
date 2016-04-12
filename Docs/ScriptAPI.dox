@@ -7188,6 +7188,7 @@ Properties:
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
 - JoystickState@[] joysticksByIndex // readonly
+- JoystickState@[] joysticksByName // readonly
 - bool[] keyDown // readonly
 - bool[] keyPress // readonly
 - bool minimized // readonly

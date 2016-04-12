@@ -560,7 +560,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
                     SetMouseModeAbsolute(SDL_TRUE);
 #else
                 if (mouseMode_ == MM_ABSOLUTE && !emscriptenPointerLock_)
-                    emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);      
+                    emscriptenInput_->RequestPointerLock(MM_ABSOLUTE, suppressEvent);
 #endif
                 SDL_ShowCursor(SDL_FALSE);
                 mouseVisible_ = false;
@@ -568,7 +568,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
             else if (mouseMode_ != MM_RELATIVE)
             {
                 SetMouseGrabbed(false, suppressEvent);
-                
+
                 SDL_ShowCursor(SDL_TRUE);
                 mouseVisible_ = true;
 
@@ -595,7 +595,7 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
                     {
                         SetMousePosition(lastVisibleMousePosition_);
                         lastMousePosition_ = lastVisibleMousePosition_;
-                    } 
+                    }
                 }
 #else
                 if (mouseMode_ == MM_ABSOLUTE && emscriptenPointerLock_)
@@ -1410,6 +1410,17 @@ JoystickState* Input::GetJoystickByIndex(unsigned index)
     return 0;
 }
 
+JoystickState* Input::GetJoystickByName(const String& name)
+{
+    for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
+    {
+        if (i->second_.name_ == name)
+            return &(i->second_);
+    }
+
+    return 0;
+}
+
 JoystickState* Input::GetJoystick(SDL_JoystickID id)
 {
     HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Find(id);
@@ -1487,7 +1498,7 @@ void Input::Initialize()
 #ifdef __EMSCRIPTEN__
     SubscribeToEvent(E_ENDFRAME, URHO3D_HANDLER(Input, HandleEndFrame));
 #endif
-    
+
     URHO3D_LOGINFO("Initialized input");
 }
 

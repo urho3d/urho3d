@@ -465,7 +465,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (maximize)
     {
         Maximize();
-        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(impl_->window_, &width, &height);
     }
 
     if (fullscreen)
@@ -735,7 +735,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(impl_->window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -2050,7 +2050,7 @@ void Graphics::WindowResized()
 
     int newWidth, newHeight;
 
-    SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -2411,18 +2411,21 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         if (!newWidth || !newHeight)
         {
             SDL_MaximizeWindow(impl_->window_);
-            SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
+            SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
         }
         else
             SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
 
-        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
+        // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
+        SDL_HideWindow(impl_->window_);
+        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_FALSE : SDL_TRUE);
+        SDL_ShowWindow(impl_->window_);
     }
     else
     {
         // If external window, must ask its dimensions instead of trying to set them
-        SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
+        SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
         newFullscreen = false;
     }
 }

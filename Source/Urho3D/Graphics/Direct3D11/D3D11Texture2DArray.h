@@ -61,7 +61,7 @@ public:
     /// Set data of one face from a stream. Return true if successful.
     bool SetData(unsigned layer, Deserializer& source);
     /// Set data of one face from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool SetData(unsigned layer, SharedPtr<Image> image, bool useAlpha = false);
+    bool SetData(unsigned layer, Image* image, bool useAlpha = false);
 
     /// Return number of layers in the texture.
     unsigned GetLayers() const { return layers_; }

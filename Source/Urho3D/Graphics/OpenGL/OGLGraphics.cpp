@@ -2361,7 +2361,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
-        SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
+        SDL_SetWindowFullscreen(impl_->window_, 0);
 #endif
 
     if (impl_->context_)

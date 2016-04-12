@@ -334,8 +334,10 @@ if ($ENV{COVERITY_SCAN_BRANCH})
 endif ()
 
 # Enable/disable SIMD instruction set for STB image (do it here instead of in the STB CMakeLists.txt because the header files are exposed to Urho3D library user)
-if (NEON AND NOT XCODE)
-    add_definitions (-DSTBI_NEON)       # Cannot define it directly for Xcode due to universal binary support, we define it in the setup_target() macro instead for Xcode
+if (NEON)
+    if (NOT XCODE)
+        add_definitions (-DSTBI_NEON)   # Cannot define it directly for Xcode due to universal binary support, we define it in the setup_target() macro instead for Xcode
+    endif ()
 elseif (NOT URHO3D_SSE)
     add_definitions (-DSTBI_NO_SIMD)    # GCC/Clang/MinGW will switch this off automatically except MSVC, but no harm to make it explicit for all
 endif ()
@@ -1007,12 +1009,15 @@ macro (setup_target)
         if (ATTRIBUTE_ALREADY_SET EQUAL -1)
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
         endif ()
-        if (URHO3D_SSE OR NEON)
-            # When targeting x86 with SSE enabled; or when targeting iOS with NEON enabled as universal binary includes iPhoneSimulator x86 arch too
-            # Clang by default always enable SSE instruction set for both i386 and x86_64 ABIs, so we only need to take care of special compiler flags/defines for NEON
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[sdk=iphoneos*] "-DSTBI_NEON $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*] "-DSTBI_NEON $(OTHER_CPLUSPLUSFLAGS)")
-        else ()
+        if (NEON)
+            if (IOS)
+                set (SDK iphoneos)
+            elseif (TVOS)
+                set (SDK appletvos)
+            endif ()
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[sdk=${SDK}*] "-DSTBI_NEON $(OTHER_CFLAGS)")
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[sdk=${SDK}*] "-DSTBI_NEON $(OTHER_CPLUSPLUSFLAGS)")
+        elseif (NOT URHO3D_SSE)
             # Nullify the Clang default so that it is consistent with GCC
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse $(OTHER_CFLAGS)")
             list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-mno-sse $(OTHER_CPLUSPLUSFLAGS)")
