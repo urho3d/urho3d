@@ -142,7 +142,7 @@ public:
     /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
     template <typename... Args> void SendEvent(StringHash eventType, Args... args)
     {
-        SendEvent(eventType, PopulateEventDataMap(GetEventDataMap(), args...));
+        SendEvent(eventType, GetEventDataMap().Populate(args...));
     }
 #endif
 
@@ -186,20 +186,6 @@ private:
     EventHandler* FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous = 0) const;
     /// Remove event handlers related to a specific sender.
     void RemoveEventSender(Object* sender);
-#if URHO3D_CXX11
-    /// Populate event data map using variadic template. This handles the base case.
-    template <typename T> VariantMap& PopulateEventDataMap(VariantMap& eventData, StringHash paramID, T paramValue)
-    {
-        eventData[paramID] = paramValue;
-        return eventData;
-    };
-    /// Populate event data map using variadic template.
-    template <typename T, typename... Args> VariantMap& PopulateEventDataMap(VariantMap& eventData, StringHash paramID, T paramValue, Args... args)
-    {
-        eventData[paramID] = paramValue;
-        return PopulateEventDataMap(eventData, args...);
-    };
-#endif
 
     /// Event handlers. Sender is null for non-specific handlers.
     LinkedList<EventHandler> eventHandlers_;
