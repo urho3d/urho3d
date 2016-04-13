@@ -196,6 +196,12 @@ struct URHO3D_API VertexElement
     {
     }
 
+    /// Test for equality with another vertex element. Offset is intentionally not compared, as it's relevant only when an element exists within a vertex buffer.
+    bool operator ==(const VertexElement& rhs) const { return type_ == rhs.type_ && semantic_ == rhs.semantic_ && index_ == rhs.index_ && perInstance_ == rhs.perInstance_; }
+
+    /// Test for inequality with another vertex element.
+    bool operator !=(const VertexElement& rhs) const { return !(*this == rhs); }
+
     /// Data type of element.
     VertexElementType type_;
     /// Semantic of element.

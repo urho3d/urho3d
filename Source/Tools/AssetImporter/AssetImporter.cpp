@@ -89,6 +89,8 @@ struct OutScene
     PODVector<unsigned> nodeModelIndices_;
 };
 
+static const unsigned MAX_CHANNELS = 4;
+
 SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
@@ -169,10 +171,10 @@ unsigned GetNumValidFaces(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
-void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
     const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights);
-unsigned GetElementMask(aiMesh* mesh, bool isSkinned);
+PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
@@ -885,17 +887,18 @@ void BuildAndSaveModel(OutModel& model)
     unsigned numValidGeometries = 0;
 
     bool combineBuffers = true;
-    // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
-    unsigned elementMask = GetElementMask(model.meshes_[0], model.bones_.Size() > 0);
+    // Check if buffers can be combined (same vertex elements, under 65535 vertices)
+    PODVector<VertexElement> elements = GetVertexElements(model.meshes_[0], model.bones_.Size() > 0);
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         if (GetNumValidFaces(model.meshes_[i]))
         {
             ++numValidGeometries;
-            if (i > 0 && GetElementMask(model.meshes_[i], model.bones_.Size() > 0) != elementMask)
+            if (i > 0 && GetVertexElements(model.meshes_[i], model.bones_.Size() > 0) != elements)
                 combineBuffers = false;
         }
     }
+
     // Check if keeping separate buffers allows to avoid 32-bit indices
     if (combineBuffers && model.totalVertices_ > 65535)
     {
@@ -919,13 +922,14 @@ void BuildAndSaveModel(OutModel& model)
     unsigned startVertexOffset = 0;
     unsigned startIndexOffset = 0;
     unsigned destGeomIndex = 0;
+    bool isSkinned = model.bones_.Size() > 0;
 
     outModel->SetNumGeometries(numValidGeometries);
 
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
-        unsigned elementMask = GetElementMask(mesh, model.bones_.Size() > 0);
+        PODVector<VertexElement> elements = GetVertexElements(mesh, isSkinned);
         unsigned validFaces = GetNumValidFaces(mesh);
         if (!validFaces)
             continue;
@@ -945,12 +949,12 @@ void BuildAndSaveModel(OutModel& model)
             if (combineBuffers)
             {
                 ib->SetSize(model.totalIndices_, largeIndices);
-                vb->SetSize(model.totalVertices_, elementMask);
+                vb->SetSize(model.totalVertices_, elements);
             }
             else
             {
                 ib->SetSize(validFaces * 3, largeIndices);
-                vb->SetSize(mesh->mNumVertices, elementMask);
+                vb->SetSize(mesh->mNumVertices, elements);
             }
 
             vbVector.Push(vb);
@@ -1003,7 +1007,7 @@ void BuildAndSaveModel(OutModel& model)
 
         float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-            WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
+            WriteVertex(dest, mesh, j, isSkinned, box, vertexTransform, normalTransform, blendIndices, blendWeights);
 
         // Calculate the geometry center
         Vector3 center = Vector3::ZERO;
@@ -2263,7 +2267,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
     }
 }
 
-void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
     const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights)
 {
@@ -2272,32 +2276,30 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     *dest++ = vertex.x_;
     *dest++ = vertex.y_;
     *dest++ = vertex.z_;
-    if (elementMask & MASK_NORMAL)
+
+    if (mesh->HasNormals())
     {
         Vector3 normal = normalTransform * ToVector3(mesh->mNormals[index]);
         *dest++ = normal.x_;
         *dest++ = normal.y_;
         *dest++ = normal.z_;
     }
-    if (elementMask & MASK_COLOR)
+
+    for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
     {
-        *((unsigned*)dest) = Color(mesh->mColors[0][index].r, mesh->mColors[0][index].g, mesh->mColors[0][index].b,
+        *((unsigned*)dest) = Color(mesh->mColors[i][index].r, mesh->mColors[i][index].g, mesh->mColors[i][index].b,
             mesh->mColors[0][index].a).ToUInt();
         ++dest;
     }
-    if (elementMask & MASK_TEXCOORD1)
+    
+    for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
     {
-        Vector3 texCoord = ToVector3(mesh->mTextureCoords[0][index]);
+        Vector3 texCoord = ToVector3(mesh->mTextureCoords[i][index]);
         *dest++ = texCoord.x_;
         *dest++ = texCoord.y_;
     }
-    if (elementMask & MASK_TEXCOORD2)
-    {
-        Vector3 texCoord = ToVector3(mesh->mTextureCoords[1][index]);
-        *dest++ = texCoord.x_;
-        *dest++ = texCoord.y_;
-    }
-    if (elementMask & MASK_TANGENT)
+
+    if (mesh->HasTangentsAndBitangents())
     {
         Vector3 tangent = normalTransform * ToVector3(mesh->mTangents[index]);
         Vector3 normal = normalTransform * ToVector3(mesh->mNormals[index]);
@@ -2312,7 +2314,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
         *dest++ = tangent.z_;
         *dest++ = w;
     }
-    if (elementMask & MASK_BLENDWEIGHTS)
+
+    if (isSkinned)
     {
         for (unsigned i = 0; i < 4; ++i)
         {
@@ -2321,9 +2324,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
             else
                 *dest++ = 0.0f;
         }
-    }
-    if (elementMask & MASK_BLENDINDICES)
-    {
+    
         unsigned char* destBytes = (unsigned char*)dest;
         ++dest;
         for (unsigned i = 0; i < 4; ++i)
@@ -2336,22 +2337,33 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     }
 }
 
-unsigned GetElementMask(aiMesh* mesh, bool isSkinned)
+PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
 {
-    unsigned elementMask = MASK_POSITION;
+    PODVector<VertexElement> ret;
+
+    // Position must always be first and of type Vector3 for raycasts to work
+    ret.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+
     if (mesh->HasNormals())
-        elementMask |= MASK_NORMAL;
+        ret.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+
+    for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
+        ret.Push(VertexElement(TYPE_UBYTE4_NORM, SEM_COLOR, i));
+
+    /// \todo Assimp mesh structure can specify 3D UV-coords. How to determine the difference? For now always treated as 2D.
+    for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
+        ret.Push(VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, i));
+
     if (mesh->HasTangentsAndBitangents())
-        elementMask |= MASK_TANGENT;
-    if (mesh->GetNumColorChannels() > 0)
-        elementMask |= MASK_COLOR;
-    if (mesh->GetNumUVChannels() > 0)
-        elementMask |= MASK_TEXCOORD1;
-    if (mesh->GetNumUVChannels() > 1)
-        elementMask |= MASK_TEXCOORD2;
+        ret.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
+
     if (isSkinned)
-        elementMask |= (MASK_BLENDWEIGHTS | MASK_BLENDINDICES);
-    return elementMask;
+    {
+        ret.Push(VertexElement(TYPE_VECTOR4, SEM_BLENDWEIGHTS));
+        ret.Push(VertexElement(TYPE_UBYTE4, SEM_BLENDINDICES));
+    }
+
+    return ret;
 }
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)

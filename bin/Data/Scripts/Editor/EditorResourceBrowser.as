@@ -94,6 +94,7 @@ const StringHash BINARY_TYPE_PACKAGE("UPAK");
 const StringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
 const StringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
 const StringHash BINARY_TYPE_MODEL("UMDL");
+const StringHash BINARY_TYPE_MODEL2("UMD2");
 const StringHash BINARY_TYPE_SHADER("USHD");
 const StringHash BINARY_TYPE_ANIMATION("UANI");
 
@@ -1065,7 +1066,7 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_UNUSABLE;
     else if (fileType == BINARY_TYPE_ANGLESCRIPT)
         return RESOURCE_TYPE_SCRIPTFILE;
-    else if (fileType == BINARY_TYPE_MODEL)
+    else if (fileType == BINARY_TYPE_MODEL || fileType == BINARY_TYPE_MODEL2)
         return RESOURCE_TYPE_MODEL;
     else if (fileType == BINARY_TYPE_SHADER)
         return RESOURCE_TYPE_UNUSABLE;
@@ -1284,7 +1285,7 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
         fileType = BINARY_TYPE_COMPRESSED_PACKAGE;
     else if (type == BINARY_TYPE_ANGLESCRIPT)
         fileType = BINARY_TYPE_ANGLESCRIPT;
-    else if (type == BINARY_TYPE_MODEL)
+    else if (type == BINARY_TYPE_MODEL || type == BINARY_TYPE_MODEL2)
         fileType = BINARY_TYPE_MODEL;
     else if (type == BINARY_TYPE_SHADER)
         fileType = BINARY_TYPE_SHADER;
