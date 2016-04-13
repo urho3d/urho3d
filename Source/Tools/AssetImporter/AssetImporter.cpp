@@ -2288,7 +2288,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
     for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
     {
         *((unsigned*)dest) = Color(mesh->mColors[i][index].r, mesh->mColors[i][index].g, mesh->mColors[i][index].b,
-            mesh->mColors[0][index].a).ToUInt();
+            mesh->mColors[i][index].a).ToUInt();
         ++dest;
     }
     

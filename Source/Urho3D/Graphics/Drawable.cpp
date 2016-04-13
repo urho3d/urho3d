@@ -447,7 +447,6 @@ void Drawable::RemoveFromOctree()
 
 bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool asZUp, bool asRightHanded, bool writeLightmapUV)
 {
-/*
     // Must track indices independently to deal with potential mismatching of drawables vertex attributes (ie. one with UV, another without, then another with)
     unsigned currentPositionIndex = 1;
     unsigned currentUVIndex = 1;
@@ -486,28 +485,38 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
             // If we've reached here than we're going to actually write something to the OBJ file
             anythingWritten = true;
 
-            const unsigned char* vertexData = 0x0;
-            const unsigned char* indexData = 0x0;
-            unsigned int elementSize = 0, indexSize = 0, elementMask = 0;
-            geo->GetRawData(vertexData, elementSize, indexData, indexSize, elementMask);
+            const unsigned char* vertexData;
+            const unsigned char* indexData;
+            unsigned elementSize, indexSize;
+            const PODVector<VertexElement>* elements;
+            geo->GetRawData(vertexData, elementSize, indexData, indexSize, elements);
+            if (!vertexData || !elements)
+                continue;
 
-            const bool hasNormals = (elementMask & MASK_NORMAL) != 0;
-            const bool hasUV = (elementMask & MASK_TEXCOORD1) != 0;
-            const bool hasLMUV = (elementMask & MASK_TEXCOORD2) != 0;
+            bool hasPosition = VertexBuffer::HasElement(*elements, TYPE_VECTOR3, SEM_POSITION);
+            if (!hasPosition)
+            {
+                URHO3D_LOGERRORF("%s (%u) %s (%u) Geometry %u contains does not have Vector3 type positions in vertex data", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex);
+                continue;
+            }
+
+            bool hasNormals = VertexBuffer::HasElement(*elements, TYPE_VECTOR3, SEM_NORMAL);
+            bool hasUV = VertexBuffer::HasElement(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 0);
+            bool hasLMUV = VertexBuffer::HasElement(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 1);
 
             if (elementSize > 0 && indexSize > 0)
             {
-                const unsigned vertexStart = geo->GetVertexStart();
-                const unsigned vertexCount = geo->GetVertexCount();
-                const unsigned indexStart = geo->GetIndexStart();
-                const unsigned indexCount = geo->GetIndexCount();
+                unsigned vertexStart = geo->GetVertexStart();
+                unsigned vertexCount = geo->GetVertexCount();
+                unsigned indexStart = geo->GetIndexStart();
+                unsigned indexCount = geo->GetIndexCount();
 
                 // Name NodeID DrawableType DrawableID GeometryIndex ("Geo" is included for clarity as StaticModel_32_2 could easily be misinterpreted or even quickly misread as 322)
                 // Generated object name example: Node_5_StaticModel_32_Geo_0 ... or ... Bob_5_StaticModel_32_Geo_0
                 outputFile->WriteLine(String("o ").AppendWithFormat("%s_%u_%s_%u_Geo_%u", node->GetName().Length() > 0 ? node->GetName().CString() : "Node", node->GetID(), drawable->GetTypeName().CString(), drawable->GetID(), geoIndex));
 
                 // Write vertex position
-                const unsigned positionOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_POSITION);
+                unsigned positionOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION);
                 for (unsigned j = 0; j < vertexCount; ++j)
                 {
                     Vector3 vertexPosition = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + positionOffset]));
@@ -527,7 +536,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
 
                 if (hasNormals)
                 {
-                    const unsigned normalOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_NORMAL);
+                    unsigned normalOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_NORMAL);
                     for (unsigned j = 0; j < vertexCount; ++j)
                     {
                         Vector3 vertexNormal = *((const Vector3*)(&vertexData[(vertexStart + j) * elementSize + normalOffset]));
@@ -551,7 +560,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                 if (hasUV || (hasLMUV && writeLightmapUV))
                 {
                     // if writing Lightmap UV is chosen, only use it if TEXCOORD2 exists, otherwise use TEXCOORD1
-                    const unsigned texCoordOffset = (writeLightmapUV && hasLMUV) ? VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD2) : VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD1);
+                    unsigned texCoordOffset = (writeLightmapUV && hasLMUV) ? VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 1) : VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD, 9);
                     for (unsigned j = 0; j < vertexCount; ++j)
                     {
                         Vector2 uvCoords = *((const Vector2*)(&vertexData[(vertexStart + j) * elementSize + texCoordOffset]));
@@ -612,7 +621,7 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
                     }
                     else if (hasNormals || hasUV)
                     {
-                        const unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
+                        unsigned secondTraitIndex = hasNormals ? currentNormalIndex : currentUVIndex;
                         output.AppendWithFormat("%l%s%l %l%s%l %l%s%l",
                             currentPositionIndex + longIndices[0],
                             slashCharacter.CString(),
@@ -643,8 +652,6 @@ bool WriteDrawablesToOBJ(PODVector<Drawable*> drawables, File* outputFile, bool 
         }
     }
     return anythingWritten;
-*/
-    return true;
 }
 
 }

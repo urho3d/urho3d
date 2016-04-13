@@ -1117,7 +1117,7 @@ Note that the texcoord numbers are misleading as the actual texcoord inputs in s
 shader texcoord inputs 4-6.
 
 2) By defining VertexElement structures, which tell the data type, semantic, and zero-based semantic index (for e.g. multiple texcoords), and whether the data is per-vertex or per-instance data.
-This allows to freely define the order and meaning of the elements.
+This allows to freely define the order and meaning of the elements. However for 3D objects, the first element should always be "Position" and use the Vector3 type to ensure e.g. raycasts and occlusion rendering work properly.
 
 The third parameter of \ref VertexBuffer::SetSize "SetSize()" is whether to create the buffer as static or dynamic. This is a hint to the underlying graphics API how to allocate the buffer data. Dynamic will suit frequent (every frame) modification better, while static has likely better overall performance for world geometry rendering.
 
