@@ -269,7 +269,7 @@ template <class T> T* ResourceCache::GetResource(const String& name, bool sendEv
 template <class T> void ResourceCache::ReleaseResource(const String& name, bool force)
 {
     StringHash type = T::GetTypeStatic();
-    static_cast<T*>(ReleaseResource(type, name, force));
+    ReleaseResource(type, name, force);
 }
 
 template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)
