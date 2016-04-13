@@ -386,6 +386,7 @@ task :ci do
       # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
       system "bash -c '#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
+    next if timeup
     # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
       puts "\nConfiguring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
