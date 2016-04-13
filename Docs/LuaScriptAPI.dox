@@ -2737,6 +2737,7 @@ Methods:
 - unsigned GetNumJoysticks() const
 - JoystickState* GetJoystick(int id)
 - JoystickState* GetJoystickByIndex(unsigned index)
+- JoystickState* GetJoystickByName(const String name)
 - bool GetToggleFullscreen() const
 - bool GetScreenKeyboardSupport() const
 - bool IsScreenJoystickVisible(int id) const
@@ -6142,6 +6143,11 @@ Methods:
 
 Methods:
 
+- TextureCube() (GC)
+- TextureCube* new()
+- void delete()
+- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>

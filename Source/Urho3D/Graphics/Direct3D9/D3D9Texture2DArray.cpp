@@ -243,7 +243,7 @@ bool Texture2DArray::SetData(unsigned layer, Deserializer& source)
     return SetData(layer, image);
 }
 
-bool Texture2DArray::SetData(unsigned layer, SharedPtr<Image> image, bool useAlpha)
+bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -261,8 +261,9 @@ bool Texture2DArray::SetData(unsigned layer, SharedPtr<Image> image, bool useAlp
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -270,25 +271,16 @@ bool Texture2DArray::SetData(unsigned layer, SharedPtr<Image> image, bool useAlp
 
     if (!image->IsCompressed())
     {
-        // Convert unsuitable formats to RGBA
-        unsigned components = image->GetComponents();
-        if ((components == 1 && !useAlpha) || components == 2 || components == 3)
-        {
-            image = image->ConvertToRGBA();
-            if (!image)
-                return false;
-            components = image->GetComponents();
-        }
-
         unsigned char* levelData = image->GetData();
         int levelWidth = image->GetWidth();
         int levelHeight = image->GetHeight();
+        unsigned components = image->GetComponents();
         unsigned format = 0;
 
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -338,7 +330,7 @@ bool Texture2DArray::SetData(unsigned layer, SharedPtr<Image> image, bool useAlp
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();

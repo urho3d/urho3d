@@ -626,6 +626,15 @@ bool Graphics::TakeScreenShot(Image& destImage)
 {
     URHO3D_PROFILE(TakeScreenShot);
 
+    if (!IsInitialized())
+        return false;
+
+    if (IsDeviceLost())
+    {
+        URHO3D_LOGERROR("Can not take screenshot while device is lost");
+        return false;
+    }
+
     ResetRenderTargets();
 
     destImage.SetSize(width_, height_, 3);
@@ -2396,7 +2405,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
-        SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
+        SDL_SetWindowFullscreen(impl_->window_, 0);
 #endif
 
     if (impl_->context_)

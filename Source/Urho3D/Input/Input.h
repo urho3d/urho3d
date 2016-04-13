@@ -265,6 +265,8 @@ public:
     JoystickState* GetJoystick(SDL_JoystickID id);
     /// Return joystick state by index, or null if does not exist. 0 = first connected joystick.
     JoystickState* GetJoystickByIndex(unsigned index);
+    /// Return joystick state by name, or null if does not exist.
+    JoystickState* GetJoystickByName(const String& name);
 
     /// Return whether fullscreen toggle is enabled.
     bool GetToggleFullscreen() const { return toggleFullscreen_; }

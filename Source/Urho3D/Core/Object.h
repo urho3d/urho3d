@@ -49,7 +49,7 @@ public:
     bool IsTypeOf(const TypeInfo* typeInfo) const;
     /// Check current type is type of specified class type.
     template<typename T> bool IsTypeOf() const { return IsTypeOf(T::GetTypeInfoStatic()); }
-    
+
     /// Return type.
     StringHash GetType() const { return type_; }
     /// Return type name.
@@ -138,6 +138,13 @@ public:
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap() const;
+#if URHO3D_CXX11
+    /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
+    template <typename... Args> void SendEvent(StringHash eventType, Args... args)
+    {
+        SendEvent(eventType, GetEventDataMap().Populate(args...));
+    }
+#endif
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
