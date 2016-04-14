@@ -43,7 +43,7 @@ matrix:
     - compiler: gcc
   include:
     - &Linux-64bit
-      addons: {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [g++-4.9, &linux_packages [*default_packages, libasound2-dev, libpulse-dev, rpm]]}}
+      addons: {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [g++-4.9, &linux_packages [*default_packages, libpulse-dev, rpm]]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       addons: {apt: {sources: *default_sources, packages: *linux_packages}}
@@ -199,7 +199,8 @@ cache: ccache
 sudo: false
 addons:
   apt:
-    packages: [libasound2-dev, libpulse-dev]
+    sources: kubuntu-backports
+    packages: [cmake, libpulse-dev]
   coverity_scan:
     project:
       name: urho3d/Urho3D
@@ -232,7 +233,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev, libpulse-dev]}}
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libpulse-dev]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -260,7 +261,7 @@ cache: {directories: $HOME/.ccache}
 android: {components: [build-tools-22.0.1]}
 jdk: oraclejdk8
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -309,7 +310,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib, rpm]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib, rpm]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
