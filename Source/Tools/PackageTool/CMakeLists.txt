@@ -22,11 +22,7 @@
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-    if (WIN32)
-        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
-    else ()
-        cmake_minimum_required (VERSION 2.8.6)
-    endif ()
+    cmake_minimum_required (VERSION 3.2.3)
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
