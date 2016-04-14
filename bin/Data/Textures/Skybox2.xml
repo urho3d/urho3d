@@ -1,0 +1,10 @@
+<cubemap>
+    <srgb enable="true" />
+    <face name="output_skybox_posx.dds" />
+    <face name="output_skybox_negx.dds" />
+    <face name="output_skybox_posy.dds" />
+    <face name="output_skybox_negy.dds" />
+    <face name="output_skybox_posz.dds" />
+    <face name="output_skybox_negz.dds" />
+    <quality low="0" />
+</cubemap>
