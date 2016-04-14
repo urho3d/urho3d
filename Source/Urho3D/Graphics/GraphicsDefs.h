@@ -340,6 +340,8 @@ extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
 extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
+extern URHO3D_API const StringHash PSP_ROUGHNESS;
+extern URHO3D_API const StringHash PSP_METALLIC;
 
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;

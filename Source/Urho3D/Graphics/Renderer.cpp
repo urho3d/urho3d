@@ -310,6 +310,11 @@ void Renderer::SetDefaultRenderPath(XMLFile* xmlFile)
         defaultRenderPath_ = newRenderPath;
 }
 
+void Renderer::SetDefaultTechnique(Technique* technique)
+{
+    defaultTechnique_ = technique;
+}
+
 void Renderer::SetHDRRendering(bool enable)
 {
     hdrRendering_ = enable;
@@ -520,6 +525,15 @@ Viewport* Renderer::GetViewport(unsigned index) const
 RenderPath* Renderer::GetDefaultRenderPath() const
 {
     return defaultRenderPath_;
+}
+
+Technique* Renderer::GetDefaultTechnique() const
+{
+    // Assign default when first asked if not assigned yet
+    if (!defaultTechnique_)
+        const_cast<SharedPtr<Technique>& >(defaultTechnique_) = GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml");
+
+    return defaultTechnique_;
 }
 
 unsigned Renderer::GetNumGeometries(bool allViews) const
