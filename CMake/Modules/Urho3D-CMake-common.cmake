@@ -1797,7 +1797,7 @@ else ()
     # Ensure the output directory exist before creating the symlinks
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
-    foreach (I CoreData Data)
+    foreach (I Autoload CoreData Data)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
         endif ()
