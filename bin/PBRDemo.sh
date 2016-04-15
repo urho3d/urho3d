@@ -1,1 +1,2 @@
-$(dirname $0)/Urho3DPlayer 42_PBRMaterials.as $@
+#!/usr/bin/env bash
+$(dirname $0)/Urho3DPlayer Scripts/42_PBRMaterials.as $@
