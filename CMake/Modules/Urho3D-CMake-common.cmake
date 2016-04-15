@@ -287,15 +287,13 @@ if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (EMSCRIPTEN_SYSTEM_LIBS "" CACHE STRING "Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten cross-compiling build only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries")
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
-if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
-    set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED)
-    if (NOT CMAKE_CONFIGURATION_TYPES)
-        set_property (CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${URHO3D_BUILD_CONFIGURATIONS})
-    endif ()
-    if (RPI)
-        set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
-    endif ()
-endif()
+set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED)
+if (NOT CMAKE_CONFIGURATION_TYPES)
+    set_property (CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${URHO3D_BUILD_CONFIGURATIONS})
+endif ()
+if (RPI)
+    set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
+endif ()
 
 # Union all the sysroot variables into one so it can be referred to generically later
 # TODO: to be replaced with CMAKE_SYSROOT later if it is more beneficial
@@ -1182,13 +1180,7 @@ macro (setup_executable)
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (NOT ARG_PRIVATE)
         if (WEB AND DEST_BUNDLE_DIR)
-            # todo: Just use generator-expression when CMake minimum version is 3.0
-            if (CMAKE_VERSION VERSION_LESS 3.0)
-                get_target_property (LOCATION ${TARGET_NAME} LOCATION)
-                get_filename_component (LOCATION ${LOCATION} DIRECTORY)
-            else ()
-                set (LOCATION $<TARGET_FILE_DIR:${TARGET_NAME}>)
-            endif ()
+            set (LOCATION $<TARGET_FILE_DIR:${TARGET_NAME}>)
             unset (FILES)
             foreach (EXT data html html.map html.mem js)
                 list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
@@ -1868,12 +1860,6 @@ endif ()
 
 # Post-CMake fixes
 if (IOS)
-    # TODO: can be removed when CMake minimum required has reached 2.8.12
-    if (CMAKE_VERSION VERSION_LESS 2.8.12)
-        # Due to a bug in the CMake/Xcode generator (fixed in 2.8.12) where it has wrongly assumed the IOS bundle structure to be the same as MacOSX bundle structure,
-        # below temporary fix is required in order to solve the auto-linking issue when dependent libraries are changed
-        list (APPEND POST_CMAKE_FIXES COMMAND sed -i '' 's/\\/Contents\\/MacOS//g' ${CMAKE_BINARY_DIR}/CMakeScripts/XCODE_DEPEND_HELPER.make || exit 0)
-    endif ()
     # TODO: can be removed when CMake minimum required has reached 3.4
     if (CMAKE_VERSION VERSION_LESS 3.4)
         # Due to a bug in the CMake/Xcode generator (fixed in 3.4) that prevents iOS targets (library and bundle) to be installed correctly

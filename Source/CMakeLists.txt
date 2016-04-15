@@ -34,9 +34,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
     # But don't set them yet in the build tree
     set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     if (APPLE)
-        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-            set (CMAKE_MACOSX_RPATH TRUE)
-        endif ()
+        set (CMAKE_MACOSX_RPATH TRUE)
         set (ORIGIN @loader_path)
     else ()
         set (ORIGIN $ORIGIN)

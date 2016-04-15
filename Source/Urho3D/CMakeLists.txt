@@ -407,25 +407,9 @@ if (NOT XCODE AND NOT MSVC)
         endif ()
     endif ()
 endif ()
-# todo This is a deprecated property in CMake version 2.8.12 - Remove below commands when CMake minimum version is 2.8.12
-if (CMAKE_VERSION VERSION_LESS 2.8.12)
-    set_target_properties (${TARGET_NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "")
-    if (URHO3D_LIB_TYPE STREQUAL SHARED)
-        if (NOT MSVC AND CMAKE_VERSION VERSION_LESS 2.8.11)
-            get_target_property (LINK_LIBRARIES ${TARGET_NAME} LINK_LIBRARIES)
-            target_link_libraries (${TARGET_NAME} LINK_PRIVATE ${LINK_LIBRARIES})
-        endif ()
-    else ()
-        set_target_properties (${TARGET_NAME} PROPERTIES LINK_LIBRARIES "")
-    endif ()
-endif ()
-# end todo
 # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (NOT MSVC AND NOT (MINGW AND CMAKE_CROSSCOMPILING) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
-        set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
-    endif ()
 endif ()
 
 # Install headers for using the Urho3D library
