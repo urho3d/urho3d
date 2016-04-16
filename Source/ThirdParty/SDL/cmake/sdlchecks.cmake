@@ -696,7 +696,7 @@ macro(CheckOpenGL)
   if(VIDEO_OPENGL)
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     if (CMAKE_CROSSCOMPILING AND SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-      set (CMAKE_REQUIRED_FLAGS "--sysroot=${SYSROOT} ${ORIG_CMAKE_REQUIRED_FLAGS}")
+      set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
     endif ()
     if (APPLE)
       check_c_source_compiles ("
@@ -732,7 +732,7 @@ macro(CheckOpenGLES)
   if(VIDEO_OPENGLES)
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     if (CMAKE_CROSSCOMPILING AND SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-      set (CMAKE_REQUIRED_FLAGS "--sysroot=${SYSROOT} ${ORIG_CMAKE_REQUIRED_FLAGS}")
+      set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
     endif ()
     check_c_source_compiles("
         #define EGL_API_FB
@@ -818,7 +818,7 @@ macro(CheckPTHREAD)
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" option or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     if(CMAKE_CROSSCOMPILING)
       if (SYSROOT AND NOT CMAKE_REQUIRED_INCLUDES)
-        set (CMAKE_REQUIRED_FLAGS "--sysroot=${SYSROOT} ${ORIG_CMAKE_REQUIRED_FLAGS}")
+        set (CMAKE_REQUIRED_FLAGS "--sysroot=\"${SYSROOT}\" ${ORIG_CMAKE_REQUIRED_FLAGS}")
       endif ()
       check_c_source_compiles("
         #include <pthread.h>
