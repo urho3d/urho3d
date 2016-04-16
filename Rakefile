@@ -370,8 +370,13 @@ task :ci do
   unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
-    puts "Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}..."; $stdout.flush
-    system "bash -c 'rake make target=install >/dev/null'" or abort 'Failed to install Urho3D SDK'
+    system 'touch enabled_time_check.log' if ENV['XCODE']
+    if wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { system "bash -c 'rake make target=install >/dev/null'"; Thread.current[:exit_code] = $?.exitstatus } != 0
+      abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
+      $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
+      next
+    end
+    File.delete 'enabled_time_check.log' if ENV['XCODE']
     # Alternate to use in-the-source build tree for test coverage
     ENV['build_tree'] = '.' unless ENV['APPVEYOR']
     # Ensure the following variables are auto-discovered during scaffolding test
