@@ -164,6 +164,8 @@ public:
     template <class T> T* GetExistingResource(const String& name);
     /// Template version of loading a resource without storing it to the cache.
     template <class T> SharedPtr<T> GetTempResource(const String& name, bool sendEventOnFailure = true);
+    /// Template version of releasing a resource by name.
+    template <class T> void ReleaseResource(const String& name, bool force = false);
     /// Template version of queueing a resource background load.
     template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Template version of returning loaded resources of a specific type.
@@ -262,6 +264,12 @@ template <class T> T* ResourceCache::GetResource(const String& name, bool sendEv
 {
     StringHash type = T::GetTypeStatic();
     return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
+}
+
+template <class T> void ResourceCache::ReleaseResource(const String& name, bool force)
+{
+    StringHash type = T::GetTypeStatic();
+    ReleaseResource(type, name, force);
 }
 
 template <class T> SharedPtr<T> ResourceCache::GetTempResource(const String& name, bool sendEventOnFailure)

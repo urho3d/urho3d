@@ -9838,6 +9838,7 @@ Properties:
 - Material@ defaultLightSpot // readonly
 - Material@ defaultMaterial // readonly
 - RenderPath@ defaultRenderPath
+- Technique@ defaultTechnique
 - Zone@ defaultZone // readonly
 - bool drawShadows
 - bool dynamicInstancing

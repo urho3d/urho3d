@@ -27,6 +27,7 @@
 #include "../Core/Profiler.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
+#include "../Graphics/Renderer.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/Texture2DArray.h"
@@ -1164,7 +1165,9 @@ void Material::ResetToDefaults()
         return;
 
     SetNumTechniques(1);
-    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
+    Renderer* renderer = GetSubsystem<Renderer>();
+    SetTechnique(0, renderer ? renderer->GetDefaultTechnique() :
+        GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
     textures_.Clear();
 
@@ -1176,6 +1179,8 @@ void Material::ResetToDefaults()
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    SetShaderParameter("RoughnessPS", 0.5f);
+    SetShaderParameter("MetallicPS", 0.0f);
     batchedParameterUpdate_ = false;
 
     cullMode_ = CULL_CCW;

@@ -6,6 +6,7 @@ class Renderer
     void SetViewport(unsigned index, Viewport* viewport);
     void SetDefaultRenderPath(RenderPath* renderPath);
     void SetDefaultRenderPath(XMLFile* file);
+    void SetDefaultTechnique(Technique* technique);
     void SetHDRRendering(bool enable);
     void SetSpecularLighting(bool enable);
     void SetTextureAnisotropy(int level);
@@ -33,6 +34,7 @@ class Renderer
     unsigned GetNumViewports() const;
     Viewport* GetViewport(unsigned index) const;
     RenderPath* GetDefaultRenderPath() const;
+    Technique* GetDefaultTechnique() const;
     bool GetHDRRendering() const;
     bool GetSpecularLighting() const;
     bool GetDrawShadows() const;
@@ -71,6 +73,7 @@ class Renderer
 
     tolua_property__get_set unsigned numViewports;
     tolua_property__get_set RenderPath* defaultRenderPath;
+    tolua_property__get_set Technique* defaultTechnique;
     tolua_property__get_set bool HDRRendering;
     tolua_property__get_set bool specularLighting;
     tolua_property__get_set bool drawShadows;

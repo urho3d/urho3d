@@ -4749,6 +4749,7 @@ Methods:
 - void SetViewport(unsigned index, Viewport* viewport)
 - void SetDefaultRenderPath(RenderPath* renderPath)
 - void SetDefaultRenderPath(XMLFile* file)
+- void SetDefaultTechnique(Technique* technique)
 - void SetHDRRendering(bool enable)
 - void SetSpecularLighting(bool enable)
 - void SetTextureAnisotropy(int level)
@@ -4775,6 +4776,7 @@ Methods:
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
 - RenderPath* GetDefaultRenderPath() const
+- Technique* GetDefaultTechnique() const
 - bool GetHDRRendering() const
 - bool GetSpecularLighting() const
 - bool GetDrawShadows() const
@@ -4814,6 +4816,7 @@ Properties:
 
 - unsigned numViewports
 - RenderPath* defaultRenderPath
+- Technique* defaultTechnique
 - bool HDRRendering
 - bool specularLighting
 - bool drawShadows
@@ -6143,6 +6146,11 @@ Methods:
 
 Methods:
 
+- TextureCube() (GC)
+- TextureCube* new()
+- void delete()
+- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>

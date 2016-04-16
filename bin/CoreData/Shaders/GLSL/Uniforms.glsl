@@ -67,6 +67,10 @@ uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
 uniform vec4 cMatSpecColor;
+#ifdef PBR
+    uniform float cRoughnessPS;
+    uniform float cMetallicPS;
+#endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform vec4 cShadowCubeAdjust;
@@ -194,6 +198,10 @@ uniform MaterialPS
     vec3 cMatEmissiveColor;
     vec3 cMatEnvMapColor;
     vec4 cMatSpecColor;
+    #ifdef PBR
+        float cRoughnessPS;
+        float cMetallicPS;
+    #endif
 };
 #endif
 
