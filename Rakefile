@@ -825,6 +825,7 @@ end
 def wait_for_block comment = '', retries = -1, retry_interval = 60, exit_code_sym = 'exit_code', &block
   # Wait until the code block is completed or it is killed externally by user via Ctrl+C or when it exceeds the number of retries (if the retries parameter is provided)
   thread = Thread.new &block
+  thread.priority = 1   # Make the worker thread has higher priority than the main thread
   str = comment
   retries = retries * 60 / retry_interval unless retries == -1
   until retries == 0
