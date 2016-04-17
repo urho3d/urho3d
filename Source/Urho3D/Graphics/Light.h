@@ -195,7 +195,7 @@ public:
     void SetShadowCascade(const CascadeParameters& parameters);
     /// Set shadow map focusing parameters.
     void SetShadowFocus(const FocusParameters& parameters);
-    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    /// Set light intensity in shadow between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
     /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
     void SetShadowResolution(float resolution);
@@ -251,7 +251,7 @@ public:
     /// Return shadow map focus parameters.
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
 
-    /// Return shadow intensity.
+    /// Return light intensity in shadow.
     float GetShadowIntensity() const { return shadowIntensity_; }
 
     /// Return shadow resolution.
@@ -338,7 +338,7 @@ private:
     float fadeDistance_;
     /// Shadow fade start distance.
     float shadowFadeDistance_;
-    /// Shadow intensity.
+    /// Light intensity in shadow.
     float shadowIntensity_;
     /// Shadow resolution.
     float shadowResolution_;
