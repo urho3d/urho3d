@@ -99,13 +99,13 @@ void PS()
     #endif
 
     vec3 toCamera = normalize(-worldPos);
-    vec3 lightVec = lightDir;
+    vec3 lightVec = normalize(lightDir);
 
     vec3 Hn = normalize(toCamera + lightVec);
-    float vdh = max(M_EPSILON, dot(toCamera, Hn));
-    float ndh = max(M_EPSILON, dot(normal, Hn));
-    float ndl = max(M_EPSILON, dot(normal, lightVec));
-    float ndv = max(M_EPSILON, dot(normal, toCamera));
+    float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
+    float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
+    float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
+    float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
     vec3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
     vec3 specularFactor = vec3(0,0,0);
