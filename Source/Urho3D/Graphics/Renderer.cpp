@@ -639,60 +639,17 @@ void Renderer::Update(float timeStep)
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
         QueueViewport(0, viewports_[i]);
 
-    // Gather other render surfaces that are autoupdated
+    // Update main viewports. This may queue further views
+    unsigned numMainViewports = queuedViewports_.Size();
+    for (unsigned i = 0; i < numMainViewports; ++i)
+        UpdateQueuedViewport(i);
+
+    // Gather queued & autoupdated render surfaces
     SendEvent(E_RENDERSURFACEUPDATE);
 
-    // Process gathered views. This may queue further views (render surfaces that are only updated when visible)
-    for (unsigned i = 0; i < queuedViewports_.Size(); ++i)
-    {
-        WeakPtr<RenderSurface>& renderTarget = queuedViewports_[i].first_;
-        WeakPtr<Viewport>& viewport = queuedViewports_[i].second_;
-
-        // Null pointer means backbuffer view. Differentiate between that and an expired rendersurface
-        if ((renderTarget.NotNull() && renderTarget.Expired()) || viewport.Expired())
-            continue;
-
-        // (Re)allocate the view structure if necessary
-        if (!viewport->GetView() || resetViews_)
-            viewport->AllocateView();
-
-        View* view = viewport->GetView();
-        assert(view);
-        // Check if view can be defined successfully (has either valid scene, camera and octree, or no scene passes)
-        if (!view->Define(renderTarget, viewport))
-            continue;
-
-        views_.Push(WeakPtr<View>(view));
-
-        const IntRect& viewRect = viewport->GetRect();
-        Scene* scene = viewport->GetScene();
-        if (!scene)
-            continue;
-
-        Octree* octree = scene->GetComponent<Octree>();
-
-        // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
-        // However, if the same scene is viewed from multiple cameras, update the octree only once
-        if (!updatedOctrees_.Contains(octree))
-        {
-            frame_.camera_ = viewport->GetCamera();
-            frame_.viewSize_ = viewRect.Size();
-            if (frame_.viewSize_ == IntVector2::ZERO)
-                frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
-            octree->Update(frame_);
-            updatedOctrees_.Insert(octree);
-
-            // Set also the view for the debug renderer already here, so that it can use culling
-            /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
-            DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
-            if (debug && viewport->GetDrawDebug())
-                debug->SetView(viewport->GetCamera());
-        }
-
-        // Update view. This may queue further views. View will send update begin/end events once its state is set
-        ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
-        view->Update(frame_);
-    }
+    // Update viewports that were added as result of the event above
+    for (unsigned i = numMainViewports; i < queuedViewports_.Size(); ++i)
+        UpdateQueuedViewport(i);
 
     queuedViewports_.Clear();
     resetViews_ = false;
@@ -1469,6 +1426,57 @@ const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
         BoundingBox viewBox(light->GetWorldBoundingBox().Transformed(view));
         return lightScissorCache_[combination] = viewBox.Projected(projection);
     }
+}
+
+void Renderer::UpdateQueuedViewport(unsigned index)
+{
+    WeakPtr<RenderSurface>& renderTarget = queuedViewports_[index].first_;
+    WeakPtr<Viewport>& viewport = queuedViewports_[index].second_;
+
+    // Null pointer means backbuffer view. Differentiate between that and an expired rendersurface
+    if ((renderTarget.NotNull() && renderTarget.Expired()) || viewport.Expired())
+        return;
+
+    // (Re)allocate the view structure if necessary
+    if (!viewport->GetView() || resetViews_)
+        viewport->AllocateView();
+
+    View* view = viewport->GetView();
+    assert(view);
+    // Check if view can be defined successfully (has either valid scene, camera and octree, or no scene passes)
+    if (!view->Define(renderTarget, viewport))
+        return;
+
+    views_.Push(WeakPtr<View>(view));
+
+    const IntRect& viewRect = viewport->GetRect();
+    Scene* scene = viewport->GetScene();
+    if (!scene)
+        return;
+
+    Octree* octree = scene->GetComponent<Octree>();
+
+    // Update octree (perform early update for drawables which need that, and reinsert moved drawables.)
+    // However, if the same scene is viewed from multiple cameras, update the octree only once
+    if (!updatedOctrees_.Contains(octree))
+    {
+        frame_.camera_ = viewport->GetCamera();
+        frame_.viewSize_ = viewRect.Size();
+        if (frame_.viewSize_ == IntVector2::ZERO)
+            frame_.viewSize_ = IntVector2(graphics_->GetWidth(), graphics_->GetHeight());
+        octree->Update(frame_);
+        updatedOctrees_.Insert(octree);
+
+        // Set also the view for the debug renderer already here, so that it can use culling
+        /// \todo May result in incorrect debug geometry culling if the same scene is drawn from multiple viewports
+        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        if (debug && viewport->GetDrawDebug())
+            debug->SetView(viewport->GetCamera());
+    }
+
+    // Update view. This may queue further views. View will send update begin/end events once its state is set
+    ResetShadowMapAllocations(); // Each view can reuse the same shadow maps
+    view->Update(frame_);
 }
 
 void Renderer::PrepareViewRender()

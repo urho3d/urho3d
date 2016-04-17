@@ -411,6 +411,8 @@ private:
     void CreateInstancingBuffer();
     /// Create point light shadow indirection texture data.
     void SetIndirectionTextureData();
+    /// Update a queued viewport for rendering.
+    void UpdateQueuedViewport(unsigned index);
     /// Prepare for rendering of a new view.
     void PrepareViewRender();
     /// Remove unused occlusion and screen buffers.
@@ -429,7 +431,7 @@ private:
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    /// Blur the shadow map
+    /// Blur the shadow map.
     void BlurShadowMap(View* view, Texture2D* shadowMap);
 
     /// Graphics subsystem.
