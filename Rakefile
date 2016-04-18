@@ -389,7 +389,7 @@ task :ci do
     next if timeup
     # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
-      puts "\nConfiguring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
+      puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
       system "bash -c 'rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? '../../Build' : '..'} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
   end
@@ -647,7 +647,7 @@ task :ci_timer do
 end
 
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup quiet = false
+def timeup quiet = false, cutoff_time = 40.0
   unless File.exists?('start_time.log')
     system 'touch start_time.log split_time.log'
     return nil
@@ -659,7 +659,7 @@ def timeup quiet = false
     system 'touch split_time.log'
     puts "\n=== elapsed time: #{elapsed_time.to_i} minutes #{((elapsed_time - elapsed_time.to_i) * 60.0).round} seconds, lap time: #{lap_time.to_i} minutes #{((lap_time - lap_time.to_i) * 60.0).round} seconds ===\n\n" unless File.exists?('already_timeup.log'); $stdout.flush
   end
-  return system('touch already_timeup.log') if elapsed_time > 40.0
+  return system('touch already_timeup.log') if elapsed_time > cutoff_time
 end
 
 def scaffolding dir, project = 'Scaffolding', target = 'Main'
@@ -835,7 +835,7 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   str = comment
   retries = retries * 60 / retry_interval unless retries == -1
   until thread.status == false
-    if retries == 0 || timeup(true)
+    if retries == 0 || timeup(true, 45.0)
       thread.kill   # TODO: also kill the child subproceses spawned by the worker thread
       break
     end
