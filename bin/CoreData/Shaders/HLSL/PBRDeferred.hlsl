@@ -84,7 +84,7 @@ void PS(
     const float roughness = length(normal);
     normal = normalize(normal);
 
-    const float3 specColor = float3(specularInput.a, albedoInput.a, normalInput.a);
+    const float3 specColor = specularInput.rgb;
 
     const float4 projWorldPos = float4(worldPos, 1.0);
 
@@ -108,10 +108,10 @@ void PS(
     const float3 lightVec = normalize(lightDir);
 
     const float3 Hn = normalize(toCamera + lightVec);
-    const float vdh = max(M_EPSILON, dot(toCamera, Hn));
-    const float ndh = max(M_EPSILON, dot(normal, Hn));
-    const float ndl = max(M_EPSILON, dot(normal, lightVec));
-    const float ndv = max(M_EPSILON, dot(normal, toCamera));
+    const float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
+    const float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
+    const float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
+    const float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
     const float3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
     float3 specularFactor = 0;

@@ -2468,6 +2468,9 @@ void Graphics::Restore()
             URHO3D_LOGERROR("OpenGL 2.0 is required");
             return;
         }
+
+        // Enable seamless cubemap if possible
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 
         // Set up texture data read/write alignment. It is important that this is done before uploading any texture data

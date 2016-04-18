@@ -1,39 +1,40 @@
 #line 10001
 #ifdef COMPILEPS
-    #define PBRFAST
-
     vec3 ImportanceSampleSimple(in vec2 Xi, in float roughness, in vec3 T, in vec3 B, in vec3 N)
     {
-      float a = roughness * roughness;
-      mat3 tbn = mat3(T, B, N);
-      #ifdef PBRFAST
-          const float blurFactor = 0.0;
-      #else
-          const float blurFactor = 5.0;
-      #endif
-      vec3 Xi3 = mix(vec3(0,0,1), normalize(vec3(Xi.xy * blurFactor , 1)), a);
-      vec3 XiWS = tbn * Xi3;
-      return normalize(N + XiWS);
+        float a = roughness * roughness;
+        mat3 tbn = mat3(T, B, N);
+        #ifdef IBLFAST
+            const float blurFactor = 0.0;
+        #else
+            const float blurFactor = 5.0;
+        #endif
+        vec2 xx = Xi.xy * blurFactor;
+        xx = xx - 1.0 * trunc(xx/1.0); // hlsl style modulo
+        vec3 Xi3 = mix(vec3(0,0,1), normalize(vec3(xx, 1.0)), a);
+        vec3 XiWS = tbn * Xi3;
+        return normalize(N + XiWS);
     }
 
     // Karis '13
-    vec3 ImportanceSampleGGX(in vec2 Xi, in float roughness, in vec3 N)
+    vec3 ImportanceSampleGGX(in vec2 Xi, in float roughness, in vec3 T, in vec3 B, in vec3 N)
     {
-       float a = roughness * roughness;
-       float Phi = 2.0 * M_PI * Xi.x;
-       float CosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
-       float SinTheta = sqrt(1.0 - CosTheta * CosTheta);
-       vec3 H = vec3(0,0,0);
-       H.x = SinTheta * cos(Phi);
-       H.y = SinTheta * sin(Phi);
-       H.z = CosTheta;
+        float a = roughness * roughness;
+        float Phi = 2.0 * M_PI * Xi.x;
+        float CosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
+        float SinTheta = sqrt(1.0 - CosTheta * CosTheta);
+        vec3 H = vec3(0,0,0);
+        H.x = SinTheta * cos(Phi);
+        H.y = SinTheta * sin(Phi);
+        H.z = CosTheta;
 
-       vec3 UpVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
-       vec3 TangentX = normalize(cross(UpVector, N));
-       vec3 TangentY = cross(N, TangentX);
-       // Tangent to world space
-       return TangentX * H.x + TangentY * H.y + N * H.z;
+        vec3 UpVector = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+        vec3 TangentX = normalize(cross(UpVector, N));
+        vec3 TangentY = cross(N, TangentX);
+        // Tangent to world space
+        return TangentX * H.x + TangentY * H.y + N * H.z;
     }
+
     /// Determine reflection vector based on surface roughness, rougher uses closer to the normal and smoother uses closer to the reflection vector
     ///     normal: surface normal
     ///     reflection: vector of reflection off of the surface
@@ -45,8 +46,14 @@
         return mix(normal, reflection, lerpFactor);
     }
 
-    #define IMPORTANCE_SAMPLES 16
-    vec2 IMPORTANCE_KERNEL[IMPORTANCE_SAMPLES] = vec2[] (
+    #ifdef IBLFAST
+        #define IMPORTANCE_SAMPLES 1
+    #else
+        #define IMPORTANCE_SAMPLES 4
+    #endif
+
+    #define IMPORTANCE_KERNEL_SIZE 16
+    vec2 IMPORTANCE_KERNEL[IMPORTANCE_KERNEL_SIZE] = vec2[] (
         vec2(-0.0780436, 0.0558389),
         vec2(0.034318, -0.0635879),
         vec2(0.00230821, 0.0807279),
@@ -110,15 +117,12 @@
                 float ndh = clamp(abs(dot(N, H)), 0.0, 1.0);
                 float ndl = clamp(abs(dot(N, L)), 0.0, 1.0);
 
-                //if (ndl > 0.0)
-                {
-                    vec3 sampledColor = textureLod(sZoneCubeMap, L, mipLevel).rgb;
+                vec3 sampledColor = textureLod(sZoneCubeMap, L, mipLevel).rgb;
 
-                    vec3 diffuseTerm = Diffuse(diffColor, rough, ndv, ndl, vdh);
-                    vec3 lightTerm = sampledColor;
+                vec3 diffuseTerm = Diffuse(diffColor, rough, ndv, ndl, vdh);
+                vec3 lightTerm = sampledColor;
 
-                    diffuseFactor = lightTerm * diffuseTerm;
-                }
+                diffuseFactor = lightTerm * diffuseTerm;
             }
 
             {
@@ -134,30 +138,15 @@
                 float ndh = clamp(abs(dot(N, H)), 0.0, 1.0);
                 float ndl = clamp(abs(dot(N, L)), 0.0, 1.0);
 
-                vec3 specularTerm = vec3(0,0,0);
-                float pdf = 1.0;
-                vec3 lightTerm = vec3(0,0,0);
+                vec3 fresnelTerm = Fresnel(specColor, vdh);
+                float distTerm = 1.0; // Optimization, this term is mathematically cancelled out  -- Distribution(ndh, roughness);
+                float visTerm = Visibility(ndl, ndv, rough);
 
-                if (ndl > 0.05)
-                {
-                    vec3 fresnelTerm = Fresnel(specColor, vdh);
-                    float distTerm = 1.0; // Optimization, this term is mathematically cancelled out  -- Distribution(ndh, roughness);
-                    float visTerm = Visibility(ndl, ndv, rough);
+                vec3 lightTerm = sampledColor * ndl;
 
-                    lightTerm = sampledColor * ndl;
-                    specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-                    pdf = ImportanceSamplePDF(distTerm, ndh, vdh);
-                }
-                else // reduce artifacts at extreme grazing angles
-                {
-                    vec3 fresnelTerm = Fresnel(specColor, vdh);
-                    float distTerm = 1.0;//Distribution(ndh_, roughness);
-                    float visTerm = Visibility(ndl, ndv, rough);
+                float pdf = ndl > 0.05 ? ImportanceSamplePDF(distTerm, ndh, vdh) : 4.0; // reduce artifacts at extreme grazing angles
 
-                    lightTerm = sampledColor * ndl;
-                    specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndl);
-                    pdf = 4.0;//ImportanceSamplePDF(distTerm, ndh, vdh);
-                }
+                vec3 specularTerm = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
 
                 // energy conservation:
                 // Specular conservation:
@@ -201,7 +190,7 @@
                 const float rough = 1.0;
                 const float mipLevel = 9.0;
 
-                vec3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, wsNormal);
+                vec3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, tangent, bitangent, wsNormal);
                 vec3 sampleVec = wsNormal + perturb; //perturb by the sample vector
 
                 vec3 sampledColor = textureLod(sZoneCubeMap, sampleVec, mipLevel).rgb;
@@ -218,7 +207,7 @@
                 float rough = roughness;
                 float mipLevel =  GetMipFromRougness(rough);
 
-                vec3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, reflectVec);
+                vec3 perturb = ImportanceSampleGGX(IMPORTANCE_KERNEL[i].xy, rough, tangent, bitangent, reflectVec);
                 vec3 sampleVec = reflectVec + perturb; //perturb by the sample vector
 
                 vec3 sampledColor = textureCube(sZoneCubeMap, sampleVec, mipLevel).rgb;

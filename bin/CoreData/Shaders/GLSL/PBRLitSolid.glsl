@@ -178,12 +178,13 @@ void PS()
         #endif
 
         vec3 toCamera = normalize(cCameraPosPS - vWorldPos.xyz);
+        vec3 lightVec = normalize(lightDir);
 
         vec3 Hn = normalize(toCamera + lightDir);
-        float vdh = max(M_EPSILON, dot(toCamera, Hn));
-        float ndh = max(M_EPSILON, dot(normal, Hn));
-        float ndl = max(M_EPSILON, dot(normal, lightDir));
-        float ndv = max(M_EPSILON, dot(normal, toCamera));
+        float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
+        float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
+        float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
+        float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
         vec3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
         vec3 specularFactor = vec3(0,0,0);
@@ -206,12 +207,12 @@ void PS()
             gl_FragColor = vec4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(DEFERRED)
-        // Fill deferred G-buffer'
+        // Fill deferred G-buffer
         const vec3 spareData = vec3(0,0,0); // Can be used to pass more data to deferred renderer
-        gl_FragData[0] = vec4(spareData, specColor.r);
-        gl_FragData[1] = vec4(diffColor.rgb, specColor.g);
-        gl_FragData[2] = vec4(normal, specColor.b);
-        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), roughness);
+        gl_FragData[0] = vec4(specColor, spareData.r);
+        gl_FragData[1] = vec4(diffColor.rgb, spareData.g);
+        gl_FragData[2] = vec4(normal * roughness, spareData.b);
+        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), 0);
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight * diffColor.rgb;
