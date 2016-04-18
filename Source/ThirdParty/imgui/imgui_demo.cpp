@@ -1,4 +1,4 @@
-// dear imgui, v1.48 WIP
+// dear imgui, v1.48
 // (demo code)
 
 // Don't remove this file from your project! It is useful reference code that you can execute.
@@ -1496,7 +1496,7 @@ void ImGui::ShowTestWindow(bool* p_opened)
             ImGui::Text("Keys down:");      for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (io.KeysDownDuration[i] >= 0.0f)     { ImGui::SameLine(); ImGui::Text("%d (%.02f secs)", i, io.KeysDownDuration[i]); }
             ImGui::Text("Keys pressed:");   for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (ImGui::IsKeyPressed(i))             { ImGui::SameLine(); ImGui::Text("%d", i); }
             ImGui::Text("Keys release:");   for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (ImGui::IsKeyReleased(i))            { ImGui::SameLine(); ImGui::Text("%d", i); }
-            ImGui::Text("KeyMods: %s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
+            ImGui::Text("KeyMods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
 
             ImGui::Text("WantCaptureMouse: %s", io.WantCaptureMouse ? "true" : "false");
             ImGui::Text("WantCaptureKeyboard: %s", io.WantCaptureKeyboard ? "true" : "false");
@@ -2295,12 +2295,12 @@ static void ShowExampleAppPropertyEditor(bool* opened)
         {
             ImGui::PushID(uid);                      // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
             ImGui::AlignFirstTextHeightToWidgets();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
-            bool opened = ImGui::TreeNode("Object", "%s_%u", prefix, uid);
+            bool is_opened = ImGui::TreeNode("Object", "%s_%u", prefix, uid);
             ImGui::NextColumn();
             ImGui::AlignFirstTextHeightToWidgets();
             ImGui::Text("my sailor is rich");
             ImGui::NextColumn();
-            if (opened)
+            if (is_opened)
             {
                 static float dummy_members[8] = { 0.0f,0.0f,1.0f,3.1416f,100.0f,999.0f };
                 for (int i = 0; i < 8; i++)
