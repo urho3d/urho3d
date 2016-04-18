@@ -207,12 +207,12 @@ void PS()
             gl_FragColor = vec4(GetLitFog(finalColor, fogFactor), diffColor.a);
         #endif
     #elif defined(DEFERRED)
-        // Fill deferred G-buffer'
+        // Fill deferred G-buffer
         const vec3 spareData = vec3(0,0,0); // Can be used to pass more data to deferred renderer
-        gl_FragData[0] = vec4(spareData, specColor.r);
-        gl_FragData[1] = vec4(diffColor.rgb, specColor.g);
-        gl_FragData[2] = vec4(normal, specColor.b);
-        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), roughness);
+        gl_FragData[0] = vec4(specColor, spareData.r);
+        gl_FragData[1] = vec4(diffColor.rgb, spareData.g);
+        gl_FragData[2] = vec4(normal * roughness, spareData.b);
+        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), 0);
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight * diffColor.rgb;

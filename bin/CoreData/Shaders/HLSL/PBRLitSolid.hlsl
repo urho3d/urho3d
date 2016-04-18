@@ -294,9 +294,9 @@ void PS(
     #elif defined(DEFERRED)
         // Fill deferred G-buffer
         const float3 spareData = 0; // Can be used to pass more data to deferred renderer
-        oColor = float4(spareData, specColor.r);
-        oAlbedo = float4(diffColor.rgb, specColor.g);
-        oNormal = float4(normalize(normal) * roughness, specColor.b);
+        oColor = float4(specColor, spareData.r);
+        oAlbedo = float4(diffColor.rgb, spareData.g);
+        oNormal = float4(normalize(normal) * roughness, spareData.b);
         oDepth = iWorldPos.w;
     #else
         // Ambient & per-vertex lighting

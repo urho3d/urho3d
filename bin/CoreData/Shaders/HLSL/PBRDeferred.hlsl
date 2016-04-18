@@ -84,7 +84,7 @@ void PS(
     const float roughness = length(normal);
     normal = normalize(normal);
 
-    const float3 specColor = float3(specularInput.a, albedoInput.a, normalInput.a);
+    const float3 specColor = specularInput.rgb;
 
     const float4 projWorldPos = float4(worldPos, 1.0);
 

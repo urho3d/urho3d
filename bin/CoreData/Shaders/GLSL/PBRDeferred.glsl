@@ -73,11 +73,11 @@ void PS()
         vec4 specularInput = texture2DProj(sSpecMap, vScreenPos);
     #endif
 
-    vec3 normal = normalize(normalInput.rgb);
-    float roughness = depthInput.a;//length(normal);
-    //normal = normalize(normal);
+    vec3 normal = normalInput.rgb;
+    float roughness = length(normal);
+    normal = normalize(normal);
 
-    vec3 specColor = vec3(specularInput.a, albedoInput.a, normalInput.a);
+    vec3 specColor = specularInput.rgb;
 
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
