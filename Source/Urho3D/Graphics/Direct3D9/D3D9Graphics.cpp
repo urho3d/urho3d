@@ -909,6 +909,23 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     ++numBatches_;
 }
 
+void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+{
+    if (!indexCount)
+        return;
+
+    ResetStreamFrequencies();
+
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
+
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
+
+    numPrimitives_ += primitiveCount;
+    ++numBatches_;
+}
+
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
@@ -934,6 +951,36 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
     impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, 0, minVertex, vertexCount, indexStart, primitiveCount);
+
+    numPrimitives_ += instanceCount * primitiveCount;
+    ++numBatches_;
+}
+
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
+    unsigned vertexCount, unsigned instanceCount)
+{
+    if (!indexCount || !instanceCount)
+        return;
+
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    {
+        VertexBuffer* buffer = vertexBuffers_[i];
+        if (buffer)
+        {
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data
+            if (elements.Size() && elements[0].perInstance_)
+                SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
+            else
+                SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
+        }
+    }
+
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
+
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
