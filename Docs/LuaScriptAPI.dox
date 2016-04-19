@@ -208,6 +208,7 @@ namespace Urho3D
 <a href="#Class_Vector4"><b>Vector4</b></a>
 <a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
 <a href="#Class_VertexBuffer"><b>VertexBuffer</b></a>
+<a href="#Class_VertexElement"><b>VertexElement</b></a>
 <a href="#Class_View3D"><b>View3D</b></a>
 <a href="#Class_Viewport"><b>Viewport</b></a>
 <a href="#Class_Window"><b>Window</b></a>
@@ -2453,14 +2454,13 @@ Methods:
 - Geometry* new()
 - void delete()
 - bool SetNumVertexBuffers(unsigned num)
-- bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT)
+- bool SetVertexBuffer(unsigned index, VertexBuffer* buffer)
 - void SetIndexBuffer(IndexBuffer* buffer)
 - bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true)
 - bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true)
 - void SetLodDistance(float distance)
 - unsigned GetNumVertexBuffers() const
 - VertexBuffer* GetVertexBuffer(unsigned index) const
-- unsigned GetVertexElementMask(unsigned index) const
 - IndexBuffer* GetIndexBuffer() const
 - PrimitiveType GetPrimitiveType() const
 - unsigned GetIndexStart() const
@@ -6982,6 +6982,7 @@ Methods:
 - VertexBuffer* new()
 - void delete()
 - void SetShadowed(bool enable)
+- bool SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic = false)
 - bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false)
 - bool SetData(VectorBuffer& data)
 - bool SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false)
@@ -6990,6 +6991,11 @@ Methods:
 - bool IsDynamic() const
 - unsigned GetVertexCount() const
 - unsigned GetVertexSize() const
+- const PODVector<VertexElement>& GetElements() const
+- bool HasElement(VertexElementSemantic semantic, char index = 0) const
+- bool HasElement(VertexElementType type, VertexElementSemantic semantic, char index = 0) const
+- unsigned GetElementOffset(VertexElementSemantic semantic, char index = 0) const
+- unsigned GetElementOffset(VertexElementType type, VertexElementSemantic semantic, char index = 0) const
 - unsigned GetElementMask() const
 
 Properties:
@@ -6999,6 +7005,25 @@ Properties:
 - unsigned vertexCount (readonly)
 - unsigned vertexSize (readonly)
 - unsigned elementMask (readonly)
+
+<a name="Class_VertexElement"></a>
+### VertexElement
+
+
+Methods:
+
+- VertexElement() (GC)
+- VertexElement* new()
+- VertexElement(VertexElementType type, VertexElementSemantic semantic, char index = 0, bool perInstance = false) (GC)
+- VertexElement* new(VertexElementType type, VertexElementSemantic semantic, char index = 0, bool perInstance = false)
+
+Properties:
+
+- VertexElementType type
+- VertexElementSemantic semantic
+- char index
+- bool perInstance
+- unsigned offset
 
 <a name="Class_View3D"></a>
 ### View3D : Window
@@ -7512,6 +7537,24 @@ Properties:
 - int LM_HORIZONTAL
 - int LM_VERTICAL
 
+### LegacyVertexElement
+
+- int ELEMENT_POSITION
+- int ELEMENT_NORMAL
+- int ELEMENT_COLOR
+- int ELEMENT_TEXCOORD1
+- int ELEMENT_TEXCOORD2
+- int ELEMENT_CUBETEXCOORD1
+- int ELEMENT_CUBETEXCOORD2
+- int ELEMENT_TANGENT
+- int ELEMENT_BLENDWEIGHTS
+- int ELEMENT_BLENDINDICES
+- int ELEMENT_INSTANCEMATRIX1
+- int ELEMENT_INSTANCEMATRIX2
+- int ELEMENT_INSTANCEMATRIX3
+- int ELEMENT_OBJECTINDEX
+- int MAX_LEGACY_VERTEX_ELEMENTS
+
 ### LightType
 
 - int LIGHT_DIRECTIONAL
@@ -7757,23 +7800,29 @@ Properties:
 - int VAR_STRINGVECTOR
 - int MAX_VAR_TYPES
 
-### VertexElement
+### VertexElementSemantic
 
-- int ELEMENT_POSITION
-- int ELEMENT_NORMAL
-- int ELEMENT_COLOR
-- int ELEMENT_TEXCOORD1
-- int ELEMENT_TEXCOORD2
-- int ELEMENT_CUBETEXCOORD1
-- int ELEMENT_CUBETEXCOORD2
-- int ELEMENT_TANGENT
-- int ELEMENT_BLENDWEIGHTS
-- int ELEMENT_BLENDINDICES
-- int ELEMENT_INSTANCEMATRIX1
-- int ELEMENT_INSTANCEMATRIX2
-- int ELEMENT_INSTANCEMATRIX3
-- int ELEMENT_OBJECTINDEX
-- int MAX_VERTEX_ELEMENTS
+- int SEM_POSITION
+- int SEM_NORMAL
+- int SEM_BINORMAL
+- int SEM_TANGENT
+- int SEM_TEXCOORD
+- int SEM_COLOR
+- int SEM_BLENDWEIGHTS
+- int SEM_BLENDINDICES
+- int SEM_OBJECTINDEX
+- int MAX_VERTEX_ELEMENT_SEMANTICS
+
+### VertexElementType
+
+- int TYPE_INT
+- int TYPE_FLOAT
+- int TYPE_VECTOR2
+- int TYPE_VECTOR3
+- int TYPE_VECTOR4
+- int TYPE_UBYTE4
+- int TYPE_UBYTE4_NORM
+- int MAX_VERTEX_ELEMENT_TYPES
 
 ### VerticalAlignment
 
@@ -8126,7 +8175,6 @@ Properties:
 - unsigned MASK_COLOR
 - unsigned MASK_CUBETEXCOORD1
 - unsigned MASK_CUBETEXCOORD2
-- unsigned MASK_DEFAULT
 - unsigned MASK_INSTANCEMATRIX1
 - unsigned MASK_INSTANCEMATRIX2
 - unsigned MASK_INSTANCEMATRIX3
