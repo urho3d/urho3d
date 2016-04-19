@@ -1121,7 +1121,7 @@ This allows to freely define the order and meaning of the elements. However for 
 
 The third parameter of \ref VertexBuffer::SetSize "SetSize()" is whether to create the buffer as static or dynamic. This is a hint to the underlying graphics API how to allocate the buffer data. Dynamic will suit frequent (every frame) modification better, while static has likely better overall performance for world geometry rendering.
 
-After the size and format are defined, the vertex data can be set either by calling \ref VertexBuffer::SetData "SetData()" or locking the vertex buffer for access, writing the data to the memory space returned from the lock, then unlocking when done. Whatever is more appropriate
+After the size and format are defined, the vertex data can be set either by calling \ref VertexBuffer::SetData "SetData()" / \ref VertexBuffer::SetDataRange "SetDataRange()" or locking the vertex buffer for access, writing the data to the memory space returned from the lock, then unlocking when done.
 
 \section VertexBuffers_MultipleBuffers Multiple vertex buffers
 
