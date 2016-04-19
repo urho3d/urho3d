@@ -309,13 +309,6 @@ bool Model::BeginLoad(Deserializer& source)
 
     geometryNames_.Resize(geometries_.Size());
 
-    // check if old mdl file
-    if (source.IsEof())
-    {
-        SetMemoryUse(memoryUse);
-        return true;
-    }
-
     // Read geometry names
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
