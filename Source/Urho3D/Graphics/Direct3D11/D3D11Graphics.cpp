@@ -824,7 +824,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     ++numBatches_;
 }
 
-void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, , unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
     if (!vertexCount || !shaderProgram_)
         return;

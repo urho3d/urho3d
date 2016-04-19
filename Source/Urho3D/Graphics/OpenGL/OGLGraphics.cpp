@@ -832,7 +832,8 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
 #if !defined(GL_ES_VERSION_2_0)
-#if defined(GLEW_ARB_draw_elements_base_vertex)
+    if (!gl3Support)
+        return;
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
         return;
 
@@ -848,7 +849,6 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
     numPrimitives_ += primitiveCount;
     ++numBatches_;
-#endif
 #endif
 }
 
@@ -892,7 +892,8 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         unsigned vertexCount, unsigned instanceCount)
 {
 #if !defined(GL_ES_VERSION_2_0)
-#if defined(GLEW_ARB_draw_elements_base_vertex)
+    if (!gl3Support)
+        return;
     if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
         return;
 
@@ -910,7 +911,6 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 
     numPrimitives_ += instanceCount * primitiveCount;
     ++numBatches_;
-#endif
 #endif
 }
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
