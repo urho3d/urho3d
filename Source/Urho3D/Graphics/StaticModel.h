@@ -107,20 +107,17 @@ public:
     /// Return materials attribute.
     const ResourceRefList& GetMaterialsAttr() const;
 
-    // ATOMIC BEGIN
-
-    /// Get whether a named submesh is visible
+    /// Get whether a named submesh is visible.
     bool GetGeometryVisible(const String& name);
-    /// Show a named submesh
+    /// Show a named submesh.
     void ShowGeometry(const String& name);
-    /// Hide a named submesh
+    /// Hide a named submesh.
     void HideGeometry(const String& name);
-
+    /// Set geometry enabled.
     void SetGeometryEnabledAttr(const VariantVector& value);
+    /// Return geometry enabled (bool variant vector).
     const VariantVector& GetGeometryEnabledAttr() const;
 
-    // ATOMIC END
-        
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
@@ -143,12 +140,10 @@ protected:
     unsigned occlusionLodLevel_;
     /// Material list attribute.
     mutable ResourceRefList materialsAttr_;
-
-    // ATOMIC BEGIN
+    /// Enabled geometry.
     mutable VariantVector geometryEnabled_;
     /// true if any geometry has been disabled
     mutable bool geometryDisabled_;
-    // ATOMIC END
 
 private:
     /// Handle model reload finished.

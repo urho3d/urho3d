@@ -316,27 +316,11 @@ bool Model::BeginLoad(Deserializer& source)
         return true;
     }
 
-    // ATOMIC BEGIN
-
-    // MODEL_VERSION
-    unsigned version = source.ReadUInt();
-    // TODO version checking needed ?
-//     if (version != MODEL_VERSION)
-//     {
-//         URHO3D_LOGERROR(source.GetName() + " model version " + String(version) +
-//             " not supportet! Engine supports model version " +
-//             String(MODEL_VERSION) + " . Update engine code base ?!");
-//         return false;
-//     }
-
     // Read geometry names
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         geometryNames_[i] = source.ReadString();
     }
-
-    // ATOMIC END
-
 
     SetMemoryUse(memoryUse);
     return true;
@@ -485,15 +469,9 @@ bool Model::Save(Serializer& dest) const
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
         dest.WriteVector3(geometryCenters_[i]);
 
-    // ATOMIC BEGIN
-
-    dest.WriteUInt(MODEL_VERSION);
-
     // Write geometry names
     for (unsigned i = 0; i < geometryNames_.Size(); ++i)
         dest.WriteString(geometryNames_[i]);
-
-    // ATOMIC END
 
     return true;
 }
@@ -559,10 +537,7 @@ void Model::SetNumGeometries(unsigned num)
     geometries_.Resize(num);
     geometryBoneMappings_.Resize(num);
     geometryCenters_.Resize(num);
-
-    // ATOMIC BEGIN
     geometryNames_.Resize(num);
-    // ATOMIC END
 
     // For easier creation of from-scratch geometry, ensure that all geometries start with at least 1 LOD level (0 makes no sense)
     for (unsigned i = 0; i < geometries_.Size(); ++i)
@@ -704,12 +679,11 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
 
     // Deep copy all the geometry LOD levels and refer to the copied vertex/index buffers
     ret->geometries_.Resize(geometries_.Size());
-    // ATOMIC BEGIN
     ret->geometryNames_.Resize(geometryNames_.Size());
+
     for (unsigned i = 0; i < geometries_.Size(); ++i)
     {
         ret->geometryNames_[i] = geometryNames_[i];
-        // ATOMIC END
         ret->geometries_[i].Resize(geometries_[i].Size());
         for (unsigned j = 0; j < geometries_[i].Size(); ++j)
         {
@@ -803,8 +777,6 @@ unsigned Model::GetMorphRangeCount(unsigned bufferIndex) const
     return bufferIndex < vertexBuffers_.Size() ? morphRangeCounts_[bufferIndex] : 0;
 }
 
-// ATOMIC BEGIN
-
 bool Model::SetGeometryName(unsigned index, const String& name)
 {
     if (index >= geometryNames_.Size())
@@ -812,22 +784,15 @@ bool Model::SetGeometryName(unsigned index, const String& name)
         URHO3D_LOGERROR("Geometry name index out of bounds");
         return false;
     }
-
     geometryNames_[index] = name;
-
     return true;
-
 }
 
 const String& Model::GetGeometryName(unsigned index) const
 {
     if (index >= geometryNames_.Size())
         return String::EMPTY;
-
     return geometryNames_[index];
-
 }
-
-// ATOMIC END
 
 }

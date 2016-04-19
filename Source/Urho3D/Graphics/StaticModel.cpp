@@ -72,14 +72,8 @@ void StaticModel::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_ATTRIBUTE("Occlusion LOD Level", int, occlusionLodLevel_, M_MAX_UNSIGNED, AM_DEFAULT);
-
-    // ATOMIC BEGIN
-
     URHO3D_ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-
-    // ATOMIC END
-
 }
 
 void StaticModel::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -163,8 +157,6 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
         CalculateLodLevels();
     }
 
-    // ATOMIC BEGIN
-
     // Handle mesh hiding
     if (geometryDisabled_)
     {
@@ -187,9 +179,6 @@ void StaticModel::UpdateBatches(const FrameInfo& frame)
             }
         }
     }
-
-    // ATOMIC END
-
 }
 
 Geometry* StaticModel::GetLodGeometry(unsigned batchIndex, unsigned level)
@@ -493,7 +482,6 @@ void StaticModel::HandleModelReloadFinished(StringHash eventType, VariantMap& ev
     model_.Reset(); // Set null to allow to be re-set
     SetModel(currentModel);
 }
-// ATOMIC BEGIN
 
 bool StaticModel::GetGeometryVisible(const String& name)
 {
@@ -587,6 +575,7 @@ void StaticModel::SetGeometryEnabledAttr(const VariantVector& value)
     }
 
 }
+
 const VariantVector& StaticModel::GetGeometryEnabledAttr() const
 {
     geometryEnabled_.Resize(geometryData_.Size());
@@ -603,5 +592,4 @@ const VariantVector& StaticModel::GetGeometryEnabledAttr() const
     return geometryEnabled_;
 }
 
-// ATOMIC END
 }

@@ -111,14 +111,8 @@ void AnimatedModel::RegisterObject(Context* context)
         Variant::emptyVariantVector, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
-
-    // ATOMIC BEGIN
-
     URHO3D_ACCESSOR_ATTRIBUTE("Geometry Enabled", GetGeometryEnabledAttr, SetGeometryEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-
-    // ATOMIC END
-
 }
 
 bool AnimatedModel::Load(Deserializer& source, bool setInstanceDefault)
@@ -289,8 +283,6 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
         CalculateLodLevels();
     }
 
-    // ATOMIC BEGIN
-
     // Handle mesh hiding
     if (geometryDisabled_)
     {
@@ -313,8 +305,6 @@ void AnimatedModel::UpdateBatches(const FrameInfo& frame)
             }
         }
     }
-
-    // ATOMIC END
 }
 
 void AnimatedModel::UpdateGeometry(const FrameInfo& frame)
@@ -1018,8 +1008,6 @@ void AnimatedModel::AssignBoneNodes()
         i->node_ = boneNode;
     }
 
-    // ATOMIC BEGIN
-
     // If no bones found, this may be a prefab where the bone information was left out.
     // In that case reassign the skeleton now if possible
     if (!boneFound && model_)
@@ -1045,8 +1033,6 @@ void AnimatedModel::AssignBoneNodes()
                 bones[parentIndex].node_->AddChild(bones[i].node_);
         }
     }
-
-    // ATOMIC END
 
     // Re-assign the same start bone to animations to get the proper bone node this time
     for (Vector<SharedPtr<AnimationState> >::Iterator i = animationStates_.Begin(); i != animationStates_.End(); ++i)
