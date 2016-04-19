@@ -12,7 +12,6 @@ uniform vec3 cAmbientStartColor;
 uniform vec3 cAmbientEndColor;
 uniform mat3 cBillboardRot;
 uniform vec3 cCameraPos;
-uniform mat3 cCameraRot;
 uniform float cNearClip;
 uniform float cFarClip;
 uniform vec4 cDepthMode;
@@ -99,7 +98,6 @@ uniform FrameVS
 uniform CameraVS
 {
     vec3 cCameraPos;
-    mat3 cCameraRot;
     float cNearClip;
     float cFarClip;
     vec4 cDepthMode;

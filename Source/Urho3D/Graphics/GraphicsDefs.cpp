@@ -37,7 +37,6 @@ extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
 extern URHO3D_API const StringHash VSP_BILLBOARDROT("BillboardRot");
 extern URHO3D_API const StringHash VSP_CAMERAPOS("CameraPos");
-extern URHO3D_API const StringHash VSP_CAMERAROT("CameraRot");
 extern URHO3D_API const StringHash VSP_CLIPPLANE("ClipPlane");
 extern URHO3D_API const StringHash VSP_NEARCLIP("NearClip");
 extern URHO3D_API const StringHash VSP_FARCLIP("FarClip");

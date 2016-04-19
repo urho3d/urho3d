@@ -11,7 +11,6 @@ uniform float3 cAmbientEndColor;
 uniform float3x3 cBillboardRot;
 #endif
 uniform float3 cCameraPos;
-uniform float3x3 cCameraRot;
 uniform float cNearClip;
 uniform float cFarClip;
 uniform float4 cDepthMode;
@@ -89,7 +88,6 @@ cbuffer FrameVS : register(b0)
 cbuffer CameraVS : register(b1)
 {
     float3 cCameraPos;
-    float3x3 cCameraRot;
     float cNearClip;
     float cFarClip;
     float4 cDepthMode;

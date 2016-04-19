@@ -1343,13 +1343,14 @@ Vertex shader uniforms:
 - float3 cAmbientStartColor: the start color value for a zone's ambient gradient
 - float3 cAmbientEndColor: the end color value for a zone's ambient gradient
 - float3 cCameraPos: camera's world position
-- float3x3 cCameraRot: camera's world rotation matrix
 - float cNearClip: camera's near clip distance
 - float cFarClip: camera's far clip distance
 - float cDeltaTime: the timestep of the current frame
 - float4 cDepthMode: parameters for calculating a linear depth value between 0-1 to pass to the pixel shader in an interpolator.
 - float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
 - float4x3 cModel: the world transform matrix of the object being rendered
+- float4x3 cView: the camera's view matrix
+- float4x3 cViewInv: the inverse of the camera's view matrix (camera world transform)
 - float4x4 cViewProj: the camera's concatenated view and projection matrices
 - float4x3 cZone: zone's transform matrix; used for ambient gradient calculations
 

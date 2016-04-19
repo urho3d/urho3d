@@ -369,7 +369,6 @@ extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
 extern URHO3D_API const StringHash VSP_BILLBOARDROT;
 extern URHO3D_API const StringHash VSP_CAMERAPOS;
-extern URHO3D_API const StringHash VSP_CAMERAROT;
 extern URHO3D_API const StringHash VSP_CLIPPLANE;
 extern URHO3D_API const StringHash VSP_NEARCLIP;
 extern URHO3D_API const StringHash VSP_FARCLIP;

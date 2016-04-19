@@ -714,7 +714,8 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
     Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
 
     graphics_->SetShaderParameter(VSP_CAMERAPOS, cameraEffectiveTransform.Translation());
-    graphics_->SetShaderParameter(VSP_CAMERAROT, cameraEffectiveTransform.RotationMatrix());
+    graphics_->SetShaderParameter(VSP_VIEWINV, cameraEffectiveTransform);
+    graphics_->SetShaderParameter(VSP_VIEW, camera->GetView());
     graphics_->SetShaderParameter(PSP_CAMERAPOS, cameraEffectiveTransform.Translation());
 
     float nearClip = camera->GetNearClip();
@@ -759,8 +760,6 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
         projection.m23_ += projection.m33_ * constantBias;
 #endif
 
-        graphics_->SetShaderParameter(VSP_VIEWINV, camera->GetEffectiveWorldTransform());
-        graphics_->SetShaderParameter(VSP_VIEW, camera->GetView());
         graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
     }
 }
