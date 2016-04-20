@@ -300,6 +300,31 @@ public:
         Resize(size_ - length, 0);
     }
 
+    /// Erase a range of elements by swapping elements from the end of the array in order to reduce the amount of
+    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
+    void EraseSwap(unsigned pos, unsigned length = 1)
+    {
+        unsigned shiftStartIndex = pos + length;
+        // Return if the range is illegal
+        if (shiftStartIndex > size_ || !length)
+            return;
+
+        unsigned newSize = size_ - length;
+        unsigned trailingCount = size_ - shiftStartIndex;
+        if (trailingCount <= length)
+        {
+            // We're removing more elements from the array than exist past the end of the range being removed, so
+            // perform a normal shift and destroy.
+            MoveRange(pos, shiftStartIndex, trailingCount);
+        }
+        else
+        {
+            // Swap elements from the end of the array into the empty space.
+            CopyElements(Buffer() + pos, Buffer() + newSize, length);
+        }
+        Resize(newSize, 0);
+    }
+
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
@@ -330,6 +355,20 @@ public:
         if (i != End())
         {
             Erase(i);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /// Erase an element if found by swapping with the last element in order to reduce the amount of
+    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Remove!
+    bool RemoveSwap(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            EraseSwap(i);
             return true;
         }
         else
@@ -803,6 +842,31 @@ public:
         return Begin() + pos;
     }
 
+    /// Erase a range of elements by swapping elements from the end of the array in order to reduce the amount of
+    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
+    void EraseSwap(unsigned pos, unsigned length = 1)
+    {
+        unsigned shiftStartIndex = pos + length;
+        // Return if the range is illegal
+        if (shiftStartIndex > size_ || !length)
+            return;
+      
+        unsigned newSize = size_ - length;
+        unsigned trailingCount = size_ - shiftStartIndex;
+        if (trailingCount <= length)
+        {
+            // We're removing more elements from the array than exist past the end of the range being removed, so
+            // perform a normal shift and destroy.
+            MoveRange(pos, shiftStartIndex, trailingCount);
+        }
+        else
+        {
+            // Swap elements from the end of the array into the empty space.
+            CopyElements(Buffer() + pos, Buffer() + newSize, length);
+        }
+        Resize(newSize);
+    }
+
     /// Erase an element if found.
     bool Remove(const T& value)
     {
@@ -810,6 +874,20 @@ public:
         if (i != End())
         {
             Erase(i);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /// Erase an element if found by swapping with the last element in order to reduce the amount of
+    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Remove!
+    bool RemoveSwap(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            EraseSwap(i);
             return true;
         }
         else

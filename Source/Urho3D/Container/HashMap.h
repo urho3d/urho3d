@@ -385,6 +385,42 @@ public:
             InsertNode(*it++);
     }
 
+    /// Insert a key and value and return iterator to the value and if the value was already added.
+    Pair<Iterator, bool> Insert(const T& key, const U& value, bool findExisting = true)
+    {
+        // If no pointers yet, allocate with minimum bucket count
+        if (!ptrs_)
+        {
+            AllocateBuckets(Size(), MIN_BUCKETS);
+            Rehash();
+        }
+
+        unsigned hashKey = Hash(key);
+
+        if (findExisting)
+        {
+            // If exists, just change the value
+            Node* existing = FindNode(key, hashKey);
+            if (existing)
+            {
+                existing->pair_.second_ = value;
+                return  Pair<T, U>(Iterator(existing), true);
+            }
+        }
+
+        Node* newNode = InsertNode(Tail(), key, value);
+        newNode->down_ = Ptrs()[hashKey];
+        Ptrs()[hashKey] = newNode;
+
+        // Rehash if the maximum load factor has been exceeded
+        if (Size() > NumBuckets() * MAX_LOAD_FACTOR)
+        {
+            AllocateBuckets(Size(), NumBuckets() << 1);
+            Rehash();
+        }
+        return  Pair<T, U>(Iterator(newNode), false);
+    }
+
     /// Erase a pair by key. Return true if was found.
     bool Erase(const T& key)
     {
@@ -543,6 +579,22 @@ public:
 
         unsigned hashKey = Hash(key);
         return FindNode(key, hashKey) != 0;
+    }
+
+    /// Return true if key found.
+    bool TryGetValue(const T& key, U& out)
+    {
+        if (!ptrs_)
+            return false;
+        unsigned hashKey = Hash(key);
+        Node* node = FindNode(key, hashKey);
+        if (node)
+        {
+            out = node->pair_.second_;
+            return true;
+        }
+        else
+            return false;
     }
 
     /// Return all the keys.
