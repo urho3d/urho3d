@@ -829,6 +829,29 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     ++numBatches_;
 }
 
+void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+{
+#if !defined(GL_ES_VERSION_2_0)
+    if (!gl3Support)
+        return;
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+        return;
+
+    PrepareDraw();
+
+    unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
+
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    glDrawElementsBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<GLvoid*>(indexStart * indexSize), baseVertexIndex);
+
+    numPrimitives_ += primitiveCount;
+    ++numBatches_;
+#endif
+}
+
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
@@ -865,6 +888,31 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 #endif
 }
 
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, 
+        unsigned vertexCount, unsigned instanceCount)
+{
+#if !defined(GL_ES_VERSION_2_0)
+    if (!gl3Support)
+        return;
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+        return;
+
+    PrepareDraw();
+
+    unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
+
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+    glDrawElementsInstancedBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+        instanceCount, baseVertexIndex);
+
+    numPrimitives_ += instanceCount * primitiveCount;
+    ++numBatches_;
+#endif
+}
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
