@@ -300,8 +300,7 @@ public:
         Resize(size_ - length, 0);
     }
 
-    /// Erase a range of elements by swapping elements from the end of the array in order to reduce the amount of
-    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
+    /// Erase a range of elements by swapping elements from the end of the array.
     void EraseSwap(unsigned pos, unsigned length = 1)
     {
         unsigned shiftStartIndex = pos + length;
@@ -348,7 +347,7 @@ public:
         return Begin() + pos;
     }
 
-    /// Erase an element if found.
+    /// Erase an element by value. Return true if was found and erased.
     bool Remove(const T& value)
     {
         Iterator i = Find(value);
@@ -361,8 +360,7 @@ public:
             return false;
     }
 
-    /// Erase an element if found by swapping with the last element in order to reduce the amount of
-    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Remove!
+    /// Erase an element by value by swapping with the last element. Return true if was found and erased.
     bool RemoveSwap(const T& value)
     {
         Iterator i = Find(value);
@@ -842,8 +840,7 @@ public:
         return Begin() + pos;
     }
 
-    /// Erase a range of elements by swapping elements from the end of the array in order to reduce the amount of
-    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
+    /// Erase a range of elements by swapping elements from the end of the array.
     void EraseSwap(unsigned pos, unsigned length = 1)
     {
         unsigned shiftStartIndex = pos + length;
@@ -867,7 +864,7 @@ public:
         Resize(newSize);
     }
 
-    /// Erase an element if found.
+    /// Erase an element by value. Return true if was found and erased.
     bool Remove(const T& value)
     {
         Iterator i = Find(value);
@@ -880,8 +877,7 @@ public:
             return false;
     }
 
-    /// Erase an element if found by swapping with the last element in order to reduce the amount of
-    /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Remove!
+    /// Erase an element by value by swapping with the last element. Return true if was found and erased.
     bool RemoveSwap(const T& value)
     {
         Iterator i = Find(value);

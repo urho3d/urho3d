@@ -300,6 +300,15 @@ public:
         return Iterator(newNode);
     }
 
+    /// Insert a key. Return an iterator and set exists flag according to whether the key already existed.
+    Iterator Insert(const T& key, bool& exists)
+    {
+        unsigned oldSize = Size();
+        Iterator ret = Insert(key);
+        exists = (Size() == oldSize);
+        return ret;
+    }
+
     /// Insert a set.
     void Insert(const HashSet<T>& set)
     {

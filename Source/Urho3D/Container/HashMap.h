@@ -362,6 +362,15 @@ public:
         return Iterator(InsertNode(pair.first_, pair.second_));
     }
 
+    /// Insert a pair. Return iterator and set exists flag according to whether the key already existed.
+    Iterator Insert(const Pair<T, U>& pair, bool& exists)
+    {
+        unsigned oldSize = Size();
+        Iterator ret(InsertNode(pair.first_, pair.second_));
+        exists = (Size() == oldSize);
+        return ret;
+    }
+
     /// Insert a map.
     void Insert(const HashMap<T, U>& map)
     {
@@ -383,42 +392,6 @@ public:
         ConstIterator it = start;
         while (it != end)
             InsertNode(*it++);
-    }
-
-    /// Insert a key and value and return iterator to the value and if the value was already added.
-    Pair<Iterator, bool> Insert(const T& key, const U& value, bool findExisting = true)
-    {
-        // If no pointers yet, allocate with minimum bucket count
-        if (!ptrs_)
-        {
-            AllocateBuckets(Size(), MIN_BUCKETS);
-            Rehash();
-        }
-
-        unsigned hashKey = Hash(key);
-
-        if (findExisting)
-        {
-            // If exists, just change the value
-            Node* existing = FindNode(key, hashKey);
-            if (existing)
-            {
-                existing->pair_.second_ = value;
-                return  Pair<T, U>(Iterator(existing), true);
-            }
-        }
-
-        Node* newNode = InsertNode(Tail(), key, value);
-        newNode->down_ = Ptrs()[hashKey];
-        Ptrs()[hashKey] = newNode;
-
-        // Rehash if the maximum load factor has been exceeded
-        if (Size() > NumBuckets() * MAX_LOAD_FACTOR)
-        {
-            AllocateBuckets(Size(), NumBuckets() << 1);
-            Rehash();
-        }
-        return  Pair<T, U>(Iterator(newNode), false);
     }
 
     /// Erase a pair by key. Return true if was found.
@@ -581,7 +554,7 @@ public:
         return FindNode(key, hashKey) != 0;
     }
 
-    /// Return true if key found.
+    /// Try to copy value to output. Return true if was found.
     bool TryGetValue(const T& key, U& out)
     {
         if (!ptrs_)
