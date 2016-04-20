@@ -836,7 +836,11 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   retries = retries * 60 / retry_interval unless retries == -1
   until thread.status == false
     if retries == 0 || timeup(true, 45.0)
-      thread.kill   # TODO: also kill the child subproceses spawned by the worker thread
+      thread.kill
+      # Also kill the child subproceses spawned by the worker thread
+      Signal.trap('INT') {}
+      Process.kill('INT', -Process.ppid)
+      Signal.trap('INT', 'DEFAULT')
       break
     end
     print str; str = '.'; $stdout.flush   # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
