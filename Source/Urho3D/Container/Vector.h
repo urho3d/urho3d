@@ -304,14 +304,14 @@ public:
     /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
     void EraseSwap(unsigned pos, unsigned length = 1)
     {
-        unsigned shiftStartIndex = pos + count;
+        unsigned shiftStartIndex = pos + length;
         // Return if the range is illegal
         if (shiftStartIndex > size_ || !length)
             return;
 
         unsigned newSize = size_ - length;
         unsigned trailingCount = size_ - shiftStartIndex;
-        if (trailingCount <= count)
+        if (trailingCount <= length)
         {
             // We're removing more elements from the array than exist past the end of the range being removed, so
             // perform a normal shift and destroy.
@@ -846,14 +846,14 @@ public:
     /// data copied. The order of existing elements will be changed, if ordering needs to be retained use Erase!
     void EraseSwap(unsigned pos, unsigned length = 1)
     {
-        unsigned shiftStartIndex = pos + count;
+        unsigned shiftStartIndex = pos + length;
         // Return if the range is illegal
         if (shiftStartIndex > size_ || !length)
             return;
       
         unsigned newSize = size_ - length;
         unsigned trailingCount = size_ - shiftStartIndex;
-        if (trailingCount <= count)
+        if (trailingCount <= length)
         {
             // We're removing more elements from the array than exist past the end of the range being removed, so
             // perform a normal shift and destroy.
