@@ -831,10 +831,8 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
-#if !defined(GL_ES_VERSION_2_0)
-    if (!gl3Support)
-        return;
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
         return;
 
     PrepareDraw();
@@ -891,10 +889,8 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, 
         unsigned vertexCount, unsigned instanceCount)
 {
-#if !defined(GL_ES_VERSION_2_0)
-    if (!gl3Support)
-        return;
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
         return;
 
     PrepareDraw();
@@ -913,6 +909,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     ++numBatches_;
 #endif
 }
+
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe

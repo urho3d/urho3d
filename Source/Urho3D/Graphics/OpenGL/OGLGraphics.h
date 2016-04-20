@@ -126,12 +126,12 @@ public:
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
-    /// Draw indexed geometry with vertex index offset. ONLY supported if the GL version is 3.2 or greater!
+    /// Draw indexed geometry with vertex index offset. Only supported on desktop OpenGL 3.2 or greater.
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed, instanced geometry.
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
         unsigned instanceCount);
-    /// Draw indexed, instanced geometry with vertex index offset. ONLY supported if the GL version is 3.2 or greater!
+    /// Draw indexed, instanced geometry with vertex index offset. Only supported on desktop OpenGL 3.2 or greater.
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, 
         unsigned vertexCount, unsigned instanceCount);
     /// Set vertex buffer.
