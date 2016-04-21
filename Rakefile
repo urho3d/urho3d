@@ -350,7 +350,7 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  if !wait_for_block { system "bash -c 'rake make'" }
+  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "bash -c 'rake make'" }
     abort 'Failed to build Urho3D library' unless File.exists?('already_timeup.log')
     $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
     next
@@ -367,7 +367,7 @@ task :ci do
   unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
-    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { system "bash -c 'rake make target=install >/dev/null'" }
+    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "bash -c 'rake make target=install >/dev/null'" }
       abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
       $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
       next
@@ -837,10 +837,8 @@ def wait_for_block comment = '', retries = -1, retry_interval = 60
   until thread.status == false
     if retries == 0 || timeup(true, 45.0)
       thread.kill
-      # Also kill the child subproceses spawned by the worker thread
-      Signal.trap('INT') {}
-      Process.kill('INT', -Process.ppid)
-      Signal.trap('INT', 'DEFAULT')
+      # Also kill the child subproceses spawned by the worker thread if specified
+      system "killall #{thread[:subcommand_to_kill]}" if thread[:subcommand_to_kill]
       break
     end
     print str; str = '.'; $stdout.flush   # Flush the standard output stream in case it is buffered to prevent Travis-CI into thinking that the build/test has stalled
