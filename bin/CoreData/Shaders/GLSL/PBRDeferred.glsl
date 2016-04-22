@@ -73,6 +73,9 @@ void PS()
         vec4 specularInput = texture2DProj(sSpecMap, vScreenPos);
     #endif
 
+    // Position acquired via near/far ray is relative to camera. Bring position to world space
+    worldPos += cCameraPosPS;
+    
     vec3 normal = normalInput.rgb;
     float roughness = length(normal);
     normal = normalize(normal);

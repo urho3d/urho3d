@@ -80,12 +80,11 @@ inline bool CompareBatchGroupOrder(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->renderOrder_ < rhs->renderOrder_;
 }
 
-void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer)
 {
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
-    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 shadowView(shadowCamera->GetView());
     Matrix4 shadowProj(shadowCamera->GetProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -131,7 +130,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     texAdjust.SetTranslation(offset);
     texAdjust.SetScale(scale);
 
-    dest = texAdjust * shadowProj * shadowView * posAdjust;
+    dest = texAdjust * shadowProj * shadowView;
 }
 
 void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation)
@@ -306,9 +305,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     {
         if (light && graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
-            // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
-            bool isLightVolume = !material_ && !pass_ && !zone_;
-
             Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
             Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
 
@@ -330,7 +326,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
                         for (unsigned i = 0; i < numSplits; ++i)
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
+                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
 
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                     }
@@ -343,7 +339,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
                         bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
                         if (isShadowed)
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
+                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
 
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                     }
@@ -376,9 +372,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetEffectiveColor().Abs(),
                 light->GetEffectiveSpecularIntensity()) * fade);
             graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-            graphics->SetShaderParameter(PSP_LIGHTPOS,
-                Vector4((isLightVolume ? (lightNode->GetWorldPosition() - cameraEffectivePos) : lightNode->GetWorldPosition()),
-                    atten));
+            graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
 
             if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
             {
@@ -390,10 +384,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
                         for (unsigned i = 0; i < numSplits; ++i)
-                        {
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
-                                Vector3::ZERO);
-                        }
+                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
+
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                     }
                     break;
@@ -405,10 +397,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                         bool isShadowed = lightQueue_->shadowMap_ != 0;
                         if (isShadowed)
-                        {
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, isLightVolume ? cameraEffectivePos :
-                                Vector3::ZERO);
-                        }
+                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
 
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                     }
