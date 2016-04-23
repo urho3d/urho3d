@@ -210,6 +210,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     /*unsigned short shaderType = */file->ReadUShort();
     /*unsigned short shaderModel = */file->ReadUShort();
     elementHash_ = file->ReadUInt();
+    elementHash_ <<= 32;
 
     unsigned numParameters = file->ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
@@ -379,10 +380,11 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
             if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
-                elementHash_ <<= 6;
+                elementHash_ <<= 4;
                 elementHash_ += ((int)semantic + 1) * (paramDesc.SemanticIndex + 1);
             }
         }
+        elementHash_ <<= 32;
     }
 
     HashMap<String, unsigned> cbRegisterMap;
@@ -439,7 +441,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     file->WriteFileID("USHD");
     file->WriteShort((unsigned short)type_);
     file->WriteShort(4);
-    file->WriteUInt(elementHash_);
+    file->WriteUInt(elementHash_ >> 32);
 
     file->WriteUInt(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)

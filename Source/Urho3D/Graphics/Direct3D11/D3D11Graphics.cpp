@@ -2581,18 +2581,17 @@ void Graphics::PrepareDraw()
         // Do not create input layout if no vertex buffers / elements
         if (newVertexDeclarationHash)
         {
-            /// \todo Is this safe? (Should preferably use non-overlapping bits)
+            /// \todo Using a 64bit total hash for vertex shader and vertex buffer elements hash may not guarantee uniqueness
             newVertexDeclarationHash += vertexShader_->GetElementHash();
             if (newVertexDeclarationHash != vertexDeclarationHash_)
             {
-                HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator
-                    i = vertexDeclarations_.Find(newVertexDeclarationHash);
+                HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator i = 
+                    vertexDeclarations_.Find(newVertexDeclarationHash);
                 if (i == vertexDeclarations_.End())
                 {
                     SharedPtr<VertexDeclaration> newVertexDeclaration(new VertexDeclaration(this, vertexShader_, vertexBuffers_));
                     i = vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
                 }
-
                 impl_->deviceContext_->IASetInputLayout((ID3D11InputLayout*)i->second_->GetInputLayout());
                 vertexDeclarationHash_ = newVertexDeclarationHash;
             }
