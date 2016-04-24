@@ -5101,7 +5101,7 @@ void PrecacheShaders(File);
 void PrecacheShaders(VectorBuffer&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetMode(int, int);
-bool SetMode(int, int, bool, bool, bool, bool, bool, int);
+bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int);
 void SetWindowPosition(int, int);
 bool TakeScreenShot(Image);
 bool ToggleFullscreen();
