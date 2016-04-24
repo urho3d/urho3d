@@ -250,6 +250,7 @@ Graphics::Graphics(Context* context_) :
     fullscreen_(false),
     borderless_(false),
     resizable_(false),
+    highDPI_(false),
     vsync_(false),
     tripleBuffer_(false),
     sRGB_(false),
@@ -335,8 +336,8 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
+    bool tripleBuffer, int multiSample)
 {
     URHO3D_PROFILE(SetScreenMode);
 
@@ -475,13 +476,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
             flags |= SDL_WINDOW_FULLSCREEN;
-        if (resizable)
-            flags |= SDL_WINDOW_RESIZABLE;
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
-#ifdef __APPLE__
+        if (resizable)
+            flags |= SDL_WINDOW_RESIZABLE;
+        if (highDPI)
             flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-#endif
 
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -542,8 +542,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 #endif
 
     fullscreen_ = fullscreen;
-    resizable_ = resizable;
     borderless_ = borderless;
+    resizable_ = resizable;
+    highDPI_ = highDPI;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
@@ -579,8 +580,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -588,7 +590,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -625,7 +627,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -886,7 +888,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 #endif
 }
 
-void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, 
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
         unsigned vertexCount, unsigned instanceCount)
 {
 #ifndef GL_ES_VERSION_2_0
@@ -3099,7 +3101,7 @@ void Graphics::PrepareDraw()
             for (PODVector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
             {
                 const VertexElement& element = *j;
-                HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k = 
+                HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k =
                     impl_->vertexAttributes_->Find(MakePair((unsigned char)element.semantic_, element.index_));
 
                 if (k != impl_->vertexAttributes_->End())

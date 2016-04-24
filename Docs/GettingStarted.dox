@@ -387,6 +387,7 @@ The engine can be configured using the following command line options.
 -t           Enable triple buffering
 -w           Start in windowed mode
 -s           Enable resizing when in windowed mode
+-hd          Enable high DPI, only supported by Apple platforms (OSX, iOS, and tvOS)
 -q           Enable quiet mode which does not log to standard output stream
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz

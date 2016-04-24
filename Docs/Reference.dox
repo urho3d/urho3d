@@ -196,9 +196,10 @@ The full list of supported parameters, their datatypes and default values:
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
 - WindowPositionX (int) %Window horizontal position. Default center to screen.
 - WindowPositionY (int) %Window vertical position. Default center to screen.
-- WindowResizable (bool) Whether window is resizable. Default false.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
 - Borderless (bool) Whether to create the window as borderless. Default false.
+- WindowResizable (bool) Whether window is resizable. Default false.
+- HighDPI (bool) Whether window is high DPI. Default false. Currently only supported by Apple platforms (OSX, iOS, and tvOS).
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.

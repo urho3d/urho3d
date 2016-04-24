@@ -33,8 +33,9 @@ URHO3D_EVENT(E_SCREENMODE, ScreenMode)
     URHO3D_PARAM(P_WIDTH, Width);                  // int
     URHO3D_PARAM(P_HEIGHT, Height);                // int
     URHO3D_PARAM(P_FULLSCREEN, Fullscreen);        // bool
-    URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
     URHO3D_PARAM(P_BORDERLESS, Borderless);        // bool
+    URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
+    URHO3D_PARAM(P_HIGHDPI, HighDPI);              // bool
 }
 
 /// Window position changed.

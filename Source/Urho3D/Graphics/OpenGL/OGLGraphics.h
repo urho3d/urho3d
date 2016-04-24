@@ -97,7 +97,8 @@ public:
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
+            int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
@@ -132,7 +133,7 @@ public:
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
         unsigned instanceCount);
     /// Draw indexed, instanced geometry with vertex index offset. Only supported on desktop OpenGL 3.2 or greater.
-    void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, 
+    void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
         unsigned vertexCount, unsigned instanceCount);
     /// Set vertex buffer.
     void SetVertexBuffer(VertexBuffer* buffer);
@@ -271,6 +272,9 @@ public:
 
     /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
+
+    /// Return whether window is high DPI.
+    bool GetHighDPI() const { return highDPI_; }
 
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -577,6 +581,8 @@ private:
     bool borderless_;
     /// Resizable flag.
     bool resizable_;
+    /// High DPI flag.
+    bool highDPI_;
     /// Vertical sync flag.
     bool vsync_;
     /// Triple buffering flag.

@@ -84,6 +84,7 @@ void Urho3DPlayer::Setup()
             "-t           Enable triple buffering\n"
             "-w           Start in windowed mode\n"
             "-s           Enable resizing when in windowed mode\n"
+            "-hd          Enable high DPI, only supported by Apple platforms (OSX, iOS, and tvOS)\n"
             "-q           Enable quiet mode which does not log to standard output stream\n"
             "-b <length>  Sound buffer length in milliseconds\n"
             "-r <freq>    Sound mixing frequency in Hz\n"

@@ -370,6 +370,7 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, "FullScreen", true).GetBool(),
             GetParameter(parameters, "Borderless", false).GetBool(),
             GetParameter(parameters, "WindowResizable", false).GetBool(),
+            GetParameter(parameters, "HighDPI", false).GetBool(),
             GetParameter(parameters, "VSync", false).GetBool(),
             GetParameter(parameters, "TripleBuffer", false).GetBool(),
             GetParameter(parameters, "MultiSample", 1).GetInt()
@@ -790,10 +791,12 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret["TripleBuffer"] = true;
             else if (argument == "w")
                 ret["FullScreen"] = false;
-            else if (argument == "s")
-                ret["WindowResizable"] = true;
             else if (argument == "borderless")
                 ret["Borderless"] = true;
+            else if (argument == "s")
+                ret["WindowResizable"] = true;
+            else if (argument == "hd")
+                ret["HighDPI"] = true;
             else if (argument == "q")
                 ret["LogQuiet"] = true;
             else if (argument == "log" && !value.Empty())

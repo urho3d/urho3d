@@ -268,6 +268,7 @@ Graphics::Graphics(Context* context) :
     fullscreen_(false),
     borderless_(false),
     resizable_(false),
+    highDPI_(false),
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(false),
@@ -366,10 +367,12 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
+    bool tripleBuffer, int multiSample)
 {
     URHO3D_PROFILE(SetScreenMode);
+
+    highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
     bool maximize = false;
 
@@ -501,6 +504,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     fullscreen_ = fullscreen;
     borderless_ = borderless;
     resizable_ = resizable;
+    highDPI_ = highDPI;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
 
@@ -553,8 +557,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -562,7 +567,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -583,7 +588,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
