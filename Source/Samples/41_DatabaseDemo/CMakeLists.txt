@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_DATABASE_ODBC AND NOT URHO3D_DATABASE_SQLITE)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 41_DatabaseDemo)
 

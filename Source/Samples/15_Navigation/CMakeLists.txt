@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_NAVIGATION)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 15_Navigation)
 

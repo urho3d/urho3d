@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_URHO2D)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 32_Urho2DConstraints)
 

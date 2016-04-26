@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_ANGELSCRIPT)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 21_AngelScriptIntegration)
 

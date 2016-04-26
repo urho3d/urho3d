@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_LUA)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 22_LuaIntegration)
 
