@@ -307,15 +307,15 @@ task :ci do
   # Obtain our custom data, if any
   if ENV['APPVEYOR']
     # AppVeyor does not provide job number environment variable in the same semantics as TRAVIS_JOB_NUMBER nor it supports custom data in its .appveyor.yml document
-    if ENV['excluded_sample']
-      pairs = ENV['excluded_sample'].split
+    if ENV['included_sample'] || ENV['excluded_sample']   # Inclusion has higher precedence
+      pairs = (ENV['included_sample'] || ENV['excluded_sample']).split
       samples = pairs.pop.split ','
       matched = true
       pairs.each { |pair|
         kv = pair.split '='
         matched = false if ENV[kv.first] != kv.last
       }
-      samples.each { |name| ENV["EXCLUDE_SAMPLE_#{name}"] = '1' } if matched
+      samples.each { |name| ENV["#{ENV['included_sample'] ? 'INCLUDED' : 'EXCLUDED'}_SAMPLE_#{name}"] = '1' } if matched
     end
   else
     data = YAML::load(File.open('.travis.yml'))['data']

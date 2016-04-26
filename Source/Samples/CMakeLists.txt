@@ -35,7 +35,11 @@ set (INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Macro for adding sample subdirectory
 macro (add_sample_subdirectory SOURCE_DIR)
-    if (NOT DEFINED ENV{EXCLUDE_SAMPLE_${SOURCE_DIR}})
+    if (DEFINED ENV{included_sample})
+        if (DEFINED ENV{INCLUDED_SAMPLE_${SOURCE_DIR}})
+            add_subdirectory (${SOURCE_DIR} ${ARGN})
+        endif ()
+    elseif (NOT DEFINED ENV{EXCLUDED_SAMPLE_${SOURCE_DIR}})
         add_subdirectory (${SOURCE_DIR} ${ARGN})
     endif ()
 endmacro ()
