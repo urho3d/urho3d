@@ -770,10 +770,13 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
 
 void Input::SetMouseGrabbed(bool grab, bool suppressEvent)
 {
+// To not interfere with touch UI operation, never report the mouse as grabbed on Android / iOS
+#if !defined(ANDROID) && !defined(IOS)
     mouseGrabbed_ = grab;
 
     if (!suppressEvent)
         lastMouseGrabbed_ = grab;
+#endif
 }
 
 void Input::ResetMouseGrabbed()
