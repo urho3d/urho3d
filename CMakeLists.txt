@@ -44,7 +44,7 @@ endif ()
 project (Urho3D)
 
 # Set CMake modules search path
-set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+set (CMAKE_MODULE_PATH ${Urho3D_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D Cmake common module
 include (Urho3D-CMake-common)
@@ -80,14 +80,14 @@ set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
-file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
+file (GLOB APP_SCRIPTS ${Urho3D_SOURCE_DIR}/bin/*${SCRIPT_EXT})
 install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the Urho3D-CMake-common module
 # Install resource directories required by applications built with Urho3D library
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Autoload ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data DESTINATION ${DEST_SHARE_DIR}/Resources)
+install (DIRECTORY ${Urho3D_SOURCE_DIR}/bin/Autoload ${Urho3D_SOURCE_DIR}/bin/CoreData ${Urho3D_SOURCE_DIR}/bin/Data DESTINATION ${DEST_SHARE_DIR}/Resources)
 # Install CMake modules and toolchains provided by and for Urho3D
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
+install (DIRECTORY ${Urho3D_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
 # Install CMake build scripts
-file (GLOB CMAKE_SCRIPTS ${CMAKE_SOURCE_DIR}/*${SCRIPT_EXT})
+file (GLOB CMAKE_SCRIPTS ${Urho3D_SOURCE_DIR}/*${SCRIPT_EXT})
 install (PROGRAMS ${CMAKE_SCRIPTS} DESTINATION ${DEST_SHARE_DIR}/Scripts)
 
 # Setup package variables
@@ -96,7 +96,7 @@ set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
 set (CPACK_PACKAGE_CONTACT ${URHO3D_URL})
-execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND ${CMAKE_COMMAND} -P ${Urho3D_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake WORKING_DIRECTORY ${Urho3D_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set (CPACK_PACKAGE_VERSION ${URHO3D_VERSION})
 string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO3D_VERSION})
 if (MATCHED)
@@ -104,7 +104,7 @@ if (MATCHED)
     set (CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_2})
     set (CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_3})
 endif ()
-set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/License.txt)
+set (CPACK_RESOURCE_FILE_LICENSE ${Urho3D_SOURCE_DIR}/License.txt)
 set (CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME})
 set (CPACK_GENERATOR TGZ)
 if (ANDROID)
