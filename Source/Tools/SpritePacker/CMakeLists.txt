@@ -26,7 +26,5 @@ set (TARGET_NAME SpritePacker)
 # Define source files
 define_source_files ()
 
-include_directories(../../ThirdParty/STB)
-
 # Setup target
 setup_executable (TOOL)
