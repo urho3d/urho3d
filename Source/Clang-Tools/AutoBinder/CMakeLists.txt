@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,6 @@ define_source_files ()
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/../../ThirdParty/Mustache Mustache)
 
 # Setup target
-if (APPLE)
-    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-endif ()
-setup_executable (NODEPS)
+setup_executable (TOOL NODEPS)
 install (DIRECTORY Templates DESTINATION ${DEST_RUNTIME_DIR})
 add_dependencies (${TARGET_NAME} Mustache)

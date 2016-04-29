@@ -3,7 +3,10 @@ $#include "Urho2D/SpriteSheet2D.h"
 class SpriteSheet2D : public Resource
 {
 public:
+    void SetTexture(Texture2D* texture);
     Texture2D* GetTexture() const;
     Sprite2D* GetSprite(const String name) const;
     void DefineSprite(const String name, const IntRect& rectangle, const Vector2& hotSpot = Vector2(0.5f, 0.5f), const IntVector2& originSize = IntVector2::ZERO);
+
+    tolua_property__get_set Texture2D* texture;
 };

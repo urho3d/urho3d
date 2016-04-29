@@ -6,7 +6,7 @@ class Geometry : public Object
     ~Geometry();
     
     bool SetNumVertexBuffers(unsigned num);
-    bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT);
+    bool SetVertexBuffer(unsigned index, VertexBuffer* buffer);
     void SetIndexBuffer(IndexBuffer* buffer);
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, bool getUsedVertexRange = true);
     bool SetDrawRange(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, bool checkIllegal = true);
@@ -14,7 +14,6 @@ class Geometry : public Object
 
     unsigned GetNumVertexBuffers() const;
     VertexBuffer* GetVertexBuffer(unsigned index) const;
-    unsigned GetVertexElementMask(unsigned index) const;
     IndexBuffer* GetIndexBuffer() const;
     PrimitiveType GetPrimitiveType() const;
     unsigned GetIndexStart() const;

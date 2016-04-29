@@ -262,7 +262,8 @@ bool jo_write_jpg(const char *filename, const void *data, int width, int height,
 	fwrite(YTable, sizeof(YTable), 1, fp);
 	putc(1, fp);
 	fwrite(UVTable, sizeof(UVTable), 1, fp);
-	const unsigned char head1[] = { 0xFF,0xC0,0,0x11,8,height>>8,height&0xFF,width>>8,width&0xFF,3,1,0x11,0,2,0x11,1,3,0x11,1,0xFF,0xC4,0x01,0xA2,0 };
+    // Urho3D: modified to avoid narrowing conversion
+	const unsigned char head1[] = { 0xFF,0xC0,0,0x11,8,static_cast<unsigned char>(height>>8),static_cast<unsigned char>(height&0xFF),static_cast<unsigned char>(width>>8),static_cast<unsigned char>(width&0xFF),3,1,0x11,0,2,0x11,1,3,0x11,1,0xFF,0xC4,0x01,0xA2,0 };
 	fwrite(head1, sizeof(head1), 1, fp);
 	fwrite(std_dc_luminance_nrcodes+1, sizeof(std_dc_luminance_nrcodes)-1, 1, fp);
 	fwrite(std_dc_luminance_values, sizeof(std_dc_luminance_values), 1, fp);

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,22 +18,18 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
 
 #include <android/log.h>
 
+#include "SDL_hints.h"
 #include "SDL_events.h"
+#include "SDL_log.h"
+#include "SDL_androidtouch.h"
 #include "../../events/SDL_mouse_c.h"
 #include "../../events/SDL_touch_c.h"
-#include "SDL_log.h"
-
-#include "SDL_androidtouch.h"
-
 #include "../../core/android/SDL_android.h"
 
 #define ACTION_DOWN 0
@@ -54,17 +50,42 @@ static void Android_GetWindowCoordinates(float x, float y,
     *window_y = (int)(y * window_h);
 }
 
+static volatile SDL_bool separate_mouse_and_touch = SDL_FALSE;
+
+static void
+SeparateEventsHintWatcher(void *userdata, const char *name,
+                          const char *oldValue, const char *newValue)
+{
+    jclass mActivityClass = Android_JNI_GetActivityClass();
+    JNIEnv *env = Android_JNI_GetEnv();
+    jfieldID fid = (*env)->GetStaticFieldID(env, mActivityClass, "mSeparateMouseAndTouch", "Z");
+
+    separate_mouse_and_touch = (newValue && (SDL_strcmp(newValue, "1") == 0));
+    (*env)->SetStaticBooleanField(env, mActivityClass, fid, separate_mouse_and_touch ? JNI_TRUE : JNI_FALSE);
+}
+
 void Android_InitTouch(void)
 {
     int i;
     int* ids;
-    int number = Android_JNI_GetTouchDeviceIds(&ids);
+    const int number = Android_JNI_GetTouchDeviceIds(&ids);
+
+    SDL_AddHintCallback(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH,
+                        SeparateEventsHintWatcher, NULL);
+
     if (0 < number) {
         for (i = 0; i < number; ++i) {
             SDL_AddTouch((SDL_TouchID) ids[i], ""); /* no error handling */
         }
         SDL_free(ids);
     }
+}
+
+void Android_QuitTouch(void)
+{
+    SDL_DelHintCallback(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH,
+                        SeparateEventsHintWatcher, NULL);
+    separate_mouse_and_touch = SDL_FALSE;
 }
 
 void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int action, float x, float y, float p)
@@ -87,12 +108,13 @@ void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int actio
     switch (action) {
         case ACTION_DOWN:
             /* Primary pointer down */
-            Android_GetWindowCoordinates(x, y, &window_x, &window_y);
-            // Urho3D: do not send emulated mouse events
-            /* send moved event */
-            //SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
-            /* send mouse down event */
-            //SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
+            if (!separate_mouse_and_touch) {
+                Android_GetWindowCoordinates(x, y, &window_x, &window_y);
+                /* send moved event */
+                SDL_SendMouseMotion(Android_Window, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+                /* send mouse down event */
+                SDL_SendMouseButton(Android_Window, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
+            }
             pointerFingerID = fingerId;
         case ACTION_POINTER_DOWN:
             /* Non primary pointer down */
@@ -101,24 +123,27 @@ void Android_OnTouch(int touch_device_id_in, int pointer_finger_id_in, int actio
 
         case ACTION_MOVE:
             if (!pointerFingerID) {
-                Android_GetWindowCoordinates(x, y, &window_x, &window_y);
-
-                /* send moved event */
-                //SDL_SendMouseMotion(NULL, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+                if (!separate_mouse_and_touch) {
+                    Android_GetWindowCoordinates(x, y, &window_x, &window_y);
+                    /* send moved event */
+                    SDL_SendMouseMotion(Android_Window, SDL_TOUCH_MOUSEID, 0, window_x, window_y);
+                }
             }
             SDL_SendTouchMotion(touchDeviceId, fingerId, x, y, p);
             break;
-            
+
         case ACTION_UP:
             /* Primary pointer up */
-            /* send mouse up */
+            if (!separate_mouse_and_touch) {
+                /* send mouse up */
+                SDL_SendMouseButton(Android_Window, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);
+            }
             pointerFingerID = (SDL_FingerID) 0;
-            //SDL_SendMouseButton(NULL, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);
         case ACTION_POINTER_UP:
             /* Non primary pointer up */
             SDL_SendTouch(touchDeviceId, fingerId, SDL_FALSE, x, y, p);
             break;
-            
+
         default:
             break;
     }

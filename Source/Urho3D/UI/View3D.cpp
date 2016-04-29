@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Graphics.h"
+#include "../Graphics/GraphicsEvents.h"
 #include "../Graphics/Octree.h"
 #include "../Graphics/Texture2D.h"
 #include "../Graphics/Zone.h"
@@ -47,6 +48,8 @@ View3D::View3D(Context* context) :
     renderTexture_ = new Texture2D(context_);
     depthTexture_ = new Texture2D(context_);
     viewport_ = new Viewport(context_);
+
+    SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(View3D, HandleRenderSurfaceUpdate));
 }
 
 View3D::~View3D()
@@ -76,7 +79,7 @@ void View3D::OnResize()
         depthTexture_->SetSize(width, height, Graphics::GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
         RenderSurface* surface = renderTexture_->GetRenderSurface();
         surface->SetViewport(0, viewport_);
-        surface->SetUpdateMode(autoUpdate_ ? SURFACE_UPDATEALWAYS : SURFACE_MANUALUPDATE);
+        surface->SetUpdateMode(SURFACE_MANUALUPDATE);
         surface->SetLinkedDepthStencil(depthTexture_->GetRenderSurface());
 
         SetTexture(renderTexture_);
@@ -111,23 +114,14 @@ void View3D::SetFormat(unsigned format)
 
 void View3D::SetAutoUpdate(bool enable)
 {
-    if (enable != autoUpdate_)
-    {
-        autoUpdate_ = enable;
-        RenderSurface* surface = renderTexture_->GetRenderSurface();
-        if (surface)
-            surface->SetUpdateMode(autoUpdate_ ? SURFACE_UPDATEALWAYS : SURFACE_MANUALUPDATE);
-    }
+    autoUpdate_ = enable;
 }
 
 void View3D::QueueUpdate()
 {
-    if (!autoUpdate_)
-    {
-        RenderSurface* surface = renderTexture_->GetRenderSurface();
-        if (surface)
-            surface->QueueUpdate();
-    }
+    RenderSurface* surface = renderTexture_->GetRenderSurface();
+    if (surface)
+        surface->QueueUpdate();
 }
 
 Scene* View3D::GetScene() const
@@ -169,6 +163,12 @@ void View3D::ResetScene()
     }
     else
         scene_ = 0;
+}
+
+void View3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
+{
+    if (autoUpdate_ && IsVisibleEffective())
+        QueueUpdate();
 }
 
 }

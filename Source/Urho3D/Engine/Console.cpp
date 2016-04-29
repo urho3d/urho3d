@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -127,21 +127,31 @@ void Console::SetDefaultStyle(XMLFile* style)
 void Console::SetVisible(bool enable)
 {
     Input* input = GetSubsystem<Input>();
+    UI* ui = GetSubsystem<UI>();
+    Cursor* cursor = ui->GetCursor();
+
     background_->SetVisible(enable);
     closeButton_->SetVisible(enable);
+
     if (enable)
     {
         // Check if we have receivers for E_CONSOLECOMMAND every time here in case the handler is being added later dynamically
         bool hasInterpreter = PopulateInterpreter();
         commandLine_->SetVisible(hasInterpreter);
         if (hasInterpreter && focusOnShow_)
-            GetSubsystem<UI>()->SetFocusElement(lineEdit_);
+            ui->SetFocusElement(lineEdit_);
 
         // Ensure the background has no empty space when shown without the lineedit
         background_->SetHeight(background_->GetMinHeight());
 
-        // Show OS mouse
-        input->SetMouseVisible(true, true);
+        if (!cursor)
+        {
+            // Show OS mouse
+            input->SetMouseMode(MM_FREE, true);
+            input->SetMouseVisible(true, true);
+        }
+
+        input->SetMouseGrabbed(false, true);
     }
     else
     {
@@ -149,8 +159,14 @@ void Console::SetVisible(bool enable)
         interpreters_->SetFocus(false);
         lineEdit_->SetFocus(false);
 
-        // Restore OS mouse visibility
-        input->ResetMouseVisible();
+        if (!cursor)
+        {
+            // Restore OS mouse visibility
+            input->ResetMouseMode();
+            input->ResetMouseVisible();
+        }
+
+        input->ResetMouseGrabbed();
     }
 }
 
@@ -315,10 +331,14 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
+#if URHO3D_CXX11
+        SendEvent(E_CONSOLECOMMAND, P_COMMAND, line, P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
+#else
         VariantMap& newEventData = GetEventDataMap();
         newEventData[P_COMMAND] = line;
         newEventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
         SendEvent(E_CONSOLECOMMAND, newEventData);
+#endif
 
         // Store to history, then clear the lineedit
         history_.Push(line);

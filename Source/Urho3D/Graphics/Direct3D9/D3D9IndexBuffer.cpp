@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,17 +79,10 @@ void IndexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
-    {
-        if (!graphics_)
-            return;
+    if (graphics_ && graphics_->GetIndexBuffer() == this)
+        graphics_->SetIndexBuffer(0);
 
-        if (graphics_->GetIndexBuffer() == this)
-            graphics_->SetIndexBuffer(0);
-
-        ((IDirect3DIndexBuffer9*)object_)->Release();
-        object_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(object_);
 }
 
 void IndexBuffer::SetShadowed(bool enable)
@@ -362,15 +355,17 @@ bool IndexBuffer::Create()
         }
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        if (!device || FAILED(device->CreateIndexBuffer(
+        HRESULT hr = device->CreateIndexBuffer(
             indexCount_ * indexSize_,
             usage_,
             indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
             (D3DPOOL)pool_,
             (IDirect3DIndexBuffer9**)&object_,
-            0)))
+            0);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Could not create index buffer");
+            URHO3D_SAFE_RELEASE(object_)
+            URHO3D_LOGD3DERROR("Could not create index buffer", hr);
             return false;
         }
     }
@@ -397,8 +392,9 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
         if (discard && usage_ & D3DUSAGE_DYNAMIC)
             flags = D3DLOCK_DISCARD;
 
-        if (FAILED(((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags)))
-            URHO3D_LOGERROR("Could not lock index buffer");
+        HRESULT hr = ((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags);
+        if (FAILED(hr))
+            URHO3D_LOGD3DERROR("Could not lock index buffer", hr);
         else
             lockState_ = LOCK_HARDWARE;
     }

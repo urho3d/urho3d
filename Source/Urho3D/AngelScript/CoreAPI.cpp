@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -778,6 +778,8 @@ static void RegisterProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String GetPlatform()", asFUNCTION(GetPlatform), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetNumPhysicalCPUs()", asFUNCTION(GetNumPhysicalCPUs), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetNumLogicalCPUs()", asFUNCTION(GetNumLogicalCPUs), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetMiniDumpDir(const String&in)", asFUNCTION(SetMiniDumpDir), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetMiniDumpDir()", asFUNCTION(GetMiniDumpDir), asCALL_CDECL);
 }
 
 static void ConstructAttributeInfo(AttributeInfo* ptr)
@@ -867,6 +869,18 @@ static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
     listener->RemoveEventHandlersExcept(destExceptions);
 }
 
+static bool HasSubscribedToEvent(const String& eventType)
+{
+    ScriptEventListener* listener = GetScriptContextEventListener();
+    return listener ? listener->HasEventHandler(StringHash(eventType)) : false;
+}
+
+static bool HasSubscribedToSenderEvent(Object* sender, const String& eventType)
+{
+    ScriptEventListener* listener = GetScriptContextEventListener();
+    return listener ? listener->HasEventHandler(sender, StringHash(eventType)) : false;
+}
+
 static Object* GetEventSender()
 {
     return GetScriptContext()->GetEventSender();
@@ -897,6 +911,21 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
+static void SetGlobalVar(const String& key, Variant value)
+{
+    GetScriptContext()->SetGlobalVar(key, value);
+}
+
+static Variant GetGlobalVar(const String& key)
+{
+    return GetScriptContext()->GetGlobalVar(key);
+}
+
+static VariantMap& GetGlobalVars()
+{
+    return const_cast<VariantMap&>(GetScriptContext()->GetGlobalVars());
+}
+
 void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
@@ -920,8 +949,13 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEventsExcept(Array<String>@+)", asFUNCTION(UnsubscribeFromAllEventsExcept), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(const String&in)", asFUNCTION(HasSubscribedToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(HasSubscribedToSenderEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(StringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetGlobalVar(const String&in, Variant&in)", asFUNCTION(SetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Variant GetGlobalVar(const String&in)", asFUNCTION(GetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("VariantMap& get_globalVars()", asFUNCTION(GetGlobalVars), asCALL_CDECL);
 
     engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<RefCounted>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructWeakHandle), asCALL_CDECL_OBJLAST);

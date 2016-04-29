@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,6 @@
 #include "SDL_blit.h"
 #include "SDL_RLEaccel_c.h"
 #include "SDL_pixels_c.h"
-
 
 /* Public routines */
 /*
@@ -145,7 +144,12 @@ SDL_SetSurfacePalette(SDL_Surface * surface, SDL_Palette * palette)
     if (!surface) {
         return SDL_SetError("SDL_SetSurfacePalette() passed a NULL surface");
     }
-    return SDL_SetPixelFormatPalette(surface->format, palette);
+    if (SDL_SetPixelFormatPalette(surface->format, palette) < 0) {
+        return -1;
+    }
+    SDL_InvalidateMap(surface->map);
+
+    return 0;
 }
 
 int
@@ -618,7 +622,12 @@ int
 SDL_UpperBlitScaled(SDL_Surface * src, const SDL_Rect * srcrect,
               SDL_Surface * dst, SDL_Rect * dstrect)
 {
-    SDL_Rect final_src, final_dst, fulldst;
+    double src_x0, src_y0, src_x1, src_y1;
+    double dst_x0, dst_y0, dst_x1, dst_y1;
+    SDL_Rect final_src, final_dst;
+    double scaling_w, scaling_h;
+    int src_w, src_h;
+    int dst_w, dst_h;
 
     /* Make sure the surfaces aren't locked */
     if (!src || !dst) {
@@ -628,78 +637,135 @@ SDL_UpperBlitScaled(SDL_Surface * src, const SDL_Rect * srcrect,
         return SDL_SetError("Surfaces must not be locked during blit");
     }
 
-    /* If the destination rectangle is NULL, use the entire dest surface */
-    if (dstrect == NULL) {
-        fulldst.x = fulldst.y = 0;
-        fulldst.w = dst->w;
-        fulldst.h = dst->h;
-        dstrect = &fulldst;
-    }
-
-    /* clip the source rectangle to the source surface */
-    if (srcrect) {
-        int maxw, maxh;
-
-        final_src.x = srcrect->x;
-        final_src.w = srcrect->w;
-        if (final_src.x < 0) {
-            final_src.w += final_src.x;
-            final_src.x = 0;
-        }
-        maxw = src->w - final_src.x;
-        if (maxw < final_src.w)
-            final_src.w = maxw;
-
-        final_src.y = srcrect->y;
-        final_src.h = srcrect->h;
-        if (final_src.y < 0) {
-            final_src.h += final_src.y;
-            final_src.y = 0;
-        }
-        maxh = src->h - final_src.y;
-        if (maxh < final_src.h)
-            final_src.h = maxh;
-
+    if (NULL == srcrect) {
+        src_w = src->w;
+        src_h = src->h;
     } else {
-        final_src.x = final_src.y = 0;
-        final_src.w = src->w;
-        final_src.h = src->h;
+        src_w = srcrect->w;
+        src_h = srcrect->h;
     }
 
-    /* clip the destination rectangle against the clip rectangle */
-    if (dstrect) {
-        int maxw, maxh;
-
-        final_dst.x = dstrect->x;
-        final_dst.w = dstrect->w;
-        if (final_dst.x < 0) {
-            final_dst.w += final_dst.x;
-            final_dst.x = 0;
-        }
-        maxw = dst->w - final_dst.x;
-        if (maxw < final_dst.w)
-            final_dst.w = maxw;
-
-        final_dst.y = dstrect->y;
-        final_dst.h = dstrect->h;
-        if (final_dst.y < 0) {
-            final_dst.h += final_dst.y;
-            final_dst.y = 0;
-        }
-        maxh = dst->h - final_dst.y;
-        if (maxh < final_dst.h)
-            final_dst.h = maxh;
+    if (NULL == dstrect) {
+        dst_w = dst->w;
+        dst_h = dst->h;
     } else {
-        final_dst.x = final_dst.y = 0;
-        final_dst.w = dst->w;
-        final_dst.h = dst->h;
+        dst_w = dstrect->w;
+        dst_h = dstrect->h;
     }
 
-    if (final_dst.w > 0 && final_dst.h > 0) {
-        return SDL_LowerBlitScaled(src, &final_src, dst, &final_dst);
+    if (dst_w == src_w && dst_h == src_h) {
+        /* No scaling, defer to regular blit */
+        return SDL_BlitSurface(src, srcrect, dst, dstrect);
     }
 
-    return 0;
+    scaling_w = (double)dst_w / src_w;
+    scaling_h = (double)dst_h / src_h;
+
+    if (NULL == dstrect) {
+        dst_x0 = 0;
+        dst_y0 = 0;
+        dst_x1 = dst_w - 1;
+        dst_y1 = dst_h - 1;
+    } else {
+        dst_x0 = dstrect->x;
+        dst_y0 = dstrect->y;
+        dst_x1 = dst_x0 + dst_w - 1;
+        dst_y1 = dst_y0 + dst_h - 1;
+    }
+
+    if (NULL == srcrect) {
+        src_x0 = 0;
+        src_y0 = 0;
+        src_x1 = src_w - 1;
+        src_y1 = src_h - 1;
+    } else {
+        src_x0 = srcrect->x;
+        src_y0 = srcrect->y;
+        src_x1 = src_x0 + src_w - 1;
+        src_y1 = src_y0 + src_h - 1;
+
+        /* Clip source rectangle to the source surface */
+
+        if (src_x0 < 0) {
+            dst_x0 -= src_x0 * scaling_w;
+            src_x0 = 0;
+        }
+
+        if (src_x1 >= src->w) {
+            dst_x1 -= (src_x1 - src->w + 1) * scaling_w;
+            src_x1 = src->w - 1;
+        }
+
+        if (src_y0 < 0) {
+            dst_y0 -= src_y0 * scaling_h;
+            src_y0 = 0;
+        }
+
+        if (src_y1 >= src->h) {
+            dst_y1 -= (src_y1 - src->h + 1) * scaling_h;
+            src_y1 = src->h - 1;
+        }
+    }
+
+    /* Clip destination rectangle to the clip rectangle */
+
+    /* Translate to clip space for easier calculations */
+    dst_x0 -= dst->clip_rect.x;
+    dst_x1 -= dst->clip_rect.x;
+    dst_y0 -= dst->clip_rect.y;
+    dst_y1 -= dst->clip_rect.y;
+
+    if (dst_x0 < 0) {
+        src_x0 -= dst_x0 / scaling_w;
+        dst_x0 = 0;
+    }
+
+    if (dst_x1 >= dst->clip_rect.w) {
+        src_x1 -= (dst_x1 - dst->clip_rect.w + 1) / scaling_w;
+        dst_x1 = dst->clip_rect.w - 1;
+    }
+
+    if (dst_y0 < 0) {
+        src_y0 -= dst_y0 / scaling_h;
+        dst_y0 = 0;
+    }
+
+    if (dst_y1 >= dst->clip_rect.h) {
+        src_y1 -= (dst_y1 - dst->clip_rect.h + 1) / scaling_h;
+        dst_y1 = dst->clip_rect.h - 1;
+    }
+
+    /* Translate back to surface coordinates */
+    dst_x0 += dst->clip_rect.x;
+    dst_x1 += dst->clip_rect.x;
+    dst_y0 += dst->clip_rect.y;
+    dst_y1 += dst->clip_rect.y;
+
+    final_src.x = (int)SDL_floor(src_x0 + 0.5);
+    final_src.y = (int)SDL_floor(src_y0 + 0.5);
+    final_src.w = (int)SDL_floor(src_x1 - src_x0 + 1.5);
+    final_src.h = (int)SDL_floor(src_y1 - src_y0 + 1.5);
+
+    final_dst.x = (int)SDL_floor(dst_x0 + 0.5);
+    final_dst.y = (int)SDL_floor(dst_y0 + 0.5);
+    final_dst.w = (int)SDL_floor(dst_x1 - dst_x0 + 1.5);
+    final_dst.h = (int)SDL_floor(dst_y1 - dst_y0 + 1.5);
+
+    if (final_dst.w < 0)
+        final_dst.w = 0;
+    if (final_dst.h < 0)
+        final_dst.h = 0;
+
+    if (dstrect)
+        *dstrect = final_dst;
+
+    if (final_dst.w == 0 || final_dst.h == 0 ||
+        final_src.w <= 0 || final_src.h <= 0) {
+        /* No-op. */
+        return 0;
+    }
+
+    return SDL_LowerBlitScaled(src, &final_src, dst, &final_dst);
 }
 
 /**
@@ -716,43 +782,6 @@ SDL_LowerBlitScaled(SDL_Surface * src, SDL_Rect * srcrect,
         SDL_COPY_COLORKEY
     );
 
-    /* Save off the original dst width, height */
-    int dstW = dstrect->w;
-    int dstH = dstrect->h;
-    SDL_Rect full_rect;
-    SDL_Rect final_dst = *dstrect;
-    SDL_Rect final_src = *srcrect;
-
-    /* Clip the dst surface to the dstrect */
-    full_rect.x = 0;
-    full_rect.y = 0;
-    full_rect.w = dst->w;
-    full_rect.h = dst->h;
-    if (!SDL_IntersectRect(&final_dst, &full_rect, &final_dst)) {
-        return 0;
-    }
-
-    /* Did the dst width change? */
-    if ( dstW != final_dst.w ) {
-        /* scale the src width appropriately */
-        final_src.w = final_src.w * dst->clip_rect.w / dstW;
-    }
-
-    /* Did the dst height change? */
-    if ( dstH != final_dst.h ) {
-        /* scale the src width appropriately */
-        final_src.h = final_src.h * dst->clip_rect.h / dstH;
-    }
-
-    /* Clip the src surface to the srcrect */
-    full_rect.x = 0;
-    full_rect.y = 0;
-    full_rect.w = src->w;
-    full_rect.h = src->h;
-    if (!SDL_IntersectRect(&final_src, &full_rect, &final_src)) {
-        return 0;
-    }
-
     if (!(src->map->info.flags & SDL_COPY_NEAREST)) {
         src->map->info.flags |= SDL_COPY_NEAREST;
         SDL_InvalidateMap(src->map);
@@ -761,9 +790,9 @@ SDL_LowerBlitScaled(SDL_Surface * src, SDL_Rect * srcrect,
     if ( !(src->map->info.flags & complex_copy_flags) &&
          src->format->format == dst->format->format &&
          !SDL_ISPIXELFORMAT_INDEXED(src->format->format) ) {
-        return SDL_SoftStretch( src, &final_src, dst, &final_dst );
+        return SDL_SoftStretch( src, srcrect, dst, dstrect );
     } else {
-        return SDL_LowerBlit( src, &final_src, dst, &final_dst );
+        return SDL_LowerBlit( src, srcrect, dst, dstrect );
     }
 }
 
@@ -1000,7 +1029,7 @@ int SDL_ConvertPixels(int width, int height,
     SDL_Rect rect;
     void *nonconst_src = (void *) src;
 
-    /* Check to make sure we are bliting somewhere, so we don't crash */
+    /* Check to make sure we are blitting somewhere, so we don't crash */
     if (!dst) {
         return SDL_InvalidParamError("dst");
     }
@@ -1010,16 +1039,20 @@ int SDL_ConvertPixels(int width, int height,
 
     /* Fast path for same format copy */
     if (src_format == dst_format) {
-        int bpp;
+        int bpp, i;
 
         if (SDL_ISPIXELFORMAT_FOURCC(src_format)) {
             switch (src_format) {
-            case SDL_PIXELFORMAT_YV12:
-            case SDL_PIXELFORMAT_IYUV:
             case SDL_PIXELFORMAT_YUY2:
             case SDL_PIXELFORMAT_UYVY:
             case SDL_PIXELFORMAT_YVYU:
                 bpp = 2;
+                break;
+            case SDL_PIXELFORMAT_YV12:
+            case SDL_PIXELFORMAT_IYUV:
+            case SDL_PIXELFORMAT_NV12:
+            case SDL_PIXELFORMAT_NV21:
+                bpp = 1;
                 break;
             default:
                 return SDL_SetError("Unknown FOURCC pixel format");
@@ -1029,10 +1062,31 @@ int SDL_ConvertPixels(int width, int height,
         }
         width *= bpp;
 
-        while (height-- > 0) {
+        for (i = height; i--;) {
             SDL_memcpy(dst, src, width);
             src = (Uint8*)src + src_pitch;
             dst = (Uint8*)dst + dst_pitch;
+        }
+
+        if (src_format == SDL_PIXELFORMAT_YV12 || src_format == SDL_PIXELFORMAT_IYUV) {
+            /* U and V planes are a quarter the size of the Y plane */
+            width /= 2;
+            height /= 2;
+            src_pitch /= 2;
+            dst_pitch /= 2;
+            for (i = height * 2; i--;) {
+                SDL_memcpy(dst, src, width);
+                src = (Uint8*)src + src_pitch;
+                dst = (Uint8*)dst + dst_pitch;
+            }
+        } else if (src_format == SDL_PIXELFORMAT_NV12 || src_format == SDL_PIXELFORMAT_NV21) {
+            /* U/V plane is half the height of the Y plane */
+            height /= 2;
+            for (i = height; i--;) {
+                SDL_memcpy(dst, src, width);
+                src = (Uint8*)src + src_pitch;
+                dst = (Uint8*)dst + dst_pitch;
+            }
         }
         return 0;
     }

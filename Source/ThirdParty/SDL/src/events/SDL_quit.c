@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,8 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "../SDL_internal.h"
+#include "SDL_hints.h"
+#include "SDL_assert.h"
 
 /* General quit handling code for SDL */
 
@@ -29,6 +31,8 @@
 #include "SDL_events.h"
 #include "SDL_events_c.h"
 
+static SDL_bool disable_signals = SDL_FALSE;
+static SDL_bool send_quit_pending = SDL_FALSE;
 
 #ifdef HAVE_SIGNAL_H
 static void
@@ -37,14 +41,15 @@ SDL_HandleSIG(int sig)
     /* Reset the signal handler */
     signal(sig, SDL_HandleSIG);
 
-    /* Signal a quit interrupt */
-    SDL_SendQuit();
+    /* Send a quit event next time the event loop pumps. */
+    /* We can't send it in signal handler; malloc() might be interrupted! */
+    send_quit_pending = SDL_TRUE;
 }
 #endif /* HAVE_SIGNAL_H */
 
 /* Public functions */
-int
-SDL_QuitInit(void)
+static int
+SDL_QuitInit_Internal(void)
 {
 #ifdef HAVE_SIGACTION
     struct sigaction action;
@@ -80,11 +85,22 @@ SDL_QuitInit(void)
 #endif /* HAVE_SIGNAL_H */
 
     /* That's it! */
-    return (0);
+    return 0;
 }
 
-void
-SDL_QuitQuit(void)
+int
+SDL_QuitInit(void)
+{
+    const char *hint = SDL_GetHint(SDL_HINT_NO_SIGNAL_HANDLERS);
+    disable_signals = hint && (SDL_atoi(hint) == 1);
+    if (!disable_signals) {
+        return SDL_QuitInit_Internal();
+    }
+    return 0;
+}
+
+static void
+SDL_QuitQuit_Internal(void)
 {
 #ifdef HAVE_SIGACTION
     struct sigaction action;
@@ -110,11 +126,29 @@ SDL_QuitQuit(void)
 #endif /* HAVE_SIGNAL_H */
 }
 
+void
+SDL_QuitQuit(void)
+{
+    if (!disable_signals) {
+        SDL_QuitQuit_Internal();
+    }
+}
+
 /* This function returns 1 if it's okay to close the application window */
 int
 SDL_SendQuit(void)
 {
+    send_quit_pending = SDL_FALSE;
     return SDL_SendAppEvent(SDL_QUIT);
+}
+
+void
+SDL_SendPendingQuit(void)
+{
+    if (send_quit_pending) {
+        SDL_SendQuit();
+        SDL_assert(!send_quit_pending);
+    }
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

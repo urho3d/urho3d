@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,6 +77,8 @@ struct URHO3D_API PhysicsRaycastResult
     Vector3 normal_;
     /// Hit distance from ray origin.
     float distance_;
+    /// Hit fraction.
+    float hitFraction_;
     /// Rigid body that was hit.
     RigidBody* body_;
 };
@@ -160,6 +162,8 @@ public:
         (PODVector<PhysicsRaycastResult>& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world raycast and return the closest hit.
     void RaycastSingle(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);
+    /// Perform a physics world segmented raycast and return the closest hit. Useful for big scenes with many bodies.
+    void RaycastSingleSegmented(PhysicsRaycastResult& result, const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask = M_MAX_UNSIGNED);
     /// Perform a physics world swept sphere test and return the closest hit.
     void SphereCast
         (PhysicsRaycastResult& result, const Ray& ray, float radius, float maxDistance, unsigned collisionMask = M_MAX_UNSIGNED);

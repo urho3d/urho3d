@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,10 +45,10 @@ public:
     /// Destruct.
     virtual ~Geometry();
 
-    /// Set number of vertex buffer.
+    /// Set number of vertex buffers.
     bool SetNumVertexBuffers(unsigned num);
     /// Set a vertex buffer by index.
-    bool SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask = MASK_DEFAULT);
+    bool SetVertexBuffer(unsigned index, VertexBuffer* buffer);
     /// Set the index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set the draw range.
@@ -59,7 +59,9 @@ public:
     /// Set the LOD distance.
     void SetLodDistance(float distance);
     /// Override raw vertex data to be returned for CPU-side operations.
-    void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned vertexSize, unsigned elementMask);
+    void SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements);
+    /// Override raw vertex data to be returned for CPU-side operations using a legacy vertex bitmask.
+    void SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask);
     /// Override raw index data to be returned for CPU-side operations.
     void SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize);
     /// Draw.
@@ -68,16 +70,11 @@ public:
     /// Return all vertex buffers.
     const Vector<SharedPtr<VertexBuffer> >& GetVertexBuffers() const { return vertexBuffers_; }
 
-    /// Return vertex element masks.
-    const PODVector<unsigned>& GetVertexElementMasks() const { return elementMasks_; }
-
     /// Return number of vertex buffers.
     unsigned GetNumVertexBuffers() const { return vertexBuffers_.Size(); }
 
     /// Return vertex buffer by index.
     VertexBuffer* GetVertexBuffer(unsigned index) const;
-    /// Return vertex element mask by index.
-    unsigned GetVertexElementMask(unsigned index) const;
 
     /// Return the index buffer.
     IndexBuffer* GetIndexBuffer() const { return indexBuffer_; }
@@ -102,12 +99,11 @@ public:
 
     /// Return buffers' combined hash value for state sorting.
     unsigned short GetBufferHash() const;
-    /// Return raw vertex and index data for CPU operations, or null pointers if not available.
-    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize,
-        unsigned& elementMask) const;
-    /// Return raw vertex and index data for CPU operations, or null pointers if not available.
+    /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
+    void GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const;
+    /// Return raw vertex and index data for CPU operations, or null pointers if not available. Will return data of the first vertex buffer if override data not set.
     void GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize, SharedArrayPtr<unsigned char>& indexData,
-        unsigned& indexSize, unsigned& elementMask) const;
+        unsigned& indexSize, const PODVector<VertexElement>*& elements) const;
     /// Return ray hit distance or infinity if no hit. Requires raw data to be set. Optionally return hit normal and hit uv coordinates at intersect point.
     float GetHitDistance(const Ray& ray, Vector3* outNormal = 0, Vector2* outUV = 0) const;
     /// Return whether or not the ray is inside geometry.
@@ -117,19 +113,10 @@ public:
     bool IsEmpty() const { return indexCount_ == 0 && vertexCount_ == 0; }
 
 private:
-    /// Locate vertex buffer with position data.
-    void GetPositionBufferIndex();
-
     /// Vertex buffers.
     Vector<SharedPtr<VertexBuffer> > vertexBuffers_;
-    /// Vertex element masks.
-    PODVector<unsigned> elementMasks_;
     /// Index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
-    /// Raw vertex data override.
-    SharedArrayPtr<unsigned char> rawVertexData_;
-    /// Raw index data override.
-    SharedArrayPtr<unsigned char> rawIndexData_;
     /// Primitive type.
     PrimitiveType primitiveType_;
     /// Start index.
@@ -140,16 +127,18 @@ private:
     unsigned vertexStart_;
     /// Number of used vertices.
     unsigned vertexCount_;
-    /// Index of vertex buffer with position data.
-    unsigned positionBufferIndex_;
-    /// Raw vertex data override size.
-    unsigned rawVertexSize_;
-    /// Raw vertex data override element mask.
-    unsigned rawElementMask_;
-    /// Raw index data override size.
-    unsigned rawIndexSize_;
     /// LOD distance.
     float lodDistance_;
+    /// Raw vertex data elements.
+    PODVector<VertexElement> rawElements_;
+    /// Raw vertex data override.
+    SharedArrayPtr<unsigned char> rawVertexData_;
+    /// Raw index data override.
+    SharedArrayPtr<unsigned char> rawIndexData_;
+    /// Raw vertex data override size.
+    unsigned rawVertexSize_;
+    /// Raw index data override size.
+    unsigned rawIndexSize_;
 };
 
 }

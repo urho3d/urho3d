@@ -6,6 +6,7 @@ class Renderer
     void SetViewport(unsigned index, Viewport* viewport);
     void SetDefaultRenderPath(RenderPath* renderPath);
     void SetDefaultRenderPath(XMLFile* file);
+    void SetDefaultTechnique(Technique* technique);
     void SetHDRRendering(bool enable);
     void SetSpecularLighting(bool enable);
     void SetTextureAnisotropy(int level);
@@ -14,7 +15,9 @@ class Renderer
     void SetMaterialQuality(int quality);
     void SetDrawShadows(bool enable);
     void SetShadowMapSize(int size);
-    void SetShadowQuality(int quality);
+    void SetShadowQuality(ShadowQuality quality);
+    void SetShadowSoftness(float shadowSoftness);
+    void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
     void SetReuseShadowMaps(bool enable);
     void SetMaxShadowMaps(int shadowMaps);
     void SetDynamicInstancing(bool enable);
@@ -31,6 +34,7 @@ class Renderer
     unsigned GetNumViewports() const;
     Viewport* GetViewport(unsigned index) const;
     RenderPath* GetDefaultRenderPath() const;
+    Technique* GetDefaultTechnique() const;
     bool GetHDRRendering() const;
     bool GetSpecularLighting() const;
     bool GetDrawShadows() const;
@@ -39,7 +43,9 @@ class Renderer
     int GetTextureQuality() const;
     int GetMaterialQuality() const;
     int GetShadowMapSize() const;
-    int GetShadowQuality() const;
+    ShadowQuality GetShadowQuality() const;
+    float GetShadowSoftness() const;
+    Vector2 GetVSMShadowParameters() const;
     bool GetReuseShadowMaps() const;
     int GetMaxShadowMaps() const;
     bool GetDynamicInstancing() const;
@@ -67,6 +73,7 @@ class Renderer
 
     tolua_property__get_set unsigned numViewports;
     tolua_property__get_set RenderPath* defaultRenderPath;
+    tolua_property__get_set Technique* defaultTechnique;
     tolua_property__get_set bool HDRRendering;
     tolua_property__get_set bool specularLighting;
     tolua_property__get_set bool drawShadows;
@@ -75,7 +82,8 @@ class Renderer
     tolua_property__get_set int textureQuality;
     tolua_property__get_set int materialQuality;
     tolua_property__get_set int shadowMapSize;
-    tolua_property__get_set int shadowQuality;
+    tolua_property__get_set ShadowQuality shadowQuality;
+    tolua_property__get_set float shadowSoftness;
     tolua_property__get_set bool reuseShadowMaps;
     tolua_property__get_set int maxShadowMaps;
     tolua_property__get_set bool dynamicInstancing;

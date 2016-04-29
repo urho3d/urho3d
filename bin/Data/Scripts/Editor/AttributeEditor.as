@@ -314,7 +314,7 @@ UIElement@ CreateIntAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         LineEdit@ attrEdit = CreateAttributeLineEdit(parent, serializables, index, subIndex);
         CreateDragSlider(attrEdit);
         // If the attribute is a counter for things like billboards or animation states, disable apply at each change
-        if (info.name.Find(" Count", 0, false) == -1)
+        if (info.name.Find(" Count", 0, false) == NPOS)
             SubscribeToEvent(attrEdit, "TextChanged", "EditAttribute");
         SubscribeToEvent(attrEdit, "TextFinished", "EditAttribute");
         // If the attribute is a node ID, make it a drag/drop target
@@ -677,8 +677,8 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 // Reevaluate each name in the list
                 for (uint i = 0; i < values.length; ++i)
                 {
-                    ResourceRefList refList = values[i].GetResourceRefList();
-                    if (subIndex >= refList.length || refList.names[subIndex] != firstName)
+                    ResourceRefList rList = values[i].GetResourceRefList();
+                    if (subIndex >= rList.length || rList.names[subIndex] != firstName)
                     {
                         nameSameValue = false;
                         break;
@@ -699,28 +699,28 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 break;
 
             Variant firstValue = vector[subIndex];
-            bool sameValue = true;
+            bool sameVal = true;
             Array<Variant> varValues;
 
             // Reevaluate each variant in the vector
             for (uint i = 0; i < values.length; ++i)
             {
-                Array<Variant>@ vector = values[i].GetVariantVector();
-                if (subIndex < vector.length)
+                Array<Variant>@ vec = values[i].GetVariantVector();
+                if (subIndex < vec.length)
                 {
-                    Variant value = vector[subIndex];
-                    varValues.Push(value);
-                    if (value != firstValue)
-                        sameValue = false;
+                    Variant v = vec[subIndex];
+                    varValues.Push(v);
+                    if (v != firstValue)
+                        sameVal = false;
                 }
                 else
-                    sameValue = false;
+                    sameVal = false;
             }
 
             // The individual variant in the list is not an attribute of the serializable, the structure is reused for convenience
-            AttributeInfo info;
-            info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
+            AttributeInfo ai;
+            ai.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, ai, editable, sameVal, varValues);
         }
     }
     else if (type == VAR_VARIANTMAP)
@@ -739,28 +739,28 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
                 varName = keys[subIndex].ToString(); // Use hexadecimal if nothing else is available
 
             Variant firstValue = map[keys[subIndex]];
-            bool sameValue = true;
+            bool sameVal = true;
             Array<Variant> varValues;
 
             // Reevaluate each variant in the map
             for (uint i = 0; i < values.length; ++i)
             {
-                VariantMap map = values[i].GetVariantMap();
-                if (map.Contains(keys[subIndex]))
+                VariantMap m = values[i].GetVariantMap();
+                if (m.Contains(keys[subIndex]))
                 {
-                    Variant value = map[keys[subIndex]];
-                    varValues.Push(value);
-                    if (value != firstValue)
-                       sameValue = false;
+                    Variant v = m[keys[subIndex]];
+                    varValues.Push(v);
+                    if (v != firstValue)
+                       sameVal = false;
                 }
                 else
-                    sameValue = false;
+                    sameVal = false;
             }
 
             // The individual variant in the map is not an attribute of the serializable, the structure is reused for convenience
-            AttributeInfo info;
-            info.type = firstValue.type;
-            LoadAttributeEditor(parent, firstValue, info, editable, sameValue, varValues);
+            AttributeInfo ai;
+            ai.type = firstValue.type;
+            LoadAttributeEditor(parent, firstValue, ai, editable, sameVal, varValues);
         }
     }
     else
@@ -768,31 +768,31 @@ void LoadAttributeEditor(UIElement@ parent, const Variant&in value, const Attrib
         Array<Array<String> > coordinates;
         for (uint i = 0; i < values.length; ++i)
         {
-            Variant value = values[i];
+            Variant v = values[i];
 
             // Convert Quaternion value to Vector3 value first
             if (type == VAR_QUATERNION)
-                value = value.GetQuaternion().eulerAngles;
+                v = v.GetQuaternion().eulerAngles;
 
-            coordinates.Push(value.ToString().Split(' '));
+            coordinates.Push(v.ToString().Split(' '));
         }
         for (uint i = 0; i < coordinates[0].length; ++i)
         {
-            String value = coordinates[0][i];
+            String str = coordinates[0][i];
             bool coordinateSameValue = true;
             if (!sameValue)
             {
                 // Reevaluate each coordinate
                 for (uint j = 1; j < coordinates.length; ++j)
                 {
-                    if (coordinates[j][i] != value)
+                    if (coordinates[j][i] != str)
                     {
                         coordinateSameValue = false;
                         break;
                     }
                 }
             }
-            SetEditable(SetValue(parent.children[i + 1], value, coordinateSameValue), editable && coordinateSameValue);
+            SetEditable(SetValue(parent.children[i + 1], str, coordinateSameValue), editable && coordinateSameValue);
         }
     }
 }
@@ -827,7 +827,6 @@ void StoreAttributeEditor(UIElement@ parent, Array<Serializable@>@ serializables
     }
     else if (info.type == VAR_VARIANTMAP)
     {
-        VariantMap map = serializables[0].attributes[index].GetVariantMap();
         StringHash key(parent.vars["Key"].GetUInt());
         for (uint i = 0; i < serializables.length; ++i)
         {
@@ -877,8 +876,8 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
         FillValue(values, Variant(attrEdit.text.Trimmed()));
     else if (type == VAR_BOOL)
     {
-        CheckBox@ attrEdit = parent.children[1];
-        FillValue(values, Variant(attrEdit.checked));
+        CheckBox@ cb = parent.children[1];
+        FillValue(values, Variant(cb.checked));
     }
     else if (type == VAR_FLOAT)
         FillValue(values, Variant(attrEdit.text.ToFloat()));
@@ -900,16 +899,16 @@ void GetEditorValue(UIElement@ parent, VariantType type, Array<String>@ enumName
             FillValue(values, Variant(attrEdit.text.ToInt()));
         else
         {
-            DropDownList@ attrEdit = parent.children[1];
-            FillValue(values, Variant(attrEdit.selection));
+            DropDownList@ ddl = parent.children[1];
+            FillValue(values, Variant(ddl.selection));
         }
     }
     else if (type == VAR_RESOURCEREF)
     {
-        LineEdit@ attrEdit = parent.children[0];
+        LineEdit@ le = parent.children[0];
         ResourceRef ref;
-        ref.name = attrEdit.text.Trimmed();
-        ref.type = StringHash(attrEdit.vars[TYPE_VAR].GetUInt());
+        ref.name = le.text.Trimmed();
+        ref.type = StringHash(le.vars[TYPE_VAR].GetUInt());
         FillValue(values, Variant(ref));
     }
     else
@@ -972,16 +971,6 @@ void UpdateAttributes(Array<Serializable@>@ serializables, ListView@ list, bool&
         list.viewPosition = oldViewPos;
 }
 
-void EditScriptAttributes(Component@ component, uint index)
-{
-    if (component !is null && component.typeName.Contains("ScriptInstance"))
-    {
-        String hash = GetComponentAttributeHash(component, index);
-        if (!hash.empty)
-            scriptAttributes[hash] = component.attributes[index];
-    }
-}
-
 void CreateDragSlider(LineEdit@ parent)
 {
     Button@ dragSld = Button();
@@ -1039,9 +1028,6 @@ void EditAttribute(StringHash eventType, VariantMap& eventData)
         // Do the editor post logic after attribute has been modified.
         PostEditAttribute(serializables, index, oldValues);
     }
-
-    // Update the stored script attributes if this is a ScriptInstance
-    EditScriptAttributes(serializables[0], index);
 
     inEditAttribute = false;
 
@@ -1170,11 +1156,11 @@ void InitResourcePicker()
 {
     // Fill resource picker data
     Array<String> fontFilters = {"*.ttf", "*.otf", "*.fnt", "*.xml", "*.sdf"};
-    Array<String> imageFilters = {"*.png", "*.jpg", "*.bmp", "*.tga"};
+    Array<String> imageFilters = {"*.png", "*.jpg", "*.bmp", "*.tga", "*.hdr"};
     Array<String> luaFileFilters = {"*.lua", "*.luc"};
     Array<String> scriptFilters = {"*.as", "*.asc"};
     Array<String> soundFilters = {"*.wav","*.ogg"};
-    Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.tga", "*.ktx", "*.pvr"};
+    Array<String> textureFilters = {"*.dds", "*.png", "*.jpg", "*.bmp", "*.tga", "*.ktx", "*.pvr", "*.hdr"};
     Array<String> materialFilters = {"*.xml", "*.material", "*.json"};
     Array<String> anmSetFilters = {"*.scml"};
     Array<String> pexFilters = {"*.pex"};
@@ -1308,8 +1294,6 @@ void PickResourceDone(StringHash eventType, VariantMap& eventData)
             target.attributes[resourcePickIndex] = Variant(attrs);
             target.ApplyAttributes();
         }
-
-        EditScriptAttributes(target, resourcePickIndex);
     }
 
     PostEditAttribute(resourceTargets, resourcePickIndex, oldValues);
@@ -1512,6 +1496,7 @@ void InitVectorStructs()
         "   UV Coordinates",
         "   Color",
         "   Rotation",
+        "   Direction",
         "   Is Enabled"
     };
     vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));

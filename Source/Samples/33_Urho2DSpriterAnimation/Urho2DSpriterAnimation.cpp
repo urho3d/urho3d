@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,9 @@ void Urho2DSpriterAnimation::Start()
 
     // Setup the viewport for displaying the scene
     SetupViewport();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 
     // Hook up to the frame update events
     SubscribeToEvents();
@@ -158,7 +161,6 @@ void Urho2DSpriterAnimation::SubscribeToEvents()
     // Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DSpriterAnimation, HandleUpdate));
     SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Urho2DSpriterAnimation, HandleMouseButtonDown));
-
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

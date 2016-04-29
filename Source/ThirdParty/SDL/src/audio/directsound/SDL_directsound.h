@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -23,7 +23,7 @@
 #ifndef _SDL_directsound_h
 #define _SDL_directsound_h
 
-#include "directx.h"
+#include "../../core/windows/SDL_directx.h"
 
 #include "../SDL_sysaudio.h"
 

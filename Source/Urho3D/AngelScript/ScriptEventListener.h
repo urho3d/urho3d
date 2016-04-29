@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@ class asIScriptObject;
 
 namespace Urho3D
 {
+
+class Object;
 
 /// Delay-executed function or method call.
 struct DelayedCall
@@ -67,6 +69,10 @@ public:
     virtual void RemoveEventHandlers() = 0;
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) = 0;
+    /// Return whether has subscribed to an event.
+    virtual bool HasEventHandler(StringHash eventType) const = 0;
+    /// Return whether has subscribed to a specific sender's event.
+    virtual bool HasEventHandler(Object* sender, StringHash eventType) const = 0;
 };
 
 }

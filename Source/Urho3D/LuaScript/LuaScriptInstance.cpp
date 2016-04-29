@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,8 @@
 #include "../LuaScript/LuaScript.h"
 #include "../LuaScript/LuaScriptEventInvoker.h"
 #include "../LuaScript/LuaScriptInstance.h"
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 #include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Scene/Scene.h"
@@ -362,6 +361,16 @@ void LuaScriptInstance::RemoveEventHandlersExcept(const Vector<String>& exceptio
     eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
+bool LuaScriptInstance::HasEventHandler(const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(eventName);
+}
+
+bool LuaScriptInstance::HasEventHandler(Object* sender, const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(sender, eventName);
+}
+
 bool LuaScriptInstance::CreateObject(const String& scriptObjectType)
 {
     SetScriptFile(0);
@@ -608,14 +617,14 @@ void LuaScriptInstance::SubscribeToScriptMethodEvents()
     if (scene && scriptObjectMethods_[LSOM_POSTUPDATE])
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LuaScriptInstance, HandlePostUpdate));
 
-#ifdef URHO3D_PHYSICS
-    PhysicsWorld* physicsWorld = scene ? scene->GetComponent<PhysicsWorld>() : 0;
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+    Component* world = GetFixedUpdateSource();
 
-    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPRESTEP, URHO3D_HANDLER(LuaScriptInstance, HandleFixedUpdate));
+    if (world && scriptObjectMethods_[LSOM_FIXEDUPDATE])
+        SubscribeToEvent(world, E_PHYSICSPRESTEP, URHO3D_HANDLER(LuaScriptInstance, HandleFixedUpdate));
 
-    if (physicsWorld && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
-        SubscribeToEvent(physicsWorld, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
+    if (world && scriptObjectMethods_[LSOM_FIXEDPOSTUPDATE])
+        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LuaScriptInstance, HandlePostFixedUpdate));
 #endif
 
     if (node_ && scriptObjectMethods_[LSOM_TRANSFORMCHANGED])
@@ -627,7 +636,7 @@ void LuaScriptInstance::UnsubscribeFromScriptMethodEvents()
     UnsubscribeFromEvent(E_SCENEUPDATE);
     UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
     UnsubscribeFromEvent(E_PHYSICSPRESTEP);
     UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -670,10 +679,18 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
     }
 }
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Execute delayed start before first fixed update if not called yet
+    if (scriptObjectMethods_[LSOM_DELAYEDSTART])
+    {
+        if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
+            scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+    }
+
     using namespace PhysicsPreStep;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 

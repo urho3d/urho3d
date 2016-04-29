@@ -48,13 +48,15 @@ generated/
 # JetBrains IDE project settings
 /.idea/
 
-# Custom rake tasks
-/.rake/
+# Code::Blocks project settings
+/*.cbp
+
+# Codelite project settings
+/*.project
+/*.workspace
 
 # Android project settings
-/Android/project.properties
 /Android/local.properties
-/Android/proguard-project.txt
 
 # Android output directories
 /Android/Urho3D/
@@ -72,12 +74,17 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CTestTestfile.cmake
 /Source/**/*.cmake
+!/Source/ThirdParty/SDL/cmake/*.cmake
 /Docs/**/*.cmake
 
 # Precompiled header files
 *.gch/
 *.pch/
 *.pch.*
+
+# Custom rake tasks
+/.rake/
+.rake_t_cache
 
 # Misc.
 configure*
@@ -87,3 +94,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+.directory

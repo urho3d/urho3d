@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -90,13 +90,10 @@ bool SpriteSheet2D::EndLoad()
     return false;
 }
 
-Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
+void SpriteSheet2D::SetTexture(Texture2D* texture)
 {
-    HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
-    if (i == spriteMapping_.End())
-        return 0;
-
-    return i->second_;
+    loadTextureName_.Clear();
+    texture_ = texture;
 }
 
 void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, const Vector2& hotSpot, const IntVector2& offset)
@@ -116,6 +113,15 @@ void SpriteSheet2D::DefineSprite(const String& name, const IntRect& rectangle, c
     sprite->SetSpriteSheet(this);
 
     spriteMapping_[name] = sprite;
+}
+
+Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
+{
+    HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
+    if (i == spriteMapping_.End())
+        return 0;
+
+    return i->second_;
 }
 
 bool SpriteSheet2D::BeginLoadFromPListFile(Deserializer& source)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,15 +89,19 @@ struct OutScene
     PODVector<unsigned> nodeModelIndices_;
 };
 
+static const unsigned MAX_CHANNELS = 4;
+
 SharedPtr<Context> context_(new Context());
 const aiScene* scene_ = 0;
 aiNode* rootNode_ = 0;
 String inputName_;
 String resourcePath_;
 String outPath_;
+String outName_;
 bool useSubdirs_ = true;
 bool localIDs_ = false;
 bool saveBinary_ = false;
+bool saveJson_ = false;
 bool createZone_ = true;
 bool noAnimations_ = false;
 bool noHierarchy_ = false;
@@ -122,6 +126,9 @@ HashSet<aiAnimation*> allAnimations_;
 PODVector<aiAnimation*> sceneAnimations_;
 
 float defaultTicksPerSecond_ = 4800.0f;
+// For subset animation import usage
+float importStartTime_ = 0.0f;
+float importEndTime_ = 0.0f;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -154,7 +161,7 @@ unsigned GetMeshIndex(aiMesh* mesh);
 unsigned GetBoneIndex(OutModel& model, const String& boneName);
 aiBone* GetMeshBone(OutModel& model, const String& boneName);
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName);
-void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights);
 String GetMeshMaterialName(aiMesh* mesh);
 String GetMaterialTextureName(const String& nameIn);
@@ -164,10 +171,10 @@ unsigned GetNumValidFaces(aiMesh* mesh);
 
 void WriteShortIndices(unsigned short*& dest, aiMesh* mesh, unsigned index, unsigned offset);
 void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned offset);
-void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
     const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights);
-unsigned GetElementMask(aiMesh* mesh);
+PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned);
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive = true);
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive = true);
@@ -205,16 +212,17 @@ void Run(const Vector<String>& arguments)
             "Usage: AssetImporter <command> <input file> <output file> [options]\n"
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
-            "model      Output a model\n"
-            "scene      Output a scene\n"
-            "node       Output a node and its children (prefab)\n"
-            "dump       Dump scene node structure. No output file is generated\n"
-            "lod        Combine several Urho3D models as LOD levels of the output model\n"
-            "           Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
+            "model       Output a model\n"
+            "scene       Output a scene\n"
+            "node        Output a node and its children (prefab)\n"
+            "dump        Dump scene node structure. No output file is generated\n"
+            "lod         Combine several Urho3D models as LOD levels of the output model\n"
+            "            Syntax: lod <dist0> <mdl0> <dist1 <mdl1> ... <output file>\n"
             "\n"
             "Options:\n"
             "-b          Save scene in binary format, default format is XML\n"
-            "-h          Generate hard instead of smooth normals if input file has no normals\n"
+            "-j          Save scene in JSON format, default format is XML\n"
+            "-h          Generate hard instead of smooth normals if input has no normals\n"
             "-i          Use local ID's for scene nodes\n"
             "-l          Output a material list file for models\n"
             "-na         Do not output animations\n"
@@ -243,6 +251,8 @@ void Run(const Vector<String>& arguments)
             "-ctn        Check and do not overwrite if texture has newer timestamp\n"
             "-am         Export all meshes even if identical (scene mode only)\n"
             "-bp         Move bones to bind pose before saving model\n"
+            "-split <start> <end> (animation model only)\n"
+            "            Split animation, will only import from start frame to end frame\n"
         );
     }
 
@@ -281,6 +291,8 @@ void Run(const Vector<String>& arguments)
 
             if (argument == "b")
                 saveBinary_ = true;
+            else if(argument == "j")
+                saveJson_ = true;
             else if (argument == "h")
             {
                 flags &= ~aiProcess_GenSmoothNormals;
@@ -386,6 +398,15 @@ void Run(const Vector<String>& arguments)
                 checkUniqueModel_ = false;
             else if (argument == "bp")
                 moveToBindPose_ = true;
+            else if (argument == "split")
+            {
+                String value2 = i + 2 < arguments.Size() ? arguments[i + 2] : String::EMPTY;
+                if (value.Length() && value2.Length() && (value[0] != '-') && (value2[0] != '-'))
+                {
+                    importStartTime_ = ToFloat(value);
+                    importEndTime_ = ToFloat(value2);
+                }
+            }
         }
     }
 
@@ -397,6 +418,7 @@ void Run(const Vector<String>& arguments)
             outFile = GetInternalPath(arguments[2]);
 
         inputName_ = GetFileName(inFile);
+        outName_ = outFile;
         outPath_ = GetPath(outFile);
 
         if (resourcePath_.Empty())
@@ -581,6 +603,16 @@ void CollectBones(OutModel& model, bool animationOnly)
     HashSet<aiNode*> necessary;
     HashSet<aiNode*> rootNodes;
 
+    bool haveSkinnedMeshes = false;
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        if (model.meshes_[i]->HasBones())
+        {
+            haveSkinnedMeshes = true;
+            break;
+        }
+    }
+
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
@@ -610,23 +642,72 @@ void CollectBones(OutModel& model, bool animationOnly)
             if (rootNodes.Find(rootNode) == rootNodes.End())
                 rootNodes.Insert(rootNode);
         }
+
+        // When model is partially skinned, include the attachment nodes of the rigid meshes in the skeleton
+        if (haveSkinnedMeshes && !mesh->mNumBones)
+        {
+            aiNode* boneNode = meshNode;
+            necessary.Insert(boneNode);
+            rootNode = boneNode;
+
+            for (;;)
+            {
+                boneNode = boneNode->mParent;
+                if (!boneNode || ((boneNode == meshNode || boneNode == meshParentNode) && !animationOnly))
+                    break;
+                rootNode = boneNode;
+                necessary.Insert(boneNode);
+            }
+
+            if (rootNodes.Find(rootNode) == rootNodes.End())
+                rootNodes.Insert(rootNode);
+        }
     }
 
-    // If we find multiple root nodes, try to remedy by using their parent instead
+
+    // If we find multiple root nodes, try to remedy by going back in the parent chain and finding a common parent
     if (rootNodes.Size() > 1)
     {
-        aiNode* commonParent = (*rootNodes.Begin())->mParent;
         for (HashSet<aiNode*>::Iterator i = rootNodes.Begin(); i != rootNodes.End(); ++i)
         {
-            if (*i != commonParent)
+            aiNode* commonParent = (*i);
+
+            while (commonParent)
             {
-                if (!commonParent || (*i)->mParent != commonParent)
-                    ErrorExit("Skeleton with multiple root nodes found, not supported");
+                unsigned found = 0;
+                for (HashSet<aiNode*>::Iterator j = rootNodes.Begin(); j != rootNodes.End(); ++j)
+                {
+                    if (i == j)
+                        continue;
+                    aiNode* parent = *j;
+                    while (parent)
+                    {
+                        if (parent == commonParent)
+                        {
+                            ++found;
+                            break;
+                        }
+                        parent = parent->mParent;
+                    }
+                }
+
+                if (found >= rootNodes.Size() - 1)
+                {
+                    PrintLine("Multiple roots initially found, using new root node " + FromAIString(commonParent->mName));
+                    rootNodes.Clear();
+                    rootNodes.Insert(commonParent);
+                    necessary.Insert(commonParent);
+                    break;
+                }
+
+                commonParent = commonParent->mParent;
             }
+
+            if (rootNodes.Size() == 1)
+                break; // Succeeded
         }
-        rootNodes.Clear();
-        rootNodes.Insert(commonParent);
-        necessary.Insert(commonParent);
+        if (rootNodes.Size() > 1)
+            ErrorExit("Skeleton with multiple root nodes found, not supported");
     }
 
     if (rootNodes.Empty())
@@ -785,10 +866,17 @@ void BuildBoneCollisionInfo(OutModel& model)
 void BuildAndSaveModel(OutModel& model)
 {
     if (!model.rootNode_)
-        ErrorExit("Null root node for model");
+    {
+        PrintLine("Null root node for model, skipping model save");
+        return;
+    }
+
     String rootNodeName = FromAIString(model.rootNode_->mName);
     if (!model.meshes_.Size())
-        ErrorExit("No geometries found starting from node " + rootNodeName);
+    {
+        PrintLine("No geometries found starting from node " + rootNodeName + ", skipping model save");
+        return;
+    }
 
     PrintLine("Writing model " + rootNodeName);
 
@@ -799,17 +887,18 @@ void BuildAndSaveModel(OutModel& model)
     unsigned numValidGeometries = 0;
 
     bool combineBuffers = true;
-    // Check if buffers can be combined (same vertex element mask, under 65535 vertices)
-    unsigned elementMask = GetElementMask(model.meshes_[0]);
+    // Check if buffers can be combined (same vertex elements, under 65535 vertices)
+    PODVector<VertexElement> elements = GetVertexElements(model.meshes_[0], model.bones_.Size() > 0);
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         if (GetNumValidFaces(model.meshes_[i]))
         {
             ++numValidGeometries;
-            if (i > 0 && GetElementMask(model.meshes_[i]) != elementMask)
+            if (i > 0 && GetVertexElements(model.meshes_[i], model.bones_.Size() > 0) != elements)
                 combineBuffers = false;
         }
     }
+
     // Check if keeping separate buffers allows to avoid 32-bit indices
     if (combineBuffers && model.totalVertices_ > 65535)
     {
@@ -833,13 +922,14 @@ void BuildAndSaveModel(OutModel& model)
     unsigned startVertexOffset = 0;
     unsigned startIndexOffset = 0;
     unsigned destGeomIndex = 0;
+    bool isSkinned = model.bones_.Size() > 0;
 
     outModel->SetNumGeometries(numValidGeometries);
 
     for (unsigned i = 0; i < model.meshes_.Size(); ++i)
     {
         aiMesh* mesh = model.meshes_[i];
-        unsigned elementMask = GetElementMask(mesh);
+        PODVector<VertexElement> elements = GetVertexElements(mesh, isSkinned);
         unsigned validFaces = GetNumValidFaces(mesh);
         if (!validFaces)
             continue;
@@ -859,12 +949,12 @@ void BuildAndSaveModel(OutModel& model)
             if (combineBuffers)
             {
                 ib->SetSize(model.totalIndices_, largeIndices);
-                vb->SetSize(model.totalVertices_, elementMask);
+                vb->SetSize(model.totalVertices_, elements);
             }
             else
             {
                 ib->SetSize(validFaces * 3, largeIndices);
-                vb->SetSize(mesh->mNumVertices, elementMask);
+                vb->SetSize(mesh->mNumVertices, elements);
             }
 
             vbVector.Push(vb);
@@ -886,6 +976,9 @@ void BuildAndSaveModel(OutModel& model)
 
         PrintLine("Writing geometry " + String(i) + " with " + String(mesh->mNumVertices) + " vertices " +
             String(validFaces * 3) + " indices");
+
+        if (model.bones_.Size() > 0 && !mesh->HasBones())
+            PrintLine("Warning: model has bones but geometry " + String(i) + " has no skinning information");
 
         unsigned char* vertexData = vb->GetShadowData();
         unsigned char* indexData = ib->GetShadowData();
@@ -910,11 +1003,11 @@ void BuildAndSaveModel(OutModel& model)
         Vector<PODVector<float> > blendWeights;
         PODVector<unsigned> boneMappings;
         if (model.bones_.Size())
-            GetBlendData(model, mesh, boneMappings, blendIndices, blendWeights);
+            GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
         float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
-            WriteVertex(dest, mesh, j, elementMask, box, vertexTransform, normalTransform, blendIndices, blendWeights);
+            WriteVertex(dest, mesh, j, isSkinned, box, vertexTransform, normalTransform, blendIndices, blendWeights);
 
         // Calculate the geometry center
         Vector3 center = Vector3::ZERO;
@@ -1037,12 +1130,16 @@ void BuildAndSaveAnimations(OutModel* model)
         String animName = FromAIString(anim->mName);
         String animOutName;
 
+        // If no animation split specified, set the end time to duration
+        if (importEndTime_ == 0.0f)
+            importEndTime_ = duration;
+
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
         if (model)
             animOutName = GetPath(model->outName_) + GetFileName(model->outName_) + "_" + SanitateAssetName(animName) + ".ani";
         else
-            animOutName = outPath_ + SanitateAssetName(animName) + ".ani";
+            animOutName = outPath_ + GetFileName(outName_) + "_" + SanitateAssetName(animName) + ".ani";
 
         float ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
@@ -1063,7 +1160,9 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
-        duration -= startTime;
+        if (startTime > importStartTime_)
+            importStartTime_ = startTime;
+        duration = importEndTime_ - importStartTime_;
 
         SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
@@ -1179,11 +1278,11 @@ void BuildAndSaveAnimations(OutModel* model)
 
                 // Get time for the keyframe. Adjust with animation's start time
                 if (track->channelMask_ & CHANNEL_POSITION && k < channel->mNumPositionKeys)
-                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mPositionKeys[k].mTime - startTime);
                 else if (track->channelMask_ & CHANNEL_ROTATION && k < channel->mNumRotationKeys)
-                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mRotationKeys[k].mTime - startTime);
                 else if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
-                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime) * tickConversion;
+                    kf.time_ = ((float)channel->mScalingKeys[k].mTime - startTime);
 
                 // Make sure time stays positive
                 kf.time_ = Max(kf.time_, 0.0f);
@@ -1219,8 +1318,11 @@ void BuildAndSaveAnimations(OutModel* model)
                     kf.rotation_ = ToQuaternion(rot);
                 if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-
-                track->keyFrames_.Push(kf);
+                if (kf.time_ >= importStartTime_ && kf.time_ <= importEndTime_)
+                {
+                    kf.time_ = (kf.time_ - importStartTime_) * tickConversion;
+                    track->keyFrames_.Push(kf);
+                }
             }
         }
 
@@ -1525,17 +1627,21 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         ErrorExit("Could not open output file " + scene.outName_);
     if (!asPrefab)
     {
-        if (!saveBinary_)
-            outScene->SaveXML(file);
-        else
+        if (saveBinary_)
             outScene->Save(file);
+        else if (saveJson_)
+            outScene->SaveJSON(file);
+        else
+            outScene->SaveXML(file);
     }
     else
     {
-        if (!saveBinary_)
-            outRootNode->SaveXML(file);
-        else
+        if (saveBinary_)
             outRootNode->Save(file);
+        else if (saveJson_)
+            outRootNode->SaveJSON(file);
+        else
+            outRootNode->SaveXML(file);
     }
 }
 
@@ -1937,10 +2043,24 @@ Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
             }
         }
     }
+
+    // Fallback for rigid skinning for which actual offset matrix information doesn't exist
+    for (unsigned i = 0; i < model.meshes_.Size(); ++i)
+    {
+        aiMesh* mesh = model.meshes_[i];
+        aiNode* node = model.meshNodes_[i];
+        if (!mesh->HasBones() && boneName == node->mName.data)
+        {
+            aiMatrix4x4 nodeDerivedInverse = GetMeshBakingTransform(node, model.rootNode_);
+            nodeDerivedInverse.Inverse();
+            return ToMatrix3x4(nodeDerivedInverse);
+        }
+    }
+
     return Matrix3x4::IDENTITY;
 }
 
-void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
+void GetBlendData(OutModel& model, aiMesh* mesh, aiNode* meshNode, PODVector<unsigned>& boneMappings, Vector<PODVector<unsigned char> >&
     blendIndices, Vector<PODVector<float> >& blendWeights)
 {
     blendIndices.Resize(mesh->mNumVertices);
@@ -1957,37 +2077,75 @@ void GetBlendData(OutModel& model, aiMesh* mesh, PODVector<unsigned>& boneMappin
                 "that each stay at " + String(maxBones_) + " bones or below."
             );
         }
-        boneMappings.Resize(mesh->mNumBones);
-        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        if (mesh->mNumBones > 0)
         {
-            aiBone* bone = mesh->mBones[i];
-            String boneName = FromAIString(bone->mName);
+            boneMappings.Resize(mesh->mNumBones);
+            for (unsigned i = 0; i < mesh->mNumBones; ++i)
+            {
+                aiBone* bone = mesh->mBones[i];
+                String boneName = FromAIString(bone->mName);
+                unsigned globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == M_MAX_UNSIGNED)
+                    ErrorExit("Bone " + boneName + " not found");
+                boneMappings[i] = globalIndex;
+                for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                {
+                    unsigned vertex = bone->mWeights[j].mVertexId;
+                    blendIndices[vertex].Push(i);
+                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+            // If mesh does not have skinning information, implement rigid skinning so that it stays compatible with AnimatedModel
+            String boneName = FromAIString(meshNode->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-                ErrorExit("Bone " + boneName + " not found");
-            boneMappings[i] = globalIndex;
-            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                PrintLine("Warning: bone " + boneName + " not found, skipping rigid skinning");
+            else
             {
-                unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].Push(i);
-                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                boneMappings.Push(globalIndex);
+                for (unsigned i = 0; i < mesh->mNumVertices; ++i)
+                {
+                    blendIndices[i].Push(0);
+                    blendWeights[i].Push(1.0f);
+                }
             }
         }
     }
     else
     {
-        for (unsigned i = 0; i < mesh->mNumBones; ++i)
+        if (mesh->mNumBones > 0)
         {
-            aiBone* bone = mesh->mBones[i];
-            String boneName = FromAIString(bone->mName);
+            for (unsigned i = 0; i < mesh->mNumBones; ++i)
+            {
+                aiBone* bone = mesh->mBones[i];
+                String boneName = FromAIString(bone->mName);
+                unsigned globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == M_MAX_UNSIGNED)
+                    ErrorExit("Bone " + boneName + " not found");
+                for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                {
+                    unsigned vertex = bone->mWeights[j].mVertexId;
+                    blendIndices[vertex].Push(globalIndex);
+                    blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+            String boneName = FromAIString(meshNode->mName);
             unsigned globalIndex = GetBoneIndex(model, boneName);
             if (globalIndex == M_MAX_UNSIGNED)
-                ErrorExit("Bone " + boneName + " not found");
-            for (unsigned j = 0; j < bone->mNumWeights; ++j)
+                PrintLine("Warning: bone " + boneName + " not found, skipping rigid skinning");
+            else
             {
-                unsigned vertex = bone->mWeights[j].mVertexId;
-                blendIndices[vertex].Push(globalIndex);
-                blendWeights[vertex].Push(bone->mWeights[j].mWeight);
+                for (unsigned i = 0; i < mesh->mNumVertices; ++i)
+                {
+                    blendIndices[i].Push(globalIndex);
+                    blendWeights[i].Push(1.0f);
+                }
             }
         }
     }
@@ -2109,7 +2267,7 @@ void WriteLargeIndices(unsigned*& dest, aiMesh* mesh, unsigned index, unsigned o
     }
 }
 
-void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMask, BoundingBox& box,
+void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, BoundingBox& box,
     const Matrix3x4& vertexTransform, const Matrix3& normalTransform, Vector<PODVector<unsigned char> >& blendIndices,
     Vector<PODVector<float> >& blendWeights)
 {
@@ -2118,32 +2276,30 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     *dest++ = vertex.x_;
     *dest++ = vertex.y_;
     *dest++ = vertex.z_;
-    if (elementMask & MASK_NORMAL)
+
+    if (mesh->HasNormals())
     {
         Vector3 normal = normalTransform * ToVector3(mesh->mNormals[index]);
         *dest++ = normal.x_;
         *dest++ = normal.y_;
         *dest++ = normal.z_;
     }
-    if (elementMask & MASK_COLOR)
+
+    for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
     {
-        *((unsigned*)dest) = Color(mesh->mColors[0][index].r, mesh->mColors[0][index].g, mesh->mColors[0][index].b,
-            mesh->mColors[0][index].a).ToUInt();
+        *((unsigned*)dest) = Color(mesh->mColors[i][index].r, mesh->mColors[i][index].g, mesh->mColors[i][index].b,
+            mesh->mColors[i][index].a).ToUInt();
         ++dest;
     }
-    if (elementMask & MASK_TEXCOORD1)
+    
+    for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
     {
-        Vector3 texCoord = ToVector3(mesh->mTextureCoords[0][index]);
+        Vector3 texCoord = ToVector3(mesh->mTextureCoords[i][index]);
         *dest++ = texCoord.x_;
         *dest++ = texCoord.y_;
     }
-    if (elementMask & MASK_TEXCOORD2)
-    {
-        Vector3 texCoord = ToVector3(mesh->mTextureCoords[1][index]);
-        *dest++ = texCoord.x_;
-        *dest++ = texCoord.y_;
-    }
-    if (elementMask & MASK_TANGENT)
+
+    if (mesh->HasTangentsAndBitangents())
     {
         Vector3 tangent = normalTransform * ToVector3(mesh->mTangents[index]);
         Vector3 normal = normalTransform * ToVector3(mesh->mNormals[index]);
@@ -2158,7 +2314,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
         *dest++ = tangent.z_;
         *dest++ = w;
     }
-    if (elementMask & MASK_BLENDWEIGHTS)
+
+    if (isSkinned)
     {
         for (unsigned i = 0; i < 4; ++i)
         {
@@ -2167,9 +2324,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
             else
                 *dest++ = 0.0f;
         }
-    }
-    if (elementMask & MASK_BLENDINDICES)
-    {
+    
         unsigned char* destBytes = (unsigned char*)dest;
         ++dest;
         for (unsigned i = 0; i < 4; ++i)
@@ -2182,22 +2337,33 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, unsigned elementMas
     }
 }
 
-unsigned GetElementMask(aiMesh* mesh)
+PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
 {
-    unsigned elementMask = MASK_POSITION;
+    PODVector<VertexElement> ret;
+
+    // Position must always be first and of type Vector3 for raycasts to work
+    ret.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+
     if (mesh->HasNormals())
-        elementMask |= MASK_NORMAL;
+        ret.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+
+    for (unsigned i = 0; i < mesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
+        ret.Push(VertexElement(TYPE_UBYTE4_NORM, SEM_COLOR, i));
+
+    /// \todo Assimp mesh structure can specify 3D UV-coords. How to determine the difference? For now always treated as 2D.
+    for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
+        ret.Push(VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, i));
+
     if (mesh->HasTangentsAndBitangents())
-        elementMask |= MASK_TANGENT;
-    if (mesh->GetNumColorChannels() > 0)
-        elementMask |= MASK_COLOR;
-    if (mesh->GetNumUVChannels() > 0)
-        elementMask |= MASK_TEXCOORD1;
-    if (mesh->GetNumUVChannels() > 1)
-        elementMask |= MASK_TEXCOORD2;
-    if (mesh->HasBones())
-        elementMask |= (MASK_BLENDWEIGHTS | MASK_BLENDINDICES);
-    return elementMask;
+        ret.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
+
+    if (isSkinned)
+    {
+        ret.Push(VertexElement(TYPE_VECTOR4, SEM_BLENDWEIGHTS));
+        ret.Push(VertexElement(TYPE_UBYTE4, SEM_BLENDINDICES));
+    }
+
+    return ret;
 }
 
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)

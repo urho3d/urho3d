@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ if [ -f "$BUILD"/.fix-scm ]; then FIX_SCM=1; fi
 post_cmake() {
     if [ $ECLIPSE ]; then
         # Check if xmlstarlet software package is available for fixing the generated Eclipse project setting
+        if xmlstarlet --version >/dev/null 2>&1; then HAS_XMLSTARLET=1; fi
         if [ $HAS_XMLSTARLET ]; then
             # Common fixes for all builds
             #
@@ -99,9 +100,11 @@ post_cmake() {
         echo -- post_cmake: Fix generated Xcode project
         # Temporary workaround to fix file references being added into multiple groups warnings (CMake bug http://www.cmake.org/Bug/view.php?id=15272, stil exists in 3.1)
         perl -i -pe 'BEGIN {$/=undef} s/(Begin PBXGroup section.*?\/\* Sources \*\/,).*?,/\1/s' "$BUILD"/*.xcodeproj/project.pbxproj
-        # Set Xcode build settings to skip dSYM file generation for Debug configuration (other configurations still use the default dwarf-with-dsym)
+        # Speed up build for Debug build configuration by building only active arch (currently this is not doable via CMake generator-expression as it only works for individual target instead of global)
+        perl -i -pe 'BEGIN {$/=undef} s/(Debug \*\/ = {[^}]+?)SDKROOT/\1ONLY_ACTIVE_ARCH = YES; SDKROOT/s' "$BUILD"/*.xcodeproj/project.pbxproj
+        # Speed up build for Debug build configuration by skipping dSYM file generation
         if [ $IOS ]; then
-            perl -i -pe 'BEGIN {$/=undef} s/(Begin XCBuildConfiguration.*?Debug.*?Settings = {\n)/\1DEBUG_INFORMATION_FORMAT = dwarf;\n/s' "$BUILD"/*.xcodeproj/project.pbxproj
+            perl -i -pe 'BEGIN {$/=undef} s/(Debug \*\/ = {[^}]+?)SDKROOT/\1DEBUG_INFORMATION_FORMAT = dwarf; SDKROOT/s' "$BUILD"/*.xcodeproj/project.pbxproj
         fi
     fi
 }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -117,6 +117,12 @@ HandleMouseButton(SDL_Window* sdl_window, Uint8 state, MirMotionButton button_st
 }
 
 static void
+HandleMouseMotion(SDL_Window* sdl_window, int x, int y)
+{
+    SDL_SendMouseMotion(sdl_window, 0, 0, x, y);
+}
+
+static void
 HandleTouchPress(int device_id, int source_id, SDL_bool down, float x, float y, float pressure)
 {
     SDL_SendTouch(device_id, source_id, down, x, y, pressure);
@@ -129,15 +135,9 @@ HandleTouchMotion(int device_id, int source_id, float x, float y, float pressure
 }
 
 static void
-HandleMouseMotion(SDL_Window* sdl_window, int x, int y)
-{
-    SDL_SendMouseMotion(sdl_window, 0, 0, x, y);
-}
-
-static void
 HandleMouseScroll(SDL_Window* sdl_window, int hscroll, int vscroll)
 {
-    SDL_SendMouseWheel(sdl_window, 0, hscroll, vscroll);
+    SDL_SendMouseWheel(sdl_window, 0, hscroll, vscroll, SDL_MOUSEWHEEL_NORMAL);
 }
 
 static void
@@ -205,13 +205,11 @@ HandleMouseEvent(MirMotionEvent const motion, int cord_index, SDL_Window* sdl_wi
         case mir_motion_action_outside:
             SDL_SetMouseFocus(NULL);
             break;
-#if 0  /* !!! FIXME: needs a newer set of dev headers than Ubuntu 13.10 is shipping atm. */
         case mir_motion_action_scroll:
             HandleMouseScroll(sdl_window,
                               motion.pointer_coordinates[cord_index].hscroll,
                               motion.pointer_coordinates[cord_index].vscroll);
             break;
-#endif
         case mir_motion_action_cancel:
         case mir_motion_action_hover_enter:
         case mir_motion_action_hover_exit:
@@ -226,16 +224,12 @@ HandleMotionEvent(MirMotionEvent const motion, SDL_Window* sdl_window)
 {
     int cord_index;
     for (cord_index = 0; cord_index < motion.pointer_count; cord_index++) {
-#if 0  /* !!! FIXME: needs a newer set of dev headers than Ubuntu 13.10 is shipping atm. */
-        if (motion.pointer_coordinates[cord_index].tool_type == mir_motion_tool_type_mouse) {
-            HandleMouseEvent(motion, cord_index, sdl_window);
-        }
-        else if (motion.pointer_coordinates[cord_index].tool_type == mir_motion_tool_type_finger) {
+        if (motion.pointer_coordinates[cord_index].tool_type == mir_motion_tool_type_finger) {
             HandleTouchEvent(motion, cord_index, sdl_window);
         }
-#else
-        HandleMouseEvent(motion, cord_index, sdl_window);
-#endif
+        else {
+            HandleMouseEvent(motion, cord_index, sdl_window);
+        }
     }
 }
 

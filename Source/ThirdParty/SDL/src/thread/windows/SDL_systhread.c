@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -106,7 +106,7 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args,
                      pfnSDL_CurrentBeginThread pfnBeginThread,
                      pfnSDL_CurrentEndThread pfnEndThread)
 {
-#elif defined(__CYGWIN__)
+#elif defined(__CYGWIN__) || defined(__WINRT__)
 int
 SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
@@ -230,7 +230,11 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
 void
 SDL_SYS_WaitThread(SDL_Thread * thread)
 {
+#if __WINRT__
+    WaitForSingleObjectEx(thread->handle, INFINITE, FALSE);
+#else
     WaitForSingleObject(thread->handle, INFINITE);
+#endif
     CloseHandle(thread->handle);
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,11 +73,14 @@ static void RegisterSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite2D", "const Vector2& get_hotSpot() const", asMETHOD(Sprite2D, GetHotSpot), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "void set_offset(const IntVector2&in)", asMETHOD(Sprite2D, SetOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite2D", "const IntVector2& get_offset() const", asMETHOD(Sprite2D, GetOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "void set_textureEdgeOffset(float)", asMETHOD(Sprite2D, SetTextureEdgeOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sprite2D", "float get_textureEdgeOffset() const", asMETHOD(Sprite2D, GetTextureEdgeOffset), asCALL_THISCALL);
 }
 
 static void RegisterSpriteSheet2D(asIScriptEngine* engine)
 {
     RegisterResource<SpriteSheet2D>(engine, "SpriteSheet2D");
+    engine->RegisterObjectMethod("SpriteSheet2D", "void set_texture(Texture2D@+)", asMETHOD(SpriteSheet2D, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "Texture2D@+ get_texture() const", asMETHOD(SpriteSheet2D, GetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "Sprite2D@+ GetSprite(const String&)", asMETHOD(SpriteSheet2D, GetSprite), asCALL_THISCALL);
     engine->RegisterObjectMethod("SpriteSheet2D", "void DefineSprite(const String&, const IntRect&, const Vector2& hotSpot=Vector2(0.5f, 0.5f), const IntVector2& offset = IntVector2::ZERO)", asMETHOD(SpriteSheet2D, DefineSprite), asCALL_THISCALL);

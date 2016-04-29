@@ -2,7 +2,8 @@
 // This sample demonstrates:
 //     - Creating GUI elements from AngelScript
 //     - Loading GUI Style from xml
-//     - Subscribing to GUI drag events and handling them.
+//     - Subscribing to GUI drag events and handling them
+//     - Working with GUI elements with specific tags.
 
 #include "Scripts/Utilities/Sample.as"
 StringHash VAR_BUTTONS("BUTTONS");
@@ -18,10 +19,13 @@ void Start()
     String platform = GetPlatform();
     if (platform != "Android" and platform != "iOS")
         input.mouseVisible = true;
-    
+
     // Create the UI content
     CreateGUI();
     CreateInstructions();
+
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE);
 
     // Hook up to the frame update events
     SubscribeToEvents();
@@ -41,6 +45,9 @@ void CreateGUI()
         b.style = "Button";
         b.size = IntVector2(300, 100);
         b.position = IntVector2(50*i, 50*i);
+
+        if (i % 2 == 0)
+            b.AddTag("SomeTag");
 
         SubscribeToEvent(b, "DragMove", "HandleDragMove");
         SubscribeToEvent(b, "DragBegin", "HandleDragBegin");
@@ -88,7 +95,9 @@ void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
-    instructionText.text = "Drag on the buttons to move them around.\nTouch input allows also multi-drag.";
+    instructionText.text = "Drag on the buttons to move them around.\n" +
+                           "Touch input allows also multi-drag.\n" +
+                           "Press SPACE to show/hide tagged UI elements.";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     instructionText.textAlignment = HA_CENTER;
 
@@ -158,7 +167,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         Text@ t = root.GetChild("Touch " + String(i));
         TouchState@ ts = input.touches[i];
         t.text = "Touch "+ String(ts.touchID);
-        
+
         IntVector2 pos = ts.position;
         pos.y -= 30;
 
@@ -170,6 +179,13 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text@ t = root.GetChild("Touch " + String(i));
         t.visible = false;
+    }
+
+    if (input.keyPress[KEY_SPACE])
+    {
+        Array<UIElement@>@ elements = root.GetChildrenWithTag("SomeTag");
+        for (uint i = 0; i < elements.length; ++i)
+            elements[i].visible = !elements[i].visible;
     }
 }
 

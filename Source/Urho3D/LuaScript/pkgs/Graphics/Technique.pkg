@@ -9,17 +9,53 @@ enum PassLightingMode
 
 class Pass : public RefCounted
 {
+    void SetBlendMode(BlendMode mode);
+    void SetDepthTestMode(CompareMode mode);
+    void SetLightingMode(PassLightingMode mode);
+    void SetDepthWrite(bool enable);
+    void SetAlphaMask(bool enable);
+    void SetIsDesktop(bool enable);
+    void SetVertexShader(const String name);
+    void SetPixelShader(const String name);
+    void SetVertexShaderDefines(const String defines);
+    void SetPixelShaderDefines(const String defines);
+    void ReleaseShaders();
+
+    const String GetName() const;
+    unsigned GetIndex() const;
+    BlendMode GetBlendMode() const;
+    CompareMode GetDepthTestMode() const;
+    PassLightingMode GetLightingMode() const;
+    bool GetDepthWrite() const;
+    bool GetAlphaMask() const;
     bool IsDesktop() const;
     const String GetVertexShader() const;
     const String GetPixelShader() const;
+    const String GetVertexShaderDefines() const;
+    const String GetPixelShaderDefines() const;
 
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set unsigned index;
+    tolua_property__get_set BlendMode blendMode;
+    tolua_property__get_set CompareMode depthTestMode;
+    tolua_property__get_set PassLightingMode lightingMode;
+    tolua_property__get_set bool depthWrite;
+    tolua_property__get_set bool alphaMask;
     tolua_readonly tolua_property__is_set bool desktop;
-    tolua_readonly tolua_property__get_set const String vertexShader;
-    tolua_readonly tolua_property__get_set const String pixelShader;
+    tolua_property__get_set String vertexShader;
+    tolua_property__get_set String pixelShader;
+    tolua_property__get_set String vertexShaderDefines;
+    tolua_property__get_set String pixelShaderDefines;
 };
 
 class Technique : public Resource
 {
+    void SetIsDesktop(bool enable);
+    Pass* CreatePass(const String passName);
+    void RemovePass(const String passName);
+    void ReleaseShaders();
+    tolua_outside Technique* TechniqueClone @ Clone(const String cloneName = String::EMPTY) const;
+
     bool HasPass(const String type) const;
     Pass* GetPass(const String type) const;
     Pass* GetSupportedPass(const String type) const;
@@ -45,5 +81,17 @@ static const PODVector<Pass*>& TechniqueGetPasses(const Technique* technique)
 {
     static PODVector<Pass*> vector = technique->GetPasses();
     return vector;
+}
+
+static Technique* TechniqueClone(const Technique* technique, const String& cloneName = String::EMPTY)
+{
+    if (!technique)
+        return 0;
+        
+    SharedPtr<Technique> clonedTechniquePtr = technique->Clone(cloneName);
+    Technique* clonedTechnique = clonedTechniquePtr.Get();
+    clonedTechniquePtr.Detach();
+    
+    return clonedTechnique;
 }
 $}

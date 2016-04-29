@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR("AmbientStartColor");
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR("AmbientEndColor");
 extern URHO3D_API const StringHash VSP_BILLBOARDROT("BillboardRot");
 extern URHO3D_API const StringHash VSP_CAMERAPOS("CameraPos");
-extern URHO3D_API const StringHash VSP_CAMERAROT("CameraRot");
 extern URHO3D_API const StringHash VSP_CLIPPLANE("ClipPlane");
 extern URHO3D_API const StringHash VSP_NEARCLIP("NearClip");
 extern URHO3D_API const StringHash VSP_FARCLIP("FarClip");
@@ -49,6 +48,8 @@ extern URHO3D_API const StringHash VSP_GBUFFEROFFSETS("GBufferOffsets");
 extern URHO3D_API const StringHash VSP_LIGHTDIR("LightDir");
 extern URHO3D_API const StringHash VSP_LIGHTPOS("LightPos");
 extern URHO3D_API const StringHash VSP_MODEL("Model");
+extern URHO3D_API const StringHash VSP_VIEW("View");
+extern URHO3D_API const StringHash VSP_VIEWINV("ViewInv");
 extern URHO3D_API const StringHash VSP_VIEWPROJ("ViewProj");
 extern URHO3D_API const StringHash VSP_UOFFSET("UOffset");
 extern URHO3D_API const StringHash VSP_VOFFSET("VOffset");
@@ -79,7 +80,40 @@ extern URHO3D_API const StringHash PSP_SHADOWINTENSITY("ShadowIntensity");
 extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE("ShadowMapInvSize");
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS("ShadowSplits");
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES("LightMatricesPS");
+extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS("VSMShadowParams");
+extern URHO3D_API const StringHash PSP_ROUGHNESS("RoughnessPS");
+extern URHO3D_API const StringHash PSP_METALLIC("MetallicPS");
 
 extern URHO3D_API const Vector3 DOT_SCALE(1 / 3.0f, 1 / 3.0f, 1 / 3.0f);
+
+extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[] =
+{
+    VertexElement(TYPE_VECTOR3, SEM_POSITION, 0, false),     // Position
+    VertexElement(TYPE_VECTOR3, SEM_NORMAL, 0, false),       // Normal
+    VertexElement(TYPE_UBYTE4_NORM, SEM_COLOR, 0, false),    // Color
+    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 0, false),     // Texcoord1
+    VertexElement(TYPE_VECTOR2, SEM_TEXCOORD, 1, false),     // Texcoord2
+    VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 0, false),     // Cubetexcoord1
+    VertexElement(TYPE_VECTOR3, SEM_TEXCOORD, 1, false),     // Cubetexcoord2
+    VertexElement(TYPE_VECTOR4, SEM_TANGENT, 0, false),      // Tangent
+    VertexElement(TYPE_VECTOR4, SEM_BLENDWEIGHTS, 0, false), // Blendweights
+    VertexElement(TYPE_UBYTE4, SEM_BLENDINDICES, 0, false),  // Blendindices
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 4, true),      // Instancematrix1
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 5, true),      // Instancematrix2
+    VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 6, true),      // Instancematrix3
+    VertexElement(TYPE_INT, SEM_OBJECTINDEX, 0, false)      // Objectindex
+};
+
+extern URHO3D_API const unsigned ELEMENT_TYPESIZES[] =
+{
+    sizeof(int),
+    sizeof(float),
+    2 * sizeof(float),
+    3 * sizeof(float),
+    4 * sizeof(float),
+    sizeof(unsigned),
+    sizeof(unsigned)
+};
+
 
 }

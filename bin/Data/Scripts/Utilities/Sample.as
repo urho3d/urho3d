@@ -18,6 +18,7 @@ Node@ cameraNode; // Camera scene node
 float yaw = 0.0f; // Camera yaw angle
 float pitch = 0.0f; // Camera pitch angle
 const float TOUCH_SENSITIVITY = 2;
+MouseMode useMouseMode_ = MM_ABSOLUTE;
 
 void SampleStart()
 {
@@ -40,6 +41,9 @@ void SampleStart()
     // Subscribe key down event
     SubscribeToEvent("KeyDown", "HandleKeyDown");
 
+    // Subscribe key up event
+    SubscribeToEvent("KeyUp", "HandleKeyUp");
+
     // Subscribe scene update event
     SubscribeToEvent("SceneUpdate", "HandleSceneUpdate");
 }
@@ -58,6 +62,30 @@ void InitTouchInput()
     }
     screenJoystickIndex = input.AddScreenJoystick(layout, cache.GetResource("XMLFile", "UI/DefaultStyle.xml"));
     input.screenJoystickVisible[0] = true;
+}
+
+void SampleInitMouseMode(MouseMode mode)
+{
+  useMouseMode_ = mode;
+
+    if (GetPlatform() != "Web")
+    {
+      if (useMouseMode_ == MM_FREE)
+          input.mouseVisible = true;
+
+      if (useMouseMode_ != MM_ABSOLUTE)
+      {
+          input.mouseMode = useMouseMode_;
+          if (console.visible)
+              input.SetMouseMode(MM_ABSOLUTE, true);
+      }
+    }
+    else
+    {
+        input.mouseVisible = true;
+        SubscribeToEvent("MouseButtonDown", "HandleMouseModeRequest");
+        SubscribeToEvent("MouseModeChanged", "HandleMouseModeChange");
+    }
 }
 
 void SetLogoVisible(bool enable)
@@ -125,21 +153,35 @@ void CreateConsoleAndDebugHud()
     debugHud.defaultStyle = xmlFile;
 }
 
-void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void HandleKeyUp(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 
     // Close console (if open) or exit when ESC is pressed
     if (key == KEY_ESC)
     {
-        if (!console.visible)
-            engine.Exit();
-        else
+        if (console.visible)
             console.visible = false;
+        else
+        {
+            if (GetPlatform() == "Web")
+            {
+                input.mouseVisible = true;
+                if (useMouseMode_ != MM_ABSOLUTE)
+                    input.mouseMode = MM_FREE;
+            }
+            else
+                engine.Exit();
+        }
     }
+}
+
+void HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    int key = eventData["Key"].GetInt();
 
     // Toggle console with F1
-    else if (key == KEY_F1)
+    if (key == KEY_F1)
         console.Toggle();
 
     // Toggle debug HUD with F2
@@ -216,10 +258,10 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         // Shadow depth and filtering quality
         else if (key == '6')
         {
-            int quality = renderer.shadowQuality;
-            ++quality;
-            if (quality > SHADOWQUALITY_HIGH_24BIT)
-                quality = SHADOWQUALITY_LOW_16BIT;
+            ShadowQuality quality = renderer.shadowQuality;
+            quality = ShadowQuality(quality + 1);
+            if (quality > SHADOWQUALITY_BLUR_VSM)
+                quality = SHADOWQUALITY_SIMPLE_16BIT;
             renderer.shadowQuality = quality;
         }
 
@@ -286,4 +328,24 @@ void HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     // On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput();
     UnsubscribeFromEvent("TouchBegin");
+}
+
+// If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+void HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
+{
+    if (console !is null && console.visible)
+        return;
+
+    if (useMouseMode_ == MM_ABSOLUTE)
+        input.mouseVisible = false;
+    else if (useMouseMode_ == MM_FREE)
+        input.mouseVisible = true;
+
+    input.mouseMode = useMouseMode_;
+}
+
+void HandleMouseModeChange(StringHash eventType, VariantMap& eventData)
+{
+    bool mouseLocked = eventData["MouseLocked"].GetBool();
+    input.SetMouseVisible(!mouseLocked);
 }

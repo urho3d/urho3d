@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,8 @@ public:
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
     bool SetMode
-        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+        (int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool highDPI, bool tripleBuffer,
+            int multiSample);
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
@@ -122,19 +123,22 @@ public:
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
+    /// Draw indexed geometry with vertex index offset.
+    void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed geometry.
     void Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount);
     /// Draw indexed, instanced geometry. An instancing vertex buffer must be set.
     void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
         unsigned instanceCount);
+    /// Draw indexed, instanced geometry with vertex index offset.
+    void DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
+        unsigned vertexCount, unsigned instanceCount);
     /// Set vertex buffer.
     void SetVertexBuffer(VertexBuffer* buffer);
     /// Set multiple vertex buffers.
-    bool SetVertexBuffers
-        (const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset = 0);
     /// Set multiple vertex buffers.
-    bool SetVertexBuffers
-        (const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks, unsigned instanceOffset = 0);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset = 0);
     /// Set index buffer.
     void SetIndexBuffer(IndexBuffer* buffer);
     /// Set shaders.
@@ -245,10 +249,10 @@ public:
     /// Return window position.
     IntVector2 GetWindowPosition() const;
 
-    /// Return window width.
+    /// Return window width in pixels.
     int GetWidth() const { return width_; }
 
-    /// Return window height.
+    /// Return window height in pixels.
     int GetHeight() const { return height_; }
 
     /// Return multisample mode (1 = no multisampling.)
@@ -257,11 +261,14 @@ public:
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
 
+    /// Return whether window is borderless.
+    bool GetBorderless() const { return borderless_; }
+
     /// Return whether window is resizable.
     bool GetResizable() const { return resizable_; }
 
-    /// Return whether window is borderless.
-    bool GetBorderless() const { return borderless_; }
+    /// Return whether window is high DPI.
+    bool GetHighDPI() const { return highDPI_; }
 
     /// Return whether vertical sync is on.
     bool GetVSync() const { return vsync_; }
@@ -317,7 +324,7 @@ public:
     /// Return whether sRGB conversion on rendertarget writing is supported.
     bool GetSRGBWriteSupport() const { return sRGBWriteSupport_; }
 
-    /// Return supported fullscreen resolutions. Will be empty if listing the resolutions is not supported on the platform (e.g. HTML5.)
+    /// Return supported fullscreen resolutions. Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
     PODVector<IntVector2> GetResolutions() const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
@@ -523,9 +530,9 @@ private:
     Image* windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
-    /// Window width.
+    /// Window width in pixels.
     int width_;
-    /// Window height.
+    /// Window height in pixels.
     int height_;
     /// Window position.
     IntVector2 position_;
@@ -537,6 +544,8 @@ private:
     bool borderless_;
     /// Resizable flag.
     bool resizable_;
+    /// High DPI flag.
+    bool highDPI_;
     /// Vertical sync flag.
     bool vsync_;
     /// Triple buffering flag.

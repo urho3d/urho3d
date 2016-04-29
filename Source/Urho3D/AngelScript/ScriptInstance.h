@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,6 +93,10 @@ public:
     virtual void RemoveEventHandlers();
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+    /// Return whether has subscribed to an event.
+    virtual bool HasEventHandler(StringHash eventType) const;
+    /// Return whether has subscribed to a specific sender's event.
+    virtual bool HasEventHandler(Object* sender, StringHash eventType) const;
 
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
@@ -156,6 +160,10 @@ private:
     void GetScriptMethods();
     /// Check for script attributes.
     void GetScriptAttributes();
+    /// Store values of script attributes for hot reload.
+    void StoreScriptAttributes();
+    /// Restore values of script attributes after hot reload is complete.
+    void RestoreScriptAttributes();
     /// Clear supported script methods.
     void ClearScriptMethods();
     /// Clear attributes to C++ side attributes only.
@@ -166,7 +174,7 @@ private:
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle scene post-update event.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
     /// Handle physics pre-step event.
     void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData);
     /// Handle physics post-step event.
@@ -193,6 +201,8 @@ private:
     Vector<AttributeInfo> attributeInfos_;
     /// Storage for unapplied node and component ID attributes
     HashMap<AttributeInfo*, unsigned> idAttributes_;
+    /// Storage for attributes while script object is being hot-reloaded.
+    HashMap<String, Variant> storedAttributes_;
     /// Subscribed to scene update events flag.
     bool subscribed_;
     /// Subscribed to scene post and fixed update events flag.

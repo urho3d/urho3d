@@ -38,6 +38,9 @@ function Start()
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Hook up to necessary events
     SubscribeToEvents()
 end
@@ -222,8 +225,14 @@ function CreateControllableObject()
 end
 
 function MoveCamera()
+    input.mouseVisible = input.mouseMode ~= MM_RELATIVE
+    mouseDown = input:GetMouseButtonDown(MOUSEB_RIGHT)
+
+    -- Override the MM_RELATIVE mouse grabbed settings, to allow interaction with UI
+    input.mouseGrabbed = mouseDown
+
     -- Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = not input:GetMouseButtonDown(MOUSEB_RIGHT)
+    ui.cursor.visible = not mouseDown
 
     -- Mouse sensitivity as degrees per pixel
     local MOUSE_SENSITIVITY = 0.1

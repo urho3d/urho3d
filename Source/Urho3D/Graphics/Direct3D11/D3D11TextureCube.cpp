@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -249,38 +249,24 @@ bool TextureCube::EndLoad()
 
 void TextureCube::Release()
 {
-    if (object_)
+    if (graphics_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-
-        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-        {
-            if (renderSurfaces_[i])
-                renderSurfaces_[i]->Release();
-        }
-
-        ((ID3D11Resource*)object_)->Release();
-        object_ = 0;
-
-        if (shaderResourceView_)
-        {
-            ((ID3D11ShaderResourceView*)shaderResourceView_)->Release();
-            shaderResourceView_ = 0;
-        }
-
-        if (sampler_)
-        {
-            ((ID3D11SamplerState*)sampler_)->Release();
-            sampler_ = 0;
-        }
     }
+
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        if (renderSurfaces_[i])
+            renderSurfaces_[i]->Release();
+    }
+
+    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(shaderResourceView_);
+    URHO3D_SAFE_RELEASE(sampler_);
 }
 
 bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
@@ -313,6 +299,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
+    else if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     if (usage_ == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(TextureCube, HandleRenderSurfaceUpdate));
@@ -383,18 +371,18 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
-        if (mappedData.pData)
+        if (FAILED(hr) || !mappedData.pData)
+        {
+            URHO3D_LOGD3DERROR("Failed to map texture for update", hr);
+            return false;
+        }
+        else
         {
             for (int row = 0; row < height; ++row)
                 memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
             graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
-        }
-        else
-        {
-            URHO3D_LOGERROR("Failed to map texture for update");
-            return false;
         }
     }
     else
@@ -423,7 +411,7 @@ bool TextureCube::SetData(CubeMapFace face, Deserializer& source)
     return SetData(face, image);
 }
 
-bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlpha)
+bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -431,8 +419,9 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -444,7 +433,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         unsigned components = image->GetComponents();
         if ((components == 1 && !useAlpha) || components == 2 || components == 3)
         {
-            image = image->ConvertToRGBA();
+            mipImage = image->ConvertToRGBA(); image = mipImage;
             if (!image)
                 return false;
             components = image->GetComponents();
@@ -464,7 +453,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -512,7 +501,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
@@ -550,7 +539,7 @@ bool TextureCube::SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlph
         // Create the texture when face 0 is being loaded, assume rest of the faces are same size & format
         if (!face)
         {
-            SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+            SetNumLevels(Max((levels - mipsToSkip), 1U));
             SetSize(width, format);
         }
         else
@@ -631,10 +620,11 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
     ID3D11Texture2D* stagingTexture = 0;
-    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
-    if (!stagingTexture)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create staging texture for GetData");
+        URHO3D_SAFE_RELEASE(stagingTexture);
+        URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
         return false;
     }
 
@@ -654,20 +644,20 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     unsigned rowSize = GetRowDataSize(levelWidth);
     unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
 
-    graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
-    if (mappedData.pData)
+    hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (FAILED(hr) || !mappedData.pData)
+    {
+        URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
+        stagingTexture->Release();
+        return false;
+    }
+    else
     {
         for (unsigned row = 0; row < numRows; ++row)
             memcpy((unsigned char*)dest + row * rowSize, (unsigned char*)mappedData.pData + row * mappedData.RowPitch, rowSize);
         graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
         stagingTexture->Release();
         return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Failed to map staging texture for GetData");
-        stagingTexture->Release();
-        return false;
     }
 }
 
@@ -698,10 +688,11 @@ bool TextureCube::Create()
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
     textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
-    if (!object_)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create texture");
+        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
 
@@ -711,11 +702,12 @@ bool TextureCube::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
     resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
-    graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
-    if (!shaderResourceView_)
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create shader resource view for texture");
+        URHO3D_SAFE_RELEASE(shaderResourceView_);
+        URHO3D_LOGD3DERROR("Failed to create shader resource view for texture", hr);
         return false;
     }
 
@@ -723,8 +715,6 @@ bool TextureCube::Create()
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            renderSurfaces_[i] = new RenderSurface(this);
-
             D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
             memset(&renderTargetViewDesc, 0, sizeof renderTargetViewDesc);
             renderTargetViewDesc.Format = textureDesc.Format;
@@ -733,12 +723,13 @@ bool TextureCube::Create()
             renderTargetViewDesc.Texture2DArray.FirstArraySlice = i;
             renderTargetViewDesc.Texture2DArray.MipSlice = 0;
 
-            graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+            hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
                 (ID3D11RenderTargetView**)&renderSurfaces_[i]->renderTargetView_);
 
-            if (!renderSurfaces_[i]->renderTargetView_)
+            if (FAILED(hr))
             {
-                URHO3D_LOGERROR("Failed to create rendertarget view for texture");
+                URHO3D_SAFE_RELEASE(renderSurfaces_[i]->renderTargetView_);
+                URHO3D_LOGD3DERROR("Failed to create rendertarget view for texture", hr);
                 return false;
             }
         }
@@ -749,10 +740,16 @@ bool TextureCube::Create()
 
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
+    Renderer* renderer = GetSubsystem<Renderer>();
+
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {
-        if (renderSurfaces_[i] && renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-            renderSurfaces_[i]->QueueUpdate();
+        if (renderSurfaces_[i] && (renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurfaces_[i]->IsUpdateQueued()))
+        {
+            if (renderer)
+                renderer->QueueRenderSurface(renderSurfaces_[i]);
+            renderSurfaces_[i]->ResetUpdateQueued();
+        }
     }
 }
 

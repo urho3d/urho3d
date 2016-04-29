@@ -1,13 +1,12 @@
 /*
 ** OS library.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
 */
 
 #include <errno.h>
-#include <locale.h>
 #include <time.h>
 
 #define lib_os_c
@@ -18,7 +17,10 @@
 #include "lualib.h"
 
 #include "lj_obj.h"
+#include "lj_gc.h"
 #include "lj_err.h"
+#include "lj_buf.h"
+#include "lj_str.h"
 #include "lj_lib.h"
 
 #if LJ_TARGET_POSIX
@@ -27,13 +29,17 @@
 #include <stdio.h>
 #endif
 
+#if !LJ_TARGET_PSVITA
+#include <locale.h>
+#endif
+
 /* ------------------------------------------------------------------------ */
 
 #define LJLIB_MODULE_os
 
 LJLIB_CF(os_execute)
 {
-#if LJ_TARGET_CONSOLE
+#if LJ_NO_SYSTEM
 #if LJ_52
   errno = ENOSYS;
   return luaL_fileresult(L, 0, NULL);
@@ -70,7 +76,7 @@ LJLIB_CF(os_rename)
 
 LJLIB_CF(os_tmpname)
 {
-#if LJ_TARGET_PS3 || LJ_TARGET_PS4
+#if LJ_TARGET_PS3 || LJ_TARGET_PS4 || LJ_TARGET_PSVITA
   lj_err_caller(L, LJ_ERR_OSUNIQF);
   return 0;
 #else
@@ -185,7 +191,7 @@ LJLIB_CF(os_date)
 #endif
   }
   if (stm == NULL) {  /* Invalid date? */
-    setnilV(L->top-1);
+    setnilV(L->top++);
   } else if (strcmp(s, "*t") == 0) {
     lua_createtable(L, 0, 9);  /* 9 = number of fields */
     setfield(L, "sec", stm->tm_sec);
@@ -197,23 +203,25 @@ LJLIB_CF(os_date)
     setfield(L, "wday", stm->tm_wday+1);
     setfield(L, "yday", stm->tm_yday+1);
     setboolfield(L, "isdst", stm->tm_isdst);
-  } else {
-    char cc[3];
-    luaL_Buffer b;
-    cc[0] = '%'; cc[2] = '\0';
-    luaL_buffinit(L, &b);
-    for (; *s; s++) {
-      if (*s != '%' || *(s + 1) == '\0') {  /* No conversion specifier? */
-	luaL_addchar(&b, *s);
-      } else {
-	size_t reslen;
-	char buff[200];  /* Should be big enough for any conversion result. */
-	cc[1] = *(++s);
-	reslen = strftime(buff, sizeof(buff), cc, stm);
-	luaL_addlstring(&b, buff, reslen);
+  } else if (*s) {
+    SBuf *sb = &G(L)->tmpbuf;
+    MSize sz = 0;
+    const char *q;
+    for (q = s; *q; q++)
+      sz += (*q == '%') ? 30 : 1;  /* Overflow doesn't matter. */
+    setsbufL(sb, L);
+    for (;;) {
+      char *buf = lj_buf_need(sb, sz);
+      size_t len = strftime(buf, sbufsz(sb), s, stm);
+      if (len) {
+	setstrV(L, L->top++, lj_str_new(L, buf, len));
+	lj_gc_check(L);
+	break;
       }
+      sz += (sz|1);
     }
-    luaL_pushresult(&b);
+  } else {
+    setstrV(L, L->top++, &G(L)->strempty);
   }
   return 1;
 }
@@ -254,6 +262,9 @@ LJLIB_CF(os_difftime)
 
 LJLIB_CF(os_setlocale)
 {
+#if LJ_TARGET_PSVITA
+  lua_pushliteral(L, "C");
+#else
   GCstr *s = lj_lib_optstr(L, 1);
   const char *str = s ? strdata(s) : NULL;
   int opt = lj_lib_checkopt(L, 2, 6,
@@ -265,6 +276,7 @@ LJLIB_CF(os_setlocale)
   else if (opt == 4) opt = LC_MONETARY;
   else if (opt == 6) opt = LC_ALL;
   lua_pushstring(L, setlocale(opt, str));
+#endif
   return 1;
 }
 

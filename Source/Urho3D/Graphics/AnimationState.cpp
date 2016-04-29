@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,8 @@ AnimationState::AnimationState(AnimatedModel* model, Animation* animation) :
     looped_(false),
     weight_(0.0f),
     time_(0.0f),
-    layer_(0)
+    layer_(0),
+    blendingMode_(ABM_LERP)
 {
     // Set default start bone (use all tracks.)
     SetStartBone(0);
@@ -65,7 +66,8 @@ AnimationState::AnimationState(Node* node, Animation* animation) :
     looped_(false),
     weight_(1.0f),
     time_(0.0f),
-    layer_(0)
+    layer_(0),
+    blendingMode_(ABM_LERP)
 {
     if (animation_)
     {
@@ -173,6 +175,18 @@ void AnimationState::SetWeight(float weight)
         if (weight != weight_)
         {
             weight_ = weight;
+            model_->MarkAnimationDirty();
+        }
+    }
+}
+
+void AnimationState::SetBlendMode(AnimationBlendMode mode)
+{
+    if (model_)
+    {
+        if (blendingMode_ != mode)
+        {
+            blendingMode_ = mode;
             model_->MarkAnimationDirty();
         }
     }
@@ -452,11 +466,8 @@ void AnimationState::ApplyToModel()
         // Do not apply if zero effective weight or the bone has animation disabled
         if (Equals(finalWeight, 0.0f) || !stateTrack.bone_->animated_)
             continue;
-
-        if (Equals(finalWeight, 1.0f))
-            ApplyTrackFullWeightSilent(stateTrack);
-        else
-            ApplyTrackBlendedSilent(stateTrack, finalWeight);
+            
+        ApplyTrack(stateTrack, finalWeight, true);
     }
 }
 
@@ -464,10 +475,10 @@ void AnimationState::ApplyToNodes()
 {
     // When applying to a node hierarchy, can only use full weight (nothing to blend to)
     for (Vector<AnimationStateTrack>::Iterator i = stateTracks_.Begin(); i != stateTracks_.End(); ++i)
-        ApplyTrackFullWeight(*i);
+        ApplyTrack(*i, 1.0f, false);
 }
 
-void AnimationState::ApplyTrackFullWeight(AnimationStateTrack& stateTrack)
+void AnimationState::ApplyTrack(AnimationStateTrack& stateTrack, float weight, bool silent)
 {
     const AnimationTrack* track = stateTrack.track_;
     Node* node = stateTrack.node_;
@@ -495,17 +506,11 @@ void AnimationState::ApplyTrackFullWeight(AnimationStateTrack& stateTrack)
     const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
     unsigned char channelMask = track->channelMask_;
 
-    if (!interpolate)
-    {
-        // No interpolation, full weight
-        if (channelMask & CHANNEL_POSITION)
-            node->SetPosition(keyFrame->position_);
-        if (channelMask & CHANNEL_ROTATION)
-            node->SetRotation(keyFrame->rotation_);
-        if (channelMask & CHANNEL_SCALE)
-            node->SetScale(keyFrame->scale_);
-    }
-    else
+    Vector3 newPosition;
+    Quaternion newRotation;
+    Vector3 newScale;
+
+    if (interpolate)
     {
         const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
         float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
@@ -513,134 +518,73 @@ void AnimationState::ApplyTrackFullWeight(AnimationStateTrack& stateTrack)
             timeInterval += animation_->GetLength();
         float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
 
-        // Interpolation, full weight
         if (channelMask & CHANNEL_POSITION)
-            node->SetPosition(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
+            newPosition = keyFrame->position_.Lerp(nextKeyFrame->position_, t);
         if (channelMask & CHANNEL_ROTATION)
-            node->SetRotation(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
+            newRotation = keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t);
         if (channelMask & CHANNEL_SCALE)
-            node->SetScale(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
-    }
-}
-
-void AnimationState::ApplyTrackFullWeightSilent(AnimationStateTrack& stateTrack)
-{
-    const AnimationTrack* track = stateTrack.track_;
-    Node* node = stateTrack.node_;
-
-    if (track->keyFrames_.Empty() || !node)
-        return;
-
-    unsigned& frame = stateTrack.keyFrame_;
-    track->GetKeyFrameIndex(time_, frame);
-
-    // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-    unsigned nextFrame = frame + 1;
-    bool interpolate = true;
-    if (nextFrame >= track->keyFrames_.Size())
-    {
-        if (!looped_)
-        {
-            nextFrame = frame;
-            interpolate = false;
-        }
-        else
-            nextFrame = 0;
-    }
-
-    const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-    unsigned char channelMask = track->channelMask_;
-
-    if (!interpolate)
-    {
-        // No interpolation, full weight
-        if (channelMask & CHANNEL_POSITION)
-            node->SetPositionSilent(keyFrame->position_);
-        if (channelMask & CHANNEL_ROTATION)
-            node->SetRotationSilent(keyFrame->rotation_);
-        if (channelMask & CHANNEL_SCALE)
-            node->SetScaleSilent(keyFrame->scale_);
+            newScale = keyFrame->scale_.Lerp(nextKeyFrame->scale_, t);
     }
     else
     {
-        const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
-        float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
-        if (timeInterval < 0.0f)
-            timeInterval += animation_->GetLength();
-        float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
-
-        // Interpolation, full weight
         if (channelMask & CHANNEL_POSITION)
-            node->SetPositionSilent(keyFrame->position_.Lerp(nextKeyFrame->position_, t));
+            newPosition = keyFrame->position_;
         if (channelMask & CHANNEL_ROTATION)
-            node->SetRotationSilent(keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t));
+            newRotation = keyFrame->rotation_;
         if (channelMask & CHANNEL_SCALE)
-            node->SetScaleSilent(keyFrame->scale_.Lerp(nextKeyFrame->scale_, t));
+            newScale = keyFrame->scale_;
     }
-}
-
-void AnimationState::ApplyTrackBlendedSilent(AnimationStateTrack& stateTrack, float weight)
-{
-    const AnimationTrack* track = stateTrack.track_;
-    Node* node = stateTrack.node_;
-
-    if (track->keyFrames_.Empty() || !node)
-        return;
-
-    unsigned& frame = stateTrack.keyFrame_;
-    track->GetKeyFrameIndex(time_, frame);
-
-    // Check if next frame to interpolate to is valid, or if wrapping is needed (looping animation only)
-    unsigned nextFrame = frame + 1;
-    bool interpolate = true;
-    if (nextFrame >= track->keyFrames_.Size())
+    
+    if (blendingMode_ == ABM_ADDITIVE) // not ABM_LERP
     {
-        if (!looped_)
+        if (channelMask & CHANNEL_POSITION)
         {
-            nextFrame = frame;
-            interpolate = false;
+            Vector3 delta = newPosition - stateTrack.bone_->initialPosition_;
+            newPosition = node->GetPosition() + delta * weight;
         }
-        else
-            nextFrame = 0;
-    }
-
-    const AnimationKeyFrame* keyFrame = &track->keyFrames_[frame];
-    unsigned char channelMask = track->channelMask_;
-
-    if (!interpolate)
-    {
-        // No interpolation, blend between old transform & animation
-        if (channelMask & CHANNEL_POSITION)
-            node->SetPositionSilent(node->GetPosition().Lerp(keyFrame->position_, weight));
         if (channelMask & CHANNEL_ROTATION)
-            node->SetRotationSilent(node->GetRotation().Slerp(keyFrame->rotation_, weight));
+        {
+            Quaternion delta = newRotation * stateTrack.bone_->initialRotation_.Inverse();
+            newRotation = (delta * node->GetRotation()).Normalized();
+            if (!Equals(weight, 1.0f))
+                newRotation = node->GetRotation().Slerp(newRotation, weight);
+        }
         if (channelMask & CHANNEL_SCALE)
-            node->SetScaleSilent(node->GetScale().Lerp(keyFrame->scale_, weight));
+        {
+            Vector3 delta = newScale - stateTrack.bone_->initialScale_;
+            newScale = node->GetScale() + delta * weight;
+        }
     }
     else
     {
-        const AnimationKeyFrame* nextKeyFrame = &track->keyFrames_[nextFrame];
-        float timeInterval = nextKeyFrame->time_ - keyFrame->time_;
-        if (timeInterval < 0.0f)
-            timeInterval += animation_->GetLength();
-        float t = timeInterval > 0.0f ? (time_ - keyFrame->time_) / timeInterval : 1.0f;
-
-        // Interpolation, blend between old transform & animation
+        if (!Equals(weight, 1.0f)) // not full weight
+        {
+            if (channelMask & CHANNEL_POSITION)
+                newPosition = node->GetPosition().Lerp(newPosition, weight);
+            if (channelMask & CHANNEL_ROTATION)
+                newRotation = node->GetRotation().Slerp(newRotation, weight);
+            if (channelMask & CHANNEL_SCALE)
+                newScale = node->GetScale().Lerp(newScale, weight);
+        }
+    }
+    
+    if (silent)
+    {
         if (channelMask & CHANNEL_POSITION)
-        {
-            node->SetPositionSilent(node->GetPosition().Lerp(
-                keyFrame->position_.Lerp(nextKeyFrame->position_, t), weight));
-        }
+            node->SetPositionSilent(newPosition);
         if (channelMask & CHANNEL_ROTATION)
-        {
-            node->SetRotationSilent(node->GetRotation().Slerp(
-                keyFrame->rotation_.Slerp(nextKeyFrame->rotation_, t), weight));
-        }
+            node->SetRotationSilent(newRotation);
         if (channelMask & CHANNEL_SCALE)
-        {
-            node->SetScaleSilent(node->GetScale().Lerp(
-                keyFrame->scale_.Lerp(nextKeyFrame->scale_, t), weight));
-        }
+            node->SetScaleSilent(newScale);
+    }
+    else
+    {
+        if (channelMask & CHANNEL_POSITION)
+            node->SetPosition(newPosition);
+        if (channelMask & CHANNEL_ROTATION)
+            node->SetRotation(newRotation);
+        if (channelMask & CHANNEL_SCALE)
+            node->SetScale(newScale);
     }
 }
 

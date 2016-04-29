@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,9 @@ void LuaIntegration::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void LuaIntegration::CreateScene()
@@ -94,7 +97,7 @@ void LuaIntegration::CreateScene()
     zone->SetFogStart(10.0f);
     zone->SetFogEnd(100.0f);
 
-    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Rotator.lua");
+    LuaFile* scriptFile = cache->GetResource<LuaFile>("LuaScripts/Utilities/Rotator.lua");
     if (!scriptFile)
         return;
 

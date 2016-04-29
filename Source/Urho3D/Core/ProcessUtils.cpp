@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
+#include "../IO/FileSystem.h"
 
 #include <cstdio>
 #include <fcntl.h>
@@ -43,6 +44,10 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#endif
+
+#if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
+#include <emscripten/threading.h>
 #endif
 
 #if defined(_MSC_VER)
@@ -88,6 +93,7 @@ static bool consoleOpened = false;
 #endif
 static String currentLine;
 static Vector<String> arguments;
+static String miniDumpDir;
 
 #if defined(IOS)
 static void GetCPUData(host_basic_info_data_t* data)
@@ -147,7 +153,7 @@ void OpenConsoleWindow()
         return;
 
     AllocConsole();
-    
+
     freopen("CONIN$", "r", stdin);
     freopen("CONOUT$", "w", stdout);
 
@@ -354,7 +360,7 @@ String GetPlatform()
 #elif defined(RPI)
     return "Raspberry Pi";
 #elif defined(__EMSCRIPTEN__)
-    return "HTML5";
+    return "Web";
 #elif defined(__linux__)
     return "Linux";
 #else
@@ -399,13 +405,16 @@ unsigned GetNumPhysicalCPUs()
 #endif
 #elif defined(ANDROID) || defined(RPI)
     return GetArmCPUCount();
-#elif !defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN_PTHREADS__
+    return emscripten_num_logical_cores();
+#else
+    return 1; // Targeting a single-threaded Emscripten build.
+#endif
+#else
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_cores;
-#else
-    /// \todo Implement properly
-    return 1;
 #endif
 }
 
@@ -421,14 +430,40 @@ unsigned GetNumLogicalCPUs()
 #endif
 #elif defined(ANDROID) || defined (RPI)
     return GetArmCPUCount();
-#elif !defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN_PTHREADS__
+    return emscripten_num_logical_cores();
+#else
+    return 1; // Targeting a single-threaded Emscripten build.
+#endif
+#else
     struct cpu_id_t data;
     GetCPUData(&data);
     return (unsigned)data.num_logical_cpus;
-#else
-    /// \todo Implement properly
-    return 1;
 #endif
+}
+
+void SetMiniDumpDir(const String& pathName)
+{
+    miniDumpDir = AddTrailingSlash(pathName);
+}
+
+String GetMiniDumpDir()
+{
+#ifndef MINI_URHO
+    if (miniDumpDir.Empty())
+    {
+        char* pathName = SDL_GetPrefPath("urho3d", "crashdumps");
+        if (pathName)
+        {
+            String ret(pathName);
+            SDL_free(pathName);
+            return ret;
+        }
+    }
+#endif
+
+    return miniDumpDir;
 }
 
 }

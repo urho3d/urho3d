@@ -78,7 +78,7 @@ enum LockState
     LOCK_SCRATCH
 };
 
-enum VertexElement
+enum LegacyVertexElement
 {
     ELEMENT_POSITION = 0,
     ELEMENT_NORMAL,
@@ -93,7 +93,34 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX1,
     ELEMENT_INSTANCEMATRIX2,
     ELEMENT_INSTANCEMATRIX3,
-    MAX_VERTEX_ELEMENTS
+    ELEMENT_OBJECTINDEX,
+    MAX_LEGACY_VERTEX_ELEMENTS
+};
+
+enum VertexElementType
+{
+    TYPE_INT = 0,
+    TYPE_FLOAT,
+    TYPE_VECTOR2,
+    TYPE_VECTOR3,
+    TYPE_VECTOR4,
+    TYPE_UBYTE4,
+    TYPE_UBYTE4_NORM,
+    MAX_VERTEX_ELEMENT_TYPES
+};
+
+enum VertexElementSemantic
+{
+    SEM_POSITION = 0,
+    SEM_NORMAL,
+    SEM_BINORMAL,
+    SEM_TANGENT,
+    SEM_TEXCOORD,
+    SEM_COLOR,
+    SEM_BLENDWEIGHTS,
+    SEM_BLENDINDICES,
+    SEM_OBJECTINDEX,
+    MAX_VERTEX_ELEMENT_SEMANTICS
 };
 
 enum TextureFilterMode
@@ -173,18 +200,38 @@ enum FaceCameraMode
     FC_ROTATE_XYZ,
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
-    FC_LOOKAT_Y
+    FC_LOOKAT_Y,
+    FC_DIRECTION
 };
+
+/// Shadow type
+enum ShadowQuality
+{
+    SHADOWQUALITY_SIMPLE_16BIT = 0,
+    SHADOWQUALITY_SIMPLE_24BIT,
+    SHADOWQUALITY_PCF_16BIT,
+    SHADOWQUALITY_PCF_24BIT,
+    SHADOWQUALITY_VSM,
+    SHADOWQUALITY_BLUR_VSM
+};
+
+struct VertexElement
+{
+    VertexElement();
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false);
+
+    VertexElementType type_ @ type;
+    VertexElementSemantic semantic_ @ semantic;
+    unsigned char index_ @ index;
+    bool perInstance_ @ perInstance;
+    unsigned offset_ @ offset;
+};
+
 
 static const int QUALITY_LOW;
 static const int QUALITY_MEDIUM;
 static const int QUALITY_HIGH;
 static const int QUALITY_MAX;
-
-static const int SHADOWQUALITY_LOW_16BIT;
-static const int SHADOWQUALITY_LOW_24BIT;
-static const int SHADOWQUALITY_HIGH_16BIT;
-static const int SHADOWQUALITY_HIGH_24BIT;
 
 static const unsigned CLEAR_COLOR;
 static const unsigned CLEAR_DEPTH;
@@ -204,4 +251,4 @@ static const unsigned MASK_BLENDINDICES;
 static const unsigned MASK_INSTANCEMATRIX1;
 static const unsigned MASK_INSTANCEMATRIX2;
 static const unsigned MASK_INSTANCEMATRIX3;
-static const unsigned MASK_DEFAULT;
+static const unsigned MASK_OBJECTINDEX;

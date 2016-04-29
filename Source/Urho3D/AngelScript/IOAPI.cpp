@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -308,7 +308,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asMETHODPR(Variant, operator =, (const VectorBuffer&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asMETHODPR(Variant, operator ==, (const VectorBuffer&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "const VectorBuffer GetBuffer() const", asMETHOD(Variant, GetVectorBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asMETHOD(Variant, GetVectorBuffer), asCALL_THISCALL);
 
     // Register VectorBuffer compression functions
     engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&in)", asFUNCTION(CompressVectorBuffer), asCALL_CDECL);

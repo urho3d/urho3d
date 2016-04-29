@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,7 @@
 #include "../../Graphics/Terrain.h"
 #include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/Texture2DArray.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
@@ -267,6 +268,7 @@ Graphics::Graphics(Context* context) :
     fullscreen_(false),
     borderless_(false),
     resizable_(false),
+    highDPI_(false),
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(false),
@@ -310,31 +312,12 @@ Graphics::~Graphics()
 
     vertexDeclarations_.Clear();
 
-    if (impl_->defaultColorSurface_)
-    {
-        impl_->defaultColorSurface_->Release();
-        impl_->defaultColorSurface_ = 0;
-    }
-    if (impl_->defaultDepthStencilSurface_)
-    {
-        impl_->defaultDepthStencilSurface_->Release();
-        impl_->defaultDepthStencilSurface_ = 0;
-    }
-    if (impl_->frameQuery_)
-    {
-        impl_->frameQuery_->Release();
-        impl_->frameQuery_ = 0;
-    }
-    if (impl_->device_)
-    {
-        impl_->device_->Release();
-        impl_->device_ = 0;
-    }
-    if (impl_->interface_)
-    {
-        impl_->interface_->Release();
-        impl_->interface_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(impl_->defaultColorSurface_);
+    URHO3D_SAFE_RELEASE(impl_->defaultDepthStencilSurface_);
+    URHO3D_SAFE_RELEASE(impl_->frameQuery_);
+    URHO3D_SAFE_RELEASE(impl_->device_);
+    URHO3D_SAFE_RELEASE(impl_->interface_);
+
     if (impl_->window_)
     {
         SDL_ShowCursor(SDL_TRUE);
@@ -384,10 +367,12 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
+    bool tripleBuffer, int multiSample)
 {
     URHO3D_PROFILE(SetScreenMode);
+
+    highDPI = false;   // SDL does not support High DPI mode on Windows platform yet, so always disable it for now
 
     bool maximize = false;
 
@@ -519,6 +504,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     fullscreen_ = fullscreen;
     borderless_ = borderless;
     resizable_ = resizable;
+    highDPI_ = highDPI;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
 
@@ -571,8 +557,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -580,7 +567,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -601,7 +588,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -620,6 +607,12 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     if (!impl_->device_)
         return false;
+
+    if (IsDeviceLost())
+    {
+        URHO3D_LOGERROR("Can not take screenshot while device is lost");
+        return false;
+    }
 
     D3DSURFACE_DESC surfaceDesc;
     impl_->defaultColorSurface_->GetDesc(&surfaceDesc);
@@ -644,17 +637,24 @@ bool Graphics::TakeScreenShot(Image& destImage)
     }
 
     IDirect3DSurface9* surface = 0;
-    impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
-    if (!surface)
+    HRESULT hr = impl_->device_->CreateOffscreenPlainSurface(surfaceWidth, surfaceHeight, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &surface, 0);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not create surface for taking a screenshot");
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not create surface for taking a screenshot", hr);
         return false;
     }
 
     if (useBackBuffer)
-        impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
+        hr = impl_->device_->GetRenderTargetData(impl_->defaultColorSurface_, surface);
     else
-        impl_->device_->GetFrontBufferData(0, surface);
+        hr = impl_->device_->GetFrontBufferData(0, surface);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not get rendertarget data for taking a screenshot", hr);
+        return false;
+    }
 
     // If capturing the whole screen, determine the window rect
     RECT sourceRect;
@@ -674,11 +674,11 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     D3DLOCKED_RECT lockedRect;
     lockedRect.pBits = 0;
-    surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
-    if (!lockedRect.pBits)
+    hr = surface->LockRect(&lockedRect, &sourceRect, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY);
+    if (FAILED(hr) || !lockedRect.pBits)
     {
-        URHO3D_LOGERROR("Could not lock surface for taking a screenshot");
-        surface->Release();
+        URHO3D_SAFE_RELEASE(surface);
+        URHO3D_LOGD3DERROR("Could not lock surface for taking a screenshot", hr);
         return false;
     }
 
@@ -869,8 +869,15 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     destRect.right = destination->GetWidth();
     destRect.bottom = destination->GetHeight();
 
-    return SUCCEEDED(impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
-        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE));
+    HRESULT hr = impl_->device_->StretchRect(impl_->defaultColorSurface_, &rect,
+        (IDirect3DSurface9*)destination->GetRenderSurface()->GetSurface(), &destRect, D3DTEXF_NONE);
+    if (FAILED(hr))
+    {
+        URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
+        return false;
+    }
+    else
+        return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
@@ -907,6 +914,23 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     ++numBatches_;
 }
 
+void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+{
+    if (!indexCount)
+        return;
+
+    ResetStreamFrequencies();
+
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
+
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
+
+    numPrimitives_ += primitiveCount;
+    ++numBatches_;
+}
+
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
@@ -918,7 +942,9 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         VertexBuffer* buffer = vertexBuffers_[i];
         if (buffer)
         {
-            if (buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data
+            if (elements.Size() && elements[0].perInstance_)
                 SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
             else
                 SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
@@ -935,38 +961,60 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     ++numBatches_;
 }
 
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
+    unsigned vertexCount, unsigned instanceCount)
+{
+    if (!indexCount || !instanceCount)
+        return;
+
+    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
+    {
+        VertexBuffer* buffer = vertexBuffers_[i];
+        if (buffer)
+        {
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data
+            if (elements.Size() && elements[0].perInstance_)
+                SetStreamFrequency(i, D3DSTREAMSOURCE_INSTANCEDATA | 1u);
+            else
+                SetStreamFrequency(i, D3DSTREAMSOURCE_INDEXEDDATA | instanceCount);
+        }
+    }
+
+    unsigned primitiveCount;
+    D3DPRIMITIVETYPE d3dPrimitiveType;
+
+    GetD3DPrimitiveType(indexCount, type, primitiveCount, d3dPrimitiveType);
+    impl_->device_->DrawIndexedPrimitive(d3dPrimitiveType, baseVertexIndex, minVertex, vertexCount, indexStart, primitiveCount);
+
+    numPrimitives_ += instanceCount * primitiveCount;
+    ++numBatches_;
+}
+
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
     static PODVector<VertexBuffer*> vertexBuffers(1);
-    static PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
-    elementMasks[0] = MASK_DEFAULT;
-    SetVertexBuffers(vertexBuffers, elementMasks);
+    SetVertexBuffers(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
 
-    // Build vertex declaration hash code out of the buffers & masks
+    // Build vertex declaration hash code out of the buffers
     unsigned long long hash = 0;
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
         if (!buffers[i])
             continue;
 
-        hash |= buffers[i]->GetBufferHash(i, elementMasks[i]);
+        hash |= buffers[i]->GetBufferHash(i);
     }
 
     if (hash)
@@ -974,12 +1022,9 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         // If no previous vertex declaration for that hash, create new
         if (!vertexDeclarations_.Contains(hash))
         {
-            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers, elementMasks));
+            SharedPtr<VertexDeclaration> newDeclaration(new VertexDeclaration(this, buffers));
             if (!newDeclaration->GetDeclaration())
-            {
-                URHO3D_LOGERROR("Failed to create vertex declaration");
                 return false;
-            }
 
             vertexDeclarations_[hash] = newDeclaration;
         }
@@ -997,10 +1042,12 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
         VertexBuffer* buffer = 0;
         unsigned offset = 0;
 
-        if (i < buffers.Size())
+        if (i < buffers.Size() && buffers[i])
         {
             buffer = buffers[i];
-            if (buffer && buffer->GetElementMask() & MASK_INSTANCEMATRIX1)
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+            // Check if buffer has per-instance data; add instance offset in that case
+            if (elements.Size() && elements[0].perInstance_)
                 offset = instanceOffset * buffer->GetVertexSize();
         }
 
@@ -1020,10 +1067,9 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const P
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)
@@ -1312,6 +1358,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_MATRIX4:
         SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
         break;
 
     default:
@@ -2414,8 +2468,11 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
         else
             SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
 
-        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_TRUE : SDL_FALSE);
+        // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
+        SDL_HideWindow(impl_->window_);
+        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_FALSE : SDL_TRUE);
+        SDL_ShowWindow(impl_->window_);
     }
     else
     {
@@ -2434,15 +2491,17 @@ bool Graphics::CreateInterface()
         return false;
     }
 
-    if (FAILED(impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_)))
+    HRESULT hr = impl_->interface_->GetDeviceCaps(impl_->adapter_, impl_->deviceType_, &impl_->deviceCaps_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not get Direct3D capabilities");
+        URHO3D_LOGD3DERROR("Could not get Direct3D capabilities", hr);
         return false;
     }
 
-    if (FAILED(impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_)))
+    hr = impl_->interface_->GetAdapterIdentifier(impl_->adapter_, 0, &impl_->adapterIdentifier_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not get Direct3D adapter identifier");
+        URHO3D_LOGD3DERROR("Could not get Direct3D adapter identifier", hr);
         return false;
     }
 
@@ -2471,15 +2530,16 @@ bool Graphics::CreateDevice(unsigned adapter, unsigned deviceType)
     else
         behaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
-    if (FAILED(impl_->interface_->CreateDevice(
+    HRESULT hr = impl_->interface_->CreateDevice(
         adapter,
         (D3DDEVTYPE)deviceType,
         GetWindowHandle(impl_->window_),
         behaviorFlags,
         &impl_->presentParams_,
-        &impl_->device_)))
+        &impl_->device_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Could not create Direct3D9 device");
+        URHO3D_LOGD3DERROR("Could not create Direct3D9 device", hr);
         return false;
     }
 
@@ -2731,6 +2791,7 @@ void RegisterGraphicsLibrary(Context* context)
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
+    Texture2DArray::RegisterObject(context);
     Texture3D::RegisterObject(context);
     TextureCube::RegisterObject(context);
     Camera::RegisterObject(context);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,9 @@ void L10n::Start()
 
     // Init the user interface
     CreateGUI();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void L10n::InitLocalizationSystem()
@@ -215,7 +218,8 @@ void L10n::HandleChangeLangButtonPressed(StringHash eventType, VariantMap& event
 
 void L10n::HandleQuitButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    engine_->Exit();
+    if (GetPlatform() != "Web")
+        engine_->Exit();
 }
 
 // You can manually change texts, sprites and other aspects of the game when language is changed

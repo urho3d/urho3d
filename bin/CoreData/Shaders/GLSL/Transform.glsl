@@ -10,17 +10,18 @@ attribute vec4 iPos;
 attribute vec3 iNormal;
 attribute vec4 iColor;
 attribute vec2 iTexCoord;
-attribute vec2 iTexCoord2;
+attribute vec2 iTexCoord1;
 attribute vec4 iTangent;
 attribute vec4 iBlendWeights;
 attribute vec4 iBlendIndices;
 attribute vec3 iCubeTexCoord;
-attribute vec4 iCubeTexCoord2;
+attribute vec4 iCubeTexCoord1;
 #ifdef INSTANCED
-    attribute vec4 iInstanceMatrix1;
-    attribute vec4 iInstanceMatrix2;
-    attribute vec4 iInstanceMatrix3;
+    attribute vec4 iTexCoord4;
+    attribute vec4 iTexCoord5;
+    attribute vec4 iTexCoord6;
 #endif
+attribute float iObjectIndex;
 
 #ifdef SKINNED
 mat4 GetSkinMatrix(vec4 blendWeights, vec4 blendIndices)
@@ -38,7 +39,7 @@ mat4 GetSkinMatrix(vec4 blendWeights, vec4 blendIndices)
 mat4 GetInstanceMatrix()
 {
     const vec4 lastColumn = vec4(0.0, 0.0, 0.0, 1.0);
-    return mat4(iInstanceMatrix1, iInstanceMatrix2, iInstanceMatrix3, lastColumn);
+    return mat4(iTexCoord4, iTexCoord5, iTexCoord6, lastColumn);
 }
 #endif
 
@@ -86,6 +87,33 @@ vec3 GetBillboardNormal()
 }
 #endif
 
+#ifdef DIRBILLBOARD
+mat3 GetFaceCameraRotation(vec3 cameraPos, vec3 position, vec3 direction)
+{
+    vec3 cameraDir = normalize(position - cameraPos);
+    vec3 front = normalize(direction);
+    vec3 right = normalize(cross(front, cameraDir));
+    vec3 up = normalize(cross(front, right));
+
+    return mat3(
+        right.x, up.x, front.x,
+        right.y, up.y, front.y,
+        right.z, up.z, front.z
+    );
+}
+
+vec3 GetBillboardPos(vec4 iPos, vec3 iDirection, vec3 iCameraPos, mat4 modelMatrix)
+{
+    return (iPos * modelMatrix).xyz +
+        vec3(iTexCoord1.x, 0.0, iTexCoord1.y) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
+}
+
+vec3 GetBillboardNormal(vec4 iPos, vec3 iDirection, vec3 iCameraPos)
+{
+    return vec3(0.0, 1.0, 0.0) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
+}
+#endif
+
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
@@ -97,7 +125,9 @@ vec3 GetBillboardNormal()
 vec3 GetWorldPos(mat4 modelMatrix)
 {
     #if defined(BILLBOARD)
-        return GetBillboardPos(iPos, iTexCoord2, modelMatrix);
+        return GetBillboardPos(iPos, iTexCoord1, modelMatrix);
+    #elif defined(DIRBILLBOARD)
+        return GetBillboardPos(iPos, iNormal, iTangent.xyz, modelMatrix);
     #else
         return (iPos * modelMatrix).xyz;
     #endif
@@ -107,6 +137,8 @@ vec3 GetWorldNormal(mat4 modelMatrix)
 {
     #if defined(BILLBOARD)
         return GetBillboardNormal();
+    #elif defined(DIRBILLBOARD)
+        return GetBillboardNormal(iPos, iNormal, iTangent.xyz);
     #else
         return normalize(iNormal * GetNormalMatrix(modelMatrix));
     #endif

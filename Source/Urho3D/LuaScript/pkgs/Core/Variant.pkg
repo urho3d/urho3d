@@ -86,7 +86,7 @@ class Variant
     const Color& GetColor() const;
     const String GetString() const;
     const PODVector<unsigned char>& GetBuffer @ GetRawBuffer() const;
-    const VectorBuffer GetVectorBuffer @ GetBuffer() const;     // For backward compatibility reason, keep the old alias
+    VectorBuffer GetVectorBuffer @ GetBuffer() const;     // For backward compatibility reason, keep the old alias
     void* GetVoidPtr(const char* type) const;
     const ResourceRef& GetResourceRef() const;
     const ResourceRefList& GetResourceRefList() const;

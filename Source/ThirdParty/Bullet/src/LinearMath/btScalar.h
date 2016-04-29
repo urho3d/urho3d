@@ -74,10 +74,11 @@ inline int	btGetVersion()
  			#define btFsel(a,b,c) __fsel((a),(b),(c))
 		#else
 
-// Urho3D: allow to disable SSE
 #if defined (_M_ARM)
             //Do not turn SSE on for ARM (may want to turn on BT_USE_NEON however)
-#elif (defined (URHO3D_SSE) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
+
+// Urho3D: allow to disable SSE
+#elif ((!defined(_M_IX86_FP) || _M_IX86_FP) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
 			#if _MSC_VER>1400
 				#define BT_USE_SIMD_VECTOR3
 			#endif
@@ -178,11 +179,10 @@ inline int	btGetVersion()
 
 // Urho3D - allow to disable SSE/NEON and let Linux, MinGW, & Android platforms in besides Apple
 #if (!defined (BT_USE_DOUBLE_PRECISION))
-    #if defined (URHO3D_SSE) && (defined (__i386__) || defined (__x86_64__))
+    #if defined(__SSE__)
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
 		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
-		//if apps run into issues, we will disable the next line
 		#define BT_USE_SSE_IN_API
         #ifdef BT_USE_SSE
             // include appropriate SSE level
@@ -196,7 +196,7 @@ inline int	btGetVersion()
                 #include <emmintrin.h>
             #endif
         #endif //BT_USE_SSE
-    #elif defined (URHO3D_NEON) && defined( __ARM_NEON__ )
+    #elif defined( __ARM_NEON__ )
             #define BT_USE_NEON 1
 			#define BT_USE_SIMD_VECTOR3
 		
@@ -261,7 +261,7 @@ inline int	btGetVersion()
 		#define btFullAssert(x)
 		#define btLikely(_c)  _c
 		#define btUnlikely(_c) _c
-#endif //__APPLE__ 
+#endif
 
 #endif // LIBSPE2
 

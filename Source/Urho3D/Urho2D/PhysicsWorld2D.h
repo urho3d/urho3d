@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,19 @@ struct URHO3D_API PhysicsRaycastResult2D
     float distance_;
     /// Rigid body that was hit.
     RigidBody2D* body_;
+};
+
+/// Delayed world transform assignment for parented 2D rigidbodies.
+struct DelayedWorldTransform2D
+{
+    /// Rigid body.
+    RigidBody2D* rigidBody_;
+    /// Parent rigid body.
+    RigidBody2D* parentRigidBody_;
+    /// New world position.
+    Vector3 worldPosition_;
+    /// New world rotation.
+    Quaternion worldRotation_;
 };
 
 /// 2D physics simulation world component. Should be added only to the root scene node.
@@ -129,6 +142,8 @@ public:
     void AddRigidBody(RigidBody2D* rigidBody);
     /// Remove rigid body.
     void RemoveRigidBody(RigidBody2D* rigidBody);
+    /// Add a delayed world transform assignment. Called by RigidBody2D.
+    void AddDelayedWorldTransform(const DelayedWorldTransform2D& transform);
 
     /// Perform a physics world raycast and return all hits.
     void Raycast(PODVector<PhysicsRaycastResult2D>& results, const Vector2& startPoint, const Vector2& endPoint,
@@ -226,6 +241,8 @@ private:
     bool applyingTransforms_;
     /// Rigid bodies.
     Vector<WeakPtr<RigidBody2D> > rigidBodies_;
+    /// Delayed (parented) world transform assignments.
+    HashMap<RigidBody2D*, DelayedWorldTransform2D> delayedWorldTransforms_;
 
     /// Contact info.
     struct ContactInfo

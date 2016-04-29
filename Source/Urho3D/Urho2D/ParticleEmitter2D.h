@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -143,8 +143,8 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Num particles.
-    int numParticles_;
+    /// Nummber of particles.
+    unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
     /// Emit particle time

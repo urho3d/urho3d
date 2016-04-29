@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -847,6 +847,8 @@ void LoadMesh(const String& inputFileName, bool generateTangents, bool splitSubM
 
 void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotationsOnly, bool saveMaterialList)
 {
+    /// \todo Use save functions of Model & Animation classes
+
     // Begin serialization
     {
         File dest(context_);
@@ -854,7 +856,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
             ErrorExit("Could not open output file " + outputFileName);
 
         // ID
-        dest.WriteFileID("UMDL");
+        dest.WriteFileID("UMD2");
 
         // Vertexbuffers
         dest.WriteUInt(vertexBuffers_.Size());
@@ -999,7 +1001,7 @@ void WriteOutput(const String& outputFileName, bool exportAnimations, bool rotat
                         Quaternion rot(angle, axisVec);
 
                         // Transform from bind-pose relative into absolute
-                        pos = bone->bindPosition_ + bone->bindRotation_ * pos;
+                        pos = bone->bindPosition_ + pos;
                         rot = bone->bindRotation_ * rot;
 
                         newKeyFrame.time_ = keyFrame.GetFloat("time");

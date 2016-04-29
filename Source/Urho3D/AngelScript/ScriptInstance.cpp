@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,8 @@
 #include "../Core/Profiler.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 #include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/ResourceEvents.h"
@@ -94,6 +93,14 @@ void ScriptInstance::RegisterObject(Context* context)
 
 void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
+    // Update stored script attributes if being manipulated while the actual object doesn't exist
+    if (!scriptObject_ && storedAttributes_.Size())
+    {
+        HashMap<String, Variant>::Iterator i = storedAttributes_.Find(attr.name_);
+        if (i != storedAttributes_.End())
+            i->second_ = src;
+    }
+
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
     {
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
@@ -363,6 +370,16 @@ void ScriptInstance::RemoveEventHandlersExcept(const PODVector<StringHash>& exce
     UnsubscribeFromAllEventsExcept(exceptions, true);
 }
 
+bool ScriptInstance::HasEventHandler(StringHash eventType) const
+{
+    return HasSubscribedToEvent(eventType);
+}
+
+bool ScriptInstance::HasEventHandler(Object* sender, StringHash eventType) const
+{
+    return HasSubscribedToEvent(sender, eventType);
+}
+
 bool ScriptInstance::IsA(const String& className) const
 {
     // Early out for the easiest case where that's what we are
@@ -491,7 +508,7 @@ void ScriptInstance::OnSceneSet(Scene* scene)
     {
         UnsubscribeFromEvent(E_SCENEUPDATE);
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -666,6 +683,41 @@ void ScriptInstance::GetScriptAttributes()
     }
 }
 
+void ScriptInstance::StoreScriptAttributes()
+{
+    if (!scriptObject_)
+        return;
+
+    storedAttributes_.Clear();
+
+    for (unsigned i = 0; i < attributeInfos_.Size(); ++i)
+    {
+        const AttributeInfo& attr = attributeInfos_[i];
+        if (attr.ptr_)
+            storedAttributes_[attr.name_] = GetAttribute(i);
+    }
+}
+
+void ScriptInstance::RestoreScriptAttributes()
+{
+    if (!scriptObject_)
+        return;
+
+    for (unsigned i = 0; i < attributeInfos_.Size(); ++i)
+    {
+        const AttributeInfo& attr = attributeInfos_[i];
+        if (attr.ptr_)
+        {
+            HashMap<String, Variant>::ConstIterator j = storedAttributes_.Find(attr.name_);
+            if (j != storedAttributes_.End())
+                SetAttribute(i, j->second_);
+        }
+    }
+
+    // Clear after restoring once. If the attributes are no longer in use (script code has changed) they are forgotten now
+    storedAttributes_.Clear();
+}
+
 void ScriptInstance::UpdateEventSubscription()
 {
     Scene* scene = GetScene();
@@ -690,10 +742,11 @@ void ScriptInstance::UpdateEventSubscription()
             if (methods_[METHOD_POSTUPDATE])
                 SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(ScriptInstance, HandleScenePostUpdate));
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
             if (methods_[METHOD_FIXEDUPDATE] || methods_[METHOD_FIXEDPOSTUPDATE])
             {
-                PhysicsWorld* world = scene->GetOrCreateComponent<PhysicsWorld>();
+                Component* world = GetFixedUpdateSource();
+
                 if (world)
                 {
                     if (methods_[METHOD_FIXEDUPDATE])
@@ -722,8 +775,9 @@ void ScriptInstance::UpdateEventSubscription()
         if (subscribedPostFixed_)
         {
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
-            PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+            Component* world = GetFixedUpdateSource();
             if (world)
             {
                 UnsubscribeFromEvent(world, E_PHYSICSPRESTEP);
@@ -798,12 +852,19 @@ void ScriptInstance::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     scriptFile_->Execute(scriptObject_, methods_[METHOD_POSTUPDATE], parameters);
 }
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 
 void ScriptInstance::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     if (!scriptObject_)
         return;
+
+    // Execute delayed start before first fixed update if not called yet
+    if (methods_[METHOD_DELAYEDSTART])
+    {
+        scriptFile_->Execute(scriptObject_, methods_[METHOD_DELAYEDSTART]);
+        methods_[METHOD_DELAYEDSTART] = 0;  // Only execute once
+    }
 
     using namespace PhysicsPreStep;
 
@@ -845,13 +906,17 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
 
 void ScriptInstance::HandleScriptFileReload(StringHash eventType, VariantMap& eventData)
 {
+    StoreScriptAttributes();
     ReleaseObject();
 }
 
 void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     if (!className_.Empty())
+    {
         CreateObject();
+        RestoreScriptAttributes();
+    }
 }
 
 Context* GetScriptContext()

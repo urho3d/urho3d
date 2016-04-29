@@ -15,7 +15,11 @@ uniform samplerCube sLightCubeMap;
     uniform sampler2D sNormalBuffer;
     uniform sampler2D sDepthBuffer;
     uniform sampler2D sLightBuffer;
-    uniform sampler2DShadow sShadowMap;
+    #ifdef VSM_SHADOW
+        uniform sampler2D sShadowMap;
+    #else
+        uniform sampler2DShadow sShadowMap;
+    #endif
     uniform samplerCube sFaceSelectCubeMap;
     uniform samplerCube sIndirectionCubeMap;
     uniform samplerCube sZoneCubeMap;

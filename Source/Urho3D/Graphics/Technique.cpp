@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -301,6 +301,35 @@ void Technique::ReleaseShaders()
         if (pass)
             pass->ReleaseShaders();
     }
+}
+
+SharedPtr<Technique> Technique::Clone(const String& cloneName) const
+{
+    SharedPtr<Technique> ret(new Technique(context_));
+    ret->SetIsDesktop(isDesktop_);
+    ret->SetName(cloneName);
+
+    // Deep copy passes
+    for (Vector<SharedPtr<Pass> >::ConstIterator i = passes_.Begin(); i != passes_.End(); ++i)
+    {
+        Pass* srcPass = i->Get();
+        if (!srcPass)
+            continue;
+
+        Pass* newPass = ret->CreatePass(srcPass->GetName());
+        newPass->SetBlendMode(srcPass->GetBlendMode());
+        newPass->SetDepthTestMode(srcPass->GetDepthTestMode());
+        newPass->SetLightingMode(srcPass->GetLightingMode());
+        newPass->SetDepthWrite(srcPass->GetDepthWrite());
+        newPass->SetAlphaMask(srcPass->GetAlphaMask());
+        newPass->SetIsDesktop(srcPass->IsDesktop());
+        newPass->SetVertexShader(srcPass->GetVertexShader());
+        newPass->SetPixelShader(srcPass->GetPixelShader());
+        newPass->SetVertexShaderDefines(srcPass->GetVertexShaderDefines());
+        newPass->SetPixelShaderDefines(srcPass->GetPixelShaderDefines());
+    }
+
+    return ret;
 }
 
 Pass* Technique::CreatePass(const String& name)

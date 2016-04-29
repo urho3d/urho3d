@@ -8,9 +8,9 @@ class Graphics : public Object
     void SetWindowPosition(const IntVector2& position);
     void SetWindowPosition(int x, int y);
 
-    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample);
     bool SetMode(int width, int height);
-    
+
     void SetSRGB(bool enable);
     void SetFlushGPU(bool enable);
     void SetOrientations(const String orientations);

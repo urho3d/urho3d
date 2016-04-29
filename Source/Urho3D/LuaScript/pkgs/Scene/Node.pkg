@@ -25,6 +25,10 @@ class Node : public Animatable
     tolua_outside bool NodeSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
     tolua_outside bool NodeSaveJSON @ SaveJSON(File* dest, const String indentation = "\t") const;
     void SetName(const String name);
+    void AddTag(const String tag);
+    void AddTags(const String tags, char separator);
+    bool RemoveTag(const String tag);
+    void RemoveAllTags();
 
     void SetPosition(const Vector3& position);
     void SetPosition2D(const Vector2& position);
@@ -191,6 +195,12 @@ class Node : public Animatable
 
     Node* CreateChild(unsigned id, CreateMode mode);
     void AddComponent(Component* component, unsigned id, CreateMode mode);
+
+    bool HasTag(const String tag) const;
+    const StringVector& GetTags() const;
+
+    // void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
 
     tolua_readonly tolua_property__get_set unsigned ID;
     tolua_property__get_set String name;
@@ -430,6 +440,14 @@ static const PODVector<Node*>& NodeGetChildrenWithComponent(Node* node, String t
     static PODVector<Node*> result;
     result.Clear();
     node->GetChildrenWithComponent(result, type, recursive);
+    return result;
+}
+
+static const PODVector<Node*>& NodeGetChildrenWithTag(const Node* node, const String& tag, bool recursive)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    node->GetChildrenWithTag(result, tag, recursive);
     return result;
 }
 $}

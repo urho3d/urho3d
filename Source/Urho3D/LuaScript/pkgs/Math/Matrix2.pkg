@@ -1,0 +1,38 @@
+$#include "Math/Matrix2.h"
+
+class Matrix2
+{
+    Matrix2();
+    Matrix2(const Matrix2& matrix);
+    Matrix2(float v00, float v01, float v02,
+            float v10, float v11, float v12,
+            float v20, float v21, float v22);
+    ~Matrix2();
+
+    bool operator ==(const Matrix2& rhs) const;
+
+    Vector2 operator * (const Vector2& rhs) const;
+    Matrix2 operator + (const Matrix2& rhs) const;
+    Matrix2 operator - (const Matrix2& rhs) const;
+    Matrix2 operator * (float rhs) const;
+    Matrix2 operator * (const Matrix2& rhs) const;
+
+    void SetScale(const Vector2& scale);
+    void SetScale(float scale);
+
+    Vector2 Scale() const;
+    Matrix2 Transpose() const;
+    Matrix2 Scaled(const Vector2& scale) const;
+    bool Equals(const Matrix2& rhs) const;
+    Matrix2 Inverse() const;
+
+    String ToString() const;
+
+    float m00_ @ m00;
+    float m01_ @ m01;
+    float m10_ @ m10;
+    float m11_ @ m11;
+
+    static const Matrix2 ZERO;
+    static const Matrix2 IDENTITY;
+};

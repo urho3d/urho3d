@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,26 @@
 
 package com.github.urho3d;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.util.Log;
 import org.libsdl.app.SDLActivity;
 
-import android.content.Intent;
+import java.io.IOException;
+import java.util.*;
 
 public class Urho3D extends SDLActivity {
+
+    public static final String SCRIPTS = "scripts";
+    public static final String PICKED_SCRIPT = "pickedScript";
+    private static final String TAG = "Urho3D";
+    private static final int OBTAINING_SCRIPT = 1;
+    private static String[] mArguments = new String[0];
+
+    @Override
+    protected String[] getArguments() {
+        return mArguments;
+    }
 
     @Override
     protected boolean onLoadLibrary(ArrayList<String> libraryNames) {
@@ -71,10 +82,33 @@ public class Urho3D extends SDLActivity {
         } else {
             // Intention for loading a picked library name (and remove all others)
             libraryNames.subList(startIndex, libraryNames.size()).clear();
-            libraryNames.add(pickedLibrary);
+            mArguments = pickedLibrary.split(":");
+            libraryNames.add(mArguments[0]);
+            if ("Urho3DPlayer".equals(mArguments[0]) && mArguments.length == 1) {
+                // Urho3DPlayer needs a script name to play
+                try {
+                    final AssetManager assetManager = getContext().getAssets();
+                    HashMap<String, ArrayList<String>> scripts = new HashMap<String, ArrayList<String>>(2) {{
+                        put("AngleScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
+                        put("Lua", new ArrayList<String>(Arrays.asList(assetManager.list("Data/LuaScripts"))));
+                    }};
+                    startActivityForResult(new Intent(this, ScriptPicker.class).putExtra(SCRIPTS, scripts), OBTAINING_SCRIPT);
+                } catch (IOException e) {
+                    Log.e(TAG, "Could not scan assets directory for playable scripts", e);
+                }
+            }
         }
 
         return super.onLoadLibrary(libraryNames);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (OBTAINING_SCRIPT != requestCode || RESULT_CANCELED == resultCode)
+            return;
+        String script = data.getStringExtra(PICKED_SCRIPT);
+        script = (script.endsWith(".as") ? "Scripts/" : "LuaScripts/") + script;
+        mArguments = new String[]{mArguments[0], script};
     }
 
 }

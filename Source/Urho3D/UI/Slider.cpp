@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -271,7 +271,7 @@ void Slider::Page(const IntVector2& position, bool pressed)
 
     // Start transmitting repeated pages after the initial press
     if (selected_ && pressed && repeatRate_ > 0.0f &&
-        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
+        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0.0f, Abs(offset) / length))
         repeatTimer_.Reset();
     else
         pressed = false;

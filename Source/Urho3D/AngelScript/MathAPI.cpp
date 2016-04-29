@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include "../Math/Frustum.h"
 #include "../Math/Polyhedron.h"
 #include "../Math/Ray.h"
+#include "../Math/Matrix2.h"
 
 namespace Urho3D
 {
@@ -51,17 +52,17 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint M_MIN_UNSIGNED", (void*)&M_MIN_UNSIGNED);
     engine->RegisterGlobalProperty("const uint M_MAX_UNSIGNED", (void*)&M_MAX_UNSIGNED);
 
-    engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool Equals(float, float)", asFUNCTION(Equals<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("bool IsNaN(float)", asFUNCTION(IsNaN), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Asin(float)", asFUNCTION(Asin), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Acos(float)", asFUNCTION(Acos), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Atan(float)", asFUNCTION(Atan), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTION(Atan2), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Sin(float)", asFUNCTION(Sin<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Cos(float)", asFUNCTION(Cos<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Tan(float)", asFUNCTION(Tan<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Asin(float)", asFUNCTION(Asin<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Acos(float)", asFUNCTION(Acos<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Atan(float)", asFUNCTION(Atan<float>), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Atan2(float, float)", asFUNCTION(Atan2<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Abs(float)", asFUNCTIONPR(Abs, (float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float Sign(float)", asFUNCTION(Sign), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float Sign(float)", asFUNCTION(Sign<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Sqrt(float)", asFUNCTION(sqrtf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Pow(float, float)", asFUNCTION(powf), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Min(float, float)", asFUNCTIONPR(Min, (float, float), float), asCALL_CDECL);
@@ -69,7 +70,7 @@ static void RegisterMathFunctions(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("float Max(float, float)", asFUNCTIONPR(Max, (float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("int Max(int, int)", asFUNCTIONPR(Max, (int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Clamp(float, float, float)", asFUNCTIONPR(Clamp, (float, float, float), float), asCALL_CDECL);
-    engine->RegisterGlobalFunction("float SmoothStep(float, float, float)", asFUNCTION(SmoothStep), asCALL_CDECL);
+    engine->RegisterGlobalFunction("float SmoothStep(float, float, float)", asFUNCTION(SmoothStep<float>), asCALL_CDECL);
     engine->RegisterGlobalFunction("int Clamp(int, int, int)", asFUNCTIONPR(Clamp, (int, int, int), int), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Lerp(float, float, float)", asFUNCTIONPR(Lerp, (float, float, float), float), asCALL_CDECL);
     engine->RegisterGlobalFunction("float Mod(float, float)", asFUNCTION(fmodf), asCALL_CDECL);
@@ -235,6 +236,7 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Vector2", "void Normalize()", asMETHOD(Vector2, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float DotProduct(const Vector2&in) const", asMETHOD(Vector2, DotProduct), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "float AbsDotProduct(const Vector2&in) const", asMETHOD(Vector2, AbsDotProduct), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Vector2", "float Angle(const Vector2&in) const", asMETHOD(Vector2, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Abs() const", asMETHOD(Vector2, Abs), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "Vector2 Lerp(const Vector2&in, float) const", asMETHOD(Vector2, Lerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Vector2", "bool Equals(const Vector2&in) const", asMETHOD(Vector2, Equals), asCALL_THISCALL);
@@ -443,6 +445,11 @@ static void ConstructQuaternionAxes(const Vector3& xAxis, const Vector3& yAxis, 
     new(ptr) Quaternion(xAxis, yAxis, zAxis);
 }
 
+static void ConstructQuaternionMatrix(const Matrix3& matrix, Quaternion* ptr)
+{
+    new(ptr) Quaternion(matrix);
+}
+
 static void RegisterQuaternion(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("Quaternion", sizeof(Quaternion), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
@@ -455,6 +462,7 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3&in)", asFUNCTION(ConstructQuaternionEulerVector), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in)", asFUNCTION(ConstructQuaternionRotation), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Vector3&in, const Vector3&in, const Vector3&in)", asFUNCTION(ConstructQuaternionAxes), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Quaternion", asBEHAVE_CONSTRUCT, "void f(const Matrix3&in)", asFUNCTION(ConstructQuaternionMatrix), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Quaternion", "Quaternion& opAssign(const Quaternion&in)", asMETHOD(Quaternion, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion& opAddAssign(const Quaternion&in)", asMETHOD(Quaternion, operator +=), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "bool opEquals(const Quaternion&in) const", asMETHOD(Quaternion, operator ==), asCALL_THISCALL);
@@ -468,20 +476,24 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "void FromEulerAngles(float, float, float)", asMETHOD(Quaternion, FromEulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromRotationTo(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromRotationTo), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void FromAxes(const Vector3&in, const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromAxes), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "bool FromLookRotation(const Vector3&in, const Vector3&in)", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "void FromRotationMatrix(const Matrix3&in)", asMETHOD(Quaternion, FromRotationMatrix), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "bool FromLookRotation(const Vector3&in, const Vector3&in up = Vector3(0.0, 1.0, 0.0))", asMETHOD(Quaternion, FromLookRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "void Normalize()", asMETHOD(Quaternion, Normalize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Normalized() const", asMETHOD(Quaternion, Normalized), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Inverse() const", asMETHOD(Quaternion, Inverse), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "float LengthSquared() const", asMETHOD(Quaternion, LengthSquared), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float DotProduct(const Quaternion&in) const", asMETHOD(Quaternion, DotProduct), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(Quaternion, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(Quaternion, float, bool) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "bool Equals(const Quaternion&in) const", asMETHOD(Quaternion, Equals), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "bool IsNaN() const", asMETHOD(Quaternion, IsNaN), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Conjugate() const", asMETHOD(Quaternion, Conjugate), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Vector3 get_eulerAngles() const", asMETHOD(Quaternion, EulerAngles), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, YawAngle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, PitchAngle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_roll() const", asMETHOD(Quaternion, RollAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Matrix3 get_rotationMatrix() const", asMETHOD(Quaternion, RotationMatrix), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(Quaternion, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(Quaternion, float, bool) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "String ToString() const", asMETHOD(Quaternion, ToString), asCALL_THISCALL);
     engine->RegisterObjectProperty("Quaternion", "float w", offsetof(Quaternion, w_));
     engine->RegisterObjectProperty("Quaternion", "float x", offsetof(Quaternion, x_));
     engine->RegisterObjectProperty("Quaternion", "float y", offsetof(Quaternion, y_));
@@ -533,6 +545,48 @@ static void RegisterMatrix3(asIScriptEngine* engine)
     engine->RegisterObjectProperty("Matrix3", "float m20", offsetof(Matrix3, m20_));
     engine->RegisterObjectProperty("Matrix3", "float m21", offsetof(Matrix3, m21_));
     engine->RegisterObjectProperty("Matrix3", "float m22", offsetof(Matrix3, m22_));
+}
+
+static void ConstructMatrix2(Matrix2* ptr)
+{
+    new(ptr) Matrix2();
+}
+
+static void ConstructMatrix2Copy(const Matrix2& mat, Matrix2* ptr)
+{
+    new(ptr) Matrix2(mat);
+}
+
+static void ConstructMatrix2Init(float v00, float v01, float v10, float v11, Matrix2* ptr)
+{
+    new(ptr) Matrix2(v00, v01, v10, v11);
+}
+
+static void RegisterMatrix2(asIScriptEngine* engine)
+{
+    engine->RegisterObjectType("Matrix2", sizeof(Matrix2), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CAK);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructMatrix2), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(const Matrix2&in)", asFUNCTION(ConstructMatrix2Copy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("Matrix2", asBEHAVE_CONSTRUCT, "void f(float, float, float, float)", asFUNCTION(ConstructMatrix2Init), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opMul(const Matrix2&in) const", asMETHODPR(Matrix2, operator *, (const Matrix2&) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opMul(float) const", asMETHODPR(Matrix2, operator *, (float) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Vector2 opMul(const Vector2&in) const", asMETHODPR(Matrix2, operator *, (const Vector2&) const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opAdd(const Matrix2&in) const", asMETHODPR(Matrix2, operator +, (const Matrix2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 opSub(const Matrix2&in) const", asMETHODPR(Matrix2, operator -, (const Matrix2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2& opAssign(const Matrix2&in)", asMETHODPR(Matrix2, operator =, (const Matrix2 &), Matrix2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "bool opEquals(const Matrix2&in) const", asMETHOD(Matrix2, operator ==), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Vector2 Scale() const", asMETHODPR(Matrix2, Scale, () const, Vector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Scaled(const Vector2&in) const", asMETHODPR(Matrix2, Scaled, (const Vector2 &) const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "void SetScale(const Vector2&in)", asMETHODPR(Matrix2,SetScale, (const Vector2 &), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "void SetScale(float)", asMETHODPR(Matrix2,SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Transpose() const", asMETHODPR(Matrix2, Transpose, () const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "Matrix2 Inverse() const", asMETHODPR(Matrix2, Inverse, () const, Matrix2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "bool Equals(const Matrix2&in) const", asMETHOD(Matrix2, Equals), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Matrix2", "String ToString() const", asMETHOD(Matrix2, ToString), asCALL_THISCALL);
+    engine->RegisterObjectProperty("Matrix2", "float m00", offsetof(Matrix2, m00_));
+    engine->RegisterObjectProperty("Matrix2", "float m01", offsetof(Matrix2, m01_));
+    engine->RegisterObjectProperty("Matrix2", "float m10", offsetof(Matrix2, m10_));
+    engine->RegisterObjectProperty("Matrix2", "float m11", offsetof(Matrix2, m11_));
 }
 
 static void ConstructMatrix4(Matrix4* ptr)
@@ -1206,8 +1260,9 @@ void RegisterMathAPI(asIScriptEngine* engine)
     RegisterVector2(engine);
     RegisterVector3(engine);
     RegisterVector4(engine);
-    RegisterQuaternion(engine);
+    RegisterMatrix2(engine);
     RegisterMatrix3(engine);
+    RegisterQuaternion(engine);
     RegisterMatrix4(engine);
     RegisterMatrix3x4(engine);
     RegisterRect(engine);

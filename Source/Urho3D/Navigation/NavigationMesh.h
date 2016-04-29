@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@ enum NavmeshPartitionType
 };
 
 class Geometry;
+class NavArea;
 
 struct FindPathData;
 struct NavBuildData;
@@ -63,15 +64,26 @@ struct NavigationGeometryInfo
     Matrix3x4 transform_;
     /// Bounding box relative to the navigation mesh root node.
     BoundingBox boundingBox_;
+
 };
 
-struct URHO3D_API NavigationPathData
+/// A flag representing the type of path point- none, the start of a path segment, the end of one, or an off-mesh connection.
+enum NavigationPathPointFlag
 {
-    PODVector<Vector3> pathPoints_;
-    // Flags on the path.
-    PODVector<unsigned char> pathFlags_;
-    // Area Ids on the path.
-    PODVector<unsigned char> pathAreas_;
+    NAVPATHFLAG_NONE = 0,
+    NAVPATHFLAG_START = 0x01,
+    NAVPATHFLAG_END = 0x02,
+    NAVPATHFLAG_OFF_MESH = 0x04
+};
+
+struct URHO3D_API NavigationPathPoint
+{
+    /// World-space position of the path point.
+    Vector3 position_;
+    /// Detour flag.
+    NavigationPathPointFlag flag_;
+    /// Detour area ID.
+    unsigned char areaID_;
 };
 
 /// Navigation mesh component. Collects the navigation geometry from child nodes with the Navigable component and responds to path queries.
@@ -135,11 +147,10 @@ public:
     /// Find a path between world space points. Return non-empty list of points if successful. Extents specifies how far off the navigation mesh the points can be.
     void FindPath(PODVector<Vector3>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
         const dtQueryFilter* filter = 0);
-
-    /// Find a path between world space points. Returns a NavigationPathData structure. Extents specifies how far off the navigaion mesh the points can be.
-    void FindPath(NavigationPathData& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
-        const dtQueryFilter* filter = 0);
-
+    /// Find a path between world space points. Return non-empty list of navigation path points if successful. Extents specifies how far off the navigation mesh the points can be.
+    void FindPath
+        (PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end, const Vector3& extents = Vector3::ONE,
+            const dtQueryFilter* filter = 0);
     /// Return a random point on the navigation mesh.
     Vector3 GetRandomPoint(const dtQueryFilter* filter = 0, dtPolyRef* randomRef = 0);
     /// Return a random point on the navigation mesh within a circle. The circle radius is only a guideline and in practice the returned point may be further away.
@@ -304,16 +315,16 @@ protected:
     int numTilesZ_;
     /// Whole navigation mesh bounding box.
     BoundingBox boundingBox_;
-
     /// Type of the heightfield partitioning.
     NavmeshPartitionType partitionType_;
     /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
     bool drawNavAreas_;
+    /// NavAreas for this NavMesh
+    Vector<WeakPtr<NavArea> > areas_;
 };
 
 /// Register Navigation library objects.

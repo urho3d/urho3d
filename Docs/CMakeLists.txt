@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -135,7 +135,7 @@ if (DOXYGEN_FOUND)
 endif ()
 
 # Make sure html output directory exists and not empty
-file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/html/Readme.txt "If URHO3D_DOCS build option is not set then use 'make doc' command to re-generate Urho3D documentation before calling 'make install', alternatively use the 'doc' and 'install' built-in targets in an IDE, respectively")
+file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/html/Readme.txt "If the URHO3D_DOCS build option is set then the Urho3D documentation will be built automatically as part of the Urho3D library build. If build option is not set, however, then use 'doc' built-in target to generate the documentation manually (must do this before installing the SDK).\n")
 
 # Currently it is not possible to make built-in 'install' target to depend on 'doc' in CMake, therefore 'make doc' command need to be invoked manually before 'make install' in order to install the SDK with complete documentation
 # Unless, URHO3D_DOCS build option is set in which case the custom 'doc' target is part of the default 'all' target which in turn the 'install' target depends on, so a single 'make install' alone is suffice to install everything

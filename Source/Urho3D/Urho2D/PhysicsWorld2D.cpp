@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -228,25 +228,56 @@ void PhysicsWorld2D::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdatePhysics2D);
 
-    using namespace PhysicsPreStep2D;
+    using namespace PhysicsPreStep;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_WORLD] = this;
     eventData[P_TIMESTEP] = timeStep;
-    SendEvent(E_PHYSICSPRESTEP2D, eventData);
+    SendEvent(E_PHYSICSPRESTEP, eventData);
 
     physicsStepping_ = true;
     world_->Step(timeStep, velocityIterations_, positionIterations_);
     physicsStepping_ = false;
 
-    for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
-        rigidBodies_[i]->ApplyWorldTransform();
+    // Apply world transforms. Unparented transforms first
+    for (unsigned i = 0; i < rigidBodies_.Size();)
+    {
+        if (rigidBodies_[i])
+        {
+            rigidBodies_[i]->ApplyWorldTransform();
+            ++i;
+        }
+        else
+        {
+            // Erase possible stale weak pointer
+            rigidBodies_.Erase(i);
+        }
+    }
+
+    // Apply delayed (parented) world transforms now, if any
+    while (!delayedWorldTransforms_.Empty())
+    {
+        for (HashMap<RigidBody2D*, DelayedWorldTransform2D>::Iterator i = delayedWorldTransforms_.Begin();
+            i != delayedWorldTransforms_.End();)
+        {
+            const DelayedWorldTransform2D& transform = i->second_;
+
+            // If parent's transform has already been assigned, can proceed
+            if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
+            {
+                transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
+                i = delayedWorldTransforms_.Erase(i);
+            }
+            else
+                ++i;
+        }
+    }
 
     SendBeginContactEvents();
     SendEndContactEvents();
 
-    using namespace PhysicsPostStep2D;
-    SendEvent(E_PHYSICSPOSTSTEP2D, eventData);
+    using namespace PhysicsPostStep;
+    SendEvent(E_PHYSICSPOSTSTEP, eventData);
 }
 
 void PhysicsWorld2D::DrawDebugGeometry()
@@ -363,6 +394,11 @@ void PhysicsWorld2D::RemoveRigidBody(RigidBody2D* rigidBody)
 
     WeakPtr<RigidBody2D> rigidBodyPtr(rigidBody);
     rigidBodies_.Remove(rigidBodyPtr);
+}
+
+void PhysicsWorld2D::AddDelayedWorldTransform(const DelayedWorldTransform2D& transform)
+{
+    delayedWorldTransforms_[transform.rigidBody_] = transform;
 }
 
 // Ray cast call back class.

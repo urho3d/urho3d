@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,17 +88,25 @@ bool ShaderVariation::Create()
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     if (type_ == VS)
     {
-        if (!device || FAILED(device->CreateVertexShader(
+        HRESULT hr = device->CreateVertexShader(
             (const DWORD*)&byteCode[0],
-            (IDirect3DVertexShader9**)&object_)))
-            compilerOutput_ = "Could not create vertex shader";
+            (IDirect3DVertexShader9**)&object_);
+        if (FAILED(hr))
+        {
+            URHO3D_SAFE_RELEASE(object_);
+            compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
+        }
     }
     else
     {
-        if (!device || FAILED(device->CreatePixelShader(
+        HRESULT hr = device->CreatePixelShader(
             (const DWORD*)&byteCode[0],
-            (IDirect3DPixelShader9**)&object_)))
-            compilerOutput_ = "Could not create pixel shader";
+            (IDirect3DPixelShader9**)&object_);
+        if (FAILED(hr))
+        {
+            URHO3D_SAFE_RELEASE(object_);
+            compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
+        }
     }
 
     return object_ != 0;
@@ -106,30 +114,23 @@ bool ShaderVariation::Create()
 
 void ShaderVariation::Release()
 {
-    if (object_)
+    if (object_ && graphics_)
     {
-        if (!graphics_)
-            return;
-
         graphics_->CleanupShaderPrograms(this);
 
         if (type_ == VS)
         {
             if (graphics_->GetVertexShader() == this)
                 graphics_->SetShaders(0, 0);
-
-            ((IDirect3DVertexShader9*)object_)->Release();
         }
         else
         {
             if (graphics_->GetPixelShader() == this)
                 graphics_->SetShaders(0, 0);
-
-            ((IDirect3DPixelShader9*)object_)->Release();
         }
-
-        object_ = 0;
     }
+
+    URHO3D_SAFE_RELEASE(object_);
 
     compilerOutput_.Clear();
 
@@ -279,13 +280,16 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
     macros.Push(endMacro);
 
     // Compile using D3DCompile
+    ID3DBlob* shaderCode = 0;
+    ID3DBlob* errorMsgs = 0;
 
-    LPD3DBLOB shaderCode = 0;
-    LPD3DBLOB errorMsgs = 0;
-
-    if (FAILED(D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
-        entryPoint, profile, flags, 0, &shaderCode, &errorMsgs)))
-        compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), (unsigned)errorMsgs->GetBufferSize());
+    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+        entryPoint, profile, flags, 0, &shaderCode, &errorMsgs);
+    if (FAILED(hr))
+    {
+        // Do not include end zero unnecessarily
+        compilerOutput_ = String((const char*)errorMsgs->GetBufferPointer(), (unsigned)errorMsgs->GetBufferSize() - 1);
+    }
     else
     {
         if (type_ == VS)
@@ -300,10 +304,8 @@ bool ShaderVariation::Compile(PODVector<unsigned>& byteCode)
         CopyStrippedCode(byteCode, bufData, bufSize);
     }
 
-    if (shaderCode)
-        shaderCode->Release();
-    if (errorMsgs)
-        errorMsgs->Release();
+    URHO3D_SAFE_RELEASE(shaderCode);
+    URHO3D_SAFE_RELEASE(errorMsgs);
 
     return !byteCode.Empty();
 }

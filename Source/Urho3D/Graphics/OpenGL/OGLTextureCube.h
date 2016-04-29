@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ public:
     /// Set data of one face from a stream. Return true if successful.
     bool SetData(CubeMapFace face, Deserializer& source);
     /// Set data of one face from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool SetData(CubeMapFace face, SharedPtr<Image> image, bool useAlpha = false);
+    bool SetData(CubeMapFace face, Image* image, bool useAlpha = false);
 
     /// Get data from a face's mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(CubeMapFace face, unsigned level, void* dest) const;

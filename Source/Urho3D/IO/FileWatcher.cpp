@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
 #if defined(URHO3D_FILEWATCHER) && defined(URHO3D_THREADING)
 #ifdef _WIN32
     String nativePath = GetNativePath(RemoveTrailingSlash(pathName));
-    
+
     dirHandle_ = (void*)CreateFileW(
         WString(nativePath).CString(),
         FILE_LIST_DIRECTORY,
@@ -97,13 +97,13 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         OPEN_EXISTING,
         FILE_FLAG_BACKUP_SEMANTICS,
         0);
-    
+
     if (dirHandle_ != INVALID_HANDLE_VALUE)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
         Run();
-        
+
         URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
@@ -114,7 +114,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
     }
 #elif defined(__linux__)
     int flags = IN_CREATE | IN_DELETE | IN_MODIFY | IN_MOVED_FROM | IN_MOVED_TO;
-    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (uint32_t)flags);
+    int handle = inotify_add_watch(watchHandle_, pathName.CString(), (unsigned)flags);
 
     if (handle < 0)
     {
@@ -140,7 +140,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
                 // Don't watch ./ or ../ sub-directories
                 if (!subDirFullPath.EndsWith("./"))
                 {
-                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (uint32_t)flags);
+                    handle = inotify_add_watch(watchHandle_, subDirFullPath.CString(), (unsigned)flags);
                     if (handle < 0)
                         URHO3D_LOGERROR("Failed to start watching subdirectory path " + subDirFullPath);
                     else
@@ -162,14 +162,14 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         URHO3D_LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
         return false;
     }
-    
+
     watcher_ = CreateFileWatcher(pathName.CString(), watchSubDirs);
     if (watcher_)
     {
         path_ = AddTrailingSlash(pathName);
         watchSubDirs_ = watchSubDirs;
         Run();
-        
+
         URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
@@ -195,13 +195,20 @@ void FileWatcher::StopWatching()
         shouldRun_ = false;
 
         // Create and delete a dummy file to make sure the watcher loop terminates
+        // This is only required on Windows platform
+        // TODO: Remove this temp write approach as it depends on user write privilege
+#ifdef _WIN32
         String dummyFileName = path_ + "dummy.tmp";
         File file(context_, dummyFileName, FILE_WRITE);
         file.Close();
         if (fileSystem_)
             fileSystem_->Delete(dummyFileName);
+#endif
 
+#if defined(__APPLE__) && !defined(IOS)
+        // Our implementation of file watcher requires the thread to be stopped first before closing the watcher
         Stop();
+#endif
 
 #ifdef _WIN32
         CloseHandle((HANDLE)dirHandle_);
@@ -211,6 +218,10 @@ void FileWatcher::StopWatching()
         dirHandle_.Clear();
 #elif defined(__APPLE__) && !defined(IOS)
         CloseFileWatcher(watcher_);
+#endif
+
+#ifndef __APPLE__
+        Stop();
 #endif
 
         URHO3D_LOGDEBUG("Stopped watching path " + path_);
@@ -229,7 +240,7 @@ void FileWatcher::ThreadFunction()
 #ifdef _WIN32
     unsigned char buffer[BUFFERSIZE];
     DWORD bytesFilled = 0;
-    
+
     while (shouldRun_)
     {
         if (ReadDirectoryChangesW((HANDLE)dirHandle_,
@@ -243,11 +254,11 @@ void FileWatcher::ThreadFunction()
             0))
         {
             unsigned offset = 0;
-            
+
             while (offset < bytesFilled)
             {
                 FILE_NOTIFY_INFORMATION* record = (FILE_NOTIFY_INFORMATION*)&buffer[offset];
-                
+
                 if (record->Action == FILE_ACTION_MODIFIED || record->Action == FILE_ACTION_RENAMED_NEW_NAME)
                 {
                     String fileName;
@@ -255,11 +266,11 @@ void FileWatcher::ThreadFunction()
                     const wchar_t* end = src + record->FileNameLength / 2;
                     while (src < end)
                         fileName.AppendUTF8(String::DecodeUTF16(src));
-                    
+
                     fileName = GetInternalPath(fileName);
                     AddChange(fileName);
                 }
-                
+
                 if (!record->NextEntryOffset)
                     break;
                 else

@@ -150,7 +150,7 @@ void InitScene()
     if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
     {
         renderer.reuseShadowMaps = false;
-        renderer.shadowQuality = SHADOWQUALITY_LOW_16BIT;
+        renderer.shadowQuality = SHADOWQUALITY_SIMPLE_16BIT;
         // Adjust the directional light shadow range slightly further, as only the first
         // cascade is supported
         Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);
@@ -496,6 +496,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         if (!gameScene.updateEnabled)
         {
             SetMessage("PAUSED");
+            audio.PauseSoundType(SOUND_EFFECT);
             
             // Open the settings joystick only if the controls screen joystick was already open
             if (screenJoystickID >= 0)
@@ -510,6 +511,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
         {
             SetMessage("");
+            audio.ResumeSoundType(SOUND_EFFECT);
 
             // Hide the settings joystick
             if (screenJoystickSettingsID >= 0)

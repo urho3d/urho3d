@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -100,44 +100,31 @@ bool Texture2D::EndLoad()
 
 void Texture2D::Release()
 {
-    if (object_)
+    if (graphics_ && object_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-
-        if (renderSurface_)
-            renderSurface_->Release();
-
-        ((ID3D11Resource*)object_)->Release();
-        object_ = 0;
-
-        if (shaderResourceView_)
-        {
-            ((ID3D11ShaderResourceView*)shaderResourceView_)->Release();
-            shaderResourceView_ = 0;
-        }
-
-        if (sampler_)
-        {
-            ((ID3D11SamplerState*)sampler_)->Release();
-            sampler_ = 0;
-        }
     }
-    else
-    {
-        if (renderSurface_)
-            renderSurface_->Release();
-    }
+
+    if (renderSurface_)
+        renderSurface_->Release();
+
+    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(shaderResourceView_);
+    URHO3D_SAFE_RELEASE(sampler_);
 }
 
 bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
 {
+    if (width <= 0 || height <= 0)
+    {
+        URHO3D_LOGERROR("Zero or negative texture dimensions");
+        return false;
+    }
+
     // Delete the old rendersurface if any
     renderSurface_.Reset();
     usage_ = usage;
@@ -145,12 +132,15 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     if (usage_ == TEXTURE_RENDERTARGET || usage_ == TEXTURE_DEPTHSTENCIL)
     {
         renderSurface_ = new RenderSurface(this);
+
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
     }
+    else if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
     if (usage_ == TEXTURE_RENDERTARGET)
         SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
@@ -221,18 +211,18 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
-        if (mappedData.pData)
+        if (FAILED(hr) || !mappedData.pData)
+        {
+            URHO3D_LOGD3DERROR("Failed to map texture for update", hr);
+            return false;
+        }
+        else
         {
             for (int row = 0; row < height; ++row)
                 memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
             graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
-        }
-        else
-        {
-            URHO3D_LOGERROR("Failed to map texture for update");
-            return false;
         }
     }
     else
@@ -252,7 +242,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     return true;
 }
 
-bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
+bool Texture2D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -260,8 +250,9 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture2D);
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -273,7 +264,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         unsigned components = image->GetComponents();
         if ((components == 1 && !useAlpha) || components == 2 || components == 3)
         {
-            image = image->ConvertToRGBA();
+            mipImage = image->ConvertToRGBA(); image = mipImage;
             if (!image)
                 return false;
             components = image->GetComponents();
@@ -287,7 +278,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -318,7 +309,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
@@ -347,7 +338,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
@@ -409,10 +400,11 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
     ID3D11Texture2D* stagingTexture = 0;
-    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
-    if (!stagingTexture)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create staging texture for GetData");
+        URHO3D_SAFE_RELEASE(stagingTexture);
+        URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
         return false;
     }
 
@@ -432,20 +424,20 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     unsigned rowSize = GetRowDataSize(levelWidth);
     unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
 
-    graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
-    if (mappedData.pData)
+    hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (FAILED(hr) || !mappedData.pData)
+    {
+        URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
+        stagingTexture->Release();
+        return false;
+    }
+    else
     {
         for (unsigned row = 0; row < numRows; ++row)
             memcpy((unsigned char*)dest + row * rowSize, (unsigned char*)mappedData.pData + row * mappedData.RowPitch, rowSize);
         graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
         stagingTexture->Release();
         return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Failed to map staging texture for GetData");
-        stagingTexture->Release();
-        return false;
     }
 }
 
@@ -475,10 +467,11 @@ bool Texture2D::Create()
         textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
-    graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
-    if (!object_)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create texture");
+        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
 
@@ -488,59 +481,55 @@ bool Texture2D::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
-    graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
-    if (!shaderResourceView_)
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create shader resource view for texture");
+        URHO3D_SAFE_RELEASE(shaderResourceView_);
+        URHO3D_LOGD3DERROR("Failed to create shader resource view for texture", hr);
         return false;
     }
 
     if (usage_ == TEXTURE_RENDERTARGET)
     {
-        renderSurface_ = new RenderSurface(this);
-
         D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
         memset(&renderTargetViewDesc, 0, sizeof renderTargetViewDesc);
         renderTargetViewDesc.Format = textureDesc.Format;
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-        graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
             (ID3D11RenderTargetView**)&renderSurface_->renderTargetView_);
-
-        if (!renderSurface_->renderTargetView_)
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create rendertarget view for texture");
+            URHO3D_SAFE_RELEASE(renderSurface_->renderTargetView_);
+            URHO3D_LOGD3DERROR("Failed to create rendertarget view for texture", hr);
             return false;
         }
     }
     else if (usage_ == TEXTURE_DEPTHSTENCIL)
     {
-        renderSurface_ = new RenderSurface(this);
-
         D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
         memset(&depthStencilViewDesc, 0, sizeof depthStencilViewDesc);
         depthStencilViewDesc.Format = (DXGI_FORMAT)GetDSVFormat(textureDesc.Format);
         depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-        graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
             (ID3D11DepthStencilView**)&renderSurface_->renderTargetView_);
-
-        if (!renderSurface_->renderTargetView_)
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create depth-stencil view for texture");
+            URHO3D_SAFE_RELEASE(renderSurface_->renderTargetView_);
+            URHO3D_LOGD3DERROR("Failed to create depth-stencil view for texture", hr);
             return false;
         }
 
         // Create also a read-only version of the view for simultaneous depth testing and sampling in shader
         depthStencilViewDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
-        graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
             (ID3D11DepthStencilView**)&renderSurface_->readOnlyView_);
-
-        if (!renderSurface_->readOnlyView_)
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create read-only depth-stencil view for texture");
-            return false;
+            URHO3D_SAFE_RELEASE(renderSurface_->readOnlyView_);
+            URHO3D_LOGD3DERROR("Failed to create read-only depth-stencil view for texture", hr);
         }
     }
 
@@ -549,8 +538,13 @@ bool Texture2D::Create()
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
+    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer)
+            renderer->QueueRenderSurface(renderSurface_);
+        renderSurface_->ResetUpdateQueued();
+    }
 }
 
 }

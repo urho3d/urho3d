@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -207,7 +207,7 @@ SDL_X11_LoadSymbols(void)
 #else  /* no dynamic X11 */
 
 #define SDL_X11_MODULE(modname) SDL_X11_HAVE_##modname = 1; /* default yes */
-#define SDL_X11_SYM(a,fn,x,y,z) X11_##fn = fn;
+#define SDL_X11_SYM(a,fn,x,y,z) X11_##fn = (SDL_DYNX11FN_##fn) fn;
 #include "SDL_x11sym.h"
 #undef SDL_X11_MODULE
 #undef SDL_X11_SYM

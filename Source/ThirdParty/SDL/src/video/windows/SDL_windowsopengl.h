@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -30,6 +30,7 @@ struct SDL_GLDriverData
     SDL_bool HAS_WGL_ARB_pixel_format;
     SDL_bool HAS_WGL_EXT_swap_control_tear;
     SDL_bool HAS_WGL_EXT_create_context_es2_profile;
+    SDL_bool HAS_WGL_ARB_context_flush_control;
 
     void *(WINAPI * wglGetProcAddress) (const char *proc);
       HGLRC(WINAPI * wglCreateContext) (HDC hdc);

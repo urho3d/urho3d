@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -196,6 +196,17 @@ Object* Context::GetSubsystem(StringHash type) const
         return i->second_;
     else
         return 0;
+}
+
+const Variant& Context::GetGlobalVar(StringHash key) const
+{
+    VariantMap::ConstIterator i = globalVars_.Find(key);
+    return i != globalVars_.End() ? i->second_ : Variant::EMPTY;
+}
+
+void Context::SetGlobalVar(StringHash key, const Variant& value)
+{
+    globalVars_[key] = value;
 }
 
 Object* Context::GetEventSender() const

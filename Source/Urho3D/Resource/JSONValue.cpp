@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -559,8 +559,13 @@ VariantMap JSONValue::GetVariantMap() const
 void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context)
 {
     SetType(JSON_ARRAY);
+    arrayValue_->Reserve(variantVector.Size());
     for (unsigned i = 0; i < variantVector.Size(); ++i)
-        (*this)[i].SetVariant(variantVector[i]);
+    {
+        JSONValue val;
+        val.SetVariant(variantVector[i], context);
+        arrayValue_->Push(val);
+    }
 }
 
 VariantVector JSONValue::GetVariantVector() const

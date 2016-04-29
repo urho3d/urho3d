@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -305,6 +305,8 @@ private:
     bool inWorld_;
     /// Mass update enable flag.
     bool enableMassUpdate_;
+    /// Internal flag whether has simulated at least once.
+    mutable bool hasSimulated_;
 };
 
 }

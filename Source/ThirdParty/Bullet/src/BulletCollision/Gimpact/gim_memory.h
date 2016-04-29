@@ -118,7 +118,7 @@ void gim_free(void *ptr);
 
 
 // Urho3D - allow to disable SIMD, allow MinGW to use SIMD
-#if defined(URHO3D_SSE) && defined(_WIN32) && !defined(__CYGWIN__)
+#if (!defined(_M_IX86_FP) || _M_IX86_FP || defined(__SSE__)) && defined(_WIN32) && !defined(__CYGWIN__)
     #define GIM_SIMD_MEMORY 1
 #endif
 

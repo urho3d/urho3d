@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -343,7 +343,7 @@ BlitRGBtoRGBPixelAlphaMMX(SDL_BlitInfo * info)
     mm_zero = _mm_setzero_si64();       /* 0 -> mm_zero */
     multmask = 0x00FF;
 	multmask <<= (ashift * 2);
-	multmask2 = 0x00FF00FF00FF00FF;
+	multmask2 = 0x00FF00FF00FF00FFULL;
 
     while (height--) {
 		/* *INDENT-OFF* */
@@ -530,7 +530,7 @@ BlitRGBtoRGBPixelAlphaMMX3DNOW(SDL_BlitInfo * info)
     mm_zero = _mm_setzero_si64();       /* 0 -> mm_zero */
     multmask = 0x00FF;
     multmask <<= (ashift * 2);
-    multmask2 = 0x00FF00FF00FF00FF;
+    multmask2 = 0x00FF00FF00FF00FFULL;
 
     while (height--) {
 	    /* *INDENT-OFF* */
@@ -580,7 +580,7 @@ BlitRGBtoRGBPixelAlphaMMX3DNOW(SDL_BlitInfo * info)
     _mm_empty();
 }
 
-#endif /* __MMX__ */
+#endif /* __3dNOW__ */
 
 /* 16bpp special case for per-surface alpha=50%: blend 2 pixels in parallel */
 

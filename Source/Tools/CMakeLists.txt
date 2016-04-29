@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,16 @@ find_package (Urho3D REQUIRED)
 include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Urho3DPlayer target is rather special, although it is here, it is not a tool because it is built into target platform binary as opposed to host platform
-if (NOT EMSCRIPTEN)
+# In order to test the player on Web platform built using Emscripten, the request parameters need to be parsed into Module['argument'] (see https://github.com/kripken/emscripten/blob/master/src/emrun_prejs.js for inspiration)
+# The CTest could "run" the Urho3DPlayer.html with script name as parameter, thanks to emrun performing this parsing automatically
+# In a production environment, however, the request parameters parsing has to be done by the application itself one way or another
+if (URHO3D_ANGELSCRIPT OR URHO3D_LUA${JIT})
+    # Add Urho3DPlayer as target only when one of the supported scripting subystems is enabled
     add_subdirectory (Urho3DPlayer)
 endif ()
 
 # Build PackageTool using host compiler toolchain
-if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
+if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     if (IOS)
@@ -49,9 +53,6 @@ if ((CMAKE_CROSSCOMPILING OR IOS) AND URHO3D_PACKAGING)
     install (PROGRAMS ${CMAKE_BINARY_DIR}/bin/tool/PackageTool DESTINATION ${DEST_RUNTIME_DIR}/tool)
 endif ()
 
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
-
 if (URHO3D_TOOLS)
     # Urho3D tools
     add_subdirectory (AssetImporter)
@@ -62,7 +63,7 @@ if (URHO3D_TOOLS)
     if (URHO3D_ANGELSCRIPT)
         add_subdirectory (ScriptCompiler)
     endif ()
-elseif ((NOT CMAKE_CROSSCOMPILING AND NOT IOS) AND URHO3D_PACKAGING)
+elseif (NOT CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
     # PackageTool target is required but we are not cross-compiling, so build it as per normal
     add_subdirectory (PackageTool)
 endif ()

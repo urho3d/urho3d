@@ -6,6 +6,7 @@ class VertexBuffer : public Object
     ~VertexBuffer();
 
     void SetShadowed(bool enable);
+    bool SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic = false);
     bool SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic = false);
     tolua_outside bool VertexBufferSetData @ SetData(VectorBuffer& data);
     tolua_outside bool VertexBufferSetDataRange @ SetDataRange(VectorBuffer& data, unsigned start, unsigned count, bool discard = false);
@@ -15,6 +16,11 @@ class VertexBuffer : public Object
     bool IsDynamic() const;
     unsigned GetVertexCount() const;
     unsigned GetVertexSize() const;
+    tolua_outside const PODVector<VertexElement>& VertexBufferGetElements @ GetElements() const;
+    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const;
+    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const;
+    unsigned GetElementOffset(VertexElementSemantic semantic, unsigned char index = 0) const;
+    unsigned GetElementOffset(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const;
     unsigned GetElementMask() const;
 
     tolua_property__is_set bool shadowed;
@@ -68,5 +74,11 @@ static VectorBuffer VertexBufferGetData(VertexBuffer* src)
     }
 
     return ret;
+}
+
+static const PODVector<VertexElement>& VertexBufferGetElements(const VertexBuffer* buffer)
+{
+    static PODVector<VertexElement> vector = buffer->GetElements();
+    return vector;
 }
 $}

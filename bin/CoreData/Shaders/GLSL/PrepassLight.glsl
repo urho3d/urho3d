@@ -63,6 +63,9 @@ void PS()
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);
     #endif
 
+    // Position acquired via near/far ray is relative to camera. Bring position to world space
+    worldPos += cCameraPosPS;
+    
     vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     vec4 projWorldPos = vec4(worldPos, 1.0);
     vec3 lightColor;

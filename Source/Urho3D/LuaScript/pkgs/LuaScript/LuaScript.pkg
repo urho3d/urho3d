@@ -9,10 +9,16 @@ void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(Object* sender, const St
 void LuaScriptRemoveEventHandlers @ UnsubscribeFromEvents(Object* sender);
 void LuaScriptRemoveAllEventHandlers @ UnsubscribeFromAllEvents();
 void LuaScriptRemoveEventHandlersExcept @ UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames);
+bool LuaScriptHasSubscribedToEvent @ HasSubscribedToEvent(const String eventName);
+bool LuaScriptHasSubscribedToEvent @ HasSubscribedToEvent(Object* sender, const String eventName);
 
 void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventData);
 void LuaScriptSetExecuteConsoleCommands @ SetExecuteConsoleCommands(bool enable);
 bool LuaScriptGetExecuteConsoleCommands @ GetExecuteConsoleCommands();
+
+void LuaScriptSetGlobalVar @ SetGlobalVar(const String key, Variant value);
+Variant LuaScriptGetGlobalVar @ GetGlobalVar(const String key);
+VariantMap& LuaScriptGetGlobalVars @ GetGlobalVars();
 
 ${
 static LuaScript* GetLuaScript(lua_State* L)
@@ -25,10 +31,15 @@ static LuaScript* GetLuaScript(lua_State* L)
 #define LuaScriptRemoveEventHandlers GetLuaScript(tolua_S)->RemoveEventHandlers
 #define LuaScriptRemoveAllEventHandlers GetLuaScript(tolua_S)->RemoveAllEventHandlers
 #define LuaScriptRemoveEventHandlersExcept GetLuaScript(tolua_S)->RemoveEventHandlersExcept
+#define LuaScriptHasSubscribedToEvent GetLuaScript(tolua_S)->HasEventHandler
 
 #define LuaScriptSendEvent GetLuaScript(tolua_S)->SendEvent
 #define LuaScriptSetExecuteConsoleCommands GetLuaScript(tolua_S)->SetExecuteConsoleCommands
 #define LuaScriptGetExecuteConsoleCommands GetLuaScript(tolua_S)->GetExecuteConsoleCommands
+
+#define LuaScriptSetGlobalVar GetLuaScript(tolua_S)->SetGlobalVar
+#define LuaScriptGetGlobalVar GetLuaScript(tolua_S)->GetGlobalVar
+#define LuaScriptGetGlobalVars GetLuaScript(tolua_S)->GetGlobalVars
 
 static bool tolua_isfunctionorurho3dstring(lua_State* L, int lo, int def, tolua_Error* err)
 {

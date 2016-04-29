@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -116,8 +116,14 @@ private:
     unsigned systemFBO_;
     /// Active texture unit.
     unsigned activeTexture_;
-    /// Vertex attributes in use.
-    unsigned enabledAttributes_;
+    /// Enabled vertex attributes bitmask.
+    unsigned enabledVertexAttributes_;
+    /// Vertex attributes bitmask used by the current shader program.
+    unsigned usedVertexAttributes_;
+    /// Vertex attribute instancing bitmask for keeping track of divisors.
+    unsigned instancingVertexAttributes_;
+    /// Current mapping of vertex attribute locations by semantic. The map is owned by the shader program, so care must be taken to switch a null shader program when it's destroyed.
+    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_;
     /// Currently bound frame buffer object.
     unsigned boundFBO_;
     /// Currently bound vertex buffer object.
@@ -130,6 +136,8 @@ private:
     HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
     /// Need FBO commit flag.
     bool fboDirty_;
+    /// Need vertex attribute pointer update flag.
+    bool vertexBuffersDirty_;
     /// sRGB write mode flag.
     bool sRGBWrite_;
 };

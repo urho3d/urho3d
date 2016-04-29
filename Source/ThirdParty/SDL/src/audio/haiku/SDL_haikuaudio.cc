@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -111,7 +111,7 @@ UnmaskSignals(sigset_t * omask)
 
 
 static int
-HAIKUAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
+HAIKUAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 {
     int valid_datatype = 0;
     media_raw_audio_format format;

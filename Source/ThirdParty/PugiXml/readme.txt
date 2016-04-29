@@ -1,6 +1,6 @@
-pugixml 1.5 - an XML processing library
+pugixml 1.7 - an XML processing library
 
-Copyright (C) 2006-2014, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+Copyright (C) 2006-2015, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
 Report bugs and download new versions at http://pugixml.org/
 
 This is the distribution of pugixml, which is a C++ XML processing library,
@@ -28,7 +28,7 @@ The distribution contains the following folders:
 
 This library is distributed under the MIT License:
 
-Copyright (c) 2006-2014 Arseny Kapoulkine
+Copyright (c) 2006-2015 Arseny Kapoulkine
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

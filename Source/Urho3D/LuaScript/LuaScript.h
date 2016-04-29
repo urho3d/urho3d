@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,6 +66,10 @@ public:
     virtual void RemoveAllEventHandlers();
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
+    /// Return whether has subscribed to an event.
+    virtual bool HasEventHandler(const String& eventName) const;
+    /// Return whether has subscribed to a specific sender's event.
+    virtual bool HasEventHandler(Object* sender, const String& eventName) const;
 
     /// Execute script file. Return true if successful.
     bool ExecuteFile(const String& fileName);

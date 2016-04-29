@@ -33,6 +33,9 @@ function Start()
     -- Show OS mouse cursor
     input.mouseVisible = true
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
+
     -- Open the operating system console window (for stdin / stdout) if not open yet
     -- Do not open in fullscreen, as this would cause constant device loss
     if not graphics.fullscreen then
@@ -50,7 +53,7 @@ function Start()
     --   and it is designed for development of game server connecting to ODBC-compliant databases in mind
 
     -- This demo will always work when using SQLite API as the SQLite database engine is embedded inside Urho3D game engine
-    --   and this is also the case when targeting HTML5 in Emscripten build
+    --   and this is also the case when targeting Web platform
 
     -- We could have used #ifdef to init the connection string during compile time, but below shows how it is done during runtime
     -- The "URHO3D_DATABASE_ODBC" compiler define is set when URHO3D_DATABASE_ODBC build option is enabled

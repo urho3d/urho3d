@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,12 @@
 
 #ifndef MINI_URHO
 #include <SDL/SDL_filesystem.h>
-#else
-#include <stdio.h>
 #endif
 
 #include <sys/stat.h>
+#include <cstdio>
 
 #ifdef _WIN32
-#include <cstdio>
 #ifndef _MSC_VER
 #define _WIN32_IE 0x501
 #endif

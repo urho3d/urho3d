@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -56,22 +56,15 @@ public:
     /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data);
     /// Set data from an image. Return true if successful. Optionally make a single channel image alpha-only.
-    bool SetData(SharedPtr<Image> image, bool useAlpha = false);
+    bool SetData(Image* image, bool useAlpha = false);
 
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned level, void* dest) const;
 
-    /// Return render surface.
-    RenderSurface* GetRenderSurface() const { return renderSurface_; }
-
 private:
     /// Create texture.
     bool Create();
-    /// Handle render surface update event.
-    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 
-    /// Render surface.
-    SharedPtr<RenderSurface> renderSurface_;
     /// Image file acquired during BeginLoad.
     SharedPtr<Image> loadImage_;
     /// Parameter file acquired during BeginLoad.

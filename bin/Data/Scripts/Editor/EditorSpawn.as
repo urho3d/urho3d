@@ -430,7 +430,7 @@ void SpawnObject()
         Vector3 position, normal;
         bool result = false;
         
-        if (spawnOnSelection && selectedNode != null)
+        if (spawnOnSelection && selectedNode !is null)
             result = GetSpawnPositionOnNode(cameraRay, camera.farClip, position, normal, selectedNode, spawnRadius, false);
         else
             result = GetSpawnPosition(cameraRay, camera.farClip, position, normal, spawnRadius, false);        

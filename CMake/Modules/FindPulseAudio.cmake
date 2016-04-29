@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,22 @@
 
 # Find PulseAudio development library
 #
-#  PA_FOUND
-#  PA_INCLUDE_DIRS
-#  PA_LIBRARIES
-#  PA_VERSION
+#  PULSEAUDIO_FOUND
+#  PULSEAUDIO_INCLUDE_DIRS
+#  PULSEAUDIO_LIBRARIES
+#  PULSEAUDIO_VERSION
 #
 
-find_path (PA_INCLUDE_DIRS NAMES pulse/pulseaudio.h DOC "PulseAudio include directory")
-find_library (PA_LIBRARIES NAMES pulse-simple DOC "PulseAudio library")
+find_path (PULSEAUDIO_INCLUDE_DIRS NAMES pulse/pulseaudio.h DOC "PulseAudio include directory")
+find_library (PULSEAUDIO_LIBRARIES NAMES pulse-simple DOC "PulseAudio library")
 
-if (NOT PA_VERSION AND PA_INCLUDE_DIRS AND EXISTS ${PA_INCLUDE_DIRS}/pulse/version.h)   # Only do this once
-    file (STRINGS "${PA_INCLUDE_DIRS}/pulse/version.h" PA_VERSION REGEX "^.*pa_get_headers_version.+\"[^\"]*\".*$")
-    string (REGEX REPLACE "^.*pa_get_headers_version.+\"([^\"]*)\".*$" \\1 PA_VERSION "${PA_VERSION}")      # Stringify to guard against empty variable
-    set (PA_VERSION "${PA_VERSION}" CACHE INTERNAL "PulseAudio version")
+if (NOT PULSEAUDIO_VERSION AND PULSEAUDIO_INCLUDE_DIRS AND EXISTS ${PULSEAUDIO_INCLUDE_DIRS}/pulse/version.h)   # Only do this once
+    file (STRINGS ${PULSEAUDIO_INCLUDE_DIRS}/pulse/version.h PULSEAUDIO_VERSION REGEX "^.*pa_get_headers_version.+\"[^\"]*\".*$")
+    string (REGEX REPLACE "^.*pa_get_headers_version.+\"([^\"]*)\".*$" \\1 PULSEAUDIO_VERSION "${PULSEAUDIO_VERSION}")      # Stringify to guard against empty variable
+    set (PULSEAUDIO_VERSION "${PULSEAUDIO_VERSION}" CACHE INTERNAL "PulseAudio version")
 endif ()
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (PA REQUIRED_VARS PA_LIBRARIES PA_INCLUDE_DIRS VERSION_VAR PA_VERSION FAIL_MESSAGE "Could NOT find PulseAudio development library")
+find_package_handle_standard_args (PulseAudio REQUIRED_VARS PULSEAUDIO_LIBRARIES PULSEAUDIO_INCLUDE_DIRS VERSION_VAR PULSEAUDIO_VERSION FAIL_MESSAGE "Could NOT find PulseAudio development library")
 
-mark_as_advanced (PA_INCLUDE_DIRS PA_LIBRARIES)
+mark_as_advanced (PULSEAUDIO_INCLUDE_DIRS PULSEAUDIO_LIBRARIES)

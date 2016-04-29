@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,6 +78,8 @@ public:
 private:
     /// Reset scene.
     void ResetScene();
+    /// Handle render surface update event. Queue the texture for update in case the View3D is visible and automatic update is enabled.
+    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 
     /// Renderable texture.
     SharedPtr<Texture2D> renderTexture_;

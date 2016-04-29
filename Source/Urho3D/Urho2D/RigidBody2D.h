@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -101,8 +101,10 @@ public:
     /// Release body.
     void ReleaseBody();
 
-    /// Apply world transform. Called by PhysicsWorld2D.
+    /// Apply world transform from the Box2D body. Called by PhysicsWorld2D.
     void ApplyWorldTransform();
+    /// Apply specified world position & rotation. Called by PhysicsWorld2D.
+    void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
     /// Add collision shape.
     void AddCollisionShape2D(CollisionShape2D* collisionShape);
     /// Remove collision shape.

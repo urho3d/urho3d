@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -136,15 +136,25 @@ X11_HandleXinput2Event(SDL_VideoData *videodata,XGenericEventCookie *cookie)
         case XI_RawMotion: {
             const XIRawEvent *rawev = (const XIRawEvent*)cookie->data;
             SDL_Mouse *mouse = SDL_GetMouse();
-            double relative_cords[2];
+            double relative_coords[2];
+            static Time prev_time = 0;
+            static double prev_rel_coords[2];
 
             if (!mouse->relative_mode || mouse->relative_mode_warp) {
                 return 0;
             }
 
             parse_valuators(rawev->raw_values,rawev->valuators.mask,
-                            rawev->valuators.mask_len,relative_cords,2);
-            SDL_SendMouseMotion(mouse->focus,mouse->mouseID,1,(int)relative_cords[0],(int)relative_cords[1]);
+                            rawev->valuators.mask_len,relative_coords,2);
+
+            if ((rawev->time == prev_time) && (relative_coords[0] == prev_rel_coords[0]) && (relative_coords[1] == prev_rel_coords[1])) {
+                return 0;  /* duplicate event, drop it. */
+            }
+
+            SDL_SendMouseMotion(mouse->focus,mouse->mouseID,1,(int)relative_coords[0],(int)relative_coords[1]);
+            prev_rel_coords[0] = relative_coords[0];
+            prev_rel_coords[1] = relative_coords[1];
+            prev_time = rawev->time;
             return 1;
             }
             break;
@@ -183,7 +193,7 @@ X11_InitXinput2Multitouch(_THIS)
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     XIDeviceInfo *info;
     int ndevices,i,j;
-    info = X11_XIQueryDevice(data->display, XIAllMasterDevices, &ndevices);
+    info = X11_XIQueryDevice(data->display, XIAllDevices, &ndevices);
 
     for (i = 0; i < ndevices; i++) {
         XIDeviceInfo *dev = &info[i];
@@ -197,9 +207,7 @@ X11_InitXinput2Multitouch(_THIS)
                 continue;
 
             touchId = t->sourceid;
-            if (!SDL_GetTouch(touchId)) {
-                SDL_AddTouch(touchId, dev->name);
-            }
+            SDL_AddTouch(touchId, dev->name);
         }
     }
     X11_XIFreeDeviceInfo(info);

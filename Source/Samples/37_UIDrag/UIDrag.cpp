@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,9 @@ void UIDrag::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void UIDrag::CreateGUI()
@@ -72,6 +75,9 @@ void UIDrag::CreateGUI()
         b->SetStyle("Button");
         b->SetSize(300, 100);
         b->SetPosition(IntVector2(50*i, 50*i));
+
+        if (i % 2 == 0)
+            b->AddTag("SomeTag");
 
         SubscribeToEvent(b, E_DRAGMOVE, URHO3D_HANDLER(UIDrag, HandleDragMove));
         SubscribeToEvent(b, E_DRAGBEGIN, URHO3D_HANDLER(UIDrag, HandleDragBegin));
@@ -123,7 +129,9 @@ void UIDrag::CreateInstructions()
 
     // Construct new Text object, set string to display and font to use
     Text* instructionText = ui->GetRoot()->CreateChild<Text>();
-    instructionText->SetText("Drag on the buttons to move them around.\nTouch input allows also multi-drag.");
+    instructionText->SetText("Drag on the buttons to move them around.\n"
+                             "Touch input allows also multi-drag.\n"
+                             "Press SPACE to show/hide tagged UI elements.");
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
     instructionText->SetTextAlignment(HA_CENTER);
 
@@ -216,5 +224,16 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         Text* t = (Text*)root->GetChild("Touch " + String(i));
         t->SetVisible(false);
+    }
+    
+    if (input->GetKeyPress(KEY_SPACE))
+    {
+        PODVector<UIElement*> elements;
+        root->GetChildrenWithTag(elements, "SomeTag");
+        for (PODVector<UIElement*>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+        {
+            UIElement* element = *i;
+            element->SetVisible(!element->IsVisible());
+        }
     }
 }

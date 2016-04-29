@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -99,12 +99,11 @@ static void
 SDL_FillRect1SSE(Uint8 *pixels, int pitch, Uint32 color, int w, int h)
 {
     int i, n;
-    Uint8 *p = NULL;
-    
+
     SSE_BEGIN;
     while (h--) {
+        Uint8 *p = pixels;
         n = w;
-        p = pixels;
 
         if (n > 63) {
             int adjust = 16 - ((uintptr_t)p & 15);
@@ -118,7 +117,6 @@ SDL_FillRect1SSE(Uint8 *pixels, int pitch, Uint32 color, int w, int h)
         if (n & 63) {
             int remainder = (n & 63);
             SDL_memset(p, color, remainder);
-            p += remainder;
         }
         pixels += pitch;
     }
@@ -198,9 +196,15 @@ SDL_FillRect2(Uint8 * pixels, int pitch, Uint32 color, int w, int h)
 static void
 SDL_FillRect3(Uint8 * pixels, int pitch, Uint32 color, int w, int h)
 {
-    Uint8 r = (Uint8) ((color >> 16) & 0xFF);
-    Uint8 g = (Uint8) ((color >> 8) & 0xFF);
-    Uint8 b = (Uint8) (color & 0xFF);
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    Uint8 b1 = (Uint8) (color & 0xFF);
+    Uint8 b2 = (Uint8) ((color >> 8) & 0xFF);
+    Uint8 b3 = (Uint8) ((color >> 16) & 0xFF);
+#elif SDL_BYTEORDER == SDL_BIG_ENDIAN
+    Uint8 b1 = (Uint8) ((color >> 16) & 0xFF);
+    Uint8 b2 = (Uint8) ((color >> 8) & 0xFF);
+    Uint8 b3 = (Uint8) (color & 0xFF);
+#endif
     int n;
     Uint8 *p = NULL;
 
@@ -209,9 +213,9 @@ SDL_FillRect3(Uint8 * pixels, int pitch, Uint32 color, int w, int h)
         p = pixels;
 
         while (n--) {
-            *p++ = r;
-            *p++ = g;
-            *p++ = b;
+            *p++ = b1;
+            *p++ = b2;
+            *p++ = b3;
         }
         pixels += pitch;
     }
@@ -253,6 +257,10 @@ SDL_FillRect(SDL_Surface * dst, const SDL_Rect * rect, Uint32 color)
         rect = &clipped;
     } else {
         rect = &dst->clip_rect;
+        /* Don't attempt to fill if the surface's clip_rect is empty */
+        if (SDL_RectEmpty(rect)) {
+            return 0;
+        }
     }
 
     /* Perform software fill */

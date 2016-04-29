@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -328,8 +328,8 @@ bool FontFaceFreeType::CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, in
         FT_Error error = FT_Load_Char(face, charCode, loadMode_);
         if (!error)
         {
-            int width = Max(RoundToPixels(slot->metrics.width), slot->bitmap.width);
-            int height = Max(RoundToPixels(slot->metrics.height), slot->bitmap.rows);
+            int width = Max(RoundToPixels(slot->metrics.width), (int)slot->bitmap.width);
+            int height = Max(RoundToPixels(slot->metrics.height), (int)slot->bitmap.rows);
             int x, y;
             if (!allocator.Allocate(width + 1, height + 1, x, y))
                 return false;
@@ -373,8 +373,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     if (!error)
     {
         // Note: position within texture will be filled later
-        fontGlyph.width_ = (short)Max(RoundToPixels(slot->metrics.width), slot->bitmap.width);
-        fontGlyph.height_ = (short)Max(RoundToPixels(slot->metrics.height), slot->bitmap.rows);
+        fontGlyph.width_ = (short)Max(RoundToPixels(slot->metrics.width), (int)slot->bitmap.width);
+        fontGlyph.height_ = (short)Max(RoundToPixels(slot->metrics.height), (int)slot->bitmap.rows);
         fontGlyph.offsetX_ = (short)(RoundToPixels(slot->metrics.horiBearingX));
         fontGlyph.offsetY_ = (short)(ascender_ - RoundToPixels(slot->metrics.horiBearingY));
         fontGlyph.advanceX_ = (short)(slot->metrics.horiAdvance >> 6);
@@ -412,23 +412,23 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
             if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
             {
-                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
+                for (unsigned int y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
+                    for (unsigned int x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = (unsigned char)((src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0);
                 }
             }
             else
             {
-                for (unsigned y = 0; y < slot->bitmap.rows; ++y)
+                for (unsigned int y = 0; y < slot->bitmap.rows; ++y)
                 {
                     unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                     unsigned char* rowDest = dest + y * pitch;
 
-                    for (unsigned x = 0; x < slot->bitmap.width; ++x)
+                    for (unsigned int x = 0; x < slot->bitmap.width; ++x)
                         rowDest[x] = src[x];
                 }
             }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -327,7 +327,6 @@ Octree::~Octree()
 {
     // Reset root pointer from all child octants now so that they do not move their drawables to root
     drawableUpdates_.Clear();
-    drawableReinsertions_.Clear();
     ResetRoot();
 }
 
@@ -370,11 +369,17 @@ void Octree::SetSize(const BoundingBox& box, unsigned numLevels)
 
     Initialize(box);
     numDrawables_ = drawables_.Size();
-    numLevels_ = (unsigned)Max((int)numLevels, 1);
+    numLevels_ = Max(numLevels, 1U);
 }
 
 void Octree::Update(const FrameInfo& frame)
 {
+    if (!Thread::IsMainThread())
+    {
+        URHO3D_LOGERROR("Octree::Update() can not be called from worker threads");
+        return;
+    }
+
     // Let drawables update themselves before reinsertion. This can be used for animation
     if (!drawableUpdates_.Empty())
     {
@@ -411,6 +416,24 @@ void Octree::Update(const FrameInfo& frame)
 
         queue->Complete(M_MAX_UNSIGNED);
         scene->EndThreadedUpdate();
+    }
+
+    // If any drawables were inserted during threaded update, update them now from the main thread
+    if (!threadedDrawableUpdates_.Empty())
+    {
+        URHO3D_PROFILE(UpdateDrawablesQueuedDuringUpdate);
+
+        for (PODVector<Drawable*>::ConstIterator i = threadedDrawableUpdates_.Begin(); i != threadedDrawableUpdates_.End(); ++i)
+        {
+            Drawable* drawable = *i;
+            if (drawable)
+            {
+                drawable->Update(frame);
+                drawableUpdates_.Push(drawable);
+            }
+        }
+
+        threadedDrawableUpdates_.Clear();
     }
 
     // Notify drawable update being finished. Custom animation (eg. IK) can be done at this point
@@ -541,7 +564,7 @@ void Octree::QueueUpdate(Drawable* drawable)
     if (scene && scene->IsThreadedUpdate())
     {
         MutexLock lock(octreeMutex_);
-        drawableUpdates_.Push(drawable);
+        threadedDrawableUpdates_.Push(drawable);
     }
     else
         drawableUpdates_.Push(drawable);
@@ -551,6 +574,8 @@ void Octree::QueueUpdate(Drawable* drawable)
 
 void Octree::CancelUpdate(Drawable* drawable)
 {
+    // This doesn't have to take into account scene being in threaded update, because it is called only
+    // when removing a drawable from octree, which should only ever happen from the main thread.
     drawableUpdates_.Remove(drawable);
     drawable->updateQueued_ = false;
 }

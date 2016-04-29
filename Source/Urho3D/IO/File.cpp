@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -281,12 +281,12 @@ unsigned File::Read(void* dest, unsigned size)
         {
             if (readBufferOffset_ >= readBufferSize_)
             {
-                readBufferSize_ = Min((int)size_ - position_, (int)READ_BUFFER_SIZE);
+                readBufferSize_ = Min(size_ - position_, READ_BUFFER_SIZE);
                 readBufferOffset_ = 0;
                 SDL_RWread(assetHandle_, readBuffer_.Get(), readBufferSize_, 1);
             }
 
-            unsigned copySize = Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -327,7 +327,7 @@ unsigned File::Read(void* dest, unsigned size)
                 readBufferOffset_ = 0;
             }
 
-            unsigned copySize = (unsigned)Min((int)(readBufferSize_ - readBufferOffset_), (int)sizeLeft);
+            unsigned copySize = Min((readBufferSize_ - readBufferOffset_), sizeLeft);
             memcpy(destPtr, readBuffer_.Get() + readBufferOffset_, copySize);
             destPtr += copySize;
             sizeLeft -= copySize;
@@ -400,7 +400,7 @@ unsigned File::Seek(unsigned position)
         {
             unsigned char skipBuffer[SKIP_BUFFER_SIZE];
             while (position > position_)
-                Read(skipBuffer, (unsigned)Min((int)position - position_, (int)SKIP_BUFFER_SIZE));
+                Read(skipBuffer, Min(position - position_, SKIP_BUFFER_SIZE));
         }
         else
             URHO3D_LOGERROR("Seeking backward in a compressed file is not supported");

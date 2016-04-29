@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ set (CMAKE_OBJDUMP      ${RPI_PREFIX}-objdump  CACHE PATH "objdump")
 set (CMAKE_RANLIB       ${RPI_PREFIX}-ranlib   CACHE PATH "ranlib")
 
 # specify the system root
-if (NOT RPI_SYSROOT OR NOT BCM_VC_INCLUDE_DIRS OR NOT BCM_VC_LIBRARIES)
+if (NOT RPI_SYSROOT OR NOT VIDEOCORE_INCLUDE_DIRS OR NOT VIDEOCORE_LIBRARIES)
     if (DEFINED ENV{RPI_SYSROOT})
         file (TO_CMAKE_PATH $ENV{RPI_SYSROOT} RPI_SYSROOT)
     endif ()
@@ -94,3 +94,5 @@ set (CMAKE_FIND_ROOT_PATH ${RPI_SYSROOT})
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+set (RPI 1)

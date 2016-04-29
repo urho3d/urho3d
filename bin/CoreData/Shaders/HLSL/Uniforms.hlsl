@@ -11,7 +11,6 @@ uniform float3 cAmbientEndColor;
 uniform float3x3 cBillboardRot;
 #endif
 uniform float3 cCameraPos;
-uniform float3x3 cCameraRot;
 uniform float cNearClip;
 uniform float cFarClip;
 uniform float4 cDepthMode;
@@ -22,6 +21,8 @@ uniform float4 cGBufferOffsets;
 uniform float3 cLightDir;
 uniform float4 cLightPos;
 uniform float4x3 cModel;
+uniform float4x3 cView;
+uniform float4x3 cViewInv;
 uniform float4x4 cViewProj;
 uniform float4 cUOffset;
 uniform float4 cVOffset;
@@ -54,6 +55,10 @@ uniform float4 cMatDiffColor;
 uniform float3 cMatEmissiveColor;
 uniform float3 cMatEnvMapColor;
 uniform float4 cMatSpecColor;
+#ifdef PBR
+    uniform float cRoughnessPS; 
+    uniform float cMetallicPS;
+#endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform float4 cShadowCubeAdjust;
@@ -62,6 +67,9 @@ uniform float2 cShadowIntensity;
 uniform float2 cShadowMapInvSize;
 uniform float4 cShadowSplits;
 uniform float4x4 cLightMatricesPS[4];
+#ifdef VSM_SHADOW
+uniform float2 cVSMShadowParams;
+#endif
 #endif
 
 #else
@@ -80,12 +88,13 @@ cbuffer FrameVS : register(b0)
 cbuffer CameraVS : register(b1)
 {
     float3 cCameraPos;
-    float3x3 cCameraRot;
     float cNearClip;
     float cFarClip;
     float4 cDepthMode;
     float3 cFrustumSize;
     float4 cGBufferOffsets;
+    float4x3 cView;
+    float4x3 cViewInv;
     float4x4 cViewProj;
     float4 cClipPlane;
 }
@@ -163,6 +172,7 @@ cbuffer LightPS : register(b3)
     float2 cShadowIntensity;
     float2 cShadowMapInvSize;
     float4 cShadowSplits;
+    float2 cVSMShadowParams;
     float4x4 cLightMatricesPS[4];
 }
 
@@ -173,6 +183,10 @@ cbuffer MaterialPS : register(b4)
     float3 cMatEmissiveColor;
     float3 cMatEnvMapColor;
     float4 cMatSpecColor;
+    #ifdef PBR
+        float cRoughnessPS; 
+        float cMetallicPS;
+    #endif
 }
 #endif
 

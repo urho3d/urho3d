@@ -43,11 +43,11 @@ float colorHValue = 1;
 float colorSValue = 1;
 float colorVValue = 1;
 float colorAValue = 0.5;
-float high = 0;
+int high = 0;
 float aValue = 1;
 
-const float IMAGE_SIZE = 256;
-const float HALF_IMAGE_SIZE = 128;
+const int IMAGE_SIZE = 256;
+const int HALF_IMAGE_SIZE = 128;
 const float MAX_ANGLE = 360;
 const float ROUND_VALUE_MAX = 0.99f;
 const float ROUND_VALUE_MIN = 0.01f;
@@ -152,25 +152,25 @@ void HandleWheelButtons(StringHash eventType, VariantMap& eventData)
 
     if (edit is cancelButton) 
     {
-        VariantMap eventData;
+        VariantMap vm;
         eventData["Color"] = wheelIncomingColor;
-        SendEvent(eventTypeWheelDiscardColor, eventData);
+        SendEvent(eventTypeWheelDiscardColor, vm);
         HideColorWheel();
     }
 
     if (edit is closeButton)
     {
-        VariantMap eventData;
+        VariantMap vm;
         eventData["Color"] = wheelIncomingColor;
-        SendEvent(eventTypeWheelDiscardColor, eventData);
+        SendEvent(eventTypeWheelDiscardColor, vm);
         HideColorWheel();
     }
 
     if (edit is okButton) 
     {
-        VariantMap eventData;
+        VariantMap vm;
         eventData["Color"] = wheelColor;
-        SendEvent(eventTypeWheelSelectColor, eventData);
+        SendEvent(eventTypeWheelSelectColor, vm);
         HideColorWheel();
     }
 }
@@ -228,13 +228,13 @@ void HandleColorWheelMouseWheel(StringHash eventType, VariantMap& eventData)
         else if (wheelValue < 0)
         {
             high = high + wheelValue;
-            high = Max(high, 0.0f);
+            high = Max(high, 0);
         }
 
-        bwCursor.SetPosition(bwCursor.position.x, high-7);
-        colorVValue = float((IMAGE_SIZE-high) / IMAGE_SIZE);
+        bwCursor.SetPosition(bwCursor.position.x, high - 7);
+        colorVValue = float(IMAGE_SIZE - high) / IMAGE_SIZE;
 
-        wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+        wheelColor.FromHSV(colorHValue, colorSValue, colorVValue, colorAValue);
         SendEventChangeColor();
         UpdateColorInformation(); 
     }
@@ -277,7 +277,7 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
         cy = cwy - HALF_IMAGE_SIZE;
 
         // get direction vector of H on circle
-        Vector2 d = Vector2(cx,cy);
+        Vector2 d = Vector2(cx, cy);
 
         // if out  of circle place colorCurcor back to circle
         if (d.length > HALF_IMAGE_SIZE) 
@@ -285,7 +285,7 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
             d.Normalize();
             d = d * HALF_IMAGE_SIZE;
 
-            i = IntVector2(d.x, d.y);
+            i = IntVector2(int(d.x), int(d.y));
             inWheel = false;
 
         }
@@ -312,7 +312,7 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
             if (colorSValue < ROUND_VALUE_MIN) colorSValue = 0.0;
             if (colorSValue > ROUND_VALUE_MAX) colorSValue = 1.0;
 
-            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            wheelColor.FromHSV(colorHValue, colorSValue, colorVValue, colorAValue);
             SendEventChangeColor();
             UpdateColorInformation();
         }
@@ -322,17 +322,17 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
     {
         isBWGradientHovering = true;
         IntVector2 ep = bwGradient.screenPosition; 
-        float high = y - ep.y;
+        int high = y - ep.y;
 
         if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonDown[MOUSEB_RIGHT])
         {
-            bwCursor.SetPosition(bwCursor.position.x, high-7);
-            colorVValue = float((IMAGE_SIZE-high) / IMAGE_SIZE);
+            bwCursor.SetPosition(bwCursor.position.x, high - 7);
+            colorVValue = float(IMAGE_SIZE - high) / IMAGE_SIZE;
 
             if (colorVValue < 0.01) colorVValue = 0.0;
             if (colorVValue > 0.99) colorVValue = 1.0;
 
-            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            wheelColor.FromHSV(colorHValue, colorSValue, colorVValue, colorAValue);
             SendEventChangeColor();
         }
 
@@ -342,18 +342,18 @@ void HandleColorWheelMouseMove(StringHash eventType, VariantMap& eventData)
     else if (AGradient.IsInside(IntVector2(x,y), true))
     {
         IntVector2 ep = AGradient.screenPosition; 
-        float aValue = x - ep.x;
+        int aValue = x - ep.x;
 
         if (input.mouseButtonDown[MOUSEB_LEFT] || input.mouseButtonDown[MOUSEB_RIGHT])
         {
-            ACursor.SetPosition(aValue-7, ACursor.position.y);
+            ACursor.SetPosition(aValue - 7, ACursor.position.y);
             colorAValue = float((aValue) / 200); // 200pix image
 
             // round values for min or max
             if (colorAValue < 0.01) colorAValue = 0.0;
             if (colorAValue > 0.99) colorAValue = 1.0;
 
-            wheelColor.FromHSV(colorHValue,colorSValue,colorVValue, colorAValue);
+            wheelColor.FromHSV(colorHValue, colorSValue, colorVValue, colorAValue);
             SendEventChangeColor();
         }
 
@@ -409,22 +409,21 @@ void EstablishColorWheelUIFromColor(Color c)
     colorAValue = c.a;
 
     // convert color value to BWGradient high
-    high = IMAGE_SIZE - colorVValue * IMAGE_SIZE;
-    bwCursor.SetPosition(bwCursor.position.x, high-7);
+    high = int(IMAGE_SIZE - colorVValue * IMAGE_SIZE);
+    bwCursor.SetPosition(bwCursor.position.x, high - 7);
 
     // convert color alpha to shift on x-axis for ACursor
     aValue = 200 * colorAValue;
-    ACursor.SetPosition(aValue-7 , ACursor.position.y);
+    ACursor.SetPosition(int(aValue - 7), ACursor.position.y);
 
     // rotate vector to H-angle with scale(shifting) by S to calculate final point position
     Quaternion q(colorHValue * -MAX_ANGLE);
-    Vector3 pos = Vector3(1,0,0);
-    pos.Normalize();
+    Vector3 pos = Vector3(1, 0, 0);
     pos = q * pos;
     pos = pos * (colorSValue * HALF_IMAGE_SIZE);
-    pos = pos + Vector3(HALF_IMAGE_SIZE,HALF_IMAGE_SIZE);
+    pos = pos + Vector3(HALF_IMAGE_SIZE, HALF_IMAGE_SIZE);
 
-    colorCursor.position = IntVector2(pos.x-7, pos.y-7);
+    colorCursor.position = IntVector2(int(pos.x) - 7, int(pos.y) - 7);
 
     // Update information on UI about color
     UpdateColorInformation();

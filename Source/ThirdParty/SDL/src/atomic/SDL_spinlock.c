@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,6 +28,9 @@
 #include "SDL_mutex.h"
 #include "SDL_timer.h"
 
+#if !defined(HAVE_GCC_ATOMICS) && defined(__SOLARIS__)
+#include <atomic.h>
+#endif
 
 /* This function is where all the magic happens... */
 SDL_bool
@@ -86,9 +89,13 @@ SDL_AtomicTryLock(SDL_SpinLock *lock)
     /* Maybe used for PowerPC, but the Intel asm or gcc atomics are favored. */
     return OSAtomicCompareAndSwap32Barrier(0, 1, lock);
 
-#elif HAVE_PTHREAD_SPINLOCK
-    /* pthread instructions */
-    return (pthread_spin_trylock(lock) == 0);
+#elif defined(__SOLARIS__) && defined(_LP64)
+    /* Used for Solaris with non-gcc compilers. */
+    return (SDL_bool) ((int) atomic_cas_64((volatile uint64_t*)lock, 0, 1) == 0);
+
+#elif defined(__SOLARIS__) && !defined(_LP64)
+    /* Used for Solaris with non-gcc compilers. */
+    return (SDL_bool) ((int) atomic_cas_32((volatile uint32_t*)lock, 0, 1) == 0);
 
 #else
 #error Please implement for your platform.
@@ -115,8 +122,10 @@ SDL_AtomicUnlock(SDL_SpinLock *lock)
 #elif HAVE_GCC_ATOMICS || HAVE_GCC_SYNC_LOCK_TEST_AND_SET
     __sync_lock_release(lock);
 
-#elif HAVE_PTHREAD_SPINLOCK
-    pthread_spin_unlock(lock);
+#elif defined(__SOLARIS__)
+    /* Used for Solaris when not using gcc. */
+    *lock = 0;
+    membar_producer();
 
 #else
     *lock = 0;

@@ -73,6 +73,9 @@ void PS(
         float4 normalInput = Sample2DProj(NormalBuffer, iScreenPos);
     #endif
     
+    // Position acquired via near/far ray is relative to camera. Bring position to world space
+    worldPos += cCameraPosPS;
+    
     float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;

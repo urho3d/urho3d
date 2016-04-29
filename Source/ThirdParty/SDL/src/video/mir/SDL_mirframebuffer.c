@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -55,6 +55,8 @@ MIR_CreateWindowFramebuffer(_THIS, SDL_Window* window, Uint32* format,
     MIR_Data* mir_data = _this->driverdata;
     MIR_Window* mir_window;
     MirSurfaceParameters surfaceparm;
+
+    mir_data->software = SDL_TRUE;
 
     if (MIR_CreateWindow(_this, window) < 0)
         return SDL_SetError("Failed to created a mir window.");

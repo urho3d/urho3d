@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -176,6 +176,8 @@ public:
     void RemovePass(const String& passName);
     /// Reset shader pointers in all passes.
     void ReleaseShaders();
+    /// Clone the technique. Passes will be deep copied to allow independent modification.
+    SharedPtr<Technique> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }

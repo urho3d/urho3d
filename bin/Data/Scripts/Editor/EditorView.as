@@ -1438,7 +1438,7 @@ void UpdateView(float timeStep)
             }
             else
             {
-                for (int i = 0; i < selectedNodes.length; i++)
+                for (uint i = 0; i < selectedNodes.length; i++)
                 {
                     bb.Merge(selectedNodes[i].position);
                 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -325,11 +325,7 @@ void Texture::UpdateParameters()
         return;
 
     // Release old sampler
-    if (sampler_)
-    {
-        ((ID3D11SamplerState*)sampler_)->Release();
-        sampler_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(sampler_);
 
     D3D11_SAMPLER_DESC samplerDesc;
     memset(&samplerDesc, 0, sizeof samplerDesc);
@@ -346,10 +342,12 @@ void Texture::UpdateParameters()
     samplerDesc.MaxLOD = M_INFINITY;
     memcpy(&samplerDesc.BorderColor, borderColor_.Data(), 4 * sizeof(float));
 
-    graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
-
-    if (!sampler_)
-        URHO3D_LOGERROR("Failed to create sampler state");
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateSamplerState(&samplerDesc, (ID3D11SamplerState**)&sampler_);
+    if (FAILED(hr))
+    {
+        URHO3D_SAFE_RELEASE(sampler_);
+        URHO3D_LOGD3DERROR("Failed to create sampler state", hr);
+    }
 
     parametersDirty_ = false;
 }

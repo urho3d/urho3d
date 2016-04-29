@@ -1,6 +1,6 @@
 /*
 ** C data arithmetic.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #include "lj_obj.h"
@@ -11,10 +11,12 @@
 #include "lj_err.h"
 #include "lj_tab.h"
 #include "lj_meta.h"
+#include "lj_ir.h"
 #include "lj_ctype.h"
 #include "lj_cconv.h"
 #include "lj_cdata.h"
 #include "lj_carith.h"
+#include "lj_strscan.h"
 
 /* -- C data arithmetic --------------------------------------------------- */
 
@@ -62,7 +64,7 @@ static int carith_checkarg(lua_State *L, CTState *cts, CDArith *ca)
       TValue *o2 = i == 0 ? o+1 : o-1;
       CType *ct = ctype_raw(cts, cdataV(o2)->ctypeid);
       ca->ct[i] = NULL;
-      ca->p[i] = NULL;
+      ca->p[i] = (uint8_t *)strVdata(o);
       ok = 0;
       if (ctype_isenum(ct->info)) {
 	CTSize ofs;
@@ -79,7 +81,7 @@ static int carith_checkarg(lua_State *L, CTState *cts, CDArith *ca)
       }
     } else {
       ca->ct[i] = NULL;
-      ca->p[i] = NULL;
+      ca->p[i] = (void *)(intptr_t)1;  /* To make it unequal. */
       ok = 0;
     }
   }
@@ -234,7 +236,9 @@ static int lj_carith_meta(lua_State *L, CTState *cts, CDArith *ca, MMS mm)
     const char *repr[2];
     int i, isenum = -1, isstr = -1;
     if (mm == MM_eq) {  /* Equality checks never raise an error. */
-      setboolV(L->top-1, 0);
+      int eq = ca->p[0] == ca->p[1];
+      setboolV(L->top-1, eq);
+      setboolV(&G(L)->tmptv2, eq);  /* Remember for trace recorder. */
       return 1;
     }
     for (i = 0; i < 2; i++) {
@@ -269,6 +273,80 @@ int lj_carith_op(lua_State *L, MMS mm)
   }
   return lj_carith_meta(L, cts, &ca, mm);
 }
+
+/* -- 64 bit bit operations helpers --------------------------------------- */
+
+#if LJ_64
+#define B64DEF(name) \
+  static LJ_AINLINE uint64_t lj_carith_##name(uint64_t x, int32_t sh)
+#else
+/* Not inlined on 32 bit archs, since some of these are quite lengthy. */
+#define B64DEF(name) \
+  uint64_t LJ_NOINLINE lj_carith_##name(uint64_t x, int32_t sh)
+#endif
+
+B64DEF(shl64) { return x << (sh&63); }
+B64DEF(shr64) { return x >> (sh&63); }
+B64DEF(sar64) { return (uint64_t)((int64_t)x >> (sh&63)); }
+B64DEF(rol64) { return lj_rol(x, (sh&63)); }
+B64DEF(ror64) { return lj_ror(x, (sh&63)); }
+
+#undef B64DEF
+
+uint64_t lj_carith_shift64(uint64_t x, int32_t sh, int op)
+{
+  switch (op) {
+  case IR_BSHL-IR_BSHL: x = lj_carith_shl64(x, sh); break;
+  case IR_BSHR-IR_BSHL: x = lj_carith_shr64(x, sh); break;
+  case IR_BSAR-IR_BSHL: x = lj_carith_sar64(x, sh); break;
+  case IR_BROL-IR_BSHL: x = lj_carith_rol64(x, sh); break;
+  case IR_BROR-IR_BSHL: x = lj_carith_ror64(x, sh); break;
+  default: lua_assert(0); break;
+  }
+  return x;
+}
+
+/* Equivalent to lj_lib_checkbit(), but handles cdata. */
+uint64_t lj_carith_check64(lua_State *L, int narg, CTypeID *id)
+{
+  TValue *o = L->base + narg-1;
+  if (o >= L->top) {
+  err:
+    lj_err_argt(L, narg, LUA_TNUMBER);
+  } else if (LJ_LIKELY(tvisnumber(o))) {
+    /* Handled below. */
+  } else if (tviscdata(o)) {
+    CTState *cts = ctype_cts(L);
+    uint8_t *sp = (uint8_t *)cdataptr(cdataV(o));
+    CTypeID sid = cdataV(o)->ctypeid;
+    CType *s = ctype_get(cts, sid);
+    uint64_t x;
+    if (ctype_isref(s->info)) {
+      sp = *(void **)sp;
+      sid = ctype_cid(s->info);
+    }
+    s = ctype_raw(cts, sid);
+    if (ctype_isenum(s->info)) s = ctype_child(cts, s);
+    if ((s->info & (CTMASK_NUM|CTF_BOOL|CTF_FP|CTF_UNSIGNED)) ==
+	CTINFO(CT_NUM, CTF_UNSIGNED) && s->size == 8)
+      *id = CTID_UINT64;  /* Use uint64_t, since it has the highest rank. */
+    else if (!*id)
+      *id = CTID_INT64;  /* Use int64_t, unless already set. */
+    lj_cconv_ct_ct(cts, ctype_get(cts, *id), s,
+		   (uint8_t *)&x, sp, CCF_ARG(narg));
+    return x;
+  } else if (!(tvisstr(o) && lj_strscan_number(strV(o), o))) {
+    goto err;
+  }
+  if (LJ_LIKELY(tvisint(o))) {
+    return (uint32_t)intV(o);
+  } else {
+    int32_t i = lj_num2bit(numV(o));
+    if (LJ_DUALNUM) setintV(o, i);
+    return (uint32_t)i;
+  }
+}
+
 
 /* -- 64 bit integer arithmetic helpers ----------------------------------- */
 

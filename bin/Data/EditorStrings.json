@@ -1390,5 +1390,41 @@
 		"ru":"Цвет",
 		"fr":"Couleur",
 		"it":"Colore"
+	},
+	"Tags":{
+		"en":"Tags",
+		"ru":"Теги",
+		"fr":"Étiquettes",
+		"it":"Etichette"
+	},
+	"Export scene to OBJ...":{
+		"en":"Export scene to OBJ...",
+		"ru":"Экспортировать сцену в OBJ...",
+		"it":"Esporta scena a OBJ..."
+	},
+	"Export selected to OBJ...":{
+		"en":"Export selected to OBJ...",
+		"ru":"Экспортировать выбранное в OBJ...",
+		"it":"Esporta selezione a OBJ..."
+	},
+	"Reset transform":{
+		"en":"Reset transform",
+		"ru":"Сбросить трансформации",
+		"it":"Reimposta trasformazione"
+	},
+	"Show components icons":{
+		"en":"Show components icons",
+		"ru":"Показывать значки компонентов",
+		"it":"Visualizza icone componenti"
+	},
+	"Render Zone Cubemap":{
+		"en":"Render Zone Cubemap",
+		"ru":"Отренедерить зону в Cubemap",
+		"it":"Rendera Cubemap della zona"
+	},
+	"Show Grid":{
+		"en":"Show Grid",
+		"ru":"Показывать сетку",
+		"it":"Visualizza griglia"
 	}
 }

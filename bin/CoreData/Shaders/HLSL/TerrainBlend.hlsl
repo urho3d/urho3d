@@ -46,10 +46,13 @@ void VS(float4 iPos : POSITION,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
-        float4x3 iModelInstance : TEXCOORD2,
+        float4x3 iModelInstance : TEXCOORD4,
     #endif
-    #ifdef BILLBOARD
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
+    #endif
+    #ifdef DIRBILLBOARD
+        float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,
     out float3 oNormal : TEXCOORD1,

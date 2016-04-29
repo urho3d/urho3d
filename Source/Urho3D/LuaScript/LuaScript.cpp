@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -216,6 +216,16 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
         exceptionTypes[i] = StringHash(exceptionNames[i]);
 
     eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
+}
+
+bool LuaScript::HasEventHandler(const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(eventName);
+}
+
+bool LuaScript::HasEventHandler(Object* sender, const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(sender, eventName);
 }
 
 bool LuaScript::ExecuteFile(const String& fileName)

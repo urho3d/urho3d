@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,12 +80,11 @@ inline bool CompareBatchGroupOrder(BatchGroup* lhs, BatchGroup* rhs)
     return lhs->renderOrder_ < rhs->renderOrder_;
 }
 
-void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer, const Vector3& translation)
+void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split, Renderer* renderer)
 {
     Camera* shadowCamera = queue->shadowSplits_[split].shadowCamera_;
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
-    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 shadowView(shadowCamera->GetView());
     Matrix4 shadowProj(shadowCamera->GetProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -123,7 +122,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
 #endif
 
     // If using 4 shadow samples, offset the position diagonally by half pixel
-    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
     {
         offset.x_ -= 0.5f / width;
         offset.y_ -= 0.5f / height;
@@ -131,7 +130,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     texAdjust.SetTranslation(offset);
     texAdjust.SetScale(scale);
 
-    dest = texAdjust * shadowProj * shadowView * posAdjust;
+    dest = texAdjust * shadowProj * shadowView;
 }
 
 void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation)
@@ -306,9 +305,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     {
         if (light && graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
-            // Deferred light volume batches operate in a camera-centered space. Detect from material, zone & pass all being null
-            bool isLightVolume = !material_ && !pass_ && !zone_;
-
             Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
             Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
 
@@ -327,10 +323,10 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 case LIGHT_DIRECTIONAL:
                     {
                         Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = (unsigned)Min(MAX_CASCADE_SPLITS, (int)lightQueue_->shadowSplits_.Size());
+                        unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
                         for (unsigned i = 0; i < numSplits; ++i)
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, Vector3::ZERO);
+                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
 
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                     }
@@ -343,7 +339,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
                         bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
                         if (isShadowed)
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, Vector3::ZERO);
+                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
 
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                     }
@@ -376,9 +372,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetEffectiveColor().Abs(),
                 light->GetEffectiveSpecularIntensity()) * fade);
             graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-            graphics->SetShaderParameter(PSP_LIGHTPOS,
-                Vector4((isLightVolume ? (lightNode->GetWorldPosition() - cameraEffectivePos) : lightNode->GetWorldPosition()),
-                    atten));
+            graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
 
             if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
             {
@@ -387,13 +381,11 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 case LIGHT_DIRECTIONAL:
                     {
                         Matrix4 shadowMatrices[MAX_CASCADE_SPLITS];
-                        unsigned numSplits = (unsigned)Min(MAX_CASCADE_SPLITS, (int)lightQueue_->shadowSplits_.Size());
+                        unsigned numSplits = Min(MAX_CASCADE_SPLITS, lightQueue_->shadowSplits_.Size());
 
                         for (unsigned i = 0; i < numSplits; ++i)
-                        {
-                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer, isLightVolume ? cameraEffectivePos :
-                                Vector3::ZERO);
-                        }
+                            CalculateShadowMatrix(shadowMatrices[i], lightQueue_, i, renderer);
+
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), 16 * numSplits);
                     }
                     break;
@@ -405,10 +397,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
                         bool isShadowed = lightQueue_->shadowMap_ != 0;
                         if (isShadowed)
-                        {
-                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer, isLightVolume ? cameraEffectivePos :
-                                Vector3::ZERO);
-                        }
+                            CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
 
                         graphics->SetShaderParameter(PSP_LIGHTMATRICES, shadowMatrices[0].Data(), isShadowed ? 32 : 16);
                     }
@@ -450,7 +439,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     float addY = 2.5f / height;
 #endif
                     // If using 4 shadow samples, offset the position diagonally by half pixel
-                    if (renderer->GetShadowQuality() & SHADOWQUALITY_HIGH_16BIT)
+                    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
                     {
                         addX -= 0.5f / width;
                         addY -= 0.5f / height;
@@ -485,8 +474,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         intensity =
                             Lerp(intensity, 1.0f, Clamp((light->GetDistance() - fadeStart) / (fadeEnd - fadeStart), 0.0f, 1.0f));
                     float pcfValues = (1.0f - intensity);
-                    float samples = renderer->GetShadowQuality() >= SHADOWQUALITY_HIGH_16BIT ? 4.0f : 1.0f;
-
+                    float samples = 1.0f;
+                    if (renderer->GetShadowQuality() == SHADOWQUALITY_PCF_16BIT || renderer->GetShadowQuality() == SHADOWQUALITY_PCF_24BIT)
+                        samples = 4.0f;
                     graphics->SetShaderParameter(PSP_SHADOWINTENSITY, Vector4(pcfValues / samples, intensity, 0.0f, 0.0f));
                 }
 
@@ -503,6 +493,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     lightSplits.z_ = lightQueue_->shadowSplits_[2].farSplit_ / camera->GetFarClip();
 
                 graphics->SetShaderParameter(PSP_SHADOWSPLITS, lightSplits);
+
+                if (graphics->HasShaderParameter(PSP_VSMSHADOWPARAMS))
+                    graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVSMShadowParameters());
             }
         }
         else if (lightQueue_->vertexLights_.Size() && graphics->HasShaderParameter(VSP_VERTEXLIGHTS) &&
@@ -642,7 +635,7 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
             Batch::Prepare(view, camera, false, allowDepthWrite);
 
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-            graphics->SetVertexBuffers(geometry_->GetVertexBuffers(), geometry_->GetVertexElementMasks());
+            graphics->SetVertexBuffers(geometry_->GetVertexBuffers());
 
             for (unsigned i = 0; i < instances_.Size(); ++i)
             {
@@ -661,18 +654,15 @@ void BatchGroup::Draw(View* view, Camera* camera, bool allowDepthWrite) const
             // Hack: use a const_cast to avoid dynamic allocation of new temp vectors
             Vector<SharedPtr<VertexBuffer> >& vertexBuffers = const_cast<Vector<SharedPtr<VertexBuffer> >&>(
                 geometry_->GetVertexBuffers());
-            PODVector<unsigned>& elementMasks = const_cast<PODVector<unsigned>&>(geometry_->GetVertexElementMasks());
             vertexBuffers.Push(SharedPtr<VertexBuffer>(instanceBuffer));
-            elementMasks.Push(instanceBuffer->GetElementMask());
 
             graphics->SetIndexBuffer(geometry_->GetIndexBuffer());
-            graphics->SetVertexBuffers(vertexBuffers, elementMasks, startIndex_);
+            graphics->SetVertexBuffers(vertexBuffers, startIndex_);
             graphics->DrawInstanced(geometry_->GetPrimitiveType(), geometry_->GetIndexStart(), geometry_->GetIndexCount(),
                 geometry_->GetVertexStart(), geometry_->GetVertexCount(), instances_.Size());
 
             // Remove the instancing buffer & element mask now
             vertexBuffers.Pop();
-            elementMasks.Pop();
         }
     }
 }

@@ -1,6 +1,6 @@
 /*
 ** LuaJIT common internal definitions.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_DEF_H
@@ -46,10 +46,14 @@ typedef unsigned int uintptr_t;
 #include <stdlib.h>
 
 /* Various VM limits. */
-#define LJ_MAX_MEM	0x7fffff00	/* Max. total memory allocation. */
+#define LJ_MAX_MEM32	0x7fffff00	/* Max. 32 bit memory allocation. */
+#define LJ_MAX_MEM64	((uint64_t)1<<47)  /* Max. 64 bit memory allocation. */
+/* Max. total memory allocation. */
+#define LJ_MAX_MEM	(LJ_GC64 ? LJ_MAX_MEM64 : LJ_MAX_MEM32)
 #define LJ_MAX_ALLOC	LJ_MAX_MEM	/* Max. individual allocation length. */
-#define LJ_MAX_STR	LJ_MAX_MEM	/* Max. string length. */
-#define LJ_MAX_UDATA	LJ_MAX_MEM	/* Max. userdata length. */
+#define LJ_MAX_STR	LJ_MAX_MEM32	/* Max. string length. */
+#define LJ_MAX_BUF	LJ_MAX_MEM32	/* Max. buffer length. */
+#define LJ_MAX_UDATA	LJ_MAX_MEM32	/* Max. userdata length. */
 
 #define LJ_MAX_STRTAB	(1<<26)		/* Max. string table size. */
 #define LJ_MAX_HBITS	26		/* Max. hash bits. */
@@ -57,7 +61,7 @@ typedef unsigned int uintptr_t;
 #define LJ_MAX_ASIZE	((1<<(LJ_MAX_ABITS-1))+1)  /* Max. array part size. */
 #define LJ_MAX_COLOSIZE	16		/* Max. elems for colocated array. */
 
-#define LJ_MAX_LINE	LJ_MAX_MEM	/* Max. source code line number. */
+#define LJ_MAX_LINE	LJ_MAX_MEM32	/* Max. source code line number. */
 #define LJ_MAX_XLEVEL	200		/* Max. syntactic nesting level. */
 #define LJ_MAX_BCINS	(1<<26)		/* Max. # of bytecode instructions. */
 #define LJ_MAX_SLOTS	250		/* Max. # of slots in a Lua func. */
@@ -65,7 +69,7 @@ typedef unsigned int uintptr_t;
 #define LJ_MAX_UPVAL	60		/* Max. # of upvalues. */
 
 #define LJ_MAX_IDXCHAIN	100		/* __index/__newindex chain limit. */
-#define LJ_STACK_EXTRA	5		/* Extra stack space (metamethods). */
+#define LJ_STACK_EXTRA	(5+2*LJ_FR2)	/* Extra stack space (metamethods). */
 
 #define LJ_NUM_CBPAGE	1		/* Number of FFI callback pages. */
 
@@ -99,6 +103,14 @@ typedef unsigned int uintptr_t;
 #define checki32(x)	((x) == (int32_t)(x))
 #define checku32(x)	((x) == (uint32_t)(x))
 #define checkptr32(x)	((uintptr_t)(x) == (uint32_t)(uintptr_t)(x))
+#define checkptr47(x)	(((uint64_t)(x) >> 47) == 0)
+#if LJ_GC64
+#define checkptrGC(x)	(checkptr47((x)))
+#elif LJ_64
+#define checkptrGC(x)	(checkptr32((x)))
+#else
+#define checkptrGC(x)	1
+#endif
 
 /* Every half-decent C compiler transforms this into a rotate instruction. */
 #define lj_rol(x, n)	(((x)<<(n)) | ((x)>>(-(int)(n)&(8*sizeof(x)-1))))
@@ -111,7 +123,7 @@ typedef uintptr_t BloomFilter;
 #define bloomset(b, x)	((b) |= bloombit((x)))
 #define bloomtest(b, x)	((b) & bloombit((x)))
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__psp2__)
 
 #define LJ_NORET	__attribute__((noreturn))
 #define LJ_ALIGN(n)	__attribute__((aligned(n)))
@@ -119,7 +131,7 @@ typedef uintptr_t BloomFilter;
 #define LJ_AINLINE	inline __attribute__((always_inline))
 #define LJ_NOINLINE	__attribute__((noinline))
 
-#if defined(__ELF__) || defined(__MACH__)
+#if defined(__ELF__) || defined(__MACH__) || defined(__psp2__)
 #if !((defined(__sun__) && defined(__svr4__)) || defined(__CELLOS_LV2__))
 #define LJ_NOAPI	extern __attribute__((visibility("hidden")))
 #endif
@@ -150,6 +162,9 @@ static LJ_AINLINE uint32_t lj_fls(uint32_t x)
 #if defined(__arm__)
 static LJ_AINLINE uint32_t lj_bswap(uint32_t x)
 {
+#if defined(__psp2__)
+  return __builtin_rev(x);
+#else
   uint32_t r;
 #if __ARM_ARCH_6__ || __ARM_ARCH_6J__ || __ARM_ARCH_6T2__ || __ARM_ARCH_6Z__ ||\
     __ARM_ARCH_6ZK__ || __ARM_ARCH_7__ || __ARM_ARCH_7A__ || __ARM_ARCH_7R__
@@ -162,6 +177,7 @@ static LJ_AINLINE uint32_t lj_bswap(uint32_t x)
   __asm__("eor %0, %1, %1, ror #16" : "=r" (r) : "r" (x));
 #endif
   return ((r & 0xff00ffffu) >> 8) ^ lj_ror(x, 8);
+#endif
 #endif
 }
 

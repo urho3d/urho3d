@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,7 @@
 #include "../../Graphics/Terrain.h"
 #include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/Texture2DArray.h"
 #include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
@@ -81,7 +82,7 @@ extern "C"
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 // Prefer the high-performance GPU on switchable GPU systems
 #include <windows.h>
 extern "C"
@@ -162,11 +163,26 @@ static const unsigned glStencilOps[] =
 };
 #endif
 
-// Remap vertex attributes on OpenGL so that all usually needed attributes including skinning fit to the first 8.
-// This avoids a skinning bug on GLES2 devices which only support 8.
-static const unsigned glVertexAttrIndex[] =
+static const unsigned glElementTypes[] =
 {
-    0, 1, 2, 3, 4, 8, 9, 5, 6, 7, 10, 11, 12
+    GL_INT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_FLOAT,
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_BYTE
+};
+
+static const unsigned glElementComponents[] =
+{
+    1,
+    1,
+    2,
+    3,
+    4,
+    4,
+    4
 };
 
 #ifdef GL_ES_VERSION_2_0
@@ -234,6 +250,7 @@ Graphics::Graphics(Context* context_) :
     fullscreen_(false),
     borderless_(false),
     resizable_(false),
+    highDPI_(false),
     vsync_(false),
     tripleBuffer_(false),
     sRGB_(false),
@@ -319,12 +336,17 @@ void Graphics::SetWindowPosition(int x, int y)
     SetWindowPosition(IntVector2(x, y));
 }
 
-bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool vsync, bool tripleBuffer,
-    int multiSample)
+bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
+    bool tripleBuffer, int multiSample)
 {
     URHO3D_PROFILE(SetScreenMode);
 
     bool maximize = false;
+
+#if defined(IOS) || defined(TVOS)
+    // iOS and tvOS app always take the fullscreen (and with status bar hidden)
+    fullscreen = true;
+#endif
 
     // Fullscreen or Borderless can not be resizable
     if (fullscreen || borderless)
@@ -454,10 +476,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
             flags |= SDL_WINDOW_FULLSCREEN;
-        if (resizable)
-            flags |= SDL_WINDOW_RESIZABLE;
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
+        if (resizable)
+            flags |= SDL_WINDOW_RESIZABLE;
+        if (highDPI)
+            flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
@@ -498,7 +522,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (maximize)
         {
             Maximize();
-            SDL_GetWindowSize(impl_->window_, &width, &height);
+            SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
         }
 
         // Create/restore context and GPU objects and set initial renderstate
@@ -518,13 +542,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 #endif
 
     fullscreen_ = fullscreen;
-    resizable_ = resizable;
     borderless_ = borderless;
+    resizable_ = resizable;
+    highDPI_ = highDPI;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
 
-    SDL_GetWindowSize(impl_->window_, &width_, &height_);
+    SDL_GL_GetDrawableSize(impl_->window_, &width_, &height_);
     if (!fullscreen)
         SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
 
@@ -555,8 +580,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_WIDTH] = width_;
     eventData[P_HEIGHT] = height_;
     eventData[P_FULLSCREEN] = fullscreen_;
-    eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -564,7 +590,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -601,7 +627,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -616,6 +642,15 @@ void Graphics::Close()
 bool Graphics::TakeScreenShot(Image& destImage)
 {
     URHO3D_PROFILE(TakeScreenShot);
+
+    if (!IsInitialized())
+        return false;
+
+    if (IsDeviceLost())
+    {
+        URHO3D_LOGERROR("Can not take screenshot while device is lost");
+        return false;
+    }
 
     ResetRenderTargets();
 
@@ -637,7 +672,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -796,6 +831,27 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
     ++numBatches_;
 }
 
+void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+        return;
+
+    PrepareDraw();
+
+    unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
+
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+    glDrawElementsBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<GLvoid*>(indexStart * indexSize), baseVertexIndex);
+
+    numPrimitives_ += primitiveCount;
+    ++numBatches_;
+#endif
+}
+
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
@@ -832,118 +888,70 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 #endif
 }
 
+void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex,
+        unsigned vertexCount, unsigned instanceCount)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+        return;
+
+    PrepareDraw();
+
+    unsigned indexSize = indexBuffer_->GetIndexSize();
+    unsigned primitiveCount;
+    GLenum glPrimitiveType;
+
+    GetGLPrimitiveType(indexCount, type, primitiveCount, glPrimitiveType);
+    GLenum indexType = indexSize == sizeof(unsigned short) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+    glDrawElementsInstancedBaseVertex(glPrimitiveType, indexCount, indexType, reinterpret_cast<const GLvoid*>(indexStart * indexSize),
+        instanceCount, baseVertexIndex);
+
+    numPrimitives_ += instanceCount * primitiveCount;
+    ++numBatches_;
+#endif
+}
+
 void Graphics::SetVertexBuffer(VertexBuffer* buffer)
 {
     // Note: this is not multi-instance safe
     static PODVector<VertexBuffer*> vertexBuffers(1);
-    static PODVector<unsigned> elementMasks(1);
     vertexBuffers[0] = buffer;
-    elementMasks[0] = MASK_DEFAULT;
-    SetVertexBuffers(vertexBuffers, elementMasks);
+    SetVertexBuffers(vertexBuffers);
 }
 
-bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigned instanceOffset)
 {
     if (buffers.Size() > MAX_VERTEX_STREAMS)
     {
         URHO3D_LOGERROR("Too many vertex buffers");
         return false;
     }
-    if (buffers.Size() != elementMasks.Size())
-    {
-        URHO3D_LOGERROR("Amount of element masks and vertex buffers does not match");
-        return false;
-    }
 
-    bool changed = false;
-    unsigned newAttributes = 0;
+    if (instanceOffset != lastInstanceOffset_)
+    {
+        lastInstanceOffset_ = instanceOffset;
+        impl_->vertexBuffersDirty_ = true;
+    }
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
         VertexBuffer* buffer = 0;
-        unsigned elementMask = 0;
-
-        if (i < buffers.Size() && buffers[i])
-        {
+        if (i < buffers.Size())
             buffer = buffers[i];
-            if (elementMasks[i] == MASK_DEFAULT)
-                elementMask = buffer->GetElementMask();
-            else
-                elementMask = buffer->GetElementMask() & elementMasks[i];
-        }
-
-        // If buffer and element mask have stayed the same, skip to the next buffer
-        if (buffer == vertexBuffers_[i] && elementMask == elementMasks_[i] && instanceOffset == lastInstanceOffset_ && !changed)
+        if (buffer != vertexBuffers_[i])
         {
-            newAttributes |= elementMask;
-            continue;
+            vertexBuffers_[i] = buffer;
+            impl_->vertexBuffersDirty_ = true;
         }
-
-        vertexBuffers_[i] = buffer;
-        elementMasks_[i] = elementMask;
-        changed = true;
-
-        // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
-        // in which case the pointer will be invalid and cause a crash
-        if (!buffer || !buffer->GetGPUObject())
-            continue;
-
-        SetVBO(buffer->GetGPUObject());
-        unsigned vertexSize = buffer->GetVertexSize();
-
-        for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
-        {
-            unsigned attrIndex = glVertexAttrIndex[j];
-            unsigned elementBit = (unsigned)(1 << j);
-
-            if (elementMask & elementBit)
-            {
-                newAttributes |= elementBit;
-
-                // Enable attribute if not enabled yet
-                if ((impl_->enabledAttributes_ & elementBit) == 0)
-                {
-                    glEnableVertexAttribArray(attrIndex);
-                    impl_->enabledAttributes_ |= elementBit;
-                }
-
-                // Set the attribute pointer. Add instance offset for the instance matrix pointers
-                unsigned offset = j >= ELEMENT_INSTANCEMATRIX1 ? instanceOffset * vertexSize : 0;
-                glVertexAttribPointer(attrIndex, VertexBuffer::elementComponents[j], VertexBuffer::elementType[j],
-                    (GLboolean)VertexBuffer::elementNormalize[j], vertexSize,
-                    reinterpret_cast<const GLvoid*>(buffer->GetElementOffset((VertexElement)j) + offset));
-            }
-        }
-    }
-
-    if (!changed)
-        return true;
-
-    lastInstanceOffset_ = instanceOffset;
-
-    // Now check which vertex attributes should be disabled
-    unsigned disableAttributes = impl_->enabledAttributes_ & (~newAttributes);
-    unsigned disableIndex = 0;
-
-    while (disableAttributes)
-    {
-        if (disableAttributes & 1)
-        {
-            glDisableVertexAttribArray(glVertexAttrIndex[disableIndex]);
-            impl_->enabledAttributes_ &= ~(1 << disableIndex);
-        }
-        disableAttributes >>= 1;
-        ++disableIndex;
     }
 
     return true;
 }
 
-bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks,
-    unsigned instanceOffset)
+bool Graphics::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, unsigned instanceOffset)
 {
-    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), elementMasks, instanceOffset);
+    return SetVertexBuffers(reinterpret_cast<const PODVector<VertexBuffer*>&>(buffers), instanceOffset);
 }
 
 void Graphics::SetIndexBuffer(IndexBuffer* buffer)
@@ -1079,6 +1087,19 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
+
+    if (shaderProgram_)
+    {
+        impl_->usedVertexAttributes_ = shaderProgram_->GetUsedVertexAttributes();
+        impl_->vertexAttributes_ = &shaderProgram_->GetVertexAttributes();
+    }
+    else
+    {
+        impl_->usedVertexAttributes_ = 0;
+        impl_->vertexAttributes_ = 0;
+    }
+
+    impl_->vertexBuffersDirty_ = true;
 }
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
@@ -1382,6 +1403,14 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
 
     case VAR_MATRIX4:
         SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
         break;
 
     default:
@@ -2136,7 +2165,7 @@ void Graphics::WindowResized()
 
     int newWidth, newHeight;
 
-    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -2379,7 +2408,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
-        SDL_SetWindowFullscreen(impl_->window_, SDL_FALSE);
+        SDL_SetWindowFullscreen(impl_->window_, 0);
 #endif
 
     if (impl_->context_)
@@ -2486,6 +2515,9 @@ void Graphics::Restore()
             URHO3D_LOGERROR("OpenGL 2.0 is required");
             return;
         }
+
+        // Enable seamless cubemap if possible
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 
         // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
@@ -2759,10 +2791,6 @@ void Graphics::CheckFeatureSupport()
         sRGBSupport_ = true;
         sRGBWriteSupport_ = true;
 
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX1, 1);
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX2, 1);
-        glVertexAttribDivisor(ELEMENT_INSTANCEMATRIX3, 1);
-
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &numSupportedRTs);
     }
     else
@@ -2772,14 +2800,6 @@ void Graphics::CheckFeatureSupport()
         anisotropySupport_ = GLEW_EXT_texture_filter_anisotropic != 0;
         sRGBSupport_ = GLEW_EXT_texture_sRGB != 0;
         sRGBWriteSupport_ = GLEW_EXT_framebuffer_sRGB != 0;
-
-        // Set up instancing divisors if supported
-        if (instancingSupport_)
-        {
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX1, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX2, 1);
-            glVertexAttribDivisorARB(ELEMENT_INSTANCEMATRIX3, 1);
-        }
 
         glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &numSupportedRTs);
     }
@@ -2807,12 +2827,6 @@ void Graphics::CheckFeatureSupport()
     // Instancing is in core in WebGL 2, so the extension may not be present anymore. In WebGL 1, find https://www.khronos.org/registry/webgl/extensions/ANGLE_instanced_arrays/
     // TODO: In the distant future, this may break if WebGL 3 is introduced, so either improve the GL_VERSION parsing here, or keep track of which WebGL version we attempted to initialize.
     instancingSupport_ = (strstr((const char *)glGetString(GL_VERSION), "WebGL 2.") != 0) || CheckExtension("ANGLE_instanced_arrays");
-    if (instancingSupport_)
-    {
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX1, 1);
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX2, 1);
-        glVertexAttribDivisorANGLE(ELEMENT_INSTANCEMATRIX3, 1);
-    }
 #else
     dxtTextureSupport_ = CheckExtension("EXT_texture_compression_dxt1");
     etcTextureSupport_ = CheckExtension("OES_compressed_ETC1_RGB8_texture");
@@ -3067,6 +3081,88 @@ void Graphics::PrepareDraw()
         }
 #endif
     }
+
+    if (impl_->vertexBuffersDirty_)
+    {
+        // Go through currently bound vertex buffers and set the attribute pointers that are available & required
+        // Use reverse order so that elements from higher index buffers will override lower index buffers
+        unsigned assignedLocations = 0;
+
+        for (unsigned i = MAX_VERTEX_STREAMS - 1; i < MAX_VERTEX_STREAMS; --i)
+        {
+            VertexBuffer* buffer = vertexBuffers_[i];
+            // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
+            // in which case the pointer will be invalid and cause a crash
+            if (!buffer || !buffer->GetGPUObject() || !impl_->vertexAttributes_)
+                continue;
+
+            const PODVector<VertexElement>& elements = buffer->GetElements();
+
+            for (PODVector<VertexElement>::ConstIterator j = elements.Begin(); j != elements.End(); ++j)
+            {
+                const VertexElement& element = *j;
+                HashMap<Pair<unsigned char, unsigned char>, unsigned>::ConstIterator k =
+                    impl_->vertexAttributes_->Find(MakePair((unsigned char)element.semantic_, element.index_));
+
+                if (k != impl_->vertexAttributes_->End())
+                {
+                    unsigned location = k->second_;
+                    unsigned locationMask = 1 << location;
+                    if (assignedLocations & locationMask)
+                        continue; // Already assigned by higher index vertex buffer
+                    assignedLocations |= locationMask;
+
+                    // Enable attribute if not enabled yet
+                    if (!(impl_->enabledVertexAttributes_ & locationMask))
+                    {
+                        glEnableVertexAttribArray(location);
+                        impl_->enabledVertexAttributes_ |= locationMask;
+                    }
+
+                    // Enable/disable instancing divisor as necessary
+                    unsigned dataStart = element.offset_;
+                    if (element.perInstance_)
+                    {
+                        dataStart += lastInstanceOffset_ * buffer->GetVertexSize();
+                        if (!(impl_->instancingVertexAttributes_ & locationMask))
+                        {
+                            SetVertexAttribDivisor(location, 1);
+                            impl_->instancingVertexAttributes_ |= locationMask;
+                        }
+                    }
+                    else
+                    {
+                        if (impl_->instancingVertexAttributes_ & locationMask)
+                        {
+                            SetVertexAttribDivisor(location, 0);
+                            impl_->instancingVertexAttributes_ &= ~locationMask;
+                        }
+                    }
+
+                    SetVBO(buffer->GetGPUObject());
+                    glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
+                        element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
+                        (const void *)dataStart);
+                }
+            }
+        }
+
+        // Finally disable unnecessary vertex attributes
+        unsigned disableVertexAttributes = impl_->enabledVertexAttributes_ & (~impl_->usedVertexAttributes_);
+        unsigned location = 0;
+        while (disableVertexAttributes)
+        {
+            if (disableVertexAttributes & 1)
+            {
+                glDisableVertexAttribArray(location);
+                impl_->enabledVertexAttributes_ &= ~(1 << location);
+            }
+            ++location;
+            disableVertexAttributes >>= 1;
+        }
+
+        impl_->vertexBuffersDirty_ = false;
+    }
 }
 
 void Graphics::CleanupFramebuffers()
@@ -3132,7 +3228,9 @@ void Graphics::ResetCachedState()
     useClipPlane_ = false;
     lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
-    impl_->enabledAttributes_ = 0;
+    impl_->enabledVertexAttributes_ = 0;
+    impl_->usedVertexAttributes_ = 0;
+    impl_->instancingVertexAttributes_ = 0;
     impl_->boundFBO_ = impl_->systemFBO_;
     impl_->boundVBO_ = 0;
     impl_->boundUBO_ = 0;
@@ -3276,6 +3374,21 @@ bool Graphics::CheckFramebuffer()
         return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
+void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (gl3Support)
+        glVertexAttribDivisor(location, divisor);
+    else if (instancingSupport_)
+        glVertexAttribDivisorARB(location, divisor);
+#else
+#ifdef __EMSCRIPTEN__
+    if (instancingSupport_)
+        glVertexAttribDivisorANGLE(location, divisor);
+#endif
+#endif
+}
+
 void RegisterGraphicsLibrary(Context* context)
 {
     Animation::RegisterObject(context);
@@ -3284,6 +3397,7 @@ void RegisterGraphicsLibrary(Context* context)
     Shader::RegisterObject(context);
     Technique::RegisterObject(context);
     Texture2D::RegisterObject(context);
+    Texture2DArray::RegisterObject(context);
     Texture3D::RegisterObject(context);
     TextureCube::RegisterObject(context);
     Camera::RegisterObject(context);

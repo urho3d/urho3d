@@ -444,16 +444,22 @@
                                 <element type="BorderImage" internal="true" style="none">
                                     <element internal="true" style="none">
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="1-tap 16bit" />
+                                            <attribute name="Text" value="Simple 16bit" />
                                         </element>
                                         <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="1-tap 24bit" />
+                                            <attribute name="Text" value="Simple 24bit" />
                                         </element>
                                        <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="4-tap 16bit" />
+                                            <attribute name="Text" value="PCF 16bit" />
                                         </element>
                                        <element type="Text" style="FileSelectorFilterText">
-                                            <attribute name="Text" value="4-tap 24bit" />
+                                            <attribute name="Text" value="PCF 24bit" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="VSM" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Blurred VSM" />
                                         </element>
                                     </element>
                                 </element>
@@ -499,7 +505,6 @@
                         <attribute name="Text" value="Frame limiter" />
                     </element>
                 </element>
-                
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />
                     <element type="Text">
@@ -511,7 +516,6 @@
                         <attribute name="Max Size" value="100 2147483647" />
                      </element>
                 </element>
-                
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />
                     <element type="Text">
@@ -523,7 +527,6 @@
                         <attribute name="Max Size" value="100 2147483647" />
                      </element>
                 </element>
-                
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="20" />
                     <element type="Text">
@@ -533,6 +536,17 @@
                         <attribute name="Name" value="CubeMapGenSize" />
                         <attribute name="Min Size" value="100 0" />
                         <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Tags " />
+                        <attribute name="Min Size" value="88 17" />
+                        <attribute name="Max Size" value="88 17" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultTagsEdit" />
                      </element>
                 </element>
             </element>

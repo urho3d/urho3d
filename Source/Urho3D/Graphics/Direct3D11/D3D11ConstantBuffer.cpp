@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,14 +45,7 @@ ConstantBuffer::~ConstantBuffer()
 
 void ConstantBuffer::Release()
 {
-    if (object_)
-    {
-        if (!graphics_)
-            return;
-
-        ((ID3D11Buffer*)object_)->Release();
-        object_ = 0;
-    }
+    URHO3D_SAFE_RELEASE(object_);
 
     shadowData_.Reset();
     size_ = 0;
@@ -87,11 +80,11 @@ bool ConstantBuffer::SetSize(unsigned size)
         bufferDesc.CPUAccessFlags = 0;
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-        graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
-
-        if (!object_)
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create constant buffer");
+            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_LOGD3DERROR("Failed to create constant buffer", hr);
             return false;
         }
     }

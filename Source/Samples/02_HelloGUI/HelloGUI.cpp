@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,9 @@ void HelloGUI::Start()
 
     // Create a draggable Fish
     CreateDraggableFish();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void HelloGUI::InitControls()
@@ -181,7 +184,7 @@ void HelloGUI::CreateDraggableFish()
 
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
-    // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    // Get UIElement relative position where input (touch or click) occurred (top-left = IntVector2(0,0))
     dragBeginPosition_ = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
 }
 
@@ -198,7 +201,8 @@ void HelloGUI::HandleDragEnd(StringHash eventType, VariantMap& eventData) // For
 
 void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 {
-    engine_->Exit();
+    if (GetPlatform() != "Web")
+        engine_->Exit();
 }
 
 void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)

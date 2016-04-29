@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@
 namespace Urho3D
 {
 
-const char* shaderParameterGroups[] = {
+static const char* shaderParameterGroups[] = {
     "frame",
     "camera",
     "zone",
@@ -44,6 +44,30 @@ const char* shaderParameterGroups[] = {
     "custom"
 };
 
+static const char* elementSemanticNames[] =
+{
+    "POS",
+    "NORMAL",
+    "BINORMAL",
+    "TANGENT",
+    "TEXCOORD",
+    "COLOR",
+    "BLENDWEIGHT",
+    "BLENDINDICES",
+    "OBJECTINDEX"
+};
+
+static unsigned NumberPostfix(const String& str)
+{
+    for (unsigned i = 0; i < str.Length(); ++i)
+    {
+        if (IsDigit(str[i]))
+            return ToUInt(str.CString() + i);
+    }
+
+    return M_MAX_UNSIGNED;
+}
+
 unsigned ShaderProgram::globalFrameNumber = 0;
 const void* ShaderProgram::globalParameterSources[MAX_SHADER_PARAMETER_GROUPS];
 
@@ -51,6 +75,7 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
     GPUObject(graphics),
     vertexShader_(vertexShader),
     pixelShader_(pixelShader),
+    usedVertexAttributes_(0),
     frameNumber_(0)
 {
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
@@ -92,6 +117,8 @@ void ShaderProgram::Release()
         object_ = 0;
         linkerOutput_.Clear();
         shaderParameters_.Clear();
+        vertexAttributes_.Clear();
+        usedVertexAttributes_ = 0;
 
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             useTextureUnit_[i] = false;
@@ -114,25 +141,6 @@ bool ShaderProgram::Link()
         return false;
     }
 
-    // Bind vertex attribute locations to ensure they are the same in all shaders
-    // Note: this is not the same order as in VertexBuffer, instead a remapping is used to ensure everything except cube texture
-    // coordinates fit to the first 8 for better GLES2 device compatibility
-    glBindAttribLocation(object_, 0, "iPos");
-    glBindAttribLocation(object_, 1, "iNormal");
-    glBindAttribLocation(object_, 2, "iColor");
-    glBindAttribLocation(object_, 3, "iTexCoord");
-    glBindAttribLocation(object_, 4, "iTexCoord2");
-    glBindAttribLocation(object_, 5, "iTangent");
-    glBindAttribLocation(object_, 6, "iBlendWeights");
-    glBindAttribLocation(object_, 7, "iBlendIndices");
-    glBindAttribLocation(object_, 8, "iCubeTexCoord");
-    glBindAttribLocation(object_, 9, "iCubeTexCoord2");
-#if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
-    glBindAttribLocation(object_, 10, "iInstanceMatrix1");
-    glBindAttribLocation(object_, 11, "iInstanceMatrix2");
-    glBindAttribLocation(object_, 12, "iInstanceMatrix3");
-#endif
-
     glAttachShader(object_, vertexShader_->GetGPUObject());
     glAttachShader(object_, pixelShader_->GetGPUObject());
     glLinkProgram(object_);
@@ -154,12 +162,47 @@ bool ShaderProgram::Link()
     if (!object_)
         return false;
 
-    const int MAX_PARAMETER_NAME_LENGTH = 256;
-    char uniformName[MAX_PARAMETER_NAME_LENGTH];
-    int uniformCount;
+    const int MAX_NAME_LENGTH = 256;
+    char nameBuffer[MAX_NAME_LENGTH];
+    int attributeCount, uniformCount, elementCount, nameLength;
+    GLenum type;
 
     glUseProgram(object_);
-    glGetProgramiv(object_, GL_ACTIVE_UNIFORMS, &uniformCount);
+
+    // Check for vertex attributes
+    glGetProgramiv(object_, GL_ACTIVE_ATTRIBUTES, &attributeCount);
+    for (int i = 0; i < attributeCount; ++i)
+    {
+        glGetActiveAttrib(object_, i, (GLsizei)MAX_NAME_LENGTH, &nameLength, &elementCount, &type, nameBuffer);
+
+        String name = String(nameBuffer, nameLength);
+        VertexElementSemantic semantic = MAX_VERTEX_ELEMENT_SEMANTICS;
+        unsigned char semanticIndex = 0;
+
+        // Go in reverse order so that "binormal" is detected before "normal"
+        for (unsigned j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j < MAX_VERTEX_ELEMENT_SEMANTICS; --j)
+        {
+            if (name.Contains(elementSemanticNames[j], false))
+            {
+                semantic = (VertexElementSemantic)j;
+                unsigned index = NumberPostfix(name);
+                if (index != M_MAX_UNSIGNED)
+                    semanticIndex = (unsigned char)index;
+                break;
+            }
+        }
+
+        if (semantic == MAX_VERTEX_ELEMENT_SEMANTICS)
+        {
+            URHO3D_LOGWARNING("Found vertex attribute " + name + " with no known semantic in shader program " + 
+                vertexShader_->GetFullName() + " " + pixelShader_->GetFullName());
+            continue;
+        }
+
+        int location = glGetAttribLocation(object_, name.CString());
+        vertexAttributes_[MakePair((unsigned char)semantic, semanticIndex)] = location;
+        usedVertexAttributes_ |= (1 << location);
+    }
 
     // Check for constant buffers
 #ifndef GL_ES_VERSION_2_0
@@ -172,10 +215,9 @@ bool ShaderProgram::Link()
         glGetProgramiv(object_, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
         for (int i = 0; i < numUniformBlocks; ++i)
         {
-            int nameLength;
-            glGetActiveUniformBlockName(object_, (GLuint)i, MAX_PARAMETER_NAME_LENGTH, &nameLength, uniformName);
+            glGetActiveUniformBlockName(object_, (GLuint)i, MAX_NAME_LENGTH, &nameLength, nameBuffer);
 
-            String name(uniformName, (unsigned)nameLength);
+            String name(nameBuffer, (unsigned)nameLength);
 
             unsigned blockIndex = glGetUniformBlockIndex(object_, name.CString());
             unsigned group = M_MAX_UNSIGNED;
@@ -192,16 +234,7 @@ bool ShaderProgram::Link()
 
             // If name is not recognized, search for a digit in the name and use that as the group index
             if (group == M_MAX_UNSIGNED)
-            {
-                for (unsigned j = 1; j < name.Length(); ++j)
-                {
-                    if (name[j] >= '0' && name[j] <= '5')
-                    {
-                        group = name[j] - '0';
-                        break;
-                    }
-                }
-            }
+                group = NumberPostfix(name);
 
             if (group >= MAX_SHADER_PARAMETER_GROUPS)
             {
@@ -231,16 +264,14 @@ bool ShaderProgram::Link()
 #endif
 
     // Check for shader parameters and texture units
+    glGetProgramiv(object_, GL_ACTIVE_UNIFORMS, &uniformCount);
     for (int i = 0; i < uniformCount; ++i)
     {
-        unsigned type;
-        int count;
-
-        glGetActiveUniform(object_, (GLuint)i, MAX_PARAMETER_NAME_LENGTH, 0, &count, &type, uniformName);
-        int location = glGetUniformLocation(object_, uniformName);
+        glGetActiveUniform(object_, (GLuint)i, MAX_NAME_LENGTH, 0, &elementCount, &type, nameBuffer);
+        int location = glGetUniformLocation(object_, nameBuffer);
 
         // Check for array index included in the name and strip it
-        String name(uniformName);
+        String name(nameBuffer);
         unsigned index = name.Find('[');
         if (index != String::NPOS)
         {
@@ -280,29 +311,20 @@ bool ShaderProgram::Link()
         else if (location >= 0 && name[0] == 's')
         {
             // Set the samplers here so that they do not have to be set later
-            int unit = graphics_->GetTextureUnit(name.Substring(1));
+            unsigned unit = graphics_->GetTextureUnit(name.Substring(1));
             if (unit >= MAX_TEXTURE_UNITS)
-            {
-                // If texture unit name is not recognized, search for a digit in the name and use that as the unit index
-                for (unsigned j = 1; j < name.Length(); ++j)
-                {
-                    if (name[j] >= '0' && name[j] <= '9')
-                    {
-                        unit = name[j] - '0';
-                        break;
-                    }
-                }
-            }
+                unit = NumberPostfix(name);
 
             if (unit < MAX_TEXTURE_UNITS)
             {
                 useTextureUnit_[unit] = true;
-                glUniform1iv(location, 1, &unit);
+                glUniform1iv(location, 1, reinterpret_cast<int*>(&unit));
             }
         }
     }
 
-    // Rehash the parameter map to ensure minimal load factor
+    // Rehash the parameter & vertex attributes maps to ensure minimal load factor
+    vertexAttributes_.Rehash(NextPowerOfTwo(vertexAttributes_.Size()));
     shaderParameters_.Rehash(NextPowerOfTwo(shaderParameters_.Size()));
 
     return true;

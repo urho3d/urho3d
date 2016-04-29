@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -395,7 +395,7 @@ Frustum Light::GetFrustum() const
 
 int Light::GetNumShadowSplits() const
 {
-    int ret = 1;
+    unsigned ret = 1;
 
     if (shadowCascade_.splits_[1] > shadowCascade_.splits_[0])
     {
@@ -408,7 +408,7 @@ int Light::GetNumShadowSplits() const
         }
     }
 
-    return Min(ret, MAX_CASCADE_SPLITS);
+    return (int)Min(ret, MAX_CASCADE_SPLITS);
 }
 
 const Matrix3x4& Light::GetVolumeTransform(Camera* camera)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ class ValueAnimation;
 struct VAnimEventFrame;
 
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.
-class ValueAnimationInfo : public RefCounted
+class URHO3D_API ValueAnimationInfo : public RefCounted
 {
 public:
     /// Construct without target object.

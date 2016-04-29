@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -269,6 +269,26 @@ void ScriptFile::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptio
         if (!i->second_->HasEventHandlers())
             eventInvokers_.Erase(i);
     }
+}
+
+bool ScriptFile::HasEventHandler(StringHash eventType) const
+{
+    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
+    if (i != eventInvokers_.End())
+        return i->second_->HasSubscribedToEvent(eventType);
+    else
+        return false;
+}
+
+bool ScriptFile::HasEventHandler(Object* sender, StringHash eventType) const
+{
+    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
+    if (i != eventInvokers_.End())
+        return i->second_->HasSubscribedToEvent(sender, eventType);
+    else
+        return false;
 }
 
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
@@ -747,6 +767,42 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
 
                 case VAR_STRING:
                     context->SetArgObject(i, (void*)&parameters[i].GetString());
+                    break;
+
+                case VAR_VARIANTMAP:
+                    context->SetArgObject(i, (void*)&parameters[i].GetVariantMap());
+                    break;
+
+                case VAR_INTRECT:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntRect());
+                    break;
+
+                case VAR_INTVECTOR2:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntVector2());
+                    break;
+
+                case VAR_COLOR:
+                    context->SetArgObject(i, (void*)&parameters[i].GetColor());
+                    break;
+
+                case VAR_MATRIX3:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix3());
+                    break;
+
+                case VAR_MATRIX3X4:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix3x4());
+                    break;
+
+                case VAR_MATRIX4:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix4());
+                    break;
+
+                case VAR_RESOURCEREF:
+                    context->SetArgObject(i, (void*)&parameters[i].GetResourceRef());
+                    break;
+
+                case VAR_RESOURCEREFLIST:
+                    context->SetArgObject(i, (void*)&parameters[i].GetResourceRefList());
                     break;
 
                 case VAR_VOIDPTR:

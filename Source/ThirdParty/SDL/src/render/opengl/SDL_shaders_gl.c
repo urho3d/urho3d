@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -113,7 +113,7 @@ static const char *shader_source[NUM_SHADERS][2] =
 "}"
     },
 
-    /* SHADER_YV12 */
+    /* SHADER_YUV */
     {
         /* vertex shader */
 "varying vec4 v_color;\n"
@@ -133,7 +133,7 @@ static const char *shader_source[NUM_SHADERS][2] =
 "uniform sampler2D tex2; // V \n"
 "\n"
 "// YUV offset \n"
-"const vec3 offset = vec3(-0.0625, -0.5, -0.5);\n"
+"const vec3 offset = vec3(-0.0627451017, -0.501960814, -0.501960814);\n"
 "\n"
 "// RGB coefficients \n"
 "const vec3 Rcoeff = vec3(1.164,  0.000,  1.596);\n"
@@ -150,9 +150,109 @@ static const char *shader_source[NUM_SHADERS][2] =
 "    yuv.x = texture2D(tex0, tcoord).r;\n"
 "\n"
 "    // Get the U and V values \n"
-"    tcoord *= 0.5;\n"
+"    tcoord *= UVCoordScale;\n"
 "    yuv.y = texture2D(tex1, tcoord).r;\n"
 "    yuv.z = texture2D(tex2, tcoord).r;\n"
+"\n"
+"    // Do the color transform \n"
+"    yuv += offset;\n"
+"    rgb.r = dot(yuv, Rcoeff);\n"
+"    rgb.g = dot(yuv, Gcoeff);\n"
+"    rgb.b = dot(yuv, Bcoeff);\n"
+"\n"
+"    // That was easy. :) \n"
+"    gl_FragColor = vec4(rgb, 1.0) * v_color;\n"
+"}"
+    },
+
+    /* SHADER_NV12 */
+    {
+        /* vertex shader */
+"varying vec4 v_color;\n"
+"varying vec2 v_texCoord;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+"    v_color = gl_Color;\n"
+"    v_texCoord = vec2(gl_MultiTexCoord0);\n"
+"}",
+        /* fragment shader */
+"varying vec4 v_color;\n"
+"varying vec2 v_texCoord;\n"
+"uniform sampler2D tex0; // Y \n"
+"uniform sampler2D tex1; // U/V \n"
+"\n"
+"// YUV offset \n"
+"const vec3 offset = vec3(-0.0627451017, -0.501960814, -0.501960814);\n"
+"\n"
+"// RGB coefficients \n"
+"const vec3 Rcoeff = vec3(1.164,  0.000,  1.596);\n"
+"const vec3 Gcoeff = vec3(1.164, -0.391, -0.813);\n"
+"const vec3 Bcoeff = vec3(1.164,  2.018,  0.000);\n"
+"\n"
+"void main()\n"
+"{\n"
+"    vec2 tcoord;\n"
+"    vec3 yuv, rgb;\n"
+"\n"
+"    // Get the Y value \n"
+"    tcoord = v_texCoord;\n"
+"    yuv.x = texture2D(tex0, tcoord).r;\n"
+"\n"
+"    // Get the U and V values \n"
+"    tcoord *= UVCoordScale;\n"
+"    yuv.yz = texture2D(tex1, tcoord).ra;\n"
+"\n"
+"    // Do the color transform \n"
+"    yuv += offset;\n"
+"    rgb.r = dot(yuv, Rcoeff);\n"
+"    rgb.g = dot(yuv, Gcoeff);\n"
+"    rgb.b = dot(yuv, Bcoeff);\n"
+"\n"
+"    // That was easy. :) \n"
+"    gl_FragColor = vec4(rgb, 1.0) * v_color;\n"
+"}"
+    },
+
+    /* SHADER_NV21 */
+    {
+        /* vertex shader */
+"varying vec4 v_color;\n"
+"varying vec2 v_texCoord;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+"    v_color = gl_Color;\n"
+"    v_texCoord = vec2(gl_MultiTexCoord0);\n"
+"}",
+        /* fragment shader */
+"varying vec4 v_color;\n"
+"varying vec2 v_texCoord;\n"
+"uniform sampler2D tex0; // Y \n"
+"uniform sampler2D tex1; // U/V \n"
+"\n"
+"// YUV offset \n"
+"const vec3 offset = vec3(-0.0627451017, -0.501960814, -0.501960814);\n"
+"\n"
+"// RGB coefficients \n"
+"const vec3 Rcoeff = vec3(1.164,  0.000,  1.596);\n"
+"const vec3 Gcoeff = vec3(1.164, -0.391, -0.813);\n"
+"const vec3 Bcoeff = vec3(1.164,  2.018,  0.000);\n"
+"\n"
+"void main()\n"
+"{\n"
+"    vec2 tcoord;\n"
+"    vec3 yuv, rgb;\n"
+"\n"
+"    // Get the Y value \n"
+"    tcoord = v_texCoord;\n"
+"    yuv.x = texture2D(tex0, tcoord).r;\n"
+"\n"
+"    // Get the U and V values \n"
+"    tcoord *= UVCoordScale;\n"
+"    yuv.yz = texture2D(tex1, tcoord).ar;\n"
 "\n"
 "    // Do the color transform \n"
 "    yuv += offset;\n"
@@ -218,7 +318,11 @@ CompileShaderProgram(GL_ShaderContext *ctx, int index, GL_ShaderData *data)
     if (ctx->GL_ARB_texture_rectangle_supported) {
         frag_defines =
 "#define sampler2D sampler2DRect\n"
-"#define texture2D texture2DRect\n";
+"#define texture2D texture2DRect\n"
+"#define UVCoordScale 0.5\n";
+    } else {
+        frag_defines = 
+"#define UVCoordScale 1.0\n";
     }
 
     /* Create one program object to rule them all */
@@ -276,8 +380,9 @@ GL_CreateShaderContext()
         return NULL;
     }
 
-    if (SDL_GL_ExtensionSupported("GL_ARB_texture_rectangle")
-        || SDL_GL_ExtensionSupported("GL_EXT_texture_rectangle")) {
+    if (!SDL_GL_ExtensionSupported("GL_ARB_texture_non_power_of_two") &&
+        (SDL_GL_ExtensionSupported("GL_ARB_texture_rectangle") ||
+         SDL_GL_ExtensionSupported("GL_EXT_texture_rectangle"))) {
         ctx->GL_ARB_texture_rectangle_supported = SDL_TRUE;
     }
 

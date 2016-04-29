@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,8 @@ RigidBody::RigidBody(Context* context) :
     useGravity_(true),
     readdBody_(false),
     inWorld_(false),
-    enableMassUpdate_(true)
+    enableMassUpdate_(true),
+    hasSimulated_(false)
 {
     compoundShape_ = new btCompoundShape();
     shiftedCompoundShape_ = new btCompoundShape();
@@ -171,6 +172,8 @@ void RigidBody::getWorldTransform(btTransform& worldTrans) const
         worldTrans.setOrigin(ToBtVector3(lastPosition_ + lastRotation_ * centerOfMass_));
         worldTrans.setRotation(ToBtQuaternion(lastRotation_));
     }
+
+    hasSimulated_ = true;
 }
 
 void RigidBody::setWorldTransform(const btTransform& worldTrans)
@@ -203,6 +206,8 @@ void RigidBody::setWorldTransform(const btTransform& worldTrans)
 
         MarkNetworkUpdate();
     }
+
+    hasSimulated_ = true;
 }
 
 void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -241,8 +246,9 @@ void RigidBody::SetPosition(const Vector3& position)
 
         // When forcing the physics position, set also interpolated position so that there is no jitter
         // When not inside the simulation loop, this may lead to erratic movement of parented rigidbodies
-        // so skip in that case
-        if (physicsWorld_->IsSimulating())
+        // so skip in that case. Exception made before first simulation tick so that interpolation position
+        // of e.g. instantiated prefabs will be correct from the start
+        if (!hasSimulated_ || physicsWorld_->IsSimulating())
         {
             btTransform interpTrans = body_->getInterpolationWorldTransform();
             interpTrans.setOrigin(worldTrans.getOrigin());
@@ -264,7 +270,7 @@ void RigidBody::SetRotation(const Quaternion& rotation)
         if (!centerOfMass_.Equals(Vector3::ZERO))
             worldTrans.setOrigin(ToBtVector3(oldPosition + rotation * centerOfMass_));
 
-        if (physicsWorld_->IsSimulating())
+        if (!hasSimulated_ || physicsWorld_->IsSimulating())
         {
             btTransform interpTrans = body_->getInterpolationWorldTransform();
             interpTrans.setRotation(worldTrans.getRotation());
@@ -288,7 +294,7 @@ void RigidBody::SetTransform(const Vector3& position, const Quaternion& rotation
         worldTrans.setRotation(ToBtQuaternion(rotation));
         worldTrans.setOrigin(ToBtVector3(position + rotation * centerOfMass_));
 
-        if (physicsWorld_->IsSimulating())
+        if (!hasSimulated_ || physicsWorld_->IsSimulating())
         {
             btTransform interpTrans = body_->getInterpolationWorldTransform();
             interpTrans.setOrigin(worldTrans.getOrigin());
@@ -893,7 +899,8 @@ void RigidBody::OnMarkedDirty(Node* node)
     // is in use, because in that case the node transform will be constantly updated into smoothed, possibly non-physical
     // states; rather follow the SmoothedTransform target transform directly
     // Also, for kinematic objects Bullet asks the position from us, so we do not need to apply ourselves
-    if (!kinematic_ && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !smoothedTransform_)
+    // (exception: initial setting of transform)
+    if ((!kinematic_ || !hasSimulated_) && (!physicsWorld_ || !physicsWorld_->IsApplyingTransforms()) && !smoothedTransform_)
     {
         // Physics operations are not safe from worker threads
         Scene* scene = GetScene();
@@ -1012,6 +1019,7 @@ void RigidBody::AddBodyToWorld()
     world->addRigidBody(body_, (short)collisionLayer_, (short)collisionMask_);
     inWorld_ = true;
     readdBody_ = false;
+    hasSimulated_ = false;
 
     if (mass_ > 0.0f)
         Activate();

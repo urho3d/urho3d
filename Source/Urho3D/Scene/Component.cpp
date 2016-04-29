@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,19 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Resource/JSONValue.h"
 #include "../Scene/Component.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#ifdef URHO3D_PHYSICS
+#include "../Physics/PhysicsWorld.h"
+#endif
+#ifdef URHO3D_URHO2D
+#include "../Urho2D/PhysicsWorld2D.h"
+#endif
 
 #include "../DebugNew.h"
-#include "./Resource/JSONValue.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:6293)
@@ -68,7 +74,7 @@ bool Component::SaveXML(XMLElement& dest) const
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
         return false;
-    if (!dest.SetInt("id", id_))
+    if (!dest.SetUInt("id", id_))
         return false;
 
     // Write attributes
@@ -79,7 +85,7 @@ bool Component::SaveJSON(JSONValue& dest) const
 {
     // Write type and ID
     dest.Set("type", GetTypeName());
-    dest.Set("id", (int) id_);
+    dest.Set("id", id_);
 
     // Write attributes
     return Animatable::SaveJSON(dest);
@@ -280,4 +286,24 @@ void Component::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap&
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
 }
+
+Component* Component::GetFixedUpdateSource()
+{
+    Component* ret = 0;
+    Scene* scene = GetScene();
+
+    if (scene)
+    {
+#ifdef URHO3D_PHYSICS
+        ret = scene->GetComponent<PhysicsWorld>();
+#endif
+#ifdef URHO3D_URHO2D
+        if (!ret)
+            ret = scene->GetComponent<PhysicsWorld2D>();
+#endif
+    }
+
+    return ret;
+}
+
 }

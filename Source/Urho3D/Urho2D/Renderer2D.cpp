@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,6 @@ Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
-    frustum_(0),
     viewMask_(DEFAULT_VIEWMASK)
 {
     material_->SetName("Urho2D");
@@ -135,7 +134,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
     for (HashMap<Camera*, ViewBatchInfo2D>::ConstIterator i = viewBatchInfos_.Begin(); i != viewBatchInfos_.End(); ++i)
     {
         if (i->second_.batchUpdatedFrameNumber_ == frame_.frameNumber_)
-            indexCount = (unsigned)Max((int)indexCount, (int)i->second_.indexCount_);
+            indexCount = Max(indexCount, i->second_.indexCount_);
     }
 
     // Fill index buffer
@@ -273,10 +272,7 @@ bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
         return false;
 
     const BoundingBox& box = drawable->GetWorldBoundingBox();
-    if (frustum_)
-        return frustum_->IsInsideFast(box) != OUTSIDE;
-
-    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
+    return frustum_.IsInsideFast(box) != OUTSIDE;
 }
 
 void Renderer2D::OnWorldBoundingBoxUpdate()
@@ -336,13 +332,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     URHO3D_PROFILE(UpdateRenderer2D);
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
-    frustum_ = &camera->GetFrustum();
-    if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
-    {
-        // Define bounding box with min and max points
-        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]);
-        frustum_ = 0;
-    }
+    frustum_ = camera->GetFrustum();
     viewMask_ = camera->GetViewMask();
 
     // Check visibility
@@ -520,7 +510,7 @@ void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material
     {
         SharedPtr<Geometry> geometry(new Geometry(context_));
         geometry->SetIndexBuffer(indexBuffer_);
-        geometry->SetVertexBuffer(0, viewBatchInfo.vertexBuffer_, MASK_VERTEX2D);
+        geometry->SetVertexBuffer(0, viewBatchInfo.vertexBuffer_);
 
         viewBatchInfo.geometries_.Push(geometry);
     }

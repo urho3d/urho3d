@@ -10,8 +10,8 @@ Array<QuickMenuItem@> quickMenuItems;
 FileSelector@ uiFileSelector;
 String consoleCommandInterpreter;
 Window@ contextMenu;
-float stepColoringGroupUpdate = 100; // ms
-float timeToNextColoringGroupUpdate = 0;
+uint stepColoringGroupUpdate = 100; // ms
+uint timeToNextColoringGroupUpdate = 0;
 
 const StringHash UI_ELEMENT_TYPE("UIElement");
 const StringHash WINDOW_TYPE("Window");
@@ -462,12 +462,12 @@ void CreateMenuBar()
             if (objectCategories[i] == "UI")
                 continue;
 
-            Menu@ menu = CreateMenuItem(objectCategories[i], null, SHOW_POPUP_INDICATOR);
-            Window@ popup = CreatePopup(menu);
+            Menu@ m = CreateMenuItem(objectCategories[i], null, SHOW_POPUP_INDICATOR);
+            Window@ p = CreatePopup(m);
             String[] componentTypes = GetObjectsByCategory(objectCategories[i]);
             for (uint j = 0; j < componentTypes.length; ++j)
-                popup.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent, 0, 0, "", true, "Create " + componentTypes[j]));
-            childPopup.AddChild(menu);
+                p.AddChild(CreateIconizedMenuItem(componentTypes[j], @PickComponent, 0, 0, "", true, "Create " + componentTypes[j]));
+            childPopup.AddChild(m);
         }
         FinalizedPopupMenu(childPopup);
         popup.AddChild(childMenu);
@@ -1364,17 +1364,17 @@ void HandleHotKeysBlender( VariantMap& eventData)
         activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
-    else if (key == '4')
+    else if (key == '4' && ui.focusElement is null)
         editMode = EDIT_SELECT;
-    else if (key == '5')
+    else if (key == '5' && ui.focusElement is null)
         axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-    else if (key == '6')
+    else if (key == '6' && ui.focusElement is null)
     {
         --pickMode;
         if (pickMode < PICK_GEOMETRIES)
                 pickMode = MAX_PICK_MODES - 1;
     }
-    else if (key == '7')
+    else if (key == '7' && ui.focusElement is null)
     {
         ++pickMode;
         if (pickMode >= MAX_PICK_MODES)
@@ -1382,12 +1382,15 @@ void HandleHotKeysBlender( VariantMap& eventData)
     }
     else if (key == 'Z' && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
     {
-        fillMode = FillMode(fillMode + 1);
-        if (fillMode > FILL_POINT)
-            fillMode = FILL_SOLID;
+        if (ui.focusElement is null) 
+        {
+            fillMode = FillMode(fillMode + 1);
+            if (fillMode > FILL_POINT)
+                fillMode = FILL_SOLID;
 
-        // Update camera fill mode
-        SetFillMode(fillMode);
+            // Update camera fill mode
+            SetFillMode(fillMode);
+        }
     }
     else if (key == KEY_SPACE)
     {

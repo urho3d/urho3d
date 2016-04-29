@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -112,8 +112,8 @@ public:
     /// Return all parameter definitions.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
 
-    /// Return vertex element mask.
-    unsigned GetElementMask() const { return elementMask_; }
+    /// Return vertex element hash.
+    unsigned long long GetElementHash() const { return elementHash_; }
 
     /// Return shader bytecode.
     const PODVector<unsigned char>& GetByteCode() const { return byteCode_; }
@@ -126,6 +126,12 @@ public:
 
     /// Return constant buffer data sizes.
     const unsigned* GetConstantBufferSizes() const { return &constantBufferSizes_[0]; }
+
+    /// Return defines with the CLIPPLANE define appended. Used internally on D3D11 only.
+    const String& GetDefinesClipPlane() { return definesClipPlane_; }
+
+    /// D3D11 vertex semantic names. Used internally.
+    static const char* elementSemanticNames[];
 
 private:
     /// Load bytecode from a file. Return true if successful.
@@ -143,8 +149,8 @@ private:
     WeakPtr<Shader> owner_;
     /// Shader type.
     ShaderType type_;
-    /// Vertex element mask for vertex shaders. Zero for pixel shaders.
-    unsigned elementMask_;
+    /// Vertex element hash for vertex shaders. Zero for pixel shaders. Note that hashing is different than vertex buffers.
+    unsigned long long elementHash_;
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
@@ -157,6 +163,8 @@ private:
     String name_;
     /// Defines to use in compiling.
     String defines_;
+    /// Defines to use in compiling + CLIPPLANE define appended.
+    String definesClipPlane_;
     /// Shader compile error string.
     String compilerOutput_;
 };

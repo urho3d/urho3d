@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,74 +32,6 @@
 namespace Urho3D
 {
 
-const unsigned VertexBuffer::elementSize[] =
-{
-    3 * sizeof(float), // Position
-    3 * sizeof(float), // Normal
-    4 * sizeof(unsigned char), // Color
-    2 * sizeof(float), // Texcoord1
-    2 * sizeof(float), // Texcoord2
-    3 * sizeof(float), // Cubetexcoord1
-    3 * sizeof(float), // Cubetexcoord2
-    4 * sizeof(float), // Tangent
-    4 * sizeof(float), // Blendweights
-    4 * sizeof(unsigned char), // Blendindices
-    4 * sizeof(float), // Instancematrix1
-    4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
-};
-
-const char* VertexBuffer::elementSemantics[] =
-{
-    "POSITION",
-    "NORMAL",
-    "COLOR",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TANGENT",
-    "BLENDWEIGHT",
-    "BLENDINDICES",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD"
-};
-
-const unsigned VertexBuffer::elementSemanticIndices[] =
-{
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    1,
-    0,
-    0,
-    0,
-    2,
-    3,
-    4
-};
-
-const unsigned VertexBuffer::elementFormats[] =
-{
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R8G8B8A8_UNORM,
-    DXGI_FORMAT_R32G32_FLOAT,
-    DXGI_FORMAT_R32G32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R8G8B8A8_UINT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT
-};
-
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
     GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
@@ -128,20 +60,16 @@ void VertexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
+    if (graphics_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
         {
             if (graphics_->GetVertexBuffer(i) == this)
                 graphics_->SetVertexBuffer(0);
         }
-
-        ((ID3D11Buffer*)object_)->Release();
-        object_ = 0;
     }
+
+    URHO3D_SAFE_RELEASE(object_);
 }
 
 void VertexBuffer::SetShadowed(bool enable)
@@ -163,11 +91,16 @@ void VertexBuffer::SetShadowed(bool enable)
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
+    return SetSize(vertexCount, GetElements(elementMask), dynamic);
+}
+
+bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic)
+{
     Unlock();
 
     dynamic_ = dynamic;
     vertexCount_ = vertexCount;
-    elementMask_ = elementMask;
+    elements_ = elements;
 
     UpdateOffsets();
 
@@ -357,61 +290,105 @@ void VertexBuffer::Unlock()
 void VertexBuffer::UpdateOffsets()
 {
     unsigned elementOffset = 0;
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    elementHash_ = 0;
+    elementMask_ = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
     {
-        if (elementMask_ & (1 << i))
+        i->offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[i->type_];
+        elementHash_ <<= 6;
+        elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
+
+        for (unsigned j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
         {
-            elementOffset_[i] = elementOffset;
-            elementOffset += elementSize[i];
+            const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
+            if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
+                elementMask_ |= (1 << j);
         }
-        else
-            elementOffset_[i] = NO_ELEMENT;
     }
+
     vertexSize_ = elementOffset;
 }
 
-unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex, unsigned useMask)
+const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index) const
 {
-    unsigned long long bufferHash = elementMask_;
-    unsigned long long maskHash;
-    if (useMask == MASK_DEFAULT)
-        maskHash = ((unsigned long long)elementMask_) * 0x100000000ULL;
-    else
-        maskHash = ((unsigned long long)useMask) * 0x100000000ULL;
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
 
-    bufferHash |= maskHash;
-    bufferHash <<= streamIndex * MAX_VERTEX_ELEMENTS;
+    return 0;
+}
 
-    return bufferHash;
+const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    return GetElement(elements, type, semantic, index) != 0;
+}
+
+unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    const VertexElement* element = GetElement(elements, type, semantic, index);
+    return element ? element->offset_ : M_MAX_UNSIGNED;
+}
+
+PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+{
+    PODVector<VertexElement> ret;
+
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
+    {
+        if (elementMask & (1 << i))
+            ret.Push(LEGACY_VERTEXELEMENTS[i]);
+    }
+
+    return ret;
+}
+
+unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
+{
+    unsigned size = 0;
+
+    for (unsigned i = 0; i < elements.Size(); ++i)
+        size += ELEMENT_TYPESIZES[elements[i].type_];
+
+    return size;
 }
 
 unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 {
-    unsigned vertexSize = 0;
+    unsigned size = 0;
 
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
         if (elementMask & (1 << i))
-            vertexSize += elementSize[i];
+            size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 
-    return vertexSize;
-}
-
-unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement element)
-{
-    unsigned offset = 0;
-
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        if (i == element)
-            break;
-
-        if (elementMask & (1 << i))
-            offset += elementSize[i];
-    }
-
-    return offset;
+    return size;
 }
 
 bool VertexBuffer::Create()
@@ -430,11 +407,11 @@ bool VertexBuffer::Create()
         bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
         bufferDesc.ByteWidth = (UINT)(vertexCount_ * vertexSize_);
 
-        graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
-
-        if (!object_)
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+        if (FAILED(hr))
         {
-            URHO3D_LOGERROR("Failed to create vertex buffer");
+            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_LOGD3DERROR("Failed to create vertex buffer", hr);
             return false;
         }
     }
@@ -459,13 +436,15 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
             D3D11_MAP_WRITE, 0, &mappedData);
-        hwData = mappedData.pData;
-        if (!hwData)
-            URHO3D_LOGERROR("Failed to map vertex buffer");
+        if (FAILED(hr) || !mappedData.pData)
+            URHO3D_LOGD3DERROR("Failed to map vertex buffer", hr);
         else
+        {
+            hwData = mappedData.pData;
             lockState_ = LOCK_HARDWARE;
+        }
     }
 
     return hwData;

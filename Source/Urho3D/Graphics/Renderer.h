@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ class RenderSurface;
 class ResourceCache;
 class Skeleton;
 class OcclusionBuffer;
+class Technique;
 class Texture;
 class Texture2D;
 class TextureCube;
@@ -153,6 +154,8 @@ class URHO3D_API Renderer : public Object
     URHO3D_OBJECT(Renderer, Object);
 
 public:
+    typedef void(Object::*ShadowMapFilter)(View* view, Texture2D* shadowMap);
+
     /// Construct.
     Renderer(Context* context);
     /// Destruct.
@@ -166,6 +169,8 @@ public:
     void SetDefaultRenderPath(RenderPath* renderPath);
     /// Set default renderpath from an XML file.
     void SetDefaultRenderPath(XMLFile* file);
+    /// Set default non-textured material technique.
+    void SetDefaultTechnique(Technique* tech);
     /// Set HDR rendering on/off.
     void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
@@ -182,8 +187,14 @@ public:
     void SetDrawShadows(bool enable);
     /// Set shadow map resolution.
     void SetShadowMapSize(int size);
-    /// Set shadow quality mode. See the SHADOWQUALITY constants in GraphicsDefs.h.
-    void SetShadowQuality(int quality);
+    /// Set shadow quality mode. See the SHADOWQUALITY enum in GraphicsDefs.h.
+    void SetShadowQuality(ShadowQuality quality);
+    /// Set shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
+    void SetShadowSoftness(float shadowSoftness);
+    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+    void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
+    /// Set post processing filter to the shadow map
+    void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
     void SetReuseShadowMaps(bool enable);
     /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
@@ -209,6 +220,9 @@ public:
     /// Force reload of shaders.
     void ReloadShaders();
 
+    /// Apply post processing filter to the shadow map. Called by View.
+    void ApplyShadowMapFilter(View* view, Texture2D* shadowMap);
+
     /// Return number of backbuffer viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
 
@@ -216,6 +230,8 @@ public:
     Viewport* GetViewport(unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
+    /// Return default non-textured material technique.
+    Technique* GetDefaultTechnique() const;
 
     /// Return whether HDR rendering is enabled.
     bool GetHDRRendering() const { return hdrRendering_; }
@@ -242,7 +258,13 @@ public:
     int GetShadowMapSize() const { return shadowMapSize_; }
 
     /// Return shadow quality.
-    int GetShadowQuality() const { return shadowQuality_; }
+    ShadowQuality GetShadowQuality() const { return shadowQuality_; }
+
+    /// Return shadow softness.
+    float GetShadowSoftness() const { return shadowSoftness_; }
+
+    /// Return VSM shadow parameters
+    Vector2 GetVSMShadowParameters() const { return vsmShadowParams_; };
 
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
@@ -389,6 +411,8 @@ private:
     void CreateInstancingBuffer();
     /// Create point light shadow indirection texture data.
     void SetIndirectionTextureData();
+    /// Update a queued viewport for rendering.
+    void UpdateQueuedViewport(unsigned index);
     /// Prepare for rendering of a new view.
     void PrepareViewRender();
     /// Remove unused occlusion and screen buffers.
@@ -401,15 +425,21 @@ private:
     void ResetShadowMaps();
     /// Remove all occlusion and screen buffers.
     void ResetBuffers();
+    /// Find variations for shadow shaders
+    String GetShadowVariations() const;
     /// Handle screen mode event.
     void HandleScreenMode(StringHash eventType, VariantMap& eventData);
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Blur the shadow map.
+    void BlurShadowMap(View* view, Texture2D* shadowMap);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
     /// Default renderpath.
     SharedPtr<RenderPath> defaultRenderPath_;
+    /// Default non-textured material technique.
+    SharedPtr<Technique> defaultTechnique_;
     /// Default zone.
     SharedPtr<Zone> defaultZone_;
     /// Directional light quad geometry.
@@ -440,6 +470,10 @@ private:
     HashMap<int, SharedPtr<Texture2D> > colorShadowMaps_;
     /// Shadow map allocations by resolution.
     HashMap<int, PODVector<Light*> > shadowMapAllocations_;
+    /// Instance of shadow map filter
+    Object* shadowMapFilterInstance_;
+    /// Function pointer of shadow map filter
+    ShadowMapFilter shadowMapFilter_;
     /// Screen buffers by resolution and format.
     HashMap<long long, Vector<SharedPtr<Texture> > > screenBuffers_;
     /// Current screen buffer allocations by resolution and format.
@@ -477,7 +511,11 @@ private:
     /// Shadow map resolution.
     int shadowMapSize_;
     /// Shadow quality.
-    int shadowQuality_;
+    ShadowQuality shadowQuality_;
+    /// Shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
+    float shadowSoftness_;
+    /// Shadow parameters when VSM is used, they help to reduce light bleeding.
+    Vector2 vsmShadowParams_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.

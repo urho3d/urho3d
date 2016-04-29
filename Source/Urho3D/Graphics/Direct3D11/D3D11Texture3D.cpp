@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -144,63 +144,36 @@ bool Texture3D::EndLoad()
 
 void Texture3D::Release()
 {
-    if (object_)
+    if (graphics_ && object_)
     {
-        if (!graphics_)
-            return;
-
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
                 graphics_->SetTexture(i, 0);
         }
-
-        if (renderSurface_)
-            renderSurface_->Release();
-
-        ((ID3D11Resource*)object_)->Release();
-        object_ = 0;
-
-        if (shaderResourceView_)
-        {
-            ((ID3D11ShaderResourceView*)shaderResourceView_)->Release();
-            shaderResourceView_ = 0;
-        }
-
-        if (sampler_)
-        {
-            ((ID3D11SamplerState*)sampler_)->Release();
-            sampler_ = 0;
-        }
     }
-    else
-    {
-        if (renderSurface_)
-            renderSurface_->Release();
-    }
+
+    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(shaderResourceView_);
+    URHO3D_SAFE_RELEASE(sampler_);
 }
 
 bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage)
 {
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-    usage_ = usage;
-
-    if (usage_ == TEXTURE_RENDERTARGET)
+    if (width <= 0 || height <= 0 || depth <= 0)
     {
-        renderSurface_ = new RenderSurface(this);
-
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
+        URHO3D_LOGERROR("Zero or negative 3D texture dimensions");
+        return false;
     }
+    if (usage >= TEXTURE_RENDERTARGET)
+    {
+        URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
+        return false;
+    }
+    if (usage_ == TEXTURE_DYNAMIC)
+        requestedLevels_ = 1;
 
-    if (usage_ == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture3D, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
+    usage_ = usage;
 
     width_ = width;
     height_ = height;
@@ -269,9 +242,14 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
-        if (mappedData.pData)
+        if (FAILED(hr) || !mappedData.pData)
+        {
+            URHO3D_LOGD3DERROR("Failed to map texture for update", hr);
+            return false;
+        }
+        else
         {
             for (int page = 0; page < depth; ++page)
             {
@@ -283,11 +261,6 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
             }
 
             graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
-        }
-        else
-        {
-            URHO3D_LOGERROR("Failed to map texture for update");
-            return false;
         }
     }
     else
@@ -310,7 +283,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     return true;
 }
 
-bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
+bool Texture3D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -318,8 +291,9 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture3D);
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -331,7 +305,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         unsigned components = image->GetComponents();
         if ((components == 1 && !useAlpha) || components == 2 || components == 3)
         {
-            image = image->ConvertToRGBA();
+            mipImage = image->ConvertToRGBA(); image = mipImage;
             if (!image)
                 return false;
             components = image->GetComponents();
@@ -346,7 +320,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -378,7 +352,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
@@ -410,7 +384,7 @@ bool Texture3D::SetData(SharedPtr<Image> image, bool useAlpha)
         height /= (1 << mipsToSkip);
         depth /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, depth, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
@@ -471,10 +445,11 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
     ID3D11Texture3D* stagingTexture = 0;
-    graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
-    if (!stagingTexture)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create staging texture for GetData");
+        URHO3D_SAFE_RELEASE(stagingTexture);
+        URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
         return false;
     }
 
@@ -494,8 +469,14 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     unsigned rowSize = GetRowDataSize(levelWidth);
     unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
 
-    graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
-    if (mappedData.pData)
+    hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP_READ, 0, &mappedData);
+    if (FAILED(hr) || !mappedData.pData)
+    {
+        URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
+        stagingTexture->Release();
+        return false;
+    }
+    else
     {
         for (int page = 0; page < levelDepth; ++page)
         {
@@ -508,12 +489,6 @@ bool Texture3D::GetData(unsigned level, void* dest) const
         graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
         stagingTexture->Release();
         return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Failed to map staging texture for GetData");
-        stagingTexture->Release();
-        return false;
     }
 }
 
@@ -537,10 +512,11 @@ bool Texture3D::Create()
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
-    graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_);
-    if (!object_)
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_);
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create texture");
+        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
 
@@ -550,21 +526,16 @@ bool Texture3D::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
     resourceViewDesc.Texture3D.MipLevels = (UINT)levels_;
 
-    graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
-    if (!shaderResourceView_)
+    if (FAILED(hr))
     {
-        URHO3D_LOGERROR("Failed to create shader resource view for texture");
+        URHO3D_SAFE_RELEASE(shaderResourceView_);
+        URHO3D_LOGD3DERROR("Failed to create shader resource view for texture", hr);
         return false;
     }
 
     return true;
-}
-
-void Texture3D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
 }
 
 }

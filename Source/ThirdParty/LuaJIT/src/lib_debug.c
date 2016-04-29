@@ -1,6 +1,6 @@
 /*
 ** Debug library.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -29,7 +29,7 @@ LJLIB_CF(debug_getregistry)
   return 1;
 }
 
-LJLIB_CF(debug_getmetatable)
+LJLIB_CF(debug_getmetatable)	LJLIB_REC(.)
 {
   lj_lib_checkany(L, 1);
   if (!lua_getmetatable(L, 1)) {

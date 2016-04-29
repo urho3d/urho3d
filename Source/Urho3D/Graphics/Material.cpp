@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,10 @@
 #include "../Core/Profiler.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
+#include "../Graphics/Renderer.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/Texture2D.h"
+#include "../Graphics/Texture2DArray.h"
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../IO/FileSystem.h"
@@ -119,6 +121,38 @@ TextureUnit ParseTextureUnitName(String name)
         URHO3D_LOGERROR("Unknown texture unit name " + name);
 
     return unit;
+}
+
+StringHash ParseTextureTypeName(String name)
+{
+    name = name.ToLower().Trimmed();
+
+    if (name == "texture")
+        return Texture2D::GetTypeStatic();
+    else if (name == "cubemap")
+        return TextureCube::GetTypeStatic();
+    else if (name == "texture3d")
+        return Texture3D::GetTypeStatic();
+    else if (name == "texturearray")
+        return Texture2DArray::GetTypeStatic();
+
+    return 0;
+}
+
+StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
+{
+    StringHash type = 0;
+    if (!cache)
+        return type;
+
+    SharedPtr<File> texXmlFile = cache->GetFile(filename, false);
+    if (texXmlFile.NotNull())
+    {
+        SharedPtr<XMLFile> texXml(new XMLFile(cache->GetContext()));
+        if (texXml->Load(*texXmlFile))
+            type = ParseTextureTypeName(texXml->GetRoot().GetName());
+    }
+    return type;
 }
 
 static TechniqueEntry noEntry;
@@ -275,16 +309,22 @@ bool Material::BeginLoadXML(Deserializer& source)
             while (textureElem)
             {
                 String name = textureElem.GetAttribute("name");
-                // Detect cube maps by file extension: they are defined by an XML file
-                /// \todo Differentiate with 3D textures by actually reading the XML content
+                // Detect cube maps and arrays by file extension: they are defined by an XML file
                 if (GetExtension(name) == ".xml")
                 {
 #ifdef DESKTOP_GRAPHICS
-                    TextureUnit unit = TU_DIFFUSE;
-                    if (textureElem.HasAttribute("unit"))
-                        unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
-                    if (unit == TU_VOLUMEMAP)
+                    StringHash type = ParseTextureTypeXml(cache, name);
+                    if (!type && textureElem.HasAttribute("unit"))
+                    {
+                        TextureUnit unit = ParseTextureUnitName(textureElem.GetAttribute("unit"));
+                        if (unit == TU_VOLUMEMAP)
+                            type = Texture3D::GetTypeStatic();
+                    }
+
+                    if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else if (type == Texture2DArray::GetTypeStatic())
+                        cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
                     else
 #endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
@@ -330,18 +370,24 @@ bool Material::BeginLoadJSON(Deserializer& source)
             {
                 String unitString = it->first_;
                 String name = it->second_.GetString();
-                // Detect cube maps by file extension: they are defined by an XML file
-                /// \todo Differentiate with 3D textures by actually reading the XML content
+                // Detect cube maps and arrays by file extension: they are defined by an XML file
                 if (GetExtension(name) == ".xml")
                 {
-    #ifdef DESKTOP_GRAPHICS
-                    TextureUnit unit = TU_DIFFUSE;
-                    unit = ParseTextureUnitName(unitString);
+#ifdef DESKTOP_GRAPHICS
+                    StringHash type = ParseTextureTypeXml(cache, name);
+                    if (!type && !unitString.Empty())
+                    {
+                        TextureUnit unit = ParseTextureUnitName(unitString);
+                        if (unit == TU_VOLUMEMAP)
+                            type = Texture3D::GetTypeStatic();
+                    }
 
-                    if (unit == TU_VOLUMEMAP)
+                    if (type == Texture3D::GetTypeStatic())
                         cache->BackgroundLoadResource<Texture3D>(name, true, this);
+                    else if (type == Texture2DArray::GetTypeStatic())
+                        cache->BackgroundLoadResource<Texture2DArray>(name, true, this);
                     else
-    #endif
+#endif
                         cache->BackgroundLoadResource<TextureCube>(name, true, this);
                 }
                 else
@@ -408,13 +454,18 @@ bool Material::Load(const XMLElement& source)
         if (unit < MAX_TEXTURE_UNITS)
         {
             String name = textureElem.GetAttribute("name");
-            // Detect cube maps by file extension: they are defined by an XML file
-            /// \todo Differentiate with 3D textures by actually reading the XML content
+            // Detect cube maps and arrays by file extension: they are defined by an XML file
             if (GetExtension(name) == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
-                if (unit == TU_VOLUMEMAP)
+                StringHash type = ParseTextureTypeXml(cache, name);
+                if (!type && unit == TU_VOLUMEMAP)
+                    type = Texture3D::GetTypeStatic();
+
+                if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(name));
+                else if (type == Texture2DArray::GetTypeStatic())
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(name));
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(name));
@@ -430,7 +481,10 @@ bool Material::Load(const XMLElement& source)
     while (parameterElem)
     {
         String name = parameterElem.GetAttribute("name");
-        SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
+        if (!parameterElem.HasAttribute("type"))
+            SetShaderParameter(name, ParseShaderParameterValue(parameterElem.GetAttribute("value")));
+        else
+            SetShaderParameter(name, Variant(parameterElem.GetAttribute("type"), parameterElem.GetAttribute("value")));
         parameterElem = parameterElem.GetNext("parameter");
     }
     batchedParameterUpdate_ = false;
@@ -538,13 +592,18 @@ bool Material::Load(const JSONValue& source)
 
         if (unit < MAX_TEXTURE_UNITS)
         {
-            // Detect cube maps by file extension: they are defined by an XML file
-            /// \todo Differentiate with 3D textures by actually reading the XML content
+            // Detect cube maps and arrays by file extension: they are defined by an XML file
             if (GetExtension(textureName) == ".xml")
             {
 #ifdef DESKTOP_GRAPHICS
-                if (unit == TU_VOLUMEMAP)
+                StringHash type = ParseTextureTypeXml(cache, textureName);
+                if (!type && unit == TU_VOLUMEMAP)
+                    type = Texture3D::GetTypeStatic();
+
+                if (type == Texture3D::GetTypeStatic())
                     SetTexture(unit, cache->GetResource<Texture3D>(textureName));
+                else if (type == Texture2DArray::GetTypeStatic())
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(textureName));
                 else
 #endif
                     SetTexture(unit, cache->GetResource<TextureCube>(textureName));
@@ -561,7 +620,13 @@ bool Material::Load(const JSONValue& source)
     for (JSONObject::ConstIterator it = parameterObject.Begin(); it != parameterObject.End(); it++)
     {
         String name = it->first_;
-        SetShaderParameter(name, ParseShaderParameterValue(it->second_.GetString()));
+        if (it->second_.IsString())
+            SetShaderParameter(name, ParseShaderParameterValue(it->second_.GetString()));
+        else if (it->second_.IsObject())
+        {
+            JSONObject valueObj = it->second_.GetObject();
+            SetShaderParameter(name, Variant(valueObj["type"].GetString(), valueObj["value"].GetString()));
+        }
     }
     batchedParameterUpdate_ = false;
 
@@ -659,7 +724,13 @@ bool Material::Save(XMLElement& dest) const
     {
         XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
-        parameterElem.SetVectorVariant("value", j->second_.value_);
+        if (j->second_.value_.GetType() != VAR_BUFFER)
+            parameterElem.SetVectorVariant("value", j->second_.value_);
+        else
+        {
+            parameterElem.SetAttribute("type", j->second_.value_.GetTypeName());
+            parameterElem.SetAttribute("value", j->second_.value_.ToString());
+        }
     }
 
     // Write shader parameter animations
@@ -733,7 +804,15 @@ bool Material::Save(JSONValue& dest) const
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin();
          j != shaderParameters_.End(); ++j)
     {
-        shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
+        if (j->second_.value_.GetType() != VAR_BUFFER)
+            shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
+        else
+        {
+            JSONObject valueObj;
+            valueObj["type"] = j->second_.value_.GetTypeName();
+            valueObj["value"] = j->second_.value_.ToString();
+            shaderParamsVal.Set(j->second_.name_, valueObj);
+        }
     }
     dest.Set("shaderParameters", shaderParamsVal);
 
@@ -975,6 +1054,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
     ret->shaderParameters_ = shaderParameters_;
+    ret->shaderParameterHash_ = shaderParameterHash_;
     ret->textures_ = textures_;
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
@@ -1085,7 +1165,9 @@ void Material::ResetToDefaults()
         return;
 
     SetNumTechniques(1);
-    SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
+    Renderer* renderer = GetSubsystem<Renderer>();
+    SetTechnique(0, renderer ? renderer->GetDefaultTechnique() :
+        GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 
     textures_.Clear();
 
@@ -1097,6 +1179,8 @@ void Material::ResetToDefaults()
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+    SetShaderParameter("RoughnessPS", 0.5f);
+    SetShaderParameter("MetallicPS", 0.0f);
     batchedParameterUpdate_ = false;
 
     cullMode_ = CULL_CCW;
@@ -1156,7 +1240,7 @@ void Material::UpdateEventSubscription()
             SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Material, HandleAttributeAnimationUpdate));
         subscribed_ = true;
     }
-    else if (subscribed_)
+    else if (subscribed_ && shaderParameterAnimationInfos_.Empty())
     {
         UnsubscribeFromEvent(E_UPDATE);
         UnsubscribeFromEvent(E_ATTRIBUTEANIMATIONUPDATE);

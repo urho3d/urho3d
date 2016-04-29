@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,9 @@
 #include <cassert>
 #include <cstring>
 #include <new>
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -66,7 +69,16 @@ public:
     {
         *this = vector;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    Vector(const std::initializer_list<T>& list) : Vector()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Push(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~Vector()
     {
@@ -288,6 +300,30 @@ public:
         Resize(size_ - length, 0);
     }
 
+    /// Erase a range of elements by swapping elements from the end of the array.
+    void EraseSwap(unsigned pos, unsigned length = 1)
+    {
+        unsigned shiftStartIndex = pos + length;
+        // Return if the range is illegal
+        if (shiftStartIndex > size_ || !length)
+            return;
+
+        unsigned newSize = size_ - length;
+        unsigned trailingCount = size_ - shiftStartIndex;
+        if (trailingCount <= length)
+        {
+            // We're removing more elements from the array than exist past the end of the range being removed, so
+            // perform a normal shift and destroy.
+            MoveRange(pos, shiftStartIndex, trailingCount);
+        }
+        else
+        {
+            // Swap elements from the end of the array into the empty space.
+            CopyElements(Buffer() + pos, Buffer() + newSize, length);
+        }
+        Resize(newSize, 0);
+    }
+
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
@@ -311,13 +347,26 @@ public:
         return Begin() + pos;
     }
 
-    /// Erase an element if found.
+    /// Erase an element by value. Return true if was found and erased.
     bool Remove(const T& value)
     {
         Iterator i = Find(value);
         if (i != End())
         {
             Erase(i);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /// Erase an element by value by swapping with the last element. Return true if was found and erased.
+    bool RemoveSwap(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            EraseSwap(i);
             return true;
         }
         else
@@ -791,13 +840,50 @@ public:
         return Begin() + pos;
     }
 
-    /// Erase an element if found.
+    /// Erase a range of elements by swapping elements from the end of the array.
+    void EraseSwap(unsigned pos, unsigned length = 1)
+    {
+        unsigned shiftStartIndex = pos + length;
+        // Return if the range is illegal
+        if (shiftStartIndex > size_ || !length)
+            return;
+      
+        unsigned newSize = size_ - length;
+        unsigned trailingCount = size_ - shiftStartIndex;
+        if (trailingCount <= length)
+        {
+            // We're removing more elements from the array than exist past the end of the range being removed, so
+            // perform a normal shift and destroy.
+            MoveRange(pos, shiftStartIndex, trailingCount);
+        }
+        else
+        {
+            // Swap elements from the end of the array into the empty space.
+            CopyElements(Buffer() + pos, Buffer() + newSize, length);
+        }
+        Resize(newSize);
+    }
+
+    /// Erase an element by value. Return true if was found and erased.
     bool Remove(const T& value)
     {
         Iterator i = Find(value);
         if (i != End())
         {
             Erase(i);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    /// Erase an element by value by swapping with the last element. Return true if was found and erased.
+    bool RemoveSwap(const T& value)
+    {
+        Iterator i = Find(value);
+        if (i != End())
+        {
+            EraseSwap(i);
             return true;
         }
         else
@@ -940,11 +1026,6 @@ private:
             memcpy(dest, src, count * sizeof(T));
     }
 };
-
-}
-
-namespace std
-{
 
 template <class T> typename Urho3D::Vector<T>::ConstIterator begin(const Urho3D::Vector<T>& v) { return v.Begin(); }
 
