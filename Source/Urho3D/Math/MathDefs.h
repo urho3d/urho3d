@@ -166,11 +166,7 @@ template <> inline float Atan2<float>(float y, float x) { return M_RADTODEG * at
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
 {
-    if (!value)
-        return true;
-    while (!(value & 1))
-        value >>= 1;
-    return value == 1;
+    return !(value & (value - 1));
 }
 
 /// Round up to next power of two.

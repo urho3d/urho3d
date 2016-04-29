@@ -63,6 +63,7 @@ Urho3D development, contributions and bugfixes by:
 - OvermindDL1
 - Skrylar
 - TheComet93
+- Y-way
 - 1vanK
 - andmar1x
 - amadeus_osa
