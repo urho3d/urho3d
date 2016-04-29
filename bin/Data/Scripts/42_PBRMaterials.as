@@ -1,8 +1,9 @@
-// Scene & UI load example.
+// PBR materials example.
 // This sample demonstrates:
-//      - Loading a scene from a file and showing it
-//      - Loading a UI layout from a file and showing it
-//      - Subscribing to the UI layout's events
+//      - Loading a scene that showcases physically based materials & shaders
+//
+// To use with deferred rendering, a PBR deferred renderpath should be chosen:
+// CoreData/RenderPaths/PBRDeferred.xml or CoreData/RenderPaths/PBRDeferredHWDepth.xml
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -63,6 +64,7 @@ void SetupViewport()
     Viewport@ viewport = Viewport(scene_, cameraNode.GetComponent("Camera"));
     renderer.viewports[0] = viewport;
 
+    // Add post-processing effects appropriate with the example scene
     RenderPath@ effectRenderPath = viewport.renderPath.Clone();
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/BloomHDR.xml"));
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/FXAA2.xml"));
