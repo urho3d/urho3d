@@ -2785,7 +2785,7 @@ void Graphics::CheckFeatureSupport()
     if (gl3Support)
     {
         // Work around GLEW failure to check extensions properly from a GL3 context
-        instancingSupport_ = true;
+        instancingSupport_ = glDrawElementsInstanced != 0 && glVertexAttribDivisor != 0;
         dxtTextureSupport_ = true;
         anisotropySupport_ = true;
         sRGBSupport_ = true;
@@ -3377,7 +3377,7 @@ bool Graphics::CheckFramebuffer()
 void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
 {
 #ifndef GL_ES_VERSION_2_0
-    if (gl3Support)
+    if (gl3Support && instancingSupport_)
         glVertexAttribDivisor(location, divisor);
     else if (instancingSupport_)
         glVertexAttribDivisorARB(location, divisor);
