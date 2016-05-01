@@ -172,10 +172,14 @@ inline bool IsPowerOfTwo(unsigned value)
 /// Round up to next power of two.
 inline unsigned NextPowerOfTwo(unsigned value)
 {
-    unsigned ret = 1;
-    while (ret < value && ret < 0x80000000)
-        ret <<= 1;
-    return ret;
+    // http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+    --value;
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    return ++value;
 }
 
 /// Count the number of set bits in a mask.
