@@ -375,6 +375,7 @@ endif ()
 # Makefile: Make targets
 # The host tool must be built natively
 if (CMAKE_CROSSCOMPILING)
+    check_native_compiler_exist ()
     # Escape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
         string (REPLACE -D +D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")

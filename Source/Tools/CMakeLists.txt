@@ -38,6 +38,7 @@ endif ()
 
 # Build PackageTool using host compiler toolchain
 if (CMAKE_CROSSCOMPILING AND URHO3D_PACKAGING)
+    check_native_compiler_exist ()
     # When cross-compiling, build the host tool as external project
     include (ExternalProject)
     if (IOS)
