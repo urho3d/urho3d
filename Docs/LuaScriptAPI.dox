@@ -317,6 +317,9 @@ Properties:
 
 Methods:
 
+- Animation() (GC)
+- Animation* new()
+- void delete()
 - void SetAnimationName(const String name)
 - void SetLength(float length)
 - AnimationTrack* CreateTrack(const String name)
@@ -327,6 +330,7 @@ Methods:
 - void AddTrigger(float time, bool timeIsNormalized, const Variant& data)
 - void RemoveTrigger(unsigned index)
 - void RemoveAllTriggers()
+- Animation* Clone(const String cloneName = String::EMPTY) const
 - const String GetAnimationName() const
 - float GetLength() const
 - unsigned GetNumTracks() const
