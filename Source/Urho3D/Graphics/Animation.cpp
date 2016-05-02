@@ -364,6 +364,20 @@ void Animation::SetNumTriggers(unsigned num)
     triggers_.Resize(num);
 }
 
+SharedPtr<Animation> Animation::Clone(const String& cloneName) const
+{
+    SharedPtr<Animation> ret(new Animation(context_));
+
+    ret->SetName(cloneName);
+    ret->SetAnimationName(animationName_);
+    ret->length_ = length_;
+    ret->tracks_ = tracks_;
+    ret->triggers_ = triggers_;
+    ret->SetMemoryUse(GetMemoryUse());
+    
+    return ret;
+}
+
 AnimationTrack* Animation::GetTrack(const String& name)
 {
     HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Find(StringHash(name));

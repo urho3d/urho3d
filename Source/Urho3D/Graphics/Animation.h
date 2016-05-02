@@ -146,6 +146,8 @@ public:
     void RemoveAllTriggers();
     /// Resize trigger point vector.
     void SetNumTriggers(unsigned num);
+    /// Clone the animation.
+    SharedPtr<Animation> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }
