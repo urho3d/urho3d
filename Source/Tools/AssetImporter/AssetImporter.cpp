@@ -135,6 +135,7 @@ void Run(const Vector<String>& arguments);
 void DumpNodes(aiNode* rootNode, unsigned level);
 
 void ExportModel(const String& outName, bool animationOnly);
+void ExportAnimation(const String& outName, bool animationOnly);
 void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
@@ -213,6 +214,7 @@ void Run(const Vector<String>& arguments)
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
             "model       Output a model\n"
+            "anim        Output a animation\n"
             "scene       Output a scene\n"
             "node        Output a node and its children (prefab)\n"
             "dump        Dump scene node structure. No output file is generated\n"
@@ -410,7 +412,7 @@ void Run(const Vector<String>& arguments)
         }
     }
 
-    if (command == "model" || command == "scene" || command == "node" || command == "dump")
+    if (command == "model" || command == "scene" || command == "anim" || command == "node" || command == "dump")
     {
         String inFile = arguments[1];
         String outFile;
@@ -466,6 +468,9 @@ void Run(const Vector<String>& arguments)
 
         if (command == "model")
             ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
+
+        if (command == "anim")
+            ExportAnimation(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
 
         if (command == "scene" || command == "node")
         {
@@ -562,6 +567,30 @@ void ExportModel(const String& outName, bool animationOnly)
     CollectBones(model, animationOnly);
     BuildBoneCollisionInfo(model);
     BuildAndSaveModel(model);
+    if (!noAnimations_)
+    {
+        CollectAnimations(&model);
+        BuildAndSaveAnimations(&model);
+
+        // Save scene-global animations
+        CollectAnimations();
+        BuildAndSaveAnimations();
+    }
+}
+
+void ExportAnimation(const String& outName, bool animationOnly)
+{
+    if (outName.Empty())
+        ErrorExit("No output file defined");
+
+    OutModel model;
+    model.rootNode_ = rootNode_;
+    model.outName_ = outName;
+
+    CollectMeshes(model, model.rootNode_);
+    CollectBones(model, animationOnly);
+    BuildBoneCollisionInfo(model);
+    //    BuildAndSaveModel(model);
     if (!noAnimations_)
     {
         CollectAnimations(&model);

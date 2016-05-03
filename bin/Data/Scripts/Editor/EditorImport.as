@@ -34,6 +34,34 @@ int ExecuteAssetImporter(Array<String>@ args)
     return fileSystem.SystemRun(assetImporterPath, args);
 }
 
+void ImportAnimation(const String&in fileName)
+{
+  if (fileName.empty)
+      return;
+
+  ui.cursor.shape = CS_BUSY;
+
+  String modelName = "Models/" + GetFileName(fileName) + ".ani";
+  String outFileName = sceneResourcePath + modelName;
+  fileSystem.CreateDir(sceneResourcePath + "Models");
+
+  Array<String> args;
+  args.Push("anim");
+  args.Push("\"" + fileName + "\"");
+  args.Push("\"" + outFileName + "\"");
+  args.Push("-p \"" + sceneResourcePath + "\"");
+  Array<String> options = importOptions.Trimmed().Split(' ');
+  for (uint i = 0; i < options.length; ++i)
+      args.Push(options[i]);
+
+  if (ExecuteAssetImporter(args) == 0)
+  {
+
+  }
+  else
+      log.Error("Failed to execute AssetImporter to import model");
+}
+
 void ImportModel(const String&in fileName)
 {
     if (fileName.empty)
