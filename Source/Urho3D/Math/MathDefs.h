@@ -168,7 +168,7 @@ inline bool IsPowerOfTwo(unsigned value)
 {
     if (!value)
         return true;
-    return (0 == (value & (value - 1)));
+    return !(value & (value - 1));
 }
 
 /// Round up to next power of two.
