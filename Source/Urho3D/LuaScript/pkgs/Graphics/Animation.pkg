@@ -40,6 +40,9 @@ struct AnimationTriggerPoint
 
 class Animation : public Resource
 {
+    Animation();
+    ~Animation();
+
     void SetAnimationName(const String name);
     void SetLength(float length);
     AnimationTrack* CreateTrack(const String name);
@@ -50,6 +53,9 @@ class Animation : public Resource
     void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
     void RemoveTrigger(unsigned index);
     void RemoveAllTriggers();
+    
+    // SharedPtr<Animation> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside Animation* AnimationClone @ Clone(const String cloneName = String::EMPTY) const;
 
     const String GetAnimationName() const;
     float GetLength() const;
@@ -64,3 +70,29 @@ class Animation : public Resource
     tolua_readonly tolua_property__get_set unsigned numTracks;
     tolua_readonly tolua_property__get_set unsigned numTriggers;
 };
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Animation_new00
+static int tolua_GraphicsLuaAPI_Animation_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Animation>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Animation_new00_local
+static int tolua_GraphicsLuaAPI_Animation_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Animation>(tolua_S);
+}
+
+static Animation* AnimationClone(const Animation* animation, const String& cloneName = String::EMPTY)
+{
+    if (!animation)
+        return 0;
+        
+    SharedPtr<Animation> clonedAnimationPtr = animation->Clone(cloneName);
+    Animation* clonedAnimation = clonedAnimationPtr.Get();
+    clonedAnimationPtr.Detach();
+    
+    return clonedAnimation;
+}
+$}

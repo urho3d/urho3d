@@ -91,6 +91,7 @@ namespace Urho3D
 <a href="#Class_Frustum"><b>Frustum</b></a>
 <a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
+<a href="#Class_HierarchyContainer"><b>HierarchyContainer</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
 <a href="#Class_Image"><b>Image</b></a>
 <a href="#Class_IndexBuffer"><b>IndexBuffer</b></a>
@@ -317,6 +318,9 @@ Properties:
 
 Methods:
 
+- Animation() (GC)
+- Animation* new()
+- void delete()
 - void SetAnimationName(const String name)
 - void SetLength(float length)
 - AnimationTrack* CreateTrack(const String name)
@@ -327,6 +331,7 @@ Methods:
 - void AddTrigger(float time, bool timeIsNormalized, const Variant& data)
 - void RemoveTrigger(unsigned index)
 - void RemoveAllTriggers()
+- Animation* Clone(const String cloneName = String::EMPTY) const
 - const String GetAnimationName() const
 - float GetLength() const
 - unsigned GetNumTracks() const
@@ -2585,6 +2590,9 @@ Properties:
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
+
+<a name="Class_HierarchyContainer"></a>
+### HierarchyContainer : UIElement
 
 <a name="Class_HttpRequest"></a>
 ### HttpRequest : Deserializer

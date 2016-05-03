@@ -295,6 +295,7 @@ class Animation
 // Methods:
 void AddTrigger(const AnimationTriggerPoint&);
 void AddTrigger(float, bool, const Variant&);
+Animation Clone(const String& = String ( )) const;
 AnimationTrack CreateTrack(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);

@@ -7,6 +7,10 @@ enum HighlightMode
     HM_ALWAYS
 };
 
+class HierarchyContainer : public UIElement
+{
+};
+
 class ListView : public ScrollView
 {
     ListView();

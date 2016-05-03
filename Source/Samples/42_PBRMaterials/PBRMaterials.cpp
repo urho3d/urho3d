@@ -24,25 +24,29 @@
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/RenderPath.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/UIEvents.h>
+#ifdef URHO3D_ANGELSCRIPT
+#include <Urho3D/AngelScript/Script.h>
+#endif
 
-#include "SceneAndUILoad.h"
+#include "PBRMaterials.h"
 
 #include <Urho3D/DebugNew.h>
 
-URHO3D_DEFINE_APPLICATION_MAIN(SceneAndUILoad)
+URHO3D_DEFINE_APPLICATION_MAIN(PBRMaterials)
 
-SceneAndUILoad::SceneAndUILoad(Context* context) :
+PBRMaterials::PBRMaterials(Context* context) :
     Sample(context)
 {
 }
 
-void SceneAndUILoad::Start()
+void PBRMaterials::Start()
 {
     // Execute base class startup
     Sample::Start();
@@ -58,20 +62,22 @@ void SceneAndUILoad::Start()
 
     // Subscribe to global events for camera movement
     SubscribeToEvents();
-
-    // Set the mouse mode to use in the sample
-    Sample::InitMouseMode(MM_RELATIVE);
 }
 
-void SceneAndUILoad::CreateScene()
+void PBRMaterials::CreateScene()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+#ifdef URHO3D_ANGELSCRIPT
+    // The scene uses an AngelScript component for animation. Instantiate the subsystem if possible
+    context_->RegisterSubsystem(new Script(context_));
+#endif
 
     scene_ = new Scene(context_);
 
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
-    SharedPtr<File> file = cache->GetFile("Scenes/SceneLoadExample.xml");
+    SharedPtr<File> file = cache->GetFile("Scenes/PBRExample.xml");
     scene_->LoadXML(*file);
 
     // Create the camera (not included in the scene file)
@@ -79,10 +85,10 @@ void SceneAndUILoad::CreateScene()
     cameraNode_->CreateComponent<Camera>();
 
     // Set an initial position for the camera scene node above the plane
-    cameraNode_->SetPosition(Vector3(0.0f, 2.0f, -10.0f));
+    cameraNode_->SetPosition(Vector3(0.0f, 4.0f, 0.0f));
 }
 
-void SceneAndUILoad::CreateUI()
+void PBRMaterials::CreateUI()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     UI* ui = GetSubsystem<UI>();
@@ -99,36 +105,33 @@ void SceneAndUILoad::CreateUI()
     // Set starting position of the cursor at the rendering window center
     Graphics* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
-
-    // Load UI content prepared in the editor and add to the UI hierarchy
-    SharedPtr<UIElement> layoutRoot = ui->LoadLayout(cache->GetResource<XMLFile>("UI/UILoadExample.xml"));
-    ui->GetRoot()->AddChild(layoutRoot);
-
-    // Subscribe to button actions (toggle scene lights when pressed then released)
-    Button* button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight1", true));
-    if (button)
-        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight1));
-    button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight2", true));
-    if (button)
-        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight2));
 }
 
-void SceneAndUILoad::SetupViewport()
+void PBRMaterials::SetupViewport()
 {
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     Renderer* renderer = GetSubsystem<Renderer>();
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
+
+    // Add post-processing effects appropriate with the example scene
+    SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
+    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
+
+    viewport->SetRenderPath(effectRenderPath);
 }
 
-void SceneAndUILoad::SubscribeToEvents()
+void PBRMaterials::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for camera motion
-    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SceneAndUILoad, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(PBRMaterials, HandleUpdate));
 }
 
-void SceneAndUILoad::MoveCamera(float timeStep)
+void PBRMaterials::MoveCamera(float timeStep)
 {
     // Right mouse button controls mouse cursor visibility: hide when pressed
     UI* ui = GetSubsystem<UI>();
@@ -140,7 +143,7 @@ void SceneAndUILoad::MoveCamera(float timeStep)
         return;
 
     // Movement speed as world units per second
-    const float MOVE_SPEED = 20.0f;
+    const float MOVE_SPEED = 10.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 
@@ -168,7 +171,7 @@ void SceneAndUILoad::MoveCamera(float timeStep)
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
-void SceneAndUILoad::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void PBRMaterials::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
@@ -177,18 +180,4 @@ void SceneAndUILoad::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
-}
-
-void SceneAndUILoad::ToggleLight1(StringHash eventType, VariantMap& eventData)
-{
-    Node* lightNode = scene_->GetChild("Light1", true);
-    if (lightNode)
-        lightNode->SetEnabled(!lightNode->IsEnabled());
-}
-
-void SceneAndUILoad::ToggleLight2(StringHash eventType, VariantMap& eventData)
-{
-    Node* lightNode = scene_->GetChild("Light2", true);
-    if (lightNode)
-        lightNode->SetEnabled(!lightNode->IsEnabled());
 }

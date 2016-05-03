@@ -346,6 +346,7 @@ ViewportContext@ activeViewport;
 
 Text@ editorModeText;
 Text@ renderStatsText;
+Text@ modelInfoText;
 
 EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
@@ -1110,6 +1111,8 @@ void CreateStatsBar()
     ui.root.AddChild(editorModeText);
     renderStatsText = Text();
     ui.root.AddChild(renderStatsText);
+    modelInfoText = Text();
+    ui.root.AddChild(modelInfoText);
 }
 
 void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -1153,11 +1156,13 @@ void UpdateStats(float timeStep)
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(modelInfoText, font, 35, 88, HA_LEFT, VA_TOP);
     }
     else
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
+        SetupStatsBarText(modelInfoText, font, 35, 102, HA_LEFT, VA_TOP);
     }
 }
 

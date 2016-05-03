@@ -1375,9 +1375,6 @@ message(STATUS " EXTRA_CFLAGS:  ${EXTRA_CFLAGS}")
 message(STATUS " EXTRA_LDFLAGS: ${EXTRA_LDFLAGS}")
 message(STATUS " EXTRA_LIBS:    ${EXTRA_LIBS}")
 message(STATUS "")
-message(STATUS " Build Shared Library: ${SDL_SHARED}")
-message(STATUS " Build Static Library: ${SDL_STATIC}")
-message(STATUS "")
 # Urho3D - commented out messages informing user to set the CFLAGS and LDFLAGS environment variables to workaround detection problems, our modified version does not support that
 endif (NOT SDL_INFO_ECHOED_STATUS)
 

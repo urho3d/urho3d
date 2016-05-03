@@ -1052,6 +1052,15 @@ static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* ptr
         return ptr->GetTrigger(index);
 }
 
+static Animation* AnimationClone(const String& cloneName, Animation* ptr)
+{
+    SharedPtr<Animation> clone = ptr->Clone(cloneName);
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
+}
+
 static void RegisterAnimation(asIScriptEngine* engine)
 {
     engine->RegisterGlobalProperty("const uint8 CHANNEL_POSITION", (void*)&CHANNEL_POSITION);
@@ -1096,6 +1105,7 @@ static void RegisterAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Animation", "void AddTrigger(float, bool, const Variant&in)", asMETHODPR(Animation, AddTrigger, (float, bool, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void RemoveTrigger(uint)", asMETHOD(Animation, RemoveTrigger), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void RemoveAllTriggers()", asMETHOD(Animation, RemoveAllTriggers), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Animation", "Animation@ Clone(const String&in cloneName = String()) const", asFUNCTION(AnimationClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Animation", "void set_animationName(const String&in) const", asMETHOD(Animation, SetAnimationName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "const String& get_animationName() const", asMETHOD(Animation, GetAnimationName), asCALL_THISCALL);
     engine->RegisterObjectMethod("Animation", "void set_length(float)", asMETHOD(Animation, SetLength), asCALL_THISCALL);
