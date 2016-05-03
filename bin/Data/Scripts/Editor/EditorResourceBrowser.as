@@ -992,6 +992,19 @@ void HandleBrowserFileDragBegin(StringHash eventType, VariantMap& eventData)
     @browserDragFile = GetBrowserFileFromUIElement(uiElement);
 }
 
+Vector3 GetNodeSize(Node@ node)
+{
+    CollisionShape@ shape = node.GetComponent("CollisionShape");
+    if (shape !is null)
+        return shape.size;
+
+    Drawable@ object = node.GetComponent("Drawable");
+    if (object !is null)
+        return object.boundingBox.size;
+
+    return Vector3(0, 0, 0);
+}
+
 void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
 {
     if (@browserDragFile is null)
@@ -1001,6 +1014,7 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
     if (element !is null)
         return;
 
+    Node@ createdNode = null;
     if (browserDragFile.resourceType == RESOURCE_TYPE_MATERIAL)
     {
         StaticModel@ model = cast<StaticModel>(GetDrawableAtMousePostion());
@@ -1008,6 +1022,32 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
         {
             AssignMaterial(model, browserDragFile.resourceKey);
         }
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_PREFAB)
+    {
+        createdNode = LoadNode(browserDragFile.GetFullPath());
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_MODEL)
+    {
+        createdNode = CreateNode(REPLICATED);
+        Model@ model = cache.GetResource("Model", browserDragFile.resourceKey);
+        if (model.skeleton.numBones > 0)
+        {
+            AnimatedModel@ am = createdNode.CreateComponent("AnimatedModel");
+            am.model = model;
+        }
+        else
+        {
+            StaticModel@ sm = createdNode.CreateComponent("StaticModel");
+            sm.model = model;
+        }
+    }
+
+    if (createdNode !is null)
+    {
+        Vector3 pos = GetScreenCollision(ui.cursorPosition);
+        pos.y += GetNodeSize(createdNode).y/2;
+        createdNode.worldPosition = pos;
     }
 
     browserDragFile = null;
