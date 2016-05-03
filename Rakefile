@@ -573,6 +573,7 @@ task :ci_package_upload do
     # Ignore the exit status from 'make doc' on Windows host system only due to Doxygen may not return exit status correctly on Windows
     system "bash -c 'rake make target=doc >/dev/null'" or ENV['OS'] or abort 'Failed to generate documentation'
   end
+  next if timeup
   # Make the package
   puts "Packaging artifacts...\n\n"; $stdout.flush
   if ENV['IOS']
