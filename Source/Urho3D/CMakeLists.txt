@@ -143,11 +143,14 @@ if (URHO3D_BINDINGS)
     include (ExternalProject)
     if (IOS)
         # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
-        set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+        set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    else ()
+        set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND})
     endif ()
     ExternalProject_Add (AutoBinder
-            SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
-            CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} ${IOS_FIX})
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
+        CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+        ${ALTERNATE_COMMAND})
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
     foreach (SCRIPT AngelScript LuaScript JavaScript)
         string (TOUPPER URHO3D_${SCRIPT} OPT)
@@ -171,11 +174,14 @@ if (URHO3D_LUA)
         # When cross-compiling or using LuaJIT, build the tolua++ host tool as external project using normal Lua (there is not much point using LuaJIT for the tool building even when technically it can)
         include (ExternalProject)
         if (IOS)
-            set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+            set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+        else ()
+            set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND})
         endif ()
         ExternalProject_Add (tolua++
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
-            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE} ${IOS_FIX})
+            CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE}
+            ${ALTERNATE_COMMAND})
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)

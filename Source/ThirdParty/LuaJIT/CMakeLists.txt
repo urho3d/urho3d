@@ -385,12 +385,15 @@ if (CMAKE_CROSSCOMPILING)
     include (ExternalProject)
     if (IOS)
         # For iOS target, ensure the host environment is cleared first; Also workaround a known CMake/Xcode generator bug which prevents it from installing binaries correctly
-        set (IOS_FIX CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+        set (ALTERNATE_COMMAND CMAKE_COMMAND /usr/bin/env -i PATH=$ENV{PATH} CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND} BUILD_COMMAND bash -c "sed -i '' 's/EFFECTIVE_PLATFORM_NAME//g' CMakeScripts/install_postBuildPhase.make*")
+    else ()
+        set (ALTERNATE_COMMAND CMAKE_COMMAND ${CMAKE_COMMAND} -E env CC=${SAVED_CC} CXX=${SAVED_CXX} ${CMAKE_COMMAND})
     endif ()
     set (TOOL_PATH ${CMAKE_CURRENT_BINARY_DIR}/tool/)
     ExternalProject_Add (buildvm
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/host
-        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${TOOL_PATH} -DBAKED_CMAKE_SOURCE_DIR=${BAKED_CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH} ${IOS_FIX})
+        CMAKE_ARGS -DURHO3D_64BIT=${URHO3D_64BIT} -DDEST_RUNTIME_DIR=${TOOL_PATH} -DBAKED_CMAKE_SOURCE_DIR=${BAKED_CMAKE_SOURCE_DIR} -DHOST_XCFLAGS=${HOST_XCFLAGS} -DTARGET_ARCH=${TARGET_ARCH} -DDASM_FLAGS=${DASM_FLAGS} -DDASM_ARCH=${DASM_ARCH}
+        ${ALTERNATE_COMMAND})
 else ()
     # Otherwise, build it internally as per normal
     set (PRIVATE PRIVATE)

@@ -20,6 +20,12 @@
 # THE SOFTWARE.
 #
 
+# Save the original values of CC and CXX environment variables as they are not saved yet when no CMake toolchain file is being used
+if (NOT CMAKE_CROSSCOMPILING)
+    set (SAVED_CC $ENV{CC})
+    set (SAVED_CXX $ENV{CXX})
+endif ()
+
 # Limit the supported build configurations
 set (URHO3D_BUILD_CONFIGURATIONS Release RelWithDebInfo Debug)
 set (DOC_STRING "Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug")
