@@ -992,19 +992,6 @@ void HandleBrowserFileDragBegin(StringHash eventType, VariantMap& eventData)
     @browserDragFile = GetBrowserFileFromUIElement(uiElement);
 }
 
-Vector3 GetNodeSize(Node@ node)
-{
-    CollisionShape@ shape = node.GetComponent("CollisionShape");
-    if (shape !is null)
-        return shape.size;
-
-    Drawable@ object = node.GetComponent("Drawable");
-    if (object !is null)
-        return object.boundingBox.size;
-
-    return Vector3(0, 0, 0);
-}
-
 void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
 {
     if (@browserDragFile is null)
@@ -1045,9 +1032,14 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
 
     if (createdNode !is null)
     {
-        Vector3 pos = GetScreenCollision(ui.cursorPosition);
-        pos.y += GetNodeSize(createdNode).y/2;
-        createdNode.worldPosition = pos;
+        Drawable@ drawable = GetFirstDrawable(createdNode);
+        if (drawable !is null)
+        {
+            BoundingBox aabb = drawable.worldBoundingBox;
+            Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+            Vector3 offset = aabbBottomCenter - createdNode.worldPosition;
+            createdNode.worldPosition = createdNode.worldPosition - offset;
+        }
     }
 
     browserDragFile = null;
