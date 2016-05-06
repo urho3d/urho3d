@@ -1001,12 +1001,44 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
     if (element !is null)
         return;
 
+    Node@ createdNode = null;
     if (browserDragFile.resourceType == RESOURCE_TYPE_MATERIAL)
     {
         StaticModel@ model = cast<StaticModel>(GetDrawableAtMousePostion());
         if (model !is null)
         {
             AssignMaterial(model, browserDragFile.resourceKey);
+        }
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_PREFAB)
+    {
+        createdNode = LoadNode(browserDragFile.GetFullPath());
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_MODEL)
+    {
+        createdNode = CreateNode(REPLICATED);
+        Model@ model = cache.GetResource("Model", browserDragFile.resourceKey);
+        if (model.skeleton.numBones > 0)
+        {
+            AnimatedModel@ am = createdNode.CreateComponent("AnimatedModel");
+            am.model = model;
+        }
+        else
+        {
+            StaticModel@ sm = createdNode.CreateComponent("StaticModel");
+            sm.model = model;
+        }
+    }
+
+    if (createdNode !is null)
+    {
+        Drawable@ drawable = GetFirstDrawable(createdNode);
+        if (drawable !is null)
+        {
+            BoundingBox aabb = drawable.worldBoundingBox;
+            Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+            Vector3 offset = aabbBottomCenter - createdNode.worldPosition;
+            createdNode.worldPosition = createdNode.worldPosition - offset;
         }
     }
 
