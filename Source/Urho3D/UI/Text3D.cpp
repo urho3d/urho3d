@@ -58,7 +58,6 @@ Text3D::Text3D(Context* context) :
     usingSDFShader_(false),
     fontDataLost_(false)
 {
-    text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
