@@ -149,10 +149,6 @@ void Drawable::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryRe
     }
 }
 
-void Drawable::Update(const FrameInfo& frame)
-{
-}
-
 void Drawable::UpdateBatches(const FrameInfo& frame)
 {
     const BoundingBox& worldBoundingBox = GetWorldBoundingBox();
@@ -170,10 +166,6 @@ void Drawable::UpdateBatches(const FrameInfo& frame)
 
     if (newLodDistance != lodDistance_)
         lodDistance_ = newLodDistance;
-}
-
-void Drawable::UpdateGeometry(const FrameInfo& frame)
-{
 }
 
 Geometry* Drawable::GetLodGeometry(unsigned batchIndex, unsigned level)

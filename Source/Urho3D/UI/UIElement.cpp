@@ -476,21 +476,6 @@ void UIElement::OnHover(const IntVector2& position, const IntVector2& screenPosi
     hovering_ = true;
 }
 
-void UIElement::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
-    Cursor* cursor)
-{
-}
-
-void UIElement::OnClickEnd(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
-    Cursor* cursor, UIElement* beginElement)
-{
-}
-
-void UIElement::OnDoubleClick(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
-    Cursor* cursor)
-{
-}
-
 void UIElement::OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers,
     Cursor* cursor)
 {
@@ -527,16 +512,14 @@ bool UIElement::OnDragDropFinish(UIElement* source)
     return true;
 }
 
-void UIElement::OnWheel(int delta, int buttons, int qualifiers)
+IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)
 {
+    return screenPosition - GetScreenPosition();
 }
 
-void UIElement::OnKey(int key, int buttons, int qualifiers)
+IntVector2 UIElement::ElementToScreen(const IntVector2& position)
 {
-}
-
-void UIElement::OnTextInput(const String& text, int buttons, int qualifiers)
-{
+    return position + GetScreenPosition();
 }
 
 bool UIElement::LoadXML(Deserializer& source)
@@ -1636,16 +1619,6 @@ void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const S
     }
 }
 
-IntVector2 UIElement::ScreenToElement(const IntVector2& screenPosition)
-{
-    return screenPosition - GetScreenPosition();
-}
-
-IntVector2 UIElement::ElementToScreen(const IntVector2& position)
-{
-    return position + GetScreenPosition();
-}
-
 bool UIElement::IsInside(IntVector2 position, bool isScreen)
 {
     if (isScreen)
@@ -1664,7 +1637,7 @@ bool UIElement::IsInsideCombined(IntVector2 position, bool isScreen)
 
     IntRect combined = GetCombinedScreenRect();
     return position.x_ >= combined.left_ && position.y_ >= combined.top_ && position.x_ < combined.right_ &&
-           position.y_ < combined.bottom_;
+        position.y_ < combined.bottom_;
 }
 
 IntRect UIElement::GetCombinedScreenRect()
