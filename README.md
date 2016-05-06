@@ -2,6 +2,8 @@
 
 #Urho3D
 
+[![Join the chat at https://gitter.im/urho3d/Urho3D](https://badges.gitter.im/urho3d/Urho3D.svg)](https://gitter.im/urho3d/Urho3D?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
 
 Main website: [http://urho3d.github.io/](http://urho3d.github.io/)
@@ -63,6 +65,7 @@ Urho3D development, contributions and bugfixes by:
 - OvermindDL1
 - Skrylar
 - TheComet93
+- Y-way
 - 1vanK
 - andmar1x
 - amadeus_osa
