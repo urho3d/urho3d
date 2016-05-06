@@ -24,6 +24,7 @@
 
 #include "../AngelScript/APITemplates.h"
 #include "../Input/Input.h"
+#include "../UI/AnimatedSprite.h"
 #include "../UI/CheckBox.h"
 #include "../UI/DropDownList.h"
 #include "../UI/FileSelector.h"
@@ -147,6 +148,41 @@ static void RegisterSprite(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sprite", "const IntRect& get_imageRect() const", asMETHOD(Sprite, GetImageRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite", "void set_blendMode(BlendMode)", asMETHOD(Sprite, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sprite", "BlendMode get_blendMode() const", asMETHOD(Sprite, GetBlendMode), asCALL_THISCALL);
+}
+
+static void RegisterAnimatedSprite(asIScriptEngine* engine)
+{
+    RegisterUIElement<AnimatedSprite>(engine, "AnimatedSprite", true);
+    RegisterSubclass<Sprite, AnimatedSprite>(engine, "Sprite", "AnimatedSprite");
+
+    engine->RegisterObjectMethod("AnimatedSprite", "void SetPosition(float, float)", asMETHODPR(AnimatedSprite, SetPosition, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void SetHotSpot(int, int)", asMETHODPR(AnimatedSprite, SetHotSpot, (int, int), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void SetScale(float, float)", asMETHODPR(AnimatedSprite, SetScale, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void SetScale(float)", asMETHODPR(AnimatedSprite, SetScale, (float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void SetFullImageRect()", asMETHOD(AnimatedSprite, SetFullImageRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_position(const Vector2&)", asMETHODPR(AnimatedSprite, SetPosition, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "const Vector2& get_position() const", asMETHODPR(AnimatedSprite, GetPosition, () const, const Vector2&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_hotSpot(const IntVector2&)", asMETHODPR(AnimatedSprite, SetHotSpot, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "const IntVector2& get_hotSpot() const", asMETHOD(AnimatedSprite, GetHotSpot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_scale(const Vector2&)", asMETHODPR(AnimatedSprite, SetScale, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "const Vector2& get_scale() const", asMETHOD(AnimatedSprite, GetScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_rotation(float)", asMETHOD(AnimatedSprite, SetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "float get_rotation() const", asMETHOD(AnimatedSprite, GetRotation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_texture(Texture@+)", asMETHOD(AnimatedSprite, SetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "Texture@+ get_texture() const", asMETHOD(AnimatedSprite, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_imageRect(const IntRect&in)", asMETHODPR(AnimatedSprite, SetImageRect, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "const IntRect& get_imageRect() const", asMETHOD(AnimatedSprite, GetImageRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_blendMode(BlendMode)", asMETHOD(AnimatedSprite, SetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "BlendMode get_blendMode() const", asMETHOD(AnimatedSprite, GetBlendMode), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_numFrames(uint)", asMETHOD(AnimatedSprite, SetNumFrames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "uint get_numFramesMode() const", asMETHOD(AnimatedSprite, GetNumFrames), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_speed(float)", asMETHOD(AnimatedSprite, SetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "float get_speed() const", asMETHOD(AnimatedSprite, GetSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_time(float)", asMETHOD(AnimatedSprite, SetTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "float get_time() const", asMETHOD(AnimatedSprite, GetTime), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "void set_columns(uint)", asMETHOD(AnimatedSprite, SetColumns), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimatedSprite", "uint get_columns() const", asMETHOD(AnimatedSprite, GetColumns), asCALL_THISCALL);
 }
 
 static void RegisterCursor(asIScriptEngine* engine)
@@ -748,6 +784,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterUIElement(engine);
     RegisterBorderImage(engine);
     RegisterSprite(engine);
+    RegisterAnimatedSprite(engine);
     RegisterButton(engine);
     RegisterCheckBox(engine);
     RegisterCursor(engine);

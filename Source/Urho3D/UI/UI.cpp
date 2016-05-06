@@ -37,6 +37,7 @@
 #include "../IO/Log.h"
 #include "../Math/Matrix3x4.h"
 #include "../Resource/ResourceCache.h"
+#include "../UI/AnimatedSprite.h"
 #include "../UI/CheckBox.h"
 #include "../UI/Cursor.h"
 #include "../UI/DropDownList.h"
@@ -1841,6 +1842,7 @@ void RegisterUILibrary(Context* context)
     UIElement::RegisterObject(context);
     BorderImage::RegisterObject(context);
     Sprite::RegisterObject(context);
+    AnimatedSprite::RegisterObject(context);
     Button::RegisterObject(context);
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);

@@ -26,6 +26,7 @@
 #include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/UI/AnimatedSprite.h>
 #include <Urho3D/UI/Button.h>
 #include <Urho3D/UI/CheckBox.h>
 #include <Urho3D/UI/LineEdit.h>
@@ -71,6 +72,8 @@ void HelloGUI::Start()
 
     // Create a draggable Fish
     CreateDraggableFish();
+
+    CreateAnimatedSprite();
 
     // Set the mouse mode to use in the sample
     Sample::InitMouseMode(MM_FREE);
@@ -180,6 +183,29 @@ void HelloGUI::CreateDraggableFish()
     SubscribeToEvent(draggableFish, E_DRAGBEGIN, URHO3D_HANDLER(HelloGUI, HandleDragBegin));
     SubscribeToEvent(draggableFish, E_DRAGMOVE, URHO3D_HANDLER(HelloGUI, HandleDragMove));
     SubscribeToEvent(draggableFish, E_DRAGEND, URHO3D_HANDLER(HelloGUI, HandleDragEnd));
+}
+
+void HelloGUI::CreateAnimatedSprite()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    AnimatedSprite* animatedSprite = uiRoot_->CreateChild<AnimatedSprite>("Animated Sprite");
+    animatedSprite->SetTexture(cache->GetResource<Texture2D>("Textures/AnimExclam.png"));
+    animatedSprite->SetBlendMode(BLEND_ALPHA);
+    animatedSprite->SetHotSpot(10, 32);
+    animatedSprite->SetAlignment(HA_CENTER, VA_CENTER);
+    animatedSprite->SetPosition(0.0f, 0.0f);
+
+    // Size of single frame.
+    animatedSprite->SetImageRect(IntRect(0, 0, 20, 64));
+    // Animation speed = 20 frames per second.
+    animatedSprite->SetSpeed(20.0f);
+    // Total number of frames.
+    animatedSprite->SetNumFrames(20);
+    // Max frames in a row.
+    animatedSprite->SetColumns(10);
+    // Size of sprite on a screen.
+    animatedSprite->SetSize(IntVector2(20, 64));
 }
 
 void HelloGUI::HandleDragBegin(StringHash eventType, VariantMap& eventData)

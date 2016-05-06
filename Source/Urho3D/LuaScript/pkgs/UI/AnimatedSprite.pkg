@@ -1,0 +1,25 @@
+$#include "UI/AnimatedSprite.h"
+
+class AnimatedSprite : public Sprite
+{
+    AnimatedSprite();
+
+    tolua_property__get_set unsigned numFrames;
+    tolua_property__get_set float speed;
+    tolua_property__get_set float time;
+    tolua_property__get_set unsigned columns;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_AnimatedSprite_new00
+static int tolua_UILuaAPI_AnimatedSprite_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<AnimatedSprite>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_AnimatedSprite_new00_local
+static int tolua_UILuaAPI_AnimatedSprite_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<AnimatedSprite>(tolua_S);
+}
+$}

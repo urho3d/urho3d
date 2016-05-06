@@ -34,6 +34,8 @@ function Start()
 
     -- Create a draggable Fish
     CreateDraggableFish()
+    
+    CreateAnimatedSprite()
 
     -- Set the mouse mode to use in the sample
     SampleInitMouseMode(MM_FREE)
@@ -153,6 +155,26 @@ function CreateDraggableFish()
     SubscribeToEvent(draggableFish, "DragEnd",
         function (eventType, eventData)
         end)
+end
+
+function CreateAnimatedSprite()
+    local animatedSprite = ui.root:CreateChild("AnimatedSprite", "Animated Sprite")
+    animatedSprite.texture = cache:GetResource("Texture2D", "Textures/AnimExclam.png")
+    animatedSprite.blendMode = BLEND_ALPHA
+    animatedSprite.hotSpot = IntVector2(10, 32)
+    animatedSprite:SetAlignment(HA_CENTER, VA_CENTER)
+    animatedSprite:SetPosition(0.0, 0.0)
+
+    -- Size of single frame.
+    animatedSprite.imageRect = IntRect(0, 0, 20, 64)
+    -- Animation speed = 20 frames per second.
+    animatedSprite.speed = 20.0
+    -- Total number of frames.
+    animatedSprite.numFrames = 20
+    -- Max frames in a row.
+    animatedSprite.columns = 10
+    -- Size of sprite on a screen.
+    animatedSprite.size = IntVector2(20, 64)
 end
 
 function HandleControlClicked(eventType, eventData)

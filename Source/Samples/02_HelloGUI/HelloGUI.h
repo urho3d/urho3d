@@ -68,6 +68,8 @@ private:
     void InitControls();
     /// Create a draggable fish button.
     void CreateDraggableFish();
+    /// Create an animated sprite.
+    void CreateAnimatedSprite();
     /// Handle drag begin for the fish button.
     void HandleDragBegin(StringHash eventType, VariantMap& eventData);
     /// Handle drag move for the fish button.

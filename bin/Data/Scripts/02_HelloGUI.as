@@ -35,6 +35,8 @@ void Start()
 
     // Create a draggable Fish
     CreateDraggableFish();
+    
+    CreateAnimatedSprite();
 
     // Set the mouse mode to use in the sample
     SampleInitMouseMode(MM_FREE);
@@ -136,6 +138,27 @@ void CreateDraggableFish()
     SubscribeToEvent(draggableFish, "DragBegin", "HandleDragBegin");
     SubscribeToEvent(draggableFish, "DragMove", "HandleDragMove");
     SubscribeToEvent(draggableFish, "DragEnd", "HandleDragEnd");
+}
+
+void CreateAnimatedSprite()
+{
+    AnimatedSprite@ animatedSprite = ui.root.CreateChild("AnimatedSprite", "Animated Sprite");
+    animatedSprite.texture = cache.GetResource("Texture2D", "Textures/AnimExclam.png");
+    animatedSprite.blendMode = BLEND_ALPHA;
+    animatedSprite.SetHotSpot(10, 32);
+    animatedSprite.SetAlignment(HA_CENTER, VA_CENTER);
+    animatedSprite.SetPosition(0.0f, 0.0f);
+
+    // Size of single frame.
+    animatedSprite.imageRect = IntRect(0, 0, 20, 64);
+    // Animation speed = 20 frames per second.
+    animatedSprite.speed = 20.0f;
+    // Total number of frames.
+    animatedSprite.numFrames = 20;
+    // Max frames in a row.
+    animatedSprite.columns = 10;
+    // Size of sprite on a screen.
+    animatedSprite.SetSize(20, 64);
 }
 
 void HandleDragBegin(StringHash eventType, VariantMap& eventData)
