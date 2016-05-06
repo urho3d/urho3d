@@ -2000,44 +2000,6 @@ Vector3 SelectedNodesCenterPoint()
     }
 }
 
-Vector3 GetScreenCollision(IntVector2 pos)
-{
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
-    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
-
-    bool physicsFound = false;
-    if (editorScene.physicsWorld !is null)
-    {
-        if (!runUpdate)
-            editorScene.physicsWorld.UpdateCollisions();
-
-        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-        if (result.body !is null)
-        {
-            physicsFound = true;
-            result.position;
-        }
-    }
-
-    if (editorScene.octree is null)
-        return res;
-
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        DRAWABLE_GEOMETRY, 0x7fffffff);
-
-    if (result.drawable !is null)
-    {
-        // take the closer of the results
-        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
-            return res;
-        else
-            return result.position;
-    }
-
-    return res;
-}
-
 Drawable@ GetDrawableAtMousePostion()
 {
     IntVector2 pos = ui.cursorPosition;
