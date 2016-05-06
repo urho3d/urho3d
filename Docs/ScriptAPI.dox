@@ -2046,6 +2046,7 @@ namespace Urho3D
 - %Width : int
 - %Horiz %Alignment : int
 - %Vert %Alignment : int
+- %Opacity : float
 - %Color : Color
 - %Top %Left %Color : Color
 - %Top %Right %Color : Color
