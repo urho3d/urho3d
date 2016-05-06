@@ -1877,13 +1877,13 @@ void ViewRaycast(bool mouseClick)
     }
 }
 
-Vector3 GetNewNodePosition()
+Vector3 GetNewNodePosition(bool raycastToMouse = false)
 {
     if (newNodeMode == NEW_NODE_IN_CENTER)
         return Vector3(0, 0, 0);
     if (newNodeMode == NEW_NODE_RAYCAST)
     {
-        Ray cameraRay = camera.GetScreenRay(0.5, 0.5);
+        Ray cameraRay = raycastToMouse ? GetActiveViewportCameraRay() : camera.GetScreenRay(0.5, 0.5);
         Vector3 position, normal;
         if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, 0, false))
             return position;
