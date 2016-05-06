@@ -290,9 +290,17 @@ void Text3D::SetWidth(int width)
 
 void Text3D::SetColor(const Color& color)
 {
+    float oldAlpha = text_.GetColor(C_TOPLEFT).a_;
     text_.SetColor(color);
 
     MarkTextDirty();
+
+    // If alpha changes from zero to nonzero or vice versa, amount of text batches changes (optimization), so do full update
+    if ((oldAlpha == 0.0f && color.a_ != 0.0f) || (oldAlpha != 0.0f && color.a_ == 0.0f))
+    {
+        UpdateTextBatches();
+        UpdateTextMaterials();
+    }
 }
 
 void Text3D::SetColor(Corner corner, const Color& color)
@@ -304,9 +312,18 @@ void Text3D::SetColor(Corner corner, const Color& color)
 
 void Text3D::SetOpacity(float opacity)
 {
+    float oldOpacity = text_.GetOpacity();
     text_.SetOpacity(opacity);
+    float newOpacity = text_.GetOpacity();
 
     MarkTextDirty();
+
+    // If opacity changes from zero to nonzero or vice versa, amount of text batches changes (optimization), so do full update
+    if ((oldOpacity == 0.0f && newOpacity != 0.0f) || (oldOpacity != 0.0f && newOpacity == 0.0f))
+    {
+        UpdateTextBatches();
+        UpdateTextMaterials();
+    }
 }
 
 void Text3D::SetFaceCameraMode(FaceCameraMode mode)
