@@ -236,7 +236,7 @@ public:
     void SetMobileShadowBiasMul(float mul);
     /// Set shadow depth bias addition for mobile platforms (OpenGL ES.) No effect on desktops. Default 0.0001.
     void SetMobileShadowBiasAdd(float add);
-    /// Set shadow normal offset multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 1.
+    /// Set shadow normal offset multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
     void SetMobileNormalOffsetMul(float mul);
     /// Force reload of shaders.
     void ReloadShaders();

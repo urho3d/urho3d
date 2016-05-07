@@ -77,7 +77,12 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
 vec4 GetShadowPos(int index, vec3 normal, vec4 projWorldPos)
 {
     #ifdef NORMALOFFSET
-        float normalOffsetScale[4] = float[](cNormalOffsetScale.x, cNormalOffsetScale.y, cNormalOffsetScale.z, cNormalOffsetScale.w);
+        float normalOffsetScale[4];
+        normalOffsetScale[0] = cNormalOffsetScale.x;
+        normalOffsetScale[1] = cNormalOffsetScale.y;
+        normalOffsetScale[2] = cNormalOffsetScale.z;
+        normalOffsetScale[3] = cNormalOffsetScale.w;
+
         #ifdef DIRLIGHT
             float cosAngle = clamp(1.0 - dot(normal, cLightDir), 0.0, 1.0);
         #else

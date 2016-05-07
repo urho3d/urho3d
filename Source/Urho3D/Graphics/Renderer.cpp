@@ -272,7 +272,7 @@ Renderer::Renderer(Context* context) :
     occluderSizeThreshold_(0.025f),
     mobileShadowBiasMul_(2.0f),
     mobileShadowBiasAdd_(0.0001f),
-    mobileNormalOffsetMul_(1.0f),
+    mobileNormalOffsetMul_(2.0f),
     numOcclusionBuffers_(0),
     numShadowCameras_(0),
     shadersChangedFrameNumber_(M_MAX_UNSIGNED),
