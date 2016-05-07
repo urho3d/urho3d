@@ -82,7 +82,7 @@ void GetShadowPos(float4 projWorldPos, float3 normal, out float4 shadowPos[NUMCA
 {
     // Shadow projection: transform from world space to shadow space
     #ifdef NORMALOFFSET
-        #if defined(DIRLIGHT)
+        #ifdef DIRLIGHT
             float cosAngle = saturate(1.0 - dot(normal, cLightDir));
         #else
             float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)));

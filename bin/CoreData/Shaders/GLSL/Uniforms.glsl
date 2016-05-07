@@ -19,8 +19,9 @@ uniform vec3 cFrustumSize;
 uniform float cDeltaTime;
 uniform float cElapsedTime;
 uniform vec4 cGBufferOffsets;
-uniform vec3 cLightDir;
 uniform vec4 cLightPos;
+uniform vec3 cLightDir;
+uniform vec4 cNormalOffsetScale;
 uniform mat4 cModel;
 uniform mat4 cView;
 uniform mat4 cViewInv;
@@ -60,8 +61,9 @@ uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;
-uniform vec3 cLightDirPS;
 uniform vec4 cLightPosPS;
+uniform vec3 cLightDirPS;
+uniform vec4 cNormalOffsetScalePS;
 uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
@@ -118,8 +120,9 @@ uniform ZoneVS
 
 uniform LightVS
 {
-    vec3 cLightDir;
     vec4 cLightPos;
+    vec3 cLightDir;
+    vec4 cNormalOffsetScale;
 #ifdef NUMVERTEXLIGHTS
     vec4 cVertexLights[4 * 3];
 #else
@@ -178,6 +181,7 @@ uniform LightPS
     vec4 cLightColor;
     vec4 cLightPosPS;
     vec3 cLightDirPS;
+    vec4 cNormalOffsetScalePS;
     vec4 cShadowCubeAdjust;
     vec4 cShadowDepthFade;
     vec2 cShadowIntensity;

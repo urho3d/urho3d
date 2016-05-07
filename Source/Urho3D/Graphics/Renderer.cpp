@@ -1609,7 +1609,7 @@ void Renderer::LoadShaders()
     for (unsigned i = 0; i < MAX_DEFERRED_LIGHT_PS_VARIATIONS; ++i)
     {
         deferredLightPSVariations_[i] = lightPSVariations[i % DLPS_ORTHO];
-        if ((i % DLPS_ORTHO) > DLPS_SHADOW)
+        if ((i % DLPS_ORTHO) >= DLPS_SHADOW)
             deferredLightPSVariations_[i] += GetShadowVariations();
         if (i >= DLPS_ORTHO)
             deferredLightPSVariations_[i] += "ORTHO ";
