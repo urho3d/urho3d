@@ -59,9 +59,10 @@ struct URHO3D_API BiasParameters
     }
 
     /// Construct with initial values.
-    BiasParameters(float constantBias, float slopeScaledBias) :
+    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f) :
         constantBias_(constantBias),
-        slopeScaledBias_(slopeScaledBias)
+        slopeScaledBias_(slopeScaledBias),
+        normalOffset_(normalOffset)
     {
     }
 
@@ -72,6 +73,8 @@ struct URHO3D_API BiasParameters
     float constantBias_;
     /// Slope scaled bias.
     float slopeScaledBias_;
+    /// Normal offset multiplier.
+    float normalOffset_;
 };
 
 /// Cascaded shadow map parameters.

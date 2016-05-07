@@ -1323,6 +1323,7 @@ Vertex shader:
 - NUMVERTEXLIGHTS=1,2,3 or 4: number of vertex lights influencing the object
 - DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
 - SHADOW: the per-pixel forward light has shadowing
+- NORMALOFFSET: shadow receiver UV coordinates should be adjusted according to normals
 - SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
 
 Pixel shader:
@@ -1580,7 +1581,8 @@ In light pre-pass and deferred rendering, light culling happens by writing the o
 
 Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of per-light parameters exists for controlling the shadows:
 
-- BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
+- BiasParameters: define constant & slope-scaled depth bias values and normal offset for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials". Normal offset is an alternative shadow biasing
+method which is based on modifying the shadow receiver UV coordinates in the direction of the receiver geometry normal, rather than modifying the depth during shadow rendering.
 
 - CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0.
 

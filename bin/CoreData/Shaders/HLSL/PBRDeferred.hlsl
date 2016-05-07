@@ -81,6 +81,7 @@ void PS(
     #endif
 
     // Position acquired via near/far ray is relative to camera. Bring position to world space
+    float3 eyeVec = -worldPos;
     worldPos += cCameraPosPS;
 
     float3 normal = normalInput.rgb;
@@ -95,7 +96,7 @@ void PS(
     float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
-        diff *= GetShadowDeferred(projWorldPos, depth);
+        diff *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -107,7 +108,7 @@ void PS(
         const float3 lightColor = cLightColor.rgb;
     #endif
 
-    const float3 toCamera = normalize(-worldPos);
+    const float3 toCamera = normalize(eyeVec);
     const float3 lightVec = normalize(lightDir);
 
     const float3 Hn = normalize(toCamera + lightVec);

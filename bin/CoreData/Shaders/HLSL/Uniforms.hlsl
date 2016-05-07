@@ -18,8 +18,9 @@ uniform float cDeltaTime;
 uniform float cElapsedTime;
 uniform float3 cFrustumSize;
 uniform float4 cGBufferOffsets;
-uniform float3 cLightDir;
 uniform float4 cLightPos;
+uniform float3 cLightDir;
+uniform float4 cNormalOffsetScale;
 uniform float4x3 cModel;
 uniform float4x3 cView;
 uniform float4x3 cViewInv;
@@ -51,6 +52,7 @@ uniform float2 cGBufferInvSize;
 uniform float4 cLightColor;
 uniform float4 cLightPosPS;
 uniform float3 cLightDirPS;
+uniform float4 cNormalOffsetScalePS;
 uniform float4 cMatDiffColor;
 uniform float3 cMatEmissiveColor;
 uniform float3 cMatEnvMapColor;
@@ -108,8 +110,9 @@ cbuffer ZoneVS : register(b2)
 
 cbuffer LightVS : register(b3)
 {
-    float3 cLightDir;
     float4 cLightPos;
+    float3 cLightDir;
+    float4 cNormalOffsetScale;
 #ifdef NUMVERTEXLIGHTS
     float4 cVertexLights[4 * 3];
 #else
@@ -167,6 +170,7 @@ cbuffer LightPS : register(b3)
     float4 cLightColor;
     float4 cLightPosPS;
     float3 cLightDirPS;
+    float4 cNormalOffsetScalePS;
     float4 cShadowCubeAdjust;
     float4 cShadowDepthFade;
     float2 cShadowIntensity;

@@ -75,7 +75,7 @@ void VS(float4 iPos : POSITION,
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(projWorldPos, oShadowPos);
+            GetShadowPos(projWorldPos, float3(0, 0, 0), oShadowPos);
         #endif
 
         #ifdef SPOTLIGHT
