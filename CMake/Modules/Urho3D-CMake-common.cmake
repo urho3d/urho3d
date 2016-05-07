@@ -855,17 +855,26 @@ macro (enable_pch HEADER_PATHNAME)
 
         if (MSVC)
             get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
+            get_filename_component (PCH_HEADER_PATH ${HEADER_FILENAME} PATH)
             if (TARGET ${TARGET_NAME})
                 foreach (FILE ${SOURCE_FILES})
                     if (FILE MATCHES \\.${EXT}$)
                         if (FILE MATCHES ${NAME_WE}\\.${EXT}$)
                             # Precompiling header file
-                            set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
+                            if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
+                                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yc${HEADER_FILENAME}")     # Need a leading space for appending
+                            else()
+                                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp${PCH_FILENAME} /I\"${PCH_HEADER_PATH}\" /Yc${HEADER_FILENAME}")
+                            endif()
                         else ()
                             # Using precompiled header file
                             get_property (NO_PCH SOURCE ${FILE} PROPERTY NO_PCH)
                             if (NOT NO_PCH)
-                                set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                                if(NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
+                                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS " /Fp$(IntDir)${PCH_FILENAME} /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                                else()
+                                    set_property (SOURCE ${FILE} APPEND_STRING PROPERTY COMPILE_FLAGS "  /Fp${PCH_FILENAME} /I\"${PCH_HEADER_PATH}\" /Yu${HEADER_FILENAME} /FI${HEADER_FILENAME}")
+                                endif()
                             endif ()
                         endif ()
                     endif ()
