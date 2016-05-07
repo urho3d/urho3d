@@ -569,11 +569,11 @@ task :ci_package_upload do
       ENV['SITE_UPDATE'] = nil
     end
   elsif !File.exists?("#{ENV['build_tree']}/Docs/html/index.html")
-    puts "Generating documentation...\n\n"; $stdout.flush
-    # Ignore the exit status from 'make doc' on Windows host system only due to Doxygen may not return exit status correctly on Windows
+    puts "Generating documentation...\n"; $stdout.flush
+    # Ignore the exit status from 'make doc' on Windows host system because Doxygen may not return exit status correctly on Windows
     system "bash -c 'rake make target=doc >/dev/null'" or ENV['OS'] or abort 'Failed to generate documentation'
+    next if timeup
   end
-  next if timeup
   # Make the package
   puts "Packaging artifacts...\n\n"; $stdout.flush
   if ENV['IOS']
@@ -592,7 +592,9 @@ task :ci_package_upload do
      end
     system "bash -c '#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI']) ? 'setarch i686' : ''} rake make target=package'" or abort 'Failed to make binary package'
   end
+  next if timeup
   # Determine the upload location
+  puts "Uploading artifacts...\n\n"; $stdout.flush
   setup_digital_keys
   repo = ENV[ENV['TRAVIS'] ? 'TRAVIS_REPO_SLUG' : 'APPVEYOR_REPO_NAME']
   unless ENV['RELEASE_TAG']
