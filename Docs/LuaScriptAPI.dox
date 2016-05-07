@@ -567,9 +567,15 @@ Methods:
 
 - BiasParameters() (GC)
 - BiasParameters* new()
-- BiasParameters(float constantBias, float slopeScaledBias) (GC)
-- BiasParameters* new(float constantBias, float slopeScaledBias)
+- BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f) (GC)
+- BiasParameters* new(float constantBias, float slopeScaledBias, float normalOffset = 0.0f)
 - void delete()
+
+Properties:
+
+- float constantBias
+- float slopeScaledBias
+- float normalOffset
 
 <a name="Class_Billboard"></a>
 ### Billboard
@@ -864,6 +870,11 @@ Methods:
 - CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f) (GC)
 - CascadeParameters* new(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f)
 - void delete()
+
+Properties:
+
+- float fadeStart
+- float biasAutoAdjust
 
 <a name="Class_CheckBox"></a>
 ### CheckBox : BorderImage
@@ -2400,6 +2411,14 @@ Methods:
 - FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView) (GC)
 - FocusParameters* new(bool focus, bool nonUniform, bool autoSize, float quantize, float minView)
 - void delete()
+
+Properties:
+
+- bool focus
+- bool nonUniform
+- bool autoSize
+- float quantize
+- float minView
 
 <a name="Class_Font"></a>
 ### Font : Resource
@@ -4780,6 +4799,7 @@ Methods:
 - void SetThreadedOcclusion(bool enable)
 - void SetMobileShadowBiasMul(float mul)
 - void SetMobileShadowBiasAdd(float add)
+- void SetMobileNormalOffsetMul(float mul)
 - void ReloadShaders()
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
@@ -4807,6 +4827,7 @@ Methods:
 - bool GetThreadedOcclusion() const
 - float GetMobileShadowBiasMul() const
 - float GetMobileShadowBiasAdd() const
+- float GetMobileNormalOffsetMul() const
 - unsigned GetNumViews() const
 - unsigned GetNumPrimitives() const
 - unsigned GetNumBatches() const
@@ -4846,6 +4867,7 @@ Properties:
 - bool threadedOcclusion
 - float mobileShadowBiasMul
 - float mobileShadowBiasAdd
+- float mobileNormalOffsetMul
 - unsigned numViews (readonly)
 - unsigned numPrimitives (readonly)
 - unsigned numBatches (readonly)

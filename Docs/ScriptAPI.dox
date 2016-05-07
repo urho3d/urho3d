@@ -1414,6 +1414,7 @@ namespace Urho3D
 - %View %Size %Minimum : float
 - %Depth %Constant %Bias : float
 - %Depth %Slope %Bias : float
+- %Normal %Offset : float
 - %Near/Farclip %Ratio : float
 - %View %Mask : int
 - %Light %Mask : int
@@ -3058,6 +3059,7 @@ Properties:
 Properties:
 
 - float constantBias
+- float normalOffset
 - float slopeScaledBias
 
 <a name="Class_Billboard"></a>
@@ -9876,6 +9878,7 @@ Properties:
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances
+- float mobileNormalOffsetMul
 - float mobileShadowBiasAdd
 - float mobileShadowBiasMul
 - uint numBatches // readonly

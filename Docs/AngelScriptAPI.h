@@ -626,6 +626,7 @@ class BiasParameters
 
 // Properties:
 float constantBias;
+float normalOffset;
 float slopeScaledBias;
 };
 
@@ -8356,6 +8357,7 @@ int maxOccluderTriangles;
 int maxShadowMaps;
 int maxSortedInstances;
 int minInstances;
+float mobileNormalOffsetMul;
 float mobileShadowBiasAdd;
 float mobileShadowBiasMul;
 /* readonly */
