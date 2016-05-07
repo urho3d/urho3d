@@ -1581,10 +1581,9 @@ In light pre-pass and deferred rendering, light culling happens by writing the o
 
 Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of per-light parameters exists for controlling the shadows:
 
-- BiasParameters: define constant & slope-scaled depth bias values and normal offset for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials". Normal offset is an alternative shadow biasing
-method which is based on modifying the shadow receiver UV coordinates in the direction of the receiver geometry normal, rather than modifying the depth during shadow rendering.
+- BiasParameters: define constant & slope-scaled depth bias values and normal offset for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Normal offset is an alternative shadow biasing method which is based on modifying the shadow receiver UV coordinates in the direction of the receiver geometry normal, rather than modifying the depth during shadow rendering. Yet another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
 
-- CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0.
+- CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0. This structure also includes the biasAutoAdjust setting for adjusting the depth bias automatically based on cascade split distance. By default it is on at 1x strength (value 1) but could be disabled (value 0) or adjusted stronger (values larger than 1.)
 
 - FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic size reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
@@ -1598,7 +1597,7 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
-Finally, there are global settings for the shadow map base resolution and shadow map depth (16 or 24 bit) & filtering quality (1 or 4 samples) in Renderer.
+Finally, there are global settings for the shadow map base resolution, shadow map bit depth (16 or 24 bit) & filtering quality in Renderer.
 
 \section Lights_ShadowCulling Shadow culling
 

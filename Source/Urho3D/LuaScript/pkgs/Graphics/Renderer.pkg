@@ -97,6 +97,7 @@ class Renderer
     tolua_property__get_set bool threadedOcclusion;
     tolua_property__get_set float mobileShadowBiasMul;
     tolua_property__get_set float mobileShadowBiasAdd;
+    tolua_property__get_set float mobileNormalOffsetMul;
     tolua_readonly tolua_property__get_set unsigned numViews;
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;
