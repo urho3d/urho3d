@@ -10,7 +10,7 @@ enum LightType
 struct BiasParameters
 {
     BiasParameters();
-    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0);
+    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f);
     ~BiasParameters();
     
     float constantBias_ @ constantBias;

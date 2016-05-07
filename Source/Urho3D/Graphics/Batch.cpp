@@ -133,10 +133,9 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     dest = texAdjust * shadowProj * shadowView;
 }
 
-void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation)
+void CalculateSpotMatrix(Matrix4& dest, Light* light)
 {
     Node* lightNode = light->GetNode();
-    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 spotView = Matrix3x4(lightNode->GetWorldPosition(), lightNode->GetWorldRotation(), 1.0f).Inverse();
     Matrix4 spotProj(Matrix4::ZERO);
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -157,7 +156,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
 #endif
 
-    dest = texAdjust * spotProj * spotView * posAdjust;
+    dest = texAdjust * spotProj * spotView;
 }
 
 void Batch::CalculateSortKey()
@@ -305,9 +304,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     {
         if (light && graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
-            Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
-            Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
-
             Node* lightNode = light->GetNode();
             float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
             Vector3 lightDir(lightNode->GetWorldRotation() * Vector3::BACK);
@@ -336,7 +332,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     {
                         Matrix4 shadowMatrices[2];
 
-                        CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
+                        CalculateSpotMatrix(shadowMatrices[0], light);
                         bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
                         if (isShadowed)
                             CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
@@ -394,7 +390,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     {
                         Matrix4 shadowMatrices[2];
 
-                        CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
+                        CalculateSpotMatrix(shadowMatrices[0], light);
                         bool isShadowed = lightQueue_->shadowMap_ != 0;
                         if (isShadowed)
                             CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
