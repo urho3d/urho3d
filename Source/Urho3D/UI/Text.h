@@ -175,8 +175,6 @@ public:
     /// Return size of character by index.
     IntVector2 GetCharSize(unsigned index);
 
-    /// Set used in Text3D.
-    void SetUsedInText3D(bool usedInText3D);
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
 
@@ -204,8 +202,6 @@ protected:
         (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
             float depthBias = 0.0f);
 
-    /// Used in Text3D.
-    bool usedInText3D_;
     /// Font.
     SharedPtr<Font> font_;
     /// Current face.

@@ -1009,6 +1009,27 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
             AssignMaterial(model, browserDragFile.resourceKey);
         }
     }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_PREFAB)
+    {
+        LoadNode(browserDragFile.GetFullPath(), null, true);
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_MODEL)
+    {
+        Node@ createdNode = CreateNode(REPLICATED, true);
+        Model@ model = cache.GetResource("Model", browserDragFile.resourceKey);
+        if (model.skeleton.numBones > 0)
+        {
+            AnimatedModel@ am = createdNode.CreateComponent("AnimatedModel");
+            am.model = model;
+        }
+        else
+        {
+            StaticModel@ sm = createdNode.CreateComponent("StaticModel");
+            sm.model = model;
+        }
+        
+        AdjustNodePositionByAABB(createdNode);
+    }
 
     browserDragFile = null;
     browserDragComponent = null;

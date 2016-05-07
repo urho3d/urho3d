@@ -58,7 +58,6 @@ Text3D::Text3D(Context* context) :
     usingSDFShader_(false),
     fontDataLost_(false)
 {
-    text_.SetUsedInText3D(true);
     text_.SetEffectDepthBias(DEFAULT_EFFECT_DEPTH_BIAS);
 }
 
@@ -87,6 +86,7 @@ void Text3D::RegisterObject(Context* context)
         horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
         VA_TOP, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Top Left Color", Color, text_.color_[0], Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Top Right Color", Color, text_.color_[1], Color::WHITE, AM_DEFAULT);
@@ -146,7 +146,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
     if (geometryDirty_)
     {
-        for (unsigned i = 0; i < batches_.Size(); ++i)
+        for (unsigned i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
         {
             Geometry* geometry = geometries_[i];
             geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_,
@@ -289,9 +289,17 @@ void Text3D::SetWidth(int width)
 
 void Text3D::SetColor(const Color& color)
 {
+    float oldAlpha = text_.GetColor(C_TOPLEFT).a_;
     text_.SetColor(color);
 
     MarkTextDirty();
+
+    // If alpha changes from zero to nonzero or vice versa, amount of text batches changes (optimization), so do full update
+    if ((oldAlpha == 0.0f && color.a_ != 0.0f) || (oldAlpha != 0.0f && color.a_ == 0.0f))
+    {
+        UpdateTextBatches();
+        UpdateTextMaterials();
+    }
 }
 
 void Text3D::SetColor(Corner corner, const Color& color)
@@ -303,9 +311,18 @@ void Text3D::SetColor(Corner corner, const Color& color)
 
 void Text3D::SetOpacity(float opacity)
 {
+    float oldOpacity = text_.GetOpacity();
     text_.SetOpacity(opacity);
+    float newOpacity = text_.GetOpacity();
 
     MarkTextDirty();
+
+    // If opacity changes from zero to nonzero or vice versa, amount of text batches changes (optimization), so do full update
+    if ((oldOpacity == 0.0f && newOpacity != 0.0f) || (oldOpacity != 0.0f && newOpacity == 0.0f))
+    {
+        UpdateTextBatches();
+        UpdateTextMaterials();
+    }
 }
 
 void Text3D::SetFaceCameraMode(FaceCameraMode mode)

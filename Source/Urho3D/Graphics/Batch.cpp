@@ -133,10 +133,9 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     dest = texAdjust * shadowProj * shadowView;
 }
 
-void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation)
+void CalculateSpotMatrix(Matrix4& dest, Light* light)
 {
     Node* lightNode = light->GetNode();
-    Matrix3x4 posAdjust(translation, Quaternion::IDENTITY, 1.0f);
     Matrix3x4 spotView = Matrix3x4(lightNode->GetWorldPosition(), lightNode->GetWorldRotation(), 1.0f).Inverse();
     Matrix4 spotProj(Matrix4::ZERO);
     Matrix4 texAdjust(Matrix4::IDENTITY);
@@ -157,7 +156,7 @@ void CalculateSpotMatrix(Matrix4& dest, Light* light, const Vector3& translation
     texAdjust.SetScale(Vector3(0.5f, -0.5f, 1.0f));
 #endif
 
-    dest = texAdjust * spotProj * spotView * posAdjust;
+    dest = texAdjust * spotProj * spotView;
 }
 
 void Batch::CalculateSortKey()
@@ -305,16 +304,13 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     {
         if (light && graphics->NeedParameterUpdate(SP_LIGHT, lightQueue_))
         {
-            Matrix3x4 cameraEffectiveTransform = camera->GetEffectiveWorldTransform();
-            Vector3 cameraEffectivePos = cameraEffectiveTransform.Translation();
-
             Node* lightNode = light->GetNode();
-            Matrix3 lightWorldRotation = lightNode->GetWorldRotation().RotationMatrix();
-
-            graphics->SetShaderParameter(VSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-
             float atten = 1.0f / Max(light->GetRange(), M_EPSILON);
-            graphics->SetShaderParameter(VSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
+            Vector3 lightDir(lightNode->GetWorldRotation() * Vector3::BACK);
+            Vector4 lightPos(lightNode->GetWorldPosition(), atten);
+
+            graphics->SetShaderParameter(VSP_LIGHTDIR, lightDir);
+            graphics->SetShaderParameter(VSP_LIGHTPOS, lightPos);
 
             if (graphics->HasShaderParameter(VSP_LIGHTMATRICES))
             {
@@ -336,7 +332,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     {
                         Matrix4 shadowMatrices[2];
 
-                        CalculateSpotMatrix(shadowMatrices[0], light, Vector3::ZERO);
+                        CalculateSpotMatrix(shadowMatrices[0], light);
                         bool isShadowed = shadowMap && graphics->HasTextureUnit(TU_SHADOWMAP);
                         if (isShadowed)
                             CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
@@ -371,8 +367,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             // Negative lights will use subtract blending, so write absolute RGB values to the shader parameter
             graphics->SetShaderParameter(PSP_LIGHTCOLOR, Color(light->GetEffectiveColor().Abs(),
                 light->GetEffectiveSpecularIntensity()) * fade);
-            graphics->SetShaderParameter(PSP_LIGHTDIR, lightWorldRotation * Vector3::BACK);
-            graphics->SetShaderParameter(PSP_LIGHTPOS, Vector4(lightNode->GetWorldPosition(), atten));
+            graphics->SetShaderParameter(PSP_LIGHTDIR, lightDir);
+            graphics->SetShaderParameter(PSP_LIGHTPOS, lightPos);
 
             if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
             {
@@ -394,7 +390,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                     {
                         Matrix4 shadowMatrices[2];
 
-                        CalculateSpotMatrix(shadowMatrices[0], light, cameraEffectivePos);
+                        CalculateSpotMatrix(shadowMatrices[0], light);
                         bool isShadowed = lightQueue_->shadowMap_ != 0;
                         if (isShadowed)
                             CalculateShadowMatrix(shadowMatrices[1], lightQueue_, 0, renderer);
@@ -496,6 +492,35 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
                 if (graphics->HasShaderParameter(PSP_VSMSHADOWPARAMS))
                     graphics->SetShaderParameter(PSP_VSMSHADOWPARAMS, renderer->GetVSMShadowParameters());
+
+                if (light->GetShadowBias().normalOffset_ > 0.0f)
+                {
+                    Vector4 normalOffsetScale(Vector4::ZERO);
+
+                    // Scale normal offset strength with the width of the shadow camera view
+                    if (light->GetLightType() != LIGHT_DIRECTIONAL)
+                    {
+                        Camera* shadowCamera = lightQueue_->shadowSplits_[0].shadowCamera_;
+                        normalOffsetScale.x_ = 2.0f * tanf(shadowCamera->GetFov() * M_DEGTORAD * 0.5f) * shadowCamera->GetFarClip();
+                    }
+                    else
+                    {
+                        normalOffsetScale.x_ = lightQueue_->shadowSplits_[0].shadowCamera_->GetOrthoSize();
+                        if (lightQueue_->shadowSplits_.Size() > 1)
+                            normalOffsetScale.y_ = lightQueue_->shadowSplits_[1].shadowCamera_->GetOrthoSize();
+                        if (lightQueue_->shadowSplits_.Size() > 2)
+                            normalOffsetScale.z_ = lightQueue_->shadowSplits_[2].shadowCamera_->GetOrthoSize();
+                        if (lightQueue_->shadowSplits_.Size() > 3)
+                            normalOffsetScale.w_ = lightQueue_->shadowSplits_[3].shadowCamera_->GetOrthoSize();
+                    }
+
+                    normalOffsetScale *= light->GetShadowBias().normalOffset_;
+#ifdef GL_ES_VERSION_2_0
+                    normalOffsetScale *= renderer->GetMobileNormalOffsetMul();
+#endif
+                    graphics->SetShaderParameter(VSP_NORMALOFFSETSCALE, normalOffsetScale);
+                    graphics->SetShaderParameter(PSP_NORMALOFFSETSCALE, normalOffsetScale);
+                }
             }
         }
         else if (lightQueue_->vertexLights_.Size() && graphics->HasShaderParameter(VSP_VERTEXLIGHTS) &&

@@ -289,14 +289,14 @@ bool SaveSceneWithExistingName()
         return SaveScene(editorScene.fileName);
 }
 
-Node@ CreateNode(CreateMode mode)
+Node@ CreateNode(CreateMode mode, bool raycastToMouse = false)
 {
     Node@ newNode = null;
     if (editNode !is null)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    newNode.worldPosition = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition(raycastToMouse);
 
     // Create an undo action for the create
     CreateNodeAction action;
@@ -352,7 +352,7 @@ void CreateLoadedComponent(Component@ component)
     FocusComponent(component);
 }
 
-Node@ LoadNode(const String&in fileName, Node@ parent = null)
+Node@ LoadNode(const String&in fileName, Node@ parent = null, bool raycastToMouse = false)
 {
     if (fileName.empty)
         return null;
@@ -375,11 +375,7 @@ Node@ LoadNode(const String&in fileName, Node@ parent = null)
     // Before instantiating, add object's resource path if necessary
     SetResourcePath(GetPath(fileName), true, true);
 
-    Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
-    Vector3 position, normal;
-    GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
-
-    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, parent, instantiateMode);
+    Node@ newNode = InstantiateNodeFromFile(file, GetNewNodePosition(raycastToMouse), Quaternion(), 1, parent, instantiateMode);
     if (newNode !is null)
     {
         FocusNode(newNode);
@@ -414,17 +410,8 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
-        if (alignToAABBBottom)
-        {
-            Drawable@ drawable = GetFirstDrawable(newNode);
-            if (drawable !is null)
-            {
-                BoundingBox aabb = drawable.worldBoundingBox;
-                Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
-                Vector3 offset = aabbBottomCenter - newNode.worldPosition;
-                newNode.worldPosition = newNode.worldPosition - offset;
-            }
-        }
+        
+        AdjustNodePositionByAABB(newNode);
 
         // Create an undo action for the load
         CreateNodeAction action;
@@ -439,6 +426,21 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     }
 
     return newNode;
+}
+
+void AdjustNodePositionByAABB(Node@ newNode)
+{
+    if (alignToAABBBottom)
+    {
+        Drawable@ drawable = GetFirstDrawable(newNode);
+        if (drawable !is null)
+        {
+            BoundingBox aabb = drawable.worldBoundingBox;
+            Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+            Vector3 offset = aabbBottomCenter - newNode.worldPosition;
+            newNode.worldPosition = newNode.worldPosition - offset;
+        }
+    }
 }
 
 bool SaveNode(const String&in fileName)

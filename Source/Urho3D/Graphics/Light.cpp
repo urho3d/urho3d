@@ -49,6 +49,7 @@ static const float DEFAULT_SPECULARINTENSITY = 1.0f;
 static const float DEFAULT_BRIGHTNESS = 1.0f;
 static const float DEFAULT_CONSTANTBIAS = 0.0002f;
 static const float DEFAULT_SLOPESCALEDBIAS = 0.5f;
+static const float DEFAULT_NORMALOFFSET = 0.0f;
 static const float DEFAULT_BIASAUTOADJUST = 1.0f;
 static const float DEFAULT_SHADOWFADESTART = 0.8f;
 static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
@@ -68,6 +69,7 @@ void BiasParameters::Validate()
 {
     constantBias_ = Clamp(constantBias_, -1.0f, 1.0f);
     slopeScaledBias_ = Clamp(slopeScaledBias_, -16.0f, 16.0f);
+    normalOffset_ = Max(normalOffset_, 0.0f);
 }
 
 void CascadeParameters::Validate()
@@ -144,6 +146,7 @@ void Light::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Normal Offset", float, shadowBias_.normalOffset_, DEFAULT_NORMALOFFSET, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);

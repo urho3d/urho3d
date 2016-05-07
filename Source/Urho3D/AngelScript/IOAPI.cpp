@@ -109,18 +109,18 @@ static void LogError(const String& str, Log* ptr)
 
 #else
 
-static void Print(const String& value, bool error) {}
-static void Print(int value, bool error) {}
-static void Print(unsigned value, bool error) {}
-static void Print(float value, bool error) {}
-static void Print(bool value, bool error) {}
-static void Print(const Variant& value, bool error) {}
-static void PrintCallStack(bool error) {}
-static void LogWrite(const String& str, bool error, Log* ptr) {}
-static void LogDebug(const String& str, Log* ptr) {}
-static void LogInfo(const String& str, Log* ptr) {}
-static void LogWarning(const String& str, Log* ptr) {}
-static void LogError(const String& str, Log* ptr) {}
+static void Print(const String& value, bool error) { }
+static void Print(int value, bool error) { }
+static void Print(unsigned value, bool error) { }
+static void Print(float value, bool error) { }
+static void Print(bool value, bool error) { }
+static void Print(const Variant& value, bool error) { }
+static void PrintCallStack(bool error) { }
+static void LogWrite(const String& str, bool error, Log* ptr) { }
+static void LogDebug(const String& str, Log* ptr) { }
+static void LogInfo(const String& str, Log* ptr) { }
+static void LogWarning(const String& str, Log* ptr) { }
+static void LogError(const String& str, Log* ptr) { }
 
 #endif
 

@@ -578,9 +578,9 @@ static void ConstructBiasParametersCopy(BiasParameters& parameters, BiasParamete
     new(ptr) BiasParameters(parameters);
 }
 
-static void ConstructBiasParametersInit(float constantBias, float slopeScaledBias, BiasParameters* ptr)
+static void ConstructBiasParametersInit(float constantBias, float slopeScaledBias, float normalOffset, BiasParameters* ptr)
 {
-    new(ptr) BiasParameters(constantBias, slopeScaledBias);
+    new(ptr) BiasParameters(constantBias, slopeScaledBias, normalOffset);
 }
 
 static void ConstructTechniqueEntry(TechniqueEntry* ptr)
@@ -856,9 +856,10 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectType("BiasParameters", sizeof(BiasParameters), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_C);
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructBiasParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(const BiasParameters&in)", asFUNCTION(ConstructBiasParametersCopy), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("BiasParameters", asBEHAVE_CONSTRUCT, "void f(float, float, float normalOffset = 0.0f)", asFUNCTION(ConstructBiasParametersInit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("BiasParameters", "float constantBias", offsetof(BiasParameters, constantBias_));
     engine->RegisterObjectProperty("BiasParameters", "float slopeScaledBias", offsetof(BiasParameters, slopeScaledBias_));
+    engine->RegisterObjectProperty("BiasParameters", "float normalOffset", offsetof(BiasParameters, normalOffset_));
 
     engine->RegisterEnum("CompareMode");
     engine->RegisterEnumValue("CompareMode", "CMP_ALWAYS", CMP_ALWAYS);
@@ -1866,6 +1867,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "float get_mobileShadowBiasMul() const", asMETHOD(Renderer, GetMobileShadowBiasMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_mobileShadowBiasAdd(float)", asMETHOD(Renderer, SetMobileShadowBiasAdd), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "float get_mobileShadowBiasAdd() const", asMETHOD(Renderer, GetMobileShadowBiasAdd), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_mobileNormalOffsetMul(float)", asMETHOD(Renderer, SetMobileNormalOffsetMul), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "float get_mobileNormalOffsetMul() const", asMETHOD(Renderer, GetMobileNormalOffsetMul), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numPrimitives() const", asMETHOD(Renderer, GetNumPrimitives), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numBatches() const", asMETHOD(Renderer, GetNumBatches), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "uint get_numViews() const", asMETHOD(Renderer, GetNumViews), asCALL_THISCALL);

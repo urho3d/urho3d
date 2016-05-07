@@ -1877,13 +1877,13 @@ void ViewRaycast(bool mouseClick)
     }
 }
 
-Vector3 GetNewNodePosition()
+Vector3 GetNewNodePosition(bool raycastToMouse = false)
 {
     if (newNodeMode == NEW_NODE_IN_CENTER)
         return Vector3(0, 0, 0);
     if (newNodeMode == NEW_NODE_RAYCAST)
     {
-        Ray cameraRay = camera.GetScreenRay(0.5, 0.5);
+        Ray cameraRay = raycastToMouse ? GetActiveViewportCameraRay() : camera.GetScreenRay(0.5, 0.5);
         Vector3 position, normal;
         if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, 0, false))
             return position;
@@ -1998,44 +1998,6 @@ Vector3 SelectedNodesCenterPoint()
         lastSelectedNodesCenterPoint = centerPoint;
         return centerPoint;
     }
-}
-
-Vector3 GetScreenCollision(IntVector2 pos)
-{
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
-    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
-
-    bool physicsFound = false;
-    if (editorScene.physicsWorld !is null)
-    {
-        if (!runUpdate)
-            editorScene.physicsWorld.UpdateCollisions();
-
-        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-        if (result.body !is null)
-        {
-            physicsFound = true;
-            result.position;
-        }
-    }
-
-    if (editorScene.octree is null)
-        return res;
-
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        DRAWABLE_GEOMETRY, 0x7fffffff);
-
-    if (result.drawable !is null)
-    {
-        // take the closer of the results
-        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
-            return res;
-        else
-            return result.position;
-    }
-
-    return res;
 }
 
 Drawable@ GetDrawableAtMousePostion()

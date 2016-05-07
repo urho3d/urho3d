@@ -1370,6 +1370,18 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
     if (eventType == E_UIMOUSECLICKEND)
         eventData[UIMouseClickEnd::P_BEGINELEMENT] = beginElement;
 
+    if (endElement)
+    {
+        // Send also element version of the event
+        if (eventType == E_UIMOUSECLICK)
+            endElement->SendEvent(E_CLICK, eventData);
+        else if (eventType == E_UIMOUSECLICKEND)
+            endElement->SendEvent(E_CLICKEND, eventData);
+        else if (eventType == E_UIMOUSEDOUBLECLICK)
+            endElement->SendEvent(E_DOUBLECLICK, eventData);
+    }
+
+    // Send the global event from the UI subsystem last
     SendEvent(eventType, eventData);
 }
 

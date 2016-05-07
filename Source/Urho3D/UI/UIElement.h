@@ -146,14 +146,14 @@ public:
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse click end.
     virtual void OnClickEnd
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
-            UIElement* beginElement);
+            UIElement* beginElement) { }
     /// React to double mouse click.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse drag begin.
     virtual void
         OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
@@ -172,11 +172,11 @@ public:
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    virtual void OnWheel(int delta, int buttons, int qualifiers) { }
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) { }
     /// React to text input event.
-    virtual void OnTextInput(const String& text, int buttons, int qualifiers);
+    virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
 
     /// React to resize.
     virtual void OnResize() { }
@@ -189,6 +189,11 @@ public:
 
     /// React to indent change.
     virtual void OnIndentSet() { }
+
+    /// Convert screen coordinates to element coordinates.
+    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    /// Convert element coordinates to screen coordinates.
+    virtual IntVector2 ElementToScreen(const IntVector2& position);
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -531,10 +536,6 @@ public:
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
 
-    /// Convert screen coordinates to element coordinates.
-    IntVector2 ScreenToElement(const IntVector2& screenPosition);
-    /// Convert element coordinates to screen coordinates.
-    IntVector2 ElementToScreen(const IntVector2& position);
     /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
     /// Return whether a point (either in element or screen coordinates) is inside the combined rect of the element and its children.

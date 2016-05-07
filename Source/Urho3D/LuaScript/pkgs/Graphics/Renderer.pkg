@@ -29,6 +29,7 @@ class Renderer
     void SetThreadedOcclusion(bool enable);
     void SetMobileShadowBiasMul(float mul);
     void SetMobileShadowBiasAdd(float add);
+    void SetMobileNormalOffsetMul(float mul);
     void ReloadShaders();
     
     unsigned GetNumViewports() const;
@@ -57,6 +58,7 @@ class Renderer
     bool GetThreadedOcclusion() const;
     float GetMobileShadowBiasMul() const;
     float GetMobileShadowBiasAdd() const;
+    float GetMobileNormalOffsetMul() const;
     unsigned GetNumViews() const;
     unsigned GetNumPrimitives() const;
     unsigned GetNumBatches() const;
@@ -95,6 +97,7 @@ class Renderer
     tolua_property__get_set bool threadedOcclusion;
     tolua_property__get_set float mobileShadowBiasMul;
     tolua_property__get_set float mobileShadowBiasAdd;
+    tolua_property__get_set float mobileNormalOffsetMul;
     tolua_readonly tolua_property__get_set unsigned numViews;
     tolua_readonly tolua_property__get_set unsigned numPrimitives;
     tolua_readonly tolua_property__get_set unsigned numBatches;

@@ -74,8 +74,23 @@ float GetVertexLightVolumetric(int index, vec3 worldPos)
     #define NUMCASCADES 1
 #endif
 
-vec4 GetShadowPos(int index, vec4 projWorldPos)
+vec4 GetShadowPos(int index, vec3 normal, vec4 projWorldPos)
 {
+    #ifdef NORMALOFFSET
+        float normalOffsetScale[4];
+        normalOffsetScale[0] = cNormalOffsetScale.x;
+        normalOffsetScale[1] = cNormalOffsetScale.y;
+        normalOffsetScale[2] = cNormalOffsetScale.z;
+        normalOffsetScale[3] = cNormalOffsetScale.w;
+
+        #ifdef DIRLIGHT
+            float cosAngle = clamp(1.0 - dot(normal, cLightDir), 0.0, 1.0);
+        #else
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)), 0.0, 1.0);
+        #endif
+        projWorldPos.xyz += cosAngle * normalOffsetScale[index] * normal;
+    #endif
+
     #if defined(DIRLIGHT)
         return projWorldPos * cLightMatrices[index];
     #elif defined(SPOTLIGHT)
@@ -154,7 +169,7 @@ float Chebyshev(vec2 Moments, float depth)
     float Variance = Moments.y - (Moments.x * Moments.x); 
 
     float minVariance = cVSMShadowParams.x;
-    Variance = max(Variance, minVariance);  
+    Variance = max(Variance, minVariance);
     //Compute probabilistic upper bound.  
     float d = depth - Moments.x;  
     float p_max = Variance / (Variance + d*d); 
@@ -276,18 +291,30 @@ float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
 #endif
 
 #ifndef GL_ES
-float GetDirShadowDeferred(vec4 projWorldPos, float depth)
+float GetDirShadowDeferred(vec4 projWorldPos, vec3 normal, float depth)
 {
     vec4 shadowPos;
 
-    if (depth < cShadowSplits.x)
-        shadowPos = projWorldPos * cLightMatricesPS[0];
-    else if (depth < cShadowSplits.y)
-        shadowPos = projWorldPos * cLightMatricesPS[1];
-    else if (depth < cShadowSplits.z)
-        shadowPos = projWorldPos * cLightMatricesPS[2];
-    else
-        shadowPos = projWorldPos * cLightMatricesPS[3];
+    #ifdef NORMALOFFSET
+        float cosAngle = clamp(1.0 - dot(normal, cLightDirPS), 0.0, 1.0);
+        if (depth < cShadowSplits.x)
+            shadowPos = vec4(projWorldPos.xyz + cosAngle * cNormalOffsetScalePS.x * normal, 1.0) * cLightMatricesPS[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = vec4(projWorldPos.xyz + cosAngle * cNormalOffsetScalePS.y * normal, 1.0) * cLightMatricesPS[1];
+        else if (depth < cShadowSplits.z)
+            shadowPos = vec4(projWorldPos.xyz + cosAngle * cNormalOffsetScalePS.z * normal, 1.0) * cLightMatricesPS[2];
+        else
+            shadowPos = vec4(projWorldPos.xyz + cosAngle * cNormalOffsetScalePS.w * normal, 1.0) * cLightMatricesPS[3];
+    #else
+        if (depth < cShadowSplits.x)
+            shadowPos = projWorldPos * cLightMatricesPS[0];
+        else if (depth < cShadowSplits.y)
+            shadowPos = projWorldPos * cLightMatricesPS[1];
+        else if (depth < cShadowSplits.z)
+            shadowPos = projWorldPos * cLightMatricesPS[2];
+        else
+            shadowPos = projWorldPos * cLightMatricesPS[3];
+    #endif
 
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
@@ -306,16 +333,23 @@ float GetShadow(vec4 iShadowPos[NUMCASCADES], float depth)
 }
 
 #ifndef GL_ES
-float GetShadowDeferred(vec4 projWorldPos, float depth)
+float GetShadowDeferred(vec4 projWorldPos, vec3 normal, float depth)
 {
-    #if defined(DIRLIGHT)
-        return GetDirShadowDeferred(projWorldPos, depth);
-    #elif defined(SPOTLIGHT)
-        vec4 shadowPos = projWorldPos * cLightMatricesPS[1];
-        return GetShadow(shadowPos);
+    #ifdef DIRLIGHT
+        return GetDirShadowDeferred(projWorldPos, normal, depth);
     #else
-        vec3 shadowPos = projWorldPos.xyz - cLightPosPS.xyz;
-        return GetPointShadow(shadowPos);
+        #ifdef NORMALOFFSET
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPosPS - projWorldPos.xyz)), 0.0, 1.0);
+            projWorldPos.xyz += cosAngle * cNormalOffsetScalePS.x * normal;
+        #endif
+
+        #ifdef SPOTLIGHT
+            vec4 shadowPos = projWorldPos * cLightMatricesPS[1];
+            return GetShadow(shadowPos);
+        #else
+            vec3 shadowPos = projWorldPos.xyz - cLightPosPS.xyz;
+            return GetPointShadow(shadowPos);
+        #endif
     #endif
 }
 #endif
