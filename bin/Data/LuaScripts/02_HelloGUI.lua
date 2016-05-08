@@ -165,7 +165,7 @@ function CreateAnimatedSprite()
     animatedSprite:SetAlignment(HA_CENTER, VA_CENTER)
     animatedSprite:SetPosition(0.0, 0.0)
 
-    -- Size of single frame.
+    -- Bounds of the first frame.
     animatedSprite.imageRect = IntRect(0, 0, 20, 64)
     -- Animation speed = 20 frames per second.
     animatedSprite.speed = 20.0

@@ -196,7 +196,7 @@ void HelloGUI::CreateAnimatedSprite()
     animatedSprite->SetAlignment(HA_CENTER, VA_CENTER);
     animatedSprite->SetPosition(0.0f, 0.0f);
 
-    // Size of single frame.
+    // Bounds of the first frame.
     animatedSprite->SetImageRect(IntRect(0, 0, 20, 64));
     // Animation speed = 20 frames per second.
     animatedSprite->SetSpeed(20.0f);
