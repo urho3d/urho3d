@@ -859,7 +859,7 @@ macro (enable_pch HEADER_PATHNAME)
             get_filename_component (NAME_WE ${HEADER_FILENAME} NAME_WE)
             if (TARGET ${TARGET_NAME})
                 if (VS)
-                    # VS generator is multi-config capable, the exact path is only known during actual build time
+                    # VS is multi-config, the exact path is only known during actual build time based on effective build config
                     set (PCH_PATHNAME "$(IntDir)${PCH_FILENAME}")
                 else ()
                     set (PCH_PATHNAME ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
