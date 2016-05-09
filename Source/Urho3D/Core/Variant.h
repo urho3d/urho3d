@@ -129,6 +129,20 @@ struct URHO3D_API ResourceRef
     {
     }
 
+    /// Construct with type and resource name.
+    ResourceRef(const String& type, const String& name) :
+        type_(type),
+        name_(name)
+    {
+    }
+
+    /// Construct with type and resource name.
+    ResourceRef(const char* type, const char* name) :
+        type_(type),
+        name_(name)
+    {
+    }
+
     // Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),

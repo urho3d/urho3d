@@ -35,6 +35,7 @@
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Scene/ValueAnimation.h>
 #include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Sprite.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
 
@@ -123,6 +124,16 @@ void LightAnimation::CreateScene()
     textAnimation->SetKeyFrame(4.0f, "WHITE");
     GetSubsystem<UI>()->GetRoot()->GetChild(String("animatingText"))->SetAttributeAnimation("Text", textAnimation);
 
+    // Create UI element animation
+    // (note: a spritesheet should be used in real use cases for better performance)
+    SharedPtr<ValueAnimation> spriteAnimation(new ValueAnimation(context_));
+    spriteAnimation->SetKeyFrame(0.0f, ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png"));
+    spriteAnimation->SetKeyFrame(0.1f, ResourceRef("Texture2D", "Urho2D/GoldIcon/2.png"));
+    spriteAnimation->SetKeyFrame(0.2f, ResourceRef("Texture2D", "Urho2D/GoldIcon/4.png"));
+    spriteAnimation->SetKeyFrame(0.3f, ResourceRef("Texture2D", "Urho2D/GoldIcon/5.png"));
+    spriteAnimation->SetKeyFrame(0.4f, ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png"));
+    GetSubsystem<UI>()->GetRoot()->GetChild(String("animatingSprite"))->SetAttributeAnimation("Texture", spriteAnimation);
+
     // Create light color animation
     SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
     colorAnimation->SetKeyFrame(0.0f, Color::WHITE);
@@ -185,6 +196,11 @@ void LightAnimation::CreateInstructions()
     text->SetHorizontalAlignment(HA_CENTER);
     text->SetVerticalAlignment(VA_CENTER);
     text->SetPosition(0, ui->GetRoot()->GetHeight() / 4 + 20);
+
+    // Animating sprite in the top left corner
+    Sprite* sprite = ui->GetRoot()->CreateChild<Sprite>("animatingSprite");
+    sprite->SetPosition(8, 8);
+    sprite->SetSize(64, 64);
 }
 
 void LightAnimation::SetupViewport()
