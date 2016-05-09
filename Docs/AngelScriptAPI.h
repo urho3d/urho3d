@@ -13918,6 +13918,7 @@ HTTP_CLOSED,
 
 enum InterpMethod
 {
+IM_NONE,
 IM_LINEAR,
 IM_SPLINE,
 };
