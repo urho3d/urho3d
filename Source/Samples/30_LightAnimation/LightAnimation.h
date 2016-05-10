@@ -34,7 +34,7 @@ class Scene;
 
 /// Light animation example.
 /// This sample is base on StaticScene, and it demonstrates:
-///     - Usage of attribute animation for light color animation
+///     - Usage of attribute animation for light color & UI animation
 class LightAnimation : public Sample
 {
     URHO3D_OBJECT(LightAnimation, Sample);

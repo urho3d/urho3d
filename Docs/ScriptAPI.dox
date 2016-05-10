@@ -14773,6 +14773,7 @@ Properties:
 
 ### InterpMethod
 
+- IM_NONE
 - IM_LINEAR
 - IM_SPLINE
 

@@ -35,6 +35,7 @@ struct ResourceRef
     ResourceRef();
     ResourceRef(StringHash type);
     ResourceRef(StringHash type, String name);
+    ResourceRef(String type, String name);
     ResourceRef(const ResourceRef& rhs);
     ~ResourceRef();
 

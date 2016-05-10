@@ -2,7 +2,8 @@ $#include "Scene/ValueAnimation.h"
 
 enum InterpMethod
 {
-    IM_LINEAR = 0,
+    IM_NONE = 0,
+    IM_LINEAR,
     IM_SPLINE,
 };
 
