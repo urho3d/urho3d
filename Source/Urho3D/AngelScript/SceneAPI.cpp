@@ -56,6 +56,7 @@ static void ValueAnimationSetEventFrame(float time, const String& eventType, con
 static void RegisterValueAnimation(asIScriptEngine* engine)
 {
     engine->RegisterEnum("InterpMethod");
+    engine->RegisterEnumValue("InterpMethod", "IM_NONE", IM_NONE);
     engine->RegisterEnumValue("InterpMethod", "IM_LINEAR", IM_LINEAR);
     engine->RegisterEnumValue("InterpMethod", "IM_SPLINE", IM_SPLINE);
 

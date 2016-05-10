@@ -2886,7 +2886,7 @@ ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/Li
 lightNode->SetObjectAnimation (lightAnimation);
 \endcode
 
-Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).
+Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).  Alternatively interpolation can be turned off for any data type by setting the interpolation method IM_NONE (see \ref ValueAnimation::SetInterpolationMethod "SetInterpolationMethod()"). This allows e.g. animating %UI elements by modifying the element's image rect to cover a series of animation frames.
 
 \section AttributeAnimation_Classes Attribute animation classes
 

@@ -4952,6 +4952,8 @@ Methods:
 - ResourceRef* new(StringHash type)
 - ResourceRef(StringHash type, String name) (GC)
 - ResourceRef* new(StringHash type, String name)
+- ResourceRef(String type, String name) (GC)
+- ResourceRef* new(String type, String name)
 - ResourceRef(const ResourceRef& rhs) (GC)
 - ResourceRef* new(const ResourceRef& rhs)
 - void delete()
@@ -7536,6 +7538,7 @@ Properties:
 
 ### InterpMethod
 
+- int IM_NONE
 - int IM_LINEAR
 - int IM_SPLINE
 
