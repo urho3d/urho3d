@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="b8_1">
     <folder id="0" name="GoldIcon">
-        <file id="0" name="GoldIcon/2.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
-        <file id="1" name="GoldIcon/1.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
-        <file id="2" name="GoldIcon/3.png" width="17" height="60" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="0" name="GoldIcon/1.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="1" name="GoldIcon/2.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="2" name="GoldIcon/3.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
         <file id="3" name="GoldIcon/4.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
         <file id="4" name="GoldIcon/5.png" width="64" height="64" pivot_x="0.5" pivot_y="0.5"/>
     </folder>
@@ -28,10 +28,10 @@
             </mainline>
             <timeline id="0" name="1">
                 <key id="0" spin="0">
-                    <object folder="0" file="1" angle="0"/>
+                    <object folder="0" file="0" angle="0"/>
                 </key>
                 <key id="1" time="100" spin="0">
-                    <object folder="0" file="0" angle="0"/>
+                    <object folder="0" file="1" angle="0"/>
                 </key>
                 <key id="2" time="200" spin="0">
                     <object folder="0" file="2" angle="0"/>
