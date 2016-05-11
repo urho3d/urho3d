@@ -67,13 +67,14 @@ function CreateScene()
     ui.root:GetChild("animatingText"):SetAttributeAnimation("Text", textAnimation)
 
     -- Create UI element animation
-    -- (note: a spritesheet should be used in real use cases for better performance)
+    -- (note: a spritesheet and "Image Rect" attribute should be used in real use cases for better performance)
     local spriteAnimation = ValueAnimation:new()
     spriteAnimation:SetKeyFrame(0.0, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png")))
     spriteAnimation:SetKeyFrame(0.1, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/2.png")))
-    spriteAnimation:SetKeyFrame(0.2, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/4.png")))
-    spriteAnimation:SetKeyFrame(0.3, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/5.png")))
-    spriteAnimation:SetKeyFrame(0.4, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png")))
+    spriteAnimation:SetKeyFrame(0.2, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/3.png")))
+    spriteAnimation:SetKeyFrame(0.3, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/4.png")))
+    spriteAnimation:SetKeyFrame(0.4, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/5.png")))
+    spriteAnimation:SetKeyFrame(0.5, Variant(ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png")))
     ui.root:GetChild("animatingSprite"):SetAttributeAnimation("Texture", spriteAnimation)
 
     -- Create light position animation
