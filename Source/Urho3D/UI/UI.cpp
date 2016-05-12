@@ -53,6 +53,7 @@
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/UIEvents.h"
+#include "../UI/UIUnknownComponent.h"
 #include "../UI/Window.h"
 #include "../UI/View3D.h"
 
@@ -1858,6 +1859,7 @@ void RegisterUILibrary(Context* context)
     FileSelector::RegisterObject(context);
     MessageBox::RegisterObject(context);
     ToolTip::RegisterObject(context);
+    UIUnknownComponent::RegisterObject(context);
 }
 
 }
