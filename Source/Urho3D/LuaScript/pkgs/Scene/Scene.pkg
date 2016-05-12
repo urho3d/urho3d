@@ -82,7 +82,7 @@ class Scene : public Node
     void MarkNetworkUpdate(Component* component);
     void MarkReplicationDirty(Node* node);
     
-	// bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const;
+    // bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag) const;
     tolua_outside const PODVector<Node*>&  SceneGetNodesWithTag @ GetNodesWithTag( const String& tag) const; 
 
     tolua_property__is_set bool updateEnabled;

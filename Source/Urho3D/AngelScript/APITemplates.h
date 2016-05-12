@@ -583,14 +583,14 @@ static CScriptArray* NodeGetChildrenWithComponent(const String& typeName, bool r
 
 static CScriptArray* NodeGetChildrenWithTag(const String& typeName, bool recursive, Node* ptr)
 {
-	PODVector<Node*> nodes;
-	ptr->GetChildrenWithTag(nodes, typeName, recursive);
-	return VectorToHandleArray<Node>(nodes, "Array<Node@>");
+    PODVector<Node*> nodes;
+    ptr->GetChildrenWithTag(nodes, typeName, recursive);
+    return VectorToHandleArray<Node>(nodes, "Array<Node@>");
 }
 
 static CScriptArray* NodeGetTags(Node* ptr)
 {
-	return VectorToArray<String>(ptr->GetTags(), "Array<String>");
+    return VectorToArray<String>(ptr->GetTags(), "Array<String>");
 }
 
 static unsigned NodeGetNumChildrenNonRecursive(Node* ptr)
