@@ -2081,7 +2081,7 @@ bool CScriptDictValue::Get(asIScriptEngine *engine, void *value, int typeId) con
     {
         // A handle can be retrieved if the stored type is a handle of same or compatible type
         // or if the stored type is an object that implements the interface that the handle refer to.
-        
+
         void* cast = 0x0;
         if ((m_typeId & asTYPEID_MASK_OBJECT) &&
             engine->RefCastObject(m_valueObj, engine->GetObjectTypeById(m_typeId), engine->GetObjectTypeById(typeId), &cast) >= 0)
@@ -2480,6 +2480,7 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "uint get_length() const", asMETHOD(String, Length), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool get_empty() const", asMETHOD(String, Empty), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "int Compare(const String&in, bool caseSensitive = true) const", asMETHODPR(String, Compare, (const String&, bool) const, int), asCALL_THISCALL);
+    engine->RegisterObjectMethod("String", "int Compare(uint, uint, const String&in, bool caseSensitive = true) const", asMETHODPR(String, Compare, (unsigned, unsigned, const String&, bool) const, int), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool Contains(const String&in, bool caseSensitive = true) const", asMETHODPR(String, Contains, (const String&, bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "bool Contains(uint8, bool caseSensitive = true) const", asMETHODPR(String, Contains, (char, bool) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void Clear()", asMETHOD(String, Clear), asCALL_THISCALL);

@@ -420,6 +420,10 @@ public:
     int Compare(const String& str, bool caseSensitive = true) const;
     /// Return comparison result with a C string.
     int Compare(const char* str, bool caseSensitive = true) const;
+    /// Return comparison of a substring with a string.
+    int Compare(unsigned pos, unsigned length, const String& str, bool caseSensitive = true) const;
+    /// Return comparison of a substring with a C string.
+    int Compare(unsigned pos, unsigned length, const char* str, bool caseSensitive = true) const;
 
     /// Return whether contains a specific occurrence of a string.
     bool Contains(const String& str, bool caseSensitive = true) const { return Find(str, 0, caseSensitive) != NPOS; }
@@ -498,7 +502,7 @@ public:
     String& AppendWithFormatArgs(const char* formatString, va_list args);
 
     /// Compare two C strings.
-    static int Compare(const char* str1, const char* str2, bool caseSensitive);
+    static int Compare(const char* str1, const char* str2, bool caseSensitive, unsigned length = 0);
 
     /// Position for "not found."
     static const unsigned NPOS = 0xffffffff;
