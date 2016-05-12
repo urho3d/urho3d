@@ -375,6 +375,12 @@ before_script:
 script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
+# Below samples are excluded from Xcode/OSX build due to build time constraint
+data:
+  excluded_sample:
+    '#2': [42_PBRMaterials]
+    '#3': [42_PBRMaterials]
+
 ---
 
 branch: {name: Web-CI, active: yes}
