@@ -31,8 +31,10 @@
 #include "../Scene/ObjectAnimation.h"
 #include "../UI/Cursor.h"
 #include "../UI/UI.h"
+#include "../UI/UIComponent.h"
 #include "../UI/UIElement.h"
 #include "../UI/UIEvents.h"
+#include "../UI/UIUnknownComponent.h"
 
 #include "../DebugNew.h"
 
@@ -2095,6 +2097,221 @@ void UIElement::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     using namespace PostUpdate;
 
     UpdateAttributeAnimations(eventData[P_TIMESTEP].GetFloat());
+}
+
+void UIElement::GetComponents(PODVector<UIComponent*>& dest, StringHash type, bool recursive) const
+{
+    dest.Clear();
+
+    if (!recursive)
+    {
+        for (Vector<SharedPtr<UIComponent> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+        {
+            if ((*i)->GetType() == type)
+                dest.Push(*i);
+        }
+    }
+    else
+        GetComponentsRecursive(dest, type);
+}
+
+void UIElement::GetComponentsRecursive(PODVector<UIComponent*>& dest, StringHash type) const
+{
+    for (Vector<SharedPtr<UIComponent> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+            dest.Push(*i);
+    }
+    for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        (*i)->GetComponentsRecursive(dest, type);
+}
+
+bool UIElement::HasComponent(StringHash type) const
+{
+    for (Vector<SharedPtr<UIComponent> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+            return true;
+    }
+    return false;
+}
+
+UIComponent* UIElement::GetComponent(StringHash type, bool recursive) const
+{
+    for (Vector<SharedPtr<UIComponent> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+            return *i;
+    }
+
+    if (recursive)
+    {
+        for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)
+        {
+            UIComponent* component = (*i)->GetComponent(type, true);
+            if (component)
+                return component;
+        }
+    }
+
+    return 0;
+}
+
+UIComponent* UIElement::GetParentComponent(StringHash type, bool fullTraversal) const
+{
+    UIElement* current = GetParent();
+    while (current)
+    {
+        UIComponent* soughtComponent = current->GetComponent(type);
+        if (soughtComponent)
+            return soughtComponent;
+
+        if (fullTraversal)
+            current = current->GetParent();
+        else
+            break;
+    }
+    return 0;
+}
+
+void UIElement::RemoveComponent(UIComponent* component)
+{
+    for (Vector<SharedPtr<UIComponent> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if (*i == component)
+        {
+            RemoveComponent(i);
+            return;
+        }
+    }
+}
+
+void UIElement::RemoveComponent(StringHash type)
+{
+    for (Vector<SharedPtr<UIComponent> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if ((*i)->GetType() == type)
+        {
+            RemoveComponent(i);
+            return;
+        }
+    }
+}
+
+void UIElement::RemoveComponents(StringHash type)
+{
+    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+    {
+        if (components_[i]->GetType() == type)
+            RemoveComponent(components_.Begin() + i);
+    }
+}
+
+void UIElement::RemoveAllComponents()
+{
+    for (unsigned i = components_.Size() - 1; i < components_.Size(); --i)
+        RemoveComponent(components_.Begin() + i);
+}
+
+void UIElement::RemoveComponent(Vector<SharedPtr<UIComponent> >::Iterator i)
+{
+    (*i)->SetElement(0);
+    components_.Erase(i);
+}
+
+UIComponent* UIElement::CreateComponent(StringHash type)
+{
+    // Check that creation succeeds and that the object in fact is a component
+    SharedPtr<UIComponent> newComponent = DynamicCast<UIComponent>(context_->CreateObject(type));
+    if (!newComponent)
+    {
+        URHO3D_LOGERROR("Could not create unknown ui component type " + type.ToString());
+        return 0;
+    }
+
+    AddComponent(newComponent);
+    return newComponent;
+}
+
+UIComponent* UIElement::GetOrCreateComponent(StringHash type)
+{
+    UIComponent* oldComponent = GetComponent(type);
+    if (oldComponent)
+        return oldComponent;
+    else
+        return CreateComponent(type);
+}
+
+void UIElement::AddComponent(UIComponent* component)
+{
+    if (!component)
+        return;
+
+    components_.Push(SharedPtr<UIComponent>(component));
+
+    if (component->GetElement())
+        URHO3D_LOGWARNING("Component " + component->GetTypeName() + " already belongs to a element!");
+
+    component->SetElement(this);
+}
+
+UIComponent* UIElement::CloneComponent(UIComponent* component)
+{
+    if (!component)
+    {
+        URHO3D_LOGERROR("Null source component given for UIElement::CloneComponent");
+        return 0;
+    }
+
+    UIComponent* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType());
+    if (!cloneComponent)
+    {
+        URHO3D_LOGERROR("Could not clone ui component " + component->GetTypeName());
+        return 0;
+    }
+
+    const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
+    const Vector<AttributeInfo>* cloneAttributes = cloneComponent->GetAttributes();
+
+    if (compAttributes)
+    {
+        for (unsigned i = 0; i < compAttributes->Size() && i < cloneAttributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = compAttributes->At(i);
+            const AttributeInfo& cloneAttr = cloneAttributes->At(i);
+            if (attr.mode_ & AM_FILE)
+            {
+                Variant value;
+                component->OnGetAttribute(attr, value);
+                // Note: when eg. a ScriptInstance component is cloned, its script object attributes are unique and therefore we
+                // can not simply refer to the source component's AttributeInfo
+                cloneComponent->OnSetAttribute(cloneAttr, value);
+            }
+        }
+        cloneComponent->ApplyAttributes();
+    }
+
+    return cloneComponent;
+}
+
+UIComponent* UIElement::SafeCreateComponent(const String& typeName, StringHash type)
+{
+    // First check if factory for type exists
+    if (!context_->GetTypeName(type).Empty())
+        return CreateComponent(type);
+    else
+    {
+        URHO3D_LOGWARNING("Component type " + type.ToString() + " not known, creating UIUnknownComponent as placeholder");
+        // Else create as UIUnknownComponent
+        SharedPtr<UIUnknownComponent> newComponent(new UIUnknownComponent(context_));
+        if (typeName.Empty() || typeName.StartsWith("UIUnknown", false))
+            newComponent->SetType(type);
+        else
+            newComponent->SetTypeName(typeName);
+
+        AddComponent(newComponent);
+        return newComponent;
+    }
 }
 
 }

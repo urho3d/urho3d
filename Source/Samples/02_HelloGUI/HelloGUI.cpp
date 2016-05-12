@@ -36,6 +36,7 @@
 #include <Urho3D/UI/Window.h>
 
 #include "HelloGUI.h"
+#include "Mover.h"
 
 #include <Urho3D/DebugNew.h>
 
@@ -46,6 +47,7 @@ HelloGUI::HelloGUI(Context* context) :
     uiRoot_(GetSubsystem<UI>()->GetRoot()),
     dragBeginPosition_(IntVector2::ZERO)
 {
+    context->RegisterFactory<Mover>();
 }
 
 void HelloGUI::Start()
@@ -136,6 +138,10 @@ void HelloGUI::InitWindow()
 
     // Add the title bar to the Window
     window_->AddChild(titleBar);
+    
+    // Create ui component for the Window
+    Mover* mover = window_->CreateComponent<Mover>();
+    mover->Init(Vector2(0.0f, 0.0f), Vector2(40.0f, 40.0f));
 
     // Apply styles
     window_->SetStyleAuto();

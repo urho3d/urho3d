@@ -107,6 +107,7 @@ static const unsigned DD_SOURCE_AND_TARGET = 0x3;
 
 class Cursor;
 class ResourceCache;
+class UIComponent;
 
 /// Base class for %UI elements.
 class URHO3D_API UIElement : public Animatable
@@ -580,6 +581,42 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
+
+    /// Return all components of type. Optionally recursive.
+    void GetComponents(PODVector<UIComponent*>& dest, StringHash type, bool recursive = false) const;
+    /// Return component by type. If there are several, returns the first.
+    UIComponent* GetComponent(StringHash type, bool recursive = false) const;
+    /// Return component in parent element. If there are several, returns the first. May optional traverse up to the root.
+    UIComponent* GetParentComponent(StringHash type, bool fullTraversal = false) const;
+    /// Return whether has a specific component.
+    bool HasComponent(StringHash type) const;
+
+    /// Remove a component from this element.
+    void RemoveComponent(UIComponent* component);
+    /// Remove the first component of specific type from this element.
+    void RemoveComponent(StringHash type);
+    /// Remove all components of specific type.
+    void RemoveComponents(StringHash type);
+    /// Remove all components from this element.
+    void RemoveAllComponents();
+
+    /// Add a pre-created component.
+    void AddComponent(UIComponent* component);
+    /// Create a component to this element.
+    UIComponent* CreateComponent(StringHash type);
+    /// Create a component to this element if it does not exist already.
+    UIComponent* GetOrCreateComponent(StringHash type);
+    /// Clone a component from another element. Return the clone if successful or null on failure.
+    UIComponent* CloneComponent(UIComponent* component);
+
+    /// Template version of creating a component.
+    template <class T> T* CreateComponent();
+    /// Template version of getting or creating a component.
+    template <class T> T* GetOrCreateComponent();
+    /// Template version of removing a component.
+    template <class T> void RemoveComponent();
+    /// Template version of removing all components of specific type.
+    template <class T> void RemoveComponents();
     
 protected:
     /// Handle attribute animation added.
@@ -677,6 +714,8 @@ private:
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
     /// Return child elements with a specific tag recursively.
     void GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const;
+    /// Return specific components recursively.
+    void GetComponentsRecursive(PODVector<UIComponent*>& dest, StringHash type) const;
     /// Recursively apply style to a child element hierarchy when adding to an element.
     void ApplyStyleRecursive(UIElement* element);
     /// Calculate layout width for resizing the parent element.
@@ -693,6 +732,10 @@ private:
     void VerifyChildAlignment();
     /// Handle logic post-update event.
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+    /// Remove a component from this element with the specified iterator.
+    void RemoveComponent(Vector<SharedPtr<UIComponent> >::Iterator i);
+    /// Create component, allowing UIUnknownComponent if actual type is not supported. Leave typeName empty if not known.
+    UIComponent* SafeCreateComponent(const String& typeName, StringHash type);
 
     /// Size.
     IntVector2 size_;
@@ -728,17 +771,35 @@ private:
     WeakPtr<XMLFile> appliedStyleFile_;
     /// Traversal mode for rendering.
     TraversalMode traversalMode_;
-    /// Flag whether node should send child added / removed events by itself.
+    /// Flag whether element should send child added / removed events by itself.
     bool elementEventSender_;
     /// XPath query for selecting UI-style.
     static XPathQuery styleXPathQuery_;
     /// Tag list.
     StringVector tags_;
+    /// Components.
+    Vector<SharedPtr<UIComponent> > components_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
 {
     return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
 }
+
+template <class T> T* UIElement::CreateComponent()
+{
+    return static_cast<T*>(CreateComponent(T::GetTypeStatic()));
+}
+
+template <class T> T* UIElement::GetOrCreateComponent()
+{
+    return static_cast<T*>(GetOrCreateComponent(T::GetTypeStatic()));
+}
+
+template <class T> void UIElement::RemoveComponent() { RemoveComponent(T::GetTypeStatic()); }
+
+template <class T> void UIElement::RemoveComponents() { RemoveComponents(T::GetTypeStatic()); }
+
+// TODO: Template for get component
 
 }
