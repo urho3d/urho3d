@@ -32,6 +32,7 @@ namespace Urho3D
 PackageFile::PackageFile(Context* context) :
     Object(context),
     totalSize_(0),
+    totalDataSize_(0),
     checksum_(0),
     compressed_(false)
 {
@@ -40,6 +41,7 @@ PackageFile::PackageFile(Context* context) :
 PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
     Object(context),
     totalSize_(0),
+    totalDataSize_(0),
     checksum_(0),
     compressed_(false)
 {
@@ -104,7 +106,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         String entryName = file->ReadString();
         PackageEntry newEntry;
         newEntry.offset_ = file->ReadUInt() + startOffset;
-        newEntry.size_ = file->ReadUInt();
+        totalDataSize_ += (newEntry.size_ = file->ReadUInt());
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
         {

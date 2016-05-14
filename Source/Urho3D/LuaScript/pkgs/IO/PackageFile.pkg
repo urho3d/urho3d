@@ -12,16 +12,17 @@ class PackageFile : public Object
     PackageFile();
     PackageFile(const String fileName, unsigned startOffset = 0);
     ~PackageFile();
-    
+
     bool Open(const String fileName, unsigned startOffset = 0);
     bool Exists(const String fileName) const;
     const PackageEntry* GetEntry(const String fileName) const;
     const HashMap<String, PackageEntry>& GetEntries() const;
-    
+
     const String GetName() const;
     StringHash GetNameHash() const;
     unsigned GetNumFiles() const;
     unsigned GetTotalSize() const;
+    unsigned GetTotalDataSize() const;
     unsigned GetChecksum() const;
     bool IsCompressed() const;
 
@@ -29,6 +30,7 @@ class PackageFile : public Object
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_readonly tolua_property__get_set unsigned numFiles;
     tolua_readonly tolua_property__get_set unsigned totalSize;
+    tolua_readonly tolua_property__get_set unsigned totalDataSize;
     tolua_readonly tolua_property__get_set unsigned checksum;
     tolua_readonly tolua_property__is_set bool compressed;
 };
