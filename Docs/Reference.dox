@@ -3073,7 +3073,8 @@ PackageTool <output option> <package name>
 
 Output option:
 -i      Output package file information
--l      Output file names (including its path) contained in the package
+-l      Output file names (including their paths) contained in the package
+-L      Similar to -l but also output compression ratio (compressed package file only)
 
 \endverbatim
 

@@ -97,7 +97,8 @@ void Run(const Vector<String>& arguments)
             "Alternative output usage: PackageTool <output option> <package name>\n"
             "Output option:\n"
             "-i      Output package file information\n"
-            "-l      Output file names (including its path) contained in the package\n"
+            "-l      Output file names (including their paths) contained in the package\n"
+            "-L      Similar to -l but also output compression ratio (compressed package file only)\n"
         );
 
     const String& dirName = arguments[0];
@@ -121,7 +122,8 @@ void Run(const Vector<String>& arguments)
                     case 'q':
                         quiet_ = true;
                         break;
-                    default: break;
+                    default:
+                        ErrorExit("Unrecognized option");
                     }
                 }
             }
@@ -161,6 +163,7 @@ void Run(const Vector<String>& arguments)
     else
     {
         SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
+        bool outputCompressionRatio = false;
         switch (arguments[0][1])
         {
         case 'i':
@@ -170,11 +173,28 @@ void Run(const Vector<String>& arguments)
             PrintLine("Checksum: " + String(packageFile->GetChecksum()));
             PrintLine("Compressed: " + String(packageFile->IsCompressed() ? "yes" : "no"));
             break;
+        case 'L':
+            if (!packageFile->IsCompressed())
+                ErrorExit("Invalid output option: -L is applicable for compressed package file only");
+            outputCompressionRatio = true;
+            // Fallthrough
         case 'l':
             {
                 const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
-                for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End(); ++i)
-                    PrintLine(i->first_);
+                for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
+                {
+                    HashMap<String, PackageEntry>::ConstIterator current = i++;
+                    String fileEntry(current->first_);
+                    if (outputCompressionRatio)
+                    {
+                        unsigned compressedSize =
+                            (i == entries.End() ? packageFile->GetTotalSize() - sizeof(unsigned) : i->second_.offset_) -
+                            current->second_.offset_;
+                        fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", current->second_.size_, compressedSize,
+                            compressedSize ? 1.f * current->second_.size_ / compressedSize : 0.f);
+                    }
+                    PrintLine(fileEntry);
+                }
             }
             break;
         default:
@@ -222,11 +242,12 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     }
 
     unsigned totalDataSize = 0;
+    unsigned lastOffset;
 
     // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-        entries_[i].offset_ = dest.GetSize();
+        lastOffset = entries_[i].offset_ = dest.GetSize();
         String fileFullPath = rootDir + "/" + entries_[i].name_;
 
         File srcFile(context_, fileFullPath);
@@ -258,7 +279,6 @@ void WritePackageFile(const String& fileName, const String& rootDir)
             SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
 
             unsigned pos = 0;
-            unsigned totalPackedBytes = 0;
 
             while (pos < dataSize)
             {
@@ -266,20 +286,25 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (pos + unpackedSize > dataSize)
                     unpackedSize = dataSize - pos;
 
-                unsigned packedSize = LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
+                unsigned packedSize = (unsigned)LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + pos);
 
-                dest.WriteUShort(unpackedSize);
-                dest.WriteUShort(packedSize);
+                dest.WriteUShort((unsigned short)unpackedSize);
+                dest.WriteUShort((unsigned short)packedSize);
                 dest.Write(compressBuffer.Get(), packedSize);
-                totalPackedBytes += 6 + packedSize;
 
                 pos += unpackedSize;
             }
 
             if (!quiet_)
-                PrintLine(entries_[i].name_ + " in " + String(dataSize) + " out " + String(totalPackedBytes));
+            {
+                unsigned totalPackedBytes = dest.GetSize() - lastOffset;
+                String fileEntry(entries_[i].name_);
+                fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", dataSize, totalPackedBytes,
+                    totalPackedBytes ? 1.f * dataSize / totalPackedBytes : 0.f);
+                PrintLine(fileEntry);
+            }
         }
     }
 
