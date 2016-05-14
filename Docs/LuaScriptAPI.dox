@@ -4020,6 +4020,7 @@ Methods:
 - StringHash GetNameHash() const
 - unsigned GetNumFiles() const
 - unsigned GetTotalSize() const
+- unsigned GetTotalDataSize() const
 - unsigned GetChecksum() const
 - bool IsCompressed() const
 
@@ -4029,6 +4030,7 @@ Properties:
 - StringHash nameHash (readonly)
 - unsigned numFiles (readonly)
 - unsigned totalSize (readonly)
+- unsigned totalDataSize (readonly)
 - unsigned checksum (readonly)
 - bool compressed (readonly)
 

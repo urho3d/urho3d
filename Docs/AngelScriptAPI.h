@@ -7525,6 +7525,8 @@ uint numFiles;
 /* readonly */
 int refs;
 /* readonly */
+uint totalDataSize;
+/* readonly */
 uint totalSize;
 /* readonly */
 StringHash type;
