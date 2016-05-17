@@ -883,6 +883,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     RegisterRefCounted<Pass>(engine, "Pass");
     engine->RegisterObjectMethod("Pass", "void set_blendMode(BlendMode)", asMETHOD(Pass, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "BlendMode get_blendMode() const", asMETHOD(Pass, GetBlendMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pass", "void set_cullMode(CullMode)", asMETHOD(Pass, SetCullMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Pass", "CullMode get_cullMode() const", asMETHOD(Pass, GetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_depthTestMode(CompareMode)", asMETHOD(Pass, SetDepthTestMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "CompareMode get_depthTestMode() const", asMETHOD(Pass, GetDepthTestMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_lightingMode(PassLightingMode)", asMETHOD(Pass, SetLightingMode), asCALL_THISCALL);

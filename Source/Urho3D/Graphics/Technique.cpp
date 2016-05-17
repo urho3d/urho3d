@@ -37,6 +37,8 @@
 namespace Urho3D
 {
 
+extern const char* cullModeNames[];
+
 const char* blendModeNames[] =
 {
     "replace",
@@ -73,6 +75,7 @@ static const char* lightingModeNames[] =
 
 Pass::Pass(const String& name) :
     blendMode_(BLEND_REPLACE),
+    cullMode_(MAX_CULLMODES),
     depthTestMode_(CMP_LESSEQUAL),
     lightingMode_(LIGHTING_UNLIT),
     shadersLoadedFrameNumber_(0),
@@ -98,6 +101,11 @@ Pass::~Pass()
 void Pass::SetBlendMode(BlendMode mode)
 {
     blendMode_ = mode;
+}
+
+void Pass::SetCullMode(CullMode mode)
+{
+    cullMode_ = mode;
 }
 
 void Pass::SetDepthTestMode(CompareMode mode)
@@ -260,6 +268,12 @@ bool Technique::BeginLoad(Deserializer& source)
             {
                 String blend = passElem.GetAttributeLower("blend");
                 newPass->SetBlendMode((BlendMode)GetStringListIndex(blend.CString(), blendModeNames, BLEND_REPLACE));
+            }
+
+            if (passElem.HasAttribute("cull"))
+            {
+                String cull = passElem.GetAttributeLower("cull");
+                newPass->SetCullMode((CullMode)GetStringListIndex(cull.CString(), cullModeNames, MAX_CULLMODES));
             }
 
             if (passElem.HasAttribute("depthtest"))
