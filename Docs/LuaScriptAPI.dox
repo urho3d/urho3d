@@ -4203,6 +4203,7 @@ Properties:
 Methods:
 
 - void SetBlendMode(BlendMode mode)
+- void SetCullMode(CullMode mode)
 - void SetDepthTestMode(CompareMode mode)
 - void SetLightingMode(PassLightingMode mode)
 - void SetDepthWrite(bool enable)
@@ -4215,6 +4216,7 @@ Methods:
 - void ReleaseShaders()
 - const String GetName() const
 - unsigned GetIndex() const
+- CullMode GetCullMode() const
 - BlendMode GetBlendMode() const
 - CompareMode GetDepthTestMode() const
 - PassLightingMode GetLightingMode() const
@@ -4231,6 +4233,7 @@ Properties:
 - String name (readonly)
 - unsigned index (readonly)
 - BlendMode blendMode
+- CullMode cullMode
 - CompareMode depthTestMode
 - PassLightingMode lightingMode
 - bool depthWrite
