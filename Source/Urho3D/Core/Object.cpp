@@ -1,4 +1,3 @@
-
 //
 // Copyright (c) 2008-2016 the Urho3D project.
 //
@@ -26,8 +25,11 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
+#include "../Core/EventProfiler.h"
+#include "../Container/HashMap.h"
 
 #include "../DebugNew.h"
+
 
 namespace Urho3D
 {
@@ -302,6 +304,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         URHO3D_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
+#ifdef URHO3D_PROFILING
+    EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+    if (eventProfiler)
+        eventProfiler->BeginBlock(eventType);
+#endif
 
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
@@ -398,6 +405,11 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
 
     context->EndSendEvent();
+
+#ifdef URHO3D_PROFILING
+    if (eventProfiler)
+        eventProfiler->EndBlock();
+#endif
 }
 
 VariantMap& Object::GetEventDataMap() const
@@ -533,6 +545,26 @@ void Object::RemoveEventSender(Object* sender)
             handler = eventHandlers_.Next(handler);
         }
     }
+}
+
+
+Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
+{  
+    StringHash id(eventName);
+    GetEventNameMap()[id] = eventName;
+    return id;
+}
+
+const String& EventNameRegistrar::GetEventName(StringHash eventID) 
+{
+    HashMap<StringHash, String>::ConstIterator it = GetEventNameMap().Find(eventID);
+    return  it != GetEventNameMap().End() ? it->second_ : String::EMPTY ;
+}
+
+HashMap<StringHash, String>& EventNameRegistrar::GetEventNameMap()
+{
+    static HashMap<StringHash, String> eventNames_;
+    return eventNames_;
 }
 
 }

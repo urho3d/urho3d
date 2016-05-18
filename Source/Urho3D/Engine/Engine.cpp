@@ -27,6 +27,7 @@
 #include "../Core/CoreEvents.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Profiler.h"
+#include "../Core/EventProfiler.h"
 #include "../Core/WorkQueue.h"
 #include "../Engine/Console.h"
 #include "../Engine/DebugHud.h"
@@ -63,6 +64,7 @@
 #endif
 
 #include "../DebugNew.h"
+
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // From dbgint.h
@@ -422,7 +424,14 @@ bool Engine::Initialize(const VariantMap& parameters)
             SharedPtr<Object> object = i->second_->CreateObject();
     }
 #endif
-
+#ifdef URHO3D_PROFILING
+    if (GetParameter(parameters, "EventProfiler", true).GetBool())
+    {
+        EventProfiler* evpr = new EventProfiler(context_);
+        context_->RegisterSubsystem(evpr);
+        evpr->SetActive(true);
+    }
+#endif
     frameTimer_.Reset();
 
     URHO3D_LOGINFO("Initialized engine");
@@ -446,7 +455,11 @@ void Engine::RunFrame()
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
     Audio* audio = GetSubsystem<Audio>();
-
+#ifdef URHO3D_PROFILING
+    EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+    if (eventProfiler)
+        eventProfiler->BeginFrame();
+#endif
     time->BeginFrame(timeStep_);
 
     // If pause when minimized -mode is in use, stop updates and audio as necessary
@@ -474,6 +487,10 @@ void Engine::RunFrame()
     ApplyFrameLimit();
 
     time->EndFrame();
+#ifdef URHO3D_PROFILING
+    if (eventProfiler)
+        eventProfiler->EndFrame();
+#endif
 }
 
 Console* Engine::CreateConsole()
