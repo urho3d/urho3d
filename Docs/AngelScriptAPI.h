@@ -7841,6 +7841,7 @@ class Pass
 // Properties:
 bool alphaMask;
 BlendMode blendMode;
+CullMode cullMode;
 CompareMode depthTestMode;
 bool depthWrite;
 bool desktop;

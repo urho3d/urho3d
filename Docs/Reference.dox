@@ -1266,6 +1266,7 @@ A technique definition looks like this:
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
+        [cull="cw|ccw|none"]
         depthtest="always|equal|less|lessequal|greater|greaterequal"
         depthwrite="true|false"
         alphamask="true|false" />
@@ -1275,6 +1276,8 @@ A technique definition looks like this:
 \endcode
 
 The "desktop" attribute in either technique or pass allows to specify it requires desktop graphics hardware (exclude mobile devices.) Omitting it is the same as specifying false.
+
+A pass should normally not define culling mode, but it can optionally specify it to override the value in the material.
 
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 

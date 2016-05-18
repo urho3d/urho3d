@@ -206,7 +206,12 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         graphics->SetBlendMode(blend);
 
         bool isShadowPass = pass_->GetIndex() == Technique::shadowPassIndex;
-        renderer->SetCullMode(isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode(), camera);
+        CullMode effectiveCullMode = pass_->GetCullMode();
+        // Get cull mode from material if pass doesn't override it
+        if (effectiveCullMode == MAX_CULLMODES)
+            effectiveCullMode = isShadowPass ? material_->GetShadowCullMode() : material_->GetCullMode();
+
+        renderer->SetCullMode(effectiveCullMode, camera);
         if (!isShadowPass)
         {
             const BiasParameters& depthBias = material_->GetDepthBias();

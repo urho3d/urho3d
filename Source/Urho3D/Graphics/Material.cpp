@@ -78,7 +78,7 @@ static const char* textureUnitNames[] =
 #endif
 };
 
-static const char* cullModeNames[] =
+const char* cullModeNames[] =
 {
     "none",
     "ccw",
