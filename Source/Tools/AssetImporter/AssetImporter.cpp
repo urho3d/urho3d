@@ -214,7 +214,7 @@ void Run(const Vector<String>& arguments)
             "See http://assimp.sourceforge.net/main_features_formats.html for input formats\n\n"
             "Commands:\n"
             "model       Output a model\n"
-            "anim        Output a animation\n"
+            "anim        Output animation(s)\n"
             "scene       Output a scene\n"
             "node        Output a node and its children (prefab)\n"
             "dump        Dump scene node structure. No output file is generated\n"
@@ -470,8 +470,10 @@ void Run(const Vector<String>& arguments)
             ExportModel(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
 
         if (command == "anim")
+        {
+            noMaterials_ = true;
             ExportAnimation(outFile, scene_->mFlags & AI_SCENE_FLAGS_INCOMPLETE);
-
+        }
         if (command == "scene" || command == "node")
         {
             bool asPrefab = command == "node";
