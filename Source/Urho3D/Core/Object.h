@@ -357,7 +357,7 @@ private:
 #endif
 
 /// Register event names.
-struct EventNameRegistrar
+struct URHO3D_API EventNameRegistrar
 {
     static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.

@@ -164,6 +164,11 @@ unsigned Time::GetSystemTime()
     return Tick();
 }
 
+long long Time::GetSystemHiresTime()
+{
+    return HiresTick();
+}
+
 unsigned Time::GetTimeSinceEpoch()
 {
     return (unsigned)time(NULL);

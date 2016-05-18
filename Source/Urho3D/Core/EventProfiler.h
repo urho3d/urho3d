@@ -174,16 +174,11 @@ public:
     /// Destruct.
     virtual ~EventProfiler();
 
-    /// Activate the event profiler to collect information. Request deactivation, will delete all blocks!
-    void SetActive(bool active);
-    /// Return true if active.
-    bool IsActive() const { return active_; }
-
     /// Begin timing a profiling block.
     void BeginBlock(StringHash eventID)
     {
         // Profiler supports only the main thread currently
-        if (!active_ || !Thread::IsMainThread())
+        if (!Thread::IsMainThread())
             return;
 
         current_ = current_->GetChild(eventID);
@@ -193,7 +188,7 @@ public:
     /// End timing the current profiling block.
     void EndBlock()
     {
-        if (!active_ || !Thread::IsMainThread())
+        if (!Thread::IsMainThread())
             return;
 
         if (current_ != root_)
@@ -219,8 +214,6 @@ public:
 private:
     /// Return profiling data as text output for a specified profiling block.
     void PrintData(EventProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
-    /// Is the profiler collecting event information.
-    bool active_;
     /// Current profiling block.
     EventProfilerBlock* current_;
     /// Root profiling block.

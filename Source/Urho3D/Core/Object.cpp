@@ -305,9 +305,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         return;
     }
 #ifdef URHO3D_PROFILING
-    EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
-    if (eventProfiler)
-        eventProfiler->BeginBlock(eventType);
+    if (context_->GetSubsystemStatic<EventProfiler>())
+        context_->GetSubsystemStatic<EventProfiler>()->BeginBlock(eventType);
 #endif
 
     // Make a weak pointer to self to check for destruction during event handling
@@ -407,8 +406,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->EndSendEvent();
 
 #ifdef URHO3D_PROFILING
-    if (eventProfiler)
-        eventProfiler->EndBlock();
+    if (context_->GetSubsystemStatic<EventProfiler>())
+        context_->GetSubsystemStatic<EventProfiler>()->EndBlock();
 #endif
 }
 

@@ -37,7 +37,6 @@ static const int NAME_MAX_LENGTH = 30;
 
 EventProfiler::EventProfiler(Context* context) : 
     Object(context),
-    active_(false),
     current_(0),
     root_(0),
     intervalFrames_(0),
@@ -54,25 +53,9 @@ EventProfiler::~EventProfiler()
     root_ = 0;
 }
 
-void EventProfiler::SetActive(bool active)
-{
-    if (!active && active_)
-    {
-        /// deleting all blocks and creating new root block.
-        delete root_;
-        root_ = 0;
-        root_ = new EventProfilerBlock(0, "Root");
-        current_ = root_;
-        current_->name_ = "Root";
-    }
-    
-    active_ = active;
-}
 
 void EventProfiler::BeginFrame()
 {
-    if (!active_)
-        return;
     // End the previous frame if any
     EndFrame();
 
@@ -82,8 +65,7 @@ void EventProfiler::BeginFrame()
 
 void EventProfiler::EndFrame()
 {
-    if (!active_)
-        return;
+
     if (current_ != root_)
     {
         EndBlock();
@@ -98,8 +80,6 @@ void EventProfiler::EndFrame()
 
 void EventProfiler::BeginInterval()
 {
-    if (!active_)
-        return;
     root_->BeginInterval();
     intervalFrames_ = 0;
 }

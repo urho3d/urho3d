@@ -25,6 +25,7 @@
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
 #include "../Container/HashSet.h"
+#include "../Container/Ptr.h"
 
 namespace Urho3D
 {
@@ -70,6 +71,8 @@ public:
     template <class T> void RegisterFactory();
     /// Template version of registering an object factory with category.
     template <class T> void RegisterFactory(const char* category);
+    /// Template version of registering a subsystem.
+    template <class T> void RegisterSubsystemStatic();
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
@@ -114,6 +117,8 @@ public:
     AttributeInfo* GetAttribute(StringHash objectType, const char* name);
     /// Template version of returning a subsystem.
     template <class T> T* GetSubsystem() const;
+    /// Template version of returning a subsystem that saved the Subsystem in a static variable for fast access.
+    template <class T> T* GetSubsystemStatic();
     /// Template version of returning a specific attribute description.
     template <class T> AttributeInfo* GetAttribute(const char* name);
 
@@ -155,6 +160,8 @@ public:
     }
 
 private:
+    /// Template version of caching the Subsystem in a static variable for fast access.
+    template <class T> WeakPtr<T>& CacheSubsystem();
     /// Add event receiver.
     void AddEventReceiver(Object* receiver, StringHash eventType);
     /// Add event receiver for specific event.
@@ -206,7 +213,7 @@ template <class T> void Context::RegisterFactory(const char* category)
     RegisterFactory(new ObjectFactoryImpl<T>(this), category);
 }
 
-template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
+template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic());  CacheSubsystem<T>().Reset(); }
 
 template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
 
@@ -216,7 +223,31 @@ template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttribu
 
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 
+template <class T> T* Context::GetSubsystemStatic() { return CacheSubsystem<T>().Get(); }
+
 template <class T> AttributeInfo* Context::GetAttribute(const char* name) { return GetAttribute(T::GetTypeStatic(), name); }
+
+template <class T> void Context::RegisterSubsystemStatic()
+{
+// check if already created 
+    if (CacheSubsystem<T>().Null())
+    {
+        // check if already registered
+        HashMap<StringHash, SharedPtr<Object> >::Iterator it = subsystems_.Find(T::GetTypeStatic());
+        if (it != subsystems_.End())
+        {
+            CacheSubsystem<T>() =static_cast<T*>( it->second_.Get());
+        }
+        else
+        {
+            T* subSystem = new T(this);
+            RegisterSubsystem(subSystem);
+            CacheSubsystem<T>() = subSystem;
+        }
+    }
+}
+
+template <class T> WeakPtr<T>& Context::CacheSubsystem() { static WeakPtr<T> cachedSubsystem(NULL); return cachedSubsystem; }
 
 template <class T> void Context::UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue)
 {
