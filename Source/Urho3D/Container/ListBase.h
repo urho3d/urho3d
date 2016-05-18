@@ -95,6 +95,8 @@ class URHO3D_API ListBase
 public:
     /// Construct.
     ListBase() :
+        head_(0),
+        tail_(0),
         allocator_(0),
         size_(0)
     {
