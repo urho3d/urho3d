@@ -243,9 +243,11 @@ Image::Image(Context* context) :
     height_(0),
     depth_(0),
     components_(0),
+    numCompressedLevels_(0),
     cubemap_(false),
     array_(false),
-    sRGB_(false)
+    sRGB_(false),
+    compressedFormat_(CF_NONE)
 {
 }
 
