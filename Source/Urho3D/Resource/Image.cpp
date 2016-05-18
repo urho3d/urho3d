@@ -1182,7 +1182,7 @@ bool Image::SavePNG(const String& fileName) const
             bool success = false;
             File outFile(context_, fileName, FILE_WRITE);
             if (outFile.IsOpen())
-                success = outFile.Write(png, (unsigned)len) == len;
+                success = outFile.Write(png, len) == len;
             STBIW_FREE(png);
             return success;
         }
