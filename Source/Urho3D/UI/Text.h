@@ -38,7 +38,11 @@ enum TextEffect
 {
     TE_NONE = 0,
     TE_SHADOW,
-    TE_STROKE
+    TE_STROKE,
+    TE_STROKE2,
+    TE_STROKE3,
+    TE_STROKE4,
+    TE_STROKE5
 };
 
 /// Cached character location and size within text. Used for queries related to text editing.
