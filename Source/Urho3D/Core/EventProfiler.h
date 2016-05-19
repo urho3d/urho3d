@@ -35,7 +35,7 @@ namespace Urho3D
 class URHO3D_API EventProfilerBlock
 {
 public:
-    /// Construct with the specified parent block and name.
+    /// Construct with the specified parent block and event id.
     EventProfilerBlock(EventProfilerBlock* parent, StringHash eventID) :
         eventID_(eventID),
         name_(0),
@@ -163,7 +163,7 @@ public:
     unsigned totalCount_;
 };
 
-/// Hierarchical performance profiler subsystem.
+/// Hierarchical performance event profiler subsystem.
 class URHO3D_API EventProfiler : public Object
 {
     URHO3D_OBJECT(EventProfiler, Object);
@@ -175,15 +175,15 @@ public:
     virtual ~EventProfiler();
 
     /// Activate the event profiler to collect information. Request deactivation, will delete all blocks!
-    void SetActive(bool active);
+    static void SetActive(bool active);
     /// Return true if active.
-    bool IsActive() const { return active_; }
+    static bool IsActive() { return active_; }
 
     /// Begin timing a profiling block.
     void BeginBlock(StringHash eventID)
     {
         // Profiler supports only the main thread currently
-        if (!active_ || !Thread::IsMainThread())
+        if ( !Thread::IsMainThread())
             return;
 
         current_ = current_->GetChild(eventID);
@@ -193,7 +193,7 @@ public:
     /// End timing the current profiling block.
     void EndBlock()
     {
-        if (!active_ || !Thread::IsMainThread())
+        if (!Thread::IsMainThread())
             return;
 
         if (current_ != root_)
@@ -203,13 +203,14 @@ public:
         }
     }
 
-    /// Begin the profiling frame. Called by HandleBeginFrame().
+    /// Begin the profiling frame. Called by Engine::RunFrame().
     void BeginFrame();
-    /// End the profiling frame. Called by HandleEndFrame().
+    /// End the profiling frame. Called by Engine::RunFrame().
     void EndFrame();
     /// Begin a new interval.
     void BeginInterval();
-
+    /// Delete all blocks and recreate root block.
+    void Clear();
     /// Return profiling data as text output.
     String PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
     /// Return the current profiling block.
@@ -219,8 +220,6 @@ public:
 private:
     /// Return profiling data as text output for a specified profiling block.
     void PrintData(EventProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
-    /// Is the profiler collecting event information.
-    bool active_;
     /// Current profiling block.
     EventProfilerBlock* current_;
     /// Root profiling block.
@@ -229,30 +228,8 @@ private:
     unsigned intervalFrames_;
     /// Total frames.
     unsigned totalFrames_;
-};
-
-/// Helper class for automatically beginning and ending a profiling block
-class URHO3D_API AutoEventProfileBlock
-{
-public:
-    /// Construct. Begin a profiling block with the specified name and optional call count.
-    AutoEventProfileBlock(EventProfiler* profiler, StringHash eventID) :
-        profiler_(profiler)
-    {
-        if (profiler_)
-            profiler_->BeginBlock(eventID);
-    }
-
-    /// Destruct. End the profiling block.
-    ~AutoEventProfileBlock()
-    {
-        if (profiler_)
-            profiler_->EndBlock();
-    }
-
-private:
-    /// Profiler.
-    EventProfiler* profiler_;
+    /// Profiler active.
+    static bool active_;
 };
 
 }

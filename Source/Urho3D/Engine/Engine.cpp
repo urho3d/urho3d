@@ -427,9 +427,8 @@ bool Engine::Initialize(const VariantMap& parameters)
 #ifdef URHO3D_PROFILING
     if (GetParameter(parameters, "EventProfiler", true).GetBool())
     {
-        EventProfiler* evpr = new EventProfiler(context_);
-        context_->RegisterSubsystem(evpr);
-        evpr->SetActive(true);
+        context_->RegisterSubsystem(new EventProfiler(context_));
+        EventProfiler::SetActive(true);
     }
 #endif
     frameTimer_.Reset();
@@ -455,11 +454,16 @@ void Engine::RunFrame()
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
     Audio* audio = GetSubsystem<Audio>();
+
 #ifdef URHO3D_PROFILING
-    EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
-    if (eventProfiler)
-        eventProfiler->BeginFrame();
+    if (EventProfiler::IsActive())
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->BeginFrame();
+    }
 #endif
+
     time->BeginFrame(timeStep_);
 
     // If pause when minimized -mode is in use, stop updates and audio as necessary
@@ -487,10 +491,6 @@ void Engine::RunFrame()
     ApplyFrameLimit();
 
     time->EndFrame();
-#ifdef URHO3D_PROFILING
-    if (eventProfiler)
-        eventProfiler->EndFrame();
-#endif
 }
 
 Console* Engine::CreateConsole()

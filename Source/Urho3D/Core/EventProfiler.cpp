@@ -37,7 +37,6 @@ static const int NAME_MAX_LENGTH = 30;
 
 EventProfiler::EventProfiler(Context* context) : 
     Object(context),
-    active_(false),
     current_(0),
     root_(0),
     intervalFrames_(0),
@@ -56,23 +55,11 @@ EventProfiler::~EventProfiler()
 
 void EventProfiler::SetActive(bool active)
 {
-    if (!active && active_)
-    {
-        /// deleting all blocks and creating new root block.
-        delete root_;
-        root_ = 0;
-        root_ = new EventProfilerBlock(0, "Root");
-        current_ = root_;
-        current_->name_ = "Root";
-    }
-    
     active_ = active;
 }
 
 void EventProfiler::BeginFrame()
 {
-    if (!active_)
-        return;
     // End the previous frame if any
     EndFrame();
 
@@ -82,8 +69,6 @@ void EventProfiler::BeginFrame()
 
 void EventProfiler::EndFrame()
 {
-    if (!active_)
-        return;
     if (current_ != root_)
     {
         EndBlock();
@@ -98,10 +83,17 @@ void EventProfiler::EndFrame()
 
 void EventProfiler::BeginInterval()
 {
-    if (!active_)
-        return;
+
     root_->BeginInterval();
     intervalFrames_ = 0;
+}
+
+void EventProfiler::Clear()
+{
+    delete root_;
+    root_ = new EventProfilerBlock(0, "Root");
+    current_ = root_;
+    current_->name_ = "Root";
 }
 
 Urho3D::String EventProfiler::PrintData(bool showUnused /*= false*/, bool showTotal /*= false*/, unsigned maxDepth /*= M_MAX_UNSIGNED*/) const
@@ -179,5 +171,7 @@ void EventProfiler::PrintData(EventProfilerBlock* block, String& output, unsigne
     for (HashMap<StringHash, EventProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
         PrintData(i->second_, output, depth, maxDepth, showUnused, showTotal);
 }
+
+bool EventProfiler::active_ = false;
 
 }

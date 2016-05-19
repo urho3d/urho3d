@@ -240,17 +240,21 @@ void DebugHud::SetMode(unsigned mode)
 #ifdef URHO3D_PROFILING
     if ((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0)
     {
+        // event profiler is created on engine initialization if "EventProfiler" parameter is set
         EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
-        if (!eventProfiler)
-            context_->RegisterSubsystem(eventProfiler = new EventProfiler(context_));
         if (eventProfiler)
-            eventProfiler->SetActive(true);
+            EventProfiler::SetActive(true);
     }
     else
     {
+        // event profiler is created on engine initialization if "EventProfiler" parameter is set
         EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
-            eventProfiler->SetActive(false);
+        {
+            EventProfiler::SetActive(false);
+            eventProfiler->Clear();
+        }
+           
     }
 #endif
     mode_ = mode;
