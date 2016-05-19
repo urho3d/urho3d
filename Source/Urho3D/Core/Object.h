@@ -361,7 +361,7 @@ struct URHO3D_API EventNameRegistrar
 {
     static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.
-    static const String& GetEventName(StringHash eventID );
+    static const String& GetEventName(StringHash eventID);
     /// Return Event name map.
     static HashMap<StringHash, String>& GetEventNameMap();
 };

@@ -304,8 +304,9 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         URHO3D_LOGERROR("Sending events is only supported from the main thread");
         return;
     }
+
 #ifdef URHO3D_PROFILING
-    EventProfiler* eventProfiler = NULL;
+    EventProfiler* eventProfiler = 0;
     if (EventProfiler::IsActive())
     {
         eventProfiler = GetSubsystem<EventProfiler>();
@@ -340,6 +341,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             if (self.Expired())
             {
                 context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                if (eventProfiler)
+                    eventProfiler->EndBlock();
+#endif
                 return;
             }
 
@@ -372,6 +377,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (self.Expired())
                 {
                     context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                    if (eventProfiler)
+                         eventProfiler->EndBlock();
+#endif
                     return;
                 }
 
@@ -398,6 +407,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     if (self.Expired())
                     {
                         context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                        if (eventProfiler)
+                            eventProfiler->EndBlock();
+#endif
                         return;
                     }
 
@@ -411,11 +424,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->EndSendEvent();
 
 #ifdef URHO3D_PROFILING
-    if (EventProfiler::IsActive())
-    {
-        if (eventProfiler)
-            eventProfiler->EndBlock();
-    }
+    if (eventProfiler)
+        eventProfiler->EndBlock();
 #endif
 }
 
