@@ -489,6 +489,17 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_F4)
         drawOctreeDebug = !drawOctreeDebug;
 
+    if (key == KEY_F5)
+        debugHud.Toggle(DEBUGHUD_SHOW_EVENTPROFILER);
+                // Take screenshot
+    if (key == KEY_F6)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        // Here we save in the Data folder with date and time appended
+        screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }
     // Allow pause only in singleplayer
     if (key == 'P' && singlePlayer && !console.visible && gameOn)
     {
