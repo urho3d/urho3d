@@ -174,10 +174,10 @@ public:
     /// Destruct.
     virtual ~EventProfiler();
 
-    /// Activate the event profiler to collect information. Request deactivation, will delete all blocks!
+    /// Activate the event profiler to collect information. This incurs slight performance hit on each SendEvent. By default inactive.
     static void SetActive(bool active);
     /// Return true if active.
-    static bool IsActive() { return active_; }
+    static bool IsActive() { return active; }
 
     /// Begin timing a profiling block.
     void BeginBlock(StringHash eventID)
@@ -228,8 +228,8 @@ private:
     unsigned intervalFrames_;
     /// Total frames.
     unsigned totalFrames_;
-    /// Profiler active.
-    static bool active_;
+    /// Profiler active. Default false.
+    static bool active;
 };
 
 }

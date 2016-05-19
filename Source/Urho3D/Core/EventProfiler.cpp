@@ -35,6 +35,8 @@ namespace Urho3D
 static const int LINE_MAX_LENGTH = 256;
 static const int NAME_MAX_LENGTH = 30;
 
+bool EventProfiler::active = false;
+
 EventProfiler::EventProfiler(Context* context) : 
     Object(context),
     current_(0),
@@ -53,9 +55,9 @@ EventProfiler::~EventProfiler()
     root_ = 0;
 }
 
-void EventProfiler::SetActive(bool active)
+void EventProfiler::SetActive(bool newActive)
 {
-    active_ = active;
+    active = newActive;
 }
 
 void EventProfiler::BeginFrame()
@@ -171,7 +173,5 @@ void EventProfiler::PrintData(EventProfilerBlock* block, String& output, unsigne
     for (HashMap<StringHash, EventProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
         PrintData(i->second_, output, depth, maxDepth, showUnused, showTotal);
 }
-
-bool EventProfiler::active_ = false;
 
 }
