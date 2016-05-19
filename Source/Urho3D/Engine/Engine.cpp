@@ -115,26 +115,26 @@ Engine::Engine(Context* context) :
     context_->RegisterSubsystem(this);
 
     // Create subsystems which do not depend on engine initialization or startup parameters
-    context_->RegisterSubsystemStatic<Time>();
-    context_->RegisterSubsystemStatic<WorkQueue>();
+    context_->RegisterSubsystem(new Time(context_));
+    context_->RegisterSubsystem(new WorkQueue(context_));
 #ifdef URHO3D_PROFILING
-    context_->RegisterSubsystemStatic<Profiler>();
+    context_->RegisterSubsystem(new Profiler(context_));
 #endif
-    context_->RegisterSubsystemStatic<FileSystem>();
+    context_->RegisterSubsystem(new FileSystem(context_));
 #ifdef URHO3D_LOGGING
-    context_->RegisterSubsystemStatic<Log>();
+    context_->RegisterSubsystem(new Log(context_));
 #endif
-    context_->RegisterSubsystemStatic<ResourceCache>();
-    context_->RegisterSubsystemStatic<Localization>();
+    context_->RegisterSubsystem(new ResourceCache(context_));
+    context_->RegisterSubsystem(new Localization(context_));
 #ifdef URHO3D_NETWORK
-    context_->RegisterSubsystemStatic<Network>();
+    context_->RegisterSubsystem(new Network(context_));
 #endif
 #ifdef URHO3D_DATABASE
-    context_->RegisterSubsystemStatic<Database>();
+    context_->RegisterSubsystem(new Database(context_));
 #endif
-    context_->RegisterSubsystemStatic<Input>();
-    context_->RegisterSubsystemStatic<Audio>();
-    context_->RegisterSubsystemStatic<UI>();
+    context_->RegisterSubsystem(new Input(context_));
+    context_->RegisterSubsystem(new Audio(context_));
+    context_->RegisterSubsystem(new UI(context_));
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
@@ -167,8 +167,8 @@ bool Engine::Initialize(const VariantMap& parameters)
     // Register the rest of the subsystems
     if (!headless_)
     {
-        context_->RegisterSubsystemStatic<Graphics>();
-        context_->RegisterSubsystemStatic<Renderer>();
+        context_->RegisterSubsystem(new Graphics(context_));
+        context_->RegisterSubsystem(new Renderer(context_));
     }
     else
     {
@@ -426,7 +426,11 @@ bool Engine::Initialize(const VariantMap& parameters)
 #endif
 #ifdef URHO3D_PROFILING
     if (GetParameter(parameters, "EventProfiler", true).GetBool())
-        context_->RegisterSubsystemStatic<EventProfiler>();   
+    {
+        EventProfiler* evpr = new EventProfiler(context_);
+        context_->RegisterSubsystem(evpr);
+        evpr->SetActive(true);
+    }
 #endif
     frameTimer_.Reset();
 
@@ -448,13 +452,13 @@ void Engine::RunFrame()
 
     // Note: there is a minimal performance cost to looking up subsystems (uses a hashmap); if they would be looked up several
     // times per frame it would be better to cache the pointers
-    Time* time = context_->GetSubsystemStatic<Time>();
-    Input* input = context_->GetSubsystemStatic<Input>();
-    Audio* audio = context_->GetSubsystemStatic<Audio>();
+    Time* time = GetSubsystem<Time>();
+    Input* input = GetSubsystem<Input>();
+    Audio* audio = GetSubsystem<Audio>();
 #ifdef URHO3D_PROFILING
-
-    if (context_->GetSubsystemStatic<EventProfiler>())
-        context_->GetSubsystemStatic<EventProfiler>()->BeginFrame();
+    EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+    if (eventProfiler)
+        eventProfiler->BeginFrame();
 #endif
     time->BeginFrame(timeStep_);
 
@@ -484,8 +488,8 @@ void Engine::RunFrame()
 
     time->EndFrame();
 #ifdef URHO3D_PROFILING
-    if (context_->GetSubsystemStatic<EventProfiler>())
-        context_->GetSubsystemStatic<EventProfiler>()->EndFrame();
+    if (eventProfiler)
+        eventProfiler->EndFrame();
 #endif
 }
 
@@ -495,10 +499,14 @@ Console* Engine::CreateConsole()
         return 0;
 
     // Return existing console if possible
-    if (!context_->GetSubsystemStatic<Console>())
-        context_->RegisterSubsystemStatic<Console>();
-    
-    return context_->GetSubsystemStatic<Console>();
+    Console* console = GetSubsystem<Console>();
+    if (!console)
+    {
+        console = new Console(context_);
+        context_->RegisterSubsystem(console);
+    }
+
+    return console;
 }
 
 DebugHud* Engine::CreateDebugHud()
@@ -507,10 +515,14 @@ DebugHud* Engine::CreateDebugHud()
         return 0;
 
     // Return existing debug HUD if possible
-    if (!context_->GetSubsystemStatic<DebugHud>())
-        context_->RegisterSubsystemStatic<DebugHud>();
+    DebugHud* debugHud = GetSubsystem<DebugHud>();
+    if (!debugHud)
+    {
+        debugHud = new DebugHud(context_);
+        context_->RegisterSubsystem(debugHud);
+    }
 
-    return context_->GetSubsystemStatic<DebugHud>();
+    return debugHud;
 }
 
 void Engine::SetTimeStepSmoothing(int frames)
@@ -563,14 +575,15 @@ void Engine::Exit()
 
 void Engine::DumpProfiler()
 {
-    if (context_->GetSubsystemStatic<Profiler>())
-        URHO3D_LOGRAW(context_->GetSubsystemStatic<Profiler>()->PrintData(true, true) + "\n");
+    Profiler* profiler = GetSubsystem<Profiler>();
+    if (profiler)
+        URHO3D_LOGRAW(profiler->PrintData(true, true) + "\n");
 }
 
 void Engine::DumpResources(bool dumpFileName)
 {
 #ifdef URHO3D_LOGGING
-    ResourceCache* cache = context_->GetSubsystemStatic<ResourceCache>();
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     const HashMap<StringHash, ResourceGroup>& resourceGroups = cache->GetAllResources();
     URHO3D_LOGRAW("\n");
 
@@ -663,12 +676,12 @@ void Engine::Render()
     URHO3D_PROFILE(Render);
 
     // If device is lost, BeginFrame will fail and we skip rendering
-    Graphics* graphics = context_->GetSubsystemStatic<Graphics>();
+    Graphics* graphics = GetSubsystem<Graphics>();
     if (!graphics->BeginFrame())
         return;
 
-    context_->GetSubsystemStatic<Renderer>()->Render();
-    context_->GetSubsystemStatic<UI>()->Render();
+    GetSubsystem<Renderer>()->Render();
+    GetSubsystem<UI>()->Render();
     graphics->EndFrame();
 }
 
@@ -678,7 +691,7 @@ void Engine::ApplyFrameLimit()
         return;
 
     unsigned maxFps = maxFps_;
-    Input* input = context_->GetSubsystemStatic<Input>();
+    Input* input = GetSubsystem<Input>();
     if (input && !input->HasFocus())
         maxFps = Min(maxInactiveFps_, maxFps);
 
@@ -923,7 +936,7 @@ void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void Engine::DoExit()
 {
-    Graphics* graphics = context_->GetSubsystemStatic<Graphics>();
+    Graphics* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();
 

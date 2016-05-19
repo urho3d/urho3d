@@ -238,18 +238,20 @@ void DebugHud::SetMode(unsigned mode)
     memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
     eventProfilerText_->SetVisible((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
 #ifdef URHO3D_PROFILING
-//     if ((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0)
-//     {
-//         EventProfiler* eventProfiler = context_->GetSubsystemStatic<EventProfiler>();
-//         if (!eventProfiler)
-//             context_->RegisterSubsystemStatic<EventProfiler>();
-//     }
-//     else
-//     {
-//         if (context_->GetSubsystemStatic<EventProfiler>())
-//             context_->RemoveSubsystem<EventProfiler>();
-// 
-//     }
+    if ((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0)
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (!eventProfiler)
+            context_->RegisterSubsystem(eventProfiler = new EventProfiler(context_));
+        if (eventProfiler)
+            eventProfiler->SetActive(true);
+    }
+    else
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->SetActive(false);
+    }
 #endif
     mode_ = mode;
 }
