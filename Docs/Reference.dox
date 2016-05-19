@@ -77,6 +77,7 @@ After Engine initialization, the following subsystems will always exist:
 The following subsystems are optional, so GetSubsystem() may return null if they have not been created:
 
 - Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
+- EventProfiler: Same as Profiler but for events.
 - Graphics: Manages the application window, the rendering context and resources. Exists if not in headless mode.
 - Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
 - Script: Provides the AngelScript execution environment. Needs to be created and registered manually.
@@ -185,6 +186,7 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
+- EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
 - ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
