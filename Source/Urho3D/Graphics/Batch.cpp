@@ -235,7 +235,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     unsigned viewportHash = (unsigned)(viewSize.x_ | (viewSize.y_ << 16));
     if (graphics->NeedParameterUpdate(SP_CAMERA, reinterpret_cast<const void*>(cameraHash + viewportHash)))
     {
-        view->SetCameraShaderParameters(camera, true);
+        view->SetCameraShaderParameters(camera);
         // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
         view->SetGBufferShaderParameters(viewSize, IntRect(0, 0, viewSize.x_, viewSize.y_));
     }
