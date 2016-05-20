@@ -7952,8 +7952,8 @@ Properties:
 - Renderer* GetRenderer()
 - Time* GetTime()
 - UI* GetUI()
-- bool HasSubscribedToEvent(const String eventName)
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
+- bool HasSubscribedToEvent(const String eventName)
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
@@ -7972,9 +7972,10 @@ Properties:
 - float Random()
 - float Random(float range)
 - float Random(float min, float max)
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
+- void RegisterEventName(const String eventName)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
 - unsigned SDBMHash(unsigned hash, char c)
@@ -7986,8 +7987,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -8070,6 +8071,8 @@ Properties:
 - unsigned DD_TARGET
 - unsigned DEBUGHUD_SHOW_ALL
 - unsigned DEBUGHUD_SHOW_ALL_MEMORY
+- unsigned DEBUGHUD_SHOW_EVENTPROFILER
+- unsigned DEBUGHUD_SHOW_MEMORY
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_PROFILER

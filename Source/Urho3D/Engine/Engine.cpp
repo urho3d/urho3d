@@ -27,6 +27,7 @@
 #include "../Core/CoreEvents.h"
 #include "../Core/ProcessUtils.h"
 #include "../Core/Profiler.h"
+#include "../Core/EventProfiler.h"
 #include "../Core/WorkQueue.h"
 #include "../Engine/Console.h"
 #include "../Engine/DebugHud.h"
@@ -63,6 +64,7 @@
 #endif
 
 #include "../DebugNew.h"
+
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 // From dbgint.h
@@ -422,7 +424,13 @@ bool Engine::Initialize(const VariantMap& parameters)
             SharedPtr<Object> object = i->second_->CreateObject();
     }
 #endif
-
+#ifdef URHO3D_PROFILING
+    if (GetParameter(parameters, "EventProfiler", true).GetBool())
+    {
+        context_->RegisterSubsystem(new EventProfiler(context_));
+        EventProfiler::SetActive(true);
+    }
+#endif
     frameTimer_.Reset();
 
     URHO3D_LOGINFO("Initialized engine");
@@ -446,6 +454,15 @@ void Engine::RunFrame()
     Time* time = GetSubsystem<Time>();
     Input* input = GetSubsystem<Input>();
     Audio* audio = GetSubsystem<Audio>();
+
+#ifdef URHO3D_PROFILING
+    if (EventProfiler::IsActive())
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->BeginFrame();
+    }
+#endif
 
     time->BeginFrame(timeStep_);
 

@@ -1159,39 +1159,9 @@ bool Image::SavePNG(const String& fileName) const
 {
     URHO3D_PROFILE(SaveImagePNG);
 
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
-    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
-    {
-        URHO3D_LOGERROR("Access denied to " + fileName);
-        return false;
-    }
-
-    if (IsCompressed())
-    {
-        URHO3D_LOGERROR("Can not save compressed image to PNG");
-        return false;
-    }
-
-    if (data_)
-    {
-        int len;
-        unsigned char* png =  stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
-
-        if (png)
-        {
-            bool success = false;
-            File outFile(context_, fileName, FILE_WRITE);
-            if (outFile.IsOpen())
-                success = outFile.Write(png, len) == len;
-            STBIW_FREE(png);
-            return success;
-        }
-        else
-        {
-            URHO3D_LOGERROR("No data produced for image save to PNG");
-            return false;
-        }
-    }
+    File outFile(context_, fileName, FILE_WRITE);
+    if (outFile.IsOpen())
+        return Image::Save(outFile); // Save uses PNG format
     else
         return false;
 }

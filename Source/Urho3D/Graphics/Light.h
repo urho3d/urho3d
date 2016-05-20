@@ -304,6 +304,9 @@ public:
     /// Return shape texture attribute.
     ResourceRef GetShapeTextureAttr() const;
 
+    /// Return a transform for deferred fullscreen quad (directional light) rendering.
+    static Matrix3x4 GetFullscreenQuadTransform(Camera* camera);
+
 protected:
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
