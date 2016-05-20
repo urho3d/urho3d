@@ -1173,7 +1173,25 @@ bool Image::SavePNG(const String& fileName) const
     }
 
     if (data_)
-        return stbi_write_png(GetNativePath(fileName).CString(), width_, height_, components_, data_.Get(), 0) != 0;
+    {
+        int len;
+        unsigned char* png =  stbi_write_png_to_mem(data_.Get(), 0, width_, height_, components_, &len);
+
+        if (png)
+        {
+            bool success = false;
+            File outFile(context_, fileName, FILE_WRITE);
+            if (outFile.IsOpen())
+                success = outFile.Write(png, len) == len;
+            STBIW_FREE(png);
+            return success;
+        }
+        else
+        {
+            URHO3D_LOGERROR("No data produced for image save to PNG");
+            return false;
+        }
+    }
     else
         return false;
 }
