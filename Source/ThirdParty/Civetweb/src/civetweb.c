@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+// Modified by cosmy1 for Urho3D
+
 #if defined(_WIN32)
 #if !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS /* Disable deprecation warning in VS2005 */
@@ -319,6 +321,10 @@ typedef DWORD clockid_t;
 #define CLOCK_REALTIME (2)
 #endif
 
+// Urho3D: fix VC15 compilation issue
+#if defined(_MSC_VER) && (_MSC_VER >= 1900)
+#define _TIMESPEC_DEFINED
+#endif
 #ifndef _TIMESPEC_DEFINED
 struct timespec {
 	time_t tv_sec; /* seconds */
