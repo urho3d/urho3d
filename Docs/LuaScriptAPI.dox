@@ -5232,7 +5232,7 @@ Properties:
 - String varNamesAttr
 
 <a name="Class_ScrollBar"></a>
-### ScrollBar : UIElement
+### ScrollBar : BorderImage
 
 Methods:
 

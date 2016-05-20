@@ -1768,6 +1768,13 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 - %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
 - %Orientation : int
 - %Range : float
 - %Value : float
