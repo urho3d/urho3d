@@ -53,6 +53,7 @@ struct CompressedLevel
     /// Construct empty.
     CompressedLevel() :
         data_(0),
+        format_(CF_NONE),
         width_(0),
         height_(0),
         depth_(0),

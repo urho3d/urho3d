@@ -10,6 +10,7 @@ enum PassLightingMode
 class Pass : public RefCounted
 {
     void SetBlendMode(BlendMode mode);
+    void SetCullMode(CullMode mode);
     void SetDepthTestMode(CompareMode mode);
     void SetLightingMode(PassLightingMode mode);
     void SetDepthWrite(bool enable);
@@ -23,6 +24,7 @@ class Pass : public RefCounted
 
     const String GetName() const;
     unsigned GetIndex() const;
+    CullMode GetCullMode() const;
     BlendMode GetBlendMode() const;
     CompareMode GetDepthTestMode() const;
     PassLightingMode GetLightingMode() const;
@@ -37,6 +39,7 @@ class Pass : public RefCounted
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned index;
     tolua_property__get_set BlendMode blendMode;
+    tolua_property__get_set CullMode cullMode;
     tolua_property__get_set CompareMode depthTestMode;
     tolua_property__get_set PassLightingMode lightingMode;
     tolua_property__get_set bool depthWrite;

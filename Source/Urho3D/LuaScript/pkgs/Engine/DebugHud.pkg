@@ -4,8 +4,10 @@ static const unsigned DEBUGHUD_SHOW_NONE;
 static const unsigned DEBUGHUD_SHOW_STATS;
 static const unsigned DEBUGHUD_SHOW_MODE;
 static const unsigned DEBUGHUD_SHOW_PROFILER;
+static const unsigned DEBUGHUD_SHOW_MEMORY;
 static const unsigned DEBUGHUD_SHOW_ALL;
 static const unsigned DEBUGHUD_SHOW_ALL_MEMORY;
+static const unsigned DEBUGHUD_SHOW_EVENTPROFILER;
 
 class DebugHud : public Object
 {

@@ -1947,7 +1947,7 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
     graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness_ / shadowMap->GetWidth(), 0.0f));
 
     graphics_->SetTexture(TU_DIFFUSE, shadowMap);
-    view->DrawFullscreenQuad(false);
+    view->DrawFullscreenQuad(true);
 
     // Vertical blur
     graphics_->SetRenderTarget(0, shadowMap);
@@ -1956,6 +1956,6 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
     graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness_ / shadowMap->GetHeight()));
 
     graphics_->SetTexture(TU_DIFFUSE, tmpBuffer);
-    view->DrawFullscreenQuad(false);
+    view->DrawFullscreenQuad(true);
 }
 }

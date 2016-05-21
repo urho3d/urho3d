@@ -49,6 +49,8 @@ public:
 
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
+    /// Set culling mode override. By default culling mode is read from the material instead. Set the illegal culling mode MAX_CULLMODES to disable override again.
+    void SetCullMode(CullMode mode);
     /// Set depth compare mode.
     void SetDepthTestMode(CompareMode mode);
     /// Set pass lighting mode, affects what shader variations will be attempted to be loaded.
@@ -80,6 +82,9 @@ public:
 
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
+    /// Return culling mode override. If pass is not overriding culling mode (default), the illegal mode MAX_CULLMODES is returned.
+    CullMode GetCullMode() const { return cullMode_; }
 
     /// Return depth compare mode.
     CompareMode GetDepthTestMode() const { return depthTestMode_; }
@@ -122,6 +127,8 @@ private:
     unsigned index_;
     /// Blend mode.
     BlendMode blendMode_;
+    /// Culling mode.
+    CullMode cullMode_;
     /// Depth compare mode.
     CompareMode depthTestMode_;
     /// Lighting mode.

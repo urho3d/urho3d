@@ -7841,6 +7841,7 @@ class Pass
 // Properties:
 bool alphaMask;
 BlendMode blendMode;
+CullMode cullMode;
 CompareMode depthTestMode;
 bool depthWrite;
 bool desktop;
@@ -14348,6 +14349,7 @@ int RandomInt();
 int RandomInt(int);
 int RandomInt(int, int);
 float RandomNormal(float, float);
+void RegisterEventName(const String&);
 void Remove();
 String RemoveTrailingSlash(const String&);
 String ReplaceExtension(const String&, const String&);
@@ -14448,6 +14450,7 @@ uint DD_SOURCE_AND_TARGET;
 uint DD_TARGET;
 uint DEBUGHUD_SHOW_ALL;
 uint DEBUGHUD_SHOW_ALL_MEMORY;
+uint DEBUGHUD_SHOW_EVENTPROFILER;
 uint DEBUGHUD_SHOW_MEMORY;
 uint DEBUGHUD_SHOW_MODE;
 uint DEBUGHUD_SHOW_NONE;

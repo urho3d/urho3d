@@ -107,6 +107,8 @@ public:
 
     /// Construct.
     HashBase() :
+        head_(0),
+        tail_(0),
         ptrs_(0),
         allocator_(0)
     {
