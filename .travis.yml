@@ -311,7 +311,7 @@ before_script:
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
   - travis_retry brew install ccache $cmake $doxygen
-  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml openssl pkg-config readline'
+  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
   - for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
   - for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
   - brew cleanup
