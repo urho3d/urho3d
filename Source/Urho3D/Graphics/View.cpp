@@ -2974,23 +2974,23 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     // Set shadow depth bias
     BiasParameters parameters = queue.light_->GetShadowBias();
 
-    // the shadow map is a depth stencil map
+    // The shadow map is a depth stencil texture
     if (shadowMap->GetUsage() == TEXTURE_DEPTHSTENCIL)
     {
         graphics_->SetColorWrite(false);
         graphics_->SetDepthStencil(shadowMap);
         graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
-        // disable other render targets
+        // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH);
     }
-    else // if the shadow map is a render texture
+    else // if the shadow map is a color rendertarget
     {
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap);
-        // disable other render targets
+        // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
@@ -3032,8 +3032,9 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         }
     }
 
-    renderer_->ApplyShadowMapFilter(this, shadowMap);
-
+    // Scale filter blur amount to shadow map viewport size so that different shadow map resolutions don't behave differently
+    float blurScale = queue.shadowSplits_[0].shadowViewport_.Width() / 1024.0f;
+    renderer_->ApplyShadowMapFilter(this, shadowMap, blurScale);
 
     // reset some parameters
     graphics_->SetColorWrite(true);

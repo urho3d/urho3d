@@ -173,7 +173,7 @@ class URHO3D_API Renderer : public Object
     URHO3D_OBJECT(Renderer, Object);
 
 public:
-    typedef void(Object::*ShadowMapFilter)(View* view, Texture2D* shadowMap);
+    typedef void(Object::*ShadowMapFilter)(View* view, Texture2D* shadowMap, float blurScale);
 
     /// Construct.
     Renderer(Context* context);
@@ -242,7 +242,7 @@ public:
     void ReloadShaders();
 
     /// Apply post processing filter to the shadow map. Called by View.
-    void ApplyShadowMapFilter(View* view, Texture2D* shadowMap);
+    void ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blurScale);
 
     /// Return number of backbuffer viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
@@ -456,7 +456,7 @@ private:
     /// Handle render update event.
     void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
     /// Blur the shadow map.
-    void BlurShadowMap(View* view, Texture2D* shadowMap);
+    void BlurShadowMap(View* view, Texture2D* shadowMap, float blurScale);
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
