@@ -125,56 +125,6 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: VS-CI, active: no, appveyor: yes, last_job: 'x64:SHARED'}
-version: '{build}'
-platform: x64
-clone_depth: 50
-environment:
-  GIT_NAME:
-    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
-  GIT_EMAIL:
-    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
-  GH_TOKEN:
-    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
-  SF_KEY:
-    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
-  SF_API:
-    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
-# Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
-  build_tree: Build
-  config: Release
-  included_sample: PLATFORM=x64 39_CrowdNavigation
-# We cannot afford to have a large matrix on AppVeyor at the moment
-  URHO3D_D3D11: 1
-  matrix:
-    - URHO3D_LIB_TYPE: STATIC
-    - URHO3D_LIB_TYPE: SHARED
-install:
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
-        {
-          $env:PACKAGE_UPLOAD = "1";
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
-          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
-        }
-        else
-        {
-          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
-        }
-build_script:
-  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
-  - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
-test: off
-artifacts:
-  - path: Build\*.zip
-deploy: off
-
----
-
 branch: {name: Coverity-Scan, active: no, mandatory: yes}
 language: cpp
 compiler: gcc
@@ -361,7 +311,7 @@ before_script:
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
   - travis_retry brew install ccache $cmake $doxygen
-  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml openssl pkg-config readline'
+  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
   - for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
   - for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
   - brew cleanup
