@@ -38,12 +38,7 @@ enum TextEffect
 {
     TE_NONE = 0,
     TE_SHADOW,
-    TE_STROKE,
-    TE_STROKE2,
-    TE_STROKE3,
-    TE_STROKE4,
-    TE_STROKE5,
-    TE_STROKECUSTOM
+    TE_STROKE
 };
 
 /// Cached character location and size within text. Used for queries related to text editing.
@@ -122,6 +117,12 @@ public:
     void SetHoverColor(const Color& color);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
+    /// Set shadow offset.
+    void SetEffectShadowOffset(IntVector2 offset);
+    /// Set stroke thickness.
+    void SetEffectStrokeThickness(int thickness);
+    /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    void SetEffectRoundStroke(bool roundCorners);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
 
@@ -186,6 +187,13 @@ public:
     /// Return effect Z bias.
     float GetEffectDepthBias() const { return effectDepthBias_; }
 
+    /// Return effect shadow offset.
+    IntVector2 GetEffectShadowOffset() { return shadowOffset_; }
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() { return strokeThickness_; }
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() { return roundStroke_; }
+
     /// Set font attribute.
     void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
@@ -233,6 +241,12 @@ protected:
     Color hoverColor_;
     /// Text effect.
     TextEffect textEffect_;
+    /// Text effect shadow offset.
+    IntVector2 shadowOffset_;
+    /// Text effect stroke thickness.
+    int strokeThickness_;
+    /// Text effect stroke rounding flag.
+    bool roundStroke_;
     /// Effect color.
     Color effectColor_;
     /// Text effect Z bias.

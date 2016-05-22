@@ -43,11 +43,6 @@ const char* textEffects[] =
     "None",
     "Shadow",
     "Stroke",
-    "Stroke 2",
-    "Stroke 3",
-    "Stroke 4",
-    "Stroke 5",
-    "Stroke Custom",
     0
 };
 
@@ -69,6 +64,9 @@ Text::Text(Context* context) :
     selectionColor_(Color::TRANSPARENT),
     hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
+    shadowOffset_(IntVector2(1, 1)),
+    strokeThickness_(1),
+    roundStroke_(false),
     effectColor_(Color::BLACK),
     effectDepthBias_(0.0f),
     rowHeight_(0)
@@ -97,6 +95,9 @@ void Text::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
+    URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, shadowOffset_, IntVector2(1, 1), AM_FILE);
+    URHO3D_ATTRIBUTE("Stroke Thickness", int, strokeThickness_, 1, AM_FILE);
+    URHO3D_ATTRIBUTE("Round Stroke", bool, roundStroke_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
 
     // Change the default value for UseDerivedOpacity
@@ -196,150 +197,42 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             break;
 
         case TE_SHADOW:
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, shadowOffset_.x_, shadowOffset_.y_, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
 
         case TE_STROKE:
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            break;
-
-        case TE_STROKE2:
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            break;
-
-        case TE_STROKE3:
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            break;
-
-        case TE_STROKE4:
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            break;
-
-        case TE_STROKE5:
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 5, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 5, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 5, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 4, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 3, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 2, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, 4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, 3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, 2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -5, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -5, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -5, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, -2, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -4, -3, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -3, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -2, -4, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -5, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            break;
-
-        case TE_STROKECUSTOM:
-            /*
-            int thickness = 12;
-            // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
-            // Adding to thickness helps with thickness of 1 not having enought samples for this formula
-            // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
-            int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
-            float angle = 360.f / samples;
-            for (int i = 0; i < samples; ++i)
+            if (roundStroke_)
             {
-                float x = cos(angle * i * M_PI / 180.f) * thickness;
-                float y = sin(angle * i * M_PI / 180.f) * thickness;
-                ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+                // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
+                // Adding to thickness helps with thickness of 1 not having enought samples for this formula
+                // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
+                int samples = strokeThickness_ * strokeThickness_ + (strokeThickness_ % 2 == 0 ? 4 : 3);
+                float angle = 360.f / samples;
+                for (int i = 0; i < samples; ++i)
+                {
+                    float x = cos(angle * i * M_PI / 180.f) * strokeThickness_;
+                    float y = sin(angle * i * M_PI / 180.f) * strokeThickness_;
+                    ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+                }
             }
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
-            */
-
-            int thickness = 12;
-            // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
-            // Adding to thickness helps with thickness of 1 not having enought samples for this formula
-            // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
-            int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
-            float angle = 360.f / samples;
-            for (int i = 0; i < samples; ++i)
+            else
             {
-                float x = i * thickness;
-                float y = i * thickness;
-                ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+                float offset = strokeThickness_ / 2.f;
+                offset = floor(offset + .5f);
+                int x, y;
+                for (x = -(int)offset; x <= (int)offset; ++x)
+                {
+                    for (y = -(int)offset; y <= (int)offset; ++y)
+                    {
+                        // Don't draw glyphs that aren't on the edges
+                        if (x > -(int)offset && x < (int)offset &&
+                            y > -(int)offset && y < (int)offset)
+                            continue;
+
+                        ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
+                    }
+                }
             }
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
@@ -502,6 +395,20 @@ void Text::SetTextEffect(TextEffect textEffect)
     textEffect_ = textEffect;
 }
 
+void Text::SetEffectShadowOffset(IntVector2 offset)
+{
+    shadowOffset_ = offset;
+}
+
+void Text::SetEffectStrokeThickness(int thickness)
+{
+    strokeThickness_ = thickness;
+}
+
+void Text::SetEffectRoundStroke(bool roundStroke)
+{
+    roundStroke_ = roundStroke;
+}
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
