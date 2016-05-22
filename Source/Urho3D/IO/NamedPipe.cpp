@@ -160,7 +160,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
         WriteFile(handle_, data, size, &written, 0);
         return written;
     }
-    
+
     return 0;
 }
 
@@ -179,7 +179,7 @@ void NamedPipe::Close()
         CloseHandle(handle_);
         handle_ = INVALID_HANDLE_VALUE;
         pipeName_.Clear();
-        
+
         URHO3D_LOGDEBUG("Closed named pipe " + pipeName_);
     }
 }
@@ -233,7 +233,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         {
             URHO3D_LOGERROR("Failed to create named pipe " + pipeName);
             SAFE_CLOSE(readHandle_);
-            SAFE_CLOSE(writeHandle_);        
+            SAFE_CLOSE(writeHandle_);
             unlink(serverReadName.CString());
             unlink(clientReadName.CString());
             return false;
@@ -241,8 +241,8 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         else
         {
             URHO3D_LOGDEBUG("Created named pipe " + pipeName);
-            isServer_ = true;
             pipeName_ = pipeName;
+            isServer_ = true;
             return true;
         }
     }
@@ -254,9 +254,9 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         {
             URHO3D_LOGERROR("Failed to connect to named pipe " + pipeName);
             SAFE_CLOSE(readHandle_);
-            SAFE_CLOSE(writeHandle_);   
+            SAFE_CLOSE(writeHandle_);
             return false;
-        } 
+        }
         else
         {
             URHO3D_LOGDEBUG("Connected to named pipe " + pipeName);
@@ -296,7 +296,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
         else
             writeHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_WRONLY | O_NDELAY);
     }
- 
+
     // Loop until all bytes written in case of partial write
     if (writeHandle_ != -1)
     {
@@ -306,7 +306,7 @@ unsigned NamedPipe::Write(const void* data, unsigned size)
             ssize_t writtenNow = write(writeHandle_, ((const unsigned char*)data) + written, size - written);
             if (writtenNow < 0)
                 return 0; // Error while writing
-            written += writtenNow;               
+            written += writtenNow;
         }
 
         return (unsigned)written;
@@ -321,14 +321,14 @@ void NamedPipe::Close()
     {
         URHO3D_PROFILE(CloseNamedPipe);
         SAFE_CLOSE(readHandle_);
-        SAFE_CLOSE(writeHandle_);   
+        SAFE_CLOSE(writeHandle_);
 
         if (isServer_)
         {
             String serverReadName = pipePath + pipeName_ + "SR";
             String clientReadName = pipePath + pipeName_ + "CR";
-            unlink(serverReadName.CString());                        
-            unlink(clientReadName.CString());  
+            unlink(serverReadName.CString());
+            unlink(clientReadName.CString());
             isServer_ = false;
         }
 
@@ -361,7 +361,7 @@ bool NamedPipe::IsEof() const
         struct timeval timeout;
         timeout.tv_sec = 0;
         timeout.tv_usec = 1000; // 1ms timeout for select
-    
+
         return select(readHandle_ + 1, &set, 0, 0, &timeout) <= 0;
     }
     else
