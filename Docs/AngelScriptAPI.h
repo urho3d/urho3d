@@ -6669,6 +6669,107 @@ uint useTimer;
 int weakRefs;
 };
 
+class NamedPipe
+{
+// Methods:
+void Close();
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+bool Open(const String&, bool);
+Array<uint8> Read(uint);
+bool ReadBool();
+BoundingBox ReadBoundingBox();
+int8 ReadByte();
+Color ReadColor();
+double ReadDouble();
+String ReadFileID();
+float ReadFloat();
+int ReadInt();
+IntRect ReadIntRect();
+IntVector2 ReadIntVector2();
+String ReadLine();
+Matrix3 ReadMatrix3();
+Matrix3x4 ReadMatrix3x4();
+Matrix4 ReadMatrix4();
+uint ReadNetID();
+Quaternion ReadPackedQuaternion();
+Vector3 ReadPackedVector3(float);
+Quaternion ReadQuaternion();
+int16 ReadShort();
+String ReadString();
+StringHash ReadStringHash();
+uint8 ReadUByte();
+uint ReadUInt();
+uint16 ReadUShort();
+uint ReadVLE();
+Variant ReadVariant();
+VariantMap ReadVariantMap();
+Vector2 ReadVector2();
+Vector3 ReadVector3();
+Vector4 ReadVector4();
+VectorBuffer ReadVectorBuffer(uint);
+uint Seek(uint);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+uint Write(Array<uint8>);
+bool WriteBool(bool);
+bool WriteBoundingBox(const BoundingBox&);
+bool WriteByte(int8);
+bool WriteColor(const Color&);
+bool WriteDouble(double);
+bool WriteFileID(const String&);
+bool WriteFloat(float);
+bool WriteInt(int);
+bool WriteIntRect(const IntRect&);
+bool WriteIntVector2(const IntVector2&);
+bool WriteLine(const String&);
+bool WriteMatrix3(const Matrix3&);
+bool WriteMatrix3x4(const Matrix3x4&);
+bool WriteMatrix4(const Matrix4&);
+bool WriteNetID(uint);
+bool WritePackedQuaternion(const Quaternion&);
+bool WritePackedVector3(const Vector3&, float);
+bool WriteQuaternion(const Quaternion&);
+bool WriteShort(int16);
+bool WriteString(const String&);
+bool WriteStringHash(const StringHash&);
+bool WriteUByte(uint8);
+bool WriteUInt(uint);
+bool WriteUShort(uint16);
+bool WriteVLE(uint);
+bool WriteVariant(const Variant&);
+bool WriteVariantMap(const VariantMap&);
+bool WriteVector2(const Vector2&);
+bool WriteVector3(const Vector3&);
+bool WriteVector4(const Vector4&);
+bool WriteVectorBuffer(const VectorBuffer&);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+uint checksum;
+/* readonly */
+bool eof;
+/* readonly */
+String name;
+/* readonly */
+bool open;
+/* readonly */
+uint position;
+/* readonly */
+int refs;
+/* readonly */
+bool server;
+/* readonly */
+uint size;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class NavArea
 {
 // Methods:
