@@ -47,6 +47,7 @@ const char* textEffects[] =
     "Stroke 3",
     "Stroke 4",
     "Stroke 5",
+    "Stroke Custom",
     0
 };
 
@@ -308,6 +309,38 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             ConstructBatch(pageBatch, pageGlyphLocation, -3, -4, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, -2, -4, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, -1, -5, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+            break;
+
+        case TE_STROKECUSTOM:
+            /*
+            int thickness = 12;
+            // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
+            // Adding to thickness helps with thickness of 1 not having enought samples for this formula
+            // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
+            int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
+            float angle = 360.f / samples;
+            for (int i = 0; i < samples; ++i)
+            {
+                float x = cos(angle * i * M_PI / 180.f) * thickness;
+                float y = sin(angle * i * M_PI / 180.f) * thickness;
+                ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+            }
+            ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
+            */
+
+            int thickness = 12;
+            // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
+            // Adding to thickness helps with thickness of 1 not having enought samples for this formula
+            // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
+            int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
+            float angle = 360.f / samples;
+            for (int i = 0; i < samples; ++i)
+            {
+                float x = i * thickness;
+                float y = i * thickness;
+                ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+            }
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
         }

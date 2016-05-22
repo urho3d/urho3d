@@ -42,7 +42,8 @@ enum TextEffect
     TE_STROKE2,
     TE_STROKE3,
     TE_STROKE4,
-    TE_STROKE5
+    TE_STROKE5,
+    TE_STROKECUSTOM
 };
 
 /// Cached character location and size within text. Used for queries related to text editing.
