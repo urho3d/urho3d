@@ -209,6 +209,10 @@ static const String pipePath("/tmp/");
 
 bool NamedPipe::Open(const String& pipeName, bool isServer)
 {
+#ifdef __EMSCRIPTEN__
+    URHO3D_LOGERROR("Opening a named pipe not supported on Web platform");
+    return false;
+#else
     URHO3D_PROFILE(OpenNamedPipe);
 
     Close();
@@ -264,6 +268,7 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             return true;
         }
     }
+#endif
 }
 
 unsigned NamedPipe::Read(void* dest, unsigned size)
@@ -343,6 +348,9 @@ bool NamedPipe::IsOpen() const
 
 bool NamedPipe::IsEof() const
 {
+#ifdef __EMSCRIPTEN__
+    return true;
+#else
     // Attempt to open late if only the write handle is open yet
     if (readHandle_ == -1 && writeHandle_ != -1)
     {
@@ -366,6 +374,7 @@ bool NamedPipe::IsEof() const
     }
     else
         return true;
+#endif
 }
 #endif
 
