@@ -409,6 +409,7 @@ void Text::SetEffectRoundStroke(bool roundStroke)
 {
     roundStroke_ = roundStroke;
 }
+
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
