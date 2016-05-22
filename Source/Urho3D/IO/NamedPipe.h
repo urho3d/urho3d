@@ -54,7 +54,7 @@ public:
     /// Write bytes to the pipe. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size);
     /// Return whether pipe has no data available.
-    virtual bool IsEof() const { return GetAvailableSize() == 0; }
+    virtual bool IsEof() const;
     /// Return the pipe name.
     virtual const String& GetName() const { return pipeName_; }
 
@@ -67,8 +67,6 @@ public:
     bool IsOpen() const;
     /// Return whether is in server mode.
     bool IsServer() const { return isServer_; }
-    /// Return amount of bytes available to read from the pipe.
-    unsigned GetAvailableSize() const;
 
 private:
     /// Pipe name.
@@ -76,7 +74,12 @@ private:
     /// Server mode flag.
     bool isServer_;
     /// Pipe handle.
+#ifdef _WIN32
     void* handle_;
+#else
+    mutable int readHandle_;
+    mutable int writeHandle_;
+#endif
 };
 
 }

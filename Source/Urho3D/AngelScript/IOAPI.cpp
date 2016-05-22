@@ -309,7 +309,6 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("NamedPipe", "void Close()", asMETHOD(NamedPipe, Close), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "bool get_server() const", asMETHOD(NamedPipe, IsServer), asCALL_THISCALL);
     engine->RegisterObjectMethod("NamedPipe", "bool get_open() const", asMETHOD(NamedPipe, IsOpen), asCALL_THISCALL);
-    engine->RegisterObjectMethod("NamedPipe", "uint get_availableSize() const", asMETHOD(NamedPipe, GetAvailableSize), asCALL_THISCALL);
     RegisterSerializer<File>(engine, "NamedPipe");
     RegisterDeserializer<File>(engine, "NamedPipe");
 

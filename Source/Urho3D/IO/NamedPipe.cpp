@@ -28,6 +28,11 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#else
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <unistd.h>
 #endif
 
 #include "../DebugNew.h"
@@ -43,7 +48,8 @@ NamedPipe::NamedPipe(Context* context) :
 #ifdef _WIN32
     handle_(INVALID_HANDLE_VALUE)
 #else
-    handle_(0)
+    readHandle_(-1),
+    writeHandle_(-1)
 #endif
 {
 }
@@ -54,7 +60,8 @@ NamedPipe::NamedPipe(Context* context, const String& pipeName, bool isServer) :
 #ifdef _WIN32
     handle_(INVALID_HANDLE_VALUE)
 #else
-    handle_(0)
+    readHandle_(-1),
+    writeHandle_(-1)
 #endif
 {
     Open(pipeName, isServer);
@@ -65,13 +72,18 @@ NamedPipe::~NamedPipe()
     Close();
 }
 
+unsigned NamedPipe::Seek(unsigned position)
+{
+    return 0;
+}
+
 #ifdef _WIN32
+
+static const String pipePath("\\\\.\\pipe\\");
 
 bool NamedPipe::Open(const String& pipeName, bool isServer)
 {
     URHO3D_PROFILE(OpenNamedPipe);
-
-    const String pipePath("\\\\.\\pipe\\");
 
     Close();
 
@@ -97,7 +109,9 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
         else
         {
             URHO3D_LOGDEBUG("Created named pipe " + pipeName);
+            pipeName_ = pipeName;
             isServer_ = true;
+            return true;
         }
     }
     else
@@ -118,10 +132,12 @@ bool NamedPipe::Open(const String& pipeName, bool isServer)
             return false;
         }
         else
+        {
             URHO3D_LOGDEBUG("Connected to named pipe " + pipeName);
+            pipeName_ = pipeName;
+            return true;
+        }
     }
-
-    return true;
 }
 
 unsigned NamedPipe::Read(void* dest, unsigned size)
@@ -133,11 +149,6 @@ unsigned NamedPipe::Read(void* dest, unsigned size)
         return read;
     }
 
-    return 0;
-}
-
-unsigned NamedPipe::Seek(unsigned position)
-{
     return 0;
 }
 
@@ -167,6 +178,7 @@ void NamedPipe::Close()
 
         CloseHandle(handle_);
         handle_ = INVALID_HANDLE_VALUE;
+        pipeName_.Clear();
         
         URHO3D_LOGDEBUG("Closed named pipe " + pipeName_);
     }
@@ -177,18 +189,184 @@ bool NamedPipe::IsOpen() const
     return handle_ != INVALID_HANDLE_VALUE;
 }
 
-unsigned NamedPipe::GetAvailableSize() const
+bool NamedPipe::IsEof() const
 {
     if (handle_ != INVALID_HANDLE_VALUE)
     {
         DWORD bytesAvailable = 0;
         PeekNamedPipe(handle_, 0, 0, 0, &bytesAvailable, 0);
-        return bytesAvailable;
+        return bytesAvailable == 0;
     }
-    
-    return 0;
+    else
+        return true;
 }
 
+#else
+
+static const String pipePath("/tmp/");
+
+#define SAFE_CLOSE(handle) if (handle != -1) { close(handle); handle = -1; }
+
+bool NamedPipe::Open(const String& pipeName, bool isServer)
+{
+    URHO3D_PROFILE(OpenNamedPipe);
+
+    Close();
+
+    isServer_ = false;
+
+    String serverReadName = pipePath + pipeName + "SR";
+    String clientReadName = pipePath + pipeName + "CR";
+
+    // Make sure SIGPIPE is ignored and will not lead to process termination
+    signal(SIGPIPE, SIG_IGN);
+
+    if (isServer)
+    {
+        mkfifo(serverReadName.CString(), 0660);
+        mkfifo(clientReadName.CString(), 0660);
+
+        readHandle_ = open(serverReadName.CString(), O_RDONLY | O_NDELAY);
+        writeHandle_ = open(clientReadName.CString(), O_WRONLY | O_NDELAY);
+
+        if (readHandle_ == -1 && writeHandle_ == -1)
+        {
+            URHO3D_LOGERROR("Failed to create named pipe " + pipeName);
+            SAFE_CLOSE(readHandle_);
+            SAFE_CLOSE(writeHandle_);        
+            unlink(serverReadName.CString());
+            unlink(clientReadName.CString());
+            return false;
+        }
+        else
+        {
+            URHO3D_LOGDEBUG("Created named pipe " + pipeName);
+            isServer_ = true;
+            pipeName_ = pipeName;
+            return true;
+        }
+    }
+    else
+    {
+        readHandle_ = open(clientReadName.CString(), O_RDONLY | O_NDELAY);
+        writeHandle_ = open(serverReadName.CString(), O_WRONLY | O_NDELAY);
+        if (readHandle_ == -1 && writeHandle_ == -1)
+        {
+            URHO3D_LOGERROR("Failed to connect to named pipe " + pipeName);
+            SAFE_CLOSE(readHandle_);
+            SAFE_CLOSE(writeHandle_);   
+            return false;
+        } 
+        else
+        {
+            URHO3D_LOGDEBUG("Connected to named pipe " + pipeName);
+            pipeName_ = pipeName;
+            return true;
+        }
+    }
+}
+
+unsigned NamedPipe::Read(void* dest, unsigned size)
+{
+    // Attempt to open late if only the write handle is open yet
+    if (readHandle_ == -1 && writeHandle_ != -1)
+    {
+        if (isServer_)
+            readHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_RDONLY | O_NDELAY);
+        else
+            readHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_RDONLY | O_NDELAY);
+    }
+
+    if (readHandle_ != -1)
+    {
+        ssize_t readNow = read(readHandle_, dest, size);
+        return readNow < 0 ? 0 : (unsigned)readNow;
+    }
+    else
+        return 0;
+}
+
+unsigned NamedPipe::Write(const void* data, unsigned size)
+{
+    // Attempt to open late if only the read handle is open yet
+    if (writeHandle_ == -1 && readHandle_ != -1)
+    {
+        if (isServer_)
+            writeHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_WRONLY | O_NDELAY);
+        else
+            writeHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_WRONLY | O_NDELAY);
+    }
+ 
+    // Loop until all bytes written in case of partial write
+    if (writeHandle_ != -1)
+    {
+        ssize_t written = 0;
+        while (written < (ssize_t)size)
+        {
+            ssize_t writtenNow = write(writeHandle_, ((const unsigned char*)data) + written, size - written);
+            if (writtenNow < 0)
+                return 0; // Error while writing
+            written += writtenNow;               
+        }
+
+        return (unsigned)written;
+    }
+    else
+        return 0;
+}
+
+void NamedPipe::Close()
+{
+    if (readHandle_ != -1 || writeHandle_ != -1)
+    {
+        URHO3D_PROFILE(CloseNamedPipe);
+        SAFE_CLOSE(readHandle_);
+        SAFE_CLOSE(writeHandle_);   
+
+        if (isServer_)
+        {
+            String serverReadName = pipePath + pipeName_ + "SR";
+            String clientReadName = pipePath + pipeName_ + "CR";
+            unlink(serverReadName.CString());                        
+            unlink(clientReadName.CString());  
+            isServer_ = false;
+        }
+
+        pipeName_.Clear();
+    }
+}
+
+bool NamedPipe::IsOpen() const
+{
+    return readHandle_ != -1 || writeHandle_ != -1;
+}
+
+bool NamedPipe::IsEof() const
+{
+    // Attempt to open late if only the write handle is open yet
+    if (readHandle_ == -1 && writeHandle_ != -1)
+    {
+        if (isServer_)
+            readHandle_ = open((pipePath + pipeName_ + "SR").CString(), O_RDONLY | O_NDELAY);
+        else
+            readHandle_ = open((pipePath + pipeName_ + "CR").CString(), O_RDONLY | O_NDELAY);
+    }
+
+    if (readHandle_ != -1)
+    {
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(readHandle_, &set);
+
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 1000; // 1ms timeout for select
+    
+        return select(readHandle_ + 1, &set, 0, 0, &timeout) <= 0;
+    }
+    else
+        return true;
+}
 #endif
 
 }

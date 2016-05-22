@@ -8,7 +8,6 @@ class NamedPipe : public Object
 
     bool Open(const String pipeName, bool isServer);
     void Close();
-    unsigned GetAvailableSize() const;
     bool IsOpen() const;
 
     // From Deserializer
@@ -105,7 +104,6 @@ class NamedPipe : public Object
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__is_set bool eof;
 
-    tolua_readonly tolua_property__get_set unsigned availableSize;
     tolua_readonly tolua_property__is_set bool open;
 };
 

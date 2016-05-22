@@ -3142,7 +3142,7 @@ void Graphics::PrepareDraw()
                     SetVBO(buffer->GetGPUObject());
                     glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
                         element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
-                        (const void *)dataStart);
+                        (const void *)(size_t)dataStart);
                 }
             }
         }
