@@ -58,7 +58,7 @@ function HandleUpdate(eventType, eventData)
         -- Get message data
         else
             if httpRequest.availableSize > 0 then
-                message = message + httpRequest:ReadLine()
+                message = message .. httpRequest:ReadLine()
             else
                 text.text = "Processing..."
 

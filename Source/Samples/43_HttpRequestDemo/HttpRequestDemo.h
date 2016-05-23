@@ -24,6 +24,12 @@
 
 #include "Sample.h"
 
+namespace Urho3D
+{
+    class HttpRequest;
+    class Text;
+}
+
 /// Http request example.
 /// This example demonstrates:
 ///     - How to use Http request API
