@@ -25,6 +25,7 @@
 #include "../AngelScript/APITemplates.h"
 #include "../IO/Compression.h"
 #include "../IO/FileSystem.h"
+#include "../IO/NamedPipe.h"
 #include "../IO/PackageFile.h"
 
 namespace Urho3D
@@ -169,6 +170,16 @@ static File* ConstructFileAndOpen(const String& fileName, FileMode mode)
     return new File(GetScriptContext(), fileName, mode);
 }
 
+static NamedPipe* ConstructNamedPipe()
+{
+    return new NamedPipe(GetScriptContext());
+}
+
+static NamedPipe* ConstructNamedPipeAndOpen(const String& fileName, bool isServer)
+{
+    return new NamedPipe(GetScriptContext(), fileName, isServer);
+}
+
 static void ConstructVectorBuffer(VectorBuffer* ptr)
 {
     new(ptr) VectorBuffer();
@@ -290,6 +301,16 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectMethod("File", "bool get_packaged()", asMETHOD(File, IsPackaged), asCALL_THISCALL);
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");
+
+    RegisterObject<NamedPipe>(engine, "NamedPipe");
+    engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f()", asFUNCTION(ConstructNamedPipe), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f(const String&in, bool)", asFUNCTION(ConstructNamedPipeAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod("NamedPipe", "bool Open(const String&in, bool)", asMETHODPR(NamedPipe, Open, (const String&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "void Close()", asMETHOD(NamedPipe, Close), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "bool get_server() const", asMETHOD(NamedPipe, IsServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "bool get_open() const", asMETHOD(NamedPipe, IsOpen), asCALL_THISCALL);
+    RegisterSerializer<File>(engine, "NamedPipe");
+    RegisterDeserializer<File>(engine, "NamedPipe");
 
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);

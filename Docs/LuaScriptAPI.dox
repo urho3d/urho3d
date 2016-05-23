@@ -114,6 +114,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NamedPipe"><b>NamedPipe</b></a>
 <a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationGeometryInfo"><b>NavigationGeometryInfo</b></a>
@@ -2860,6 +2861,7 @@ Methods:
 - JSONFile() (GC)
 - JSONFile* new()
 - void delete()
+- bool FromString(const String source)
 - const JSONValue& GetRoot() const
 - bool Save(const String fileName, const String indentation = "\t") const
 
@@ -3493,6 +3495,102 @@ Properties:
 - Skeleton skeleton (readonly)
 - unsigned numGeometries
 - unsigned numMorphs (readonly)
+
+<a name="Class_NamedPipe"></a>
+### NamedPipe : Object
+
+Methods:
+
+- NamedPipe() (GC)
+- NamedPipe* new()
+- NamedPipe(const String pipeName, bool isServer) (GC)
+- NamedPipe* new(const String pipeName, bool isServer)
+- void delete()
+- bool Open(const String pipeName, bool isServer)
+- void Close()
+- bool IsOpen() const
+- VectorBuffer Read(unsigned size)
+- const String GetName() const
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- char ReadByte()
+- unsigned ReadUInt()
+- short ReadUShort()
+- char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- double ReadDouble()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
+- unsigned Write(const VectorBuffer& buffer)
+- bool WriteInt(int value)
+- bool WriteShort(short value)
+- bool WriteByte(char value)
+- bool WriteUInt(unsigned value)
+- bool WriteUShort(short value)
+- bool WriteUByte(char value)
+- bool WriteBool(bool value)
+- bool WriteFloat(float value)
+- bool WriteDouble(double value)
+- bool WriteIntRect(const IntRect& value)
+- bool WriteIntVector2(const IntVector2& value)
+- bool WriteRect(const Rect& value)
+- bool WriteVector2(const Vector2& value)
+- bool WriteVector3(const Vector3& value)
+- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
+- bool WriteVector4(const Vector4& value)
+- bool WriteQuaternion(const Quaternion& value)
+- bool WritePackedQuaternion(const Quaternion& value)
+- bool WriteMatrix3(const Matrix3& value)
+- bool WriteMatrix3x4(const Matrix3x4& value)
+- bool WriteMatrix4(const Matrix4& value)
+- bool WriteColor(const Color& value)
+- bool WriteBoundingBox(const BoundingBox& value)
+- bool WriteString(const String value)
+- bool WriteFileID(const String value)
+- bool WriteStringHash(const StringHash& value)
+- bool WriteBuffer(const VectorBuffer& buffer)
+- bool WriteResourceRef(const ResourceRef& value)
+- bool WriteResourceRefList(const ResourceRefList& value)
+- bool WriteVariant(const Variant& value)
+- bool WriteVariantData(const Variant& value)
+- bool WriteVariantVector(const VariantVector& value)
+- bool WriteVariantMap(const VariantMap& value)
+- bool WriteVLE(unsigned value)
+- bool WriteNetID(unsigned value)
+- bool WriteLine(const String value)
+
+Properties:
+
+- String name (readonly)
+- bool eof (readonly)
+- bool open (readonly)
 
 <a name="Class_NavArea"></a>
 ### NavArea : Component
