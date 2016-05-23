@@ -5,6 +5,7 @@ class JSONFile : Resource
     JSONFile();
     ~JSONFile();
 
+    bool FromString(const String source);
     const JSONValue& GetRoot() const;
 
     tolua_outside bool JSONFileSave @ Save(const String fileName, const String indentation = "\t") const;

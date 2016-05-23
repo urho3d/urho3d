@@ -1614,13 +1614,11 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
-Finally, there are global settings for the shadow map base resolution, shadow map bit depth (16 or 24 bit) & filtering quality in Renderer.
+\section Lights_ShadowGlobal Global shadow settings
 
-\section Lights_ShadowCulling Shadow culling
+The shadow map base resolution and quality (bit depth & sampling mode) are set through functions in the Renderer subsystem, see \ref Renderer::SetShadowMapSize "SetShadowMapSize()" and \ref Renderer::SetShadowQuality "SetShadowQuality()".
 
-Similarly to light culling with lightmasks, shadowmasks can be used to select which objects should cast shadows with respect to each light. See \ref Drawable::SetShadowMask "SetShadowMask()". A potential shadow caster's shadow mask will be ANDed with the light's lightmask to see if it should be rendered to the light's shadow map. Also, when an object is inside a zone, its shadowmask will be ANDed with the zone's shadowmask as well. By default all bits are set in the shadowmask.
-
-For an example of shadow culling, imagine a house (which itself is a shadow caster) containing several objects inside, and a shadowed directional light shining in from the windows. In that case shadow map rendering can be avoided for objects already in shadow by clearing the respective bit from their shadowmasks.
+The shadow quality enum allows choosing also variance (VSM) shadows instead of the default hardware depth shadows. VSM shadows behave markedly differently; depth bias settings are no longer relevant, but you should make sure all your large surfaces (also ground & terrain) are marked as shadow casters, otherwise shadows cast by objects moving over them can appear unnaturally thin. For VSM shadows, see the functions \ref Renderer::SetShadowSoftness "SetShadowSoftness()" and \ref Renderer::SetVSMShadowParameters "SetVSMShadowParameters()" to control the softness (blurring) and in-shadow detection behavior. Instead of self-shadowing artifacts common with hardware depth shadows, you may encounter light bleeding when shadow casting surfaces are close in light direction to each other, which adjusting the VSM shadow parameters may help.
 
 \section Lights_ShadowMapReuse Shadow map reuse
 
@@ -1629,6 +1627,12 @@ The Renderer can be configured to either reuse shadow maps, or not. To reuse is 
 When reuse is enabled, only one shadow texture of each shadow map size needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
 
 When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows.
+
+\section Lights_ShadowCulling Shadow culling
+
+Similarly to light culling with lightmasks, shadowmasks can be used to select which objects should cast shadows with respect to each light. See \ref Drawable::SetShadowMask "SetShadowMask()". A potential shadow caster's shadow mask will be ANDed with the light's lightmask to see if it should be rendered to the light's shadow map. Also, when an object is inside a zone, its shadowmask will be ANDed with the zone's shadowmask as well. By default all bits are set in the shadowmask.
+
+For an example of shadow culling, imagine a house (which itself is a shadow caster) containing several objects inside, and a shadowed directional light shining in from the windows. In that case shadow map rendering can be avoided for objects already in shadow by clearing the respective bit from their shadowmasks.
 
 
 \page SkeletalAnimation Skeletal animation

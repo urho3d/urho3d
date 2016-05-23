@@ -2517,7 +2517,8 @@ void Graphics::Restore()
         }
 
         // Enable seamless cubemap if possible
-        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+        if (gl3Support || GLEW_ARB_seamless_cube_map)
+            glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 
         // Set up texture data read/write alignment. It is important that this is done before uploading any texture data
@@ -3142,7 +3143,7 @@ void Graphics::PrepareDraw()
                     SetVBO(buffer->GetGPUObject());
                     glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
                         element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
-                        (const void *)dataStart);
+                        (const void *)(size_t)dataStart);
                 }
             }
         }
