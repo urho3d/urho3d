@@ -188,11 +188,11 @@ public:
     float GetEffectDepthBias() const { return effectDepthBias_; }
 
     /// Return effect shadow offset.
-    IntVector2 GetEffectShadowOffset() { return shadowOffset_; }
+    IntVector2 GetEffectShadowOffset() const { return shadowOffset_; }
     /// Return effect stroke thickness.
-    int GetEffectStrokeThickness() { return strokeThickness_; }
+    int GetEffectStrokeThickness() const { return strokeThickness_; }
     /// Return effect round stroke.
-    bool GetEffectRoundStroke() { return roundStroke_; }
+    bool GetEffectRoundStroke() const { return roundStroke_; }
 
     /// Set font attribute.
     void SetFontAttr(const ResourceRef& value);
