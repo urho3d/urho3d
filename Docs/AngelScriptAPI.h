@@ -5477,6 +5477,7 @@ int y;
 class JSONFile
 {
 // Methods:
+bool FromString(const String&);
 JSONValue& GetRoot();
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);

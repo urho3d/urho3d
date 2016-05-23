@@ -2861,6 +2861,7 @@ Methods:
 - JSONFile() (GC)
 - JSONFile* new()
 - void delete()
+- bool FromString(const String source)
 - const JSONValue& GetRoot() const
 - bool Save(const String fileName, const String indentation = "\t") const
 
