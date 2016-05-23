@@ -23,6 +23,7 @@
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Input/Input.h>
+#include <Urho3D/Network/Network.h>
 #include <Urho3D/Network/HttpRequest.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
@@ -81,8 +82,13 @@ void HttpRequestDemo::SubscribeToEvents()
 
 void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
+    Network* network = GetSubsystem<Network>();
+
+    if (!network)
+        return;
+
     if (httpRequest_.Null())
-        httpRequest_ = new HttpRequest("http://httpbin.org/ip", "GET", Vector<String>(), String::EMPTY);
+        httpRequest_ = network->MakeHttpRequest("http://httpbin.org/ip");
     else
     {
         // Initializing HTTP request
