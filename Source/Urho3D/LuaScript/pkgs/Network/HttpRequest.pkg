@@ -8,7 +8,7 @@ enum HttpRequestState
     HTTP_CLOSED
 };
 
-class HttpRequest : public Deserializer
+class HttpRequest
 {
     const String GetURL() const;
     const String GetVerb() const;
@@ -16,7 +16,52 @@ class HttpRequest : public Deserializer
     HttpRequestState GetState() const;
     unsigned GetAvailableSize() const;
     bool IsOpen() const;
+
+    // From Deserializer
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer HttpRequestRead @ Read(unsigned size);
+    bool IsEof() const;
     
+    int ReadInt();
+    short ReadShort();
+    signed char ReadByte();
+    unsigned ReadUInt();
+    unsigned short ReadUShort();
+    unsigned char ReadUByte();
+    bool ReadBool();
+    float ReadFloat();
+    double ReadDouble();
+    IntRect ReadIntRect();
+    IntVector2 ReadIntVector2();
+    Rect ReadRect();
+    Vector2 ReadVector2();
+    Vector3 ReadVector3();
+    Vector3 ReadPackedVector3(float maxAbsCoord);
+    Vector4 ReadVector4();
+    Quaternion ReadQuaternion();
+    Quaternion ReadPackedQuaternion();
+    Matrix3 ReadMatrix3();
+    Matrix3x4 ReadMatrix3x4();
+    Matrix4 ReadMatrix4();
+    Color ReadColor();
+    BoundingBox ReadBoundingBox();
+    String ReadString();
+    String ReadFileID();
+    StringHash ReadStringHash();
+    
+    // PODVector<unsigned char> ReadBuffer();
+    VectorBuffer ReadBuffer();
+    
+    ResourceRef ReadResourceRef();
+    ResourceRefList ReadResourceRefList();
+    Variant ReadVariant();
+    Variant ReadVariant(VariantType type);
+    VariantVector ReadVariantVector();
+    VariantMap ReadVariantMap();
+    unsigned ReadVLE();
+    unsigned ReadNetID();
+    String ReadLine();
+
     tolua_readonly tolua_property__get_set String URL;
     tolua_readonly tolua_property__get_set String verb;
     tolua_readonly tolua_property__get_set String error;
@@ -24,3 +69,15 @@ class HttpRequest : public Deserializer
     tolua_readonly tolua_property__get_set unsigned availableSize;
     tolua_readonly tolua_property__is_set bool open;
 };
+
+${
+static VectorBuffer HttpRequestRead(HttpRequest* request, unsigned size)
+{
+    unsigned char* data = new unsigned char[size];
+    request->Read(data, size);
+    VectorBuffer buffer(data, size);
+    delete [] data;
+    return buffer;
+}
+$}
+
