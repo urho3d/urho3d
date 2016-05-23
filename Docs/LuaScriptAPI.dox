@@ -2615,7 +2615,8 @@ Properties:
 ### HierarchyContainer : UIElement
 
 <a name="Class_HttpRequest"></a>
-### HttpRequest : Deserializer
+### HttpRequest
+
 
 Methods:
 
@@ -2625,6 +2626,44 @@ Methods:
 - HttpRequestState GetState() const
 - unsigned GetAvailableSize() const
 - bool IsOpen() const
+- VectorBuffer Read(unsigned size)
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- char ReadByte()
+- unsigned ReadUInt()
+- short ReadUShort()
+- char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- double ReadDouble()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
 
 Properties:
 
