@@ -27,6 +27,7 @@
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
 #include "../Resource/JSONFile.h"
 #include "../Resource/ResourceCache.h"
 
@@ -228,6 +229,15 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     document.Accept(writer);
     unsigned size = (unsigned)buffer.GetSize();
     return dest.Write(buffer.GetString(), size) == size;
+}
+
+bool JSONFile::FromString(const String & source)
+{
+    if (source.Empty())
+        return false;
+
+    MemoryBuffer buffer(source.CString(), source.Length());
+    return Load(buffer);
 }
 
 }
