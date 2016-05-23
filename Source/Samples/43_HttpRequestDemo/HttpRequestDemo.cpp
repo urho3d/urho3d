@@ -82,7 +82,7 @@ void HttpRequestDemo::SubscribeToEvents()
 void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (httpRequest_.Null())
-        httpRequest_ = new HttpRequest("http://httpbin.org/ip", "GET", {}, "");
+        httpRequest_ = new HttpRequest("http://httpbin.org/ip", "GET", Vector<String>(), String::EMPTY);
     else
     {
         // Initializing HTTP request
