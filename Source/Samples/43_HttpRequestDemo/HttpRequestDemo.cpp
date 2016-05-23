@@ -84,9 +84,6 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     Network* network = GetSubsystem<Network>();
 
-    if (!network)
-        return;
-
     if (httpRequest_.Null())
         httpRequest_ = network->MakeHttpRequest("http://httpbin.org/ip");
     else

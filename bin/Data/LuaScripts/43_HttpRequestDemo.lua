@@ -46,7 +46,7 @@ end
 function HandleUpdate(eventType, eventData)
     -- Create HTTP request
     if httpRequest == nil then
-        httpRequest = network:MakeHttpRequest("http://httpbin.org/ip", "GET")
+        httpRequest = network:MakeHttpRequest("http://httpbin.org/ip")
     else
         -- Initializing HTTP request
         if httpRequest.state == HTTP_INITIALIZING then

@@ -50,7 +50,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Create HTTP request
     if (httpRequest is null)
-        httpRequest = network.MakeHttpRequest("http://httpbin.org/ip", "GET");
+        httpRequest = network.MakeHttpRequest("http://httpbin.org/ip");
     else
     {
         // Initializing HTTP request
