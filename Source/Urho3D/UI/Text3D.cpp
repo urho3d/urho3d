@@ -93,6 +93,9 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Bottom Left Color", Color, text_.color_[2], Color::WHITE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Bottom Right Color", Color, text_.color_[3], Color::WHITE, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", text_.textEffect_, textEffects, TE_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, text_.shadowOffset_, IntVector2(1, 1), AM_FILE);
+    URHO3D_ATTRIBUTE("Stroke Thickness", int, text_.strokeThickness_, 1, AM_FILE);
+    URHO3D_ATTRIBUTE("Round Stroke", bool, text_.roundStroke_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Effect Depth Bias", float, text_.effectDepthBias_, DEFAULT_EFFECT_DEPTH_BIAS, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
@@ -264,6 +267,21 @@ void Text3D::SetTextEffect(TextEffect textEffect)
     UpdateTextMaterials(true);
 }
 
+void Text3D::SetEffectShadowOffset(const IntVector2& offset)
+{
+    text_.SetEffectShadowOffset(offset);
+}
+
+void Text3D::SetEffectStrokeThickness(int thickness)
+{
+    text_.SetEffectStrokeThickness(thickness);
+}
+
+void Text3D::SetEffectRoundStroke(bool roundStroke)
+{
+    text_.SetEffectRoundStroke(roundStroke);
+}
+
 void Text3D::SetEffectColor(const Color& effectColor)
 {
     text_.SetEffectColor(effectColor);
@@ -384,6 +402,21 @@ bool Text3D::GetWordwrap() const
 TextEffect Text3D::GetTextEffect() const
 {
     return text_.GetTextEffect();
+}
+
+const IntVector2& Text3D::GetEffectShadowOffset() const
+{
+    return text_.GetEffectShadowOffset();
+}
+
+int Text3D::GetEffectStrokeThickness() const
+{
+    return text_.GetEffectStrokeThickness();
+}
+
+bool Text3D::GetEffectRoundStroke() const
+{
+    return text_.GetEffectRoundStroke();
 }
 
 const Color& Text3D::GetEffectColor() const

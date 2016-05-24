@@ -76,6 +76,12 @@ public:
     void SetWordwrap(bool enable);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
+    /// Set shadow offset.
+    void SetEffectShadowOffset(const IntVector2& offset);
+    /// Set stroke thickness.
+    void SetEffectStrokeThickness(int thickness);
+    /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
     /// Set effect Z bias.
@@ -111,6 +117,12 @@ public:
     bool GetWordwrap() const;
     /// Return text effect.
     TextEffect GetTextEffect() const;
+    /// Return effect shadow offset.
+    const IntVector2& GetEffectShadowOffset() const;
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() const;
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() const;
     /// Return effect color.
     const Color& GetEffectColor() const;
     /// Return effect depth bias.

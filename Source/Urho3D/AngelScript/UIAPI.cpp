@@ -386,6 +386,12 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "const Color& get_hoverColor() const", asMETHOD(Text, GetHoverColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_textEffect(TextEffect)", asMETHOD(Text, SetTextEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "TextEffect get_textEffect() const", asMETHOD(Text, GetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_effectShadowOffset(const IntVector2&in)", asMETHOD(Text, SetEffectShadowOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "const IntVector2& get_effectShadowOffset() const", asMETHOD(Text, GetEffectShadowOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_effectStrokeThickness(int)", asMETHOD(Text, SetEffectStrokeThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "int get_effectStrokeThickness() const", asMETHOD(Text, GetEffectStrokeThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "void set_effectRoundStroke(bool)", asMETHOD(Text, SetEffectRoundStroke), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool get_effectRoundStroke() const", asMETHOD(Text, GetEffectRoundStroke), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_effectColor(const Color&in)", asMETHOD(Text, SetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const Color& get_effectColor() const", asMETHOD(Text, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_numRows() const", asMETHOD(Text, GetNumRows), asCALL_THISCALL);
@@ -420,6 +426,12 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "bool get_wordwrap() const", asMETHOD(Text3D, GetWordwrap), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_textEffect(TextEffect)", asMETHOD(Text3D, SetTextEffect), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "TextEffect get_textEffect() const", asMETHOD(Text3D, GetTextEffect), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectShadowOffset(const IntVector2&in)", asMETHOD(Text3D, SetEffectShadowOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "const IntVector2& get_effectShadowOffset() const", asMETHOD(Text3D, GetEffectShadowOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectStrokeThickness(int)", asMETHOD(Text3D, SetEffectStrokeThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "int get_effectStrokeThickness() const", asMETHOD(Text3D, GetEffectStrokeThickness), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_effectRoundStroke(bool)", asMETHOD(Text3D, SetEffectRoundStroke), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_effectRoundStroke() const", asMETHOD(Text3D, GetEffectRoundStroke), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_effectColor(const Color&in)", asMETHOD(Text3D, SetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "const Color& get_effectColor() const", asMETHOD(Text3D, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_effectDepthBias(float)", asMETHOD(Text3D, SetEffectDepthBias), asCALL_THISCALL);
