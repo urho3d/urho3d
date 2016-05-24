@@ -162,6 +162,15 @@ public:
     /// Return text effect.
     TextEffect GetTextEffect() const { return textEffect_; }
 
+    /// Return effect shadow offset.
+    IntVector2 GetEffectShadowOffset() const { return shadowOffset_; }
+
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() const { return strokeThickness_; }
+
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() const { return roundStroke_; }
+
     /// Return effect color.
     const Color& GetEffectColor() const { return effectColor_; }
 
@@ -186,13 +195,6 @@ public:
 
     /// Return effect Z bias.
     float GetEffectDepthBias() const { return effectDepthBias_; }
-
-    /// Return effect shadow offset.
-    IntVector2 GetEffectShadowOffset() const { return shadowOffset_; }
-    /// Return effect stroke thickness.
-    int GetEffectStrokeThickness() const { return strokeThickness_; }
-    /// Return effect round stroke.
-    bool GetEffectRoundStroke() const { return roundStroke_; }
 
     /// Set font attribute.
     void SetFontAttr(const ResourceRef& value);
