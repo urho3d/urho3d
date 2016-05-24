@@ -2062,6 +2062,9 @@ namespace Urho3D
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 
 ### Text3D
@@ -2086,6 +2089,9 @@ namespace Urho3D
 - %Bottom %Left %Color : Color
 - %Bottom %Right %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
@@ -12647,6 +12653,9 @@ Properties:
 - uint dragDropMode
 - bool editable
 - Color effectColor
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool elementEventSender
 - bool enabled
 - bool enabledSelf // readonly
@@ -12776,6 +12785,9 @@ Properties:
 - float drawDistance
 - Color effectColor
 - float effectDepthBias
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
