@@ -25,7 +25,7 @@ class Text : public UIElement
     void SetSelectionColor(const Color& color);
     void SetHoverColor(const Color& color);
     void SetTextEffect(TextEffect textEffect);
-    void SetEffectShadowOffset(IntVector2 offset);
+    void SetEffectShadowOffset(const IntVector2& offset);
     void SetEffectStrokeThickness(int thickness);
     void SetEffectRoundStroke(bool roundStroke);
     void SetEffectColor(const Color& effectColor);
@@ -44,7 +44,7 @@ class Text : public UIElement
     const Color& GetSelectionColor() const;
     const Color& GetHoverColor() const;
     TextEffect GetTextEffect() const;
-    IntVector2 GetEffectShadowOffset() const;
+    const IntVector2& GetEffectShadowOffset() const;
     int GetEffectStrokeThickness() const;
     bool GetEffectRoundStroke() const;
     const Color& GetEffectColor() const;
@@ -70,7 +70,7 @@ class Text : public UIElement
     tolua_property__get_set Color& selectionColor;
     tolua_property__get_set Color& hoverColor;
     tolua_property__get_set TextEffect textEffect;
-    tolua_property__get_set IntVector2 effectShadowOffset;
+    tolua_property__get_set IntVector2& effectShadowOffset;
     tolua_property__get_set int effectStrokeThickness;
     tolua_property__get_set bool effectRoundStroke;
     tolua_property__get_set Color& effectColor;

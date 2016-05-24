@@ -267,7 +267,7 @@ void Text3D::SetTextEffect(TextEffect textEffect)
     UpdateTextMaterials(true);
 }
 
-void Text3D::SetEffectShadowOffset(IntVector2 offset)
+void Text3D::SetEffectShadowOffset(const IntVector2& offset)
 {
     text_.SetEffectShadowOffset(offset);
 }
@@ -404,7 +404,7 @@ TextEffect Text3D::GetTextEffect() const
     return text_.GetTextEffect();
 }
 
-IntVector2 Text3D::GetEffectShadowOffset() const
+const IntVector2& Text3D::GetEffectShadowOffset() const
 {
     return text_.GetEffectShadowOffset();
 }

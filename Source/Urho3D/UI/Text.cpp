@@ -395,7 +395,7 @@ void Text::SetTextEffect(TextEffect textEffect)
     textEffect_ = textEffect;
 }
 
-void Text::SetEffectShadowOffset(IntVector2 offset)
+void Text::SetEffectShadowOffset(const IntVector2& offset)
 {
     shadowOffset_ = offset;
 }
