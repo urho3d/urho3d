@@ -11484,6 +11484,9 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 Color effectColor;
+bool effectRoundStroke;
+IntVector2 effectShadowOffset;
+int effectStrokeThickness;
 bool elementEventSender;
 bool enabled;
 /* readonly */
@@ -11643,6 +11646,9 @@ Array<Color> colors;
 float drawDistance;
 Color effectColor;
 float effectDepthBias;
+bool effectRoundStroke;
+IntVector2 effectShadowOffset;
+int effectStrokeThickness;
 bool enabled;
 /* readonly */
 bool enabledEffective;

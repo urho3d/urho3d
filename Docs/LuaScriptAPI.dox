@@ -6111,6 +6111,9 @@ Methods:
 - void SetSelectionColor(const Color& color)
 - void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
@@ -6125,6 +6128,9 @@ Methods:
 - const Color& GetSelectionColor() const
 - const Color& GetHoverColor() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
@@ -6149,6 +6155,9 @@ Properties:
 - Color& selectionColor
 - Color& hoverColor
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
@@ -6173,6 +6182,9 @@ Methods:
 - void SetRowSpacing(float spacing)
 - void SetWordwrap(bool enable)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - void SetEffectDepthBias(float bias)
 - void SetWidth(int width)
@@ -6190,6 +6202,9 @@ Methods:
 - float GetRowSpacing() const
 - bool GetWordwrap() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - float GetEffectDepthBias() const
 - int GetWidth() const
@@ -6215,6 +6230,9 @@ Properties:
 - float rowSpacing
 - bool wordwrap
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - float effectDepthBias
 - int width
