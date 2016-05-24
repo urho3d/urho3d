@@ -38,6 +38,7 @@ class ParticleEffect : public Resource
     void SetRelative(bool enable);
     void SetScaled(bool enable);
     void SetSorted(bool enable);
+    void SetFixedScreenSize(bool enable);
     void SetAnimationLodBias(float lodBias);
     void SetEmitterType(EmitterType type);
     void SetEmitterSize(const Vector3& size);
@@ -80,6 +81,7 @@ class ParticleEffect : public Resource
     bool IsRelative() const;
     bool IsScaled() const;
     bool IsSorted() const;
+    bool IsFixedScreenSize() const;
     float GetAnimationLodBias() const;
     EmitterType GetEmitterType() const;
     const Vector3& GetEmitterSize() const;
@@ -114,6 +116,7 @@ class ParticleEffect : public Resource
     tolua_property__is_set bool relative;
     tolua_property__is_set bool scaled;
     tolua_property__is_set bool sorted;
+    tolua_property__is_set bool fixedScreenSize;
     tolua_property__get_set float animationLodBias;
     tolua_property__get_set EmitterType emitterType;
     tolua_property__get_set const Vector3& emitterSize;

@@ -39,7 +39,7 @@ struct URHO3D_API Billboard
 {
     /// Position.
     Vector3 position_;
-    /// Two-dimensional size.
+    /// Two-dimensional size. If BillboardSet has fixed screen size enabled, this is measured in pixels instead of world units.
     Vector2 size_;
     /// UV coordinates.
     Rect uv_;
@@ -51,8 +51,10 @@ struct URHO3D_API Billboard
     Vector3 direction_;
     /// Enabled flag.
     bool enabled_;
-    /// Sort distance.
+    /// Sort distance. Used internally.
     float sortDistance_;
+    /// Scale factor for fixed screen size mode. Used internally.
+    float screenScaleFactor_;
 };
 
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
@@ -89,6 +91,8 @@ public:
     void SetScaled(bool enable);
     /// Set whether billboards are sorted by distance. Default false.
     void SetSorted(bool enable);
+    /// Set whether billboards have fixed size on screen (measured in pixels) regardless of distance to camera. Default false.
+    void SetFixedScreenSize(bool enable);
     /// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
     void SetFaceCameraMode(FaceCameraMode mode);
     /// Set animation LOD bias.
@@ -116,6 +120,9 @@ public:
 
     /// Return whether billboards are sorted.
     bool IsSorted() const { return sorted_; }
+
+    /// Return whether billboards are fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
 
     /// Return how the billboards rotate in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
@@ -156,6 +163,8 @@ protected:
     bool scaled_;
     /// Billboards sorted flag.
     bool sorted_;
+    /// Billboards fixed screen size flag.
+    bool fixedScreenSize_;
     /// Billboard rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
 
@@ -187,6 +196,8 @@ private:
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
     Vector3 previousOffset_;
+    /// Scale factor for fixed screen size mode.
+    float fixedScaleFactor_;
     /// Billboard pointers for sorting.
     Vector<Billboard*> sortedBillboards_;
     /// Attribute buffer for network replication.
