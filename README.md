@@ -47,6 +47,7 @@ Urho3D development, contributions and bugfixes by:
 - Pranjal Raihan
 - Nick Royer
 - Miika Santala
+- Bengt Soderstrom
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
