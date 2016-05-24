@@ -1865,7 +1865,9 @@ The Audio subsystem implements an audio output stream. Once it has been initiali
 - Playing raw audio, Ogg Vorbis or WAV Sound resources using the SoundSource component. This allows manual stereo panning of mono sounds; stereo sounds will be output with their original stereo mix.
 - Playing the above sound formats in pseudo-3D using the SoundSource3D component. It has stereo positioning and distance attenuation, but does not (at least yet) filter the sound depending on the direction.
 
-To hear pseudo-3D positional sounds, a SoundListener component must exist in a scene node and be assigned to the audio subsystem by calling \ref Audio::SetListener "SetListener()". If the sound listener's scene node exists within a specific scene, it will only hear sounds from that scene, but if it has been created into a "sceneless" node it will hear sounds from all scenes.
+A sound source component needs to be created into a Node to be considered "enabled" and be able to play, however that node does not need to belong to a scene (e.g. for positionless %UI / HUD sounds, which would be just unnecessarily clutter in a 3D scene, you can just instantiate a node in application code, similar to a camera existing outside the scene.)
+
+To hear pseudo-3D positional sounds, a SoundListener component must likewise exist in a node and be assigned to the audio subsystem by calling \ref Audio::SetListener "SetListener()". The node's position & rotation define the listening spot. If the sound listener's node belongs to a scene, it only hears sounds from within that specific scene, but if it has been created outside of a scene it will hear any sounds.
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 
