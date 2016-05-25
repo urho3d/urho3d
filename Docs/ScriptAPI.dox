@@ -875,6 +875,7 @@ namespace Urho3D
 - %Relative %Position : bool
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
+- %Fixed %Screen %Size : bool
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Face %Camera %Mode : int
@@ -3147,6 +3148,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -9246,6 +9248,7 @@ Properties:
 - Vector3 emitterSize
 - EmitterType emitterType
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - float inactiveTime
 - Material@ material
 - Vector3 maxDirection
@@ -9367,6 +9370,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
