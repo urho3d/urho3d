@@ -18,7 +18,6 @@ cameraNode = nil -- Camera scene node
 yaw = 0 -- Camera yaw angle
 pitch = 0 -- Camera pitch angle
 TOUCH_SENSITIVITY = 2
-debugHudMode = 0
 useMouseMode_ = MM_ABSOLUTE
 
 function SampleStart()
@@ -170,21 +169,11 @@ function HandleKeyDown(eventType, eventData)
 
     if key == KEY_F1 then
         console:Toggle()
-    elseif key == KEY_F2 then
-        if debugHud:GetMode() == DEBUGHUD_SHOW_ALL_MEMORY or debugHud:GetMode() == 0 then
-            debugHud:SetMode(DEBUGHUD_SHOW_ALL)
-        else
-            debugHud:SetMode(0)
-        end
-    elseif key == KEY_F3 then
-        if debugHud:GetMode() == DEBUGHUD_SHOW_ALL or debugHud:GetMode() == 0 then
-            debugHud:SetMode(DEBUGHUD_SHOW_ALL_MEMORY)
-        else
-            debugHud:SetMode(0)
-        end
-    end
 
-    if ui.focusElement == nil then
+    elseif key == KEY_F2 then
+        debugHud:ToggleAll()
+
+    elseif ui.focusElement == nil then
         -- Preferences / Pause
         if key == KEY_SELECT and touchEnabled then
             paused = not paused

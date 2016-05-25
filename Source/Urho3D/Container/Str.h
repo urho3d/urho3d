@@ -538,19 +538,7 @@ public:
 #endif
 
     /// Return length of a C string.
-    static unsigned CStringLength(const char* str)
-    {
-        if (!str)
-            return 0;
-#ifdef _MSC_VER
-        return (unsigned)strlen(str);
-#else
-        const char* ptr = str;
-        while (*ptr)
-            ++ptr;
-        return (unsigned)(ptr - str);
-#endif
-    }
+    static unsigned CStringLength(const char* str) { return str ? (unsigned)strlen(str) : 0; }
 
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);

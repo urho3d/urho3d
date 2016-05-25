@@ -38,9 +38,8 @@ static const unsigned DEBUGHUD_SHOW_STATS = 0x1;
 static const unsigned DEBUGHUD_SHOW_MODE = 0x2;
 static const unsigned DEBUGHUD_SHOW_PROFILER = 0x4;
 static const unsigned DEBUGHUD_SHOW_MEMORY = 0x8;
-static const unsigned DEBUGHUD_SHOW_ALL = 0x7;
-static const unsigned DEBUGHUD_SHOW_ALL_MEMORY = 0xB;
 static const unsigned DEBUGHUD_SHOW_EVENTPROFILER = 0x10;
+static const unsigned DEBUGHUD_SHOW_ALL = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_PROFILER | DEBUGHUD_SHOW_MEMORY;
 
 /// Displays rendering stats and profiling information.
 class URHO3D_API DebugHud : public Object

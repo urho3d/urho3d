@@ -912,9 +912,11 @@ void ResourceCache::ResetDependencies(Resource* resource)
     }
 }
 
-String ResourceCache::PrintMemoryUsage() const
+const String& ResourceCache::PrintMemoryUsage() const
 {
-    String output = "Resource Type                 Cnt       Avg       Max    Budget     Total\n\n";
+    static String output;
+
+    output = "Resource Type                 Cnt       Avg       Max    Budget     Total\n\n";
     char outputLine[256];
 
     unsigned totalResourceCt = 0;
@@ -948,11 +950,9 @@ String ResourceCache::PrintMemoryUsage() const
         const String memTotalString = GetFileSizeString(cit->second_.memoryUse_);
         const String resTypeName = context_->GetTypeName(cit->first_);
 
-        memset(outputLine, ' ', 256);
-        outputLine[255] = 0;
-        sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(), memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
-
-        output += ((const char*)outputLine);
+        snprintf(outputLine, sizeof(outputLine), "%-28s %4s %9s %9s %9s %9s\n", resTypeName.CString(), countString.CString(),
+            memUseString.CString(), memMaxString.CString(), memBudgetString.CString(), memTotalString.CString());
+        output += (const char*)outputLine;
     }
 
     if (totalResourceCt > 0)
@@ -963,10 +963,9 @@ String ResourceCache::PrintMemoryUsage() const
     const String memMaxString = GetFileSizeString(totalLargest);
     const String memTotalString = GetFileSizeString(totalUse);
 
-    memset(outputLine, ' ', 256);
-    outputLine[255] = 0;
-    sprintf(outputLine, "%-28s %4s %9s %9s %9s %9s\n", "All", countString.CString(), memUseString.CString(), memMaxString.CString(), "-", memTotalString.CString());
-    output += ((const char*)outputLine);
+    snprintf(outputLine, sizeof(outputLine), "%-28s %4s %9s %9s %9s %9s\n", "All", countString.CString(), memUseString.CString(),
+        memMaxString.CString(), "-", memTotalString.CString());
+    output += (const char*)outputLine;
 
     return output;
 }

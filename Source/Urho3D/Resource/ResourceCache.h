@@ -207,8 +207,8 @@ public:
     /// Reset dependencies for a resource.
     void ResetDependencies(Resource* resource);
 
-    /// Returns a formatted string containing the memory actively used.
-    String PrintMemoryUsage() const;
+    /// Returns a formatted string containing the memory actively used. This method is not thread-safe.
+    const String& PrintMemoryUsage() const;
 
 private:
     /// Find a resource.
