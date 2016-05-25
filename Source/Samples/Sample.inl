@@ -247,8 +247,8 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     int key = eventData[P_KEY].GetInt();
 
-    // Toggle console with F1 or Z
-    if (key == KEY_F1 || key == 'Z')
+    // Toggle console with F1
+    if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
 
     // Toggle debug HUD with F2
