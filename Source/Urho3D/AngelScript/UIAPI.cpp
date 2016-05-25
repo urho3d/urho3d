@@ -443,6 +443,8 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "const Color& get_colors(Corner) const", asMETHOD(Text3D, GetColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_opacity(float)", asMETHOD(Text3D, SetOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "float get_opacity() const", asMETHOD(Text3D, GetOpacity), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "void set_fixedScreenSize(bool)", asMETHOD(Text3D, SetFixedScreenSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool get_fixedScreenSize() const", asMETHOD(Text3D, IsFixedScreenSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(Text3D, SetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "FaceCameraMode get_faceCameraMode() const", asMETHOD(Text3D, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
