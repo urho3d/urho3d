@@ -1706,6 +1706,7 @@ The parameters of the particle system are stored in a ParticleEffect resource cl
     <relative enable="true|false" />
     <scaled enable="true|false" />
     <sorted enable="true|false" />
+    <fixedscreensize enable="true|false" />
     <emittertype value="sphere|box" />
     <emittersize value="x y z" />
     <emitterradius value="x" />

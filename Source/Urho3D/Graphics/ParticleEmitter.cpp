@@ -337,6 +337,7 @@ void ParticleEmitter::ApplyEffect()
     SetRelative(effect_->IsRelative());
     SetScaled(effect_->IsScaled());
     SetSorted(effect_->IsSorted());
+    SetFixedScreenSize(effect_->IsFixedScreenSize());
     SetAnimationLodBias(effect_->GetAnimationLodBias());
     SetFaceCameraMode(effect_->GetFaceCameraMode());
 }

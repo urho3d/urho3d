@@ -657,6 +657,25 @@
                                 </element>
                             </element>
                             <element>
+                                <!-- Relative -->
+                                <attribute name="Min Size" value="0 16" />
+                                <attribute name="Max Size" value="2147483647 16" />
+                                <attribute name="Layout Mode" value="Horizontal" />
+                                <attribute name="Layout Spacing" value="10" />
+                                <element type="Text" style="EditorAttributeText">
+                                    <attribute name="Text" value="Relative Transform" />
+                                </element>
+                                <element>
+                                    <attribute name="Min Size" value="0 16" />
+                                    <attribute name="Max Size" value="2147483647 16" />
+                                    <attribute name="Layout Mode" value="Horizontal" />
+                                    <attribute name="Layout Spacing" value="1" />
+                                    <element type="CheckBox">
+                                        <attribute name="Name" value="Relative" />
+                                    </element>
+                                </element>
+                            </element>
+                            <element>
                                 <!-- Scaled -->
                                 <attribute name="Min Size" value="0 16" />
                                 <attribute name="Max Size" value="2147483647 16" />
@@ -695,13 +714,13 @@
                                 </element>
                             </element>
                             <element>
-                                <!-- Relative -->
+                                <!-- Fixed screen size -->
                                 <attribute name="Min Size" value="0 16" />
                                 <attribute name="Max Size" value="2147483647 16" />
                                 <attribute name="Layout Mode" value="Horizontal" />
                                 <attribute name="Layout Spacing" value="10" />
                                 <element type="Text" style="EditorAttributeText">
-                                    <attribute name="Text" value="Relative Transform" />
+                                    <attribute name="Text" value="Fixed Screen Size" />
                                 </element>
                                 <element>
                                     <attribute name="Min Size" value="0 16" />
@@ -709,7 +728,7 @@
                                     <attribute name="Layout Mode" value="Horizontal" />
                                     <attribute name="Layout Spacing" value="1" />
                                     <element type="CheckBox">
-                                        <attribute name="Name" value="Relative" />
+                                        <attribute name="Name" value="FixedScreenSize" />
                                     </element>
                                 </element>
                             </element>

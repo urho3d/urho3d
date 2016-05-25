@@ -128,8 +128,9 @@ void CreateParticleEffectEditor()
     SubscribeToEvent(particleEffectWindow.GetChild("Scaled", true), "Toggled", "EditParticleEffectScaled");
     SubscribeToEvent(particleEffectWindow.GetChild("Sorted", true), "Toggled", "EditParticleEffectSorted");
     SubscribeToEvent(particleEffectWindow.GetChild("Relative", true), "Toggled", "EditParticleEffectRelative");
+    SubscribeToEvent(particleEffectWindow.GetChild("FixedScreenSize", true), "Toggled", "EditParticleEffectFixedScreenSize");
     SubscribeToEvent(particleEffectWindow.GetChild("FaceCameraMode", true), "ItemSelected", "EditParticleEffectFaceCameraMode");
-    
+
     SubscribeToEvent(particleEffectWindow.GetChild("ResetViewport", true), "Released", "ParticleEffectResetViewport");
     SubscribeToEvent(particleEffectWindow.GetChild("ShowGrid", true), "Toggled", "ParticleEffectShowGrid");
 }
@@ -866,6 +867,27 @@ void EditParticleEffectRelative(StringHash eventType, VariantMap& eventData)
     EndParticleEffectEdit();
 }
 
+void EditParticleEffectFixedScreenSize(StringHash eventType, VariantMap& eventData)
+{
+    if (inParticleEffectRefresh)
+        return;
+
+    if (editParticleEffect is null)
+        return;
+
+    if (particleEffectEmitter is null)
+        return;
+
+    BeginParticleEffectEdit();
+
+    CheckBox@ element = eventData["Element"].GetPtr();
+
+    editParticleEffect.fixedScreenSize = element.checked;
+    particleEffectEmitter.ApplyEffect();
+
+    EndParticleEffectEdit();
+}
+
 bool ToggleParticleEffectEditor()
 {
     if (particleEffectWindow.visible == false)
@@ -1480,6 +1502,7 @@ void RefreshParticleEffectBasicAttributes()
     cast<CheckBox>(particleEffectWindow.GetChild("Scaled", true)).checked = editParticleEffect.scaled;
     cast<CheckBox>(particleEffectWindow.GetChild("Sorted", true)).checked = editParticleEffect.sorted;
     cast<CheckBox>(particleEffectWindow.GetChild("Relative", true)).checked = editParticleEffect.relative;
+    cast<CheckBox>(particleEffectWindow.GetChild("FixedScreenSize", true)).checked = editParticleEffect.fixedScreenSize;
 }
 
 void RefreshParticleEffectMaterial()

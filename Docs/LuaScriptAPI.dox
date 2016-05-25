@@ -590,7 +590,6 @@ Properties:
 - Color color
 - float rotation
 - bool enabled
-- float sortDistance
 
 <a name="Class_BillboardSet"></a>
 ### BillboardSet : Drawable
@@ -602,6 +601,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - void SetAnimationLodBias(float bias)
 - void Commit()
@@ -611,6 +611,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 - float GetAnimationLodBias() const
 
@@ -621,6 +622,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 - float animationLodBias
 
@@ -4185,6 +4187,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetAnimationLodBias(float lodBias)
 - void SetEmitterType(EmitterType type)
 - void SetEmitterSize(const Vector3& size)
@@ -4226,6 +4229,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - float GetAnimationLodBias() const
 - EmitterType GetEmitterType() const
 - const Vector3& GetEmitterSize() const
@@ -4262,6 +4266,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - float animationLodBias
 - EmitterType emitterType
 - const Vector3& emitterSize
