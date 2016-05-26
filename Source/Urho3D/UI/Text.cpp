@@ -404,7 +404,7 @@ void Text::SetEffectShadowOffset(const IntVector2& offset)
 
 void Text::SetEffectStrokeThickness(int thickness)
 {
-    strokeThickness_ = thickness;
+    strokeThickness_ = Abs(thickness);
 }
 
 void Text::SetEffectRoundStroke(bool roundStroke)
