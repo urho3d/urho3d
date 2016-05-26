@@ -2517,6 +2517,10 @@ void Graphics::Restore()
         }
 
         // Enable seamless cubemap if possible
+        // Note: even though we check the extension, this can lead to software fallback on some old GPU's
+        // See https://github.com/urho3d/Urho3D/issues/1380 or
+        // http://distrustsimplicity.net/articles/gl_texture_cube_map_seamless-on-os-x/
+        // In case of trouble or for wanting maximum compatibility, simply remove the glEnable below.
         if (gl3Support || GLEW_ARB_seamless_cube_map)
             glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif

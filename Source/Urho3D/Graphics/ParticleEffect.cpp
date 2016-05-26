@@ -60,6 +60,7 @@ ParticleEffect::ParticleEffect(Context* context) :
     relative_(true),
     scaled_(true),
     sorted_(false),
+    fixedScreenSize_(false),
     animationLodBias_(0.0f),
     emitterType_(EMITTER_SPHERE),
     emitterSize_(Vector3::ZERO),
@@ -136,6 +137,7 @@ bool ParticleEffect::Load(const XMLElement& source)
     relative_ = true;
     scaled_ = true;
     sorted_ = false;
+    fixedScreenSize_ = false;
     animationLodBias_ = 0.0f;
     emitterType_ = EMITTER_SPHERE;
     emitterSize_ = Vector3::ZERO;
@@ -191,6 +193,9 @@ bool ParticleEffect::Load(const XMLElement& source)
 
     if (source.HasChild("sorted"))
         sorted_ = source.GetChild("sorted").GetBool("enable");
+
+    if (source.HasChild("fixedscreensize"))
+        fixedScreenSize_ = source.GetChild("fixedscreensize").GetBool("enable");
 
     if (source.HasChild("animlodbias"))
         SetAnimationLodBias(source.GetChild("animlodbias").GetFloat("value"));
@@ -346,6 +351,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem = dest.CreateChild("sorted");
     childElem.SetBool("enable", sorted_);
 
+    childElem = dest.CreateChild("fixedscreensize");
+    childElem.SetBool("enable", fixedScreenSize_);
+
     childElem = dest.CreateChild("animlodbias");
     childElem.SetFloat("value", animationLodBias_);
 
@@ -456,6 +464,11 @@ void ParticleEffect::SetScaled(bool enable)
 void ParticleEffect::SetSorted(bool enable)
 {
     sorted_ = enable;
+}
+
+void ParticleEffect::SetFixedScreenSize(bool enable)
+{
+    fixedScreenSize_ = enable;
 }
 
 void ParticleEffect::SetAnimationLodBias(float lodBias)

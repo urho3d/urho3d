@@ -702,6 +702,7 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 FaceCameraMode faceCameraMode;
+bool fixedScreenSize;
 /* readonly */
 uint id;
 /* readonly */
@@ -7673,6 +7674,7 @@ float dampingForce;
 Vector3 emitterSize;
 EmitterType emitterType;
 FaceCameraMode faceCameraMode;
+bool fixedScreenSize;
 float inactiveTime;
 Material material;
 Vector3 maxDirection;
@@ -7807,6 +7809,7 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 FaceCameraMode faceCameraMode;
+bool fixedScreenSize;
 /* readonly */
 uint id;
 /* readonly */
@@ -11484,6 +11487,9 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 Color effectColor;
+bool effectRoundStroke;
+IntVector2 effectShadowOffset;
+int effectStrokeThickness;
 bool elementEventSender;
 bool enabled;
 /* readonly */
@@ -11643,10 +11649,14 @@ Array<Color> colors;
 float drawDistance;
 Color effectColor;
 float effectDepthBias;
+bool effectRoundStroke;
+IntVector2 effectShadowOffset;
+int effectStrokeThickness;
 bool enabled;
 /* readonly */
 bool enabledEffective;
 FaceCameraMode faceCameraMode;
+bool fixedScreenSize;
 /* readonly */
 Font font;
 /* readonly */

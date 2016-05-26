@@ -590,7 +590,6 @@ Properties:
 - Color color
 - float rotation
 - bool enabled
-- float sortDistance
 
 <a name="Class_BillboardSet"></a>
 ### BillboardSet : Drawable
@@ -602,6 +601,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - void SetAnimationLodBias(float bias)
 - void Commit()
@@ -611,6 +611,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 - float GetAnimationLodBias() const
 
@@ -621,6 +622,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 - float animationLodBias
 
@@ -2615,7 +2617,8 @@ Properties:
 ### HierarchyContainer : UIElement
 
 <a name="Class_HttpRequest"></a>
-### HttpRequest : Deserializer
+### HttpRequest
+
 
 Methods:
 
@@ -2625,6 +2628,44 @@ Methods:
 - HttpRequestState GetState() const
 - unsigned GetAvailableSize() const
 - bool IsOpen() const
+- VectorBuffer Read(unsigned size)
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- char ReadByte()
+- unsigned ReadUInt()
+- short ReadUShort()
+- char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- double ReadDouble()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
 
 Properties:
 
@@ -4146,6 +4187,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetAnimationLodBias(float lodBias)
 - void SetEmitterType(EmitterType type)
 - void SetEmitterSize(const Vector3& size)
@@ -4187,6 +4229,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - float GetAnimationLodBias() const
 - EmitterType GetEmitterType() const
 - const Vector3& GetEmitterSize() const
@@ -4223,6 +4266,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - float animationLodBias
 - EmitterType emitterType
 - const Vector3& emitterSize
@@ -6072,6 +6116,9 @@ Methods:
 - void SetSelectionColor(const Color& color)
 - void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
@@ -6086,6 +6133,9 @@ Methods:
 - const Color& GetSelectionColor() const
 - const Color& GetHoverColor() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
@@ -6110,6 +6160,9 @@ Properties:
 - Color& selectionColor
 - Color& hoverColor
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
@@ -6134,12 +6187,16 @@ Methods:
 - void SetRowSpacing(float spacing)
 - void SetWordwrap(bool enable)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - void SetEffectDepthBias(float bias)
 - void SetWidth(int width)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
@@ -6151,6 +6208,9 @@ Methods:
 - float GetRowSpacing() const
 - bool GetWordwrap() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - float GetEffectDepthBias() const
 - int GetWidth() const
@@ -6162,6 +6222,7 @@ Methods:
 - IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 
 Properties:
@@ -6176,6 +6237,9 @@ Properties:
 - float rowSpacing
 - bool wordwrap
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - float effectDepthBias
 - int width
@@ -6184,6 +6248,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 
 <a name="Class_Texture"></a>

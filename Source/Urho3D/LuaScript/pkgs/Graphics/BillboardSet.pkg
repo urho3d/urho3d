@@ -8,7 +8,6 @@ struct Billboard
     Color color_ @ color;
     float rotation_ @ rotation;
     bool enabled_ @ enabled;
-    float sortDistance_ @ sortDistance;
 };
 
 class BillboardSet : public Drawable
@@ -18,6 +17,7 @@ class BillboardSet : public Drawable
     void SetRelative(bool enable);
     void SetScaled(bool enable);
     void SetSorted(bool enable);
+    void SetFixedScreenSize(bool enable);
     void SetFaceCameraMode(FaceCameraMode mode);
     void SetAnimationLodBias(float bias);
 
@@ -29,6 +29,7 @@ class BillboardSet : public Drawable
     bool IsRelative() const;
     bool IsScaled() const;
     bool IsSorted() const;
+    bool IsFixedScreenSize() const;
     FaceCameraMode GetFaceCameraMode() const;
     float GetAnimationLodBias() const;
     
@@ -37,6 +38,7 @@ class BillboardSet : public Drawable
     tolua_property__is_set bool relative;
     tolua_property__is_set bool scaled;
     tolua_property__is_set bool sorted;
+    tolua_property__is_set bool fixedScreenSize;
     tolua_property__get_set FaceCameraMode faceCameraMode;
     tolua_property__get_set float animationLodBias;
 };

@@ -117,6 +117,12 @@ public:
     void SetHoverColor(const Color& color);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
+    /// Set shadow offset.
+    void SetEffectShadowOffset(const IntVector2& offset);
+    /// Set stroke thickness.
+    void SetEffectStrokeThickness(int thickness);
+    /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
 
@@ -155,6 +161,15 @@ public:
 
     /// Return text effect.
     TextEffect GetTextEffect() const { return textEffect_; }
+
+    /// Return effect shadow offset.
+    const IntVector2& GetEffectShadowOffset() const { return shadowOffset_; }
+
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() const { return strokeThickness_; }
+
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() const { return roundStroke_; }
 
     /// Return effect color.
     const Color& GetEffectColor() const { return effectColor_; }
@@ -228,6 +243,12 @@ protected:
     Color hoverColor_;
     /// Text effect.
     TextEffect textEffect_;
+    /// Text effect shadow offset.
+    IntVector2 shadowOffset_;
+    /// Text effect stroke thickness.
+    int strokeThickness_;
+    /// Text effect stroke rounding flag.
+    bool roundStroke_;
     /// Effect color.
     Color effectColor_;
     /// Text effect Z bias.
