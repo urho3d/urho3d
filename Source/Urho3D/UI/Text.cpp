@@ -111,6 +111,7 @@ void Text::ApplyAttributes()
     DecodeToUnicode();
 
     fontSize_ = Max(fontSize_, 1);
+    strokeThickness_ = Abs(strokeThickness_);
     ValidateSelection();
     UpdateText();
 }
