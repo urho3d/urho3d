@@ -262,7 +262,7 @@ Renderer::Renderer(Context* context) :
     materialQuality_(QUALITY_HIGH),
     shadowMapSize_(1024),
     shadowQuality_(SHADOWQUALITY_PCF_16BIT),
-    shadowSoftness_(2.0f),
+    shadowSoftness_(1.0f),
     vsmShadowParams_(0.0000001f, 0.2f),
     maxShadowMaps_(1),
     minInstances_(2),
@@ -528,10 +528,10 @@ void Renderer::ReloadShaders()
     shadersDirty_ = true;
 }
 
-void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap)
+void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blurScale)
 {
     if (shadowMapFilterInstance_ && shadowMapFilter_)
-        (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap);
+        (shadowMapFilterInstance_->*shadowMapFilter_)(view, shadowMap, blurScale);
 }
 
 Viewport* Renderer::GetViewport(unsigned index) const
@@ -1921,7 +1921,7 @@ void Renderer::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
 }
 
 
-void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
+void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap, float blurScale)
 {
     graphics_->SetBlendMode(BLEND_REPLACE);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -1944,18 +1944,17 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap)
 
     // Horizontal blur of the shadow map
     static const StringHash blurOffsetParam("BlurOffsets");
-    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness_ / shadowMap->GetWidth(), 0.0f));
 
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(shadowSoftness_ * blurScale / shadowMap->GetWidth(), 0.0f));
     graphics_->SetTexture(TU_DIFFUSE, shadowMap);
-    view->DrawFullscreenQuad(false);
+    view->DrawFullscreenQuad(true);
 
     // Vertical blur
     graphics_->SetRenderTarget(0, shadowMap);
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
-
-    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness_ / shadowMap->GetHeight()));
+    graphics_->SetShaderParameter(blurOffsetParam, Vector2(0.0f, shadowSoftness_ * blurScale / shadowMap->GetHeight()));
 
     graphics_->SetTexture(TU_DIFFUSE, tmpBuffer);
-    view->DrawFullscreenQuad(false);
+    view->DrawFullscreenQuad(true);
 }
 }

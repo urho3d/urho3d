@@ -114,6 +114,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NamedPipe"><b>NamedPipe</b></a>
 <a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationGeometryInfo"><b>NavigationGeometryInfo</b></a>
@@ -589,7 +590,6 @@ Properties:
 - Color color
 - float rotation
 - bool enabled
-- float sortDistance
 
 <a name="Class_BillboardSet"></a>
 ### BillboardSet : Drawable
@@ -601,6 +601,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - void SetAnimationLodBias(float bias)
 - void Commit()
@@ -610,6 +611,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 - float GetAnimationLodBias() const
 
@@ -620,6 +622,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 - float animationLodBias
 
@@ -2614,7 +2617,8 @@ Properties:
 ### HierarchyContainer : UIElement
 
 <a name="Class_HttpRequest"></a>
-### HttpRequest : Deserializer
+### HttpRequest
+
 
 Methods:
 
@@ -2624,6 +2628,44 @@ Methods:
 - HttpRequestState GetState() const
 - unsigned GetAvailableSize() const
 - bool IsOpen() const
+- VectorBuffer Read(unsigned size)
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- char ReadByte()
+- unsigned ReadUInt()
+- short ReadUShort()
+- char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- double ReadDouble()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
 
 Properties:
 
@@ -2860,6 +2902,7 @@ Methods:
 - JSONFile() (GC)
 - JSONFile* new()
 - void delete()
+- bool FromString(const String source)
 - const JSONValue& GetRoot() const
 - bool Save(const String fileName, const String indentation = "\t") const
 
@@ -3494,6 +3537,102 @@ Properties:
 - unsigned numGeometries
 - unsigned numMorphs (readonly)
 
+<a name="Class_NamedPipe"></a>
+### NamedPipe : Object
+
+Methods:
+
+- NamedPipe() (GC)
+- NamedPipe* new()
+- NamedPipe(const String pipeName, bool isServer) (GC)
+- NamedPipe* new(const String pipeName, bool isServer)
+- void delete()
+- bool Open(const String pipeName, bool isServer)
+- void Close()
+- bool IsOpen() const
+- VectorBuffer Read(unsigned size)
+- const String GetName() const
+- bool IsEof() const
+- int ReadInt()
+- short ReadShort()
+- char ReadByte()
+- unsigned ReadUInt()
+- short ReadUShort()
+- char ReadUByte()
+- bool ReadBool()
+- float ReadFloat()
+- double ReadDouble()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- Rect ReadRect()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector3 ReadPackedVector3(float maxAbsCoord)
+- Vector4 ReadVector4()
+- Quaternion ReadQuaternion()
+- Quaternion ReadPackedQuaternion()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- Color ReadColor()
+- BoundingBox ReadBoundingBox()
+- String ReadString()
+- String ReadFileID()
+- StringHash ReadStringHash()
+- VectorBuffer ReadBuffer()
+- ResourceRef ReadResourceRef()
+- ResourceRefList ReadResourceRefList()
+- Variant ReadVariant()
+- Variant ReadVariant(VariantType type)
+- VariantVector ReadVariantVector()
+- VariantMap ReadVariantMap()
+- unsigned ReadVLE()
+- unsigned ReadNetID()
+- String ReadLine()
+- unsigned Write(const VectorBuffer& buffer)
+- bool WriteInt(int value)
+- bool WriteShort(short value)
+- bool WriteByte(char value)
+- bool WriteUInt(unsigned value)
+- bool WriteUShort(short value)
+- bool WriteUByte(char value)
+- bool WriteBool(bool value)
+- bool WriteFloat(float value)
+- bool WriteDouble(double value)
+- bool WriteIntRect(const IntRect& value)
+- bool WriteIntVector2(const IntVector2& value)
+- bool WriteRect(const Rect& value)
+- bool WriteVector2(const Vector2& value)
+- bool WriteVector3(const Vector3& value)
+- bool WritePackedVector3(const Vector3& value, float maxAbsCoord)
+- bool WriteVector4(const Vector4& value)
+- bool WriteQuaternion(const Quaternion& value)
+- bool WritePackedQuaternion(const Quaternion& value)
+- bool WriteMatrix3(const Matrix3& value)
+- bool WriteMatrix3x4(const Matrix3x4& value)
+- bool WriteMatrix4(const Matrix4& value)
+- bool WriteColor(const Color& value)
+- bool WriteBoundingBox(const BoundingBox& value)
+- bool WriteString(const String value)
+- bool WriteFileID(const String value)
+- bool WriteStringHash(const StringHash& value)
+- bool WriteBuffer(const VectorBuffer& buffer)
+- bool WriteResourceRef(const ResourceRef& value)
+- bool WriteResourceRefList(const ResourceRefList& value)
+- bool WriteVariant(const Variant& value)
+- bool WriteVariantData(const Variant& value)
+- bool WriteVariantVector(const VariantVector& value)
+- bool WriteVariantMap(const VariantMap& value)
+- bool WriteVLE(unsigned value)
+- bool WriteNetID(unsigned value)
+- bool WriteLine(const String value)
+
+Properties:
+
+- String name (readonly)
+- bool eof (readonly)
+- bool open (readonly)
+
 <a name="Class_NavArea"></a>
 ### NavArea : Component
 
@@ -4048,6 +4187,7 @@ Methods:
 - void SetRelative(bool enable)
 - void SetScaled(bool enable)
 - void SetSorted(bool enable)
+- void SetFixedScreenSize(bool enable)
 - void SetAnimationLodBias(float lodBias)
 - void SetEmitterType(EmitterType type)
 - void SetEmitterSize(const Vector3& size)
@@ -4089,6 +4229,7 @@ Methods:
 - bool IsRelative() const
 - bool IsScaled() const
 - bool IsSorted() const
+- bool IsFixedScreenSize() const
 - float GetAnimationLodBias() const
 - EmitterType GetEmitterType() const
 - const Vector3& GetEmitterSize() const
@@ -4125,6 +4266,7 @@ Properties:
 - bool relative
 - bool scaled
 - bool sorted
+- bool fixedScreenSize
 - float animationLodBias
 - EmitterType emitterType
 - const Vector3& emitterSize
@@ -5232,7 +5374,7 @@ Properties:
 - String varNamesAttr
 
 <a name="Class_ScrollBar"></a>
-### ScrollBar : UIElement
+### ScrollBar : BorderImage
 
 Methods:
 
@@ -5974,6 +6116,9 @@ Methods:
 - void SetSelectionColor(const Color& color)
 - void SetHoverColor(const Color& color)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
@@ -5988,6 +6133,9 @@ Methods:
 - const Color& GetSelectionColor() const
 - const Color& GetHoverColor() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
@@ -6012,6 +6160,9 @@ Properties:
 - Color& selectionColor
 - Color& hoverColor
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
@@ -6036,12 +6187,16 @@ Methods:
 - void SetRowSpacing(float spacing)
 - void SetWordwrap(bool enable)
 - void SetTextEffect(TextEffect textEffect)
+- void SetEffectShadowOffset(const IntVector2& offset)
+- void SetEffectStrokeThickness(int thickness)
+- void SetEffectRoundStroke(bool roundStroke)
 - void SetEffectColor(const Color& effectColor)
 - void SetEffectDepthBias(float bias)
 - void SetWidth(int width)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
@@ -6053,6 +6208,9 @@ Methods:
 - float GetRowSpacing() const
 - bool GetWordwrap() const
 - TextEffect GetTextEffect() const
+- const IntVector2& GetEffectShadowOffset() const
+- int GetEffectStrokeThickness() const
+- bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
 - float GetEffectDepthBias() const
 - int GetWidth() const
@@ -6064,6 +6222,7 @@ Methods:
 - IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 
 Properties:
@@ -6078,6 +6237,9 @@ Properties:
 - float rowSpacing
 - bool wordwrap
 - TextEffect textEffect
+- IntVector2& effectShadowOffset
+- int effectStrokeThickness
+- bool effectRoundStroke
 - Color& effectColor
 - float effectDepthBias
 - int width
@@ -6086,6 +6248,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 
 <a name="Class_Texture"></a>
@@ -7952,8 +8115,8 @@ Properties:
 - Renderer* GetRenderer()
 - Time* GetTime()
 - UI* GetUI()
-- bool HasSubscribedToEvent(const String eventName)
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
+- bool HasSubscribedToEvent(const String eventName)
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
@@ -7972,9 +8135,10 @@ Properties:
 - float Random()
 - float Random(float range)
 - float Random(float min, float max)
-- int RandomInt(int min, int max)
 - int RandomInt(int range)
+- int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
+- void RegisterEventName(const String eventName)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
 - unsigned SDBMHash(unsigned hash, char c)
@@ -7986,8 +8150,8 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
-- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -8070,6 +8234,8 @@ Properties:
 - unsigned DD_TARGET
 - unsigned DEBUGHUD_SHOW_ALL
 - unsigned DEBUGHUD_SHOW_ALL_MEMORY
+- unsigned DEBUGHUD_SHOW_EVENTPROFILER
+- unsigned DEBUGHUD_SHOW_MEMORY
 - unsigned DEBUGHUD_SHOW_MODE
 - unsigned DEBUGHUD_SHOW_NONE
 - unsigned DEBUGHUD_SHOW_PROFILER

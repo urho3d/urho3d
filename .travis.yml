@@ -23,6 +23,7 @@
 ---
 
 language: cpp
+compiler: gcc
 cache: ccache
 sudo: false
 addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake]}}
@@ -38,70 +39,68 @@ env:
     - URHO3D_DEPLOYMENT_TARGET=generic
 matrix:
   fast_finish: true
+  exclude:
+    - compiler: gcc
   include:
     - &Linux-64bit
       addons: {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [g++-4.9, &linux_packages [*default_packages, libasound2-dev, libpulse-dev, rpm]]}}
-      compiler: gcc-64bit-static
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       addons: {apt: {sources: *default_sources, packages: *linux_packages}}
-      compiler: gcc-64bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
     - <<: *Linux-64bit-shared
-      compiler: clang-64bit-static
+      compiler: clang
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC
     - <<: *Linux-64bit-shared
-      compiler: clang-64bit-shared
+      compiler: clang
     - &Linux-32bit
-      compiler: gcc-32bit-static
       addons: {apt: {sources: *default_sources, packages: [*linux_packages, g++-multilib, "libxrandr-dev:i386", "libglapi-mesa:i386", "libgl1-mesa-glx:i386", "libgl1-mesa-dev:i386", "libxext-dev:i386", "libxrender-dev:i386", lib32readline6-dev]}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - &Linux-32bit-shared
       <<: *Linux-32bit
-      compiler: gcc-32bit-shared
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *Linux-32bit
-      compiler: clang-32bit-static
+      compiler: clang
     - <<: *Linux-32bit-shared
-      compiler: clang-32bit-shared
+      compiler: clang
     - &MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-static
+      compiler: x86_64-w64-mingw32-gcc
       addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-x86-64, g++-mingw-w64-x86-64, binutils-mingw-w64-x86-64]}}
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC
     - <<: *MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-shared
+      compiler: x86_64-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED
     - <<: *MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-d3d9-static
+      compiler: x86_64-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_OPENGL=0
     - <<: *MinGW-64bit
-      compiler: x86_64-w64-mingw32-gcc-d3d9-shared
+      compiler: x86_64-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_OPENGL=0
     # Ubuntu 12.04 LTS does not have up-to-date D3D11 headers, disable the CI build jobs for D3D11 for now until Travis-CI upgrades their OS to 14.04 LTS or better (We may not need these anymore because now we already have CI jobs on AppVeyor to cover the D3D11 build)
     # <<: *MinGW-64bit
-    # compiler: x86_64-w64-mingw32-gcc-d3d11-static
+    # compiler: x86_64-w64-mingw32-gcc
     # env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_D3D11=1
     # <<: *MinGW-64bit
-    # compiler: x86_64-w64-mingw32-gcc-d3d11-shared
+    # compiler: x86_64-w64-mingw32-gcc
     # env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_D3D11=1
     - &MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-static
+      compiler: i686-w64-mingw32-gcc
       addons: {apt: {sources: *default_sources, packages: [*default_packages, gcc-mingw-w64-i686, g++-mingw-w64-i686, binutils-mingw-w64-i686]}}
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0
     - <<: *MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-shared
+      compiler: i686-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0
     - <<: *MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-d3d9-static
+      compiler: i686-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
-      compiler: i686-w64-mingw32-gcc-d3d9-shared
+      compiler: i686-w64-mingw32-gcc
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
     # <<: *MinGW-32bit
-    # compiler: i686-w64-mingw32-gcc-d3d11-static
+    # compiler: i686-w64-mingw32-gcc
     # env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_D3D11=1
     # <<: *MinGW-32bit
-    # compiler: i686-w64-mingw32-gcc-d3d11-shared
+    # compiler: i686-w64-mingw32-gcc
     # env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 before_script:
   - rake ci_timer
@@ -123,56 +122,6 @@ after_script:
   - rake ci_teardown_cache
   - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
-
----
-
-branch: {name: VS-CI, active: yes, appveyor: yes, last_job: 'x64:SHARED'}
-version: '{build}'
-platform: x64
-clone_depth: 50
-environment:
-  GIT_NAME:
-    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
-  GIT_EMAIL:
-    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
-  GH_TOKEN:
-    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
-  SF_KEY:
-    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
-  SF_API:
-    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
-# Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
-  build_tree: Build
-  config: Release
-  included_sample: PLATFORM=x64 39_CrowdNavigation
-# We cannot afford to have a large matrix on AppVeyor at the moment
-  URHO3D_D3D11: 1
-  matrix:
-    - URHO3D_LIB_TYPE: STATIC
-    - URHO3D_LIB_TYPE: SHARED
-install:
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
-        {
-          $env:PACKAGE_UPLOAD = "1";
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
-          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
-        }
-        else
-        {
-          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
-        }
-build_script:
-  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
-  - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
-test: off
-artifacts:
-  - path: Build\*.zip
-deploy: off
 
 ---
 
@@ -240,6 +189,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: Android-CI, active: yes}
 language: android
+cache: {directories: $HOME/.ccache}
 android: {components: [build-tools-22.0.1]}
 jdk: oraclejdk8
 sudo: false
@@ -251,7 +201,7 @@ env:
     - numjobs=4
     - ANDROID=1
     - ANDROID_TMP=~/tmp
-    - USE_CCACHE=2
+    - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
@@ -291,6 +241,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: RPI-CI, active: yes}
 language: cpp
+compiler: gcc
 cache: ccache
 sudo: false
 addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib, rpm]}}
@@ -305,21 +256,15 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+  matrix:
+    - URHO3D_LIB_TYPE=STATIC
+    - URHO3D_LIB_TYPE=SHARED
+    - URHO3D_LIB_TYPE=STATIC RPI_ABI=armeabi-v7a
+    - URHO3D_LIB_TYPE=SHARED RPI_ABI=armeabi-v7a
+    - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
+    - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
 matrix:
   fast_finish: true
-  include:
-    - compiler: gcc-armeabi-v6-static
-      env: URHO3D_LIB_TYPE=STATIC
-    - compiler: gcc-armeabi-v6-shared
-      env: URHO3D_LIB_TYPE=SHARED
-    - compiler: gcc-armeabi-v7a-static
-      env: URHO3D_LIB_TYPE=STATIC RPI_ABI=armeabi-v7a
-    - compiler: gcc-armeabi-v7a-shared
-      env: URHO3D_LIB_TYPE=SHARED RPI_ABI=armeabi-v7a
-    - compiler: gcc-armeabi-v7a-with-NEON-static
-      env: URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
-    - compiler: gcc-armeabi-v7a-with-NEON-shared
-      env: URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
 before_script:
   - rake ci_timer
   - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for f in $RPI_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
@@ -336,6 +281,7 @@ after_script: rake ci_teardown_cache
 
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
+cache: {directories: $HOME/.ccache}
 osx_image: xcode7.1
 env:
   global:
@@ -343,7 +289,7 @@ env:
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=3
     - OSX=1
-    - USE_CCACHE=2
+    - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
@@ -365,7 +311,7 @@ before_script:
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
   - travis_retry brew install ccache $cmake $doxygen
-  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml openssl pkg-config readline'
+  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
   - for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
   - for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
   - brew cleanup
@@ -385,6 +331,7 @@ data:
 
 branch: {name: Web-CI, active: yes}
 language: cpp
+compiler: gcc
 cache: ccache
 sudo: false
 addons: {apt: {sources: [george-edison55-precise-backports, kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, doxygen, graphviz, g++-4.9]}}
@@ -399,13 +346,11 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+  matrix:
+    - URHO3D_LIB_TYPE=STATIC
+    - URHO3D_LIB_TYPE=SHARED
 matrix:
   fast_finish: true
-  include:
-    - compiler: gcc-archived-bitcode
-      env: URHO3D_LIB_TYPE=STATIC
-    - compiler: gcc-linked-bitcode
-      env: URHO3D_LIB_TYPE=SHARED
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~

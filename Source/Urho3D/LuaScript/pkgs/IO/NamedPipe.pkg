@@ -1,0 +1,174 @@
+$#include "IO/NamedPipe.h"
+
+class NamedPipe : public Object
+{
+    NamedPipe();
+    NamedPipe(const String pipeName, bool isServer);
+    ~NamedPipe();
+
+    bool Open(const String pipeName, bool isServer);
+    void Close();
+    bool IsOpen() const;
+
+    // From Deserializer
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
+    const String GetName() const;
+    bool IsEof() const;
+
+    int ReadInt();
+    short ReadShort();
+    signed char ReadByte();
+    unsigned ReadUInt();
+    unsigned short ReadUShort();
+    unsigned char ReadUByte();
+    bool ReadBool();
+    float ReadFloat();
+    double ReadDouble();
+    IntRect ReadIntRect();
+    IntVector2 ReadIntVector2();
+    Rect ReadRect();
+    Vector2 ReadVector2();
+    Vector3 ReadVector3();
+    Vector3 ReadPackedVector3(float maxAbsCoord);
+    Vector4 ReadVector4();
+    Quaternion ReadQuaternion();
+    Quaternion ReadPackedQuaternion();
+    Matrix3 ReadMatrix3();
+    Matrix3x4 ReadMatrix3x4();
+    Matrix4 ReadMatrix4();
+    Color ReadColor();
+    BoundingBox ReadBoundingBox();
+    String ReadString();
+    String ReadFileID();
+    StringHash ReadStringHash();
+
+    // PODVector<unsigned char> ReadBuffer();
+    VectorBuffer ReadBuffer();
+
+    ResourceRef ReadResourceRef();
+    ResourceRefList ReadResourceRefList();
+    Variant ReadVariant();
+    Variant ReadVariant(VariantType type);
+    VariantVector ReadVariantVector();
+    VariantMap ReadVariantMap();
+    unsigned ReadVLE();
+    unsigned ReadNetID();
+    String ReadLine();
+
+    // From Serializer
+    // unsigned Write(const void* data, unsigned size);
+    tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
+
+    bool WriteInt(int value);
+    bool WriteShort(short value);
+    bool WriteByte(signed char value);
+    bool WriteUInt(unsigned value);
+    bool WriteUShort(unsigned short value);
+    bool WriteUByte(unsigned char value);
+    bool WriteBool(bool value);
+    bool WriteFloat(float value);
+    bool WriteDouble(double value);
+    bool WriteIntRect(const IntRect& value);
+    bool WriteIntVector2(const IntVector2& value);
+    bool WriteRect(const Rect& value);
+    bool WriteVector2(const Vector2& value);
+    bool WriteVector3(const Vector3& value);
+    bool WritePackedVector3(const Vector3& value, float maxAbsCoord);
+    bool WriteVector4(const Vector4& value);
+    bool WriteQuaternion(const Quaternion& value);
+    bool WritePackedQuaternion(const Quaternion& value);
+    bool WriteMatrix3(const Matrix3& value);
+    bool WriteMatrix3x4(const Matrix3x4& value);
+    bool WriteMatrix4(const Matrix4& value);
+    bool WriteColor(const Color& value);
+    bool WriteBoundingBox(const BoundingBox& value);
+    bool WriteString(const String value);
+    bool WriteFileID(const String value);
+    bool WriteStringHash(const StringHash& value);
+
+    // bool WriteBuffer(const PODVector<unsigned char>& buffer);
+    tolua_outside bool SerializerWriteBuffer @ WriteBuffer(const VectorBuffer& buffer);
+
+    bool WriteResourceRef(const ResourceRef& value);
+    bool WriteResourceRefList(const ResourceRefList& value);
+    bool WriteVariant(const Variant& value);
+    bool WriteVariantData(const Variant& value);
+    bool WriteVariantVector(const VariantVector& value);
+    bool WriteVariantMap(const VariantMap& value);
+    bool WriteVLE(unsigned value);
+    bool WriteNetID(unsigned value);
+    bool WriteLine(const String value);
+
+    // From Deserializer
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__is_set bool eof;
+
+    tolua_readonly tolua_property__is_set bool open;
+};
+
+${
+#define TOLUA_DISABLE_tolua_IOLuaAPI_NamedPipe_new00
+static int tolua_IOLuaAPI_NamedPipe_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<NamedPipe>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_IOLuaAPI_NamedPipe_new00_local
+static int tolua_IOLuaAPI_NamedPipe_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<NamedPipe>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_IOLuaAPI_NamedPipe_new01
+static int tolua_IOLuaAPI_NamedPipe_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"NamedPipe",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String pipeName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  bool isServer = ((bool)  tolua_toboolean(tolua_S,3,0));
+ {
+  NamedPipe* tolua_ret = (NamedPipe*)  Mtolua_new((NamedPipe)(GetContext(tolua_S),pipeName,isServer));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"NamedPipe");
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_IOLuaAPI_NamedPipe_new00(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_IOLuaAPI_NamedPipe_new01_local
+static int tolua_IOLuaAPI_NamedPipe_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertable(tolua_S,1,"NamedPipe",0,&tolua_err) ||
+ !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+ !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+ !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+ {
+  const String pipeName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+  bool isServer = ((bool)  tolua_toboolean(tolua_S,3,0));
+ {
+  NamedPipe* tolua_ret = (NamedPipe*)  Mtolua_new((NamedPipe)(GetContext(tolua_S),pipeName,isServer));
+  tolua_pushusertype(tolua_S,(void*)tolua_ret,"NamedPipe");
+ tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+ }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_IOLuaAPI_NamedPipe_new00_local(tolua_S);
+}
+
+$}

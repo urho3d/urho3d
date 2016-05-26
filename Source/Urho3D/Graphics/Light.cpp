@@ -422,15 +422,7 @@ const Matrix3x4& Light::GetVolumeTransform(Camera* camera)
     switch (lightType_)
     {
     case LIGHT_DIRECTIONAL:
-        {
-            Matrix3x4 quadTransform;
-            Vector3 near, far;
-            // Position the directional light quad in halfway between far & near planes to prevent depth clipping
-            camera->GetFrustumSize(near, far);
-            quadTransform.SetTranslation(Vector3(0.0f, 0.0f, (camera->GetNearClip() + camera->GetFarClip()) * 0.5f));
-            quadTransform.SetScale(Vector3(far.x_, far.y_, 1.0f)); // Will be oversized, but doesn't matter (gets frustum clipped)
-            volumeTransform_ = camera->GetEffectiveWorldTransform() * quadTransform;
-        }
+        volumeTransform_ = GetFullscreenQuadTransform(camera);
         break;
 
     case LIGHT_SPOT:
@@ -571,6 +563,17 @@ void Light::SetIntensitySortValue(const BoundingBox& box)
 void Light::SetLightQueue(LightBatchQueue* queue)
 {
     lightQueue_ = queue;
+}
+
+Matrix3x4 Light::GetFullscreenQuadTransform(Camera* camera)
+{
+    Matrix3x4 quadTransform;
+    Vector3 near, far;
+    // Position the directional light quad in halfway between far & near planes to prevent depth clipping
+    camera->GetFrustumSize(near, far);
+    quadTransform.SetTranslation(Vector3(0.0f, 0.0f, (camera->GetNearClip() + camera->GetFarClip()) * 0.5f));
+    quadTransform.SetScale(Vector3(far.x_, far.y_, 1.0f)); // Will be oversized, but doesn't matter (gets frustum clipped)
+    return camera->GetEffectiveWorldTransform() * quadTransform;
 }
 
 }

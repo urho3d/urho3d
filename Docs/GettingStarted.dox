@@ -460,6 +460,7 @@ F1          Toggle console
 F2          Toggle profiling display
 F3          Toggle physics debug geometry
 F4          Toggle octree debug geometry
+F5          Toggle event profiling display
 \endverbatim
 
 If a joystick is connected, it can also be used for controlling the player character.

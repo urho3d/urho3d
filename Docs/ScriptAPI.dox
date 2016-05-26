@@ -875,6 +875,7 @@ namespace Urho3D
 - %Relative %Position : bool
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
+- %Fixed %Screen %Size : bool
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Face %Camera %Mode : int
@@ -1768,6 +1769,13 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 - %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -2055,6 +2063,9 @@ namespace Urho3D
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 
 ### Text3D
@@ -2067,6 +2078,7 @@ namespace Urho3D
 - %Row %Spacing : float
 - %Word %Wrap : bool
 - %Can %Be %Occluded : bool
+- %Fixed %Screen %Size : bool
 - %Face %Camera %Mode : int
 - %Draw %Distance : float
 - %Width : int
@@ -2079,6 +2091,9 @@ namespace Urho3D
 - %Bottom %Left %Color : Color
 - %Bottom %Right %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
@@ -2389,6 +2404,7 @@ namespace Urho3D
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NamedPipe"><b>NamedPipe</b></a>
 <a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
@@ -3133,6 +3149,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -7290,6 +7307,7 @@ Properties:
 
 Methods:
 
+- bool FromString(const String&)
 - JSONValue& GetRoot()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
@@ -8341,6 +8359,98 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_NamedPipe"></a>
+
+### NamedPipe
+
+Methods:
+
+- void Close()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Open(const String&, bool)
+- uint8[]@ Read(uint)
+- bool ReadBool()
+- BoundingBox ReadBoundingBox()
+- int8 ReadByte()
+- Color ReadColor()
+- double ReadDouble()
+- String ReadFileID()
+- float ReadFloat()
+- int ReadInt()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- uint ReadNetID()
+- Quaternion ReadPackedQuaternion()
+- Vector3 ReadPackedVector3(float)
+- Quaternion ReadQuaternion()
+- int16 ReadShort()
+- String ReadString()
+- StringHash ReadStringHash()
+- uint8 ReadUByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint ReadVLE()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
+- uint Seek(uint)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Write(uint8[]@)
+- bool WriteBool(bool)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteByte(int8)
+- bool WriteColor(const Color&)
+- bool WriteDouble(double)
+- bool WriteFileID(const String&)
+- bool WriteFloat(float)
+- bool WriteInt(int)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
+- bool WriteNetID(uint)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteQuaternion(const Quaternion&)
+- bool WriteShort(int16)
+- bool WriteString(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteUByte(uint8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteVLE(uint)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
+
+Properties:
+
+- String category // readonly
+- uint checksum // readonly
+- bool eof // readonly
+- String name // readonly
+- bool open // readonly
+- uint position // readonly
+- int refs // readonly
+- bool server // readonly
+- uint size // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_NavArea"></a>
 
 ### NavArea
@@ -9139,6 +9249,7 @@ Properties:
 - Vector3 emitterSize
 - EmitterType emitterType
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - float inactiveTime
 - Material@ material
 - Vector3 maxDirection
@@ -9260,6 +9371,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -12546,6 +12658,9 @@ Properties:
 - uint dragDropMode
 - bool editable
 - Color effectColor
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool elementEventSender
 - bool enabled
 - bool enabledSelf // readonly
@@ -12675,9 +12790,13 @@ Properties:
 - float drawDistance
 - Color effectColor
 - float effectDepthBias
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - Font@ font // readonly
 - int fontSize // readonly
 - HorizontalAlignment horizontalAlignment
@@ -15202,6 +15321,7 @@ Properties:
 - int RandomInt(int)
 - int RandomInt(int, int)
 - float RandomNormal(float, float)
+- void RegisterEventName(const String&)
 - void Remove()
 - String RemoveTrailingSlash(const String&)
 - String ReplaceExtension(const String&, const String&)
@@ -15300,6 +15420,7 @@ Properties:
 - uint DD_TARGET
 - uint DEBUGHUD_SHOW_ALL
 - uint DEBUGHUD_SHOW_ALL_MEMORY
+- uint DEBUGHUD_SHOW_EVENTPROFILER
 - uint DEBUGHUD_SHOW_MEMORY
 - uint DEBUGHUD_SHOW_MODE
 - uint DEBUGHUD_SHOW_NONE

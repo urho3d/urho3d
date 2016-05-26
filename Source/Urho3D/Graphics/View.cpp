@@ -706,7 +706,7 @@ void View::SetGlobalShaderParameters()
     }
 }
 
-void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
+void View::SetCameraShaderParameters(Camera* camera)
 {
     if (!camera)
         return;
@@ -750,18 +750,15 @@ void View::SetCameraShaderParameters(Camera* camera, bool setProjection)
     camera->GetFrustumSize(nearVector, farVector);
     graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
 
-    if (setProjection)
-    {
-        Matrix4 projection = camera->GetProjection();
+    Matrix4 projection = camera->GetProjection();
 #ifdef URHO3D_OPENGL
-        // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
-        float constantBias = 2.0f * graphics_->GetDepthConstantBias();
-        projection.m22_ += projection.m32_ * constantBias;
-        projection.m23_ += projection.m33_ * constantBias;
+    // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
+    float constantBias = 2.0f * graphics_->GetDepthConstantBias();
+    projection.m22_ += projection.m32_ * constantBias;
+    projection.m23_ += projection.m33_ * constantBias;
 #endif
 
-        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
-    }
+    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
 }
 
 void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
@@ -1800,12 +1797,8 @@ void View::RenderQuad(RenderPathCommand& command)
     // Set shaders & shader parameters and textures
     graphics_->SetShaders(vs, ps);
 
-    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
-    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
-        graphics_->SetShaderParameter(k->first_, k->second_);
-
     SetGlobalShaderParameters();
-    SetCameraShaderParameters(camera_, false);
+    SetCameraShaderParameters(camera_);
 
     // During renderpath commands the G-Buffer or viewport texture is assumed to always be viewport-sized
     IntRect viewport = graphics_->GetViewport();
@@ -1832,6 +1825,11 @@ void View::RenderQuad(RenderPathCommand& command)
         graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
         graphics_->SetShaderParameter(offsetsName, Vector2(pixelUVOffset.x_ / width, pixelUVOffset.y_ / height));
     }
+
+    // Set command's shader parameters last to allow them to override any of the above
+    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
+    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+        graphics_->SetShaderParameter(k->first_, k->second_);
 
     graphics_->SetBlendMode(command.blendMode_);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -2079,27 +2077,36 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     SetGBufferShaderParameters(srcSize, srcRect);
 
     graphics_->SetTexture(TU_DIFFUSE, source);
-    DrawFullscreenQuad(false);
+    DrawFullscreenQuad(true);
 }
 
-void View::DrawFullscreenQuad(bool nearQuad)
+void View::DrawFullscreenQuad(bool setIdentityProjection)
 {
     Geometry* geometry = renderer_->GetQuadGeometry();
 
-    Matrix3x4 model = Matrix3x4::IDENTITY;
-    Matrix4 projection = Matrix4::IDENTITY;
+    // If no camera, no choice but to use identity projection
+    if (!camera_)
+        setIdentityProjection = true;
 
+    if (setIdentityProjection)
+    {
+        Matrix3x4 model = Matrix3x4::IDENTITY;
+        Matrix4 projection = Matrix4::IDENTITY;
 #ifdef URHO3D_OPENGL
-    if (camera_ && camera_->GetFlipVertical())
-        projection.m11_ = -1.0f;
-    model.m23_ = nearQuad ? -1.0f : 1.0f;
+        if (camera_ && camera_->GetFlipVertical())
+            projection.m11_ = -1.0f;
+        model.m23_ = 0.0f;
 #else
-    model.m23_ = nearQuad ? 0.0f : 1.0f;
+        model.m23_ = 0.5f;
 #endif
 
+        graphics_->SetShaderParameter(VSP_MODEL, model);
+        graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+    }
+    else
+        graphics_->SetShaderParameter(VSP_MODEL, Light::GetFullscreenQuadTransform(camera_));
+
     graphics_->SetCullMode(CULL_NONE);
-    graphics_->SetShaderParameter(VSP_MODEL, model);
-    graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
     graphics_->ClearTransformSources();
 
     geometry->Draw(graphics_);
@@ -2967,23 +2974,23 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
     // Set shadow depth bias
     BiasParameters parameters = queue.light_->GetShadowBias();
 
-    // the shadow map is a depth stencil map
+    // The shadow map is a depth stencil texture
     if (shadowMap->GetUsage() == TEXTURE_DEPTHSTENCIL)
     {
         graphics_->SetColorWrite(false);
         graphics_->SetDepthStencil(shadowMap);
         graphics_->SetRenderTarget(0, shadowMap->GetRenderSurface()->GetLinkedRenderTarget());
-        // disable other render targets
+        // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH);
     }
-    else // if the shadow map is a render texture
+    else // if the shadow map is a color rendertarget
     {
         graphics_->SetColorWrite(true);
         graphics_->SetRenderTarget(0, shadowMap);
-        // disable other render targets
+        // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
         graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
@@ -3025,8 +3032,9 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         }
     }
 
-    renderer_->ApplyShadowMapFilter(this, shadowMap);
-
+    // Scale filter blur amount to shadow map viewport size so that different shadow map resolutions don't behave differently
+    float blurScale = queue.shadowSplits_[0].shadowViewport_.Width() / 1024.0f;
+    renderer_->ApplyShadowMapFilter(this, shadowMap, blurScale);
 
     // reset some parameters
     graphics_->SetColorWrite(true);

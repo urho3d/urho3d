@@ -356,8 +356,18 @@ private:
 };
 #endif
 
+/// Register event names.
+struct URHO3D_API EventNameRegistrar
+{
+    static StringHash RegisterEventName(const char* eventName);
+    /// Return Event name or empty string if not found.
+    static const String& GetEventName(StringHash eventID);
+    /// Return Event name map.
+    static HashMap<StringHash, String>& GetEventNameMap();
+};
+
 /// Describe an event's hash ID and begin a namespace in which to define its parameters.
-#define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(#eventName); namespace eventName
+#define URHO3D_EVENT(eventID, eventName) static const Urho3D::StringHash eventID(Urho3D::EventNameRegistrar::RegisterEventName(#eventName)); namespace eventName
 /// Describe an event's parameter hash ID. Should be used inside an event namespace.
 #define URHO3D_PARAM(paramID, paramName) static const Urho3D::StringHash paramID(#paramName)
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function.

@@ -77,7 +77,7 @@ public:
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
     /// Set shadow offset.
-    void SetEffectShadowOffset(IntVector2 offset);
+    void SetEffectShadowOffset(const IntVector2& offset);
     /// Set stroke thickness.
     void SetEffectStrokeThickness(int thickness);
     /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
@@ -94,15 +94,17 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
+    /// Set whether text has fixed size on screen (pixel-perfect) regardless of distance to camera. Works best when combined with face camera rotation. Default false.
+    void SetFixedScreenSize(bool enable);
     /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Return font.
     Font* GetFont() const;
-    /// Return material.
-    Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
+    /// Return material.
+    Material* GetMaterial() const;
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.
@@ -118,7 +120,7 @@ public:
     /// Return text effect.
     TextEffect GetTextEffect() const;
     /// Return effect shadow offset.
-    IntVector2 GetEffectShadowOffset() const;
+    const IntVector2& GetEffectShadowOffset() const;
     /// Return effect stroke thickness.
     int GetEffectStrokeThickness() const;
     /// Return effect round stroke.
@@ -145,7 +147,8 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-
+    /// Return whether text has fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
     /// Return how the text rotates in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
@@ -166,15 +169,13 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-
-private:
     /// Mark text & geometry dirty.
     void MarkTextDirty();
     /// Update text %UI batches.
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.
     void UpdateTextMaterials(bool forceUpdate = false);
-
+    
     /// Internally used text element.
     Text text_;
     /// Geometries.
@@ -191,6 +192,8 @@ private:
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Fixed screen size flag.
+    bool fixedScreenSize_;
     /// Text needs update flag.
     bool textDirty_;
     /// Geometry dirty flag.

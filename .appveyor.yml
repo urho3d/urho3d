@@ -39,7 +39,6 @@ environment:
 # Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
   build_tree: Build
   config: Release
-  excluded_sample: PLATFORM=x64 39_CrowdNavigation
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
   matrix:

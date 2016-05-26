@@ -56,6 +56,8 @@ public:
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position from the beginning of the stream. Not supported.
     virtual unsigned Seek(unsigned position);
+    /// Return whether all response data has been read.
+    virtual bool IsEof() const;
 
     /// Return URL used in the request.
     const String& GetURL() const { return url_; }
@@ -74,8 +76,8 @@ public:
     bool IsOpen() const { return GetState() == HTTP_OPEN; }
 
 private:
-    /// Check for end of the data stream and return available size in buffer. Must only be called when the mutex is held by the main thread.
-    unsigned CheckEofAndAvailableSize();
+    /// Check for available read data in buffer and whether end has been reached. Must only be called when the mutex is held by the main thread.
+    Pair<unsigned, bool> CheckAvailableSizeAndEof() const;
 
     /// URL.
     String url_;

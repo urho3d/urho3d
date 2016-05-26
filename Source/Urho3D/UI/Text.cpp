@@ -207,29 +207,30 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
                 // Adding to thickness helps with thickness of 1 not having enought samples for this formula
                 // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
-                int samples = strokeThickness_ * strokeThickness_ + (strokeThickness_ % 2 == 0 ? 4 : 3);
+                int thickness = Clamp(strokeThickness_, 0, fontSize_);
+                int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
                 float angle = 360.f / samples;
+                float floatThickness = (float)thickness;
                 for (int i = 0; i < samples; ++i)
                 {
-                    float x = cos(angle * i * M_PI / 180.f) * strokeThickness_;
-                    float y = sin(angle * i * M_PI / 180.f) * strokeThickness_;
+                    float x = Cos(angle * i) * floatThickness;
+                    float y = Sin(angle * i) * floatThickness;
                     ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
                 }
             }
             else
             {
-                float offset = strokeThickness_ / 2.f;
-                offset = floor(offset + .5f);
+                int thickness = Clamp(strokeThickness_, 0, fontSize_);
                 int x, y;
-                for (x = -(int)offset; x <= (int)offset; ++x)
+                for (x = -thickness; x <= thickness; ++x)
                 {
-                    for (y = -(int)offset; y <= (int)offset; ++y)
+                    for (y = -thickness; y <= thickness; ++y)
                     {
                         // Don't draw glyphs that aren't on the edges
-                        if (x > -(int)offset && x < (int)offset &&
-                            y > -(int)offset && y < (int)offset)
+                        if (x > -thickness && x < thickness &&
+                            y > -thickness && y < thickness)
                             continue;
-
+    
                         ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
                     }
                 }
@@ -395,7 +396,7 @@ void Text::SetTextEffect(TextEffect textEffect)
     textEffect_ = textEffect;
 }
 
-void Text::SetEffectShadowOffset(IntVector2 offset)
+void Text::SetEffectShadowOffset(const IntVector2& offset)
 {
     shadowOffset_ = offset;
 }
