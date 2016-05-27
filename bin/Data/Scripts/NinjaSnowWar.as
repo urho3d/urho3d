@@ -469,7 +469,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         if (!console.visible)
             engine.Exit();

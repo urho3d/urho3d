@@ -56,7 +56,7 @@ static const int KEY_ALT;
 static const int KEY_GUI;
 static const int KEY_PAUSE;
 static const int KEY_CAPSLOCK;
-static const int KEY_ESC;
+static const int KEY_ESCAPE;
 static const int KEY_SPACE;
 static const int KEY_PAGEUP;
 static const int KEY_PAGEDOWN;

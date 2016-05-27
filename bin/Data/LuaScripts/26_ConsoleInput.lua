@@ -89,7 +89,7 @@ end
 
 function HandleEscKeyDown(eventType, eventData)
     -- Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if eventData["Key"]:GetInt() == KEY_ESC then
+    if eventData["Key"]:GetInt() == KEY_ESCAPE then
         engine:Exit()
     end
 end

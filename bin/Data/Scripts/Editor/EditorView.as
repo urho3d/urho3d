@@ -1347,7 +1347,7 @@ void UpdateView(float timeStep)
     {
         changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
 
-        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC])
+        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESCAPE])
             cameraFlyMode = false;
     }
 
