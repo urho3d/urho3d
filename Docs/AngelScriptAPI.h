@@ -11656,6 +11656,7 @@ bool enabled;
 /* readonly */
 bool enabledEffective;
 FaceCameraMode faceCameraMode;
+bool fixedScreenSize;
 /* readonly */
 Font font;
 /* readonly */

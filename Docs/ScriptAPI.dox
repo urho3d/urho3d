@@ -2078,6 +2078,7 @@ namespace Urho3D
 - %Row %Spacing : float
 - %Word %Wrap : bool
 - %Can %Be %Occluded : bool
+- %Fixed %Screen %Size : bool
 - %Face %Camera %Mode : int
 - %Draw %Distance : float
 - %Width : int
@@ -12795,6 +12796,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - Font@ font // readonly
 - int fontSize // readonly
 - HorizontalAlignment horizontalAlignment

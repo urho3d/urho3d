@@ -6196,6 +6196,7 @@ Methods:
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
 - void SetOpacity(float opacity)
+- void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
@@ -6221,6 +6222,7 @@ Methods:
 - IntVector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
+- bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
 
 Properties:
@@ -6246,6 +6248,7 @@ Properties:
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
+- bool fixedScreenSize
 - FaceCameraMode faceCameraMode
 
 <a name="Class_Texture"></a>

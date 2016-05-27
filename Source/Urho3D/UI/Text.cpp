@@ -111,6 +111,7 @@ void Text::ApplyAttributes()
     DecodeToUnicode();
 
     fontSize_ = Max(fontSize_, 1);
+    strokeThickness_ = Abs(strokeThickness_);
     ValidateSelection();
     UpdateText();
 }
@@ -207,7 +208,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
                 // Adding to thickness helps with thickness of 1 not having enought samples for this formula
                 // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
-                int thickness = Clamp(strokeThickness_, 0, fontSize_);
+                int thickness = Min(strokeThickness_, fontSize_);
                 int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
                 float angle = 360.f / samples;
                 float floatThickness = (float)thickness;
@@ -220,7 +221,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             }
             else
             {
-                int thickness = Clamp(strokeThickness_, 0, fontSize_);
+                int thickness = Min(strokeThickness_, fontSize_);
                 int x, y;
                 for (x = -thickness; x <= thickness; ++x)
                 {
@@ -403,7 +404,7 @@ void Text::SetEffectShadowOffset(const IntVector2& offset)
 
 void Text::SetEffectStrokeThickness(int thickness)
 {
-    strokeThickness_ = thickness;
+    strokeThickness_ = Abs(thickness);
 }
 
 void Text::SetEffectRoundStroke(bool roundStroke)

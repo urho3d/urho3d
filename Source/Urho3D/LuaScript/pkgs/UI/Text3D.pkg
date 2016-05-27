@@ -38,6 +38,7 @@ class Text3D : public Drawable
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
     void SetOpacity(float opacity);
+    void SetFixedScreenSize(bool enable);
     void SetFaceCameraMode(FaceCameraMode mode);
 
     Font* GetFont() const;
@@ -64,6 +65,7 @@ class Text3D : public Drawable
     IntVector2 GetCharSize(unsigned index);
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
+    bool IsFixedScreenSize() const;
     FaceCameraMode GetFaceCameraMode() const;
 
     tolua_property__get_set Font* font;
@@ -87,6 +89,7 @@ class Text3D : public Drawable
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;
+    tolua_property__is_set bool fixedScreenSize;
     tolua_property__get_set FaceCameraMode faceCameraMode;
 };
 

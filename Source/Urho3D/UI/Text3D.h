@@ -94,15 +94,17 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
+    /// Set whether text has fixed size on screen (pixel-perfect) regardless of distance to camera. Works best when combined with face camera rotation. Default false.
+    void SetFixedScreenSize(bool enable);
     /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Return font.
     Font* GetFont() const;
-    /// Return material.
-    Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
+    /// Return material.
+    Material* GetMaterial() const;
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.
@@ -145,7 +147,8 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-
+    /// Return whether text has fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
     /// Return how the text rotates in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
@@ -189,6 +192,8 @@ protected:
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Fixed screen size flag.
+    bool fixedScreenSize_;
     /// Text needs update flag.
     bool textDirty_;
     /// Geometry dirty flag.

@@ -201,7 +201,7 @@ struct URHO3D_API RenderPathCommand
     bool vertexLights_;
 };
 
-/// Rendering path definition.
+/// Rendering path definition. A sequence of commands (e.g. clear screen, draw objects with specific pass) that yields the scene rendering result.
 class URHO3D_API RenderPath : public RefCounted
 {
 public:
