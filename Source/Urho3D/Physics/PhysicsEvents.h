@@ -41,7 +41,7 @@ URHO3D_EVENT(E_PHYSICSPOSTSTEP, PhysicsPostStep)
     URHO3D_PARAM(P_TIMESTEP, TimeStep);            // float
 }
 
-/// Physics collision started.
+/// Physics collision started. Global event sent by the PhysicsWorld.
 URHO3D_EVENT(E_PHYSICSCOLLISIONSTART, PhysicsCollisionStart)
 {
     URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld pointer
@@ -53,7 +53,7 @@ URHO3D_EVENT(E_PHYSICSCOLLISIONSTART, PhysicsCollisionStart)
     URHO3D_PARAM(P_CONTACTS, Contacts);            // Buffer containing position (Vector3), normal (Vector3), distance (float), impulse (float) for each contact
 }
 
-/// Physics collision ongoing.
+/// Physics collision ongoing. Global event sent by the PhysicsWorld.
 URHO3D_EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
 {
     URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld pointer
@@ -65,7 +65,7 @@ URHO3D_EVENT(E_PHYSICSCOLLISION, PhysicsCollision)
     URHO3D_PARAM(P_CONTACTS, Contacts);            // Buffer containing position (Vector3), normal (Vector3), distance (float), impulse (float) for each contact
 }
 
-/// Physics collision ended.
+/// Physics collision ended. Global event sent by the PhysicsWorld.
 URHO3D_EVENT(E_PHYSICSCOLLISIONEND, PhysicsCollisionEnd)
 {
     URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld pointer
@@ -76,7 +76,7 @@ URHO3D_EVENT(E_PHYSICSCOLLISIONEND, PhysicsCollisionEnd)
     URHO3D_PARAM(P_TRIGGER, Trigger);              // bool
 }
 
-/// Physics collision started (sent to the participating scene nodes.)
+/// Node's physics collision started. Sent by scene nodes participating in a collision.
 URHO3D_EVENT(E_NODECOLLISIONSTART, NodeCollisionStart)
 {
     URHO3D_PARAM(P_BODY, Body);                    // RigidBody pointer
@@ -86,7 +86,7 @@ URHO3D_EVENT(E_NODECOLLISIONSTART, NodeCollisionStart)
     URHO3D_PARAM(P_CONTACTS, Contacts);            // Buffer containing position (Vector3), normal (Vector3), distance (float), impulse (float) for each contact
 }
 
-/// Physics collision ongoing (sent to the participating scene nodes.)
+/// Node's physics collision ongoing. Sent by scene nodes participating in a collision.
 URHO3D_EVENT(E_NODECOLLISION, NodeCollision)
 {
     URHO3D_PARAM(P_BODY, Body);                    // RigidBody pointer
@@ -96,7 +96,7 @@ URHO3D_EVENT(E_NODECOLLISION, NodeCollision)
     URHO3D_PARAM(P_CONTACTS, Contacts);            // Buffer containing position (Vector3), normal (Vector3), distance (float), impulse (float) for each contact
 }
 
-/// Physics collision ended (sent to the participating scene nodes.)
+/// Node's physics collision ended. Sent by scene nodes participating in a collision.
 URHO3D_EVENT(E_NODECOLLISIONEND, NodeCollisionEnd)
 {
     URHO3D_PARAM(P_BODY, Body);                    // RigidBody pointer
