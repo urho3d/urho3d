@@ -1838,7 +1838,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
     switch (evt.type)
     {
         case SDL_KEYDOWN:
-            // Convert to uppercase to match Win32 virtual key codes
 #ifdef __EMSCRIPTEN__
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
 #else
