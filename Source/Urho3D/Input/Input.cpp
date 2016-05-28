@@ -69,7 +69,7 @@ int ConvertSDLKeyCode(int keySym, int scanCode)
     if (scanCode == SCANCODE_AC_BACK)
         return KEY_ESC;
     else
-        return SDL_toupper(keySym);
+        return SDL_tolower(keySym);
 }
 
 UIElement* TouchState::GetTouchedElement()
@@ -1288,12 +1288,12 @@ String Input::GetScancodeName(int scancode) const
 
 bool Input::GetKeyDown(int key) const
 {
-    return keyDown_.Contains(SDL_toupper(key));
+    return keyDown_.Contains(SDL_tolower(key));
 }
 
 bool Input::GetKeyPress(int key) const
 {
-    return keyPress_.Contains(SDL_toupper(key));
+    return keyPress_.Contains(SDL_tolower(key));
 }
 
 bool Input::GetScancodeDown(int scancode) const
