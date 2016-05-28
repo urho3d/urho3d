@@ -824,6 +824,10 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+        float elapsedTime = GetSubsystem<Time>()->GetElapsedTime();
+        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+
         IntRect scissor = batch.scissor_;
         scissor.left_ = (int)(scissor.left_ * uiScale_);
         scissor.top_ = (int)(scissor.top_ * uiScale_);
