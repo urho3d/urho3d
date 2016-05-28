@@ -173,6 +173,8 @@ private:
     void UpdateBufferSize();
     /// Rewrite billboard vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
+    /// Calculate billboard scale factors in fixed screen size mode.
+    void CalculateFixedScreenSize(const FrameInfo& frame);
 
     /// Geometry.
     SharedPtr<Geometry> geometry_;
@@ -196,8 +198,6 @@ private:
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
     Vector3 previousOffset_;
-    /// Scale factor for fixed screen size mode.
-    float fixedScaleFactor_;
     /// Billboard pointers for sorting.
     Vector<Billboard*> sortedBillboards_;
     /// Attribute buffer for network replication.
