@@ -116,29 +116,7 @@ void Text3D::UpdateBatches(const FrameInfo& frame)
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
     if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
-    {
-        Vector3 worldPosition = node_->GetWorldPosition();
-        Vector3 worldScale = node_->GetWorldScale();
-
-        if (fixedScreenSize_)
-        {
-            float textScaling = 2.0f / TEXT_SCALING / frame.viewSize_.y_;
-            float halfViewWorldSize = frame.camera_->GetHalfViewSize();
-
-            if (!frame.camera_->IsOrthographic())
-            {
-                Matrix4 viewProj(frame.camera_->GetProjection(false) * frame.camera_->GetView());
-                Vector4 projPos(viewProj * Vector4(worldPosition, 1.0f));
-                worldScale *= textScaling * halfViewWorldSize * projPos.w_;
-            }
-            else
-                worldScale *= textScaling * halfViewWorldSize;
-        }
-
-        customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
-            worldPosition, node_->GetWorldRotation(), faceCameraMode_), worldScale);
-        worldBoundingBoxDirty_ = true;
-    }
+        CalculateFixedScreenSize(frame);
 
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
@@ -166,6 +144,10 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
         fontDataLost_ = false;
     }
 
+    // In case is being rendered from multiple views, recalculate camera facing & fixed size
+    if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
+        CalculateFixedScreenSize(frame);
+
     if (geometryDirty_)
     {
         for (unsigned i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
@@ -189,7 +171,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType Text3D::GetUpdateGeometryType()
 {
-    if (geometryDirty_ || fontDataLost_ || vertexBuffer_->IsDataLost())
+    if (geometryDirty_ || fontDataLost_ || vertexBuffer_->IsDataLost() || faceCameraMode_ != FC_NONE || fixedScreenSize_)
         return UPDATE_MAIN_THREAD;
     else
         return UPDATE_NONE;
@@ -696,6 +678,31 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             }
         }
     }
+}
+
+void Text3D::CalculateFixedScreenSize(const FrameInfo& frame)
+{
+    Vector3 worldPosition = node_->GetWorldPosition();
+    Vector3 worldScale = node_->GetWorldScale();
+
+    if (fixedScreenSize_)
+    {
+        float textScaling = 2.0f / TEXT_SCALING / frame.viewSize_.y_;
+        float halfViewWorldSize = frame.camera_->GetHalfViewSize();
+
+        if (!frame.camera_->IsOrthographic())
+        {
+            Matrix4 viewProj(frame.camera_->GetProjection(false) * frame.camera_->GetView());
+            Vector4 projPos(viewProj * Vector4(worldPosition, 1.0f));
+            worldScale *= textScaling * halfViewWorldSize * projPos.w_;
+        }
+        else
+            worldScale *= textScaling * halfViewWorldSize;
+    }
+
+    customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
+        worldPosition, node_->GetWorldRotation(), faceCameraMode_), worldScale);
+    worldBoundingBoxDirty_ = true;
 }
 
 }
