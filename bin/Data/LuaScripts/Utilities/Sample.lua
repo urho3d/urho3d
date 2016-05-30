@@ -149,7 +149,7 @@ end
 function HandleKeyUp(eventType, eventData)
     local key = eventData["Key"]:GetInt()
     -- Close console (if open) or exit when ESC is pressed
-    if key == KEY_ESC then
+    if key == KEY_ESCAPE then
         if console:IsVisible() then
             console:SetVisible(false)
         else

@@ -67,7 +67,7 @@ const unsigned TOUCHID_MAX = 32;
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
     if (scanCode == SCANCODE_AC_BACK)
-        return KEY_ESC;
+        return KEY_ESCAPE;
     else
         return SDL_toupper(keySym);
 }
