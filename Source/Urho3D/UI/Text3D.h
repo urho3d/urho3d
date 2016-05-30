@@ -175,6 +175,8 @@ protected:
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.
     void UpdateTextMaterials(bool forceUpdate = false);
+    /// Recalculate camera facing and fixed screen size.
+    void CalculateFixedScreenSize(const FrameInfo& frame);
     
     /// Internally used text element.
     Text text_;
