@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Nathanial Lydick for Urho3D
 
 //
 // as_context.cpp
@@ -5129,16 +5130,16 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 	m_regs.objectRegister = gen.objectRegister;
 	m_regs.objectType = descr->returnType.GetObjectType();
 
-
-//ADDED from http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
-//if ( m_callingSystemFunction->returnType.IsObject()	&& !m_callingSystemFunction->returnType.IsReference() && m_callingSystemFunction->returnType.IsObjectHandle()	&& m_callingSystemFunction->sysFuncIntf && m_callingSystemFunction->sysFuncIntf->returnAutoHandle	&& m_regs.objectRegister )
-//	m_engine->CallObjectMethod( m_regs.objectRegister, m_callingSystemFunction->returnType.GetObjectType()->beh.addref );
+// Urho3D: add autohandle support for the AS_MAX_PORTABILITY builds
+#if defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
+//based on http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
 if ( descr->returnType.IsObject()
 		&& !descr->returnType.IsReference()
 		&& descr->returnType.IsObjectHandle()
 		&& sysFunc->returnAutoHandle
 		&& m_regs.objectRegister )
 	m_engine->CallObjectMethod( m_regs.objectRegister, descr->returnType.GetObjectType()->beh.addref );
+#endif
 
 	// Clean up arguments
 	const asUINT cleanCount = sysFunc->cleanArgs.GetLength();

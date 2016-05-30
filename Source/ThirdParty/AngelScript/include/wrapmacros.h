@@ -1,12 +1,56 @@
-#if  defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
-#include "wrap16.h"
-//can help solve potential ... problems if we need it at the start: http://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
-#define asFUNCTION(f) F, f
+//
+// Copyright (c) 2008-2016 the Urho3D project.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
 
+#pragma once
+
+//only use this file if we are in a web build or the portable (wrapped) code has been specifically requested
+#if defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
+
+//the template wrapper code
+#include "wrap16.h"
+
+//can help solve potential ... problems if we need it at the start: http://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
+
+//Overview of the process:
+//take the original funciton that registers a function for the angelscript engine:
+//(RegisterGlobalFunction, RegisterObjectMethod, ...)
+//Define it as a macro. Redefine the asFUNCTION family of macros to extract the arguments passed to them 
+//and pass an F, M, FPR, or MPR depending on which macro was chosen as another argument before the original 
+//contents of the asFUNCTION macro
+//Use the ## operator to paste the F, M, FPR< or MPR allong with the asECallConvTypes name to form the name of another macro
+//This other macro will then bundle the arguments back into the original RegisterGlobalFunction... call, but will use the 
+//wrap macros from the wrap16.h and wrap.h files instead of the original asFUNCTION... call, and will specify the asCALL_GENERIC
+//calling convention
+//***NOTE***: not all of the possibly calling convention/method combinations have been finished, and those that Urho does not use are untested
+
+
+
+#define asFUNCTION(f) F, f
+//define a new macro (taken from angelscript.h) to use in place of the original asFUNCTION macro
 #define _asFUNCTION(f) asFunctionPtr(f)
 //#define asMETHOD(cls, f) cls, M, f
 #define asMETHOD(cls, f) M, (cls,f) //package class and function for UNWRAPping later
 #define UNWRAP(x,y) x,y// try -fmacro-backtrace-limit=0 on compile
+//define a new macro (taken from angelscript.h) to use in place of the original asMETHOD macro
 #define _asMETHOD(c,m) asSMethodPtr<sizeof(void (c::*)())>::Convert((void (c::*)())(&c::m))
 #define RegisterGlobalFunction(...) RegGlobalIndirect(__VA_ARGS__)
 #define RegGlobalIndirect(decl, F, func, kind) RegisterGlobalFunction##F##kind (decl,func) // ... = decl or it = decl, cls for asCall_ThisCall
@@ -55,6 +99,7 @@
 #define UNWRAP3(x,y,z) x,y,z
 #define UNWRAP4(x,y,z,w) x,y,z,w
 #define asMETHODPR(cls,f,p,r) MPR, (cls,f,p,r)
+//define a new macro (taken from angelscript.h) to use in place of the original asFUNCTIONPR macro
 #if (defined(_MSC_VER) && _MSC_VER <= 1200) || (defined(__BORLANDC__) && __BORLANDC__ < 0x590)
 // MSVC 6 has a bug that prevents it from properly compiling using the correct asFUNCTIONPR with operator >
 // so we need to use ordinary C style cast instead of static_cast. The drawback is that the compiler can't
@@ -67,6 +112,7 @@
 #else
 #define _asFUNCTIONPR(f,p,r) asFunctionPtr((void (*)())(static_cast<r (*)p>(f)))
 #endif
+//define a new macro (taken from angelscript.h) to use in place of the original asMETHODPR macro
 #define _asMETHODPR(c,m,p,r) asSMethodPtr<sizeof(void (c::*)())>::Convert(AS_METHOD_AMBIGUITY_CAST(r (c::*)p)(&c::m))
 
 
