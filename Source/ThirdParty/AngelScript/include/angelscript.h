@@ -35,7 +35,12 @@
 //
 // The script engine interface
 //
-
+#ifdef EMSCRIPTEN
+#define AS_MAX_PORTABILITY
+#endif
+#ifdef FORCE_AS_PORTABLE
+#define AS_MAX_PORTABILITY
+#endif
 
 #ifndef ANGELSCRIPT_H
 #define ANGELSCRIPT_H
@@ -1929,5 +1934,8 @@ const asSBCInfo asBCInfo[256] =
 
 
 END_AS_NAMESPACE
+#ifndef URHO_PROJECT_BUILD
+#include "mine.h"
+#endif
 
 #endif

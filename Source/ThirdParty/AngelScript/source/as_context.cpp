@@ -5129,6 +5129,17 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 	m_regs.objectRegister = gen.objectRegister;
 	m_regs.objectType = descr->returnType.GetObjectType();
 
+
+//ADDED from http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
+//if ( m_callingSystemFunction->returnType.IsObject()	&& !m_callingSystemFunction->returnType.IsReference() && m_callingSystemFunction->returnType.IsObjectHandle()	&& m_callingSystemFunction->sysFuncIntf && m_callingSystemFunction->sysFuncIntf->returnAutoHandle	&& m_regs.objectRegister )
+//	m_engine->CallObjectMethod( m_regs.objectRegister, m_callingSystemFunction->returnType.GetObjectType()->beh.addref );
+if ( descr->returnType.IsObject()
+		&& !descr->returnType.IsReference()
+		&& descr->returnType.IsObjectHandle()
+		&& sysFunc->returnAutoHandle
+		&& m_regs.objectRegister )
+	m_engine->CallObjectMethod( m_regs.objectRegister, descr->returnType.GetObjectType()->beh.addref );
+
 	// Clean up arguments
 	const asUINT cleanCount = sysFunc->cleanArgs.GetLength();
 	if( cleanCount )

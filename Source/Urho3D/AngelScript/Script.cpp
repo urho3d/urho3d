@@ -85,11 +85,11 @@ Script::Script(Context* context) :
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, (asPWORD)true);
-    scriptEngine_->SetMessageCallback(asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
+    scriptEngine_->SetMessageCallback(_asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
 
     // Create the context for immediate execution
     immediateContext_ = scriptEngine_->CreateContext();
-    immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+    immediateContext_->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
 
     // Register Script library object factories
     RegisterScriptLibrary(context_);
@@ -303,7 +303,7 @@ asIScriptContext* Script::GetScriptFileContext()
     while (scriptNestingLevel_ >= scriptFileContexts_.Size())
     {
         asIScriptContext* newContext = scriptEngine_->CreateContext();
-        newContext->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+        newContext->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
         scriptFileContexts_.Push(newContext);
     }
 

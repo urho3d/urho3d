@@ -744,7 +744,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector3 get_worldPosition()", asMETHOD(T, GetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldPosition2D(const Vector2&in)", asMETHODPR(T, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 get_worldPosition2D()", asMETHOD(T, GetWorldPosition2D), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_worldRotation(const Quaternion&in)", asMETHODPR(T, SetWorldRotation, (const Quaternion&in), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldRotation(const Quaternion&in)", asMETHODPR(T, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldRotation2D(float)", asMETHODPR(T, SetWorldRotation2D, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_worldRotation2D()", asMETHOD(T, GetWorldRotation2D), asCALL_THISCALL);

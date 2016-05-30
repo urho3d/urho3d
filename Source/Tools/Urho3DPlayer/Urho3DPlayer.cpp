@@ -68,6 +68,9 @@ void Urho3DPlayer::Setup()
     String scriptFileName;
     if (arguments.Size() && arguments[0][0] != '-')
         scriptFileName_ = GetInternalPath(arguments[0]);
+#ifdef EMSCRIPTEN
+	scriptFileName_ = "Scripts/NinjaSnowWar.as";
+#endif
 
     // Show usage if not found
     if (scriptFileName_.Empty())
