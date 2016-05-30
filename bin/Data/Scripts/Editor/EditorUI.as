@@ -1590,7 +1590,7 @@ void HandleHotKeysStandard(VariantMap& eventData)
             if (pickMode >= MAX_PICK_MODES)
                 pickMode = PICK_GEOMETRIES;
         }
-        else if (key == 'W')
+        else if (key == KEY_W)
         {
             fillMode = FillMode(fillMode + 1);
             if (fillMode > FILL_POINT)

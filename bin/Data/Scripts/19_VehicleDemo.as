@@ -165,10 +165,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
     if (ui.focusElement is null)
     {
-        vehicle.controls.Set(CTRL_FORWARD, input.keyDown['W']);
-        vehicle.controls.Set(CTRL_BACK, input.keyDown['S']);
-        vehicle.controls.Set(CTRL_LEFT, input.keyDown['A']);
-        vehicle.controls.Set(CTRL_RIGHT, input.keyDown['D']);
+        vehicle.controls.Set(CTRL_FORWARD, input.keyDown[KEY_W]);
+        vehicle.controls.Set(CTRL_BACK, input.keyDown[KEY_S]);
+        vehicle.controls.Set(CTRL_LEFT, input.keyDown[KEY_A]);
+        vehicle.controls.Set(CTRL_RIGHT, input.keyDown[KEY_D]);
 
         // Add yaw & pitch from the mouse motion. Used only for the camera, does not affect motion
         if (touchEnabled)
