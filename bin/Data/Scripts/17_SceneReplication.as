@@ -310,10 +310,10 @@ void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
         // Only apply WASD controls if there is no focused UI element
         if (ui.focusElement is null)
         {
-            controls.Set(CTRL_FORWARD, input.keyDown['W']);
-            controls.Set(CTRL_BACK, input.keyDown['S']);
-            controls.Set(CTRL_LEFT, input.keyDown['A']);
-            controls.Set(CTRL_RIGHT, input.keyDown['D']);
+            controls.Set(CTRL_FORWARD, input.keyDown[KEY_W]);
+            controls.Set(CTRL_BACK, input.keyDown[KEY_S]);
+            controls.Set(CTRL_LEFT, input.keyDown[KEY_A]);
+            controls.Set(CTRL_RIGHT, input.keyDown[KEY_D]);
         }
 
         serverConnection.controls = controls;

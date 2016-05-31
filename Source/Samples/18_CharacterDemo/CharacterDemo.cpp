@@ -274,10 +274,10 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         {
             if (!touch_ || !touch_->useGyroscope_)
             {
-                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-                character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+                character_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
             }
             character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
 

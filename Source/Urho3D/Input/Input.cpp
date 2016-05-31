@@ -67,9 +67,9 @@ const unsigned TOUCHID_MAX = 32;
 int ConvertSDLKeyCode(int keySym, int scanCode)
 {
     if (scanCode == SCANCODE_AC_BACK)
-        return KEY_ESC;
+        return KEY_ESCAPE;
     else
-        return SDL_toupper(keySym);
+        return SDL_tolower(keySym);
 }
 
 UIElement* TouchState::GetTouchedElement()
@@ -1288,12 +1288,12 @@ String Input::GetScancodeName(int scancode) const
 
 bool Input::GetKeyDown(int key) const
 {
-    return keyDown_.Contains(SDL_toupper(key));
+    return keyDown_.Contains(SDL_tolower(key));
 }
 
 bool Input::GetKeyPress(int key) const
 {
-    return keyPress_.Contains(SDL_toupper(key));
+    return keyPress_.Contains(SDL_tolower(key));
 }
 
 bool Input::GetScancodeDown(int scancode) const
@@ -1838,7 +1838,6 @@ void Input::HandleSDLEvent(void* sdlEvent)
     switch (evt.type)
     {
         case SDL_KEYDOWN:
-            // Convert to uppercase to match Win32 virtual key codes
 #ifdef __EMSCRIPTEN__
         SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
 #else

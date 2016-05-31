@@ -224,10 +224,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         if (touchEnabled || !useGyroscope)
         {
-            character.controls.Set(CTRL_FORWARD, input.keyDown['W']);
-            character.controls.Set(CTRL_BACK, input.keyDown['S']);
-            character.controls.Set(CTRL_LEFT, input.keyDown['A']);
-            character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
+            character.controls.Set(CTRL_FORWARD, input.keyDown[KEY_W]);
+            character.controls.Set(CTRL_BACK, input.keyDown[KEY_S]);
+            character.controls.Set(CTRL_LEFT, input.keyDown[KEY_A]);
+            character.controls.Set(CTRL_RIGHT, input.keyDown[KEY_D]);
         }
         character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
 

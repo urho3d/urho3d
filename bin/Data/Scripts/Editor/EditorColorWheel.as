@@ -181,7 +181,7 @@ void HandleColorWheelKeyDown(StringHash eventType, VariantMap& eventData)
 
     int key = eventData["Key"].GetInt();
 
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         SendEvent(eventTypeWheelDiscardColor, eventData);
         HideColorWheel();

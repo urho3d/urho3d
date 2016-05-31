@@ -215,10 +215,10 @@ void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
         if (!ui->GetFocusElement())
         {
-            vehicle_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-            vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-            vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-            vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+            vehicle_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+            vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+            vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+            vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
 
             // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
             if (touchEnabled_)
