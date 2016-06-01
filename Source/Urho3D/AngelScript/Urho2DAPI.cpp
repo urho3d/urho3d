@@ -196,6 +196,7 @@ static void RegisterTileMapDefs2D(asIScriptEngine* engine)
     engine->RegisterEnumValue("Orientation2D", "O_ORTHOGONAL", O_ORTHOGONAL);
     engine->RegisterEnumValue("Orientation2D", "O_ISOMETRIC", O_ISOMETRIC);
     engine->RegisterEnumValue("Orientation2D", "O_STAGGERED", O_STAGGERED);
+    engine->RegisterEnumValue("Orientation2D", "O_HEXAGONAL", O_HEXAGONAL);
 
     engine->RegisterObjectType("TileMapInfo2D", 0, asOBJ_REF);
     engine->RegisterObjectBehaviour("TileMapInfo2D", asBEHAVE_ADDREF, "void f()", asFUNCTION(FakeAddRef), asCALL_CDECL_OBJLAST);

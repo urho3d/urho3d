@@ -85,6 +85,13 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
         debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
         break;
+
+    case O_HEXAGONAL:
+        debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
+        debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
+        debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
+        debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
+        break;
     }
 
     for (unsigned i = 0; i < layers_.Size(); ++i)
