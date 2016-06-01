@@ -338,7 +338,9 @@ Components created into the Scene itself have a special role: to implement scene
 
 "Ordinary" components like Light, Camera or StaticModel should not be created directly into the Scene, but rather into child nodes.
 
-\section SceneModel_Identification Identification
+\section SceneModel_Identification Identification and queries
+
+Nodes can be queried by name from the Scene (or any parent node) with the function \ref Node::GetChild "GetChild()". The query can be optionally recursive, meaning it traverses into child hierarchies. This is relatively slow, since string compares are involved.
 
 Unlike nodes, components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
 
