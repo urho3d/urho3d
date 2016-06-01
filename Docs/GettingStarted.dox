@@ -13,26 +13,27 @@ Although all required third-party libraries are included as source code, there a
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
 - For Linux, install one or more of the development packages from each software component category below. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
-  + %Database server (disabled by default even when installed, use URHO3D_DATABASE_ODBC build option to enable):
-    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager. Mutually exclusive with ODBC driver manager.
-    - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager. Mutually exclusive with iODBC driver manager. *Recommended but optional*
-  + Display server:
+  + %Database server (optional). Disabled by default even when the development package is installed, use URHO3D_DATABASE_ODBC build option to enable. The two packages below are mutually exclusive. The ODBC driver manager is the recommended package.
+    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager.
+    - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager.
+  + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable).
     - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
     - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
     - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
-    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11. *Recommended*
-  + %Sound server:
-    - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux Sound Architecture (ALSA).
-    - arts-devel (RedHat-based only) for Analog Real Time Synthesizer (aRts).
-    - libaudio-dev (Debian-based only) for Network Audio System (NAS).
-    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened Sound Daemon (ESounD).
+    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11.
+  + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable).
+    - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux %Sound Architecture (ALSA).
+    - arts-devel (RedHat-based only) for Analog Real %Time Synthesizer (aRts).
+    - libaudio-dev (Debian-based only) for %Network %Audio System (NAS).
+    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened %Sound Daemon (ESounD).
     - libfusionsound-dev (Debian-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND build option to enable.
-    - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio. *Recommended*
+    - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio.
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
-  + Misc.:
-    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this. *Optional*
+  + Miscellaneous (optional).
+    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
 
-- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libevdev2 and libudev-dev. On Pidora: libevdev and systemd-devel. The same list of optional development libraries listed above for Linux can also be installed on Raspberry Pi system to enable support for the corresponding software components. However, for display server the recommendation is to use Broadcom Video Core that comes preinstalled with Raspbian or Pidora.
+- For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian)o or libevdev (Pidora).
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
@@ -72,7 +73,7 @@ The basic usage is as follows:
 <script-name> /path/to/build-tree [build-options]
 \endverbatim
 
-Where the <script-name> is one of the provided build script. The /path/to/build-tree is where CMake will be generating the build tree for the project. Both out-of-source build tree and non out-of-source build tree path are now supported. The build options are described in detail in the \ref Build_Options "next section" below.
+Where the <script-name> is one of the provided build script. The /path/to/build-tree is where CMake will be generating the build tree for the project. Both out-of-source build tree and non out-of-source build tree path are now supported. The build options are described in detail in the next section below.
 
 After the build tree has been generated, you can use the build script again to reconfigure it by passing different build options. You can do so as the basic usage above; or by first change the working directory to the already generated build tree and use the following syntax:
 
@@ -111,8 +112,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
 |URHO3D_PCH           |1|Enable PCH support|
-|URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
-|URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
+|URHO3D_DATABASE_ODBC |0|Enable %Database support with ODBC, requires vendor-specific ODBC driver|
+|URHO3D_DATABASE_SQLITE|0|Enable %Database support with SQLite embedded|
 |URHO3D_C++11         |0|Enable use of C++11 standard|
 |URHO3D_MMX           |0|Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support|
 |URHO3D_3DNOW         |0|Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support|
@@ -332,9 +333,6 @@ CCACHE_SLOPPINESS=pch_defines,time_macros
 \endverbatim
 
 Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
-
-> There are some caveats with ccache support on Emscripten compiler toolchain. At the moment to enable ccache support for Emscripten, you also need to set 'CCACHE_CPP2' environment variable to 1 (see Emscripten issue [#3365](https://github.com/kripken/emscripten/issues/3365) for more detail).
-> This upstream issue has been closed. The issue is now fixed in the Emscripten incoming branch.
 
 You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
 
@@ -667,7 +665,7 @@ under the Source/Urho3D directory:
 
 - Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.
-- Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Event "event handling", threading and profiling.
+- Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Events "event handling", threading and profiling.
 - IO. Provides file system access, stream input/output and logging.
 - %Resource. Provides the ResourceCache and the base resource types, including XML documents.
 - %Scene. Provides Node and Component classes, from which Urho3D scenes are built.
@@ -744,7 +742,7 @@ the assignment and free the reference counted object, call the Set...() function
 
 - Third party libraries are included as source code for the build process. They are however hidden from the public API as completely as possible.
 
-For more details related to the C++ coding style, see also \ref CodingConventions "Coding conventions".
+For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
 
 
 \page EditorInstructions Editor instructions
@@ -890,7 +888,7 @@ In addition to whole scenes, single scene nodes including all their components a
 
 Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
 
-Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
+Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a %LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
 
 
 \section EditorInstructions_Importing Importing
