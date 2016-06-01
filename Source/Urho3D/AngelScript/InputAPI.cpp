@@ -120,7 +120,7 @@ static void RegisterInputConstants(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const int KEY_GUI", (void*)&KEY_GUI);
     engine->RegisterGlobalProperty("const int KEY_PAUSE", (void*)&KEY_PAUSE);
     engine->RegisterGlobalProperty("const int KEY_CAPSLOCK", (void*)&KEY_CAPSLOCK);
-    engine->RegisterGlobalProperty("const int KEY_ESC", (void*)&KEY_ESC);
+    engine->RegisterGlobalProperty("const int KEY_ESCAPE", (void*)&KEY_ESCAPE);
     engine->RegisterGlobalProperty("const int KEY_SPACE", (void*)&KEY_SPACE);
     engine->RegisterGlobalProperty("const int KEY_PAGEUP", (void*)&KEY_PAGEUP);
     engine->RegisterGlobalProperty("const int KEY_PAGEDOWN", (void*)&KEY_PAGEDOWN);

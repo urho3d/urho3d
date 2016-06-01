@@ -134,13 +134,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the Translate() function (default local space) to move relative to the node's orientation.
-    if (input.keyDown['W'])
+    if (input.keyDown[KEY_W])
         cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['S'])
+    if (input.keyDown[KEY_S])
         cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['A'])
+    if (input.keyDown[KEY_A])
         cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['D'])
+    if (input.keyDown[KEY_D])
         cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 }
 

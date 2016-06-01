@@ -1291,7 +1291,7 @@ void HandleHotKeysBlender( VariantMap& eventData)
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
 
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         if (uiHidden)
             UnhideUI();
@@ -1481,7 +1481,7 @@ void HandleHotKeysStandard(VariantMap& eventData)
     int key = eventData["Key"].GetInt();
     int viewDirection = eventData["Qualifiers"].GetInt() == QUAL_CTRL ? -1 : 1;
 
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         if (uiHidden)
             UnhideUI();
@@ -1590,7 +1590,7 @@ void HandleHotKeysStandard(VariantMap& eventData)
             if (pickMode >= MAX_PICK_MODES)
                 pickMode = PICK_GEOMETRIES;
         }
-        else if (key == 'W')
+        else if (key == KEY_W)
         {
             fillMode = FillMode(fillMode + 1);
             if (fillMode > FILL_POINT)

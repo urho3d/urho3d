@@ -293,7 +293,7 @@ public:
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
     void Remove();
-    /// Set parent scene node. Retains the world transform.
+    /// Assign to a new parent scene node. Retains the world transform.
     void SetParent(Node* parent);
     /// Set a user variable.
     void SetVar(StringHash key, const Variant& value);
