@@ -5130,16 +5130,14 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 	m_regs.objectRegister = gen.objectRegister;
 	m_regs.objectType = descr->returnType.GetObjectType();
 
-// Urho3D: add autohandle support for the AS_MAX_PORTABILITY builds
-#if defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
-//based on http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
-if ( descr->returnType.IsObject()
-		&& !descr->returnType.IsReference()
-		&& descr->returnType.IsObjectHandle()
-		&& sysFunc->returnAutoHandle
-		&& m_regs.objectRegister )
-	m_engine->CallObjectMethod( m_regs.objectRegister, descr->returnType.GetObjectType()->beh.addref );
-#endif
+	// Urho3D: add autohandle support
+	// based on http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
+	if ( descr->returnType.IsObject()
+			&& !descr->returnType.IsReference()
+			&& descr->returnType.IsObjectHandle()
+			&& sysFunc->returnAutoHandle
+			&& m_regs.objectRegister )
+		m_engine->CallObjectMethod( m_regs.objectRegister, descr->returnType.GetObjectType()->beh.addref );
 
 	// Clean up arguments
 	const asUINT cleanCount = sysFunc->cleanArgs.GetLength();
