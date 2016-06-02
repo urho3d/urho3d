@@ -414,6 +414,10 @@ endif ()
 # Add definition for AngelScript
 if (URHO3D_ANGELSCRIPT)
     add_definitions (-DURHO3D_ANGELSCRIPT)
+    # Force C++11 if using Emscripten + AngelScript (required by the generic bindings generation)
+    if (EMSCRIPTEN)
+        set (URHO3D_C++11 1)
+    endif ()
 endif ()
 
 # Add definition for Lua and LuaJIT

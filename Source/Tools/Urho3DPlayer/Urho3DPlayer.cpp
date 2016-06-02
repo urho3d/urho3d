@@ -70,9 +70,9 @@ void Urho3DPlayer::Setup()
         scriptFileName_ = GetInternalPath(arguments[0]);
 
     // On Emscripten CommandLine.txt can only be read through the resource system, but it is not yet possible,
-    // so hardcode the script name for now
+    // so hardcode the script name for now. NinjaSnowWar cannot be used as the Network subsystem doesn't exist
 #ifdef EMSCRIPTEN
-    scriptFileName_ = "Scripts/NinjaSnowWar.as";
+    scriptFileName_ = "Scripts/18_CharacterDemo.as";
 #endif
 
     // Show usage if not found
