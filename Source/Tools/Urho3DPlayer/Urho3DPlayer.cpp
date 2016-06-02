@@ -69,6 +69,11 @@ void Urho3DPlayer::Setup()
     if (arguments.Size() && arguments[0][0] != '-')
         scriptFileName_ = GetInternalPath(arguments[0]);
 
+//hardcoded emscripten build script file, as it did not seem to work in the commandline.txt manner
+#ifdef EMSCRIPTEN
+    scriptFileName_ = "Scripts/NinjaSnowWar.as";
+#endif
+
     // Show usage if not found
     if (scriptFileName_.Empty())
     {

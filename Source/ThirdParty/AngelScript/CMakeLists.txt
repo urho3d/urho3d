@@ -23,6 +23,12 @@
 # Define target name
 set (TARGET_NAME AngelScript)
 
+#ADDED define flag to build the library with the normal function/method macros
+set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DURHO_PROJECT_BUILD")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DURHO_PROJECT_BUILD")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DURHO_PROJECT_BUILD")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DURHO_PROJECT_BUILD")
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
 if (IOS OR ANDROID OR RPI)
