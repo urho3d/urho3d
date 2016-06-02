@@ -7815,6 +7815,7 @@ Properties:
 - int O_ORTHOGONAL
 - int O_ISOMETRIC
 - int O_STAGGERED
+- int O_HEXAGONAL
 
 ### PassLightingMode
 

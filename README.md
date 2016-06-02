@@ -20,6 +20,7 @@ Urho3D development, contributions and bugfixes by:
 - Colin Barrett
 - Erik Beran
 - Danny Boisvert
+- Sergey Bosko
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet

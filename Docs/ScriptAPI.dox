@@ -14991,6 +14991,7 @@ Properties:
 - O_ORTHOGONAL
 - O_ISOMETRIC
 - O_STAGGERED
+- O_HEXAGONAL
 
 
 ### PassLightingMode
