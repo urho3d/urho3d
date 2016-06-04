@@ -28,7 +28,7 @@ add_definitions (-DAS_IS_BUILDING)
 
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
-if (IOS OR ANDROID OR RPI)
+if (ARM AND NOT URHO3D_64BIT)
     enable_language (ASM)
     if (IOS)
         set (ASM_FILES source/as_callfunc_arm_xcode.S)

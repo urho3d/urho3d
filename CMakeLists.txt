@@ -120,6 +120,8 @@ elseif (WEB)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)
+    elseif (ARM)
+        set (CPACK_SYSTEM_NAME Arm)     # Generic ARM
     endif ()
     if (NOT URHO3D_64BIT OR HAS_LIB64)
         list (APPEND CPACK_GENERATOR RPM)
@@ -154,6 +156,9 @@ elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 va
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
 elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
+elseif (ARM_ABI_FLAGS)
+    string (REGEX REPLACE "^.*mcpu=([^ ]+).*$" -\\1 CPU_NAME "${ARM_ABI_FLAGS}")
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)

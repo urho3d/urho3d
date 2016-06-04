@@ -92,14 +92,8 @@ else ()
     endif ()
     # Android arm64 compiler only emits __aarch64__ while iOS arm64 emits __aarch64__, __arm64__, and __arm__; for armv7a all emit __arm__
     check_native_define ("__(arm|aarch64)__" ARM)
-    check_native_define ("__aarch64__" ARM64)
     # For completeness sake as currently we do not support PowerPC (yet)
     check_native_define ("__(ppc|PPC|powerpc|POWERPC)(64)*__" POWERPC)
-    # Check if the target arm platform is currently supported
-    if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
-        # TODO: check the uname of the host system for the telltale sign of RPI, just in case this is a native build on the device itself
-        message (STATUS "Unsupported arm target architecture")
-    endif ()
     # GCC/Clang and all their derivatives should understand this command line option to get the compiler version
     if (NOT DEFINED COMPILER_VERSION)
         execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)

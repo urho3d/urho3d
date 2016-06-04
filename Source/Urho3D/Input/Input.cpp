@@ -48,7 +48,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID) && !defined(RPI))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
