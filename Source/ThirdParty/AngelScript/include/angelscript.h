@@ -36,13 +36,13 @@
 // The script engine interface
 //
 
+#ifndef ANGELSCRIPT_H
+#define ANGELSCRIPT_H
+
 // Urho3D: Define AS_MAX_PORTABILITY for Web builds and when specifically requested (This could be moved to the CMake files)
 #if defined(__EMSCRIPTEN__) || defined(FORCE_AS_PORTABLE)
 #define AS_MAX_PORTABILITY
 #endif
-
-#ifndef ANGELSCRIPT_H
-#define ANGELSCRIPT_H
 
 #include <stddef.h>
 #ifndef _MSC_VER
@@ -1936,10 +1936,10 @@ END_AS_NAMESPACE
 
 // Urho3D: Include the wrapper macros file but only after they have been defined above
 // This causes a large number of warnings, which could possibly be prevented with further 
-//  changes ot the library or the Urho Angelscript code
+// changes to the library or the Urho Angelscript code
 // Only include this file if we request are NOT building the angelscript library itself, 
 // as Angelscript already provides generic wrappers for their classes 
-// (URHO_PROJECT_BUILD is defined in teh CMakeLists.txt file for the AngelScript (sub)library)
+// (URHO_PROJECT_BUILD is defined in the CMakeLists.txt file for the AngelScript (sub)library)
 #ifndef URHO_PROJECT_BUILD
 #include "wrapmacros.h"
 #endif
