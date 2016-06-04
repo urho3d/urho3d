@@ -47,14 +47,13 @@ Urho3DPlayer::Urho3DPlayer(Context* context) :
 
 void Urho3DPlayer::Setup()
 {
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-
-    // Web platform depends on the resource system to read any data files. Skip parsing the command line now
+    // Web platform depends on the resource system to read any data files. Skip parsing the command line file now
     // and try later when the resource system is live
 #ifndef EMSCRIPTEN
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
     const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
@@ -144,9 +143,10 @@ void Urho3DPlayer::Start()
             String commandLine = commandFile->ReadLine();
             commandFile->Close();
             ParseArguments(commandLine, false);
-            GetScriptFileName();
         }
     }
+    
+    GetScriptFileName();
     
     if (scriptFileName_.Empty())
     {
