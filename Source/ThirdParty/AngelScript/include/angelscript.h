@@ -37,7 +37,7 @@
 //
 
 // Urho3D: Define AS_MAX_PORTABILITY for Web builds and when specifically requested (This could be moved to the CMake files)
-#if defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
+#if defined(__EMSCRIPTEN__) || defined(FORCE_AS_PORTABLE)
 #define AS_MAX_PORTABILITY
 #endif
 

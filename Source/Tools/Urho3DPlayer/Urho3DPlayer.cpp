@@ -49,7 +49,7 @@ void Urho3DPlayer::Setup()
 {
     // Web platform depends on the resource system to read any data files. Skip parsing the command line file now
     // and try later when the resource system is live
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
@@ -134,7 +134,7 @@ void Urho3DPlayer::Setup()
 void Urho3DPlayer::Start()
 {
     // Reattempt reading the command line now on Web platform
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
     if (GetArguments().Empty())
     {
         SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);

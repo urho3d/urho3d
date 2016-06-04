@@ -23,7 +23,7 @@
 #pragma once
 
 //only use this file if we are in a web build or the portable (wrapped) code has been specifically requested
-#if defined(EMSCRIPTEN) || defined(FORCE_AS_PORTABLE)
+#if defined(__EMSCRIPTEN__) || defined(FORCE_AS_PORTABLE)
 
 //the template wrapper code
 #include "wrap16.h"
