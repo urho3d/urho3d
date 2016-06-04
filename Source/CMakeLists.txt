@@ -59,6 +59,9 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
+    if (EMSCRIPTEN)
+        add_subdirectory (ThirdParty/boost)
+    endif ()
 endif ()
 
 if (URHO3D_LUA)
