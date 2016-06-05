@@ -26,7 +26,9 @@
 #include "../../Core/Timer.h"
 #include "../../Math/Color.h"
 
-#if defined(ANDROID) || defined (RPI) || defined (__EMSCRIPTEN__)
+#include <SDL/SDL.h>
+
+#if defined(ANDROID) || defined (RPI) || defined(SDL_VIDEO_OPENGL_ES2) || defined (__EMSCRIPTEN__)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #elif defined(IOS)
@@ -61,7 +63,6 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-#include <SDL/SDL.h>
 
 namespace Urho3D
 {
