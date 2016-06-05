@@ -52,7 +52,7 @@
 
 #if defined(_MSC_VER)
 #include <float.h>
-#elif !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__EMSCRIPTEN__)
+#elif !defined(ANDROID) && !defined(IOS) && !defined(__ARM_ARCH) && !defined(__EMSCRIPTEN__)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -102,7 +102,7 @@ static void GetCPUData(host_basic_info_data_t* data)
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
-#elif !defined(ANDROID) && !defined(RPI) && !defined(__EMSCRIPTEN__)
+#elif !defined(ANDROID) && !defined(__ARM_ARCH) && !defined(__EMSCRIPTEN__)
 
 static void GetCPUData(struct cpu_id_t* data)
 {
@@ -117,7 +117,7 @@ static void GetCPUData(struct cpu_id_t* data)
 
 void InitFPU()
 {
-#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(__EMSCRIPTEN__)
+#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(__ARM_ARCH) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(__EMSCRIPTEN__)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
 #ifdef _MSC_VER
@@ -368,7 +368,7 @@ String GetPlatform()
 #endif
 }
 
-#if defined(ANDROID) || defined(RPI)
+#if defined(ANDROID) || defined(__ARM_ARCH)
 static unsigned GetArmCPUCount()
 {
     FILE* fp;
@@ -403,7 +403,7 @@ unsigned GetNumPhysicalCPUs()
 #else
     return data.physical_cpu;
 #endif
-#elif defined(ANDROID) || defined(RPI)
+#elif defined(ANDROID) || defined(__ARM_ARCH)
     return GetArmCPUCount();
 #elif defined(__EMSCRIPTEN__)
 #ifdef __EMSCRIPTEN_PTHREADS__
@@ -428,7 +428,7 @@ unsigned GetNumLogicalCPUs()
 #else
     return data.logical_cpu;
 #endif
-#elif defined(ANDROID) || defined (RPI)
+#elif defined(ANDROID) || defined (__ARM_ARCH)
     return GetArmCPUCount();
 #elif defined(__EMSCRIPTEN__)
 #ifdef __EMSCRIPTEN_PTHREADS__
