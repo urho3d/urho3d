@@ -44,6 +44,9 @@ void VS(float4 iPos : POSITION,
     #if defined(D3D11) && defined(CLIPPLANE)
         out float oClip : SV_CLIPDISTANCE0,
     #endif
+    #ifdef INSTANCED
+        float4x3 iModelInstance : TEXCOORD4,
+    #endif
     out float4 oPos : OUTPOSITION)
 {
     float4x3 modelMatrix = iModelMatrix;
