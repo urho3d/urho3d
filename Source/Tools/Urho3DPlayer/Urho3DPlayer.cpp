@@ -145,9 +145,9 @@ void Urho3DPlayer::Start()
             ParseArguments(commandLine, false);
         }
     }
-    
+
     GetScriptFileName();
-    
+
     if (scriptFileName_.Empty())
     {
         ErrorExit("Script file name not specified; cannot proceed");

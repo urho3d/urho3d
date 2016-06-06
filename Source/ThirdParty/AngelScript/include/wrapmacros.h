@@ -22,8 +22,8 @@
 
 #pragma once
 
-//only use this file if we are in a web build or the portable (wrapped) code has been specifically requested
-#if defined(__EMSCRIPTEN__) || defined(FORCE_AS_PORTABLE)
+// Only use this file if the portable (wrapped) code has been specifically requested
+#ifdef AS_MAX_PORTABILITY
 
 //the template wrapper code
 #include "wrap16.h"
@@ -31,13 +31,13 @@
 //can help solve potential ... problems if we need it at the start: http://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
 
 //Overview of the process:
-//take the original funciton that registers a function for the angelscript engine:
+//take the original function that registers a function for the angelscript engine:
 //(RegisterGlobalFunction, RegisterObjectMethod, ...)
-//Define it as a macro. Redefine the asFUNCTION family of macros to extract the arguments passed to them 
-//and pass an F, M, FPR, or MPR depending on which macro was chosen as another argument before the original 
+//Define it as a macro. Redefine the asFUNCTION family of macros to extract the arguments passed to them
+//and pass an F, M, FPR, or MPR depending on which macro was chosen as another argument before the original
 //contents of the asFUNCTION macro
-//Use the ## operator to paste the F, M, FPR< or MPR allong with the asECallConvTypes name to form the name of another macro
-//This other macro will then bundle the arguments back into the original RegisterGlobalFunction... call, but will use the 
+//Use the ## operator to paste the F, M, FPR< or MPR along with the asECallConvTypes name to form the name of another macro
+//This other macro will then bundle the arguments back into the original RegisterGlobalFunction... call, but will use the
 //wrap macros from the wrap16.h and wrap.h files instead of the original asFUNCTION... call, and will specify the asCALL_GENERIC
 //calling convention
 //***NOTE***: not all of the possibly calling convention/method combinations have been finished, and those that Urho does not use are untested

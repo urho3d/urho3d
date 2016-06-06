@@ -333,7 +333,7 @@ void Menu::ShowPopup(bool enable)
 
 void Menu::SetAccelerator(int key, int qualifiers)
 {
-    acceleratorKey_ = key;
+    acceleratorKey_ = ToLower(key);
     acceleratorQualifiers_ = qualifiers;
 
     if (key)
