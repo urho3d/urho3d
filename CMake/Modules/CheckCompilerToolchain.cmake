@@ -43,7 +43,11 @@
 
 if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
     if (IOS OR TVOS)
-        set (ARCH_FLAGS -arch arm64)    # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+        # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+        set (ARCH_FLAGS -arch arm64)
+    elseif (ANDROID_COMPILER_IS_CLANG)
+        # Use the same target flag as configured by Android/CMake toolchain file
+        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${ANDROID_CXX_FLAGS}")  # Stringify for string replacement
     endif ()
     execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
     if (NOT CC_EXIT_STATUS EQUAL 0)

@@ -59,7 +59,7 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
-    if (EMSCRIPTEN)
+    if (EMSCRIPTEN OR (ARM AND NATIVE_64BIT))
         add_subdirectory (ThirdParty/boost)
     endif ()
 endif ()

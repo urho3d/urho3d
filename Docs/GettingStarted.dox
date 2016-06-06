@@ -16,12 +16,12 @@ Although all required third-party libraries are included as source code, there a
   + %Database server (optional). Disabled by default even when the development package is installed, use URHO3D_DATABASE_ODBC build option to enable. The two packages below are mutually exclusive. The ODBC driver manager is the recommended package.
     - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager.
     - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager.
-  + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable).
+  + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable during application runtime).
     - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
     - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
     - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
     - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11.
-  + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable).
+  + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable during application runtime).
     - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux %Sound Architecture (ALSA).
     - arts-devel (RedHat-based only) for Analog Real %Time Synthesizer (aRts).
     - libaudio-dev (Debian-based only) for %Network %Audio System (NAS).
@@ -144,6 +144,7 @@ A number of build options can be defined when invoking the build scripts or when
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified, the minimum spported target is 3.0 due to constraint from SDL library|
 |ANDROID_ABI          |armeabi-v7a|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
 |ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 9 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
+|ANDROID_TOOLCHAIN_NAME|-|Specify the name of compiler toolchain (Android build only), possible values depends on installed NDK version, default to arm-linux-androideabi-4.9|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
 |MINGW_SYSROOT        |-|Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected|
