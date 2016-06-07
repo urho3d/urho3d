@@ -392,6 +392,8 @@ void UpdateNodeAttributes()
 {
     bool fullUpdate = false;
     UpdateAttributes(ToSerializableArray(editNodes), GetNodeContainer().GetChild("AttributeList"), fullUpdate);
+    if (fullUpdate)
+        HandleWindowLayoutUpdated();
 }
 
 /// Update the icons enabled color based on the internal state of the objects.
