@@ -1025,7 +1025,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
         return '?';
     }
     
-    if (word1 < 0xd800 || word1 >= 0xe00)
+    if (word1 < 0xd800 || word1 >= 0xe000)
         return word1;
     else
     {
