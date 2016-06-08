@@ -145,7 +145,7 @@ Urho3D uses the following third-party libraries:
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.4 (http://www.libsdl.org)
-- SQLite 3.8.10.2 (https://www.sqlite.org)
+- SQLite 3.13.0 (https://www.sqlite.org)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (http://nothings.org)
 - stb_image_write 1.02 (http://nothings.org)
