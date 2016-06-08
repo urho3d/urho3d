@@ -53,7 +53,7 @@ public:
         totalMaxTime_(0),
         totalCount_(0)
     {
-        name_ = EventNameRegistrar::GetEventName(eventID);
+        name_ = EventNameRegister::GetEventName(eventID);
     }
 
     /// Destruct. Free the child blocks.
