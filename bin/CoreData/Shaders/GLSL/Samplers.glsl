@@ -25,7 +25,7 @@ uniform samplerCube sLightCubeMap;
     uniform samplerCube sZoneCubeMap;
     uniform sampler3D sZoneVolumeMap;
 #else
-    uniform sampler2D sShadowMap;
+    uniform highp sampler2D sShadowMap;
 #endif
 
 #ifdef GL3

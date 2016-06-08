@@ -232,11 +232,11 @@ public:
     void SetOccluderSizeThreshold(float screenSize);
     /// Set whether to thread occluder rendering. Default false.
     void SetThreadedOcclusion(bool enable);
-    /// Set shadow depth bias multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
+    /// Set shadow depth bias multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 1.1.
     void SetMobileShadowBiasMul(float mul);
     /// Set shadow depth bias addition for mobile platforms (OpenGL ES.) No effect on desktops. Default 0.0001.
     void SetMobileShadowBiasAdd(float add);
-    /// Set shadow normal offset multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
+    /// Set shadow normal offset multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 1.1.
     void SetMobileNormalOffsetMul(float mul);
     /// Force reload of shaders.
     void ReloadShaders();
