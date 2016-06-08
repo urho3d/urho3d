@@ -49,6 +49,8 @@ private:
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    /// Parse script file name from the first argument.
+    void GetScriptFileName();
 
     /// Script file name.
     String scriptFileName_;

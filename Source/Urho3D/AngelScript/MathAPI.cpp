@@ -1223,7 +1223,7 @@ static void RegisterColor(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Color", "float Hue() const", asFUNCTION(ColorHue), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Color", "float SaturationHSL() const", asFUNCTION(ColorSaturationHSL), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Color", "float SaturationHSV() const", asFUNCTION(ColorSaturationHSV), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Color", "float Value(void) const", asMETHOD(Color, Value), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Color", "float Value() const", asMETHOD(Color, Value), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "float Lightness() const", asMETHOD(Color, Lightness), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "float MaxRGB() const", asMETHOD(Color, MaxRGB), asCALL_THISCALL);
     engine->RegisterObjectMethod("Color", "float MinRGB() const", asMETHOD(Color, MinRGB), asCALL_THISCALL);

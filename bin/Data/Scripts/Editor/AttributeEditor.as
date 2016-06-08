@@ -565,6 +565,9 @@ uint GetAttributeEditorCount(Array<Serializable@>@ serializables)
             // Similarly, for UIElement, "Is Visible" is not inserted
             if (info.name == (isUIElement ? "Is Visible" : "Is Enabled"))
                 continue;
+            // Tags are also handled separately
+            if (info.name == "Tags")
+                continue;
             if (info.type == VAR_RESOURCEREFLIST)
                 count += serializables[0].attributes[i].GetResourceRefList().length;
             else if (info.type == VAR_VARIANTVECTOR && GetVectorStruct(serializables, i) !is null)

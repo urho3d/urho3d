@@ -23,6 +23,9 @@
 # Define target name
 set (TARGET_NAME AngelScript)
 
+# Add compiler define to build the library with the normal function/method macros
+add_definitions (-DAS_IS_BUILDING)
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
 if (IOS OR ANDROID OR RPI)

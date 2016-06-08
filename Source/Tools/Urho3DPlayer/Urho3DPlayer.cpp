@@ -47,11 +47,13 @@ Urho3DPlayer::Urho3DPlayer(Context* context) :
 
 void Urho3DPlayer::Setup()
 {
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-
+    // Web platform depends on the resource system to read any data files. Skip parsing the command line file now
+    // and try later when the resource system is live
+#ifndef __EMSCRIPTEN__
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
     const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
@@ -63,11 +65,8 @@ void Urho3DPlayer::Setup()
         engineParameters_ = Engine::ParseParameters(GetArguments());
     }
 
-    // Check for script file name
-    const Vector<String>& arguments = GetArguments();
-    String scriptFileName;
-    if (arguments.Size() && arguments[0][0] != '-')
-        scriptFileName_ = GetInternalPath(arguments[0]);
+    // Check for script file name from the arguments
+    GetScriptFileName();
 
     // Show usage if not found
     if (scriptFileName_.Empty())
@@ -120,6 +119,10 @@ void Urho3DPlayer::Setup()
         // Use the script file name as the base name for the log file
         engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
     }
+#else
+    // On Web platform setup a default windowed resolution similar to the executable samples
+    engineParameters_["FullScreen"]  = false;
+#endif
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
@@ -130,6 +133,28 @@ void Urho3DPlayer::Setup()
 
 void Urho3DPlayer::Start()
 {
+    // Reattempt reading the command line now on Web platform
+#ifdef __EMSCRIPTEN__
+    if (GetArguments().Empty())
+    {
+        SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);
+        if (commandFile)
+        {
+            String commandLine = commandFile->ReadLine();
+            commandFile->Close();
+            ParseArguments(commandLine, false);
+        }
+    }
+
+    GetScriptFileName();
+
+    if (scriptFileName_.Empty())
+    {
+        ErrorExit("Script file name not specified; cannot proceed");
+        return;
+    }
+#endif
+
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
     {
@@ -233,4 +258,11 @@ void Urho3DPlayer::HandleScriptReloadFailed(StringHash eventType, VariantMap& ev
     scriptFile_.Reset();
     ErrorExit();
 #endif
+}
+
+void Urho3DPlayer::GetScriptFileName()
+{
+    const Vector<String>& arguments = GetArguments();
+    if (arguments.Size() && arguments[0][0] != '-')
+        scriptFileName_ = GetInternalPath(arguments[0]);
 }

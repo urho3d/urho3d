@@ -104,7 +104,7 @@ static Vector3 CrowdManagerRandomPointInCircle(const Vector3& center, float radi
 
 template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const char* name)
 {
-    engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (void), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build(const BoundingBox&in)", asMETHODPR(T, Build, (const BoundingBox&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);

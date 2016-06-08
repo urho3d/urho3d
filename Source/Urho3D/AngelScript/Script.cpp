@@ -85,11 +85,21 @@ Script::Script(Context* context) :
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, (asPWORD)true);
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+    scriptEngine_->SetMessageCallback(_asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
+#else
     scriptEngine_->SetMessageCallback(asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
+#endif
 
     // Create the context for immediate execution
     immediateContext_ = scriptEngine_->CreateContext();
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+    immediateContext_->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#else
     immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#endif
 
     // Register Script library object factories
     RegisterScriptLibrary(context_);
@@ -303,7 +313,13 @@ asIScriptContext* Script::GetScriptFileContext()
     while (scriptNestingLevel_ >= scriptFileContexts_.Size())
     {
         asIScriptContext* newContext = scriptEngine_->CreateContext();
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+        newContext->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#else
         newContext->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#endif
+
         scriptFileContexts_.Push(newContext);
     }
 
