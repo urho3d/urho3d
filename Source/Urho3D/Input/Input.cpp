@@ -1485,7 +1485,7 @@ void Input::Initialize()
     // Set the initial activation
     initialized_ = true;
 #ifndef __EMSCRIPTEN__
-    focusedThisFrame_ = true;
+    GainFocus();
 #else
     // Note: Page visibility and focus are slightly different, however we can't query last focus with Emscripten (1.29.0)
     if (emscriptenInput_->IsVisible())
