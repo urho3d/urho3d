@@ -601,9 +601,12 @@ const Matrix3x4& Camera::GetView() const
 
 void Camera::SetAspectRatioInternal(float aspectRatio)
 {
-    aspectRatio_ = aspectRatio;
-    frustumDirty_ = true;
-    projectionDirty_ = true;
+    if (aspectRatio != aspectRatio_)
+    {
+        aspectRatio_ = aspectRatio;
+        frustumDirty_ = true;
+        projectionDirty_ = true;
+    }
     MarkNetworkUpdate();
 }
 

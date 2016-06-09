@@ -846,7 +846,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
         else
         {
             // Calculate spot light pixel size from the projection of its frustum far vertices
-            Frustum lightFrustum = light->GetFrustum().Transformed(view);
+            Frustum lightFrustum = light->GetViewSpaceFrustum(view);
             lightBox.Define(&lightFrustum.vertices_[4], 4);
         }
 
@@ -1443,7 +1443,7 @@ const Rect& Renderer::GetLightScissor(Light* light, Camera* camera)
     assert(light->GetLightType() != LIGHT_DIRECTIONAL);
     if (light->GetLightType() == LIGHT_SPOT)
     {
-        Frustum viewFrustum(light->GetFrustum().Transformed(view));
+        Frustum viewFrustum(light->GetViewSpaceFrustum(view));
         return lightScissorCache_[combination] = viewFrustum.Projected(projection);
     }
     else // LIGHT_POINT

@@ -396,6 +396,16 @@ Frustum Light::GetFrustum() const
     return ret;
 }
 
+Frustum Light::GetViewSpaceFrustum(const Matrix3x4& view) const
+{
+    // Note: frustum is unaffected by node or parent scale
+    Matrix3x4 frustumTransform(node_ ? Matrix3x4(node_->GetWorldPosition(), node_->GetWorldRotation(), 1.0f) :
+                               Matrix3x4::IDENTITY);
+    Frustum ret;
+    ret.Define(fov_, aspectRatio_, 1.0f, M_MIN_NEARCLIP, range_, view * frustumTransform);
+    return ret;
+}
+
 int Light::GetNumShadowSplits() const
 {
     unsigned ret = 1;
