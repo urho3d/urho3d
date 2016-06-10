@@ -98,7 +98,7 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(ANDROID) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
@@ -1175,7 +1175,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             if (!HasModalElement())
                 SetFocusElement(0);
             SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
-            
+
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
                 SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
         }

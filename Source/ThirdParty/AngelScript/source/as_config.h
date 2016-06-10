@@ -472,7 +472,7 @@
 			#ifndef _XBOX
 				// Not tested with xbox (only enabled if is Windows)
 				#undef AS_NO_THISCALL_FUNCTOR_METHOD
-			#endif 
+			#endif
 		#elif defined(_M_X64)
 			#define AS_X64_MSVC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
@@ -491,7 +491,7 @@
 		#define STDCALL_RETURN_SIMPLE_IN_MEMORY
 		#define COMPLEX_MASK (asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY)
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY)
-	
+
 		// Windows CE uses softfp calling convention, while Windows RT uses hardfp calling convention
 		// ref: http://stackoverflow.com/questions/16375355/what-is-the-windows-rt-on-arm-native-code-calling-convention
 		#if defined(_WIN32_WCE)
@@ -800,7 +800,7 @@
 
 			// As of version 4.7 MinGW changed the ABI, presumably
 			// to be better aligned with how MSVC works
-			// Urho3D: also check for Clang version and use the same workaround 
+			// Urho3D: also check for Clang version and use the same workaround
 			#if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || __GNUC__ > 4
 				#define AS_MINGW47
 			#endif
@@ -1229,7 +1229,8 @@
 
 
 // The assert macro
-#if defined(ANDROID)
+// Urho3D - use __ANDROID__ define emitted by all Android compiler toolchains
+#if defined(ANDROID) || defined(__ANDROID__)
 	#if defined(AS_DEBUG)
 		#include <android/log.h>
 		#include <stdlib.h>

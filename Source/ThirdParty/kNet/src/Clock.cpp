@@ -15,12 +15,13 @@
 /** @file Clock.cpp
 	@brief */
 
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 // Urho3D: ensure that kNetBuildConfig.h is included for WinXP compatibility
 #include "kNetBuildConfig.h"
 
-#if defined(__unix__) || defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(ANDROID) || defined(__APPLE__) || defined (__CYGWIN__)
+// Urho3D - use __EMSCRIPTEN__ and __ANDROID__ defines emitted natively by their respective compiler toolchains
+#if defined(__unix__) || defined(__native_client__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__APPLE__) || defined (__CYGWIN__)
 #include <time.h>
 #include <errno.h>
 #include <string.h>
@@ -200,7 +201,7 @@ unsigned long Clock::Time()
 
 tick_t Clock::Tick()
 {
-#if defined(ANDROID)
+#if defined(__ANDROID__)
 	struct timespec res;
 	clock_gettime(CLOCK_REALTIME, &res);
 	return 1000000000ULL*res.tv_sec + (tick_t)res.tv_nsec;
@@ -239,7 +240,7 @@ unsigned long Clock::TickU32()
 
 tick_t Clock::TicksPerSec()
 {
-#if defined(ANDROID)
+#if defined(__ANDROID__)
 	return 1000000000ULL; // 1e9 == nanoseconds.
 #elif defined(__EMSCRIPTEN__)
 	return 1000000ULL; // 1e6 == microseconds.

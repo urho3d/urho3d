@@ -48,7 +48,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(ANDROID))
+#if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
 
@@ -352,7 +352,7 @@ Input::Input(Context* context) :
 
     SubscribeToEvent(E_SCREENMODE, URHO3D_HANDLER(Input, HandleScreenMode));
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     SDL_SetHint(SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1");
 #elif defined(__EMSCRIPTEN__)
     emscriptenInput_ = new EmscriptenInput(this);
@@ -771,7 +771,7 @@ void Input::SetMouseModeEmscripten(MouseMode mode, bool suppressEvent)
 void Input::SetMouseGrabbed(bool grab, bool suppressEvent)
 {
 // To not interfere with touch UI operation, never report the mouse as grabbed on Android / iOS
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     mouseGrabbed_ = grab;
 
     if (!suppressEvent)
@@ -1145,7 +1145,7 @@ void Input::SetScreenKeyboardVisible(bool enable)
 
 void Input::SetTouchEmulation(bool enable)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (enable != touchEmulation_)
     {
         if (enable)
@@ -2278,7 +2278,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
-#if defined(IOS) || defined (ANDROID)
+#if defined(IOS) || defined (__ANDROID__)
                 // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
                 graphics_->Restore();

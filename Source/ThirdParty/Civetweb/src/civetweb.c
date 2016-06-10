@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-// Modified by cosmy1 for Urho3D
+// Modified by cosmy1 and Yao Wei Tjong for Urho3D
 
 #if defined(_WIN32)
 #if !defined(_CRT_SECURE_NO_WARNINGS)
@@ -390,7 +390,8 @@ struct pollfd {
 #include <netdb.h>
 typedef const void *SOCK_OPT_TYPE;
 
-#if defined(ANDROID)
+// Urho3D - use __ANDROID__ define emitted by all Android compiler toolchains
+#if defined(__ANDROID__)
 typedef unsigned short int in_port_t;
 #endif
 

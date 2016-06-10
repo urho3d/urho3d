@@ -1265,7 +1265,8 @@ endforeach()
 # flags and definitions
 # Urho3D: comment out redundant command which actually may interfere with compile definition cache generation when enabling PCH
 #remove_definitions( -DANDROID )
-add_definitions( -DANDROID )
+# Urho3D: comment out redundant compiler defines as we use __ANDROID__ in our code base consistently
+#add_definitions( -DANDROID )
 
 if( ANDROID_SYSROOT MATCHES "[ ;\"]" )
  if( CMAKE_HOST_WIN32 )

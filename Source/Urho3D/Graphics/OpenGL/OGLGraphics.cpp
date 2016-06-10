@@ -2020,7 +2020,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 
 IntVector2 Graphics::GetDesktopResolution() const
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     SDL_DisplayMode mode;
     SDL_GetDesktopDisplayMode(0, &mode);
     return IntVector2(mode.w, mode.h);
@@ -2440,7 +2440,7 @@ void Graphics::Restore()
     if (!impl_->window_)
         return;
 
-#ifdef ANDROID
+#ifdef __ANDROID__
     // On Android the context may be lost behind the scenes as the application is minimized
     if (impl_->context_ && !SDL_GL_GetCurrentContext())
     {

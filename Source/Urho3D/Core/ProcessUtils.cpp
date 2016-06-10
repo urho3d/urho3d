@@ -202,7 +202,7 @@ void OpenConsoleWindow()
 
 void PrintUnicode(const String& str, bool error)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
 #ifdef _WIN32
     // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
     // though it means that proper Unicode output will not work
@@ -231,7 +231,7 @@ void PrintUnicodeLine(const String& str, bool error)
 
 void PrintLine(const String& str, bool error)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     fprintf(error ? stderr : stdout, "%s\n", str.CString());
 #endif
 }
@@ -369,7 +369,7 @@ String GetConsoleInput()
             }
         }
     }
-#elif !defined(ANDROID) && !defined(IOS)
+#elif !defined(__ANDROID__) && !defined(IOS)
     int flags = fcntl(STDIN_FILENO, F_GETFL);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
@@ -388,7 +388,7 @@ String GetConsoleInput()
 
 String GetPlatform()
 {
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     return "Android";
 #elif defined(IOS)
     return "iOS";

@@ -93,7 +93,7 @@ Engine::Engine(Context* context) :
     timeStep_(0.0f),
     timeStepSmoothing_(2),
     minFps_(10),
-#if defined(ANDROID) || defined(__arm__) || defined(__aarch64)
+#if defined(__ANDROID__) || defined(__arm__) || defined(__aarch64)
     maxFps_(60),
     maxInactiveFps_(10),
     pauseMinimized_(true),
@@ -553,7 +553,7 @@ void Engine::SetPauseMinimized(bool enable)
 void Engine::SetAutoExit(bool enable)
 {
     // On mobile platforms exit is mandatory if requested by the platform itself and should not be attempted to be disabled
-#if defined(ANDROID) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS)
     enable = true;
 #endif
     autoExit_ = enable;
