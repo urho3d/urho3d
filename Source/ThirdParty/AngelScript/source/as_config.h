@@ -846,7 +846,7 @@
 			#define THISCALL_PASS_OBJECT_POINTER_ON_THE_STACK
 			#define AS_X86
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-		#elif defined(__LP64__) && !defined(__arm64__)
+		#elif defined(__LP64__) && !defined(__arm64__) && !defined(__aarch64__) && !defined(__ARM_ARCH)
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
 			#define HAS_128_BIT_PRIMITIVES
@@ -856,6 +856,16 @@
 			// STDCALL is not available on 64bit Linux
 			#undef STDCALL
 			#define STDCALL
+		#elif (defined(__arm64__) || defined(__aarch64__))
+			// AngelScript currently doesn't support native calling
+			// for 64bit ARM processors so it's necessary to turn on
+			// portability mode
+			#define AS_MAX_PORTABILITY
+
+			// STDCALL is not available on ARM
+			#undef STDCALL
+			#define STDCALL
+
 		#elif (defined(__ARMEL__) || defined(__arm__)) && !(defined(__ARM_ARCH_4__) || defined(__ARM_ARCH_4T__))
 			#define AS_ARM
 
