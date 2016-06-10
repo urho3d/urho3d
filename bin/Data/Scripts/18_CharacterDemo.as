@@ -259,11 +259,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
 
         // Switch between 1st and 3rd person
-        if (input.keyPress['F'])
+        if (input.keyPress[KEY_F])
             firstPerson = !firstPerson;
 
         // Turn on/off gyroscope on mobile platform
-        if (input.keyPress['G'])
+        if (input.keyPress[KEY_G])
             useGyroscope = !useGyroscope;
 
         // Check for loading / saving the scene

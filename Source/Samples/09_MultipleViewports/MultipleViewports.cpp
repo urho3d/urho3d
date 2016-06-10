@@ -258,9 +258,9 @@ void MultipleViewports::MoveCamera(float timeStep)
 
     // Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
     RenderPath* effectRenderPath = GetSubsystem<Renderer>()->GetViewport(0)->GetRenderPath();
-    if (input->GetKeyPress('B'))
+    if (input->GetKeyPress(KEY_B))
         effectRenderPath->ToggleEnabled("Bloom");
-    if (input->GetKeyPress('F'))
+    if (input->GetKeyPress(KEY_F))
         effectRenderPath->ToggleEnabled("FXAA2");
 
     // Toggle debug geometry with space

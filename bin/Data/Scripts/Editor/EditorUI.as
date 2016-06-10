@@ -318,10 +318,10 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("File");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("New scene", @ResetScene, 'N', QUAL_SHIFT | QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Open scene...", @PickFile, 'O', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, 'S', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, 'S', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("New scene", @ResetScene, KEY_N, QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Open scene...", @PickFile, KEY_O, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene", @SaveSceneWithExistingName, KEY_S, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Save scene as...", @PickFile, KEY_S, QUAL_SHIFT | QUAL_CTRL));
         recentSceneMenu = CreateMenuItem("Open recent scene", null, SHOW_POPUP_INDICATOR);
         popup.AddChild(recentSceneMenu);
         mruScenesPopup = CreatePopup(recentSceneMenu);
@@ -354,26 +354,26 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("Edit");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Undo", @Undo, 'Z', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Redo", @Redo, 'Y', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Undo", @Undo, KEY_Z, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Redo", @Redo, KEY_Y, QUAL_CTRL));
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Cut", @Cut, 'X', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Cut", @Cut, KEY_X, QUAL_CTRL));
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
-            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_CTRL));
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, KEY_D, QUAL_CTRL));
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, 'D', QUAL_SHIFT));
+            popup.AddChild(CreateMenuItem("Duplicate", @Duplicate, KEY_D, QUAL_SHIFT));
 
-        popup.AddChild(CreateMenuItem("Copy", @Copy, 'C', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Paste", @Paste, 'V', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Copy", @Copy, KEY_C, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Paste", @Paste, KEY_V, QUAL_CTRL));
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
             popup.AddChild(CreateMenuItem("Delete", @Delete, KEY_DELETE, QUAL_ANY));
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-            popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, 'X', QUAL_ANY));
+            popup.AddChild(CreateMenuItem("Delete", @BlenderModeDelete, KEY_X, QUAL_ANY));
 
-        popup.AddChild(CreateMenuItem("Select all", @SelectAll, 'A', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, 'A', QUAL_SHIFT | QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Select all", @SelectAll, KEY_A, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Deselect all", @DeselectAll, KEY_A, QUAL_SHIFT | QUAL_CTRL));
 
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Reset to default", @ResetToDefault));
@@ -384,52 +384,52 @@ void CreateMenuBar()
             popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, '1' , QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, '2' , QUAL_ALT));
             popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, '3' , QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, 'Q' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, KEY_Q , QUAL_ALT));
         }
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
-            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, 'G' , QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, 'R', QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, 'S', QUAL_ALT));
-            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, 'Q' , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset position", @SceneResetPosition, KEY_G , QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset rotation", @SceneResetRotation, KEY_R, QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset scale", @SceneResetScale, KEY_S, QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Reset transform", @SceneResetTransform, KEY_Q , QUAL_ALT));
         }
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
         {
-            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'E', QUAL_CTRL));
-            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'E', QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, KEY_E, QUAL_CTRL));
+            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, KEY_E, QUAL_ALT));
         }
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
-            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, 'H'));
-            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, 'H', QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Enable/disable", @SceneToggleEnable, KEY_H));
+            popup.AddChild(CreateMenuItem("Enable all", @SceneEnableAllNodes, KEY_H, QUAL_ALT));
         }
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
-            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'U', QUAL_CTRL));
+            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, KEY_U, QUAL_CTRL));
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, 'P', QUAL_ALT));
+            popup.AddChild(CreateMenuItem("Unparent", @SceneUnparent, KEY_P, QUAL_ALT));
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
-            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'U'));
+            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, KEY_U));
         else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, 'P', QUAL_CTRL));
+            popup.AddChild(CreateMenuItem("Parent to last", @NodesParentToLastSelected, KEY_P, QUAL_CTRL));
 
         CreateChildDivider(popup);
 
         if (hotKeyMode == HOTKEYS_MODE_STANDARD)
-            popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
+            popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, KEY_P, QUAL_CTRL));
         //else if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
-        //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, 'P', QUAL_CTRL));
+        //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, KEY_P, QUAL_CTRL));
 
         if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
-             popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, 'M'));
-             popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, 'D', QUAL_ALT));
+             popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, KEY_M));
+             popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, KEY_D, QUAL_ALT));
              popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_KP_PERIOD));
         }
-        popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, 'W', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Show components icons", @ViewDebugIcons, 'I', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Color wheel", @ColorWheelBuildMenuSelectTypeColor, KEY_W, QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Show components icons", @ViewDebugIcons, KEY_I, QUAL_ALT));
 
         CreateChildDivider(popup);
 
@@ -500,11 +500,11 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("UI-layout");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Open UI-layout...", @PickFile, 'O', QUAL_ALT));
-        popup.AddChild(CreateMenuItem("Save UI-layout", @SaveUILayoutWithExistingName, 'S', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Open UI-layout...", @PickFile, KEY_O, QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Save UI-layout", @SaveUILayoutWithExistingName, KEY_S, QUAL_ALT));
         popup.AddChild(CreateMenuItem("Save UI-layout as...", @PickFile));
         CreateChildDivider(popup);
-        popup.AddChild(CreateMenuItem("Close UI-layout", @CloseUILayout, 'C', QUAL_ALT));
+        popup.AddChild(CreateMenuItem("Close UI-layout", @CloseUILayout, KEY_C, QUAL_ALT));
         popup.AddChild(CreateMenuItem("Close all UI-layouts", @CloseAllUILayouts));
         CreateChildDivider(popup);
         popup.AddChild(CreateMenuItem("Load child element...", @PickFile));
@@ -518,9 +518,9 @@ void CreateMenuBar()
     {
         Menu@ menu = CreateMenu("View");
         Window@ popup = menu.popup;
-        popup.AddChild(CreateMenuItem("Hierarchy", @ToggleHierarchyWindow, 'H', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Attribute inspector", @ToggleAttributeInspectorWindow, 'I', QUAL_CTRL));
-        popup.AddChild(CreateMenuItem("Resource browser", @ToggleResourceBrowserWindow, 'B', QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Hierarchy", @ToggleHierarchyWindow, KEY_H, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Attribute inspector", @ToggleAttributeInspectorWindow, KEY_I, QUAL_CTRL));
+        popup.AddChild(CreateMenuItem("Resource browser", @ToggleResourceBrowserWindow, KEY_B, QUAL_CTRL));
         popup.AddChild(CreateMenuItem("Material editor", @ToggleMaterialEditor));
         popup.AddChild(CreateMenuItem("Particle editor", @ToggleParticleEffectEditor));
         popup.AddChild(CreateMenuItem("Spawn editor", @ToggleSpawnEditor));
@@ -1391,7 +1391,7 @@ void HandleHotKeysBlender( VariantMap& eventData)
         if (pickMode >= MAX_PICK_MODES)
             pickMode = PICK_GEOMETRIES;
     }
-    else if (key == 'Z' && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
+    else if (key == KEY_Z && eventData["Qualifiers"].GetInt() != QUAL_CTRL)
     {
         if (ui.focusElement is null)
         {

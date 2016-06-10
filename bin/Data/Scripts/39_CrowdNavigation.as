@@ -387,7 +387,7 @@ void MoveCamera(float timeStep)
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SetPathPoint(input.qualifierDown[QUAL_SHIFT]);
     // Add new obstacle or remove existing obstacle/agent with middle mouse button
-    else if (input.mouseButtonPress[MOUSEB_MIDDLE] || input.keyPress['O'])
+    else if (input.mouseButtonPress[MOUSEB_MIDDLE] || input.keyPress[KEY_O])
         AddOrRemoveObject();
 
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory

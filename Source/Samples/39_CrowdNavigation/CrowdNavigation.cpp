@@ -446,7 +446,7 @@ void CrowdNavigation::MoveCamera(float timeStep)
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
         SetPathPoint(input->GetQualifierDown(QUAL_SHIFT));
     // Add new obstacle or remove existing obstacle/agent with middle mouse button
-    else if (input->GetMouseButtonPress(MOUSEB_MIDDLE) || input->GetKeyPress('O'))
+    else if (input->GetMouseButtonPress(MOUSEB_MIDDLE) || input->GetKeyPress(KEY_O))
         AddOrRemoveObject();
 
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory

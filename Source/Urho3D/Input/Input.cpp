@@ -2461,7 +2461,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
         }
         else
         {
-            // Hat is binded by 4 integers representing keysyms for 'W', 'S', 'A', 'D' or something similar
+            // Hat is binded by 4 integers representing keysyms for 'w', 's', 'a', 'd' or something similar
             IntRect keyBinding = keyBindingVar.GetIntRect();
 
             if (eventType == E_TOUCHEND)
