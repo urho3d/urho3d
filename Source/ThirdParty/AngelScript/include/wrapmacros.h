@@ -20,6 +20,8 @@
 // THE SOFTWARE.
 //
 
+// FIXME: This file needs to be cleaned up
+
 #pragma once
 
 // Only use this file if the portable (wrapped) code has been specifically requested
@@ -43,12 +45,14 @@
 //***NOTE***: not all of the possibly calling convention/method combinations have been finished, and those that Urho does not use are untested
 
 
-
+#undef asFUNCTION
 #define asFUNCTION(f) F, f
 //define a new macro (taken from angelscript.h) to use in place of the original asFUNCTION macro
 #define _asFUNCTION(f) asFunctionPtr(f)
 //#define asMETHOD(cls, f) cls, M, f
+#undef asMETHOD
 #define asMETHOD(cls, f) M, (cls,f) //package class and function for UNWRAPping later
+#undef UNWRAP
 #define UNWRAP(x,y) x,y// try -fmacro-backtrace-limit=0 on compile
 //define a new macro (taken from angelscript.h) to use in place of the original asMETHOD macro
 #define _asMETHOD(c,m) asSMethodPtr<sizeof(void (c::*)())>::Convert((void (c::*)())(&c::m))
@@ -95,9 +99,11 @@
 
 //Parameter-Return versions:
 
+#undef asFUNCTIONPR
 #define asFUNCTIONPR(f,p,r) FPR, (f,p,r)
 #define UNWRAP3(x,y,z) x,y,z
 #define UNWRAP4(x,y,z,w) x,y,z,w
+#undef asMETHODPR
 #define asMETHODPR(cls,f,p,r) MPR, (cls,f,p,r)
 //define a new macro (taken from angelscript.h) to use in place of the original asFUNCTIONPR macro
 #if (defined(_MSC_VER) && _MSC_VER <= 1200) || (defined(__BORLANDC__) && __BORLANDC__ < 0x590)
