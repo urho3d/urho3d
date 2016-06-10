@@ -1042,7 +1042,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             {
                 text->SetVisible(false);
                 String keyBinding = text->GetText();
-                int mappedKeyBinding[4] = {'W', 'S', 'A', 'D'};
+                int mappedKeyBinding[4] = {KEY_W, KEY_S, KEY_A, KEY_D};
                 Vector<String> keyBindings;
                 if (keyBinding.Contains(' '))   // e.g.: "UP DOWN LEFT RIGHT"
                     keyBindings = keyBinding.Split(' ');    // Attempt to split the text using ' ' as separator
@@ -2418,7 +2418,7 @@ void Input::HandleScreenJoystickTouch(StringHash eventType, VariantMap& eventDat
             if (!keyBindingVar.IsEmpty())
             {
                 evt.type = eventType == E_TOUCHBEGIN ? SDL_KEYDOWN : SDL_KEYUP;
-                evt.key.keysym.sym = keyBindingVar.GetInt();
+                evt.key.keysym.sym = ToLower(keyBindingVar.GetInt());
                 evt.key.keysym.scancode = SDL_SCANCODE_UNKNOWN;
             }
             if (!mouseButtonBindingVar.IsEmpty())

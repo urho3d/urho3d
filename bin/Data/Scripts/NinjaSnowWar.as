@@ -501,7 +501,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
     }
     // Allow pause only in singleplayer
-    if (key == 'P' && singlePlayer && !console.visible && gameOn)
+    if (key == KEY_P && singlePlayer && !console.visible && gameOn)
     {
         gameScene.updateEnabled = !gameScene.updateEnabled;
         if (!gameScene.updateEnabled)
