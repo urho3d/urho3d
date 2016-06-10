@@ -91,8 +91,8 @@ option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
-if (ARM AND NOT URHO3D_64BIT AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
-    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (generic arm-linux-gnueabihf build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
+if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
+    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
 if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (URHO3D_64BIT OR "${ARM_ABI_FLAGS}" MATCHES neon)))    # Stringify in case RPI_ABI/ARM_ABI_FLAGS is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
@@ -610,9 +610,10 @@ else ()
                 # Generic ARM-specific setup
                 add_definitions (-DGENERIC_ARM)
                 if (URHO3D_64BIT)
-                    # aarch64 has only one valid arch so far, so it does not need to use ARM_ABI_FLAGS build option
+                    # aarch64 has only one valid arch so far
                     set (ARM_CFLAGS "${ARM_CFLAGS} -march=armv8-a")
-                elseif (ARM_ABI_FLAGS)
+                endif ()
+                if (ARM_ABI_FLAGS)
                     # Instead of guessing all the possible ABIs, user would have to specify the ABI compiler flags explicitly via ARM_ABI_FLAGS build option
                     set (ARM_CFLAGS "${ARM_CFLAGS} ${ARM_ABI_FLAGS}")
                 endif ()
@@ -700,7 +701,7 @@ else ()
         elseif (MINGW)
             # MinGW-specific setup
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libstdc++ -static-libgcc -fno-keep-inline-dllexport")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -fno-keep-inline-dllexport")
             if (NOT URHO3D_64BIT)
                 # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
                 if (URHO3D_SSE)

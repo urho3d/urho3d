@@ -53,6 +53,9 @@ for a in $@; do
         -DRPI=1)
             if [[ ! $(uname -m) =~ ^arm ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake"; fi
             ;;
+        -DARM=1)
+            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/arm-linux.toolchain.cmake"; fi
+            ;;
         -DWIN32=1)
             OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake"
             ;;
