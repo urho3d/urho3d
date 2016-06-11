@@ -64,7 +64,7 @@ task :cmake do
       # do nothing
     when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
-    when 'android', 'web', 'ios', 'mingw', 'rpi', 'arm'
+    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
       platform = option
       build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
       script = 'cmake_xcode' if option == 'ios'
@@ -100,7 +100,7 @@ task :make do
     case option
     when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       # do nothing
-    when 'android', 'web', 'ios', 'mingw', 'rpi', 'arm'
+    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
       platform = option
     when 'clean_first'
       cmake_build_options = "#{cmake_build_options} --clean-first"
