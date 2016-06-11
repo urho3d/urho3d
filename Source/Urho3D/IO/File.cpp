@@ -29,6 +29,10 @@
 #include "../IO/MemoryBuffer.h"
 #include "../IO/PackageFile.h"
 
+#ifdef __ANDROID__
+#include <SDL/SDL_rwops.h>
+#endif
+
 #include <cstdio>
 #include <LZ4/lz4.h>
 

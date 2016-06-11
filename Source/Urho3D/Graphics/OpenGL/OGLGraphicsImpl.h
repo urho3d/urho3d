@@ -61,7 +61,8 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-#include <SDL/SDL.h>
+struct SDL_Window;
+typedef void *SDL_GLContext;
 
 namespace Urho3D
 {

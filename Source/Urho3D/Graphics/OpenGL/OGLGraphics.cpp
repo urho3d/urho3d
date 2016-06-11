@@ -63,6 +63,8 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
+#include <SDL/SDL.h>
+
 #include "../../DebugNew.h"
 
 #ifdef GL_ES_VERSION_2_0

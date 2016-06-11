@@ -32,6 +32,10 @@
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 
+#ifdef __ANDROID__
+#include <SDL/SDL_rwops.h>
+#endif
+
 #ifndef MINI_URHO
 #include <SDL/SDL_filesystem.h>
 #endif

@@ -39,6 +39,8 @@
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 
+#include <SDL/SDL.h>
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
 #endif

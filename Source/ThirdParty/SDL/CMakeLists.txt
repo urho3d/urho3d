@@ -1391,7 +1391,7 @@ set (TARGET_NAME SDL)
 # Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
 setup_library ()
 
-# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
+# Install headers for building and using the Urho3D library (install dependency for InputEvents.h)
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
 install_header_files (FILES ${SDL2_BINARY_DIR}/include/generated/SDL_config.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
 # Install dependency for SDL_android_main.c
