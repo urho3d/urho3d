@@ -48,6 +48,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
+// TODO: For now, in this particular case only, treat all the Linux on ARM as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" Linux on ARM
 #if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
