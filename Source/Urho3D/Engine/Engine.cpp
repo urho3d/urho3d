@@ -699,7 +699,13 @@ void Engine::ApplyFrameLimit()
 
 #ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
+#ifndef IOS
     if (maxFps)
+#else
+    // If on iOS and target framerate is 60 or above, just let the animation callback handle frame timing
+    // instead of waiting ourselves
+    if (maxFps < 60)
+#endif
     {
         URHO3D_PROFILE(ApplyFrameLimit);
 
