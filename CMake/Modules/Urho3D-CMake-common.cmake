@@ -1055,6 +1055,11 @@ macro (setup_library)
         # Accumulate all the dependent static libraries that are used in building the Urho3D library itself
         if (NOT ${TARGET_NAME} STREQUAL Urho3D AND LIB_TYPE STREQUAL STATIC_LIBRARY)
             set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+            # When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
+            if (XCODE AND DEFINED ENV{CI})
+                set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+            endif ()
         endif ()
     elseif (URHO3D_SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0

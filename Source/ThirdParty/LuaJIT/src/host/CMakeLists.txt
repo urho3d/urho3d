@@ -54,6 +54,11 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     endforeach ()
 endif ()
 
+# When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
+if (XCODE AND DEFINED ENV{CI})
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+endif ()
+
 # Add dependency target
 set (TARGET_NAME minilua)
 set (SOURCE_FILES minilua.c)

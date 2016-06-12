@@ -751,3 +751,9 @@ ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 set (TARGET_NAME Assimp)
 list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH YES)   # Since we only build AssetImporter as a single-arch native tool, there is no point to build Assimp as universal binary library
 setup_library ()
+
+# When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
+if (XCODE AND DEFINED ENV{CI})
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+endif ()
