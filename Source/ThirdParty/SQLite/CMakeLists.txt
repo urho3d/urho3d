@@ -23,12 +23,20 @@
 # Define target name
 set (TARGET_NAME sqlite)
 
-# https://www.sqlite.org/compile.html
-add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)
-# Do not use pthread and dl libraries for Web platform
+# Define preprocessor macros
+add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)   # https://www.sqlite.org/compile.html
 if (WEB)
+    # Do not use pthread and dl libraries for Web platform
     add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
+elseif (MINGW)
+    # We only support MinGW with "_mingw.h" header file, note the leading underscore
+    add_definitions (-D_HAVE__MINGW_H)
 endif ()
+foreach (VAR HAVE_STDINT_H HAVE_INTTYPES_H HAVE_MALLOC_H HAVE_MALLOC_USABLE_SIZE)
+    if (${VAR})
+        add_definitions (-D${VAR})
+    endif ()
+endforeach ()
 
 # Define source files
 set (SOURCE_FILES src/sqlite3.c)
@@ -65,5 +73,5 @@ if (NOT IOS AND NOT WEB)
     setup_executable (NODEPS)
 endif ()
 
-# SQLite will not work correctly with the -ffast-math option of GCC
-string (REPLACE -ffast-math "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+# SQLite will not work correctly with the -ffast-math option, so unset it in this scope only
+string (REPLACE -ffast-math "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")    # Stringify for string replacement
