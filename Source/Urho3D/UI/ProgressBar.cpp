@@ -81,7 +81,8 @@ void ProgressBar::SetOrientation(Orientation type)
 void ProgressBar::SetRange(float range)
 {
     range = Max(range, 0.0f);
-    if (range != range_) {
+    if (range != range_)
+    {
         range_ = range;
         UpdateProgressBar();
     }
@@ -90,7 +91,8 @@ void ProgressBar::SetRange(float range)
 void ProgressBar::SetValue(float value)
 {
     value = Clamp(value, 0.0f, range_);
-    if (value != value_) {
+    if (value != value_)
+    {
         value_ = value;
         UpdateProgressBar();
 
@@ -132,21 +134,25 @@ void ProgressBar::UpdateProgressBar()
 {
     const IntRect &border = knob_->GetBorder();
 
-    if (range_ > 0.0f) {
-        if (orientation_ == O_HORIZONTAL) {
+    if (range_ > 0.0f)
+    {
+        if (orientation_ == O_HORIZONTAL)
+        {
             int loadingBarLength = (int) Max((float) GetWidth() * value_ / range_,
                  (float) (border.left_ + border.right_));
             knob_->SetSize(loadingBarLength, GetHeight());
             knob_->SetPosition(Clamp(0, 0, GetWidth() - knob_->GetWidth()), 0);
         }
-        else {
+        else
+        {
             int loadingBarLength = (int) Max((float) GetHeight() * value_ / range_,
                  (float) (border.top_ + border.bottom_));
             knob_->SetSize(GetWidth(), loadingBarLength);
             knob_->SetPosition(0, Clamp(0, 0, GetHeight() - knob_->GetHeight()));
         }
     }
-    else {
+    else
+    {
         knob_->SetSize(GetSize());
         knob_->SetPosition(0, 0);
     }
