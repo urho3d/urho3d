@@ -427,4 +427,8 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="112 16 126 30" />
     </element>
+    <element type="RibbonTrail">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="176 16 190 30" />
+    </element>
 </elements>
