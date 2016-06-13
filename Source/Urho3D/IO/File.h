@@ -27,14 +27,14 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
 
-#ifdef ANDROID
-#include <SDL/SDL_rwops.h>
+#ifdef __ANDROID__
+struct SDL_RWops;
 #endif
 
 namespace Urho3D
 {
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 extern const char* APK;
 
 // Macro for checking if a given pathname is inside APK's assets directory
@@ -115,7 +115,7 @@ private:
     FileMode mode_;
     /// File handle.
     void* handle_;
-#ifdef ANDROID
+#ifdef __ANDROID__
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
 #endif

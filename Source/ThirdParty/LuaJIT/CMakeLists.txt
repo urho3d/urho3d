@@ -247,7 +247,7 @@ if (NOT LUAJIT_CACHE STREQUAL "${URHO3D_64BIT}-${LUAJIT_DISABLE_FFI}-${LUAJIT_DI
     # Makefile: Target system detection
     if (IOS)
         set (TARGET_SYS iOS)
-    elseif (ANDROID OR RPI)
+    elseif (CMAKE_SYSTEM_NAME STREQUAL Linux)
         set (TARGET_SYS Linux)
     elseif (MINGW)
         set (TARGET_SYS Windows)

@@ -27,7 +27,7 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 #include <SDL/SDL_rwops.h>
 #endif
 
@@ -47,7 +47,7 @@ public:
     /// Destruct and close.
     virtual ~NamedPipe();
 
-    /// Read bytes from the pipe without blocking if there is less data available. Return number of bytes actually read. 
+    /// Read bytes from the pipe without blocking if there is less data available. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
     /// Set position. No-op for pipes.
     virtual unsigned Seek(unsigned position);

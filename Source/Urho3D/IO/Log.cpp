@@ -33,7 +33,7 @@
 
 #include <cstdio>
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 #include <android/log.h>
 #endif
 #ifdef IOS
@@ -80,7 +80,7 @@ Log::~Log()
 
 void Log::Open(const String& fileName)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (fileName.Empty())
         return;
     if (logFile_ && logFile_->IsOpen())
@@ -104,7 +104,7 @@ void Log::Open(const String& fileName)
 
 void Log::Close()
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (logFile_ && logFile_->IsOpen())
     {
         logFile_->Close();
@@ -164,7 +164,7 @@ void Log::Write(int level, const String& message)
     if (logInstance->timeStamp_)
         formattedMessage = "[" + Time::GetTimeStamp() + "] " + formattedMessage;
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     int androidLevel = ANDROID_LOG_DEBUG + level;
     __android_log_print(androidLevel, "Urho3D", "%s", message.CString());
 #elif defined(IOS)
@@ -218,7 +218,7 @@ void Log::WriteRaw(const String& message, bool error)
 
     logInstance->lastMessage_ = message;
 
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     if (logInstance->quiet_)
     {
         if (error)

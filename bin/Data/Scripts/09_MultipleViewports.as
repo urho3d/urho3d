@@ -202,9 +202,9 @@ void MoveCamera(float timeStep)
 
     // Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
     RenderPath@ effectRenderPath = renderer.viewports[0].renderPath;
-    if (input.keyPress['B'])
+    if (input.keyPress[KEY_B])
         effectRenderPath.ToggleEnabled("Bloom");
-    if (input.keyPress['F'])
+    if (input.keyPress[KEY_F])
         effectRenderPath.ToggleEnabled("FXAA2");
 
     // Toggle debug geometry with space

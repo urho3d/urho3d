@@ -29,6 +29,10 @@
 #include "../IO/MemoryBuffer.h"
 #include "../IO/PackageFile.h"
 
+#ifdef __ANDROID__
+#include <SDL/SDL_rwops.h>
+#endif
+
 #include <cstdio>
 #include <LZ4/lz4.h>
 
@@ -55,7 +59,7 @@ static const char* openMode[] =
 };
 #endif
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 const char* APK = "/apk/";
 static const unsigned READ_BUFFER_SIZE = 32768;
 #endif
@@ -65,7 +69,7 @@ File::File(Context* context) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
-#ifdef ANDROID
+#ifdef __ANDROID__
     assetHandle_(0),
 #endif
     readBufferOffset_(0),
@@ -82,7 +86,7 @@ File::File(Context* context, const String& fileName, FileMode mode) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
-#ifdef ANDROID
+#ifdef __ANDROID__
     assetHandle_(0),
 #endif
     readBufferOffset_(0),
@@ -100,7 +104,7 @@ File::File(Context* context, PackageFile* package, const String& fileName) :
     Object(context),
     mode_(FILE_READ),
     handle_(0),
-#ifdef ANDROID
+#ifdef __ANDROID__
     assetHandle_(0),
 #endif
     readBufferOffset_(0),
@@ -130,7 +134,7 @@ bool File::Open(const String& fileName, FileMode mode)
         return false;
     }
 
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (URHO3D_IS_ASSET(fileName))
     {
         if (mode != FILE_READ)
@@ -250,7 +254,7 @@ bool File::Open(PackageFile* package, const String& fileName)
 
 unsigned File::Read(void* dest, unsigned size)
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (!handle_ && !assetHandle_)
 #else
     if (!handle_)
@@ -271,7 +275,7 @@ unsigned File::Read(void* dest, unsigned size)
     if (!size)
         return 0;
 
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (assetHandle_)
     {
         unsigned sizeLeft = size;
@@ -361,7 +365,7 @@ unsigned File::Read(void* dest, unsigned size)
 
 unsigned File::Seek(unsigned position)
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (!handle_ && !assetHandle_)
 #else
     if (!handle_)
@@ -375,7 +379,7 @@ unsigned File::Seek(unsigned position)
     if (mode_ == FILE_READ && position > size_)
         position = size_;
 
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (assetHandle_)
     {
         SDL_RWseek(assetHandle_, position, SEEK_SET);
@@ -459,7 +463,7 @@ unsigned File::GetChecksum()
 {
     if (offset_ || checksum_)
         return checksum_;
-#ifdef ANDROID
+#ifdef __ANDROID__
     if ((!handle_ && !assetHandle_) || mode_ == FILE_WRITE)
 #else
     if (!handle_ || mode_ == FILE_WRITE)
@@ -486,7 +490,7 @@ unsigned File::GetChecksum()
 
 void File::Close()
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (assetHandle_)
     {
         SDL_RWclose(assetHandle_);
@@ -521,7 +525,7 @@ void File::SetName(const String& name)
 
 bool File::IsOpen() const
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
         return handle_ != 0 || assetHandle_ != 0;
 #else
     return handle_ != 0;

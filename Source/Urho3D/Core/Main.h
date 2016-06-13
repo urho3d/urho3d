@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return function; \
 }
 // Android or iOS: use SDL_main
-#elif defined(ANDROID) || defined(IOS)
+#elif defined(__ANDROID__) || defined(IOS)
 #define URHO3D_DEFINE_MAIN(function) \
 extern "C" int SDL_main(int argc, char** argv); \
 int SDL_main(int argc, char** argv) \

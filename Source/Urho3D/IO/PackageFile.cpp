@@ -54,7 +54,7 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-#ifdef ANDROID
+#ifdef __ANDROID__
     if (URHO3D_IS_ASSET(fileName))
     {
         URHO3D_LOGERROR("Package files within the apk are not supported on Android");

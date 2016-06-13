@@ -35,13 +35,16 @@
 #if defined(IOS)
 #include "../Math/MathDefs.h"
 #include <mach/mach_host.h>
-#elif !defined(ANDROID) && !defined(RPI) && !defined(__EMSCRIPTEN__)
+#elif !defined(__linux__) && !defined(__EMSCRIPTEN__)
 #include <LibCpuId/libcpuid.h>
 #endif
 
 #ifdef _WIN32
 #include <windows.h>
 #include <io.h>
+#if defined(_MSC_VER)
+#include <float.h>
+#endif
 #else
 #include <unistd.h>
 #endif
@@ -50,9 +53,7 @@
 #include <emscripten/threading.h>
 #endif
 
-#if defined(_MSC_VER)
-#include <float.h>
-#elif !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__EMSCRIPTEN__)
+#if defined(__i386__)
 // From http://stereopsis.com/FPU.html
 
 #define FPU_CW_PREC_MASK        0x0300
@@ -76,7 +77,6 @@ inline void SetFPUState(unsigned control)
 {
     __asm__ __volatile__ ("fldcw %0" : : "m" (control));
 }
-
 #endif
 
 #ifndef MINI_URHO
@@ -102,8 +102,50 @@ static void GetCPUData(host_basic_info_data_t* data)
     infoCount = HOST_BASIC_INFO_COUNT;
     host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)data, &infoCount);
 }
-#elif !defined(ANDROID) && !defined(RPI) && !defined(__EMSCRIPTEN__)
+#elif defined(__linux__)
+struct CpuCoreCount
+{
+    unsigned numPhysicalCores_;
+    unsigned numLogicalCores_;
+};
 
+// This function is used by all the target triplets with Linux as the OS, such as Android, RPI, desktop Linux, etc
+static void GetCPUData(struct CpuCoreCount* data)
+{
+    // Sanity check
+    assert(data);
+    // At least return 1 core
+    data->numPhysicalCores_ = data->numLogicalCores_ = 1;
+
+    FILE* fp;
+    int res;
+    unsigned i, j;
+
+    fp = fopen("/sys/devices/system/cpu/present", "r");
+    if (fp)
+    {
+        res = fscanf(fp, "%d-%d", &i, &j);
+        fclose(fp);
+
+        if (res == 2 && i == 0)
+        {
+            data->numPhysicalCores_ = data->numLogicalCores_ = j + 1;
+
+            fp = fopen("/sys/devices/system/cpu/cpu0/topology/thread_siblings_list", "r");
+            if (fp)
+            {
+                res = fscanf(fp, "%d,%d,%d,%d", &i, &j, &i, &j);
+                fclose(fp);
+
+                // Having sibling thread(s) indicates the CPU is using HT/SMT technology
+                if (res > 1)
+                    data->numPhysicalCores_ /= res;
+            }
+        }
+    }
+}
+
+#elif !defined(__EMSCRIPTEN__)
 static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -112,22 +154,19 @@ static void GetCPUData(struct cpu_id_t* data)
         data->num_cores = 1;
     }
 }
-
 #endif
 
 void InitFPU()
 {
-#if !defined(URHO3D_LUAJIT) && !defined(ANDROID) && !defined(IOS) && !defined(RPI) && !defined(__x86_64__) && !defined(_M_AMD64) && !defined(__EMSCRIPTEN__)
     // Make sure FPU is in round-to-nearest, single precision mode
     // This ensures Direct3D and OpenGL behave similarly, and all threads behave similarly
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(_M_IX86)
     _controlfp(_RC_NEAR | _PC_24, _MCW_RC | _MCW_PC);
-#else
+#elif defined(__i386__)
     unsigned control = GetFPUState();
     control &= ~(FPU_CW_PREC_MASK | FPU_CW_ROUND_MASK);
     control |= (FPU_CW_PREC_SINGLE | FPU_CW_ROUND_NEAR);
     SetFPUState(control);
-#endif
 #endif
 }
 
@@ -163,7 +202,7 @@ void OpenConsoleWindow()
 
 void PrintUnicode(const String& str, bool error)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
 #ifdef _WIN32
     // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
     // though it means that proper Unicode output will not work
@@ -192,7 +231,7 @@ void PrintUnicodeLine(const String& str, bool error)
 
 void PrintLine(const String& str, bool error)
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     fprintf(error ? stderr : stdout, "%s\n", str.CString());
 #endif
 }
@@ -280,8 +319,7 @@ String GetConsoleInput()
 #ifdef URHO3D_TESTING
     // When we are running automated tests, reading the console may block. Just return empty in that case
     return ret;
-#endif
-
+#else
 #ifdef _WIN32
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -331,7 +369,7 @@ String GetConsoleInput()
             }
         }
     }
-#elif !defined(ANDROID) && !defined(IOS)
+#elif !defined(__ANDROID__) && !defined(IOS)
     int flags = fcntl(STDIN_FILENO, F_GETFL);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
@@ -345,11 +383,12 @@ String GetConsoleInput()
 #endif
 
     return ret;
+#endif
 }
 
 String GetPlatform()
 {
-#if defined(ANDROID)
+#if defined(__ANDROID__)
     return "Android";
 #elif defined(IOS)
     return "iOS";
@@ -368,30 +407,6 @@ String GetPlatform()
 #endif
 }
 
-#if defined(ANDROID) || defined(RPI)
-static unsigned GetArmCPUCount()
-{
-    FILE* fp;
-    int res, i = -1, j = -1;
-
-    fp = fopen("/sys/devices/system/cpu/present", "r");
-    // If failed, return at least 1
-    if (fp == 0)
-        return 1;
-
-    res = fscanf(fp, "%d-%d", &i, &j);
-    fclose(fp);
-
-    if (res == 1 && i == 0)
-        return 1;
-    else if (res == 2 && i == 0)
-        return j + 1;
-
-    // If failed, return at least 1
-    return 1;
-}
-#endif
-
 unsigned GetNumPhysicalCPUs()
 {
 #if defined(IOS)
@@ -403,8 +418,10 @@ unsigned GetNumPhysicalCPUs()
 #else
     return data.physical_cpu;
 #endif
-#elif defined(ANDROID) || defined(RPI)
-    return GetArmCPUCount();
+#elif defined(__linux__)
+    struct CpuCoreCount data;
+    GetCPUData(&data);
+    return data.numPhysicalCores_;
 #elif defined(__EMSCRIPTEN__)
 #ifdef __EMSCRIPTEN_PTHREADS__
     return emscripten_num_logical_cores();
@@ -428,8 +445,10 @@ unsigned GetNumLogicalCPUs()
 #else
     return data.logical_cpu;
 #endif
-#elif defined(ANDROID) || defined (RPI)
-    return GetArmCPUCount();
+#elif defined(__linux__)
+    struct CpuCoreCount data;
+    GetCPUData(&data);
+    return data.numLogicalCores_;
 #elif defined(__EMSCRIPTEN__)
 #ifdef __EMSCRIPTEN_PTHREADS__
     return emscripten_num_logical_cores();

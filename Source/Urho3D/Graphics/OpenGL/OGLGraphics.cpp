@@ -63,6 +63,8 @@
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
 
+#include <SDL/SDL.h>
+
 #include "../../DebugNew.h"
 
 #ifdef GL_ES_VERSION_2_0
@@ -2020,7 +2022,7 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
 
 IntVector2 Graphics::GetDesktopResolution() const
 {
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     SDL_DisplayMode mode;
     SDL_GetDesktopDisplayMode(0, &mode);
     return IntVector2(mode.w, mode.h);
@@ -2072,6 +2074,7 @@ unsigned Graphics::GetFormat(CompressedFormat format) const
 unsigned Graphics::GetMaxBones()
 {
 #ifdef RPI
+    // At the moment all RPI GPUs are low powered and only have limited number of uniforms
     return 32;
 #else
     return gl3Support ? 128 : 64;
@@ -2439,7 +2442,7 @@ void Graphics::Restore()
     if (!impl_->window_)
         return;
 
-#ifdef ANDROID
+#ifdef __ANDROID__
     // On Android the context may be lost behind the scenes as the application is minimized
     if (impl_->context_ && !SDL_GL_GetCurrentContext())
     {
