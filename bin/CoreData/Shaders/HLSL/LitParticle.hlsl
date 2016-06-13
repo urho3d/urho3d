@@ -5,7 +5,7 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    #ifndef BILLBOARD
+    #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
     #endif
     #ifndef NOUV
@@ -24,7 +24,7 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #ifdef DIRBILLBOARD
+    #if defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,
