@@ -21,6 +21,7 @@ class Renderer
     void SetReuseShadowMaps(bool enable);
     void SetMaxShadowMaps(int shadowMaps);
     void SetDynamicInstancing(bool enable);
+    void SetNumExtraInstancingBufferElements(int elements);
     void SetMinInstances(int instances);
     void SetMaxSortedInstances(int instances);
     void SetMaxOccluderTriangles(int triangles);
@@ -50,6 +51,7 @@ class Renderer
     bool GetReuseShadowMaps() const;
     int GetMaxShadowMaps() const;
     bool GetDynamicInstancing() const;
+    int GetNumExtraInstancingBufferElements() const;
     int GetMinInstances() const;
     int GetMaxSortedInstances() const;
     int GetMaxOccluderTriangles() const;
@@ -89,6 +91,7 @@ class Renderer
     tolua_property__get_set bool reuseShadowMaps;
     tolua_property__get_set int maxShadowMaps;
     tolua_property__get_set bool dynamicInstancing;
+    tolua_property__get_set int numExtraInstancingBufferElements;
     tolua_property__get_set int minInstances;
     tolua_property__get_set int maxSortedInstances;
     tolua_property__get_set int maxOccluderTriangles;
