@@ -182,7 +182,7 @@ void RibbonTrail::HandleScenePostUpdate(StringHash eventType, VariantMap& eventD
     if (viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         // Reset if ribbon trail is too small and too much difference in frame
-        if(points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
+        if (points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
         {
             previousPosition_ = node_->GetWorldPosition();
             points_.Erase(0, points_.Size());
@@ -221,18 +221,18 @@ void RibbonTrail::UpdateTail()
             points_[i].lifetime_ += lastTimeStep_;
 
             // Get point index with expired lifetime
-            if(points_[i].lifetime_ > lifetime_)
+            if (points_[i].lifetime_ > lifetime_)
                 expiredIndex = i;
         }
     }
 
     // Delete expired points
-    if(expiredIndex != -1)
+    if (expiredIndex != -1)
     {
         points_.Erase(0, expiredIndex+1);
 
         // Update endTail pointer
-        if(points_.Size() > 1)
+        if (points_.Size() > 1)
         {
             endTail_.position_ = points_[0].position_;
             startEndTailTime_ = points_[0].lifetime_;
@@ -245,7 +245,7 @@ void RibbonTrail::UpdateTail()
         previousPosition_ = worldPosition;
     }
     // Delete lonely point
-    else if(points_.Size() == 1)
+    else if (points_.Size() == 1)
     {
         points_.Erase(0, 1);
         previousPosition_ = worldPosition;
@@ -259,7 +259,7 @@ void RibbonTrail::UpdateTail()
     }
 
     // Add starting points
-    if(points_.Size() == 0 && path > M_LARGE_EPSILON && emitting_)
+    if (points_.Size() == 0 && path > M_LARGE_EPSILON && emitting_)
     {
         Vector3 forwardmotion = (previousPosition_ - worldPosition).Normalized();
 
@@ -273,7 +273,7 @@ void RibbonTrail::UpdateTail()
         nextPoint.lifetime_ = 0.0f;
         nextPoint.forward_ = forwardmotion;
 
-        if(node_->GetParent() != 0)
+        if (node_->GetParent() != 0)
         {
             startPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
             nextPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
@@ -292,14 +292,14 @@ void RibbonTrail::UpdateTail()
     {
         Vector3 forwardmotion = (previousPosition_ - worldPosition).Normalized();
 
-        // Add more point if path exceeded tail length
-        if(path > vertexDistance_)
+        // Add more points if path exceeded tail length
+        if (path > vertexDistance_)
         {
             Point newPoint;
             newPoint.position_ = worldPosition;
             newPoint.lifetime_ = 0.0f;
             newPoint.forward_ = forwardmotion;
-            if(node_->GetParent() != 0)
+            if (node_->GetParent() != 0)
                 newPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
 
             points_.Push(newPoint);
@@ -308,9 +308,9 @@ void RibbonTrail::UpdateTail()
         }
         else
         {
-            // Updating recent tail
+            // Update recent tail
             points_.Back().position_ = worldPosition;
-            if(forwardmotion != Vector3::ZERO)
+            if (forwardmotion != Vector3::ZERO)
                 points_.Back().forward_ = forwardmotion;
         }
     }
@@ -353,9 +353,9 @@ void RibbonTrail::SetEmitting(bool emitting)
 
 void RibbonTrail::SetTailColumn(unsigned tailColumn)
 {
-    if(tailColumn > MAX_TAIL_COLUMN)
+    if (tailColumn > MAX_TAIL_COLUMN)
     {
-        URHO3D_LOGINFO("Max tail column is " + String(MAX_TAIL_COLUMN));
+        URHO3D_LOGWARNING("Max ribbon trail tail column is " + String(MAX_TAIL_COLUMN));
         tailColumn_ = MAX_TAIL_COLUMN;
     }
     else if (tailColumn < 1)
@@ -447,13 +447,13 @@ void RibbonTrail::UpdateBufferSize()
     unsigned indexPerSegment = 6 + (tailColumn_ - 1) * 6;
     unsigned vertexPerSegment = 4 + (tailColumn_ - 1) * 2;
 
-    if(trailType_ == TT_FACE_CAMERA)
+    if (trailType_ == TT_FACE_CAMERA)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_FACE_CAMERA;
         vertexBuffer_->SetSize((numPoints_ * vertexPerSegment),
             MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT, true);
     }
-    else if(trailType_ == TT_BONE)
+    else if (trailType_ == TT_BONE)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_BONE;
         vertexBuffer_->SetSize((numPoints_ * vertexPerSegment),
@@ -561,7 +561,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
         float length = i == 0 ? 0.0f : (points_[i].position_ - points_[i-1].position_).Length();
         trailLength += length;
         points_[i].elapsedLength_ = trailLength;
-        if(i < numPoints_ - 1)
+        if (i < numPoints_ - 1)
             points_[i].next_ = &points_[i+1];
     }
 
@@ -676,7 +676,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             dest += 20;
         }
     }
-    else if(trailType_ == TT_BONE)
+    else if (trailType_ == TT_BONE)
     {
         for (unsigned i = 0; i < numPoints_; ++i)
         {

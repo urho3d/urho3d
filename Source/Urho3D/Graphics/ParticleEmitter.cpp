@@ -486,7 +486,7 @@ bool ParticleEmitter::EmitNewParticle()
     particle.colorIndex_ = 0;
     particle.texIndex_ = 0;
 
-    if(faceCameraMode_ == FC_DIRECTION)
+    if (faceCameraMode_ == FC_DIRECTION)
     {
         startPos += startDir * particle.size_.y_;
     }

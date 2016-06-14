@@ -149,7 +149,7 @@ void RibbonTrailDemo::CreateScene()
     swordTrail_->SetMaterial(cache->GetResource<Material>("Materials/SlashTrail.xml"));
     swordTrail_->SetLifetime(0.22f);
     swordTrail_->SetStartColor(Color(1.0f, 1.0f, 1.0f, 0.75f));
-    swordTrail_->SetEndColor(Color(0.2, 0.5f, 1.0f, 0.0f));
+    swordTrail_->SetEndColor(Color(0.2f, 0.5f, 1.0f, 0.0f));
     swordTrail_->SetTailColumn(4);
 
     // Add floating text for info.
@@ -261,11 +261,11 @@ void RibbonTrailDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move first box with pattern.
     boxNode1_->SetTransform(
-                Vector3(-4.0 + 3.0 * Cos(100.0 * timeStepSum_), 0.5, -2.0 * Cos(400.0 * timeStepSum_)), Quaternion());
+                Vector3(-4.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)), Quaternion());
 
     // Move second box with pattern.
     boxNode2_->SetTransform(
-                Vector3(0.0 + 3.0 * Cos(100.0 * timeStepSum_), 0.5, -2.0 * Cos(400.0 * timeStepSum_)), Quaternion());
+                Vector3(0.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)), Quaternion());
     
     // Get elapsed attack animation time.
     float swordAnimTime = ninjaAnimCtrl_->GetAnimationState(String("Models/NinjaSnowWar/Ninja_Attack3.ani"))->GetTime();
