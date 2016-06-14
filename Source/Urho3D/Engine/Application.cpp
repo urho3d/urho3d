@@ -23,13 +23,14 @@
 #include "../Precompiled.h"
 
 #include "../Engine/Application.h"
-#include "../Engine/Engine.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+
 #ifdef IOS
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsImpl.h"
+#include <SDL/SDL.h>
 #endif
-#include "../IO/IOEvents.h"
-#include "../IO/Log.h"
 
 #include "../DebugNew.h"
 

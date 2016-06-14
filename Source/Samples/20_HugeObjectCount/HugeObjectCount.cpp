@@ -256,7 +256,7 @@ void HugeObjectCount::HandleUpdate(StringHash eventType, VariantMap& eventData)
         animate_ = !animate_;
 
     // Toggle grouped / ungrouped mode
-    if (input->GetKeyPress('G'))
+    if (input->GetKeyPress(KEY_G))
     {
         useGroups_ = !useGroups_;
         CreateScene();

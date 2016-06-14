@@ -26,7 +26,7 @@
 #include "../Resource/Image.h"
 #include "../UI/BorderImage.h"
 
-#include <SDL/SDL_mouse.h>
+struct SDL_Cursor;
 
 namespace Urho3D
 {

@@ -235,21 +235,43 @@ void Slider::UpdateSlider()
         if (orientation_ == O_HORIZONTAL)
         {
             int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
+
+            if (knob_->IsFixedSize())
+                sliderLength = knob_->GetWidth();
+
             float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
-            knob_->SetSize(sliderLength, GetHeight());
-            knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+
+            if (!knob_->IsFixedSize())
+            {
+                knob_->SetSize(sliderLength, GetHeight());
+                knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+            }
+            else
+                knob_->SetPosition(Clamp((int)(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
         }
         else
         {
             int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
+
+            if (knob_->IsFixedSize())
+                sliderLength = knob_->GetHeight();
+
             float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;
-            knob_->SetSize(GetWidth(), sliderLength);
-            knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+
+            if (!knob_->IsFixedSize())
+            {
+                knob_->SetSize(GetWidth(), sliderLength);
+                knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+            }
+            else
+                knob_->SetPosition(0, Clamp((int)(sliderPos), 0, GetHeight() - knob_->GetHeight()));
         }
     }
     else
     {
-        knob_->SetSize(GetSize());
+        if (!knob_->IsFixedSize())
+            knob_->SetSize(GetSize());
+
         knob_->SetPosition(0, 0);
     }
 }

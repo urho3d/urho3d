@@ -218,7 +218,7 @@ public:
     void SetReuseShadowMaps(bool enable);
     /// Set maximum number of shadow maps created for one resolution. Only has effect if reuse of shadow maps is disabled.
     void SetMaxShadowMaps(int shadowMaps);
-    /// Set dynamic instancing on/off.
+    /// Set dynamic instancing on/off. When on (default), drawables using the same static-type geometry and material will be automatically combined to an instanced draw call.
     void SetDynamicInstancing(bool enable);
     /// Set minimum number of instances required in a batch group to render as instanced.
     void SetMinInstances(int instances);
@@ -232,11 +232,11 @@ public:
     void SetOccluderSizeThreshold(float screenSize);
     /// Set whether to thread occluder rendering. Default false.
     void SetThreadedOcclusion(bool enable);
-    /// Set shadow depth bias multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
+    /// Set shadow depth bias multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
     void SetMobileShadowBiasMul(float mul);
-    /// Set shadow depth bias addition for mobile platforms (OpenGL ES.) No effect on desktops. Default 0.0001.
+    /// Set shadow depth bias addition for mobile platforms to counteract possible worse shadow map precision. Default 0.0 (no effect.)
     void SetMobileShadowBiasAdd(float add);
-    /// Set shadow normal offset multiplier for mobile platforms (OpenGL ES.) No effect on desktops. Default 2.
+    /// Set shadow normal offset multiplier for mobile platforms to counteract possible worse shadow map precision. Default 1.0 (no effect.)
     void SetMobileNormalOffsetMul(float mul);
     /// Force reload of shaders.
     void ReloadShaders();

@@ -211,8 +211,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 
     switch (key)
     {
-    case 'X':
-    case 'C':
+    case KEY_X:
+    case KEY_C:
         if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
             unsigned start = text_->GetSelectionStart();
@@ -221,7 +221,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             if (text_->GetSelectionLength())
                 GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
 
-            if (key == 'X' && editable_)
+            if (key == KEY_X && editable_)
             {
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
@@ -234,7 +234,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         }
         break;
 
-    case 'V':
+    case KEY_V:
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
             const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();

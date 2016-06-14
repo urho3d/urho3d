@@ -207,20 +207,20 @@ env:
     - CCACHE_MAXSIZE=100M
   matrix:
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
-    - ANDROID_ABI=x86_64 URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level 21
-    - ANDROID_ABI=x86_64 URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
-    - ANDROID_ABI=x86    URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21  # 9 is the default but at least 12 is needed when LuaJIT is enabled
-    - ANDROID_ABI=x86    URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21
-    - ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=STATIC          # Using default native API Level 9
-    - ANDROID_ABI=armeabi-v7a URHO3D_LIB_TYPE=SHARED AVD=21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang3.6 URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level 21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang3.6 URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang3.6 URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21  # 9 is the default but at least 12 is needed when LuaJIT is enabled
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang3.6 URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang3.6 URHO3D_LIB_TYPE=STATIC          # Using default native API Level 9
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang3.6 URHO3D_LIB_TYPE=SHARED AVD=21
 matrix:
   fast_finish: true
   include:
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
     - addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
-      env: ANDROID_ABI=arm64-v8a URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level 21
+      env: ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang3.6 URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level 21
     - addons: {<<: *newer_gcc}
-      env: ANDROID_ABI=arm64-v8a URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
+      env: ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang3.6 URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
@@ -228,11 +228,9 @@ before_script:
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
-  - if [ "$ANDROID_ABI" == "x86_64" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin C_PREFIX=x86_64-linux-android; fi
-  - if [ "$ANDROID_ABI" == "x86" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/x86-4.9/prebuilt/linux-x86_64/bin C_PREFIX=i686-linux-android; fi
-  - if [ "$ANDROID_ABI" == "arm64-v8a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin C_PREFIX=aarch64-linux-android PATH=$HOME:$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
-  - if [ "$ANDROID_ABI" == "armeabi-v7a" ]; then export C_PATH=$(pwd)/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin C_PREFIX=arm-linux-androideabi; fi
-  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/$C_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - if [ "$ANDROID_ABI" == "arm64-v8a" ]; then export PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
+  - export C_PATH=$(pwd)/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/{clang,clang++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
 script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
@@ -306,7 +304,6 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - if [ $XCODE ] && echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]'; then export XCODE_64BIT_ONLY=1; fi
   - travis_retry brew update >/dev/null
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
@@ -316,7 +313,7 @@ before_script:
   - for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
   - brew cleanup
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; fi
+  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
   - rake ci_setup_cache
 script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache

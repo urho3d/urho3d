@@ -11,7 +11,11 @@ varying vec4 vWorldPos;
 #endif
 #ifdef PERPIXEL
     #ifdef SHADOW
-        varying vec4 vShadowPos[NUMCASCADES];
+        #ifndef GL_ES
+            varying vec4 vShadowPos[NUMCASCADES];
+        #else
+            varying highp vec4 vShadowPos[NUMCASCADES];
+        #endif
     #endif
     #ifdef SPOTLIGHT
         varying vec4 vSpotPos;

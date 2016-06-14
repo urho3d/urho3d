@@ -19,6 +19,7 @@ Urho3D development, contributions and bugfixes by:
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
+- Loic Blot
 - Danny Boisvert
 - Sergey Bosko
 - Carlo Carollo
@@ -87,6 +88,7 @@ Urho3D development, contributions and bugfixes by:
 - neat3d
 - nemerle
 - ninjastone
+- proller
 - raould
 - rasteron
 - reattiva
@@ -125,7 +127,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 
 Urho3D uses the following third-party libraries:
 - AngelScript 2.30.2 (http://www.angelcode.com/angelscript)
-- Boost 1.61.0 (http://www.boost.org) - only used for AngelScript bindings on Web platform
+- Boost 1.61.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.0 (http://box2d.org)
 - Bullet 2.83.6 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
@@ -145,7 +147,7 @@ Urho3D uses the following third-party libraries:
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.4 (http://www.libsdl.org)
-- SQLite 3.8.10.2 (https://www.sqlite.org)
+- SQLite 3.13.0 (https://www.sqlite.org)
 - StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (http://nothings.org)
 - stb_image_write 1.02 (http://nothings.org)

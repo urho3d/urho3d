@@ -27,7 +27,8 @@
 
 #include <d3d11.h>
 #include <dxgi.h>
-#include <SDL/SDL.h>
+
+struct SDL_Window;
 
 namespace Urho3D
 {

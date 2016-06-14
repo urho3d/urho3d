@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'RPI', 'RPI_ABI', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -64,7 +64,7 @@ task :cmake do
       # do nothing
     when 'clean', 'codeblocks', 'codelite', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       script = "cmake_#{option}" unless script == 'cmake_clean'
-    when 'android', 'web', 'ios', 'mingw', 'rpi'
+    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
       platform = option
       build_options = "#{build_options} -D#{option == 'mingw' ? 'WIN32' : option.upcase}=1" unless script == 'cmake_clean'
       script = 'cmake_xcode' if option == 'ios'
@@ -100,7 +100,7 @@ task :make do
     case option
     when 'codeblocks', 'codelite', 'eclipse', 'generic', 'make', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'
       # do nothing
-    when 'android', 'web', 'ios', 'mingw', 'rpi'
+    when 'android', 'arm', 'ios', 'mingw', 'rpi', 'web'
       platform = option
     when 'clean_first'
       cmake_build_options = "#{cmake_build_options} --clean-first"

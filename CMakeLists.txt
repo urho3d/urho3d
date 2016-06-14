@@ -77,7 +77,7 @@ set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 # TODO: Investigate the implication of using CMAKE_SYSROOT variable (available since 3.0.0) instead of our own SYSROOT variable
-set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
+set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
@@ -120,6 +120,8 @@ elseif (WEB)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)
+    elseif (ARM)
+        set (CPACK_SYSTEM_NAME Arm)     # Generic ARM
     endif ()
     if (NOT URHO3D_64BIT OR HAS_LIB64)
         list (APPEND CPACK_GENERATOR RPM)
@@ -154,6 +156,9 @@ elseif (ANDROID AND X86)    # Take advantage of Android toolchain setting X86 va
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-IA)     # Stands for Intel Architecture
 elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
+elseif (ARM_ABI_FLAGS)
+    string (REGEX REPLACE "^.*mcpu=([^ ]+).*$" -\\1 CPU_NAME "${ARM_ABI_FLAGS}")
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)

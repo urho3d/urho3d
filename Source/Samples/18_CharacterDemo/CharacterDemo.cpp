@@ -310,11 +310,11 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
 
             // Switch between 1st and 3rd person
-            if (input->GetKeyPress('F'))
+            if (input->GetKeyPress(KEY_F))
                 firstPerson_ = !firstPerson_;
 
             // Turn on/off gyroscope on mobile platform
-            if (touch_ && input->GetKeyPress('G'))
+            if (touch_ && input->GetKeyPress(KEY_G))
                 touch_->useGyroscope_ = !touch_->useGyroscope_;
 
             // Check for loading / saving the scene

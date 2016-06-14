@@ -201,7 +201,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         animate = !animate;
 
     // Toggle grouped / ungrouped mode
-    if (input.keyPress['G'])
+    if (input.keyPress[KEY_G])
     {
         useGroups = !useGroups;
         CreateScene();

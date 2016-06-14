@@ -43,7 +43,11 @@
 
 if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
     if (IOS OR TVOS)
-        set (ARCH_FLAGS -arch arm64)    # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+        # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+        set (ARCH_FLAGS -arch arm64)
+    elseif (ANDROID_COMPILER_IS_CLANG)
+        # Use the same target flag as configured by Android/CMake toolchain file
+        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${ANDROID_CXX_FLAGS}")  # Stringify for string replacement
     endif ()
     execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM - RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
     if (NOT CC_EXIT_STATUS EQUAL 0)
@@ -94,11 +98,6 @@ else ()
     check_native_define ("__(arm|aarch64)__" ARM)
     # For completeness sake as currently we do not support PowerPC (yet)
     check_native_define ("__(ppc|PPC|powerpc|POWERPC)(64)*__" POWERPC)
-    # Check if the target arm platform is currently supported
-    if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
-        # TODO: check the uname of the host system for the telltale sign of RPI, just in case this is a native build on the device itself
-        message (FATAL_ERROR "Unsupported arm target architecture")
-    endif ()
     # GCC/Clang and all their derivatives should understand this command line option to get the compiler version
     if (NOT DEFINED COMPILER_VERSION)
         execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)

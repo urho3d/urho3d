@@ -182,7 +182,10 @@ void Time::Sleep(unsigned mSec)
 #ifdef _WIN32
     ::Sleep(mSec);
 #else
-    usleep(mSec * 1000);
+    timespec time;
+    time.tv_sec = mSec / 1000;
+    time.tv_nsec = (mSec % 1000) * 1000000;
+    nanosleep(&time, 0);
 #endif
 }
 

@@ -215,7 +215,7 @@ void MoveCamera(float timeStep)
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SetPathPoint();
     // Add or remove objects with middle mouse button, then rebuild navigation mesh partially
-    if (input.mouseButtonPress[MOUSEB_MIDDLE] || input.keyPress['O'])
+    if (input.mouseButtonPress[MOUSEB_MIDDLE] || input.keyPress[KEY_O])
         AddOrRemoveObject();
 
     // Toggle debug geometry with space
