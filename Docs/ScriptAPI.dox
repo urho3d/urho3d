@@ -9996,6 +9996,7 @@ Properties:
 - float mobileShadowBiasAdd
 - float mobileShadowBiasMul
 - uint numBatches // readonly
+- int numExtraInstancingBufferElements
 - uint[] numGeometries // readonly
 - uint[] numLights // readonly
 - uint[] numOccluders // readonly

@@ -8470,6 +8470,7 @@ float mobileShadowBiasAdd;
 float mobileShadowBiasMul;
 /* readonly */
 uint numBatches;
+int numExtraInstancingBufferElements;
 /* readonly */
 Array<uint> numGeometries;
 /* readonly */
