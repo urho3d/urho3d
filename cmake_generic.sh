@@ -22,9 +22,9 @@
 #
 
 # Determine source tree and build tree
-if [ "$1" ] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [ -f $(pwd)/CMakeCache.txt ]; then BUILD=$(pwd); else caller=$(ps -o args= $PPID |cut -d' ' -f2); if [[ ! "$caller" =~ cmake_.*\.sh$ ]]; then caller=$0; fi; echo "Usage: ${caller##*/} /path/to/build-tree [build-options]"; exit 1; fi
+if [[ "$1" ]] && [[ ! "$1" =~ ^- ]]; then BUILD=$1; shift; elif [[ -f $(pwd)/CMakeCache.txt ]]; then BUILD=$(pwd); else caller=$(ps -o args= $PPID |cut -d' ' -f2); if [[ ! "$caller" =~ cmake_.*\.sh$ ]]; then caller=$0; fi; echo "Usage: ${caller##*/} /path/to/build-tree [build-options]"; exit 1; fi
 SOURCE=$(cd ${0%/*}; pwd)
-if [ "$BUILD" == "." ]; then BUILD=$(pwd); fi
+if [[ "$BUILD" == "." ]]; then BUILD=$(pwd); fi
 
 # Define helpers
 . "$SOURCE"/.bash_helpers.sh
