@@ -37,8 +37,7 @@ class IndexBuffer;
 class VertexBuffer;
 
 /// Trail is consisting of series of tails. Two connected points make a tail.
-//struct URHO3D_API Point
-struct Point
+struct URHO3D_API TrailPoint
 {
     /// Position.
     Vector3 position_;
@@ -49,19 +48,17 @@ struct Point
     /// Elapsed length inside the trail.
     float elapsedLength_;
     /// Next point to make a tail.
-    Point* next_;
+    TrailPoint* next_;
     /// Tail time to live.
     float lifetime_;
     /// Distance for sorting.
     float sortDistance_;
 };
 
-//static const unsigned MAX_TAILS = 65536 / 6;
-
-/// Custom component that creates a tail
+/// Drawable component that creates a tail.
 class URHO3D_API RibbonTrail : public Drawable
 {
-	URHO3D_OBJECT(RibbonTrail, Drawable);
+    URHO3D_OBJECT(RibbonTrail, Drawable);
 
 public:
     /// Construct.
@@ -92,9 +89,9 @@ public:
     /// Set width of the tail. Only works for face camera trail type.
     void SetWidth(float width);
     /// Set vertex blended color for start of trail.
-    void SetStartColor(const Color& c);
+    void SetStartColor(const Color& color);
     /// Set vertex blended scale for end of trail.
-    void SetEndColor(const Color& c);
+    void SetEndColor(const Color& color);
     /// Set vertex blended color for start of trail.
     void SetStartScale(float startScale);
     /// Set vertex blended scale for end of trail.
@@ -164,7 +161,7 @@ protected:
     /// Mark vertex buffer to need an update.
     void MarkPositionsDirty();
     /// Tails.
-    PODVector<Point> points_;
+    PODVector<TrailPoint> points_;
     /// Tails sorted flag.
     bool sorted_;
     /// Animation LOD bias.
@@ -182,8 +179,8 @@ private:
     void UpdateBufferSize();
     /// Rewrite RibbonTrail vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
-	/// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
-	void UpdateTail();
+    /// Update/Rebuild tail mesh only if position changed (called by UpdateBatches())
+    void UpdateTail();
     /// Geometry.
     SharedPtr<Geometry> geometry_;
     /// Vertex buffer.
@@ -226,15 +223,15 @@ private:
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
     Vector3 previousOffset_;
-    /// Billboard pointers for sorting.
-    Vector<Point*> sortedPoints_;
+    /// Trail pointers for sorting.
+    Vector<TrailPoint*> sortedPoints_;
     /// Force update flag (ignore animation LOD momentarily.)
     bool forceUpdate_;
     /// Currently emitting flag.
     bool emitting_;
 
     /// End of trail point for smoother tail dissapearance.
-    Point endTail_;
+    TrailPoint endTail_;
     /// The time the tail become end of trail.
     float startEndTailTime_;
 };

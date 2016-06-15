@@ -49,7 +49,7 @@ const char* trailTypeNames[] =
     0
 };
 
-inline bool CompareTails(Point* lhs, Point* rhs)
+inline bool CompareTails(TrailPoint* lhs, TrailPoint* rhs)
 {
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
@@ -102,7 +102,7 @@ void RibbonTrail::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-	URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Emittting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
@@ -259,12 +259,12 @@ void RibbonTrail::UpdateTail()
     {
         Vector3 forwardmotion = (previousPosition_ - worldPosition).Normalized();
 
-        Point startPoint;
+        TrailPoint startPoint;
         startPoint.position_ = previousPosition_;
         startPoint.lifetime_ = 0.0f;
         startPoint.forward_ = forwardmotion;
 
-        Point nextPoint;
+        TrailPoint nextPoint;
         nextPoint.position_ = worldPosition;
         nextPoint.lifetime_ = 0.0f;
         nextPoint.forward_ = forwardmotion;
@@ -291,7 +291,7 @@ void RibbonTrail::UpdateTail()
         // Add more points if path exceeded tail length
         if (path > vertexDistance_)
         {
-            Point newPoint;
+            TrailPoint newPoint;
             newPoint.position_ = worldPosition;
             newPoint.lifetime_ = 0.0f;
             newPoint.forward_ = forwardmotion;
@@ -399,7 +399,7 @@ void RibbonTrail::UpdateGeometry(const FrameInfo& frame)
 }
 
 UpdateGeometryType RibbonTrail::GetUpdateGeometryType()
-{	
+{
     if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else
@@ -546,7 +546,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
     sortedPoints_.Resize(numPoints_);
     for (unsigned i = 0; i < numPoints_; ++i)
     {
-        Point& point = points_[i];
+        TrailPoint& point = points_[i];
         sortedPoints_[i] = &point;
         if (sorted_)
             point.sortDistance_ = frame.camera_->GetDistanceSquared(point.position_);
@@ -580,7 +580,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
     {
         for (unsigned i = 0; i < numPoints_; ++i)
         {
-            Point& point = *sortedPoints_[i];
+            TrailPoint& point = *sortedPoints_[i];
 
             if (sortedPoints_[i] == &points_.Back()) continue;
 
@@ -682,7 +682,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
     {
         for (unsigned i = 0; i < numPoints_; ++i)
         {
-            Point& point = *sortedPoints_[i];
+            TrailPoint& point = *sortedPoints_[i];
 
             if (sortedPoints_[i] == &points_.Back()) continue;
 
@@ -819,15 +819,15 @@ void RibbonTrail::SetVertexDistance(float length)
     Commit();
 }
 
-void RibbonTrail::SetEndColor(const Color& c)
+void RibbonTrail::SetEndColor(const Color& color)
 {
-    endColor_ = Color(c.r_, c.g_, c.b_, c.a_);
+    endColor_ = color;
     Commit();
 }
 
-void RibbonTrail::SetStartColor(const Color& c)
+void RibbonTrail::SetStartColor(const Color& color)
 {
-    startColor_ = Color(c.r_, c.g_, c.b_, c.a_);
+    startColor_ = color;
     Commit();
 }
 
