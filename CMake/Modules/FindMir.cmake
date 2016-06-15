@@ -30,17 +30,11 @@
 #  XKB
 #
 
-if (URHO3D_64BIT)
-    set (MIR_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
-else ()
-    set (MIR_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
-endif ()
-
 find_path (MIR_CLIENT_INCLUDE_DIR NAMES mir_toolkit/mir_client_library.h DOC "Mir client include directory")
 find_path (MIR_COMMON_INCLUDE_DIR NAMES mir_toolkit/common.h DOC "Mir common include directory")
-find_library (MIR_CLIENT NAMES mirclient PATHS ${MIR_LIB_SEARCH_PATH} DOC "Mir client library")
-find_library (MIR_COMMON NAMES mircommon PATHS ${MIR_LIB_SEARCH_PATH} DOC "Mir common library")
-find_library (XKB NAMES xkbcommon PATHS ${MIR_LIB_SEARCH_PATH} DOC "X.Org library for compiling XKB maps into formats usable by the X Server or other display servers")
+find_library (MIR_CLIENT NAMES mirclient DOC "Mir client library")
+find_library (MIR_COMMON NAMES mircommon DOC "Mir common library")
+find_library (XKB NAMES xkbcommon DOC "X.Org library for compiling XKB maps into formats usable by the X Server or other display servers")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (Mir REQUIRED_VARS MIR_CLIENT MIR_COMMON XKB MIR_CLIENT_INCLUDE_DIR MIR_COMMON_INCLUDE_DIR FAIL_MESSAGE "Could NOT find Mir display server")

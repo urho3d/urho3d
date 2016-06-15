@@ -27,14 +27,8 @@
 #  NAS_LIBRARIES
 #
 
-if (URHO3D_64BIT)
-    set (NAS_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
-else ()
-    set (NAS_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
-endif ()
-
 find_path (NAS_INCLUDE_DIRS NAMES audio/audiolib.h nas/audiolib.h DOC "NetworkAudioSystem include directory")
-find_library (NAS_LIBRARIES NAMES audio PATHS ${NAS_LIB_SEARCH_PATH} DOC "NetworkAudioSystem library")
+find_library (NAS_LIBRARIES NAMES audio DOC "NetworkAudioSystem library")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (NAS REQUIRED_VARS NAS_LIBRARIES NAS_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find NetworkAudioSystem development library")

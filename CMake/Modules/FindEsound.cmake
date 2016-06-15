@@ -27,14 +27,8 @@
 #  ESOUND_LIBRARIES
 #
 
-if (URHO3D_64BIT)
-    set (ESOUND_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
-else ()
-    set (ESOUND_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
-endif ()
-
 find_path (ESOUND_INCLUDE_DIRS NAMES esd.h DOC "Esound include directory")
-find_library (ESOUND_LIBRARIES NAMES esd PATHS ${ESOUND_LIB_SEARCH_PATH} DOC "Esound library")
+find_library (ESOUND_LIBRARIES NAMES esd DOC "Esound library")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (Esound REQUIRED_VARS ESOUND_LIBRARIES ESOUND_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find Esound development library")
