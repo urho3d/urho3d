@@ -42,6 +42,7 @@
 #include "../../Graphics/Octree.h"
 #include "../../Graphics/ParticleEffect.h"
 #include "../../Graphics/ParticleEmitter.h"
+#include "../../Graphics/RibbonTrail.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
@@ -2827,6 +2828,7 @@ void RegisterGraphicsLibrary(Context* context)
     BillboardSet::RegisterObject(context);
     ParticleEffect::RegisterObject(context);
     ParticleEmitter::RegisterObject(context);
+    RibbonTrail::RegisterObject(context);
     CustomGeometry::RegisterObject(context);
     DecalSet::RegisterObject(context);
     Terrain::RegisterObject(context);

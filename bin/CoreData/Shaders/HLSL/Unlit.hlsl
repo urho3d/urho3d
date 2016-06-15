@@ -20,8 +20,10 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #ifdef DIRBILLBOARD
+    #if defined(DIRBILLBOARD) || defined(TRAILBONE)
         float3 iNormal : NORMAL,
+    #endif
+    #if defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,

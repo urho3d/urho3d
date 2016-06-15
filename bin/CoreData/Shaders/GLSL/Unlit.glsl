@@ -20,7 +20,11 @@ void VS()
 
     #ifdef VERTEXCOLOR
         vColor = iColor;
+        //#ifdef TRAIL
+        //    vColor = vec4(normalize(cCameraPos), 1.0);
+        //#endif
     #endif
+
 }
 
 void PS()
