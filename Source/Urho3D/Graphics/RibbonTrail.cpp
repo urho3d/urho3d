@@ -90,10 +90,6 @@ RibbonTrail::RibbonTrail(Context* context) :
     batches_[0].geometryType_ = GEOM_TRAIL_FACE_CAMERA;
     batches_[0].worldTransform_ = &transforms_;
     batches_[0].numWorldTransforms_ = 1;
-
-    // for debug
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>("Materials/TailGenerator.xml"));
 }
 
 RibbonTrail::~RibbonTrail()
@@ -447,28 +443,34 @@ void RibbonTrail::UpdateBufferSize()
     unsigned indexPerSegment = 6 + (tailColumn_ - 1) * 6;
     unsigned vertexPerSegment = 4 + (tailColumn_ - 1) * 2;
 
+    unsigned mask = 0;
+
     if (trailType_ == TT_FACE_CAMERA)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_FACE_CAMERA;
-        vertexBuffer_->SetSize((numPoints_ * vertexPerSegment),
-            MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT, true);
+        mask =  MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
     }
     else if (trailType_ == TT_BONE)
     {
         batches_[0].geometryType_ = GEOM_TRAIL_BONE;
-        vertexBuffer_->SetSize((numPoints_ * vertexPerSegment),
-            MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT, true);
+        mask =  MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TANGENT;
     }
-
-    if (indexBuffer_->GetIndexCount() != ((numPoints_ - 1) * indexPerSegment))
-        indexBuffer_->SetSize(((numPoints_ - 1) * indexPerSegment), false);
 
     bufferSizeDirty_ = false;
     bufferDirty_ = true;
     forceUpdate_ = true;
 
-    if (numPoints_ == 0)
+    if (numPoints_ < 2)
+    {
+        indexBuffer_->SetSize(0, false);
+        vertexBuffer_->SetSize(0, mask, true);
         return;
+    }
+    else
+    {
+        indexBuffer_->SetSize(((numPoints_ - 1) * indexPerSegment), false);
+        vertexBuffer_->SetSize(numPoints_ * vertexPerSegment, mask, true);
+    }
 
     // Indices do not change for a given tail generator capacity
     unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, ((numPoints_ - 1) * indexPerSegment), true);
