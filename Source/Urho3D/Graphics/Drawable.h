@@ -97,6 +97,8 @@ struct URHO3D_API SourceBatch
     const Matrix3x4* worldTransform_;
     /// Number of world transforms.
     unsigned numWorldTransforms_;
+    /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
+    void* instancingData_;
     /// %Geometry type.
     GeometryType geometryType_;
 };

@@ -2898,15 +2898,16 @@ void View::PrepareInstancingBuffer()
     if (!dest)
         return;
 
+    const unsigned stride = instancingBuffer->GetVertexSize();
     for (HashMap<unsigned, BatchQueue>::Iterator i = batchQueues_.Begin(); i != batchQueues_.End(); ++i)
-        i->second_.SetTransforms(dest, freeIndex);
+        i->second_.SetInstancingData(dest, stride, freeIndex);
 
     for (Vector<LightBatchQueue>::Iterator i = lightQueues_.Begin(); i != lightQueues_.End(); ++i)
     {
         for (unsigned j = 0; j < i->shadowSplits_.Size(); ++j)
-            i->shadowSplits_[j].shadowBatches_.SetTransforms(dest, freeIndex);
-        i->litBaseBatches_.SetTransforms(dest, freeIndex);
-        i->litBatches_.SetTransforms(dest, freeIndex);
+            i->shadowSplits_[j].shadowBatches_.SetInstancingData(dest, stride, freeIndex);
+        i->litBaseBatches_.SetInstancingData(dest, stride, freeIndex);
+        i->litBatches_.SetInstancingData(dest, stride, freeIndex);
     }
 
     instancingBuffer->Unlock();

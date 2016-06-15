@@ -4938,6 +4938,7 @@ Methods:
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
+- void SetNumExtraInstancingBufferElements(int elements)
 - void SetMinInstances(int instances)
 - void SetMaxSortedInstances(int instances)
 - void SetMaxOccluderTriangles(int triangles)
@@ -4966,6 +4967,7 @@ Methods:
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
+- int GetNumExtraInstancingBufferElements() const
 - int GetMinInstances() const
 - int GetMaxSortedInstances() const
 - int GetMaxOccluderTriangles() const
@@ -5006,6 +5008,7 @@ Properties:
 - bool reuseShadowMaps
 - int maxShadowMaps
 - bool dynamicInstancing
+- int numExtraInstancingBufferElements
 - int minInstances
 - int maxSortedInstances
 - int maxOccluderTriangles

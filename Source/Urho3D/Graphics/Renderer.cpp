@@ -248,8 +248,20 @@ static const char* heightFogVariations[] =
     "HEIGHTFOG "
 };
 
-static const unsigned INSTANCING_BUFFER_MASK = MASK_INSTANCEMATRIX1 | MASK_INSTANCEMATRIX2 | MASK_INSTANCEMATRIX3;
 static const unsigned MAX_BUFFER_AGE = 1000;
+
+static const int MAX_EXTRA_INSTANCING_BUFFER_ELEMENTS = 4;
+
+inline PODVector<VertexElement> CreateInstancingBufferElements(unsigned numExtraElements)
+{
+    static const unsigned NUM_INSTANCEMATRIX_ELEMENTS = 3;
+    static const unsigned FIRST_UNUSED_TEXCOORD = 4;
+
+    PODVector<VertexElement> elements;
+    for (unsigned i = 0; i < NUM_INSTANCEMATRIX_ELEMENTS + numExtraElements; ++i)
+        elements.Push(VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, FIRST_UNUSED_TEXCOORD + i, true));
+    return elements;
+}
 
 Renderer::Renderer(Context* context) :
     Object(context),
@@ -281,6 +293,7 @@ Renderer::Renderer(Context* context) :
     drawShadows_(true),
     reuseShadowMaps_(true),
     dynamicInstancing_(true),
+    numExtraInstancingBufferElements_(0),
     threadedOcclusion_(false),
     shadersDirty_(true),
     initialized_(false),
@@ -473,9 +486,18 @@ void Renderer::SetDynamicInstancing(bool enable)
     dynamicInstancing_ = enable;
 }
 
+void Renderer::SetNumExtraInstancingBufferElements(int elements)
+{
+    if (numExtraInstancingBufferElements_ != elements)
+    {
+        numExtraInstancingBufferElements_ = Clamp(elements, 0, MAX_EXTRA_INSTANCING_BUFFER_ELEMENTS);
+        CreateInstancingBuffer();
+    }
+}
+
 void Renderer::SetMinInstances(int instances)
 {
-    minInstances_ = Max(instances, 2);
+    minInstances_ = Max(instances, 1);
 }
 
 void Renderer::SetMaxSortedInstances(int instances)
@@ -1327,11 +1349,12 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     while (newSize < numInstances)
         newSize <<= 1;
 
-    if (!instancingBuffer_->SetSize(newSize, INSTANCING_BUFFER_MASK, true))
+    const PODVector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
+    if (!instancingBuffer_->SetSize(newSize, instancingBufferElements, true))
     {
         URHO3D_LOGERROR("Failed to resize instancing buffer to " + String(newSize));
         // If failed, try to restore the old size
-        instancingBuffer_->SetSize(oldSize, INSTANCING_BUFFER_MASK, true);
+        instancingBuffer_->SetSize(oldSize, instancingBufferElements, true);
         return false;
     }
 
@@ -1850,7 +1873,8 @@ void Renderer::CreateInstancingBuffer()
     }
 
     instancingBuffer_ = new VertexBuffer(context_);
-    if (!instancingBuffer_->SetSize(INSTANCING_BUFFER_DEFAULT_SIZE, INSTANCING_BUFFER_MASK, true))
+    const PODVector<VertexElement> instancingBufferElements = CreateInstancingBufferElements(numExtraInstancingBufferElements_);
+    if (!instancingBuffer_->SetSize(INSTANCING_BUFFER_DEFAULT_SIZE, instancingBufferElements, true))
     {
         instancingBuffer_.Reset();
         dynamicInstancing_ = false;
