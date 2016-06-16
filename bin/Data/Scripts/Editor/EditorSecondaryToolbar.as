@@ -52,6 +52,10 @@ void CreateSecondaryToolBar()
     secondaryToolBar.AddChild(b);
     SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");
 
+    b = CreateSmallToolBarButton("RibbonTrail");
+    secondaryToolBar.AddChild(b);
+    SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");
+
     b = CreateSmallToolBarButton("Skybox");
     secondaryToolBar.AddChild(b);
     SubscribeToEvent(b, "Released", "SmallToolBarCreateComponent");

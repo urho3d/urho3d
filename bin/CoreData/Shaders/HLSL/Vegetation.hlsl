@@ -27,7 +27,7 @@ cbuffer CustomVS : register(b6)
 #endif
 
 void VS(float4 iPos : POSITION,
-    #ifndef BILLBOARD
+    #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
     #endif
     #ifndef NOUV
@@ -39,7 +39,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED

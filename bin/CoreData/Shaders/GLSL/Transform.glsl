@@ -114,6 +114,35 @@ vec3 GetBillboardNormal(vec4 iPos, vec3 iDirection, vec3 iCameraPos)
 }
 #endif
 
+#ifdef TRAILFACECAM
+vec3 GetTrailPos(vec4 iPos, vec3 iFront, float iScale, mat4 modelMatrix)
+{
+    vec3 up = normalize(cCameraPos - iPos.xyz);
+    vec3 right = normalize(cross(iFront, up));
+    return (vec4((iPos.xyz + right * iScale), 1.0) * modelMatrix).xyz;
+}
+
+vec3 GetTrailNormal(vec4 iPos)
+{
+    return normalize(cCameraPos - iPos.xyz);
+}
+#endif
+
+#ifdef TRAILBONE
+vec3 GetTrailPos(vec4 iPos, vec3 iParentPos, float iScale, mat4 modelMatrix)
+{
+    vec3 right = iParentPos - iPos.xyz;
+    return (vec4((iPos.xyz + right * iScale), 1.0) * modelMatrix).xyz;
+}
+
+vec3 GetTrailNormal(vec4 iPos, vec3 iParentPos, vec3 iForward)
+{
+    vec3 left = normalize(iPos.xyz - iParentPos);
+    vec3 up = normalize(cross(normalize(iForward), left));
+    return up;
+}
+#endif
+
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
@@ -128,6 +157,10 @@ vec3 GetWorldPos(mat4 modelMatrix)
         return GetBillboardPos(iPos, iTexCoord1, modelMatrix);
     #elif defined(DIRBILLBOARD)
         return GetBillboardPos(iPos, iNormal, iTangent.xyz, modelMatrix);
+    #elif defined(TRAILFACECAM)
+        return GetTrailPos(iPos, iTangent.xyz, iTangent.w, modelMatrix);
+    #elif defined(TRAILBONE)
+        return GetTrailPos(iPos, iTangent.xyz, iTangent.w, modelMatrix);
     #else
         return (iPos * modelMatrix).xyz;
     #endif
@@ -139,6 +172,10 @@ vec3 GetWorldNormal(mat4 modelMatrix)
         return GetBillboardNormal();
     #elif defined(DIRBILLBOARD)
         return GetBillboardNormal(iPos, iNormal, iTangent.xyz);
+    #elif defined(TRAILFACECAM)
+        return GetTrailNormal(iPos);
+    #elif defined(TRAILBONE)
+        return GetTrailNormal(iPos, iTangent.xyz, iNormal);
     #else
         return normalize(iNormal * GetNormalMatrix(modelMatrix));
     #endif
