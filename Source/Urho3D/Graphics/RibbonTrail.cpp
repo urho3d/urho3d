@@ -77,6 +77,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     forceUpdate_(false),
     trailType_(TT_FACE_CAMERA),
     tailColumn_(1),
+    updateInvisible_(false),
     emitting_(true)
 {
     geometry_->SetVertexBuffer(0, vertexBuffer_);
@@ -103,6 +104,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
@@ -174,7 +176,7 @@ void RibbonTrail::HandleScenePostUpdate(StringHash eventType, VariantMap& eventD
     lastTimeStep_ = eventData[P_TIMESTEP].GetFloat();
 
     // Update if frame has changed
-    if (viewFrameNumber_ != lastUpdateFrameNumber_)
+    if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         // Reset if ribbon trail is too small and too much difference in frame
         if (points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
@@ -869,6 +871,11 @@ void RibbonTrail::SetAnimationLodBias(float bias)
 {
     animationLodBias_ = Max(bias, 0.0f);
     MarkNetworkUpdate();
+}
+
+void RibbonTrail::SetUpdateInvisible(bool enable)
+{
+    updateInvisible_ = enable;
 }
 
 void RibbonTrail::Commit()

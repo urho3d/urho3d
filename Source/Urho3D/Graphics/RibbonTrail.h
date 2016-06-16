@@ -104,6 +104,8 @@ public:
     void SetLifetime(float time);
     /// Set whether trail should be emitting.
     void SetEmitting(bool emitting);
+    /// Set whether to update when trail emiiter are not visible.
+    void SetUpdateInvisible(bool enable);
     /// Set number of column for every tails. Can be useful for fixing distortion at high angle.
     void SetTailColumn(unsigned tailColumn);
     /// Set animation LOD bias.
@@ -152,6 +154,9 @@ public:
 
     /// Return whether is currently emitting.
     bool IsEmitting() const { return emitting_ ; }
+
+    /// Return whether to update when trail emitter are not visible.
+    bool GetUpdateInvisible() const { return updateInvisible_; }
 
 protected:
     /// Handle node being assigned.
@@ -227,6 +232,8 @@ private:
     bool forceUpdate_;
     /// Currently emitting flag.
     bool emitting_;
+    /// Update when invisible flag.
+    bool updateInvisible_;
 
     /// End of trail point for smoother tail disappearance.
     TrailPoint endTail_;
