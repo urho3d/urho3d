@@ -5148,6 +5148,7 @@ Methods:
 - void SetSorted(bool enable)
 - void SetLifetime(float time)
 - void SetEmitting(bool emitting)
+- void SetUpdateInvisible(bool updateInvisible)
 - void SetTailColumn(unsigned tailColumn)
 - void SetAnimationLodBias(float bias)
 - void Commit()
@@ -5163,6 +5164,7 @@ Methods:
 - float GetLifetime() const
 - unsigned GetTailColumn() const
 - bool IsEmitting() const
+- bool GetUpdateInvisible() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -5179,6 +5181,7 @@ Properties:
 - float lifetime
 - unsigned tailColumn
 - bool emitting
+- bool updateInvisible
 - float animationLodBias
 
 <a name="Class_RigidBody"></a>

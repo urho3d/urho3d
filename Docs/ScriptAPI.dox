@@ -1688,6 +1688,7 @@ namespace Urho3D
 - %Zone %Mask : int
 - %Material : ResourceRef
 - %Emitting : bool
+- %Update %Invisible : bool
 - %Trail %Type : int
 - %Tail %Lifetime : float
 - %Tail %Column : int
@@ -10228,6 +10229,7 @@ Properties:
 - TrailType trailType
 - StringHash type // readonly
 - String typeName // readonly
+- bool updateInvisible
 - float vertexDistance
 - uint viewMask
 - int weakRefs // readonly
