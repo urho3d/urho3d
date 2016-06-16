@@ -1687,7 +1687,7 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 - %Material : ResourceRef
-- %Emittting : bool
+- %Emitting : bool
 - %Trail %Type : int
 - %Tail %Lifetime : float
 - %Tail %Column : int
