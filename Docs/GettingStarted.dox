@@ -31,6 +31,7 @@ Although all required third-party libraries are included as source code, there a
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Miscellaneous (optional).
     - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+    - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
     - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian)o or libevdev (Pidora).
