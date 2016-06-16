@@ -1,8 +1,5 @@
-// Static 3D scene example.
-// This sample demonstrates:
-//     - Creating a 3D scene with static content
-//     - Displaying the scene using the Renderer subsystem
-//     - Handling keyboard and mouse input to move a freelook camera
+// Ribbon trail demo.
+// This sample demonstrates how to use both trail types of RibbonTrail component.
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -207,20 +204,18 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     timeStepSum += timeStep;
     
     // Move first box with pattern.
-    boxNode1.SetTransform(
-                Vector3(-4.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion());
+    boxNode1.SetTransform(Vector3(-4.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion());
     
     // Move second box with pattern.
-    boxNode2.SetTransform(
-                Vector3(0.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion());
+    boxNode2.SetTransform(Vector3(0.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion());
     
     // Get elapsed attack animation time.
     float swordAnimTime = ninjaAnimCtrl.GetAnimationState("Models/NinjaSnowWar/Ninja_Attack3.ani").time;
 
     // Stop emitting trail when sword is finished slashing.
-    if (swordAnimTime > swordTrailStartTime && swordAnimTime < swordTrailEndTime && swordTrail.emitting == false)
+    if (!swordTrail.emitting && swordAnimTime > swordTrailStartTime && swordAnimTime < swordTrailEndTime)
         swordTrail.emitting = true;
-    else if (swordAnimTime >= swordTrailEndTime && swordTrail.emitting == true)
+    else if (swordTrail.emitting && swordAnimTime >= swordTrailEndTime)
         swordTrail.emitting = false;
 }
 

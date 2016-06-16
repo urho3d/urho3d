@@ -30,7 +30,6 @@
 #include "../Graphics/Geometry.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../Graphics/Material.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/MemoryBuffer.h"
@@ -488,8 +487,8 @@ void BillboardSet::UpdateBufferSize()
             vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_NORMAL | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2 | MASK_TANGENT, true);
             geometry_->SetVertexBuffer(0, vertexBuffer_);
 
-        } 
-        else 
+        }
+        else
         {
             vertexBuffer_->SetSize(numBillboards * 4, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1 | MASK_TEXCOORD2, true);
             geometry_->SetVertexBuffer(0, vertexBuffer_);
@@ -646,7 +645,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
 
             dest += 32;
         }
-    } 
+    }
     else
     {
         Vector3 cameraWorldPosition = frame.camera_->GetNode()->GetWorldPosition();
@@ -753,7 +752,6 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
         Matrix4 viewProj(frame.camera_->GetProjection(false) * frame.camera_->GetView());
         const Matrix3x4& worldTransform = node_->GetWorldTransform();
         Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
-        Vector3 billboardScale = scaled_ ? worldTransform.Scale() : Vector3::ONE;
 
         for (unsigned i = 0; i < billboards_.Size(); ++i)
         {

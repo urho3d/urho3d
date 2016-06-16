@@ -24,16 +24,15 @@
 
 #include "../Core/Context.h"
 #include "../Graphics/RibbonTrail.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SceneEvents.h"
-#include "../Resource/ResourceCache.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../Graphics/IndexBuffer.h"
-#include "../Scene/Node.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/Geometry.h"
+#include "../Scene/Scene.h"
+#include "../Scene/SceneEvents.h"
+#include "../Resource/ResourceCache.h"
 #include "../IO/Log.h"
 
 namespace Urho3D
@@ -54,7 +53,7 @@ inline bool CompareTails(TrailPoint* lhs, TrailPoint* rhs)
     return lhs->sortDistance_ > rhs->sortDistance_;
 }
 
-RibbonTrail::RibbonTrail(Context* context) : 
+RibbonTrail::RibbonTrail(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     geometry_(new Geometry(context_)),
     animationLodBias_(1.0f),
@@ -103,7 +102,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Emittting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
@@ -225,7 +224,7 @@ void RibbonTrail::UpdateTail()
     // Delete expired points
     if (expiredIndex != -1)
     {
-        points_.Erase(0, expiredIndex+1);
+        points_.Erase(0, (unsigned)(expiredIndex + 1));
 
         // Update endTail pointer
         if (points_.Size() > 1)
@@ -257,17 +256,17 @@ void RibbonTrail::UpdateTail()
     // Add starting points
     if (points_.Size() == 0 && path > M_LARGE_EPSILON && emitting_)
     {
-        Vector3 forwardmotion = (previousPosition_ - worldPosition).Normalized();
+        Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
 
         TrailPoint startPoint;
         startPoint.position_ = previousPosition_;
         startPoint.lifetime_ = 0.0f;
-        startPoint.forward_ = forwardmotion;
+        startPoint.forward_ = forwardMotion;
 
         TrailPoint nextPoint;
         nextPoint.position_ = worldPosition;
         nextPoint.lifetime_ = 0.0f;
-        nextPoint.forward_ = forwardmotion;
+        nextPoint.forward_ = forwardMotion;
 
         if (node_->GetParent() != 0)
         {
@@ -278,7 +277,7 @@ void RibbonTrail::UpdateTail()
         points_.Push(startPoint);
         points_.Push(nextPoint);
 
-        // Update endtail
+        // Update endTail
         endTail_.position_ = startPoint.position_;
         startEndTailTime_ = 0.0f;
     }
@@ -286,7 +285,7 @@ void RibbonTrail::UpdateTail()
     // Add more points
     if (points_.Size() > 1 && emitting_)
     {
-        Vector3 forwardmotion = (previousPosition_ - worldPosition).Normalized();
+        Vector3 forwardMotion = (previousPosition_ - worldPosition).Normalized();
 
         // Add more points if path exceeded tail length
         if (path > vertexDistance_)
@@ -294,7 +293,7 @@ void RibbonTrail::UpdateTail()
             TrailPoint newPoint;
             newPoint.position_ = worldPosition;
             newPoint.lifetime_ = 0.0f;
-            newPoint.forward_ = forwardmotion;
+            newPoint.forward_ = forwardMotion;
             if (node_->GetParent() != 0)
                 newPoint.parentPos_ = node_->GetParent()->GetWorldPosition();
 
@@ -306,15 +305,14 @@ void RibbonTrail::UpdateTail()
         {
             // Update recent tail
             points_.Back().position_ = worldPosition;
-            if (forwardmotion != Vector3::ZERO)
-                points_.Back().forward_ = forwardmotion;
+            if (forwardMotion != Vector3::ZERO)
+                points_.Back().forward_ = forwardMotion;
         }
     }
 
     // Update buffer size if size of points different with tail number
     if (points_.Size() != numPoints_)
         bufferSizeDirty_ = true;
-
 }
 
 void RibbonTrail::SetEndScale(float endScale)
@@ -337,7 +335,7 @@ void RibbonTrail::SetEmitting(bool emitting)
     emitting_ = emitting;
 
     // Reset already available points
-    if (emitting == true && points_.Size() > 0)
+    if (emitting && points_.Size() > 0)
     {
         points_.Clear();
         bufferSizeDirty_ = true;
@@ -366,7 +364,7 @@ void RibbonTrail::SetTailColumn(unsigned tailColumn)
     MarkNetworkUpdate();
 }
 
-void RibbonTrail::UpdateBatches(const FrameInfo& frame) 
+void RibbonTrail::UpdateBatches(const FrameInfo& frame)
 {
     // Update information for renderer about this drawable
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
@@ -422,7 +420,7 @@ void RibbonTrail::OnSceneSet(Scene* scene)
          UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
 
-void RibbonTrail::OnWorldBoundingBoxUpdate() 
+void RibbonTrail::OnWorldBoundingBoxUpdate()
 {
     BoundingBox worldBox;
 
@@ -436,7 +434,7 @@ void RibbonTrail::OnWorldBoundingBoxUpdate()
     worldBoundingBox_ = worldBox;
 }
 
-void RibbonTrail::UpdateBufferSize() 
+void RibbonTrail::UpdateBufferSize()
 {
     numPoints_ = points_.Size();
 
@@ -516,7 +514,7 @@ void RibbonTrail::UpdateBufferSize()
     indexBuffer_->ClearDataLost();
 }
 
-void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame) 
+void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
 {
     // If using animation LOD, accumulate time and see if it is time to update
     if (animationLodBias_ > 0.0f && lodDistance_ > 0.0f)
@@ -623,7 +621,6 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             for (unsigned j = 0; j < (tailColumn_ - 1); ++j)
             {
                 float elapsed = 1.0f / tailColumn_ * (j + 1);
-                float scale = width_ - elapsed * 2.0f * width_;
                 float midWidth = width - elapsed * 2.0f * width;
                 float nextMidWidth = nextWidth - elapsed * 2.0f * nextWidth;
 

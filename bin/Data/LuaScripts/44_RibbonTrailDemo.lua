@@ -1,8 +1,5 @@
--- Static 3D scene example.
--- This sample demonstrates:
---     - Creating a 3D scene with static content
---     - Displaying the scene using the Renderer subsystem
---     - Handling keyboard and mouse input to move a freelook camera
+-- Ribbon trail demo.
+-- This sample demonstrates how to use both trail types of RibbonTrail component.
 
 require "LuaScripts/Utilities/Sample"
 
@@ -203,10 +200,10 @@ function HandleUpdate(eventType, eventData)
 
     -- Sum of timesteps.
     timeStepSum = timeStepSum + timeStep
-    
+
     -- Move first box with pattern.
     boxNode1:SetTransform(Vector3(-4.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion())
-    
+
     -- Move second box with pattern.
     boxNode2:SetTransform(Vector3(0.0 + 3.0 * Cos(100.0 * timeStepSum), 0.5, -2.0 * Cos(400.0 * timeStepSum)), Quaternion())
 
@@ -214,9 +211,9 @@ function HandleUpdate(eventType, eventData)
     local swordAnimTime = ninjaAnimCtrl:GetAnimationState("Models/NinjaSnowWar/Ninja_Attack3.ani").time
 
     -- Stop emitting trail when sword is finished slashing.
-    if swordAnimTime > swordTrailStartTime and swordAnimTime < swordTrailEndTime and swordTrail.emitting == false then
+    if not swordTrail.emitting and swordAnimTime > swordTrailStartTime and swordAnimTime < swordTrailEndTime then
         swordTrail.emitting = true
-    elseif swordAnimTime >= swordTrailEndTime and swordTrail.emitting == true then
+    elseif swordTrail.emitting and swordAnimTime >= swordTrailEndTime then
         swordTrail.emitting = false
     end
 end

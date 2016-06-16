@@ -33,11 +33,8 @@ class RibbonTrail;
 
 }
 
-/// Static 3D scene example.
-/// This sample demonstrates:
-///     - Creating a 3D scene with static content
-///     - Displaying the scene using the Renderer subsystem
-///     - Handling keyboard and mouse input to move a freelook camera
+/// Ribbon trail demo.
+/// This sample demonstrates how to use both trail types of RibbonTrail component.
 class RibbonTrailDemo : public Sample
 {
     URHO3D_OBJECT(RibbonTrailDemo, Sample);
@@ -50,19 +47,19 @@ public:
     virtual void Start();
 
 protected:
-    // Trail that emmited from sword.
+    /// Trail that emitted from sword.
     SharedPtr<RibbonTrail> swordTrail_;
-    // Animation controller of the ninja.
+    /// Animation controller of the ninja.
     SharedPtr<AnimationController> ninjaAnimCtrl_;
-    // The time sword emit trail.
+    /// The time sword start emitting trail.
     float swordTrailStartTime_;
-    // The time sword stop emitting trail.
+    /// The time sword stop emitting trail.
     float swordTrailEndTime_;
-    // Box node 1.
+    /// Box node 1.
     SharedPtr<Node> boxNode1_;
-    // Box node 2.
+    /// Box node 2.
     SharedPtr<Node> boxNode2_;
-    // Sum of timestep.
+    /// Sum of timestep.
     float timeStepSum_;
 
 private:

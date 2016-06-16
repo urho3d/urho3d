@@ -23,17 +23,13 @@
 #include <Urho3D/Core/CoreEvents.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/AnimatedModel.h>
-//#include <Urho3D/Graphics/Animation.h>
-//#include <Urho3D/Graphics/AnimationState.h>
 #include <Urho3D/Graphics/AnimationController.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Material.h>
-#include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Graphics/Renderer.h>
 #include <Urho3D/Graphics/RibbonTrail.h>
-#include <Urho3D/Graphics/StaticModel.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -260,20 +256,19 @@ void RibbonTrailDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
     timeStepSum_ += timeStep;
 
     // Move first box with pattern.
-    boxNode1_->SetTransform(
-                Vector3(-4.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)), Quaternion());
+    boxNode1_->SetTransform(Vector3(-4.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)),
+        Quaternion());
 
     // Move second box with pattern.
-    boxNode2_->SetTransform(
-                Vector3(0.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)), Quaternion());
-    
+    boxNode2_->SetTransform(Vector3(0.0f + 3.0f * Cos(100.0f * timeStepSum_), 0.5f, -2.0f * Cos(400.0f * timeStepSum_)),
+        Quaternion());
+
     // Get elapsed attack animation time.
     float swordAnimTime = ninjaAnimCtrl_->GetAnimationState(String("Models/NinjaSnowWar/Ninja_Attack3.ani"))->GetTime();
 
     // Stop emitting trail when sword is finished slashing.
-    if (swordAnimTime > swordTrailStartTime_ && swordAnimTime < swordTrailEndTime_
-            && swordTrail_->IsEmitting() == false)
+    if (!swordTrail_->IsEmitting() && swordAnimTime > swordTrailStartTime_ && swordAnimTime < swordTrailEndTime_)
         swordTrail_->SetEmitting(true);
-    else if (swordAnimTime >= swordTrailEndTime_ && swordTrail_->IsEmitting() == true)
+    else if (swordTrail_->IsEmitting() && swordAnimTime >= swordTrailEndTime_)
         swordTrail_->SetEmitting(false);
 }

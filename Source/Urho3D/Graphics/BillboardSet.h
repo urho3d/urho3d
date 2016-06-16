@@ -151,8 +151,6 @@ protected:
 
     /// Billboards.
     PODVector<Billboard> billboards_;
-    /// Coordinate axes on which camera facing is done.
-    Vector3 faceCameraAxes_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.

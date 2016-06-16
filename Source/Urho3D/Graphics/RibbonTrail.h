@@ -219,8 +219,6 @@ private:
     unsigned lastUpdateFrameNumber_;
     /// Need update flag.
     bool needUpdate_;
-    /// Frame number on which was last sorted.
-    unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.
     Vector3 previousOffset_;
     /// Trail pointers for sorting.
@@ -230,7 +228,7 @@ private:
     /// Currently emitting flag.
     bool emitting_;
 
-    /// End of trail point for smoother tail dissapearance.
+    /// End of trail point for smoother tail disappearance.
     TrailPoint endTail_;
     /// The time the tail become end of trail.
     float startEndTailTime_;
