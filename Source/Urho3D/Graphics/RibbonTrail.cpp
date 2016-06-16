@@ -120,7 +120,7 @@ void RibbonTrail::RegisterObject(Context* context)
 
 void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // If no billboard-level testing, use the Drawable test
+    // If no trail-level testing, use the Drawable test
     if (query.level_ < RAY_TRIANGLE)
     {
         Drawable::ProcessRayQuery(query, results);
@@ -491,7 +491,6 @@ void RibbonTrail::UpdateBufferSize()
         dest[5] = (unsigned short)(vertexIndex + 3);
 
         dest += 6;
-        //vertexIndex += 4;
         vertexIndex += 2;
 
         for (unsigned i = 0; i < (tailColumn_ - 1); ++i)
@@ -688,7 +687,6 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             // This point
             float factor = SmoothStep(0.0f, trailLength, point.elapsedLength_);
             unsigned c = endColor_.Lerp(startColor_, factor).ToUInt();
-            //float scale = factor
 
             float rightScale = Lerp(endScale_, startScale_, factor);
             float shift = (rightScale - 1.0f) / 2.0f;
@@ -848,7 +846,6 @@ void RibbonTrail::SetTrailType(TrailType type)
     }
 
     trailType_ = type;
-    //Commit();
     Drawable::OnMarkedDirty(node_);
     bufferSizeDirty_ = true;
     MarkNetworkUpdate();
@@ -876,6 +873,7 @@ void RibbonTrail::SetAnimationLodBias(float bias)
 void RibbonTrail::SetUpdateInvisible(bool enable)
 {
     updateInvisible_ = enable;
+    MarkNetworkUpdate();
 }
 
 void RibbonTrail::Commit()
