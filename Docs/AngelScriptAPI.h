@@ -8710,6 +8710,7 @@ TrailType trailType;
 StringHash type;
 /* readonly */
 String typeName;
+bool updateInvisible;
 float vertexDistance;
 uint viewMask;
 /* readonly */

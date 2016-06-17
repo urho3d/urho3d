@@ -1640,6 +1640,8 @@ static void RegisterRibbonTrail(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RibbonTrail", "float get_lifetime() const", asMETHOD(RibbonTrail, GetLifetime), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_emitting(bool)", asMETHOD(RibbonTrail, SetEmitting), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "bool get_emitting() const", asMETHOD(RibbonTrail, IsEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RibbonTrail", "void set_updateInvisible(bool)", asMETHOD(RibbonTrail, SetUpdateInvisible), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RibbonTrail", "bool get_updateInvisible() const", asMETHOD(RibbonTrail, GetUpdateInvisible), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_tailColumn(uint)", asMETHOD(RibbonTrail, SetTailColumn), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "uint get_tailColumn() const", asMETHOD(RibbonTrail, GetTailColumn), asCALL_THISCALL);
     engine->RegisterObjectMethod("RibbonTrail", "void set_animationLodBias(float)", asMETHOD(RibbonTrail, SetAnimationLodBias), asCALL_THISCALL);

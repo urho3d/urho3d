@@ -109,6 +109,7 @@ void RibbonTrailDemo::CreateScene()
     boxTrail1->SetStartColor(Color(1.0f, 0.5f, 0.0f, 1.0f));
     boxTrail1->SetEndColor(Color(1.0f, 1.0f, 0.0f, 0.0f));
     boxTrail1->SetWidth(0.5f);
+    boxTrail1->SetUpdateInvisible(true);
 
     // Create second box for face camera trail demo with 4 column.
     // This will produce less distortion than first trail.
@@ -122,6 +123,7 @@ void RibbonTrailDemo::CreateScene()
     boxTrail2->SetEndColor(Color(1.0f, 1.0f, 0.0f, 0.0f));
     boxTrail2->SetWidth(0.5f);
     boxTrail2->SetTailColumn(4);
+    boxTrail2->SetUpdateInvisible(true);
 
     // Load ninja animated model for bone trail demo.
     Node* ninjaNode = scene_->CreateChild("Ninja");
@@ -147,6 +149,7 @@ void RibbonTrailDemo::CreateScene()
     swordTrail_->SetStartColor(Color(1.0f, 1.0f, 1.0f, 0.75f));
     swordTrail_->SetEndColor(Color(0.2f, 0.5f, 1.0f, 0.0f));
     swordTrail_->SetTailColumn(4);
+    swordTrail_->SetUpdateInvisible(true);
 
     // Add floating text for info.
     Node* boxTextNode1 = scene_->CreateChild("BoxText1");

@@ -64,6 +64,7 @@ function CreateScene()
     boxTrail1.startColor = Color(1.0, 0.5, 0.0, 1.0)
     boxTrail1.endColor = Color(1.0, 1.0, 0.0, 0.0)
     boxTrail1.width = 0.5
+    boxTrail1.updateInvisible = true
 
     -- Create second box for face camera trail demo with 4 column.
     -- This will produce less distortion than first trail.
@@ -77,6 +78,7 @@ function CreateScene()
     boxTrail2.endColor = Color(1.0, 1.0, 0.0, 0.0)
     boxTrail2.width = 0.5
     boxTrail2.tailColumn = 4
+    boxTrail2.updateInvisible = true
 
     -- Load ninja animated model for bone trail demo.
     local ninjaNode = scene_:CreateChild("Ninja")
@@ -102,6 +104,7 @@ function CreateScene()
     swordTrail.startColor = Color(1.0, 1.0, 1.0, 0.75)
     swordTrail.endColor = Color(0.2, 0.5, 1.0, 0.0)
     swordTrail.tailColumn = 4
+    swordTrail.updateInvisible = true
 
     -- Add floating text for info.
     local boxTextNode1 = scene_:CreateChild("BoxText1")

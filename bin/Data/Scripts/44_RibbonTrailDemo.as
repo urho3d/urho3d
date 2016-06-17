@@ -66,6 +66,7 @@ void CreateScene()
     boxTrail1.startColor = Color(1.0f, 0.5f, 0.0f, 1.0f);
     boxTrail1.endColor = Color(1.0f, 1.0f, 0.0f, 0.0f);
     boxTrail1.width = 0.5f;
+    boxTrail1.updateInvisible = true;
     
     // Create second box for face camera trail demo with 4 column.
     // This will produce less distortion than first trail.
@@ -79,6 +80,7 @@ void CreateScene()
     boxTrail2.endColor = Color(1.0f, 1.0f, 0.0f, 0.0f);
     boxTrail2.width = 0.5f;
     boxTrail2.tailColumn = 4;
+    boxTrail2.updateInvisible = true;
     
     // Load ninja animated model for bone trail demo.
     Node@ ninjaNode = scene_.CreateChild("Ninja");
@@ -104,6 +106,7 @@ void CreateScene()
     swordTrail.startColor = Color(1.0f, 1.0f, 1.0f, 0.75f);
     swordTrail.endColor = Color(0.2, 0.5f, 1.0f, 0.0f);
     swordTrail.tailColumn = 4;
+    swordTrail.updateInvisible = true;
     
     // Add floating text for info.
     Node@ boxTextNode1 = scene_.CreateChild("BoxText1");

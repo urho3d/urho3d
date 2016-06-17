@@ -77,6 +77,7 @@ RibbonTrail::RibbonTrail(Context* context) :
     forceUpdate_(false),
     trailType_(TT_FACE_CAMERA),
     tailColumn_(1),
+    updateInvisible_(false),
     emitting_(true)
 {
     geometry_->SetVertexBuffer(0, vertexBuffer_);
@@ -103,6 +104,7 @@ void RibbonTrail::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Trail Type", GetTrailType, SetTrailType, TrailType, trailTypeNames, TT_FACE_CAMERA, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Lifetime", GetLifetime, SetLifetime, float, 1.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tail Column", GetTailColumn, SetTailColumn, unsigned, 0, AM_DEFAULT);
@@ -118,7 +120,7 @@ void RibbonTrail::RegisterObject(Context* context)
 
 void RibbonTrail::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
 {
-    // If no billboard-level testing, use the Drawable test
+    // If no trail-level testing, use the Drawable test
     if (query.level_ < RAY_TRIANGLE)
     {
         Drawable::ProcessRayQuery(query, results);
@@ -174,7 +176,7 @@ void RibbonTrail::HandleScenePostUpdate(StringHash eventType, VariantMap& eventD
     lastTimeStep_ = eventData[P_TIMESTEP].GetFloat();
 
     // Update if frame has changed
-    if (viewFrameNumber_ != lastUpdateFrameNumber_)
+    if (updateInvisible_ || viewFrameNumber_ != lastUpdateFrameNumber_)
     {
         // Reset if ribbon trail is too small and too much difference in frame
         if (points_.Size() < 3 && viewFrameNumber_ - lastUpdateFrameNumber_ > 1)
@@ -489,7 +491,6 @@ void RibbonTrail::UpdateBufferSize()
         dest[5] = (unsigned short)(vertexIndex + 3);
 
         dest += 6;
-        //vertexIndex += 4;
         vertexIndex += 2;
 
         for (unsigned i = 0; i < (tailColumn_ - 1); ++i)
@@ -686,7 +687,6 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
             // This point
             float factor = SmoothStep(0.0f, trailLength, point.elapsedLength_);
             unsigned c = endColor_.Lerp(startColor_, factor).ToUInt();
-            //float scale = factor
 
             float rightScale = Lerp(endScale_, startScale_, factor);
             float shift = (rightScale - 1.0f) / 2.0f;
@@ -846,7 +846,6 @@ void RibbonTrail::SetTrailType(TrailType type)
     }
 
     trailType_ = type;
-    //Commit();
     Drawable::OnMarkedDirty(node_);
     bufferSizeDirty_ = true;
     MarkNetworkUpdate();
@@ -868,6 +867,12 @@ void RibbonTrail::SetWidth(float width)
 void RibbonTrail::SetAnimationLodBias(float bias)
 {
     animationLodBias_ = Max(bias, 0.0f);
+    MarkNetworkUpdate();
+}
+
+void RibbonTrail::SetUpdateInvisible(bool enable)
+{
+    updateInvisible_ = enable;
     MarkNetworkUpdate();
 }
 

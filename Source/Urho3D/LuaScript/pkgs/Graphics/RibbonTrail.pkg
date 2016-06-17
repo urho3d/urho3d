@@ -19,6 +19,7 @@ class RibbonTrail : public Drawable
     void SetSorted(bool enable);
     void SetLifetime(float time);
     void SetEmitting(bool emitting);
+    void SetUpdateInvisible(bool updateInvisible);
     void SetTailColumn(unsigned tailColumn);
     void SetAnimationLodBias(float bias);
 
@@ -36,6 +37,7 @@ class RibbonTrail : public Drawable
     float GetLifetime() const;
     unsigned GetTailColumn() const;
     bool IsEmitting() const;
+    bool GetUpdateInvisible() const;
     float GetAnimationLodBias() const;
 
     tolua_property__get_set Material* material;
@@ -50,5 +52,6 @@ class RibbonTrail : public Drawable
     tolua_property__get_set float lifetime;
     tolua_property__get_set unsigned tailColumn;
     tolua_property__is_set bool emitting;
+    tolua_property__get_set bool updateInvisible;
     tolua_property__get_set float animationLodBias;
 }
