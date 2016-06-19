@@ -18,9 +18,9 @@ Although all required third-party libraries are included as source code, there a
     - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager.
   + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable during application runtime).
     - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
-    - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
-    - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
-    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11.
+    - libegl1-mesa-dev and mir-client-platform-mesa-dev (Ubuntu only) for Mir.
+    - libegl1-mesa-dev and libwayland-dev (Debian-based) or libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based) for Wayland.
+    - libx11-dev, libxcursor-dev, libxext-dev, libxi-dev, libxinerama-dev, libxrandr-dev, libxrender-dev, and libxss-dev (Debian-based) or libX11-devel, libXcursor-devel, libXext-devel, libXi-devel, libXinerama-devel, libXrandr-devel, libXrender-devel, and libXScrnSaver-devel (RedHat-based) for X11 and its extensions. Alternatively, you can use xorg-devel meta package on Debian-based system, but it would install other unneeded packages as well.
   + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable during application runtime).
     - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux %Sound Architecture (ALSA).
     - arts-devel (RedHat-based only) for Analog Real %Time Synthesizer (aRts).
@@ -30,9 +30,10 @@ Although all required third-party libraries are included as source code, there a
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio.
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Miscellaneous (optional).
-    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+    - libdbus-1-dev (Debian-based) or dbus-devel (Redhat-based) for system-wide messaging (e.g. inhibiting screen-saver).
     - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
     - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
+    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian)o or libevdev (Pidora).
 
