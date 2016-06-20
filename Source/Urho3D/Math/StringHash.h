@@ -76,7 +76,7 @@ public:
         return *this;
     }
 
-    // Test for equality with another hash.
+    /// Test for equality with another hash.
     bool operator ==(const StringHash& rhs) const { return value_ == rhs.value_; }
 
     /// Test for inequality with another hash.

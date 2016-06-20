@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<material>
+    <technique name="Techniques/DiffVColUnlitAlpha.xml" quality="1" loddistance="0" />
+    <texture unit="diffuse" name="Textures/SlashTrail.png" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatEmissiveColor" value="0 0 0" />
+	<parameter name="MatEnvMapColor" value="1 1 1" />
+	<parameter name="MatSpecColor" value="0.3 0.3 0.3 16" />
+	<cull value="none" />
+	<shadowcull value="ccw" />
+	<depthbias constant="0" slopescaled="0" />
+</material>

@@ -156,6 +156,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
 <a href="#Class_Scene"><b>Scene</b></a>
@@ -4938,6 +4939,7 @@ Methods:
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
+- void SetNumExtraInstancingBufferElements(int elements)
 - void SetMinInstances(int instances)
 - void SetMaxSortedInstances(int instances)
 - void SetMaxOccluderTriangles(int triangles)
@@ -4966,6 +4968,7 @@ Methods:
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
+- int GetNumExtraInstancingBufferElements() const
 - int GetMinInstances() const
 - int GetMaxSortedInstances() const
 - int GetMaxOccluderTriangles() const
@@ -5006,6 +5009,7 @@ Properties:
 - bool reuseShadowMaps
 - int maxShadowMaps
 - bool dynamicInstancing
+- int numExtraInstancingBufferElements
 - int minInstances
 - int maxSortedInstances
 - int maxOccluderTriangles
@@ -5127,6 +5131,58 @@ Methods:
 Properties:
 
 - StringHash type
+
+<a name="Class_RibbonTrail"></a>
+### RibbonTrail : Drawable
+
+Methods:
+
+- void SetMaterial(Material* material)
+- void SetVertexDistance(float length)
+- void SetWidth(float width)
+- void SetStartColor(const Color& c)
+- void SetEndColor(const Color& c)
+- void SetStartScale(float startScale)
+- void SetEndScale(float endScale)
+- void SetTrailType(TrailType type)
+- void SetSorted(bool enable)
+- void SetLifetime(float time)
+- void SetEmitting(bool emitting)
+- void SetUpdateInvisible(bool updateInvisible)
+- void SetTailColumn(unsigned tailColumn)
+- void SetAnimationLodBias(float bias)
+- void Commit()
+- Material* GetMaterial() const
+- float GetVertexDistance() const
+- float GetWidth() const
+- const Color& GetStartColor() const
+- const Color& GetEndColor() const
+- float GetStartScale() const
+- float GetEndScale() const
+- TrailType GetTrailType() const
+- bool IsSorted() const
+- float GetLifetime() const
+- unsigned GetTailColumn() const
+- bool IsEmitting() const
+- bool GetUpdateInvisible() const
+- float GetAnimationLodBias() const
+
+Properties:
+
+- Material* material
+- float vertexDistance
+- float width
+- Color& startColor
+- Color& endColor
+- float startScale
+- float endScale
+- TrailType trailType
+- bool sorted
+- float lifetime
+- unsigned tailColumn
+- bool emitting
+- bool updateInvisible
+- float animationLodBias
 
 <a name="Class_RigidBody"></a>
 ### RigidBody : Component
@@ -7962,6 +8018,11 @@ Properties:
 - int OT_POLYLINE
 - int OT_TILE
 - int OT_INVALID
+
+### TrailType
+
+- int TT_FACE_CAMERA
+- int TT_BONE
 
 ### TransformSpace
 

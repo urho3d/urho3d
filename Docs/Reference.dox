@@ -961,6 +961,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - AnimationController: drives animations forward automatically and controls animation fade-in/out.
 - BillboardSet: a group of camera-facing billboards, which can have varying sizes, rotations and texture coordinates.
 - ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
+- RibbonTrail: creates tail geometry following an object.
 - Light: illuminates the scene. Can optionally cast shadows.
 - Terrain: renders heightmap terrain.
 - CustomGeometry: renders runtime-defined unindexed geometry. The geometry data is not serialized or replicated over the network.
@@ -997,6 +998,15 @@ On Direct3D9 and Android OpenGL ES 2.0 it is possible to lose the rendering cont
 Textures that have been loaded from a file, as well as vertex & index buffers that have shadowing enabled will restore their contents automatically, the rest have to be restored manually. On Direct3D9 non-dynamic (managed) textures and buffers will never be lost, as the runtime automatically backs them up to system memory.
 
 See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D, TextureCube and Texture3D classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
+
+\section Rendering_ExtraInstanceData Defining extra instancing data
+
+The only per-instance data that the rendering system supplies by itself are the objects' world transform matrices. If you want to define extra per-instance data in your custom Drawable subclasses, follow these steps:
+
+- Call \ref Renderer::SetNumExtraInstancingBufferElements "SetNumExtraInstancingBufferElements()". This defines the amount of extra Vector4's (in addition to the transform matrices) that the instancing data will contain.
+- The SourceBatch structure(s) of your custom Drawable need to point to the extra data. See the \ref SourceBatch::instancingData_ "instancingData_" member. Null pointer is allowed for objects that do not need to define extra data; be aware that the instancing vertex buffer will contain undefined data in that case.
+- Because non-instanced rendering will not have access to the extra data, you should disable non-instanced rendering of GEOM_STATIC drawables. Call \ref Renderer::SetMinInstances "SetMinInstances()" with a parameter 1 to accomplish this.
+- Use the extra data as texcoord 7 onward in your vertex shader (texcoord 4-6 are the transform matrix.)
 
 \section Rendering_Further Further details
 
@@ -1118,8 +1128,7 @@ The vertex format can be defined in two ways by two overloads of \ref VertexBuff
 - Instancematrix1-3 (%Vector4)
 - %Object index (int, not supported on D3D9)
 
-Note that the texcoord numbers are misleading as the actual texcoord inputs in shaders are zero-based. Instancematrix1-3 are reserved to be used by the engine for instancing and map to
-shader texcoord inputs 4-6.
+Note that the texcoord numbers are misleading as the actual texcoord inputs in shaders are zero-based. Instancematrix1-3 are reserved to be used by the engine for instancing and map to shader texcoord inputs 4-6.
 
 2) By defining VertexElement structures, which tell the data type, semantic, and zero-based semantic index (for e.g. multiple texcoords), and whether the data is per-vertex or per-instance data.
 This allows to freely define the order and meaning of the elements. However for 3D objects, the first element should always be "Position" and use the Vector3 type to ensure e.g. raycasts and occlusion rendering work properly.

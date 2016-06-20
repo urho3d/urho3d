@@ -1679,6 +1679,28 @@ namespace Urho3D
 - %Velocity %Iterations : int
 - %Position %Iterations : int
 
+### RibbonTrail
+- %Is %Enabled : bool
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Material : ResourceRef
+- %Emitting : bool
+- %Update %Invisible : bool
+- %Trail %Type : int
+- %Tail %Lifetime : float
+- %Tail %Column : int
+- %Vertex %Distance : float
+- %Width : float
+- %Start %Scale : float
+- %End %Scale : float
+- %Start %Color : Color
+- %End %Color : Color
+- %Animation %LOD %Bias : float
+- %Sort %By %Distance : bool
+
 ### RigidBody
 - %Is %Enabled : bool
 - %Mass : float
@@ -2443,6 +2465,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
 <a href="#Class_Scene"><b>Scene</b></a>
@@ -9996,6 +10019,7 @@ Properties:
 - float mobileShadowBiasAdd
 - float mobileShadowBiasMul
 - uint numBatches // readonly
+- int numExtraInstancingBufferElements
 - uint[] numGeometries // readonly
 - uint[] numLights // readonly
 - uint[] numOccluders // readonly
@@ -10123,6 +10147,96 @@ Properties:
 - uint length // readonly
 - String[] names
 - StringHash type
+
+<a name="Class_RibbonTrail"></a>
+
+### RibbonTrail
+
+Methods:
+
+- void ApplyAttributes()
+- void Commit()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- float animationLodBias
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- float drawDistance
+- bool emitting
+- bool enabled
+- bool enabledEffective // readonly
+- Color endColor
+- float endScale
+- uint id // readonly
+- bool inView // readonly
+- float lifetime
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- bool sorted
+- Color startColor
+- float startScale
+- uint tailColumn
+- bool temporary
+- TrailType trailType
+- StringHash type // readonly
+- String typeName // readonly
+- bool updateInvisible
+- float vertexDistance
+- uint viewMask
+- int weakRefs // readonly
+- float width
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
+- uint zoneMask
 
 <a name="Class_RigidBody"></a>
 
@@ -15152,6 +15266,12 @@ Properties:
 - OT_POLYLINE
 - OT_TILE
 - OT_INVALID
+
+
+### TrailType
+
+- TT_FACE_CAMERA
+- TT_BONE
 
 
 ### TransformSpace

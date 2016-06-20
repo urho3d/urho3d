@@ -635,18 +635,25 @@ void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const
     }
 }
 
-void BatchGroup::SetTransforms(void* lockedData, unsigned& freeIndex)
+void BatchGroup::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
 {
     // Do not use up buffer space if not going to draw as instanced
     if (geometryType_ != GEOM_INSTANCED)
         return;
 
     startIndex_ = freeIndex;
-    Matrix3x4* dest = (Matrix3x4*)lockedData;
-    dest += freeIndex;
+    unsigned char* buffer = static_cast<unsigned char*>(lockedData) + startIndex_ * stride;
 
     for (unsigned i = 0; i < instances_.Size(); ++i)
-        *dest++ = *instances_[i].worldTransform_;
+    {
+        const InstanceData& instance = instances_[i];
+
+        memcpy(buffer, instance.worldTransform_, sizeof(Matrix3x4));
+        if (instance.instancingData_)
+            memcpy(buffer + sizeof(Matrix3x4), instance.instancingData_, stride - sizeof(Matrix3x4));
+
+        buffer += stride;
+    }
 
     freeIndex += instances_.Size();
 }
@@ -825,10 +832,10 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
 #endif
 }
 
-void BatchQueue::SetTransforms(void* lockedData, unsigned& freeIndex)
+void BatchQueue::SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex)
 {
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
-        i->second_.SetTransforms(lockedData, freeIndex);
+        i->second_.SetInstancingData(lockedData, stride, freeIndex);
 }
 
 void BatchQueue::Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const

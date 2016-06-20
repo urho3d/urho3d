@@ -52,6 +52,7 @@ SourceBatch::SourceBatch() :
     geometry_(0),
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
+    instancingData_((void*)0),
     geometryType_(GEOM_STATIC)
 {
 }
@@ -72,6 +73,7 @@ SourceBatch& SourceBatch::operator =(const SourceBatch& rhs)
     material_ = rhs.material_;
     worldTransform_ = rhs.worldTransform_;
     numWorldTransforms_ = rhs.numWorldTransforms_;
+    instancingData_ = rhs.instancingData_;
     geometryType_ = rhs.geometryType_;
 
     return *this;
