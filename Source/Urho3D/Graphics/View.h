@@ -184,6 +184,9 @@ public:
     /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand. Quad will be drawn to the middle of depth range, similarly to deferred directional lights.
     void DrawFullscreenQuad(bool setIdentityProjection = false);
 
+	/// Get a named texture from the rendertarget list or from the resource cache, to be either used as a rendertarget or texture binding.
+	Texture* FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap = false);
+
 private:
     /// Query the octree for drawable objects.
     void GetDrawables();
@@ -260,8 +263,6 @@ private:
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     /// Helper function to get the render surface from a texture. 2D textures will always return the first face only.
     RenderSurface* GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace face = FACE_POSITIVE_X);
-    /// Get a named texture from the rendertarget list or from the resource cache, to be either used as a rendertarget or texture binding.
-    Texture* FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap = false);
 
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable)
