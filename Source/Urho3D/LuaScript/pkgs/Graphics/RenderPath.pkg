@@ -8,7 +8,8 @@ enum RenderCommandType
     CMD_QUAD,
     CMD_FORWARDLIGHTS,
     CMD_LIGHTVOLUMES,
-    CMD_RENDERUI
+    CMD_RENDERUI,
+    CMD_SENDEVENT
 };
 
 enum RenderCommandSortMode
@@ -82,6 +83,7 @@ struct RenderPathCommand
     bool markToStencil_ @ markToStencil;
     bool useLitBase_ @ useLitBase;
     bool vertexLights_ @ vertexLights;
+    String eventName_ @ eventName;
 };
 
 class RenderPath

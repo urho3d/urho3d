@@ -43,7 +43,8 @@ enum RenderCommandType
     CMD_QUAD,
     CMD_FORWARDLIGHTS,
     CMD_LIGHTVOLUMES,
-    CMD_RENDERUI
+    CMD_RENDERUI,
+    CMD_SENDEVENT
 };
 
 /// Rendering path sorting modes.
@@ -199,6 +200,8 @@ struct URHO3D_API RenderPathCommand
     bool useLitBase_;
     /// Vertex lights flag.
     bool vertexLights_;
+    /// Event name.
+    String eventName_;
 };
 
 /// Rendering path definition. A sequence of commands (e.g. clear screen, draw objects with specific pass) that yields the scene rendering result.
