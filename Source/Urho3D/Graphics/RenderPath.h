@@ -200,7 +200,7 @@ struct URHO3D_API RenderPathCommand
     bool useLitBase_;
     /// Vertex lights flag.
     bool vertexLights_;
-    /// Event name
+    /// Event name.
     String eventName_;
 };
 
