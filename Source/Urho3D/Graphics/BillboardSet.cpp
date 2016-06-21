@@ -78,6 +78,7 @@ BillboardSet::BillboardSet(Context* context) :
     forceUpdate_(false),
     geometryTypeUpdate_(false),
     sortThisFrame_(false),
+    hasOrthoCamera_(false),
     sortFrameNumber_(0),
     previousOffset_(Vector3::ZERO)
 {
@@ -175,12 +176,14 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     Vector3 worldPos = node_->GetWorldPosition();
     Vector3 offset = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     // Sort if position relative to camera has changed
-    if (offset != previousOffset_)
+    if (offset != previousOffset_ || frame.camera_->IsOrthographic() != hasOrthoCamera_)
     {
         if (sorted_)
             sortThisFrame_ = true;
         if (faceCameraMode_ == FC_DIRECTION)
             bufferDirty_ = true;
+
+        hasOrthoCamera_ = frame.camera_->IsOrthographic();
 
         // Calculate fixed screen size scale factor for billboards if needed
         if (fixedScreenSize_)
@@ -251,6 +254,8 @@ void BillboardSet::SetNumBillboards(unsigned num)
         num = MAX_BILLBOARDS;
 
     unsigned oldNum = billboards_.Size();
+    if (num == oldNum)
+        return;
 
     billboards_.Resize(num);
 
