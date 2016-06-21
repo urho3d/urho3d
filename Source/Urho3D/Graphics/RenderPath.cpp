@@ -46,6 +46,7 @@ static const char* commandTypeNames[] =
     "forwardlights",
     "lightvolumes",
     "renderui",
+    "sendevent",
     0
 };
 
@@ -178,6 +179,10 @@ void RenderPathCommand::Load(const XMLElement& element)
                 parameterElem = parameterElem.GetNext("parameter");
             }
         }
+        break;
+
+    case CMD_SENDEVENT:
+        eventName_ = element.GetAttribute("name");
         break;
 
     default:
