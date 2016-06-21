@@ -4853,6 +4853,7 @@ Properties:
 - bool markToStencil
 - bool useLitBase
 - bool vertexLights
+- String eventName
 
 <a name="Class_RenderSurface"></a>
 ### RenderSurface
@@ -7909,6 +7910,7 @@ Properties:
 - int CMD_FORWARDLIGHTS
 - int CMD_LIGHTVOLUMES
 - int CMD_RENDERUI
+- int CMD_SENDEVENT
 
 ### RenderSurfaceUpdateMode
 
