@@ -123,6 +123,9 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### RenderPathEvent
+- %Name : String
+
 ### DeviceLost
 
 ### DeviceReset
@@ -9928,6 +9931,7 @@ Properties:
 - uint clearStencil
 - String depthStencilName
 - bool enabled
+- String eventName
 - bool markToStencil
 - String metadata
 - uint numOutputs
@@ -15148,6 +15152,7 @@ Properties:
 - CMD_FORWARDLIGHTS
 - CMD_LIGHTVOLUMES
 - CMD_RENDERUI
+- CMD_SENDEVENT
 
 
 ### RenderSurfaceUpdateMode

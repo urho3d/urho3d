@@ -53,7 +53,11 @@ if (NOT IOS AND NOT WEB)
     endif ()
     if (READLINE_FOUND)
         add_definitions (-DHAVE_READLINE)
-        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        # FIXME: temporary quick fix
+        if (SYSROOT)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
+        endif ()
+        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
         list (APPEND LIBS ${READLINE_LIBRARIES})
     endif ()
 
