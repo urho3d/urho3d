@@ -36,12 +36,9 @@ JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jc
     /* Prepare the arguments. */
 
     int len = (*env)->GetArrayLength(env, array);
-    char* argv[1 + len + 1];
+    char* argv[len + 1];
     argc = 0;
-    /* Use the name "app_process" so PHYSFS_platformCalcBaseDir() works.
-       https://bitbucket.org/MartinFelis/love-android-sdl2/issue/23/release-build-crash-on-start
-     */
-    argv[argc++] = SDL_strdup("app_process");
+    // Urho3D: avoid hard-coding the "app_process" as the first argument
     for (i = 0; i < len; ++i) {
         const char* utf;
         char* arg = NULL;
