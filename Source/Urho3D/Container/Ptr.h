@@ -40,6 +40,14 @@ public:
     {
     }
 
+#if URHO3D_CXX11
+    /// Construct a null shared pointer.
+    SharedPtr(std::nullptr_t) :
+        ptr_(0)
+    {
+    }
+#endif
+
     /// Copy-construct from another shared pointer.
     SharedPtr(const SharedPtr<T>& rhs) :
         ptr_(rhs.ptr_)
@@ -241,6 +249,15 @@ public:
         refCount_(0)
     {
     }
+
+#if URHO3D_CXX11
+    /// Construct a null weak pointer.
+    WeakPtr(std::nullptr_t) :
+        ptr_(0),
+        refCount_(0)
+    {
+    }
+#endif
 
     /// Copy-construct from another weak pointer.
     WeakPtr(const WeakPtr<T>& rhs) :
