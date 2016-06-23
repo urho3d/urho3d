@@ -154,14 +154,14 @@ void Texture2DArray::OnDeviceLost()
 
 void Texture2DArray::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -173,7 +173,7 @@ void Texture2DArray::OnDeviceReset()
 
 void Texture2DArray::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -186,13 +186,13 @@ void Texture2DArray::Release()
                     graphics_->SetTexture(i, 0);
             }
 
-            glDeleteTextures(1, &object_);
+            glDeleteTextures(1, &object_.name_);
         }
 
         if (renderSurface_)
             renderSurface_->Release();
 
-        object_ = 0;
+        object_.name_ = 0;
     }
 }
 
@@ -252,7 +252,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("Texture array not created, can not set data");
         return false;
@@ -420,7 +420,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -476,7 +476,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -519,7 +519,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("Texture array not created, can not get data");
         return false;
@@ -582,7 +582,7 @@ bool Texture2DArray::Create()
         return true;
     }
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);

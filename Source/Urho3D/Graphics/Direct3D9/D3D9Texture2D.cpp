@@ -114,14 +114,14 @@ void Texture2D::OnDeviceLost()
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.ptr_)
         {
             Create();
             dataLost_ = true;
@@ -145,7 +145,7 @@ void Texture2D::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
@@ -198,7 +198,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -248,7 +248,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
+    HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -311,7 +311,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         break;
     }
 
-    ((IDirect3DTexture9*)object_)->UnlockRect(level);
+    ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
     return true;
 }
 
@@ -440,7 +440,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -510,7 +510,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     }
     else
     {
-        HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
+        HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -577,7 +577,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         offscreenSurface->Release();
     }
     else
-        ((IDirect3DTexture9*)object_)->UnlockRect(level);
+        ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
 
     return true;
 }
@@ -630,16 +630,16 @@ bool Texture2D::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Could not create texture", hr);
             return false;
         }
 
-        levels_ = ((IDirect3DTexture9*)object_)->GetLevelCount();
+        levels_ = ((IDirect3DTexture9*)object_.ptr_)->GetLevelCount();
 
         if (usage_ & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL))
         {
-            hr = ((IDirect3DTexture9*)object_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
+            hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
         }

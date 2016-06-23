@@ -140,14 +140,14 @@ void Texture2DArray::OnDeviceLost()
 
 void Texture2DArray::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.ptr_)
         {
             Create();
             dataLost_ = true;
@@ -171,7 +171,7 @@ void Texture2DArray::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 void Texture2DArray::SetLayers(unsigned layers)
@@ -310,7 +310,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 // Do not spam this error on D3D9
                 //URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
@@ -367,7 +367,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 //URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;

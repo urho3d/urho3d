@@ -144,7 +144,7 @@ bool Texture3D::EndLoad()
 
 void Texture3D::Release()
 {
-    if (graphics_ && object_)
+    if (graphics_ && object_.ptr_)
     {
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
@@ -153,7 +153,7 @@ void Texture3D::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
 }
@@ -187,7 +187,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -242,7 +242,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -260,7 +260,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
                 }
             }
 
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
@@ -276,7 +276,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         destBox.front = (UINT)z;
         destBox.back = (UINT)(z + depth);
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, levelHeight * rowSize);
     }
 
@@ -412,7 +412,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 
 bool Texture3D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -461,7 +461,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = (UINT)levelDepth;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -512,10 +512,10 @@ bool Texture3D::Create()
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_);
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_.ptr_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
@@ -526,7 +526,7 @@ bool Texture3D::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
     resourceViewDesc.Texture3D.MipLevels = (UINT)levels_;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {

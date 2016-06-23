@@ -32,7 +32,6 @@
 namespace Urho3D
 {
 
-
 ConstantBuffer::ConstantBuffer(Context* context) :
     Object(context),
     GPUObject(GetSubsystem<Graphics>())
@@ -46,16 +45,16 @@ ConstantBuffer::~ConstantBuffer()
 
 void ConstantBuffer::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
 
 #ifndef GL_ES_VERSION_2_0
         graphics_->SetUBO(0);
-        glDeleteBuffers(1, &object_);
+        glDeleteBuffers(1, &object_.name_);
 #endif
-        object_ = 0;
+        object_.name_ = 0;
     }
 
     shadowData_.Reset();
@@ -88,9 +87,9 @@ bool ConstantBuffer::SetSize(unsigned size)
     if (graphics_)
     {
 #ifndef GL_ES_VERSION_2_0
-        if (!object_)
-            glGenBuffers(1, &object_);
-        graphics_->SetUBO(object_);
+        if (!object_.name_)
+            glGenBuffers(1, &object_.name_);
+        graphics_->SetUBO(object_.name_);
         glBufferData(GL_UNIFORM_BUFFER, size_, shadowData_.Get(), GL_DYNAMIC_DRAW);
 #endif
     }
@@ -128,10 +127,10 @@ void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, co
 
 void ConstantBuffer::Apply()
 {
-    if (dirty_ && object_)
+    if (dirty_ && object_.name_)
     {
 #ifndef GL_ES_VERSION_2_0
-        graphics_->SetUBO(object_);
+        graphics_->SetUBO(object_.name_);
         glBufferData(GL_UNIFORM_BUFFER, size_, shadowData_.Get(), GL_DYNAMIC_DRAW);
 #endif
         dirty_ = false;

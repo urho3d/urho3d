@@ -148,7 +148,7 @@ void Texture::SetSRGB(bool enable)
     {
         sRGB_ = enable;
         // If texture had already been created, must recreate it to set the sRGB texture format
-        if (object_)
+        if (object_.name_)
             Create();
 
         // If texture in use in the framebuffer, mark it dirty
@@ -184,7 +184,7 @@ void Texture::SetParametersDirty()
 
 void Texture::UpdateParameters()
 {
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
         return;
 
     // Wrapping

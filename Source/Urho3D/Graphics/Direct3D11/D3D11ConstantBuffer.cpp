@@ -45,7 +45,7 @@ ConstantBuffer::~ConstantBuffer()
 
 void ConstantBuffer::Release()
 {
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 
     shadowData_.Reset();
     size_ = 0;
@@ -80,10 +80,10 @@ bool ConstantBuffer::SetSize(unsigned size)
         bufferDesc.CPUAccessFlags = 0;
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Failed to create constant buffer", hr);
             return false;
         }
@@ -122,9 +122,9 @@ void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, co
 
 void ConstantBuffer::Apply()
 {
-    if (dirty_ && object_)
+    if (dirty_ && object_.ptr_)
     {
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_, 0, 0, shadowData_.Get(), 0, 0);
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_.ptr_, 0, 0, shadowData_.Get(), 0, 0);
         dirty_ = false;
     }
 }

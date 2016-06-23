@@ -260,14 +260,14 @@ void TextureCube::OnDeviceLost()
 
 void TextureCube::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.ptr_)
         {
             Create();
             dataLost_ = true;
@@ -294,7 +294,7 @@ void TextureCube::Release()
             renderSurfaces_[i]->Release();
     }
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
@@ -354,7 +354,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -404,7 +404,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
+    HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
         (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
     if (FAILED(hr))
     {
@@ -468,7 +468,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         break;
     }
 
-    ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+    ((IDirect3DCubeTexture9*)object_.ptr_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
     return true;
 }
 
@@ -553,7 +553,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
@@ -615,7 +615,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
@@ -657,7 +657,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
 bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -725,7 +725,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     }
     else
     {
-        HRESULT hr = ((IDirect3DCubeTexture9*)object_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
+        HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -792,7 +792,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         offscreenSurface->Release();
     }
     else
-        ((IDirect3DCubeTexture9*)object_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
+        ((IDirect3DCubeTexture9*)object_.ptr_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
 
     return true;
 }
@@ -817,22 +817,22 @@ bool TextureCube::Create()
         usage_,
         (D3DFORMAT)format_,
         (D3DPOOL)pool_,
-        (IDirect3DCubeTexture9**)&object_,
+        (IDirect3DCubeTexture9**)&object_.ptr_,
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create cube texture", hr);
         return false;
     }
 
-    levels_ = ((IDirect3DCubeTexture9*)object_)->GetLevelCount();
+    levels_ = ((IDirect3DCubeTexture9*)object_.ptr_)->GetLevelCount();
 
     if (usage_ & D3DUSAGE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            hr = ((IDirect3DCubeTexture9*)object_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
+            hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
                 (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
             if (FAILED(hr))
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);

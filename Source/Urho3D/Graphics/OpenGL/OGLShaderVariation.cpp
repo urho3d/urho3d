@@ -55,7 +55,7 @@ void ShaderVariation::OnDeviceLost()
 
 void ShaderVariation::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -73,10 +73,10 @@ void ShaderVariation::Release()
                     graphics_->SetShaders(0, 0);
             }
 
-            glDeleteShader(object_);
+            glDeleteShader(object_.name_);
         }
 
-        object_ = 0;
+        object_.name_ = 0;
         graphics_->CleanupShaderPrograms(this);
     }
 
@@ -93,8 +93,8 @@ bool ShaderVariation::Create()
         return false;
     }
 
-    object_ = glCreateShader(type_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
-    if (!object_)
+    object_.name_ = glCreateShader(type_ == VS ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+    if (!object_.name_)
     {
         compilerOutput_ = "Could not create shader object";
         return false;
@@ -166,24 +166,24 @@ bool ShaderVariation::Create()
         shaderCode += originalShaderCode;
 
     const char* shaderCStr = shaderCode.CString();
-    glShaderSource(object_, 1, &shaderCStr, 0);
-    glCompileShader(object_);
+    glShaderSource(object_.name_, 1, &shaderCStr, 0);
+    glCompileShader(object_.name_);
 
     int compiled, length;
-    glGetShaderiv(object_, GL_COMPILE_STATUS, &compiled);
+    glGetShaderiv(object_.name_, GL_COMPILE_STATUS, &compiled);
     if (!compiled)
     {
-        glGetShaderiv(object_, GL_INFO_LOG_LENGTH, &length);
+        glGetShaderiv(object_.name_, GL_INFO_LOG_LENGTH, &length);
         compilerOutput_.Resize((unsigned)length);
         int outLength;
-        glGetShaderInfoLog(object_, length, &outLength, &compilerOutput_[0]);
-        glDeleteShader(object_);
-        object_ = 0;
+        glGetShaderInfoLog(object_.name_, length, &outLength, &compilerOutput_[0]);
+        glDeleteShader(object_.name_);
+        object_.name_ = 0;
     }
     else
         compilerOutput_.Clear();
 
-    return object_ != 0;
+    return object_.name_ != 0;
 }
 
 void ShaderVariation::SetName(const String& name)

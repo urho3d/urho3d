@@ -321,7 +321,7 @@ void Texture::SetParametersDirty()
 
 void Texture::UpdateParameters()
 {
-    if ((!parametersDirty_ && sampler_) || !object_)
+    if ((!parametersDirty_ && sampler_) || !object_.ptr_)
         return;
 
     // Release old sampler

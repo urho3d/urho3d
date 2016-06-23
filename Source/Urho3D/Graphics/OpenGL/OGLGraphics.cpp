@@ -817,7 +817,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName())
         return;
 
     PrepareDraw();
@@ -837,7 +837,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName())
         return;
 
     PrepareDraw();
@@ -859,7 +859,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     unsigned instanceCount)
 {
 #if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName() || !instancingSupport_)
         return;
 
     PrepareDraw();
@@ -895,7 +895,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         unsigned vertexCount, unsigned instanceCount)
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName() || !instancingSupport_)
         return;
 
     PrepareDraw();
@@ -962,7 +962,7 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
     if (indexBuffer_ == buffer)
         return;
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer ? buffer->GetGPUObject() : 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer ? buffer->GetGPUObjectName() : 0);
     indexBuffer_ = buffer;
 }
 
@@ -972,7 +972,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         return;
 
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
-    if (vs && !vs->GetGPUObject())
+    if (vs && !vs->GetGPUObjectName())
     {
         if (vs->GetCompilerOutput().Empty())
         {
@@ -991,7 +991,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             vs = 0;
     }
 
-    if (ps && !ps->GetGPUObject())
+    if (ps && !ps->GetGPUObjectName())
     {
         if (ps->GetCompilerOutput().Empty())
         {
@@ -1028,9 +1028,9 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         if (i != shaderPrograms_.End())
         {
             // Use the existing linked program
-            if (i->second_->GetGPUObject())
+            if (i->second_->GetGPUObjectName())
             {
-                glUseProgram(i->second_->GetGPUObject());
+                glUseProgram(i->second_->GetGPUObjectName());
                 shaderProgram_ = i->second_;
             }
             else
@@ -1074,7 +1074,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             ConstantBuffer* buffer = constantBuffers[i].Get();
             if (buffer != currentConstantBuffers_[i])
             {
-                unsigned object = buffer ? buffer->GetGPUObject() : 0;
+                unsigned object = buffer ? buffer->GetGPUObjectName() : 0;
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, object);
                 // Calling glBindBufferBase also affects the generic buffer binding point
                 impl_->boundUBO_ = object;
@@ -1483,7 +1483,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             // Unbind old texture type if necessary
             if (textureTypes_[index] && textureTypes_[index] != glType)
                 glBindTexture(textureTypes_[index], 0);
-            glBindTexture(glType, texture->GetGPUObject());
+            glBindTexture(glType, texture->GetGPUObjectName());
             textureTypes_[index] = glType;
 
             if (texture->GetParametersDirty())
@@ -1507,7 +1507,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 impl_->activeTexture_ = index;
             }
 
-            glBindTexture(texture->GetTarget(), texture->GetGPUObject());
+            glBindTexture(texture->GetTarget(), texture->GetGPUObjectName());
             texture->UpdateParameters();
         }
     }
@@ -1525,7 +1525,7 @@ void Graphics::SetTextureForUpdate(Texture* texture)
     // Unbind old texture type if necessary
     if (textureTypes_[0] && textureTypes_[0] != glType)
         glBindTexture(textureTypes_[0], 0);
-    glBindTexture(glType, texture->GetGPUObject());
+    glBindTexture(glType, texture->GetGPUObjectName());
     textureTypes_[0] = glType;
     textures_[0] = texture;
 }
@@ -3018,7 +3018,7 @@ void Graphics::PrepareDraw()
 
                 if (i->second_.colorAttachments_[j] != renderTargets_[j])
                 {
-                    BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObject());
+                    BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObjectName());
                     i->second_.colorAttachments_[j] = renderTargets_[j];
                 }
             }
@@ -3054,8 +3054,8 @@ void Graphics::PrepareDraw()
 
                 if (i->second_.depthAttachment_ != depthStencil_)
                 {
-                    BindDepthAttachment(texture->GetGPUObject(), false);
-                    BindStencilAttachment(hasStencil ? texture->GetGPUObject() : 0, false);
+                    BindDepthAttachment(texture->GetGPUObjectName(), false);
+                    BindStencilAttachment(hasStencil ? texture->GetGPUObjectName() : 0, false);
                     i->second_.depthAttachment_ = depthStencil_;
                 }
             }
@@ -3107,7 +3107,7 @@ void Graphics::PrepareDraw()
             VertexBuffer* buffer = vertexBuffers_[i];
             // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
             // in which case the pointer will be invalid and cause a crash
-            if (!buffer || !buffer->GetGPUObject() || !impl_->vertexAttributes_)
+            if (!buffer || !buffer->GetGPUObjectName() || !impl_->vertexAttributes_)
                 continue;
 
             const PODVector<VertexElement>& elements = buffer->GetElements();
@@ -3153,7 +3153,7 @@ void Graphics::PrepareDraw()
                         }
                     }
 
-                    SetVBO(buffer->GetGPUObject());
+                    SetVBO(buffer->GetGPUObjectName());
                     glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
                         element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
                         (const void *)(size_t)dataStart);

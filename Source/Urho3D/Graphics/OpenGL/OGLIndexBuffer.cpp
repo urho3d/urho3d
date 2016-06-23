@@ -57,7 +57,7 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::OnDeviceReset()
 {
-    if (!object_)
+    if (!object_.name_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -72,7 +72,7 @@ void IndexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -82,10 +82,10 @@ void IndexBuffer::Release()
             if (graphics_->GetIndexBuffer() == this)
                 graphics_->SetIndexBuffer(0);
 
-            glDeleteBuffers(1, &object_);
+            glDeleteBuffers(1, &object_.name_);
         }
 
-        object_ = 0;
+        object_.name_ = 0;
     }
 }
 
@@ -139,7 +139,7 @@ bool IndexBuffer::SetData(const void* data)
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
@@ -186,7 +186,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
         memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
@@ -331,9 +331,9 @@ bool IndexBuffer::Create()
             return true;
         }
 
-        if (!object_)
-            glGenBuffers(1, &object_);
-        if (!object_)
+        if (!object_.name_)
+            glGenBuffers(1, &object_.name_);
+        if (!object_.name_)
         {
             URHO3D_LOGERROR("Failed to create index buffer");
             return false;
@@ -348,7 +348,7 @@ bool IndexBuffer::Create()
 
 bool IndexBuffer::UpdateToGPU()
 {
-    if (object_ && shadowData_)
+    if (object_.name_ && shadowData_)
         return SetData(shadowData_.Get());
     else
         return false;

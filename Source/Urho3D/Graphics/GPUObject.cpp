@@ -20,19 +20,24 @@
 // THE SOFTWARE.
 //
 
-#include "../../Precompiled.h"
+#include "../Precompiled.h"
 
-#include "../../Graphics/Graphics.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GPUObject.h"
 
-#include "../../DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
 
 GPUObject::GPUObject(Graphics* graphics) :
     graphics_(graphics),
-    object_(0)
+    dataLost_(false),
+    dataPending_(false)
 {
+    object_.ptr_ = 0;
+    object_.name_ = 0;
+
     if (graphics_)
         graphics->AddGPUObject(this);
 }
@@ -41,6 +46,27 @@ GPUObject::~GPUObject()
 {
     if (graphics_)
         graphics_->RemoveGPUObject(this);
+}
+
+void GPUObject::OnDeviceLost()
+{
+#ifdef URHO3D_OPENGL
+    // On OpenGL the object has already been lost at this point; reset object name
+    object_.name_ = 0;
+#endif
+}
+
+void GPUObject::OnDeviceReset()
+{
+}
+
+void GPUObject::Release()
+{
+}
+
+void GPUObject::ClearDataLost()
+{
+    dataLost_ = false;
 }
 
 Graphics* GPUObject::GetGraphics() const

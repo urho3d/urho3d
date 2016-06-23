@@ -90,10 +90,10 @@ bool ShaderVariation::Create()
     {
         HRESULT hr = device->CreateVertexShader(
             (const DWORD*)&byteCode[0],
-            (IDirect3DVertexShader9**)&object_);
+            (IDirect3DVertexShader9**)&object_.ptr_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
         }
     }
@@ -101,20 +101,20 @@ bool ShaderVariation::Create()
     {
         HRESULT hr = device->CreatePixelShader(
             (const DWORD*)&byteCode[0],
-            (IDirect3DPixelShader9**)&object_);
+            (IDirect3DPixelShader9**)&object_.ptr_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
         }
     }
 
-    return object_ != 0;
+    return object_.ptr_ != 0;
 }
 
 void ShaderVariation::Release()
 {
-    if (object_ && graphics_)
+    if (object_.ptr_ && graphics_)
     {
         graphics_->CleanupShaderPrograms(this);
 
@@ -130,7 +130,7 @@ void ShaderVariation::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 
     compilerOutput_.Clear();
 

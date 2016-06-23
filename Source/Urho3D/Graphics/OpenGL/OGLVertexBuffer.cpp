@@ -58,7 +58,7 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::OnDeviceReset()
 {
-    if (!object_)
+    if (!object_.name_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -73,7 +73,7 @@ void VertexBuffer::Release()
 {
     Unlock();
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -87,10 +87,10 @@ void VertexBuffer::Release()
             }
 
             graphics_->SetVBO(0);
-            glDeleteBuffers(1, &object_);
+            glDeleteBuffers(1, &object_.name_);
         }
 
-        object_ = 0;
+        object_.name_ = 0;
     }
 }
 
@@ -151,11 +151,11 @@ bool VertexBuffer::SetData(const void* data)
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
-            graphics_->SetVBO(object_);
+            graphics_->SetVBO(object_.name_);
             glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, data, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
         }
         else
@@ -198,11 +198,11 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
         memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
 
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_->IsDeviceLost())
         {
-            graphics_->SetVBO(object_);
+            graphics_->SetVBO(object_.name_);
             if (!discard || start != 0)
                 glBufferSubData(GL_ARRAY_BUFFER, start * vertexSize_, count * vertexSize_, data);
             else
@@ -401,15 +401,15 @@ bool VertexBuffer::Create()
             return true;
         }
 
-        if (!object_)
-            glGenBuffers(1, &object_);
-        if (!object_)
+        if (!object_.name_)
+            glGenBuffers(1, &object_.name_);
+        if (!object_.name_)
         {
             URHO3D_LOGERROR("Failed to create vertex buffer");
             return false;
         }
 
-        graphics_->SetVBO(object_);
+        graphics_->SetVBO(object_.name_);
         glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
@@ -418,7 +418,7 @@ bool VertexBuffer::Create()
 
 bool VertexBuffer::UpdateToGPU()
 {
-    if (object_ && shadowData_)
+    if (object_.name_ && shadowData_)
         return SetData(shadowData_.Get());
     else
         return false;

@@ -163,14 +163,14 @@ void Texture3D::OnDeviceLost()
 
 void Texture3D::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -182,7 +182,7 @@ void Texture3D::OnDeviceReset()
 
 void Texture3D::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_ || graphics_->IsDeviceLost())
             return;
@@ -193,8 +193,8 @@ void Texture3D::Release()
                 graphics_->SetTexture(i, 0);
         }
 
-        glDeleteTextures(1, &object_);
-        object_ = 0;
+        glDeleteTextures(1, &object_.name_);
+        object_.name_ = 0;
     }
 }
 
@@ -225,7 +225,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -364,7 +364,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
         if (IsCompressed() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, levelDepth, format);
-        if (!object_)
+        if (!object_.name_)
             return false;
 
         for (unsigned i = 0; i < levels_; ++i)
@@ -435,7 +435,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 bool Texture3D::GetData(unsigned level, void* dest) const
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -495,7 +495,7 @@ bool Texture3D::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);

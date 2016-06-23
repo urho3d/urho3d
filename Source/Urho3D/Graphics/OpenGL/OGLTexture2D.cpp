@@ -117,14 +117,14 @@ void Texture2D::OnDeviceLost()
 
 void Texture2D::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -136,7 +136,7 @@ void Texture2D::OnDeviceReset()
 
 void Texture2D::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -149,13 +149,13 @@ void Texture2D::Release()
                     graphics_->SetTexture(i, 0);
             }
 
-            glDeleteTextures(1, &object_);
+            glDeleteTextures(1, &object_.name_);
         }
 
         if (renderSurface_)
             renderSurface_->Release();
 
-        object_ = 0;
+        object_.name_ = 0;
     }
     else
     {
@@ -204,7 +204,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -336,7 +336,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
         if (IsCompressed() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
-        if (!object_)
+        if (!object_.name_)
             return false;
 
         for (unsigned i = 0; i < levels_; ++i)
@@ -403,7 +403,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -488,7 +488,7 @@ bool Texture2D::Create()
             return false;
     }
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);

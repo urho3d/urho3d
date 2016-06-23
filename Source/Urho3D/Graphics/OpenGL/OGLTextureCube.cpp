@@ -269,14 +269,14 @@ void TextureCube::OnDeviceLost()
 
 void TextureCube::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -288,7 +288,7 @@ void TextureCube::OnDeviceReset()
 
 void TextureCube::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -301,7 +301,7 @@ void TextureCube::Release()
                     graphics_->SetTexture(i, 0);
             }
 
-            glDeleteTextures(1, &object_);
+            glDeleteTextures(1, &object_.name_);
         }
 
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
@@ -310,7 +310,7 @@ void TextureCube::Release()
                 renderSurfaces_[i]->Release();
         }
 
-        object_ = 0;
+        object_.name_ = 0;
     }
 }
 
@@ -365,7 +365,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -522,7 +522,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
@@ -584,7 +584,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Cube texture face 0 must be loaded first");
                 return false;
@@ -625,7 +625,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
 bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
 {
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -688,7 +688,7 @@ bool TextureCube::Create()
         return true;
     }
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);

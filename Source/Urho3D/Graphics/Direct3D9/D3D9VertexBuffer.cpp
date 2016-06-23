@@ -64,7 +64,7 @@ void VertexBuffer::OnDeviceLost()
 
 void VertexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -88,7 +88,7 @@ void VertexBuffer::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 void VertexBuffer::SetShadowed(bool enable)
@@ -158,7 +158,7 @@ bool VertexBuffer::SetData(const void* data)
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (graphics_->IsDeviceLost())
         {
@@ -210,7 +210,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
         memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (graphics_->IsDeviceLost())
         {
@@ -259,7 +259,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
     lockCount_ = count;
 
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
-    if (object_ && !shadowData_ && !graphics_->IsDeviceLost())
+    if (object_.ptr_ && !shadowData_ && !graphics_->IsDeviceLost())
         return MapBuffer(start, count, discard);
     else if (shadowData_)
     {
@@ -431,11 +431,11 @@ bool VertexBuffer::Create()
             usage_,
             0,
             (D3DPOOL)pool_,
-            (IDirect3DVertexBuffer9**)&object_,
+            (IDirect3DVertexBuffer9**)&object_.ptr_,
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Could not create vertex buffer", hr);
             return false;
         }
@@ -446,7 +446,7 @@ bool VertexBuffer::Create()
 
 bool VertexBuffer::UpdateToGPU()
 {
-    if (object_ && shadowData_)
+    if (object_.ptr_ && shadowData_)
         return SetData(shadowData_.Get());
     else
         return false;
@@ -456,14 +456,14 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     void* hwData = 0;
 
-    if (object_)
+    if (object_.ptr_)
     {
         DWORD flags = 0;
 
         if (discard && usage_ & D3DUSAGE_DYNAMIC)
             flags = D3DLOCK_DISCARD;
 
-        HRESULT hr = ((IDirect3DVertexBuffer9*)object_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags);
+        HRESULT hr = ((IDirect3DVertexBuffer9*)object_.ptr_)->Lock(start * vertexSize_, count * vertexSize_, &hwData, flags);
         if (FAILED(hr))
             URHO3D_LOGD3DERROR("Could not lock vertex buffer", hr);
         else
@@ -475,9 +475,9 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 
 void VertexBuffer::UnmapBuffer()
 {
-    if (object_ && lockState_ == LOCK_HARDWARE)
+    if (object_.ptr_ && lockState_ == LOCK_HARDWARE)
     {
-        ((IDirect3DVertexBuffer9*)object_)->Unlock();
+        ((IDirect3DVertexBuffer9*)object_.ptr_)->Unlock();
         lockState_ = LOCK_NONE;
     }
 }

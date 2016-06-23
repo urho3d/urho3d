@@ -64,7 +64,7 @@ void IndexBuffer::OnDeviceLost()
 
 void IndexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_)
+    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -82,7 +82,7 @@ void IndexBuffer::Release()
     if (graphics_ && graphics_->GetIndexBuffer() == this)
         graphics_->SetIndexBuffer(0);
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 void IndexBuffer::SetShadowed(bool enable)
@@ -145,7 +145,7 @@ bool IndexBuffer::SetData(const void* data)
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, indexCount_ * indexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (graphics_->IsDeviceLost())
         {
@@ -197,7 +197,7 @@ bool IndexBuffer::SetDataRange(const void* data, unsigned start, unsigned count,
     if (shadowData_ && shadowData_.Get() + start * indexSize_ != data)
         memcpy(shadowData_.Get() + start * indexSize_, data, count * indexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (graphics_->IsDeviceLost())
         {
@@ -246,7 +246,7 @@ void* IndexBuffer::Lock(unsigned start, unsigned count, bool discard)
     lockCount_ = count;
 
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
-    if (object_ && !shadowData_ && !graphics_->IsDeviceLost())
+    if (object_.ptr_ && !shadowData_ && !graphics_->IsDeviceLost())
         return MapBuffer(start, count, discard);
     else if (shadowData_)
     {
@@ -364,7 +364,7 @@ bool IndexBuffer::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_)
+            URHO3D_SAFE_RELEASE(object_.ptr_)
             URHO3D_LOGD3DERROR("Could not create index buffer", hr);
             return false;
         }
@@ -375,7 +375,7 @@ bool IndexBuffer::Create()
 
 bool IndexBuffer::UpdateToGPU()
 {
-    if (object_ && shadowData_)
+    if (object_.ptr_ && shadowData_)
         return SetData(shadowData_.Get());
     else
         return false;
@@ -385,14 +385,14 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     void* hwData = 0;
 
-    if (object_)
+    if (object_.ptr_)
     {
         DWORD flags = 0;
 
         if (discard && usage_ & D3DUSAGE_DYNAMIC)
             flags = D3DLOCK_DISCARD;
 
-        HRESULT hr = ((IDirect3DIndexBuffer9*)object_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags);
+        HRESULT hr = ((IDirect3DIndexBuffer9*)object_.ptr_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags);
         if (FAILED(hr))
             URHO3D_LOGD3DERROR("Could not lock index buffer", hr);
         else
@@ -404,9 +404,9 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 
 void IndexBuffer::UnmapBuffer()
 {
-    if (object_ && lockState_ == LOCK_HARDWARE)
+    if (object_.ptr_ && lockState_ == LOCK_HARDWARE)
     {
-        ((IDirect3DIndexBuffer9*)object_)->Unlock();
+        ((IDirect3DIndexBuffer9*)object_.ptr_)->Unlock();
         lockState_ = LOCK_NONE;
     }
 }

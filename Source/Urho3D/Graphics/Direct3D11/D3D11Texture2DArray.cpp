@@ -146,7 +146,7 @@ void Texture2DArray::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
 }
@@ -209,7 +209,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("Texture array not created, can not set data");
         return false;
@@ -268,7 +268,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -279,7 +279,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         {
             for (int row = 0; row < height; ++row)
                 memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
@@ -292,7 +292,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         destBox.front = 0;
         destBox.back = 1;
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, 0);
     }
 
@@ -384,7 +384,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -440,7 +440,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -482,7 +482,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("Texture array not created, can not get data");
         return false;
@@ -538,7 +538,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = 1;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -592,7 +592,7 @@ bool Texture2DArray::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture array", hr);
         return false;
     }
@@ -615,7 +615,7 @@ bool Texture2DArray::Create()
         srvDesc.Texture2DArray.MostDetailedMip = 0;
     }
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &srvDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &srvDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
@@ -642,7 +642,7 @@ bool Texture2DArray::Create()
             renderTargetViewDesc.Texture2DArray.FirstArraySlice = 0;
         }
 
-        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_.ptr_, &renderTargetViewDesc,
             (ID3D11RenderTargetView**)&renderSurface_->renderTargetView_);
 
         if (FAILED(hr))
