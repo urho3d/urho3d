@@ -192,6 +192,8 @@ private:
     bool geometryTypeUpdate_;
     /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
     bool sortThisFrame_;
+    /// Whether was last rendered from an ortho camera.
+    bool hasOrthoCamera_;
     /// Frame number on which was last sorted.
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.

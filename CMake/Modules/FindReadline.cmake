@@ -35,7 +35,10 @@ elseif (NATIVE_64BIT AND NOT URHO3D_64BIT)
     # To cater for 32-bit build on 64-bit host system using Debian-based distros; no special handling required for Redhat-based distros but no harm done in doing below
     set (LIB_HINTS /usr/lib32)
 endif ()
-find_path (READLINE_INCLUDE_DIRS NAMES readline.h HINTS ${INC_HINTS} PATH_SUFFIXES readline DOC "Readline include directory")
+find_path (READLINE_INCLUDE_DIRS NAMES readline/readline.h HINTS ${INC_HINTS} PATH_SUFFIXES readline DOC "Readline include directory")
+if (READLINE_INCLUDE_DIRS AND CMAKE_LIBRARY_ARCHITECTURE)
+    list (APPEND READLINE_INCLUDE_DIRS ${READLINE_INCLUDE_DIRS}/${CMAKE_LIBRARY_ARCHITECTURE})
+endif ()
 find_library (READLINE_LIBRARIES NAMES readline HINTS ${LIB_HINTS} DOC "Readline library")
 if (NOT APPLE AND NATIVE_64BIT AND NOT URHO3D_64BIT AND READLINE_LIBRARIES MATCHES 64)
     unset (READLINE_LIBRARIES CACHE)    # Nullify the search result if the ABI is not matched

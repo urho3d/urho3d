@@ -100,6 +100,12 @@ URHO3D_EVENT(E_ENDVIEWRENDER, EndViewRender)
     URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
+/// A render path event has occurred.
+URHO3D_EVENT(E_RENDERPATHEVENT, RenderPathEvent)
+{
+    URHO3D_PARAM(P_NAME, Name);                    // String
+}
+
 /// Graphics context has been lost. Some or all (depending on the API) GPU objects have lost their contents.
 URHO3D_EVENT(E_DEVICELOST, DeviceLost)
 {

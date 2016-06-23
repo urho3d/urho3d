@@ -488,12 +488,9 @@ if(LIBC)
     set(STDC_HEADERS 1)
   else()
     set(HAVE_LIBC TRUE)
-    # Urho3D - bug fix - starting since Raspbian Jessie the __USE_EXTERN_INLINE is defined in <features.h> causing stdlib.h to look for <bits/stdlib-bsearch.h> which is not in the system header search path on Raspberry-Pi platform
-    if (RPI)
-      find_path (STDLIB_BITS_INCLUDE_DIR NAMES bits/stdlib-bsearch.h PATH_SUFFIXES arm-linux-gnueabihf DOC "Raspberry-Pi stdlib's bits include directory")
-      if (STDLIB_BITS_INCLUDE_DIR)
-        include_directories (${STDLIB_BITS_INCLUDE_DIR})
-      endif ()
+    # Urho3D - temporary bug fix - starting since Raspbian Jessie some of the headers are installed in the arch-specific directory and it seems that older CMake (prior to release 3.2.3) does not include this directory by default yet, so we have to do that manually
+    if (RPI AND CMAKE_LIBRARY_ARCHITECTURE)
+      include_directories (${SYSROOT}/usr/include/${CMAKE_LIBRARY_ARCHITECTURE})    # SYSROOT is empty when we are not cross-compiling
     endif ()
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     set (CMAKE_REQUIRED_INCLUDES_SYS_TYPES_SAVED ${CMAKE_REQUIRED_INCLUDES})

@@ -49,6 +49,7 @@ Urho3D development, contributions and bugfixes by:
 - Jordan Patterson
 - Anton Petrov
 - Vladimir Pobedinsky
+- Franck Poulain
 - Pranjal Raihan
 - Nick Royer
 - Miika Santala

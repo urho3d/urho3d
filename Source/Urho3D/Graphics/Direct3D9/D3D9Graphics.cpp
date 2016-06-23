@@ -2250,7 +2250,7 @@ void Graphics::CleanupScratchBuffers()
 {
     for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
     {
-        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2)
+        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
         {
             i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
             i->size_ = maxScratchBufferRequest_;
