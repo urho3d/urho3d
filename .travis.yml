@@ -277,6 +277,41 @@ after_script: rake ci_teardown_cache
 
 ---
 
+branch: {name: ARM-CI, active: yes}
+language: cpp
+compiler: gcc
+cache: ccache
+sudo: false
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib, rpm]}}
+env:
+  global:
+    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - numjobs=4
+    - ARM=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
+  matrix:
+    - URHO3D_LIB_TYPE=STATIC
+    - URHO3D_LIB_TYPE=SHARED
+matrix:
+  fast_finish: true
+before_script:
+  - rake ci_timer
+  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export ARM_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/armhf-sysroot.git && export ARM_SYSROOT=$(pwd)/armhf-sysroot && for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${ARM_PREFIX%/*}:$PATH
+  - rake ci_setup_cache
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+after_script: rake ci_teardown_cache
+
+---
+
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}

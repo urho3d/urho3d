@@ -229,7 +229,10 @@ else ()
             # Below variables are loop invariant but there is no harm to keep them here
             if (ANDROID)
                 # TODO - remove this hard-coding when we do the library dependency refactoring
-                set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
+                set (DEP_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
+            elseif (CMAKE_SYSTEM_NAME STREQUAL Linux AND ARM AND NOT RPI)
+                # TODO - remove this hard-coding when we do the library dependency refactoring
+                set (DEP_LIBRARIES "GLESv1_CM\;GLESv2")
             elseif (WIN32)
                 set (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED ${CMAKE_TRY_COMPILE_CONFIGURATION})
                 if (URHO3D_LIBRARIES_REL)
@@ -263,7 +266,7 @@ else ()
                 while (NOT URHO3D_COMPILE_RESULT)
                     # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
                     try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${DEP_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
                         COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
                     if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
                         # Give a second chance for MSVC to use static runtime flag
