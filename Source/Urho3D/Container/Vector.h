@@ -597,7 +597,16 @@ public:
     {
         *this = vector;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    PODVector(const std::initializer_list<T>& list) : PODVector()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Push(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~PODVector()
     {
