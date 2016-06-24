@@ -97,6 +97,7 @@ bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>&
 
     vertexCount_ = vertexCount;
     elements_ = elements;
+    dynamic_ = dynamic;
 
     UpdateOffsets();
 
