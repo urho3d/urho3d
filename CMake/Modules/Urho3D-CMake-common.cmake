@@ -1317,10 +1317,6 @@ macro (setup_main_executable)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
                 COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
         endif ()
-        # Strip target main shared library
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>
-            COMMENT "Stripping lib${TARGET_NAME}.so in library output directory")
         # When performing packaging, include the final apk file
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
             install (FILES ${LIBRARY_OUTPUT_PATH_ROOT}/bin/Urho3D-debug.apk DESTINATION ${DEST_RUNTIME_DIR} OPTIONAL)
@@ -1419,6 +1415,11 @@ macro (setup_main_executable)
             DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             COMMENT "Generating shared data file")
+    endif ()
+
+    # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
+    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB)  # This condition excludes Xcode and VS as they are multi-config, which is exactly what we want too
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
     endif ()
 endmacro ()
 
