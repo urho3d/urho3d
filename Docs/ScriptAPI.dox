@@ -574,6 +574,16 @@ namespace Urho3D
 ### TemporaryChanged
 - %Serializable : Serializable pointer
 
+### NodeCloned
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %CloneNode : Node pointer
+
+### ComponentCloned
+- %Scene : Scene pointer
+- %Component : Component pointer
+- %CloneComponent : Component pointer
+
 ### InterceptNetworkUpdate
 - %Serializable : Serializable pointer
 - %TimeStamp : unsigned (0-255)
