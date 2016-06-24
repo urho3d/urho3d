@@ -55,6 +55,39 @@ IndexBuffer::~IndexBuffer()
     Release();
 }
 
+void IndexBuffer::SetShadowed(bool enable)
+{
+    // If no graphics subsystem, can not disable shadowing
+    if (!graphics_)
+        enable = true;
+
+    if (enable != shadowed_)
+    {
+        if (enable && indexCount_ && indexSize_)
+            shadowData_ = new unsigned char[indexCount_ * indexSize_];
+        else
+            shadowData_.Reset();
+
+        shadowed_ = enable;
+    }
+}
+
+bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
+{
+    Unlock();
+
+    indexCount_ = indexCount;
+    indexSize_ = (unsigned)(largeIndices ? sizeof(unsigned) : sizeof(unsigned short));
+    dynamic_ = dynamic;
+
+    if (shadowed_ && indexCount_ && indexSize_)
+        shadowData_ = new unsigned char[indexCount_ * indexSize_];
+    else
+        shadowData_.Reset();
+
+    return Create();
+}
+
 bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
 {
     if (!shadowData_)

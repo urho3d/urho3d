@@ -58,46 +58,6 @@ void VertexBuffer::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
-void VertexBuffer::SetShadowed(bool enable)
-{
-    // If no graphics subsystem, can not disable shadowing
-    if (!graphics_)
-        enable = true;
-
-    if (enable != shadowed_)
-    {
-        if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
-        else
-            shadowData_.Reset();
-
-        shadowed_ = enable;
-    }
-}
-
-bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
-{
-    return SetSize(vertexCount, GetElements(elementMask), dynamic);
-}
-
-bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic)
-{
-    Unlock();
-
-    dynamic_ = dynamic;
-    vertexCount_ = vertexCount;
-    elements_ = elements;
-
-    UpdateOffsets();
-
-    if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
-    else
-        shadowData_.Reset();
-
-    return Create();
-}
-
 bool VertexBuffer::SetData(const void* data)
 {
     if (!data)
@@ -272,8 +232,6 @@ void VertexBuffer::Unlock()
     default: break;
     }
 }
-
-
 
 bool VertexBuffer::Create()
 {
