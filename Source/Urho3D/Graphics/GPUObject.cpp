@@ -35,8 +35,11 @@ GPUObject::GPUObject(Graphics* graphics) :
     dataLost_(false),
     dataPending_(false)
 {
-    object_.ptr_ = 0;
+#ifdef URHO3D_OPENGL
     object_.name_ = 0;
+#else
+    object_.ptr_ = 0;
+#endif
 
     if (graphics_)
         graphics->AddGPUObject(this);

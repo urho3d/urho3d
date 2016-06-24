@@ -32,28 +32,14 @@
 namespace Urho3D
 {
 
-VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
-    Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
-    vertexCount_(0),
-    elementMask_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(0),
-    dynamic_(false),
-    shadowed_(false)
+void VertexBuffer::OnDeviceLost()
 {
-    UpdateOffsets();
-
-    // Force shadowing mode if graphics subsystem does not exist
-    if (!graphics_)
-        shadowed_ = true;
+    // No-op on Direct3D11
 }
 
-VertexBuffer::~VertexBuffer()
+void VertexBuffer::OnDeviceReset()
 {
-    Release();
+    // No-op on Direct3D11
 }
 
 void VertexBuffer::Release()
@@ -287,109 +273,7 @@ void VertexBuffer::Unlock()
     }
 }
 
-void VertexBuffer::UpdateOffsets()
-{
-    unsigned elementOffset = 0;
-    elementHash_ = 0;
-    elementMask_ = 0;
 
-    for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
-    {
-        i->offset_ = elementOffset;
-        elementOffset += ELEMENT_TYPESIZES[i->type_];
-        elementHash_ <<= 6;
-        elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
-
-        for (unsigned j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
-        {
-            const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
-            if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
-                elementMask_ |= (1 << j);
-        }
-    }
-
-    vertexSize_ = elementOffset;
-}
-
-const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index) const
-{
-    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
-    {
-        if (i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
-    }
-
-    return 0;
-}
-
-const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
-{
-    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
-    {
-        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
-    }
-
-    return 0;
-}
-
-const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
-{
-    for (PODVector<VertexElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
-    {
-        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
-            return &(*i);
-    }
-
-    return 0;
-}
-
-bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
-{
-    return GetElement(elements, type, semantic, index) != 0;
-}
-
-unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
-{
-    const VertexElement* element = GetElement(elements, type, semantic, index);
-    return element ? element->offset_ : M_MAX_UNSIGNED;
-}
-
-PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
-{
-    PODVector<VertexElement> ret;
-
-    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
-    {
-        if (elementMask & (1 << i))
-            ret.Push(LEGACY_VERTEXELEMENTS[i]);
-    }
-
-    return ret;
-}
-
-unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
-{
-    unsigned size = 0;
-
-    for (unsigned i = 0; i < elements.Size(); ++i)
-        size += ELEMENT_TYPESIZES[elements[i].type_];
-
-    return size;
-}
-
-unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
-{
-    unsigned size = 0;
-
-    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
-    {
-        if (elementMask & (1 << i))
-            size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
-    }
-
-    return size;
-}
 
 bool VertexBuffer::Create()
 {

@@ -33,26 +33,14 @@
 namespace Urho3D
 {
 
-IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
-    Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
-    indexCount_(0),
-    indexSize_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(0),
-    dynamic_(false),
-    shadowed_(false)
+void IndexBuffer::OnDeviceLost()
 {
-    // Force shadowing mode if graphics subsystem does not exist
-    if (!graphics_)
-        shadowed_ = true;
+    // No-op on Direct3D11
 }
 
-IndexBuffer::~IndexBuffer()
+void IndexBuffer::OnDeviceReset()
 {
-    Release();
+    // No-op on Direct3D11
 }
 
 void IndexBuffer::Release()
@@ -271,52 +259,6 @@ void IndexBuffer::Unlock()
 
     default: break;
     }
-}
-
-bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
-{
-    if (!shadowData_)
-    {
-        URHO3D_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
-        return false;
-    }
-
-    if (start + count > indexCount_)
-    {
-        URHO3D_LOGERROR("Illegal index range for querying used vertices");
-        return false;
-    }
-
-    minVertex = M_MAX_UNSIGNED;
-    unsigned maxVertex = 0;
-
-    if (indexSize_ == sizeof(unsigned))
-    {
-        unsigned* indices = ((unsigned*)shadowData_.Get()) + start;
-
-        for (unsigned i = 0; i < count; ++i)
-        {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
-        }
-    }
-    else
-    {
-        unsigned short* indices = ((unsigned short*)shadowData_.Get()) + start;
-
-        for (unsigned i = 0; i < count; ++i)
-        {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
-        }
-    }
-
-    vertexCount = maxVertex - minVertex + 1;
-    return true;
 }
 
 bool IndexBuffer::Create()

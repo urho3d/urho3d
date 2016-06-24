@@ -33,38 +33,17 @@
 namespace Urho3D
 {
 
-IndexBuffer::IndexBuffer(Context* context, bool forceHeadless) :
-    Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
-    indexCount_(0),
-    indexSize_(0),
-    pool_(D3DPOOL_MANAGED),
-    usage_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(0),
-    shadowed_(false)
-{
-    // Force shadowing mode if graphics subsystem does not exist
-    if (!graphics_)
-        shadowed_ = true;
-}
-
-IndexBuffer::~IndexBuffer()
-{
-    Release();
-}
-
 void IndexBuffer::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    // Dynamic buffers are in the default pool and need to be released on device loss
+    if (dynamic_)
         Release();
 }
 
 void IndexBuffer::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_)
+    // Dynamic buffers are in the default pool and need to be recreated after device reset
+    if (dynamic_ || !object_.ptr_)
     {
         Create();
         dataLost_ = !UpdateToGPU();
@@ -106,19 +85,9 @@ bool IndexBuffer::SetSize(unsigned indexCount, bool largeIndices, bool dynamic)
 {
     Unlock();
 
-    if (dynamic)
-    {
-        pool_ = D3DPOOL_DEFAULT;
-        usage_ = D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY;
-    }
-    else
-    {
-        pool_ = D3DPOOL_MANAGED;
-        usage_ = 0;
-    }
-
     indexCount_ = indexCount;
     indexSize_ = (unsigned)(largeIndices ? sizeof(unsigned) : sizeof(unsigned short));
+    dynamic_ = dynamic;
 
     if (shadowed_ && indexCount_ && indexSize_)
         shadowData_ = new unsigned char[indexCount_ * indexSize_];
@@ -288,57 +257,6 @@ void IndexBuffer::Unlock()
     }
 }
 
-bool IndexBuffer::IsDynamic() const
-{
-    return pool_ == D3DPOOL_DEFAULT;
-}
-
-bool IndexBuffer::GetUsedVertexRange(unsigned start, unsigned count, unsigned& minVertex, unsigned& vertexCount)
-{
-    if (!shadowData_)
-    {
-        URHO3D_LOGERROR("Used vertex range can only be queried from an index buffer with shadow data");
-        return false;
-    }
-
-    if (start + count > indexCount_)
-    {
-        URHO3D_LOGERROR("Illegal index range for querying used vertices");
-        return false;
-    }
-
-    minVertex = M_MAX_UNSIGNED;
-    unsigned maxVertex = 0;
-
-    if (indexSize_ == sizeof(unsigned))
-    {
-        unsigned* indices = ((unsigned*)shadowData_.Get()) + start;
-
-        for (unsigned i = 0; i < count; ++i)
-        {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
-        }
-    }
-    else
-    {
-        unsigned short* indices = ((unsigned short*)shadowData_.Get()) + start;
-
-        for (unsigned i = 0; i < count; ++i)
-        {
-            if (indices[i] < minVertex)
-                minVertex = indices[i];
-            if (indices[i] > maxVertex)
-                maxVertex = indices[i];
-        }
-    }
-
-    vertexCount = maxVertex - minVertex + 1;
-    return true;
-}
-
 bool IndexBuffer::Create()
 {
     Release();
@@ -354,12 +272,15 @@ bool IndexBuffer::Create()
             return true;
         }
 
+        unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+        unsigned usage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
+
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateIndexBuffer(
             indexCount_ * indexSize_,
-            usage_,
+            usage,
             indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
-            (D3DPOOL)pool_,
+            (D3DPOOL)pool,
             (IDirect3DIndexBuffer9**)&object_,
             0);
         if (FAILED(hr))
@@ -389,7 +310,7 @@ void* IndexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
     {
         DWORD flags = 0;
 
-        if (discard && usage_ & D3DUSAGE_DYNAMIC)
+        if (discard && dynamic_)
             flags = D3DLOCK_DISCARD;
 
         HRESULT hr = ((IDirect3DIndexBuffer9*)object_.ptr_)->Lock(start * indexSize_, count * indexSize_, &hwData, flags);
