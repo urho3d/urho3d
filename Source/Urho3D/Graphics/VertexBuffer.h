@@ -43,10 +43,8 @@ public:
 
     /// Mark the buffer destroyed on graphics context destruction. May be a no-op depending on the API.
     virtual void OnDeviceLost();
-
     /// Recreate the buffer and restore data if applicable. May be a no-op depending on the API.
     virtual void OnDeviceReset();
-
     /// Release buffer.
     virtual void Release();
 

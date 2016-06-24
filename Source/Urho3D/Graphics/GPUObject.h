@@ -49,28 +49,22 @@ public:
 
     /// Mark the GPU resource destroyed on graphics context destruction.
     virtual void OnDeviceLost();
-
     /// Recreate the GPU resource and restore data if applicable.
     virtual void OnDeviceReset();
-
     /// Unconditionally release the GPU resource.
     virtual void Release();
 
     /// Clear the data lost flag.
     void ClearDataLost();
 
-    /// Return the graphics subsystem.
+    /// Return the graphics subsystem associated with this GPU object.
     Graphics* GetGraphics() const;
-
     /// Return the object pointer. Applicable only on Direct3D.
     void* GetGPUObject() const { return object_.ptr_; }
-    
     /// Return the object name. Applicable only on OpenGL.
     unsigned GetGPUObjectName() const { return object_.name_; }
-
     /// Return whether data is lost due to context loss.
     bool IsDataLost() const { return dataLost_; }
-
     /// Return whether has pending data assigned while graphics context was lost.
     bool HasPendingData() const { return dataPending_; }
 
