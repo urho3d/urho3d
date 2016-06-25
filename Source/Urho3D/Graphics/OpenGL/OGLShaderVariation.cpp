@@ -34,17 +34,18 @@
 namespace Urho3D
 {
 
-ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
-    GPUObject(owner->GetSubsystem<Graphics>()),
-    owner_(owner),
-    type_(type)
+const char* ShaderVariation::elementSemanticNames[] =
 {
-}
-
-ShaderVariation::~ShaderVariation()
-{
-    Release();
-}
+    "POS",
+    "NORMAL",
+    "BINORMAL",
+    "TANGENT",
+    "TEXCOORD",
+    "COLOR",
+    "BLENDWEIGHT",
+    "BLENDINDICES",
+    "OBJECTINDEX"
+};
 
 void ShaderVariation::OnDeviceLost()
 {
@@ -186,19 +187,9 @@ bool ShaderVariation::Create()
     return object_.name_ != 0;
 }
 
-void ShaderVariation::SetName(const String& name)
-{
-    name_ = name;
-}
-
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
-}
-
-Shader* ShaderVariation::GetOwner() const
-{
-    return owner_;
 }
 
 }

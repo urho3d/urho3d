@@ -1121,7 +1121,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 return;
             }
 
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, count, data);
@@ -1196,7 +1196,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
@@ -1250,7 +1250,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
@@ -1308,7 +1308,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());

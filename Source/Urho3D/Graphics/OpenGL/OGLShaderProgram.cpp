@@ -44,19 +44,6 @@ static const char* shaderParameterGroups[] = {
     "custom"
 };
 
-static const char* elementSemanticNames[] =
-{
-    "POS",
-    "NORMAL",
-    "BINORMAL",
-    "TANGENT",
-    "TEXCOORD",
-    "COLOR",
-    "BLENDWEIGHT",
-    "BLENDINDICES",
-    "OBJECTINDEX"
-};
-
 static unsigned NumberPostfix(const String& str)
 {
     for (unsigned i = 0; i < str.Length(); ++i)
@@ -182,7 +169,7 @@ bool ShaderProgram::Link()
         // Go in reverse order so that "binormal" is detected before "normal"
         for (unsigned j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j < MAX_VERTEX_ELEMENT_SEMANTICS; --j)
         {
-            if (name.Contains(elementSemanticNames[j], false))
+            if (name.Contains(ShaderVariation::elementSemanticNames[j], false))
             {
                 semantic = (VertexElementSemantic)j;
                 unsigned index = NumberPostfix(name);
@@ -287,8 +274,10 @@ bool ShaderProgram::Link()
             // Store constant uniform
             String paramName = name.Substring(1);
             ShaderParameter newParam;
-            newParam.type_ = type;
+            newParam.name_ = paramName;
+            newParam.glType_ = type;
             newParam.location_ = location;
+            newParam.bufferPtr_ = 0;
 
 #ifndef GL_ES_VERSION_2_0
             // If running OpenGL 3, the uniform may be inside a constant buffer

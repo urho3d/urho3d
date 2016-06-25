@@ -51,21 +51,9 @@ const char* ShaderVariation::elementSemanticNames[] =
     "OBJECTINDEX"
 };
 
-ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
-    GPUObject(owner->GetSubsystem<Graphics>()),
-    owner_(owner),
-    type_(type),
-    elementHash_(0)
+void ShaderVariation::OnDeviceLost()
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        constantBufferSizes_[i] = 0;
-}
-
-ShaderVariation::~ShaderVariation()
-{
-    Release();
+    // No-op on Direct3D11
 }
 
 bool ShaderVariation::Create()
@@ -166,11 +154,6 @@ void ShaderVariation::Release()
     elementHash_ = 0;
 }
 
-void ShaderVariation::SetName(const String& name)
-{
-    name_ = name;
-}
-
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
@@ -179,11 +162,6 @@ void ShaderVariation::SetDefines(const String& defines)
     definesClipPlane_ = defines;
     if (!definesClipPlane_.EndsWith(" CLIPPLANE"))
         definesClipPlane_ += " CLIPPLANE";
-}
-
-Shader* ShaderVariation::GetOwner() const
-{
-    return owner_;
 }
 
 bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
@@ -220,7 +198,13 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter(type_, name_, buffer, offset, size);
+        ShaderParameter parameter;
+        parameter.type_ = type_;
+        parameter.name_ = name;
+        parameter.buffer_ = buffer;
+        parameter.offset_ = offset;
+        parameter.size_ = size;
+        parameter.bufferPtr_ = 0;
         parameters_[StringHash(name)] = parameter;
     }
 
@@ -416,7 +400,14 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                parameters_[varName] = ShaderParameter(type_, varName, cbRegister, varDesc.StartOffset, varDesc.Size);
+                ShaderParameter parameter;
+                parameter.type_ = type_;
+                parameter.name_ = varName;
+                parameter.buffer_ = cbRegister;
+                parameter.offset_ = varDesc.StartOffset;
+                parameter.size_ = varDesc.Size;
+                parameter.bufferPtr_ = 0;
+                parameters_[varName] = parameter;
             }
         }
     }

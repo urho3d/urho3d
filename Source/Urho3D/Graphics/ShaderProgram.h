@@ -22,6 +22,8 @@
 
 #pragma once
 
+// Note: ShaderProgram class is purposefully API-specific. It should not be used by Urho3D client applications.
+
 #if defined(URHO3D_OPENGL)
 #include "OpenGL/OGLShaderProgram.h"
 #elif defined(URHO3D_D3D11)
