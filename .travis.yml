@@ -26,7 +26,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -282,7 +282,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib, rpm]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz, g++-multilib, rpm]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -294,14 +294,23 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
   matrix:
-    - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
+    # ODROID-X2
+    - SYSROOT=armhf-sysroot URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a9 -mfpu=neon-fp16'
+    - SYSROOT=armhf-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a9 -mfpu=neon-fp16'
 matrix:
   fast_finish: true
+  include:
+    # ODROID-C2
+    - addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
+      env: SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
+    - addons: {<<: *newer_gcc}
+      env: SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
 before_script:
   - rake ci_timer
-  - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf && for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
-  - git clone --depth 1 https://github.com/urho3d/armhf-sysroot.git && export ARM_SYSROOT=$(pwd)/armhf-sysroot
+  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
+  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
+  - for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - git clone --depth 1 https://github.com/urho3d/$SYSROOT.git && export ARM_SYSROOT=$(pwd)/$SYSROOT
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
