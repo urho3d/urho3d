@@ -79,6 +79,13 @@ elseif (XCODE)
     endif ()
 endif ()
 
+# Extra linker flags for linking against indirect dependencies (linking shared lib with dependencies) when in cross-compiling mode
+if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CROSSCOMPILING)
+    # Cannot do this in the toolchain file because CMAKE_LIBRARY_ARCHITECTURE is not yet defined when CMake is processing toolchain file
+    set (ROOTED_EXE_LINKER_FLAGS "-Wl,-rpath-link,\"${ARM_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${ARM_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
+    set (CMAKE_REQUIRED_FLAGS ${ROOTED_EXE_LINKER_FLAGS})
+endif ()
+
 # Define all supported build options
 include (CheckHost)
 include (CheckCompilerToolchain)
@@ -284,6 +291,10 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
         set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
     endif ()
 endif()
+
+# Union all the sysroot variables into one so it can be referred to generically later
+# TODO: to be replaced with CMAKE_SYSROOT later if it is more beneficial
+set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 
 # Clang tools building
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
@@ -562,12 +573,13 @@ if (MSVC)
 else ()
     # GCC/Clang-specific setup
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
-    if (NOT ANDROID AND NOT IOS AND NOT TVOS)    # Most of the flags are already setup in android.toolchain.cmake module or already has correct default setup for iOS
-        if (ARM)
+    if (NOT ANDROID)    # Most of the flags are already setup in android.toolchain.cmake module
+        if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux)
             # Common compiler flags for aarch64-linux-gnu and arm-linux-gnueabihf, we do not support Windows on arm for now
             set (ARM_CFLAGS "${ARM_CFLAGS} -pipe")
             if (NOT URHO3D_64BIT)
-                set (ARM_CFLAGS "${ARM_CFLAGS} -mfloat-abi=hard -Wno-psabi")    # We only support armhf distros, so turn on hard-float by default
+                # We only support armhf distros, so turn on hard-float by default
+                set (ARM_CFLAGS "${ARM_CFLAGS} -mfloat-abi=hard -Wno-psabi")
             endif ()
             # The configuration is done here instead of in CMake toolchain file because we also support native build which does not use toolchain file at all
             if (RPI)
@@ -591,6 +603,9 @@ else ()
                 if (URHO3D_64BIT)
                     # aarch64 has only one valid arch so far
                     set (ARM_CFLAGS "${ARM_CFLAGS} -march=armv8-a")
+                elseif (URHO3D_ANGELSCRIPT)
+                    # Angelscript seems to fail to compile using Thumb states, so force to use ARM states by default
+                    set (ARM_CFLAGS "${ARM_CFLAGS} -marm")
                 endif ()
                 if (ARM_ABI_FLAGS)
                     # Instead of guessing all the possible ABIs, user would have to specify the ABI compiler flags explicitly via ARM_ABI_FLAGS build option
@@ -707,6 +722,7 @@ else ()
             # Not Android and not Emscripten and not MinGW derivative
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")     # This will emit '-DREENTRANT' to compiler and '-lpthread' to linker on Linux and Mac OSX platform
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread") # However, it may emit other equivalent compiler define and/or linker flag on other *nix platforms
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${ROOTED_EXE_LINKER_FLAGS}")
         endif ()
         set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
@@ -1141,7 +1157,7 @@ macro (setup_executable)
         endif ()
     endif ()
     if (ARG_NODEPS)
-        set (CMAKE_EXE_LINKER_FLAGS ${LUAJIT_EXE_LINKER_FLAGS})  # Don't need extra linker flags that are meant for main executable only, except those from LuaJIT (if enabled)
+        set (CMAKE_EXE_LINKER_FLAGS "${ROOTED_EXE_LINKER_FLAGS} ${LUAJIT_EXE_LINKER_FLAGS}")    # Don't need other extra linker flags that are meant for main executable only
     else ()
         define_dependency_libs (Urho3D)
     endif ()

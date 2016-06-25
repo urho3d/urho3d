@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (DEFINED CMAKE_CROSSCOMPILING)
+    return ()
+endif ()
+
 if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
     mark_as_advanced (CMAKE_TOOLCHAIN_FILE)

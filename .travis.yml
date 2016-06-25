@@ -300,7 +300,8 @@ matrix:
   fast_finish: true
 before_script:
   - rake ci_timer
-  - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export ARM_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/armhf-sysroot.git && export ARM_SYSROOT=$(pwd)/armhf-sysroot && for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf && for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
+  - git clone --depth 1 https://github.com/urho3d/armhf-sysroot.git && export ARM_SYSROOT=$(pwd)/armhf-sysroot
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
