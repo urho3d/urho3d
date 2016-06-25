@@ -204,7 +204,6 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         parameter.name_ = name;
         parameter.register_ = reg;
         parameter.regCount_ = regCount;
-        parameter.bufferPtr_ = 0;
         parameters_[StringHash(name)] = parameter;
     }
 
@@ -361,7 +360,6 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             parameter.name_ = name;
             parameter.register_ = reg;
             parameter.regCount_ = regCount;
-            parameter.bufferPtr_ = 0;
             parameters_[StringHash(name)] = parameter;
         }
     }

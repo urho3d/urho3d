@@ -37,18 +37,22 @@ class Shader;
 /// %Shader parameter definition.
 struct ShaderParameter
 {
+    /// Construct with defaults.
+    ShaderParameter() :
+        bufferPtr_(0)
+    {
+    }
+
     /// %Shader type.
     ShaderType type_;
     /// Name of the parameter.
     String name_;
-    /// Constant buffer index.
-    unsigned buffer_;
 
     union
     {
         /// Offset in constant buffer.
         unsigned offset_;
-        /// OpenGL Uniform location.
+        /// OpenGL uniform location.
         int location_;
         /// Direct3D9 register index.
         unsigned register_;
@@ -56,7 +60,7 @@ struct ShaderParameter
 
     union
     {
-        /// Parameter size.
+        /// Parameter size. Used only on Direct3D11 to calculate constant buffer size.
         unsigned size_;
         /// Parameter OpenGL type.
         unsigned glType_;
@@ -64,6 +68,8 @@ struct ShaderParameter
         unsigned regCount_;
     };
 
+    /// Constant buffer index. Only used on Direct3D11.
+    unsigned buffer_;
     /// Constant buffer pointer. Defined only in shader programs.
     ConstantBuffer* bufferPtr_;
 };

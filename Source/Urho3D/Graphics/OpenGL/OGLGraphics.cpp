@@ -1117,7 +1117,7 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, (unsigned)(count * sizeof(float)), data);
+                buffer->SetParameter(info->offset_, (unsigned)(count * sizeof(float)), data);
                 return;
             }
 
@@ -1165,7 +1165,7 @@ void Graphics::SetShaderParameter(StringHash param, float value)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(float), &value);
+                buffer->SetParameter(info->offset_, sizeof(float), &value);
                 return;
             }
 
@@ -1191,7 +1191,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector2), &vector);
+                buffer->SetParameter(info->offset_, sizeof(Vector2), &vector);
                 return;
             }
 
@@ -1224,7 +1224,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetVector3ArrayParameter((unsigned)info->location_, 3, &matrix);
+                buffer->SetVector3ArrayParameter(info->offset_, 3, &matrix);
                 return;
             }
 
@@ -1245,7 +1245,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector3), &vector);
+                buffer->SetParameter(info->offset_, sizeof(Vector3), &vector);
                 return;
             }
 
@@ -1282,7 +1282,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Matrix4), &matrix);
+                buffer->SetParameter(info->offset_, sizeof(Matrix4), &matrix);
                 return;
             }
 
@@ -1303,7 +1303,7 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector4), &vector);
+                buffer->SetParameter(info->offset_, sizeof(Vector4), &vector);
                 return;
             }
 
@@ -1359,7 +1359,7 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
                     dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Matrix4), &fullMatrix);
+                buffer->SetParameter(info->offset_, sizeof(Matrix4), &fullMatrix);
                 return;
             }
 

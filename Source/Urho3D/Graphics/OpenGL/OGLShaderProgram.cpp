@@ -273,29 +273,30 @@ bool ShaderProgram::Link()
         {
             // Store constant uniform
             String paramName = name.Substring(1);
-            ShaderParameter newParam;
-            newParam.name_ = paramName;
-            newParam.glType_ = type;
-            newParam.location_ = location;
-            newParam.bufferPtr_ = 0;
+            ShaderParameter parameter;
+            parameter.name_ = paramName;
+            parameter.glType_ = type;
+            parameter.location_ = location;
+            bool store = location >= 0;
 
 #ifndef GL_ES_VERSION_2_0
             // If running OpenGL 3, the uniform may be inside a constant buffer
-            if (newParam.location_ < 0 && Graphics::GetGL3Support())
+            if (parameter.location_ < 0 && Graphics::GetGL3Support())
             {
                 int blockIndex, blockOffset;
                 glGetActiveUniformsiv(object_.name_, 1, (const GLuint*)&i, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
                 glGetActiveUniformsiv(object_.name_, 1, (const GLuint*)&i, GL_UNIFORM_OFFSET, &blockOffset);
                 if (blockIndex >= 0)
                 {
-                    newParam.location_ = blockOffset;
-                    newParam.bufferPtr_ = constantBuffers_[blockToBinding[blockIndex]];
+                    parameter.offset_ = blockOffset;
+                    parameter.bufferPtr_ = constantBuffers_[blockToBinding[blockIndex]];
+                    store = true;
                 }
             }
 #endif
 
-            if (newParam.location_ >= 0)
-                shaderParameters_[StringHash(paramName)] = newParam;
+            if (store)
+                shaderParameters_[StringHash(paramName)] = parameter;
         }
         else if (location >= 0 && name[0] == 's')
         {

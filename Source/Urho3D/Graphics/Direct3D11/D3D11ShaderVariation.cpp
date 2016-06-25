@@ -204,7 +204,6 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         parameter.buffer_ = buffer;
         parameter.offset_ = offset;
         parameter.size_ = size;
-        parameter.bufferPtr_ = 0;
         parameters_[StringHash(name)] = parameter;
     }
 
@@ -406,7 +405,6 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
                 parameter.buffer_ = cbRegister;
                 parameter.offset_ = varDesc.StartOffset;
                 parameter.size_ = varDesc.Size;
-                parameter.bufferPtr_ = 0;
                 parameters_[varName] = parameter;
             }
         }
