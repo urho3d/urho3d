@@ -20,8 +20,12 @@
 # THE SOFTWARE.
 #
 
+# Save the original values of CC and CXX environment variables before they get altered by CMake in the current process (and all the subprocesses later)
 if (DEFINED CMAKE_CROSSCOMPILING)
     return ()
+else ()
+    set (SAVED_CC $ENV{CC})
+    set (SAVED_CXX $ENV{CXX})
 endif ()
 
 if (CMAKE_TOOLCHAIN_FILE)

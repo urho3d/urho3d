@@ -261,7 +261,7 @@ cache: {directories: $HOME/.ccache}
 android: {components: [build-tools-22.0.1]}
 jdk: oraclejdk8
 sudo: false
-addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz, g++-multilib]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -310,7 +310,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [doxygen, graphviz, cmake, g++-multilib, rpm]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz, g++-multilib, rpm]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
