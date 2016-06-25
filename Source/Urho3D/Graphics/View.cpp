@@ -1077,7 +1077,6 @@ void View::GetLightBatches()
                                 threadedGeometries_.Push(drawable);
                         }
 
-                        Zone* zone = GetZone(drawable);
                         const Vector<SourceBatch>& batches = drawable->GetBatches();
 
                         for (unsigned l = 0; l < batches.Size(); ++l)
@@ -1095,7 +1094,7 @@ void View::GetLightBatches()
 
                             Batch destBatch(srcBatch);
                             destBatch.pass_ = pass;
-                            destBatch.zone_ = zone;
+                            destBatch.zone_ = 0;
 
                             AddBatchToQueue(shadowQueue.shadowBatches_, destBatch, tech);
                         }
