@@ -72,7 +72,7 @@ public:
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
 
 protected:
-    /// Create texture.
+    /// Create the GPU texture.
     virtual bool Create();
 
 private:

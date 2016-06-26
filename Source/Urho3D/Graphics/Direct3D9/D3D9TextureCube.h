@@ -71,9 +71,11 @@ public:
     /// Return render surface for one face.
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }
 
+protected:
+    /// Create the GPU texture.
+    virtual bool Create();
+
 private:
-    /// Create texture.
-    bool Create();
     /// Handle render surface update event.
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 

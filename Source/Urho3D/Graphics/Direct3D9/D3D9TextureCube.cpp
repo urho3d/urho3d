@@ -254,13 +254,13 @@ bool TextureCube::EndLoad()
 
 void TextureCube::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void TextureCube::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -317,25 +317,14 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         faceMemoryUse_[i] = 0;
     }
 
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
-
     if (usage == TEXTURE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
             renderSurfaces_[i] = new RenderSurface(this);
 
-        usage_ |= D3DUSAGE_RENDERTARGET;
-        pool_ = D3DPOOL_DEFAULT;
-
         // Nearest filtering and mipmaps disabled by default
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
-    }
-    else if (usage == TEXTURE_DYNAMIC)
-    {
-        usage_ |= D3DUSAGE_DYNAMIC;
-        pool_ = D3DPOOL_DEFAULT;
     }
 
     if (usage == TEXTURE_RENDERTARGET)
@@ -346,6 +335,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     width_ = size;
     height_ = size;
     format_ = format;
+    usage_ = usage;
 
     return Create();
 }
@@ -401,7 +391,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
     d3dRect.bottom = y + height;
 
     DWORD flags = 0;
-    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
     HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
@@ -810,13 +800,28 @@ bool TextureCube::Create()
         return true;
     }
 
+    unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+    unsigned d3dUsage = 0;
+
+    switch (usage_)
+    {
+    case TEXTURE_DYNAMIC:
+        d3dUsage |= D3DUSAGE_DYNAMIC;
+        break;
+    case TEXTURE_RENDERTARGET:
+        d3dUsage |= D3DUSAGE_RENDERTARGET;
+        break;
+    default:
+        break;
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     HRESULT hr = device->CreateCubeTexture(
         (UINT)width_,
         requestedLevels_,
-        usage_,
+        d3dUsage,
         (D3DFORMAT)format_,
-        (D3DPOOL)pool_,
+        (D3DPOOL)pool,
         (IDirect3DCubeTexture9**)&object_.ptr_,
         0);
     if (FAILED(hr))
@@ -828,7 +833,7 @@ bool TextureCube::Create()
 
     levels_ = ((IDirect3DCubeTexture9*)object_.ptr_)->GetLevelCount();
 
-    if (usage_ & D3DUSAGE_RENDERTARGET)
+    if (usage_ == TEXTURE_RENDERTARGET)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {

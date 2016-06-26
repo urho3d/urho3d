@@ -152,13 +152,13 @@ bool Texture3D::EndLoad()
 
 void Texture3D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void Texture3D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -202,19 +202,11 @@ bool Texture3D::SetSize(int width, int height, int depth, unsigned format, Textu
         return false;
     }
 
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
-
-    if (usage == TEXTURE_DYNAMIC)
-    {
-        usage_ |= D3DUSAGE_DYNAMIC;
-        pool_ = D3DPOOL_DEFAULT;
-    }
-
     width_ = width;
     height_ = height;
     depth_ = depth;
     format_ = format;
+    usage_ = usage;
 
     return Create();
 }
@@ -275,7 +267,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     DWORD flags = 0;
     if (level == 0 && x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth &&
-        pool_ == D3DPOOL_DEFAULT)
+        usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
     HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags);
@@ -610,15 +602,18 @@ bool Texture3D::Create()
         return true;
     }
 
+    unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+    unsigned d3dUsage = usage_ == TEXTURE_DYNAMIC ? D3DUSAGE_DYNAMIC : 0;
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     HRESULT hr = device->CreateVolumeTexture(
         (UINT)width_,
         (UINT)height_,
         (UINT)depth_,
         requestedLevels_,
-        usage_,
+        d3dUsage,
         (D3DFORMAT)format_,
-        (D3DPOOL)pool_,
+        (D3DPOOL)pool,
         (IDirect3DVolumeTexture9**)&object_,
         0);
     if (FAILED(hr))

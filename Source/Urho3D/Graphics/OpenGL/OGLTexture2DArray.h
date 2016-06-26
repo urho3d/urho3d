@@ -75,7 +75,7 @@ public:
     RenderSurface* GetRenderSurface() const { return renderSurface_; }
 
 protected:
-    /// Create texture array.
+    /// Create the GPU texture.
     virtual bool Create();
 
 private:

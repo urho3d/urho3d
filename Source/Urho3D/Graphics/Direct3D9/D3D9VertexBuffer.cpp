@@ -245,12 +245,12 @@ bool VertexBuffer::Create()
         }
 
         unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-        unsigned usage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
+        unsigned d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateVertexBuffer(
             vertexCount_ * vertexSize_,
-            usage,
+            d3dUsage,
             0,
             (D3DPOOL)pool,
             (IDirect3DVertexBuffer9**)&object_.ptr_,

@@ -240,12 +240,12 @@ bool IndexBuffer::Create()
         }
 
         unsigned pool = dynamic_ ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-        unsigned usage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
+        unsigned d3dUsage = dynamic_ ? D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY : 0;
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateIndexBuffer(
             indexCount_ * indexSize_,
-            usage,
+            d3dUsage,
             indexSize_ == sizeof(unsigned) ? D3DFMT_INDEX32 : D3DFMT_INDEX16,
             (D3DPOOL)pool,
             (IDirect3DIndexBuffer9**)&object_,

@@ -134,13 +134,13 @@ bool Texture2DArray::EndLoad()
 
 void Texture2DArray::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void Texture2DArray::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();

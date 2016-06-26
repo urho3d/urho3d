@@ -69,9 +69,11 @@ public:
     /// Return render surface.
     RenderSurface* GetRenderSurface() const { return renderSurface_; }
 
+protected:
+    /// Create the GPU texture.
+    virtual bool Create();
+
 private:
-    /// Create texture.
-    bool Create();
     /// Handle render surface update event.
     void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
 

@@ -65,7 +65,7 @@ public:
     bool GetData(unsigned level, void* dest) const;
 
 protected:
-    /// Create texture.
+    /// Create the GPU texture.
     virtual bool Create();
 
 private:

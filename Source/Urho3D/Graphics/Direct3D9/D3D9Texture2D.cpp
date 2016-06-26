@@ -108,13 +108,13 @@ bool Texture2D::EndLoad()
 
 void Texture2D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_.ptr_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -158,28 +158,16 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 
     // Delete the old rendersurface if any
     renderSurface_.Reset();
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
 
     if (usage == TEXTURE_RENDERTARGET || usage == TEXTURE_DEPTHSTENCIL)
     {
         renderSurface_ = new RenderSurface(this);
-        if (usage == TEXTURE_RENDERTARGET)
-            usage_ |= D3DUSAGE_RENDERTARGET;
-        else
-            usage_ |= D3DUSAGE_DEPTHSTENCIL;
-        pool_ = D3DPOOL_DEFAULT;
 
         // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
         requestedLevels_ = 1;
-    }
-    else if (usage == TEXTURE_DYNAMIC)
-    {
-        usage_ |= D3DUSAGE_DYNAMIC;
-        pool_ = D3DPOOL_DEFAULT;
     }
 
     if (usage == TEXTURE_RENDERTARGET)
@@ -190,6 +178,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     width_ = width;
     height_ = height;
     format_ = format;
+    usage_ = usage;
 
     return Create();
 }
@@ -245,7 +234,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     d3dRect.bottom = y + height;
 
     DWORD flags = 0;
-    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
     HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
@@ -595,9 +584,27 @@ bool Texture2D::Create()
         return true;
     }
 
+    unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+    unsigned d3dUsage = 0;
+
+    switch (usage_)
+    {
+    case TEXTURE_DYNAMIC:
+        d3dUsage |= D3DUSAGE_DYNAMIC;
+        break;
+    case TEXTURE_RENDERTARGET:
+        d3dUsage |= D3DUSAGE_RENDERTARGET;
+        break;
+    case TEXTURE_DEPTHSTENCIL:
+        d3dUsage |= D3DUSAGE_DEPTHSTENCIL;
+        break;
+    default:
+        break;
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
-    if (usage_ & D3DUSAGE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE))
+    if (usage_ == TEXTURE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, d3dUsage, D3DRTYPE_TEXTURE))
     {
         HRESULT hr = device->CreateDepthStencilSurface(
             (UINT)width_,
@@ -623,9 +630,9 @@ bool Texture2D::Create()
             (UINT)width_,
             (UINT)height_,
             requestedLevels_,
-            usage_,
+            d3dUsage,
             (D3DFORMAT)format_,
-            (D3DPOOL)pool_,
+            (D3DPOOL)pool,
             (IDirect3DTexture9**)&object_,
             0);
         if (FAILED(hr))
@@ -637,7 +644,7 @@ bool Texture2D::Create()
 
         levels_ = ((IDirect3DTexture9*)object_.ptr_)->GetLevelCount();
 
-        if (usage_ & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL))
+        if (usage_ >= TEXTURE_RENDERTARGET)
         {
             hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
