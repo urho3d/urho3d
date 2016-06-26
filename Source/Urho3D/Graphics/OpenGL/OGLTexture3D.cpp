@@ -515,17 +515,7 @@ bool Texture3D::Create()
     }
 
     // Set mipmapping
-    levels_ = requestedLevels_;
-    if (!levels_)
-    {
-        unsigned maxSize = (unsigned)Max(Max((int)width_, (int)height_), (int)depth_);
-        while (maxSize)
-        {
-            maxSize >>= 1;
-            ++levels_;
-        }
-    }
-
+    levels_ = CheckMaxLevels(width_, height_, depth_, requestedLevels_);
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
 

@@ -508,17 +508,7 @@ bool Texture2D::Create()
     }
 
     // Set mipmapping
-    levels_ = requestedLevels_;
-    if (!levels_)
-    {
-        unsigned maxSize = Max((int)width_, (int)height_);
-        while (maxSize)
-        {
-            maxSize >>= 1;
-            ++levels_;
-        }
-    }
-
+    levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
