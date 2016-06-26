@@ -242,13 +242,25 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 \section Building_RaspberryPi Raspberry Pi build process
 
-For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above.
+For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above for Linux platform.
 
-For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
+For cross-compiling build on a Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi cross-compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just clone one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. You may pass the optional RPI_ABI build option to specifically target for the Raspberry Pi 2. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
 
 You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DRPI=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target Raspberry Pi device as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target Raspberry Pi device.
+
+\section Building_GenericARM Generic ARM build process (EXPERIMENTAL)
+
+For native build on ARM board itself, use the similar process for \ref Building_Native "Native build process" described above for Linux platform.
+
+> At the moment we only support Linux on generic ARM. Other OSes are not supported yet.
+
+For cross-compiling build on a Linux host system, firstly set the ARM_PREFIX environment variable or build option to point to your ARM cross-compiling tools are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from http://www.linaro.org/downloads/. You need to obtain the little-endian version of the armhf or aarch64 compiler toolchains for setting up a 32-bit or 64-bit build environment, respectively. Secondly, set the ARM_SYSROOT environment variable or build option to point to your generic ARM system root. Similarly you need to obtain the armhf (hard float) sysroot for 32-bit or arm64 (aarch64) sysroot for 64-bit. You must install the Urho3D prerequisites software development packages for Linux platform (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. There are a few ways to obtain and prepare the sysroots yourself but the easiest way is to download the already prepared one from https://github.com/urho3d/armhf-sysroot or https://github.com/urho3d/arm64-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual ARM board to your host system via SSHFS and set the ARM_SYSROOT to use the mount point.
+
+Execute cmake_arm.sh then go to the build tree to execute make command. You may pass the optional ARM_ABI_FLAGS build option to specifically target the CPU and FPU on your ARM board. For example: "-mcpu=cortex-a9 -mfpu=neon-fp16" for ODROID-X2, "-mcpu=cortex-a53" for ODROID-C2, "-mcpu=cortex-a7 -mfpu=neon-vfpv4" for Orange Pi, etc. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
+
+You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DARM=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target ARM board as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target ARM board.
 
 \section Building_MinGW MinGW cross-compile build process
 
@@ -260,7 +272,7 @@ For activating the MinGW toolchain, and to allow it to find the correct compiler
 
 Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "bin" subdirectory.
 
-\section Building_Emscripten Emscripten build process (EXPERIMENTAL)
+\section Building_Emscripten Emscripten build process
 
 > WHAT DOESN'T WORK:
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
