@@ -236,6 +236,10 @@ else ()
                 endif ()
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
+            # FIXME: For yet an unknown reason, CMake seems to fail to setup the sysroot as expected here, so we have to set it manually
+            if (ANDROID)
+                set (COMPILER_FLAGS "${COMPILER_FLAGS} --sysroot=\"${CMAKE_SYSROOT}\"")
+            endif ()
             while (NOT URHO3D_COMPILE_RESULT)
                 try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
                     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}

@@ -88,11 +88,11 @@ include (CheckCompilerToolchain)
 # Extra linker flags for linking against indirect dependencies (linking shared lib with dependencies)
 if (RPI)
     # Extra linker flags for Raspbian because it installs VideoCore libraries in the "/opt/vc/lib" directory (no harm in doing so for other distros)
-    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${RPI_SYSROOT}/opt/vc/lib\"")      # RPI_SYSROOT is empty when not cross-compiling
+    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${CMAKE_SYSROOT}/opt/vc/lib\"")      # CMAKE_SYSROOT is empty when not cross-compiling
 endif ()
 if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CROSSCOMPILING)
     # Cannot do this in the toolchain file because CMAKE_LIBRARY_ARCHITECTURE is not yet defined when CMake is processing toolchain file
-    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${ARM_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${ARM_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
+    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${CMAKE_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${CMAKE_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
 endif ()
 set (CMAKE_REQUIRED_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
 set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
@@ -119,7 +119,7 @@ endif ()
 if (RPI)
     # TODO: this logic is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling
     find_package (VideoCore REQUIRED)
-    include_directories (${VIDEOCORE_INCLUDE_DIRS})
+    include_directories (SYSTEM ${VIDEOCORE_INCLUDE_DIRS})
     link_directories (${VIDEOCORE_LIBRARY_DIRS})
 endif ()
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
@@ -323,8 +323,7 @@ if (URHO3D_LUAJIT)
 endif ()
 
 # Union all the sysroot variables into one so it can be referred to generically later
-# TODO: to be replaced with CMAKE_SYSROOT later if it is more beneficial
-set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
+set (SYSROOT ${CMAKE_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 
 # Clang tools building
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
@@ -422,7 +421,7 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
     endif ()
     find_package (DirectX REQUIRED ${DIRECTX_REQUIRED_COMPONENTS} OPTIONAL_COMPONENTS ${DIRECTX_OPTIONAL_COMPONENTS})
     if (DIRECTX_FOUND)
-        include_directories (${DIRECTX_INCLUDE_DIRS})   # These variables may be empty when WinSDK or MinGW is being used
+        include_directories (SYSTEM ${DIRECTX_INCLUDE_DIRS})   # These variables may be empty when WinSDK or MinGW is being used
         link_directories (${DIRECTX_LIBRARY_DIRS})
     endif ()
 endif ()
@@ -902,12 +901,15 @@ macro (enable_pch HEADER_PATHNAME)
                 string (REPLACE ";" " -D" COMPILE_DEFINITIONS "-D${COMPILE_DEFINITIONS}")
                 string (REPLACE "\"" "\\\"" COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS})
                 string (REPLACE ";" "\" -I\"" INCLUDE_DIRECTORIES "-I\"${INCLUDE_DIRECTORIES}\"")
+                if (CMAKE_SYSROOT)
+                    set (SYSROOT_FLAGS "--sysroot=\"${CMAKE_SYSROOT}\"")
+                endif ()
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                     file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                     # Determine the dependency list

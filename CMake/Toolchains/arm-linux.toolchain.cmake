@@ -94,14 +94,7 @@ if (NOT ARM_SYSROOT)
     set (ARM_PREFIX ${ARM_PREFIX} CACHE STRING "Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)" FORCE)
     set (ARM_SYSROOT ${ARM_SYSROOT} CACHE PATH "Path to ARM system root (ARM on Linux cross-compiling build only)" FORCE)
 endif ()
-set (CMAKE_FIND_ROOT_PATH ${ARM_SYSROOT})
-
-# cache flags (use the same trick found in android.toolchain.cmake)
-set (CMAKE_C_FLAGS "" CACHE STRING "C compiler flags")
-set (CMAKE_CXX_FLAGS "" CACHE STRING "C++ compiler flags")
-# finish flags
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=${ARM_SYSROOT}")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${ARM_SYSROOT}")
+set (CMAKE_SYSROOT ${ARM_SYSROOT})
 
 # only search libraries, and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

@@ -55,8 +55,7 @@ endif ()
 
 # LLVM/Clang is assumed to be installed in a system-wide location when not explicitily defined using env-var
 if (DEFINED ENV{LLVM_CLANG_ROOT})
-    link_directories ($ENV{LLVM_CLANG_ROOT}/lib)
-    include_directories ($ENV{LLVM_CLANG_ROOT}/include)
+    set (CMAKE_SYSROOT $ENV{LLVM_CLANG_ROOT})
 endif ()
 execute_process (COMMAND ${LLVM_CONFIG} --bindir OUTPUT_VARIABLE LLVM_BINDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 

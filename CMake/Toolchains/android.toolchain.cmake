@@ -1319,6 +1319,10 @@ else()
  set( ANDROID_CXX_FLAGS "--sysroot=${ANDROID_SYSROOT}" )
 endif()
 
+# Urho3D: take advantage of CMAKE_SYSROOT variable for setting up of sysroot
+set( CMAKE_SYSROOT ${ANDROID_SYSROOT} )
+unset( ANDROID_CXX_FLAGS )
+
 # NDK flags
 if (ARM64_V8A )
  set( ANDROID_CXX_FLAGS         "${ANDROID_CXX_FLAGS} -funwind-tables" )
@@ -1664,7 +1668,8 @@ set( BUILD_ANDROID True )
 
 # where is the target environment
 # Urho3D: bug fix - should just add paths that look like a system root
-set( CMAKE_FIND_ROOT_PATH ${ANDROID_TOOLCHAIN_ROOT} ${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME} ${ANDROID_SYSROOT} )
+# Urho3D: we don't even need it now because setting CMAKE_SYSROOT will also do this for us
+#set( CMAKE_FIND_ROOT_PATH ${ANDROID_TOOLCHAIN_ROOT} ${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_MACHINE_NAME} ${ANDROID_SYSROOT} )
 
 # only search for libraries and includes in the ndk toolchain
 set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )

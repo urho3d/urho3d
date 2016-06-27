@@ -98,7 +98,7 @@ if (NOT RPI_SYSROOT OR NOT VIDEOCORE_INCLUDE_DIRS OR NOT VIDEOCORE_LIBRARIES)
     set (RPI_PREFIX ${RPI_PREFIX} CACHE STRING "Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)" FORCE)
     set (RPI_SYSROOT ${RPI_SYSROOT} CACHE PATH "Path to Raspberry Pi system root (RPI cross-compiling build only)" FORCE)
 endif ()
-set (CMAKE_FIND_ROOT_PATH ${RPI_SYSROOT})
+set (CMAKE_SYSROOT ${RPI_SYSROOT})
 
 # only search libraries, and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
