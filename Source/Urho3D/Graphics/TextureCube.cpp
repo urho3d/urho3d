@@ -286,7 +286,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
         {
             renderSurfaces_[i] = new RenderSurface(this);
 #ifdef URHO3D_OPENGL
-            renderSurfaces_[i]->SetTarget(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i);
+            renderSurfaces_[i]->target_ = GL_TEXTURE_CUBE_MAP_POSITIVE_X + i;
 #endif
         }
 
