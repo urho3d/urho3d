@@ -27,7 +27,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
     set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 else ()
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
     cmake_minimum_required (VERSION 3.2.3)
     if (COMMAND cmake_policy)
         # Libraries linked via full path no longer produce linker search paths
@@ -46,8 +46,8 @@ else ()
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D CMake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # Setup SDK-like include dir in the build tree for building the Clang-tools
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)

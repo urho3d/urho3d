@@ -21,7 +21,7 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
     else ()
@@ -44,8 +44,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D CMake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # Unescape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)

@@ -712,7 +712,7 @@ def scaffolding dir, project = 'Scaffolding', target = 'Main'
   end
   dir.gsub!(/\//, '\\') if ENV['OS']
   build_script = <<EOF
-# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+# Set CMake minimum version and CMake policy required by UrhoCommon module
 cmake_minimum_required (VERSION 3.2.3)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
@@ -731,8 +731,8 @@ project (#{project})
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D CMake common module
-include (Urho3D-CMake-common)
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
 
 # Define target name
 set (TARGET_NAME #{target})

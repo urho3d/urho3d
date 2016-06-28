@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+# Set CMake minimum version and CMake policy required by UrhoCommon module
 cmake_minimum_required (VERSION 3.2.3)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
@@ -39,8 +39,8 @@ project (Urho3D)
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D CMake common module
-include (Urho3D-CMake-common)
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
 
 # Setup SDK install destinations
 set (PATH_SUFFIX Urho3D)
@@ -69,7 +69,7 @@ set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
-install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the Urho3D-CMake-common module
+install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the UrhoCommon module
 # Install resource directories required by applications built with Urho3D library
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Autoload ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data DESTINATION ${DEST_SHARE_DIR}/Resources)
 # Install CMake modules and toolchains provided by and for Urho3D

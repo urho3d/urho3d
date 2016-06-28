@@ -24,7 +24,7 @@
 # The cross-compiling logic is ported to CMake as faithful as possible although currently Urho3D does not support all target archs supported by LuaJIT
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
     else ()
@@ -47,8 +47,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D CMake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
     if (XCODE AND DEFINED ENV{CI})

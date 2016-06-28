@@ -566,7 +566,7 @@ The physical project root directory is also the logical project source tree in C
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
-# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+# Set CMake minimum version and CMake policy required by UrhoCommon module
 cmake_minimum_required (VERSION 3.2.3)
 if (COMMAND cmake_policy)
     # Libraries linked via full path no longer produce linker search paths
@@ -585,8 +585,8 @@ project (MyProjectName)
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D CMake common module
-include (Urho3D-CMake-common)
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
 
 # Define target name
 set (TARGET_NAME MyExecutableName)
@@ -598,7 +598,7 @@ define_source_files ()
 setup_main_executable ()
 \endcode
 
-The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project. It does this by automatically finding the required software library components specific for your target platform and configuring your project to use them together with the platform-specific compiler flags and definitions. It utilizes CMake-provided as well as Urho3D custom-made FindXXX modules to get the work done. So, it is important to get the CMAKE_MODULE_PATH setup correctly in your project early on.
+The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The UrhoCommon.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project. It does this by automatically finding the required software library components specific for your target platform and configuring your project to use them together with the platform-specific compiler flags and definitions. It utilizes CMake-provided as well as Urho3D custom-made FindXXX modules to get the work done. So, it is important to get the CMAKE_MODULE_PATH setup correctly in your project early on.
 
 Your own project naturally depends on Urho3D project, or to be more precise it depends on Urho3D library. The Urho3D library needs to be built first so that it can be found later by your own project. When using GCC/Clang or one of its derivatives, both Urho3D static and shared libraries could be potentially built/installed at a same location and coexist. In such cases the FindUrho3D.cmake module, the module responsible to find Urho3D software library component, has precedence to first find the static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to override this precedence. When using MSVC compiler, both static and shared libraries could not be built/installed at a same location because both the static library and import library have a same file extension. However, for MSVC, it is possible to have both Release and Debug versions of either static or shared library type built/installed at a same location. In such cases the FindUrho3D.cmake module would automatically utilize both of Release and Debug versions as appropriate in your project for Release and Debug build configuration, respectively, without user intervention.
 
