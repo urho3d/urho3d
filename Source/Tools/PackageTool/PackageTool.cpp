@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/IO/PackageFile.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -91,10 +92,18 @@ void Run(const Vector<String>& arguments)
             "Options:\n"
             "-c      Enable package file LZ4 compression\n"
             "-q      Enable quiet mode\n"
+            "\n"
+            "Basepath is an optional prefix that will be added to the file entries.\n\n"
+            "Alternative output usage: PackageTool <output option> <package name>\n"
+            "Output option:\n"
+            "-i      Output package file information\n"
+            "-l      Output file names (including their paths) contained in the package\n"
+            "-L      Similar to -l but also output compression ratio (compressed package file only)\n"
         );
 
     const String& dirName = arguments[0];
     const String& packageName = arguments[1];
+    bool isOutputMode = arguments[0].Length() == 2 && arguments[0][0] == '-';
     if (arguments.Size() > 2)
     {
         for (unsigned i = 2; i < arguments.Size(); ++i)
@@ -113,39 +122,85 @@ void Run(const Vector<String>& arguments)
                     case 'q':
                         quiet_ = true;
                         break;
+                    default:
+                        ErrorExit("Unrecognized option");
                     }
                 }
             }
         }
     }
 
-    if (!quiet_)
-        PrintLine("Scanning directory " + dirName + " for files");
-
-   // Get the file list recursively
-    Vector<String> fileNames;
-    fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
-    if (!fileNames.Size())
-        ErrorExit("No files found");
-
-    // Check for extensions to ignore
-    for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
+    if (!isOutputMode)
     {
-        String extension = GetExtension(fileNames[i]);
-        for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
+        if (!quiet_)
+            PrintLine("Scanning directory " + dirName + " for files");
+
+        // Get the file list recursively
+        Vector<String> fileNames;
+        fileSystem_->ScanDir(fileNames, dirName, "*.*", SCAN_FILES, true);
+        if (!fileNames.Size())
+            ErrorExit("No files found");
+
+        // Check for extensions to ignore
+        for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
         {
-            if (extension == ignoreExtensions_[j])
+            String extension = GetExtension(fileNames[i]);
+            for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
             {
-                fileNames.Erase(fileNames.Begin() + i);
-                break;
+                if (extension == ignoreExtensions_[j])
+                {
+                    fileNames.Erase(fileNames.Begin() + i);
+                    break;
+                }
             }
         }
+
+        for (unsigned i = 0; i < fileNames.Size(); ++i)
+            ProcessFile(fileNames[i], dirName);
+
+        WritePackageFile(packageName, dirName);
     }
-
-    for (unsigned i = 0; i < fileNames.Size(); ++i)
-        ProcessFile(fileNames[i], dirName);
-
-    WritePackageFile(packageName, dirName);
+    else
+    {
+        SharedPtr<PackageFile> packageFile(new PackageFile(context_, packageName));
+        bool outputCompressionRatio = false;
+        switch (arguments[0][1])
+        {
+        case 'i':
+            PrintLine("Number of files: " + String(packageFile->GetNumFiles()));
+            PrintLine("File data size: " + String(packageFile->GetTotalDataSize()));
+            PrintLine("Package size: " + String(packageFile->GetTotalSize()));
+            PrintLine("Checksum: " + String(packageFile->GetChecksum()));
+            PrintLine("Compressed: " + String(packageFile->IsCompressed() ? "yes" : "no"));
+            break;
+        case 'L':
+            if (!packageFile->IsCompressed())
+                ErrorExit("Invalid output option: -L is applicable for compressed package file only");
+            outputCompressionRatio = true;
+            // Fallthrough
+        case 'l':
+            {
+                const HashMap<String, PackageEntry>& entries = packageFile->GetEntries();
+                for (HashMap<String, PackageEntry>::ConstIterator i = entries.Begin(); i != entries.End();)
+                {
+                    HashMap<String, PackageEntry>::ConstIterator current = i++;
+                    String fileEntry(current->first_);
+                    if (outputCompressionRatio)
+                    {
+                        unsigned compressedSize =
+                            (i == entries.End() ? packageFile->GetTotalSize() - sizeof(unsigned) : i->second_.offset_) -
+                            current->second_.offset_;
+                        fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", current->second_.size_, compressedSize,
+                            compressedSize ? 1.f * current->second_.size_ / compressedSize : 0.f);
+                    }
+                    PrintLine(fileEntry);
+                }
+            }
+            break;
+        default:
+            ErrorExit("Unrecognized output option");
+        }
+    }
 }
 
 void ProcessFile(const String& fileName, const String& rootDir)
@@ -180,18 +235,19 @@ void WritePackageFile(const String& fileName, const String& rootDir)
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
         // Write entry (correct offset is still unknown, will be filled in later)
-        dest.WriteString(entries_[i].name_);
+        dest.WriteString(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);
     }
 
     unsigned totalDataSize = 0;
+    unsigned lastOffset;
 
     // Write file data, calculate checksums & correct offsets
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-        entries_[i].offset_ = dest.GetSize();
+        lastOffset = entries_[i].offset_ = dest.GetSize();
         String fileFullPath = rootDir + "/" + entries_[i].name_;
 
         File srcFile(context_, fileFullPath);
@@ -223,7 +279,6 @@ void WritePackageFile(const String& fileName, const String& rootDir)
             SharedArrayPtr<unsigned char> compressBuffer(new unsigned char[LZ4_compressBound(blockSize_)]);
 
             unsigned pos = 0;
-            unsigned totalPackedBytes = 0;
 
             while (pos < dataSize)
             {
@@ -231,20 +286,25 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (pos + unpackedSize > dataSize)
                     unpackedSize = dataSize - pos;
 
-                unsigned packedSize = LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
+                unsigned packedSize = (unsigned)LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + pos);
 
-                dest.WriteUShort(unpackedSize);
-                dest.WriteUShort(packedSize);
+                dest.WriteUShort((unsigned short)unpackedSize);
+                dest.WriteUShort((unsigned short)packedSize);
                 dest.Write(compressBuffer.Get(), packedSize);
-                totalPackedBytes += 6 + packedSize;
 
                 pos += unpackedSize;
             }
 
             if (!quiet_)
-                PrintLine(entries_[i].name_ + " in " + String(dataSize) + " out " + String(totalPackedBytes));
+            {
+                unsigned totalPackedBytes = dest.GetSize() - lastOffset;
+                String fileEntry(entries_[i].name_);
+                fileEntry.AppendWithFormat("\tin: %u\tout: %u\tratio: %f", dataSize, totalPackedBytes,
+                    totalPackedBytes ? 1.f * dataSize / totalPackedBytes : 0.f);
+                PrintLine(fileEntry);
+            }
         }
     }
 
@@ -258,7 +318,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
     for (unsigned i = 0; i < entries_.Size(); ++i)
     {
-        dest.WriteString(entries_[i].name_);
+        dest.WriteString(basePath_ + entries_[i].name_);
         dest.WriteUInt(entries_[i].offset_);
         dest.WriteUInt(entries_[i].size_);
         dest.WriteUInt(entries_[i].checksum_);
@@ -266,9 +326,11 @@ void WritePackageFile(const String& fileName, const String& rootDir)
 
     if (!quiet_)
     {
-        PrintLine("Number of files " + String(entries_.Size()));
-        PrintLine("File data size " + String(totalDataSize));
-        PrintLine("Package size " + String(dest.GetSize()));
+        PrintLine("Number of files: " + String(entries_.Size()));
+        PrintLine("File data size: " + String(totalDataSize));
+        PrintLine("Package size: " + String(dest.GetSize()));
+        PrintLine("Checksum: " + String(checksum_));
+        PrintLine("Compressed: " + String(compress_ ? "yes" : "no"));
     }
 }
 

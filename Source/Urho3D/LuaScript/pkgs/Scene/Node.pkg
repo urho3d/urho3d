@@ -23,7 +23,12 @@ class Node : public Animatable
     virtual ~Node();
 
     tolua_outside bool NodeSaveXML @ SaveXML(File* dest, const String indentation = "\t") const;
+    tolua_outside bool NodeSaveJSON @ SaveJSON(File* dest, const String indentation = "\t") const;
     void SetName(const String name);
+    void AddTag(const String tag);
+    void AddTags(const String tags, char separator);
+    bool RemoveTag(const String tag);
+    void RemoveAllTags();
 
     void SetPosition(const Vector3& position);
     void SetPosition2D(const Vector2& position);
@@ -174,6 +179,8 @@ class Node : public Animatable
 
     // template <class T> T* GetComponent() const;
     Component* GetComponent(const String type, bool recursive = false) const;
+    // template <class T> T* GetParentComponent() const;
+    Component* GetParentComponent(const String type, bool recursive = false) const;
 
     // template <class T> void GetComponents(PODVector<T*>& dest, bool recursive = false) const;
     tolua_outside const PODVector<Component*>& NodeGetComponentsWithType @ GetComponents(const String type, bool recursive = false);
@@ -184,9 +191,16 @@ class Node : public Animatable
 
     bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
     bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
+    bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED);
 
     Node* CreateChild(unsigned id, CreateMode mode);
     void AddComponent(Component* component, unsigned id, CreateMode mode);
+
+    bool HasTag(const String tag) const;
+    const StringVector& GetTags() const;
+
+    // void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
 
     tolua_readonly tolua_property__get_set unsigned ID;
     tolua_property__get_set String name;
@@ -237,6 +251,11 @@ static int tolua_SceneLuaAPI_Node_new00_local(lua_State* tolua_S)
 static bool NodeSaveXML(const Node* node, File* file, const String& indentation)
 {
     return file ? node->SaveXML(*file, indentation) : false;
+}
+
+static bool NodeSaveJSON(const Node* node, File* file, const String& indentation)
+{
+    return file ? node->SaveJSON(*file, indentation) : false;
 }
 
 #define TOLUA_DISABLE_tolua_SceneLuaAPI_Node_CreateScriptObject00
@@ -421,6 +440,14 @@ static const PODVector<Node*>& NodeGetChildrenWithComponent(Node* node, String t
     static PODVector<Node*> result;
     result.Clear();
     node->GetChildrenWithComponent(result, type, recursive);
+    return result;
+}
+
+static const PODVector<Node*>& NodeGetChildrenWithTag(const Node* node, const String& tag, bool recursive)
+{
+    static PODVector<Node*> result;
+    result.Clear();
+    node->GetChildrenWithTag(result, tag, recursive);
     return result;
 }
 $}

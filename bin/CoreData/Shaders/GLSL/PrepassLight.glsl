@@ -63,6 +63,10 @@ void PS()
         vec4 normalInput = texture2DProj(sNormalBuffer, vScreenPos);
     #endif
 
+    // Position acquired via near/far ray is relative to camera. Bring position to world space
+    vec3 eyeVec = -worldPos;
+    worldPos += cCameraPosPS;
+
     vec3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     vec4 projWorldPos = vec4(worldPos, 1.0);
     vec3 lightColor;
@@ -72,7 +76,7 @@ void PS()
     float diff = 0.5 * GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
-        diff *= GetShadowDeferred(projWorldPos, depth);
+        diff *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
     
     #if defined(SPOTLIGHT)
@@ -86,7 +90,7 @@ void PS()
     #endif
 
     #ifdef SPECULAR
-        float spec = lightColor.g * GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);
+        float spec = lightColor.g * GetSpecular(normal, eyeVec, lightDir, normalInput.a * 255.0);
         gl_FragColor = diff * vec4(lightColor, spec * cLightColor.a);
     #else
         gl_FragColor = diff * vec4(lightColor, 0.0);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ enum CollisionEventMode
 /// Physics rigid body component.
 class URHO3D_API RigidBody : public Component, public btMotionState
 {
-    OBJECT(RigidBody, Component);
+    URHO3D_OBJECT(RigidBody, Component);
 
 public:
     /// Construct.
@@ -225,7 +225,7 @@ public:
     /// Return collision event signaling mode.
     CollisionEventMode GetCollisionEventMode() const { return collisionEventMode_; }
 
-    /// Return colliding rigid bodies from the last simulation step.
+    /// Return colliding rigid bodies from the last simulation step. Only returns collisions that were sent as events (depends on collision event mode) and excludes e.g. static-static collisions.
     void GetCollidingBodies(PODVector<RigidBody*>& result) const;
 
     /// Apply new world transform after a simulation step. Called internally.
@@ -305,6 +305,8 @@ private:
     bool inWorld_;
     /// Mass update enable flag.
     bool enableMassUpdate_;
+    /// Internal flag whether has simulated at least once.
+    mutable bool hasSimulated_;
 };
 
 }

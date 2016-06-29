@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ class Vehicle;
 ///     - Defining attributes (including node and component references) of a custom component so that it can be saved and loaded
 class VehicleDemo : public Sample
 {
-    OBJECT(VehicleDemo, Sample);
+    URHO3D_OBJECT(VehicleDemo, Sample);
 
 public:
     /// Construct.

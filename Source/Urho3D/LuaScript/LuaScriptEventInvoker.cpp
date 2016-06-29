@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,9 +52,9 @@ void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& ev
         return;
 
     if (sender)
-        SubscribeToEvent(sender, eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
+        SubscribeToEvent(sender, eventType, URHO3D_HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
     else
-        SubscribeToEvent(eventType, HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
+        SubscribeToEvent(eventType, URHO3D_HANDLER_USERDATA(LuaScriptEventInvoker, HandleLuaScriptEvent, function));
 }
 
 void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData)

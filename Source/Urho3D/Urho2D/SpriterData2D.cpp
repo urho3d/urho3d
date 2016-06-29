@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -416,7 +416,13 @@ bool Timeline::Load(const pugi::xml_node& node)
     id_ = node.attribute("id").as_int();
     name_ = node.attribute("name").as_string();
 
-    String typeString = node.attribute("type").as_string("sprite");
+    String typeString;
+    xml_attribute typeAttr = node.attribute("type");
+    if (typeAttr.empty())
+        typeString = node.attribute("object_type").as_string("sprite");
+    else
+        typeString = typeAttr.as_string("sprite");
+    
     if (typeString == "bone")
     {
         objectType_ = BONE;

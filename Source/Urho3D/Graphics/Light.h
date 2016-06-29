@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,9 +45,9 @@ static const float SHADOW_MIN_QUANTIZE = 0.1f;
 static const float SHADOW_MIN_VIEW = 1.0f;
 static const int MAX_LIGHT_SPLITS = 6;
 #ifdef DESKTOP_GRAPHICS
-static const int MAX_CASCADE_SPLITS = 4;
+static const unsigned MAX_CASCADE_SPLITS = 4;
 #else
-static const int MAX_CASCADE_SPLITS = 1;
+static const unsigned MAX_CASCADE_SPLITS = 1;
 #endif
 
 /// Shadow depth bias parameters.
@@ -59,9 +59,10 @@ struct URHO3D_API BiasParameters
     }
 
     /// Construct with initial values.
-    BiasParameters(float constantBias, float slopeScaledBias) :
+    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f) :
         constantBias_(constantBias),
-        slopeScaledBias_(slopeScaledBias)
+        slopeScaledBias_(slopeScaledBias),
+        normalOffset_(normalOffset)
     {
     }
 
@@ -72,6 +73,8 @@ struct URHO3D_API BiasParameters
     float constantBias_;
     /// Slope scaled bias.
     float slopeScaledBias_;
+    /// Normal offset multiplier.
+    float normalOffset_;
 };
 
 /// Cascaded shadow map parameters.
@@ -150,7 +153,7 @@ struct URHO3D_API FocusParameters
 /// %Light component.
 class URHO3D_API Light : public Drawable
 {
-    OBJECT(Light, Drawable);
+    URHO3D_OBJECT(Light, Drawable);
 
 public:
     /// Construct.
@@ -195,7 +198,7 @@ public:
     void SetShadowCascade(const CascadeParameters& parameters);
     /// Set shadow map focusing parameters.
     void SetShadowFocus(const FocusParameters& parameters);
-    /// Set shadow intensity between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
+    /// Set light intensity in shadow between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
     /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
     void SetShadowResolution(float resolution);
@@ -251,7 +254,7 @@ public:
     /// Return shadow map focus parameters.
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
 
-    /// Return shadow intensity.
+    /// Return light intensity in shadow.
     float GetShadowIntensity() const { return shadowIntensity_; }
 
     /// Return shadow resolution.
@@ -268,6 +271,9 @@ public:
 
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
+    /// Return spotlight frustum in the specified view space.
+    Frustum GetViewSpaceFrustum(const Matrix3x4& view) const;
+
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
     int GetNumShadowSplits() const;
 
@@ -300,6 +306,9 @@ public:
     ResourceRef GetRampTextureAttr() const;
     /// Return shape texture attribute.
     ResourceRef GetShapeTextureAttr() const;
+
+    /// Return a transform for deferred fullscreen quad (directional light) rendering.
+    static Matrix3x4 GetFullscreenQuadTransform(Camera* camera);
 
 protected:
     /// Recalculate the world-space bounding box.
@@ -338,7 +347,7 @@ private:
     float fadeDistance_;
     /// Shadow fade start distance.
     float shadowFadeDistance_;
-    /// Shadow intensity.
+    /// Light intensity in shadow.
     float shadowIntensity_;
     /// Shadow resolution.
     float shadowResolution_;

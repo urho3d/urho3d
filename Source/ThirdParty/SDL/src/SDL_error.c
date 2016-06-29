@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,7 +50,7 @@ SDL_LookupString(const char *key)
 /* Public functions */
 
 int
-SDL_SetError(const char *fmt, ...)
+SDL_SetError(SDL_PRINTF_FORMAT_STRING const char *fmt, ...)
 {
     va_list ap;
     SDL_error *error;
@@ -111,7 +111,7 @@ SDL_SetError(const char *fmt, ...)
     va_end(ap);
 
     /* If we are in debug mode, print out an error message */
-    SDL_LogError(SDL_LOG_CATEGORY_ERROR, "%s", SDL_GetError());
+    SDL_LogDebug(SDL_LOG_CATEGORY_ERROR, "%s", SDL_GetError());
 
     return -1;
 }
@@ -120,7 +120,7 @@ SDL_SetError(const char *fmt, ...)
    so that it supports internationalization and thread-safe errors.
 */
 static char *
-SDL_GetErrorMsg(char *errstr, unsigned int maxlen)
+SDL_GetErrorMsg(char *errstr, int maxlen)
 {
     SDL_error *error;
 
@@ -163,37 +163,55 @@ SDL_GetErrorMsg(char *errstr, unsigned int maxlen)
                     len =
                         SDL_snprintf(msg, maxlen, tmp,
                                      error->args[argi++].value_i);
-                    msg += len;
-                    maxlen -= len;
+                    if (len > 0) {
+                        msg += len;
+                        maxlen -= len;
+                    }
                     break;
+
                 case 'f':
                     len =
                         SDL_snprintf(msg, maxlen, tmp,
                                      error->args[argi++].value_f);
-                    msg += len;
-                    maxlen -= len;
+                    if (len > 0) {
+                        msg += len;
+                        maxlen -= len;
+                    }
                     break;
+
                 case 'p':
                     len =
                         SDL_snprintf(msg, maxlen, tmp,
                                      error->args[argi++].value_ptr);
-                    msg += len;
-                    maxlen -= len;
+                    if (len > 0) {
+                        msg += len;
+                        maxlen -= len;
+                    }
                     break;
+
                 case 's':
                     len =
                         SDL_snprintf(msg, maxlen, tmp,
                                      SDL_LookupString(error->args[argi++].
                                                       buf));
-                    msg += len;
-                    maxlen -= len;
+                    if (len > 0) {
+                        msg += len;
+                        maxlen -= len;
+                    }
                     break;
+
                 }
             } else {
                 *msg++ = *fmt++;
                 maxlen -= 1;
             }
         }
+
+        /* slide back if we've overshot the end of our buffer. */
+        if (maxlen < 0) {
+            msg -= (-maxlen) + 1;
+        }
+
         *msg = 0;               /* NULL terminate the string */
     }
     return (errstr);

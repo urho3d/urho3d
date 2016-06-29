@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,10 @@ namespace Urho3D
 {
 
 /// A command has been entered on the console.
-EVENT(E_CONSOLECOMMAND, ConsoleCommand)
+URHO3D_EVENT(E_CONSOLECOMMAND, ConsoleCommand)
 {
-    PARAM(P_COMMAND, Command);              // String
-    PARAM(P_ID, Id);                        // String
+    URHO3D_PARAM(P_COMMAND, Command);              // String
+    URHO3D_PARAM(P_ID, Id);                        // String
 }
 
 }

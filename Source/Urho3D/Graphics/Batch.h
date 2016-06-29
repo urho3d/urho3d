@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,7 @@ struct Batch
         material_(rhs.material_),
         worldTransform_(rhs.worldTransform_),
         numWorldTransforms_(rhs.numWorldTransforms_),
+        instancingData_(rhs.instancingData_),
         lightQueue_(0),
         geometryType_(rhs.geometryType_)
     {
@@ -73,9 +74,10 @@ struct Batch
     /// Calculate state sorting key, which consists of base pass flag, light, pass and geometry.
     void CalculateSortKey();
     /// Prepare for rendering.
-    void Prepare(View* view, bool setModelTransform, bool allowDepthWrite) const;
+    void Prepare(View* view, Camera* camera, bool setModelTransform, bool allowDepthWrite) const;
     /// Prepare and draw.
-    void Draw(View* view, bool allowDepthWrite) const;
+    void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
+
     /// State sorting key.
     unsigned long long sortKey_;
     /// Distance from camera.
@@ -84,7 +86,7 @@ struct Batch
     unsigned char renderOrder_;
     /// 8-bit light mask for stencil marking in deferred rendering.
     unsigned char lightMask_;
-   /// Base batch flag. This tells to draw the object fully without light optimizations.
+    /// Base batch flag. This tells to draw the object fully without light optimizations.
     bool isBase_;
     /// Geometry.
     Geometry* geometry_;
@@ -94,8 +96,8 @@ struct Batch
     const Matrix3x4* worldTransform_;
     /// Number of world transforms.
     unsigned numWorldTransforms_;
-    /// Camera.
-    Camera* camera_;
+    /// Per-instance data. If not null, must contain enough data to fill instancing buffer.
+    void* instancingData_;
     /// Zone.
     Zone* zone_;
     /// Light properties.
@@ -118,15 +120,18 @@ struct InstanceData
     {
     }
 
-    /// Construct with transform and distance.
-    InstanceData(const Matrix3x4* worldTransform, float distance) :
+    /// Construct with transform, instancing data and distance.
+    InstanceData(const Matrix3x4* worldTransform, const void* instancingData, float distance) :
         worldTransform_(worldTransform),
+        instancingData_(instancingData),
         distance_(distance)
     {
     }
 
     /// World transform.
     const Matrix3x4* worldTransform_;
+    /// Instancing data buffer.
+    const void* instancingData_;
     /// Distance from camera.
     float distance_;
 };
@@ -157,6 +162,7 @@ struct BatchGroup : public Batch
     {
         InstanceData newInstance;
         newInstance.distance_ = batch.distance_;
+        newInstance.instancingData_ = batch.instancingData_;
 
         for (unsigned i = 0; i < batch.numWorldTransforms_; ++i)
         {
@@ -165,10 +171,10 @@ struct BatchGroup : public Batch
         }
     }
 
-    /// Pre-set the instance transforms. Buffer must be big enough to hold all transforms.
-    void SetTransforms(void* lockedData, unsigned& freeIndex);
+    /// Pre-set the instance data. Buffer must be big enough to hold all data.
+    void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
     /// Prepare and draw.
-    void Draw(View* view, bool allowDepthWrite) const;
+    void Draw(View* view, Camera* camera, bool allowDepthWrite) const;
 
     /// Instance data.
     PODVector<InstanceData> instances_;
@@ -238,10 +244,10 @@ public:
     void SortFrontToBack();
     /// Sort batches front to back while also maintaining state sorting.
     void SortFrontToBack2Pass(PODVector<Batch*>& batches);
-    /// Pre-set instance transforms of all groups. The vertex buffer must be big enough to hold all transforms.
-    void SetTransforms(void* lockedData, unsigned& freeIndex);
+    /// Pre-set instance data of all groups. The vertex buffer must be big enough to hold all data.
+    void SetInstancingData(void* lockedData, unsigned stride, unsigned& freeIndex);
     /// Draw.
-    void Draw(View* view, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const;
+    void Draw(View* view, Camera* camera, bool markToStencil, bool usingLightOptimization, bool allowDepthWrite) const;
     /// Return the combined amount of instances.
     unsigned GetNumInstances() const;
 

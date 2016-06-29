@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ template <class T> unsigned MakeHash(kNet::MessageConnection* value)
 /// %Network subsystem. Manages client-server communications using the UDP protocol.
 class URHO3D_API Network : public Object, public kNet::IMessageHandler, public kNet::INetworkServerListener
 {
-    OBJECT(Network, Object);
+    URHO3D_OBJECT(Network, Object);
 
 public:
     /// Construct.

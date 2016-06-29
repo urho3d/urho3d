@@ -1,6 +1,6 @@
 /*
 ** x86/x64 instruction emitter.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 /* -- Emit basic instructions --------------------------------------------- */
@@ -241,10 +241,6 @@ static void emit_gmrmi(ASMState *as, x86Group xg, Reg rb, int32_t i)
 
 /* -- Emit loads/stores --------------------------------------------------- */
 
-/* Instruction selection for XMM moves. */
-#define XMM_MOVRR(as)	((as->flags & JIT_F_SPLIT_XMM) ? XO_MOVSD : XO_MOVAPS)
-#define XMM_MOVRM(as)	((as->flags & JIT_F_SPLIT_XMM) ? XO_MOVLPD : XO_MOVSD)
-
 /* mov [base+ofs], i */
 static void emit_movmroi(ASMState *as, Reg base, int32_t ofs, int32_t i)
 {
@@ -314,7 +310,7 @@ static void emit_loadn(ASMState *as, Reg r, cTValue *tv)
   if (tvispzero(tv))  /* Use xor only for +0. */
     emit_rr(as, XO_XORPS, r, r);
   else
-    emit_rma(as, XMM_MOVRM(as), r, &tv->n);
+    emit_rma(as, XO_MOVSD, r, &tv->n);
 }
 
 /* -- Emit control-flow instructions -------------------------------------- */
@@ -427,25 +423,25 @@ static void emit_movrr(ASMState *as, IRIns *ir, Reg dst, Reg src)
   if (dst < RID_MAX_GPR)
     emit_rr(as, XO_MOV, REX_64IR(ir, dst), src);
   else
-    emit_rr(as, XMM_MOVRR(as), dst, src);
+    emit_rr(as, XO_MOVAPS, dst, src);
 }
 
-/* Generic load of register from stack slot. */
-static void emit_spload(ASMState *as, IRIns *ir, Reg r, int32_t ofs)
+/* Generic load of register with base and (small) offset address. */
+static void emit_loadofs(ASMState *as, IRIns *ir, Reg r, Reg base, int32_t ofs)
 {
   if (r < RID_MAX_GPR)
-    emit_rmro(as, XO_MOV, REX_64IR(ir, r), RID_ESP, ofs);
+    emit_rmro(as, XO_MOV, REX_64IR(ir, r), base, ofs);
   else
-    emit_rmro(as, irt_isnum(ir->t) ? XMM_MOVRM(as) : XO_MOVSS, r, RID_ESP, ofs);
+    emit_rmro(as, irt_isnum(ir->t) ? XO_MOVSD : XO_MOVSS, r, base, ofs);
 }
 
-/* Generic store of register to stack slot. */
-static void emit_spstore(ASMState *as, IRIns *ir, Reg r, int32_t ofs)
+/* Generic store of register with base and (small) offset address. */
+static void emit_storeofs(ASMState *as, IRIns *ir, Reg r, Reg base, int32_t ofs)
 {
   if (r < RID_MAX_GPR)
-    emit_rmro(as, XO_MOVto, REX_64IR(ir, r), RID_ESP, ofs);
+    emit_rmro(as, XO_MOVto, REX_64IR(ir, r), base, ofs);
   else
-    emit_rmro(as, irt_isnum(ir->t) ? XO_MOVSDto : XO_MOVSSto, r, RID_ESP, ofs);
+    emit_rmro(as, irt_isnum(ir->t) ? XO_MOVSDto : XO_MOVSSto, r, base, ofs);
 }
 
 /* Add offset to pointer. */

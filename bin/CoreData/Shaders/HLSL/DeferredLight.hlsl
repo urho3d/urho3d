@@ -72,7 +72,11 @@ void PS(
         float4 albedoInput = Sample2DProj(AlbedoBuffer, iScreenPos);
         float4 normalInput = Sample2DProj(NormalBuffer, iScreenPos);
     #endif
-    
+
+    // Position acquired via near/far ray is relative to camera. Bring position to world space
+    float3 eyeVec = -worldPos;
+    worldPos += cCameraPosPS;
+
     float3 normal = normalize(normalInput.rgb * 2.0 - 1.0);
     float4 projWorldPos = float4(worldPos, 1.0);
     float3 lightColor;
@@ -81,7 +85,7 @@ void PS(
     float diff = GetDiffuse(normal, worldPos, lightDir);
 
     #ifdef SHADOW
-        diff *= GetShadowDeferred(projWorldPos, depth);
+        diff *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -94,7 +98,7 @@ void PS(
     #endif
 
     #ifdef SPECULAR
-        float spec = GetSpecular(normal, -worldPos, lightDir, normalInput.a * 255.0);
+        float spec = GetSpecular(normal, eyeVec, lightDir, normalInput.a * 255.0);
         oColor = diff * float4(lightColor * (albedoInput.rgb + spec * cLightColor.a * albedoInput.aaa), 0.0);
     #else
         oColor = diff * float4(lightColor * albedoInput.rgb, 0.0);

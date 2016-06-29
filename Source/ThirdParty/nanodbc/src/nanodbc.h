@@ -74,50 +74,116 @@
 #ifndef NANODBC_H
 #define NANODBC_H
 
-#include <cstdint>
 #include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+#ifndef __clang__
+    #include <cstdint>
+#endif
+
 //! \brief The entirety of nanodbc can be found within this one namespace.
 //! \note This library does not make any exception safety guarantees, but should work just fine with a threading enabled ODBC driver. If you want to use nanodbc objects in threads I recommend each thread keep their own connection to the database. Otherwise you must synchronize any access to nanodbc objects.
 namespace nanodbc
 {
 
+//  .d8888b.                     .d888 d8b                                   888    d8b
+// d88P  Y88b                   d88P"  Y8P                                   888    Y8P
+// 888    888                   888                                          888
+// 888         .d88b.  88888b.  888888 888  .d88b.  888  888 888d888 8888b.  888888 888  .d88b.  88888b.
+// 888        d88""88b 888 "88b 888    888 d88P"88b 888  888 888P"      "88b 888    888 d88""88b 888 "88b
+// 888    888 888  888 888  888 888    888 888  888 888  888 888    .d888888 888    888 888  888 888  888
+// Y88b  d88P Y88..88P 888  888 888    888 Y88b 888 Y88b 888 888    888  888 Y88b.  888 Y88..88P 888  888
+//  "Y8888P"   "Y88P"  888  888 888    888  "Y88888  "Y88888 888    "Y888888  "Y888 888  "Y88P"  888  888
+//                                              888
+//                                         Y8b d88P
+//                                          "Y88P"
+// MARK: Configuration -
+
+//! \addtogroup macros Macros
+//! \brief Macros that nanodbc uses, can be overriden by users.
+//!
+//! @{
+
+#ifdef DOXYGEN
+    //! \def NANODBC_ASSERT(expression)
+    //! \brief Assertion.
+    //!
+    //! By default, nanodbc uses C \c assert() for internal assertions.
+    //! User can override it by defining \c NANODBC_ASSERT(expr) macro
+    //! in the nanodbc.h file and customizing it as desired,
+    //! before building the library.
+    //!
+    //! \code{.cpp}
+    //! #ifdef _DEBUG
+    //!     #include <crtdbg.h>
+    //!     #define NANODBC_ASSERT _ASSERTE
+    //! #endif
+    //! \endcode
+    #define NANODBC_ASSERT(expression) assert(expression)
+#endif
+
+//! @}
+
 // You must explicitly request Unicode support by defining NANODBC_USE_UNICODE at compile time.
 #ifndef DOXYGEN
     #ifdef NANODBC_USE_UNICODE
-        typedef std::wstring string_type;
+        #ifdef NANODBC_USE_IODBC_WIDE_STRINGS
+            typedef std::u32string string_type;
+        #else
+            typedef std::u16string string_type;
+        #endif
     #else
         typedef std::string string_type;
     #endif // NANODBC_USE_UNICODE
 
     #if defined(_WIN64)
-        // LLP64 machine, Windows
+        // LLP64 machine: Windows
         typedef std::int64_t null_type;
     #elif !defined(_WIN64) && defined(__LP64__)
-        // LP64 machine, OS X or Linux
+        // LP64 machine: OS X or Linux
         typedef long null_type;
     #else
         // 32-bit machine
         typedef long null_type;
     #endif
 #else
-    //! string_type will be std::wstring if NANODBC_USE_UNICODE is defined, otherwise std::string.
+    //! \c string_type will be \c std::u16string or \c std::32string if \c NANODBC_USE_UNICODE is defined, otherwise \c std::string.
     typedef unspecified-type string_type;
-    //! null_type will be int64_t for 64-bit compilations, otherwise long.
+    //! \c null_type will be \c int64_t for 64-bit compilations, otherwise \c long.
     typedef unspecified-type null_type;
 #endif // DOXYGEN
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+    // These versions of Visual C++ do not yet support \c noexcept or \c std::move.
+    #define NANODBC_NOEXCEPT
+    #define NANODBC_NO_MOVE_CTOR
+#else
+    #define NANODBC_NOEXCEPT noexcept
+#endif
+
+// 8888888888                                      888    888                        888 888 d8b
+// 888                                             888    888                        888 888 Y8P
+// 888                                             888    888                        888 888
+// 8888888    888d888 888d888 .d88b.  888d888      8888888888  8888b.  88888b.   .d88888 888 888 88888b.   .d88b.
+// 888        888P"   888P"  d88""88b 888P"        888    888     "88b 888 "88b d88" 888 888 888 888 "88b d88P"88b
+// 888        888     888    888  888 888          888    888 .d888888 888  888 888  888 888 888 888  888 888  888
+// 888        888     888    Y88..88P 888          888    888 888  888 888  888 Y88b 888 888 888 888  888 Y88b 888
+// 8888888888 888     888     "Y88P"  888          888    888 "Y888888 888  888  "Y88888 888 888 888  888  "Y88888
+//                                                                                                             888
+//                                                                                                        Y8b d88P
+//                                                                                                         "Y88P"
+// MARK: Error Handling -
 
 //! \addtogroup exceptions Exception types
 //! \brief Possible error conditions.
 //!
-//! Specific errors such as type_incompatible_error, null_access_error, and index_range_error can arise
-//! from improper use of the nanodbc library. The general database_error is for all other situations
+//! Specific errors such as \c type_incompatible_error, \c null_access_error, and \c index_range_error can arise
+//! from improper use of the nanodbc library. The general \c database_error is for all other situations
 //! in which the ODBC driver or C API reports an error condition. The explanatory string for database_error
-//! will, if possible, contain a diagnostic message obtained from SQLGetDiagRec().
+//! will, if possible, contain a diagnostic message obtained from \c SQLGetDiagRec().
 //! @{
 
 //! \brief Type incompatible.
@@ -126,7 +192,7 @@ class type_incompatible_error : public std::runtime_error
 {
 public:
     type_incompatible_error();
-    const char* what() const throw();
+    const char* what() const NANODBC_NOEXCEPT;
 };
 
 //! \brief Accessed null data.
@@ -135,7 +201,7 @@ class null_access_error : public std::runtime_error
 {
 public:
     null_access_error();
-    const char* what() const throw();
+    const char* what() const NANODBC_NOEXCEPT;
 };
 
 //! \brief Index out of range.
@@ -144,7 +210,7 @@ class index_range_error : public std::runtime_error
 {
 public:
     index_range_error();
-    const char* what() const throw();
+    const char* what() const NANODBC_NOEXCEPT;
 };
 
 //! \brief Programming logic error.
@@ -153,7 +219,7 @@ class programming_error : public std::runtime_error
 {
 public:
     explicit programming_error(const std::string& info);
-    const char* what() const throw();
+    const char* what() const NANODBC_NOEXCEPT;
 };
 
 //! \brief General database error.
@@ -166,10 +232,26 @@ public:
     //! \param handle_type The native ODBC handle type code for the given handle.
     //! \param info Additional information that will be appended to the beginning of the error message.
     database_error(void* handle, short handle_type, const std::string& info = "");
-    const char* what() const throw();
+    const char* what() const NANODBC_NOEXCEPT;
+    const long native() const NANODBC_NOEXCEPT;
+    const std::string state() const NANODBC_NOEXCEPT;
+private:
+    long native_error;
+    std::string sql_state;
+    std::string message;
 };
 
 //! @}
+
+// 888     888 888    d8b 888 d8b 888    d8b
+// 888     888 888    Y8P 888 Y8P 888    Y8P
+// 888     888 888        888     888
+// 888     888 888888 888 888 888 888888 888  .d88b.  .d8888b
+// 888     888 888    888 888 888 888    888 d8P  Y8b 88K
+// 888     888 888    888 888 888 888    888 88888888 "Y8888b.
+// Y88b. .d88P Y88b.  888 888 888 Y88b.  888 Y8b.          X88
+//  "Y88888P"   "Y888 888 888 888  "Y888 888  "Y8888   88888P'
+// MARK: Utilities -
 
 //! \addtogroup utility Utilities
 //! \brief Additional nanodbc utility classes and functions.
@@ -203,6 +285,16 @@ struct timestamp
 //!
 //! @{
 
+// 88888888888                                                  888    d8b
+//     888                                                      888    Y8P
+//     888                                                      888
+//     888  888d888 8888b.  88888b.  .d8888b   8888b.   .d8888b 888888 888  .d88b.  88888b.
+//     888  888P"      "88b 888 "88b 88K          "88b d88P"    888    888 d88""88b 888 "88b
+//     888  888    .d888888 888  888 "Y8888b. .d888888 888      888    888 888  888 888  888
+//     888  888    888  888 888  888      X88 888  888 Y88b.    Y88b.  888 Y88..88P 888  888
+//     888  888    "Y888888 888  888  88888P' "Y888888  "Y8888P  "Y888 888  "Y88P"  888  888
+// MARK: Transaction -
+
 //! \brief A resource for managing transaction commits and rollbacks.
 //!
 //! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
@@ -217,21 +309,26 @@ public:
     //! Copy constructor.
     transaction(const transaction& rhs);
 
+    #ifndef NANODBC_NO_MOVE_CTOR
+        //! Move constructor.
+        transaction(transaction&& rhs) NANODBC_NOEXCEPT;
+    #endif
+
     //! Assignment.
     transaction& operator=(transaction rhs);
 
     //! Member swap.
-    void swap(transaction& rhs) throw();
+    void swap(transaction& rhs) NANODBC_NOEXCEPT;
 
     //! \brief If this transaction has not been committed, will will rollback any modifying operations.
-    ~transaction() throw();
+    ~transaction() NANODBC_NOEXCEPT;
 
     //! \brief Marks this transaction for commit.
     //! \throws database_error
     void commit();
 
     //! \brief Marks this transaction for rollback.
-    void rollback() throw();
+    void rollback() NANODBC_NOEXCEPT;
 
     //! Returns the connection object.
     class connection& connection();
@@ -252,6 +349,16 @@ private:
 private:
     std::shared_ptr<transaction_impl> impl_;
 };
+
+//  .d8888b.  888             888                                            888
+// d88P  Y88b 888             888                                            888
+// Y88b.      888             888                                            888
+//  "Y888b.   888888  8888b.  888888 .d88b.  88888b.d88b.   .d88b.  88888b.  888888
+//     "Y88b. 888        "88b 888   d8P  Y8b 888 "888 "88b d8P  Y8b 888 "88b 888
+//       "888 888    .d888888 888   88888888 888  888  888 88888888 888  888 888
+// Y88b  d88P Y88b.  888  888 Y88b. Y8b.     888  888  888 Y8b.     888  888 Y88b.
+//  "Y8888P"   "Y888 "Y888888  "Y888 "Y8888  888  888  888  "Y8888  888  888  "Y888
+// MARK: Statement -
 
 //! \brief Represents a statement on the database.
 class statement
@@ -287,15 +394,20 @@ public:
     //! Copy constructor.
     statement(const statement& rhs);
 
+    #ifndef NANODBC_NO_MOVE_CTOR
+        //! Move constructor.
+        statement(statement&& rhs) NANODBC_NOEXCEPT;
+    #endif
+
     //! Assignment.
     statement& operator=(statement rhs);
 
     //! Member swap.
-    void swap(statement& rhs) throw();
+    void swap(statement& rhs) NANODBC_NOEXCEPT;
 
     //! \brief Closes the statement.
     //! \see close()
-    ~statement() throw();
+    ~statement() NANODBC_NOEXCEPT;
 
     //! \brief Creates a statement for the given connection.
     //! \param conn The connection where the statement will be executed.
@@ -354,6 +466,30 @@ public:
     //! \see open(), prepare(), execute(), result, transaction
     class result execute_direct(class connection& conn, const string_type& query, long batch_operations = 1, long timeout = 0);
 
+    //! \brief Immediately opens, prepares, and executes the given query directly on the given connection, in asynchronous mode.
+    //!
+    //! This method will only be available if nanodbc is built against ODBC headers and library that supports asynchronous mode.
+    //! Such that the identifiers `SQL_ATTR_ASYNC_STMT_EVENT` and `SQLCompleteAsync` are extant. Otherwise
+    //! this method will be defined, but not implemented.
+    //!
+    //! \param conn The connection where the statement will be executed.
+    //! \param event_handle The event handle for which the caller will wait before calling async_complete.
+    //! \param query The SQL query that will be executed.
+    //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+    //! \param timeout The number in seconds before query timeout. Default is 0 indicating no timeout.
+    //! \attention You will want to use transactions if you are doing batch operations because it will prevent auto commits from occurring after each individual operation is executed.
+    //! \see open(), prepare(), execute(), result, transaction
+    void async_execute_direct(class connection& conn, void* event_handle, const string_type& query, long batch_operations = 1, long timeout = 0);
+
+    //! \brief Completes a previously initiated asynchronous query operation, returning the result.
+    //!
+    //! This method will only be available if nanodbc is built against ODBC headers and library that supports asynchronous mode.
+    //! Such that the identifiers `SQL_ATTR_ASYNC_STMT_EVENT` and `SQLCompleteAsync` are extant. Otherwise
+    //! this method will be defined, but not implemented.
+    //!
+    //! \param batch_operations Numbers of rows to fetch per rowset, or the number of batch parameters to process.
+    class result async_complete(long batch_operations = 1);
+
     //! \brief Execute the previously prepared query now without constructing result object.
     //! \param conn The connection where the statement will be executed.
     //! \param query The SQL query that will be executed.
@@ -401,7 +537,7 @@ public:
     short columns() const;
 
     //! \brief Resets all currently bound parameters.
-    void reset_parameters() throw();
+    void reset_parameters() NANODBC_NOEXCEPT;
 
     //! \brief Returns the parameter size for the indicated parameter placeholder within a prepared statement.
     unsigned long parameter_size(short param) const;
@@ -587,6 +723,16 @@ private:
     std::shared_ptr<statement_impl> impl_;
 };
 
+//  .d8888b.                                               888    d8b
+// d88P  Y88b                                              888    Y8P
+// 888    888                                              888
+// 888         .d88b.  88888b.  88888b.   .d88b.   .d8888b 888888 888  .d88b.  88888b.
+// 888        d88""88b 888 "88b 888 "88b d8P  Y8b d88P"    888    888 d88""88b 888 "88b
+// 888    888 888  888 888  888 888  888 88888888 888      888    888 888  888 888  888
+// Y88b  d88P Y88..88P 888  888 888  888 Y8b.     Y88b.    Y88b.  888 Y88..88P 888  888
+//  "Y8888P"   "Y88P"  888  888 888  888  "Y8888   "Y8888P  "Y888 888  "Y88P"  888  888
+// MARK: Connection -
+
 //! \brief Manages and encapsulates ODBC resources such as the connection and environment handles.
 class connection
 {
@@ -597,11 +743,16 @@ public:
     //! Copy constructor.
     connection(const connection& rhs);
 
+    #ifndef NANODBC_NO_MOVE_CTOR
+        //! Move constructor.
+        connection(connection&& rhs) NANODBC_NOEXCEPT;
+    #endif
+
     //! Assignment.
     connection& operator=(connection rhs);
 
     //! Member swap.
-    void swap(connection&) throw();
+    void swap(connection&) NANODBC_NOEXCEPT;
 
     //! \brief Create new connection object and immediately connect to the given data source.
     //! \param dsn The name of the data source.
@@ -627,9 +778,9 @@ public:
     //!
     //! Will not throw even if disconnecting causes some kind of error and raises an exception.
     //! If you explicitly need to know if disconnect() succeeds, call it directly.
-    ~connection() throw();
+    ~connection() NANODBC_NOEXCEPT;
 
-    //! \brief Create new connection object and immediately connect to the given data source.
+    //! \brief Connect to the given data source.
     //! \param dsn The name of the data source.
     //! \param user The username for authenticating to the data source.
     //! \param pass The password for authenticating to the data source.
@@ -642,12 +793,48 @@ public:
         , const string_type& pass
         , long timeout = 0);
 
-    //! \brief Create new connection object and immediately connect using the given connection string.
+    //! \brief Connect using the given connection string.
     //! \param connection_string The connection string for establishing a connection.
     //! \param timeout The number in seconds before connection timeout. Default is 0 indicating no timeout.
     //! \throws database_error
     //! \see connected()
     void connect(const string_type& connection_string, long timeout = 0);
+
+    //! \brief Initiate an asynchronous connection operation to the given data source.
+    //!
+    //! This method will only be available if nanodbc is built against ODBC headers and library that supports asynchronous mode.
+    //! Such that the identifiers `SQL_ATTR_ASYNC_DBC_EVENT` and `SQLCompleteAsync` are extant. Otherwise
+    //! this method will be defined, but not implemented.
+    //!
+    //! \param dsn The name of the data source.
+    //! \param user The username for authenticating to the data source.
+    //! \param pass The password for authenticating to the data source.
+    //! \param event_handle The event handle for which the caller will wait before calling async_complete.
+    //! \param timeout The number in seconds before connection timeout. Default is 0 indicating no timeout.
+    //! \throws database_error
+    //! \see connected()
+    void async_connect(
+        const string_type& dsn
+        , const string_type& user
+        , const string_type& pass
+        , void* event_handle
+        , long timeout = 0);
+
+    //! \brief Initiate an asynchronous connection operation using the given connection string.
+    //!
+    //! This method will only be available if nanodbc is built against ODBC headers and library that supports asynchronous mode.
+    //! Such that the identifiers `SQL_ATTR_ASYNC_DBC_EVENT` and `SQLCompleteAsync` are extant. Otherwise
+    //! this method will be defined, but not implemented.
+    //!
+    //! \param connection_string The connection string for establishing a connection.
+    //! \param event_handle The event handle for which the caller will wait before calling async_complete.
+    //! \param timeout The number in seconds before connection timeout. Default is 0 indicating no timeout.
+    //! \throws database_error
+    //! \see connected()
+    void async_connect(const string_type& connection_string, void* event_handle, long timeout = 0);
+
+    //! \brief Completes a previously initiated asynchronous connection operation.
+    void async_complete();
 
     //! \brief Returns true if connected to the database.
     bool connected() const;
@@ -664,9 +851,27 @@ public:
     //! \brief Returns the native ODBC environment handle.
     void* native_env_handle() const;
 
+    //! \brief Returns name of the DBMS product.
+    //! Returns the ODBC information type SQL_DBMS_NAME of the DBMS product
+    //! accesssed by the driver via the current connection.
+    string_type dbms_name() const;
+
+    //! \brief Returns version of the DBMS product.
+    //! Returns the ODBC information type SQL_DBMS_VER of the DBMS product
+    //! accesssed by the driver via the current connection.
+    string_type dbms_version() const;
+
     //! \brief Returns the name of the ODBC driver.
     //! \throws database_error
     string_type driver_name() const;
+
+    //! \brief Returns the name of the currently connected database.
+    //! Returns the current SQL_DATABASE_NAME information value associated with the connection.
+    string_type database_name() const;
+
+    //! \brief Returns the name of the current catalog.
+    //! Returns the current setting of the connection attribute SQL_ATTR_CURRENT_CATALOG.
+    string_type catalog_name() const;
 
 private:
     std::size_t ref_transaction();
@@ -682,6 +887,18 @@ private:
     std::shared_ptr<connection_impl> impl_;
 };
 
+// 8888888b.                            888 888
+// 888   Y88b                           888 888
+// 888    888                           888 888
+// 888   d88P .d88b.  .d8888b  888  888 888 888888
+// 8888888P" d8P  Y8b 88K      888  888 888 888
+// 888 T88b  88888888 "Y8888b. 888  888 888 888
+// 888  T88b Y8b.          X88 Y88b 888 888 Y88b.
+// 888   T88b "Y8888   88888P'  "Y88888 888  "Y888
+// MARK: Result -
+
+class catalog;
+
 //! \brief A resource for managing result sets from statement execution.
 //!
 //! \see statement::execute(), statement::execute_direct()
@@ -693,29 +910,34 @@ public:
     result();
 
     //! Free result set.
-    ~result() throw();
+    ~result() NANODBC_NOEXCEPT;
 
     //! Copy constructor.
     result(const result& rhs);
+
+    #ifndef NANODBC_NO_MOVE_CTOR
+        //! Move constructor.
+        result(result&& rhs) NANODBC_NOEXCEPT;
+    #endif
 
     //! Assignment.
     result& operator=(result rhs);
 
     //! Member swap.
-    void swap(result& rhs) throw();
+    void swap(result& rhs) NANODBC_NOEXCEPT;
 
     //! \brief Returns the native ODBC statement handle.
     void* native_statement_handle() const;
 
     //! \brief The rowset size for this result set.
-    long rowset_size() const throw();
+    long rowset_size() const NANODBC_NOEXCEPT;
 
     //! \brief Returns the number of rows affected by the request or -1 if the number of affected rows is not available.
     //! \throws database_error
     long affected_rows() const;
 
     //! \brief Returns the number of rows in the current rowset or 0 if the number of rows is not available.
-    long rows() const throw();
+    long rows() const NANODBC_NOEXCEPT;
 
     //! \brief Returns the number of columns in a result set.
     //! \throws database_error
@@ -755,7 +977,7 @@ public:
     unsigned long position() const;
 
     //! \brief Returns true if there are no more results in the current result set.
-    bool end() const throw();
+    bool end() const NANODBC_NOEXCEPT;
 
     //! \brief Gets data from the given column of the current rowset.
     //!
@@ -831,13 +1053,22 @@ public:
 
     //! \brief Returns true if and only if the given column of the current rowset is null.
     //!
+    //! There is a bug/limitation in ODBC drivers for SQL Server (and possibly others)
+    //! which causes SQLBindCol() to never write SQL_NOT_NULL to the length/indicator
+    //! buffer unless you also bind the data column. Nanodbc's is_null() will return
+    //! correct values for (n)varchar(max) columns when you ensure that SQLGetData()
+    //! has been called for that column (i.e. after get() or get_ref() is called).
+    //!
     //! Columns are numbered from left to right and 0-indexed.
+    //! \see get(), get_ref()
     //! \param column position.
     //! \throws database_error, index_range_error
     bool is_null(short column) const;
 
     //! \brief Returns true if and only if the given column by name of the current rowset is null.
     //!
+    //! See is_null(short column) for details on a bug/limitation of some ODBC drivers.
+    //! \see is_null()
     //! \param column_name column's name.
     //! \throws database_error, index_range_error
     bool is_null(const string_type& column_name) const;
@@ -887,12 +1118,193 @@ private:
 private:
     class result_impl;
     friend class nanodbc::statement::statement_impl;
+    friend class nanodbc::catalog;
 
 private:
     std::shared_ptr<result_impl> impl_;
 };
 
+
+//
+//  .d8888b.           888             888
+// d88P  Y88b          888             888
+// 888    888          888             888
+// 888         8888b.  888888  8888b.  888  .d88b.   .d88b.
+// 888            "88b 888        "88b 888 d88""88b d88P"88b
+// 888    888 .d888888 888    .d888888 888 888  888 888  888
+// Y88b  d88P 888  888 Y88b.  888  888 888 Y88..88P Y88b 888
+//  "Y8888P"  "Y888888  "Y888 "Y888888 888  "Y88P"   "Y88888
+//                                                      888
+//                                                 Y8b d88P
+//                                                  "Y88P"
+// MARK: Catalog -
+
+class catalog
+{
+public:
+
+    class tables
+    {
+    public:
+        bool next();
+        string_type table_catalog() const;
+        string_type table_schema() const;
+        string_type table_name() const;
+        string_type table_type() const;
+        string_type table_remarks() const;
+
+    private:
+        friend class nanodbc::catalog;
+        tables(result& find_result);
+        result result_;
+    };
+
+    class columns
+    {
+    public:
+
+        //! \brief
+        bool next();
+
+        //! \brief
+        string_type table_catalog() const;
+
+        //! \brief
+        string_type table_schema() const;
+
+        //! \brief
+        string_type table_name() const;
+
+        //! \brief
+        string_type column_name() const;
+
+        //! \brief
+        short data_type() const;
+
+        //! \brief
+        string_type type_name() const;
+
+        //! \brief
+        long column_size() const;
+
+        //! \brief
+        long buffer_length() const;
+
+        //! \brief
+        short decimal_digits() const;
+
+        //! \brief
+        short numeric_precision_radix() const;
+
+        //! \brief
+        short nullable() const;
+
+        //! \brief
+        string_type remarks() const;
+
+        //! \brief
+        string_type column_default() const;
+
+        //! \brief
+        short sql_data_type() const;
+
+        //! \brief
+        short sql_datetime_subtype() const;
+
+        //! \brief
+        long char_octed_length() const;
+
+        //! \brief Ordinal position of the column in the table.
+        //! The first column in the table is number 1.
+        //! Returns ORDINAL_POSITION column value in result set returned by SQLColumns.
+        long ordinal_position() const;
+
+        //! \brief
+        //! TODO: Translate "YES","NO", <empty> strings to IsNullable enum?
+        string_type is_nullable() const;
+
+    private:
+        friend class nanodbc::catalog;
+        columns(result& find_result);
+        result result_;
+    };
+
+    class primary_keys
+    {
+    public:
+        bool next();
+        string_type table_catalog() const;
+        string_type table_schema() const;
+        string_type table_name() const;
+        string_type column_name() const;
+
+        //! \brief Column sequence number in the key (starting with 1).
+        //! Returns valye of KEY_SEQ column in result set returned by SQLPrimaryKeys.
+        short column_number() const;
+
+        //! \brief Primary key name.
+        //! NULL if not applicable to the data source.
+        //! Returns valye of PK_NAME column in result set returned by SQLPrimaryKeys.
+        string_type primary_key_name() const;
+
+    private:
+        friend class nanodbc::catalog;
+        primary_keys(result& find_result);
+        result result_;
+    };
+
+    //! \brief Creates catalog operating on database accessible through the specified connection.
+    catalog(connection& conn);
+
+    //! \brief Creates result set with tables information.
+    //!
+    //! Tables information is obtained by executing SQLTable function within
+    //! scope of the connected database accessible with the specified connection.
+    //! Since this function is implemented in terms of the SQLTables, it returns
+    //! result set ordered by TABLE_TYPE, TABLE_CAT, TABLE_SCHEM, and TABLE_NAME.
+    catalog::tables find_tables(
+        const string_type& table = string_type()
+      , const string_type& type = string_type()
+      , const string_type& schema = string_type()
+      , const string_type& catalog = string_type());
+
+    //! \brief Creates result set with columns information in specified tables.
+    //!
+    //! Columns information is obtained by executing SQLColumns function within
+    //! scope of the connected database accessible with the specified connection.
+    //! Since this function is implemented in terms of the SQLColumns, it returns
+    //! result set ordered by TABLE_CAT, TABLE_SCHEM, TABLE_NAME, and ORDINAL_POSITION.
+    catalog::columns find_columns(
+        const string_type& column = string_type()
+      , const string_type& table = string_type()
+      , const string_type& schema = string_type()
+      , const string_type& catalog = string_type());
+
+    //! \brief Creates result set with primary key information.
+    //!
+    //! Returns result set with column names that make up the primary key for a table.
+    //! The primary key information is obtained by executing SQLPrimaryKey function within
+    //! scope of the connected database accessible with the specified connection.
+    catalog::primary_keys find_primary_keys(
+        const string_type& table
+      , const string_type& schema = string_type()
+      , const string_type& catalog = string_type());
+
+private:
+    connection conn_;
+};
+
 //! @}
+
+// 8888888888                            8888888888                         888    d8b
+// 888                                   888                                888    Y8P
+// 888                                   888                                888
+// 8888888 888d888 .d88b.   .d88b.       8888888 888  888 88888b.   .d8888b 888888 888  .d88b.  88888b.  .d8888b
+// 888     888P"  d8P  Y8b d8P  Y8b      888     888  888 888 "88b d88P"    888    888 d88""88b 888 "88b 88K
+// 888     888    88888888 88888888      888     888  888 888  888 888      888    888 888  888 888  888 "Y8888b.
+// 888     888    Y8b.     Y8b.          888     Y88b 888 888  888 Y88b.    Y88b.  888 Y88..88P 888  888      X88
+// 888     888     "Y8888   "Y8888       888      "Y88888 888  888  "Y8888P  "Y888 888  "Y88P"  888  888  88888P'
+// MARK: Free Functions -
 
 //! \addtogroup mainf Free Functions
 //! \brief Convenience functions.

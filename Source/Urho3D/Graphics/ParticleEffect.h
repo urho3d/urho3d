@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "../Graphics/GraphicsDefs.h"
 #include "../Resource/Resource.h"
 
 namespace Urho3D
@@ -30,7 +31,7 @@ namespace Urho3D
 /// Particle emitter shapes.
 enum EmitterType
 {
-    EMITTER_SPHERE,
+    EMITTER_SPHERE = 0,
     EMITTER_BOX
 };
 
@@ -101,7 +102,7 @@ class XMLElement;
 /// %Particle effect definition.
 class URHO3D_API ParticleEffect : public Resource
 {
-    OBJECT(ParticleEffect, Resource);
+    URHO3D_OBJECT(ParticleEffect, Resource);
 
 public:
     /// Construct.
@@ -128,12 +129,14 @@ public:
     void SetNumParticles(unsigned num);
     /// Set whether to update when particles are not visible.
     void SetUpdateInvisible(bool enable);
-    /// Set whether billboards are relative to the scene node. Default true.
+    /// Set whether billboards are relative to the scene node.
     void SetRelative(bool enable);
-    /// Set scaled.
+    /// Set whether scene node scale affects billboards' size.
     void SetScaled(bool enable);
-    /// Set sorted.
+    /// Set whether billboards are sorted by distance.
     void SetSorted(bool enable);
+    /// Set whether billboards have fixed size on screen (measured in pixels) regardless of distance to camera.
+    void SetFixedScreenSize(bool enable);
     /// Set animation LOD bias.
     void SetAnimationLodBias(float lodBias);
     /// Set emitter type.
@@ -180,6 +183,8 @@ public:
     void SetSizeAdd(float sizeAdd);
     /// Set particle size multiplicative modifier.
     void SetSizeMul(float sizeMul);
+    /// Set how the particles should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
+    void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Add a color frame sorted in the correct position based on time.
     void AddColorTime(const Color& color, const float time);
@@ -228,6 +233,9 @@ public:
 
     /// Return whether billboards are sorted.
     bool IsSorted() const { return sorted_; }
+
+    /// Return whether billboards are fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
 
     /// Return animation Lod bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
@@ -316,6 +324,9 @@ public:
     /// Return a texture animation frame, or null if outside range.
     const TextureFrame* GetTextureFrame(unsigned index) const;
 
+    /// Return how the particles rotate in relation to the camera.
+    FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
+
     /// Return random direction.
     Vector3 GetRandomDirection() const;
     /// Return random size.
@@ -349,6 +360,8 @@ private:
     bool scaled_;
     /// Billboards sorted flag.
     bool sorted_;
+    /// Billboards fixed screen size flag.
+    bool fixedScreenSize_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Emitter shape.
@@ -401,6 +414,8 @@ private:
     Vector<TextureFrame> textureFrames_;
     /// Material name acquired during BeginLoad().
     String loadMaterialName_;
+    /// Particle rotation mode in relation to the camera.
+    FaceCameraMode faceCameraMode_;
 };
 
 }

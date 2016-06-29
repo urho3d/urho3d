@@ -32,7 +32,7 @@
  * @File     libcpuid.h
  * @Author   Veselin Georgiev
  * @Date     Oct 2008
- * @Version  0.2.0
+ * @Version  0.2.2
  *
  * Version history:
  *
@@ -46,6 +46,12 @@
  *  0.2.0 (2011-10-11): Support for AMD Bulldozer CPUs, 128-bit SSE unit size
  *                      checking. A backwards-incompatible change, since the
  *                      sizeof cpu_id_t is now different.
+ *  0.2.1 (2012-05-26): Support for Ivy Bridge, and detecting the presence of
+ *                      the RdRand instruction.
+ *  0.2.2 (2015-11-04): Support for newer processors up to Haswell and Vishera.
+ *                      Fix clock detection in cpu_clock_by_ic() for Bulldozer.
+ *                      More entries supported in cpu_msrinfo().
+ *                      *BSD and Solaris support (unofficial).
  */
 
 /** @mainpage A simple libcpuid introduction
@@ -74,7 +80,7 @@
 extern "C" {
 #endif
 
-#define VERSION "0.2.0"
+#define VERSION "0.2.2"
 /**
  * @brief CPU vendor, as guessed from the Vendor String.
  */
@@ -350,6 +356,15 @@ typedef enum {
 	CPU_FEATURE_FMA4,	/*!< The FMA4 instruction set */
 	CPU_FEATURE_TBM,	/*!< Trailing bit manipulation instruction support */
 	CPU_FEATURE_F16C,	/*!< 16-bit FP convert instruction support */
+	CPU_FEATURE_RDRAND,     /*!< RdRand instruction */
+	CPU_FEATURE_X2APIC,     /*!< x2APIC, APIC_BASE.EXTD, MSRs 0000_0800h...0000_0BFFh 64-bit ICR (+030h but not +031h), no DFR (+00Eh), SELF_IPI (+040h) also see standard level 0000_000Bh */
+	CPU_FEATURE_CPB,	/*!< Core performance boost */
+	CPU_FEATURE_APERFMPERF,	/*!< MPERF/APERF MSRs support */
+	CPU_FEATURE_PFI,	/*!< Processor Feedback Interface support */
+	CPU_FEATURE_PA,		/*!< Processor accumulator */
+	CPU_FEATURE_AVX2,	/*!< AVX2 instructions */
+	CPU_FEATURE_BMI1,	/*!< BMI1 instructions */
+	CPU_FEATURE_BMI2,	/*!< BMI2 instructions */
 	/* termination: */
 	NUM_CPU_FEATURES,
 } cpu_feature_t;
@@ -383,6 +398,8 @@ typedef enum {
 	ERR_EXTRACT  = -11,	/*!< "Cannot extract RDMSR driver (read only media?)" */
 	ERR_HANDLE   = -12,	/*!< "Bad handle" */
 	ERR_INVMSR   = -13,     /*!< "Invalid MSR" */
+	ERR_INVCNB   = -14,     /*!< "Invalid core number" */
+	ERR_HANDLE_R = -15,     /*!< "Error on handle read" */
 } cpu_error_t;
 
 /**
@@ -393,6 +410,12 @@ struct cpu_mark_t {
 	uint64_t tsc;		/*!< Time-stamp from RDTSC */
 	uint64_t sys_clock;	/*!< In microsecond resolution */
 };
+
+/**
+ * @brief Returns the total number of CPUs even if CPUID is not present
+ * @retval Number of CPUs available
+ */
+int cpuid_get_total_cpus(void);
 
 /**
  * @brief Checks if the CPUID instruction is supported
@@ -674,6 +697,15 @@ int cpu_clock_measure(int millis, int quad_check);
  *
  * Recommended values - millis = 50, runs = 4. For more robustness,
  * increase the number of runs.
+ * 
+ * NOTE: on Bulldozer and later CPUs, the busy-wait cycle runs at 1.4 IPC, thus
+ * the results are skewed. This is corrected internally by dividing the resulting
+ * value by 1.4.
+ * However, this only occurs if the thread is executed on a single CMT
+ * module - if there are other threads competing for resources, the results are
+ * unpredictable. Make sure you run cpu_clock_by_ic() on a CPU that is free from
+ * competing threads, or if there are such threads, they shouldn't exceed the
+ * number of modules. On a Bulldozer X8, that means 4 threads.
  *
  * @returns the CPU clock frequency in MHz (within some measurement error
  * margin). If SSE is not supported, the result is -1. If the input parameters
@@ -729,6 +761,14 @@ libcpuid_warn_fn_t cpuid_set_warn_function(libcpuid_warn_fn_t warn_fun);
  */
 void cpuid_set_verbosiness_level(int level);
 
+
+/**
+ * @brief Obtains the CPU vendor from CPUID from the current CPU
+ * @note The result is cached.
+ * @returns VENDOR_UNKNOWN if failed, otherwise the CPU vendor type.
+ *          @see cpu_vendor_t
+ */
+cpu_vendor_t cpuid_get_vendor(void);
 
 /**
  * @brief a structure that holds a list of processor names

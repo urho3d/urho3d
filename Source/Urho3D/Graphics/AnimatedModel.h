@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ class AnimationState;
 /// Animated model component.
 class URHO3D_API AnimatedModel : public StaticModel
 {
-    OBJECT(AnimatedModel, StaticModel);
+    URHO3D_OBJECT(AnimatedModel, StaticModel);
 
     friend class AnimationState;
 
@@ -51,6 +51,8 @@ public:
     virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
     /// Load from XML data. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Process octree raycast. May be called from a worker thread.
@@ -161,6 +163,9 @@ public:
     /// Return per-geometry skin matrices. If empty, uses global skinning
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
+    /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
+    void UpdateBoneBoundingBox();
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -172,6 +177,8 @@ protected:
 private:
     /// Assign skeleton and animation bone node references as a postprocess. Called by ApplyAttributes.
     void AssignBoneNodes();
+    /// Finalize master model bone bounding boxes by merging from matching non-master bones.. Performed whenever any of the AnimatedModels in the same node changes its model.
+    void FinalizeBoneBoundingBoxes();
     /// Remove (old) skeleton root bone.
     void RemoveRootBone();
     /// Mark animation and skinning to require an update.
@@ -190,8 +197,6 @@ private:
     void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
     /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
-    /// Recalculate the bone bounding box.
-    void UpdateBoneBoundingBox();
     /// Recalculate skinning.
     void UpdateSkinning();
     /// Reapply all vertex morphs.

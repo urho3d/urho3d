@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,13 +97,13 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     XMLElement dataElem = element.GetChild("data");
     if (!dataElem)
     {
-        LOGERROR("Could not find data in layer");
+        URHO3D_LOGERROR("Could not find data in layer");
         return false;
     }
 
     if (dataElem.HasAttribute("encoding") && dataElem.GetAttribute("encoding") != "xml")
     {
-        LOGERROR("Encoding not support now");
+        URHO3D_LOGERROR("Encoding not support now");
         return false;
     }
 
@@ -270,7 +270,7 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        LOGERROR("Could not load texture " + textureFilePath);
+        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
         return false;
     }
 
@@ -315,7 +315,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     loadXMLFile_ = new XMLFile(context_);
     if (!loadXMLFile_->Load(source))
     {
-        LOGERROR("Load XML failed " + source.GetName());
+        URHO3D_LOGERROR("Load XML failed " + source.GetName());
         loadXMLFile_.Reset();
         return false;
     }
@@ -323,7 +323,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
     XMLElement rootElem = loadXMLFile_->GetRoot("map");
     if (!rootElem)
     {
-        LOGERROR("Invalid tmx file " + source.GetName());
+        URHO3D_LOGERROR("Invalid tmx file " + source.GetName());
         loadXMLFile_.Reset();
         return false;
     }
@@ -374,7 +374,7 @@ bool TmxFile2D::EndLoad()
     String version = rootElem.GetAttribute("version");
     if (version != "1.0")
     {
-        LOGERROR("Invalid version");
+        URHO3D_LOGERROR("Invalid version");
         return false;
     }
 
@@ -385,9 +385,11 @@ bool TmxFile2D::EndLoad()
         info_.orientation_ = O_ISOMETRIC;
     else if (orientation == "staggered")
         info_.orientation_ = O_STAGGERED;
+    else if (orientation == "hexagonal")
+        info_.orientation_ = O_HEXAGONAL;
     else
     {
-        LOGERROR("Unsupported orientation type " + orientation);
+        URHO3D_LOGERROR("Unsupported orientation type " + orientation);
         return false;
     }
 
@@ -442,6 +444,31 @@ bool TmxFile2D::EndLoad()
     return true;
 }
 
+bool TmxFile2D::SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight)
+{
+    if (layers_.Size() > 0)
+        return false;
+    info_.orientation_ = orientation;
+    info_.width_ = width;
+    info_.height_ = height;
+    info_.tileWidth_ = tileWidth * PIXEL_SIZE;
+    info_.tileHeight_ = tileHeight * PIXEL_SIZE;
+    return true;
+}
+
+void TmxFile2D::AddLayer(unsigned index, TmxLayer2D *layer)
+{
+    if (index > layers_.Size())
+        layers_.Push(layer);
+    else // index <= layers_.size()
+        layers_.Insert(index, layer);
+}
+
+void TmxFile2D::AddLayer(TmxLayer2D *layer)
+{
+    layers_.Push(layer);
+}
+
 Sprite2D* TmxFile2D::GetTileSprite(int gid) const
 {
     HashMap<int, SharedPtr<Sprite2D> >::ConstIterator i = gidToSpriteMapping_.Find(gid);
@@ -467,7 +494,6 @@ const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
     return layers_[index];
 }
 
-
 SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
 {
     String tsxFilePath = GetParentPath(GetName()) + source;
@@ -475,7 +501,7 @@ SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
     SharedPtr<XMLFile> tsxXMLFile(new XMLFile(context_));
     if (!tsxFile || !tsxXMLFile->Load(*tsxFile))
     {
-        LOGERROR("Load TSX file failed " + tsxFilePath);
+        URHO3D_LOGERROR("Load TSX file failed " + tsxFilePath);
         return SharedPtr<XMLFile>();
     }
 
@@ -514,7 +540,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
     if (!texture)
     {
-        LOGERROR("Could not load texture " + textureFilePath);
+        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
         return false;
     }
 

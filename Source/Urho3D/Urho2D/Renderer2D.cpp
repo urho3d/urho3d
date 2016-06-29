@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,6 @@ Renderer2D::Renderer2D(Context* context) :
     Drawable(context, DRAWABLE_GEOMETRY),
     material_(new Material(context)),
     indexBuffer_(new IndexBuffer(context_)),
-    frustum_(0),
     viewMask_(DEFAULT_VIEWMASK)
 {
     material_->SetName("Urho2D");
@@ -79,7 +78,7 @@ Renderer2D::Renderer2D(Context* context) :
     material_->SetCullMode(CULL_NONE);
 
     frame_.frameNumber_ = 0;
-    SubscribeToEvent(E_BEGINVIEWUPDATE, HANDLER(Renderer2D, HandleBeginViewUpdate));
+    SubscribeToEvent(E_BEGINVIEWUPDATE, URHO3D_HANDLER(Renderer2D, HandleBeginViewUpdate));
 }
 
 Renderer2D::~Renderer2D()
@@ -135,7 +134,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
     for (HashMap<Camera*, ViewBatchInfo2D>::ConstIterator i = viewBatchInfos_.Begin(); i != viewBatchInfos_.End(); ++i)
     {
         if (i->second_.batchUpdatedFrameNumber_ == frame_.frameNumber_)
-            indexCount = (unsigned)Max((int)indexCount, (int)i->second_.indexCount_);
+            indexCount = Max(indexCount, i->second_.indexCount_);
     }
 
     // Fill index buffer
@@ -183,7 +182,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
         }
         else
         {
-            LOGERROR("Failed to lock index buffer");
+            URHO3D_LOGERROR("Failed to lock index buffer");
             return;
         }
     }
@@ -215,7 +214,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
                 vertexBuffer->Unlock();
             }
             else
-                LOGERROR("Failed to lock vertex buffer");
+                URHO3D_LOGERROR("Failed to lock vertex buffer");
         }
 
         viewBatchInfo.vertexBufferUpdateFrameNumber_ = frame_.frameNumber_;
@@ -273,10 +272,7 @@ bool Renderer2D::CheckVisibility(Drawable2D* drawable) const
         return false;
 
     const BoundingBox& box = drawable->GetWorldBoundingBox();
-    if (frustum_)
-        return frustum_->IsInsideFast(box) != OUTSIDE;
-
-    return frustumBoundingBox_.IsInsideFast(box) != OUTSIDE;
+    return frustum_.IsInsideFast(box) != OUTSIDE;
 }
 
 void Renderer2D::OnWorldBoundingBoxUpdate()
@@ -333,21 +329,15 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     frame_ = static_cast<View*>(eventData[P_VIEW].GetPtr())->GetFrameInfo();
 
-    PROFILE(UpdateRenderer2D);
+    URHO3D_PROFILE(UpdateRenderer2D);
 
     Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
-    frustum_ = &camera->GetFrustum();
-    if (camera->IsOrthographic() && camera->GetNode()->GetWorldDirection() == Vector3::FORWARD)
-    {
-        // Define bounding box with min and max points
-        frustumBoundingBox_.Define(frustum_->vertices_[2], frustum_->vertices_[4]);
-        frustum_ = 0;
-    }
+    frustum_ = camera->GetFrustum();
     viewMask_ = camera->GetViewMask();
 
     // Check visibility
     {
-        PROFILE(CheckDrawableVisibility);
+        URHO3D_PROFILE(CheckDrawableVisibility);
 
         WorkQueue* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
@@ -390,6 +380,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     batches_.Resize(viewBatchInfo.batchCount_);
     for (unsigned i = 0; i < viewBatchInfo.batchCount_; ++i)
     {
+        batches_[i].distance_ = viewBatchInfo.distances_[i];
         batches_[i].material_ = viewBatchInfo.materials_[i];
         batches_[i].geometry_ = viewBatchInfo.geometries_[i];
     }
@@ -415,6 +406,9 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
 
 static inline bool CompareSourceBatch2Ds(const SourceBatch2D* lhs, const SourceBatch2D* rhs)
 {
+    if (lhs->distance_ != rhs->distance_)
+        return lhs->distance_ > rhs->distance_;
+
     if (lhs->drawOrder_ != rhs->drawOrder_)
         return lhs->drawOrder_ < rhs->drawOrder_;
 
@@ -430,8 +424,8 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     if (viewBatchInfo.batchUpdatedFrameNumber_ == frame_.frameNumber_)
         return;
 
-    PODVector<const SourceBatch2D*>& soruceBatches = viewBatchInfo.sourceBatches_;
-    soruceBatches.Clear();
+    PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
+    sourceBatches.Clear();
     for (unsigned d = 0; d < drawables_.Size(); ++d)
     {
         if (!drawables_[d]->IsInView(camera))
@@ -441,11 +435,18 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
         for (unsigned b = 0; b < batches.Size(); ++b)
         {
             if (batches[b].material_ && !batches[b].vertices_.Empty())
-                soruceBatches.Push(&batches[b]);
+                sourceBatches.Push(&batches[b]);
         }
     }
 
-    Sort(soruceBatches.Begin(), soruceBatches.End(), CompareSourceBatch2Ds);
+    for (unsigned i = 0; i < sourceBatches.Size(); ++i)
+    {
+        const SourceBatch2D* sourceBatch = sourceBatches[i];
+        Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
+        sourceBatch->distance_ = camera->GetDistance(worldPos);
+    }
+    
+    Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
     Material* currMaterial = 0;
@@ -453,22 +454,25 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     unsigned iCount = 0;
     unsigned vStart = 0;
     unsigned vCount = 0;
+    float distance = M_INFINITY;
 
-    for (unsigned b = 0; b < soruceBatches.Size(); ++b)
+    for (unsigned b = 0; b < sourceBatches.Size(); ++b)
     {
-        Material* material = soruceBatches[b]->material_;
-        const Vector<Vertex2D>& vertices = soruceBatches[b]->vertices_;
+        distance = Min(distance, sourceBatches[b]->distance_);
+        Material* material = sourceBatches[b]->material_;
+        const Vector<Vertex2D>& vertices = sourceBatches[b]->vertices_;
 
         // When new material encountered, finish the current batch and start new
         if (currMaterial != material)
         {
             if (currMaterial)
             {
-                AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+                AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount, distance);
                 iStart += iCount;
                 iCount = 0;
                 vStart += vCount;
                 vCount = 0;
+                distance = M_INFINITY;
             }
 
             currMaterial = material;
@@ -480,18 +484,22 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
 
     // Add the final batch if necessary
     if (currMaterial && vCount)
-        AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount);
+        AddViewBatch(viewBatchInfo, currMaterial, iStart, iCount, vStart, vCount,distance);
 
     viewBatchInfo.indexCount_ = iStart + iCount;
     viewBatchInfo.vertexCount_ = vStart + vCount;
     viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, unsigned indexStart, unsigned indexCount,
-    unsigned vertexStart, unsigned vertexCount)
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+    unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance)
 {
     if (!material || indexCount == 0 || vertexCount == 0)
         return;
+
+    if (viewBatchInfo.distances_.Size() <= viewBatchInfo.batchCount_)
+        viewBatchInfo.distances_.Resize(viewBatchInfo.batchCount_ + 1);
+    viewBatchInfo.distances_[viewBatchInfo.batchCount_] = distance;
 
     if (viewBatchInfo.materials_.Size() <= viewBatchInfo.batchCount_)
         viewBatchInfo.materials_.Resize(viewBatchInfo.batchCount_ + 1);
@@ -502,7 +510,7 @@ void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material
     {
         SharedPtr<Geometry> geometry(new Geometry(context_));
         geometry->SetIndexBuffer(indexBuffer_);
-        geometry->SetVertexBuffer(0, viewBatchInfo.vertexBuffer_, MASK_VERTEX2D);
+        geometry->SetVertexBuffer(0, viewBatchInfo.vertexBuffer_);
 
         viewBatchInfo.geometries_.Push(geometry);
     }

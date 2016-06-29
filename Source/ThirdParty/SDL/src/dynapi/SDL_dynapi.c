@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -56,38 +56,38 @@ static void SDL_InitDynamicAPI(void);
 #if DISABLE_JUMP_MAGIC
 /* Can't use the macro for varargs nonsense. This is atrocious. */
 #define SDL_DYNAPI_VARARGS_LOGFN(_static, name, initcall, logname, prio) \
-    _static void SDL_Log##logname##name(int category, const char *fmt, ...) { \
+    _static void SDL_Log##logname##name(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(category, SDL_LOG_PRIORITY_##prio, fmt, ap); \
         va_end(ap); \
     }
 
 #define SDL_DYNAPI_VARARGS(_static, name, initcall) \
-    _static int SDL_SetError##name(const char *fmt, ...) { \
+    _static int SDL_SetError##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         char buf[512]; /* !!! FIXME: dynamic allocation */ \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_vsnprintf(buf, sizeof (buf), fmt, ap); \
         va_end(ap); \
         return jump_table.SDL_SetError("%s", buf); \
     } \
-    _static int SDL_sscanf##name(const char *buf, const char *fmt, ...) { \
+    _static int SDL_sscanf##name(const char *buf, SDL_SCANF_FORMAT_STRING const char *fmt, ...) { \
         int retval; va_list ap; initcall; va_start(ap, fmt); \
         retval = jump_table.SDL_vsscanf(buf, fmt, ap); \
         va_end(ap); \
         return retval; \
     } \
-    _static int SDL_snprintf##name(char *buf, size_t buflen, const char *fmt, ...) { \
+    _static int SDL_snprintf##name(SDL_OUT_Z_CAP(maxlen) char *buf, size_t maxlen, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         int retval; va_list ap; initcall; va_start(ap, fmt); \
-        retval = jump_table.SDL_vsnprintf(buf, buflen, fmt, ap); \
+        retval = jump_table.SDL_vsnprintf(buf, maxlen, fmt, ap); \
         va_end(ap); \
         return retval; \
     } \
-    _static void SDL_Log##name(const char *fmt, ...) { \
+    _static void SDL_Log##name(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, fmt, ap); \
         va_end(ap); \
     } \
-    _static void SDL_LogMessage##name(int category, SDL_LogPriority priority, const char *fmt, ...) { \
+    _static void SDL_LogMessage##name(int category, SDL_LogPriority priority, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) { \
         va_list ap; initcall; va_start(ap, fmt); \
         jump_table.SDL_LogMessageV(category, priority, fmt, ap); \
         va_end(ap); \
@@ -206,7 +206,14 @@ SDL_DYNAPI_entry(Uint32 apiver, void *table, Uint32 tablesize)
 static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 {
     HANDLE lib = LoadLibraryA(fname);
-    return lib ? GetProcAddress(lib, sym) : NULL;
+    void *retval = NULL;
+    if (lib) {
+        retval = GetProcAddress(lib, sym);
+        if (retval == NULL) {
+            FreeLibrary(lib);
+        }
+    }
+    return retval;
 }
 
 #elif defined(__HAIKU__)
@@ -215,8 +222,11 @@ static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 {
     image_id lib = load_add_on(fname);
     void *retval = NULL;
-    if ((lib < 0) || (get_image_symbol(lib, sym, B_SYMBOL_TYPE_TEXT, &retval) != B_NO_ERROR)) {
-        retval = NULL;
+    if (lib >= 0) {
+        if (get_image_symbol(lib, sym, B_SYMBOL_TYPE_TEXT, &retval) != B_NO_ERROR) {
+            unload_add_on(lib);
+            retval = NULL;
+        }
     }
     return retval;
 }
@@ -225,7 +235,14 @@ static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 static SDL_INLINE void *get_sdlapi_entry(const char *fname, const char *sym)
 {
     void *lib = dlopen(fname, RTLD_NOW | RTLD_LOCAL);
-    return lib ? dlsym(lib, sym) : NULL;
+    void *retval = NULL;
+    if (lib != NULL) {
+        retval = dlsym(lib, sym);
+        if (retval == NULL) {
+            dlclose(lib);
+        }
+    }
+    return retval;
 }
 #else
 #error Please define your platform.

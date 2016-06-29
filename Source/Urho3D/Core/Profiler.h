@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -171,7 +171,7 @@ public:
 /// Hierarchical performance profiler subsystem.
 class URHO3D_API Profiler : public Object
 {
-    OBJECT(Profiler, Object);
+    URHO3D_OBJECT(Profiler, Object);
     
 public:
     /// Construct.
@@ -211,7 +211,7 @@ public:
     void BeginInterval();
     
     /// Return profiling data as text output.
-    String GetData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
+    String PrintData(bool showUnused = false, bool showTotal = false, unsigned maxDepth = M_MAX_UNSIGNED) const;
     /// Return the current profiling block.
     const ProfilerBlock* GetCurrentBlock() { return current_; }
     /// Return the root profiling block.
@@ -219,7 +219,7 @@ public:
     
 private:
     /// Return profiling data as text output for a specified profiling block.
-    void GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
+    void PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused, bool showTotal) const;
     
     /// Current profiling block.
     ProfilerBlock* current_;
@@ -256,9 +256,9 @@ private:
 };
 
 #ifdef URHO3D_PROFILING
-#define PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
+#define URHO3D_PROFILE(name) Urho3D::AutoProfileBlock profile_ ## name (GetSubsystem<Urho3D::Profiler>(), #name)
 #else
-#define PROFILE(name)
+#define URHO3D_PROFILE(name)
 #endif
 
 }

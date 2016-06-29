@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -92,24 +92,24 @@ void AnimatedModel::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedModel>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Model", GetModelAttr, SetModelAttr, ResourceRef, ResourceRef(Model::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Material", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
         AM_DEFAULT);
-    ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
+    URHO3D_ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update When Invisible", GetUpdateInvisible, SetUpdateInvisible, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
+    URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
 
@@ -126,6 +126,15 @@ bool AnimatedModel::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
     loading_ = true;
     bool success = Component::LoadXML(source, setInstanceDefault);
+    loading_ = false;
+
+    return success;
+}
+
+bool AnimatedModel::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    loading_ = true;
+    bool success = Component::LoadJSON(source, setInstanceDefault);
     loading_ = false;
 
     return success;
@@ -321,7 +330,7 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
 
     if (model)
     {
-        SubscribeToEvent(model, E_RELOADFINISHED, HANDLER(AnimatedModel, HandleModelReloadFinished));
+        SubscribeToEvent(model, E_RELOADFINISHED, URHO3D_HANDLER(AnimatedModel, HandleModelReloadFinished));
 
         // Copy the subgeometry & LOD level structure
         SetNumGeometries(model->GetNumGeometries());
@@ -413,7 +422,7 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
 {
     if (!isMaster_)
     {
-        LOGERROR("Can not add animation state to non-master model");
+        URHO3D_LOGERROR("Can not add animation state to non-master model");
         return 0;
     }
 
@@ -666,7 +675,7 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 {
     if (!node_ && createBones)
     {
-        LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
+        URHO3D_LOGERROR("AnimatedModel not attached to a scene node, can not create bone nodes");
         return;
     }
 
@@ -709,17 +718,10 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
 
         skeleton_.Define(skeleton);
 
-        // Remove collision information from dummy bones that do not affect skinning, to prevent them from being merged
-        // to the bounding box
-        Vector<Bone>& bones = skeleton_.GetModifiableBones();
-        for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
-        {
-            if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < M_EPSILON)
-                i->collisionMask_ &= ~BONECOLLISION_BOX;
-            if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_EPSILON)
-                i->collisionMask_ &= ~BONECOLLISION_SPHERE;
-        }
+        // Merge bounding boxes from non-master models
+        FinalizeBoneBoundingBoxes();
 
+        Vector<Bone>& bones = skeleton_.GetModifiableBones();
         // Create scene nodes for the bones
         if (createBones)
         {
@@ -729,6 +731,8 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
                 Node* boneNode = node_->CreateChild(i->name_, LOCAL);
                 boneNode->AddListener(this);
                 boneNode->SetTransform(i->initialPosition_, i->initialRotation_, i->initialScale_);
+                // Copy the model component's temporary status
+                boneNode->SetTemporary(IsTemporary());
                 i->node_ = boneNode;
             }
 
@@ -750,6 +754,11 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
     {
         // For non-master models: use the bone nodes of the master model
         skeleton_.Define(skeleton);
+
+        // Instruct the master model to refresh (merge) its bone bounding boxes
+        AnimatedModel* master = node_->GetComponent<AnimatedModel>();
+        if (master && master != this)
+            master->FinalizeBoneBoundingBoxes();
 
         if (createBones)
         {
@@ -878,6 +887,34 @@ const PODVector<unsigned char>& AnimatedModel::GetMorphsAttr() const
     return attrBuffer_.GetBuffer();
 }
 
+void AnimatedModel::UpdateBoneBoundingBox()
+{
+    if (skeleton_.GetNumBones())
+    {
+        // The bone bounding box is in local space, so need the node's inverse transform
+        boneBoundingBox_.Clear();
+        Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
+
+        const Vector<Bone>& bones = skeleton_.GetBones();
+        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
+        {
+            Node* boneNode = i->node_;
+            if (!boneNode)
+                continue;
+
+            // Use hitbox if available. If not, use only half of the sphere radius
+            /// \todo The sphere radius should be multiplied with bone scale
+            if (i->collisionMask_ & BONECOLLISION_BOX)
+                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
+            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
+                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
+        }
+    }
+
+    boneBoundingBoxDirty_ = false;
+    worldBoundingBoxDirty_ = true;
+}
+
 void AnimatedModel::OnNodeSet(Node* node)
 {
     Drawable::OnNodeSet(node);
@@ -893,11 +930,13 @@ void AnimatedModel::OnMarkedDirty(Node* node)
 {
     Drawable::OnMarkedDirty(node);
 
-    // If the scene node or any of the bone nodes move, mark skinning and the bone bounding box dirty
+    // If the scene node or any of the bone nodes move, mark skinning dirty
     if (skeleton_.GetNumBones())
     {
         skinningDirty_ = true;
-        boneBoundingBoxDirty_ = true;
+        // Bone bounding box doesn't need to be marked dirty when only the base scene node moves
+        if (node != node_)
+            boneBoundingBoxDirty_ = true;
     }
 }
 
@@ -952,6 +991,68 @@ void AnimatedModel::AssignBoneNodes()
     {
         AnimationState* state = *i;
         state->SetStartBone(state->GetStartBone());
+    }
+}
+
+void AnimatedModel::FinalizeBoneBoundingBoxes()
+{
+    Vector<Bone>& bones = skeleton_.GetModifiableBones();
+    PODVector<AnimatedModel*> models;
+    GetComponents<AnimatedModel>(models);
+
+    if (models.Size() > 1)
+    {
+        // Reset first to the model resource's original bone bounding information if available (should be)
+        if (model_)
+        {
+            const Vector<Bone>& modelBones = model_->GetSkeleton().GetBones();
+            for (unsigned i = 0; i < bones.Size() && i < modelBones.Size(); ++i)
+            {
+                bones[i].collisionMask_ = modelBones[i].collisionMask_;
+                bones[i].radius_ = modelBones[i].radius_;
+                bones[i].boundingBox_ = modelBones[i].boundingBox_;
+            }
+        }
+
+        // Get matching bones from all non-master models and merge their bone bounding information
+        // to prevent culling errors (master model may not have geometry in all bones, or the bounds are smaller)
+        for (PODVector<AnimatedModel*>::Iterator i = models.Begin(); i != models.End(); ++i)
+        {
+            if ((*i) == this)
+                continue;
+
+            Skeleton& otherSkeleton = (*i)->GetSkeleton();
+            for (Vector<Bone>::Iterator j = bones.Begin(); j != bones.End(); ++j)
+            {
+                Bone* otherBone = otherSkeleton.GetBone(j->nameHash_);
+                if (otherBone)
+                {
+                    if (otherBone->collisionMask_ & BONECOLLISION_SPHERE)
+                    {
+                        j->collisionMask_ |= BONECOLLISION_SPHERE;
+                        j->radius_ = Max(j->radius_, otherBone->radius_);
+                    }
+                    if (otherBone->collisionMask_ & BONECOLLISION_BOX)
+                    {
+                        j->collisionMask_ |= BONECOLLISION_BOX;
+                        if (j->boundingBox_.Defined())
+                            j->boundingBox_.Merge(otherBone->boundingBox_);
+                        else
+                            j->boundingBox_.Define(otherBone->boundingBox_);
+                    }
+                }
+            }
+        }
+    }
+
+    // Remove collision information from dummy bones that do not affect skinning, to prevent them from being merged
+    // to the bounding box and making it artificially large
+    for (Vector<Bone>::Iterator i = bones.Begin(); i != bones.End(); ++i)
+    {
+        if (i->collisionMask_ & BONECOLLISION_BOX && i->boundingBox_.Size().Length() < M_EPSILON)
+            i->collisionMask_ &= ~BONECOLLISION_BOX;
+        if (i->collisionMask_ & BONECOLLISION_SPHERE && i->radius_ < M_EPSILON)
+            i->collisionMask_ &= ~BONECOLLISION_SPHERE;
     }
 }
 
@@ -1036,16 +1137,16 @@ void AnimatedModel::CloneGeometries()
             for (unsigned k = 0; k < originalBuffers.Size(); ++k)
             {
                 VertexBuffer* originalBuffer = originalBuffers[k];
-                unsigned originalMask = original->GetVertexElementMask(k);
 
                 if (clonedVertexBuffers.Contains(originalBuffer))
                 {
                     VertexBuffer* clonedBuffer = clonedVertexBuffers[originalBuffer];
-                    clone->SetVertexBuffer(l++, originalBuffer, originalMask & ~clonedBuffer->GetElementMask());
-                    clone->SetVertexBuffer(l++, clonedBuffer, originalMask & clonedBuffer->GetElementMask());
+                    clone->SetVertexBuffer(l++, originalBuffer);
+                    // Specify the morph buffer at a greater index to override the model's original positions/normals/tangents
+                    clone->SetVertexBuffer(l++, clonedBuffer);
                 }
                 else
-                    clone->SetVertexBuffer(l++, originalBuffer, originalMask);
+                    clone->SetVertexBuffer(l++, originalBuffer);
             }
 
             clone->SetIndexBuffer(original->GetIndexBuffer());
@@ -1065,8 +1166,8 @@ void AnimatedModel::CopyMorphVertices(void* destVertexData, void* srcVertexData,
     VertexBuffer* srcBuffer)
 {
     unsigned mask = destBuffer->GetElementMask() & srcBuffer->GetElementMask();
-    unsigned normalOffset = srcBuffer->GetElementOffset(ELEMENT_NORMAL);
-    unsigned tangentOffset = srcBuffer->GetElementOffset(ELEMENT_TANGENT);
+    unsigned normalOffset = srcBuffer->GetElementOffset(SEM_NORMAL);
+    unsigned tangentOffset = srcBuffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = srcBuffer->GetVertexSize();
     float* dest = (float*)destVertexData;
     unsigned char* src = (unsigned char*)srcVertexData;
@@ -1178,34 +1279,6 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
     animationDirty_ = false;
 }
 
-void AnimatedModel::UpdateBoneBoundingBox()
-{
-    if (skeleton_.GetNumBones())
-    {
-        // The bone bounding box is in local space, so need the node's inverse transform
-        boneBoundingBox_.Clear();
-        Matrix3x4 inverseNodeTransform = node_->GetWorldTransform().Inverse();
-
-        const Vector<Bone>& bones = skeleton_.GetBones();
-        for (Vector<Bone>::ConstIterator i = bones.Begin(); i != bones.End(); ++i)
-        {
-            Node* boneNode = i->node_;
-            if (!boneNode)
-                continue;
-
-            // Use hitbox if available. If not, use only half of the sphere radius
-            /// \todo The sphere radius should be multiplied with bone scale
-            if (i->collisionMask_ & BONECOLLISION_BOX)
-                boneBoundingBox_.Merge(i->boundingBox_.Transformed(inverseNodeTransform * boneNode->GetWorldTransform()));
-            else if (i->collisionMask_ & BONECOLLISION_SPHERE)
-                boneBoundingBox_.Merge(Sphere(inverseNodeTransform * boneNode->GetWorldPosition(), i->radius_ * 0.5f));
-        }
-    }
-
-    boneBoundingBoxDirty_ = false;
-    worldBoundingBoxDirty_ = true;
-}
-
 void AnimatedModel::UpdateSkinning()
 {
     // Note: the model's world transform will be baked in the skin matrices
@@ -1294,8 +1367,8 @@ void AnimatedModel::ApplyMorph(VertexBuffer* buffer, void* destVertexData, unsig
 {
     unsigned elementMask = morph.elementMask_ & buffer->GetElementMask();
     unsigned vertexCount = morph.vertexCount_;
-    unsigned normalOffset = buffer->GetElementOffset(ELEMENT_NORMAL);
-    unsigned tangentOffset = buffer->GetElementOffset(ELEMENT_TANGENT);
+    unsigned normalOffset = buffer->GetElementOffset(SEM_NORMAL);
+    unsigned tangentOffset = buffer->GetElementOffset(SEM_TANGENT);
     unsigned vertexSize = buffer->GetVertexSize();
 
     unsigned char* srcData = morph.morphData_;

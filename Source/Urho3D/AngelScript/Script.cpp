@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ namespace Urho3D
 
 class ScriptResourceRouter : public ResourceRouter
 {
-    OBJECT(ScriptResourceRouter, ResourceRouter);
+    URHO3D_OBJECT(ScriptResourceRouter, ResourceRouter);
 
     /// Construct.
     ScriptResourceRouter(Context* context) :
@@ -65,7 +65,6 @@ class ScriptResourceRouter : public ResourceRouter
     }
 };
 
-VariantMap Script::globalVars;
 
 Script::Script(Context* context) :
     Object(context),
@@ -77,7 +76,7 @@ Script::Script(Context* context) :
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
     {
-        LOGERROR("Could not create AngelScript engine");
+        URHO3D_LOGERROR("Could not create AngelScript engine");
         return;
     }
 
@@ -86,11 +85,21 @@ Script::Script(Context* context) :
     scriptEngine_->SetEngineProperty(asEP_ALLOW_UNSAFE_REFERENCES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_ALLOW_IMPLICIT_HANDLE_TYPES, (asPWORD)true);
     scriptEngine_->SetEngineProperty(asEP_BUILD_WITHOUT_LINE_CUES, (asPWORD)true);
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+    scriptEngine_->SetMessageCallback(_asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
+#else
     scriptEngine_->SetMessageCallback(asMETHOD(Script, MessageCallback), this, asCALL_THISCALL);
+#endif
 
     // Create the context for immediate execution
     immediateContext_ = scriptEngine_->CreateContext();
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+    immediateContext_->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#else
     immediateContext_->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#endif
 
     // Register Script library object factories
     RegisterScriptLibrary(context_);
@@ -166,7 +175,7 @@ Script::~Script()
 bool Script::Execute(const String& line)
 {
     // Note: compiling code each time is slow. Not to be used for performance-critical or repeating activity
-    PROFILE(ExecuteImmediate);
+    URHO3D_PROFILE(ExecuteImmediate);
 
     ClearObjectTypeCache();
 
@@ -215,7 +224,7 @@ void Script::SetExecuteConsoleCommands(bool enable)
 
     executeConsoleCommands_ = enable;
     if (enable)
-        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(Script, HandleConsoleCommand));
+        SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(Script, HandleConsoleCommand));
     else
         UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
@@ -228,15 +237,15 @@ void Script::MessageCallback(const asSMessageInfo* msg)
     switch (msg->type)
     {
     case asMSGTYPE_ERROR:
-        LOGERROR(message);
+        URHO3D_LOGERROR(message);
         break;
 
     case asMSGTYPE_WARNING:
-        LOGWARNING(message);
+        URHO3D_LOGWARNING(message);
         break;
 
     default:
-        LOGINFO(message);
+        URHO3D_LOGINFO(message);
         break;
     }
 }
@@ -304,7 +313,13 @@ asIScriptContext* Script::GetScriptFileContext()
     while (scriptNestingLevel_ >= scriptFileContexts_.Size())
     {
         asIScriptContext* newContext = scriptEngine_->CreateContext();
+// Use the copy of the original asMETHOD macro in a web build (for some reason it still works, presumably because the signature of the function is known)
+#ifdef AS_MAX_PORTABILITY
+        newContext->SetExceptionCallback(_asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#else
         newContext->SetExceptionCallback(asMETHOD(Script, ExceptionCallback), this, asCALL_THISCALL);
+#endif
+
         scriptFileContexts_.Push(newContext);
     }
 

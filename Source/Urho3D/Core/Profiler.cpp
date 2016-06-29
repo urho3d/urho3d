@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ void Profiler::BeginInterval()
     intervalFrames_ = 0;
 }
 
-String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) const
+String Profiler::PrintData(bool showUnused, bool showTotal, unsigned maxDepth) const
 {
     String output;
 
@@ -95,18 +95,18 @@ String Profiler::GetData(bool showUnused, bool showTotal, unsigned maxDepth) con
     if (!maxDepth)
         maxDepth = 1;
 
-    GetData(root_, output, 0, maxDepth, showUnused, showTotal);
+    PrintData(root_, output, 0, maxDepth, showUnused, showTotal);
 
     return output;
 }
 
-void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
+void Profiler::PrintData(ProfilerBlock* block, String& output, unsigned depth, unsigned maxDepth, bool showUnused,
     bool showTotal) const
 {
     char line[LINE_MAX_LENGTH];
     char indentedName[LINE_MAX_LENGTH];
 
-    unsigned intervalFrames = (unsigned)Max(intervalFrames_, 1);
+    unsigned intervalFrames = Max(intervalFrames_, 1U);
 
     if (depth >= maxDepth)
         return;
@@ -129,7 +129,7 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
                 float frame = block->intervalTime_ / intervalFrames / 1000.0f;
                 float all = block->intervalTime_ / 1000.0f;
 
-                sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999),
+                sprintf(line, "%s %5u %8.3f %8.3f %8.3f %9.3f\n", indentedName, Min(block->intervalCount_, 99999U),
                     avg, max, frame, all);
             }
             else
@@ -142,8 +142,8 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
                 float totalMax = block->totalMaxTime_ / 1000.0f;
                 float totalAll = block->totalTime_ / 1000.0f;
 
-                sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, Min(block->frameCount_, 99999),
-                    avg, max, all, Min(block->totalCount_, 99999), totalAvg, totalMax, totalAll);
+                sprintf(line, "%s %5u %8.3f %8.3f %9.3f  %7u %9.3f %9.3f %11.3f\n", indentedName, Min(block->frameCount_, 99999U),
+                    avg, max, all, Min(block->totalCount_, 99999U), totalAvg, totalMax, totalAll);
             }
 
             output += String(line);
@@ -153,7 +153,7 @@ void Profiler::GetData(ProfilerBlock* block, String& output, unsigned depth, uns
     }
 
     for (PODVector<ProfilerBlock*>::ConstIterator i = block->children_.Begin(); i != block->children_.End(); ++i)
-        GetData(*i, output, depth, maxDepth, showUnused, showTotal);
+        PrintData(*i, output, depth, maxDepth, showUnused, showTotal);
 }
 
 }

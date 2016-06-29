@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
 #include "../Resource/XMLElement.h"
+#include "../Resource/JSONValue.h"
 #include "../Scene/UnknownComponent.h"
 
 #include "../DebugNew.h"
@@ -136,10 +137,45 @@ bool UnknownComponent::LoadXML(const XMLElement& source, bool setInstanceDefault
     return true;
 }
 
+
+bool UnknownComponent::LoadJSON(const JSONValue& source, bool setInstanceDefault)
+{
+    useXML_ = true;
+    xmlAttributes_.Clear();
+    xmlAttributeInfos_.Clear();
+    binaryAttributes_.Clear();
+
+    JSONArray attributesArray = source.Get("attributes").GetArray();
+    for (unsigned i = 0; i < attributesArray.Size(); i++)
+    {
+        const JSONValue& attrVal = attributesArray.At(i);
+
+        AttributeInfo attr;
+        attr.mode_ = AM_FILE;
+        attr.name_ = attrVal.Get("name").GetString();
+        attr.type_ = VAR_STRING;
+
+        if (!attr.name_.Empty())
+        {
+            String attrValue = attrVal.Get("value").GetString();
+            attr.defaultValue_ = String::EMPTY;
+            xmlAttributeInfos_.Push(attr);
+            xmlAttributes_.Push(attrValue);
+        }
+    }
+
+    // Fix up pointers to the attributes after all have been read
+    for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
+        xmlAttributeInfos_[i].ptr_ = &xmlAttributes_[i];
+
+    return true;
+}
+
+
 bool UnknownComponent::Save(Serializer& dest) const
 {
     if (useXML_)
-        LOGWARNING("UnknownComponent loaded in XML mode, attributes will be empty for binary save");
+        URHO3D_LOGWARNING("UnknownComponent loaded in XML mode, attributes will be empty for binary save");
 
     // Write type and ID
     if (!dest.WriteStringHash(GetType()))
@@ -157,12 +193,12 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
-        LOGERROR("Could not save " + GetTypeName() + ", null destination element");
+        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination element");
         return false;
     }
 
     if (!useXML_)
-        LOGWARNING("UnknownComponent loaded in binary mode, attributes will be empty for XML save");
+        URHO3D_LOGWARNING("UnknownComponent loaded in binary or JSON mode, attributes will be empty for XML save");
 
     // Write type and ID
     if (!dest.SetString("type", GetTypeName()))
@@ -176,6 +212,29 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
         attrElem.SetAttribute("name", xmlAttributeInfos_[i].name_);
         attrElem.SetAttribute("value", xmlAttributes_[i]);
     }
+
+    return true;
+}
+
+bool UnknownComponent::SaveJSON(JSONValue& dest) const
+{
+    if (!useXML_)
+        URHO3D_LOGWARNING("UnknownComponent loaded in binary mode, attributes will be empty for JSON save");
+
+    // Write type and ID
+    dest.Set("type", GetTypeName());
+    dest.Set("id", (int) id_);
+
+    JSONArray attributesArray;
+    attributesArray.Reserve(xmlAttributeInfos_.Size());
+    for (unsigned i = 0; i < xmlAttributeInfos_.Size(); ++i)
+    {
+        JSONValue attrVal;
+        attrVal.Set("name", xmlAttributeInfos_[i].name_);
+        attrVal.Set("value", xmlAttributes_[i]);
+        attributesArray.Push(attrVal);
+    }
+    dest.Set("attributes", attributesArray);
 
     return true;
 }

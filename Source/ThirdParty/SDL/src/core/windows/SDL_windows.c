@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,11 @@
 #include "SDL_assert.h"
 
 #include <objbase.h>  /* for CoInitialize/CoUninitialize (Win32 only) */
+
+#ifndef _WIN32_WINNT_VISTA
+#define _WIN32_WINNT_VISTA  0x0600
+#endif
+
 
 /* Sets an error message based on GetLastError() */
 int
@@ -88,6 +93,37 @@ WIN_CoUninitialize(void)
 #endif
 }
 
-#endif /* __WIN32__ */
+#ifndef __WINRT__
+static BOOL
+IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
+{
+    OSVERSIONINFOEXW osvi;
+    DWORDLONG const dwlConditionMask = VerSetConditionMask(
+        VerSetConditionMask(
+        VerSetConditionMask(
+        0, VER_MAJORVERSION, VER_GREATER_EQUAL ),
+        VER_MINORVERSION, VER_GREATER_EQUAL ),
+        VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL );
+
+    SDL_zero(osvi);
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    osvi.dwMajorVersion = wMajorVersion;
+    osvi.dwMinorVersion = wMinorVersion;
+    osvi.wServicePackMajor = wServicePackMajor;
+
+    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
+}
+#endif
+
+BOOL WIN_IsWindowsVistaOrGreater()
+{
+#ifdef __WINRT__
+    return TRUE;
+#else
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
+#endif
+}
+
+#endif /* __WIN32__ || __WINRT__ */
 
 /* vi: set ts=4 sw=4 expandtab: */

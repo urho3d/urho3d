@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,23 +28,41 @@ namespace Urho3D
 {
 
 /// AnimatedModel bone hierarchy created.
-EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
+URHO3D_EVENT(E_BONEHIERARCHYCREATED, BoneHierarchyCreated)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 /// AnimatedModel animation trigger.
-EVENT(E_ANIMATIONTRIGGER, AnimationTrigger)
+URHO3D_EVENT(E_ANIMATIONTRIGGER, AnimationTrigger)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
-    PARAM(P_NAME, Name);                    // String
-    PARAM(P_TIME, Time);                    // Float
-    PARAM(P_DATA, Data);                    // User-defined data type
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_ANIMATION, Animation);          // Animation pointer
+    URHO3D_PARAM(P_NAME, Name);                    // String
+    URHO3D_PARAM(P_TIME, Time);                    // Float
+    URHO3D_PARAM(P_DATA, Data);                    // User-defined data type
 }
-/// Terrain geometry created.
-EVENT(E_TERRAINCREATED, TerrainCreated)
+
+/// AnimatedModel animation finished or looped.
+URHO3D_EVENT(E_ANIMATIONFINISHED, AnimationFinished)
 {
-    PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_ANIMATION, Animation);          // Animation pointer
+    URHO3D_PARAM(P_NAME, Name);                    // String
+    URHO3D_PARAM(P_LOOPED, Looped);                // Bool
+}
+
+/// Particle effect finished.
+URHO3D_EVENT(E_PARTICLEEFFECTFINISHED, ParticleEffectFinished)
+{
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_EFFECT, Effect);                // ParticleEffect pointer
+}
+
+/// Terrain geometry created.
+URHO3D_EVENT(E_TERRAINCREATED, TerrainCreated)
+{
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
 }

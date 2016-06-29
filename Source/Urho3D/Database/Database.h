@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ class DbConnection;
 /// %Database subsystem. Manage database connections.
 class URHO3D_API Database : public Object
 {
-    OBJECT(Database, Object);
+    URHO3D_OBJECT(Database, Object);
 
 public:
     /// Construct.

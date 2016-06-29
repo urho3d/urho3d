@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ LuaScript::LuaScript(Context* context) :
     luaState_ = luaL_newstate();
     if (!luaState_)
     {
-        LOGERROR("Could not create Lua state");
+        URHO3D_LOGERROR("Could not create Lua state");
         return;
     }
 
@@ -130,7 +130,7 @@ LuaScript::LuaScript(Context* context) :
     coroutineUpdate_ = GetFunction("coroutine.update");
 
     // Subscribe to post update
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(LuaScript, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(LuaScript, HandlePostUpdate));
 
     // Subscribe to console commands
     SetExecuteConsoleCommands(true);
@@ -218,9 +218,19 @@ void LuaScript::RemoveEventHandlersExcept(const Vector<String>& exceptionNames)
     eventInvoker_->UnsubscribeFromAllEventsExcept(exceptionTypes, true);
 }
 
+bool LuaScript::HasEventHandler(const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(eventName);
+}
+
+bool LuaScript::HasEventHandler(Object* sender, const String& eventName) const
+{
+    return eventInvoker_->HasSubscribedToEvent(sender, eventName);
+}
+
 bool LuaScript::ExecuteFile(const String& fileName)
 {
-    PROFILE(ExecuteFile);
+    URHO3D_PROFILE(ExecuteFile);
 
 #ifdef URHO3D_LUA_RAW_SCRIPT_LOADER
     if (ExecuteRawFile(fileName))
@@ -234,12 +244,12 @@ bool LuaScript::ExecuteFile(const String& fileName)
 
 bool LuaScript::ExecuteString(const String& string)
 {
-    PROFILE(ExecuteString);
+    URHO3D_PROFILE(ExecuteString);
 
     if (luaL_dostring(luaState_, string.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Execute Lua string failed: %s", message);
+        URHO3D_LOGERRORF("Execute Lua string failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
@@ -249,39 +259,39 @@ bool LuaScript::ExecuteString(const String& string)
 
 bool LuaScript::LoadRawFile(const String& fileName)
 {
-    PROFILE(LoadRawFile);
+    URHO3D_PROFILE(LoadRawFile);
 
-    LOGINFO("Finding Lua file on file system: " + fileName);
+    URHO3D_LOGINFO("Finding Lua file on file system: " + fileName);
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String filePath = cache->GetResourceFileName(fileName);
 
     if (filePath.Empty())
     {
-        LOGINFO("Lua file not found: " + fileName);
+        URHO3D_LOGINFO("Lua file not found: " + fileName);
         return false;
     }
 
     filePath = GetNativePath(filePath);
 
-    LOGINFO("Loading Lua file from file system: " + filePath);
+    URHO3D_LOGINFO("Loading Lua file from file system: " + filePath);
 
     if (luaL_loadfile(luaState_, filePath.CString()))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Load Lua file failed: %s", message);
+        URHO3D_LOGERRORF("Load Lua file failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
 
-    LOGINFO("Lua file loaded: " + filePath);
+    URHO3D_LOGINFO("Lua file loaded: " + filePath);
 
     return true;
 }
 
 bool LuaScript::ExecuteRawFile(const String& fileName)
 {
-    PROFILE(ExecuteRawFile);
+    URHO3D_PROFILE(ExecuteRawFile);
 
     if (!LoadRawFile(fileName))
         return false;
@@ -289,7 +299,7 @@ bool LuaScript::ExecuteRawFile(const String& fileName)
     if (lua_pcall(luaState_, 0, 0, 0))
     {
         const char* message = lua_tostring(luaState_, -1);
-        LOGERRORF("Execute Lua file failed: %s", message);
+        URHO3D_LOGERRORF("Execute Lua file failed: %s", message);
         lua_pop(luaState_, 1);
         return false;
     }
@@ -310,7 +320,7 @@ void LuaScript::SetExecuteConsoleCommands(bool enable)
 
     executeConsoleCommands_ = enable;
     if (enable)
-        SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(LuaScript, HandleConsoleCommand));
+        SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(LuaScript, HandleConsoleCommand));
     else
         UnsubscribeFromEvent(E_CONSOLECOMMAND);
 }
@@ -331,7 +341,7 @@ void LuaScript::RegisterLoader()
 int LuaScript::AtPanic(lua_State* L)
 {
     String errorMessage = luaL_checkstring(L, -1);
-    LOGERROR("Lua error: Error message = '" + errorMessage + "'");
+    URHO3D_LOGERROR("Lua error: Error message = '" + errorMessage + "'");
     lua_pop(L, 1);
     return 0;
 }
@@ -402,7 +412,7 @@ int LuaScript::Print(lua_State* L)
     }
     lua_pop(L, 1);
 
-    LOGRAWF("%s\n", String::Joined(strings, "    ").CString());
+    URHO3D_LOGRAWF("%s\n", String::Joined(strings, "    ").CString());
     return 0;
 }
 
@@ -441,7 +451,7 @@ LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNot
         functionNameToFunctionMap_[functionName] = function;
     }
     else if (!silentIfNotFound)
-        LOGERRORF("%s", lua_tostring(luaState_, -1));
+        URHO3D_LOGERRORF("%s", lua_tostring(luaState_, -1));
     lua_pop(luaState_, 1);
 
     return function;
@@ -459,7 +469,7 @@ void LuaScript::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     // Collect garbage
     {
-        PROFILE(LuaCollectGarbage);
+        URHO3D_PROFILE(LuaCollectGarbage);
         lua_gc(luaState_, LUA_GCCOLLECT, 0);
     }
 }

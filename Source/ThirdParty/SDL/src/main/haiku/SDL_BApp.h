@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by OvermindDL1 for Urho3D
-
 #ifndef SDL_BAPP_H
 #define SDL_BAPP_H
 
@@ -257,7 +254,7 @@ private:
             return;
         }
         win = GetSDLWindow(winID);
-        SDL_SendMouseWheel(win, 0, xTicks, yTicks);
+        SDL_SendMouseWheel(win, 0, xTicks, yTicks, SDL_MOUSEWHEEL_NORMAL);
     }
 
     void _HandleKey(BMessage *msg) {
@@ -274,7 +271,7 @@ private:
             return;
         }
         BE_SetKeyState(scancode, state);
-        SDL_SendKeyboardKey(state, (Uint32)(scancode), BE_GetScancodeFromBeKey(scancode));
+        SDL_SendKeyboardKey(state, BE_GetScancodeFromBeKey(scancode));
     }
 
     void _HandleMouseFocus(BMessage *msg) {

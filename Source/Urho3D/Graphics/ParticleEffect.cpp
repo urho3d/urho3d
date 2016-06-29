@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,10 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/StringUtils.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/ParticleEffect.h"
+#include "../Graphics/BillboardSet.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
@@ -33,6 +35,8 @@
 
 namespace Urho3D
 {
+
+extern const char* faceCameraModeNames[];
 
 static const char* emitterTypeNames[] =
 {
@@ -56,6 +60,7 @@ ParticleEffect::ParticleEffect(Context* context) :
     relative_(true),
     scaled_(true),
     sorted_(false),
+    fixedScreenSize_(false),
     animationLodBias_(0.0f),
     emitterType_(EMITTER_SPHERE),
     emitterSize_(Vector3::ZERO),
@@ -78,7 +83,8 @@ ParticleEffect::ParticleEffect(Context* context) :
     rotationSpeedMin_(0.0f),
     rotationSpeedMax_(0.0f),
     sizeAdd_(0.0f),
-    sizeMul_(1.0f)
+    sizeMul_(1.0f),
+    faceCameraMode_(FC_ROTATE_XYZ)
 {
 }
 
@@ -98,188 +104,16 @@ bool ParticleEffect::BeginLoad(Deserializer& source)
     XMLFile file(context_);
     if (!file.Load(source))
     {
-        LOGERROR("Load particle effect file failed");
+        URHO3D_LOGERROR("Load particle effect file failed");
         return false;
     }
 
     XMLElement rootElem = file.GetRoot();
-    if (!rootElem)
-    {
-        LOGERROR("Particle emitter parameter file does not have a valid root element");
-        return false;
-    }
 
-    // Reset to defaults first so that missing parameters in case of a live reload behave as expected
-    material_.Reset();
-    numParticles_ = DEFAULT_NUM_PARTICLES;
-    updateInvisible_ = false;
-    relative_ = true;
-    scaled_ = true;
-    sorted_ = false;
-    animationLodBias_ = 0.0f;
-    emitterType_ = EMITTER_SPHERE;
-    emitterSize_ = Vector3::ZERO;
-    directionMin_ = DEFAULT_DIRECTION_MIN;
-    directionMax_ = DEFAULT_DIRECTION_MAX;
-    constantForce_ = Vector3::ZERO;
-    dampingForce_ = 0.0f;
-    activeTime_ = 0.0f;
-    inactiveTime_ = 0.0;
-    emissionRateMin_ = DEFAULT_EMISSION_RATE;
-    emissionRateMax_ = DEFAULT_EMISSION_RATE;
-    sizeMin_ = DEFAULT_PARTICLE_SIZE;
-    sizeMax_ = DEFAULT_PARTICLE_SIZE;
-    timeToLiveMin_ = DEFAULT_TIME_TO_LIVE;
-    timeToLiveMax_ = DEFAULT_TIME_TO_LIVE;
-    velocityMin_ = DEFAULT_VELOCITY;
-    velocityMax_ = DEFAULT_VELOCITY;
-    rotationMin_ = 0.0f;
-    rotationMax_ = 0.0f;
-    rotationSpeedMin_ = 0.0f;
-    rotationSpeedMax_ = 0.0f;
-    sizeAdd_ = 0.0f;
-    sizeMul_ = 1.0f;
-    colorFrames_.Clear();
-    textureFrames_.Clear();
-
-    if (rootElem.HasChild("material"))
-    {
-        loadMaterialName_ = rootElem.GetChild("material").GetAttribute("name");
-        // If async loading, can not GetResource() the material. But can do a background request for it
-        if (GetAsyncLoadState() == ASYNC_LOADING)
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Material>(loadMaterialName_, true, this);
-    }
-
-    if (rootElem.HasChild("numparticles"))
-        SetNumParticles((unsigned)rootElem.GetChild("numparticles").GetInt("value"));
-
-    if (rootElem.HasChild("updateinvisible"))
-        updateInvisible_ = rootElem.GetChild("updateinvisible").GetBool("enable");
-
-    if (rootElem.HasChild("relative"))
-        relative_ = rootElem.GetChild("relative").GetBool("enable");
-
-    if (rootElem.HasChild("scaled"))
-        scaled_ = rootElem.GetChild("scaled").GetBool("enable");
-
-    if (rootElem.HasChild("sorted"))
-        sorted_ = rootElem.GetChild("sorted").GetBool("enable");
-
-    if (rootElem.HasChild("animlodbias"))
-        SetAnimationLodBias(rootElem.GetChild("animlodbias").GetFloat("value"));
-
-    if (rootElem.HasChild("emittertype"))
-    {
-        String type = rootElem.GetChild("emittertype").GetAttributeLower("value");
-        if (type == "point")
-        {
-            // Point emitter type is deprecated, handled as zero sized sphere
-            emitterType_ = EMITTER_SPHERE;
-            emitterSize_ = Vector3::ZERO;
-        }
-        else if (type == "box")
-            emitterType_ = EMITTER_BOX;
-        else if (type == "sphere")
-            emitterType_ = EMITTER_SPHERE;
-        else
-            LOGERROR("Unknown particle emitter type " + type);
-    }
-
-    if (rootElem.HasChild("emittersize"))
-        emitterSize_ = rootElem.GetChild("emittersize").GetVector3("value");
-
-    if (rootElem.HasChild("emitterradius"))
-        emitterSize_.x_ = emitterSize_.y_ = emitterSize_.z_ = rootElem.GetChild("emitterradius").GetFloat("value");
-
-    if (rootElem.HasChild("direction"))
-        GetVector3MinMax(rootElem.GetChild("direction"), directionMin_, directionMax_);
-
-    if (rootElem.HasChild("constantforce"))
-        constantForce_ = rootElem.GetChild("constantforce").GetVector3("value");
-
-    if (rootElem.HasChild("dampingforce"))
-        dampingForce_ = rootElem.GetChild("dampingforce").GetFloat("value");
-
-    if (rootElem.HasChild("activetime"))
-        activeTime_ = rootElem.GetChild("activetime").GetFloat("value");
-    if (activeTime_ < 0.0f)
-        activeTime_ = M_INFINITY;
-
-    if (rootElem.HasChild("inactivetime"))
-        inactiveTime_ = rootElem.GetChild("inactivetime").GetFloat("value");
-    if (inactiveTime_ < 0.0f)
-        inactiveTime_ = M_INFINITY;
-
-    if (rootElem.HasChild("emissionrate"))
-        GetFloatMinMax(rootElem.GetChild("emissionrate"), emissionRateMin_, emissionRateMax_);
-
-    if (rootElem.HasChild("interval"))
-    {
-        float intervalMin = 0.0f;
-        float intervalMax = 0.0f;
-        GetFloatMinMax(rootElem.GetChild("interval"), intervalMin, intervalMax);
-        emissionRateMax_ = 1.0f / intervalMin;
-        emissionRateMin_ = 1.0f / intervalMax;
-    }
-
-    if (rootElem.HasChild("particlesize"))
-        GetVector2MinMax(rootElem.GetChild("particlesize"), sizeMin_, sizeMax_);
-
-    if (rootElem.HasChild("timetolive"))
-        GetFloatMinMax(rootElem.GetChild("timetolive"), timeToLiveMin_, timeToLiveMax_);
-
-    if (rootElem.HasChild("velocity"))
-        GetFloatMinMax(rootElem.GetChild("velocity"), velocityMin_, velocityMax_);
-
-    if (rootElem.HasChild("rotation"))
-        GetFloatMinMax(rootElem.GetChild("rotation"), rotationMin_, rotationMax_);
-
-    if (rootElem.HasChild("rotationspeed"))
-        GetFloatMinMax(rootElem.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
-
-    if (rootElem.HasChild("sizedelta"))
-    {
-        XMLElement deltaElem = rootElem.GetChild("sizedelta");
-        if (deltaElem.HasAttribute("add"))
-            sizeAdd_ = deltaElem.GetFloat("add");
-        if (deltaElem.HasAttribute("mul"))
-            sizeMul_ = deltaElem.GetFloat("mul");
-    }
-
-    if (rootElem.HasChild("color"))
-    {
-        ColorFrame colorFrame(rootElem.GetChild("color").GetColor("value"));
-        SetColorFrame(0, colorFrame);
-    }
-
-    if (rootElem.HasChild("colorfade"))
-    {
-        Vector<ColorFrame> fades;
-        for (XMLElement colorFadeElem = rootElem.GetChild("colorfade"); colorFadeElem;
-             colorFadeElem = colorFadeElem.GetNext("colorfade"))
-            fades.Push(ColorFrame(colorFadeElem.GetColor("color"), colorFadeElem.GetFloat("time")));
-
-        SetColorFrames(fades);
-    }
-
-    if (colorFrames_.Empty())
-        colorFrames_.Push(ColorFrame(Color::WHITE));
-
-    if (rootElem.HasChild("texanim"))
-    {
-        Vector<TextureFrame> animations;
-        for (XMLElement animElem = rootElem.GetChild("texanim"); animElem; animElem = animElem.GetNext("texanim"))
-        {
-            TextureFrame animation;
-            animation.uv_ = animElem.GetRect("uv");
-            animation.time_ = animElem.GetFloat("time");
-            animations.Push(animation);
-        }
-
-        SetTextureFrames(animations);
-    }
-
-    return true;
+    bool success = Load(rootElem);
+    if (success)
+        SetMemoryUse(source.GetSize());
+    return success;
 }
 
 bool ParticleEffect::EndLoad()
@@ -303,6 +137,7 @@ bool ParticleEffect::Load(const XMLElement& source)
     relative_ = true;
     scaled_ = true;
     sorted_ = false;
+    fixedScreenSize_ = false;
     animationLodBias_ = 0.0f;
     emitterType_ = EMITTER_SPHERE;
     emitterSize_ = Vector3::ZERO;
@@ -328,16 +163,20 @@ bool ParticleEffect::Load(const XMLElement& source)
     sizeMul_ = 1.0f;
     colorFrames_.Clear();
     textureFrames_.Clear();
+    faceCameraMode_ = FC_ROTATE_XYZ;
 
     if (source.IsNull())
     {
-        LOGERROR("Can not load particle effect from null XML element");
+        URHO3D_LOGERROR("Can not load particle effect from null XML element");
         return false;
     }
 
     if (source.HasChild("material"))
     {
-        material_ = GetSubsystem<ResourceCache>()->GetResource<Material>(source.GetChild("material").GetAttribute("name"));
+        loadMaterialName_ = source.GetChild("material").GetAttribute("name");
+        // If async loading, can not GetResource() the material. But can do a background request for it
+        if (GetAsyncLoadState() == ASYNC_LOADING)
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Material>(loadMaterialName_, true, this);
     }
 
     if (source.HasChild("numparticles"))
@@ -355,6 +194,9 @@ bool ParticleEffect::Load(const XMLElement& source)
     if (source.HasChild("sorted"))
         sorted_ = source.GetChild("sorted").GetBool("enable");
 
+    if (source.HasChild("fixedscreensize"))
+        fixedScreenSize_ = source.GetChild("fixedscreensize").GetBool("enable");
+
     if (source.HasChild("animlodbias"))
         SetAnimationLodBias(source.GetChild("animlodbias").GetFloat("value"));
 
@@ -367,12 +209,8 @@ bool ParticleEffect::Load(const XMLElement& source)
             emitterType_ = EMITTER_SPHERE;
             emitterSize_ = Vector3::ZERO;
         }
-        else if (type == "box")
-            emitterType_ = EMITTER_BOX;
-        else if (type == "sphere")
-            emitterType_ = EMITTER_SPHERE;
         else
-            LOGERROR("Unknown particle emitter type " + type);
+            emitterType_ = (EmitterType)GetStringListIndex(type.CString(), emitterTypeNames, EMITTER_SPHERE);
     }
 
     if (source.HasChild("emittersize"))
@@ -426,6 +264,12 @@ bool ParticleEffect::Load(const XMLElement& source)
 
     if (source.HasChild("rotationspeed"))
         GetFloatMinMax(source.GetChild("rotationspeed"), rotationSpeedMin_, rotationSpeedMax_);
+
+    if (source.HasChild("faceCameraMode"))
+    {
+        String type = source.GetChild("faceCameraMode").GetAttributeLower("value");
+        faceCameraMode_ = (FaceCameraMode)GetStringListIndex(type.CString(), faceCameraModeNames, FC_ROTATE_XYZ);
+    }
 
     if (source.HasChild("sizedelta"))
     {
@@ -485,7 +329,7 @@ bool ParticleEffect::Save(XMLElement& dest) const
 {
     if (dest.IsNull())
     {
-        LOGERROR("Can not save particle effect to null XML element");
+        URHO3D_LOGERROR("Can not save particle effect to null XML element");
         return false;
     }
 
@@ -506,6 +350,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
 
     childElem = dest.CreateChild("sorted");
     childElem.SetBool("enable", sorted_);
+
+    childElem = dest.CreateChild("fixedscreensize");
+    childElem.SetBool("enable", fixedScreenSize_);
 
     childElem = dest.CreateChild("animlodbias");
     childElem.SetFloat("value", animationLodBias_);
@@ -560,6 +407,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem.SetFloat("add", sizeAdd_);
     childElem.SetFloat("mul", sizeMul_);
 
+    childElem = dest.CreateChild("faceCameraMode");
+    childElem.SetAttribute("value", faceCameraModeNames[faceCameraMode_]);
+
     if (colorFrames_.Size() == 1)
     {
         childElem = dest.CreateChild("color");
@@ -593,7 +443,7 @@ void ParticleEffect::SetMaterial(Material* material)
 
 void ParticleEffect::SetNumParticles(unsigned num)
 {
-    numParticles_ = (unsigned)Max(0, num);
+    numParticles_ = Max(0U, num);
 }
 
 void ParticleEffect::SetUpdateInvisible(bool enable)
@@ -614,6 +464,11 @@ void ParticleEffect::SetScaled(bool enable)
 void ParticleEffect::SetSorted(bool enable)
 {
     sorted_ = enable;
+}
+
+void ParticleEffect::SetFixedScreenSize(bool enable)
+{
+    fixedScreenSize_ = enable;
 }
 
 void ParticleEffect::SetAnimationLodBias(float lodBias)
@@ -794,6 +649,11 @@ void ParticleEffect::SetNumColorFrames(unsigned number)
         colorFrames_.Resize(number);
 }
 
+void ParticleEffect::SetFaceCameraMode(FaceCameraMode mode)
+{
+    faceCameraMode_ = mode;
+}
+
 void ParticleEffect::SortColorFrames()
 {
     Vector<ColorFrame> cf = colorFrames_;
@@ -822,7 +682,7 @@ void ParticleEffect::AddTextureTime(const Rect& uv, const float time)
         }
     }
 
-    // highest time, add last:
+    // Highest time, add last
     textureFrames_[s].uv_ = uv;
     textureFrames_[s].time_ = time;
 }

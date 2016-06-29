@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -346,8 +346,17 @@ template <class T> void RegisterRefCounted(asIScriptEngine* engine, const char* 
 
 template <class T> void ObjectSendEvent(const String& eventType, VariantMap& eventData, T* ptr)
 {
-    if (ptr)
-        ptr->SendEvent(StringHash(eventType), eventData);
+    ptr->SendEvent(StringHash(eventType), eventData);
+}
+
+template <class T> bool ObjectHasSubscribedToEvent(const String& eventType, T* ptr)
+{
+    return ptr->HasSubscribedToEvent(StringHash(eventType));
+}
+
+template <class T> bool ObjectHasSubscribedToSenderEvent(Object* sender, const String& eventType, T* ptr)
+{
+    return ptr->HasSubscribedToEvent(sender, StringHash(eventType));
 }
 
 /// Template function for registering a class derived from Object.
@@ -358,6 +367,8 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "const String& get_typeName() const", asMETHODPR(T, GetTypeName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_category() const", asMETHODPR(T, GetCategory, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(const String&in)", asFUNCTION(ObjectHasSubscribedToEvent<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(ObjectHasSubscribedToSenderEvent<T>), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Object", className);
 }
 
@@ -437,6 +448,8 @@ template <class T> void RegisterSerializable(asIScriptEngine* engine, const char
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(SerializableSaveVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&, bool setInstanceDefault = false)", asMETHODPR(T, LoadXML, (const XMLElement&, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SaveXML(XMLElement&) const", asMETHODPR(T, SaveXML, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool LoadJSON(const JSONValue&, bool setInstanceDefault = false)", asMETHODPR(T, LoadJSON, (const JSONValue&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool SaveJSON(JSONValue&) const", asMETHODPR(T, SaveJSON, (JSONValue&) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void MarkNetworkUpdate() const", asMETHODPR(T, MarkNetworkUpdate, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void ApplyAttributes()", asMETHODPR(T, ApplyAttributes, (), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool SetAttribute(const String&in, const Variant&in)", asMETHODPR(T, SetAttribute, (const String&, const Variant&), bool), asCALL_THISCALL);
@@ -532,6 +545,11 @@ static Component* NodeGetComponentWithType(const String& typeName, bool recursiv
     return ptr->GetComponent(typeName, recursive);
 }
 
+static Component* NodeGetParentComponentWithType(const String& typeName, bool fullTraversal, Node* ptr)
+{
+    return ptr->GetParentComponent(typeName, fullTraversal);
+}
+
 static CScriptArray* NodeGetComponents(Node* ptr)
 {
     return VectorToHandleArray<Component>(ptr->GetComponents(), "Array<Component@>");
@@ -561,6 +579,18 @@ static CScriptArray* NodeGetChildrenWithComponent(const String& typeName, bool r
     PODVector<Node*> nodes;
     ptr->GetChildrenWithComponent(nodes, typeName, recursive);
     return VectorToHandleArray<Node>(nodes, "Array<Node@>");
+}
+
+static CScriptArray* NodeGetChildrenWithTag(const String& typeName, bool recursive, Node* ptr)
+{
+    PODVector<Node*> nodes;
+    ptr->GetChildrenWithTag(nodes, typeName, recursive);
+    return VectorToHandleArray<Node>(nodes, "Array<Node@>");
+}
+
+static CScriptArray* NodeGetTags(Node* ptr)
+{
+    return VectorToArray<String>(ptr->GetTags(), "Array<String>");
 }
 
 static unsigned NodeGetNumChildrenNonRecursive(Node* ptr)
@@ -671,15 +701,23 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void RemoveComponents(bool, bool)", asMETHODPR(T, RemoveComponents, (bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponents(const String&in)", asFUNCTION(NodeRemoveComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllComponents()", asMETHOD(T, RemoveAllComponents), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void AddTags(const String&in, int8 separator = ';')", asMETHODPR(T, AddTags, (const String&, char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveAllTags()", asMETHOD(T, RemoveAllTags), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildren(bool recursive = false) const", asFUNCTION(NodeGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithTag(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithTag), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(bool recursive = false) const", asFUNCTION(NodeGetChildrenWithScript), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Node@>@ GetChildrenWithScript(const String&in, bool recursive = false) const", asFUNCTION(NodeGetChildrenWithClassName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, Node*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents() const", asFUNCTION(NodeGetComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Component@+ GetParentComponent(const String&in, bool fullTraversal = false) const", asFUNCTION(NodeGetParentComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool HasTag(const String&in)", asMETHOD(T, HasTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<String>@ get_tags()", asFUNCTION(NodeGetTags), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector3&in) const", asMETHODPR(T, LocalToWorld, (const Vector3&) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 LocalToWorld(const Vector4&in) const", asMETHODPR(T, LocalToWorld, (const Vector4&) const, Vector3), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 LocalToWorld2D(const Vector2&in) const", asMETHODPR(T, LocalToWorld2D, (const Vector2&) const, Vector2), asCALL_THISCALL);
@@ -706,7 +744,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector3 get_worldPosition()", asMETHOD(T, GetWorldPosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldPosition2D(const Vector2&in)", asMETHODPR(T, SetWorldPosition2D, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 get_worldPosition2D()", asMETHOD(T, GetWorldPosition2D), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_worldRotation(const Quaternion&in)", asMETHODPR(T, SetWorldRotation, (const Quaternion&in), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_worldRotation(const Quaternion&in)", asMETHODPR(T, SetWorldRotation, (const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Quaternion get_worldRotation()", asMETHOD(T, GetWorldRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldRotation2D(float)", asMETHODPR(T, SetWorldRotation2D, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_worldRotation2D()", asMETHOD(T, GetWorldRotation2D), asCALL_THISCALL);
@@ -944,6 +982,18 @@ static CScriptArray* UIElementGetChildren(bool recursive, UIElement* ptr)
     return VectorToHandleArray<UIElement>(elements, "Array<UIElement@>");
 }
 
+static CScriptArray* UIElementGetChildrenWithTag(const String& tag, bool recursive, UIElement* ptr)
+{
+    PODVector<UIElement*> elements;
+    ptr->GetChildrenWithTag(elements, tag, recursive);
+    return VectorToHandleArray<UIElement>(elements, "Array<UIElement@>");
+}
+
+static CScriptArray* UIElementGetTags(UIElement* ptr)
+{
+    return VectorToArray<String>(ptr->GetTags(), "Array<String>");
+}
+
 static unsigned UIElementGetNumChildrenNonRecursive(UIElement* ptr)
 {
     return ptr->GetNumChildren(false);
@@ -1008,13 +1058,10 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void SetFixedWidth(int)", asMETHOD(T, SetFixedWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedHeight(int)", asMETHOD(T, SetFixedHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(T, SetAlignment), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void SetLayout(LayoutMode, int spacing = 0, const IntRect& border = IntRect(0, 0, 0, 0))", asMETHOD(T, SetLayout), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void UpdateLayout()", asMETHOD(T, UpdateLayout), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", asMETHOD(T, DisableLayoutUpdate), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void EnableLayoutUpdate()", asMETHOD(T, EnableLayoutUpdate), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void SetLayout(LayoutMode, int spacing = 0, const IntRect& border = IntRect(0, 0, 0, 0))", asMETHOD(T, SetLayout), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void UpdateLayout()", asMETHOD(T, UpdateLayout), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", asMETHOD(T, DisableLayoutUpdate), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void EnableLayoutUpdate()", asMETHOD(T, EnableLayoutUpdate), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void BringToFront()", asMETHOD(T, BringToFront), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ CreateChild(const String&in, const String&in name = String(), uint index = M_MAX_UNSIGNED)", asFUNCTION(UIElementCreateChild), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void AddChild(UIElement@+)", asMETHOD(T, AddChild), asCALL_THISCALL);
@@ -1025,18 +1072,21 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void Remove()", asMETHOD(T, Remove), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint FindChild(UIElement@+) const", asMETHOD(T, FindChild), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetParent(UIElement@+, uint index = M_MAX_UNSIGNED)", asMETHOD(T, SetParent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void AddTags(const String&in, int8 separator = ';')", asMETHODPR(T, AddTags, (const String&, char), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void RemoveAllTags()", asMETHOD(T, RemoveAllTags), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const String&in, bool recursive = false) const", asMETHODPR(T, GetChild, (const String&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "UIElement@+ GetChild(const StringHash&in, const Variant&in value = Variant(), bool recursive = false) const", asMETHODPR(T, GetChild, (const StringHash&, const Variant&, bool) const, UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildren(bool recursive = false) const", asFUNCTION(UIElementGetChildren), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "UIElement@+ GetElementEventSender() const", asMETHOD(T, GetElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Variant& GetVar(const StringHash&in)", asMETHOD(T, GetVar), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "IntVector2 ScreenToElement(const IntVector2&in)", asMETHOD(T, ScreenToElement), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "IntVector2 ElementToScreen(const IntVector2&in)", asMETHOD(T, ElementToScreen), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool IsInside(IntVector2, bool)", asMETHOD(T, IsInside), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool IsInsideCombined(IntVector2, bool)", asMETHOD(T, IsInsideCombined), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "bool HasTag(const String&in) const", asMETHOD(T, HasTag), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Array<UIElement@>@ GetChildrenWithTag(const String&in, bool recursive = false) const", asFUNCTION(UIElementGetChildrenWithTag), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "IntVector2 ScreenToElement(const IntVector2&in)", asMETHOD(T, ScreenToElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "IntVector2 ElementToScreen(const IntVector2&in)", asMETHOD(T, ElementToScreen), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool IsInside(IntVector2, bool)", asMETHOD(T, IsInside), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool IsInsideCombined(IntVector2, bool)", asMETHOD(T, IsInsideCombined), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_style(const String&in)", asFUNCTION(UIElementSetStyle), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "const String& get_style() const", asMETHOD(T, GetAppliedStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", asMETHOD(T, SetName), asCALL_THISCALL);
@@ -1052,33 +1102,27 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "int get_width() const", asMETHOD(T, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_height(int)", asMETHOD(T, SetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_height() const", asMETHOD(T, GetHeight), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void set_minSize(const IntVector2&in)", asMETHODPR(T, SetMinSize, (const IntVector2&), void), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const IntVector2& get_minSize() const", asMETHOD(T, GetMinSize), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_minWidth(int)", asMETHOD(T, SetMinWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_minWidth() const", asMETHOD(T, GetMinWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_minHeight(int)", asMETHOD(T, SetMinHeight), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_minHeight() const", asMETHOD(T, GetMinHeight), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_maxSize(const IntVector2&in)", asMETHODPR(T, SetMaxSize, (const IntVector2&), void), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const IntVector2& get_maxSize() const", asMETHOD(T, GetMaxSize), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_maxWidth(int)", asMETHOD(T, SetMaxWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_maxWidth() const", asMETHOD(T, GetMaxWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_maxHeight(int)", asMETHOD(T, SetMaxHeight), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_maxHeight() const", asMETHOD(T, GetMaxHeight), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_fixedSize() const", asMETHOD(T, IsFixedSize), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_fixedWidth() const", asMETHOD(T, IsFixedWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_fixedHeight() const", asMETHOD(T, IsFixedHeight), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void set_minSize(const IntVector2&in)", asMETHODPR(T, SetMinSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_minSize() const", asMETHOD(T, GetMinSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minWidth(int)", asMETHOD(T, SetMinWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_minWidth() const", asMETHOD(T, GetMinWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minHeight(int)", asMETHOD(T, SetMinHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_minHeight() const", asMETHOD(T, GetMinHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxSize(const IntVector2&in)", asMETHODPR(T, SetMaxSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_maxSize() const", asMETHOD(T, GetMaxSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxWidth(int)", asMETHOD(T, SetMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxWidth() const", asMETHOD(T, GetMaxWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxHeight(int)", asMETHOD(T, SetMaxHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_maxHeight() const", asMETHOD(T, GetMaxHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_fixedSize() const", asMETHOD(T, IsFixedSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_fixedWidth() const", asMETHOD(T, IsFixedWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_fixedHeight() const", asMETHOD(T, IsFixedHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_horizontalAlignment(HorizontalAlignment)", asMETHOD(T, SetHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(T, GetHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_verticalAlignment(VerticalAlignment)", asMETHOD(T, SetVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment get_verticalAlignment() const", asMETHOD(T, GetVerticalAlignment), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void set_clipBorder(const IntRect&in)", asMETHODPR(T, SetClipBorder, (const IntRect&), void), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const IntRect& get_clipBorder() const", asMETHOD(T, GetClipBorder), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void set_clipBorder(const IntRect&in)", asMETHODPR(T, SetClipBorder, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& get_clipBorder() const", asMETHOD(T, GetClipBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_color(const Color&in)", asMETHODPR(T, SetColor, (const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_colors(Corner, const Color&in)", asMETHODPR(T, SetColor, (Corner, const Color&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& get_colors(Corner) const", asMETHOD(T, GetColor), asCALL_THISCALL);
@@ -1090,68 +1134,53 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool get_bringToFront() const", asMETHOD(T, SetBringToFront), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_bringToBack(bool)", asMETHOD(T, SetBringToBack), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_bringToBack() const", asMETHOD(T, GetBringToBack), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void set_clipChildren(bool)", asMETHOD(T, SetClipChildren), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_clipChildren() const", asMETHOD(T, GetClipChildren), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void set_clipChildren(bool)", asMETHOD(T, SetClipChildren), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_clipChildren() const", asMETHOD(T, GetClipChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sortChildren(bool)", asMETHOD(T, SetSortChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_sortChildren() const", asMETHOD(T, GetSortChildren), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_useDerivedOpacity(bool)", asMETHOD(T, SetUseDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_useDerivedOpacity() const", asMETHOD(T, GetUseDerivedOpacity), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void SetDeepEnabled(bool)", asMETHOD(T, SetDeepEnabled), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", asMETHOD(T, ResetDeepEnabled), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void SetEnabledRecursive(bool)", asMETHOD(T, SetEnabledRecursive), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_enabledSelf() const", asMETHOD(T, IsEnabledSelf), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_selected() const", asMETHOD(T, IsSelected), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void SetDeepEnabled(bool)", asMETHOD(T, SetDeepEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ResetDeepEnabled()", asMETHOD(T, ResetDeepEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetEnabledRecursive(bool)", asMETHOD(T, SetEnabledRecursive), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_enabled(bool)", asMETHOD(T, SetEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enabled() const", asMETHOD(T, IsEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enabledSelf() const", asMETHOD(T, IsEnabledSelf), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_editable(bool)", asMETHOD(T, SetEditable), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_editable() const", asMETHOD(T, IsEditable), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_focus(bool)", asMETHOD(T, SetFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_focus() const", asMETHOD(T, HasFocus), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_selected(bool)", asMETHOD(T, SetSelected), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_selected() const", asMETHOD(T, IsSelected), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_visible(bool)", asMETHOD(T, SetVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visible() const", asMETHOD(T, IsVisible), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_visibleEffective() const", asMETHOD(T, IsVisibleEffective), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "bool get_hovering() const", asMETHOD(T, IsHovering), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_internal(bool) const", asMETHOD(T, SetInternal), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "bool get_internal() const", asMETHOD(T, IsInternal), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "bool get_hovering() const", asMETHOD(T, IsHovering), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_internal(bool) const", asMETHOD(T, SetInternal), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_internal() const", asMETHOD(T, IsInternal), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_colorGradient() const", asMETHOD(T, HasColorGradient), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void set_focusMode(FocusMode)", asMETHOD(T, SetFocusMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "FocusMode get_focusMode() const", asMETHOD(T, GetFocusMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_dragDropMode(uint)", asMETHOD(T, SetDragDropMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "uint get_dragDropMode() const", asMETHOD(T, GetDragDropMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_traversalMode(TraversalMode)", asMETHOD(T, SetTraversalMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "TraversalMode get_traversalMode() const", asMETHOD(T, GetTraversalMode), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void set_focusMode(FocusMode)", asMETHOD(T, SetFocusMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "FocusMode get_focusMode() const", asMETHOD(T, GetFocusMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_dragDropMode(uint)", asMETHOD(T, SetDragDropMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_dragDropMode() const", asMETHOD(T, GetDragDropMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_traversalMode(TraversalMode)", asMETHOD(T, SetTraversalMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "TraversalMode get_traversalMode() const", asMETHOD(T, GetTraversalMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_defaultStyle(XMLFile@+)", asMETHOD(T, SetDefaultStyle), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "XMLFile@+ get_defaultStyle() const", asFUNCTION(UIElementGetDefaultStyle), asCALL_CDECL_OBJLAST);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "void set_layoutMode(LayoutMode)", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "LayoutMode get_layoutMode() const", asMETHOD(T, GetLayoutMode), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_layoutSpacing(int)", asMETHOD(T, SetLayoutSpacing), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_layoutBorder(const IntRect&)", asMETHOD(T, SetLayoutBorder), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const IntRect& get_layoutBorder() const", asMETHOD(T, GetLayoutBorder), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_layoutFlexScale(const Vector2&)", asMETHOD(T, SetLayoutFlexScale), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const Vector2& get_layoutFlexScale() const", asMETHOD(T, GetLayoutFlexScale), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_indent(int)", asMETHOD(T, SetIndent), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_indent() const", asMETHOD(T, GetIndent), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "void set_indentSpacing(int)", asMETHOD(T, SetIndentSpacing), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_indentSpacing() const", asMETHOD(T, GetIndentSpacing), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "int get_indentWidth() const", asMETHOD(T, GetIndentWidth), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "const IntVector2& get_childOffset() const", asMETHOD(T, GetChildOffset), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "void set_layoutMode(LayoutMode)", asMETHOD(T, SetLayoutMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "LayoutMode get_layoutMode() const", asMETHOD(T, GetLayoutMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_layoutSpacing(int)", asMETHOD(T, SetLayoutSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_layoutSpacing() const", asMETHOD(T, GetLayoutSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_layoutBorder(const IntRect&)", asMETHOD(T, SetLayoutBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntRect& get_layoutBorder() const", asMETHOD(T, GetLayoutBorder), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_layoutFlexScale(const Vector2&)", asMETHOD(T, SetLayoutFlexScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_layoutFlexScale() const", asMETHOD(T, GetLayoutFlexScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_indent(int)", asMETHOD(T, SetIndent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indent() const", asMETHOD(T, GetIndent), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_indentSpacing(int)", asMETHOD(T, SetIndentSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indentSpacing() const", asMETHOD(T, GetIndentSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_indentWidth() const", asMETHOD(T, GetIndentWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_childOffset() const", asMETHOD(T, GetChildOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_elementEventSender(bool)", asMETHOD(T, SetElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_elementEventSender() const", asMETHOD(T, IsElementEventSender), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(UIElementGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
@@ -1163,13 +1192,11 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "UIElement@+ get_root() const", asMETHOD(T, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int get_dragButtonCount() const", asMETHOD(T, GetDragButtonCount), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_dragButtonCombo() const", asMETHOD(T, GetDragButtonCombo), asCALL_THISCALL);
-    if (!isSprite)
-    {
-        engine->RegisterObjectMethod(className, "const IntVector2& get_screenPosition()", asMETHOD(T, GetScreenPosition), asCALL_THISCALL);
-        engine->RegisterObjectMethod(className, "IntRect get_combinedScreenRect()", asMETHOD(T, GetCombinedScreenRect), asCALL_THISCALL);
-    }
+    engine->RegisterObjectMethod(className, "const IntVector2& get_screenPosition()", asMETHOD(T, GetScreenPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "IntRect get_combinedScreenRect()", asMETHOD(T, GetCombinedScreenRect), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_derivedOpacity()", asMETHOD(T, GetDerivedOpacity), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(UIElementGetVars), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Array<String>@ get_tags() const", asFUNCTION(UIElementGetTags), asCALL_CDECL_OBJLAST);
 }
 
 /// Template function for registering a class derived from BorderImage.

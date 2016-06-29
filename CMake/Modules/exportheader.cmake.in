@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,15 @@
 #ifndef @INCLUDE_GUARD_NAME@
 #define @INCLUDE_GUARD_NAME@
 @PRE_EXPORT_HEADER@
+#cmakedefine URHO3D_STATIC_DEFINE
+#cmakedefine URHO3D_OPENGL
+#cmakedefine URHO3D_D3D11
+#cmakedefine URHO3D_SSE
+#cmakedefine URHO3D_DATABASE_ODBC
+#cmakedefine URHO3D_DATABASE_SQLITE
+#cmakedefine URHO3D_LUAJIT
+#cmakedefine URHO3D_TESTING
+
 #ifdef @STATIC_DEFINE@
 #  define @EXPORT_MACRO_NAME@
 #  define @NO_EXPORT_MACRO_NAME@
@@ -58,5 +67,7 @@
 #if DEFINE_NO_DEPRECATED
 # define @NO_DEPRECATED_MACRO_NAME@
 #endif
+
+#define NONSCRIPTABLE @ANNOTATE_NONSCRIPTABLE@
 @POST_EXPORT_HEADER@
 #endif

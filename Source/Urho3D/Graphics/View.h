@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ class URHO3D_API View : public Object
     friend void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex);
     friend void ProcessLightWork(const WorkItem* item, unsigned threadIndex);
 
-    OBJECT(View, Object);
+    URHO3D_OBJECT(View, Object);
 
 public:
     /// Construct.
@@ -138,8 +138,11 @@ public:
     /// Return octree.
     Octree* GetOctree() const { return octree_; }
 
-    /// Return camera.
+    /// Return viewport camera.
     Camera* GetCamera() const { return camera_; }
+
+    /// Return culling camera. Normally same as the viewport camera.
+    Camera* GetCullCamera() const { return cullCamera_; }
 
     /// Return information of the frame being rendered.
     const FrameInfo& GetFrameInfo() const { return frame_; }
@@ -165,12 +168,24 @@ public:
     /// Return the last used software occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer() const { return occlusionBuffer_; }
 
+    /// Return number of occluders that were actually rendered. Occluders may be rejected if running out of triangles or if behind other occluders.
+    unsigned GetNumActiveOccluders() const { return activeOccluders_; }
+
+    /// Return the source view that was already prepared. Used when viewports specify the same culling camera.
+    View* GetSourceView() const;
+
     /// Set global (per-frame) shader parameters. Called by Batch and internally by View.
     void SetGlobalShaderParameters();
     /// Set camera-specific shader parameters. Called by Batch and internally by View.
-    void SetCameraShaderParameters(Camera* camera, bool setProjectionMatrix);
+    void SetCameraShaderParameters(Camera* camera);
     /// Set G-buffer offset and inverse size shader parameters. Called by Batch and internally by View.
     void SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect);
+
+    /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand. Quad will be drawn to the middle of depth range, similarly to deferred directional lights.
+    void DrawFullscreenQuad(bool setIdentityProjection = false);
+
+    /// Get a named texture from the rendertarget list or from the resource cache, to be either used as a rendertarget or texture binding.
+    Texture* FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap = false);
 
 private:
     /// Query the octree for drawable objects.
@@ -207,8 +222,6 @@ private:
     void AllocateScreenBuffers();
     /// Blit the viewport from one surface to another.
     void BlitFramebuffer(Texture* source, RenderSurface* destination, bool depthWrite);
-    /// Draw a fullscreen quad. Shaders and renderstates must have been set beforehand.
-    void DrawFullscreenQuad(bool nearQuad);
     /// Query for occluders as seen from a camera.
     void UpdateOccluders(PODVector<Drawable*>& occluders, Camera* camera);
     /// Draw occluders to occlusion buffer.
@@ -250,8 +263,6 @@ private:
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     /// Helper function to get the render surface from a texture. 2D textures will always return the first face only.
     RenderSurface* GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace face = FACE_POSITIVE_X);
-    /// Get a named texture from the rendertarget list or from the resource cache, to be either used as a rendertarget or texture binding.
-    Texture* FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap = false);
 
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable)
@@ -291,10 +302,12 @@ private:
     Scene* scene_;
     /// Octree to use.
     Octree* octree_;
-    /// Camera to use.
+    /// Viewport (rendering) camera.
     Camera* camera_;
-    /// Camera's scene node.
-    Node* cameraNode_;
+    /// Culling camera. Usually same as the viewport camera.
+    Camera* cullCamera_;
+    /// Shared source view. Null if this view is using its own culling.
+    WeakPtr<View> sourceView_;
     /// Zone the camera is inside, or default zone if not assigned.
     Zone* cameraZone_;
     /// Zone at far clip plane.
@@ -321,6 +334,8 @@ private:
     IntVector2 rtSize_;
     /// Information of the frame being rendered.
     FrameInfo frame_;
+    /// View aspect ratio.
+    float aspectRatio_;
     /// Minimum Z value of the visible scene.
     float minZ_;
     /// Maximum Z value of the visible scene.
@@ -333,6 +348,8 @@ private:
     int minInstances_;
     /// Highest zone priority currently visible.
     int highestZonePriority_;
+    /// Geometries updated flag.
+    bool geometriesUpdated_;
     /// Camera zone's override flag.
     bool cameraZoneOverride_;
     /// Draw shadows flag.
@@ -367,6 +384,8 @@ private:
     PODVector<Drawable*> occluders_;
     /// Lights.
     PODVector<Light*> lights_;
+    /// Number of active occluders.
+    unsigned activeOccluders_;
 
     /// Drawables that limit their maximum light count.
     HashSet<Drawable*> maxLightsDrawables_;

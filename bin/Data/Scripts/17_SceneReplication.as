@@ -46,6 +46,9 @@ void Start()
     // Setup the viewport for displaying the scene
     SetupViewport();
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE);
+
     // Hook up to necessary events
     SubscribeToEvents();
 }
@@ -240,8 +243,14 @@ Node@ CreateControllableObject()
 
 void MoveCamera()
 {
+    input.mouseVisible = input.mouseMode != MM_RELATIVE;
+    bool mouseDown = input.mouseButtonDown[MOUSEB_RIGHT];
+
+    // Override the MM_RELATIVE mouse grabbed settings, to allow interaction with UI
+    input.mouseGrabbed = mouseDown;
+
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = !input.mouseButtonDown[MOUSEB_RIGHT];
+    ui.cursor.visible = !mouseDown;
 
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
@@ -301,10 +310,10 @@ void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
         // Only apply WASD controls if there is no focused UI element
         if (ui.focusElement is null)
         {
-            controls.Set(CTRL_FORWARD, input.keyDown['W']);
-            controls.Set(CTRL_BACK, input.keyDown['S']);
-            controls.Set(CTRL_LEFT, input.keyDown['A']);
-            controls.Set(CTRL_RIGHT, input.keyDown['D']);
+            controls.Set(CTRL_FORWARD, input.keyDown[KEY_W]);
+            controls.Set(CTRL_BACK, input.keyDown[KEY_S]);
+            controls.Set(CTRL_LEFT, input.keyDown[KEY_A]);
+            controls.Set(CTRL_RIGHT, input.keyDown[KEY_D]);
         }
 
         serverConnection.controls = controls;

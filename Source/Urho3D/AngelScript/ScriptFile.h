@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ class Variant;
 /// %Script file resource.
 class URHO3D_API ScriptFile : public Resource, public ScriptEventListener
 {
-    OBJECT(ScriptFile, Resource);
+    URHO3D_OBJECT(ScriptFile, Resource);
 
 public:
     /// Construct.
@@ -74,6 +74,10 @@ public:
     virtual void RemoveEventHandlers();
     /// Remove all scripted event handlers, except those listed.
     virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions);
+    /// Return whether has subscribed to an event.
+    virtual bool HasEventHandler(StringHash eventType) const;
+    /// Return whether has subscribed to a specific sender's event.
+    virtual bool HasEventHandler(Object* sender, StringHash eventType) const;
 
     /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
@@ -150,7 +154,7 @@ private:
 /// Helper class for forwarding events to script objects that are not part of a scene.
 class URHO3D_API ScriptEventInvoker : public Object
 {
-    OBJECT(ScriptEventInvoker, Object);
+    URHO3D_OBJECT(ScriptEventInvoker, Object);
 
 public:
     /// Constructor, will create the asILockableSharedBool if a ScriptObject is passed in.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-
-# Based on cmake/Modules/Platform/Emscripten.cmake from https://github.com/kripken/emscripten
-
-cmake_minimum_required (VERSION 2.6.3)
 
 if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
@@ -83,9 +79,11 @@ set (CMAKE_C_COMPILER   ${COMPILER_PATH}/emcc${TOOL_EXT}            CACHE PATH "
 set (CMAKE_CXX_COMPILER ${COMPILER_PATH}/em++${TOOL_EXT}            CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
+set (CMAKE_LINKER       ${EMSCRIPTEN_ROOT_PATH}/emlink.py           CACHE PATH "linker")
 # Specific to Emscripten
 set (EMRUN              ${EMSCRIPTEN_ROOT_PATH}/emrun${TOOL_EXT}    CACHE PATH "emrun")
 set (EMPACKAGER         python ${EMSCRIPTEN_ROOT_PATH}/tools/file_packager.py CACHE PATH "file_packager.py")
+set (EMBUILDER          python ${EMSCRIPTEN_ROOT_PATH}/embuilder.py CACHE PATH "embuilder.py")
 
 # specify the system root
 if (NOT EMSCRIPTEN_SYSROOT)
@@ -108,12 +106,19 @@ set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# Since currently CMake does not able to identify Emscripten cross compiler, so set the compiler identification explicitly
-# However, don't force it so the rest of the compiler checks are still being performed
-set (CMAKE_C_COMPILER_ID_RUN TRUE)
-set (CMAKE_C_COMPILER_ID Clang)
-set (CMAKE_CXX_COMPILER_ID_RUN TRUE)
-set (CMAKE_CXX_COMPILER_ID Clang)
+# Still perform the compiler checks except for those stated otherwise below
+foreach (LANG C CXX)
+    # Since currently CMake does not able to identify Emscripten compiler toolchain, set the compiler identification explicitly
+    set (CMAKE_${LANG}_COMPILER_ID_RUN TRUE)
+    set (CMAKE_${LANG}_COMPILER_ID Clang)
+    # The ABI info could not be checked as per normal as CMake does not understand the test build output from Emscripten, so bypass it also
+    set (CMAKE_${LANG}_ABI_COMPILED TRUE)
+    set (CMAKE_${LANG}_SIZEOF_DATA_PTR 4)   # Assume it is always 32-bit for now (we could have used our CheckCompilerToolChains.cmake module here)
+    # There could be a bug in CMake itself where setting CMAKE_EXECUTABLE_SUFFIX variable outside of the scope, where it processes the platform configuration files, does not being honored by try_compile() command and as a result all the check macros that depend on try_compile() do not work properly when the CMAKE_EXECUTABLE_SUFFIX variable is only being set later futher down the road; At least one of the CMake devs has the opinion that this is the intended behavior but it is an unconvincing explanation because setting CMAKE_EXECUTABLE_SUFFIX variable later does have the desired effect everywhere else EXCEPT the try_compile() command
+    # We are forced to set CMAKE_EXECUTABLE_SUFFIX_C and CMAKE_EXECUTABLE_SUFFIX_CXX here as a workaround; we could not just set CMAKE_EXECUTABLE_SUFFIX directly because CMake processes platform configuration files after the toolchain file and since we tell CMake that we are cross-compiling for 'Linux' platform via CMAKE_SYSTEM_NAME variable, CMake initializes the CMAKE_EXECUTABLE_SUFFIX to empty string (as expected for Linux platform); the workaround avoids our setting from being overwritten by platform configuration files by using the C and CXX language variants of the variable
+    # The executable suffix needs to be .js for the below Emscripten-specific compiler setting to be effective
+    set (CMAKE_EXECUTABLE_SUFFIX_${LANG} .js)
+endforeach ()
 
 # Set required compiler flags for internal CMake various check_xxx() macros which rely on the error to occur for the check to be performed correctly
 set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
@@ -128,4 +133,5 @@ if (CMAKE_HOST_WIN32)
     endforeach ()
 endif ()
 
+set (WEB 1)
 set (EMSCRIPTEN 1)

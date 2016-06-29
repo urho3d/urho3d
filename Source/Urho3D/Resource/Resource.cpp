@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ bool Resource::EndLoad()
 
 bool Resource::Save(Serializer& dest) const
 {
-    LOGERROR("Save not supported for " + GetTypeName());
+    URHO3D_LOGERROR("Save not supported for " + GetTypeName());
     return false;
 }
 

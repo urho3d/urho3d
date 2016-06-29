@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
+static const unsigned MIN_LOD_LEVELS = 1;
 static const unsigned MAX_LOD_LEVELS = 4;
 static const int DEFAULT_PATCH_SIZE = 32;
 static const int MIN_PATCH_SIZE = 4;
@@ -117,27 +118,27 @@ void Terrain::RegisterObject(Context* context)
 {
     context->RegisterFactory<Terrain>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Height Map", GetHeightMapAttr, SetHeightMapAttr, ResourceRef, ResourceRef(Image::GetTypeStatic()),
         AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    ATTRIBUTE("Vertex Spacing", Vector3, spacing_, DEFAULT_SPACING, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
-    ATTRIBUTE("Smooth Height Map", bool, smoothing_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, unsigned, 0, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, unsigned, DEFAULT_VIEWMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Vertex Spacing", Vector3, spacing_, DEFAULT_SPACING, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Smooth Height Map", bool, smoothing_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Occluder", IsOccluder, SetOccluder, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cast Shadows", GetCastShadows, SetCastShadows, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Lights", GetMaxLights, SetMaxLights, unsigned, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("View Mask", GetViewMask, SetViewMask, unsigned, DEFAULT_VIEWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Light Mask", GetLightMask, SetLightMask, unsigned, DEFAULT_LIGHTMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Mask", GetShadowMask, SetShadowMask, unsigned, DEFAULT_SHADOWMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Occlusion LOD level", GetOcclusionLodLevel, SetOcclusionLodLevelAttr, unsigned, M_MAX_UNSIGNED, AM_DEFAULT);
 }
 
 void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -193,7 +194,7 @@ void Terrain::SetSpacing(const Vector3& spacing)
 
 void Terrain::SetMaxLodLevels(unsigned levels)
 {
-    levels = Clamp((int)levels, 1, MAX_LOD_LEVELS);
+    levels = Clamp(levels, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     if (levels != maxLodLevels_)
     {
         maxLodLevels_ = levels;
@@ -481,17 +482,17 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
         return IntVector2::ZERO;
 
     Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
-    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
-    Clamp(xPos, 0, numVertices_.x_);
-    Clamp(zPos, 0, numVertices_.y_);
+    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_ + 0.5f);
+    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_ + 0.5f);
+    xPos = Clamp(xPos, 0, numVertices_.x_ - 1);
+    zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
-    return IntVector2(xPos, numVertices_.y_ - zPos);
+    return IntVector2(xPos, numVertices_.y_ - 1 - zPos);
 }
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
-    PROFILE(CreatePatchGeometry);
+    URHO3D_PROFILE(CreatePatchGeometry);
 
     unsigned row = (unsigned)(patchSize_ + 1);
     VertexBuffer* vertexBuffer = patch->GetVertexBuffer();
@@ -589,13 +590,13 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        geometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         occlusionGeometry->SetIndexBuffer(indexBuffer_);
         occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
-        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, sizeof(Vector3), MASK_POSITION);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, MASK_POSITION);
     }
 
     patch->ResetLod();
@@ -656,7 +657,7 @@ void Terrain::SetPatchSizeAttr(int value)
 
 void Terrain::SetMaxLodLevelsAttr(unsigned value)
 {
-    value = Clamp((int)value, 1, MAX_LOD_LEVELS);
+    value = Clamp(value, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     
     if (value != maxLodLevels_)
     {
@@ -693,7 +694,7 @@ void Terrain::CreateGeometry()
     if (!node_)
         return;
 
-    PROFILE(CreateTerrainGeometry);
+    URHO3D_PROFILE(CreateTerrainGeometry);
 
     unsigned prevNumPatches = patches_.Size();
 
@@ -749,7 +750,7 @@ void Terrain::CreateGeometry()
     // Remove old patch nodes which are not needed
     if (updateAll)
     {
-        PROFILE(RemoveOldPatches);
+        URHO3D_PROFILE(RemoveOldPatches);
 
         PODVector<Node*> oldPatchNodes;
         node_->GetChildrenWithComponent<TerrainPatch>(oldPatchNodes);
@@ -788,7 +789,7 @@ void Terrain::CreateGeometry()
 
         if (imgComps == 1)
         {
-            PROFILE(CopyHeightData);
+            URHO3D_PROFILE(CopyHeightData);
 
             for (int z = 0; z < numVertices_.y_; ++z)
             {
@@ -813,7 +814,7 @@ void Terrain::CreateGeometry()
         }
         else
         {
-            PROFILE(CopyHeightData);
+            URHO3D_PROFILE(CopyHeightData);
 
             // If more than 1 component, use the green channel for more accuracy
             for (int z = 0; z < numVertices_.y_; ++z)
@@ -865,7 +866,7 @@ void Terrain::CreateGeometry()
         bool enabled = IsEnabledEffective();
 
         {
-            PROFILE(CreatePatches);
+            URHO3D_PROFILE(CreatePatches);
 
             // Create patches and set node transforms
             for (int z = 0; z < numPatches_.y_; ++z)
@@ -921,7 +922,7 @@ void Terrain::CreateGeometry()
         // Create vertex data for patches. First update smoothing to ensure normals are calculated correctly across patch borders
         if (smoothing_)
         {
-            PROFILE(UpdateSmoothing);
+            URHO3D_PROFILE(UpdateSmoothing);
 
             for (unsigned i = 0; i < patches_.Size(); ++i)
             {
@@ -978,7 +979,7 @@ void Terrain::CreateGeometry()
 
 void Terrain::CreateIndexData()
 {
-    PROFILE(CreateIndexData);
+    URHO3D_PROFILE(CreateIndexData);
 
     PODVector<unsigned short> indices;
     drawRanges_.Clear();
@@ -1095,7 +1096,7 @@ void Terrain::CreateIndexData()
                     indices.Push((unsigned short)((z + 2 * skip) * row + x));
                     indices.Push((unsigned short)((z + skip) * row + x + skip));
                     indices.Push((unsigned short)(z * row + x));
-                    if (x < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
+                    if (z < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
                     {
                         indices.Push((unsigned short)((z + 2 * skip) * row + x));
                         indices.Push((unsigned short)((z + 2 * skip) * row + x + skip));
@@ -1207,7 +1208,7 @@ Vector3 Terrain::GetRawNormal(int x, int z) const
 
 void Terrain::CalculateLodErrors(TerrainPatch* patch)
 {
-    PROFILE(CalculateLodErrors);
+    URHO3D_PROFILE(CalculateLodErrors);
 
     const IntVector2& coords = patch->GetCoordinates();
     PODVector<float>& lodErrors = patch->GetLodErrors();
@@ -1257,7 +1258,7 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
 {
     if (image && image->IsCompressed())
     {
-        LOGERROR("Can not use a compressed image as a terrain heightmap");
+        URHO3D_LOGERROR("Can not use a compressed image as a terrain heightmap");
         return false;
     }
 
@@ -1265,7 +1266,7 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
     if (heightMap_)
         UnsubscribeFromEvent(heightMap_, E_RELOADFINISHED);
     if (image)
-        SubscribeToEvent(image, E_RELOADFINISHED, HANDLER(Terrain, HandleHeightMapReloadFinished));
+        SubscribeToEvent(image, E_RELOADFINISHED, URHO3D_HANDLER(Terrain, HandleHeightMapReloadFinished));
 
     heightMap_ = image;
 

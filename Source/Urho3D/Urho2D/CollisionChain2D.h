@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ namespace Urho3D
 /// 2D chain collision component.
 class URHO3D_API CollisionChain2D : public CollisionShape2D
 {
-    OBJECT(CollisionChain2D, CollisionShape2D);
+    URHO3D_OBJECT(CollisionChain2D, CollisionShape2D);
 
 public:
     /// Construct.

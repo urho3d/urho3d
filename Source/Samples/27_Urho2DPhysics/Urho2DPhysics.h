@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ namespace Urho3D
 ///     - Displaying physics debug geometry
 class Urho2DPhysics : public Sample
 {
-    OBJECT(Urho2DPhysics, Sample);
+    URHO3D_OBJECT(Urho2DPhysics, Sample);
 
 public:
     /// Construct.

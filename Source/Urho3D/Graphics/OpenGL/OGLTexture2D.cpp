@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
     // If device is lost, retry later
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture load while device is lost");
+        URHO3D_LOGWARNING("Texture load while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -166,6 +166,12 @@ void Texture2D::Release()
 
 bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
 {
+    if (width <= 0 || height <= 0)
+    {
+        URHO3D_LOGERROR("Zero or negative texture dimensions");
+        return false;
+    }
+
     // Delete the old rendersurface if any
     renderSurface_.Reset();
 
@@ -183,7 +189,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     }
 
     if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, HANDLER(Texture2D, HandleRenderSurfaceUpdate));
+        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
 
@@ -196,29 +202,29 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
-    PROFILE(SetTextureData);
+    URHO3D_PROFILE(SetTextureData);
 
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not set data");
+        URHO3D_LOGERROR("No texture created, can not set data");
         return false;
     }
 
     if (!data)
     {
-        LOGERROR("Null source for setting data");
+        URHO3D_LOGERROR("Null source for setting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for setting data");
+        URHO3D_LOGERROR("Illegal mip level for setting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture data assignment while device is lost");
+        URHO3D_LOGWARNING("Texture data assignment while device is lost");
         dataPending_ = true;
         return true;
     }
@@ -233,7 +239,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     int levelHeight = GetLevelHeight(level);
     if (x < 0 || x + width > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
     {
-        LOGERROR("Illegal dimensions for setting data");
+        URHO3D_LOGERROR("Illegal dimensions for setting data");
         return false;
     }
 
@@ -261,16 +267,17 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     return true;
 }
 
-bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
+bool Texture2D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
-        LOGERROR("Null image, can not set data");
+        URHO3D_LOGERROR("Null image, can not set data");
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture2D);
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -282,7 +289,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         unsigned components = image->GetComponents();
         if (Graphics::GetGL3Support() && ((components == 1 && !useAlpha) || components == 2))
         {
-            image = image->ConvertToRGBA();
+            mipImage = image->ConvertToRGBA(); image = mipImage;
             if (!image)
                 return false;
             components = image->GetComponents();
@@ -296,7 +303,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -339,7 +346,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
@@ -368,7 +375,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
@@ -396,28 +403,28 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-#ifndef GL_ES_VERSION_2_0
     if (!object_ || !graphics_)
     {
-        LOGERROR("No texture created, can not get data");
+        URHO3D_LOGERROR("No texture created, can not get data");
         return false;
     }
 
+#ifndef GL_ES_VERSION_2_0
     if (!dest)
     {
-        LOGERROR("Null destination for getting data");
+        URHO3D_LOGERROR("Null destination for getting data");
         return false;
     }
 
     if (level >= levels_)
     {
-        LOGERROR("Illegal mip level for getting data");
+        URHO3D_LOGERROR("Illegal mip level for getting data");
         return false;
     }
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Getting texture data while device is lost");
+        URHO3D_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
 
@@ -431,7 +438,17 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     graphics_->SetTexture(0, 0);
     return true;
 #else
-    LOGERROR("Getting texture data not supported");
+    // Special case on GLES: if the texture is a rendertarget, can make it current and use glReadPixels()
+    if (usage_ == TEXTURE_RENDERTARGET)
+    {
+        graphics_->SetRenderTarget(0, const_cast<Texture2D*>(this));
+        // Ensure the FBO is current; this viewport is actually never rendered to
+        graphics_->SetViewport(IntRect(0, 0, width_, height_));
+        glReadPixels(0, 0, width_, height_, GetExternalFormat(format_), GetDataType(format_), dest);
+        return true;
+    }
+
+    URHO3D_LOGERROR("Getting texture data not supported");
     return false;
 #endif
 }
@@ -445,7 +462,7 @@ bool Texture2D::Create()
 
     if (graphics_->IsDeviceLost())
     {
-        LOGWARNING("Texture creation while device is lost");
+        URHO3D_LOGWARNING("Texture creation while device is lost");
         return true;
     }
 
@@ -485,7 +502,7 @@ bool Texture2D::Create()
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
-            LOGERROR("Failed to create texture");
+            URHO3D_LOGERROR("Failed to create texture");
             success = false;
         }
     }
@@ -516,8 +533,13 @@ bool Texture2D::Create()
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
+    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
+    {
+        Renderer* renderer = GetSubsystem<Renderer>();
+        if (renderer)
+            renderer->QueueRenderSurface(renderSurface_);
+        renderSurface_->ResetUpdateQueued();
+    }
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class TmxFile2D;
 /// Tile map component.
 class URHO3D_API TileMap2D : public Component
 {
-    OBJECT(TileMap2D, Component);
+    URHO3D_OBJECT(TileMap2D, Component);
 
 public:
     /// Construct.

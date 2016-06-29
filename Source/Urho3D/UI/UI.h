@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ class XMLFile;
 /// %UI subsystem. Manages the graphical user interface.
 class URHO3D_API UI : public Object
 {
-    OBJECT(UI, Object);
+    URHO3D_OBJECT(UI, Object);
 
 public:
     /// Construct.
@@ -95,6 +95,12 @@ public:
     void SetUseMutableGlyphs(bool enable);
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
     void SetForceAutoHint(bool enable);
+    /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
+    void SetScale(float scale);
+    /// Scale %UI to the specified width in pixels.
+    void SetWidth(float size);
+    /// Scale %UI to the specified height in pixels.
+    void SetHeight(float size);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -180,6 +186,9 @@ public:
         /// Drag start position.
         IntVector2 dragBeginSumPos;
     };
+
+    /// Return current UI scale.
+    float GetScale() const { return uiScale_; }
 
 private:
     /// Initialize when screen mode initially set.
@@ -331,6 +340,8 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
+    /// Current scale of UI
+    float uiScale_;
 };
 
 /// Register UI library objects.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
+#include "../Graphics/DrawableEvents.h"
 #include "../Graphics/ParticleEffect.h"
 #include "../Graphics/ParticleEmitter.h"
 #include "../Resource/ResourceCache.h"
@@ -46,7 +47,10 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     emissionTimer_(0.0f),
     lastTimeStep_(0.0f),
     lastUpdateFrameNumber_(M_MAX_UNSIGNED),
-    serializeParticles_(true)
+    emitting_(true),
+    needUpdate_(false),
+    serializeParticles_(true),
+    sendFinishEvent_(true)
 {
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
@@ -59,24 +63,23 @@ void ParticleEmitter::RegisterObject(Context* context)
 {
     context->RegisterFactory<ParticleEmitter>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Effect", GetEffectAttr, SetEffectAttr, ResourceRef, ResourceRef(ParticleEffect::GetTypeStatic()),
         AM_DEFAULT);
-    ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
-    ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
-    ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
-    COPY_BASE_ATTRIBUTES(Drawable);
-    MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
+    URHO3D_ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    URHO3D_ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetParticleBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
-    ATTRIBUTE("Serialize Particles", bool, serializeParticles_, true, AM_FILE);
+    URHO3D_ATTRIBUTE("Serialize Particles", bool, serializeParticles_, true, AM_FILE);
 }
 
 void ParticleEmitter::OnSetEnabled()
@@ -87,7 +90,7 @@ void ParticleEmitter::OnSetEnabled()
     if (scene)
     {
         if (IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(ParticleEmitter, HandleScenePostUpdate));
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
     }
@@ -125,6 +128,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         if (inactiveTime && periodTimer_ >= inactiveTime)
         {
             emitting_ = true;
+            sendFinishEvent_ = true;
             periodTimer_ -= inactiveTime;
         }
         // If emitter has an indefinite stop interval, keep period timer reset to allow restarting emission in the editor
@@ -200,6 +204,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
                 particle.velocity_ += lastTimeStep_ * force;
             }
             billboard.position_ += lastTimeStep_ * particle.velocity_ * scaleVector;
+            billboard.direction_ = particle.velocity_.Normalized();
 
             // Rotation
             billboard.rotation_ += lastTimeStep_ * particle.rotationSpeed_;
@@ -267,7 +272,7 @@ void ParticleEmitter::SetEffect(ParticleEffect* effect)
     effect_ = effect;
 
     if (effect_)
-        SubscribeToEvent(effect_, E_RELOADFINISHED, HANDLER(ParticleEmitter, HandleEffectReloadFinished));
+        SubscribeToEvent(effect_, E_RELOADFINISHED, URHO3D_HANDLER(ParticleEmitter, HandleEffectReloadFinished));
 
     ApplyEffect();
     MarkNetworkUpdate();
@@ -290,6 +295,7 @@ void ParticleEmitter::SetEmitting(bool enable)
     if (enable != emitting_)
     {
         emitting_ = enable;
+        sendFinishEvent_ = enable;
         periodTimer_ = 0.0f;
         // Note: network update does not need to be marked as this is a file only attribute
     }
@@ -331,7 +337,14 @@ void ParticleEmitter::ApplyEffect()
     SetRelative(effect_->IsRelative());
     SetScaled(effect_->IsScaled());
     SetSorted(effect_->IsSorted());
+    SetFixedScreenSize(effect_->IsFixedScreenSize());
     SetAnimationLodBias(effect_->GetAnimationLodBias());
+    SetFaceCameraMode(effect_->GetFaceCameraMode());
+}
+
+ParticleEffect* ParticleEmitter::GetEffect() const
+{
+    return effect_;
 }
 
 void ParticleEmitter::SetEffectAttr(const ResourceRef& value)
@@ -397,7 +410,7 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
         return ret;
     }
 
-    ret.Reserve(billboards_.Size() * 6 + 1);
+    ret.Reserve(billboards_.Size() * 7 + 1);
     ret.Push(billboards_.Size());
 
     for (PODVector<Billboard>::ConstIterator i = billboards_.Begin(); i != billboards_.End(); ++i)
@@ -407,6 +420,7 @@ VariantVector ParticleEmitter::GetParticleBillboardsAttr() const
         ret.Push(Vector4(i->uv_.min_.x_, i->uv_.min_.y_, i->uv_.max_.x_, i->uv_.max_.y_));
         ret.Push(i->color_);
         ret.Push(i->rotation_);
+        ret.Push(i->direction_);
         ret.Push(i->enabled_);
     }
 
@@ -418,7 +432,7 @@ void ParticleEmitter::OnSceneSet(Scene* scene)
     BillboardSet::OnSceneSet(scene);
 
     if (scene && IsEnabledEffective())
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(ParticleEmitter, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(ParticleEmitter, HandleScenePostUpdate));
     else if (!scene)
          UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
 }
@@ -432,9 +446,11 @@ bool ParticleEmitter::EmitNewParticle()
     Particle& particle = particles_[index];
     Billboard& billboard = billboards_[index];
 
-    Vector3 startPos;
     Vector3 startDir;
+    Vector3 startPos;
 
+    startDir = effect_->GetRandomDirection();
+    startDir.Normalize();
 
     switch (effect_->GetEmitterType())
     {
@@ -462,8 +478,18 @@ bool ParticleEmitter::EmitNewParticle()
         break;
     }
 
-    startDir = effect_->GetRandomDirection();
-    startDir.Normalize();
+    particle.size_ = effect_->GetRandomSize();
+    particle.timer_ = 0.0f;
+    particle.timeToLive_ = effect_->GetRandomTimeToLive();
+    particle.scale_ = 1.0f;
+    particle.rotationSpeed_ = effect_->GetRandomRotationSpeed();
+    particle.colorIndex_ = 0;
+    particle.texIndex_ = 0;
+
+    if (faceCameraMode_ == FC_DIRECTION)
+    {
+        startPos += startDir * particle.size_.y_;
+    }
 
     if (!relative_)
     {
@@ -472,13 +498,6 @@ bool ParticleEmitter::EmitNewParticle()
     };
 
     particle.velocity_ = effect_->GetRandomVelocity() * startDir;
-    particle.size_ = effect_->GetRandomSize();
-    particle.timer_ = 0.0f;
-    particle.timeToLive_ = effect_->GetRandomTimeToLive();
-    particle.scale_ = 1.0f;
-    particle.rotationSpeed_ = effect_->GetRandomRotationSpeed();
-    particle.colorIndex_ = 0;
-    particle.texIndex_ = 0;
 
     billboard.position_ = startPos;
     billboard.size_ = particles_[index].size_;
@@ -488,6 +507,7 @@ bool ParticleEmitter::EmitNewParticle()
     const Vector<ColorFrame>& colorFrames_ = effect_->GetColorFrames();
     billboard.color_ = colorFrames_.Size() ? colorFrames_[0].color_ : Color();
     billboard.enabled_ = true;
+    billboard.direction_ = startDir;
 
     return true;
 }
@@ -516,6 +536,34 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         lastUpdateFrameNumber_ = viewFrameNumber_;
         needUpdate_ = true;
         MarkForUpdate();
+    }
+
+    if (node_ && !emitting_ && sendFinishEvent_)
+    {
+        // Send finished event only once all billboards are gone
+        bool hasEnabledBillboards = false;
+
+        for (unsigned i = 0; i < billboards_.Size(); ++i)
+        {
+            if (billboards_[i].enabled_)
+            {
+                hasEnabledBillboards = true;
+                break;
+            }
+        }
+
+        if (!hasEnabledBillboards)
+        {
+            sendFinishEvent_ = false;
+
+            using namespace ParticleEffectFinished;
+
+            VariantMap& eventData = GetEventDataMap();
+            eventData[P_NODE] = node_;
+            eventData[P_EFFECT] = effect_;
+
+            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
+        }
     }
 }
 

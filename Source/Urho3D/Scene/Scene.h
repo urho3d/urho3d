@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Core/Mutex.h"
 #include "../Resource/XMLElement.h"
+#include "../Resource/JSONFile.h"
 #include "../Scene/Node.h"
 #include "../Scene/SceneResolver.h"
 
@@ -57,8 +58,15 @@ struct AsyncProgress
     SharedPtr<File> file_;
     /// XML file for XML mode.
     SharedPtr<XMLFile> xmlFile_;
+    /// JSON file for JSON mode
+    SharedPtr<JSONFile> jsonFile_;
+
     /// Current XML element for XML mode.
     XMLElement xmlElement_;
+
+    /// Current JSON child array and for JSON mode
+    unsigned jsonIndex_;
+
     /// Current load mode.
     LoadMode mode_;
     /// Resource name hashes left to load.
@@ -76,10 +84,11 @@ struct AsyncProgress
 /// Root scene node, represents the whole scene.
 class URHO3D_API Scene : public Node
 {
-    OBJECT(Scene, Node);
+    URHO3D_OBJECT(Scene, Node);
 
     using Node::GetComponent;
     using Node::SaveXML;
+    using Node::SaveJSON;
 
 public:
     /// Construct.
@@ -95,6 +104,8 @@ public:
     virtual bool Save(Serializer& dest) const;
     /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
     /// Mark for attribute check on the next network update.
     virtual void MarkNetworkUpdate();
     /// Add a replication state that is tracking this scene.
@@ -102,12 +113,18 @@ public:
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
+    /// Load from a JSON file. Return true if successful.
+    bool LoadJSON(Deserializer& source);
     /// Save to an XML file. Return true if successful.
     bool SaveXML(Serializer& dest, const String& indentation = "\t") const;
+    /// Save to a JSON file. Return true if successful.
+    bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Load from a binary file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
     bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     /// Load from an XML file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
     bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
+    /// Load from a JSON file asynchronously. Return true if started successfully. The LOAD_RESOURCES_ONLY mode can also be used to preload resources from object prefab files.
+    bool LoadAsyncJSON(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES);
     /// Stop asynchronous loading.
     void StopAsyncLoading();
     /// Instantiate scene content from binary data. Return root node if successful.
@@ -117,6 +134,12 @@ public:
         (const XMLElement& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
     /// Instantiate scene content from XML data. Return root node if successful.
     Node* InstantiateXML(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from JSON data. Return root node if successful.
+    Node* InstantiateJSON
+        (const JSONValue& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+    /// Instantiate scene content from JSON data. Return root node if successful.
+    Node* InstantiateJSON(Deserializer& source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED);
+
     /// Clear scene completely of either replicated, local or all nodes and components.
     void Clear(bool clearReplicated = true, bool clearLocal = true);
     /// Enable or disable scene update.
@@ -146,6 +169,8 @@ public:
     Node* GetNode(unsigned id) const;
     /// Return component from the whole scene by ID, or null if not found.
     Component* GetComponent(unsigned id) const;
+    /// Get nodes with specific tag from the whole scene, return false if empty.
+    bool GetNodesWithTag(PODVector<Node*>& dest, const String& tag)  const;
 
     /// Return whether updates are enabled.
     bool IsUpdateEnabled() const { return updateEnabled_; }
@@ -183,7 +208,7 @@ public:
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
-    /// Return a node user variable name, or empty if not registered.
+    // Return a node user variable name, or empty if not registered.
     const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.
@@ -202,6 +227,12 @@ public:
     unsigned GetFreeNodeID(CreateMode mode);
     /// Get free component ID, either non-local or local.
     unsigned GetFreeComponentID(CreateMode mode);
+
+    /// Cache node by tag if tag not zero, no checking if already added. Used internaly in Node::AddTag.
+    void NodeTagAdded(Node* node, const String& tag);
+    /// Cache node by tag if tag not zero.
+    void NodeTagRemoved(Node* node, const String& tag);
+
     /// Node added. Assign scene pointer and add to ID map.
     void NodeAdded(Node* node);
     /// Node removed. Remove from ID map.
@@ -220,7 +251,7 @@ public:
     void CleanupConnection(Connection* connection);
     /// Mark a node for attribute check on the next network update.
     void MarkNetworkUpdate(Node* node);
-    /// Mark a comoponent for attribute check on the next network update.
+    /// Mark a component for attribute check on the next network update.
     void MarkNetworkUpdate(Component* component);
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
@@ -242,6 +273,8 @@ private:
     void PreloadResources(File* file, bool isSceneFile);
     /// Preload resources from an XML scene or object prefab file.
     void PreloadResourcesXML(const XMLElement& element);
+    /// Preload resources from a JSON scene or object prefab file.
+    void PreloadResourcesJSON(const JSONValue& value);
 
     /// Replicated scene nodes by ID.
     HashMap<unsigned, Node*> replicatedNodes_;
@@ -251,6 +284,8 @@ private:
     HashMap<unsigned, Component*> replicatedComponents_;
     /// Local components by ID.
     HashMap<unsigned, Component*> localComponents_;
+    /// Cached tagged nodes by tag.
+    HashMap<StringHash, PODVector<Node*> > taggedNodes_;
     /// Asynchronous loading progress.
     AsyncProgress asyncProgress_;
     /// Node and component ID resolver for asynchronous loading.

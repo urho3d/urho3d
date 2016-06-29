@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include <Urho3D/Graphics/Animation.h>
 #include <Urho3D/Math/BoundingBox.h>
 #include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/VertexBuffer.h>
 #include <Urho3D/IO/Serializer.h>
 #include <Urho3D/Math/Matrix3x4.h>
 
@@ -118,7 +119,17 @@ struct ModelVertexBuffer
     void WriteData(Serializer& dest)
     {
         dest.WriteUInt(vertices_.Size());
-        dest.WriteUInt(elementMask_);
+        
+        PODVector<VertexElement> elements = VertexBuffer::GetElements(elementMask_);
+        dest.WriteUInt(elements.Size());
+        for (unsigned j = 0; j < elements.Size(); ++j)
+        {
+            unsigned elementDesc = ((unsigned)elements[j].type_) |
+                (((unsigned)elements[j].semantic_) << 8) |
+                (((unsigned)elements[j].index_) << 16);
+            dest.WriteUInt(elementDesc);
+        }
+
         dest.WriteUInt(morphStart_);
         dest.WriteUInt(morphCount_);
         

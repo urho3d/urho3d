@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ const int MSG_CHAT = 32;
 // UDP port we will use
 const unsigned short CHAT_SERVER_PORT = 2345;
 
-DEFINE_APPLICATION_MAIN(Chat)
+URHO3D_DEFINE_APPLICATION_MAIN(Chat)
 
 Chat::Chat(Context* context) :
     Sample(context)
@@ -75,6 +75,9 @@ void Chat::Start()
 
     // Subscribe to UI and network events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Chat::CreateUI()
@@ -119,20 +122,20 @@ void Chat::CreateUI()
 void Chat::SubscribeToEvents()
 {
     // Subscribe to UI element events
-    SubscribeToEvent(textEdit_, E_TEXTFINISHED, HANDLER(Chat, HandleSend));
-    SubscribeToEvent(sendButton_, E_RELEASED, HANDLER(Chat, HandleSend));
-    SubscribeToEvent(connectButton_, E_RELEASED, HANDLER(Chat, HandleConnect));
-    SubscribeToEvent(disconnectButton_, E_RELEASED, HANDLER(Chat, HandleDisconnect));
-    SubscribeToEvent(startServerButton_, E_RELEASED, HANDLER(Chat, HandleStartServer));
+    SubscribeToEvent(textEdit_, E_TEXTFINISHED, URHO3D_HANDLER(Chat, HandleSend));
+    SubscribeToEvent(sendButton_, E_RELEASED, URHO3D_HANDLER(Chat, HandleSend));
+    SubscribeToEvent(connectButton_, E_RELEASED, URHO3D_HANDLER(Chat, HandleConnect));
+    SubscribeToEvent(disconnectButton_, E_RELEASED, URHO3D_HANDLER(Chat, HandleDisconnect));
+    SubscribeToEvent(startServerButton_, E_RELEASED, URHO3D_HANDLER(Chat, HandleStartServer));
 
     // Subscribe to log messages so that we can pipe them to the chat window
-    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Chat, HandleLogMessage));
+    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Chat, HandleLogMessage));
 
     // Subscribe to network events
-    SubscribeToEvent(E_NETWORKMESSAGE, HANDLER(Chat, HandleNetworkMessage));
-    SubscribeToEvent(E_SERVERCONNECTED, HANDLER(Chat, HandleConnectionStatus));
-    SubscribeToEvent(E_SERVERDISCONNECTED, HANDLER(Chat, HandleConnectionStatus));
-    SubscribeToEvent(E_CONNECTFAILED, HANDLER(Chat, HandleConnectionStatus));
+    SubscribeToEvent(E_NETWORKMESSAGE, URHO3D_HANDLER(Chat, HandleNetworkMessage));
+    SubscribeToEvent(E_SERVERCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
+    SubscribeToEvent(E_SERVERDISCONNECTED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
+    SubscribeToEvent(E_CONNECTFAILED, URHO3D_HANDLER(Chat, HandleConnectionStatus));
 }
 
 Button* Chat::CreateButton(const String& text, int width)

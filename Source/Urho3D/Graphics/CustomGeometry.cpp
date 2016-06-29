@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,19 +64,19 @@ void CustomGeometry::RegisterObject(Context* context)
 {
     context->RegisterFactory<CustomGeometry>(GEOMETRY_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Dynamic Vertex Buffer", bool, dynamic_, false, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>,
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Dynamic Vertex Buffer", bool, dynamic_, false, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Geometry Data", GetGeometryDataAttr, SetGeometryDataAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_FILE | AM_NOEDIT);
-    ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
+    URHO3D_ACCESSOR_ATTRIBUTE("Materials", GetMaterialsAttr, SetMaterialsAttr, ResourceRefList, ResourceRefList(Material::GetTypeStatic()),
         AM_DEFAULT);
-    ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
-    ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
-    COPY_BASE_ATTRIBUTES(Drawable);
+    URHO3D_ATTRIBUTE("Is Occluder", bool, occluder_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("LOD Bias", GetLodBias, SetLodBias, float, 1.0f, AM_DEFAULT);
+    URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }
 
 void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -132,7 +132,7 @@ void CustomGeometry::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQ
         break;
 
     case RAY_TRIANGLE_UV:
-        LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
+        URHO3D_LOGWARNING("RAY_TRIANGLE_UV query level is not supported for CustomGeometry component");
         break;
     }
 }
@@ -188,15 +188,15 @@ bool CustomGeometry::DrawOcclusion(OcclusionBuffer* buffer)
         unsigned vertexSize;
         const unsigned char* indexData;
         unsigned indexSize;
-        unsigned elementMask;
+        const PODVector<VertexElement>* elements;
 
-        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
         // Check for valid geometry data
-        if (!vertexData)
+        if (!vertexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
             continue;
 
         // Draw and check for running out of triangles
-        success = buffer->Draw(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
+        success = buffer->AddTriangles(node_->GetWorldTransform(), vertexData, vertexSize, geometry->GetVertexStart(),
             geometry->GetVertexCount());
 
         if (!success)
@@ -242,7 +242,7 @@ void CustomGeometry::BeginGeometry(unsigned index, PrimitiveType type)
 {
     if (index > geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return;
     }
 
@@ -305,7 +305,7 @@ void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned
 {
     if (index > geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return;
     }
 
@@ -328,7 +328,7 @@ void CustomGeometry::DefineGeometry(unsigned index, PrimitiveType type, unsigned
 
 void CustomGeometry::Commit()
 {
-    PROFILE(CommitCustomGeometry);
+    URHO3D_PROFILE(CommitCustomGeometry);
 
     unsigned totalVertices = 0;
     boundingBox_.Clear();
@@ -340,6 +340,9 @@ void CustomGeometry::Commit()
         for (unsigned j = 0; j < vertices_[i].Size(); ++j)
             boundingBox_.Merge(vertices_[i][j].position_);
     }
+
+    // Make sure world-space bounding box will be updated
+    OnMarkedDirty(node_);
 
     // Resize (recreate) the vertex buffer only if necessary
     if (vertexBuffer_->GetVertexCount() != totalVertices || vertexBuffer_->GetElementMask() != elementMask_ ||
@@ -386,7 +389,7 @@ void CustomGeometry::Commit()
                     ++vertexCount;
                 }
 
-                geometries_[i]->SetVertexBuffer(0, vertexBuffer_, elementMask_);
+                geometries_[i]->SetVertexBuffer(0, vertexBuffer_);
                 geometries_[i]->SetDrawRange(primitiveTypes_[i], 0, 0, vertexStart, vertexCount);
                 vertexStart += vertexCount;
             }
@@ -394,13 +397,13 @@ void CustomGeometry::Commit()
             vertexBuffer_->Unlock();
         }
         else
-            LOGERROR("Failed to lock custom geometry vertex buffer");
+            URHO3D_LOGERROR("Failed to lock custom geometry vertex buffer");
     }
     else
     {
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
-            geometries_[i]->SetVertexBuffer(0, vertexBuffer_, elementMask_);
+            geometries_[i]->SetVertexBuffer(0, vertexBuffer_);
             geometries_[i]->SetDrawRange(primitiveTypes_[i], 0, 0, 0, 0);
         }
     }
@@ -420,7 +423,7 @@ bool CustomGeometry::SetMaterial(unsigned index, Material* material)
 {
     if (index >= batches_.Size())
     {
-        LOGERROR("Material index out of bounds");
+        URHO3D_LOGERROR("Material index out of bounds");
         return false;
     }
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set project name
-    project (ExternalProject-PackageTool)
-
-    # Set minimum version
-    cmake_minimum_required (VERSION 2.8.6)
-
+    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    if (WIN32)
+        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
+    else ()
+        cmake_minimum_required (VERSION 2.8.6)
+    endif ()
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -34,12 +34,15 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
             cmake_policy (SET CMP0022 NEW)
         endif ()
         if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
             cmake_policy (SET CMP0026 OLD)
             # MACOSX_RPATH is enabled by default
             cmake_policy (SET CMP0042 NEW)
         endif ()
     endif ()
+
+    # Set project name
+    project (Urho3D-ExternalProject-PackageTool)
 
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
@@ -55,6 +58,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/Str.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Container/VectorBase.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Context.cpp
+        ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/EventProfiler.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Mutex.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/Object.cpp
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Core/ProcessUtils.cpp
@@ -85,10 +89,13 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
 
     # Check existence of stdint.h for LibCpuId
     include (CheckIncludeFiles)
-    CHECK_INCLUDE_FILES (stdint.h HAVE_STDINT_H)
+    check_include_files (stdint.h HAVE_STDINT_H)
     if (HAVE_STDINT_H)
         add_definitions (-DHAVE_STDINT_H)
     endif ()
+
+    # Define that we are building mini Urho
+    add_definitions (-DMINI_URHO)
 
     # Setup SDK-like include dir in the build tree for building the mini-urho
     set (DEST_INCLUDE_DIR include/Urho3D)
@@ -97,9 +104,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Add dependency targets
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LibCpuId host/LibCpuId)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LZ4 host/LZ4)
-    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL host/SDL)
     set (INCLUDE_DIRS ${BAKED_CMAKE_BINARY_DIR}/include ${BAKED_CMAKE_BINARY_DIR}/include/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
-    set (LIBS LibCpuId SDL)
+    set (LIBS LibCpuId)
 endif ()
 
 # Define target name
@@ -115,8 +121,5 @@ define_source_files (EXTRA_CPP_FILES ${MINI_URHO_CPP_FILES})
 list (APPEND LIBS LZ4)
 
 # Setup target
-if (APPLE)
-    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-endif ()
-setup_executable ()
+setup_executable (TOOL)
 adjust_target_name ()   # Remove postfix from the executable/binary name

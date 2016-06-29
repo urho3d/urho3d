@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,10 @@ void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
     addressMode_[coord] = mode;
 }
 
+void Texture::SetShadowCompare(bool /*enable*/)
+{
+}
+
 void Texture::SetBorderColor(const Color& color)
 {
     borderColor_ = color;
@@ -114,11 +118,11 @@ void Texture::SetBackupTexture(Texture* texture)
     backupTexture_ = texture;
 }
 
-void Texture::SetMipsToSkip(int quality, int mips)
+void Texture::SetMipsToSkip(int quality, int toSkip)
 {
     if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
     {
-        mipsToSkip_[quality] = (unsigned)mips;
+        mipsToSkip_[quality] = (unsigned)toSkip;
 
         // Make sure a higher quality level does not actually skip more mips
         for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
@@ -302,8 +306,8 @@ void Texture::SetParameters(const XMLElement& element)
 void Texture::CheckTextureBudget(StringHash type)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    unsigned textureBudget = cache->GetMemoryBudget(type);
-    unsigned textureUse = cache->GetMemoryUse(type);
+    unsigned long long textureBudget = cache->GetMemoryBudget(type);
+    unsigned long long textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)
         return;
 

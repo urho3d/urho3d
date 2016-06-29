@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
-#include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -36,7 +35,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(SceneAndUILoad)
+URHO3D_DEFINE_APPLICATION_MAIN(SceneAndUILoad)
 
 SceneAndUILoad::SceneAndUILoad(Context* context) :
     Sample(context)
@@ -59,6 +58,9 @@ void SceneAndUILoad::Start()
 
     // Subscribe to global events for camera movement
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void SceneAndUILoad::CreateScene()
@@ -105,10 +107,10 @@ void SceneAndUILoad::CreateUI()
     // Subscribe to button actions (toggle scene lights when pressed then released)
     Button* button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight1", true));
     if (button)
-        SubscribeToEvent(button, E_RELEASED, HANDLER(SceneAndUILoad, ToggleLight1));
+        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight1));
     button = static_cast<Button*>(layoutRoot->GetChild("ToggleLight2", true));
     if (button)
-        SubscribeToEvent(button, E_RELEASED, HANDLER(SceneAndUILoad, ToggleLight2));
+        SubscribeToEvent(button, E_RELEASED, URHO3D_HANDLER(SceneAndUILoad, ToggleLight2));
 }
 
 void SceneAndUILoad::SetupViewport()
@@ -123,7 +125,7 @@ void SceneAndUILoad::SetupViewport()
 void SceneAndUILoad::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for camera motion
-    SubscribeToEvent(E_UPDATE, HANDLER(SceneAndUILoad, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SceneAndUILoad, HandleUpdate));
 }
 
 void SceneAndUILoad::MoveCamera(float timeStep)
@@ -156,13 +158,13 @@ void SceneAndUILoad::MoveCamera(float timeStep)
     }
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 

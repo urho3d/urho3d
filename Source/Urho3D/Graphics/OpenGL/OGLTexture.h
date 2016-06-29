@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ public:
     /// Set backup texture to use when rendering to this texture.
     void SetBackupTexture(Texture* texture);
     /// Set mip levels to skip on a quality setting when loading. Ensures higher quality levels do not skip more.
-    void SetMipsToSkip(int quality, int mips);
+    void SetMipsToSkip(int quality, int toSkip);
     /// Dirty the parameters.
     void SetParametersDirty();
     /// Update changed parameters to OpenGL. Called by Graphics when binding the texture.

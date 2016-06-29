@@ -1,7 +1,7 @@
 // Urho3D editor settings dialog
-
 bool subscribedToEditorSettings = false;
 Window@ settingsDialog;
+String defaultTags;
 
 void CreateEditorSettingsDialog()
 {
@@ -97,7 +97,7 @@ void UpdateEditorSettingsDialog()
     shadowResolutionEdit.selection = GetShadowResolution();
 
     DropDownList@ shadowQualityEdit = settingsDialog.GetChild("ShadowQualityEdit", true);
-    shadowQualityEdit.selection = renderer.shadowQuality;
+    shadowQualityEdit.selection = int(renderer.shadowQuality);
 
     LineEdit@ maxOccluderTrianglesEdit = settingsDialog.GetChild("MaxOccluderTrianglesEdit", true);
     maxOccluderTrianglesEdit.text = String(renderer.maxOccluderTriangles);
@@ -117,6 +117,10 @@ void UpdateEditorSettingsDialog()
     cubemapName.text = cubeMapGen_Name;
     LineEdit@ cubemapSize = settingsDialog.GetChild("CubeMapGenSize", true);
     cubemapSize.text = String(cubeMapGen_Size);
+    
+    LineEdit@ defaultTagsEdit = settingsDialog.GetChild("DefaultTagsEdit", true);
+    defaultTagsEdit.text = defaultTags.Trimmed();
+    
 
     if (!subscribedToEditorSettings)
     {
@@ -170,16 +174,26 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(cubemapSize, "TextChanged",  "EditCubemapSize");
         SubscribeToEvent(cubemapSize, "TextFinished", "EditCubemapSize");
         
+        SubscribeToEvent(defaultTagsEdit, "TextFinished", "EditDefaultTags");
+              
         subscribedToEditorSettings = true;
     }
 }
 
-bool ShowEditorSettingsDialog()
+bool ToggleEditorSettingsDialog()
+{
+    if (settingsDialog.visible == false)
+        ShowEditorSettingsDialog();
+    else
+        HideEditorSettingsDialog();
+    return true;
+}
+
+void ShowEditorSettingsDialog()
 {
     UpdateEditorSettingsDialog();
     settingsDialog.visible = true;
     settingsDialog.BringToFront();
-    return true;
 }
 
 void HideEditorSettingsDialog()
@@ -377,7 +391,7 @@ void EditShadowResolution(StringHash eventType, VariantMap& eventData)
 void EditShadowQuality(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
-    renderer.shadowQuality = edit.selection;
+    renderer.shadowQuality = ShadowQuality(edit.selection);
 }
 
 void EditMaxOccluderTriangles(StringHash eventType, VariantMap& eventData)
@@ -422,4 +436,10 @@ void EditCubemapSize(StringHash eventType, VariantMap& eventData)
 {
     LineEdit@ edit = eventData["Element"].GetPtr();
     cubeMapGen_Size = edit.text.ToInt();
+}
+
+void EditDefaultTags(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ edit = eventData["Element"].GetPtr();
+    defaultTags = edit.text;
 }

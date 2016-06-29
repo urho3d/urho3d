@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-
-cmake_minimum_required (VERSION 2.6.3)
 
 if (CMAKE_TOOLCHAIN_FILE)
     # Reference toolchain variable to suppress "unused variable" warning
@@ -82,21 +80,18 @@ if (NOT MINGW_SYSROOT)
     if (DEFINED ENV{MINGW_SYSROOT})
         file (TO_CMAKE_PATH $ENV{MINGW_SYSROOT} MINGW_SYSROOT)
     else ()
-        get_filename_component (NAME ${MINGW_PREFIX} NAME)
-        if (EXISTS /usr/${NAME}/sys-root)
-            # Redhat based system
-            set (MINGW_SYSROOT /usr/${NAME}/sys-root/mingw)
-        else ()
-            # Debian based system
-            set (MINGW_SYSROOT /usr/${NAME})
-        endif ()
+        execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE find_mingw_sysroot_output ERROR_QUIET)
+        file (STRINGS ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output MINGW_SYSROOT REGEX _mingw\\.h)
+        string (REGEX REPLACE "^[^ ]* *(.*)/include.*$" \\1 MINGW_SYSROOT "${MINGW_SYSROOT}")  # Stringify for string replacement
+        string (REPLACE "\\ " " " MINGW_SYSROOT "${MINGW_SYSROOT}")
+        execute_process (COMMAND ${CMAKE_COMMAND} -E remove find_mingw_sysroot_output)
     endif ()
     if (NOT EXISTS ${MINGW_SYSROOT})
         message (FATAL_ERROR "Could not find MinGW system root. "
             "Use MINGW_SYSROOT environment variable or build option to specify the location of system root.")
     endif ()
     set (MINGW_PREFIX ${MINGW_PREFIX} CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)" FORCE)
-    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW cross-compiling build only)" FORCE)
+    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected" FORCE)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 

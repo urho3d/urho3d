@@ -27,6 +27,9 @@ void Start()
     // Setup the viewport for displaying the scene
     SetupViewport();
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE);
+
     // Hook up to the frame update and render post-update events
     SubscribeToEvents();
 }
@@ -156,7 +159,7 @@ void CreateUI()
     instructionText.text =
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
-        "MMB to add obstacles or remove obstacles/agents\n"
+        "MMB or O key to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text";
@@ -339,8 +342,14 @@ bool Raycast(float maxDistance, Vector3& hitPos, Drawable@& hitDrawable)
 
 void MoveCamera(float timeStep)
 {
+    input.mouseVisible = input.mouseMode != MM_RELATIVE;
+    bool mouseDown = input.mouseButtonDown[MOUSEB_RIGHT];
+
+    // Override the MM_RELATIVE mouse grabbed settings, to allow interaction with UI
+    input.mouseGrabbed = mouseDown;
+
     // Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = !input.mouseButtonDown[MOUSEB_RIGHT];
+    ui.cursor.visible = !mouseDown;
 
     // Do not move if the UI has a focused element (the console)
     if (ui.focusElement !is null)
@@ -365,20 +374,20 @@ void MoveCamera(float timeStep)
     }
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input.keyDown['W'])
+    if (input.keyDown[KEY_W])
         cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['S'])
+    if (input.keyDown[KEY_S])
         cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['A'])
+    if (input.keyDown[KEY_A])
         cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['D'])
+    if (input.keyDown[KEY_D])
         cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 
     // Set destination or spawn a jack with left mouse button
     if (input.mouseButtonPress[MOUSEB_LEFT])
         SetPathPoint(input.qualifierDown[QUAL_SHIFT]);
     // Add new obstacle or remove existing obstacle/agent with middle mouse button
-    else if (input.mouseButtonPress[MOUSEB_MIDDLE])
+    else if (input.mouseButtonPress[MOUSEB_MIDDLE] || input.keyPress[KEY_O])
         AddOrRemoveObject();
 
     // Check for loading/saving the scene from/to the file Data/Scenes/CrowdNavigation.xml relative to the executable directory
@@ -506,7 +515,7 @@ String patchInstructions =
         "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" +
         "                <attribute name=\"Vert Alignment\" value=\"Center\" />" +
         "                <attribute name=\"Color\" value=\"0 0 0 1\" />" +
-        "                <attribute name=\"Text\" value=\"Spawn A jack\" />" +
+        "                <attribute name=\"Text\" value=\"Spawn\" />" +
         "            </element>" +
         "            <element type=\"Text\">" +
         "                <attribute name=\"Name\" value=\"KeyBinding\" />" +

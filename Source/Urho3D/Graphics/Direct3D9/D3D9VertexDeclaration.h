@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,18 @@ namespace Urho3D
 class Graphics;
 class VertexBuffer;
 
-/// Element in the vertex declaration.
+/// One element in a vertex declaration. In contrast to the VertexElement structure, takes into account the stream source index.
 struct VertexDeclarationElement
 {
-    /// Stream index.
-    unsigned stream_;
     /// Element type.
-    VertexElement element_;
-    /// Element offset.
+    VertexElementType type_;
+    /// Element semantic.
+    VertexElementSemantic semantic_;
+    /// Semantic index.
+    unsigned char index_;
+    /// Stream index.
+    unsigned char streamIndex_;
+    /// Byte offset.
     unsigned offset_;
 };
 
@@ -49,12 +53,12 @@ struct VertexDeclarationElement
 class URHO3D_API VertexDeclaration : public RefCounted
 {
 public:
-    /// Construct with vertex element mask.
-    VertexDeclaration(Graphics* graphics, unsigned elementMask);
-    /// Construct with vertex buffers and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers, const PODVector<unsigned>& elementMasks);
-    /// Construct with vertex buffers (shared pointer vector) and element masks to base declaration on.
-    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& elementMasks);
+    /// Construct with a single buffer's vertex element list.
+    VertexDeclaration(Graphics* graphics, const PODVector<VertexElement>& srcElements);
+    /// Construct with vertex buffers to base declaration on. Higher index buffers will override semantics on lower indices.
+    VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers);
+    /// Construct with vertex buffers (shared pointer vector) to base declaration on. Higher index buffers will override semantics on lower indices.
+    VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers);
     /// Destruct.
     ~VertexDeclaration();
 

@@ -20,7 +20,8 @@
 
 #include "Types.h"
 
-#if defined(KNET_UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <stdint.h>
 #endif
 

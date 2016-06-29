@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ class ResourceCache;
 /// Base class for %UI elements.
 class URHO3D_API UIElement : public Animatable
 {
-    OBJECT(UIElement, Animatable);
+    URHO3D_OBJECT(UIElement, Animatable);
 
 public:
     /// Construct.
@@ -146,14 +146,14 @@ public:
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse click end.
     virtual void OnClickEnd
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
-            UIElement* beginElement);
+            UIElement* beginElement) { }
     /// React to double mouse click.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse drag begin.
     virtual void
         OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
@@ -172,11 +172,11 @@ public:
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    virtual void OnWheel(int delta, int buttons, int qualifiers) { }
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) { }
     /// React to text input event.
-    virtual void OnTextInput(const String& text, int buttons, int qualifiers);
+    virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
 
     /// React to resize.
     virtual void OnResize() { }
@@ -189,6 +189,11 @@ public:
 
     /// React to indent change.
     virtual void OnIndentSet() { }
+
+    /// Convert screen coordinates to element coordinates.
+    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    /// Convert element coordinates to screen coordinates.
+    virtual IntVector2 ElementToScreen(const IntVector2& position);
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -337,6 +342,19 @@ public:
     void SetTraversalMode(TraversalMode traversalMode);
     /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
     void SetElementEventSender(bool flag);
+
+    /// Set tags. Old tags are overwritten.
+    void SetTags(const StringVector& tags);
+    /// Add a tag.
+    void AddTag(const String& tag);
+    /// Add tags with the specified separator, by default ;
+    void AddTags(const String& tags, char separator = ';');
+    /// Add tags.
+    void AddTags(const StringVector& tags);
+    // Remove specific tag. Return true if existed.
+    bool RemoveTag(const String& tag);
+    // Remove all tags.
+    void RemoveAllTags();
 
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
@@ -503,16 +521,21 @@ public:
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
 
+    /// Return whether element is tagged by a specific tag.
+    bool HasTag(const String& tag) const;
+
+    /// Return all tags.
+    const StringVector& GetTags() const { return tags_; }
+
+    /// Return child elements with a specific tag either recursively or non-recursively.
+    void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
+
     /// Return the drag button combo if this element is being dragged.
     int GetDragButtonCombo() const { return dragButtonCombo_; }
 
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
 
-    /// Convert screen coordinates to element coordinates.
-    IntVector2 ScreenToElement(const IntVector2& screenPosition);
-    /// Convert element coordinates to screen coordinates.
-    IntVector2 ElementToScreen(const IntVector2& position);
     /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
     /// Return whether a point (either in element or screen coordinates) is inside the combined rect of the element and its children.
@@ -522,11 +545,8 @@ public:
     /// Sort child elements if sorting enabled and order dirty. Called by UI.
     void SortChildren();
 
-    /// Return minimum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
-    int GetLayoutMinSize() const { return layoutMinSize_; }
-
     /// Return maximum layout element size in the layout direction. Only valid after layout has been calculated. Used internally by UI for optimizations.
-    int GetLayoutMaxSize() const { return layoutMaxSize_; }
+    int GetLayoutElementMaxSize() const { return layoutElementMaxSize_; }
 
     /// Return horizontal indentation.
     int GetIndent() const { return indent_; }
@@ -544,8 +564,7 @@ public:
     /// Adjust scissor for rendering.
     void AdjustScissor(IntRect& currentScissor);
     /// Get UI rendering batches with a specified offset. Also recurse to child elements.
-    void
-        GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
+    void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
 
     /// Return color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return color_[0]; }
@@ -559,6 +578,9 @@ public:
     /// Get element which should send child added / removed events.
     UIElement* GetElementEventSender() const;
 
+    /// Return effective minimum size, also considering layout. Used internally.
+    IntVector2 GetEffectiveMinSize() const;
+    
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
@@ -631,10 +653,8 @@ protected:
     unsigned resizeNestingLevel_;
     /// Layout update nesting level to prevent endless loop.
     unsigned layoutNestingLevel_;
-    /// Layout element minimum size in layout direction.
-    int layoutMinSize_;
     /// Layout element maximum size in layout direction.
-    int layoutMaxSize_;
+    int layoutElementMaxSize_;
     /// Horizontal indentation.
     int indent_;
     /// Indent spacing (number of pixels per indentation level).
@@ -655,6 +675,10 @@ protected:
 private:
     /// Return child elements recursively.
     void GetChildrenRecursive(PODVector<UIElement*>& dest) const;
+    /// Return child elements with a specific tag recursively.
+    void GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const;
+    /// Recursively apply style to a child element hierarchy when adding to an element.
+    void ApplyStyleRecursive(UIElement* element);
     /// Calculate layout width for resizing the parent element.
     int CalculateLayoutParentSize(const PODVector<int>& sizes, int begin, int end, int spacing);
     /// Calculate child widths/positions in the layout.
@@ -678,6 +702,8 @@ private:
     IntVector2 maxSize_;
     /// Child elements' offset. Used internally.
     IntVector2 childOffset_;
+    /// Parent's minimum size calculated by layout. Used internally.
+    IntVector2 layoutMinSize_;
     /// Horizontal alignment.
     HorizontalAlignment horizontalAlignment_;
     /// Vertical alignment.
@@ -698,12 +724,16 @@ private:
     bool colorGradient_;
     /// Default style file.
     SharedPtr<XMLFile> defaultStyle_;
+    /// Last applied style file.
+    WeakPtr<XMLFile> appliedStyleFile_;
     /// Traversal mode for rendering.
     TraversalMode traversalMode_;
     /// Flag whether node should send child added / removed events by itself.
     bool elementEventSender_;
     /// XPath query for selecting UI-style.
     static XPathQuery styleXPathQuery_;
+    /// Tag list.
+    StringVector tags_;
 };
 
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)

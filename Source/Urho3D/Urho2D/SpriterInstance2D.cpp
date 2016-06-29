@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@
 
 #include "../Precompiled.h"
 
+#include "../Graphics/DrawableEvents.h"
+#include "../Scene/Component.h"
+#include "../Scene/Node.h"
 #include "../Urho2D/SpriterInstance2D.h"
 
 #include <cmath>
@@ -32,7 +35,8 @@ namespace Urho3D
 namespace Spriter
 {
 
-SpriterInstance::SpriterInstance(SpriterData* spriteData) : 
+SpriterInstance::SpriterInstance(Component* owner, SpriterData* spriteData) : 
+    owner_(owner),
     spriterData_(spriteData),
     entity_(0),
     animation_(0)
@@ -126,16 +130,38 @@ void SpriterInstance::Update(float deltaTime)
 
     Clear();
 
+    float lastTime = currentTime_;
     currentTime_ += deltaTime;
     if (currentTime_ > animation_->length_)
     {
+        bool sendFinishEvent = false;
+
         if (looping_)
         {
             currentTime_ = fmod(currentTime_, animation_->length_);
+            sendFinishEvent = true;
         }
         else
         {
             currentTime_ = animation_->length_;
+            sendFinishEvent = lastTime != currentTime_;
+        }
+
+        if (sendFinishEvent && owner_)
+        {
+            Node* senderNode = owner_->GetNode();
+            if (senderNode)
+            {
+                using namespace AnimationFinished;
+
+                VariantMap& eventData = senderNode->GetEventDataMap();
+                eventData[P_NODE] = senderNode;
+                eventData[P_ANIMATION] = animation_;
+                eventData[P_NAME] = animation_->name_;
+                eventData[P_LOOPED] = looping_;
+    
+                senderNode->SendEvent(E_ANIMATIONFINISHED, eventData);
+            }
         }
     }
 
@@ -186,7 +212,7 @@ void SpriterInstance::UpdateTimelineKeys()
         else
         {
             timelineKey->info_ = timelineKey->info_.UnmapFromParent(spatialInfo_);
-        }            
+        }
         timelineKeys_.Push(timelineKey);
     }
 
@@ -203,7 +229,7 @@ void SpriterInstance::UpdateTimelineKeys()
         {
             timelineKey->info_ = timelineKey->info_.UnmapFromParent(spatialInfo_);
         }
-            
+        
         timelineKey->zIndex_ = ref->zIndex_;
 
         timelineKeys_.Push(timelineKey);

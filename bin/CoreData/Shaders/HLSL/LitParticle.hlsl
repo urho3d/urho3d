@@ -5,7 +5,7 @@
 #include "Fog.hlsl"
 
 void VS(float4 iPos : POSITION,
-    #ifndef BILLBOARD
+    #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
     #endif
     #ifndef NOUV
@@ -19,10 +19,13 @@ void VS(float4 iPos : POSITION,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
-        float4x3 iModelInstance : TEXCOORD2,
+        float4x3 iModelInstance : TEXCOORD4,
     #endif
-    #ifdef BILLBOARD
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
+    #endif
+    #if defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
+        float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,
     out float4 oWorldPos : TEXCOORD3,
@@ -72,7 +75,7 @@ void VS(float4 iPos : POSITION,
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(projWorldPos, oShadowPos);
+            GetShadowPos(projWorldPos, float3(0, 0, 0), oShadowPos);
         #endif
 
         #ifdef SPOTLIGHT
@@ -103,7 +106,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #ifdef SPOTLIGHT
             float4 iSpotPos : TEXCOORD5,
         #endif
-        #ifdef CUBEMASK
+        #ifdef POINTLIGHT
             float3 iCubeMaskVec : TEXCOORD5,
         #endif
     #else

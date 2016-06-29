@@ -26,6 +26,9 @@ function Start()
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE)
+
     -- Hook up to the frame update and render post-update events
     SubscribeToEvents()
 end
@@ -152,7 +155,7 @@ function CreateUI()
     local instructionText = ui.root:CreateChild("Text", INSTRUCTION)
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"..
-        "MMB to add obstacles or remove obstacles/agents\n"..
+        "MMB or O key to add obstacles or remove obstacles/agents\n"..
         "F5 to save scene, F7 to load\n"..
         "Space to toggle debug geometry\n"..
         "F12 to toggle this instruction text"
@@ -313,8 +316,14 @@ function Raycast(maxDistance)
 end
 
 function MoveCamera(timeStep)
+    input.mouseVisible = input.mouseMode ~= MM_RELATIVE
+    mouseDown = input:GetMouseButtonDown(MOUSEB_RIGHT)
+
+    -- Override the MM_RELATIVE mouse grabbed settings, to allow interaction with UI
+    input.mouseGrabbed = mouseDown
+
     -- Right mouse button controls mouse cursor visibility: hide when pressed
-    ui.cursor.visible = not input:GetMouseButtonDown(MOUSEB_RIGHT)
+    ui.cursor.visible = not mouseDown
 
     -- Do not move if the UI has a focused element (the console)
     if ui.focusElement ~= nil then
@@ -356,7 +365,7 @@ function MoveCamera(timeStep)
     if input:GetMouseButtonPress(MOUSEB_LEFT) then
         SetPathPoint(input:GetQualifierDown(QUAL_SHIFT))
     -- Add new obstacle or remove existing obstacle/agent with middle mouse button
-    elseif input:GetMouseButtonPress(MOUSEB_MIDDLE) then
+    elseif input:GetMouseButtonPress(MOUSEB_MIDDLE) or input:GetKeyPress(KEY_O) then
         AddOrRemoveObject()
     end
 
@@ -469,7 +478,7 @@ function GetScreenJoystickPatchString()
         "                <attribute name=\"Horiz Alignment\" value=\"Center\" />" ..
         "                <attribute name=\"Vert Alignment\" value=\"Center\" />" ..
         "                <attribute name=\"Color\" value=\"0 0 0 1\" />" ..
-        "                <attribute name=\"Text\" value=\"Spawn Jack\" />" ..
+        "                <attribute name=\"Text\" value=\"Spawn\" />" ..
         "            </element>" ..
         "            <element type=\"Text\">" ..
         "                <attribute name=\"Name\" value=\"KeyBinding\" />" ..

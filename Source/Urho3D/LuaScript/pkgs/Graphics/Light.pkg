@@ -10,8 +10,12 @@ enum LightType
 struct BiasParameters
 {
     BiasParameters();
-    BiasParameters(float constantBias, float slopeScaledBias);
+    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f);
     ~BiasParameters();
+    
+    float constantBias_ @ constantBias;
+    float slopeScaledBias_ @ slopeScaledBias;
+    float normalOffset_ @ normalOffset;
 };
 
 struct CascadeParameters
@@ -19,6 +23,9 @@ struct CascadeParameters
     CascadeParameters();
     CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f);
     ~CascadeParameters();
+    
+    float fadeStart_ @ fadeStart;
+    float biasAutoAdjust_ @ biasAutoAdjust;
 };
 
 struct FocusParameters
@@ -26,6 +33,12 @@ struct FocusParameters
     FocusParameters();
     FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView);
     ~FocusParameters();
+    
+    bool focus_ @ focus;
+    bool nonUniform_ @ nonUniform;
+    bool autoSize_ @ autoSize;
+    float quantize_ @ quantize;
+    float minView_ @ minView;
 };
 
 class Light : public Drawable

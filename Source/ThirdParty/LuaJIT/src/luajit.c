@@ -1,6 +1,6 @@
 /*
 ** LuaJIT frontend. Runs commands, scripts, read-eval-print (REPL) etc.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -61,8 +61,9 @@ static void laction(int i)
 
 static void print_usage(void)
 {
-  fprintf(stderr,
-  "usage: %s [options]... [script [args]...].\n"
+  fputs("usage: ", stderr);
+  fputs(progname, stderr);
+  fputs(" [options]... [script [args]...].\n"
   "Available options are:\n"
   "  -e chunk  Execute string " LUA_QL("chunk") ".\n"
   "  -l name   Require library " LUA_QL("name") ".\n"
@@ -73,16 +74,14 @@ static void print_usage(void)
   "  -v        Show version information.\n"
   "  -E        Ignore environment variables.\n"
   "  --        Stop handling options.\n"
-  "  -         Execute stdin and stop handling options.\n"
-  ,
-  progname);
+  "  -         Execute stdin and stop handling options.\n", stderr);
   fflush(stderr);
 }
 
 static void l_message(const char *pname, const char *msg)
 {
-  if (pname) fprintf(stderr, "%s: ", pname);
-  fprintf(stderr, "%s\n", msg);
+  if (pname) { fputs(pname, stderr); fputc(':', stderr); fputc(' ', stderr); }
+  fputs(msg, stderr); fputc('\n', stderr);
   fflush(stderr);
 }
 
@@ -301,17 +300,17 @@ static int loadjitmodule(lua_State *L)
   lua_concat(L, 2);
   if (lua_pcall(L, 1, 1, 0)) {
     const char *msg = lua_tostring(L, -1);
-    if (msg && !strncmp(msg, "module ", 7)) {
-    err:
-      l_message(progname,
-		"unknown luaJIT command or jit.* modules not installed");
-      return 1;
-    } else {
-      return report(L, 1);
-    }
+    if (msg && !strncmp(msg, "module ", 7))
+      goto nomodule;
+    return report(L, 1);
   }
   lua_getfield(L, -1, "start");
-  if (lua_isnil(L, -1)) goto err;
+  if (lua_isnil(L, -1)) {
+  nomodule:
+    l_message(progname,
+	      "unknown luaJIT command or jit.* modules not installed");
+    return 1;
+  }
   lua_remove(L, -2);  /* Drop module table. */
   return 0;
 }

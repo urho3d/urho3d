@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../Resource/Image.h"
 #include "../UI/BorderImage.h"
 
-#include <SDL/SDL_mouse.h>
+struct SDL_Cursor;
 
 namespace Urho3D
 {
@@ -91,7 +91,7 @@ struct URHO3D_API CursorShapeInfo
 /// Mouse cursor %UI element.
 class URHO3D_API Cursor : public BorderImage
 {
-    OBJECT(Cursor, BorderImage);
+    URHO3D_OBJECT(Cursor, BorderImage);
 
 public:
     /// Construct.

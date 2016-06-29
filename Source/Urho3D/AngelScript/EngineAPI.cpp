@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,10 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_STATS", (void*)&DEBUGHUD_SHOW_STATS);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MODE", (void*)&DEBUGHUD_SHOW_MODE);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_PROFILER", (void*)&DEBUGHUD_SHOW_PROFILER);
+    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_EVENTPROFILER", (void*)&DEBUGHUD_SHOW_EVENTPROFILER);
+    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MEMORY", (void*)&DEBUGHUD_SHOW_MEMORY);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL", (void*)&DEBUGHUD_SHOW_ALL);
+    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL_MEMORY", (void*)&DEBUGHUD_SHOW_ALL_MEMORY);
 
     RegisterObject<Console>(engine, "DebugHud");
     engine->RegisterObjectMethod("DebugHud", "void Update()", asMETHOD(DebugHud, Update), asCALL_THISCALL);
@@ -95,6 +98,7 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_statsText() const", asMETHOD(DebugHud, GetStatsText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_modeText() const", asMETHOD(DebugHud, GetModeText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "Text@+ get_profilerText() const", asMETHOD(DebugHud, GetProfilerText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugHud", "Text@+ get_memoryText() const", asMETHOD(DebugHud, GetMemoryText), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void SetAppStats(const String&in, const Variant&in)", asMETHODPR(DebugHud, SetAppStats, (const String&, const Variant&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void SetAppStats(const String&in, const String&in)", asMETHODPR(DebugHud, SetAppStats, (const String&, const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugHud", "void ResetAppStats(const String&in)", asMETHOD(DebugHud, ResetAppStats), asCALL_THISCALL);

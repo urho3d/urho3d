@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 #include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(SoundSynthesis)
+URHO3D_DEFINE_APPLICATION_MAIN(SoundSynthesis)
 
 SoundSynthesis::SoundSynthesis(Context* context) :
     Sample(context),
@@ -67,6 +67,9 @@ void SoundSynthesis::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void SoundSynthesis::CreateSound()
@@ -133,7 +136,7 @@ void SoundSynthesis::CreateInstructions()
 void SoundSynthesis::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SoundSynthesis, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SoundSynthesis, HandleUpdate));
 }
 
 void SoundSynthesis::HandleUpdate(StringHash eventType, VariantMap& eventData)

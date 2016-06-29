@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -193,11 +193,11 @@ char *wmtab[] = {
     "WM_NCMBUTTONUP",
     "WM_NCMBUTTONDBLCLK",
     "UNKNOWN (170)",
-    "UNKNOWN (171)",
-    "UNKNOWN (172)",
-    "UNKNOWN (173)",
-    "UNKNOWN (174)",
-    "UNKNOWN (175)",
+    "WM_NCXBUTTONDOWN",
+    "WM_NCXBUTTONUP",
+    "WM_NCXBUTTONDBLCLK",
+    "WM_NCUAHDRAWCAPTION",
+    "WM_NCUAHDRAWFRAME",
     "UNKNOWN (176)",
     "UNKNOWN (177)",
     "UNKNOWN (178)",

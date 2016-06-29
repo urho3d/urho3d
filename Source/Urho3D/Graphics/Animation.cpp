@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@
 #include "../IO/Serializer.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/JSONFile.h"
 
 #include "../DebugNew.h"
 
@@ -127,7 +128,7 @@ bool Animation::BeginLoad(Deserializer& source)
     // Check ID
     if (source.ReadFileID() != "UANI")
     {
-        LOGERROR(source.GetName() + " is not a valid animation file");
+        URHO3D_LOGERROR(source.GetName() + " is not a valid animation file");
         return false;
     }
 
@@ -184,6 +185,36 @@ bool Animation::BeginLoad(Deserializer& source)
         }
 
         memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
+        SetMemoryUse(memoryUse);
+        return true;
+    }
+
+    // Optionally read triggers from a JSON file
+    String jsonName = ReplaceExtension(GetName(), ".json");
+
+    SharedPtr<JSONFile> jsonFile(cache->GetTempResource<JSONFile>(jsonName, false));
+    if (jsonFile)
+    {
+        const JSONValue& rootVal = jsonFile->GetRoot();
+        JSONArray triggerArray = rootVal.Get("triggers").GetArray();
+
+        for (unsigned i = 0; i < triggerArray.Size(); i++)
+        {
+            const JSONValue& triggerValue = triggerArray.At(i);
+            JSONValue normalizedTimeValue = triggerValue.Get("normalizedTime");
+            if (!normalizedTimeValue.IsNull())
+                AddTrigger(normalizedTimeValue.GetFloat(), true, triggerValue.GetVariant());
+            else
+            {
+                JSONValue timeVal = triggerValue.Get("time");
+                if (!timeVal.IsNull())
+                    AddTrigger(timeVal.GetFloat(), false, triggerValue.GetVariant());
+            }
+        }
+
+        memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
+        SetMemoryUse(memoryUse);
+        return true;
     }
 
     SetMemoryUse(memoryUse);
@@ -242,7 +273,7 @@ bool Animation::Save(Serializer& dest) const
             xml->Save(xmlFile);
         }
         else
-            LOGWARNING("Can not save animation trigger data when not saving into a file");
+            URHO3D_LOGWARNING("Can not save animation trigger data when not saving into a file");
     }
 
     return true;
@@ -331,6 +362,20 @@ void Animation::RemoveAllTriggers()
 void Animation::SetNumTriggers(unsigned num)
 {
     triggers_.Resize(num);
+}
+
+SharedPtr<Animation> Animation::Clone(const String& cloneName) const
+{
+    SharedPtr<Animation> ret(new Animation(context_));
+
+    ret->SetName(cloneName);
+    ret->SetAnimationName(animationName_);
+    ret->length_ = length_;
+    ret->tracks_ = tracks_;
+    ret->triggers_ = triggers_;
+    ret->SetMemoryUse(GetMemoryUse());
+    
+    return ret;
 }
 
 AnimationTrack* Animation::GetTrack(const String& name)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(L10n)
+URHO3D_DEFINE_APPLICATION_MAIN(L10n)
 
 L10n::L10n(Context* context) :
     Sample(context)
@@ -62,6 +62,9 @@ void L10n::Start()
 
     // Init the user interface
     CreateGUI();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void L10n::InitLocalizationSystem()
@@ -73,7 +76,7 @@ void L10n::InitLocalizationSystem()
     // You can load multiple files
     l10n->LoadJSONFile("StringsDe.json");
     // Hook up to the change language
-    SubscribeToEvent(E_CHANGELANGUAGE, HANDLER(L10n, HandleChangeLanguage));
+    SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(L10n, HandleChangeLanguage));
 }
 
 void L10n::CreateGUI()
@@ -122,7 +125,7 @@ void L10n::CreateGUI()
 
     t->SetAlignment(HA_CENTER, VA_CENTER);
     t->SetStyle("Text");
-    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleChangeLangButtonPressed));
+    SubscribeToEvent(b, E_RELEASED, URHO3D_HANDLER(L10n, HandleChangeLangButtonPressed));
 
     b = new Button(context_);
     window->AddChild(b);
@@ -135,7 +138,7 @@ void L10n::CreateGUI()
     // Manually set text in the current language
     t->SetText(l10n->Get("quit"));
 
-    SubscribeToEvent(b, E_RELEASED, HANDLER(L10n, HandleQuitButtonPressed));
+    SubscribeToEvent(b, E_RELEASED, URHO3D_HANDLER(L10n, HandleQuitButtonPressed));
 }
 
 void L10n::CreateScene()
@@ -186,7 +189,7 @@ void L10n::CreateScene()
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
 
-    SubscribeToEvent(E_UPDATE, HANDLER(L10n, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(L10n, HandleUpdate));
 }
 
 void L10n::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -215,7 +218,8 @@ void L10n::HandleChangeLangButtonPressed(StringHash eventType, VariantMap& event
 
 void L10n::HandleQuitButtonPressed(StringHash eventType, VariantMap& eventData)
 {
-    engine_->Exit();
+    if (GetPlatform() != "Web")
+        engine_->Exit();
 }
 
 // You can manually change texts, sprites and other aspects of the game when language is changed

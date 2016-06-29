@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -54,12 +54,12 @@ static Bool isUnmapNotify(Display *dpy, XEvent *ev, XPointer win)
 {
     return ev->type == UnmapNotify && ev->xunmap.window == *((Window*)win);
 }
+
+/*
 static Bool isConfigureNotify(Display *dpy, XEvent *ev, XPointer win)
 {
     return ev->type == ConfigureNotify && ev->xconfigure.window == *((Window*)win);
 }
-
-/*
 static Bool
 X11_XIfEventTimeout(Display *display, XEvent *event_return, Bool (*predicate)(), XPointer arg, int timeoutMS)
 {
@@ -239,8 +239,7 @@ SetupWindowData(_THIS, SDL_Window * window, Window w, BOOL created)
         data->ic =
             X11_XCreateIC(videodata->im, XNClientWindow, w, XNFocusWindow, w,
                        XNInputStyle, XIMPreeditNothing | XIMStatusNothing,
-                       XNResourceName, videodata->classname, XNResourceClass,
-                       videodata->classname, NULL);
+                       NULL);
     }
 #endif
     data->created = created;
@@ -334,7 +333,7 @@ SetWindowBordered(Display *display, int screen, Window window, SDL_bool border)
 
         X11_XChangeProperty(display, window, WM_HINTS, WM_HINTS, 32,
                         PropModeReplace, (unsigned char *) &MWMHints,
-                        sizeof(MWMHints) / 4);
+                        sizeof(MWMHints) / sizeof(long));
     } else {  /* set the transient hints instead, if necessary */
         X11_XSetTransientForHint(display, window, RootWindow(display, screen));
     }
@@ -362,7 +361,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
     Atom _NET_WM_WINDOW_TYPE_NORMAL;
     Atom _NET_WM_PID;
     Atom XdndAware, xdnd_version = 5;
-    Uint32 fevent = 0;
+    long fevent = 0;
 
 #if SDL_VIDEO_OPENGL_GLX || SDL_VIDEO_OPENGL_EGL
     if ((window->flags & SDL_WINDOW_OPENGL) &&
@@ -374,7 +373,7 @@ X11_CreateWindow(_THIS, SDL_Window * window)
 #if SDL_VIDEO_OPENGL_GLX            
             && ( !_this->gl_data || ! _this->gl_data->HAS_GLX_EXT_create_context_es2_profile )
 #endif
-        ){
+        ) {
             vinfo = X11_GLES_GetVisual(_this, display, screen);
         } else
 #endif
@@ -543,11 +542,23 @@ X11_CreateWindow(_THIS, SDL_Window * window)
                     (unsigned char *)&_NET_WM_BYPASS_COMPOSITOR_HINT_ON, 1);
 
     {
-        Atom protocols[] = {
-            data->WM_DELETE_WINDOW, /* Allow window to be deleted by the WM */
-            data->_NET_WM_PING, /* Respond so WM knows we're alive */
-        };
-        X11_XSetWMProtocols(display, w, protocols, sizeof (protocols) / sizeof (protocols[0]));
+        Atom protocols[2];
+        int proto_count = 0;
+        const char *ping_hint;
+
+        protocols[proto_count] = data->WM_DELETE_WINDOW; /* Allow window to be deleted by the WM */
+        proto_count++;
+        
+        ping_hint = SDL_GetHint(SDL_HINT_VIDEO_X11_NET_WM_PING);
+        /* Default to using ping if there is no hint */
+        if (!ping_hint || SDL_atoi(ping_hint)) {
+            protocols[proto_count] = data->_NET_WM_PING; /* Respond so WM knows we're alive */
+            proto_count++;
+        }
+
+        SDL_assert(proto_count <= sizeof(protocols) / sizeof(protocols[0]));
+
+        X11_XSetWMProtocols(display, w, protocols, proto_count);
     }
 
     if (SetupWindowData(_this, window, w, SDL_TRUE) < 0) {
@@ -644,6 +655,7 @@ X11_GetWindowTitle(_THIS, Window xwindow)
                     &items_read, &items_left, &propdata);
         if (status == Success && propdata) {
             title = SDL_iconv_string("UTF-8", "", SDL_static_cast(char*, propdata), items_read+1);
+            X11_XFree(propdata);
         } else {
             title = SDL_strdup("");
         }
@@ -656,67 +668,39 @@ X11_SetWindowTitle(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     Display *display = data->videodata->display;
-    XTextProperty titleprop, iconprop;
+    XTextProperty titleprop;
     Status status;
-    const char *title = window->title;
-    const char *icon = NULL;
+    const char *title = window->title ? window->title : "";
+    char *title_locale = NULL;
 
 #ifdef X_HAVE_UTF8_STRING
     Atom _NET_WM_NAME = data->videodata->_NET_WM_NAME;
-    Atom _NET_WM_ICON_NAME = data->videodata->_NET_WM_ICON_NAME;
 #endif
 
-    if (title != NULL) {
-        char *title_locale = SDL_iconv_utf8_locale(title);
-        if (!title_locale) {
-            SDL_OutOfMemory();
-            return;
-        }
-        status = X11_XStringListToTextProperty(&title_locale, 1, &titleprop);
-        SDL_free(title_locale);
-        if (status) {
-            X11_XSetTextProperty(display, data->xwindow, &titleprop, XA_WM_NAME);
+    title_locale = SDL_iconv_utf8_locale(title);
+    if (!title_locale) {
+        SDL_OutOfMemory();
+        return;
+    }
+
+    status = X11_XStringListToTextProperty(&title_locale, 1, &titleprop);
+    SDL_free(title_locale);
+    if (status) {
+        X11_XSetTextProperty(display, data->xwindow, &titleprop, XA_WM_NAME);
+        X11_XFree(titleprop.value);
+    }
+#ifdef X_HAVE_UTF8_STRING
+    if (SDL_X11_HAVE_UTF8) {
+        status = X11_Xutf8TextListToTextProperty(display, (char **) &title, 1,
+                                            XUTF8StringStyle, &titleprop);
+        if (status == Success) {
+            X11_XSetTextProperty(display, data->xwindow, &titleprop,
+                                 _NET_WM_NAME);
             X11_XFree(titleprop.value);
         }
-#ifdef X_HAVE_UTF8_STRING
-        if (SDL_X11_HAVE_UTF8) {
-            status =
-                X11_Xutf8TextListToTextProperty(display, (char **) &title, 1,
-                                            XUTF8StringStyle, &titleprop);
-            if (status == Success) {
-                X11_XSetTextProperty(display, data->xwindow, &titleprop,
-                                 _NET_WM_NAME);
-                X11_XFree(titleprop.value);
-            }
-        }
-#endif
     }
-    if (icon != NULL) {
-        char *icon_locale = SDL_iconv_utf8_locale(icon);
-        if (!icon_locale) {
-            SDL_OutOfMemory();
-            return;
-        }
-        status = X11_XStringListToTextProperty(&icon_locale, 1, &iconprop);
-        SDL_free(icon_locale);
-        if (status) {
-            X11_XSetTextProperty(display, data->xwindow, &iconprop,
-                             XA_WM_ICON_NAME);
-            X11_XFree(iconprop.value);
-        }
-#ifdef X_HAVE_UTF8_STRING
-        if (SDL_X11_HAVE_UTF8) {
-            status =
-                X11_Xutf8TextListToTextProperty(display, (char **) &icon, 1,
-                                            XUTF8StringStyle, &iconprop);
-            if (status == Success) {
-                X11_XSetTextProperty(display, data->xwindow, &iconprop,
-                                 _NET_WM_ICON_NAME);
-                X11_XFree(iconprop.value);
-            }
-        }
 #endif
-    }
+
     X11_XFlush(display);
 }
 
@@ -892,7 +876,6 @@ X11_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered)
 
     SetWindowBordered(display, displaydata->screen, data->xwindow, bordered);
     X11_XFlush(display);
-    X11_XIfEvent(display, &event, &isConfigureNotify, (XPointer)&data->xwindow);
 
     if (visible) {
         XWindowAttributes attr;
@@ -925,6 +908,12 @@ X11_ShowWindow(_THIS, SDL_Window * window)
          * We use X11_XIfEvent because pXWindowEvent takes a mask rather than a type,
          * and XCheckTypedWindowEvent doesn't block */
         X11_XIfEvent(display, &event, &isMapNotify, (XPointer)&data->xwindow);
+        X11_XFlush(display);
+    }
+
+    if (!data->videodata->net_wm) {
+        /* no WM means no FocusIn event, which confuses us. Force it. */
+        X11_XSetInputFocus(display, data->xwindow, RevertToNone, CurrentTime);
         X11_XFlush(display);
     }
 }
@@ -1394,7 +1383,6 @@ void
 X11_DestroyWindow(_THIS, SDL_Window * window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-    window->driverdata = NULL;
 
     if (data) {
         SDL_VideoData *videodata = (SDL_VideoData *) data->videodata;
@@ -1424,6 +1412,7 @@ X11_DestroyWindow(_THIS, SDL_Window * window)
         }
         SDL_free(data);
     }
+    window->driverdata = NULL;
 }
 
 SDL_bool
@@ -1443,6 +1432,12 @@ X11_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }
+}
+
+int
+X11_SetWindowHitTest(SDL_Window *window, SDL_bool enabled)
+{
+    return 0;  /* just succeed, the real work is done elsewhere. */
 }
 
 #endif /* SDL_VIDEO_DRIVER_X11 */

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -177,7 +177,7 @@ bool Serializer::WriteString(const String& value)
 bool Serializer::WriteFileID(const String& value)
 {
     bool success = true;
-    unsigned length = (unsigned)Min((int)value.Length(), 4);
+    unsigned length = Min(value.Length(), 4U);
 
     success &= Write(value.CString(), length) == length;
     for (unsigned i = value.Length(); i < 4; ++i)

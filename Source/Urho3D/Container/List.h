@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
 #pragma once
 
 #include "../Container/ListBase.h"
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
 namespace Urho3D
 {
@@ -185,7 +188,16 @@ public:
         head_ = tail_ = ReserveNode();
         *this = list;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    List(const std::initializer_list<T>& list) : List()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Push(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~List()
     {
@@ -473,11 +485,6 @@ private:
         AllocatorFree(allocator_, node);
     }
 };
-
-}
-
-namespace std
-{
 
 template <class T> typename Urho3D::List<T>::ConstIterator begin(const Urho3D::List<T>& v) { return v.Begin(); }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,8 @@ Shader::Shader(Context* context) :
 Shader::~Shader()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    cache->ResetDependencies(this);
+    if (cache)
+        cache->ResetDependencies(this);
 }
 
 void Shader::RegisterObject(Context* context)

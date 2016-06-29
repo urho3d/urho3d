@@ -25,6 +25,9 @@ void Start()
     // Setup the viewport for displaying the scene
     SetupViewport();
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE);
+
     // Hook up to the frame update events
     SubscribeToEvents();
 }
@@ -168,13 +171,13 @@ void MoveCamera(float timeStep)
     cameraNode.rotation = Quaternion(pitch, yaw, 0.0f);
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input.keyDown['W'])
+    if (input.keyDown[KEY_W])
         cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['S'])
+    if (input.keyDown[KEY_S])
         cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['A'])
+    if (input.keyDown[KEY_A])
         cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['D'])
+    if (input.keyDown[KEY_D])
         cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 }
 
@@ -198,7 +201,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         animate = !animate;
 
     // Toggle grouped / ungrouped mode
-    if (input.keyPress['G'])
+    if (input.keyPress[KEY_G])
     {
         useGroups = !useGroups;
         CreateScene();

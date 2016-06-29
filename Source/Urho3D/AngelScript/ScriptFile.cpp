@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +126,7 @@ bool ScriptFile::BeginLoad(Deserializer& source)
         scriptModule_ = engine->GetModule(GetName().CString(), asGM_ALWAYS_CREATE);
         if (!scriptModule_)
         {
-            LOGERROR("Failed to create script module " + GetName());
+            URHO3D_LOGERROR("Failed to create script module " + GetName());
             return false;
         }
     }
@@ -161,7 +161,7 @@ bool ScriptFile::EndLoad()
 
         if (scriptModule_->LoadByteCode(&deserializer) >= 0)
         {
-            LOGINFO("Loaded script module " + GetName() + " from bytecode");
+            URHO3D_LOGINFO("Loaded script module " + GetName() + " from bytecode");
             success = true;
         }
     }
@@ -170,11 +170,11 @@ bool ScriptFile::EndLoad()
         int result = scriptModule_->Build();
         if (result >= 0)
         {
-            LOGINFO("Compiled script module " + GetName());
+            URHO3D_LOGINFO("Compiled script module " + GetName());
             success = true;
         }
         else
-            LOGERROR("Failed to compile script module " + GetName());
+            URHO3D_LOGERROR("Failed to compile script module " + GetName());
     }
 
     if (success)
@@ -203,7 +203,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
 
     if (!sender)
     {
-        LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
+        URHO3D_LOGERROR("Null event sender for event " + String(eventType) + ", handler " + handlerName);
         return;
     }
 
@@ -271,12 +271,32 @@ void ScriptFile::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptio
     }
 }
 
+bool ScriptFile::HasEventHandler(StringHash eventType) const
+{
+    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
+    if (i != eventInvokers_.End())
+        return i->second_->HasSubscribedToEvent(eventType);
+    else
+        return false;
+}
+
+bool ScriptFile::HasEventHandler(Object* sender, StringHash eventType) const
+{
+    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
+    if (i != eventInvokers_.End())
+        return i->second_->HasSubscribedToEvent(sender, eventType);
+    else
+        return false;
+}
+
 bool ScriptFile::Execute(const String& declaration, const VariantVector& parameters, bool unprepare)
 {
     asIScriptFunction* function = GetFunction(declaration);
     if (!function)
     {
-        LOGERROR("Function " + declaration + " not found in " + GetName());
+        URHO3D_LOGERROR("Function " + declaration + " not found in " + GetName());
         return false;
     }
 
@@ -285,7 +305,7 @@ bool ScriptFile::Execute(const String& declaration, const VariantVector& paramet
 
 bool ScriptFile::Execute(asIScriptFunction* function, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteFunction);
+    URHO3D_PROFILE(ExecuteFunction);
 
     if (!compiled_ || !function)
         return false;
@@ -317,7 +337,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
     asIScriptFunction* method = GetMethod(object, declaration);
     if (!method)
     {
-        LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
+        URHO3D_LOGERROR("Method " + declaration + " not found in class " + String(object->GetObjectType()->GetName()));
         return false;
     }
 
@@ -326,7 +346,7 @@ bool ScriptFile::Execute(asIScriptObject* object, const String& declaration, con
 
 bool ScriptFile::Execute(asIScriptObject* object, asIScriptFunction* method, const VariantVector& parameters, bool unprepare)
 {
-    PROFILE(ExecuteMethod);
+    URHO3D_PROFILE(ExecuteMethod);
 
     if (!compiled_ || !object || !method)
         return false;
@@ -363,7 +383,7 @@ void ScriptFile::DelayedExecute(float delay, bool repeat, const String& declarat
     // Make sure we are registered to the application update event, because delayed calls are executed there
     if (!subscribed_)
     {
-        SubscribeToEvent(E_UPDATE, HANDLER(ScriptFile, HandleUpdate));
+        SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ScriptFile, HandleUpdate));
         subscribed_ = true;
     }
 }
@@ -386,7 +406,7 @@ void ScriptFile::ClearDelayedExecute(const String& declaration)
 
 asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInterface)
 {
-    PROFILE(CreateObject);
+    URHO3D_PROFILE(CreateObject);
 
     if (!compiled_)
         return 0;
@@ -433,7 +453,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
 
     if (!found)
     {
-        LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
+        URHO3D_LOGERRORF("Script class %s does not implement the ScriptObject interface", type->GetName());
         return 0;
     }
 
@@ -534,7 +554,7 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
         if (!function)
         {
-            LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
+            URHO3D_LOGERROR("Event handler function " + handlerName + " not found in " + GetName());
             return;
         }
     }
@@ -675,7 +695,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
         }
         else
         {
-            LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
+            URHO3D_LOGERROR("Could not process all the include directives in " + GetName() + ": missing " + includeFiles[i]);
             return false;
         }
     }
@@ -683,7 +703,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
     // Then add this section
     if (scriptModule_->AddScriptSection(source.GetName().CString(), (const char*)buffer.Get(), dataSize) < 0)
     {
-        LOGERROR("Failed to add script section " + source.GetName());
+        URHO3D_LOGERROR("Failed to add script section " + source.GetName());
         return false;
     }
 
@@ -749,6 +769,42 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
                     context->SetArgObject(i, (void*)&parameters[i].GetString());
                     break;
 
+                case VAR_VARIANTMAP:
+                    context->SetArgObject(i, (void*)&parameters[i].GetVariantMap());
+                    break;
+
+                case VAR_INTRECT:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntRect());
+                    break;
+
+                case VAR_INTVECTOR2:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntVector2());
+                    break;
+
+                case VAR_COLOR:
+                    context->SetArgObject(i, (void*)&parameters[i].GetColor());
+                    break;
+
+                case VAR_MATRIX3:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix3());
+                    break;
+
+                case VAR_MATRIX3X4:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix3x4());
+                    break;
+
+                case VAR_MATRIX4:
+                    context->SetArgObject(i, (void*)&parameters[i].GetMatrix4());
+                    break;
+
+                case VAR_RESOURCEREF:
+                    context->SetArgObject(i, (void*)&parameters[i].GetResourceRef());
+                    break;
+
+                case VAR_RESOURCEREFLIST:
+                    context->SetArgObject(i, (void*)&parameters[i].GetResourceRefList());
+                    break;
+
                 case VAR_VOIDPTR:
                     context->SetArgObject(i, parameters[i].GetVoidPtr());
                     break;
@@ -794,7 +850,8 @@ void ScriptFile::ReleaseModule()
         SetMemoryUse(0);
 
         ResourceCache* cache = GetSubsystem<ResourceCache>();
-        cache->ResetDependencies(this);
+        if (cache)
+            cache->ResetDependencies(this);
     }
 }
 

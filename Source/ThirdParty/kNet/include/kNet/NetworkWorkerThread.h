@@ -56,7 +56,7 @@ private:
 	void MainLoop();
 };
 
-#ifdef WIN32
+#ifdef _WIN32
 DWORD WINAPI NetworkWorkerThreadMain(LPVOID lpParameter);
 #endif
 

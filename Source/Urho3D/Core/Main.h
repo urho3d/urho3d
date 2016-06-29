@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #include "../Core/ProcessUtils.h"
 
-#if defined(WIN32) && !defined(URHO3D_WIN32_CONSOLE)
+#if defined(_WIN32) && !defined(URHO3D_WIN32_CONSOLE)
 #include "../Core/MiniDump.h"
 #include <windows.h>
 #ifdef _MSC_VER
@@ -36,7 +36,7 @@
 
 // MSVC debug mode: use memory leak reporting
 #if defined(_MSC_VER) && defined(_DEBUG) && !defined(URHO3D_WIN32_CONSOLE)
-#define DEFINE_MAIN(function) \
+#define URHO3D_DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); \
@@ -45,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 }
 // MSVC release mode: write minidump on crash
 #elif defined(_MSC_VER) && defined(URHO3D_MINIDUMPS) && !defined(URHO3D_WIN32_CONSOLE)
-#define DEFINE_MAIN(function) \
+#define URHO3D_DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     Urho3D::ParseArguments(GetCommandLineW()); \
@@ -60,16 +60,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     return exitCode; \
 }
 // Other Win32 or minidumps disabled: just execute the function
-#elif defined(WIN32) && !defined(URHO3D_WIN32_CONSOLE)
-#define DEFINE_MAIN(function) \
+#elif defined(_WIN32) && !defined(URHO3D_WIN32_CONSOLE)
+#define URHO3D_DEFINE_MAIN(function) \
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
 { \
     Urho3D::ParseArguments(GetCommandLineW()); \
     return function; \
 }
 // Android or iOS: use SDL_main
-#elif defined(ANDROID) || defined(IOS)
-#define DEFINE_MAIN(function) \
+#elif defined(__ANDROID__) || defined(IOS)
+#define URHO3D_DEFINE_MAIN(function) \
 extern "C" int SDL_main(int argc, char** argv); \
 int SDL_main(int argc, char** argv) \
 { \
@@ -78,7 +78,7 @@ int SDL_main(int argc, char** argv) \
 }
 // Linux or OS X: use main
 #else
-#define DEFINE_MAIN(function) \
+#define URHO3D_DEFINE_MAIN(function) \
 int main(int argc, char** argv) \
 { \
     Urho3D::ParseArguments(argc, argv); \

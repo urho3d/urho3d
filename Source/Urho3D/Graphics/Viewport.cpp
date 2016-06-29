@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,6 +78,11 @@ void Viewport::SetCamera(Camera* camera)
     camera_ = camera;
 }
 
+void Viewport::SetCullCamera(Camera* camera)
+{
+    cullCamera_ = camera;
+}
+
 void Viewport::SetRect(const IntRect& rect)
 {
     rect_ = rect;
@@ -115,6 +120,11 @@ Scene* Viewport::GetScene() const
 Camera* Viewport::GetCamera() const
 {
     return camera_;
+}
+
+Camera* Viewport::GetCullCamera() const
+{
+    return cullCamera_;
 }
 
 View* Viewport::GetView() const

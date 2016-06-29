@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,10 @@ void NetworkPriority::RegisterObject(Context* context)
 {
     context->RegisterFactory<NetworkPriority>(NETWORK_CATEGORY);
 
-    ATTRIBUTE("Base Priority", float, basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
-    ATTRIBUTE("Distance Factor", float, distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);
-    ATTRIBUTE("Minimum Priority", float, minPriority_, DEFAULT_MIN_PRIORITY, AM_DEFAULT);
-    ATTRIBUTE("Always Update Owner", bool, alwaysUpdateOwner_, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Base Priority", float, basePriority_, DEFAULT_BASE_PRIORITY, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Distance Factor", float, distanceFactor_, DEFAULT_DISTANCE_FACTOR, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Minimum Priority", float, minPriority_, DEFAULT_MIN_PRIORITY, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Always Update Owner", bool, alwaysUpdateOwner_, true, AM_DEFAULT);
 }
 
 void NetworkPriority::SetBasePriority(float priority)

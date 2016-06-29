@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,14 @@
 #include "../Precompiled.h"
 
 #include "../Engine/Application.h"
-#include "../Engine/Engine.h"
+#include "../IO/IOEvents.h"
+#include "../IO/Log.h"
+
 #ifdef IOS
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsImpl.h"
+#include <SDL/SDL.h>
 #endif
-#include "../IO/IOEvents.h"
-#include "../IO/Log.h"
 
 #include "../DebugNew.h"
 
@@ -57,7 +58,7 @@ Application::Application(Context* context) :
     engine_ = new Engine(context);
 
     // Subscribe to log messages so that can show errors if ErrorExit() is called with empty message
-    SubscribeToEvent(E_LOGMESSAGE, HANDLER(Application, HandleLogMessage));
+    SubscribeToEvent(E_LOGMESSAGE, URHO3D_HANDLER(Application, HandleLogMessage));
 }
 
 int Application::Run()

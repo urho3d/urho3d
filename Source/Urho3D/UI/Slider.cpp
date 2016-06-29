@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,12 +65,12 @@ void Slider::RegisterObject(Context* context)
 {
     context->RegisterFactory<Slider>(UI_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(BorderImage);
-    UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-    ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
-    ACCESSOR_ATTRIBUTE("Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Value", GetValue, SetValue, float, 0.0f, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
 }
 
 void Slider::Update(float timeStep)
@@ -235,21 +235,43 @@ void Slider::UpdateSlider()
         if (orientation_ == O_HORIZONTAL)
         {
             int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
+
+            if (knob_->IsFixedSize())
+                sliderLength = knob_->GetWidth();
+
             float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
-            knob_->SetSize(sliderLength, GetHeight());
-            knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+
+            if (!knob_->IsFixedSize())
+            {
+                knob_->SetSize(sliderLength, GetHeight());
+                knob_->SetPosition(Clamp((int)(sliderPos + 0.5f), 0, GetWidth() - knob_->GetWidth()), 0);
+            }
+            else
+                knob_->SetPosition(Clamp((int)(sliderPos), 0, GetWidth() - knob_->GetWidth()), 0);
         }
         else
         {
             int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
+
+            if (knob_->IsFixedSize())
+                sliderLength = knob_->GetHeight();
+
             float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;
-            knob_->SetSize(GetWidth(), sliderLength);
-            knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+
+            if (!knob_->IsFixedSize())
+            {
+                knob_->SetSize(GetWidth(), sliderLength);
+                knob_->SetPosition(0, Clamp((int)(sliderPos + 0.5f), 0, GetHeight() - knob_->GetHeight()));
+            }
+            else
+                knob_->SetPosition(0, Clamp((int)(sliderPos), 0, GetHeight() - knob_->GetHeight()));
         }
     }
     else
     {
-        knob_->SetSize(GetSize());
+        if (!knob_->IsFixedSize())
+            knob_->SetSize(GetSize());
+
         knob_->SetPosition(0, 0);
     }
 }
@@ -271,7 +293,7 @@ void Slider::Page(const IntVector2& position, bool pressed)
 
     // Start transmitting repeated pages after the initial press
     if (selected_ && pressed && repeatRate_ > 0.0f &&
-        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0, Abs(offset) / length))
+        repeatTimer_.GetMSec(false) >= Lerp(1000.0f / repeatRate_, 0.0f, Abs(offset) / length))
         repeatTimer_.Reset();
     else
         pressed = false;

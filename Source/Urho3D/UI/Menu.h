@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace Urho3D
 /// %Menu %UI element that optionally shows a popup.
 class URHO3D_API Menu : public Button
 {
-    OBJECT(Menu, Button);
+    URHO3D_OBJECT(Menu, Button);
 
     using UIElement::LoadXML;
 

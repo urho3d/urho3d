@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DConstraints)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DConstraints)
 
 Node* pickedNode;
 RigidBody2D* dummyBody;
@@ -88,6 +88,9 @@ void Urho2DConstraints::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DConstraints::CreateScene()
@@ -439,13 +442,13 @@ void Urho2DConstraints::MoveCamera(float timeStep)
     const float MOVE_SPEED = 4.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     if (input->GetKeyDown(KEY_PAGEUP))
@@ -458,19 +461,19 @@ void Urho2DConstraints::MoveCamera(float timeStep)
 void Urho2DConstraints::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DConstraints, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DConstraints, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Urho2DConstraints, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Urho2DConstraints, HandlePostRenderUpdate));
 
     // Subscribe to mouse click
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(Urho2DConstraints, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonDown));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
 
     if (touchEnabled_)
-        SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Urho2DConstraints, HandleTouchBegin3));
+        SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Urho2DConstraints, HandleTouchBegin3));
 }
 
 void Urho2DConstraints::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -523,8 +526,8 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
         constraintMouse->SetDampingRatio(0.0f);
     }
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(Urho2DConstraints, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(Urho2DConstraints, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEBUTTONUP, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonUp));
 }
 
 void Urho2DConstraints::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -581,8 +584,8 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
         constraintMouse->SetDampingRatio(0);
     }
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(Urho2DConstraints, HandleTouchMove3));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(Urho2DConstraints, HandleTouchEnd3));
+    SubscribeToEvent(E_TOUCHMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleTouchMove3));
+    SubscribeToEvent(E_TOUCHEND, URHO3D_HANDLER(Urho2DConstraints, HandleTouchEnd3));
 }
 
 void Urho2DConstraints::HandleTouchMove3(StringHash eventType, VariantMap& eventData)

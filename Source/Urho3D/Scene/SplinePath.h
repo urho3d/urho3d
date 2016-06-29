@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace Urho3D
 /// Spline for creating smooth movement based on Speed along a set of Control Points modified by the Interpolation Mode.
 class URHO3D_API SplinePath : public Component
 {
-    OBJECT(SplinePath, Component)
+    URHO3D_OBJECT(SplinePath, Component)
 
 public:
     /// Construct an Empty SplinePath.

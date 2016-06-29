@@ -1,4 +1,11 @@
 #ifdef COMPILEVS
+mat3 GetCameraRot()
+{
+    return mat3(cViewInv[0][0], cViewInv[0][1], cViewInv[0][2],
+        cViewInv[1][0], cViewInv[1][1], cViewInv[1][2],
+        cViewInv[2][0], cViewInv[2][1], cViewInv[2][2]);
+}
+
 vec4 GetScreenPos(vec4 clipPos)
 {
     return vec4(
@@ -36,7 +43,7 @@ vec3 GetFarRay(vec4 clipPos)
         clipPos.y / clipPos.w * cFrustumSize.y,
         cFrustumSize.z);
 
-    return viewRay * cCameraRot;
+    return viewRay * GetCameraRot();
 }
 
 vec3 GetNearRay(vec4 clipPos)
@@ -45,7 +52,7 @@ vec3 GetNearRay(vec4 clipPos)
         clipPos.x / clipPos.w * cFrustumSize.x,
         clipPos.y / clipPos.w * cFrustumSize.y,
         0.0);
-    
-    return (viewRay * cCameraRot) * cDepthMode.x;
+
+    return (viewRay * GetCameraRot()) * cDepthMode.x;
 }
 #endif

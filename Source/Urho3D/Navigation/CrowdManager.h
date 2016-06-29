@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ struct CrowdObstacleAvoidanceParams
 /// Crowd manager scene component. Should be added only to the root scene node.
 class URHO3D_API CrowdManager : public Component
 {
-    OBJECT(CrowdManager, Component);
+    URHO3D_OBJECT(CrowdManager, Component);
 
     friend class CrowdAgent;
 

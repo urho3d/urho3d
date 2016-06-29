@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ enum WindowDragMode
 /// %Window %UI element that can optionally by moved or resized.
 class URHO3D_API Window : public BorderImage
 {
-    OBJECT(Window, BorderImage);
+    URHO3D_OBJECT(Window, BorderImage);
 
 public:
     /// Construct.

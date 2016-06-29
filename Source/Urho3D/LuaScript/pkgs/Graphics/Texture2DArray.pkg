@@ -1,0 +1,33 @@
+$#include "Graphics/Texture2DArray.h"
+
+enum TextureUsage{};
+
+class Texture2DArray : public Texture
+{
+    Texture2DArray();
+    ~Texture2DArray();
+
+    void SetLayers(unsigned layers);
+    bool SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    bool SetData(unsigned layer, Image* image, bool useAlpha = false);
+
+    unsigned GetLayers() const;
+    RenderSurface* GetRenderSurface() const;
+
+    tolua_property__get_set unsigned layers;
+    tolua_readonly tolua_property__get_set RenderSurface* renderSurface;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Texture2DArray_new00
+static int tolua_GraphicsLuaAPI_Texture2DArray_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Texture2DArray>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Texture2DArray_new00_local
+static int tolua_GraphicsLuaAPI_Texture2DArray_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Texture2DArray>(tolua_S);
+}
+$}

@@ -5,6 +5,13 @@ namespace Urho3D
 
 \page EventList Event list
 
+## %Audio events
+
+### SoundFinished
+- %Node : Node pointer
+- %SoundSource : SoundSource pointer
+- %Sound : Sound pointer
+
 ## %Core events
 
 ### BeginFrame
@@ -44,9 +51,20 @@ namespace Urho3D
 
 ### AnimationTrigger
 - %Node : Node pointer
+- %Animation : Animation pointer
 - %Name : String
 - %Time : Float
 - %Data : User-defined data type
+
+### AnimationFinished
+- %Node : Node pointer
+- %Animation : Animation pointer
+- %Name : String
+- %Looped : Bool
+
+### ParticleEffectFinished
+- %Node : Node pointer
+- %Effect : ParticleEffect pointer
 
 ### TerrainCreated
 - %Node : Node pointer
@@ -63,8 +81,9 @@ namespace Urho3D
 - %Width : int
 - %Height : int
 - %Fullscreen : bool
-- %Resizable : bool
 - %Borderless : bool
+- %Resizable : bool
+- %HighDPI : bool
 
 ### WindowPos
 - %X : int
@@ -103,6 +122,9 @@ namespace Urho3D
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
+
+### RenderPathEvent
+- %Name : String
 
 ### DeviceLost
 
@@ -146,7 +168,6 @@ namespace Urho3D
 ### KeyDown
 - %Key : int
 - %Scancode : int
-- %Raw : uint
 - %Buttons : int
 - %Qualifiers : int
 - %Repeat : bool
@@ -154,7 +175,6 @@ namespace Urho3D
 ### KeyUp
 - %Key : int
 - %Scancode : int
-- %Raw : uint
 - %Buttons : int
 - %Qualifiers : int
 
@@ -235,6 +255,7 @@ namespace Urho3D
 
 ### MouseModeChanged
 - %Mode : MouseMode
+- %MouseLocked : bool
 
 ### ExitRequested
 
@@ -257,7 +278,22 @@ namespace Urho3D
 - %Size : unsigned
 - %Position : Vector3 [in/out]
 
+### CrowdAgentNodeFormation
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Index : unsigned
+- %Size : unsigned
+- %Position : Vector3 [in/out]
+
 ### CrowdAgentReposition
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %Arrived : bool
+- %TimeStep : float
+
+### CrowdAgentNodeReposition
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
@@ -273,7 +309,23 @@ namespace Urho3D
 - %CrowdAgentState : int
 - %CrowdTargetState : int
 
+### CrowdAgentNodeFailure
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
 ### CrowdAgentStateChanged
+- %Node : Node pointer
+- %CrowdAgent : CrowdAgent pointer
+- %Position : Vector3
+- %Velocity : Vector3
+- %CrowdAgentState : int
+- %CrowdTargetState : int
+
+### CrowdAgentNodeStateChanged
 - %Node : Node pointer
 - %CrowdAgent : CrowdAgent pointer
 - %Position : Vector3
@@ -332,14 +384,6 @@ namespace Urho3D
 - %Connection : Connection pointer
 
 ## %Physics2D events
-
-### PhysicsPreStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
-
-### PhysicsPostStep2D
-- %World : PhysicsWorld2D pointer
-- %TimeStep : float
 
 ### PhysicsBeginContact2D
 - %World : PhysicsWorld2D pointer
@@ -512,6 +556,16 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Node : Node pointer
 
+### NodeTagAdded
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
+### NodeTagRemoved
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %Tag : String tag
+
 ### ComponentEnabledChanged
 - %Scene : Scene pointer
 - %Node : Node pointer
@@ -519,6 +573,16 @@ namespace Urho3D
 
 ### TemporaryChanged
 - %Serializable : Serializable pointer
+
+### NodeCloned
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %CloneNode : Node pointer
+
+### ComponentCloned
+- %Scene : Scene pointer
+- %Component : Component pointer
+- %CloneComponent : Component pointer
 
 ### InterceptNetworkUpdate
 - %Serializable : Serializable pointer
@@ -547,6 +611,31 @@ namespace Urho3D
 - %Qualifiers : int
 
 ### UIMouseDoubleClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### Click
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### ClickEnd
+- %Element : UIElement pointer
+- %BeginElement : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### DoubleClick
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
@@ -799,6 +888,7 @@ namespace Urho3D
 - %Relative %Position : bool
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
+- %Fixed %Screen %Size : bool
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Face %Camera %Mode : int
@@ -845,6 +935,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -886,6 +977,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -951,6 +1043,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1194,6 +1287,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1266,6 +1360,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1300,6 +1395,7 @@ namespace Urho3D
 - %Draw %OffMeshConnections : bool
 - %Draw %NavAreas : bool
 - %Max %Obstacles : int
+- %Max %Layers : int
 - %Draw %Obstacles : bool
 
 ### Light
@@ -1332,6 +1428,7 @@ namespace Urho3D
 - %View %Size %Minimum : float
 - %Depth %Constant %Bias : float
 - %Depth %Slope %Bias : float
+- %Normal %Offset : float
 - %Near/Farclip %Ratio : float
 - %View %Mask : int
 - %Light %Mask : int
@@ -1369,6 +1466,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1416,6 +1514,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %View %Position : IntVector2
 - %Scroll %Step : float
 - %Page %Step : float
@@ -1469,6 +1568,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1519,6 +1619,7 @@ namespace Urho3D
 ### Node
 - %Is %Enabled : bool
 - %Name : String
+- %Tags : StringVector
 - %Position : Vector3
 - %Rotation : Quaternion
 - %Scale : Vector3
@@ -1544,7 +1645,6 @@ namespace Urho3D
 ### ParticleEmitter
 - %Is %Enabled : bool
 - %Effect : ResourceRef
-- %Face %Camera %Mode : int
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Draw %Distance : float
@@ -1591,6 +1691,28 @@ namespace Urho3D
 - %Auto %Clear %Forces : bool
 - %Velocity %Iterations : int
 - %Position %Iterations : int
+
+### RibbonTrail
+- %Is %Enabled : bool
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Material : ResourceRef
+- %Emitting : bool
+- %Update %Invisible : bool
+- %Trail %Type : int
+- %Tail %Lifetime : float
+- %Tail %Column : int
+- %Vertex %Distance : float
+- %Width : float
+- %Start %Scale : float
+- %End %Scale : float
+- %Start %Color : Color
+- %End %Color : Color
+- %Animation %LOD %Bias : float
+- %Sort %By %Distance : bool
 
 ### RigidBody
 - %Is %Enabled : bool
@@ -1681,6 +1803,14 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -1724,6 +1854,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %View %Position : IntVector2
 - %Scroll %Step : float
 - %Page %Step : float
@@ -1783,6 +1914,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -1955,6 +2087,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Font : ResourceRef
 - %Font %Size : int
 - %Text : String
@@ -1965,6 +2098,9 @@ namespace Urho3D
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 
 ### Text3D
@@ -1977,17 +2113,22 @@ namespace Urho3D
 - %Row %Spacing : float
 - %Word %Wrap : bool
 - %Can %Be %Occluded : bool
+- %Fixed %Screen %Size : bool
 - %Face %Camera %Mode : int
 - %Draw %Distance : float
 - %Width : int
 - %Horiz %Alignment : int
 - %Vert %Alignment : int
+- %Opacity : float
 - %Color : Color
 - %Top %Left %Color : Color
 - %Top %Right %Color : Color
 - %Bottom %Left %Color : Color
 - %Bottom %Right %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
@@ -2028,6 +2169,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Delay : float
 
 ### UIElement
@@ -2063,6 +2205,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 
 ### View3D
 - %Name : String
@@ -2097,6 +2240,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -2147,6 +2291,7 @@ namespace Urho3D
 - %Indent : int
 - %Indent %Spacing : int
 - %Variables : VariantMap
+- %Tags : StringVector
 - %Texture : ResourceRef
 - %Image %Rect : IntRect
 - %Border : IntRect
@@ -2287,12 +2432,14 @@ namespace Urho3D
 <a href="#Class_Localization"><b>Localization</b></a>
 <a href="#Class_Log"><b>Log</b></a>
 <a href="#Class_Material"><b>Material</b></a>
+<a href="#Class_Matrix2"><b>Matrix2</b></a>
 <a href="#Class_Matrix3"><b>Matrix3</b></a>
 <a href="#Class_Matrix3x4"><b>Matrix3x4</b></a>
 <a href="#Class_Matrix4"><b>Matrix4</b></a>
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NamedPipe"><b>NamedPipe</b></a>
 <a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
@@ -2331,6 +2478,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
 <a href="#Class_Scene"><b>Scene</b></a>
@@ -2369,6 +2517,7 @@ namespace Urho3D
 <a href="#Class_Text3D"><b>Text3D</b></a>
 <a href="#Class_Texture"><b>Texture</b></a>
 <a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture2DArray"><b>Texture2DArray</b></a>
 <a href="#Class_Texture3D"><b>Texture3D</b></a>
 <a href="#Class_TextureCube"><b>TextureCube</b></a>
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
@@ -2392,6 +2541,7 @@ namespace Urho3D
 <a href="#Class_Vector4"><b>Vector4</b></a>
 <a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
 <a href="#Class_VertexBuffer"><b>VertexBuffer</b></a>
+<a href="#Class_VertexElement"><b>VertexElement</b></a>
 <a href="#Class_View3D"><b>View3D</b></a>
 <a href="#Class_Viewport"><b>Viewport</b></a>
 <a href="#Class_WeakHandle"><b>WeakHandle</b></a>
@@ -2417,8 +2567,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveAttributeAnimation(const String&)
@@ -2427,6 +2580,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2472,9 +2626,12 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - float GetMorphWeight(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2490,6 +2647,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2500,6 +2658,7 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetMorphWeight(uint, float)
+- void UpdateBoneBoundingBox()
 
 Properties:
 
@@ -2562,9 +2721,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2574,6 +2736,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimation(const String&, LoopMode2D = LM_DEFAULT)
@@ -2643,7 +2806,10 @@ Methods:
 
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
+- Animation@ Clone(const String& = String ( )) const
 - AnimationTrack@ CreateTrack(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool RemoveAllTracks()
@@ -2690,6 +2856,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
+- AnimationBlendMode GetBlendMode(const String&) const
 - float GetFadeTarget(const String&) const
 - float GetFadeTime(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2700,12 +2867,15 @@ Methods:
 - float GetSpeed(const String&) const
 - float GetTime(const String&) const
 - float GetWeight(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsAtEnd(const String&) const
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - bool Play(const String&, uint8, bool, float = 0.0f)
@@ -2717,6 +2887,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2726,6 +2897,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
+- bool SetBlendMode(const String&, AnimationBlendMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
@@ -2776,6 +2948,8 @@ Properties:
 Methods:
 
 - String GetAnimation(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -2814,6 +2988,7 @@ Methods:
 Properties:
 
 - Animation@ animation // readonly
+- AnimationBlendMode blendMode
 - float[] boneWeights
 - bool enabled // readonly
 - uint8 layer
@@ -2902,7 +3077,13 @@ Properties:
 Methods:
 
 - bool HasMasterGain(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsSoundTypePaused(const String&)
+- void PauseSoundType(const String&)
 - bool Play()
+- void ResumeAll()
+- void ResumeSoundType(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetMode(int, int, bool, bool = true)
 - void Stop()
@@ -2930,6 +3111,7 @@ Properties:
 Properties:
 
 - float constantBias
+- float normalOffset
 - float slopeScaledBias
 
 <a name="Class_Billboard"></a>
@@ -2939,6 +3121,7 @@ Properties:
 Properties:
 
 - Color color
+- Vector3 direction
 - bool enabled
 - Vector3 position
 - float rotation
@@ -2961,9 +3144,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -2973,6 +3159,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -2998,6 +3185,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -3047,6 +3235,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3063,9 +3253,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3073,6 +3267,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3081,15 +3276,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3191,6 +3389,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -3253,6 +3452,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3269,9 +3470,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3279,6 +3484,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3287,15 +3493,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3405,6 +3614,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -3438,8 +3648,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Ray GetScreenRay(float, float) const
 - Frustum GetSplitFrustum(float, float) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3449,6 +3662,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - Vector3 ScreenToWorldPoint(const Vector3&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -3524,6 +3738,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -3540,9 +3756,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -3550,6 +3770,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -3558,15 +3779,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -3671,6 +3895,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -3700,8 +3925,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3711,6 +3939,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3771,8 +4000,11 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector2[]@ GetVertices() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3782,6 +4014,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3841,8 +4074,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3852,6 +4088,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3909,8 +4146,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3920,6 +4160,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -3978,8 +4219,11 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector2[]@ GetVertices() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -3989,6 +4233,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4047,8 +4292,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4058,6 +4306,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4122,8 +4371,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4133,6 +4385,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4236,8 +4489,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4247,6 +4503,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4283,6 +4540,8 @@ Properties:
 Methods:
 
 - void Disconnect(int = 0)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SendMessage(int, bool, bool, const VectorBuffer&, uint = 0)
 - void SendPackageToClient(PackageFile@)
@@ -4327,6 +4586,8 @@ Properties:
 Methods:
 
 - void CopySelectedRows() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void Toggle()
 - void UpdateElements()
@@ -4367,8 +4628,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4378,6 +4642,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4437,8 +4702,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4448,6 +4716,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4495,8 +4764,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4506,6 +4778,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4557,8 +4830,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4568,6 +4844,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4618,8 +4895,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4629,6 +4909,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4679,8 +4960,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4690,6 +4974,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4742,8 +5027,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4753,6 +5041,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4804,8 +5093,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4815,6 +5107,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4870,8 +5163,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4881,6 +5177,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4933,8 +5230,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -4944,6 +5244,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -4998,8 +5299,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5009,6 +5313,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5059,8 +5364,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5070,6 +5378,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5120,8 +5429,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5131,6 +5443,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5204,8 +5517,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5216,6 +5532,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5290,8 +5607,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint(int)
 - Vector3 GetRandomPointInCircle(const Vector3&, float, int)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, int, uint = 3)
@@ -5304,6 +5624,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5369,6 +5690,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -5387,9 +5710,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -5397,6 +5724,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -5405,15 +5733,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -5518,6 +5849,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -5558,9 +5890,12 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - CustomGeometryVertex@ GetVertex(uint, uint)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5570,6 +5905,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5639,6 +5975,8 @@ Methods:
 
 - DbConnection@ Connect(const String&)
 - void Disconnect(DbConnection@)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5658,6 +5996,8 @@ Properties:
 Methods:
 
 - DbResult Execute(const String&, bool = false)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -5689,6 +6029,8 @@ Properties:
 Methods:
 
 - void ClearAppStats()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ResetAppStats(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAppStats(const String&, const String&)
@@ -5701,6 +6043,7 @@ Properties:
 
 - String category // readonly
 - XMLFile@ defaultStyle
+- Text@ memoryText // readonly
 - uint mode
 - Text@ modeText // readonly
 - float profilerInterval
@@ -5739,8 +6082,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5750,6 +6096,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5795,9 +6142,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5809,6 +6159,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -5948,9 +6299,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -5960,6 +6314,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6018,9 +6373,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -6030,6 +6388,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6083,6 +6442,8 @@ Methods:
 
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -6099,10 +6460,14 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
@@ -6111,6 +6476,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -6120,6 +6486,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -6127,10 +6494,12 @@ Methods:
 - void RemoveItem(UIElement@)
 - void RemoveItem(uint)
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -6253,6 +6622,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -6291,8 +6661,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
@@ -6304,6 +6677,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -6340,6 +6714,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - bool initialized // readonly
+- bool maxLayers
 - uint maxObstacles
 - Node@ node // readonly
 - uint numAttributes // readonly
@@ -6369,6 +6744,8 @@ Methods:
 - void DumpProfiler()
 - void DumpResources(bool = false)
 - void Exit()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void RunFrame()
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
@@ -6396,6 +6773,8 @@ Properties:
 Methods:
 
 - void Close()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Open(const String&, FileMode = FILE_READ)
 - uint8[]@ Read(uint)
 - bool ReadBool()
@@ -6486,6 +6865,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetButtonTexts(const String&, const String&)
 - void SetFilters(String[]@, uint)
@@ -6527,6 +6908,8 @@ Methods:
 - bool FileExists(const String&) const
 - String GetAppPreferencesDir(const String&, const String&) const
 - uint GetLastModifiedTime(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Rename(const String&, const String&)
 - String[]@ ScanDir(const String&, const String&, uint, bool) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -6568,6 +6951,8 @@ Properties:
 Methods:
 
 - IntVector2 GetTotalGlyphOffset(int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -6621,11 +7006,13 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetDrawRange(PrimitiveType, uint, uint, bool = true)
 - bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true)
 - void SetIndexBuffer(IndexBuffer@)
-- bool SetVertexBuffer(uint, VertexBuffer@, uint = MASK_DEFAULT)
+- bool SetVertexBuffer(uint, VertexBuffer@)
 
 Properties:
 
@@ -6642,7 +7029,6 @@ Properties:
 - String typeName // readonly
 - VertexBuffer@[] vertexBuffers // readonly
 - uint vertexCount // readonly
-- uint[] vertexElementMasks // readonly
 - uint vertexStart // readonly
 - int weakRefs // readonly
 
@@ -6655,13 +7041,15 @@ Methods:
 - void BeginDumpShaders(const String&)
 - void Close()
 - void EndDumpShaders()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void Maximize()
 - void Minimize()
 - void PrecacheShaders(File@)
 - void PrecacheShaders(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
-- bool SetMode(int, int, bool, bool, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int)
 - void SetWindowPosition(int, int)
 - bool TakeScreenShot(Image@)
 - bool ToggleFullscreen()
@@ -6776,6 +7164,8 @@ Methods:
 - uint GetPixelInt(int, int, int) const
 - Color GetPixelTrilinear(float, float, float) const
 - Image@ GetSubimage(const IntRect&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool LoadColorLUT(File@)
@@ -6823,6 +7213,8 @@ Properties:
 Methods:
 
 - VectorBuffer GetData()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(VectorBuffer&)
 - bool SetDataRange(VectorBuffer&, uint, uint, bool = false)
@@ -6853,18 +7245,24 @@ Methods:
 - int GetScancodeFromKey(int) const
 - int GetScancodeFromName(const String&) const
 - String GetScancodeName(int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - uint LoadGestures(File@)
 - uint LoadGestures(VectorBuffer&)
 - bool RecordGesture()
 - void RemoveAllGestures()
 - bool RemoveGesture(uint)
 - bool RemoveScreenJoystick(int)
+- void ResetMouseGrabbed()
+- void ResetMouseMode()
 - void ResetMouseVisible()
 - bool SaveGesture(File@, uint)
 - bool SaveGesture(VectorBuffer&, uint)
 - bool SaveGestures(File@)
 - bool SaveGestures(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetMouseGrabbed(bool, bool = false)
+- void SetMouseMode(MouseMode, bool = false)
 - void SetMouseVisible(bool, bool = false)
 
 Properties:
@@ -6873,12 +7271,14 @@ Properties:
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
 - JoystickState@[] joysticksByIndex // readonly
+- JoystickState@[] joysticksByName // readonly
 - bool[] keyDown // readonly
 - bool[] keyPress // readonly
 - bool minimized // readonly
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
 - bool mouseGrabbed
+- bool mouseLocked // readonly
 - MouseMode mouseMode
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly
@@ -6943,7 +7343,10 @@ Properties:
 
 Methods:
 
-- const JSONValue& GetRoot() const
+- bool FromString(const String&)
+- JSONValue& GetRoot()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -6957,6 +7360,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
+- JSONValue root // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -7028,9 +7432,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7040,6 +7447,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -7113,6 +7521,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -7129,9 +7539,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -7139,6 +7553,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7147,15 +7562,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7263,6 +7681,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - String text
 - bool textCopyable
@@ -7290,6 +7709,8 @@ Methods:
 - void AddChild(UIElement@)
 - void AddItem(UIElement@)
 - void AddSelection(uint)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeSelection(int, bool)
@@ -7311,10 +7732,14 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - UIElement@[]@ GetItems() const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - void InsertItem(uint, UIElement@, UIElement@ = null)
 - bool IsExpanded(uint) const
@@ -7325,6 +7750,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7334,6 +7760,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllItems()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
@@ -7342,10 +7769,12 @@ Methods:
 - void RemoveItem(uint)
 - void RemoveObjectAnimation()
 - void RemoveSelection(uint)
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7467,6 +7896,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -7490,6 +7920,8 @@ Methods:
 - String Get(const String&)
 - String GetLanguage(int)
 - int GetLanguageIndex(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void LoadJSON(const JSONValue&)
 - void LoadJSONFile(const String&)
 - void Reset()
@@ -7517,6 +7949,8 @@ Methods:
 - void Close()
 - void Debug(const String&)
 - void Error(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void Info(const String&)
 - void Open(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7546,11 +7980,15 @@ Methods:
 - ValueAnimation@ GetShaderParameterAnimation(const String&) const
 - float GetShaderParameterAnimationSpeed(const String&) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
+- bool Load(const JSONValue&)
 - bool Load(const XMLElement&)
 - void RemoveShaderParameter(const String&)
 - bool Save(File@) const
+- bool Save(JSONValue&) const
 - bool Save(VectorBuffer&) const
 - bool Save(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -7585,6 +8023,28 @@ Properties:
 - String typeName // readonly
 - uint useTimer // readonly
 - int weakRefs // readonly
+
+<a name="Class_Matrix2"></a>
+
+### Matrix2
+
+Methods:
+
+- bool Equals(const Matrix2&) const
+- Matrix2 Inverse() const
+- Vector2 Scale() const
+- Matrix2 Scaled(const Vector2&) const
+- void SetScale(const Vector2&)
+- void SetScale(float)
+- String ToString() const
+- Matrix2 Transpose() const
+
+Properties:
+
+- float m00
+- float m01
+- float m10
+- float m11
 
 <a name="Class_Matrix3"></a>
 
@@ -7696,6 +8156,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -7712,9 +8174,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -7722,6 +8188,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -7730,15 +8197,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -7855,6 +8325,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -7875,6 +8346,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -7896,6 +8369,8 @@ Methods:
 
 - Model@ Clone(const String& = String ( )) const
 - Geometry@ GetGeometry(uint, uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -7920,6 +8395,98 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_NamedPipe"></a>
+
+### NamedPipe
+
+Methods:
+
+- void Close()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Open(const String&, bool)
+- uint8[]@ Read(uint)
+- bool ReadBool()
+- BoundingBox ReadBoundingBox()
+- int8 ReadByte()
+- Color ReadColor()
+- double ReadDouble()
+- String ReadFileID()
+- float ReadFloat()
+- int ReadInt()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- uint ReadNetID()
+- Quaternion ReadPackedQuaternion()
+- Vector3 ReadPackedVector3(float)
+- Quaternion ReadQuaternion()
+- int16 ReadShort()
+- String ReadString()
+- StringHash ReadStringHash()
+- uint8 ReadUByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint ReadVLE()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
+- uint Seek(uint)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Write(uint8[]@)
+- bool WriteBool(bool)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteByte(int8)
+- bool WriteColor(const Color&)
+- bool WriteDouble(double)
+- bool WriteFileID(const String&)
+- bool WriteFloat(float)
+- bool WriteInt(int)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
+- bool WriteNetID(uint)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteQuaternion(const Quaternion&)
+- bool WriteShort(int16)
+- bool WriteString(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteUByte(uint8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteVLE(uint)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
+
+Properties:
+
+- String category // readonly
+- uint checksum // readonly
+- bool eof // readonly
+- String name // readonly
+- bool open // readonly
+- uint position // readonly
+- int refs // readonly
+- bool server // readonly
+- uint size // readonly
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
 <a name="Class_NavArea"></a>
 
 ### NavArea
@@ -7935,8 +8502,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -7946,6 +8516,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -7993,8 +8564,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8004,6 +8578,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8058,8 +8633,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetRandomPoint()
 - Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3)
@@ -8071,6 +8649,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8135,6 +8714,8 @@ Methods:
 - bool CheckRemoteEvent(const String&) const
 - bool Connect(const String&, uint16, Scene@, const VariantMap& = VariantMap ( ))
 - void Disconnect(int = 0)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - HttpRequest@ MakeHttpRequest(const String&, const String& = String ( ), String[]@ = null, const String& = String ( ))
 - void RegisterRemoteEvent(const String&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
@@ -8174,8 +8755,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8185,6 +8769,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8225,6 +8810,8 @@ Properties:
 Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - Node@ Clone(CreateMode = REPLICATED)
 - Component@ CloneComponent(Component@, CreateMode, uint = 0)
@@ -8244,16 +8831,22 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
+- Component@ GetParentComponent(const String&, bool = false) const
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - Vector3 LocalToWorld(const Vector3&) const
 - Vector3 LocalToWorld(const Vector4&) const
@@ -8265,6 +8858,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -8274,6 +8868,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
@@ -8283,6 +8878,9 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(File@)
+- bool SaveJSON(JSONValue&) const
+- bool SaveJSON(VectorBuffer&)
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -8352,6 +8950,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
 - StringHash type // readonly
@@ -8376,6 +8975,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -8396,6 +8997,8 @@ Methods:
 - ValueAnimation@ GetAttributeAnimation(const String&) const
 - float GetAttributeAnimationSpeed(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void RemoveAttributeAnimation(ValueAnimation@)
@@ -8434,8 +9037,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8445,6 +9051,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8499,8 +9106,11 @@ Methods:
 - Drawable@[]@ GetDrawables(const Sphere&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - Drawable@[]@ GetDrawables(const Vector3&, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK)
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - RayQueryResult[]@ Raycast(const Ray&, RayQueryLevel = RAY_TRIANGLE, float = M_INFINITY, uint8 = DRAWABLE_ANY, uint = DEFAULT_VIEWMASK) const
@@ -8513,6 +9123,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8560,8 +9171,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8571,6 +9185,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8613,6 +9228,8 @@ Methods:
 
 - bool Exists(const String&) const
 - String[]@ GetEntryNames() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Open(const String&, uint = 0) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool compressed() const
@@ -8624,6 +9241,7 @@ Properties:
 - String name // readonly
 - uint numFiles // readonly
 - int refs // readonly
+- uint totalDataSize // readonly
 - uint totalSize // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -8641,6 +9259,8 @@ Methods:
 - void AddTextureTime(Rect&, float)
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const XMLElement&)
@@ -8664,6 +9284,8 @@ Properties:
 - float dampingForce
 - Vector3 emitterSize
 - EmitterType emitterType
+- FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - float inactiveTime
 - Material@ material
 - Vector3 maxDirection
@@ -8703,6 +9325,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -8737,9 +9361,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8752,6 +9379,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8779,6 +9407,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -8823,9 +9452,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -8835,6 +9467,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8891,6 +9524,7 @@ Properties:
 
 - bool alphaMask
 - BlendMode blendMode
+- CullMode cullMode
 - CompareMode depthTestMode
 - bool depthWrite
 - bool desktop
@@ -8910,6 +9544,7 @@ Properties:
 
 - RigidBody@ body // readonly
 - float distance
+- float hitFraction
 - Vector3 normal
 - Vector3 position
 
@@ -8940,16 +9575,21 @@ Methods:
 - float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- RigidBody@[]@ GetCollidingBodies(RigidBody@)
 - bool GetInterceptNetworkUpdate(const String&) const
 - RigidBody@[]@ GetRigidBodies(RigidBody@)
 - RigidBody@[]@ GetRigidBodies(const BoundingBox&, uint = 0xffff)
 - RigidBody@[]@ GetRigidBodies(const Sphere&, uint = 0xffff)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult[]@ Raycast(const Ray&, float, uint = 0xffff)
 - PhysicsRaycastResult RaycastSingle(const Ray&, float, uint = 0xffff)
+- PhysicsRaycastResult RaycastSingleSegmented(const Ray&, float, float, uint = 0xffff)
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveCachedGeometry(Model@)
@@ -8958,6 +9598,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -8995,6 +9636,7 @@ Properties:
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- bool updateEnabled
 - int weakRefs // readonly
 
 <a name="Class_PhysicsWorld2D"></a>
@@ -9016,8 +9658,11 @@ Methods:
 - RigidBody2D@[]@ GetRigidBodies(const Rect&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(const Vector2&, uint = 0xffff)
 - RigidBody2D@ GetRigidBody(int, int, uint = 0xffff)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - PhysicsRaycastResult2D[]@ Raycast(const Vector2&, const Vector2&, uint = 0xffff)
@@ -9029,6 +9674,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9067,6 +9713,7 @@ Properties:
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- bool updateEnabled
 - uint velocityIterations
 - bool warmStarting
 - int weakRefs // readonly
@@ -9142,15 +9789,18 @@ Properties:
 
 Methods:
 
+- Quaternion Conjugate() const
 - float DotProduct(const Quaternion&) const
 - bool Equals(const Quaternion&) const
 - void FromAngleAxis(float, const Vector3&)
 - void FromAxes(const Vector3&, const Vector3&, const Vector3&)
 - void FromEulerAngles(float, float, float)
-- bool FromLookRotation(const Vector3&, const Vector3&)
+- bool FromLookRotation(const Vector3&, const Vector3& = Vector3 ( 0.0 , 1.0 , 0.0 ))
+- void FromRotationMatrix(const Matrix3&)
 - void FromRotationTo(const Vector3&, const Vector3&)
 - Quaternion Inverse() const
 - bool IsNaN() const
+- float LengthSquared() const
 - Quaternion Nlerp(Quaternion, float, bool) const
 - void Normalize()
 - Quaternion Normalized() const
@@ -9162,6 +9812,7 @@ Properties:
 - Vector3 eulerAngles // readonly
 - float pitch // readonly
 - float roll // readonly
+- Matrix3 rotationMatrix // readonly
 - float w
 - float x
 - float y
@@ -9214,6 +9865,7 @@ Methods:
 - void Clip(const Rect&)
 - void Define(const Vector2&)
 - void Define(const Vector2&, const Vector2&)
+- bool Defined() const
 - bool Equals(const Rect&) const
 - Intersection IsInside(const Vector2&) const
 - void Merge(const Rect&)
@@ -9224,7 +9876,6 @@ Properties:
 
 - float bottom
 - Vector2 center // readonly
-- bool defined
 - Vector2 halfSize // readonly
 - float left
 - Vector2 max
@@ -9290,6 +9941,7 @@ Properties:
 - uint clearStencil
 - String depthStencilName
 - bool enabled
+- String eventName
 - bool markToStencil
 - String metadata
 - uint numOutputs
@@ -9353,9 +10005,12 @@ Properties:
 Methods:
 
 - void DrawDebugGeometry(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ReloadShaders() const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetDefaultRenderPath(XMLFile@)
+- void SetVSMShadowParameters(float, float)
 
 Properties:
 
@@ -9364,6 +10019,7 @@ Properties:
 - Material@ defaultLightSpot // readonly
 - Material@ defaultMaterial // readonly
 - RenderPath@ defaultRenderPath
+- Technique@ defaultTechnique
 - Zone@ defaultZone // readonly
 - bool drawShadows
 - bool dynamicInstancing
@@ -9373,9 +10029,11 @@ Properties:
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances
+- float mobileNormalOffsetMul
 - float mobileShadowBiasAdd
 - float mobileShadowBiasMul
 - uint numBatches // readonly
+- int numExtraInstancingBufferElements
 - uint[] numGeometries // readonly
 - uint[] numLights // readonly
 - uint[] numOccluders // readonly
@@ -9388,14 +10046,17 @@ Properties:
 - int refs // readonly
 - bool reuseShadowMaps
 - int shadowMapSize
-- int shadowQuality
+- ShadowQuality shadowQuality
+- float shadowSoftness
 - bool specularLighting
 - int textureAnisotropy
 - TextureFilterMode textureFilterMode
 - int textureQuality
+- bool threadedOcclusion
 - StringHash type // readonly
 - String typeName // readonly
 - Viewport@[] viewports
+- Vector2 vsmShadowParameters
 - int weakRefs // readonly
 
 <a name="Class_Resource"></a>
@@ -9404,6 +10065,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -9440,6 +10103,8 @@ Methods:
 - Resource@ GetResource(StringHash, const String&, bool = true)
 - Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void ReleaseAllResources(bool = false)
 - void ReleaseResource(const String&, const String&, bool = false)
 - void ReleaseResources(StringHash, bool = false)
@@ -9459,8 +10124,8 @@ Properties:
 - bool autoReloadResources
 - String category // readonly
 - int finishBackgroundResourcesMs
-- uint[] memoryBudget
-- uint[] memoryUse // readonly
+- uint64[] memoryBudget
+- uint64[] memoryUse // readonly
 - uint numBackgroundLoadResources // readonly
 - PackageFile@[]@ packageFiles // readonly
 - int refs // readonly
@@ -9468,7 +10133,7 @@ Properties:
 - bool returnFailedResources
 - bool seachPackagesFirst // readonly
 - bool searchPackagesFirst // writeonly
-- uint totalMemoryUse // readonly
+- uint64 totalMemoryUse // readonly
 - StringHash type // readonly
 - String typeName // readonly
 - int weakRefs // readonly
@@ -9497,6 +10162,96 @@ Properties:
 - String[] names
 - StringHash type
 
+<a name="Class_RibbonTrail"></a>
+
+### RibbonTrail
+
+Methods:
+
+- void ApplyAttributes()
+- void Commit()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- float animationLodBias
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- float drawDistance
+- bool emitting
+- bool enabled
+- bool enabledEffective // readonly
+- Color endColor
+- float endScale
+- uint id // readonly
+- bool inView // readonly
+- float lifetime
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- bool sorted
+- Color startColor
+- float startScale
+- uint tailColumn
+- bool temporary
+- TrailType trailType
+- StringHash type // readonly
+- String typeName // readonly
+- bool updateInvisible
+- float vertexDistance
+- uint viewMask
+- int weakRefs // readonly
+- float width
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
+- uint zoneMask
+
 <a name="Class_RigidBody"></a>
 
 ### RigidBody
@@ -9522,8 +10277,11 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetVelocityAtPoint(const Vector3&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void ReAddBodyToWorld()
@@ -9535,6 +10293,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9614,8 +10373,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -9625,6 +10387,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9675,6 +10438,8 @@ Methods:
 
 - void AddChild(Node@, uint = M_MAX_UNSIGNED)
 - void AddRequiredPackageFile(PackageFile@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void Clear(bool = true, bool = true)
 - void ClearRequiredPackageFiles()
@@ -9695,18 +10460,28 @@ Methods:
 - Node@[]@ GetChildrenWithComponent(const String&, bool = false) const
 - Node@[]@ GetChildrenWithScript(bool = false) const
 - Node@[]@ GetChildrenWithScript(const String&, bool = false) const
+- Node@[]@ GetChildrenWithTag(const String&, bool = false) const
 - Component@ GetComponent(const String&, bool = false) const
 - Component@ GetComponent(uint) const
 - Component@[]@ GetComponents() const
 - Component@[]@ GetComponents(const String&, bool = false) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - Node@ GetNode(uint) const
+- Node@[]@ GetNodesWithTag(const String&) const
 - Component@ GetOrCreateComponent(const String&, CreateMode = REPLICATED, uint = 0)
+- Component@ GetParentComponent(const String&, bool = false) const
 - ScriptObject@ GetScriptObject() const
 - ScriptObject@ GetScriptObject(const String&) const
 - bool HasComponent(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&)
 - Node@ Instantiate(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ Instantiate(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(JSONFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
+- Node@ InstantiateJSON(const JSONValue&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(File@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
 - Node@ InstantiateXML(XMLFile@, const Vector3&, const Quaternion&, CreateMode = REPLICATED)
@@ -9715,6 +10490,9 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadAsync(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsyncXML(File@, LoadMode = LOAD_SCENE_AND_RESOURCES)
+- bool LoadJSON(File@)
+- bool LoadJSON(VectorBuffer&)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(const XMLElement&, bool = false)
@@ -9728,6 +10506,7 @@ Methods:
 - void Remove()
 - void RemoveAllChildren()
 - void RemoveAllComponents()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(Node@)
 - void RemoveChildren(bool, bool, bool)
@@ -9737,6 +10516,7 @@ Methods:
 - void RemoveComponents(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetToDefault()
 - void Roll(float, TransformSpace = TS_LOCAL)
 - void Rotate(const Quaternion&, TransformSpace = TS_LOCAL)
@@ -9745,6 +10525,9 @@ Methods:
 - void RotateAround2D(const Vector2&, float, TransformSpace = TS_LOCAL)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(File@, const String& = "\t")
+- bool SaveJSON(JSONValue&) const
+- bool SaveJSON(VectorBuffer&, const String& = "\t")
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -9827,6 +10610,7 @@ Properties:
 - ScriptObject@ scriptObject // readonly
 - float smoothingConstant
 - float snapThreshold
+- String[]@ tags // readonly
 - bool temporary
 - float timeScale
 - Matrix3x4 transform // readonly
@@ -9855,6 +10639,8 @@ Methods:
 
 - void DumpAPI(DumpMode = DOXYGEN, const String& = String ( ))
 - bool Execute(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -9877,6 +10663,8 @@ Methods:
 - void ClearDelayedExecute(const String& = String ( ))
 - void DelayedExecute(float, bool, const String&, const Variant[]@ = null)
 - bool Execute(const String&, const Variant[]@ = null)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -9915,9 +10703,12 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasMethod(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsA(const String&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -9927,6 +10718,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -9970,6 +10762,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
@@ -9987,9 +10781,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -9997,6 +10795,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10005,15 +10804,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10118,6 +10920,7 @@ Properties:
 - bool sortChildren
 - float stepFactor
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -10138,6 +10941,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -10154,9 +10959,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10164,6 +10973,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10172,15 +10982,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10287,6 +11100,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -10311,14 +11125,18 @@ Methods:
 - Variant GetAttribute(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void RemoveInstanceDefault()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetAttribute(const String&, const Variant&)
@@ -10407,9 +11225,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10419,6 +11240,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10474,6 +11296,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ChangeValue(float)
@@ -10491,9 +11315,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -10501,6 +11329,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -10509,15 +11338,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -10623,6 +11455,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -10653,8 +11486,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10664,6 +11500,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10705,6 +11542,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -10744,8 +11583,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -10755,6 +11597,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10799,8 +11642,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -10814,6 +11660,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -10868,8 +11715,11 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Play(Sound@)
@@ -10883,6 +11733,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
@@ -10941,6 +11792,7 @@ Methods:
 - void Define(const Polyhedron&)
 - void Define(const Sphere&)
 - void Define(const Vector3&, float)
+- bool Defined() const
 - float Distance(const Vector3&) const
 - Intersection IsInside(const BoundingBox&) const
 - Intersection IsInside(const Sphere&) const
@@ -10955,7 +11807,6 @@ Methods:
 Properties:
 
 - Vector3 center
-- bool defined
 - float radius
 
 <a name="Class_Spline"></a>
@@ -10996,8 +11847,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetPoint(float) const
 - Vector3 GetPosition() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Move(float)
@@ -11010,6 +11864,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11052,9 +11907,14 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableLayoutUpdate()
+- IntVector2 ElementToScreen(const IntVector2&)
+- void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
@@ -11065,14 +11925,21 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -11081,17 +11948,22 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
+- IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - void SetAnimationTime(float)
@@ -11100,12 +11972,15 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFullImageRect()
 - void SetHotSpot(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
 - void SetMinSize(int, int)
 - void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
@@ -11116,6 +11991,7 @@ Methods:
 - bool SetStyle(const String&, XMLFile@ = null)
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
+- void UpdateLayout()
 - const Variant& GetVar(const StringHash&)
 
 Properties:
@@ -11128,19 +12004,47 @@ Properties:
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
+- IntVector2 childOffset // readonly
 - UIElement@[] children // readonly
+- IntRect clipBorder
+- bool clipChildren
 - Color color // writeonly
 - bool colorGradient // readonly
 - Color[] colors
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
+- uint dragDropMode
+- bool editable
 - bool elementEventSender
+- bool enabled
+- bool enabledSelf // readonly
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
+- bool focus
+- FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hotSpot
+- bool hovering // readonly
 - IntRect imageRect
+- int indent
+- int indentSpacing
+- int indentWidth // readonly
+- bool internal
+- IntRect layoutBorder
+- Vector2 layoutFlexScale
+- LayoutMode layoutMode
+- int layoutSpacing
+- int maxHeight
+- IntVector2 maxSize
+- int maxWidth
+- int minHeight
+- IntVector2 minSize
+- int minWidth
 - String name
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
@@ -11154,11 +12058,15 @@ Properties:
 - UIElement@ root // readonly
 - float rotation
 - Vector2 scale
+- IntVector2 screenPosition // readonly
+- bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
+- TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
@@ -11175,6 +12083,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -11191,6 +12101,7 @@ Properties:
 - IntRect rectangle
 - int refs // readonly
 - Texture2D@ texture
+- float textureEdgeOffset
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -11204,6 +12115,8 @@ Methods:
 
 - void DefineSprite(const String&, const IntRect&, const Vector2& = Vector2 ( 0.5f , 0.5f ), const IntVector2& = IntVector2 :: ZERO)
 - Sprite2D@ GetSprite(const String&)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -11216,7 +12129,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- Texture2D@ texture // readonly
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -11238,11 +12151,14 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool IsInside(const Vector3&) const
 - bool IsInsideLocal(const Vector3&) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11252,6 +12168,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11317,9 +12234,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11331,6 +12251,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11397,9 +12318,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11409,6 +12333,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11491,7 +12416,7 @@ Methods:
 - String Replaced(uint8, uint8, bool = true) const
 - void Resize(uint)
 - void SetUTF8FromLatin1(const String&)
-- String[]@ Split(uint8) const
+- String[]@ Split(uint8, bool = false) const
 - bool StartsWith(const String&, bool = true) const
 - String Substring(uint) const
 - String Substring(uint, uint) const
@@ -11541,10 +12466,13 @@ Properties:
 
 Methods:
 
+- Technique@ Clone(const String& = String ( )) const
 - Pass@ CreatePass(const String&)
 - Pass@ GetPass(const String&)
 - Pass@ GetSupportedPass(const String&)
 - bool HasPass(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void RemovePass(const String&)
@@ -11597,8 +12525,11 @@ Methods:
 - bool GetInterceptNetworkUpdate(const String&) const
 - Vector3 GetNormal(const Vector3&) const
 - TerrainPatch@ GetPatch(int, int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11608,6 +12539,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11674,9 +12606,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11686,6 +12621,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -11736,6 +12672,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - void ClearSelection()
@@ -11753,9 +12691,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -11763,6 +12705,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -11771,15 +12714,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -11840,6 +12786,9 @@ Properties:
 - uint dragDropMode
 - bool editable
 - Color effectColor
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool elementEventSender
 - bool enabled
 - bool enabledSelf // readonly
@@ -11892,6 +12841,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - String text
 - HorizontalAlignment textAlignment
@@ -11923,9 +12873,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -11935,6 +12888,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
@@ -11964,9 +12918,13 @@ Properties:
 - float drawDistance
 - Color effectColor
 - float effectDepthBias
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - Font@ font // readonly
 - int fontSize // readonly
 - HorizontalAlignment horizontalAlignment
@@ -12011,6 +12969,8 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12053,6 +13013,8 @@ Methods:
 
 - void ClearDataLost()
 - Image@ GetImage() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12074,6 +13036,53 @@ Properties:
 - TextureFilterMode filterMode
 - uint format // readonly
 - int height // readonly
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
+- int[] mipsToSkip
+- String name
+- int refs // readonly
+- RenderSurface@ renderSurface // readonly
+- bool sRGB
+- StringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
+
+<a name="Class_Texture2DArray"></a>
+
+### Texture2DArray
+
+Methods:
+
+- void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(uint, Image@, bool = false)
+- void SetNumLevels(uint)
+- bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC)
+
+Properties:
+
+- TextureAddressMode[] addressMode
+- Texture@ backupTexture
+- Color borderColor
+- String category // readonly
+- uint components // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
+- TextureFilterMode filterMode
+- uint format // readonly
+- int height // readonly
+- uint layers
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
@@ -12097,6 +13106,8 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12104,7 +13115,7 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
-- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
+- bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC)
 
 Properties:
 
@@ -12125,7 +13136,6 @@ Properties:
 - int[] mipsToSkip
 - String name
 - int refs // readonly
-- RenderSurface@ renderSurface // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
@@ -12141,6 +13151,9 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- Image@ GetImage(CubeMapFace) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12219,8 +13232,11 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - TileMapLayer2D@ GetLayer(uint) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - bool PositionToTileIndex(int&, int&, const Vector2&) const
@@ -12231,6 +13247,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -12298,8 +13315,11 @@ Methods:
 - Tile2D@ GetTile(int, int) const
 - Node@ GetTileNode(int, int) const
 - bool HasProperty(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -12309,6 +13329,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -12375,6 +13396,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 
 Properties:
@@ -12406,6 +13429,8 @@ Methods:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12430,6 +13455,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -12446,9 +13473,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12456,6 +13487,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -12464,15 +13496,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -12568,6 +13603,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -12604,6 +13640,8 @@ Methods:
 - UIElement@ GetElementAt(const IntVector2&, bool = true)
 - UIElement@ GetElementAt(int, int, bool = true)
 - bool HasModalElement() const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsDragging() const
 - UIElement@ LoadLayout(File@)
 - UIElement@ LoadLayout(File@, XMLFile@)
@@ -12615,6 +13653,8 @@ Methods:
 - bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetFocusElement(UIElement@, bool = false)
+- void SetHeight(float)
+- void SetWidth(float)
 - const UIElement@[]@ GetDragElements()
 
 Properties:
@@ -12635,6 +13675,7 @@ Properties:
 - bool nonFocusedMouseWheel
 - int refs // readonly
 - UIElement@ root // readonly
+- float scale
 - StringHash type // readonly
 - String typeName // readonly
 - bool useMutableGlyphs
@@ -12649,6 +13690,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -12665,9 +13708,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -12675,6 +13722,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -12683,15 +13731,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -12786,6 +13837,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - TraversalMode traversalMode
 - StringHash type // readonly
@@ -12804,6 +13856,8 @@ Properties:
 
 Methods:
 
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Save(File@) const
@@ -12837,6 +13891,7 @@ Methods:
 - void FromString(VariantType, const String&)
 - void FromString(const String&, const String&)
 - bool GetBool() const
+- VectorBuffer GetBuffer() const
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
@@ -12860,7 +13915,6 @@ Methods:
 - const Vector2& GetVector2() const
 - const Vector3& GetVector3() const
 - const Vector4& GetVector4() const
-- const VectorBuffer GetBuffer() const
 
 Properties:
 
@@ -12895,6 +13949,7 @@ Methods:
 
 - Vector2 Abs() const
 - float AbsDotProduct(const Vector2&) const
+- float Angle(const Vector2&) const
 - float DotProduct(const Vector2&) const
 - bool Equals(const Vector2&) const
 - bool IsNaN() const
@@ -13049,10 +14104,17 @@ Properties:
 
 Methods:
 
-- VectorBuffer GetData()
+- VectorBuffer GetData() const
+- uint GetElementOffset(VertexElementSemantic, uint8 = 0) const
+- uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const
+- bool HasElement(VertexElementSemantic, uint8 = 0) const
+- bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(VectorBuffer&)
 - bool SetDataRange(VectorBuffer&, uint, uint, bool = false)
+- void SetSize(uint, VertexElement[]@, bool = false)
 - void SetSize(uint, uint, bool = false)
 
 Properties:
@@ -13060,6 +14122,7 @@ Properties:
 - String category // readonly
 - bool dynamic // readonly
 - uint elementMask // readonly
+- VertexElement[]@ elements // readonly
 - int refs // readonly
 - bool shadowed
 - StringHash type // readonly
@@ -13068,6 +14131,18 @@ Properties:
 - uint vertexSize // readonly
 - int weakRefs // readonly
 
+<a name="Class_VertexElement"></a>
+
+### VertexElement
+
+Properties:
+
+- uint8 index
+- uint offset
+- bool perInstance
+- VertexElementSemantic semantic
+- VertexElementType type
+
 <a name="Class_View3D"></a>
 
 ### View3D
@@ -13075,6 +14150,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -13091,9 +14168,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13101,6 +14182,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -13110,15 +14192,18 @@ Methods:
 - void QueueUpdate()
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -13237,6 +14322,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -13259,6 +14345,8 @@ Properties:
 Methods:
 
 - Ray GetScreenRay(int, int) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - Vector3 ScreenToWorldPoint(int, int, float) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
@@ -13268,6 +14356,7 @@ Properties:
 
 - Camera@ camera
 - String category // readonly
+- Camera@ cullCamera
 - bool drawDebug
 - IntRect rect
 - int refs // readonly
@@ -13298,6 +14387,8 @@ Properties:
 Methods:
 
 - void AddChild(UIElement@)
+- void AddTag(const String&)
+- void AddTags(const String&, int8 = ';')
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
@@ -13314,9 +14405,13 @@ Methods:
 - UIElement@ GetChild(const String&, bool = false) const
 - UIElement@ GetChild(const StringHash&, const Variant& = Variant ( ), bool = false) const
 - UIElement@[]@ GetChildren(bool = false) const
+- UIElement@[]@ GetChildrenWithTag(const String&, bool = false) const
 - UIElement@ GetElementEventSender() const
 - bool GetInterceptNetworkUpdate(const String&) const
 - uint GetNumChildren(bool) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
 - bool IsInside(IntVector2, bool)
 - bool IsInsideCombined(IntVector2, bool)
@@ -13324,6 +14419,7 @@ Methods:
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
 - bool LoadChildXML(const XMLElement&, XMLFile@ = null, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(File@)
 - bool LoadXML(VectorBuffer&)
 - bool LoadXML(XMLFile@, XMLFile@)
@@ -13332,15 +14428,18 @@ Methods:
 - void MarkNetworkUpdate() const
 - void Remove()
 - void RemoveAllChildren()
+- void RemoveAllTags()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveChild(UIElement@, uint = 0)
 - void RemoveChild(uint)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
+- bool RemoveTag(const String&)
 - void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
@@ -13452,6 +14551,7 @@ Properties:
 - IntVector2 size
 - bool sortChildren
 - String style
+- String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
 - bool tiled
@@ -13484,6 +14584,8 @@ Methods:
 - double GetDouble(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
+- IntRect GetIntRect(const String&) const
+- IntVector2 GetIntVector2(const String&) const
 - Matrix3 GetMatrix3(const String&) const
 - Matrix3x4 GetMatrix3x4(const String&) const
 - Matrix4 GetMatrix4(const String&) const
@@ -13518,6 +14620,8 @@ Methods:
 - bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetIntRect(const String&, const IntRect&)
+- bool SetIntVector2(const String&, const IntVector2&)
 - bool SetMatrix3(const String&, const Matrix3&)
 - bool SetMatrix3x4(const String&, const Matrix3x4&)
 - bool SetMatrix4(const String&, const Matrix4&)
@@ -13554,6 +14658,8 @@ Methods:
 - XMLElement CreateRoot(const String&)
 - bool FromString(const String&)
 - XMLElement GetRoot(const String& = String ( ))
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - void Patch(XMLElement)
@@ -13623,9 +14729,12 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsInView(Camera@) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
 - void Remove()
@@ -13635,6 +14744,7 @@ Methods:
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
@@ -13693,6 +14803,12 @@ Properties:
 - Texture@ zoneTexture
 
 \section ScriptAPI_Enums Enumerations
+
+### AnimationBlendMode
+
+- ABM_LERP
+- ABM_ADDITIVE
+
 
 ### BlendMode
 
@@ -13857,6 +14973,7 @@ Properties:
 - FC_ROTATE_Y
 - FC_LOOKAT_XYZ
 - FC_LOOKAT_Y
+- FC_DIRECTION
 
 
 ### FileMode
@@ -13905,6 +15022,7 @@ Properties:
 
 ### InterpMethod
 
+- IM_NONE
 - IM_LINEAR
 - IM_SPLINE
 
@@ -14001,6 +15119,7 @@ Properties:
 - O_ORTHOGONAL
 - O_ISOMETRIC
 - O_STAGGERED
+- O_HEXAGONAL
 
 
 ### PassLightingMode
@@ -14043,6 +15162,7 @@ Properties:
 - CMD_FORWARDLIGHTS
 - CMD_LIGHTVOLUMES
 - CMD_RENDERUI
+- CMD_SENDEVENT
 
 
 ### RenderSurfaceUpdateMode
@@ -14057,6 +15177,16 @@ Properties:
 - SIZE_ABSOLUTE
 - SIZE_VIEWPORTDIVISOR
 - SIZE_VIEWPORTMULTIPLIER
+
+
+### ShadowQuality
+
+- SHADOWQUALITY_SIMPLE_16BIT
+- SHADOWQUALITY_SIMPLE_24BIT
+- SHADOWQUALITY_PCF_16BIT
+- SHADOWQUALITY_PCF_24BIT
+- SHADOWQUALITY_VSM
+- SHADOWQUALITY_BLUR_VSM
 
 
 ### ShapeType
@@ -14153,6 +15283,12 @@ Properties:
 - OT_INVALID
 
 
+### TrailType
+
+- TT_FACE_CAMERA
+- TT_BONE
+
+
 ### TransformSpace
 
 - TS_LOCAL
@@ -14192,6 +15328,32 @@ Properties:
 - VAR_MATRIX4
 - VAR_DOUBLE
 - VAR_STRINGVECTOR
+
+
+### VertexElementSemantic
+
+- SEM_POSITION
+- SEM_NORMAL
+- SEM_BINORMAL
+- SEM_TANGENT
+- SEM_TEXCOORD
+- SEM_COLOR
+- SEM_BLENDWEIGHTS
+- SEM_BLENDINDICES
+- SEM_OBJECTINDEX
+- MAX_VERTEX_ELEMENT_SEMANTICS
+
+
+### VertexElementType
+
+- TYPE_INT
+- TYPE_FLOAT
+- TYPE_VECTOR2
+- TYPE_VECTOR3
+- TYPE_VECTOR4
+- TYPE_UBYTE4
+- TYPE_UBYTE4_NORM
+- MAX_VERTEX_ELEMENT_TYPES
 
 
 ### VerticalAlignment
@@ -14234,14 +15396,17 @@ Properties:
 - String GetExtension(const String&, bool = true)
 - String GetFileName(const String&)
 - String GetFileNameAndExtension(const String&, bool = false)
+- String GetFileSizeString(uint64)
 - uint GetFloat16Format()
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
+- Variant GetGlobalVar(const String&)
 - String GetInternalPath(const String&)
 - uint GetLinearDepthFormat()
 - uint GetLuminanceAlphaFormat()
 - uint GetLuminanceFormat()
 - uint GetMaxBones()
+- String GetMiniDumpDir()
 - uint GetNumLogicalCPUs()
 - uint GetNumPhysicalCPUs()
 - String[]@ GetObjectCategories()
@@ -14260,6 +15425,8 @@ Properties:
 - uint GetRandomSeed()
 - uint GetReadableDepthFormat()
 - String GetTextureUnitName(TextureUnit)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
 - bool IsAbsolutePath(const String&)
 - bool IsAlpha(uint)
 - bool IsDigit(uint)
@@ -14290,11 +15457,14 @@ Properties:
 - int RandomInt(int)
 - int RandomInt(int, int)
 - float RandomNormal(float, float)
+- void RegisterEventName(const String&)
 - void Remove()
 - String RemoveTrailingSlash(const String&)
 - String ReplaceExtension(const String&, const String&)
 - uint SDBMHash(uint, uint8)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetGlobalVar(const String&, Variant&)
+- void SetMiniDumpDir(const String&)
 - void SetRandomSeed(uint)
 - float Sign(float)
 - float Sin(float)
@@ -14312,7 +15482,7 @@ Properties:
 - void UnsubscribeFromEvent(Object@, const String&)
 - void UnsubscribeFromEvent(const String&)
 - void UnsubscribeFromEvents(Object@)
-- bool WriteDrawablesToOBJ(Drawable@[]@, File@, bool = false)
+- bool WriteDrawablesToOBJ(Drawable@[]@, File@, bool, bool, bool = false)
 \section ScriptAPI_GlobalProperties Global properties
 - DBAPI DBAPI
 - Audio@ audio
@@ -14323,6 +15493,7 @@ Properties:
 - DebugRenderer@ debugRenderer
 - Engine@ engine
 - FileSystem@ fileSystem
+- VariantMap globalVars
 - Graphics@ graphics
 - Input@ input
 - Localization@ localization
@@ -14384,6 +15555,9 @@ Properties:
 - uint DD_SOURCE_AND_TARGET
 - uint DD_TARGET
 - uint DEBUGHUD_SHOW_ALL
+- uint DEBUGHUD_SHOW_ALL_MEMORY
+- uint DEBUGHUD_SHOW_EVENTPROFILER
+- uint DEBUGHUD_SHOW_MEMORY
 - uint DEBUGHUD_SHOW_MODE
 - uint DEBUGHUD_SHOW_NONE
 - uint DEBUGHUD_SHOW_PROFILER
@@ -14427,7 +15601,7 @@ Properties:
 - int KEY_DOWN
 - int KEY_E
 - int KEY_END
-- int KEY_ESC
+- int KEY_ESCAPE
 - int KEY_F
 - int KEY_F1
 - int KEY_F10
@@ -14528,12 +15702,12 @@ Properties:
 - uint MASK_COLOR
 - uint MASK_CUBETEXCOORD1
 - uint MASK_CUBETEXCOORD2
-- uint MASK_DEFAULT
 - uint MASK_INSTANCEMATRIX1
 - uint MASK_INSTANCEMATRIX2
 - uint MASK_INSTANCEMATRIX3
 - uint MASK_NONE
 - uint MASK_NORMAL
+- uint MASK_OBJECTINDEX
 - uint MASK_POSITION
 - uint MASK_TANGENT
 - uint MASK_TEXCOORD1
@@ -14554,6 +15728,7 @@ Properties:
 - uint M_MIN_UNSIGNED
 - float M_PI
 - float M_RADTODEG
+- uint NPOS
 - float PIXEL_SIZE
 - int QUALITY_HIGH
 - int QUALITY_LOW
@@ -14812,10 +15987,6 @@ Properties:
 - uint SCAN_DIRS
 - uint SCAN_FILES
 - uint SCAN_HIDDEN
-- int SHADOWQUALITY_HIGH_16BIT
-- int SHADOWQUALITY_HIGH_24BIT
-- int SHADOWQUALITY_LOW_16BIT
-- int SHADOWQUALITY_LOW_24BIT
 - String SOUND_AMBIENT
 - String SOUND_EFFECT
 - String SOUND_MASTER
@@ -14828,7 +15999,6 @@ Properties:
 - uint VO_NONE
 - Color WHITE
 - Color YELLOW
-- VariantMap globalVars
 */
 
 }

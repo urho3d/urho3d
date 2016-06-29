@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -357,7 +357,7 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     (*this)["type"] = variant.GetTypeName();
@@ -367,14 +367,14 @@ void JSONValue::SetVariant(const Variant& variant, Context* context)
 Variant JSONValue::GetVariant() const
 {
     VariantType type = Variant::GetTypeFromName((*this)["type"].GetString());
-    return (*this)["value"].GetVariantValue(type);    
+    return (*this)["value"].GetVariantValue(type);
 }
 
 void JSONValue::SetVariantValue(const Variant& variant, Context* context)
 {
     if (!IsNull())
     {
-        LOGWARNING("JsonValue is not null");
+        URHO3D_LOGWARNING("JsonValue is not null");
     }
 
     switch (variant.GetType())
@@ -411,7 +411,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                LOGERROR("Context must not null for ResourceRef");
+                URHO3D_LOGERROR("Context must not be null for ResourceRef");
                 return;
             }
 
@@ -424,7 +424,7 @@ void JSONValue::SetVariantValue(const Variant& variant, Context* context)
         {
             if (!context)
             {
-                LOGERROR("Context must not null for ResourceRefList");
+                URHO3D_LOGERROR("Context must not be null for ResourceRefList");
                 return;
             }
 
@@ -502,7 +502,7 @@ Variant JSONValue::GetVariantValue(VariantType type) const
     case VAR_RESOURCEREFLIST:
         {
             ResourceRefList refList;
-            Vector<String> values = GetString().Split(';');
+            Vector<String> values = GetString().Split(';', true);
             if (values.Size() >= 1)
             {
                 refList.type_ = values[0];
@@ -542,7 +542,7 @@ VariantMap JSONValue::GetVariantMap() const
     VariantMap variantMap;
     if (!IsObject())
     {
-        LOGERROR("JSONValue is not a object");
+        URHO3D_LOGERROR("JSONValue is not a object");
         return variantMap;
     }
 
@@ -559,8 +559,13 @@ VariantMap JSONValue::GetVariantMap() const
 void JSONValue::SetVariantVector(const VariantVector& variantVector, Context* context)
 {
     SetType(JSON_ARRAY);
+    arrayValue_->Reserve(variantVector.Size());
     for (unsigned i = 0; i < variantVector.Size(); ++i)
-        (*this)[i].SetVariant(variantVector[i]);
+    {
+        JSONValue val;
+        val.SetVariant(variantVector[i], context);
+        arrayValue_->Push(val);
+    }
 }
 
 VariantVector JSONValue::GetVariantVector() const
@@ -568,7 +573,7 @@ VariantVector JSONValue::GetVariantVector() const
     VariantVector variantVector;
     if (!IsArray())
     {
-        LOGERROR("JSONValue is not a array");
+        URHO3D_LOGERROR("JSONValue is not a array");
         return variantVector;
     }
 

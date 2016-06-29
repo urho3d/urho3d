@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ struct Particle2D
     float timeToLive_;
 
     /// Position.
-    Vector2 position_;
+    Vector3 position_;
     /// Size.
     float size_;
     /// Size delta.
@@ -75,7 +75,7 @@ struct Particle2D
 /// 2D particle emitter component.
 class URHO3D_API ParticleEmitter2D : public Drawable2D
 {
-    OBJECT(ParticleEmitter2D, Drawable2D);
+    URHO3D_OBJECT(ParticleEmitter2D, Drawable2D);
 
 public:
     /// Construct.
@@ -143,8 +143,8 @@ private:
     SharedPtr<Sprite2D> sprite_;
     /// Blend mode.
     BlendMode blendMode_;
-    /// Num particles.
-    int numParticles_;
+    /// Nummber of particles.
+    unsigned numParticles_;
     /// Emission time.
     float emissionTime_;
     /// Emit particle time

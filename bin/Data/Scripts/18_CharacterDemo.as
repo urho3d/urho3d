@@ -40,6 +40,9 @@ void Start()
     // Create the UI content
     CreateInstructions();
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE);
+
     // Subscribe to necessary events
     SubscribeToEvents();
 }
@@ -221,10 +224,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     {
         if (touchEnabled || !useGyroscope)
         {
-            character.controls.Set(CTRL_FORWARD, input.keyDown['W']);
-            character.controls.Set(CTRL_BACK, input.keyDown['S']);
-            character.controls.Set(CTRL_LEFT, input.keyDown['A']);
-            character.controls.Set(CTRL_RIGHT, input.keyDown['D']);
+            character.controls.Set(CTRL_FORWARD, input.keyDown[KEY_W]);
+            character.controls.Set(CTRL_BACK, input.keyDown[KEY_S]);
+            character.controls.Set(CTRL_LEFT, input.keyDown[KEY_A]);
+            character.controls.Set(CTRL_RIGHT, input.keyDown[KEY_D]);
         }
         character.controls.Set(CTRL_JUMP, input.keyDown[KEY_SPACE]);
 
@@ -256,11 +259,11 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
 
         // Switch between 1st and 3rd person
-        if (input.keyPress['F'])
+        if (input.keyPress[KEY_F])
             firstPerson = !firstPerson;
 
         // Turn on/off gyroscope on mobile platform
-        if (input.keyPress['G'])
+        if (input.keyPress[KEY_G])
             useGyroscope = !useGyroscope;
 
         // Check for loading / saving the scene

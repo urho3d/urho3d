@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(CharacterDemo)
+URHO3D_DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
     Sample(context),
@@ -81,6 +81,9 @@ void CharacterDemo::Start()
 
     // Subscribe to necessary events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void CharacterDemo::CreateScene()
@@ -241,10 +244,10 @@ void CharacterDemo::CreateInstructions()
 void CharacterDemo::SubscribeToEvents()
 {
     // Subscribe to Update event for setting the character controls before physics simulation
-    SubscribeToEvent(E_UPDATE, HANDLER(CharacterDemo, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(CharacterDemo, HandleUpdate));
 
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(CharacterDemo, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(CharacterDemo, HandlePostUpdate));
 
     // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
@@ -271,10 +274,10 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         {
             if (!touch_ || !touch_->useGyroscope_)
             {
-                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-                character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+                character_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
             }
             character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
 
@@ -307,11 +310,11 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
 
             // Switch between 1st and 3rd person
-            if (input->GetKeyPress('F'))
+            if (input->GetKeyPress(KEY_F))
                 firstPerson_ = !firstPerson_;
 
             // Turn on/off gyroscope on mobile platform
-            if (touch_ && input->GetKeyPress('G'))
+            if (touch_ && input->GetKeyPress(KEY_G))
                 touch_->useGyroscope_ = !touch_->useGyroscope_;
 
             // Check for loading / saving the scene

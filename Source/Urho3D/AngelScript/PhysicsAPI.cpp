@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -242,6 +242,13 @@ static PhysicsRaycastResult PhysicsWorldRaycastSingle(const Ray& ray, float maxD
     return result;
 }
 
+static PhysicsRaycastResult PhysicsWorldRaycastSingleSegmented(const Ray& ray, float maxDistance, float segmentDistance, unsigned collisionMask, PhysicsWorld* ptr)
+{
+    PhysicsRaycastResult result;
+    ptr->RaycastSingleSegmented(result, ray, maxDistance, segmentDistance, collisionMask);
+    return result;
+}
+
 static PhysicsRaycastResult PhysicsWorldSphereCast(const Ray& ray, float radius, float maxDistance, unsigned collisionMask, PhysicsWorld* ptr)
 {
     PhysicsRaycastResult result;
@@ -280,6 +287,13 @@ static CScriptArray* PhysicsWorldGetRigidBodiesBody(RigidBody* body, PhysicsWorl
     return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
 }
 
+static CScriptArray* PhysicsWorldGetCollidingBodies(RigidBody* body, PhysicsWorld* ptr)
+{
+    PODVector<RigidBody*> result;
+    ptr->GetCollidingBodies(result, body);
+    return VectorToHandleArray<RigidBody>(result, "Array<RigidBody@>");
+}
+
 static void RegisterPhysicsWorld(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("PhysicsRaycastResult", sizeof(PhysicsRaycastResult), asOBJ_VALUE | asOBJ_APP_CLASS_C);
@@ -289,6 +303,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 position", offsetof(PhysicsRaycastResult, position_));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "Vector3 normal", offsetof(PhysicsRaycastResult, normal_));
     engine->RegisterObjectProperty("PhysicsRaycastResult", "float distance", offsetof(PhysicsRaycastResult, distance_));
+    engine->RegisterObjectProperty("PhysicsRaycastResult", "float hitFraction", offsetof(PhysicsRaycastResult, hitFraction_));
     engine->RegisterObjectMethod("PhysicsRaycastResult", "RigidBody@+ get_body() const", asFUNCTION(PhysicsRaycastResultGetRigidBody), asCALL_CDECL_OBJLAST);
 
     RegisterComponent<PhysicsWorld>(engine, "PhysicsWorld");
@@ -296,6 +311,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "void UpdateCollisions()", asMETHOD(PhysicsWorld, UpdateCollisions), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<PhysicsRaycastResult>@ Raycast(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycast), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingle(const Ray&in, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingle), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult RaycastSingleSegmented(const Ray&in, float, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldRaycastSingleSegmented), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "PhysicsRaycastResult SphereCast(const Ray&in, float, float, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldSphereCast), asCALL_CDECL_OBJLAST);
     // There seems to be a bug in AngelScript resulting in a crash if we use an auto handle with this function.
     // Work around by manually releasing the CollisionShape handle
@@ -303,6 +319,7 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const Sphere&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesSphere), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(const BoundingBox&in, uint collisionMask = 0xffff)", asFUNCTION(PhysicsWorldGetRigidBodiesBox), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetRigidBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetRigidBodiesBody), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("PhysicsWorld", "Array<RigidBody@>@ GetCollidingBodies(RigidBody@+)", asFUNCTION(PhysicsWorldGetCollidingBodies), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("PhysicsWorld", "void DrawDebugGeometry(bool)", asMETHODPR(PhysicsWorld, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void RemoveCachedGeometry(Model@+)", asMETHOD(PhysicsWorld, RemoveCachedGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_gravity(const Vector3&in)", asMETHOD(PhysicsWorld, SetGravity), asCALL_THISCALL);
@@ -313,6 +330,8 @@ static void RegisterPhysicsWorld(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PhysicsWorld", "int get_numIterations() const", asMETHOD(PhysicsWorld, GetNumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_fps(int)", asMETHOD(PhysicsWorld, SetFps), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "int get_fps() const", asMETHOD(PhysicsWorld, GetFps), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "void set_updateEnabled(bool)", asMETHOD(PhysicsWorld, SetUpdateEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PhysicsWorld", "bool get_updateEnabled() const", asMETHOD(PhysicsWorld, IsUpdateEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_interpolation(bool)", asMETHOD(PhysicsWorld, SetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "bool get_interpolation() const", asMETHOD(PhysicsWorld, GetInterpolation), asCALL_THISCALL);
     engine->RegisterObjectMethod("PhysicsWorld", "void set_internalEdge(bool)", asMETHOD(PhysicsWorld, SetInternalEdge), asCALL_THISCALL);

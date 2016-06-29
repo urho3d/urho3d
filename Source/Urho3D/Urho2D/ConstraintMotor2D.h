@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace Urho3D
 /// 2D motor constraint component.
 class URHO3D_API ConstraintMotor2D : public Constraint2D
 {
-    OBJECT(ConstraintMotor2D, Constraint2D);
+    URHO3D_OBJECT(ConstraintMotor2D, Constraint2D);
 
 public:
     /// Construct.

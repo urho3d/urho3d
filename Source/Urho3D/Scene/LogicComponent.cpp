@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,8 @@
 #include "../Precompiled.h"
 
 #include "../IO/Log.h"
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 #include "../Physics/PhysicsEvents.h"
-#include "../Physics/PhysicsWorld.h"
 #endif
 #include "../Scene/LogicComponent.h"
 #include "../Scene/Scene.h"
@@ -98,7 +97,7 @@ void LogicComponent::OnSceneSet(Scene* scene)
     {
         UnsubscribeFromEvent(E_SCENEUPDATE);
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
         UnsubscribeFromEvent(E_PHYSICSPRESTEP);
         UnsubscribeFromEvent(E_PHYSICSPOSTSTEP);
 #endif
@@ -117,7 +116,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needUpdate = enabled && ((updateEventMask_ & USE_UPDATE) || !delayedStartCalled_);
     if (needUpdate && !(currentEventMask_ & USE_UPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEUPDATE, HANDLER(LogicComponent, HandleSceneUpdate));
+        SubscribeToEvent(scene, E_SCENEUPDATE, URHO3D_HANDLER(LogicComponent, HandleSceneUpdate));
         currentEventMask_ |= USE_UPDATE;
     }
     else if (!needUpdate && (currentEventMask_ & USE_UPDATE))
@@ -129,24 +128,24 @@ void LogicComponent::UpdateEventSubscription()
     bool needPostUpdate = enabled && (updateEventMask_ & USE_POSTUPDATE);
     if (needPostUpdate && !(currentEventMask_ & USE_POSTUPDATE))
     {
-        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(LogicComponent, HandleScenePostUpdate));
+        SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LogicComponent, HandleScenePostUpdate));
         currentEventMask_ |= USE_POSTUPDATE;
     }
-    else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
     {
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
         currentEventMask_ &= ~USE_POSTUPDATE;
     }
 
-#ifdef URHO3D_PHYSICS
-    PhysicsWorld* world = scene->GetComponent<PhysicsWorld>();
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
+    Component* world = GetFixedUpdateSource();
     if (!world)
         return;
 
     bool needFixedUpdate = enabled && (updateEventMask_ & USE_FIXEDUPDATE);
     if (needFixedUpdate && !(currentEventMask_ & USE_FIXEDUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPRESTEP, HANDLER(LogicComponent, HandlePhysicsPreStep));
+        SubscribeToEvent(world, E_PHYSICSPRESTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPreStep));
         currentEventMask_ |= USE_FIXEDUPDATE;
     }
     else if (!needFixedUpdate && (currentEventMask_ & USE_FIXEDUPDATE))
@@ -158,7 +157,7 @@ void LogicComponent::UpdateEventSubscription()
     bool needFixedPostUpdate = enabled && (updateEventMask_ & USE_FIXEDPOSTUPDATE);
     if (needFixedPostUpdate && !(currentEventMask_ & USE_FIXEDPOSTUPDATE))
     {
-        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, HANDLER(LogicComponent, HandlePhysicsPostStep));
+        SubscribeToEvent(world, E_PHYSICSPOSTSTEP, URHO3D_HANDLER(LogicComponent, HandlePhysicsPostStep));
         currentEventMask_ |= USE_FIXEDPOSTUPDATE;
     }
     else if (!needFixedPostUpdate && (currentEventMask_ & USE_FIXEDPOSTUPDATE))
@@ -200,11 +199,18 @@ void LogicComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
-#ifdef URHO3D_PHYSICS
+#if defined(URHO3D_PHYSICS) || defined(URHO3D_URHO2D)
 
 void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
+
+    // Execute user-defined delayed start function before first fixed update if not called yet
+    if (!delayedStartCalled_)
+    {
+        DelayedStart();
+        delayedStartCalled_ = true;
+    }
 
     // Execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());

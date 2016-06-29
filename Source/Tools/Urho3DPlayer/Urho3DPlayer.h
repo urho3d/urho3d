@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ using namespace Urho3D;
 /// Urho3DPlayer application runs a script specified on the command line.
 class Urho3DPlayer : public Application
 {
-    OBJECT(Urho3DPlayer, Application);
+    URHO3D_OBJECT(Urho3DPlayer, Application);
 
 public:
     /// Construct.
@@ -49,6 +49,8 @@ private:
     void HandleScriptReloadFinished(StringHash eventType, VariantMap& eventData);
     /// Handle reload failure of the script file.
     void HandleScriptReloadFailed(StringHash eventType, VariantMap& eventData);
+    /// Parse script file name from the first argument.
+    void GetScriptFileName();
 
     /// Script file name.
     String scriptFileName_;

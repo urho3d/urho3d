@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,8 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
 
 #ifndef _SDL_config_windows_h
 #define _SDL_config_windows_h
@@ -78,6 +76,12 @@ typedef unsigned int uintptr_t;
 # define SIZEOF_VOIDP 4
 #endif
 
+#define HAVE_DDRAW_H 1
+#define HAVE_DINPUT_H 1
+#define HAVE_DSOUND_H 1
+#define HAVE_DXGI_H 1
+#define HAVE_XINPUT_H 1
+
 /* This is disabled by default to avoid C runtime dependencies and manifest requirements */
 #ifdef HAVE_LIBC
 /* Useful headers */
@@ -132,6 +136,9 @@ typedef unsigned int uintptr_t;
 #define HAVE_SIN 1
 #define HAVE_SINF 1
 #define HAVE_SQRT 1
+#define HAVE_SQRTF 1
+#define HAVE_TAN 1
+#define HAVE_TANF 1
 #if _MSC_VER >= 1800
 #define HAVE_STRTOLL 1
 #define HAVE_VSSCANF 1
@@ -148,16 +155,16 @@ typedef unsigned int uintptr_t;
 
 /* Enable various audio drivers */
 #define SDL_AUDIO_DRIVER_DSOUND 1
-// Urho3D: disable XAudio2 for now, and do not use winmm
-//#define SDL_AUDIO_DRIVER_XAUDIO2    1
-//#define SDL_AUDIO_DRIVER_WINMM  1
+#define SDL_AUDIO_DRIVER_XAUDIO2    1
+#define SDL_AUDIO_DRIVER_WINMM  1
 #define SDL_AUDIO_DRIVER_DISK   1
 #define SDL_AUDIO_DRIVER_DUMMY  1
 
 /* Enable various input drivers */
-// Urho3D: do not enable joystick & force feedback support by default, requires certain include files
-//#define SDL_JOYSTICK_DINPUT 1
-//#define SDL_HAPTIC_DINPUT   1
+#define SDL_JOYSTICK_DINPUT 1
+#define SDL_JOYSTICK_XINPUT 1
+#define SDL_HAPTIC_DINPUT   1
+#define SDL_HAPTIC_XINPUT   1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_WINDOWS  1
@@ -189,15 +196,14 @@ typedef unsigned int uintptr_t;
 #ifndef SDL_VIDEO_RENDER_OGL
 #define SDL_VIDEO_RENDER_OGL    1
 #endif
-// Urho3D: Disable OpenGL ES on Windows
 #ifndef SDL_VIDEO_RENDER_OGL_ES2
-#define SDL_VIDEO_RENDER_OGL_ES2    0
+#define SDL_VIDEO_RENDER_OGL_ES2    1
 #endif
 #ifndef SDL_VIDEO_OPENGL_ES2
-#define SDL_VIDEO_OPENGL_ES2    0
+#define SDL_VIDEO_OPENGL_ES2    1
 #endif
 #ifndef SDL_VIDEO_OPENGL_EGL
-#define SDL_VIDEO_OPENGL_EGL    0
+#define SDL_VIDEO_OPENGL_EGL    1
 #endif
 
 

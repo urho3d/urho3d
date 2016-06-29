@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ struct Decal
 /// %Decal renderer component.
 class URHO3D_API DecalSet : public Drawable
 {
-    OBJECT(DecalSet, Drawable);
+    URHO3D_OBJECT(DecalSet, Drawable);
 
 public:
     /// Construct.

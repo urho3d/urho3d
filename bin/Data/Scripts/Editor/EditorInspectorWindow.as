@@ -20,24 +20,20 @@ Array<XMLFile@> xmlResources;
 const uint ATTRIBUTE_RES = 0;
 const uint VARIABLE_RES = 1;
 const uint STYLE_RES = 2;
+const uint TAGS_RES = 3;
 
 uint nodeContainerIndex = M_MAX_UNSIGNED;
 uint componentContainerStartIndex = 0;
 uint elementContainerIndex = M_MAX_UNSIGNED;
 
-// Script Attribute session storage
-VariantMap scriptAttributes;
-const uint SCRIPTINSTANCE_ATTRIBUTE_IGNORE = 5;
-const uint LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE = 4;
-
 // Node or UIElement hash-to-varname reverse mapping
 VariantMap globalVarNames;
-
 bool inspectorLocked = false;
 
 void InitXMLResources()
 {
-    String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml", "UI/EditorInspector_Style.xml" };
+    String[] resources = { "UI/EditorInspector_Attribute.xml", "UI/EditorInspector_Variable.xml",
+                           "UI/EditorInspector_Style.xml", "UI/EditorInspector_Tags.xml" };
     for (uint i = 0; i < resources.length; ++i)
         xmlResources.Push(cache.GetResource("XMLFile", resources[i]));
 }
@@ -71,6 +67,15 @@ UIElement@ GetNodeContainer()
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateNodeVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteNodeVariable");
     ++componentContainerStartIndex;
+
+    parentContainer.LoadChildXML(xmlResources[TAGS_RES], uiStyle);
+    parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
+    LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+    SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
+    ++componentContainerStartIndex;
+
     return container;
 }
 
@@ -98,6 +103,8 @@ UIElement@ GetUIElementContainer()
 
     elementContainerIndex = parentContainer.numChildren;
     parentContainer.LoadChildXML(xmlResources[ATTRIBUTE_RES], uiStyle);
+    parentContainer.LoadChildXML(xmlResources[TAGS_RES], uiStyle);
+    parentContainer.GetChild("TagsLabel", true).SetFixedWidth(LABEL_WIDTH);
     UIElement@ container = GetContainer(elementContainerIndex);
     container.LoadChildXML(xmlResources[VARIABLE_RES], uiStyle);
     container.LoadChildXML(xmlResources[STYLE_RES], uiStyle);
@@ -109,6 +116,10 @@ UIElement@ GetUIElementContainer()
     SubscribeToEvent(container.GetChild("NewVarDropDown", true), "ItemSelected", "CreateUIElementVariable");
     SubscribeToEvent(container.GetChild("DeleteVarButton", true), "Released", "DeleteUIElementVariable");
     SubscribeToEvent(styleList, "ItemSelected", "HandleStyleItemSelected");
+    LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+    SubscribeToEvent(tagEdit, "TextChanged", "HandleTagsEdit");
+    UIElement@ tagSelect = parentContainer.GetChild("TagsSelect", true);
+    SubscribeToEvent(tagSelect, "Released", "HandleTagsSelect");
     return container;
 }
 
@@ -138,11 +149,6 @@ void CreateAttributeInspectorWindow()
     SubscribeToEvent(attributeInspectorWindow, "LayoutUpdated", "HandleWindowLayoutUpdated");
 }
 
-void HideAttributeInspectorWindow()
-{
-    attributeInspectorWindow.visible = false;
-}
-
 void DisableInspectorLock()
 {
     inspectorLocked = false;
@@ -166,12 +172,26 @@ void ToggleInspectorLock()
         EnableInspectorLock();
 }
 
-bool ShowAttributeInspectorWindow()
+bool ToggleAttributeInspectorWindow()
+{
+    if (attributeInspectorWindow.visible == false)
+        ShowAttributeInspectorWindow();
+    else
+        HideAttributeInspectorWindow();
+    return true;
+}
+
+void ShowAttributeInspectorWindow()
 {
     attributeInspectorWindow.visible = true;
     attributeInspectorWindow.BringToFront();
-    return true;
 }
+
+void HideAttributeInspectorWindow()
+{
+    attributeInspectorWindow.visible = false;
+}
+
 
 /// Handle main window layout updated event by positioning elements that needs manually-positioning (elements that are children of UI-element container with "Free" layout-mode).
 void HandleWindowLayoutUpdated()
@@ -234,9 +254,6 @@ void UpdateAttributeInspector(bool fullUpdate = true)
     if (fullUpdate)
         DeleteAllContainers();
 
-    // Update all ScriptInstances/LuaScriptInstances
-    UpdateScriptInstances();
-
     if (!editNodes.empty)
     {
         UIElement@ container = GetNodeContainer();
@@ -253,6 +270,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
                 idStr = " (ID " + String(editNode.id) + ")";
             nodeType = editNode.typeName;
             nodeTitle.text = nodeType + idStr;
+            LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+            tagEdit.text = Join(editNode.tags, ";");
         }
         else
         {
@@ -318,6 +337,8 @@ void UpdateAttributeInspector(bool fullUpdate = true)
             elementType = editUIElement.typeName;
             titleText.text = elementType + " [ID " + GetUIElementID(editUIElement).ToString() + "]";
             SetStyleListSelection(styleList, editUIElement.style);
+            LineEdit@ tagEdit = parentContainer.GetChild("TagsEdit", true);
+            tagEdit.text = Join(editUIElement.tags, ";");
         }
         else
         {
@@ -366,66 +387,13 @@ void UpdateAttributeInspector(bool fullUpdate = true)
         HandleWindowLayoutUpdated();
 }
 
-void UpdateScriptInstances()
-{
-    Array<Component@>@ components = scene.GetComponents("ScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
-
-    components = scene.GetComponents("LuaScriptInstance", true);
-    for (uint i = 0; i < components.length; i++)
-        UpdateScriptAttributes(components[i]);
-}
-
-String GetComponentAttributeHash(Component@ component, uint index)
-{
-    // We won't consider the main attributes, as they won't reset when an error occurs.
-    if (component.typeName == "ScriptInstance")
-    {
-        if (index <= SCRIPTINSTANCE_ATTRIBUTE_IGNORE)
-            return "";
-    }
-    else
-    {
-        if (index <= LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE)
-            return "";
-    }
-    AttributeInfo attributeInfo = component.attributeInfos[index];
-    Variant attribute = component.attributes[index];
-    return String(component.id) + "-" + attributeInfo.name + "-" + attribute.typeName;
-}
-
-void UpdateScriptAttributes(Component@ component)
-{
-    for (uint i = Min(SCRIPTINSTANCE_ATTRIBUTE_IGNORE, LUASCRIPTINSTANCE_ATTRIBUTE_IGNORE) + 1; i < component.numAttributes; i++)
-    {
-        Variant attribute = component.attributes[i];
-        // Component/node ID's are always unique within a scene, based on a simple increment.
-        // This makes for a simple method of mapping a components attributes unique and consistent.
-        // We will also use the type name in the hash to be able to recall and differentiate type changes.
-        String hash = GetComponentAttributeHash(component, i);
-        if (hash.empty)
-            continue;
-
-        if (!scriptAttributes.Contains(hash))
-        {
-            // set the initial value to the default value.
-            scriptAttributes[hash] = attribute;
-        }
-        else
-        {
-            // recall the previously stored value
-            component.attributes[i] = scriptAttributes[hash];
-        }
-    }
-    component.ApplyAttributes();
-}
-
 /// Update the attribute list of the node container.
 void UpdateNodeAttributes()
 {
     bool fullUpdate = false;
     UpdateAttributes(ToSerializableArray(editNodes), GetNodeContainer().GetChild("AttributeList"), fullUpdate);
+    if (fullUpdate)
+        HandleWindowLayoutUpdated();
 }
 
 /// Update the icons enabled color based on the internal state of the objects.
@@ -553,7 +521,7 @@ void PostEditAttribute(Serializable@ serializable, uint index)
     if (serializable.typeName == "CollisionShape" && serializable.attributeInfos[index].name == "Shape Type")
     {
         int shapeType = serializable.GetAttribute("Shape Type").GetInt();
-        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry NodeID").GetInt() == 0 &&
+        if ((shapeType == 6 || shapeType == 7) && serializable.GetAttribute("CustomGeometry ComponentID").GetInt() == 0 &&
             serializable.GetAttribute("Model").GetResourceRef().name.Trimmed().length == 0)
         {
             Node@ ownerNode = cast<Component>(serializable).node;
@@ -651,6 +619,155 @@ Array<Serializable@>@ GetAttributeEditorTargets(UIElement@ attrEdit)
     return ret;
 }
 
+void HandleTagsEdit(StringHash eventType, VariantMap& eventData)
+{
+    LineEdit@ lineEdit = eventData["Element"].GetPtr();
+    Array<String> tags = lineEdit.text.Split(';');
+    
+    if (editUIElement !is null)
+    {
+        editUIElement.RemoveAllTags();
+        for (uint i = 0; i < tags.length; i++)
+            editUIElement.AddTag(tags[i].Trimmed());
+    }
+    else if (editNode !is null)
+    {
+        editNode.RemoveAllTags();
+        for (uint i = 0; i < tags.length; i++)
+            editNode.AddTag(tags[i].Trimmed());
+    }
+}
+
+void HandleTagsSelect(StringHash eventType, VariantMap& eventData)
+{
+    UIElement@ tagSelect = eventData["Element"].GetPtr();
+    Array<UIElement@> actions;
+    String Indicator = "* ";
+    // In first priority changes to UIElement
+    if (editUIElement !is null)
+    {
+        // 1. Add established tags from current editable UIElement to menu
+        Array<String> elementTags = editUIElement.tags;
+        for (uint i = 0; i < elementTags.length; i++) 
+        {
+            bool isHasTag = editUIElement.HasTag(elementTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + elementTags[i], "HandleTagsMenuSelection", elementTags[i]));
+        }
+
+        // 2. Add default tags
+        Array<String> stdTags = defaultTags.Split(';');
+        for (uint i= 0; i < stdTags.length; i++) 
+        {
+            bool isHasTag = editUIElement.HasTag(stdTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag)
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
+            }
+        }
+    }
+    else if (editNode !is null)
+    {
+        // 1. Add established tags from Node to menu
+        Array<String> nodeTags = editNode.tags;
+        for (uint i = 0; i < nodeTags.length; i++) 
+        {
+            bool isHasTag = editNode.HasTag(nodeTags[i]);
+            String taggedIndicator = (isHasTag ? Indicator : "");
+            actions.Push(CreateContextMenuItem(taggedIndicator + nodeTags[i], "HandleTagsMenuSelection", nodeTags[i]));
+        }
+
+        Array<String> sceneTags = editorScene.tags;
+        // 2. Add tags from Scene.tags (In this scenario Scene.tags used as storage for frequently used tags in current Scene only)
+        for (uint i = 0; i < sceneTags.length; i++)
+        {
+            bool isHasTag = editNode.HasTag(sceneTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag)
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + sceneTags[i], "HandleTagsMenuSelection", sceneTags[i]));
+            }
+        }
+
+        // 3. Add default tags
+        Array<String> stdTags = defaultTags.Split(';');
+        for (uint i = 0; i < stdTags.length; i++)
+        {
+            bool isHasTag = editNode.HasTag(stdTags[i]);
+            // Add this tag into menu if only Node not tadded with it yet, otherwise it showed on step 1.
+            if (!isHasTag)
+            {
+                String taggedIndicator = (isHasTag ? Indicator : "");
+                actions.Push(CreateContextMenuItem(taggedIndicator + stdTags[i], "HandleTagsMenuSelection", stdTags[i]));
+            }
+        }
+    }
+    
+    // if any action has been added, add also Reset and Cancel and show menu
+    if (actions.length > 0)
+    {
+        actions.Push(CreateContextMenuItem("Reset", "HandleTagsMenuSelection", "Reset"));
+        actions.Push(CreateContextMenuItem("Cancel", "HandleTagsMenuSelectionDivisor"));
+        ActivateContextMenu(actions);
+    }
+    
+}
+void HandleTagsMenuSelectionDivisor()
+{
+    //do nothing
+}
+void HandleTagsMenuSelection() 
+{
+    Menu@ menu = GetEventSender();
+    if (menu is null)
+        return;
+
+    String menuSelectedTag = menu.name;
+
+    // In first priority changes to UIElement
+    if (editUIElement !is null)
+    {
+        if (menuSelectedTag == "Reset")
+        {
+            editUIElement.RemoveAllTags();
+            UpdateAttributeInspector();
+            return;
+        }
+        
+        if (!editUIElement.HasTag(menuSelectedTag))
+        {
+            editUIElement.AddTag(menuSelectedTag.Trimmed());
+        }
+        else
+        {
+            editUIElement.RemoveTag(menuSelectedTag.Trimmed());
+        }
+    }
+    else if (editNode !is null)
+    {
+        if (menuSelectedTag == "Reset")
+        {
+            editNode.RemoveAllTags();
+            UpdateAttributeInspector();
+            return;
+        }
+
+        if (!editNode.HasTag(menuSelectedTag))
+        {
+            editNode.AddTag(menuSelectedTag.Trimmed());
+        }
+        else
+        {
+            editNode.RemoveTag(menuSelectedTag.Trimmed());
+        }
+    }
+
+    UpdateAttributeInspector();
+}
+
 /// Handle reset to default event, sent when reset icon in the icon-panel is clicked.
 void HandleResetToDefault(StringHash eventType, VariantMap& eventData)
 {
@@ -729,8 +846,6 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
     if (delName.empty)
         return;
 
-    // Note: intentionally do not unregister the variable name here as the same variable name may still be used by other attribute list
-
     bool erased = false;
     for (uint i = 0; i < editNodes.length; ++i)
     {
@@ -738,7 +853,27 @@ void DeleteNodeVariable(StringHash eventType, VariantMap& eventData)
         erased = editNodes[i].vars.Erase(delName) || erased;
     }
     if (erased)
+    {
         attributesDirty = true;
+        // If the attribute is not defined in any other node, unregister from the scene
+        // to prevent it from being unnecessarily saved; the global var list will still hold it
+        // to keep the hash-name mapping known in case it's in use in other scenes
+        Array<Node@>@ allChildren = editorScene.GetChildren(true);
+        StringHash delNameHash(delName);
+        bool inUse = false;
+
+        for (uint i = 0; i < allChildren.length; ++i)
+        {
+            if (allChildren[i].vars.Contains(delNameHash))
+            {
+                inUse = true;
+                break;
+            }
+        }
+        
+        if (!inUse)
+            editorScene.UnregisterVar(delName);
+    }
 }
 
 /// Handle create new user-defined variable event for ui-element target.

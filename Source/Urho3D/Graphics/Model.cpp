@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
+#include "../IO/File.h"
 
 #include "../DebugNew.h"
 
@@ -73,11 +74,14 @@ void Model::RegisterObject(Context* context)
 bool Model::BeginLoad(Deserializer& source)
 {
     // Check ID
-    if (source.ReadFileID() != "UMDL")
+    String fileID = source.ReadFileID();
+    if (fileID != "UMDL" && fileID != "UMD2")
     {
-        LOGERROR(source.GetName() + " is not a valid model file");
+        URHO3D_LOGERROR(source.GetName() + " is not a valid model file");
         return false;
     }
+
+    bool hasVertexDeclarations = (fileID == "UMD2");
 
     geometries_.Clear();
     geometryBoneMappings_.Clear();
@@ -97,35 +101,53 @@ bool Model::BeginLoad(Deserializer& source)
     loadVBData_.Resize(numVertexBuffers);
     for (unsigned i = 0; i < numVertexBuffers; ++i)
     {
-        unsigned vertexCount = source.ReadUInt();
-        unsigned elementMask = source.ReadUInt();
+        VertexBufferDesc& desc = loadVBData_[i];
+
+        desc.vertexCount_ = source.ReadUInt();
+        if (!hasVertexDeclarations)
+        {
+            unsigned elementMask = source.ReadUInt();
+            desc.vertexElements_ = VertexBuffer::GetElements(elementMask);
+        }
+        else
+        {
+            desc.vertexElements_.Clear();
+            unsigned numElements = source.ReadUInt();
+            for (unsigned j = 0; j < numElements; ++j)
+            {
+                unsigned elementDesc = source.ReadUInt();
+                VertexElementType type = (VertexElementType)(elementDesc & 0xff);
+                VertexElementSemantic semantic = (VertexElementSemantic)((elementDesc >> 8) & 0xff);
+                unsigned char index = (unsigned char)((elementDesc >> 16) & 0xff);
+                desc.vertexElements_.Push(VertexElement(type, semantic, index));
+            }
+        }
+
         morphRangeStarts_[i] = source.ReadUInt();
         morphRangeCounts_[i] = source.ReadUInt();
 
         SharedPtr<VertexBuffer> buffer(new VertexBuffer(context_));
-        unsigned vertexSize = VertexBuffer::GetVertexSize(elementMask);
+        unsigned vertexSize = VertexBuffer::GetVertexSize(desc.vertexElements_);
+        desc.dataSize_ = desc.vertexCount_ * vertexSize;
 
         // Prepare vertex buffer data to be uploaded during EndLoad()
         if (async)
         {
-            loadVBData_[i].vertexCount_ = vertexCount;
-            loadVBData_[i].elementMask_ = elementMask;
-            loadVBData_[i].dataSize_ = vertexCount * vertexSize;
-            loadVBData_[i].data_ = new unsigned char[loadVBData_[i].dataSize_];
-            source.Read(loadVBData_[i].data_.Get(), loadVBData_[i].dataSize_);
+            desc.data_ = new unsigned char[desc.dataSize_];
+            source.Read(desc.data_.Get(), desc.dataSize_);
         }
         else
         {
             // If not async loading, use locking to avoid extra allocation & copy
-            loadVBData_[i].data_.Reset(); // Make sure no previous data
+            desc.data_.Reset(); // Make sure no previous data
             buffer->SetShadowed(true);
-            buffer->SetSize(vertexCount, elementMask);
-            void* dest = buffer->Lock(0, vertexCount);
-            source.Read(dest, vertexCount * vertexSize);
+            buffer->SetSize(desc.vertexCount_, desc.vertexElements_);
+            void* dest = buffer->Lock(0, desc.vertexCount_);
+            source.Read(dest, desc.vertexCount_ * vertexSize);
             buffer->Unlock();
         }
 
-        memoryUse += sizeof(VertexBuffer) + vertexCount * vertexSize;
+        memoryUse += sizeof(VertexBuffer) + desc.vertexCount_ * vertexSize;
         vertexBuffers_.Push(buffer);
     }
 
@@ -196,7 +218,7 @@ bool Model::BeginLoad(Deserializer& source)
 
             if (vbRef >= vertexBuffers_.Size())
             {
-                LOGERROR("Vertex buffer index out of bounds");
+                URHO3D_LOGERROR("Vertex buffer index out of bounds");
                 loadVBData_.Clear();
                 loadIBData_.Clear();
                 loadGeometries_.Clear();
@@ -204,7 +226,7 @@ bool Model::BeginLoad(Deserializer& source)
             }
             if (ibRef >= indexBuffers_.Size())
             {
-                LOGERROR("Index buffer index out of bounds");
+                URHO3D_LOGERROR("Index buffer index out of bounds");
                 loadVBData_.Clear();
                 loadIBData_.Clear();
                 loadGeometries_.Clear();
@@ -298,7 +320,7 @@ bool Model::EndLoad()
         if (desc.data_)
         {
             buffer->SetShadowed(true);
-            buffer->SetSize(desc.vertexCount_, desc.elementMask_);
+            buffer->SetSize(desc.vertexCount_, desc.vertexElements_);
             buffer->SetData(desc.data_.Get());
         }
     }
@@ -338,7 +360,7 @@ bool Model::EndLoad()
 bool Model::Save(Serializer& dest) const
 {
     // Write ID
-    if (!dest.WriteFileID("UMDL"))
+    if (!dest.WriteFileID("UMD2"))
         return false;
 
     // Write vertex buffers
@@ -347,7 +369,15 @@ bool Model::Save(Serializer& dest) const
     {
         VertexBuffer* buffer = vertexBuffers_[i];
         dest.WriteUInt(buffer->GetVertexCount());
-        dest.WriteUInt(buffer->GetElementMask());
+        const PODVector<VertexElement>& elements = buffer->GetElements();
+        dest.WriteUInt(elements.Size());
+        for (unsigned j = 0; j < elements.Size(); ++j)
+        {
+            unsigned elementDesc = ((unsigned)elements[j].type_) |
+                (((unsigned)elements[j].semantic_) << 8) |
+                (((unsigned)elements[j].index_) << 16);
+            dest.WriteUInt(elementDesc);
+        }
         dest.WriteUInt(morphRangeStarts_[i]);
         dest.WriteUInt(morphRangeCounts_[i]);
         dest.Write(buffer->GetShadowData(), buffer->GetVertexCount() * buffer->GetVertexSize());
@@ -438,12 +468,12 @@ bool Model::SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, co
     {
         if (!buffers[i])
         {
-            LOGERROR("Null model vertex buffers specified");
+            URHO3D_LOGERROR("Null model vertex buffers specified");
             return false;
         }
         if (!buffers[i]->IsShadowed())
         {
-            LOGERROR("Model vertex buffers must be shadowed");
+            URHO3D_LOGERROR("Model vertex buffers must be shadowed");
             return false;
         }
     }
@@ -468,12 +498,12 @@ bool Model::SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers)
     {
         if (!buffers[i])
         {
-            LOGERROR("Null model index buffers specified");
+            URHO3D_LOGERROR("Null model index buffers specified");
             return false;
         }
         if (!buffers[i]->IsShadowed())
         {
-            LOGERROR("Model index buffers must be shadowed");
+            URHO3D_LOGERROR("Model index buffers must be shadowed");
             return false;
         }
     }
@@ -500,12 +530,12 @@ bool Model::SetNumGeometryLodLevels(unsigned index, unsigned num)
 {
     if (index >= geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return false;
     }
     if (!num)
     {
-        LOGERROR("Zero LOD levels not allowed");
+        URHO3D_LOGERROR("Zero LOD levels not allowed");
         return false;
     }
 
@@ -517,12 +547,12 @@ bool Model::SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
 {
     if (index >= geometries_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return false;
     }
     if (lodLevel >= geometries_[index].Size())
     {
-        LOGERROR("LOD level index out of bounds");
+        URHO3D_LOGERROR("LOD level index out of bounds");
         return false;
     }
 
@@ -534,7 +564,7 @@ bool Model::SetGeometryCenter(unsigned index, const Vector3& center)
 {
     if (index >= geometryCenters_.Size())
     {
-        LOGERROR("Geometry index out of bounds");
+        URHO3D_LOGERROR("Geometry index out of bounds");
         return false;
     }
 
@@ -590,7 +620,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
                 if (origData)
                     cloneBuffer->SetData(origData);
                 else
-                    LOGERROR("Failed to lock original vertex buffer for copying");
+                    URHO3D_LOGERROR("Failed to lock original vertex buffer for copying");
             }
             vbMapping[origBuffer] = cloneBuffer;
         }
@@ -618,7 +648,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
                 if (origData)
                     cloneBuffer->SetData(origData);
                 else
-                    LOGERROR("Failed to lock original index buffer for copying");
+                    URHO3D_LOGERROR("Failed to lock original index buffer for copying");
             }
             ibMapping[origBuffer] = cloneBuffer;
         }
@@ -643,8 +673,7 @@ SharedPtr<Model> Model::Clone(const String& cloneName) const
                 unsigned numVbs = origGeometry->GetNumVertexBuffers();
                 for (unsigned k = 0; k < numVbs; ++k)
                 {
-                    cloneGeometry->SetVertexBuffer(k, vbMapping[origGeometry->GetVertexBuffer(k)],
-                        origGeometry->GetVertexElementMask(k));
+                    cloneGeometry->SetVertexBuffer(k, vbMapping[origGeometry->GetVertexBuffer(k)]);
                 }
                 cloneGeometry->SetDrawRange(origGeometry->GetPrimitiveType(), origGeometry->GetIndexStart(),
                     origGeometry->GetIndexCount(), origGeometry->GetVertexStart(), origGeometry->GetVertexCount(), false);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ class VertexBuffer;
 /// Custom geometry component.
 class URHO3D_API CustomGeometry : public Drawable
 {
-    OBJECT(CustomGeometry, Drawable);
+    URHO3D_OBJECT(CustomGeometry, Drawable);
 
 public:
     /// Construct.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 #include <Urho3D/DebugNew.h>
 
 // Expands to this example's entry-point
-DEFINE_APPLICATION_MAIN(ConsoleInput)
+URHO3D_DEFINE_APPLICATION_MAIN(ConsoleInput)
 
 // Hunger level descriptions
 String hungerLevels[] = {
@@ -65,11 +65,12 @@ void ConsoleInput::Start()
     Sample::Start();
 
     // Subscribe to console commands and the frame update
-    SubscribeToEvent(E_CONSOLECOMMAND, HANDLER(ConsoleInput, HandleConsoleCommand));
-    SubscribeToEvent(E_UPDATE, HANDLER(ConsoleInput, HandleUpdate));
+    SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(ConsoleInput, HandleConsoleCommand));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(ConsoleInput, HandleUpdate));
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(ConsoleInput, HandleEscKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(ConsoleInput, HandleEscKeyDown));
+    UnsubscribeFromEvent(E_KEYUP);
 
     // Hide logo to make room for the console
     SetLogoVisible(false);
@@ -85,6 +86,9 @@ void ConsoleInput::Start()
 
     // Show OS mouse cursor
     GetSubsystem<Input>()->SetMouseVisible(true);
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 
     // Open the operating system console window (for stdin / stdout) if not open yet
     OpenConsoleWindow();
@@ -114,7 +118,7 @@ void ConsoleInput::HandleUpdate(StringHash eventType, VariantMap& eventData)
 void ConsoleInput::HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if (eventData[KeyDown::P_KEY].GetInt() == KEY_ESC)
+    if (eventData[KeyDown::P_KEY].GetInt() == KEY_ESCAPE && GetPlatform() != "Web")
         engine_->Exit();
 }
 
@@ -269,5 +273,5 @@ void ConsoleInput::HandleInput(const String& input)
 void ConsoleInput::Print(const String& output)
 {
     // Logging appears both in the engine console and stdout
-    LOGRAW(output + "\n");
+    URHO3D_LOGRAW(output + "\n");
 }

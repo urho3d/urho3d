@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ public:
         return *this;
     }
 
-    // Test for equality with another hash.
+    /// Test for equality with another hash.
     bool operator ==(const StringHash& rhs) const { return value_ == rhs.value_; }
 
     /// Test for inequality with another hash.

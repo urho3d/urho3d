@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -197,6 +197,8 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     rotationEnd_ = ReadFloat(rootElem, "rotationEnd");
     rotationEndVariance_ = ReadFloat(rootElem, "rotationEndVariance");
 
+    // Note: not accurate
+    SetMemoryUse(source.GetSize());
     return true;
 }
 
@@ -208,7 +210,7 @@ bool ParticleEffect2D::EndLoad()
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
         if (!sprite_)
-            LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
+            URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
 
         loadSpriteName_.Clear();
     }

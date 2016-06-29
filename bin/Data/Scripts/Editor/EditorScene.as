@@ -83,9 +83,6 @@ bool ResetScene()
     }
     else
         messageBoxCallback = null;
-        
-    // Clear stored script attributes
-    scriptAttributes.Clear();
 
     suppressSceneChanges = true;
 
@@ -200,9 +197,6 @@ bool LoadScene(const String&in fileName)
         MessageBox("Could not open file.\n" + fileName);
         return false;
     }
-    
-    // Reset stored script attributes.
-    scriptAttributes.Clear();
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -216,10 +210,12 @@ bool LoadScene(const String&in fileName)
 
     String extension = GetExtension(fileName);
     bool loaded;
-    if (extension != ".xml")
-        loaded = editorScene.Load(file);
-    else
+    if (extension == ".xml")
         loaded = editorScene.LoadXML(file);
+    else if (extension == ".json")
+        loaded = editorScene.LoadJSON(file);
+    else
+        loaded = editorScene.Load(file);
 
     // Release resources which are not used by the new scene
     cache.ReleaseAllResources(false);
@@ -246,9 +242,6 @@ bool LoadScene(const String&in fileName)
     CreateGrid();
     SetActiveViewport(viewports[0]);
 
-    // Store all ScriptInstance and LuaScriptInstance attributes
-    UpdateScriptInstances();
-
     return loaded;
 }
 
@@ -265,7 +258,13 @@ bool SaveScene(const String&in fileName)
     MakeBackup(fileName);
     File file(fileName, FILE_WRITE);
     String extension = GetExtension(fileName);
-    bool success = (extension != ".xml" ? editorScene.Save(file) : editorScene.SaveXML(file));
+    bool success;
+    if (extension == ".xml")
+        success = editorScene.SaveXML(file);
+    else if (extension == ".json")
+        success = editorScene.SaveJSON(file);
+    else
+        success = editorScene.Save(file);
     RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
@@ -290,14 +289,14 @@ bool SaveSceneWithExistingName()
         return SaveScene(editorScene.fileName);
 }
 
-Node@ CreateNode(CreateMode mode)
+Node@ CreateNode(CreateMode mode, bool raycastToMouse = false)
 {
     Node@ newNode = null;
     if (editNode !is null)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    newNode.worldPosition = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition(raycastToMouse);
 
     // Create an undo action for the create
     CreateNodeAction action;
@@ -353,7 +352,7 @@ void CreateLoadedComponent(Component@ component)
     FocusComponent(component);
 }
 
-Node@ LoadNode(const String&in fileName, Node@ parent = null)
+Node@ LoadNode(const String&in fileName, Node@ parent = null, bool raycastToMouse = false)
 {
     if (fileName.empty)
         return null;
@@ -376,11 +375,7 @@ Node@ LoadNode(const String&in fileName, Node@ parent = null)
     // Before instantiating, add object's resource path if necessary
     SetResourcePath(GetPath(fileName), true, true);
 
-    Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
-    Vector3 position, normal;
-    GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
-
-    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, parent, instantiateMode);
+    Node@ newNode = InstantiateNodeFromFile(file, GetNewNodePosition(raycastToMouse), Quaternion(), 1, parent, instantiateMode);
     if (newNode !is null)
     {
         FocusNode(newNode);
@@ -400,10 +395,12 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     suppressSceneChanges = true;
 
     String extension = GetExtension(file.name);
-    if (extension != ".xml")
-        newNode = editorScene.Instantiate(file, position, rotation, mode);
-    else
+    if (extension == ".xml")
         newNode = editorScene.InstantiateXML(file, position, rotation, mode);
+    else if (extension == ".json")
+        newNode = editorScene.InstantiateJSON(file, position, rotation, mode);
+    else
+        newNode = editorScene.Instantiate(file, position, rotation, mode);
 
     suppressSceneChanges = false;
 
@@ -413,17 +410,8 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
-        if (alignToAABBBottom)
-        {
-            Drawable@ drawable = GetFirstDrawable(newNode);
-            if (drawable !is null)
-            {
-                BoundingBox aabb = drawable.worldBoundingBox;
-                Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
-                Vector3 offset = aabbBottomCenter - newNode.worldPosition;
-                newNode.worldPosition = newNode.worldPosition - offset;
-            }
-        }
+        
+        AdjustNodePositionByAABB(newNode);
 
         // Create an undo action for the load
         CreateNodeAction action;
@@ -438,6 +426,21 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     }
 
     return newNode;
+}
+
+void AdjustNodePositionByAABB(Node@ newNode)
+{
+    if (alignToAABBBottom)
+    {
+        Drawable@ drawable = GetFirstDrawable(newNode);
+        if (drawable !is null)
+        {
+            BoundingBox aabb = drawable.worldBoundingBox;
+            Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+            Vector3 offset = aabbBottomCenter - newNode.worldPosition;
+            newNode.worldPosition = newNode.worldPosition - offset;
+        }
+    }
 }
 
 bool SaveNode(const String&in fileName)
@@ -456,7 +459,13 @@ bool SaveNode(const String&in fileName)
     }
 
     String extension = GetExtension(fileName);
-    bool success = (extension != ".xml" ? editNode.Save(file) : editNode.SaveXML(file));
+    bool success;
+    if (extension == ".xml")
+        success = editNode.SaveXML(file);
+    else if (extension == ".json")
+        success = editNode.SaveJSON(file);
+    else
+        success = editNode.Save(file);
     RemoveBackup(success, fileName);
 
     if (success)
@@ -484,7 +493,7 @@ void StopSceneUpdate()
     {
         suppressSceneChanges = true;
         editorScene.Clear();
-        editorScene.LoadXML(revertData.GetRoot());
+        editorScene.LoadXML(revertData.root);
         CreateGrid();
         UpdateHierarchyItem(editorScene, true);
         ClearEditActions();
@@ -633,7 +642,7 @@ bool SceneCopy()
             sceneCopyBuffer.Push(xml);
         }
     }
-    // Copy nodes.
+    // Copy nodes
     else
     {
         for (uint i = 0; i < selectedNodes.length; ++i)
@@ -693,8 +702,8 @@ bool ScenePaste(bool pasteRoot = false, bool duplication = false)
                 newNode = editorScene.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
             else
             {
-                // If we are duplicating, paste into the selected nodes parent
-                if (duplication)
+                // If we are duplicating or have the original node selected, paste into the selected nodes parent
+                if (duplication || editNode is null || editNode.id == rootElem.GetUInt("id"))
                 {
                     if (editNode !is null && editNode.parent !is null)
                         newNode = editNode.parent.CreateChild("", rootElem.GetBool("local") ? LOCAL : REPLICATED);
@@ -1237,10 +1246,10 @@ bool SceneRenderZoneCubemaps()
     Array<Zone@> capturedThisCall;
     bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
     
-    for (int i = 0; i < selectedNodes.length; ++i)
+    for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
-        for (int z = 0; z < zones.length; ++z)
+        for (uint z = 0; z < zones.length; ++z)
         {
             Zone@ zone = cast<Zone>(zones[z]);
             if (zone !is null)
@@ -1251,7 +1260,7 @@ bool SceneRenderZoneCubemaps()
         }
     }
     
-    for (int i = 0; i < selectedComponents.length; ++i)
+    for (uint i = 0; i < selectedComponents.length; ++i)
     {
         Zone@ zone = cast<Zone>(selectedComponents[i]);
         if (zone !is null)
@@ -1425,6 +1434,8 @@ void CreateModelWithStaticModel(String filepath, Node@ parent)
 
     StaticModel@ staticModel = parent.GetOrCreateComponent("StaticModel");
     staticModel.model = model;
+    if (applyMaterialList)
+        staticModel.ApplyMaterialList();
     CreateLoadedComponent(staticModel);
 }
 
@@ -1442,6 +1453,8 @@ void CreateModelWithAnimatedModel(String filepath, Node@ parent)
 
     AnimatedModel@ animatedModel = parent.GetOrCreateComponent("AnimatedModel");
     animatedModel.model = model;
+    if (applyMaterialList)
+        animatedModel.ApplyMaterialList();
     CreateLoadedComponent(animatedModel);
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ class Slider;
 ///     - Controlling sound and music master volume
 class SoundEffects : public Sample
 {
-    OBJECT(SoundEffects, Sample);
+    URHO3D_OBJECT(SoundEffects, Sample);
 
 public:
     /// Construct.
@@ -80,6 +80,8 @@ private:
     void HandleSoundVolume(StringHash eventType, VariantMap& eventData);
     /// Handle music volume slider change.
     void HandleMusicVolume(StringHash eventType, VariantMap& eventData);
+    /// Handle sound effect finished.
+    void HandleSoundFinished(StringHash eventType, VariantMap& eventData);
 };
 
 

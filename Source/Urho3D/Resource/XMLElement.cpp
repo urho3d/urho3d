@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -820,7 +820,7 @@ ResourceRefList XMLElement::GetResourceRefList() const
 {
     ResourceRefList ret;
 
-    Vector<String> values = GetAttribute("value").Split(';');
+    Vector<String> values = GetAttribute("value").Split(';', true);
     if (values.Size() >= 1)
     {
         ret.type_ = values[0];
@@ -867,8 +867,12 @@ VariantMap XMLElement::GetVariantMap() const
     XMLElement variantElem = GetChild("variant");
     while (variantElem)
     {
-        StringHash key(variantElem.GetUInt("hash"));
-        ret[key] = variantElem.GetVariant();
+        // If this is a manually edited map, user can not be expected to calculate hashes manually. Also accept "name" attribute
+        if (variantElem.HasAttribute("name"))
+            ret[StringHash(variantElem.GetAttribute("name"))] = variantElem.GetVariant();
+        else if (variantElem.HasAttribute("hash"))
+            ret[StringHash(variantElem.GetUInt("hash"))] = variantElem.GetVariant();
+
         variantElem = variantElem.GetNext("variant");
     }
 
@@ -964,7 +968,7 @@ XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
 XMLElement XPathResultSet::operator [](unsigned index) const
 {
     if (!resultSet_)
-        LOGERRORF(
+        URHO3D_LOGERRORF(
             "Could not return result at index: %u. Most probably this is caused by the XPathResultSet not being stored in a lhs variable.",
             index);
 

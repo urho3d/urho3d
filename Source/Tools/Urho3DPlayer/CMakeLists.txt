@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,10 @@ if (URHO3D_LUA)
 endif ()
 
 # Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
-if (NOT IOS AND NOT ANDROID AND NOT EMSCRIPTEN AND NOT CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+if (NOT IOS AND NOT ANDROID AND NOT WEB AND NOT CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Ensure the output directory exist before creating the symlinks
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    foreach (FILE Editor NinjaSnowWar)
+    foreach (FILE Editor NinjaSnowWar PBRDemo)
         create_symlink (${CMAKE_SOURCE_DIR}/bin/${FILE}${SCRIPT_EXT} ${CMAKE_BINARY_DIR}/bin/${FILE}${SCRIPT_EXT} FALLBACK_TO_COPY)
     endforeach ()
 endif ()

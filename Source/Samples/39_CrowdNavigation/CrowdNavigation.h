@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ class Scene;
 ///     - Using agents to simulate moving obstacles
 class CrowdNavigation : public Sample
 {
-    OBJECT(CrowdNavigation, Sample);
+    URHO3D_OBJECT(CrowdNavigation, Sample);
 
 public:
     /// Construct.
@@ -74,7 +74,7 @@ protected:
         "                <attribute name=\"Horiz Alignment\" value=\"Center\" />"
         "                <attribute name=\"Vert Alignment\" value=\"Center\" />"
         "                <attribute name=\"Color\" value=\"0 0 0 1\" />"
-        "                <attribute name=\"Text\" value=\"Teleport\" />"
+        "                <attribute name=\"Text\" value=\"Spawn\" />"
         "            </element>"
         "            <element type=\"Text\">"
         "                <attribute name=\"Name\" value=\"KeyBinding\" />"

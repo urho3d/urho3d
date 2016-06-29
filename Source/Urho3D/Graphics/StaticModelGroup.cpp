@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 #include "../Graphics/OcclusionBuffer.h"
 #include "../Graphics/OctreeQuery.h"
 #include "../Graphics/StaticModelGroup.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../Scene/Scene.h"
 
 #include "../DebugNew.h"
@@ -55,8 +56,8 @@ void StaticModelGroup::RegisterObject(Context* context)
 {
     context->RegisterFactory<StaticModelGroup>(GEOMETRY_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(StaticModel);
-    ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector,
+    URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
+    URHO3D_ACCESSOR_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr, VariantVector, Variant::emptyVariantVector,
         AM_DEFAULT | AM_NODEIDVECTOR);
 }
 
@@ -246,18 +247,18 @@ bool StaticModelGroup::DrawOcclusion(OcclusionBuffer* buffer)
             unsigned vertexSize;
             const unsigned char* indexData;
             unsigned indexSize;
-            unsigned elementMask;
+            const PODVector<VertexElement>* elements;
 
-            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+            geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
             // Check for valid geometry data
-            if (!vertexData || !indexData)
+            if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
                 continue;
 
             unsigned indexStart = geometry->GetIndexStart();
             unsigned indexCount = geometry->GetIndexCount();
 
             // Draw and check for running out of triangles
-            if (!buffer->Draw(worldTransforms_[i], vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
+            if (!buffer->AddTriangles(worldTransforms_[i], vertexData, vertexSize, indexData, indexSize, indexStart, indexCount))
                 return false;
         }
     }

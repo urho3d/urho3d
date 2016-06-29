@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -161,7 +161,7 @@ DirectFB_WM_RedrawLayout(_THIS, SDL_Window * window)
                y, w - 2 * d);
 
     /* Caption */
-    if (window->title) {
+    if (*window->title) {
         s->SetColor(s, COLOR_EXPAND(t->font_color));
         DrawCraption(_this, s, (x - w) / 2, t->top_size + d, window->title);
     }

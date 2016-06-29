@@ -1,4 +1,4 @@
-// Modified by Lasse Oorni for Urho3D
+// Modified by Lasse Oorni and cosmy1 for Urho3D
 
 #include "DetourTileCache.h"
 #include "DetourTileCacheBuilder.h"
@@ -79,6 +79,10 @@ dtTileCache::dtTileCache() :
 	m_nupdate(0)
 {
 	memset(&m_params, 0, sizeof(m_params));
+
+	// Urho3D: initialize all class members
+	memset(&m_reqs, 0, sizeof(m_reqs));
+	memset(&m_update, 0, sizeof(m_update));
 }
 	
 dtTileCache::~dtTileCache()

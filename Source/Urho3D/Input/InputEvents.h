@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,192 +33,191 @@ namespace Urho3D
 {
 
 /// Mouse button pressed.
-EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
+URHO3D_EVENT(E_MOUSEBUTTONDOWN, MouseButtonDown)
 {
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse button released.
-EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
+URHO3D_EVENT(E_MOUSEBUTTONUP, MouseButtonUp)
 {
-    PARAM(P_BUTTON, Button);                // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse moved.
-EVENT(E_MOUSEMOVE, MouseMove)
+URHO3D_EVENT(E_MOUSEMOVE, MouseMove)
 {
-    PARAM(P_X, X);                          // int (only when mouse visible)
-    PARAM(P_Y, Y);                          // int (only when mouse visible)
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_X, X);                          // int (only when mouse visible)
+    URHO3D_PARAM(P_Y, Y);                          // int (only when mouse visible)
+    URHO3D_PARAM(P_DX, DX);                        // int
+    URHO3D_PARAM(P_DY, DY);                        // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Mouse wheel moved.
-EVENT(E_MOUSEWHEEL, MouseWheel)
+URHO3D_EVENT(E_MOUSEWHEEL, MouseWheel)
 {
-    PARAM(P_WHEEL, Wheel);                  // int
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_WHEEL, Wheel);                  // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Key pressed.
-EVENT(E_KEYDOWN, KeyDown)
+URHO3D_EVENT(E_KEYDOWN, KeyDown)
 {
-    PARAM(P_KEY, Key);                      // int
-    PARAM(P_SCANCODE, Scancode);            // int
-    PARAM(P_RAW, Raw);                      // uint
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
-    PARAM(P_REPEAT, Repeat);                // bool
+    URHO3D_PARAM(P_KEY, Key);                      // int
+    URHO3D_PARAM(P_SCANCODE, Scancode);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_REPEAT, Repeat);                // bool
 }
 
 /// Key released.
-EVENT(E_KEYUP, KeyUp)
+URHO3D_EVENT(E_KEYUP, KeyUp)
 {
-    PARAM(P_KEY, Key);                      // int
-    PARAM(P_SCANCODE, Scancode);            // int
-    PARAM(P_RAW, Raw);                      // uint
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_KEY, Key);                      // int
+    URHO3D_PARAM(P_SCANCODE, Scancode);            // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Text input event.
-EVENT(E_TEXTINPUT, TextInput)
+URHO3D_EVENT(E_TEXTINPUT, TextInput)
 {
-    PARAM(P_TEXT, Text);                    // String
-    PARAM(P_BUTTONS, Buttons);              // int
-    PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_TEXT, Text);                    // String
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
 /// Joystick connected.
-EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
+URHO3D_EVENT(E_JOYSTICKCONNECTED, JoystickConnected)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
 /// Joystick disconnected.
-EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
+URHO3D_EVENT(E_JOYSTICKDISCONNECTED, JoystickDisconnected)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
 }
 
 /// Joystick button pressed.
-EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
+URHO3D_EVENT(E_JOYSTICKBUTTONDOWN, JoystickButtonDown)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
-    PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick button released.
-EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
+URHO3D_EVENT(E_JOYSTICKBUTTONUP, JoystickButtonUp)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
-    PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
 }
 
 /// Joystick axis moved.
-EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
+URHO3D_EVENT(E_JOYSTICKAXISMOVE, JoystickAxisMove)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
-    PARAM(P_AXIS, Button);                  // int
-    PARAM(P_POSITION, Position);            // float
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_AXIS, Button);                  // int
+    URHO3D_PARAM(P_POSITION, Position);            // float
 }
 
 /// Joystick POV hat moved.
-EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
+URHO3D_EVENT(E_JOYSTICKHATMOVE, JoystickHatMove)
 {
-    PARAM(P_JOYSTICKID, JoystickID);        // int
-    PARAM(P_HAT, Button);                   // int
-    PARAM(P_POSITION, Position);            // int
+    URHO3D_PARAM(P_JOYSTICKID, JoystickID);        // int
+    URHO3D_PARAM(P_HAT, Button);                   // int
+    URHO3D_PARAM(P_POSITION, Position);            // int
 }
 
 /// Finger pressed on the screen.
-EVENT(E_TOUCHBEGIN, TouchBegin)
+URHO3D_EVENT(E_TOUCHBEGIN, TouchBegin)
 {
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_PRESSURE, Pressure);            // float
+    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// Finger released from the screen.
-EVENT(E_TOUCHEND, TouchEnd)
+URHO3D_EVENT(E_TOUCHEND, TouchEnd)
 {
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
 }
 
 /// Finger moved on the screen.
-EVENT(E_TOUCHMOVE, TouchMove)
+URHO3D_EVENT(E_TOUCHMOVE, TouchMove)
 {
-    PARAM(P_TOUCHID, TouchID);              // int
-    PARAM(P_X, X);                          // int
-    PARAM(P_Y, Y);                          // int
-    PARAM(P_DX, DX);                        // int
-    PARAM(P_DY, DY);                        // int
-    PARAM(P_PRESSURE, Pressure);            // float
+    URHO3D_PARAM(P_TOUCHID, TouchID);              // int
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_DX, DX);                        // int
+    URHO3D_PARAM(P_DY, DY);                        // int
+    URHO3D_PARAM(P_PRESSURE, Pressure);            // float
 }
 
 /// A touch gesture finished recording.
-EVENT(E_GESTURERECORDED, GestureRecorded)
+URHO3D_EVENT(E_GESTURERECORDED, GestureRecorded)
 {
-    PARAM(P_GESTUREID, GestureID);          // unsigned
+    URHO3D_PARAM(P_GESTUREID, GestureID);          // unsigned
 }
 
 /// A recognized touch gesture was input by the user.
-EVENT(E_GESTUREINPUT, GestureInput)
+URHO3D_EVENT(E_GESTUREINPUT, GestureInput)
 {
-    PARAM(P_GESTUREID, GestureID);          // unsigned
-    PARAM(P_CENTERX, CenterX);              // int
-    PARAM(P_CENTERY, CenterY);              // int
-    PARAM(P_NUMFINGERS, NumFingers);        // int
-    PARAM(P_ERROR, Error);                  // float
+    URHO3D_PARAM(P_GESTUREID, GestureID);          // unsigned
+    URHO3D_PARAM(P_CENTERX, CenterX);              // int
+    URHO3D_PARAM(P_CENTERY, CenterY);              // int
+    URHO3D_PARAM(P_NUMFINGERS, NumFingers);        // int
+    URHO3D_PARAM(P_ERROR, Error);                  // float
 }
 
 /// Pinch/rotate multi-finger touch gesture motion update.
-EVENT(E_MULTIGESTURE, MultiGesture)
+URHO3D_EVENT(E_MULTIGESTURE, MultiGesture)
 {
-    PARAM(P_CENTERX, CenterX);              // int
-    PARAM(P_CENTERY, CenterY);              // int
-    PARAM(P_NUMFINGERS, NumFingers);        // int
-    PARAM(P_DTHETA, DTheta);                // float (degrees)
-    PARAM(P_DDIST, DDist);                  // float
+    URHO3D_PARAM(P_CENTERX, CenterX);              // int
+    URHO3D_PARAM(P_CENTERY, CenterY);              // int
+    URHO3D_PARAM(P_NUMFINGERS, NumFingers);        // int
+    URHO3D_PARAM(P_DTHETA, DTheta);                // float (degrees)
+    URHO3D_PARAM(P_DDIST, DDist);                  // float
 }
 
 /// A file was drag-dropped into the application window.
-EVENT(E_DROPFILE, DropFile)
+URHO3D_EVENT(E_DROPFILE, DropFile)
 {
-    PARAM(P_FILENAME, FileName);            // String
+    URHO3D_PARAM(P_FILENAME, FileName);            // String
 }
 
 /// Application input focus or minimization changed.
-EVENT(E_INPUTFOCUS, InputFocus)
+URHO3D_EVENT(E_INPUTFOCUS, InputFocus)
 {
-    PARAM(P_FOCUS, Focus);                  // bool
-    PARAM(P_MINIMIZED, Minimized);          // bool
+    URHO3D_PARAM(P_FOCUS, Focus);                  // bool
+    URHO3D_PARAM(P_MINIMIZED, Minimized);          // bool
 }
 
 /// OS mouse cursor visibility changed.
-EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
+URHO3D_EVENT(E_MOUSEVISIBLECHANGED, MouseVisibleChanged)
 {
-    PARAM(P_VISIBLE, Visible);              // bool
+    URHO3D_PARAM(P_VISIBLE, Visible);              // bool
 }
 
 /// Mouse mode changed.
-EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
+URHO3D_EVENT(E_MOUSEMODECHANGED, MouseModeChanged)
 {
-    PARAM(P_MODE, Mode);                    // MouseMode
+    URHO3D_PARAM(P_MODE, Mode);                    // MouseMode
+    URHO3D_PARAM(P_MOUSELOCKED, MouseLocked);      // bool
 }
 
 /// Application exit requested.
-EVENT(E_EXITREQUESTED, ExitRequested)
+URHO3D_EVENT(E_EXITREQUESTED, ExitRequested)
 {
 }
 
@@ -233,42 +232,42 @@ static const int QUAL_CTRL = 2;
 static const int QUAL_ALT = 4;
 static const int QUAL_ANY = 8;
 
-static const int KEY_A = 'A';
-static const int KEY_B = 'B';
-static const int KEY_C = 'C';
-static const int KEY_D = 'D';
-static const int KEY_E = 'E';
-static const int KEY_F = 'F';
-static const int KEY_G = 'G';
-static const int KEY_H = 'H';
-static const int KEY_I = 'I';
-static const int KEY_J = 'J';
-static const int KEY_K = 'K';
-static const int KEY_L = 'L';
-static const int KEY_M = 'M';
-static const int KEY_N = 'N';
-static const int KEY_O = 'O';
-static const int KEY_P = 'P';
-static const int KEY_Q = 'Q';
-static const int KEY_R = 'R';
-static const int KEY_S = 'S';
-static const int KEY_T = 'T';
-static const int KEY_U = 'U';
-static const int KEY_V = 'V';
-static const int KEY_W = 'W';
-static const int KEY_X = 'X';
-static const int KEY_Y = 'Y';
-static const int KEY_Z = 'Z';
-static const int KEY_0 = '0';
-static const int KEY_1 = '1';
-static const int KEY_2 = '2';
-static const int KEY_3 = '3';
-static const int KEY_4 = '4';
-static const int KEY_5 = '5';
-static const int KEY_6 = '6';
-static const int KEY_7 = '7';
-static const int KEY_8 = '8';
-static const int KEY_9 = '9';
+static const int KEY_A = SDLK_a;
+static const int KEY_B = SDLK_b;
+static const int KEY_C = SDLK_c;
+static const int KEY_D = SDLK_d;
+static const int KEY_E = SDLK_e;
+static const int KEY_F = SDLK_f;
+static const int KEY_G = SDLK_g;
+static const int KEY_H = SDLK_h;
+static const int KEY_I = SDLK_i;
+static const int KEY_J = SDLK_j;
+static const int KEY_K = SDLK_k;
+static const int KEY_L = SDLK_l;
+static const int KEY_M = SDLK_m;
+static const int KEY_N = SDLK_n;
+static const int KEY_O = SDLK_o;
+static const int KEY_P = SDLK_p;
+static const int KEY_Q = SDLK_q;
+static const int KEY_R = SDLK_r;
+static const int KEY_S = SDLK_s;
+static const int KEY_T = SDLK_t;
+static const int KEY_U = SDLK_u;
+static const int KEY_V = SDLK_v;
+static const int KEY_W = SDLK_w;
+static const int KEY_X = SDLK_x;
+static const int KEY_Y = SDLK_y;
+static const int KEY_Z = SDLK_z;
+static const int KEY_0 = SDLK_0;
+static const int KEY_1 = SDLK_1;
+static const int KEY_2 = SDLK_2;
+static const int KEY_3 = SDLK_3;
+static const int KEY_4 = SDLK_4;
+static const int KEY_5 = SDLK_5;
+static const int KEY_6 = SDLK_6;
+static const int KEY_7 = SDLK_7;
+static const int KEY_8 = SDLK_8;
+static const int KEY_9 = SDLK_9;
 static const int KEY_BACKSPACE = SDLK_BACKSPACE;
 static const int KEY_TAB = SDLK_TAB;
 static const int KEY_RETURN = SDLK_RETURN;
@@ -280,7 +279,7 @@ static const int KEY_ALT = SDLK_LALT;
 static const int KEY_GUI = SDLK_LGUI;
 static const int KEY_PAUSE = SDLK_PAUSE;
 static const int KEY_CAPSLOCK = SDLK_CAPSLOCK;
-static const int KEY_ESC = SDLK_ESCAPE;
+static const int KEY_ESCAPE = SDLK_ESCAPE;
 static const int KEY_SPACE = SDLK_SPACE;
 static const int KEY_PAGEUP = SDLK_PAGEUP;
 static const int KEY_PAGEDOWN = SDLK_PAGEDOWN;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ class FileSystem;
 /// Watches a directory and its subdirectories for files being modified.
 class URHO3D_API FileWatcher : public Object, public Thread
 {
-    OBJECT(FileWatcher, Object);
+    URHO3D_OBJECT(FileWatcher, Object);
 
 public:
     /// Construct.
@@ -78,7 +78,7 @@ private:
     /// Watch subdirectories flag.
     bool watchSubDirs_;
 
-#ifdef WIN32
+#ifdef _WIN32
 
     /// Directory handle for the path being watched.
     void* dirHandle_;

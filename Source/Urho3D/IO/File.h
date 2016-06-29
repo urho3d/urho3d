@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,23 +27,23 @@
 #include "../IO/Deserializer.h"
 #include "../IO/Serializer.h"
 
-#ifdef ANDROID
-#include <SDL/SDL_rwops.h>
+#ifdef __ANDROID__
+struct SDL_RWops;
 #endif
 
 namespace Urho3D
 {
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 extern const char* APK;
 
 // Macro for checking if a given pathname is inside APK's assets directory
-#define IS_ASSET(p) p.StartsWith(APK)
+#define URHO3D_IS_ASSET(p) p.StartsWith(APK)
 // Macro for truncating the APK prefix string from the asset pathname and at the same time patching the directory name components (see custom_rules.xml)
 #ifdef ASSET_DIR_INDICATOR
-#define ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
+#define URHO3D_ASSET(p) p.Substring(5).Replaced("/", ASSET_DIR_INDICATOR "/").CString()
 #else
-#define ASSET(p) p.Substring(5).CString()
+#define URHO3D_ASSET(p) p.Substring(5).CString()
 #endif
 #endif
 
@@ -60,7 +60,7 @@ class PackageFile;
 /// %File opened either through the filesystem or from within a package file.
 class URHO3D_API File : public Object, public Deserializer, public Serializer
 {
-    OBJECT(File, Object);
+    URHO3D_OBJECT(File, Object);
 
 public:
     /// Construct.
@@ -115,7 +115,7 @@ private:
     FileMode mode_;
     /// File handle.
     void* handle_;
-#ifdef ANDROID
+#ifdef __ANDROID__
     /// SDL RWops context for Android asset loading.
     SDL_RWops* assetHandle_;
 #endif

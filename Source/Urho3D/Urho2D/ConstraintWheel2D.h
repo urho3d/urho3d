@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ namespace Urho3D
 /// 2D wheel constraint component.
 class URHO3D_API ConstraintWheel2D : public Constraint2D
 {
-    OBJECT(ConstraintWheel2D, Constraint2D);
+    URHO3D_OBJECT(ConstraintWheel2D, Constraint2D);
 
 public:
     /// Construct.

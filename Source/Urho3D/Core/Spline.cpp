@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ Variant Spline::GetPoint(float f) const
         }
 
     default:
-        LOGERROR("Unsupported interpolation mode");
+        URHO3D_LOGERROR("Unsupported interpolation mode");
         return Variant::EMPTY;
     }
 }
@@ -116,7 +116,7 @@ void Spline::SetKnot(const Variant& knot, unsigned index)
         else if (knots_.Empty())
             knots_.Push(knot);
         else
-            LOGERRORF("Attempted to set a Spline's Knot value of type %s where elements are already using %s",
+            URHO3D_LOGERRORF("Attempted to set a Spline's Knot value of type %s where elements are already using %s",
                 knot.GetTypeName().CString(), knots_[0].GetTypeName().CString());
     }
 }
@@ -128,7 +128,7 @@ void Spline::AddKnot(const Variant& knot)
     else if (knots_.Empty())
         knots_.Push(knot);
     else
-        LOGERRORF("Attempted to add Knot to Spline of type %s where elements are already using %s", knot.GetTypeName().CString(),
+        URHO3D_LOGERRORF("Attempted to add Knot to Spline of type %s where elements are already using %s", knot.GetTypeName().CString(),
             knots_[0].GetTypeName().CString());
 }
 
@@ -142,7 +142,7 @@ void Spline::AddKnot(const Variant& knot, unsigned index)
     else if (knots_.Empty())
         knots_.Push(knot);
     else
-        LOGERRORF("Attempted to add Knot to Spline of type %s where elements are already using %s", knot.GetTypeName().CString(),
+        URHO3D_LOGERRORF("Attempted to add Knot to Spline of type %s where elements are already using %s", knot.GetTypeName().CString(),
             knots_[0].GetTypeName().CString());
 }
 

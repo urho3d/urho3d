@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ const float CAMERA_MAX_DIST = 20.0f;
 /// - Call the update function 'UpdateTouches()' from HandleUpdate or equivalent update handler function
 class Touch : public Object
 {
-    OBJECT(Touch, Object);
+    URHO3D_OBJECT(Touch, Object);
 
 public:
     /// Construct.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,7 +104,7 @@ enum ObserverPositionSendMode
 /// %Connection to a remote network host.
 class URHO3D_API Connection : public Object
 {
-    OBJECT(Connection, Object);
+    URHO3D_OBJECT(Connection, Object);
 
 public:
     /// Construct with context and kNet message connection pointers.

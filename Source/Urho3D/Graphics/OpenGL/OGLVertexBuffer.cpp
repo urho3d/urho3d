@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,74 +31,6 @@
 
 namespace Urho3D
 {
-
-const unsigned VertexBuffer::elementSize[] =
-{
-    3 * sizeof(float), // Position
-    3 * sizeof(float), // Normal
-    4 * sizeof(unsigned char), // Color
-    2 * sizeof(float), // Texcoord1
-    2 * sizeof(float), // Texcoord2
-    3 * sizeof(float), // Cubetexcoord1
-    3 * sizeof(float), // Cubetexcoord2
-    4 * sizeof(float), // Tangent
-    4 * sizeof(float), // Blendweights
-    4 * sizeof(unsigned char), // Blendindices
-    4 * sizeof(float), // Instancematrix1
-    4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float) // Instancematrix3
-};
-
-const unsigned VertexBuffer::elementType[] =
-{
-    GL_FLOAT, // Position
-    GL_FLOAT, // Normal
-    GL_UNSIGNED_BYTE, // Color
-    GL_FLOAT, // Texcoord1
-    GL_FLOAT, // Texcoord2
-    GL_FLOAT, // Cubetexcoord1
-    GL_FLOAT, // Cubetexcoord2
-    GL_FLOAT, // Tangent
-    GL_FLOAT, // Blendweights
-    GL_UNSIGNED_BYTE, // Blendindices
-    GL_FLOAT, // Instancematrix1
-    GL_FLOAT, // Instancematrix2
-    GL_FLOAT // Instancematrix3
-};
-
-const unsigned VertexBuffer::elementComponents[] =
-{
-    3, // Position
-    3, // Normal
-    4, // Color
-    2, // Texcoord1
-    2, // Texcoord2
-    3, // Cubetexcoord1
-    3, // Cubetexcoord2
-    4, // Tangent
-    4, // Blendweights
-    4, // Blendindices
-    4, // Instancematrix1
-    4, // Instancematrix2
-    4 // Instancematrix3
-};
-
-const unsigned VertexBuffer::elementNormalize[] =
-{
-    GL_FALSE, // Position
-    GL_FALSE, // Normal
-    GL_TRUE, // Color
-    GL_FALSE, // Texcoord1
-    GL_FALSE, // Texcoord2
-    GL_FALSE, // Cubetexcoord1
-    GL_FALSE, // Cubetexcoord2
-    GL_FALSE, // Tangent
-    GL_FALSE, // Blendweights
-    GL_FALSE, // Blendindices
-    GL_FALSE, // Instancematrix1
-    GL_FALSE, // Instancematrix2
-    GL_FALSE // Instancematrix3
-};
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
@@ -181,11 +113,16 @@ void VertexBuffer::SetShadowed(bool enable)
 
 bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
 {
+    return SetSize(vertexCount, GetElements(elementMask), dynamic);
+}
+
+bool VertexBuffer::SetSize(unsigned vertexCount, const PODVector<VertexElement>& elements, bool dynamic)
+{
     Unlock();
 
-    dynamic_ = dynamic;
     vertexCount_ = vertexCount;
-    elementMask_ = elementMask;
+    elements_ = elements;
+    dynamic_ = dynamic;
 
     UpdateOffsets();
 
@@ -201,13 +138,13 @@ bool VertexBuffer::SetData(const void* data)
 {
     if (!data)
     {
-        LOGERROR("Null pointer for vertex buffer data");
+        URHO3D_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
@@ -223,7 +160,7 @@ bool VertexBuffer::SetData(const void* data)
         }
         else
         {
-            LOGWARNING("Vertex buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -239,19 +176,19 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
 
     if (!data)
     {
-        LOGERROR("Null pointer for vertex buffer data");
+        URHO3D_LOGERROR("Null pointer for vertex buffer data");
         return false;
     }
 
     if (!vertexSize_)
     {
-        LOGERROR("Vertex elements not defined, can not set vertex buffer data");
+        URHO3D_LOGERROR("Vertex elements not defined, can not set vertex buffer data");
         return false;
     }
 
     if (start + count > vertexCount_)
     {
-        LOGERROR("Illegal range for setting new vertex buffer data");
+        URHO3D_LOGERROR("Illegal range for setting new vertex buffer data");
         return false;
     }
 
@@ -273,7 +210,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
         }
         else
         {
-            LOGWARNING("Vertex buffer data assignment while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer data assignment while device is lost");
             dataPending_ = true;
         }
     }
@@ -285,19 +222,19 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
 {
     if (lockState_ != LOCK_NONE)
     {
-        LOGERROR("Vertex buffer already locked");
+        URHO3D_LOGERROR("Vertex buffer already locked");
         return 0;
     }
 
     if (!vertexSize_)
     {
-        LOGERROR("Vertex elements not defined, can not lock vertex buffer");
+        URHO3D_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
         return 0;
     }
 
     if (start + count > vertexCount_)
     {
-        LOGERROR("Illegal range for locking vertex buffer");
+        URHO3D_LOGERROR("Illegal range for locking vertex buffer");
         return 0;
     }
 
@@ -347,43 +284,105 @@ void VertexBuffer::Unlock()
 void VertexBuffer::UpdateOffsets()
 {
     unsigned elementOffset = 0;
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    elementHash_ = 0;
+    elementMask_ = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements_.Begin(); i != elements_.End(); ++i)
     {
-        if (elementMask_ & (1 << i))
+        i->offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[i->type_];
+        elementHash_ <<= 6;
+        elementHash_ += (((int)i->type_ + 1) * ((int)i->semantic_ + 1) + i->index_);
+
+        for (unsigned j = 0; j < MAX_LEGACY_VERTEX_ELEMENTS; ++j)
         {
-            elementOffset_[i] = elementOffset;
-            elementOffset += elementSize[i];
+            const VertexElement& legacy = LEGACY_VERTEXELEMENTS[j];
+            if (i->type_ == legacy.type_ && i->semantic_ == legacy.semantic_ && i->index_ == legacy.index_)
+                elementMask_ |= (1 << j);
         }
-        else
-            elementOffset_[i] = NO_ELEMENT;
     }
+
     vertexSize_ = elementOffset;
+}
+
+const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, unsigned char index) const
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements_.Begin(); i != elements_.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    for (PODVector<VertexElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        if (i->type_ == type && i->semantic_ == semantic && i->index_ == index)
+            return &(*i);
+    }
+
+    return 0;
+}
+
+bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    return GetElement(elements, type, semantic, index) != 0;
+}
+
+unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
+{
+    const VertexElement* element = GetElement(elements, type, semantic, index);
+    return element ? element->offset_ : M_MAX_UNSIGNED;
+}
+
+PODVector<VertexElement> VertexBuffer::GetElements(unsigned elementMask)
+{
+    PODVector<VertexElement> ret;
+
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
+    {
+        if (elementMask & (1 << i))
+            ret.Push(LEGACY_VERTEXELEMENTS[i]);
+    }
+
+    return ret;
+}
+
+unsigned VertexBuffer::GetVertexSize(const PODVector<VertexElement>& elements)
+{
+    unsigned size = 0;
+
+    for (unsigned i = 0; i < elements.Size(); ++i)
+        size += ELEMENT_TYPESIZES[elements[i].type_];
+
+    return size;
 }
 
 unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
 {
-    unsigned vertexSize = 0;
+    unsigned size = 0;
 
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
+    for (unsigned i = 0; i < MAX_LEGACY_VERTEX_ELEMENTS; ++i)
     {
         if (elementMask & (1 << i))
-            vertexSize += elementSize[i];
+            size += ELEMENT_TYPESIZES[LEGACY_VERTEXELEMENTS[i].type_];
     }
 
-    return vertexSize;
-}
-
-unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement element)
-{
-    unsigned offset = 0;
-
-    for (unsigned i = 0; i != element; ++i)
-    {
-        if (elementMask & (1 << i))
-            offset += elementSize[i];
-    }
-
-    return offset;
+    return size;
 }
 
 bool VertexBuffer::Create()
@@ -398,7 +397,7 @@ bool VertexBuffer::Create()
     {
         if (graphics_->IsDeviceLost())
         {
-            LOGWARNING("Vertex buffer creation while device is lost");
+            URHO3D_LOGWARNING("Vertex buffer creation while device is lost");
             return true;
         }
 
@@ -406,7 +405,7 @@ bool VertexBuffer::Create()
             glGenBuffers(1, &object_);
         if (!object_)
         {
-            LOGERROR("Failed to create vertex buffer");
+            URHO3D_LOGERROR("Failed to create vertex buffer");
             return false;
         }
 

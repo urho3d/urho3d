@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ class Scene;
 ///      - Subscribing to the UI layout's events
 class SceneAndUILoad : public Sample
 {
-    OBJECT(SceneAndUILoad, Sample);
+    URHO3D_OBJECT(SceneAndUILoad, Sample);
 
 public:
     /// Construct.

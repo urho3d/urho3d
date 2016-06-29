@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ class DebugHud;
 /// Urho3D engine. Creates the other subsystems.
 class URHO3D_API Engine : public Object
 {
-    OBJECT(Engine, Object);
+    URHO3D_OBJECT(Engine, Object);
 
 public:
     /// Construct.

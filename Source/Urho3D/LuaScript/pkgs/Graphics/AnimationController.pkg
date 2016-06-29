@@ -32,6 +32,7 @@ class AnimationController : public Component
     bool SetTime(const String name, float time);
     bool SetWeight(const String name, float weight);
     bool SetLooped(const String name, bool enable);
+    bool SetBlendMode(const String name, AnimationBlendMode mode);
     bool SetSpeed(const String name, float speed);
     bool SetAutoFade(const String name, float fadeOutTime);
     bool SetRemoveOnCompletion(const String name, bool removeOnCompletion);
@@ -46,6 +47,7 @@ class AnimationController : public Component
     float GetTime(const String name) const;
     float GetWeight(const String name) const;
     bool IsLooped(const String name) const;
+    AnimationBlendMode GetBlendMode(const String name) const;
     float GetLength(const String name) const;
     float GetSpeed(const String name) const;
     float GetFadeTarget(const String name) const;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,7 +50,7 @@ struct FileSelectorEntry
 /// %File selector dialog.
 class URHO3D_API FileSelector : public Object
 {
-    OBJECT(FileSelector, Object);
+    URHO3D_OBJECT(FileSelector, Object);
 
 public:
     /// Construct.

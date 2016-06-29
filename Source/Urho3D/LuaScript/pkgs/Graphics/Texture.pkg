@@ -8,7 +8,7 @@ class Texture : public Resource
     void SetBorderColor(const Color& color);
     void SetSRGB(bool enable);
     void SetBackupTexture(Texture* texture);
-    void SetMipsToSkip(int quality, int mips);
+    void SetMipsToSkip(int quality, int toSkip);
     
     unsigned GetFormat() const;
     bool IsCompressed() const;

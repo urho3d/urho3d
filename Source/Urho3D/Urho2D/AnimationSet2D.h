@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ class SpriteSheet2D;
 /// Spriter animation set, it includes one or more animations, for more information please refer to http://www.esotericsoftware.com and http://www.brashmonkey.com/spriter.htm.
 class URHO3D_API AnimationSet2D : public Resource
 {
-    OBJECT(AnimationSet2D, Resource);
+    URHO3D_OBJECT(AnimationSet2D, Resource);
 
 public:
     /// Construct.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +21,12 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set project name
-    project (ExternalProject-tolua++)
-
-    # Set minimum version
-    cmake_minimum_required (VERSION 2.8.6)
-
+    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    if (WIN32)
+        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
+    else ()
+        cmake_minimum_required (VERSION 2.8.6)
+    endif ()
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -34,12 +34,15 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
             cmake_policy (SET CMP0022 NEW)
         endif ()
         if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
             cmake_policy (SET CMP0026 OLD)
             # MACOSX_RPATH is enabled by default
             cmake_policy (SET CMP0042 NEW)
         endif ()
     endif ()
+
+    # Set project name
+    project (Urho3D-ExternalProject-tolua++)
 
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
@@ -48,7 +51,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     include (Urho3D-CMake-common)
 
     # Add dependency targets
-    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/Lua${JIT} host/Lua${JIT})
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/Lua host/Lua)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/lib host/toluapp)
 endif ()
 
@@ -56,10 +59,13 @@ endif ()
 set (TARGET_NAME tolua++)
 
 # Define generated source files
+if (URHO3D_UPDATE_SOURCE_TREE)
+    set (UPDATE_COMMAND COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c ${CMAKE_CURRENT_SOURCE_DIR}/toluabind.c)
+endif ()
 file (GLOB TOLUA lua/*.lua)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c
     COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -o ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c -H ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.h -n tolua tolua_scons.pkg 2>${NULL_DEVICE} || ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/toluabind.c ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c ${CMAKE_CURRENT_SOURCE_DIR}/toluabind.c
+    ${UPDATE_COMMAND}
     DEPENDS ${TOLUA} tolua_scons.pkg
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Generating toluabind.c and toluabind.h")
@@ -68,17 +74,11 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c
 define_source_files (EXTRA_CPP_FILES tolua.c ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c)
 
 # Define dependency libs
-set (LIBS toluapp Lua${JIT})
+set (LIBS toluapp Lua)
 if (NOT MSVC)
     list (APPEND LIBS m)
 endif ()
-set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
-
-# All tools must be natively built and output to bin/tool subdir to differentiate them from target platfrom binaries in the bin directory
-set_tool_output_directories ()
+set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua/src)
 
 # Setup target
-if (APPLE)
-    setup_macosx_linker_flags (CMAKE_EXE_LINKER_FLAGS)
-endif ()
-setup_executable (NODEPS)
+setup_executable (TOOL NODEPS)

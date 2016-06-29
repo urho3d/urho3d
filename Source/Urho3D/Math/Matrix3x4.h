@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,13 @@ public:
 
     /// Copy-construct from another matrix.
     Matrix3x4(const Matrix3x4& matrix)
-#ifndef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+    {
+        _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
+        _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
+        _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
+    }
+#else
        :m00_(matrix.m00_),
         m01_(matrix.m01_),
         m02_(matrix.m02_),
@@ -74,14 +80,9 @@ public:
         m21_(matrix.m21_),
         m22_(matrix.m22_),
         m23_(matrix.m23_)
-#endif
     {
-#ifdef URHO3D_SSE
-        _mm_storeu_ps(&m00_, _mm_loadu_ps(&matrix.m00_));
-        _mm_storeu_ps(&m10_, _mm_loadu_ps(&matrix.m10_));
-        _mm_storeu_ps(&m20_, _mm_loadu_ps(&matrix.m20_));
-#endif
     }
+#endif
 
     /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
     Matrix3x4(const Matrix3& matrix) :
@@ -198,7 +199,7 @@ public:
     /// Assign from another matrix.
     Matrix3x4& operator =(const Matrix3x4& rhs)
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
         _mm_storeu_ps(&m00_, _mm_loadu_ps(&rhs.m00_));
         _mm_storeu_ps(&m10_, _mm_loadu_ps(&rhs.m10_));
         _mm_storeu_ps(&m20_, _mm_loadu_ps(&rhs.m20_));
@@ -274,7 +275,7 @@ public:
         c0 = _mm_and_ps(c0, hi);
         hi = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(1, 1, 1, 1));
         c0 = _mm_and_ps(c0, hi);
-        return !_mm_ucomige_ss(c0, c0);
+        return _mm_cvtsi128_si32(_mm_castps_si128(c0)) == -1;
 #else
         const float* leftData = Data();
         const float* rightData = rhs.Data();
@@ -299,10 +300,15 @@ public:
         __m128 vec = _mm_set_ps(1.f, rhs.z_, rhs.y_, rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
         __m128 r3 = _mm_setzero_ps();
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 
         return Vector3(
             _mm_cvtss_f32(vec),
@@ -324,10 +330,15 @@ public:
         __m128 vec = _mm_loadu_ps(&rhs.x_);
         __m128 r0 = _mm_mul_ps(_mm_loadu_ps(&m00_), vec);
         __m128 r1 = _mm_mul_ps(_mm_loadu_ps(&m10_), vec);
+        __m128 t0 = _mm_unpacklo_ps(r0, r1);
+        __m128 t1 = _mm_unpackhi_ps(r0, r1);
+        t0 = _mm_add_ps(t0, t1);
         __m128 r2 = _mm_mul_ps(_mm_loadu_ps(&m20_), vec);
-        __m128 r3 = _mm_set_ps(1.f, 0.f, 0.f, 0.f);
-        _MM_TRANSPOSE4_PS(r0, r1, r2, r3);
-        vec = _mm_add_ps(_mm_add_ps(r0, r1), _mm_add_ps(r2, r3));
+        __m128 r3 = _mm_setzero_ps();
+        __m128 t2 = _mm_unpacklo_ps(r2, r3);
+        __m128 t3 = _mm_unpackhi_ps(r2, r3);
+        t2 = _mm_add_ps(t2, t3);
+        vec = _mm_add_ps(_mm_movelh_ps(t0, t2), _mm_movehl_ps(t2, t0));
 
         return Vector3(
             _mm_cvtss_f32(vec),

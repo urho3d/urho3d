@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@
 
 #include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho3DPlayer);
+URHO3D_DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
 Urho3DPlayer::Urho3DPlayer(Context* context) :
     Application(context)
@@ -47,11 +47,13 @@ Urho3DPlayer::Urho3DPlayer(Context* context) :
 
 void Urho3DPlayer::Setup()
 {
-    FileSystem* filesystem = GetSubsystem<FileSystem>();
-
+    // Web platform depends on the resource system to read any data files. Skip parsing the command line file now
+    // and try later when the resource system is live
+#ifndef __EMSCRIPTEN__
     // Read command line from a file if no arguments given. This is primarily intended for mobile platforms.
     // Note that the command file name uses a hardcoded path that does not utilize the resource system
     // properly (including resource path prefix), as the resource system is not yet initialized at this point
+    FileSystem* filesystem = GetSubsystem<FileSystem>();
     const String commandFileName = filesystem->GetProgramDir() + "Data/CommandLine.txt";
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
@@ -63,11 +65,8 @@ void Urho3DPlayer::Setup()
         engineParameters_ = Engine::ParseParameters(GetArguments());
     }
 
-    // Check for script file name
-    const Vector<String>& arguments = GetArguments();
-    String scriptFileName;
-    if (arguments.Size() && arguments[0][0] != '-')
-        scriptFileName_ = GetInternalPath(arguments[0]);
+    // Check for script file name from the arguments
+    GetScriptFileName();
 
     // Show usage if not found
     if (scriptFileName_.Empty())
@@ -84,6 +83,7 @@ void Urho3DPlayer::Setup()
             "-t           Enable triple buffering\n"
             "-w           Start in windowed mode\n"
             "-s           Enable resizing when in windowed mode\n"
+            "-hd          Enable high DPI, only supported by Apple platforms (OSX, iOS, and tvOS)\n"
             "-q           Enable quiet mode which does not log to standard output stream\n"
             "-b <length>  Sound buffer length in milliseconds\n"
             "-r <freq>    Sound mixing frequency in Hz\n"
@@ -119,10 +119,42 @@ void Urho3DPlayer::Setup()
         // Use the script file name as the base name for the log file
         engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
     }
+#else
+    // On Web platform setup a default windowed resolution similar to the executable samples
+    engineParameters_["FullScreen"]  = false;
+#endif
+
+    // Construct a search path to find the resource prefix with two entries:
+    // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
+    // The second and third entries are possible relative paths from the installed program/bin directory to the asset directory -- these entries are for binary when it is in the Urho3D SDK installation location
+    if (!engineParameters_.Contains("ResourcePrefixPaths"))
+        engineParameters_["ResourcePrefixPaths"] = ";../share/Resources;../share/Urho3D/Resources";
 }
 
 void Urho3DPlayer::Start()
 {
+    // Reattempt reading the command line now on Web platform
+#ifdef __EMSCRIPTEN__
+    if (GetArguments().Empty())
+    {
+        SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);
+        if (commandFile)
+        {
+            String commandLine = commandFile->ReadLine();
+            commandFile->Close();
+            ParseArguments(commandLine, false);
+        }
+    }
+
+    GetScriptFileName();
+
+    if (scriptFileName_.Empty())
+    {
+        ErrorExit("Script file name not specified; cannot proceed");
+        return;
+    }
+#endif
+
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
     {
@@ -142,9 +174,9 @@ void Urho3DPlayer::Start()
         if (scriptFile_ && scriptFile_->Execute("void Start()"))
         {
             // Subscribe to script's reload event to allow live-reload of the application
-            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, HANDLER(Urho3DPlayer, HandleScriptReloadStarted));
-            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, HANDLER(Urho3DPlayer, HandleScriptReloadFinished));
-            SubscribeToEvent(scriptFile_, E_RELOADFAILED, HANDLER(Urho3DPlayer, HandleScriptReloadFailed));
+            SubscribeToEvent(scriptFile_, E_RELOADSTARTED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadStarted));
+            SubscribeToEvent(scriptFile_, E_RELOADFINISHED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadFinished));
+            SubscribeToEvent(scriptFile_, E_RELOADFAILED, URHO3D_HANDLER(Urho3DPlayer, HandleScriptReloadFailed));
             return;
         }
 #else
@@ -226,4 +258,11 @@ void Urho3DPlayer::HandleScriptReloadFailed(StringHash eventType, VariantMap& ev
     scriptFile_.Reset();
     ErrorExit();
 #endif
+}
+
+void Urho3DPlayer::GetScriptFileName()
+{
+    const Vector<String>& arguments = GetArguments();
+    if (arguments.Size() && arguments[0][0] != '-')
+        scriptFileName_ = GetInternalPath(arguments[0]);
 }

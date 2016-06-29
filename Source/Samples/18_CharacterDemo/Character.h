@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ const float INAIR_THRESHOLD_TIME = 0.1f;
 /// Character component, responsible for physical movement according to controls, as well as animation.
 class Character : public LogicComponent
 {
-    OBJECT(Character, LogicComponent);
+    URHO3D_OBJECT(Character, LogicComponent);
 
 public:
     /// Construct.

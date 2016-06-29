@@ -12,6 +12,9 @@ class Audio : public Object
     bool Play();
     void Stop();
     void SetMasterGain(const String type, float gain);
+    void PauseSoundType(const String type);
+    void ResumeSoundType(const String type);
+    void ResumeAll();
     void SetListener(SoundListener* listener);
     void StopSound(Sound* sound);
 
@@ -23,6 +26,7 @@ class Audio : public Object
     bool IsInitialized() const;
     bool HasMasterGain(const String type) const;
     float GetMasterGain(const String type) const;
+    bool IsSoundTypePaused(const String type) const;
     SoundListener* GetListener() const;
     const PODVector<SoundSource*>& GetSoundSources() const;
 

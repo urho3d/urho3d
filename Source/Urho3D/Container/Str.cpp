@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -558,9 +558,9 @@ String String::ToUpper() const
     return ret;
 }
 
-Vector<String> String::Split(char separator) const
+Vector<String> String::Split(char separator, bool keepEmptyStrings) const
 {
-    return Split(CString(), separator);
+    return Split(CString(), separator, keepEmptyStrings);
 }
 
 void String::Join(const Vector<String>& subStrings, const String& glue)
@@ -757,7 +757,7 @@ void String::SetUTF8FromWChar(const wchar_t* str)
     if (!str)
         return;
 
-#ifdef WIN32
+#ifdef _WIN32
     while (*str)
     {
         unsigned unicodeChar = DecodeUTF16(str);
@@ -996,7 +996,7 @@ unsigned String::DecodeUTF8(const char*& src)
     }
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
 {
     if (unicodeChar < 0x10000)
@@ -1025,7 +1025,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
         return '?';
     }
     
-    if (word1 < 0xd800 || word1 >= 0xe00)
+    if (word1 < 0xd800 || word1 >= 0xe000)
         return word1;
     else
     {
@@ -1036,56 +1036,31 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             return '?';
         }
         else
-            return ((word1 & 0x3ff) << 10) | (word2 & 0x3ff) | 0x10000;
+            return (((word1 & 0x3ff) << 10) | (word2 & 0x3ff)) + 0x10000;
     }
 }
 #endif
 
-Vector<String> String::Split(const char* str, char separator)
+Vector<String> String::Split(const char* str, char separator, bool keepEmptyStrings)
 {
     Vector<String> ret;
-    unsigned pos = 0;
-    unsigned length = CStringLength(str);
+    const char* strEnd = str + String::CStringLength(str);
 
-    while (pos < length)
+    for (const char* splitEnd = str; splitEnd != strEnd; ++splitEnd)
     {
-        if (str[pos] != separator)
-            break;
-        ++pos;
+        if (*splitEnd == separator)
+        {
+            const ptrdiff_t splitLen = splitEnd - str;
+            if (splitLen > 0 || keepEmptyStrings)
+                ret.Push(String(str, splitLen));
+            str = splitEnd + 1;
+        }
     }
 
-    while (pos < length)
-    {
-        unsigned start = pos;
-
-        while (start < length)
-        {
-            if (str[start] == separator)
-                break;
-
-            ++start;
-        }
-
-        if (start == length)
-        {
-            ret.Push(String(&str[pos]));
-            break;
-        }
-
-        unsigned end = start;
-
-        while (end < length)
-        {
-            if (str[end] != separator)
-                break;
-
-            ++end;
-        }
-
-        ret.Push(String(&str[pos], start - pos));
-        pos = end;
-    }
-
+    const ptrdiff_t splitLen = strEnd - str;
+    if (splitLen > 0 || keepEmptyStrings)
+        ret.Push(String(str, splitLen));
+    
     return ret;
 }
 
@@ -1205,7 +1180,7 @@ String& String::AppendWithFormatArgs(const char* formatString, va_list args)
             }
 
         default:
-            LOGWARNINGF("Unsupported format specifier: '%c'", format);
+            URHO3D_LOGWARNINGF("Unsupported format specifier: '%c'", format);
             break;
         }
     }
@@ -1270,7 +1245,7 @@ WString::WString(const String& str) :
     length_(0),
     buffer_(0)
 {
-#ifdef WIN32
+#ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
     

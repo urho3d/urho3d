@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ bool ConstantBuffer::SetSize(unsigned size)
 {
     if (!size)
     {
-        LOGERROR("Can not create zero-sized constant buffer");
+        URHO3D_LOGERROR("Can not create zero-sized constant buffer");
         return false;
     }
 

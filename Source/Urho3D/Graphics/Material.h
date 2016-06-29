@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ class Texture;
 class Texture2D;
 class TextureCube;
 class ValueAnimationInfo;
+class JSONFile;
 
 static const unsigned char DEFAULT_RENDER_ORDER = 128;
 
@@ -102,7 +103,7 @@ template <> inline unsigned MakeHash(const TextureUnit& value)
 /// Describes how to render 3D geometries.
 class URHO3D_API Material : public Resource
 {
-    OBJECT(Material, Resource);
+    URHO3D_OBJECT(Material, Resource);
 
 public:
     /// Construct.
@@ -123,6 +124,12 @@ public:
     bool Load(const XMLElement& source);
     /// Save to an XML element. Return true if successful.
     bool Save(XMLElement& dest) const;
+
+    /// Load from a JSON value. Return true if successful.
+    bool Load(const JSONValue& source);
+    /// Save to a JSON value. Return true if successful.
+    bool Save(JSONValue& dest) const;
+
     /// Set number of techniques.
     void SetNumTechniques(unsigned num);
     /// Set technique.
@@ -231,6 +238,11 @@ public:
     static Variant ParseShaderParameterValue(const String& value);
 
 private:
+    /// Helper function for loading JSON files
+    bool BeginLoadJSON(Deserializer& source);
+    /// Helper function for loading XML files
+    bool BeginLoadXML(Deserializer& source);
+
     /// Re-evaluate occlusion rendering.
     void CheckOcclusion();
     /// Reset to defaults.
@@ -278,6 +290,8 @@ private:
     bool batchedParameterUpdate_;
     /// XML file used while loading.
     SharedPtr<XMLFile> loadXMLFile_;
+    /// JSON file used while loading.
+    SharedPtr<JSONFile> loadJSONFile_;
     /// Associated scene for shader parameter animation updates.
     WeakPtr<Scene> scene_;
 };

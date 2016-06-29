@@ -1,6 +1,6 @@
 /*
 ** C type management.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_CTYPE_H
@@ -263,7 +263,7 @@ typedef struct CTState {
 /* -- Predefined types ---------------------------------------------------- */
 
 /* Target-dependent types. */
-#if LJ_TARGET_PPC || LJ_TARGET_PPCSPE
+#if LJ_TARGET_PPC
 #define CTTYDEFP(_) \
   _(LINT32,		4,	CT_NUM, CTF_LONG|CTALIGN(2))
 #else

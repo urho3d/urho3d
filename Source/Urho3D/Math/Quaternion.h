@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,17 +51,18 @@ public:
 
     /// Copy-construct from another quaternion.
     Quaternion(const Quaternion& quat)
-#ifndef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
+    {
+        _mm_storeu_ps(&w_, _mm_loadu_ps(&quat.w_));
+    }
+#else
        :w_(quat.w_),
         x_(quat.x_),
         y_(quat.y_),
         z_(quat.z_)
-#endif
     {
-#ifdef URHO3D_SSE
-        _mm_storeu_ps(&w_, _mm_loadu_ps(&quat.w_));
-#endif
     }
+#endif
 
     /// Construct from values.
     Quaternion(float w, float x, float y, float z)
@@ -127,10 +128,17 @@ public:
         FromRotationMatrix(matrix);
     }
 
+#ifdef URHO3D_SSE
+    explicit Quaternion(__m128 wxyz)
+    {
+        _mm_storeu_ps(&w_, wxyz);
+    }
+#endif
+
     /// Assign from another quaternion.
     Quaternion& operator =(const Quaternion& rhs)
     {
-#ifdef URHO3D_SSE
+#if defined(URHO3D_SSE) && (!defined(_MSC_VER) || _MSC_VER >= 1700) /* Visual Studio 2012 and newer. VS2010 has a bug with these, see https://github.com/urho3d/Urho3D/issues/1044 */
         _mm_storeu_ps(&w_, _mm_loadu_ps(&rhs.w_));
 #else
         w_ = rhs.w_;
@@ -176,7 +184,7 @@ public:
         __m128 c = _mm_cmpeq_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_));
         c = _mm_and_ps(c, _mm_movehl_ps(c, c));
         c = _mm_and_ps(c, _mm_shuffle_ps(c, c, _MM_SHUFFLE(1, 1, 1, 1)));
-        return !_mm_ucomige_ss(c, c);
+        return _mm_cvtsi128_si32(_mm_castps_si128(c)) == -1;
 #else
         return w_ == rhs.w_ && x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_;
 #endif
@@ -189,9 +197,7 @@ public:
     Quaternion operator *(float rhs) const
     {
 #ifdef URHO3D_SSE
-        Quaternion q;
-        _mm_storeu_ps(&q.w_, _mm_mul_ps(_mm_loadu_ps(&w_), _mm_set1_ps(rhs)));
-        return q;
+        return Quaternion(_mm_mul_ps(_mm_loadu_ps(&w_), _mm_set1_ps(rhs)));
 #else
         return Quaternion(w_ * rhs, x_ * rhs, y_ * rhs, z_ * rhs);
 #endif
@@ -201,9 +207,7 @@ public:
     Quaternion operator -() const
     {
 #ifdef URHO3D_SSE
-        Quaternion q;
-        _mm_storeu_ps(&q.w_, _mm_xor_ps(_mm_loadu_ps(&w_), _mm_castsi128_ps(_mm_set1_epi32((int)0x80000000UL))));
-        return q;
+        return Quaternion(_mm_xor_ps(_mm_loadu_ps(&w_), _mm_castsi128_ps(_mm_set1_epi32((int)0x80000000UL))));
 #else
         return Quaternion(-w_, -x_, -y_, -z_);
 #endif
@@ -213,9 +217,7 @@ public:
     Quaternion operator +(const Quaternion& rhs) const
     {
 #ifdef URHO3D_SSE
-        Quaternion q;
-        _mm_storeu_ps(&q.w_, _mm_add_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
-        return q;
+        return Quaternion(_mm_add_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
 #else
         return Quaternion(w_ + rhs.w_, x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_);
 #endif
@@ -225,9 +227,7 @@ public:
     Quaternion operator -(const Quaternion& rhs) const
     {
 #ifdef URHO3D_SSE
-        Quaternion q;
-        _mm_storeu_ps(&q.w_, _mm_sub_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
-        return q;
+        return Quaternion(_mm_sub_ps(_mm_loadu_ps(&w_), _mm_loadu_ps(&rhs.w_)));
 #else
         return Quaternion(w_ - rhs.w_, x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_);
 #endif
@@ -247,9 +247,7 @@ public:
         out = _mm_add_ps(_mm_mul_ps(_mm_xor_ps(signy, _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(2, 2, 2, 2))), _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(1, 0, 3, 2))), _mm_xor_ps(signx, out));
         out = _mm_add_ps(_mm_mul_ps(_mm_xor_ps(signz, _mm_shuffle_ps(q1, q1, _MM_SHUFFLE(3, 3, 3, 3))), _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(2, 3, 0, 1))), out);
         out = _mm_add_ps(_mm_mul_ps(_mm_shuffle_ps(q1, q1, _MM_SHUFFLE(0, 0, 0, 0)), q2), out);
-        Quaternion q;
-        _mm_storeu_ps(&q.w_, _mm_shuffle_ps(out, out, _MM_SHUFFLE(2, 1, 0, 3)));
-        return q;
+        return Quaternion(_mm_shuffle_ps(out, out, _MM_SHUFFLE(2, 1, 0, 3)));
 #else
         return Quaternion(
             w_ * rhs.w_ - x_ * rhs.x_ - y_ * rhs.y_ - z_ * rhs.z_,
@@ -313,7 +311,11 @@ public:
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
-        _mm_storeu_ps(&w_, _mm_mul_ps(q, _mm_rsqrt_ps(n)));
+        __m128 e = _mm_rsqrt_ps(n);
+        __m128 e3 = _mm_mul_ps(_mm_mul_ps(e, e), e);
+        __m128 half = _mm_set1_ps(0.5f);
+        n = _mm_add_ps(e, _mm_mul_ps(half, _mm_sub_ps(e, _mm_mul_ps(n, e3))));
+        _mm_storeu_ps(&w_, _mm_mul_ps(q, n));
 #else
         float lenSquared = LengthSquared();
         if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
@@ -335,9 +337,11 @@ public:
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
-        Quaternion quat;
-        _mm_storeu_ps(&quat.w_, _mm_mul_ps(q, _mm_rsqrt_ps(n)));
-        return quat;
+        __m128 e = _mm_rsqrt_ps(n);
+        __m128 e3 = _mm_mul_ps(_mm_mul_ps(e, e), e);
+        __m128 half = _mm_set1_ps(0.5f);
+        n = _mm_add_ps(e, _mm_mul_ps(half, _mm_sub_ps(e, _mm_mul_ps(n, e3))));
+        return Quaternion(_mm_mul_ps(q, n));
 #else
         float lenSquared = LengthSquared();
         if (!Urho3D::Equals(lenSquared, 1.0f) && lenSquared > 0.0f)
@@ -358,9 +362,7 @@ public:
         __m128 n = _mm_mul_ps(q, q);
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 3, 0, 1)));
         n = _mm_add_ps(n, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 1, 2, 3)));
-        Quaternion quat;
-        _mm_storeu_ps(&quat.w_, _mm_mul_ps(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))), _mm_rcp_ps(n)));
-        return quat;
+        return Quaternion(_mm_div_ps(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))), n));
 #else
         float lenSquared = LengthSquared();
         if (lenSquared == 1.0f)
@@ -415,9 +417,7 @@ public:
     {
 #ifdef URHO3D_SSE
         __m128 q = _mm_loadu_ps(&w_);
-        Quaternion quat;
-        _mm_storeu_ps(&quat.w_, _mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))));
-        return quat;
+        return Quaternion(_mm_xor_ps(q, _mm_castsi128_ps(_mm_set_epi32((int)0x80000000UL, (int)0x80000000UL, (int)0x80000000UL, 0))));
 #else
         return Quaternion(w_, -x_, -y_, -z_);
 #endif

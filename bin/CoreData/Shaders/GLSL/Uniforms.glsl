@@ -6,13 +6,12 @@
 // OpenGL 2 uniforms (no constant buffers)
 
 #ifdef COMPILEVS
-          
+
 // Vertex shader uniforms
 uniform vec3 cAmbientStartColor;
 uniform vec3 cAmbientEndColor;
 uniform mat3 cBillboardRot;
 uniform vec3 cCameraPos;
-uniform mat3 cCameraRot;
 uniform float cNearClip;
 uniform float cFarClip;
 uniform vec4 cDepthMode;
@@ -20,9 +19,12 @@ uniform vec3 cFrustumSize;
 uniform float cDeltaTime;
 uniform float cElapsedTime;
 uniform vec4 cGBufferOffsets;
-uniform vec3 cLightDir;
 uniform vec4 cLightPos;
+uniform vec3 cLightDir;
+uniform vec4 cNormalOffsetScale;
 uniform mat4 cModel;
+uniform mat4 cView;
+uniform mat4 cViewInv;
 uniform mat4 cViewProj;
 uniform vec4 cUOffset;
 uniform vec4 cVOffset;
@@ -30,7 +32,7 @@ uniform mat4 cZone;
 #if !defined(GL_ES) || defined(WEBGL)
     uniform mat4 cLightMatrices[4];
 #else
-    uniform mat4 cLightMatrices[2];
+    uniform highp mat4 cLightMatrices[2];
 #endif
 #ifdef SKINNED
     uniform vec4 cSkinMatrices[MAXBONES*3];
@@ -59,12 +61,17 @@ uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;
-uniform vec3 cLightDirPS;
 uniform vec4 cLightPosPS;
+uniform vec3 cLightDirPS;
+uniform vec4 cNormalOffsetScalePS;
 uniform vec4 cMatDiffColor;
 uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
 uniform vec4 cMatSpecColor;
+#ifdef PBR
+    uniform float cRoughnessPS;
+    uniform float cMetallicPS;
+#endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform vec4 cShadowCubeAdjust;
@@ -73,7 +80,9 @@ uniform vec2 cShadowIntensity;
 uniform vec2 cShadowMapInvSize;
 uniform vec4 cShadowSplits;
 uniform mat4 cLightMatricesPS[4];
-
+#ifdef VSM_SHADOW
+uniform vec2 cVSMShadowParams;
+#endif
 #endif
 
 #else
@@ -91,12 +100,13 @@ uniform FrameVS
 uniform CameraVS
 {
     vec3 cCameraPos;
-    mat3 cCameraRot;
     float cNearClip;
     float cFarClip;
     vec4 cDepthMode;
     vec3 cFrustumSize;
     vec4 cGBufferOffsets;
+    mat4 cView;
+    mat4 cViewInv;
     mat4 cViewProj;
     vec4 cClipPlane;
 };
@@ -110,8 +120,9 @@ uniform ZoneVS
 
 uniform LightVS
 {
-    vec3 cLightDir;
     vec4 cLightPos;
+    vec3 cLightDir;
+    vec4 cNormalOffsetScale;
 #ifdef NUMVERTEXLIGHTS
     vec4 cVertexLights[4 * 3];
 #else
@@ -170,12 +181,16 @@ uniform LightPS
     vec4 cLightColor;
     vec4 cLightPosPS;
     vec3 cLightDirPS;
+    vec4 cNormalOffsetScalePS;
     vec4 cShadowCubeAdjust;
     vec4 cShadowDepthFade;
     vec2 cShadowIntensity;
     vec2 cShadowMapInvSize;
     vec4 cShadowSplits;
     mat4 cLightMatricesPS[4];
+#ifdef VSM_SHADOW
+    vec2 cVSMShadowParams;
+#endif
 };
 
 #ifndef CUSTOM_MATERIAL_CBUFFER
@@ -185,6 +200,10 @@ uniform MaterialPS
     vec3 cMatEmissiveColor;
     vec3 cMatEnvMapColor;
     vec4 cMatSpecColor;
+    #ifdef PBR
+        float cRoughnessPS;
+        float cMetallicPS;
+    #endif
 };
 #endif
 

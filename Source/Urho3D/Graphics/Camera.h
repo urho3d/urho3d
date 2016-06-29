@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ static const unsigned VO_DISABLE_OCCLUSION = 0x4;
 /// %Camera component.
 class URHO3D_API Camera : public Component
 {
-    OBJECT(Camera, Component);
+    URHO3D_OBJECT(Camera, Component);
 
 public:
     /// Construct.
@@ -149,11 +149,11 @@ public:
     Frustum GetViewSpaceFrustum() const;
     /// Return split frustum in view space.
     Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
-    /// Return ray corresponding to normalized screen coordinates (0.0 - 1.0).
+    /// Return ray corresponding to normalized screen coordinates (0.0 - 1.0), with origin on the near clip plane.
     Ray GetScreenRay(float x, float y) const;
     // Convert a world space point to normalized screen coordinates (0.0 - 1.0).
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
-    // Convert normalized screen coordinates (0.0 - 1.0) and depth to a world space point.
+    // Convert normalized screen coordinates (0.0 - 1.0) and distance (in Z coordinate) to a world space point. The distance can not be closer than the near clip plane.
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
 
     /// Return projection offset.

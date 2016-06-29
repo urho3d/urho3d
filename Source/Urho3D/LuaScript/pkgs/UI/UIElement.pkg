@@ -147,6 +147,10 @@ class UIElement : public Animatable
     void SetInternal(bool enable);
     void SetTraversalMode(TraversalMode traversalMode);
     void SetElementEventSender(bool flag);
+    void AddTag(const String tag);
+    void AddTags(const String tags, char separator);
+    bool RemoveTag(const String tag);
+    void RemoveAllTags();
 
     const String GetName() const;
     const IntVector2& GetPosition() const;
@@ -205,6 +209,12 @@ class UIElement : public Animatable
     const Color& GetDerivedColor() const;
     const Variant& GetVar(StringHash key) const;
     const VariantMap& GetVars() const;
+
+    bool HasTag(const String tag) const;
+    const StringVector& GetTags() const;
+    // void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
+    tolua_outside const PODVector<UIElement*>& UIElementGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const;
+
     IntVector2 ScreenToElement(const IntVector2& screenPosition);
     IntVector2 ElementToScreen(const IntVector2& position);
     bool IsInside(IntVector2 position, bool isScreen);
@@ -315,6 +325,13 @@ static bool UIElementSaveXML(const UIElement* element, const String& fileName, c
         return false;
 
     return element->SaveXML(file, indentation);
+}
+
+static const PODVector<UIElement*>& UIElementGetChildrenWithTag(const UIElement* element, const String& tag, bool recursive = false)
+{
+    static PODVector<UIElement*> dest;
+    element->GetChildrenWithTag(dest, tag, recursive);
+    return dest;
 }
 
 #define GetStyle GetAppliedStyle

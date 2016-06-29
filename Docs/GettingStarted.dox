@@ -12,13 +12,33 @@ Although all required third-party libraries are included as source code, there a
 
 - For Windows, the June 2010 DirectX SDK needs to be installed. This is not necessary if building on Visual Studio 2012 or newer, which install the Windows SDK with the necessary DirectX files.
 
-- For Linux, the following development packages need to be installed: libx11-dev, libxrandr-dev, libasound2-dev on Debian-based distros; libX11-devel, libXrandr-devel, alsa-lib-devel on RedHat-based distros. Also install the package libgl1-mesa-dev (Debian) or mesa-libGL-devel (RH) if your GPU driver does not include OpenGL headers & libs, but in most of the case it usually does and has better performance than Mesa's OpenGL implementation. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
+- For Linux, install one or more of the development packages from each software component category below. Building as 32-bit on a 64-bit system requires installing also the 32-bit versions of the development libraries.
+  + %Database server (optional). Disabled by default even when the development package is installed, use URHO3D_DATABASE_ODBC build option to enable. The two packages below are mutually exclusive. The ODBC driver manager is the recommended package.
+    - libiodbc2-dev (Debian-based) or libiodbc-devel (RedHat-based) for iODBC driver manager.
+    - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager.
+  + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable during application runtime).
+    - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
+    - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
+    - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
+    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11.
+  + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable during application runtime).
+    - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux %Sound Architecture (ALSA).
+    - arts-devel (RedHat-based only) for Analog Real %Time Synthesizer (aRts).
+    - libaudio-dev (Debian-based only) for %Network %Audio System (NAS).
+    - libesd0-dev (Debian-based) or esound-devel (RedHat-based) for Enlightened %Sound Daemon (ESounD).
+    - libfusionsound-dev (Debian-based only, not available on Ubuntu) for FusionSound. Disabled by default even when installed, use SDL_OPT_FUSIONSOUND build option to enable.
+    - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio.
+    - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
+  + Miscellaneous (optional).
+    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+    - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
+    - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
 
-- For Raspberry Pi, the following development packages need to be installed. On Raspbian: libasound2-dev, libudev-dev. On Pidora: alsa-lib-devel, systemd-devel.
+- For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian)o or libevdev (Pidora).
 
 - For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
-- For Android, the Android SDK and Android NDK (minimum API level 12) need to be installed.
+- For Android, the Android SDK (version 12 or later) and Android NDK (r7 or later) need to be installed.
 
 - For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
@@ -26,7 +46,9 @@ To run Urho3D, the minimum system requirements are:
 
 - Windows: CPU with SSE2 instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 3 support.
 
-- Linux & Mac OS X: CPU with SSE2 instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
+- Mac OS X: CPU with SSE2 instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
+
+- Linux: any CPU (MMX, 3DNow!, and SSE/SSE2 instructions will be used if supported), GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
 - Raspberry Pi: %Model B revision 2.0 with at least 128 MB of 512 MB SDRAM allocated for GPU.
 
@@ -34,9 +56,11 @@ To run Urho3D, the minimum system requirements are:
 
 - iOS: OpenGL ES 2.0 capable GPU.
 
-- Emscripten: modern browsers with fast JavaScript engine and HTML5 and WebGL support.
+- Web: modern browsers with fast JavaScript engine and HTML5 and WebGL support.
 
-SSE2 requirement can be eliminated by disabling the use of SSE instruction set, see URHO3D_SSE build option below.
+SSE2 requirement can be eliminated by disabling the use of SSE2 instruction set, see URHO3D_SSE build option below. For Linux platform using GCC/Clang compiler toolchain, the MMX and 3DNow! extensions can be enabled for older CPUs by using URHO3D_MMX and URHO3D_3DNOW build options when the option is available. The MMX and SSE/SSE2 extensions on x86_64 ABI are always enabled, so the URHO3D_MMX and URHO3D_SSE build option do not exist on x86_64 ABI. Also note that MMX extension is effectively enabled when 3DNow! or SSE/SSE2 extension is enabled, so disabling URHO3D_MMX build option in this case has no effect. The URHO3D_MMX and URHO3D_3DNOW build options are disabled by default. They should only be enabled when targeting older CPU with MMX and 3DNow! support, respectively.
+
+The NEON instruction set will be used by default whenever it is available. See the ANDROID_ABI and RPI_ABI build options for more detail for Android and Raspberry-Pi platforms, respectively. The NEON instruction set is always used on iOS and tVOS platforms.
 
 CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
@@ -50,7 +74,7 @@ The basic usage is as follows:
 <script-name> /path/to/build-tree [build-options]
 \endverbatim
 
-Where the <script-name> is one of the provided build script. The /path/to/build-tree is where CMake will be generating the build tree for the project. Both out-of-source build tree and non out-of-source build tree path are now supported. The build options are described in detail in the \ref Build_Options "next section" below.
+Where the <script-name> is one of the provided build script. The /path/to/build-tree is where CMake will be generating the build tree for the project. Both out-of-source build tree and non out-of-source build tree path are now supported. The build options are described in detail in the next section below.
 
 After the build tree has been generated, you can use the build script again to reconfigure it by passing different build options. You can do so as the basic usage above; or by first change the working directory to the already generated build tree and use the following syntax:
 
@@ -70,11 +94,11 @@ A number of build options can be defined when invoking the build scripts or when
 |ANDROID              |0|Configure project using Android cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Android toolchain file for cross-compiling explicitly|
 |RPI                  |0|Configure project using Raspberry Pi cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify RPI toolchain file for cross-compiling explicitly|
 |WIN32                |0|Configure project using MinGW (32-bit or 64-bit) cross-compiler toolchain (cmake_generic.sh only), cmake-gui users need to specify MinGW toolchain file for cross-compiling explicitly|
-|EMSCRIPTEN           |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
+|WEB                  |0|Configure project using Emscripten cross-compiler toolchain (cmake_generic.bat and cmake_generic.sh only), cmake-gui users need to specify Emscripten toolchain file for cross-compiling explicitly|
 |IOS                  |0|Configure project for targeting iOS platform (cmake_generic.sh and cmake-gui only)|
-|URHO3D_64BIT         |*|Enable 64-bit build, on MSVC default to 0, on other compilers the default is set based on the 64-bit capability of the chosen toolchain on host system|
+|URHO3D_64BIT         |*|Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain|
 |URHO3D_ANGELSCRIPT   |1|Enable AngelScript scripting support|
-|URHO3D_LUA           |0|Enable Lua scripting support|
+|URHO3D_LUA           |1|Enable Lua scripting support|
 |URHO3D_LUAJIT        |0|Enable Lua scripting support using LuaJIT (check LuaJIT's CMakeLists.txt for more options)|
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
@@ -83,23 +107,26 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
-|URHO3D_SAMPLES       |0|Build sample applications|
-|URHO3D_TOOLS         |1|Build tools (native and RPI only)|
-|URHO3D_EXTRAS        |0|Build extras (native and RPI only)|
+|URHO3D_SAMPLES       |1|Build sample applications|
+|URHO3D_TOOLS         |1|Build tools (native, RPI, and generic ARM only)|
+|URHO3D_EXTRAS        |0|Build extras (native, RPI, and generic ARM only)|
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
 |URHO3D_PCH           |1|Enable PCH support|
-|URHO3D_DATABASE_ODBC |0|Enable Database support with ODBC, requires vendor-specific ODBC driver|
-|URHO3D_DATABASE_SQLITE|0|Enable Database support with SQLite embedded|
-|URHO3D_SSE           |1|Enable SSE2 instruction set (HTML5 and Intel platforms only including Android on Intel Atom)|
+|URHO3D_DATABASE_ODBC |0|Enable %Database support with ODBC, requires vendor-specific ODBC driver|
+|URHO3D_DATABASE_SQLITE|0|Enable %Database support with SQLite embedded|
+|URHO3D_C++11         |0|Enable use of C++11 standard|
+|URHO3D_MMX           |0|Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support|
+|URHO3D_3DNOW         |0|Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support|
+|URHO3D_SSE           |*|Enable SSE/SSE2 instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
 |URHO3D_MINIDUMPS     |1|Enable minidumps on crash (VS only)|
 |URHO3D_FILEWATCHER   |1|Enable filewatcher support|
-|URHO3D_PACKAGING     |*|Enable resources packaging support, on Emscripten default to 1, on other platforms default to 0|
+|URHO3D_PACKAGING     |*|Enable resources packaging support, on Web platform default to 1, on other platforms default to 0|
 |URHO3D_PROFILING     |1|Enable profiling support|
 |URHO3D_LOGGING       |1|Enable logging support|
-|URHO3D_THREADING     |*|Enable thread support, on Emscripten default to 0, on other platforms default to 1|
+|URHO3D_THREADING     |*|Enable thread support, on Web platform default to 0, on other platforms default to 1|
 |URHO3D_TESTING       |0|Enable testing support|
-|URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Emscripten platform and 5 on other platforms|
+|URHO3D_TEST_TIMEOUT  |*|Number of seconds to test run the executables (when testing support is enabled only), default to 10 on Web platform and 5 on other platforms|
 |URHO3D_OPENGL        |0|Use OpenGL instead of Direct3D (Windows platform only)|
 |URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
@@ -110,25 +137,31 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
-|URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (external project only)|
+|URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (downstream project only)|
+|URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors|
 |CMAKE_BUILD_TYPE     |Release|Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
 |CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
 |IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified, the minimum spported target is 3.0 due to constraint from SDL library|
 |ANDROID_ABI          |armeabi-v7a|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
-|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 12 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
+|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 9 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
+|ANDROID_TOOLCHAIN_NAME|*|Specify the name of compiler toolchain (Android build only), possible values depends on installed NDK version, default to arm-linux-androideabi-4.9 in most recent Android NDKs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
-|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW cross-compiling build only)|
+|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (Linux on ARM cross-compiling build only)|
+|ARM_SYSROOT          |-|Path to ARM system root (Linux on ARM cross-compiling build only)|
+|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
 |EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 33554432 (32MB), this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
+|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values|
+|EMSCRIPTEN_SYSTEM_LIBS|-|Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten cross-compiling build only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 
@@ -137,10 +170,10 @@ Note that the specified build option values are cached by CMake after the initia
 A native build of Urho3D has two steps:
 
 -# Run CMake in the root directory (which is also CMake's source tree) with your preferred generator and toolchain specified to generate the build tree. You can use cmake-gui or the provided batch files or shell scripts on the respective host system. All the batch files and shell scripts expect the build tree location to be passed as the first argument, or to execute them in the build tree itself when reconfiguring the existing build tree.\n
-    - Windows: cmake_vs20xx.bat, cmake_mingw.bat, cmake_codeblock.bat, cmake_ninja.bat, or cmake_generic.bat\n
-    - Mac OS X: cmake_macosx.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
-    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
-    - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - Windows: cmake_vs20xx.bat, cmake_mingw.bat, cmake_codeblock.bat, cmake_codelite.bat cmake_ninja.bat, or cmake_generic.bat\n
+    - Mac OS X: cmake_xcode.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
 -# Use the IDE of your choice to open the CMake's generated project file or solution file in the build tree. Change the build configuration (Debug/Release) and change the built-in target to ALL_BUILD to build all the targets.\n
     - Visual Studio: open Urho3D.sln\n
     - Xcode: open Urho3D.xcodeproj\n
@@ -154,13 +187,9 @@ On Windows platform Urho3D can use either Direct3D 9 (default), Direct3D 11 or O
 
 If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D can be enabled with the "-DURHO3D_OPENGL=0" build option.
 
-After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled. Unless your build tree location is also the same as the Urho3D project source tree, in order to run the Urho3D executables successfully, you must do one of the following first:
-- Copy both the bin/Data and bin/CoreData directories in the source tree to the bin subdirectory in the build tree.
-- Instead of copying, just create symbolic links in the build tree pointing to the above two directories.
-- Or even better, use the 'resource prefix path' \ref Running_Commandline "engine parameter" by setting URHO3D_PREFIX_PATH variable in your host environment. The prefix variable must be set to an absolute path which contains the resource directories.
-- Or use the URHO3D_PACKAGING build option which would package the resource directories as *.pak files in the bin subdirectory in the build tree.
+After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
 
-The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph.
+The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph. Note that the Mach-O universal binary targets can only be built when Xcode generator is used. All the other generators only build single-arch binary targets.
 
 The Windows executables are by default built as Windows application instead of console application. You can set the URHO3D_WIN32_CONSOLE build option to override this. As console application, the standard output and standard error streams of the executable are redirected to console.
 
@@ -188,7 +217,7 @@ On Windows host, execute cmake_android.bat. On OS X or Linux host, execute cmake
 - ant debug
 \endverbatim
 
-Where the <target-id> is one of the target id returned by "android list target" command. The <num-jobs> is the number of concurrent compiler jobs to be spawned by make command.
+You only need to update the Android project once in each new build tree, use the -t <target-id> option when you want to modify the target SDK version. The <target-id> is one of the target id returned by "android list target" command (or "android list target |grep android-" when you are on *nix host system). The <num-jobs> is the number of concurrent compiler jobs to be spawned by make command.
 
 After the commands finish successfully, the APK should have been generated in the build tree's "bin" subdirectory, from where it can be installed on a device or an emulator. The command "ant installd" can be used for this. Optionally when you have Rake installed, after the debug APK has been installed then you can use "rake android" command to automate the test running of the APK on an attached Android (virtual) device.
 
@@ -214,7 +243,7 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above.
 
-For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. You can just download from the "strip" branch to cut down the download time and size. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
+For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. You may pass the optional RPI_ABI build option to specifically target for the Raspberry Pi 2. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
 
@@ -234,7 +263,6 @@ Execute cmake_mingw.sh then go to the build tree to execute make command. After 
 
 > WHAT DOESN'T WORK:
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
->    - AngelScript scripting support.
 
 This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
@@ -263,7 +291,7 @@ The build process first builds the Urho3D library target (either static or share
 
 To install the Urho3D library as an SDK, use the usual 'make install' command. There is an equivalent built-in target called "install" in Visual Studio solution and Xcode project to perform the SDK installation. This could be useful when you want your application to always link against a 'stable' installed version of the Urho3D library, while keeping your Urho3D project root tree in sync with origin/master; or when you want other users in the same host system to use the installed Urho3D SDK instead of them building from source again.
 
-The default install prefix is 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts. You can use the CMAKE_INSTALL_PREFIX build option to alter this prefix path. However, when cross-compiling you may actually want to alter the final installation destination by supplying DESDIR environment variable instead of altering the CMAKE_INSTALL_PREFIX variable directly, especially when using Urho3D library as shared library type because the installed executables have their RPATH adjusted relative to CMAKE_INSTALL_PREFIX. The DESTDIR environment variable is not applicable for installation on Windows host, i.e. it can only use CMAKE_INSTALL_PREFIX variable to alter the final installation destination. This is not a lost, however, because there is no RPATH adjustment for Windows platform, but as the result the Urho3D.dll will be installed in a same directory as the installed executables.
+The default install prefix is 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts. You can use the CMAKE_INSTALL_PREFIX build option to alter this prefix path. However, when cross-compiling you may actually want to alter the final installation destination by supplying DESTDIR environment variable instead of altering the CMAKE_INSTALL_PREFIX variable directly, especially when using Urho3D library as shared library type because the installed executables have their RPATH adjusted relative to CMAKE_INSTALL_PREFIX. The DESTDIR environment variable is not applicable for installation on Windows host, i.e. it can only use CMAKE_INSTALL_PREFIX variable to alter the final installation destination. This is not a lost, however, because there is no RPATH adjustment for Windows platform, but as the result the Urho3D.dll will be installed in a same directory as the installed executables.
 
 If the Urho3D SDK is installed to a system-wide default location then the Urho3D library can be found by FindUrho3D CMake module automatically without the help of URHO3D_HOME environment variable or build option. When cross-compiling, the system-wide default location is usually in the system root of the cross-compiling target. To get a corresponding system root path for a cross-compiling build tree, you can use SYSROOT internal variable stored in the CMake cache. You can then use the system root path to set the DESTDIR environment variable in order to stage the Urho3D SDK installation in the corresponding system root. For example:
 
@@ -310,9 +338,6 @@ CCACHE_SLOPPINESS=pch_defines,time_macros
 
 Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
 
-> There are some caveats with ccache support on Emscripten compiler toolchain. At the moment to enable ccache support for Emscripten, you also need to set 'CCACHE_CPP2' environment variable to 1 (see Emscripten issue [#3365](https://github.com/kripken/emscripten/issues/3365) for more detail).
-> This upstream issue has been closed. The issue is now fixed in the Emscripten incoming branch.
-
 You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
 
 Ensure the ccache symlinks directory is being added as the first entry in the 'PATH' environment variable so the symlinks of the compiler toolchain is being found first by CMake rather than the actual compiler toolchain. This is especially important for native build. Usually the 'PATH' environment variable has been set correctly for ccache in RedHat-based host system such as Fedora, but it is not the case in Debian-based host system such as Ubuntu nor in Mac OS X host system with homebrew's ccache installation. For the latter case, use "whereis -b ccache" or "brew info ccache" to find out where your ccache symlinks directory is and adjust the 'PATH' environment variable accordingly.
@@ -327,14 +352,14 @@ cd $(dirname $(xcodebuild -find-executable clang))
 for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
 \endverbatim
 
-On Xcode 6:
+On Xcode 6 or above:
 \verbatim
 cd $(dirname $(xcodebuild -find-executable clang))
 cp -p $(which ccache) .
-for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/$compiler.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
+for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
 \endverbatim
 
-Xcode 6 has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
+Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
 
 \page Running Running Urho3D player application
 
@@ -364,10 +389,13 @@ The engine can be configured using the following command line options.
 -t           Enable triple buffering
 -w           Start in windowed mode
 -s           Enable resizing when in windowed mode
+-hd          Enable high DPI, only supported by Apple platforms (OSX, iOS, and tvOS)
 -q           Enable quiet mode which does not log to standard output stream
 -b <length>  Sound buffer length in milliseconds
 -r <freq>    Sound mixing frequency in Hz
--pp <path>   Resource prefix path, default to URHO3D_PREFIX_PATH env-var or executable path
+-pp <paths>  Resource prefix path(s), separated by semicolons, default to executable path
+             The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var
+             When both are defined, the paths set by -pp takes higher precedence
 -p <paths>   Resource path(s) to use, separated by semicolons, default to 'Data;CoreData'
 -pf <files>  Resource package file to use, separated by semicolons, default to none
 -ap <paths>  Resource autoload path(s), separated by semicolons, default to 'AutoLoad'
@@ -434,6 +462,7 @@ F1          Toggle console
 F2          Toggle profiling display
 F3          Toggle physics debug geometry
 F4          Toggle octree debug geometry
+F5          Toggle event profiling display
 \endverbatim
 
 If a joystick is connected, it can also be used for controlling the player character.
@@ -476,7 +505,11 @@ F2          Toggle debug HUD
 
 \tableofcontents
 
-This page shows how to create a new C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other. You should also clean the cache when you change the path in the URHO3D_HOME environment variable.
+This page shows how to create a new downstream C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other, or simply delete and recreate your project build tree from scratch.
+
+> Migration note if you are migrating from Urho3D prior to release 1.4:
+>    - You are probably better of to regenerate your build tree from scratch due to some of the directory renaming in the project structure.
+>    - You must adjust the URHO3D_HOME environment variable in your build because we have changed the meaning of this variable. In release 1.4 onward, the URHO3D_HOME environment variable is supposed to point to the build tree of the Urho3D project. In prior releases, the URHO3D_HOME was supposed to point to Urho3D project root itself.
 
 First of all, structure your project similar to Urho3D project as below. Although this is not mandatory, it should increase the chance the CMake modules designed for Urho3D project also works out of the box for your project too. CMake and our CMake modules are case-sensitive. It is recommended that your project adheres to the same naming convention as Urho3D project uses, even when the filesystem in your host system is not case-sensitive.
 
@@ -493,17 +526,17 @@ First of all, structure your project similar to Urho3D project as below. Althoug
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You may want to copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everwhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can also pass most of the \ref Build_Options supported by Urho3D project. In fact, you probably have to pass a compatible build options with the Urho3D library that you intend to use to avoid any conflict.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets (if you do not follow this convention then in order to run the Urho3D executables successfully, you must use the '-pp' \ref Running_Commandline "command line option" or use the URHO3D_PREFIX_PATH environment variable to point to your resource directories). You must copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory, unless you just want to use cmake-gui for your own project configuration and generation. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everywhere. The build scripts work together with the Urho3D CMake modules to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can only pass the \ref Build_Options that are applicable to downstream projects. Be mindful that conflicting build options would be ignored.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
 \code
-# Set project name
-project (MyProjectName)
-
-# Set minimum version
-cmake_minimum_required (VERSION 2.8.6)
-
+# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+if (WIN32)
+    cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
+else ()
+    cmake_minimum_required (VERSION 2.8.6)
+endif ()
 if (COMMAND cmake_policy)
     cmake_policy (SET CMP0003 NEW)
     if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -511,22 +544,21 @@ if (COMMAND cmake_policy)
         cmake_policy (SET CMP0022 NEW)
     endif ()
     if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        # Disallow use of the LOCATION target property - therefore we set to OLD as we still need it
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
         cmake_policy (SET CMP0026 OLD)
         # MACOSX_RPATH is enabled by default
         cmake_policy (SET CMP0042 NEW)
     endif ()
 endif ()
 
+# Set project name
+project (MyProjectName)
+
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
 # Include Urho3D Cmake common module
 include (Urho3D-CMake-common)
-
-# Find Urho3D library
-find_package (Urho3D REQUIRED)
-include_directories (${URHO3D_INCLUDE_DIRS})
 
 # Define target name
 set (TARGET_NAME MyExecutableName)
@@ -538,9 +570,9 @@ define_source_files ()
 setup_main_executable ()
 \endcode
 
-The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project.
+The CMAKE_MODULE_PATH is setup so that CMake can find the Urho3D-specific CMake modules provided by Urho3D project inside your own project. The Urho3D-CMake-common.cmake is the module where all the reusable commands and macros are defined. It also gives your project cross-platform build capability similar to Urho3D project. It does this by automatically finding the required software library components specific for your target platform and configuring your project to use them together with the platform-specific compiler flags and definitions. It utilizes CMake-provided as well as Urho3D custom-made FindXXX modules to get the work done. So, it is important to get the CMAKE_MODULE_PATH setup correctly in your project early on.
 
-When both Urho3D static and shared library are built and available in the Urho3D project's library output directory in its build tree, the FindUrho3D.cmake module has precedence to first select static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to explicitly specify which Urho3D library type to be selected. When linking statically against Urho3D static library, Urho3D-CMake-common.cmake module automatically set "URHO3D_STATIC_DEFINE" compiler define for your project. This compiler define is crucial for static linking, especially on MSVC. If you do not use our CMake modules to configure your project then you have to ensure you manually set this compiler define in your project.
+Your own project naturally depends on Urho3D project, or to be more precise it depends on Urho3D library. The Urho3D library needs to be built first so that it can be found later by your own project. When using GCC/Clang or one of its derivatives, both Urho3D static and shared libraries could be potentially built/installed at a same location and coexist. In such cases the FindUrho3D.cmake module, the module responsible to find Urho3D software library component, has precedence to first find the static library type over over shared library type. However, you can use URHO3D_LIB_TYPE build option to override this precedence. When using MSVC compiler, both static and shared libraries could not be built/installed at a same location because both the static library and import library have a same file extension. However, for MSVC, it is possible to have both Release and Debug versions of either static or shared library type built/installed at a same location. In such cases the FindUrho3D.cmake module would automatically utilize both of Release and Debug versions as appropriate in your project for Release and Debug build configuration, respectively, without user intervention.
 
 As described earlier there are two approaches on how to find the Urho3D library. The FindUrho3D.cmake module is designed not only able to find Urho3D library from the Urho3D SDK installation, but also from any Urho3D project build tree directly. When searching in Urho3D SDK installed in a system-wide default location then no additional variable need to be set. When searching in a non-default SDK installation or when searching in any Urho3D project build tree then the actual location need to be provided via URHO3D_HOME environment variable (set in the host system) or URHO3D_HOME build option (set using -D at command line or in cmake-gui).
 
@@ -613,9 +645,9 @@ To build:
 rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build_tree=/path/to/build-tree] [numjobs=n] [clean_first] [unfilter]
 \endverbatim
 
-The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'macosx', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015'.
+The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'.
 
-The default <platform> when not specified is 'native'. The possible values are: 'android', 'emscripten', 'ios', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
+The default <platform> when not specified is 'native'. The possible values are: 'android', 'web', 'ios', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
 
 When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absense of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfilter' option to get the output from 'xcodebuild' tool unfiltered regardless the 'xcpretty' is installed or not. You can pass the 'clean_first' option to perform a clean build. By default this task invokes the respective build tool to use all the logical CPU cores available, but you can use the 'numjobs' option to override this default.
 
@@ -637,7 +669,7 @@ under the Source/Urho3D directory:
 
 - Container. Provides STL replacement classes and shared pointers.
 - Math. Provides vector, quaternion & matrix types and geometric shapes used in intersection tests.
-- Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Event "event handling", threading and profiling.
+- Core. Provides the execution Context, the base class Object for typed objects, object factories, \ref Events "event handling", threading and profiling.
 - IO. Provides file system access, stream input/output and logging.
 - %Resource. Provides the ResourceCache and the base resource types, including XML documents.
 - %Scene. Provides Node and Component classes, from which Urho3D scenes are built.
@@ -701,9 +733,12 @@ Urho3D uses the following conventions and principles:
 
 - Path names use slash instead of backslash. Paths will be converted internally into the necessary format when calling into the operating system.
 
-- In the script API, properties are used whenever appropriate instead of %Set... and Get... functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
+- In the script API, properties are used whenever appropriate instead of %Set...() and Get...() functions. If the setter and getter require index parameters, the property will use array-style indexing, and its name will be in plural. For example model->SetMaterial(0, myMaterial) in C++ would become model.materials[0] = myMaterial in script.
 
 - Raw pointers are used whenever possible in the classes' public API. This simplifies exposing functions & classes to script, and is relatively safe, because SharedPtr & WeakPtr use intrusive reference counting.
+
+- When an object's public API allows assigning a reference counted object to it through a %Set...() function, this implies ownership through a SharedPtr. For example assigning a Material to a StaticModel, or a Viewport to Renderer. To end
+the assignment and free the reference counted object, call the Set...() function again with a null argument.
 
 - No C++ exceptions. Error return values (false / null pointer / dummy reference) are used instead. %Script exceptions are used when there is no other sensible way, such as with out of bounds array access.
 
@@ -711,7 +746,7 @@ Urho3D uses the following conventions and principles:
 
 - Third party libraries are included as source code for the build process. They are however hidden from the public API as completely as possible.
 
-For more details related to the C++ coding style, see also \ref CodingConventions "Coding conventions".
+For more details related to the C++ coding style, see also \subpage CodingConventions "Coding conventions".
 
 
 \page EditorInstructions Editor instructions
@@ -857,7 +892,7 @@ In addition to whole scenes, single scene nodes including all their components a
 
 Primitive geometries (boxes, spheres, cylinders) can be instantiated from the Create menu. Note that these are just ordinary model files in the bin/Data/Models directory; their Blender format source files are in the SourceAssets directory.
 
-Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
+Additionally a resource browser is available to access the contents of resource directories. Whenever the editor is opened or a scene is loaded the resource browser scans for resources. If at anytime the resources change the reload button can be pressed at the top-right of the resource browser and the resource browser will rescan. Two methods are provided to find resources. A tree view of the folders and a search bar. The search box utilizes a simple string substring of the filename. Resources can also be filtered by type by opening the filter panel which is toggled by the small filter icon.  There are lots of contextual options for each resource type such as dragging a resource into the hierarchy view, a %LineEdit, or in the viewport.  A right click context menu on a resource in the browser will give additional options per resource type.
 
 
 \section EditorInstructions_Importing Importing

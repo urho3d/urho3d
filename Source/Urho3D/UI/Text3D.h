@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ class Text;
 /// 3D text component.
 class URHO3D_API Text3D : public Drawable
 {
-    OBJECT(Text3D, Drawable);
+    URHO3D_OBJECT(Text3D, Drawable);
 
 public:
     /// Construct.
@@ -76,6 +76,12 @@ public:
     void SetWordwrap(bool enable);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
+    /// Set shadow offset.
+    void SetEffectShadowOffset(const IntVector2& offset);
+    /// Set stroke thickness.
+    void SetEffectStrokeThickness(int thickness);
+    /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
     /// Set effect Z bias.
@@ -88,15 +94,17 @@ public:
     void SetColor(Corner corner, const Color& color);
     /// Set opacity.
     void SetOpacity(float opacity);
+    /// Set whether text has fixed size on screen (pixel-perfect) regardless of distance to camera. Works best when combined with face camera rotation. Default false.
+    void SetFixedScreenSize(bool enable);
     /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
     void SetFaceCameraMode(FaceCameraMode mode);
 
     /// Return font.
     Font* GetFont() const;
-    /// Return material.
-    Material* GetMaterial() const;
     /// Return font size.
     int GetFontSize() const;
+    /// Return material.
+    Material* GetMaterial() const;
     /// Return text.
     const String& GetText() const;
     /// Return row alignment.
@@ -111,6 +119,12 @@ public:
     bool GetWordwrap() const;
     /// Return text effect.
     TextEffect GetTextEffect() const;
+    /// Return effect shadow offset.
+    const IntVector2& GetEffectShadowOffset() const;
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() const;
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() const;
     /// Return effect color.
     const Color& GetEffectColor() const;
     /// Return effect depth bias.
@@ -133,7 +147,8 @@ public:
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
     float GetOpacity() const;
-
+    /// Return whether text has fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
     /// Return how the text rotates in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
@@ -154,15 +169,15 @@ protected:
     virtual void OnNodeSet(Node* node);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
-
-private:
     /// Mark text & geometry dirty.
     void MarkTextDirty();
     /// Update text %UI batches.
     void UpdateTextBatches();
     /// Create materials for text rendering. May only be called from the main thread. Text %UI batches must be up-to-date.
     void UpdateTextMaterials(bool forceUpdate = false);
-
+    /// Recalculate camera facing and fixed screen size.
+    void CalculateFixedScreenSize(const FrameInfo& frame);
+    
     /// Internally used text element.
     Text text_;
     /// Geometries.
@@ -179,12 +194,16 @@ private:
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Fixed screen size flag.
+    bool fixedScreenSize_;
     /// Text needs update flag.
     bool textDirty_;
     /// Geometry dirty flag.
     bool geometryDirty_;
     /// Flag for whether currently using SDF shader defines in the generated material.
     bool usingSDFShader_;
+    /// Font texture data lost flag.
+    bool fontDataLost_;
 };
 
 }

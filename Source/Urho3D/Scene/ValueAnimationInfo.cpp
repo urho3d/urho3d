@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -140,7 +140,7 @@ float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished)
         return Clamp(currentTime, beginTime, endTime);
 
     default:
-        LOGERROR("Unsupported attribute animation wrap mode");
+        URHO3D_LOGERROR("Unsupported attribute animation wrap mode");
         return beginTime;
     }
 }

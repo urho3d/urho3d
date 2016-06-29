@@ -1,0 +1,72 @@
+#
+# Copyright (c) 2008-2016 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+version: '{build}'
+platform:
+  - x86
+  - x64
+clone_depth: 50
+environment:
+  GIT_NAME:
+    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
+  GIT_EMAIL:
+    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
+  GH_TOKEN:
+    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
+  SF_KEY:
+    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
+  SF_API:
+    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+# Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
+  build_tree: Build
+  config: Release
+# We cannot afford to have a large matrix on AppVeyor at the moment
+  URHO3D_D3D11: 1
+  matrix:
+    - URHO3D_LIB_TYPE: STATIC
+    - URHO3D_LIB_TYPE: SHARED
+install:
+  - rake ci_timer
+  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+        {
+          $env:PACKAGE_UPLOAD = "1";
+          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
+          do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
+        }
+        else
+        {
+          iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
+        }
+build_script:
+  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
+  - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
+# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
+  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
+  - rake ci_timer
+test: off
+artifacts:
+  - path: Build\*.zip
+deploy: off
+
+# vi: set ts=2 sw=2 expandtab:

@@ -33,24 +33,29 @@
 enum _intel_code_t {
 	NA,
 	NO_CODE,
-	PENTIUM,
+	PENTIUM = 10,
 	MOBILE_PENTIUM,
-	XEON,
+	
+	XEON = 20,
 	XEON_IRWIN,
 	XEONMP,
 	XEON_POTOMAC,
 	XEON_I7,
 	XEON_GAINESTOWN,
 	XEON_WESTMERE,
-	MOBILE_PENTIUM_M,
+	
+	MOBILE_PENTIUM_M = 30,
 	CELERON,
 	MOBILE_CELERON,
 	NOT_CELERON,
-	CORE_SOLO,
+	
+	
+	CORE_SOLO = 40,
 	MOBILE_CORE_SOLO,
 	CORE_DUO,
 	MOBILE_CORE_DUO,
-	WOLFDALE,
+	
+	WOLFDALE = 50,
 	MEROM,
 	PENRYN,
 	QUAD_CORE,
@@ -58,12 +63,28 @@ enum _intel_code_t {
 	QUAD_CORE_HT,
 	MORE_THAN_QUADCORE,
 	PENTIUM_D,
-	ATOM_DIAMONDVILLE,
-	ATOM_DUALCORE,
+	
+	ATOM = 60,
 	ATOM_SILVERTHORNE,
-	CORE_I3,
+	ATOM_DIAMONDVILLE,
+	ATOM_PINEVIEW,
+	ATOM_CEDARVIEW,
+	
+	CORE_I3 = 70,
 	CORE_I5,
 	CORE_I7,
+	CORE_IVY3, /* 22nm Core-iX */
+	CORE_IVY5,
+	CORE_IVY7,
+	CORE_HASWELL3, /* 22nm Core-iX, Haswell */
+	CORE_HASWELL5,
+	CORE_HASWELL7,
+	CORE_BROADWELL3, /* 14nm Core-iX, Broadwell */
+	CORE_BROADWELL5,
+	CORE_BROADWELL7,
+	CORE_SKYLAKE3, /* 14nm Core-iX, Skylake */
+	CORE_SKYLAKE5,
+	CORE_SKYLAKE7,
 };
 typedef enum _intel_code_t intel_code_t;
 
@@ -79,6 +100,8 @@ enum _intel_model_t {
 	_5200,
 	_5300,
 	_5400,
+	_2xxx, /* Core i[357] 2xxx */
+	_3xxx, /* Core i[357] 3xxx */
 };
 typedef enum _intel_model_t intel_model_t;
 
@@ -197,10 +220,12 @@ const struct match_entry_t cpudb_intel[] = {
 	{  6, 13, -1, -1, -1,   1,    -1,    -1, MOBILE_PENTIUM_M  ,     0, "Pentium M (Dothan)"         },
 	{  6, 13, -1, -1, -1,   1,    -1,    -1, CELERON           ,     0, "Celeron M"                  },
 	
-	{  6, 12, -1, -1, -1,   1,    -1,    -1, NO_CODE           ,     0, "Unknown Atom"               },
-	{  6, 12, -1, -1, -1,   1,    -1,    -1, ATOM_DIAMONDVILLE ,     0, "Atom (Diamondville)"        },
-	{  6, 12, -1, -1, -1,   1,    -1,    -1, ATOM_DUALCORE     ,     0, "Atom Dual-Core (Diamondville)"  },
-	{  6, 12, -1, -1, -1,   1,    -1,    -1, ATOM_SILVERTHORNE ,     0, "Atom (Silverthorne)"        },
+	{  6, 12, -1, -1, -1,  -1,    -1,    -1, ATOM              ,     0, "Unknown Atom"               },
+	{  6, 12, -1, -1, -1,  -1,    -1,    -1, ATOM_DIAMONDVILLE ,     0, "Atom (Diamondville)"        },
+	{  6, 12, -1, -1, -1,  -1,    -1,    -1, ATOM_SILVERTHORNE ,     0, "Atom (Silverthorne)"        },
+	{  6, 12, -1, -1, -1,  -1,    -1,    -1, ATOM_CEDARVIEW    ,     0, "Atom (Cedarview)"           },
+	{  6,  6, -1, -1, -1,  -1,    -1,    -1, ATOM_CEDARVIEW    ,     0, "Atom (Cedarview)"           },
+	{  6, 12, -1, -1, -1,  -1,    -1,    -1, ATOM_PINEVIEW     ,     0, "Atom (Pineview)"            },
 	
 	/* -------------------------------------------------- */
 	
@@ -247,36 +272,6 @@ const struct match_entry_t cpudb_intel[] = {
 	{  6,  7, -1, -1, 23,   4,  3072,    -1, QUAD_CORE         ,     0, "Yorkfield (Core 2 Quad) 3M"},
 	{  6,  7, -1, -1, 23,   4,  6144,    -1, QUAD_CORE         ,     0, "Yorkfield (Core 2 Quad) 6M"},
 	
-	{  6,  5, -1, -1, 37,   2,    -1,    -1, NO_CODE           ,     0, "Unknown Core i3/i5 CPU"   },
-	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I7           ,     0, "Arrandale (Core i7)"      },
-	{  6,  5, -1, -1, 37,   2,    -1,  3072, CORE_I5           ,     0, "Arrandale (Core i5)"      },
-	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I5           ,     0, "Clarkdale (Core i5)"      },
-	{  6,  5, -1, -1, 37,   4,    -1,  8192, CORE_I5           ,     0, "Lynnfield (Core i5)"      },
-	{  6,  5, -1, -1, 37,   2,    -1,  3072, CORE_I3           ,     0, "Arrandale (Core i3)"      },
-	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I3           ,     0, "Clarkdale (Core i3)"      },
-
-	{  6, 10, -1, -1, 42,  -1,    -1,    -1, NO_CODE           ,     0, "Unknown Sandy Bridge"     },
-	{  6, 10, -1, -1, 42,  -1,    -1,    -1, CORE_I7           ,     0, "Sandy Bridge i7"          },
-	{  6, 10, -1, -1, 42,   4,    -1,    -1, CORE_I7           ,     0, "Sandy Bridge (Core i7)"   },
-	{  6, 10, -1, -1, 42,   4,    -1,    -1, CORE_I5           ,     0, "Sandy Bridge (Core i5)"   },
-	{  6, 10, -1, -1, 42,   1,    -1,    -1, CELERON           ,     0, "Celeron (Sandy Bridge)"   },
-	{  6, 10, -1, -1, 42,   2,    -1,    -1, CELERON           ,     0, "Celeron (Sandy Bridge)"   },
-
-	{  6, 10, -1, -1, 26,   1,    -1,    -1, CORE_I7           ,     0, "Intel Core i7"            },
-	{  6, 10, -1, -1, 26,   4,    -1,    -1, CORE_I7           ,     0, "Bloomfield (Core i7)"     },
-	{  6, 10, -1, -1, 30,   4,    -1,    -1, CORE_I7           ,     0, "Lynnfield (Core i7)"      },
-	{  6, 10, -1, -1, 26,   4,    -1,    -1, XEON_I7           ,     0, "Xeon (Bloomfield)"        },
-
-	{  6, 10, -1, -1, 26,   4,    -1,    -1, XEON_GAINESTOWN   ,     0, "Xeon (Gainestown)"        },
-	{  6, 10, -1, -1, 26,   4,    -1,  4096, XEON_GAINESTOWN   ,     0, "Xeon (Gainestown) 4M"     },
-	{  6, 10, -1, -1, 26,   4,    -1,  8192, XEON_GAINESTOWN   ,     0, "Xeon (Gainestown) 8M"     },
-	
-	{  6, 12, -1, -1, 44,  -1,    -1,    -1, XEON_WESTMERE     ,     0, "Xeon (Westmere-based)"    },
-	{  6, 12, -1, -1, 44,   4,    -1, 12288, CORE_I7           ,     0, "Gulftown (Core i7)"       },
-	{  6, 12, -1, -1, 44,  -1,    -1, 12288, XEON_WESTMERE     ,     0, "Xeon (Gulftown)"          },
-	
-	
-	
 	/* Core microarchitecture-based Xeons: */
 	{  6, 14, -1, -1, 14,   1,    -1,    -1, XEON              ,     0, "Xeon LV"                  },
 	{  6, 15, -1, -1, 15,   2,  4096,    -1, XEON              , _5100, "Xeon (Woodcrest)"         },
@@ -289,6 +284,79 @@ const struct match_entry_t cpudb_intel[] = {
 	{  6,  7, -1, -1, 23,   4,  6144,    -1, XEON              , _5400, "Xeon (Harpertown)"        },
 	{  6,  7, -1, -1, 23,   4,  3072,    -1, XEON              , X3300, "Xeon (Yorkfield/3M)"      },
 	{  6,  7, -1, -1, 23,   4,  6144,    -1, XEON              , X3300, "Xeon (Yorkfield/6M)"      },
+
+	/* Nehalem CPUs (45nm): */
+	{  6, 10, -1, -1, 26,   4,    -1,    -1, XEON_GAINESTOWN   ,     0, "Gainestown (Xeon)"        },
+	{  6, 10, -1, -1, 26,   4,    -1,  4096, XEON_GAINESTOWN   ,     0, "Gainestown 4M (Xeon)"     },
+	{  6, 10, -1, -1, 26,   4,    -1,  8192, XEON_GAINESTOWN   ,     0, "Gainestown 8M (Xeon)"     },
+	{  6, 10, -1, -1, 26,   4,    -1,    -1, XEON_I7           ,     0, "Bloomfield (Xeon)"        },
+	{  6, 10, -1, -1, 26,   4,    -1,    -1, CORE_I7           ,     0, "Bloomfield (Core i7)"     },
+	{  6, 10, -1, -1, 30,   4,    -1,    -1, CORE_I7           ,     0, "Lynnfield (Core i7)"      },
+	{  6,  5, -1, -1, 37,   4,    -1,  8192, CORE_I5           ,     0, "Lynnfield (Core i5)"      },
+
+	/* Westmere CPUs (32nm): */
+	{  6,  5, -1, -1, 37,   2,    -1,    -1, NO_CODE           ,     0, "Unknown Core i3/i5"       },
+	{  6, 12, -1, -1, 44,  -1,    -1,    -1, XEON_WESTMERE     ,     0, "Westmere (Xeon)"          },
+	{  6, 12, -1, -1, 44,  -1,    -1, 12288, XEON_WESTMERE     ,     0, "Gulftown (Xeon)"          },
+	{  6, 12, -1, -1, 44,   4,    -1, 12288, CORE_I7           ,     0, "Gulftown (Core i7)"       },
+	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I5           ,     0, "Clarkdale (Core i5)"      },
+	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I3           ,     0, "Clarkdale (Core i3)"      },
+	{  6,  5, -1, -1, 37,   2,    -1,  4096, CORE_I7           ,     0, "Arrandale (Core i7)"      },
+	{  6,  5, -1, -1, 37,   2,    -1,  3072, CORE_I5           ,     0, "Arrandale (Core i5)"      },
+	{  6,  5, -1, -1, 37,   2,    -1,  3072, CORE_I3           ,     0, "Arrandale (Core i3)"      },
+
+	/* Sandy Bridge CPUs (32nm): */
+	{  6, 10, -1, -1, 42,  -1,    -1,    -1, NO_CODE           ,     0, "Unknown Sandy Bridge"     },
+	{  6, 10, -1, -1, 42,  -1,    -1,    -1, XEON              ,     0, "Sandy Bridge (Xeon)"      },
+	{  6, 10, -1, -1, 42,  -1,    -1,    -1, CORE_I7           ,     0, "Sandy Bridge (Core i7)"   },
+	{  6, 10, -1, -1, 42,   4,    -1,    -1, CORE_I7           ,     0, "Sandy Bridge (Core i7)"   },
+	{  6, 10, -1, -1, 42,   4,    -1,    -1, CORE_I5           ,     0, "Sandy Bridge (Core i5)"   },
+	{  6, 10, -1, -1, 42,   2,    -1,    -1, CORE_I3           ,     0, "Sandy Bridge (Core i3)"   },
+	{  6, 10, -1, -1, 42,   2,    -1,    -1, PENTIUM           ,     0, "Sandy Bridge (Pentium)"   },
+	{  6, 10, -1, -1, 42,   1,    -1,    -1, CELERON           ,     0, "Sandy Bridge (Celeron)"   },
+	{  6, 10, -1, -1, 42,   2,    -1,    -1, CELERON           ,     0, "Sandy Bridge (Celeron)"   },
+	{  6, 13, -1, -1, 45,  -1,    -1,    -1, NO_CODE           ,     0, "Sandy Bridge-E"           },
+	{  6, 13, -1, -1, 45,  -1,    -1,    -1, XEON              ,     0, "Sandy Bridge-E (Xeon)"    },
+
+	/* Ivy Bridge CPUs (22nm): */
+	{  6, 10, -1, -1, 58,  -1,    -1,    -1, XEON              ,     0, "Ivy Bridge (Xeon)"        },
+	{  6, 10, -1, -1, 58,   4,    -1,    -1, CORE_IVY7         ,     0, "Ivy Bridge (Core i7)"   },
+	{  6, 10, -1, -1, 58,   4,    -1,    -1, CORE_IVY5         ,     0, "Ivy Bridge (Core i5)"   },
+	{  6, 10, -1, -1, 58,   2,    -1,    -1, CORE_IVY3         ,     0, "Ivy Bridge (Core i3)"   },
+	{  6, 10, -1, -1, 58,   2,    -1,    -1, PENTIUM           ,     0, "Ivy Bridge (Pentium)"     },
+	{  6, 10, -1, -1, 58,   1,    -1,    -1, CELERON           ,     0, "Ivy Bridge (Celeron)"     },
+	{  6, 10, -1, -1, 58,   2,    -1,    -1, CELERON           ,     0, "Ivy Bridge (Celeron)"     },
+	{  6, 14, -1, -1, 62,  -1,    -1,    -1, NO_CODE           ,     0, "Ivy Bridge-E"             },
+	
+	/* Haswell CPUs (22nm): */
+	{  6, 12, -1, -1, 60,  -1,    -1,    -1, XEON              ,     0, "Haswell (Xeon)"           },
+	{  6, 12, -1, -1, 60,   4,    -1,    -1, CORE_HASWELL7     ,     0, "Haswell (Core i7)"   },
+	{  6,  5, -1, -1, 69,   4,    -1,    -1, CORE_HASWELL7     ,     0, "Haswell (Core i7)"   },
+	{  6, 12, -1, -1, 60,   4,    -1,    -1, CORE_HASWELL5     ,     0, "Haswell (Core i5)"        },
+	{  6,  5, -1, -1, 69,   4,    -1,    -1, CORE_HASWELL5     ,     0, "Haswell (Core i5)"        },
+	{  6, 12, -1, -1, 60,   2,    -1,    -1, CORE_HASWELL3     ,     0, "Haswell (Core i3)"        },
+	{  6,  5, -1, -1, 69,   2,    -1,    -1, CORE_HASWELL3     ,     0, "Haswell (Core i3)"   },
+	{  6, 12, -1, -1, 60,   2,    -1,    -1, PENTIUM           ,     0, "Haswell (Pentium)"        },
+	{  6, 12, -1, -1, 60,   2,    -1,    -1, CELERON           ,     0, "Haswell (Celeron)"        },
+	{  6, 12, -1, -1, 60,   1,    -1,    -1, CELERON           ,     0, "Haswell (Celeron)"        },
+	{  6, 15, -1, -1, 63,  -1,    -1,    -1, NO_CODE           ,     0, "Haswell-E"                },
+
+	/* Broadwell CPUs (14nm): */
+	{  6,  7, -1, -1, 71,   4,    -1,    -1, CORE_BROADWELL7   ,     0, "Broadwell (Core i7)"      },
+	{  6,  7, -1, -1, 71,   4,    -1,    -1, CORE_BROADWELL5   ,     0, "Broadwell (Core i5)"      },
+	{  6, 13, -1, -1, 61,   4,    -1,    -1, CORE_BROADWELL7   ,     0, "Broadwell-U (Core i7)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, CORE_BROADWELL7   ,     0, "Broadwell-U (Core i7)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, CORE_BROADWELL5   ,     0, "Broadwell-U (Core i5)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, CORE_BROADWELL3   ,     0, "Broadwell-U (Core i3)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, PENTIUM           ,     0, "Broadwell-U (Pentium)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, CELERON           ,     0, "Broadwell-U (Celeron)"    },
+	{  6, 13, -1, -1, 61,   2,    -1,    -1, NA                ,     0, "Broadwell-U (Core M)"     },
+	
+	/* Skylake CPUs (14nm): */
+	{  6, 14, -1, -1, 94,   4,    -1,    -1, CORE_SKYLAKE7     ,     0, "Skylake (Core i7)"        },
+	{  6, 14, -1, -1, 94,   4,    -1,    -1, CORE_SKYLAKE5     ,     0, "Skylake (Core i5)"        },
+	{  6, 14, -1, -1, 94,   4,    -1,    -1, CORE_SKYLAKE3     ,     0, "Skylake (Core i3)"        },
+	{  6, 14, -1, -1, 94,   4,    -1,    -1, PENTIUM           ,     0, "Skylake (Pentium)"        },
 
 	/* Itaniums */
 	{  7, -1, -1, -1, -1,   1,    -1,    -1, NO_CODE           ,     0, "Itanium"                 },
@@ -325,7 +393,7 @@ static void load_intel_features(struct cpu_raw_data_t* raw, struct cpu_id_t* dat
 		{ 25, CPU_FEATURE_AES },
 		{ 26, CPU_FEATURE_XSAVE },
 		{ 27, CPU_FEATURE_OSXSAVE },
-		{ 28, CPU_FEATURE_AVX },
+		{ 30, CPU_FEATURE_RDRAND },
 	};
 	const struct feature_map_t matchtable_edx81[] = {
 		{ 20, CPU_FEATURE_XD },
@@ -556,7 +624,7 @@ static void decode_intel_number_of_cores(struct cpu_raw_data_t* raw,
 static intel_code_t get_brand_code(struct cpu_id_t* data)
 {
 	intel_code_t code = NO_CODE;
-	int i, need_matchtable = 1;
+	int i, need_matchtable = 1, core_ix_base = 0;
 	const char* bs = data->brand_str;
 	const char* s;
 	const struct { intel_code_t c; const char *search; } matchtable[] = {
@@ -570,10 +638,11 @@ static intel_code_t get_brand_code(struct cpu_id_t* data)
 		{ PENTIUM, "Pentium" },
 		{ CORE_SOLO, "Genuine Intel(R) CPU" },
 		{ CORE_SOLO, "Intel(R) Core(TM)" },
-		{ ATOM_DIAMONDVILLE, "Atom(TM) CPU  2" },
-		{ ATOM_DIAMONDVILLE, "Atom(TM) CPU N" },
-		{ ATOM_DUALCORE, "Atom(TM) CPU  3" },
+		{ ATOM_DIAMONDVILLE, "Atom(TM) CPU [N ][23]## " },
 		{ ATOM_SILVERTHORNE, "Atom(TM) CPU Z" },
+		{ ATOM_PINEVIEW, "Atom(TM) CPU D" },
+		{ ATOM_CEDARVIEW, "Atom(TM) CPU N####" },
+		{ ATOM,              "Atom(TM) CPU" },
 	};
 
 	if (strstr(bs, "Mobile")) {
@@ -586,18 +655,29 @@ static intel_code_t get_brand_code(struct cpu_id_t* data)
 	if ((i = match_pattern(bs, "Core(TM) i[357]")) != 0) {
 		/* Core i3, Core i5 or Core i7 */
 		need_matchtable = 0;
+		
+		core_ix_base = CORE_I3;
+		
+		/* if it has RdRand, then it is at least Ivy Bridge */
+		if (data->flags[CPU_FEATURE_RDRAND])
+			core_ix_base = CORE_IVY3;
+		/* if it has FMA, then it is at least Haswell */
+		if (data->flags[CPU_FEATURE_FMA3])
+			core_ix_base = CORE_HASWELL3;
+		
 		switch (bs[i + 9]) {
-			case '3': code = CORE_I3; break;
-			case '5': code = CORE_I5; break;
-			case '7': code = CORE_I7; break;
+			case '3': code = core_ix_base + 0; break;
+			case '5': code = core_ix_base + 1; break;
+			case '7': code = core_ix_base + 2; break;
 		}
 	}
 	if (need_matchtable) {
 		for (i = 0; i < COUNT_OF(matchtable); i++)
-			if (strstr(bs, matchtable[i].search)) {
+			if (match_pattern(bs, matchtable[i].search)) {
 				code = matchtable[i].c;
 				break;
 			}
+		debugf(2, "intel matchtable result is %d\n", code);
 	}
 	if (code == XEON) {
 		if (match_pattern(bs, "W35##") || match_pattern(bs, "[ELXW]75##"))
@@ -606,7 +686,8 @@ static intel_code_t get_brand_code(struct cpu_id_t* data)
 			code = XEON_GAINESTOWN;
 		else if (match_pattern(bs, "[ELXW]56##"))
 			code = XEON_WESTMERE;
-		else if (data->l3_cache > 0)
+		else if (data->l3_cache > 0 && data->family == 16)
+			/* restrict by family, since later Xeons also have L3 ... */
 			code = XEON_IRWIN;
 	}
 	if (code == XEONMP && data->l3_cache > 0)
@@ -664,6 +745,16 @@ static intel_model_t get_model_code(struct cpu_id_t* data)
 	int l = (int) strlen(data->brand_str);
 	const char *bs = data->brand_str;
 	int mod_flags = 0, model_no = 0, ndigs = 0;
+	/* If the CPU is a Core ix, then just return the model number generation: */
+	if ((i = match_pattern(bs, "Core(TM) i[357]")) != 0) {
+		i += 11;
+		if (i + 4 >= l) return UNKNOWN;
+		if (bs[i] == '2') return _2xxx;
+		if (bs[i] == '3') return _3xxx;
+		return UNKNOWN;
+	}
+	
+	/* For Core2-based Xeons: */
 	while (i < l - 3) {
 		if (bs[i] == 'C' && bs[i+1] == 'P' && bs[i+2] == 'U')
 			break;

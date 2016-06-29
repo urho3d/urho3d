@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ static const char* commandTypeNames[] =
     "forwardlights",
     "lightvolumes",
     "renderui",
+    "sendevent",
     0
 };
 
@@ -91,7 +92,7 @@ void RenderTargetInfo::Load(const XMLElement& element)
     else if (element.HasAttribute("rtsizedivisor"))
     {
         // Deprecated rtsizedivisor mode, acts the same as sizedivisor mode now
-        LOGWARNING("Deprecated rtsizedivisor mode used in rendertarget definition");
+        URHO3D_LOGWARNING("Deprecated rtsizedivisor mode used in rendertarget definition");
         size_ = element.GetVector2("rtsizedivisor");
         sizeMode_ = SIZE_VIEWPORTDIVISOR;
     }
@@ -178,6 +179,10 @@ void RenderPathCommand::Load(const XMLElement& element)
                 parameterElem = parameterElem.GetNext("parameter");
             }
         }
+        break;
+
+    case CMD_SENDEVENT:
+        eventName_ = element.GetAttribute("name");
         break;
 
     default:

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "../Core/Context.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
+#include "../IO/MemoryBuffer.h"
 #include "../Resource/JSONFile.h"
 #include "../Resource/ResourceCache.h"
 
@@ -117,7 +118,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     unsigned dataSize = source.GetSize();
     if (!dataSize && !source.GetName().Empty())
     {
-        LOGERROR("Zero sized JSON data in " + source.GetName());
+        URHO3D_LOGERROR("Zero sized JSON data in " + source.GetName());
         return false;
     }
 
@@ -129,7 +130,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     rapidjson::Document document;
     if (document.Parse<0>(buffer).HasParseError())
     {
-        LOGERROR("Could not parse JSON data from " + source.GetName());
+        URHO3D_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
     }
 
@@ -228,6 +229,15 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     document.Accept(writer);
     unsigned size = (unsigned)buffer.GetSize();
     return dest.Write(buffer.GetString(), size) == size;
+}
+
+bool JSONFile::FromString(const String & source)
+{
+    if (source.Empty())
+        return false;
+
+    MemoryBuffer buffer(source.CString(), source.Length());
+    return Load(buffer);
 }
 
 }

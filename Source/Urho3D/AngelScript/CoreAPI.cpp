@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,6 +78,11 @@ static void RegisterStringHash(asIScriptEngine* engine)
 static void ConstructResourceRef(ResourceRef* ptr)
 {
     new(ptr) ResourceRef();
+}
+
+static void ConstructResourceRefValue(const String& type, const String& name, ResourceRef* ptr)
+{
+    new(ptr) ResourceRef(type, name);
 }
 
 static void ConstructResourceRefCopy(const ResourceRef& ref, ResourceRef* ptr)
@@ -455,6 +460,7 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectType("ResourceRef", sizeof(ResourceRef), asOBJ_VALUE | asOBJ_POD | asOBJ_APP_CLASS_CK);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructResourceRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const ResourceRef&in)", asFUNCTION(ConstructResourceRefCopy), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_CONSTRUCT, "void f(const String&in, const String&in)", asFUNCTION(ConstructResourceRefValue), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("ResourceRef", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructResourceRef), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceRef", "ResourceRef& opAssign(const ResourceRef&in)", asMETHOD(ResourceRef, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceRef", "bool opEquals(const ResourceRef&in) const", asMETHOD(ResourceRef, operator ==), asCALL_THISCALL);
@@ -675,9 +681,9 @@ static void RegisterSpline(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Spline", "Variant GetPoint(float)", asMETHOD(Spline, GetPoint), asCALL_THISCALL);
 }
 
-static CScriptArray* StringSplit(char separator, const String* str)
+static CScriptArray* StringSplit(char separator, bool keepEmptyStrings, const String* str)
 {
-    Vector<String> result = str->Split(separator);
+    Vector<String> result = str->Split(separator, keepEmptyStrings);
     return VectorToArray<String>(result, "Array<String>");
 }
 
@@ -695,7 +701,7 @@ static String StringJoined(CScriptArray* arr, const String& glue)
 
 static void RegisterStringUtils(asIScriptEngine* engine)
 {
-    engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("String", "Array<String>@ Split(uint8, bool keepEmptyStrings = false) const", asFUNCTION(StringSplit), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "void Join(String[]&, const String&in)", asFUNCTION(StringJoin), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "bool ToBool() const", asFUNCTIONPR(ToBool, (const String&), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "float ToFloat() const", asFUNCTIONPR(ToFloat, (const String&), float), asCALL_CDECL_OBJLAST);
@@ -719,6 +725,7 @@ static void RegisterStringUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("bool IsAlpha(uint)", asFUNCTION(IsAlpha), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint ToUpper(uint)", asFUNCTION(ToUpper), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint ToLower(uint)", asFUNCTION(ToLower), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetFileSizeString(uint64)", asFUNCTION(GetFileSizeString), asCALL_CDECL);
 }
 
 static void ConstructTimer(Timer* ptr)
@@ -777,6 +784,8 @@ static void RegisterProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("String GetPlatform()", asFUNCTION(GetPlatform), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetNumPhysicalCPUs()", asFUNCTION(GetNumPhysicalCPUs), asCALL_CDECL);
     engine->RegisterGlobalFunction("uint GetNumLogicalCPUs()", asFUNCTION(GetNumLogicalCPUs), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetMiniDumpDir(const String&in)", asFUNCTION(SetMiniDumpDir), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetMiniDumpDir()", asFUNCTION(GetMiniDumpDir), asCALL_CDECL);
 }
 
 static void ConstructAttributeInfo(AttributeInfo* ptr)
@@ -866,6 +875,23 @@ static void UnsubscribeFromAllEventsExcept(CScriptArray* exceptions)
     listener->RemoveEventHandlersExcept(destExceptions);
 }
 
+static bool HasSubscribedToEvent(const String& eventType)
+{
+    ScriptEventListener* listener = GetScriptContextEventListener();
+    return listener ? listener->HasEventHandler(StringHash(eventType)) : false;
+}
+
+static bool HasSubscribedToSenderEvent(Object* sender, const String& eventType)
+{
+    ScriptEventListener* listener = GetScriptContextEventListener();
+    return listener ? listener->HasEventHandler(sender, StringHash(eventType)) : false;
+}
+
+static void RegisterEventName(const String& eventName)
+{
+    EventNameRegistrar::RegisterEventName(eventName.CString());
+}
+
 static Object* GetEventSender()
 {
     return GetScriptContext()->GetEventSender();
@@ -896,6 +922,21 @@ static void DestructWeakHandle(WeakPtr<RefCounted>* ptr)
     ptr->~WeakPtr<RefCounted>();
 }
 
+static void SetGlobalVar(const String& key, Variant value)
+{
+    GetScriptContext()->SetGlobalVar(key, value);
+}
+
+static Variant GetGlobalVar(const String& key)
+{
+    return GetScriptContext()->GetGlobalVar(key);
+}
+
+static VariantMap& GetGlobalVars()
+{
+    return const_cast<VariantMap&>(GetScriptContext()->GetGlobalVars());
+}
+
 void RegisterObject(asIScriptEngine* engine)
 {
     engine->RegisterObjectType("AttributeInfo", sizeof(AttributeInfo), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
@@ -919,8 +960,14 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("void UnsubscribeFromEvents(Object@+)", asFUNCTION(UnsubscribeFromSenderEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEvents()", asFUNCTION(UnsubscribeFromAllEvents), asCALL_CDECL);
     engine->RegisterGlobalFunction("void UnsubscribeFromAllEventsExcept(Array<String>@+)", asFUNCTION(UnsubscribeFromAllEventsExcept), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(const String&in)", asFUNCTION(HasSubscribedToEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(HasSubscribedToSenderEvent), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void RegisterEventName(const String&in)", asFUNCTION(RegisterEventName), asCALL_CDECL);
     engine->RegisterGlobalFunction("Object@+ GetEventSender()", asFUNCTION(GetEventSender), asCALL_CDECL);
     engine->RegisterGlobalFunction("const String& GetTypeName(StringHash)", asFUNCTION(GetTypeName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void SetGlobalVar(const String&in, Variant&in)", asFUNCTION(SetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Variant GetGlobalVar(const String&in)", asFUNCTION(GetGlobalVar), asCALL_CDECL);
+    engine->RegisterGlobalFunction("VariantMap& get_globalVars()", asFUNCTION(GetGlobalVars), asCALL_CDECL);
 
     engine->RegisterObjectType("WeakHandle", sizeof(WeakPtr<RefCounted>), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("WeakHandle", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructWeakHandle), asCALL_CDECL_OBJLAST);

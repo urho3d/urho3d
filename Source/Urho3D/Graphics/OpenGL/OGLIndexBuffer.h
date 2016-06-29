@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ namespace Urho3D
 /// Hardware index buffer.
 class URHO3D_API IndexBuffer : public Object, public GPUObject
 {
-    OBJECT(IndexBuffer, Object);
+    URHO3D_OBJECT(IndexBuffer, Object);
 
 public:
     /// Construct.
@@ -71,7 +71,7 @@ public:
     /// Return number of indices.
     unsigned GetIndexCount() const { return indexCount_; }
 
-    /// Return index size.
+    /// Return index size in bytes.
     unsigned GetIndexSize() const { return indexSize_; }
 
     /// Return used vertex range from index range. Only supported for shadowed buffers.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,6 +77,14 @@ public:
         max_(Vector3(max, max, max))
     {
     }
+
+#ifdef URHO3D_SSE
+    BoundingBox(__m128 min, __m128 max)
+    {
+        _mm_storeu_ps(&min_.x_, min);
+        _mm_storeu_ps(&max_.x_, max);
+    }
+#endif
 
     /// Construct from an array of vertices.
     BoundingBox(const Vector3* vertices, unsigned count) :
@@ -164,12 +172,6 @@ public:
         min_ = max_ = point;
     }
 
-    /// Returns true if this bounding box is defined via a previous call to Define() or Merge().
-    bool Defined() const
-    {
-        return min_.x_ != M_INFINITY;
-    }
-
     /// Merge a point.
     void Merge(const Vector3& point)
     {
@@ -250,6 +252,12 @@ public:
 #endif
     }
 
+    /// Return true if this bounding box is defined via a previous call to Define() or Merge().
+    bool Defined() const
+    {
+        return min_.x_ != M_INFINITY;
+    }
+
     /// Return center.
     Vector3 Center() const { return (max_ + min_) * 0.5f; }
 
@@ -309,14 +317,10 @@ public:
 
     /// Minimum vector.
     Vector3 min_;
-#ifdef URHO3D_SSE
     float dummyMin_; // This is never used, but exists to pad the min_ value to four floats.
-#endif
     /// Maximum vector.
     Vector3 max_;
-#ifdef URHO3D_SSE
     float dummyMax_; // This is never used, but exists to pad the max_ value to four floats.
-#endif
 };
 
 }

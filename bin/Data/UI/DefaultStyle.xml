@@ -1,9 +1,9 @@
 <elements>
     <element type="BorderImage" >
         <attribute name="Texture" value="Texture2D;Textures/UI.png" />
+        <attribute name="Blend Mode" value="alpha" />
     </element>
     <element type="Button" style="BorderImage">
-        <attribute name="Size" value="16 16" />
         <attribute name="Image Rect" value="16 0 32 16" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Pressed Image Offset" value="16 0" />
@@ -34,14 +34,14 @@
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="0 0 12 24" />
                 <variant type="IntVector2" value="0 0" />
-            </variant>           
+            </variant>
             <variant type="VariantVector" >
                 <variant type="String" value="ResizeVertical" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="0 64 20 84" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
-            <variant type="VariantVector" >     
+            <variant type="VariantVector" >
                 <variant type="String" value="ResizeDiagonalTopRight" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="20 64 40 84" />
@@ -53,19 +53,19 @@
                 <variant type="IntRect" value="40 64 60 84" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
-            <variant type="VariantVector" >             
+            <variant type="VariantVector" >
                 <variant type="String" value="ResizeDiagonalTopLeft" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="60 64 80 84" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
-            <variant type="VariantVector" >        
+            <variant type="VariantVector" >
                 <variant type="String" value="RejectDrop" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="80 64 100 84" />
                 <variant type="IntVector2" value="9 9" />
             </variant>
-            <variant type="VariantVector" >         
+            <variant type="VariantVector" >
                 <variant type="String" value="AcceptDrop" />
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="100 64 128 90" />
@@ -76,7 +76,7 @@
                 <variant type="ResourceRef" value="Image;Textures/UI.png" />
                 <variant type="IntRect" value="128 64 148 85" />
                 <variant type="IntVector2" value="9 9" />
-            </variant>              
+            </variant>
         </attribute>
     </element>
     <element type="DropDownList" style="BorderImage">
@@ -297,7 +297,7 @@
         <attribute name="Max Size" value="2147483647 11" />
     </element>
     <element type="EditorVerticalDivider" style="BorderImage" auto="false">
-        <attribute name="Image Rect" value="144 64 155 80" />
+        <attribute name="Image Rect" value="144 48 155 64" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="11 0" />
         <attribute name="Max Size" value="11 2147483647" />
@@ -356,7 +356,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="6 2 6 2" />
         <attribute name="Image Rect" value="48 0 64 16" />
-        <attribute name="Border" value="6 2 2 2" />
+        <attribute name="Border" value="4 4 4 4" />
     </element>
     <element type="ToolTipText" style="Text">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -74,14 +74,14 @@ void AnimatedSprite2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<AnimatedSprite2D>(URHO2D_CATEGORY);
 
-    COPY_BASE_ATTRIBUTES(StaticSprite2D);
-    REMOVE_ATTRIBUTE("Sprite");
-    ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
+    URHO3D_COPY_BASE_ATTRIBUTES(StaticSprite2D);
+    URHO3D_REMOVE_ATTRIBUTE("Sprite");
+    URHO3D_ACCESSOR_ATTRIBUTE("Speed", GetSpeed, SetSpeed, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Entity", GetEntity, SetEntity, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation Set", GetAnimationSetAttr, SetAnimationSetAttr, ResourceRef,
         ResourceRef(AnimatedSprite2D::GetTypeStatic()), AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Animation", GetAnimation, SetAnimationAttr, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Loop Mode", GetLoopMode, SetLoopMode, LoopMode2D, loopModeNames, LM_DEFAULT, AM_DEFAULT);
 }
 
 void AnimatedSprite2D::OnSetEnabled()
@@ -94,7 +94,7 @@ void AnimatedSprite2D::OnSetEnabled()
     if (scene)
     {
         if (enabled)
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
         else
             UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
     }
@@ -107,7 +107,7 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 
     Dispose();
 
-    animationSet_ = animationSet;    
+    animationSet_ = animationSet;
     if (!animationSet_)
         return;
 
@@ -136,14 +136,14 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 #endif
     if (animationSet_->GetSpriterData())
     {
-        spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
+        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
 
-        if (animationSet_->GetSpriterData()->entities_.Empty())
+        if (!animationSet_->GetSpriterData()->entities_.Empty())
         {
             // If entity is empty use first entity in spriter
             if (entity_.Empty())
                 entity_ = animationSet_->GetSpriterData()->entities_[0]->name_;
-            spriterInstance_->SetEntity(entity_.CString());
+            spriterInstance_->SetEntity(entity_);
         }
     }
 
@@ -177,7 +177,7 @@ void AnimatedSprite2D::SetAnimation(const String& name, LoopMode2D loopMode)
 
 #ifdef URHO3D_SPINE
     if (skeleton_)
-        SetSpineAnimation();    
+        SetSpineAnimation();
 #endif
     if (spriterInstance_)
         SetSpriterAnimation();
@@ -217,9 +217,9 @@ void AnimatedSprite2D::OnSceneSet(Scene* scene)
     if (scene)
     {
         if (scene == node_)
-            LOGWARNING(GetTypeName() + " should not be created to the root scene node");
+            URHO3D_LOGWARNING(GetTypeName() + " should not be created to the root scene node");
         if (IsEnabledEffective())
-            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
+            SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(AnimatedSprite2D, HandleScenePostUpdate));
     }
     else
         UnsubscribeFromEvent(E_SCENEPOSTUPDATE);
@@ -231,28 +231,16 @@ void AnimatedSprite2D::SetAnimationAttr(const String& name)
     SetAnimation(animationName_, loopMode_);
 }
 
-void AnimatedSprite2D::OnWorldBoundingBoxUpdate()
-{
-    boundingBox_.Clear();
-    worldBoundingBox_.Clear();
-
-    for (unsigned i = 0; i < sourceBatches_[0].vertices_.Size(); ++i)
-        worldBoundingBox_.Merge(sourceBatches_[0].vertices_[i].position_);
-
-    boundingBox_ = worldBoundingBox_.Transformed(node_->GetWorldTransform().Inverse());
-}
-
 void AnimatedSprite2D::UpdateSourceBatches()
 {
-    sourceBatchesDirty_ = false;
-
 #ifdef URHO3D_SPINE
     if (skeleton_ && animationState_)
         UpdateSourceBatchesSpine();
 #endif
     if (spriterInstance_ && spriterInstance_->GetAnimation())
         UpdateSourceBatchesSpriter();
-    
+
+    sourceBatchesDirty_ = false;
 }
 
 void AnimatedSprite2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
@@ -280,7 +268,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationStateData_ = spAnimationStateData_create(animationSet_->GetSkeletonData());
         if (!animationStateData_)
         {
-            LOGERROR("Create animation state data failed");
+            URHO3D_LOGERROR("Create animation state data failed");
             return;
         }
     }
@@ -290,7 +278,7 @@ void AnimatedSprite2D::SetSpineAnimation()
         animationState_ = spAnimationState_create(animationStateData_);
         if (!animationState_)
         {
-            LOGERROR("Create animation state failed");
+            URHO3D_LOGERROR("Create animation state failed");
             return;
         }
     }
@@ -316,6 +304,7 @@ void AnimatedSprite2D::UpdateSpineAnimation(float timeStep)
     spSkeleton_updateWorldTransform(skeleton_);
 
     sourceBatchesDirty_ = true;
+    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedSprite2D::UpdateSourceBatchesSpine()
@@ -325,8 +314,8 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
     SourceBatch2D& sourceBatch = sourceBatches_[0];
     sourceBatches_[0].vertices_.Clear();
 
-    static const int SLOT_VERTEX_COUNT_MAX = 1024;
-    static float slotVertices[SLOT_VERTEX_COUNT_MAX];
+    const int SLOT_VERTEX_COUNT_MAX = 1024;
+    float slotVertices[SLOT_VERTEX_COUNT_MAX];
 
     for (int i = 0; i < skeleton_->slotsCount; ++i)
     {
@@ -411,15 +400,13 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
             }
         }
     }
-
-    worldBoundingBoxDirty_ = true;
 }
 #endif
 
 void AnimatedSprite2D::SetSpriterAnimation()
 {
     if (!spriterInstance_)
-        spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
+        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
 
     // Use entity is empty first entity
     if (entity_.Empty())
@@ -427,13 +414,13 @@ void AnimatedSprite2D::SetSpriterAnimation()
 
     if (!spriterInstance_->SetEntity(entity_.CString()))
     {
-        LOGERROR("Set entity failed");
+        URHO3D_LOGERROR("Set entity failed");
         return;
     }
 
     if (!spriterInstance_->SetAnimation(animationName_.CString(), (Spriter::LoopMode)loopMode_))
     {
-        LOGERROR("Set animation failed");
+        URHO3D_LOGERROR("Set animation failed");
         return;
     }
 
@@ -445,8 +432,8 @@ void AnimatedSprite2D::UpdateSpriterAnimation(float timeStep)
 {
     spriterInstance_->Update(timeStep * speed_);
     sourceBatchesDirty_ = true;
+    worldBoundingBoxDirty_ = true;
 }
-
 
 void AnimatedSprite2D::UpdateSourceBatchesSpriter()
 {
@@ -472,7 +459,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
 
         Spriter::SpriteTimelineKey* timelineKey = (Spriter::SpriteTimelineKey*)timelineKeys[i];
 
-        Spriter::SpatialInfo& info = timelineKey->info_;        
+        Spriter::SpatialInfo& info = timelineKey->info_;
         Vector3 position(info.x_, info.y_, 0.0f);
         if (flipX_)
             position.x_ = -position.x_;
@@ -517,8 +504,6 @@ void AnimatedSprite2D::UpdateSourceBatchesSpriter()
         vertices.Push(vertex2);
         vertices.Push(vertex3);
     }
-
-    worldBoundingBoxDirty_ = true;
 }
 
 void AnimatedSprite2D::Dispose()

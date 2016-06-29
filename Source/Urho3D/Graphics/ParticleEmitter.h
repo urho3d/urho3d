@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ struct Particle
 /// %Particle emitter component.
 class URHO3D_API ParticleEmitter : public BillboardSet
 {
-    OBJECT(ParticleEmitter, BillboardSet);
+    URHO3D_OBJECT(ParticleEmitter, BillboardSet);
 
 public:
     /// Construct.
@@ -86,7 +86,7 @@ public:
     void ApplyEffect();
 
     /// Return particle effect.
-    ParticleEffect* GetEffect() const { return effect_; }
+    ParticleEffect* GetEffect() const;
 
     /// Return maximum number of particles.
     unsigned GetNumParticles() const { return particles_.Size(); }
@@ -141,6 +141,8 @@ private:
     bool needUpdate_;
     /// Serialize particles flag.
     bool serializeParticles_;
+    /// Ready to send effect finish event flag.
+    bool sendFinishEvent_;
 };
 
 }

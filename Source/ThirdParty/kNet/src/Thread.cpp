@@ -15,6 +15,8 @@
 /** @file Thread.cpp
 	@brief Implements platform-generic Thread functions. */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifdef KNET_USE_BOOST
 #include <boost/thread/thread.hpp>
 #endif
@@ -87,7 +89,7 @@ void Thread::CheckHold()
 }
 
 // This code adapted from http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx "How to: Set a Thread Name in Native Code":
-#ifdef WIN32
+#ifdef _WIN32
 const DWORD MS_VC_EXCEPTION=0x406D1388;
 
 #pragma pack(push,8)
@@ -100,9 +102,10 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
+// Urho3D - avoid unnecessary warning in MinGW build
+#ifdef _MSC_VER
 void SetThreadName(DWORD dwThreadID, const char *threadName)
 {
-#ifdef _MSC_VER
 	THREADNAME_INFO info;
 	info.dwType = 0x1000;
 	info.szName = threadName;
@@ -117,16 +120,14 @@ void SetThreadName(DWORD dwThreadID, const char *threadName)
 	__except(EXCEPTION_CONTINUE_EXECUTION)
 	{
 	}
-#else
-#warning SetThreadName undefined for current platform!
-#endif
 }
+#endif
 #endif
 
 void Thread::SetName(const char *name)
 {
 // The thread name can only be set when it is ensured that Thread::Id() returns the proper Win32 thread ID
-#ifdef WIN32
+#ifdef _MSC_VER
 #if !defined(KNET_USE_BOOST) || !defined(KNET_ENABLE_WINXP_SUPPORT)
 	SetThreadName(Id(), name);
 #endif

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,21 +72,21 @@ void RigidBody2D::RegisterObject(Context* context)
 {
     context->RegisterFactory<RigidBody2D>(URHO2D_CATEGORY);
 
-    ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    ENUM_ACCESSOR_ATTRIBUTE("Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Mass", GetMass, SetMass, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Inertia", GetInertia, SetInertia, float, 0.0f, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Allow Sleep", IsAllowSleep, SetAllowSleep, bool, true, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Bullet", IsBullet, SetBullet, bool, false, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
-    MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
-    ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Body Type", GetBodyType, SetBodyType, BodyType2D, bodyTypeNames, DEFAULT_BODYTYPE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Mass", GetMass, SetMass, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Inertia", GetInertia, SetInertia, float, 0.0f, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Mass Center", GetMassCenter, SetMassCenter, Vector2, Vector2::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Use Fixture Mass", GetUseFixtureMass, SetUseFixtureMass, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Linear Damping", GetLinearDamping, SetLinearDamping, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Angular Damping", GetAngularDamping, SetAngularDamping, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Allow Sleep", IsAllowSleep, SetAllowSleep, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Fixed Rotation", IsFixedRotation, SetFixedRotation, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bullet", IsBullet, SetBullet, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Gravity Scale", GetGravityScale, SetGravityScale, float, 1.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Awake", IsAwake, SetAwake, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Linear Velocity", GetLinearVelocity, SetLinearVelocity, Vector2, Vector2::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Angular Velocity", GetAngularVelocity, SetAngularVelocity, float, 0.0f, AM_DEFAULT);
 }
 
 
@@ -393,26 +393,49 @@ void RigidBody2D::ReleaseBody()
 
 void RigidBody2D::ApplyWorldTransform()
 {
-    if (!body_)
+    if (!body_ || !node_)
         return;
 
-    if (!body_->IsActive())
-        return; 
-    
-    if (body_->GetType() == b2_staticBody)
+    // If the rigid body is parented to another rigid body, can not set the transform immediately.
+    // In that case store it to PhysicsWorld2D for delayed assignment
+    RigidBody2D* parentRigidBody = 0;
+    Node* parent = node_->GetParent();
+    if (parent != GetScene() && parent)
+        parentRigidBody = parent->GetComponent<RigidBody2D>();
+
+    // If body is not parented and is static or sleeping, no need to update
+    if (!parentRigidBody && (!body_->IsActive() || body_->GetType() == b2_staticBody || !body_->IsAwake()))
         return;
 
-    if (!body_->IsAwake())
-        return;
-
-    physicsWorld_->SetApplyingTransforms(true);
-
-    Node* node = GetNode();
     const b2Transform& transform = body_->GetTransform();
-    node->SetWorldPosition(ToVector3(transform.p));
-    node->SetWorldRotation(Quaternion(transform.q.GetAngle() * M_RADTODEG, Vector3::FORWARD));
+    Vector3 newWorldPosition = node_->GetWorldPosition();
+    newWorldPosition.x_ = transform.p.x;
+    newWorldPosition.y_ = transform.p.y;
+    Quaternion newWorldRotation(transform.q.GetAngle() * M_RADTODEG, Vector3::FORWARD);
 
-    physicsWorld_->SetApplyingTransforms(false);
+    if (parentRigidBody)
+    {
+        DelayedWorldTransform2D delayed;
+        delayed.rigidBody_ = this;
+        delayed.parentRigidBody_ = parentRigidBody;
+        delayed.worldPosition_ = newWorldPosition;
+        delayed.worldRotation_ = newWorldRotation;
+        physicsWorld_->AddDelayedWorldTransform(delayed);
+    }
+    else
+        ApplyWorldTransform(newWorldPosition, newWorldRotation);
+}
+
+void RigidBody2D::ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation)
+{
+    if (newWorldPosition != node_->GetWorldPosition() || newWorldRotation != node_->GetWorldRotation())
+    {
+        // Do not feed changed position back to simulation now
+        physicsWorld_->SetApplyingTransforms(true);
+        node_->SetWorldPosition(newWorldPosition);
+        node_->SetWorldRotation(newWorldRotation);
+        physicsWorld_->SetApplyingTransforms(false);
+    }
 }
 
 void RigidBody2D::AddCollisionShape2D(CollisionShape2D* collisionShape)
