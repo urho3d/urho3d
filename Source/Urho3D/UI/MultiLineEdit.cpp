@@ -44,8 +44,6 @@ MultiLineEdit::MultiLineEdit(Context* context) :
     lastFont_(0),
     lastFontSize_(0),
     cursorPosition_(0),
-	cursorPosition_x(0),
-	cursorPosition_y(0),
     dragBeginCursor_(M_MAX_UNSIGNED),
     cursorBlinkRate_(1.0f),
     cursorBlinkTimer_(0.0f),
@@ -54,7 +52,7 @@ MultiLineEdit::MultiLineEdit(Context* context) :
     cursorMovable_(true),
     textSelectable_(true),
     textCopyable_(true),
-	multiLine_(false)
+    multiLine_(false)
 {
     clipChildren_ = true;
     SetEnabled(true);
@@ -63,18 +61,18 @@ MultiLineEdit::MultiLineEdit(Context* context) :
     text_ = CreateChild<Text>("LE_Text");
     text_->SetInternal(true);
     cursor_ = CreateChild<Text>("LE_Cursor");
-	cursor_->SetText("|");
-	cursor_->SetStyleAuto();
+    cursor_->SetText("|");
+    cursor_->SetStyleAuto();
     cursor_->SetInternal(true);
     cursor_->SetPriority(100); // Show over text
 
     SubscribeToEvent(this, E_FOCUSED, URHO3D_HANDLER(MultiLineEdit, HandleFocused));
     SubscribeToEvent(this, E_DEFOCUSED, URHO3D_HANDLER(MultiLineEdit, HandleDefocused));
     SubscribeToEvent(this, E_LAYOUTUPDATED, URHO3D_HANDLER(MultiLineEdit, HandleLayoutUpdated));
-	SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MultiLineEdit, HandleKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MultiLineEdit, HandleKeyDown));
 
-	hasMaxLines = false;
-	MaxLines = 0;
+    hasmaxLines = false;
+    maxLines = 0;
 }
 
 MultiLineEdit::~MultiLineEdit()
@@ -85,30 +83,42 @@ void MultiLineEdit::RegisterObject(Context* context)
 {
     context->RegisterFactory<MultiLineEdit>(UI_CATEGORY);
 
-	URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
-	URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
-	URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
-	URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
-	URHO3D_ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Clip Children", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
+    URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE_DEFOCUSABLE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Length", GetMaxLength, SetMaxLength, unsigned, 0, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Cursor Movable", IsCursorMovable, SetCursorMovable, bool, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Text Selectable", IsTextSelectable, SetTextSelectable, bool, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Text Copyable", IsTextCopyable, SetTextCopyable, bool, true, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Cursor Blink Rate", GetCursorBlinkRate, SetCursorBlinkRate, float, 1.0f, AM_FILE);
+    URHO3D_ATTRIBUTE("Echo Character", int, echoCharacter_, 0, AM_FILE);
 }
 int MultiLineEdit::GetNumLines() 
 {
-	String Alltext = text_->GetText();
-	int startpos = 0;
-	int counter = 0;
-	while (startpos >= 0) {
-		counter++;
-		startpos = Alltext.Find("\n", startpos);
-		if (startpos != -1) startpos += 1;
-	}
-	Log::WriteRaw("num lines  " + String(counter));
-	return counter;
+    String Alltext = text_->GetText();
+    int startpos = 0;
+    int counter = 0;
+    while (startpos >= 0) 
+    {
+        counter++;
+        startpos = Alltext.Find("\n", startpos);
+        if (startpos != -1) startpos += 1;
+    }
+    return counter;
 }
+void MultiLineedit::SetMaxNumLines(int maxNumber)
+{
+    if (maxNumber > 0) 
+    {
+        maxLines = maxNumber;
+        hasmaxLines = true;
+    }
+    else 
+    {
+        hasmaxLines = false;
+    }
+};
 
 void MultiLineEdit::ApplyAttributes()
 {
@@ -123,7 +133,7 @@ void MultiLineEdit::ApplyAttributes()
 
 void MultiLineEdit::Update(float timeStep)
 {
-	cursor_->SetFont(text_->GetFont(), text_->GetFontSize());
+    cursor_->SetFont(text_->GetFont(), text_->GetFontSize());
     if (cursorBlinkRate_ > 0.0f)
         cursorBlinkTimer_ = fmodf(cursorBlinkTimer_ + cursorBlinkRate_ * timeStep, 1.0f);
 
@@ -137,7 +147,7 @@ void MultiLineEdit::Update(float timeStep)
 
     bool cursorVisible = HasFocus() ? cursorBlinkTimer_ < 0.5f : false;
     cursor_->SetVisible(cursorVisible);
-	//cursor_->SetVisible(true);
+    //cursor_->SetVisible(true);
 }
 
 void MultiLineEdit::OnClickBegin(const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers,
@@ -381,60 +391,68 @@ void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_UP:
-		if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) {
-			// get substring from start to cursor position
-			String substring = line_.SubstringUTF8(0,cursorPosition_);
-			// find nearest new line before cursor position
-			unsigned lastlinepos = substring.FindLast("\n");
-			// get substring from start to above new line
-			String substring2 = substring.SubstringUTF8(0, (lastlinepos - 1));
-			// find position of new line directly before previous
-			unsigned lastlinepos2 = substring2.FindLast("\n");
-			// move cursor to above position depending on width of above line
-			if (lastlinepos - lastlinepos2 >= cursorPosition_ - lastlinepos) {
-				cursorPosition_ = lastlinepos2 + (cursorPosition_ - lastlinepos);
-			}
-			else {
-				cursorPosition_ = lastlinepos;
-			}
-			
-		}
-		changed = true;
-		break;
+        if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) 
+        {
+            // get substring from start to cursor position
+            String substring = line_.SubstringUTF8(0,cursorPosition_);
+            // find nearest new line before cursor position
+            unsigned lastlinepos = substring.FindLast("\n");
+            // get substring from start to above new line
+            String substring2 = substring.SubstringUTF8(0, (lastlinepos - 1));
+            // find position of new line directly before previous
+            unsigned lastlinepos2 = substring2.FindLast("\n");
+            // move cursor to above position depending on width of above line
+            if (lastlinepos - lastlinepos2 >= cursorPosition_ - lastlinepos) 
+            {
+                cursorPosition_ = lastlinepos2 + (cursorPosition_ - lastlinepos);
+            }
+            else 
+            {
+                cursorPosition_ = lastlinepos;
+            }
+            
+        }
+        changed = true;
+        break;
 
     case KEY_DOWN:
-		if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) {
-			// get substring from start to cursor position
-			String substring = line_.SubstringUTF8(0, cursorPosition_);
-			// find nearest new line before cursor position
-			unsigned lastlinepos = substring.FindLast("\n");
-			// get substring from cursor position to end
-			String substring2 = line_.SubstringUTF8(cursorPosition_);
-			// find position of new line after cursor postion
-			unsigned nextlinepos = substring2.Find("\n") + cursorPosition_;
-			// get substring from new line after cursor to end
-			String substring3 = line_.SubstringUTF8(nextlinepos+1);
-			// find position of new line after previous new line (width of line below cursor)
-			unsigned widthofbelow = substring3.Find("\n")+1;
-			// move cursor according to cursor position and width of below line
-			if (substring3.Find("\n") == 0xffffffff) {
-				if (line_.Length() - nextlinepos >= cursorPosition_ - lastlinepos) {
-					cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
-				}
-				else {
-					cursorPosition_ = line_.Length();
-				}
-			}
-			else if (cursorPosition_ - lastlinepos >= widthofbelow) {
-				cursorPosition_ = nextlinepos + widthofbelow;
-			}
-			else {
-				cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
-			}
+        if (multiLine_ && cursorMovable_ && cursorPosition_ > 0) 
+        {
+            // get substring from start to cursor position
+            String substring = line_.SubstringUTF8(0, cursorPosition_);
+            // find nearest new line before cursor position
+            unsigned lastlinepos = substring.FindLast("\n");
+            // get substring from cursor position to end
+            String substring2 = line_.SubstringUTF8(cursorPosition_);
+            // find position of new line after cursor postion
+            unsigned nextlinepos = substring2.Find("\n") + cursorPosition_;
+            // get substring from new line after cursor to end
+            String substring3 = line_.SubstringUTF8(nextlinepos+1);
+            // find position of new line after previous new line (width of line below cursor)
+            unsigned widthofbelow = substring3.Find("\n")+1;
+            // move cursor according to cursor position and width of below line
+            if (substring3.Find("\n") == 0xffffffff) 
+            {
+                if (line_.Length() - nextlinepos >= cursorPosition_ - lastlinepos) {
+                    cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
+                }
+                else 
+                {
+                    cursorPosition_ = line_.Length();
+                }
+            }
+            else if (cursorPosition_ - lastlinepos >= widthofbelow)
+            {
+                cursorPosition_ = nextlinepos + widthofbelow;
+            }
+            else 
+            {
+                cursorPosition_ = nextlinepos + (cursorPosition_ - lastlinepos);
+            }
 
-		}
-		changed = true;
-		break;
+        }
+        changed = true;
+        break;
     case KEY_PAGEUP:
     case KEY_PAGEDOWN:
         {
@@ -481,35 +499,35 @@ void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_RETURN:
-		if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < MaxLines))
-			
-		{
-			line_.Insert(cursorPosition_, "\n");
-			cursorPosition_ += 1;
-		}
-		changed = true;
-		break;
+        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
+            
+        {
+            line_.Insert(cursorPosition_, "\n");
+            cursorPosition_ += 1;
+        }
+        changed = true;
+        break;
 
-	case KEY_TAB:
-		if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < MaxLines))
+    case KEY_TAB:
+        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
 
-		{
-			line_.Insert(cursorPosition_, "    ");
-			cursorPosition_ += 4;
-		}
-		changed = true;
-		break;
+        {
+            line_.Insert(cursorPosition_, "    ");
+            cursorPosition_ += 4;
+        }
+        changed = true;
+        break;
 
 
 
     case KEY_RETURN2:
-		if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < MaxLines))
-		{
-			line_.Insert(cursorPosition_, "\n");
-			cursorPosition_ += 1;
-		}
-		changed = true;
-		break;
+        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
+        {
+            line_.Insert(cursorPosition_, "\n");
+            cursorPosition_ += 1;
+        }
+        changed = true;
+        break;
 
 
     case KEY_KP_ENTER:
@@ -606,7 +624,7 @@ void MultiLineEdit::SetText(const String& text)
 
 void MultiLineEdit::SetMultiLine(bool enable) 
 {
-	multiLine_ = enable;
+    multiLine_ = enable;
 }
 
 void MultiLineEdit::SetCursorPosition(unsigned position)
@@ -713,13 +731,13 @@ void MultiLineEdit::UpdateText()
 void MultiLineEdit::UpdateCursor()
 {
     int x = text_->GetCharPosition(cursorPosition_).x_;
-	int y = text_->GetCharPosition(cursorPosition_).y_;
+    int y = text_->GetCharPosition(cursorPosition_).y_;
 
 
     text_->SetPosition(GetIndentWidth() + clipBorder_.left_, clipBorder_.top_);
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x-text_->GetCharSize(cursorPosition_).x_/2, y));
     //cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
-	cursor_->SetSize(2, text_->GetRowHeight());
+    cursor_->SetSize(2, text_->GetRowHeight());
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
     int left = clipBorder_.left_;
@@ -775,16 +793,16 @@ void MultiLineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
 }
 void MultiLineEdit::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
-	using namespace KeyDown;
-	int key = eventData[P_KEY].GetInt();
-	int mouseButtons_ = eventData[P_BUTTONS].GetInt();
-	int qualifiers_ = eventData[P_QUALIFIERS].GetInt();
-	OnKey(key, mouseButtons_, qualifiers_);
+    using namespace KeyDown;
+    int key = eventData[P_KEY].GetInt();
+    int mouseButtons_ = eventData[P_BUTTONS].GetInt();
+    int qualifiers_ = eventData[P_QUALIFIERS].GetInt();
+    OnKey(key, mouseButtons_, qualifiers_);
 }
 
 void MultiLineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
 {
-	UpdateCursor();
+    UpdateCursor();
 }
 
 }

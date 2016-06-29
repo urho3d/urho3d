@@ -85,28 +85,20 @@ public:
     void SetTextSelectable(bool enable);
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
+    /// get number of lines in text
+    int GetNumLines();
+    /// Set maximum number of lines user can input
+    void SetMaxNumLines(int maxNumber);
 
-	int GetNumLines();
-	void SetMaxNumLines(int maxNumber) {
-		if (maxNumber > 0) {
-			MaxLines = maxNumber;
-			hasMaxLines = true;
-		}
-		else {
-			hasMaxLines = false;
-		}
-		
-	};
+    // Enable Multiline to on.
+    void SetMultiLine(bool enable);
 
-	// Enable Multiline to on.
-	void SetMultiLine(bool enable);
-
-	void SetFontSize(int size) {
-		text_->SetFont(text_->GetFont(), size);
-	}
-	void SetFontColor(Color color) {
-		text_->SetColor(color);
-	}
+    void SetFontSize(int size) {
+        text_->SetFont(text_->GetFont(), size);
+    }
+    void SetFontColor(Color color) {
+        text_->SetColor(color);
+    }
     /// Return text.
     const String& GetText() const { return line_; }
 
@@ -146,11 +138,10 @@ protected:
     void UpdateCursor();
     /// Return char index corresponding to position within element, or M_MAX_UNSIGNED if not found.
     unsigned GetCharIndex(const IntVector2& position);
-
-	bool hasMaxLines;
-
-	int MaxLines;
-
+	/// Is number of lines limited
+    bool hasMaxLines;
+	/// maximum number of lines that can be inputted (only applicable if hasMaxLines is true)
+    int maxLines_;
     /// Text element.
     SharedPtr<Text> text_;
     /// Cursor element.
@@ -163,8 +154,6 @@ protected:
     int lastFontSize_;
     /// Text edit cursor position.
     unsigned cursorPosition_;
-	unsigned cursorPosition_x;
-	unsigned cursorPosition_y;
     /// Drag begin cursor position.
     unsigned dragBeginCursor_;
     /// Cursor blink rate.
@@ -181,8 +170,8 @@ protected:
     bool textSelectable_;
     /// Copy-paste enable flag.
     bool textCopyable_;
-
-	bool multiLine_;
+	/// Ability to write several lines enabled flag.
+    bool multiLine_;
 
 private:
     /// Handle being focused.
@@ -192,7 +181,7 @@ private:
     /// Handle the element layout having been updated.
     void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
 
-	void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };
 
 }
