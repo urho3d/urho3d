@@ -75,8 +75,6 @@ struct ScratchBuffer
     bool reserved_;
 };
 
-typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
-
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
 {
@@ -308,7 +306,7 @@ public:
     /// Return 24-bit shadow map depth texture format, or 0 if not supported.
     unsigned GetHiresShadowMapFormat() const { return hiresShadowMapFormat_; }
 
-    /// Return whether hardware instancing is supported..
+    /// Return whether hardware instancing is supported.
     bool GetInstancingSupport() const { return instancingSupport_; }
 
     /// Return whether light pre-pass rendering is supported.
@@ -436,9 +434,9 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
 
     /// Window was resized through user interaction. Called by Input subsystem.
-    void WindowResized();
+    void OnWindowResized();
     /// Window was moved through user interaction. Called by Input subsystem.
-    void WindowMoved();
+    void OnWindowMoved();
     /// Maximize the Window.
     void Maximize();
     /// Minimize the Window.
@@ -527,8 +525,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-    /// Window Icon File Name
-    Image* windowIcon_;
+    /// Window icon image.
+    WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width in pixels.
@@ -605,6 +603,8 @@ private:
     RenderSurface* depthStencil_;
     /// Viewport coordinates.
     IntRect viewport_;
+    /// Default texture filtering mode.
+    TextureFilterMode defaultTextureFilterMode_;
     /// Texture anisotropy level.
     unsigned textureAnisotropy_;
     /// Blending mode.
@@ -647,48 +647,6 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Rendertargets dirty flag.
-    bool renderTargetsDirty_;
-    /// Textures dirty flag.
-    bool texturesDirty_;
-    /// Vertex declaration dirty flag.
-    bool vertexDeclarationDirty_;
-    /// Blend state dirty flag.
-    bool blendStateDirty_;
-    /// Depth state dirty flag.
-    bool depthStateDirty_;
-    /// Rasterizer state dirty flag.
-    bool rasterizerStateDirty_;
-    /// Scissor rect dirty flag.
-    bool scissorRectDirty_;
-    /// Stencil ref dirty flag.
-    bool stencilRefDirty_;
-    /// Hash of current blend state.
-    unsigned blendStateHash_;
-    /// Hash of current depth state.
-    unsigned depthStateHash_;
-    /// Hash of current rasterizer state.
-    unsigned rasterizerStateHash_;
-    /// First dirtied texture unit.
-    unsigned firstDirtyTexture_;
-    /// Last dirtied texture unit.
-    unsigned lastDirtyTexture_;
-    /// First dirtied vertex buffer.
-    unsigned firstDirtyVB_;
-    /// Last dirtied vertex buffer.
-    unsigned lastDirtyVB_;
-    /// Default texture filtering mode.
-    TextureFilterMode defaultTextureFilterMode_;
-    /// Vertex declarations.
-    HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
-    /// Constant buffers.
-    HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
-    /// Currently dirty constant buffers.
-    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
-    /// Shader programs.
-    ShaderProgramMap shaderPrograms_;
-    /// Shader program in use.
-    ShaderProgram* shaderProgram_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.

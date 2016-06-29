@@ -44,7 +44,8 @@ GraphicsImpl::GraphicsImpl() :
     boundUBO_(0),
     pixelFormat_(0),
     fboDirty_(false),
-    vertexBuffersDirty_(false)
+    vertexBuffersDirty_(false),
+    shaderProgram_(0)
 {
 }
 

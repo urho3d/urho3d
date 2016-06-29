@@ -55,8 +55,6 @@ class VertexDeclaration;
 
 struct ShaderParameter;
 
-typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
-
 /// CPU-side scratch buffer for vertex data updates.
 struct ScratchBuffer
 {
@@ -431,9 +429,9 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
 
     /// Window was resized through user interaction. Called by Input subsystem.
-    void WindowResized();
+    void OnWindowResized();
     /// Window was moved through user interaction. Called by Input subsystem.
-    void WindowMoved();
+    void OnWindowMoved();
     /// Maximize the Window.
     void Maximize();
     /// Minimize the Window.
@@ -526,8 +524,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-    /// Window Icon File Name
-    Image* windowIcon_;
+    /// Window icon image.
+    WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width in pixels.
@@ -580,8 +578,6 @@ private:
     PODVector<GPUObject*> gpuObjects_;
     /// Scratch buffers.
     Vector<ScratchBuffer> scratchBuffers_;
-    /// Vertex declarations.
-    HashMap<unsigned long long, SharedPtr<VertexDeclaration> > vertexDeclarations_;
     /// Shadow map dummy color texture format.
     unsigned dummyColorFormat_;
     /// Shadow map depth texture format.
@@ -590,14 +586,8 @@ private:
     unsigned hiresShadowMapFormat_;
     /// Vertex buffers in use.
     VertexBuffer* vertexBuffers_[MAX_VERTEX_STREAMS];
-    /// Stream frequencies by vertex buffer.
-    unsigned streamFrequencies_[MAX_VERTEX_STREAMS];
-    /// Stream offsets by vertex buffer.
-    unsigned streamOffsets_[MAX_VERTEX_STREAMS];
     /// Index buffer in use.
     IndexBuffer* indexBuffer_;
-    /// Vertex declaration in use.
-    VertexDeclaration* vertexDeclaration_;
     /// Vertex shader in use.
     ShaderVariation* vertexShader_;
     /// Pixel shader in use.
@@ -612,6 +602,8 @@ private:
     RenderSurface* depthStencil_;
     /// Viewport coordinates.
     IntRect viewport_;
+    /// Default texture filtering mode.
+    TextureFilterMode defaultTextureFilterMode_;
     /// Texture anisotropy level.
     unsigned textureAnisotropy_;
     /// Blending mode.
@@ -652,12 +644,6 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Default texture filtering mode.
-    TextureFilterMode defaultTextureFilterMode_;
-    /// Shader programs.
-    ShaderProgramMap shaderPrograms_;
-    /// Shader program in use.
-    ShaderProgram* shaderProgram_;
     /// Remembered shader parameter sources.
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.

@@ -2292,11 +2292,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_RESIZED:
                 inResize_ = true;
-                graphics_->WindowResized();
+                graphics_->OnWindowResized();
                 inResize_ = false;
                 break;
             case SDL_WINDOWEVENT_MOVED:
-                graphics_->WindowMoved();
+                graphics_->OnWindowMoved();
                 break;
 
             default: break;

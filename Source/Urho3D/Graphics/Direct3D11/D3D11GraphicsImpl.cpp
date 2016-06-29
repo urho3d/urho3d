@@ -39,7 +39,8 @@ GraphicsImpl::GraphicsImpl() :
     defaultDepthTexture_(0),
     defaultDepthStencilView_(0),
     depthStencilView_(0),
-    resolveTexture_(0)
+    resolveTexture_(0),
+    shaderProgram_(0)
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         renderTargetViews_[i] = 0;

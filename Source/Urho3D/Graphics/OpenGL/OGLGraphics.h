@@ -53,8 +53,6 @@ class Vector3;
 class Vector4;
 class VertexBuffer;
 
-typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
-
 static const unsigned NUM_SCREEN_BUFFERS = 2;
 
 /// CPU-side scratch buffer for vertex data updates.
@@ -360,8 +358,8 @@ public:
     /// Return pixel shader.
     ShaderVariation* GetPixelShader() const { return pixelShader_; }
 
-    /// Return shader program.
-    ShaderProgram* GetShaderProgram() const { return shaderProgram_; }
+    /// Return shader program. This is an API-specific class and should not be used by applications.
+    ShaderProgram* GetShaderProgram() const;
 
     /// Return texture unit index by name.
     TextureUnit GetTextureUnit(const String& name);
@@ -449,9 +447,9 @@ public:
     IntVector2 GetRenderTargetDimensions() const;
 
     /// Window was resized through user interaction. Called by Input subsystem.
-    void WindowResized();
+    void OnWindowResized();
     /// Window was moved through user interaction. Called by Input subsystem.
-    void WindowMoved();
+    void OnWindowMoved();
     /// Add a GPU object to keep track of. Called by GPUObject.
     void AddGPUObject(GPUObject* object);
     /// Remove a GPU object. Called by GPUObject.
@@ -563,8 +561,8 @@ private:
     GraphicsImpl* impl_;
     /// Window title.
     String windowTitle_;
-    /// Window Icon File Name
-    Image* windowIcon_;
+    /// Window icon image.
+    WeakPtr<Image> windowIcon_;
     /// External window, null if not in use (default.)
     void* externalWindow_;
     /// Window width in pixels.
@@ -635,28 +633,19 @@ private:
     ShaderVariation* vertexShader_;
     /// Pixel shader in use.
     ShaderVariation* pixelShader_;
-    /// Shader program in use.
-    ShaderProgram* shaderProgram_;
-    /// Linked shader programs.
-    ShaderProgramMap shaderPrograms_;
     /// Textures in use.
     Texture* textures_[MAX_TEXTURE_UNITS];
-    /// OpenGL texture types in use.
-    unsigned textureTypes_[MAX_TEXTURE_UNITS];
+
     /// Texture unit mappings.
     HashMap<String, TextureUnit> textureUnits_;
-    /// All constant buffers.
-    HashMap<unsigned, SharedPtr<ConstantBuffer> > constantBuffers_;
-    /// Currently bound constant buffers.
-    ConstantBuffer* currentConstantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
-    /// Dirty constant buffers.
-    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
     /// Rendertargets in use.
     RenderSurface* renderTargets_[MAX_RENDERTARGETS];
     /// Depth-stencil surface in use.
     RenderSurface* depthStencil_;
     /// Viewport coordinates.
     IntRect viewport_;
+    /// Default texture filtering mode.
+    TextureFilterMode defaultTextureFilterMode_;
     /// Texture anisotropy level.
     unsigned textureAnisotropy_;
     /// Blending mode.
@@ -699,12 +688,6 @@ private:
     bool stencilTest_;
     /// Custom clip plane enable flag.
     bool useClipPlane_;
-    /// Last used instance data offset.
-    unsigned lastInstanceOffset_;
-    /// Default texture filtering mode.
-    TextureFilterMode defaultTextureFilterMode_;
-    /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
-    HashMap<int, SharedPtr<Texture2D> > depthTextures_;
     /// Base directory for shaders.
     String shaderPath_;
     /// File extension for shaders.

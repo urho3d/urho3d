@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "../../Graphics/ShaderProgram.h"
+#include "../../Graphics/VertexDeclaration.h"
 #include "../../Math/Color.h"
 
 #include <d3d9.h>
@@ -34,6 +36,9 @@ namespace Urho3D
 #define URHO3D_SAFE_RELEASE(p) if (p) { ((IUnknown*)p)->Release();  p = 0; }
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
+typedef HashMap<unsigned long long, SharedPtr<VertexDeclaration> > VertexDeclarationMap;
 
 /// %Graphics implementation. Holds API-specific objects.
 class URHO3D_API GraphicsImpl
@@ -110,6 +115,19 @@ private:
     D3DBLEND destBlend_;
     /// Blend operation.
     D3DBLENDOP blendOp_;
+    /// Vertex declarations.
+    VertexDeclarationMap vertexDeclarations_;
+    /// Stream frequencies by vertex buffer.
+    unsigned streamFrequencies_[MAX_VERTEX_STREAMS];
+    /// Stream offsets by vertex buffer.
+    unsigned streamOffsets_[MAX_VERTEX_STREAMS];
+    /// Vertex declaration in use.
+    VertexDeclaration* vertexDeclaration_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
+
 };
 
 }

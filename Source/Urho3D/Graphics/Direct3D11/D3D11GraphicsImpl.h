@@ -22,7 +22,10 @@
 
 #pragma once
 
+#include "../../Graphics/ConstantBuffer.h"
 #include "../../Graphics/GraphicsDefs.h"
+#include "../../Graphics/ShaderProgram.h"
+#include "../../Graphics/VertexDeclaration.h"
 #include "../../Math/Color.h"
 
 #include <d3d11.h>
@@ -36,6 +39,10 @@ namespace Urho3D
 #define URHO3D_SAFE_RELEASE(p) if (p) { ((IUnknown*)p)->Release();  p = 0; }
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
+typedef HashMap<unsigned long long, SharedPtr<VertexDeclaration> > VertexDeclarationMap;
+typedef HashMap<unsigned, SharedPtr<ConstantBuffer> > ConstantBufferMap;
 
 /// %Graphics implementation. Holds API-specific objects.
 class URHO3D_API GraphicsImpl
@@ -97,6 +104,46 @@ private:
     unsigned vertexSizes_[MAX_VERTEX_STREAMS];
     /// Vertex stream offsets per buffer.
     unsigned vertexOffsets_[MAX_VERTEX_STREAMS];
+    /// Rendertargets dirty flag.
+    bool renderTargetsDirty_;
+    /// Textures dirty flag.
+    bool texturesDirty_;
+    /// Vertex declaration dirty flag.
+    bool vertexDeclarationDirty_;
+    /// Blend state dirty flag.
+    bool blendStateDirty_;
+    /// Depth state dirty flag.
+    bool depthStateDirty_;
+    /// Rasterizer state dirty flag.
+    bool rasterizerStateDirty_;
+    /// Scissor rect dirty flag.
+    bool scissorRectDirty_;
+    /// Stencil ref dirty flag.
+    bool stencilRefDirty_;
+    /// Hash of current blend state.
+    unsigned blendStateHash_;
+    /// Hash of current depth state.
+    unsigned depthStateHash_;
+    /// Hash of current rasterizer state.
+    unsigned rasterizerStateHash_;
+    /// First dirtied texture unit.
+    unsigned firstDirtyTexture_;
+    /// Last dirtied texture unit.
+    unsigned lastDirtyTexture_;
+    /// First dirtied vertex buffer.
+    unsigned firstDirtyVB_;
+    /// Last dirtied vertex buffer.
+    unsigned lastDirtyVB_;
+    /// Vertex declarations.
+    VertexDeclarationMap vertexDeclarations_;
+    /// Constant buffer search map.
+    ConstantBufferMap allConstantBuffers_;
+    /// Currently dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
 };
 
 }
