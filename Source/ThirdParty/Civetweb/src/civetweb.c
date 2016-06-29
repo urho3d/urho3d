@@ -325,6 +325,10 @@ typedef DWORD clockid_t;
 #if defined(_MSC_VER) && (_MSC_VER >= 1900)
 #define _TIMESPEC_DEFINED
 #endif
+// Urho3D: fixes #1444
+#if defined(__MINGW32__)
+#define _TIMESPEC_DEFINED
+#endif
 #ifndef _TIMESPEC_DEFINED
 struct timespec {
 	time_t tv_sec; /* seconds */
