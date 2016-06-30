@@ -43,6 +43,7 @@
 #include "../UI/FileSelector.h"
 #include "../UI/Font.h"
 #include "../UI/LineEdit.h"
+#include "../UI/MultiLineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/MessageBox.h"
 #include "../UI/ScrollBar.h"

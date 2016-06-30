@@ -19,18 +19,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
-#include "Urho3D/Precompiled.h"
-
-#include "Urho3D/Core/Context.h"
-#include "Urho3D/Input/Input.h"
+#include "../Precompiled.h"
+#include "../Core/Context.h"
+#include "../Input/Input.h"
+#include "../UI/LineEdit.h"
+#include "../UI/Text.h"
+#include "../UI/UI.h"
+#include "../UI/UIEvents.h"
+#include "../DebugNew.h"
 #include "MultiLineEdit.h"
-#include "Urho3D/UI/Text.h"
-#include "Urho3D/UI/LineEdit.h"
-#include "Urho3D/UI/UI.h"
-#include "Urho3D/UI/UIEvents.h"
-#include <Urho3D/IO/Log.h>
-#include "Urho3D/DebugNew.h"
 
 namespace Urho3D
 {
@@ -71,7 +68,7 @@ MultiLineEdit::MultiLineEdit(Context* context) :
     SubscribeToEvent(this, E_LAYOUTUPDATED, URHO3D_HANDLER(MultiLineEdit, HandleLayoutUpdated));
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(MultiLineEdit, HandleKeyDown));
 
-    hasmaxLines = false;
+    hasMaxLines = false;
     maxLines = 0;
 }
 
@@ -107,16 +104,16 @@ int MultiLineEdit::GetNumLines()
     }
     return counter;
 }
-void MultiLineedit::SetMaxNumLines(int maxNumber)
+void MultiLineEdit::SetMaxNumLines(int maxNumber)
 {
     if (maxNumber > 0) 
     {
         maxLines = maxNumber;
-        hasmaxLines = true;
+        hasMaxLines = true;
     }
     else 
     {
-        hasmaxLines = false;
+        hasMaxLines = false;
     }
 };
 
@@ -499,7 +496,7 @@ void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_RETURN:
-        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
+        if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < maxLines))
             
         {
             line_.Insert(cursorPosition_, "\n");
@@ -509,7 +506,7 @@ void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
         break;
 
     case KEY_TAB:
-        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
+        if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < maxLines))
 
         {
             line_.Insert(cursorPosition_, "    ");
@@ -521,7 +518,7 @@ void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
 
 
     case KEY_RETURN2:
-        if (editable_ && multiLine_ && (!hasmaxLines || GetNumLines() < maxLines))
+        if (editable_ && multiLine_ && (!hasMaxLines || GetNumLines() < maxLines))
         {
             line_.Insert(cursorPosition_, "\n");
             cursorPosition_ += 1;
@@ -799,7 +796,12 @@ void MultiLineEdit::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int qualifiers_ = eventData[P_QUALIFIERS].GetInt();
     OnKey(key, mouseButtons_, qualifiers_);
 }
-
+void MultiLineEdit::SetFontColor(Color color) {
+	text_->SetColor(color);
+}
+void MultiLineEdit::SetFontSize(int size) {
+	text_->SetFont(text_->GetFont(), size);
+}
 void MultiLineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
 {
     UpdateCursor();

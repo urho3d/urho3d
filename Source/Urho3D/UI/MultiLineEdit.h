@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Urho3D/UI/BorderImage.h"
-#include "Urho3D/UI/Text.h"
+#include "../UI/BorderImage.h"
+#include "../UI/Text.h"
 namespace Urho3D
 {
 
@@ -89,16 +89,12 @@ public:
     int GetNumLines();
     /// Set maximum number of lines user can input
     void SetMaxNumLines(int maxNumber);
-
-    // Enable Multiline to on.
+    /// Enable Multiline to on.
     void SetMultiLine(bool enable);
-
-    void SetFontSize(int size) {
-        text_->SetFont(text_->GetFont(), size);
-    }
-    void SetFontColor(Color color) {
-        text_->SetColor(color);
-    }
+	/// Set font size.
+	void SetFontSize(int size);
+	/// Set font color.
+	void SetFontColor(Color color);
     /// Return text.
     const String& GetText() const { return line_; }
 
@@ -140,8 +136,8 @@ protected:
     unsigned GetCharIndex(const IntVector2& position);
 	/// Is number of lines limited
     bool hasMaxLines;
-	/// maximum number of lines that can be inputted (only applicable if hasMaxLines is true)
-    int maxLines_;
+	/// maximum number of lines that can be inputted (only applicable if hasMaxLines is true).
+    int maxLines;
     /// Text element.
     SharedPtr<Text> text_;
     /// Cursor element.
@@ -180,7 +176,7 @@ private:
     void HandleDefocused(StringHash eventType, VariantMap& eventData);
     /// Handle the element layout having been updated.
     void HandleLayoutUpdated(StringHash eventType, VariantMap& eventData);
-
+	/// Handle key down.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 };
 
