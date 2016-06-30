@@ -186,6 +186,22 @@ URHO3D_EVENT(E_TEMPORARYCHANGED, TemporaryChanged)
     URHO3D_PARAM(P_SERIALIZABLE, Serializable);    // Serializable pointer
 }
 
+/// A node (and its children and components) has been cloned.
+URHO3D_EVENT(E_NODECLONED, NodeCloned)
+{
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_NODE, Node);                    // Node pointer
+    URHO3D_PARAM(P_CLONENODE, CloneNode);          // Node pointer
+}
+
+/// A component has been cloned.
+URHO3D_EVENT(E_COMPONENTCLONED, ComponentCloned)
+{
+    URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
+    URHO3D_PARAM(P_COMPONENT, Component);          // Component pointer
+    URHO3D_PARAM(P_CLONECOMPONENT, CloneComponent); // Component pointer
+}
+
 /// A network attribute update from the server has been intercepted.
 URHO3D_EVENT(E_INTERCEPTNETWORKUPDATE, InterceptNetworkUpdate)
 {

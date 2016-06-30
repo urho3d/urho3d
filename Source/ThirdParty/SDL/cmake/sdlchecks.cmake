@@ -355,7 +355,8 @@ endmacro()
 # - HAVE_DLOPEN opt
 macro(CheckX11)
   if(VIDEO_X11)
-    # Urho3D - no fix required - all these checks below work on native Linux build only, e.g. they would not work on RPI (native or X-compile) which is fortunately a good thing
+    # Urho3D - bug fix - in order to make these checks below work on both native and cross-compiling builds we need to add the '-shared' compiler flags to ensure the linker does not attempt to statically link against X11 shared libs which would otherwise fail the test when in cross-compiling mode
+    set(CMAKE_REQUIRED_FLAGS "-fPIC -shared ${ORIG_CMAKE_REQUIRED_FLAGS}")
     foreach (NAME X11 Xext Xcursor Xinerama Xi Xrandr Xrender Xss Xxf86vm)
       string (TOUPPER ${NAME} UPCASE_NAME)
       string (REGEX REPLACE \\..+$ "" UPCASE_NAME "${UPCASE_NAME}")  # Stringify for string replacement
@@ -364,21 +365,27 @@ macro(CheckX11)
     endforeach ()
 
     # Urho3D - commented out setting of X_CFLAGS based on the search result for X11/Xlib.h using the default search path (if it is found then it is in default path anyway so no point to add it into compiler header search path again)
+    # Urho3D - add check for Xdbe extension
 
     check_include_file(X11/Xcursor/Xcursor.h HAVE_XCURSOR_H)
     check_include_file(X11/extensions/Xinerama.h HAVE_XINERAMA_H)
     check_include_file(X11/extensions/XInput2.h HAVE_XINPUT_H)
     check_include_file(X11/extensions/Xrandr.h HAVE_XRANDR_H)
     check_include_file(X11/extensions/Xrender.h HAVE_XRENDER_H)
-    check_include_file(X11/extensions/scrnsaver.h HAVE_XSS_H)
     check_include_file(X11/extensions/shape.h HAVE_XSHAPE_H)
-    check_include_files("X11/Xlib.h;X11/extensions/xf86vmode.h" HAVE_XF86VM_H)
+    check_include_file(X11/extensions/scrnsaver.h HAVE_XSS_H)
+    check_include_files("X11/Xlib.h;X11/Xproto.h;X11/extensions/Xdbe.h" HAVE_XDBE_H)
     check_include_files("X11/Xlib.h;X11/Xproto.h;X11/extensions/Xext.h" HAVE_XEXT_H)
+    check_include_files("X11/Xlib.h;X11/extensions/xf86vmode.h" HAVE_XF86VM_H)
 
     if(X11_LIB)
       if(NOT HAVE_XEXT_H)
         message_error("Missing Xext.h, maybe you need to install the libxext-dev package?")
       endif()
+
+      if (HAVE_XDBE_H)
+        set(SDL_VIDEO_DRIVER_X11_XDBE 1)
+      endif ()
 
       set(HAVE_VIDEO_X11 TRUE)
       set(HAVE_SDL_VIDEO TRUE)
@@ -532,6 +539,7 @@ macro(CheckX11)
       endif()
 
       set(CMAKE_REQUIRED_LIBRARIES)
+      set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
     endif()
   endif()
 endmacro()
