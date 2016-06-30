@@ -36,6 +36,7 @@ endif ()
 # this one is important
 set (CMAKE_SYSTEM_NAME Linux)
 # this one not so much
+set (CMAKE_SYSTEM_PROCESSOR arm)
 set (CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
@@ -48,28 +49,29 @@ if (NOT EXISTS ${ARM_PREFIX}-gcc)
 endif ()
 set (COMPILER_PREFIX ${ARM_PREFIX})
 if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}")
+    get_filename_component (PATH ${ARM_PREFIX} PATH)
     get_filename_component (NAME ${ARM_PREFIX} NAME)
-    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (EXIT_CODE EQUAL 0 AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
+    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
         set (COMPILER_PREFIX ${CCACHE_SYMLINK}/${NAME})
     else ()
-        # Most probably this is a custom compiler toolchain not provided by the distro's own repository
-        get_filename_component (PATH ${ARM_PREFIX} PATH)
-        if (NOT $ENV{PATH} MATCHES ${PATH})
-            message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
-                "This is required to enable ccache support for ARM compiler toolchain.")
-        endif ()
+        # Fallback to create the ccache symlink in the build tree itself
         execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (EXIT_CODE EQUAL 0)
-            foreach (suffix gcc g++)
-                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${suffix})
+        if (EXIT_CODE EQUAL 0 AND CCACHE)
+            foreach (TOOL gcc g++)
+                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${TOOL})
             endforeach ()
             set (COMPILER_PREFIX ${CMAKE_BINARY_DIR}/${NAME})
         else ()
             message (WARNING "ccache may not have been installed on this host system. "
-                "This is required to enable ccache support for ARM compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+                "This is required to enable ccache support for ARM compiler toolchain. "
+                "CMake has been configured to use the actual compiler toolchain instead of ccache. "
                 "In order to rectify this, the build tree must be regenerated after installing ccache.")
         endif ()
+    endif ()
+    if (NOT $ENV{PATH} MATCHES ${PATH} AND NOT COMPILER_PREFIX STREQUAL ARM_PREFIX)
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for ARM compiler toolchain.")
     endif ()
 endif ()
 set (CMAKE_C_COMPILER   ${COMPILER_PREFIX}-gcc CACHE PATH "C compiler")
@@ -96,7 +98,7 @@ if (NOT ARM_SYSROOT)
 endif ()
 set (CMAKE_SYSROOT ${ARM_SYSROOT})
 
-# only search libraries, and headers in the target directories
+# only search libraries and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

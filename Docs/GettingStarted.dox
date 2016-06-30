@@ -112,8 +112,8 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_NAVIGATION    |1|Enable Navigation support|
 |URHO3D_URHO2D        |1|Enable 2D rendering & physics support|
 |URHO3D_SAMPLES       |1|Build sample applications|
-|URHO3D_TOOLS         |1|Build tools (native, RPI, and generic ARM only)|
-|URHO3D_EXTRAS        |0|Build extras (native, RPI, and generic ARM only)|
+|URHO3D_TOOLS         |1|Build tools (native, RPI, and ARM on Linux only)|
+|URHO3D_EXTRAS        |0|Build extras (native, RPI, and ARM on Linux only)|
 |URHO3D_DOCS          |0|Generate documentation as part of normal build (the 'doc' builtin target can be used to generate documentation regardless of this option's value)|
 |URHO3D_DOCS_QUIET    |0|Generate documentation as part of normal build, suppress generation process from sending anything to stdout|
 |URHO3D_PCH           |1|Enable PCH support|
@@ -135,38 +135,39 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_D3D11         |0|Use Direct3D11 instead of Direct3D9 (Windows platform only); overrides URHO3D_OPENGL option|
 |URHO3D_STATIC_RUNTIME|0|Use static C/C++ runtime libraries and eliminate the need for runtime DLLs installation (VS only)|
 |URHO3D_WIN32_CONSOLE |0|Use console main() instead of WinMain() as entry point when setting up Windows executable targets (Windows platform only)|
-|URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up Mac OS X executable targets (Xcode native build only)|
+|URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up macOS executable targets (macOS platform only)|
 |URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default) and SHARED|
 |URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
 |URHO3D_HOME          |-|Path to Urho3D build tree or SDK installation location (downstream project only)|
-|URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (Linux, MinGW, and non-Xcode OSX native build only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors|
+|URHO3D_DEPLOYMENT_TARGET|native|Specify the minimum CPU type on which the target binaries are to be deployed (non-ARM platform only), see GCC/Clang's -march option for possible values; Use 'generic' for targeting a wide range of generic processors|
 |CMAKE_BUILD_TYPE     |Release|Specify CMake build configuration (single-configuration generator only), possible values are Release (default), RelWithDebInfo, and Debug|
 |CMAKE_INSTALL_PREFIX |*|Install path prefix, prepended onto install directories; default to 'c:/Program Files/Urho3D' on Windows host and '/usr/local' on all other non-Windows hosts|
-|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify Mac OS X deployment target (OSX build only); default to current running OS X if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
-|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iPhone OS deployment target (iOS build only); default to latest installed iOS SDK if not specified, the minimum spported target is 3.0 due to constraint from SDL library|
-|ANDROID_ABI          |armeabi-v7a|Specify target ABI (Android build only), possible values are arm64-v8a, armeabi, armeabi-v6 with VFP, armeabi-v7a (default), armeabi-v7a with NEON, armeabi-v7a with VFPV3, mips, mips64, x86, and x86_64|
-|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android build only), possible values depends on installed NDK version, default to API level 9 on 32-bit ABIs, default to API level 21 on 64-bit ABIs|
-|ANDROID_TOOLCHAIN_NAME|*|Specify the name of compiler toolchain (Android build only), possible values depends on installed NDK version, default to arm-linux-androideabi-4.9 in most recent Android NDKs|
+|CMAKE_OSX_DEPLOYMENT_TARGET|-|Specify macOS deployment target (macOS platform only); default to current running macOS if not specified, the minimum supported target is 10.5 due to constraint from SDL library|
+|IPHONEOS_DEPLOYMENT_TARGET|-|Specify iOS deployment target (iOS platform only); default to latest installed iOS SDK if not specified, the minimum supported target is 3.0 due to constraint from SDL library|
+|ANDROID_NDK          |-|Path to Android NDK (Android platform only)|
+|ANDROID_TOOLCHAIN_NAME|*|Specify the name of compiler toolchain (Android platform only), possible values depends on installed Android NDK, default to Clang compiler toolchain|
+|ANDROID_ABI          |*|Specify target ABI (Android platform only), possible values depends on the target arch of the chosen Android compiler toolchain, default to first ABI of each target arch|
+|ANDROID_NATIVE_API_LEVEL|*|Specify target API level (Android platform only), possible values depends on installed NDK version, default to 'android-9' on 32-bit ABIs, default to 'android-21' on 64-bit ABIs|
 |ANDROID_NDK_GDB      |0|Enable ndk-gdb support (Android Debug build only)|
 |MINGW_PREFIX         |-|Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)|
-|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected|
+|MINGW_SYSROOT        |-|Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected|
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
-|RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
+|RPI_ABI              |*|Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
 |ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
 |ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
-|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
-|EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
-|EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten cross-compiling build only)|
-|EMSCRIPTEN_SHARE_JS  |0|Share the same JS file responsible to load the shared data file (Emscripten cross-compiling build only and when enabling sharing data file support only)|
-|EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values|
-|EMSCRIPTEN_SYSTEM_LIBS|-|Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten cross-compiling build only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries|
+|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
+|EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten only)|
+|EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten only)|
+|EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten only)|
+|EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
+|EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten only)|
+|EMSCRIPTEN_SHARE_JS  |0|Share the same JS file responsible to load the shared data file (Emscripten only and when enabling sharing data file support only)|
+|EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten only), use 'emrun --list_browsers' command to get the list of possible values|
+|EMSCRIPTEN_SYSTEM_LIBS|-|Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 

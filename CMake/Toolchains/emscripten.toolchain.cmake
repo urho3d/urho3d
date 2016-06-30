@@ -71,20 +71,27 @@ set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
 # ccache support could only be enabled for emcc prior to 1.31.3 when the CCACHE_CPP2 env var is also set to 1, newer emcc version could enable ccache support without this caveat (see https://github.com/kripken/emscripten/issues/3365 for more detail)
 # The CCACHE_CPP2 env var tells ccache to fallback to use original input source file instead of preprocessed one when passing on the compilation task to the compiler proper
 if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMCC_VERSION VERSION_LESS 1.31.3))
-    if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
+    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/emcc AND EXISTS ${CCACHE_SYMLINK}/em++)
+        set (COMPILER_PATH ${CCACHE_SYMLINK})
+    else ()
+        # Fallback to create the ccache symlink in the build tree itself
+        execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if (EXIT_CODE EQUAL 0 AND CCACHE)
+            foreach (TOOL emcc em++)
+                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${TOOL})
+            endforeach ()
+            set (COMPILER_PATH ${CMAKE_BINARY_DIR})
+        else ()
+            message (WARNING "ccache may not have been installed on this host system. "
+                "This is required to enable ccache support for Emscripten compiler toolchain. "
+                "CMake has been configured to use the actual compiler toolchain instead of ccache. "
+                "In order to rectify this, the build tree must be regenerated after installing ccache.")
+        endif ()
+    endif ()
+    if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH} AND NOT COMPILER_PATH STREQUAL EMSCRIPTEN_ROOT_PATH)
         message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
             "This is required to enable ccache support for Emscripten compiler toolchain.")
-    endif ()
-    execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (EXIT_CODE EQUAL 0)
-        foreach (name emcc em++)
-            execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${name})
-        endforeach ()
-        set (COMPILER_PATH ${CMAKE_BINARY_DIR})
-    else ()
-        message (WARNING "ccache may not have been installed on this host system. "
-            "This is required to enable ccache support for Emscripten compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
-            "In order to rectify this, the build tree must be regenerated after installing ccache.")
     endif ()
 endif ()
 set (CMAKE_C_COMPILER   ${COMPILER_PATH}/emcc${TOOL_EXT}            CACHE PATH "C compiler")
@@ -108,12 +115,12 @@ if (NOT EMSCRIPTEN_SYSROOT)
         message (FATAL_ERROR "Could not find Emscripten system root. "
             "Use EMSCRIPTEN_SYSROOT environment variable or build option to specify the location of system root.")
     endif ()
-    set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)" FORCE)
-    set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten cross-compiling build only)" FORCE)
+    set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten only)" FORCE)
+    set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten only)" FORCE)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${EMSCRIPTEN_SYSROOT})
 
-# only search libraries, and headers in the target directories
+# only search libraries and headers in the target directories
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

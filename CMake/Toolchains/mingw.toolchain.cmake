@@ -41,6 +41,7 @@ endif ()
 set (CMAKE_SYSTEM_NAME Windows)
 # this one not so much
 set (CMAKE_SYSTEM_PROCESSOR x86)
+set (CMAKE_SYSTEM_VERSION 1)
 
 # specify the cross compiler
 if (NOT MINGW_PREFIX AND DEFINED ENV{MINGW_PREFIX})
@@ -52,28 +53,29 @@ if (NOT EXISTS ${MINGW_PREFIX}-gcc)
 endif ()
 set (COMPILER_PREFIX ${MINGW_PREFIX})
 if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}")
+    get_filename_component (PATH ${MINGW_PREFIX} PATH)
     get_filename_component (NAME ${MINGW_PREFIX} NAME)
-    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (EXIT_CODE EQUAL 0 AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
+    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
         set (COMPILER_PREFIX ${CCACHE_SYMLINK}/${NAME})
     else ()
-        # Most probably this is a custom compiler toolchain not provided by the distro's own repository
-        get_filename_component (PATH ${MINGW_PREFIX} PATH)
-        if (NOT $ENV{PATH} MATCHES ${PATH})
-            message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
-                "This is required to enable ccache support for MinGW compiler toolchain.")
-        endif ()
+        # Fallback to create the ccache symlink in the build tree itself
         execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (EXIT_CODE EQUAL 0)
-            foreach (suffix gcc g++)
-                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${suffix})
+        if (EXIT_CODE EQUAL 0 AND CCACHE)
+            foreach (TOOL gcc g++)
+                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${TOOL})
             endforeach ()
             set (COMPILER_PREFIX ${CMAKE_BINARY_DIR}/${NAME})
         else ()
             message (WARNING "ccache may not have been installed on this host system. "
-                "This is required to enable ccache support for MinGW compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
+                "This is required to enable ccache support for MinGW compiler toolchain. "
+                "CMake has been configured to use the actual compiler toolchain instead of ccache. "
                 "In order to rectify this, the build tree must be regenerated after installing ccache.")
         endif ()
+    endif ()
+    if (NOT $ENV{PATH} MATCHES ${PATH} AND NOT COMPILER_PREFIX STREQUAL MINGW_PREFIX)
+        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
+            "This is required to enable ccache support for MinGW compiler toolchain.")
     endif ()
 endif ()
 set (CMAKE_C_COMPILER   ${COMPILER_PREFIX}-gcc  CACHE PATH "C compiler")
@@ -103,7 +105,7 @@ if (NOT MINGW_SYSROOT)
             "Use MINGW_SYSROOT environment variable or build option to specify the location of system root.")
     endif ()
     set (MINGW_PREFIX ${MINGW_PREFIX} CACHE STRING "Prefix path to MinGW cross-compiler tools (MinGW cross-compiling build only)" FORCE)
-    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected" FORCE)
+    set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected" FORCE)
 endif ()
 set (CMAKE_FIND_ROOT_PATH ${MINGW_SYSROOT})
 
