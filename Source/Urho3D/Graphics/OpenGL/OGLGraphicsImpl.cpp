@@ -31,7 +31,6 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    window_(0),
     context_(0),
     systemFBO_(0),
     activeTexture_(0),

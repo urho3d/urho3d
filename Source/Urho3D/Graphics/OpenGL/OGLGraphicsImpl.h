@@ -64,7 +64,6 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-struct SDL_Window;
 typedef void *SDL_GLContext;
 
 namespace Urho3D
@@ -109,14 +108,10 @@ public:
     /// Construct.
     GraphicsImpl();
 
-    /// Return the SDL window.
-    SDL_Window* GetWindow() const { return window_; }
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
-    /// SDL window.
-    SDL_Window* window_;
     /// SDL OpenGL context.
     SDL_GLContext context_;
     /// IOS system framebuffer handle.

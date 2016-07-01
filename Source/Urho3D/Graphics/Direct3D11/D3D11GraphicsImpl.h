@@ -31,8 +31,6 @@
 #include <d3d11.h>
 #include <dxgi.h>
 
-struct SDL_Window;
-
 namespace Urho3D
 {
 
@@ -62,12 +60,7 @@ public:
     /// Return swapchain.
     IDXGISwapChain* GetSwapChain() const { return swapChain_; }
 
-    /// Return window.
-    SDL_Window* GetWindow() const { return window_; }
-
 private:
-    /// SDL window.
-    SDL_Window* window_;
     /// Graphics device.
     ID3D11Device* device_;
     /// Immediate device context.

@@ -33,6 +33,8 @@
 #include "../Math/Rect.h"
 #include "../Resource/Image.h"
 
+struct SDL_Window;
+
 namespace Urho3D
 {
 
@@ -246,6 +248,9 @@ public:
 
     /// Return OS-specific external window handle. Null if not in use.
     void* GetExternalWindow() const { return externalWindow_; }
+
+    /// Return SDL window.
+    SDL_Window* GetWindow() const { return window_; }
 
     /// Return window title.
     const String& GetWindowTitle() const { return windowTitle_; }
@@ -582,6 +587,8 @@ private:
     Mutex gpuObjectMutex_;
     /// Implementation.
     GraphicsImpl* impl_;
+    /// SDL window.
+    SDL_Window* window_;
     /// Window title.
     String windowTitle_;
     /// Window icon image.

@@ -198,6 +198,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
+    window_(0),
     windowIcon_(0),
     externalWindow_(0),
     width_(0),
@@ -282,11 +283,11 @@ Graphics::~Graphics()
     URHO3D_SAFE_RELEASE(impl_->deviceContext_);
     URHO3D_SAFE_RELEASE(impl_->device_);
 
-    if (impl_->window_)
+    if (window_)
     {
         SDL_ShowCursor(SDL_TRUE);
-        SDL_DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        SDL_DestroyWindow(window_);
+        window_ = 0;
     }
 
     delete impl_;
@@ -341,7 +342,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
-    if (!impl_->window_)
+    if (!window_)
     {
         if (!OpenWindow(width, height, resizable, borderless))
             return false;
@@ -376,7 +377,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (maximize)
     {
         Maximize();
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(window_, &width, &height);
     }
 
     if (!impl_->device_ || multiSample_ != multiSample)
@@ -463,11 +464,11 @@ void Graphics::SetForceGL2(bool enable)
 
 void Graphics::Close()
 {
-    if (impl_->window_)
+    if (window_)
     {
         SDL_ShowCursor(SDL_TRUE);
-        SDL_DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        SDL_DestroyWindow(window_);
+        window_ = 0;
     }
 }
 
@@ -561,7 +562,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -569,7 +570,7 @@ bool Graphics::BeginFrame()
     {
         // To prevent a loop of endless device loss and flicker, do not attempt to render when in fullscreen
         // and the window is minimized
-        if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
+        if (fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
             return false;
     }
 
@@ -1666,7 +1667,7 @@ void Graphics::PrecacheShaders(Deserializer& source)
 
 bool Graphics::IsInitialized() const
 {
-    return impl_->window_ != 0 && impl_->GetDevice() != 0;
+    return window_ != 0 && impl_->GetDevice() != 0;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -1804,12 +1805,12 @@ bool Graphics::IsDeviceLost() const
 
 void Graphics::OnWindowResized()
 {
-    if (!impl_->device_ || !impl_->window_)
+    if (!impl_->device_ || !window_)
         return;
 
     int newWidth, newHeight;
 
-    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GetWindowSize(window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -1833,12 +1834,12 @@ void Graphics::OnWindowResized()
 
 void Graphics::OnWindowMoved()
 {
-    if (!impl_->device_ || !impl_->window_ || fullscreen_)
+    if (!impl_->device_ || !window_ || fullscreen_)
         return;
 
     int newX, newY;
 
-    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    SDL_GetWindowPosition(window_, &newX, &newY);
     if (newX == position_.x_ && newY == position_.y_)
         return;
 
@@ -2032,18 +2033,18 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
 
-        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
+        window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
     }
     else
-        impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
+        window_ = SDL_CreateWindowFrom(externalWindow_, 0);
 
-    if (!impl_->window_)
+    if (!window_)
     {
         URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
-    SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+    SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     CreateWindowIcon();
 
@@ -2056,22 +2057,22 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     {
         if (!newWidth || !newHeight)
         {
-            SDL_MaximizeWindow(impl_->window_);
-            SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+            SDL_MaximizeWindow(window_);
+            SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
         else
-            SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+            SDL_SetWindowSize(window_, newWidth, newHeight);
 
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
-        SDL_HideWindow(impl_->window_);
-        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-        SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_FALSE : SDL_TRUE);
-        SDL_ShowWindow(impl_->window_);
+        SDL_HideWindow(window_);
+        SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+        SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
+        SDL_ShowWindow(window_);
     }
     else
     {
         // If external window, must ask its dimensions instead of trying to set them
-        SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+        SDL_GetWindowSize(window_, &newWidth, &newHeight);
         newFullscreen = false;
     }
 }
@@ -2126,7 +2127,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferDesc.Height = (UINT)height;
     swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapChainDesc.OutputWindow = GetWindowHandle(impl_->window_);
+    swapChainDesc.OutputWindow = GetWindowHandle(window_);
     swapChainDesc.SampleDesc.Count = (UINT)multiSample;
     swapChainDesc.SampleDesc.Quality = multiSample > 1 ? 0xffffffff : 0;
     swapChainDesc.Windowed = TRUE;
@@ -2141,7 +2142,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)
-    dxgiFactory->MakeWindowAssociation(GetWindowHandle(impl_->window_), DXGI_MWA_NO_ALT_ENTER);
+    dxgiFactory->MakeWindowAssociation(GetWindowHandle(window_), DXGI_MWA_NO_ALT_ENTER);
 
     dxgiFactory->Release();
     dxgiAdapter->Release();

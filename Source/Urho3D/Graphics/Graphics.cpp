@@ -59,7 +59,7 @@ namespace Urho3D
 
 void Graphics::SetExternalWindow(void* window)
 {
-    if (!impl_->window_)
+    if (!window_)
         externalWindow_ = window;
     else
         URHO3D_LOGERROR("Window already opened, can not set external window");
@@ -68,21 +68,21 @@ void Graphics::SetExternalWindow(void* window)
 void Graphics::SetWindowTitle(const String& windowTitle)
 {
     windowTitle_ = windowTitle;
-    if (impl_->window_)
-        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
+    if (window_)
+        SDL_SetWindowTitle(window_, windowTitle_.CString());
 }
 
 void Graphics::SetWindowIcon(Image* windowIcon)
 {
     windowIcon_ = windowIcon;
-    if (impl_->window_)
+    if (window_)
         CreateWindowIcon();
 }
 
 void Graphics::SetWindowPosition(const IntVector2& position)
 {
-    if (impl_->window_)
-        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
+    if (window_)
+        SDL_SetWindowPosition(window_, position.x_, position.y_);
     else
         position_ = position; // Sets as initial position for OpenWindow()
 }
@@ -105,7 +105,7 @@ bool Graphics::ToggleFullscreen()
 
 IntVector2 Graphics::GetWindowPosition() const
 {
-    if (impl_->window_)
+    if (window_)
         return position_;
     return IntVector2::ZERO;
 }
@@ -157,18 +157,18 @@ IntVector2 Graphics::GetDesktopResolution() const
 
 void Graphics::Maximize()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
-    SDL_MaximizeWindow(impl_->window_);
+    SDL_MaximizeWindow(window_);
 }
 
 void Graphics::Minimize()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
-    SDL_MinimizeWindow(impl_->window_);
+    SDL_MinimizeWindow(window_);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)
@@ -269,7 +269,7 @@ void Graphics::CreateWindowIcon()
         SDL_Surface* surface = windowIcon_->GetSDLSurface();
         if (surface)
         {
-            SDL_SetWindowIcon(impl_->window_, surface);
+            SDL_SetWindowIcon(window_, surface);
             SDL_FreeSurface(surface);
         }
     }

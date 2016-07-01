@@ -222,6 +222,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
+    window_(0),
     windowIcon_(0),
     externalWindow_(0),
     width_(0),
@@ -434,17 +435,17 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         for (;;)
         {
             if (!externalWindow_)
-                impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+                window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
 #ifndef __EMSCRIPTEN__
-                if (!impl_->window_)
-                    impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
+                if (!window_)
+                    window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
 #endif
             }
 
-            if (impl_->window_)
+            if (window_)
                 break;
             else
             {
@@ -468,7 +469,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (maximize)
         {
             Maximize();
-            SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+            SDL_GL_GetDrawableSize(window_, &width, &height);
         }
 
         // Create/restore context and GPU objects and set initial renderstate
@@ -495,16 +496,16 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
 
-    SDL_GL_GetDrawableSize(impl_->window_, &width_, &height_);
+    SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)
-        SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+        SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
 
     // Clear the initial window contents to black
     Clear(CLEAR_COLOR);
-    SDL_GL_SwapWindow(impl_->window_);
+    SDL_GL_SwapWindow(window_);
 
     CheckFeatureSupport();
 
@@ -607,7 +608,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+        SDL_GL_GetDrawableSize(window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -644,7 +645,7 @@ void Graphics::EndFrame()
 
     SendEvent(E_ENDRENDERING);
 
-    SDL_GL_SwapWindow(impl_->window_);
+    SDL_GL_SwapWindow(window_);
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
@@ -1912,14 +1913,14 @@ void Graphics::PrecacheShaders(Deserializer& source)
 
 bool Graphics::IsInitialized() const
 {
-    return impl_->window_ != 0;
+    return window_ != 0;
 }
 
 bool Graphics::IsDeviceLost() const
 {
     // On iOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
 #ifdef IOS
-    if (impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED) != 0)
+    if (window_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED) != 0)
         return true;
 #endif
 
@@ -2077,12 +2078,12 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
 
 void Graphics::OnWindowResized()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
     int newWidth, newHeight;
 
-    SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GL_GetDrawableSize(window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -2108,12 +2109,12 @@ void Graphics::OnWindowResized()
 
 void Graphics::OnWindowMoved()
 {
-    if (!impl_->window_ || fullscreen_)
+    if (!window_ || fullscreen_)
         return;
 
     int newX, newY;
 
-    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    SDL_GetWindowPosition(window_, &newX, &newY);
     if (newX == position_.x_ && newY == position_.y_)
         return;
 
@@ -2208,7 +2209,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsign
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
     {
@@ -2244,7 +2245,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
-        SDL_SetWindowFullscreen(impl_->window_, 0);
+        SDL_SetWindowFullscreen(window_, 0);
 #endif
 
     if (impl_->context_)
@@ -2264,15 +2265,15 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         // Do not destroy external window except when shutting down
         if (!externalWindow_ || clearGPUObjects)
         {
-            SDL_DestroyWindow(impl_->window_);
-            impl_->window_ = 0;
+            SDL_DestroyWindow(window_);
+            window_ = 0;
         }
     }
 }
 
 void Graphics::Restore()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
 #ifdef __ANDROID__
@@ -2289,7 +2290,7 @@ void Graphics::Restore()
     // Ensure first that the context exists
     if (!impl_->context_)
     {
-        impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        impl_->context_ = SDL_GL_CreateContext(window_);
 
 #ifndef GL_ES_VERSION_2_0
         // If we're trying to use OpenGL 3, but context creation fails, retry with 2
@@ -2299,7 +2300,7 @@ void Graphics::Restore()
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-            impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+            impl_->context_ = SDL_GL_CreateContext(window_);
         }
 #endif
 

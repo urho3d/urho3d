@@ -31,7 +31,6 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    window_(0),
     interface_(0),
     device_(0),
     defaultColorSurface_(0),
