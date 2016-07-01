@@ -99,6 +99,10 @@ private:
     D3DTEXTUREADDRESS wAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use.
     Color borderColors_[MAX_TEXTURE_UNITS];
+    /// Device lost flag.
+    bool deviceLost_;
+    /// Frame query issued flag.
+    bool queryIssued_;
     /// sRGB mode in use.
     bool sRGBModes_[MAX_TEXTURE_UNITS];
     /// sRGB write flag.

@@ -39,7 +39,9 @@ GraphicsImpl::GraphicsImpl() :
     frameQuery_(0),
     adapter_(D3DADAPTER_DEFAULT),
     deviceType_(D3DDEVTYPE_HAL),
-    shaderProgram_(0)
+    shaderProgram_(0),
+    deviceLost_(false),
+    queryIssued_(false)
 {
     memset(&presentParams_, 0, sizeof presentParams_);
 }

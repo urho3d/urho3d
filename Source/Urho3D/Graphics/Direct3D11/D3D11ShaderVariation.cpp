@@ -127,7 +127,7 @@ void ShaderVariation::Release()
         if (!graphics_)
             return;
 
-        graphics_->CleanUpShaderPrograms(this);
+        graphics_->CleanupShaderPrograms(this);
 
         if (type_ == VS)
         {

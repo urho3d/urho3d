@@ -25,39 +25,18 @@
 #include "../../Core/Context.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
-#include "../../Graphics/Camera.h"
 #include "../../Graphics/ConstantBuffer.h"
-#include "../../Graphics/CustomGeometry.h"
-#include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../Graphics/Geometry.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/IndexBuffer.h"
-#include "../../Graphics/Material.h"
-#include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
-#include "../../Graphics/RibbonTrail.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
-#include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
-#include "../../Graphics/Texture2DArray.h"
-#include "../../Graphics/Texture3D.h"
-#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/Zone.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
@@ -214,6 +193,7 @@ static HWND GetWindowHandle(SDL_Window* window)
 }
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
+bool Graphics::gl3Support = false;
 
 Graphics::Graphics(Context* context) :
     Object(context),
@@ -231,7 +211,12 @@ Graphics::Graphics(Context* context) :
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(false),
+    forceGL2_(false),
     sRGB_(false),
+    anisotropySupport_(false),
+    dxtTextureSupport_(false),
+    etcTextureSupport_(false),
+    pvrtcTextureSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     instancingSupport_(false),
@@ -309,41 +294,6 @@ Graphics::~Graphics()
 
     // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
     SDL_Quit();
-}
-
-void Graphics::SetExternalWindow(void* window)
-{
-    if (!impl_->window_)
-        externalWindow_ = window;
-    else
-        URHO3D_LOGERROR("Window already opened, can not set external window");
-}
-
-void Graphics::SetWindowTitle(const String& windowTitle)
-{
-    windowTitle_ = windowTitle;
-    if (impl_->window_)
-        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
-}
-
-void Graphics::SetWindowIcon(Image* windowIcon)
-{
-    windowIcon_ = windowIcon;
-    if (impl_->window_)
-        CreateWindowIcon();
-}
-
-void Graphics::SetWindowPosition(const IntVector2& position)
-{
-    if (impl_->window_)
-        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
-    else
-        position_ = position; // Sets as initial position for OpenWindow()
-}
-
-void Graphics::SetWindowPosition(int x, int y)
-{
-    SetWindowPosition(IntVector2(x, y));
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
@@ -506,15 +456,9 @@ void Graphics::SetFlushGPU(bool enable)
     }
 }
 
-void Graphics::SetOrientations(const String& orientations)
+void Graphics::SetForceGL2(bool enable)
 {
-    orientations_ = orientations.Trimmed();
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
-}
-
-bool Graphics::ToggleFullscreen()
-{
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    // No effect on Direct3D11
 }
 
 void Graphics::Close()
@@ -1356,6 +1300,11 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     }
 }
 
+void SetTextureForUpdate(Texture* texture)
+{
+    // No-op on Direct3D11
+}
+
 void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
 {
     if (mode != defaultTextureFilterMode_)
@@ -1372,6 +1321,11 @@ void Graphics::SetTextureAnisotropy(unsigned level)
         textureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
+}
+
+void Graphics::Restore()
+{
+    // No-op on Direct3D11
 }
 
 void Graphics::SetTextureParametersDirty()
@@ -1715,43 +1669,6 @@ bool Graphics::IsInitialized() const
     return impl_->window_ != 0 && impl_->GetDevice() != 0;
 }
 
-IntVector2 Graphics::GetWindowPosition() const
-{
-    if (impl_->window_)
-        return position_;
-    return IntVector2::ZERO;
-}
-
-PODVector<IntVector2> Graphics::GetResolutions() const
-{
-    PODVector<IntVector2> ret;
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
-
-    for (unsigned i = 0; i < numModes; ++i)
-    {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
-        int width = mode.w;
-        int height = mode.h;
-
-        // Store mode if unique
-        bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++j)
-        {
-            if (ret[j].x_ == width && ret[j].y_ == height)
-            {
-                unique = false;
-                break;
-            }
-        }
-
-        if (unique)
-            ret.Push(IntVector2(width, height));
-    }
-
-    return ret;
-}
-
 PODVector<int> Graphics::GetMultiSampleLevels() const
 {
     PODVector<int> ret;
@@ -1770,13 +1687,6 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     }
 
     return ret;
-}
-
-IntVector2 Graphics::GetDesktopResolution() const
-{
-    SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
-    return IntVector2(mode.w, mode.h);
 }
 
 unsigned Graphics::GetFormat(CompressedFormat format) const
@@ -1826,6 +1736,11 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
+}
+
+ShaderProgram* Graphics::GetShaderProgram() const
+{
+    return impl_->shaderProgram_;
 }
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
@@ -1878,6 +1793,13 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     }
 
     return IntVector2(width, height);
+}
+
+bool Graphics::IsDeviceLost() const
+{
+    // Direct3D11 graphics context is never considered lost
+    /// \todo The device could be lost in case of graphics adapters getting disabled during runtime. This is not handled
+    return false;
 }
 
 void Graphics::OnWindowResized()
@@ -1933,114 +1855,7 @@ void Graphics::OnWindowMoved()
     SendEvent(E_WINDOWPOS, eventData);
 }
 
-void Graphics::Maximize()
-{
-    if (!impl_->window_)
-        return;
-
-    SDL_MaximizeWindow(impl_->window_);
-}
-
-void Graphics::Minimize()
-{
-    if (!impl_->window_)
-        return;
-
-    SDL_MinimizeWindow(impl_->window_);
-}
-
-void Graphics::AddGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Push(object);
-}
-
-void Graphics::RemoveGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Remove(object);
-}
-
-void* Graphics::ReserveScratchBuffer(unsigned size)
-{
-    if (!size)
-        return 0;
-
-    if (size > maxScratchBufferRequest_)
-        maxScratchBufferRequest_ = size;
-
-    // First check for a free buffer that is large enough
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ >= size)
-        {
-            i->reserved_ = true;
-            return i->data_.Get();
-        }
-    }
-
-    // Then check if a free buffer can be resized
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_)
-        {
-            i->data_ = new unsigned char[size];
-            i->size_ = size;
-            i->reserved_ = true;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
-
-            return i->data_.Get();
-        }
-    }
-
-    // Finally allocate a new buffer
-    ScratchBuffer newBuffer;
-    newBuffer.data_ = new unsigned char[size];
-    newBuffer.size_ = size;
-    newBuffer.reserved_ = true;
-    scratchBuffers_.Push(newBuffer);
-    return newBuffer.data_.Get();
-
-    URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
-}
-
-void Graphics::FreeScratchBuffer(void* buffer)
-{
-    if (!buffer)
-        return;
-
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (i->reserved_ && i->data_.Get() == buffer)
-        {
-            i->reserved_ = false;
-            return;
-        }
-    }
-
-    URHO3D_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
-}
-
-void Graphics::CleanupScratchBuffers()
-{
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
-        {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
-            i->size_ = maxScratchBufferRequest_;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
-        }
-    }
-
-    maxScratchBufferRequest_ = 0;
-}
-
-void Graphics::CleanUpShaderPrograms(ShaderVariation* variation)
+void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
 {
     for (ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Begin(); i != impl_->shaderPrograms_.End();)
     {
@@ -2052,6 +1867,11 @@ void Graphics::CleanUpShaderPrograms(ShaderVariation* variation)
 
     if (vertexShader_ == variation || pixelShader_ == variation)
         impl_->shaderProgram_ = 0;
+}
+
+void Graphics::CleanupRenderSurface(RenderSurface* surface)
+{
+    // No-op on Direct3D11
 }
 
 ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size)
@@ -2192,6 +2012,16 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
+unsigned Graphics::GetMaxBones()
+{
+    return 128;
+}
+
+bool Graphics::GetGL3Support()
+{
+    return gl3Support;
+}
+
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
     if (!externalWindow_)
@@ -2218,19 +2048,6 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     CreateWindowIcon();
 
     return true;
-}
-
-void Graphics::CreateWindowIcon()
-{
-    if (windowIcon_)
-    {
-        SDL_Surface* surface = windowIcon_->GetSDLSurface();
-        if (surface)
-        {
-            SDL_SetWindowIcon(impl_->window_, surface);
-            SDL_FreeSurface(surface);
-        }
-    }
 }
 
 void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless)
@@ -2438,6 +2255,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
 
 void Graphics::CheckFeatureSupport()
 {
+    anisotropySupport_ = true;
+    dxtTextureSupport_ = true;
     lightPrepassSupport_ = true;
     deferredSupport_ = true;
     hardwareShadowSupport_ = true;
@@ -2802,38 +2621,6 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["ZoneCubeMap"] = TU_ZONE;
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
-}
-
-void RegisterGraphicsLibrary(Context* context)
-{
-    Animation::RegisterObject(context);
-    Material::RegisterObject(context);
-    Model::RegisterObject(context);
-    Shader::RegisterObject(context);
-    Technique::RegisterObject(context);
-    Texture2D::RegisterObject(context);
-    Texture2DArray::RegisterObject(context);
-    Texture3D::RegisterObject(context);
-    TextureCube::RegisterObject(context);
-    Camera::RegisterObject(context);
-    Drawable::RegisterObject(context);
-    Light::RegisterObject(context);
-    StaticModel::RegisterObject(context);
-    StaticModelGroup::RegisterObject(context);
-    Skybox::RegisterObject(context);
-    AnimatedModel::RegisterObject(context);
-    AnimationController::RegisterObject(context);
-    BillboardSet::RegisterObject(context);
-    ParticleEffect::RegisterObject(context);
-    ParticleEmitter::RegisterObject(context);
-    RibbonTrail::RegisterObject(context);
-    CustomGeometry::RegisterObject(context);
-    DecalSet::RegisterObject(context);
-    Terrain::RegisterObject(context);
-    TerrainPatch::RegisterObject(context);
-    DebugRenderer::RegisterObject(context);
-    Octree::RegisterObject(context);
-    Zone::RegisterObject(context);
 }
 
 }
