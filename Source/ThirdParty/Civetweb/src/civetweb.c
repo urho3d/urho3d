@@ -321,14 +321,7 @@ typedef DWORD clockid_t;
 #define CLOCK_REALTIME (2)
 #endif
 
-// Urho3D: fix VC15 compilation issue
-#if defined(_MSC_VER) && (_MSC_VER >= 1900)
-#define _TIMESPEC_DEFINED
-#endif
-// Urho3D: fixes #1444
-#if defined(__MINGW32__)
-#define _TIMESPEC_DEFINED
-#endif
+// Urho3D - use CMake auto-detection to avoid hard-coding the exceptional cases
 #ifndef _TIMESPEC_DEFINED
 struct timespec {
 	time_t tv_sec; /* seconds */

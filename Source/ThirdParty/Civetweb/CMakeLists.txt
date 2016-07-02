@@ -23,6 +23,19 @@
 # Define target name
 set (TARGET_NAME Civetweb)
 
+# Define preprocessor macros
+if (WIN32)
+    include (CheckStructHasMember)
+    check_struct_has_member (struct\ timespec tv_sec time.h HAVE_STRUCT_TIMESPEC_TV_SEC)
+    if (HAVE_STRUCT_TIMESPEC_TV_SEC)
+        include (CheckSymbolExists)
+        check_symbol_exists (_TIMESPEC_DEFINED time.h HAVE__TIMESPEC_DEFINED)
+        if (NOT HAVE__TIMESPEC_DEFINED)
+            add_definitions (-D_TIMESPEC_DEFINED)
+        endif ()
+    endif ()
+endif ()
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS include/*.h)
 
