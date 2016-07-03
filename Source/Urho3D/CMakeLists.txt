@@ -68,7 +68,7 @@ if (WIN32)
 endif ()
 
 # Define source files
-foreach (DIR Navigation Network Physics Urho2D)
+foreach (DIR Navigation IceWeaselMods Network Physics Urho2D)
     string (TOUPPER URHO3D_${DIR} OPT)
     if (NOT ${OPT})
         list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})
