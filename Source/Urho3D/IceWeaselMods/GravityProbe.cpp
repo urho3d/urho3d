@@ -85,6 +85,9 @@ void GravityProbe::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     Vector3 endPosition = startPosition + direction;
     debug->AddLine(startPosition, endPosition, Color::BLUE, depthTest);
 
+    // Draw small sphere at base of arrow
+    debug->AddSphere(Sphere(startPosition, scale*.08), Color::CYAN, depthTest);
+
     // Draw two lines at tip
     startPosition = transform * Vector3(-scale*.2, 0, -scale*.2) + direction;
     debug->AddLine(startPosition, endPosition, Color::BLUE, depthTest);
