@@ -39,6 +39,7 @@ URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
     URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
     URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
     URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 /// Physics end contact.
@@ -49,6 +50,7 @@ URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
     URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
     URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
     URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 }
