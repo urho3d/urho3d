@@ -43,7 +43,7 @@ class Context;
  * force (defined by this class) and a resulting interpolated vector from
  * nearby gravity probes.
  */
-class Gravity : public Component
+class URHO3D_API Gravity : public Component
 {
     URHO3D_OBJECT(Gravity, Component)
 
@@ -83,6 +83,30 @@ public:
     Vector3 QueryGravity(Vector3 worldLocation);
 
 private:
+    void RebuildTetrahedralMesh();
+
+    /// Triggers a new search for all gravity probe nodes and rebuilds the tetrahedral mesh
+    virtual void OnSceneSet(Scene* scene);
+
+    /*!
+     * @brief Searches for all gravity probe nodes that are located beneath the
+     * specified node and caches them. The specified node is not checked.
+     */
+    void AddGravityProbeNodesRecursively(Node* node);
+
+    /*!
+     * @brief Searches for all gravity probe nodes that are located on and
+     * beneath the specified node.
+     */
+    void RemoveGravityProbeNodesRecursively(Node* node);
+
+    void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
+    void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
+    void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
+    void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
+
+    PODVector<Node*> gravityProbeNodes_;
+
     float gravity_;
 };
 

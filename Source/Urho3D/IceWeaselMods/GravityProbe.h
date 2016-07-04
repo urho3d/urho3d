@@ -31,7 +31,7 @@ namespace Urho3D
 class Context;
 
 
-class GravityProbe : public Component
+class URHO3D_API GravityProbe : public Component
 {
     URHO3D_OBJECT(GravityProbe, Component)
 

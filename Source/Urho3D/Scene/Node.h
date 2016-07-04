@@ -491,6 +491,13 @@ public:
     /// Return child scene node by name hash.
     Node* GetChild(StringHash nameHash, bool recursive = false) const;
 
+    /*!
+     * @brief Returns true if we are hierarchically above the specified node
+     * (if we are a parent, grandparent, etc. of the specified node).
+     * @note Also returns true if we pass in ourself as an argument.
+     */
+    bool IsAncestorOf(Node* node) const;
+
     /// Return number of components.
     unsigned GetNumComponents() const { return components_.Size(); }
 
