@@ -262,6 +262,8 @@ private:
         SharedPtr<Node> nodeA_;
         /// Node B.
         SharedPtr<Node> nodeB_;
+        /// Box2D Contact
+        b2Contact* contact_;
     };
     /// Begin contact infos.
     Vector<ContactInfo> beginContactInfos_;
