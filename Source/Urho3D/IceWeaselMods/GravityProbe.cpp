@@ -24,6 +24,7 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../IceWeaselMods/IceWeasel.h"
 #include "../IceWeaselMods/GravityProbe.h"
+#include "../Scene/Node.h"
 
 
 namespace Urho3D
@@ -31,7 +32,8 @@ namespace Urho3D
 
 // ----------------------------------------------------------------------------
 GravityProbe::GravityProbe(Context* context) :
-    Component(context)
+    Component(context),
+    forceFactor_(1.0f)
 {
 }
 
@@ -47,8 +49,47 @@ void GravityProbe::RegisterObject(Context* context)
 }
 
 // ----------------------------------------------------------------------------
+void GravityProbe::SetPosition(Vector3 position)
+{
+    node_->SetWorldPosition(position);
+}
+
+// ----------------------------------------------------------------------------
+Vector3 GravityProbe::GetPosition() const
+{
+    return node_->GetWorldPosition();
+}
+
+// ----------------------------------------------------------------------------
+void GravityProbe::SetDirection(Vector3 direction)
+{
+    node_->SetWorldDirection(direction);
+}
+
+// ----------------------------------------------------------------------------
+Vector3 GravityProbe::GetDirection() const
+{
+    return node_->GetWorldDirection();
+}
+
+// ----------------------------------------------------------------------------
 void GravityProbe::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
+    // Collect data for drawing an arrow
+    float scale = forceFactor_ * 3.0f;
+    Vector3 direction = GetDirection() * scale;
+    Matrix3x4 transform = node_->GetWorldTransform();
+    Vector3 startPosition = node_->GetWorldPosition();
+
+    // Draw base of arrow
+    Vector3 endPosition = startPosition + direction;
+    debug->AddLine(startPosition, endPosition, Color::BLUE, depthTest);
+
+    // Draw two lines at tip
+    startPosition = transform * Vector3(-scale*.2, 0, -scale*.2) + direction;
+    debug->AddLine(startPosition, endPosition, Color::BLUE, depthTest);
+    startPosition = transform * Vector3(scale*.2, 0, -scale*.2) + direction;
+    debug->AddLine(startPosition, endPosition, Color::BLUE, depthTest);
 }
 
 } // namespace Urho3D

@@ -20,21 +20,36 @@
 // THE SOFTWARE.
 //
 
-#include "../IceWeaselMods/IceWeasel.h"
-#include "../IceWeaselMods/GravityProbe.h"
+#include "../Core/Context.h"
 #include "../IceWeaselMods/Gravity.h"
-
+#include "../IceWeaselMods/IceWeasel.h"
 
 namespace Urho3D
 {
 
-const char* ICEWEASELMODS_CATEGORY = "Ice Weasel";
 
 // ----------------------------------------------------------------------------
-void RegisterIceWeaselMods(Context* context)
+Gravity::Gravity(Context* context)
+    : Component(context),
+    gravity_(9.81f)
 {
-    Gravity::RegisterObject(context);
-    GravityProbe::RegisterObject(context);
+}
+
+// ----------------------------------------------------------------------------
+Gravity::~Gravity()
+{
+}
+
+// ----------------------------------------------------------------------------
+void Gravity::RegisterObject(Context* context)
+{
+    context->RegisterFactory<Gravity>(ICEWEASELMODS_CATEGORY);
+}
+
+// ----------------------------------------------------------------------------
+Vector3 Gravity::QueryGravity(Vector3 worldLocation)
+{
+    return Vector3::DOWN * gravity_;
 }
 
 } // namespace Urho3D

@@ -30,6 +30,7 @@ namespace Urho3D
 
 class Context;
 
+
 class GravityProbe : public Component
 {
     URHO3D_OBJECT(GravityProbe, Component)
@@ -37,22 +38,66 @@ class GravityProbe : public Component
 public:
 
     /*!
-     * Constructs a new IK effector.
+     * @brief Constructs a new gravity probe.
      */
     GravityProbe(Context* context);
 
     /*!
-     * Destructs he IK effector.
+     * @brief Destructs the gravity probe.
      */
     virtual ~GravityProbe();
 
     /*!
-     * Registers this class as an object factory.
+     * @brief Registers this class as an object factory.
      */
     static void RegisterObject(Context* context);
 
+    /*!
+     * @brief Sets the world position of the gravity probe.
+     * @param[in] position World location as Vector3.
+     */
+    void SetPosition(Vector3 position);
+
+    /*!
+     * @brief Gets the world position of the gravity probe.
+     */
+    Vector3 GetPosition() const;
+
+    /*!
+     * @brief Sets in which world direction gravity should be applied to
+     * objects.
+     * @param[in] direction A directional Vector3 in world space. It will be
+     * normalized internally..
+     */
+    void SetDirection(Vector3 direction);
+
+    /*!
+     * @brief Returns the normalized direction of the node.
+     * @return A normalized Vector3.
+     */
+    Vector3 GetDirection() const;
+
+    /*!
+     * @brief The global gravity is multiplied by this factor. The default
+     * value is 1.0.
+     * @param[in] factor Multiplication factor to apply to this probe.
+     */
+    void SetForceFactor(float factor)
+            { forceFactor_ = factor; }
+
+    /*!
+     * @brief Gets the probe's force factor. This is multiplied with the global
+     * gravity setting to calculate the final gravitational force. Defaults to
+     * 1.0.
+     */
+    float GetForceFactor() const
+            { return forceFactor_; }
+
 protected:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
+private:
+    float forceFactor_;
 };
 
 } // namespace Urho3D
