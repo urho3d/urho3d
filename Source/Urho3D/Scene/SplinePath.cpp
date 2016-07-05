@@ -41,7 +41,6 @@ SplinePath::SplinePath(Context* context) :
     traveled_(0.f),
     length_(0.f),
     dirty_(false),
-    controlledNode_(NULL),
     controlledIdAttr_(0)
 {
     UpdateNodeIds();
