@@ -92,20 +92,20 @@ private:
      * @brief Searches for all gravity probe nodes that are located beneath the
      * specified node and caches them. The specified node is not checked.
      */
-    void AddGravityProbeNodesRecursively(Node* node);
+    void AddGravityVectorsRecursively(Node* node);
 
     /*!
      * @brief Searches for all gravity probe nodes that are located on and
      * beneath the specified node.
      */
-    void RemoveGravityProbeNodesRecursively(Node* node);
+    void RemoveGravityVectorsRecursively(Node* node);
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
-    PODVector<Node*> gravityProbeNodes_;
+    PODVector<Node*> gravityVectors_;
 
     float gravity_;
 };

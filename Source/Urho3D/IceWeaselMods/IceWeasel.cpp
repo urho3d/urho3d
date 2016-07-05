@@ -21,7 +21,7 @@
 //
 
 #include "../IceWeaselMods/IceWeasel.h"
-#include "../IceWeaselMods/GravityProbe.h"
+#include "../IceWeaselMods/GravityVector.h"
 #include "../IceWeaselMods/Gravity.h"
 
 
@@ -34,7 +34,7 @@ const char* ICEWEASELMODS_CATEGORY = "Ice Weasel";
 void RegisterIceWeaselMods(Context* context)
 {
     Gravity::RegisterObject(context);
-    GravityProbe::RegisterObject(context);
+    GravityVector::RegisterObject(context);
 }
 
 } // namespace Urho3D

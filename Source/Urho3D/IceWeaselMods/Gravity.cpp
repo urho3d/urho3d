@@ -22,7 +22,7 @@
 
 #include "../Core/Context.h"
 #include "../IceWeaselMods/Gravity.h"
-#include "../IceWeaselMods/GravityProbe.h"
+#include "../IceWeaselMods/GravityVector.h"
 #include "../IceWeaselMods/IceWeasel.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Node.h"
@@ -60,24 +60,24 @@ Vector3 Gravity::QueryGravity(Vector3 worldLocation)
 {
     // TODO Really shitty method of finding closest node
     float distance = std::numeric_limits<float>::max();
-    PODVector<Node*>::ConstIterator it = gravityProbeNodes_.Begin();
-    GravityProbe* foundProbe = NULL;
-    for(; it != gravityProbeNodes_.End(); ++it)
+    PODVector<Node*>::ConstIterator it = gravityVectors_.Begin();
+    GravityVector* foundGravityVector = NULL;
+    for(; it != gravityVectors_.End(); ++it)
     {
-        GravityProbe* probe = (*it)->GetComponent<GravityProbe>();
-        float newDistance = (worldLocation - probe->GetPosition()).Length();
+        GravityVector* gravityVector = (*it)->GetComponent<GravityVector>();
+        float newDistance = (worldLocation - gravityVector->GetPosition()).Length();
         if(newDistance < distance)
         {
-            foundProbe = probe;
+            foundGravityVector = gravityVector;
             distance = newDistance;
         }
     }
 
-    // No probe was found? No gravity probes exist. Provide default vector
-    if(!foundProbe)
+    // No node was found? No gravity nodes exist. Provide default vector
+    if(foundGravityVector == NULL)
         return Vector3::DOWN * gravity_;
 
-    return foundProbe->GetDirection() * foundProbe->GetForceFactor() * gravity_;
+    return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;
 }
 
 // ----------------------------------------------------------------------------
@@ -105,44 +105,44 @@ void Gravity::OnSceneSet(Scene* scene)
     (void)scene;
 
     // do a full search for gravityProbe nodes
-    gravityProbeNodes_.Clear();
-    AddGravityProbeNodesRecursively(node_);
+    gravityVectors_.Clear();
+    AddGravityVectorsRecursively(node_);
     RebuildTetrahedralMesh();
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::AddGravityProbeNodesRecursively(Node* node)
+void Gravity::AddGravityVectorsRecursively(Node* node)
 {
     // Recursively retrieve all nodes that have a gravity probe component and
     // add them to our internal list of gravity probe nodes. Note that it
     // should not be possible for there to be duplicates; scene graphs can't
     // have loops.
-    PODVector<Node*> gravityProbeNodesToAdd;
-    node->GetChildrenWithComponent<GravityProbe>(gravityProbeNodesToAdd, true);
+    PODVector<Node*> gravityVectorsToAdd;
+    node->GetChildrenWithComponent<GravityVector>(gravityVectorsToAdd, true);
     // Don't forget to check this node's components as well
-    if(node->GetComponent<GravityProbe>())
-        gravityProbeNodesToAdd.Push(node);
+    if(node->GetComponent<GravityVector>())
+        gravityVectorsToAdd.Push(node);
 
-    gravityProbeNodes_.Push(gravityProbeNodesToAdd);
+    gravityVectors_.Push(gravityVectorsToAdd);
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::RemoveGravityProbeNodesRecursively(Node* node)
+void Gravity::RemoveGravityVectorsRecursively(Node* node)
 {
     // Recursively retrieve all nodes that have a gravity probe component
     PODVector<Node*> gravityProbeNodesToRemove;
-    node->GetChildrenWithComponent<GravityProbe>(gravityProbeNodesToRemove, true);
+    node->GetChildrenWithComponent<GravityVector>(gravityProbeNodesToRemove, true);
     // Don't forget to check this node's components as well
-    if(node->GetComponent<GravityProbe>())
+    if(node->GetComponent<GravityVector>())
         gravityProbeNodesToRemove.Push(node);
 
     // search for found components and remove them from our internal list
     PODVector<Node*>::ConstIterator it = gravityProbeNodesToRemove.Begin();
     for(; it != gravityProbeNodesToRemove.End(); ++it)
     {
-        PODVector<Node*>::Iterator gravityProbeNode = gravityProbeNodes_.Find(*it);
-        if(gravityProbeNode != gravityProbeNodes_.End())
-            gravityProbeNodes_.Erase(gravityProbeNode);
+        PODVector<Node*>::Iterator gravityNode = gravityVectors_.Find(*it);
+        if(gravityNode != gravityVectors_.End())
+            gravityVectors_.Erase(gravityNode);
     }
 }
 
@@ -156,14 +156,14 @@ void Gravity::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     if(!node_->IsAncestorOf(static_cast<Node*>(eventData[P_NODE].GetPtr())))
         return;
 
-    // Check if the component that was added is an IK gravityProbe. If not, then it
-    // does not concern us.
+    // Check if the component that was added is a gravity vector. If not, then
+    // it does not concern us.
     Component* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
-    if(component->GetType() != GravityProbe::GetTypeStatic())
+    if(component->GetType() != GravityVector::GetTypeStatic())
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    gravityProbeNodes_.Push(node);
+    gravityVectors_.Push(node);
     RebuildTetrahedralMesh();
 }
 
@@ -177,14 +177,14 @@ void Gravity::HandleComponentRemoved(StringHash eventType, VariantMap& eventData
     if(!node_->IsAncestorOf(static_cast<Node*>(eventData[P_NODE].GetPtr())))
         return;
 
-    // Check if the component that was removed was an IK gravityProbe. If not,
+    // Check if the component that was removed was a gravity vector. If not,
     // then it does not concern us.
     Component* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
-    if(component->GetType() != GravityProbe::GetTypeStatic())
+    if(component->GetType() != GravityVector::GetTypeStatic())
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    gravityProbeNodes_.Remove(node);
+    gravityVectors_.Remove(node);
     RebuildTetrahedralMesh();
 }
 
@@ -199,7 +199,7 @@ void Gravity::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
     if(!node_->IsAncestorOf(addedNode))
         return;
 
-    AddGravityProbeNodesRecursively(addedNode);
+    AddGravityVectorsRecursively(addedNode);
     RebuildTetrahedralMesh();
 }
 
@@ -214,7 +214,7 @@ void Gravity::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     if(!node_->IsAncestorOf(removedNode))
         return;
 
-    RemoveGravityProbeNodesRecursively(static_cast<Node*>(eventData[P_NODE].GetPtr()));
+    RemoveGravityVectorsRecursively(static_cast<Node*>(eventData[P_NODE].GetPtr()));
     RebuildTetrahedralMesh();
 }
 

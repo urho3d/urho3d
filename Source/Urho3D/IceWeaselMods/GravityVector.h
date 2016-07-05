@@ -31,21 +31,21 @@ namespace Urho3D
 class Context;
 
 
-class URHO3D_API GravityProbe : public Component
+class URHO3D_API GravityVector : public Component
 {
-    URHO3D_OBJECT(GravityProbe, Component)
+    URHO3D_OBJECT(GravityVector, Component)
 
 public:
 
     /*!
      * @brief Constructs a new gravity probe.
      */
-    GravityProbe(Context* context);
+    GravityVector(Context* context);
 
     /*!
      * @brief Destructs the gravity probe.
      */
-    virtual ~GravityProbe();
+    virtual ~GravityVector();
 
     /*!
      * @brief Registers this class as an object factory.
