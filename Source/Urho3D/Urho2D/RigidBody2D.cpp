@@ -104,12 +104,7 @@ void RigidBody2D::OnSetEnabled()
 
 void RigidBody2D::SetBodyType(BodyType2D type)
 {
-    b2BodyType bodyType = (b2BodyType)type;
-    if (bodyDef_.type == bodyType)
-        return;
-
-    bodyDef_.type = bodyType;
-
+    b2BodyType bodyType = (b2BodyType)type;    
     if (body_)
     {
         body_->SetType(bodyType);
@@ -117,6 +112,13 @@ void RigidBody2D::SetBodyType(BodyType2D type)
         // If not using fixture mass, reassign our mass data now
         if (!useFixtureMass_)
             body_->SetMassData(&massData_);
+    }
+    else
+    {
+        if (bodyDef_.type == bodyType)
+            return;
+
+        bodyDef_.type = bodyType;
     }
 
     MarkNetworkUpdate();
@@ -185,50 +187,51 @@ void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
 
 void RigidBody2D::SetLinearDamping(float linearDamping)
 {
-    if (bodyDef_.linearDamping == linearDamping)
-        return;
-
-    bodyDef_.linearDamping = linearDamping;
-
     if (body_)
         body_->SetLinearDamping(linearDamping);
+    else
+    {
+        if (bodyDef_.linearDamping == linearDamping)
+            return;
+
+        bodyDef_.linearDamping = linearDamping;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetAngularDamping(float angularDamping)
 {
-    if (bodyDef_.angularDamping == angularDamping)
-        return;
-
-    bodyDef_.angularDamping = angularDamping;
-
     if (body_)
         body_->SetAngularDamping(angularDamping);
+    else
+    {
+        if (bodyDef_.angularDamping == angularDamping)
+            return;
+
+        bodyDef_.angularDamping = angularDamping;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetAllowSleep(bool allowSleep)
 {
-    if (bodyDef_.allowSleep == allowSleep)
-        return;
-
-    bodyDef_.allowSleep = allowSleep;
-
     if (body_)
         body_->SetSleepingAllowed(allowSleep);
+    else
+    {
+        if (bodyDef_.allowSleep == allowSleep)
+            return;
+
+        bodyDef_.allowSleep = allowSleep;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetFixedRotation(bool fixedRotation)
 {
-    if (bodyDef_.fixedRotation == fixedRotation)
-        return;
-
-    bodyDef_.fixedRotation = fixedRotation;
-
     if (body_)
     {
         body_->SetFixedRotation(fixedRotation);
@@ -237,45 +240,58 @@ void RigidBody2D::SetFixedRotation(bool fixedRotation)
         if (!useFixtureMass_)
             body_->SetMassData(&massData_);
     }
+    else
+    {
+        if (bodyDef_.fixedRotation == fixedRotation)
+            return;
+
+        bodyDef_.fixedRotation = fixedRotation;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetBullet(bool bullet)
 {
-    if (bodyDef_.bullet == bullet)
-        return;
-
-    bodyDef_.bullet = bullet;
-
     if (body_)
         body_->SetBullet(bullet);
+    else
+    {
+        if (bodyDef_.bullet == bullet)
+            return;
+
+        bodyDef_.bullet = bullet;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetGravityScale(float gravityScale)
 {
-    if (bodyDef_.gravityScale == gravityScale)
-        return;
-
-    bodyDef_.gravityScale = gravityScale;
-
     if (body_)
         body_->SetGravityScale(gravityScale);
+    else
+    {
+        if (bodyDef_.gravityScale == gravityScale)
+            return;
+
+        bodyDef_.gravityScale = gravityScale;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetAwake(bool awake)
 {
-    if (bodyDef_.awake == awake)
-        return;
-
-    bodyDef_.awake = awake;
-
     if (body_)
         body_->SetAwake(awake);
+    else
+    {
+        if (bodyDef_.awake == awake)
+            return;
+
+        bodyDef_.awake = awake;
+    }
 
     MarkNetworkUpdate();
 }
@@ -283,26 +299,30 @@ void RigidBody2D::SetAwake(bool awake)
 void RigidBody2D::SetLinearVelocity(const Vector2& linearVelocity)
 {
     b2Vec2 b2linearVelocity = ToB2Vec2(linearVelocity);
-    if (bodyDef_.linearVelocity == b2linearVelocity)
-        return;
-
-    bodyDef_.linearVelocity = b2linearVelocity;
-
     if (body_)
         body_->SetLinearVelocity(b2linearVelocity);
+    else
+    {
+        if (bodyDef_.linearVelocity == b2linearVelocity)
+            return;
+
+        bodyDef_.linearVelocity = b2linearVelocity;
+    }
 
     MarkNetworkUpdate();
 }
 
 void RigidBody2D::SetAngularVelocity(float angularVelocity)
 {
-    if (bodyDef_.angularVelocity == angularVelocity)
-        return;
-
-    bodyDef_.angularVelocity = angularVelocity;
-
     if (body_)
-        body_->SetAngularVelocity(angularVelocity);
+        body_->SetAngularVelocity(angularVelocity); 
+    else
+    {
+        if (bodyDef_.angularVelocity == angularVelocity)
+            return;
+
+        bodyDef_.angularVelocity = angularVelocity;
+    }
 
     MarkNetworkUpdate();
 }
@@ -573,10 +593,13 @@ void RigidBody2D::OnMarkedDirty(Node* node)
     float newAngle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
     if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
     {
-        bodyDef_.position = newPosition;
-        bodyDef_.angle = newAngle;
         if (body_)
             body_->SetTransform(newPosition, newAngle);
+        else
+        {
+            bodyDef_.position = newPosition;
+            bodyDef_.angle = newAngle;
+        }
     }
 }
 
