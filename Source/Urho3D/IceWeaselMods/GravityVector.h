@@ -93,7 +93,6 @@ public:
     float GetForceFactor() const
             { return forceFactor_; }
 
-protected:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:

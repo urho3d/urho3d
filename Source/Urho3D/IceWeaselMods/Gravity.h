@@ -28,6 +28,8 @@ namespace Urho3D
 {
 
 class Context;
+class DebugRenderer;
+class GravityVector;
 
 
 /*!
@@ -82,6 +84,8 @@ public:
      */
     Vector3 QueryGravity(Vector3 worldLocation);
 
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
 private:
     void RebuildTetrahedralMesh();
 
@@ -105,7 +109,7 @@ private:
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
-    PODVector<Node*> gravityVectors_;
+    PODVector<GravityVector*> gravityVectors_;
 
     float gravity_;
 };

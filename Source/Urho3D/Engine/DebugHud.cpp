@@ -38,6 +38,8 @@
 
 #include "../DebugNew.h"
 
+#include <stdio.h>
+
 namespace Urho3D
 {
 
@@ -141,8 +143,23 @@ void DebugHud::Update()
             batches = renderer->GetNumBatches();
         }
 
+        if(fps_.elapsedTime_ >= 0.5f)
+        {
+            float fps = fps_.accumulatedFPS_ / fps_.numAccumulated_;
+            snprintf(fps_.fpsstr_, 10, "%.1f", fps);
+            fps_.accumulatedFPS_ = 0.0f;
+            fps_.numAccumulated_ = 0;
+            fps_.elapsedTime_ = 0.0f;
+        }
+        else
+        {
+            fps_.accumulatedFPS_ += 1.0f / renderer->GetFrameInfo().timeStep_;
+            fps_.numAccumulated_ += 1;
+        }
+
         String stats;
-        stats.AppendWithFormat("Triangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+        stats.AppendWithFormat("FPS %s\nTriangles %u\nBatches %u\nViews %u\nLights %u\nShadowmaps %u\nOccluders %u",
+            fps_.fpsstr_,
             primitives,
             batches,
             renderer->GetNumViews(),
@@ -307,6 +324,8 @@ void DebugHud::ClearAppStats()
 void DebugHud::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace PostUpdate;
+
+    fps_.elapsedTime_ += eventData[P_TIMESTEP].GetFloat();
 
     Update();
 }

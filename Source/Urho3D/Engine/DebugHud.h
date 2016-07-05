@@ -132,6 +132,14 @@ private:
     bool useRendererStats_;
     /// Current shown-element mode.
     unsigned mode_;
+    /// FPS counter
+    struct FPS {
+        FPS() : elapsedTime_(0.0f), accumulatedFPS_(0.0f), numAccumulated_(0) { fpsstr_[0] = '\0'; }
+        float elapsedTime_; // used to update counter once every 500ms
+        char fpsstr_[10];
+        float accumulatedFPS_;
+        int numAccumulated_;
+    } fps_;
 };
 
 }
