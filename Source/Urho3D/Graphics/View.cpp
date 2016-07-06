@@ -297,7 +297,6 @@ View::View(Context* context) :
     octree_(0),
     cullCamera_(0),
     camera_(0),
-    sourceView_(0),
     cameraZone_(0),
     farClipZone_(0),
     occlusionBuffer_(0),

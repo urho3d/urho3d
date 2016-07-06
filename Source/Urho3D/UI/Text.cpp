@@ -87,7 +87,7 @@ void Text::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", int, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
-    URHO3D_ATTRIBUTE("Text", String, text_, String::EMPTY, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
@@ -107,6 +107,13 @@ void Text::RegisterObject(Context* context)
 void Text::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
+
+    // Localize now if attributes were loaded out-of-order
+    if (autoLocalizable_ && stringId_.Length())
+    {
+        Localization* l10n = GetSubsystem<Localization>();
+        text_ = l10n->Get(stringId_);
+    }
 
     DecodeToUnicode();
 
@@ -460,6 +467,21 @@ void Text::SetFontAttr(const ResourceRef& value)
 ResourceRef Text::GetFontAttr() const
 {
     return GetResourceRef(font_, Font::GetTypeStatic());
+}
+
+void Text::SetTextAttr(const String& value)
+{
+    text_ = value;
+    if (autoLocalizable_)
+        stringId_ = value;
+}
+
+String Text::GetTextAttr() const
+{
+    if (autoLocalizable_ && stringId_.Length())
+        return stringId_;
+    else
+        return text_;
 }
 
 bool Text::FilterImplicitAttributes(XMLElement& dest) const

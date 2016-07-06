@@ -160,6 +160,10 @@ public:
     void SetMaterialAttr(const ResourceRef& value);
     /// Return material attribute.
     ResourceRef GetMaterialAttr() const;
+    /// Set text attribute.
+    void SetTextAttr(const String& value);
+    /// Return text attribute.
+    String GetTextAttr() const;
 
     /// Get color attribute. Uses just the top-left color.
     const Color& GetColorAttr() const { return text_.color_[0]; }
