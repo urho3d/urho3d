@@ -236,6 +236,7 @@ else ()
                 endif ()
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
+            string (REPLACE .js ";" COMPILER_FLAGS "${COMPILER_FLAGS}")     # Emscripten-specific - revise SmileyHack to inject empty suffix to keep try_compile() happy
             # FIXME: For yet an unknown reason, CMake seems to fail to setup the sysroot as expected here, so we have to set it manually
             if (ANDROID)
                 set (COMPILER_FLAGS "${COMPILER_FLAGS} --sysroot=\"${CMAKE_SYSROOT}\"")

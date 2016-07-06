@@ -627,10 +627,6 @@ else ()
                 endif ()
                 set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
                 set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
-                # CMake does not treat Emscripten as a valid platform yet, certain platform-specific variables cannot be set in the
-                # toolchain file as they get overwritten by CMake internally as per Linux platform default, so set them here for now
-                set (CMAKE_EXECUTABLE_SUFFIX_C .html)
-                set (CMAKE_EXECUTABLE_SUFFIX_CXX .html)
                 # Linker flags
                 if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
                     set (MEMORY_LINKER_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
