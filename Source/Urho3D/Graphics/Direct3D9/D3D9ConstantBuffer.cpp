@@ -23,29 +23,30 @@
 #include "../../Precompiled.h"
 
 #include "../../Graphics/Graphics.h"
+#include "../../Graphics/ConstantBuffer.h"
+#include "../../IO/Log.h"
 
 #include "../../DebugNew.h"
 
 namespace Urho3D
 {
 
-GPUObject::GPUObject(Graphics* graphics) :
-    graphics_(graphics),
-    object_(0)
+void ConstantBuffer::OnDeviceReset()
 {
-    if (graphics_)
-        graphics->AddGPUObject(this);
 }
 
-GPUObject::~GPUObject()
+void ConstantBuffer::Release()
 {
-    if (graphics_)
-        graphics_->RemoveGPUObject(this);
 }
 
-Graphics* GPUObject::GetGraphics() const
+bool ConstantBuffer::SetSize(unsigned size)
 {
-    return graphics_;
+    URHO3D_LOGERROR("Constant buffers are not supported on Direct3D9");
+    return false;
+}
+
+void ConstantBuffer::Apply()
+{
 }
 
 }

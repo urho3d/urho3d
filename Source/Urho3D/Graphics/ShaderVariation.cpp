@@ -20,48 +20,42 @@
 // THE SOFTWARE.
 //
 
-#include "../../Precompiled.h"
+#include "../Precompiled.h"
 
-#include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/Shader.h"
+#include "../Graphics/ShaderVariation.h"
 
-#include "../../DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
 
-GraphicsImpl::GraphicsImpl() :
-    device_(0),
-    deviceContext_(0),
-    swapChain_(0),
-    defaultRenderTargetView_(0),
-    defaultDepthTexture_(0),
-    defaultDepthStencilView_(0),
-    depthStencilView_(0),
-    resolveTexture_(0),
-    shaderProgram_(0)
+ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
+    GPUObject(owner->GetSubsystem<Graphics>()),
+    owner_(owner),
+    type_(type),
+    elementHash_(0)
 {
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargetViews_[i] = 0;
-
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-    {
-        shaderResourceViews_[i] = 0;
-        samplers_[i] = 0;
-    }
-
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        vertexBuffers_[i] = 0;
-        vertexSizes_[i] = 0;
-        vertexOffsets_[i] = 0;
-    }
-
+        useTextureUnit_[i] = false;
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-    {
-        constantBuffers_[VS][i] = 0;
-        constantBuffers_[PS][i] = 0;
-    }
+        constantBufferSizes_[i] = 0;
+}
+
+ShaderVariation::~ShaderVariation()
+{
+    Release();
+}
+
+void ShaderVariation::SetName(const String& name)
+{
+    name_ = name;
+}
+
+Shader* ShaderVariation::GetOwner() const
+{
+    return owner_;
 }
 
 }

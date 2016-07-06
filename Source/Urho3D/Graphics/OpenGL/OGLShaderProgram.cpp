@@ -44,19 +44,6 @@ static const char* shaderParameterGroups[] = {
     "custom"
 };
 
-static const char* elementSemanticNames[] =
-{
-    "POS",
-    "NORMAL",
-    "BINORMAL",
-    "TANGENT",
-    "TEXCOORD",
-    "COLOR",
-    "BLENDWEIGHT",
-    "BLENDINDICES",
-    "OBJECTINDEX"
-};
-
 static unsigned NumberPostfix(const String& str)
 {
     for (unsigned i = 0; i < str.Length(); ++i)
@@ -101,7 +88,7 @@ void ShaderProgram::OnDeviceLost()
 
 void ShaderProgram::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -111,10 +98,10 @@ void ShaderProgram::Release()
             if (graphics_->GetShaderProgram() == this)
                 graphics_->SetShaders(0, 0);
 
-            glDeleteProgram(object_);
+            glDeleteProgram(object_.name_);
         }
 
-        object_ = 0;
+        object_.name_ = 0;
         linkerOutput_.Clear();
         shaderParameters_.Clear();
         vertexAttributes_.Clear();
@@ -131,35 +118,35 @@ bool ShaderProgram::Link()
 {
     Release();
 
-    if (!vertexShader_ || !pixelShader_ || !vertexShader_->GetGPUObject() || !pixelShader_->GetGPUObject())
+    if (!vertexShader_ || !pixelShader_ || !vertexShader_->GetGPUObjectName() || !pixelShader_->GetGPUObjectName())
         return false;
 
-    object_ = glCreateProgram();
-    if (!object_)
+    object_.name_ = glCreateProgram();
+    if (!object_.name_)
     {
         linkerOutput_ = "Could not create shader program";
         return false;
     }
 
-    glAttachShader(object_, vertexShader_->GetGPUObject());
-    glAttachShader(object_, pixelShader_->GetGPUObject());
-    glLinkProgram(object_);
+    glAttachShader(object_.name_, vertexShader_->GetGPUObjectName());
+    glAttachShader(object_.name_, pixelShader_->GetGPUObjectName());
+    glLinkProgram(object_.name_);
 
     int linked, length;
-    glGetProgramiv(object_, GL_LINK_STATUS, &linked);
+    glGetProgramiv(object_.name_, GL_LINK_STATUS, &linked);
     if (!linked)
     {
-        glGetProgramiv(object_, GL_INFO_LOG_LENGTH, &length);
+        glGetProgramiv(object_.name_, GL_INFO_LOG_LENGTH, &length);
         linkerOutput_.Resize((unsigned)length);
         int outLength;
-        glGetProgramInfoLog(object_, length, &outLength, &linkerOutput_[0]);
-        glDeleteProgram(object_);
-        object_ = 0;
+        glGetProgramInfoLog(object_.name_, length, &outLength, &linkerOutput_[0]);
+        glDeleteProgram(object_.name_);
+        object_.name_ = 0;
     }
     else
         linkerOutput_.Clear();
 
-    if (!object_)
+    if (!object_.name_)
         return false;
 
     const int MAX_NAME_LENGTH = 256;
@@ -167,13 +154,13 @@ bool ShaderProgram::Link()
     int attributeCount, uniformCount, elementCount, nameLength;
     GLenum type;
 
-    glUseProgram(object_);
+    glUseProgram(object_.name_);
 
     // Check for vertex attributes
-    glGetProgramiv(object_, GL_ACTIVE_ATTRIBUTES, &attributeCount);
+    glGetProgramiv(object_.name_, GL_ACTIVE_ATTRIBUTES, &attributeCount);
     for (int i = 0; i < attributeCount; ++i)
     {
-        glGetActiveAttrib(object_, i, (GLsizei)MAX_NAME_LENGTH, &nameLength, &elementCount, &type, nameBuffer);
+        glGetActiveAttrib(object_.name_, i, (GLsizei)MAX_NAME_LENGTH, &nameLength, &elementCount, &type, nameBuffer);
 
         String name = String(nameBuffer, nameLength);
         VertexElementSemantic semantic = MAX_VERTEX_ELEMENT_SEMANTICS;
@@ -182,7 +169,7 @@ bool ShaderProgram::Link()
         // Go in reverse order so that "binormal" is detected before "normal"
         for (unsigned j = MAX_VERTEX_ELEMENT_SEMANTICS - 1; j < MAX_VERTEX_ELEMENT_SEMANTICS; --j)
         {
-            if (name.Contains(elementSemanticNames[j], false))
+            if (name.Contains(ShaderVariation::elementSemanticNames[j], false))
             {
                 semantic = (VertexElementSemantic)j;
                 unsigned index = NumberPostfix(name);
@@ -199,7 +186,7 @@ bool ShaderProgram::Link()
             continue;
         }
 
-        int location = glGetAttribLocation(object_, name.CString());
+        int location = glGetAttribLocation(object_.name_, name.CString());
         vertexAttributes_[MakePair((unsigned char)semantic, semanticIndex)] = location;
         usedVertexAttributes_ |= (1 << location);
     }
@@ -212,14 +199,14 @@ bool ShaderProgram::Link()
     {
         int numUniformBlocks = 0;
 
-        glGetProgramiv(object_, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
+        glGetProgramiv(object_.name_, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
         for (int i = 0; i < numUniformBlocks; ++i)
         {
-            glGetActiveUniformBlockName(object_, (GLuint)i, MAX_NAME_LENGTH, &nameLength, nameBuffer);
+            glGetActiveUniformBlockName(object_.name_, (GLuint)i, MAX_NAME_LENGTH, &nameLength, nameBuffer);
 
             String name(nameBuffer, (unsigned)nameLength);
 
-            unsigned blockIndex = glGetUniformBlockIndex(object_, name.CString());
+            unsigned blockIndex = glGetUniformBlockIndex(object_.name_, name.CString());
             unsigned group = M_MAX_UNSIGNED;
 
             // Try to recognize the use of the buffer from its name
@@ -245,30 +232,34 @@ bool ShaderProgram::Link()
 
             // Find total constant buffer data size
             int dataSize;
-            glGetActiveUniformBlockiv(object_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
+            glGetActiveUniformBlockiv(object_.name_, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &dataSize);
             if (!dataSize)
                 continue;
 
             unsigned bindingIndex = group;
             // Vertex shader constant buffer bindings occupy slots starting from zero to maximum supported, pixel shader bindings
             // from that point onward
+            ShaderType shaderType = VS;
             if (name.Contains("PS", false))
+            {
                 bindingIndex += MAX_SHADER_PARAMETER_GROUPS;
+                shaderType = PS;
+            }
 
-            glUniformBlockBinding(object_, blockIndex, bindingIndex);
+            glUniformBlockBinding(object_.name_, blockIndex, bindingIndex);
             blockToBinding[blockIndex] = bindingIndex;
 
-            constantBuffers_[bindingIndex] = graphics_->GetOrCreateConstantBuffer(bindingIndex, (unsigned)dataSize);
+            constantBuffers_[bindingIndex] = graphics_->GetOrCreateConstantBuffer(shaderType, bindingIndex, (unsigned)dataSize);
         }
     }
 #endif
 
     // Check for shader parameters and texture units
-    glGetProgramiv(object_, GL_ACTIVE_UNIFORMS, &uniformCount);
+    glGetProgramiv(object_.name_, GL_ACTIVE_UNIFORMS, &uniformCount);
     for (int i = 0; i < uniformCount; ++i)
     {
-        glGetActiveUniform(object_, (GLuint)i, MAX_NAME_LENGTH, 0, &elementCount, &type, nameBuffer);
-        int location = glGetUniformLocation(object_, nameBuffer);
+        glGetActiveUniform(object_.name_, (GLuint)i, MAX_NAME_LENGTH, 0, &elementCount, &type, nameBuffer);
+        int location = glGetUniformLocation(object_.name_, nameBuffer);
 
         // Check for array index included in the name and strip it
         String name(nameBuffer);
@@ -286,27 +277,30 @@ bool ShaderProgram::Link()
         {
             // Store constant uniform
             String paramName = name.Substring(1);
-            ShaderParameter newParam;
-            newParam.type_ = type;
-            newParam.location_ = location;
+            ShaderParameter parameter;
+            parameter.name_ = paramName;
+            parameter.glType_ = type;
+            parameter.location_ = location;
+            bool store = location >= 0;
 
 #ifndef GL_ES_VERSION_2_0
             // If running OpenGL 3, the uniform may be inside a constant buffer
-            if (newParam.location_ < 0 && Graphics::GetGL3Support())
+            if (parameter.location_ < 0 && Graphics::GetGL3Support())
             {
                 int blockIndex, blockOffset;
-                glGetActiveUniformsiv(object_, 1, (const GLuint*)&i, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
-                glGetActiveUniformsiv(object_, 1, (const GLuint*)&i, GL_UNIFORM_OFFSET, &blockOffset);
+                glGetActiveUniformsiv(object_.name_, 1, (const GLuint*)&i, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
+                glGetActiveUniformsiv(object_.name_, 1, (const GLuint*)&i, GL_UNIFORM_OFFSET, &blockOffset);
                 if (blockIndex >= 0)
                 {
-                    newParam.location_ = blockOffset;
-                    newParam.bufferPtr_ = constantBuffers_[blockToBinding[blockIndex]];
+                    parameter.offset_ = blockOffset;
+                    parameter.bufferPtr_ = constantBuffers_[blockToBinding[blockIndex]];
+                    store = true;
                 }
             }
 #endif
 
-            if (newParam.location_ >= 0)
-                shaderParameters_[StringHash(paramName)] = newParam;
+            if (store)
+                shaderParameters_[StringHash(paramName)] = parameter;
         }
         else if (location >= 0 && name[0] == 's')
         {

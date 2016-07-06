@@ -24,6 +24,9 @@
 
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
+#include "../../Graphics/ConstantBuffer.h"
+#include "../../Graphics/ShaderProgram.h"
+#include "../../Graphics/Texture2D.h"
 #include "../../Math/Color.h"
 
 #if defined(IOS)
@@ -61,13 +64,15 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-struct SDL_Window;
 typedef void *SDL_GLContext;
 
 namespace Urho3D
 {
 
 class Context;
+
+typedef HashMap<unsigned, SharedPtr<ConstantBuffer> > ConstantBufferMap;
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// Cached state of a frame buffer object
 struct FrameBufferObject
@@ -103,14 +108,10 @@ public:
     /// Construct.
     GraphicsImpl();
 
-    /// Return the SDL window.
-    SDL_Window* GetWindow() const { return window_; }
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
-    /// SDL window.
-    SDL_Window* window_;
     /// SDL OpenGL context.
     SDL_GLContext context_;
     /// IOS system framebuffer handle.
@@ -135,6 +136,22 @@ private:
     int pixelFormat_;
     /// Map for FBO's per resolution and format.
     HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
+    /// OpenGL texture types in use.
+    unsigned textureTypes_[MAX_TEXTURE_UNITS];
+    /// Constant buffer search map.
+    ConstantBufferMap allConstantBuffers_;
+    /// Currently bound constant buffers.
+    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    /// Dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
+    /// Last used instance data offset.
+    unsigned lastInstanceOffset_;
+    /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
+    HashMap<int, SharedPtr<Texture2D> > depthTextures_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
+    /// Linked shader programs.
+    ShaderProgramMap shaderPrograms_;
     /// Need FBO commit flag.
     bool fboDirty_;
     /// Need vertex attribute pointer update flag.

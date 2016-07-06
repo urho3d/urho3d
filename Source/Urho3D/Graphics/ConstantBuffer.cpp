@@ -20,48 +20,54 @@
 // THE SOFTWARE.
 //
 
-#include "../../Precompiled.h"
+#include "../Precompiled.h"
 
-#include "../../Graphics/Graphics.h"
-#include "../../Graphics/GraphicsImpl.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/ConstantBuffer.h"
+#include "../IO/Log.h"
 
-#include "../../DebugNew.h"
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
 
-GraphicsImpl::GraphicsImpl() :
-    device_(0),
-    deviceContext_(0),
-    swapChain_(0),
-    defaultRenderTargetView_(0),
-    defaultDepthTexture_(0),
-    defaultDepthStencilView_(0),
-    depthStencilView_(0),
-    resolveTexture_(0),
-    shaderProgram_(0)
+ConstantBuffer::ConstantBuffer(Context* context) :
+    Object(context),
+    GPUObject(GetSubsystem<Graphics>())
 {
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargetViews_[i] = 0;
+}
 
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+ConstantBuffer::~ConstantBuffer()
+{
+    Release();
+}
+
+void ConstantBuffer::SetParameter(unsigned offset, unsigned size, const void* data)
+{
+    if (offset + size > size_)
+        return; // Would overflow the buffer
+
+    memcpy(&shadowData_[offset], data, size);
+    dirty_ = true;
+}
+
+void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, const void* data)
+{
+    if (offset + rows * 4 * sizeof(float) > size_)
+        return; // Would overflow the buffer
+
+    float* dest = (float*)&shadowData_[offset];
+    const float* src = (const float*)data;
+
+    while (rows--)
     {
-        shaderResourceViews_[i] = 0;
-        samplers_[i] = 0;
+        *dest++ = *src++;
+        *dest++ = *src++;
+        *dest++ = *src++;
+        ++dest; // Skip over the w coordinate
     }
 
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
-        vertexBuffers_[i] = 0;
-        vertexSizes_[i] = 0;
-        vertexOffsets_[i] = 0;
-    }
-
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-    {
-        constantBuffers_[VS][i] = 0;
-        constantBuffers_[PS][i] = 0;
-    }
+    dirty_ = true;
 }
 
 }

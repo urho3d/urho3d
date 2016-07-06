@@ -25,40 +25,18 @@
 #include "../../Core/Context.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
-#include "../../Graphics/Camera.h"
 #include "../../Graphics/ConstantBuffer.h"
-#include "../../Graphics/CustomGeometry.h"
-#include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../Graphics/Geometry.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/IndexBuffer.h"
-#include "../../Graphics/Material.h"
-#include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
-#include "../../Graphics/RibbonTrail.h"
 #include "../../Graphics/Renderer.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
-#include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
-#include "../../Graphics/Texture2DArray.h"
-#include "../../Graphics/Texture3D.h"
-#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/VertexDeclaration.h"
-#include "../../Graphics/Zone.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
@@ -215,10 +193,12 @@ static HWND GetWindowHandle(SDL_Window* window)
 }
 
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
+bool Graphics::gl3Support = false;
 
 Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
+    window_(0),
     windowIcon_(0),
     externalWindow_(0),
     width_(0),
@@ -232,7 +212,12 @@ Graphics::Graphics(Context* context) :
     vsync_(false),
     tripleBuffer_(false),
     flushGPU_(false),
+    forceGL2_(false),
     sRGB_(false),
+    anisotropySupport_(false),
+    dxtTextureSupport_(false),
+    etcTextureSupport_(false),
+    pvrtcTextureSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     instancingSupport_(false),
@@ -242,7 +227,6 @@ Graphics::Graphics(Context* context) :
     numBatches_(0),
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
-    shaderProgram_(0),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -269,8 +253,8 @@ Graphics::~Graphics()
         gpuObjects_.Clear();
     }
 
-    vertexDeclarations_.Clear();
-    constantBuffers_.Clear();
+    impl_->vertexDeclarations_.Clear();
+    impl_->allConstantBuffers_.Clear();
 
     for (HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Begin(); i != impl_->blendStates_.End(); ++i)
     {
@@ -299,11 +283,11 @@ Graphics::~Graphics()
     URHO3D_SAFE_RELEASE(impl_->deviceContext_);
     URHO3D_SAFE_RELEASE(impl_->device_);
 
-    if (impl_->window_)
+    if (window_)
     {
         SDL_ShowCursor(SDL_TRUE);
-        SDL_DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        SDL_DestroyWindow(window_);
+        window_ = 0;
     }
 
     delete impl_;
@@ -311,41 +295,6 @@ Graphics::~Graphics()
 
     // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
     SDL_Quit();
-}
-
-void Graphics::SetExternalWindow(void* window)
-{
-    if (!impl_->window_)
-        externalWindow_ = window;
-    else
-        URHO3D_LOGERROR("Window already opened, can not set external window");
-}
-
-void Graphics::SetWindowTitle(const String& windowTitle)
-{
-    windowTitle_ = windowTitle;
-    if (impl_->window_)
-        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
-}
-
-void Graphics::SetWindowIcon(Image* windowIcon)
-{
-    windowIcon_ = windowIcon;
-    if (impl_->window_)
-        CreateWindowIcon();
-}
-
-void Graphics::SetWindowPosition(const IntVector2& position)
-{
-    if (impl_->window_)
-        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
-    else
-        position_ = position; // Sets as initial position for OpenWindow()
-}
-
-void Graphics::SetWindowPosition(int x, int y)
-{
-    SetWindowPosition(IntVector2(x, y));
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
@@ -393,7 +342,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 
-    if (!impl_->window_)
+    if (!window_)
     {
         if (!OpenWindow(width, height, resizable, borderless))
             return false;
@@ -428,7 +377,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     if (maximize)
     {
         Maximize();
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(window_, &width, &height);
     }
 
     if (!impl_->device_ || multiSample_ != multiSample)
@@ -508,24 +457,18 @@ void Graphics::SetFlushGPU(bool enable)
     }
 }
 
-void Graphics::SetOrientations(const String& orientations)
+void Graphics::SetForceGL2(bool enable)
 {
-    orientations_ = orientations.Trimmed();
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
-}
-
-bool Graphics::ToggleFullscreen()
-{
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    // No effect on Direct3D11
 }
 
 void Graphics::Close()
 {
-    if (impl_->window_)
+    if (window_)
     {
         SDL_ShowCursor(SDL_TRUE);
-        SDL_DestroyWindow(impl_->window_);
-        impl_->window_ = 0;
+        SDL_DestroyWindow(window_);
+        window_ = 0;
     }
 }
 
@@ -619,7 +562,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GetWindowSize(impl_->window_, &width, &height);
+        SDL_GetWindowSize(window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -627,7 +570,7 @@ bool Graphics::BeginFrame()
     {
         // To prevent a loop of endless device loss and flicker, do not attempt to render when in fullscreen
         // and the window is minimized
-        if (fullscreen_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED))
+        if (fullscreen_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED))
             return false;
     }
 
@@ -783,7 +726,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
-    if (!vertexCount || !shaderProgram_)
+    if (!vertexCount || !impl_->shaderProgram_)
         return;
 
     PrepareDraw();
@@ -808,7 +751,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!vertexCount || !shaderProgram_)
+    if (!vertexCount || !impl_->shaderProgram_)
         return;
 
     PrepareDraw();
@@ -833,7 +776,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
-    if (!vertexCount || !shaderProgram_)
+    if (!vertexCount || !impl_->shaderProgram_)
         return;
 
     PrepareDraw();
@@ -859,7 +802,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-    if (!indexCount || !instanceCount || !shaderProgram_)
+    if (!indexCount || !instanceCount || !impl_->shaderProgram_)
         return;
 
     PrepareDraw();
@@ -885,7 +828,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
 void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount,
     unsigned instanceCount)
 {
-    if (!indexCount || !instanceCount || !shaderProgram_)
+    if (!indexCount || !instanceCount || !impl_->shaderProgram_)
         return;
 
     PrepareDraw();
@@ -957,16 +900,16 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
 
         if (changed)
         {
-            vertexDeclarationDirty_ = true;
+            impl_->vertexDeclarationDirty_ = true;
 
-            if (firstDirtyVB_ == M_MAX_UNSIGNED)
-                firstDirtyVB_ = lastDirtyVB_ = i;
+            if (impl_->firstDirtyVB_ == M_MAX_UNSIGNED)
+                impl_->firstDirtyVB_ = impl_->lastDirtyVB_ = i;
             else
             {
-                if (i < firstDirtyVB_)
-                    firstDirtyVB_ = i;
-                if (i > lastDirtyVB_)
-                    lastDirtyVB_ = i;
+                if (i < impl_->firstDirtyVB_)
+                    impl_->firstDirtyVB_ = i;
+                if (i > impl_->lastDirtyVB_)
+                    impl_->lastDirtyVB_ = i;
             }
         }
     }
@@ -1029,7 +972,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
         impl_->deviceContext_->VSSetShader((ID3D11VertexShader*)(vs ? vs->GetGPUObject() : 0), 0, 0);
         vertexShader_ = vs;
-        vertexDeclarationDirty_ = true;
+        impl_->vertexDeclarationDirty_ = true;
     }
 
     if (ps != pixelShader_)
@@ -1059,13 +1002,13 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (vertexShader_ && pixelShader_)
     {
         Pair<ShaderVariation*, ShaderVariation*> key = MakePair(vertexShader_, pixelShader_);
-        ShaderProgramMap::Iterator i = shaderPrograms_.Find(key);
-        if (i != shaderPrograms_.End())
-            shaderProgram_ = i->second_.Get();
+        ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Find(key);
+        if (i != impl_->shaderPrograms_.End())
+            impl_->shaderProgram_ = i->second_.Get();
         else
         {
-            ShaderProgram* newProgram = shaderPrograms_[key] = new ShaderProgram(this, vertexShader_, pixelShader_);
-            shaderProgram_ = newProgram;
+            ShaderProgram* newProgram = impl_->shaderPrograms_[key] = new ShaderProgram(this, vertexShader_, pixelShader_);
+            impl_->shaderProgram_ = newProgram;
         }
 
         bool vsBuffersChanged = false;
@@ -1073,7 +1016,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         {
-            ID3D11Buffer* vsBuffer = shaderProgram_->vsConstantBuffers_[i] ? (ID3D11Buffer*)shaderProgram_->vsConstantBuffers_[i]->
+            ID3D11Buffer* vsBuffer = impl_->shaderProgram_->vsConstantBuffers_[i] ? (ID3D11Buffer*)impl_->shaderProgram_->vsConstantBuffers_[i]->
                 GetGPUObject() : 0;
             if (vsBuffer != impl_->constantBuffers_[VS][i])
             {
@@ -1082,7 +1025,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 vsBuffersChanged = true;
             }
 
-            ID3D11Buffer* psBuffer = shaderProgram_->psConstantBuffers_[i] ? (ID3D11Buffer*)shaderProgram_->psConstantBuffers_[i]->
+            ID3D11Buffer* psBuffer = impl_->shaderProgram_->psConstantBuffers_[i] ? (ID3D11Buffer*)impl_->shaderProgram_->psConstantBuffers_[i]->
                 GetGPUObject() : 0;
             if (psBuffer != impl_->constantBuffers_[PS][i])
             {
@@ -1098,7 +1041,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             impl_->deviceContext_->PSSetConstantBuffers(0, MAX_SHADER_PARAMETER_GROUPS, &impl_->constantBuffers_[PS][0]);
     }
     else
-        shaderProgram_ = 0;
+        impl_->shaderProgram_ = 0;
 
     // Store shader combination if shader dumping in progress
     if (shaderPrecache_)
@@ -1112,120 +1055,120 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, (unsigned)(count * sizeof(float)), data);
 }
 
 void Graphics::SetShaderParameter(StringHash param, float value)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
 }
 
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(bool), &value);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Color& color)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Color), &color);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Vector2), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetVector3ArrayParameter(i->second_.offset_, 3, &matrix);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Vector3), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Matrix4), &matrix);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Vector4), &vector);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
-    if (!shaderProgram_ || (i = shaderProgram_->parameters_.Find(param)) == shaderProgram_->parameters_.End())
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
 
     ConstantBuffer* buffer = i->second_.bufferPtr_;
     if (!buffer->IsDirty())
-        dirtyConstantBuffers_.Push(buffer);
+        impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
 }
 
@@ -1296,7 +1239,7 @@ bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* sourc
 
 bool Graphics::HasShaderParameter(StringHash param)
 {
-    return shaderProgram_ && shaderProgram_->parameters_.Find(param) != shaderProgram_->parameters_.End();
+    return impl_->shaderProgram_ && impl_->shaderProgram_->parameters_.Find(param) != impl_->shaderProgram_->parameters_.End();
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)
@@ -1341,21 +1284,26 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
     if (texture != textures_[index])
     {
-        if (firstDirtyTexture_ == M_MAX_UNSIGNED)
-            firstDirtyTexture_ = lastDirtyTexture_ = index;
+        if (impl_->firstDirtyTexture_ == M_MAX_UNSIGNED)
+            impl_->firstDirtyTexture_ = impl_->lastDirtyTexture_ = index;
         else
         {
-            if (index < firstDirtyTexture_)
-                firstDirtyTexture_ = index;
-            if (index > lastDirtyTexture_)
-                lastDirtyTexture_ = index;
+            if (index < impl_->firstDirtyTexture_)
+                impl_->firstDirtyTexture_ = index;
+            if (index > impl_->lastDirtyTexture_)
+                impl_->lastDirtyTexture_ = index;
         }
 
         textures_[index] = texture;
         impl_->shaderResourceViews_[index] = texture ? (ID3D11ShaderResourceView*)texture->GetShaderResourceView() : 0;
         impl_->samplers_[index] = texture ? (ID3D11SamplerState*)texture->GetSampler() : 0;
-        texturesDirty_ = true;
+        impl_->texturesDirty_ = true;
     }
+}
+
+void SetTextureForUpdate(Texture* texture)
+{
+    // No-op on Direct3D11
 }
 
 void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
@@ -1374,6 +1322,11 @@ void Graphics::SetTextureAnisotropy(unsigned level)
         textureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
+}
+
+void Graphics::Restore()
+{
+    // No-op on Direct3D11
 }
 
 void Graphics::SetTextureParametersDirty()
@@ -1414,7 +1367,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
     if (renderTarget != renderTargets_[index])
     {
         renderTargets_[index] = renderTarget;
-        renderTargetsDirty_ = true;
+        impl_->renderTargetsDirty_ = true;
 
         // If the rendertarget is also bound as a texture, replace with backup texture or null
         if (renderTarget)
@@ -1444,7 +1397,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
     if (depthStencil != depthStencil_)
     {
         depthStencil_ = depthStencil;
-        renderTargetsDirty_ = true;
+        impl_->renderTargetsDirty_ = true;
     }
 }
 
@@ -1456,7 +1409,7 @@ void Graphics::SetDepthStencil(Texture2D* texture)
 
     SetDepthStencil(depthStencil);
     // Constant depth bias depends on the bitdepth
-    rasterizerStateDirty_ = true;
+    impl_->rasterizerStateDirty_ = true;
 }
 
 void Graphics::SetViewport(const IntRect& rect)
@@ -1495,7 +1448,7 @@ void Graphics::SetBlendMode(BlendMode mode)
     if (mode != blendMode_)
     {
         blendMode_ = mode;
-        blendStateDirty_ = true;
+        impl_->blendStateDirty_ = true;
     }
 }
 
@@ -1504,7 +1457,7 @@ void Graphics::SetColorWrite(bool enable)
     if (enable != colorWrite_)
     {
         colorWrite_ = enable;
-        blendStateDirty_ = true;
+        impl_->blendStateDirty_ = true;
     }
 }
 
@@ -1513,7 +1466,7 @@ void Graphics::SetCullMode(CullMode mode)
     if (mode != cullMode_)
     {
         cullMode_ = mode;
-        rasterizerStateDirty_ = true;
+        impl_->rasterizerStateDirty_ = true;
     }
 }
 
@@ -1523,7 +1476,7 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
     {
         constantDepthBias_ = constantBias;
         slopeScaledDepthBias_ = slopeScaledBias;
-        rasterizerStateDirty_ = true;
+        impl_->rasterizerStateDirty_ = true;
     }
 }
 
@@ -1532,7 +1485,7 @@ void Graphics::SetDepthTest(CompareMode mode)
     if (mode != depthTestMode_)
     {
         depthTestMode_ = mode;
-        depthStateDirty_ = true;
+        impl_->depthStateDirty_ = true;
     }
 }
 
@@ -1541,9 +1494,9 @@ void Graphics::SetDepthWrite(bool enable)
     if (enable != depthWrite_)
     {
         depthWrite_ = enable;
-        depthStateDirty_ = true;
+        impl_->depthStateDirty_ = true;
         // Also affects whether a read-only version of depth-stencil should be bound, to allow sampling
-        renderTargetsDirty_ = true;
+        impl_->renderTargetsDirty_ = true;
     }
 }
 
@@ -1552,7 +1505,7 @@ void Graphics::SetFillMode(FillMode mode)
     if (mode != fillMode_)
     {
         fillMode_ = mode;
-        rasterizerStateDirty_ = true;
+        impl_->rasterizerStateDirty_ = true;
     }
 }
 
@@ -1587,14 +1540,14 @@ void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusiv
         if (enable && intRect != scissorRect_)
         {
             scissorRect_ = intRect;
-            scissorRectDirty_ = true;
+            impl_->scissorRectDirty_ = true;
         }
     }
 
     if (enable != scissorTest_)
     {
         scissorTest_ = enable;
-        rasterizerStateDirty_ = true;
+        impl_->rasterizerStateDirty_ = true;
     }
 }
 
@@ -1622,14 +1575,14 @@ void Graphics::SetScissorTest(bool enable, const IntRect& rect)
         if (enable && intRect != scissorRect_)
         {
             scissorRect_ = intRect;
-            scissorRectDirty_ = true;
+            impl_->scissorRectDirty_ = true;
         }
     }
 
     if (enable != scissorTest_)
     {
         scissorTest_ = enable;
-        rasterizerStateDirty_ = true;
+        impl_->rasterizerStateDirty_ = true;
     }
 }
 
@@ -1639,7 +1592,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
     if (enable != stencilTest_)
     {
         stencilTest_ = enable;
-        depthStateDirty_ = true;
+        impl_->depthStateDirty_ = true;
     }
 
     if (enable)
@@ -1647,38 +1600,38 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
         if (mode != stencilTestMode_)
         {
             stencilTestMode_ = mode;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (pass != stencilPass_)
         {
             stencilPass_ = pass;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (fail != stencilFail_)
         {
             stencilFail_ = fail;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (zFail != stencilZFail_)
         {
             stencilZFail_ = zFail;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (compareMask != stencilCompareMask_)
         {
             stencilCompareMask_ = compareMask;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (writeMask != stencilWriteMask_)
         {
             stencilWriteMask_ = writeMask;
-            depthStateDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
         if (stencilRef != stencilRef_)
         {
             stencilRef_ = stencilRef;
-            stencilRefDirty_ = true;
-            depthStateDirty_ = true;
+            impl_->stencilRefDirty_ = true;
+            impl_->depthStateDirty_ = true;
         }
     }
 }
@@ -1714,44 +1667,7 @@ void Graphics::PrecacheShaders(Deserializer& source)
 
 bool Graphics::IsInitialized() const
 {
-    return impl_->window_ != 0 && impl_->GetDevice() != 0;
-}
-
-IntVector2 Graphics::GetWindowPosition() const
-{
-    if (impl_->window_)
-        return position_;
-    return IntVector2::ZERO;
-}
-
-PODVector<IntVector2> Graphics::GetResolutions() const
-{
-    PODVector<IntVector2> ret;
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
-
-    for (unsigned i = 0; i < numModes; ++i)
-    {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
-        int width = mode.w;
-        int height = mode.h;
-
-        // Store mode if unique
-        bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++j)
-        {
-            if (ret[j].x_ == width && ret[j].y_ == height)
-            {
-                unique = false;
-                break;
-            }
-        }
-
-        if (unique)
-            ret.Push(IntVector2(width, height));
-    }
-
-    return ret;
+    return window_ != 0 && impl_->GetDevice() != 0;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -1772,13 +1688,6 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     }
 
     return ret;
-}
-
-IntVector2 Graphics::GetDesktopResolution() const
-{
-    SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
-    return IntVector2(mode.w, mode.h);
 }
 
 unsigned Graphics::GetFormat(CompressedFormat format) const
@@ -1828,6 +1737,11 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
+}
+
+ShaderProgram* Graphics::GetShaderProgram() const
+{
+    return impl_->shaderProgram_;
 }
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
@@ -1882,14 +1796,21 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
-void Graphics::WindowResized()
+bool Graphics::IsDeviceLost() const
 {
-    if (!impl_->device_ || !impl_->window_)
+    // Direct3D11 graphics context is never considered lost
+    /// \todo The device could be lost in case of graphics adapters getting disabled during runtime. This is not handled
+    return false;
+}
+
+void Graphics::OnWindowResized()
+{
+    if (!impl_->device_ || !window_)
         return;
 
     int newWidth, newHeight;
 
-    SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GetWindowSize(window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -1911,14 +1832,14 @@ void Graphics::WindowResized()
     SendEvent(E_SCREENMODE, eventData);
 }
 
-void Graphics::WindowMoved()
+void Graphics::OnWindowMoved()
 {
-    if (!impl_->device_ || !impl_->window_ || fullscreen_)
+    if (!impl_->device_ || !window_ || fullscreen_)
         return;
 
     int newX, newY;
 
-    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    SDL_GetWindowPosition(window_, &newX, &newY);
     if (newX == position_.x_ && newY == position_.y_)
         return;
 
@@ -1935,139 +1856,37 @@ void Graphics::WindowMoved()
     SendEvent(E_WINDOWPOS, eventData);
 }
 
-void Graphics::Maximize()
+void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
 {
-    if (!impl_->window_)
-        return;
-
-    SDL_MaximizeWindow(impl_->window_);
-}
-
-void Graphics::Minimize()
-{
-    if (!impl_->window_)
-        return;
-
-    SDL_MinimizeWindow(impl_->window_);
-}
-
-void Graphics::AddGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Push(object);
-}
-
-void Graphics::RemoveGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Remove(object);
-}
-
-void* Graphics::ReserveScratchBuffer(unsigned size)
-{
-    if (!size)
-        return 0;
-
-    if (size > maxScratchBufferRequest_)
-        maxScratchBufferRequest_ = size;
-
-    // First check for a free buffer that is large enough
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ >= size)
-        {
-            i->reserved_ = true;
-            return i->data_.Get();
-        }
-    }
-
-    // Then check if a free buffer can be resized
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_)
-        {
-            i->data_ = new unsigned char[size];
-            i->size_ = size;
-            i->reserved_ = true;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
-
-            return i->data_.Get();
-        }
-    }
-
-    // Finally allocate a new buffer
-    ScratchBuffer newBuffer;
-    newBuffer.data_ = new unsigned char[size];
-    newBuffer.size_ = size;
-    newBuffer.reserved_ = true;
-    scratchBuffers_.Push(newBuffer);
-    return newBuffer.data_.Get();
-
-    URHO3D_LOGDEBUG("Allocated scratch buffer with size " + String(size));
-}
-
-void Graphics::FreeScratchBuffer(void* buffer)
-{
-    if (!buffer)
-        return;
-
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (i->reserved_ && i->data_.Get() == buffer)
-        {
-            i->reserved_ = false;
-            return;
-        }
-    }
-
-    URHO3D_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
-}
-
-void Graphics::CleanupScratchBuffers()
-{
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
-        {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
-            i->size_ = maxScratchBufferRequest_;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
-        }
-    }
-
-    maxScratchBufferRequest_ = 0;
-}
-
-void Graphics::CleanUpShaderPrograms(ShaderVariation* variation)
-{
-    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
+    for (ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Begin(); i != impl_->shaderPrograms_.End();)
     {
         if (i->first_.first_ == variation || i->first_.second_ == variation)
-            i = shaderPrograms_.Erase(i);
+            i = impl_->shaderPrograms_.Erase(i);
         else
             ++i;
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        shaderProgram_ = 0;
+        impl_->shaderProgram_ = 0;
+}
+
+void Graphics::CleanupRenderSurface(RenderSurface* surface)
+{
+    // No-op on Direct3D11
 }
 
 ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType type, unsigned index, unsigned size)
 {
     // Ensure that different shader types and index slots get unique buffers, even if the size is same
     unsigned key = type | (index << 1) | (size << 4);
-    HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = constantBuffers_.Find(key);
-    if (i != constantBuffers_.End())
+    ConstantBufferMap::Iterator i = impl_->allConstantBuffers_.Find(key);
+    if (i != impl_->allConstantBuffers_.End())
         return i->second_.Get();
     else
     {
         SharedPtr<ConstantBuffer> newConstantBuffer(new ConstantBuffer(context_));
         newConstantBuffer->SetSize(size);
-        constantBuffers_[key] = newConstantBuffer;
+        impl_->allConstantBuffers_[key] = newConstantBuffer;
         return newConstantBuffer.Get();
     }
 }
@@ -2194,6 +2013,16 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
+unsigned Graphics::GetMaxBones()
+{
+    return 128;
+}
+
+bool Graphics::GetGL3Support()
+{
+    return gl3Support;
+}
+
 bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless)
 {
     if (!externalWindow_)
@@ -2204,35 +2033,22 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
         if (borderless)
             flags |= SDL_WINDOW_BORDERLESS;
 
-        impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
+        window_ = SDL_CreateWindow(windowTitle_.CString(), position_.x_, position_.y_, width, height, flags);
     }
     else
-        impl_->window_ = SDL_CreateWindowFrom(externalWindow_, 0);
+        window_ = SDL_CreateWindowFrom(externalWindow_, 0);
 
-    if (!impl_->window_)
+    if (!window_)
     {
         URHO3D_LOGERRORF("Could not create window, root cause: '%s'", SDL_GetError());
         return false;
     }
 
-    SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+    SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     CreateWindowIcon();
 
     return true;
-}
-
-void Graphics::CreateWindowIcon()
-{
-    if (windowIcon_)
-    {
-        SDL_Surface* surface = windowIcon_->GetSDLSurface();
-        if (surface)
-        {
-            SDL_SetWindowIcon(impl_->window_, surface);
-            SDL_FreeSurface(surface);
-        }
-    }
 }
 
 void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless)
@@ -2241,22 +2057,22 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
     {
         if (!newWidth || !newHeight)
         {
-            SDL_MaximizeWindow(impl_->window_);
-            SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+            SDL_MaximizeWindow(window_);
+            SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
         else
-            SDL_SetWindowSize(impl_->window_, newWidth, newHeight);
+            SDL_SetWindowSize(window_, newWidth, newHeight);
 
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
-        SDL_HideWindow(impl_->window_);
-        SDL_SetWindowFullscreen(impl_->window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-        SDL_SetWindowBordered(impl_->window_, newBorderless ? SDL_FALSE : SDL_TRUE);
-        SDL_ShowWindow(impl_->window_);
+        SDL_HideWindow(window_);
+        SDL_SetWindowFullscreen(window_, newFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+        SDL_SetWindowBordered(window_, newBorderless ? SDL_FALSE : SDL_TRUE);
+        SDL_ShowWindow(window_);
     }
     else
     {
         // If external window, must ask its dimensions instead of trying to set them
-        SDL_GetWindowSize(impl_->window_, &newWidth, &newHeight);
+        SDL_GetWindowSize(window_, &newWidth, &newHeight);
         newFullscreen = false;
     }
 }
@@ -2311,7 +2127,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     swapChainDesc.BufferDesc.Height = (UINT)height;
     swapChainDesc.BufferDesc.Format = sRGB_ ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    swapChainDesc.OutputWindow = GetWindowHandle(impl_->window_);
+    swapChainDesc.OutputWindow = GetWindowHandle(window_);
     swapChainDesc.SampleDesc.Count = (UINT)multiSample;
     swapChainDesc.SampleDesc.Quality = multiSample > 1 ? 0xffffffff : 0;
     swapChainDesc.Windowed = TRUE;
@@ -2326,7 +2142,7 @@ bool Graphics::CreateDevice(int width, int height, int multiSample)
     HRESULT hr = dxgiFactory->CreateSwapChain(impl_->device_, &swapChainDesc, &impl_->swapChain_);
     // After creating the swap chain, disable automatic Alt-Enter fullscreen/windowed switching
     // (the application will switch manually if it wants to)
-    dxgiFactory->MakeWindowAssociation(GetWindowHandle(impl_->window_), DXGI_MWA_NO_ALT_ENTER);
+    dxgiFactory->MakeWindowAssociation(GetWindowHandle(window_), DXGI_MWA_NO_ALT_ENTER);
 
     dxgiFactory->Release();
     dxgiAdapter->Release();
@@ -2373,7 +2189,7 @@ bool Graphics::UpdateSwapChain(int width, int height)
     impl_->depthStencilView_ = 0;
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         impl_->renderTargetViews_[i] = 0;
-    renderTargetsDirty_ = true;
+    impl_->renderTargetsDirty_ = true;
 
     impl_->swapChain_->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
@@ -2440,6 +2256,8 @@ bool Graphics::UpdateSwapChain(int width, int height)
 
 void Graphics::CheckFeatureSupport()
 {
+    anisotropySupport_ = true;
+    dxtTextureSupport_ = true;
     lightPrepassSupport_ = true;
     deferredSupport_ = true;
     hardwareShadowSupport_ = true;
@@ -2489,7 +2307,6 @@ void Graphics::ResetCachedState()
     primitiveType_ = 0;
     vertexShader_ = 0;
     pixelShader_ = 0;
-    shaderProgram_ = 0;
     blendMode_ = BLEND_REPLACE;
     textureAnisotropy_ = 1;
     colorWrite_ = true;
@@ -2510,25 +2327,26 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    renderTargetsDirty_ = true;
-    texturesDirty_ = true;
-    vertexDeclarationDirty_ = true;
-    blendStateDirty_ = true;
-    depthStateDirty_ = true;
-    rasterizerStateDirty_ = true;
-    scissorRectDirty_ = true;
-    stencilRefDirty_ = true;
-    blendStateHash_ = M_MAX_UNSIGNED;
-    depthStateHash_ = M_MAX_UNSIGNED;
-    rasterizerStateHash_ = M_MAX_UNSIGNED;
-    firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
-    firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
-    dirtyConstantBuffers_.Clear();
+    impl_->shaderProgram_ = 0;
+    impl_->renderTargetsDirty_ = true;
+    impl_->texturesDirty_ = true;
+    impl_->vertexDeclarationDirty_ = true;
+    impl_->blendStateDirty_ = true;
+    impl_->depthStateDirty_ = true;
+    impl_->rasterizerStateDirty_ = true;
+    impl_->scissorRectDirty_ = true;
+    impl_->stencilRefDirty_ = true;
+    impl_->blendStateHash_ = M_MAX_UNSIGNED;
+    impl_->depthStateHash_ = M_MAX_UNSIGNED;
+    impl_->rasterizerStateHash_ = M_MAX_UNSIGNED;
+    impl_->firstDirtyTexture_ = impl_->lastDirtyTexture_ = M_MAX_UNSIGNED;
+    impl_->firstDirtyVB_ = impl_->lastDirtyVB_ = M_MAX_UNSIGNED;
+    impl_->dirtyConstantBuffers_.Clear();
 }
 
 void Graphics::PrepareDraw()
 {
-    if (renderTargetsDirty_)
+    if (impl_->renderTargetsDirty_)
     {
         impl_->depthStencilView_ =
             (depthStencil_ && depthStencil_->GetUsage() == TEXTURE_DEPTHSTENCIL) ?
@@ -2550,33 +2368,33 @@ void Graphics::PrepareDraw()
             impl_->renderTargetViews_[0] = impl_->defaultRenderTargetView_;
 
         impl_->deviceContext_->OMSetRenderTargets(MAX_RENDERTARGETS, &impl_->renderTargetViews_[0], impl_->depthStencilView_);
-        renderTargetsDirty_ = false;
+        impl_->renderTargetsDirty_ = false;
     }
 
-    if (texturesDirty_ && firstDirtyTexture_ < M_MAX_UNSIGNED)
+    if (impl_->texturesDirty_ && impl_->firstDirtyTexture_ < M_MAX_UNSIGNED)
     {
         // Set also VS textures to enable vertex texture fetch to work the same way as on OpenGL
-        impl_->deviceContext_->VSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->shaderResourceViews_[firstDirtyTexture_]);
-        impl_->deviceContext_->VSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->samplers_[firstDirtyTexture_]);
-        impl_->deviceContext_->PSSetShaderResources(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->shaderResourceViews_[firstDirtyTexture_]);
-        impl_->deviceContext_->PSSetSamplers(firstDirtyTexture_, lastDirtyTexture_ - firstDirtyTexture_ + 1,
-            &impl_->samplers_[firstDirtyTexture_]);
+        impl_->deviceContext_->VSSetShaderResources(impl_->firstDirtyTexture_, impl_->lastDirtyTexture_ - impl_->firstDirtyTexture_ + 1,
+            &impl_->shaderResourceViews_[impl_->firstDirtyTexture_]);
+        impl_->deviceContext_->VSSetSamplers(impl_->firstDirtyTexture_, impl_->lastDirtyTexture_ - impl_->firstDirtyTexture_ + 1,
+            &impl_->samplers_[impl_->firstDirtyTexture_]);
+        impl_->deviceContext_->PSSetShaderResources(impl_->firstDirtyTexture_, impl_->lastDirtyTexture_ - impl_->firstDirtyTexture_ + 1,
+            &impl_->shaderResourceViews_[impl_->firstDirtyTexture_]);
+        impl_->deviceContext_->PSSetSamplers(impl_->firstDirtyTexture_, impl_->lastDirtyTexture_ - impl_->firstDirtyTexture_ + 1,
+            &impl_->samplers_[impl_->firstDirtyTexture_]);
 
-        firstDirtyTexture_ = lastDirtyTexture_ = M_MAX_UNSIGNED;
-        texturesDirty_ = false;
+        impl_->firstDirtyTexture_ = impl_->lastDirtyTexture_ = M_MAX_UNSIGNED;
+        impl_->texturesDirty_ = false;
     }
 
-    if (vertexDeclarationDirty_ && vertexShader_ && vertexShader_->GetByteCode().Size())
+    if (impl_->vertexDeclarationDirty_ && vertexShader_ && vertexShader_->GetByteCode().Size())
     {
-        if (firstDirtyVB_ < M_MAX_UNSIGNED)
+        if (impl_->firstDirtyVB_ < M_MAX_UNSIGNED)
         {
-            impl_->deviceContext_->IASetVertexBuffers(firstDirtyVB_, lastDirtyVB_ - firstDirtyVB_ + 1,
-                &impl_->vertexBuffers_[firstDirtyVB_], &impl_->vertexSizes_[firstDirtyVB_], &impl_->vertexOffsets_[firstDirtyVB_]);
+            impl_->deviceContext_->IASetVertexBuffers(impl_->firstDirtyVB_, impl_->lastDirtyVB_ - impl_->firstDirtyVB_ + 1,
+                &impl_->vertexBuffers_[impl_->firstDirtyVB_], &impl_->vertexSizes_[impl_->firstDirtyVB_], &impl_->vertexOffsets_[impl_->firstDirtyVB_]);
 
-            firstDirtyVB_ = lastDirtyVB_ = M_MAX_UNSIGNED;
+            impl_->firstDirtyVB_ = impl_->lastDirtyVB_ = M_MAX_UNSIGNED;
         }
 
         unsigned long long newVertexDeclarationHash = 0;
@@ -2592,25 +2410,25 @@ void Graphics::PrepareDraw()
             newVertexDeclarationHash += vertexShader_->GetElementHash();
             if (newVertexDeclarationHash != vertexDeclarationHash_)
             {
-                HashMap<unsigned long long, SharedPtr<VertexDeclaration> >::Iterator i =
-                    vertexDeclarations_.Find(newVertexDeclarationHash);
-                if (i == vertexDeclarations_.End())
+                VertexDeclarationMap::Iterator i =
+                    impl_->vertexDeclarations_.Find(newVertexDeclarationHash);
+                if (i == impl_->vertexDeclarations_.End())
                 {
                     SharedPtr<VertexDeclaration> newVertexDeclaration(new VertexDeclaration(this, vertexShader_, vertexBuffers_));
-                    i = vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
+                    i = impl_->vertexDeclarations_.Insert(MakePair(newVertexDeclarationHash, newVertexDeclaration));
                 }
                 impl_->deviceContext_->IASetInputLayout((ID3D11InputLayout*)i->second_->GetInputLayout());
                 vertexDeclarationHash_ = newVertexDeclarationHash;
             }
         }
 
-        vertexDeclarationDirty_ = false;
+        impl_->vertexDeclarationDirty_ = false;
     }
 
-    if (blendStateDirty_)
+    if (impl_->blendStateDirty_)
     {
         unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (blendMode_ << 1));
-        if (newBlendStateHash != blendStateHash_)
+        if (newBlendStateHash != impl_->blendStateHash_)
         {
             HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
             if (i == impl_->blendStates_.End())
@@ -2642,19 +2460,19 @@ void Graphics::PrepareDraw()
             }
 
             impl_->deviceContext_->OMSetBlendState(i->second_, 0, M_MAX_UNSIGNED);
-            blendStateHash_ = newBlendStateHash;
+            impl_->blendStateHash_ = newBlendStateHash;
         }
 
-        blendStateDirty_ = false;
+        impl_->blendStateDirty_ = false;
     }
 
-    if (depthStateDirty_)
+    if (impl_->depthStateDirty_)
     {
         unsigned newDepthStateHash =
             (depthWrite_ ? 1 : 0) | (stencilTest_ ? 2 : 0) | (depthTestMode_ << 2) | ((stencilCompareMask_ & 0xff) << 5) |
             ((stencilWriteMask_ & 0xff) << 13) | (stencilTestMode_ << 21) |
             ((stencilFail_ + stencilZFail_ * 5 + stencilPass_ * 25) << 24);
-        if (newDepthStateHash != depthStateHash_ || stencilRefDirty_)
+        if (newDepthStateHash != impl_->depthStateHash_ || impl_->stencilRefDirty_)
         {
             HashMap<unsigned, ID3D11DepthStencilState*>::Iterator i = impl_->depthStates_.Find(newDepthStateHash);
             if (i == impl_->depthStates_.End())
@@ -2690,14 +2508,14 @@ void Graphics::PrepareDraw()
             }
 
             impl_->deviceContext_->OMSetDepthStencilState(i->second_, stencilRef_);
-            depthStateHash_ = newDepthStateHash;
+            impl_->depthStateHash_ = newDepthStateHash;
         }
 
-        depthStateDirty_ = false;
-        stencilRefDirty_ = false;
+        impl_->depthStateDirty_ = false;
+        impl_->stencilRefDirty_ = false;
     }
 
-    if (rasterizerStateDirty_)
+    if (impl_->rasterizerStateDirty_)
     {
         unsigned depthBits = 24;
         if (depthStencil_ && depthStencil_->GetParentTexture()->GetFormat() == DXGI_FORMAT_R16_TYPELESS)
@@ -2707,7 +2525,7 @@ void Graphics::PrepareDraw()
         unsigned newRasterizerStateHash =
             (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
             ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
-        if (newRasterizerStateHash != rasterizerStateHash_)
+        if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
             if (i == impl_->rasterizerStates_.End())
@@ -2739,13 +2557,13 @@ void Graphics::PrepareDraw()
             }
 
             impl_->deviceContext_->RSSetState(i->second_);
-            rasterizerStateHash_ = newRasterizerStateHash;
+            impl_->rasterizerStateHash_ = newRasterizerStateHash;
         }
 
-        rasterizerStateDirty_ = false;
+        impl_->rasterizerStateDirty_ = false;
     }
 
-    if (scissorRectDirty_)
+    if (impl_->scissorRectDirty_)
     {
         D3D11_RECT d3dRect;
         d3dRect.left = scissorRect_.left_;
@@ -2753,12 +2571,12 @@ void Graphics::PrepareDraw()
         d3dRect.right = scissorRect_.right_;
         d3dRect.bottom = scissorRect_.bottom_;
         impl_->deviceContext_->RSSetScissorRects(1, &d3dRect);
-        scissorRectDirty_ = false;
+        impl_->scissorRectDirty_ = false;
     }
 
-    for (unsigned i = 0; i < dirtyConstantBuffers_.Size(); ++i)
-        dirtyConstantBuffers_[i]->Apply();
-    dirtyConstantBuffers_.Clear();
+    for (unsigned i = 0; i < impl_->dirtyConstantBuffers_.Size(); ++i)
+        impl_->dirtyConstantBuffers_[i]->Apply();
+    impl_->dirtyConstantBuffers_.Clear();
 }
 
 void Graphics::CreateResolveTexture()
@@ -2804,38 +2622,6 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["ZoneCubeMap"] = TU_ZONE;
     textureUnits_["ZoneVolumeMap"] = TU_ZONE;
-}
-
-void RegisterGraphicsLibrary(Context* context)
-{
-    Animation::RegisterObject(context);
-    Material::RegisterObject(context);
-    Model::RegisterObject(context);
-    Shader::RegisterObject(context);
-    Technique::RegisterObject(context);
-    Texture2D::RegisterObject(context);
-    Texture2DArray::RegisterObject(context);
-    Texture3D::RegisterObject(context);
-    TextureCube::RegisterObject(context);
-    Camera::RegisterObject(context);
-    Drawable::RegisterObject(context);
-    Light::RegisterObject(context);
-    StaticModel::RegisterObject(context);
-    StaticModelGroup::RegisterObject(context);
-    Skybox::RegisterObject(context);
-    AnimatedModel::RegisterObject(context);
-    AnimationController::RegisterObject(context);
-    BillboardSet::RegisterObject(context);
-    ParticleEffect::RegisterObject(context);
-    ParticleEmitter::RegisterObject(context);
-    RibbonTrail::RegisterObject(context);
-    CustomGeometry::RegisterObject(context);
-    DecalSet::RegisterObject(context);
-    Terrain::RegisterObject(context);
-    TerrainPatch::RegisterObject(context);
-    DebugRenderer::RegisterObject(context);
-    Octree::RegisterObject(context);
-    Zone::RegisterObject(context);
 }
 
 }

@@ -57,25 +57,6 @@ static GLenum gl3WrapModes[] =
 };
 #endif
 
-static const char* addressModeNames[] =
-{
-    "wrap",
-    "mirror",
-    "clamp",
-    "border",
-    0
-};
-
-static const char* filterModeNames[] =
-{
-    "nearest",
-    "bilinear",
-    "trilinear",
-    "anisotropic",
-    "default",
-    0
-};
-
 static GLenum GetWrapMode(TextureAddressMode mode)
 {
 #ifndef GL_ES_VERSION_2_0
@@ -83,60 +64,6 @@ static GLenum GetWrapMode(TextureAddressMode mode)
 #else
     return glWrapModes[mode];
 #endif
-}
-
-Texture::Texture(Context* context) :
-    Resource(context),
-    GPUObject(GetSubsystem<Graphics>()),
-    usage_(TEXTURE_STATIC),
-    format_(0),
-    levels_(0),
-    requestedLevels_(0),
-    width_(0),
-    height_(0),
-    depth_(0),
-    shadowCompare_(false),
-    parametersDirty_(true),
-    filterMode_(FILTER_DEFAULT),
-    sRGB_(false)
-{
-    for (int i = 0; i < MAX_COORDS; ++i)
-        addressMode_[i] = ADDRESS_WRAP;
-    for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-        mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
-}
-
-Texture::~Texture()
-{
-}
-
-void Texture::SetNumLevels(unsigned levels)
-{
-    requestedLevels_ = levels;
-}
-
-void Texture::SetFilterMode(TextureFilterMode mode)
-{
-    filterMode_ = mode;
-    parametersDirty_ = true;
-}
-
-void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
-{
-    addressMode_[coord] = mode;
-    parametersDirty_ = true;
-}
-
-void Texture::SetShadowCompare(bool enable)
-{
-    shadowCompare_ = enable;
-    parametersDirty_ = true;
-}
-
-void Texture::SetBorderColor(const Color& color)
-{
-    borderColor_ = color;
-    parametersDirty_ = true;
 }
 
 void Texture::SetSRGB(bool enable)
@@ -148,7 +75,7 @@ void Texture::SetSRGB(bool enable)
     {
         sRGB_ = enable;
         // If texture had already been created, must recreate it to set the sRGB texture format
-        if (object_)
+        if (object_.name_)
             Create();
 
         // If texture in use in the framebuffer, mark it dirty
@@ -157,34 +84,9 @@ void Texture::SetSRGB(bool enable)
     }
 }
 
-void Texture::SetBackupTexture(Texture* texture)
-{
-    backupTexture_ = texture;
-}
-
-void Texture::SetMipsToSkip(int quality, int toSkip)
-{
-    if (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS)
-    {
-        mipsToSkip_[quality] = (unsigned)toSkip;
-
-        // Make sure a higher quality level does not actually skip more mips
-        for (int i = 1; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
-        {
-            if (mipsToSkip_[i] > mipsToSkip_[i - 1])
-                mipsToSkip_[i] = mipsToSkip_[i - 1];
-        }
-    }
-}
-
-void Texture::SetParametersDirty()
-{
-    parametersDirty_ = true;
-}
-
 void Texture::UpdateParameters()
 {
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
         return;
 
     // Wrapping
@@ -250,9 +152,9 @@ void Texture::UpdateParameters()
     parametersDirty_ = false;
 }
 
-int Texture::GetMipsToSkip(int quality) const
+bool Texture::GetParametersDirty() const
 {
-    return (quality >= QUALITY_LOW && quality < MAX_TEXTURE_QUALITY_LEVELS) ? mipsToSkip_[quality] : 0;
+    return parametersDirty_;
 }
 
 bool Texture::IsCompressed() const
@@ -261,47 +163,6 @@ bool Texture::IsCompressed() const
            format_ == GL_COMPRESSED_RGBA_S3TC_DXT5_EXT || format_ == GL_ETC1_RGB8_OES ||
            format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG ||
            format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-}
-
-int Texture::GetLevelWidth(unsigned level) const
-{
-    if (level > levels_)
-        return 0;
-    return Max(width_ >> level, 1);
-}
-
-int Texture::GetLevelHeight(unsigned level) const
-{
-    if (level > levels_)
-        return 0;
-    return Max(height_ >> level, 1);
-}
-
-int Texture::GetLevelDepth(unsigned level) const
-{
-    if (level > levels_)
-        return 0;
-    return Max(depth_ >> level, 1);
-}
-
-unsigned Texture::GetDataSize(int width, int height) const
-{
-    if (IsCompressed())
-    {
-        if (format_ == COMPRESSED_RGB_PVRTC_4BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_4BPPV1_IMG)
-            return (unsigned)((Max(width, 8) * Max(height, 8) * 4 + 7) >> 3);
-        else if (format_ == COMPRESSED_RGB_PVRTC_2BPPV1_IMG || format_ == COMPRESSED_RGBA_PVRTC_2BPPV1_IMG)
-            return (unsigned)((Max(width, 16) * Max(height, 8) * 2 + 7) >> 3);
-        else
-            return GetRowDataSize(width) * ((height + 3) >> 2);
-    }
-    else
-        return GetRowDataSize(width) * height;
-}
-
-unsigned Texture::GetDataSize(int width, int height, int depth) const
-{
-    return depth * GetDataSize(width, height);
 }
 
 unsigned Texture::GetRowDataSize(int width) const
@@ -366,14 +227,6 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
-unsigned Texture::GetComponents() const
-{
-    if (!width_ || IsCompressed())
-        return 0;
-    else
-        return GetRowDataSize(width_) / width_;
-}
-
 unsigned Texture::GetExternalFormat(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
@@ -423,64 +276,6 @@ unsigned Texture::GetDataType(unsigned format)
 #endif
 }
 
-void Texture::SetParameters(XMLFile* file)
-{
-    if (!file)
-        return;
-
-    XMLElement rootElem = file->GetRoot();
-    SetParameters(rootElem);
-}
-
-void Texture::SetParameters(const XMLElement& elem)
-{
-    XMLElement paramElem = elem.GetChild();
-    while (paramElem)
-    {
-        String name = paramElem.GetName();
-
-        if (name == "address")
-        {
-            String coord = paramElem.GetAttributeLower("coord");
-            if (coord.Length() >= 1)
-            {
-                TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
-                String mode = paramElem.GetAttributeLower("mode");
-                SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode.CString(), addressModeNames, ADDRESS_WRAP));
-            }
-        }
-
-        if (name == "border")
-            SetBorderColor(paramElem.GetColor("color"));
-
-        if (name == "filter")
-        {
-            String mode = paramElem.GetAttributeLower("mode");
-            SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
-        }
-
-        if (name == "mipmap")
-            SetNumLevels(paramElem.GetBool("enable") ? 0 : 1);
-
-        if (name == "quality")
-        {
-            if (paramElem.HasAttribute("low"))
-                SetMipsToSkip(QUALITY_LOW, paramElem.GetInt("low"));
-            if (paramElem.HasAttribute("med"))
-                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("med"));
-            if (paramElem.HasAttribute("medium"))
-                SetMipsToSkip(QUALITY_MEDIUM, paramElem.GetInt("medium"));
-            if (paramElem.HasAttribute("high"))
-                SetMipsToSkip(QUALITY_HIGH, paramElem.GetInt("high"));
-        }
-
-        if (name == "srgb")
-            SetSRGB(paramElem.GetBool("enable"));
-
-        paramElem = paramElem.GetNext();
-    }
-}
-
 unsigned Texture::GetSRGBFormat(unsigned format)
 {
 #ifndef GL_ES_VERSION_2_0
@@ -509,20 +304,6 @@ unsigned Texture::GetSRGBFormat(unsigned format)
 #else
     return format;
 #endif
-}
-
-void Texture::CheckTextureBudget(StringHash type)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    unsigned long long textureBudget = cache->GetMemoryBudget(type);
-    unsigned long long textureUse = cache->GetMemoryUse(type);
-    if (!textureBudget)
-        return;
-
-    // If textures are over the budget, they likely can not be freed directly as materials still refer to them.
-    // Therefore free unused materials first
-    if (textureUse > textureBudget)
-        cache->ReleaseResources(Material::GetTypeStatic());
 }
 
 }

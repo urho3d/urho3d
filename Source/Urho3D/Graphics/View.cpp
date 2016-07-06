@@ -602,11 +602,8 @@ void View::Render()
 
     // It is possible, though not recommended, that the same camera is used for multiple main views. Set automatic aspect ratio
     // to ensure correct projection will be used
-    if (camera_)
-    {
-        if (camera_->GetAutoAspectRatio())
-            camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
-    }
+    if (camera_ && camera_->GetAutoAspectRatio())
+        camera_->SetAspectRatioInternal((float)(viewSize_.x_) / (float)(viewSize_.y_));
 
     // Bind the face selection and indirection cube maps for point light shadows
 #ifndef GL_ES_VERSION_2_0
@@ -1079,7 +1076,6 @@ void View::GetLightBatches()
                                 threadedGeometries_.Push(drawable);
                         }
 
-                        Zone* zone = GetZone(drawable);
                         const Vector<SourceBatch>& batches = drawable->GetBatches();
 
                         for (unsigned l = 0; l < batches.Size(); ++l)
@@ -1097,7 +1093,7 @@ void View::GetLightBatches()
 
                             Batch destBatch(srcBatch);
                             destBatch.pass_ = pass;
-                            destBatch.zone_ = zone;
+                            destBatch.zone_ = 0;
 
                             AddBatchToQueue(shadowQueue.shadowBatches_, destBatch, tech);
                         }
