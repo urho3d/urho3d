@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-# Save the original values of CC and CXX environment variables before they get altered by CMake in the current process (and all the subprocesses later)
+# Save the original values of CC and CXX environment variables before they get altered by CMake later
 if (DEFINED CMAKE_CROSSCOMPILING)
     return ()
 else ()
@@ -28,8 +28,8 @@ else ()
     set (SAVED_CXX $ENV{CXX})
 endif ()
 
+# Reference toolchain variable to suppress "unused variable" warning
 if (CMAKE_TOOLCHAIN_FILE)
-    # Reference toolchain variable to suppress "unused variable" warning
     mark_as_advanced (CMAKE_TOOLCHAIN_FILE)
 endif ()
 
@@ -48,30 +48,35 @@ if (NOT EXISTS ${ARM_PREFIX}-gcc)
         "Use ARM_PREFIX environment variable or build option to specify the location of the toolchain.")
 endif ()
 set (COMPILER_PREFIX ${ARM_PREFIX})
-if (NOT CMAKE_C_COMPILER AND "$ENV{USE_CCACHE}")
-    get_filename_component (PATH ${ARM_PREFIX} PATH)
-    get_filename_component (NAME ${ARM_PREFIX} NAME)
-    execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
-        set (COMPILER_PREFIX ${CCACHE_SYMLINK}/${NAME})
-    else ()
-        # Fallback to create the ccache symlink in the build tree itself
-        execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (EXIT_CODE EQUAL 0 AND CCACHE)
-            foreach (TOOL gcc g++)
-                execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${TOOL})
-            endforeach ()
-            set (COMPILER_PREFIX ${CMAKE_BINARY_DIR}/${NAME})
+if (NOT CMAKE_C_COMPILER)
+    if (DEFINED ENV{CMAKE_C_COMPILER} AND DEFINED ENV{CMAKE_CXX_COMPILER})
+        set (CMAKE_C_COMPILER $ENV{CMAKE_C_COMPILER})
+        set (CMAKE_CXX_COMPILER $ENV{CMAKE_CXX_COMPILER})
+    elseif ("$ENV{USE_CCACHE}")
+        get_filename_component (PATH ${ARM_PREFIX} PATH)
+        get_filename_component (NAME ${ARM_PREFIX} NAME)
+        execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/${NAME}-gcc AND EXISTS ${CCACHE_SYMLINK}/${NAME}-g++)
+            set (COMPILER_PREFIX ${CCACHE_SYMLINK}/${NAME})
         else ()
-            message (WARNING "ccache may not have been installed on this host system. "
-                "This is required to enable ccache support for ARM compiler toolchain. "
-                "CMake has been configured to use the actual compiler toolchain instead of ccache. "
-                "In order to rectify this, the build tree must be regenerated after installing ccache.")
+            # Fallback to create the ccache symlink in the build tree itself
+            execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+            if (EXIT_CODE EQUAL 0 AND CCACHE)
+                foreach (TOOL gcc g++)
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${NAME}-${TOOL})
+                endforeach ()
+                set (COMPILER_PREFIX ${CMAKE_BINARY_DIR}/${NAME})
+            else ()
+                message (WARNING "ccache may not have been installed on this host system. "
+                    "This is required to enable ccache support for ARM compiler toolchain. "
+                    "CMake has been configured to use the actual compiler toolchain instead of ccache. "
+                    "In order to rectify this, the build tree must be regenerated after installing ccache.")
+            endif ()
         endif ()
-    endif ()
-    if (NOT $ENV{PATH} MATCHES ${PATH} AND NOT COMPILER_PREFIX STREQUAL ARM_PREFIX)
-        message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
-            "This is required to enable ccache support for ARM compiler toolchain.")
+        if (NOT $ENV{PATH} MATCHES ${PATH} AND NOT COMPILER_PREFIX STREQUAL ARM_PREFIX)
+            message (FATAL_ERROR "The bin directory containing the compiler toolchain (${PATH}) has not been added in the PATH environment variable. "
+                "This is required to enable ccache support for ARM compiler toolchain.")
+        endif ()
     endif ()
 endif ()
 set (CMAKE_C_COMPILER   ${COMPILER_PREFIX}-gcc CACHE PATH "C compiler")
@@ -102,5 +107,16 @@ set (CMAKE_SYSROOT ${ARM_SYSROOT})
 set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+# Workaround try_compile() limitation where it cannot yet see cache variables during initial configuration
+get_property(IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
+if (NOT IN_TRY_COMPILE)
+    get_cmake_property (CACHE_VARIABLES CACHE_VARIABLES)
+    foreach (VAR ${CACHE_VARIABLES})
+        if (VAR MATCHES ^ARM_|CMAKE_CX*_COMPILER)
+            set (ENV{${VAR}} ${${VAR}})
+        endif ()
+    endforeach ()
+endif ()
 
 set (ARM 1)
