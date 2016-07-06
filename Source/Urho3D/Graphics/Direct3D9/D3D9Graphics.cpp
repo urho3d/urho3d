@@ -243,7 +243,6 @@ Graphics::Graphics(Context* context) :
     Object(context),
     impl_(new GraphicsImpl()),
     window_(0),
-    windowIcon_(0),
     externalWindow_(0),
     width_(0),
     height_(0),
