@@ -20,10 +20,10 @@
 # THE SOFTWARE.
 #
 
-# Save the original values of CC and CXX environment variables as they are not saved yet when no CMake toolchain file is being used
+# Save the initial values of CC and CXX environment variables
 if (NOT CMAKE_CROSSCOMPILING)
-    set (SAVED_CC $ENV{CC})
-    set (SAVED_CXX $ENV{CXX})
+    set (SAVED_CC $ENV{CC} CACHE INTERNAL "Initial value for CC")
+    set (SAVED_CXX $ENV{CXX} CACHE INTERNAL "Initial value for CXX")
 endif ()
 
 # Limit the supported build configurations
@@ -324,7 +324,7 @@ if (URHO3D_LUAJIT)
 endif ()
 
 # Union all the sysroot variables into one so it can be referred to generically later
-set (SYSROOT ${CMAKE_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
+set (SYSROOT ${CMAKE_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 
 # Clang tools building
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)

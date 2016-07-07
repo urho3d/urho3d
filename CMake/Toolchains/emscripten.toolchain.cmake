@@ -20,12 +20,27 @@
 # THE SOFTWARE.
 #
 
-# Save the original values of CC and CXX environment variables before they get altered by CMake later
-if (DEFINED CMAKE_CROSSCOMPILING)
-    return ()
+# Workaround try_compile() limitation where it cannot yet see cache variables during initial configuration
+get_property (IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
+if (IN_TRY_COMPILE)
+    foreach (VAR $ENV{VARS})
+        set (${VAR} $ENV{${VAR}})
+    endforeach ()
 else ()
-    set (SAVED_CC $ENV{CC})
-    set (SAVED_CXX $ENV{CXX})
+    # Prevent critical variables from changing after the initial configuration
+    if (CMAKE_CROSSCOMPILING)
+        set (SAVED_EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE INTERNAL "Initial value for EMSCRIPTEN_ROOT_PATH")
+        set (SAVED_EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Initial value for EMSCRIPTEN_SYSROOT")
+        # Save the initial values of CC and CXX environment variables
+        set (SAVED_CC $ENV{CC} CACHE INTERNAL "Initial value for CC")
+        set (SAVED_CXX $ENV{CXX} CACHE INTERNAL "Initial value for CXX")
+        return ()
+    elseif ((SAVED_EMSCRIPTEN_ROOT_PATH AND NOT SAVED_EMSCRIPTEN_ROOT_PATH STREQUAL EMSCRIPTEN_ROOT_PATH) OR (SAVED_EMSCRIPTEN_SYSROOT AND NOT SAVED_EMSCRIPTEN_SYSROOT STREQUAL EMSCRIPTEN_SYSROOT))
+        set (EMSCRIPTEN_ROOT_PATH ${SAVED_EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten only)" FORCE)
+        set (EMSCRIPTEN_SYSROOT ${SAVED_EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten only)" FORCE)
+        message (FATAL_ERROR "EMSCRIPTEN_ROOT_PATH and EMSCRIPTEN_SYSROOT cannot be changed after the initial configuration/generation. "
+            "If you wish to change that then the build tree would have to be regenerated from scratch. Auto reverting to its initial value.")
+    endif ()
 endif ()
 
 # Reference toolchain variable to suppress "unused variable" warning
@@ -33,51 +48,70 @@ if (CMAKE_TOOLCHAIN_FILE)
     mark_as_advanced (CMAKE_TOOLCHAIN_FILE)
 endif ()
 
-# this one is important
+# This one is important
 set (CMAKE_SYSTEM_NAME Linux)
-# this one not so much
+# This one not so much
 set (CMAKE_SYSTEM_VERSION 1)
 
-# specify the cross compiler
+# System root
+if (NOT IN_TRY_COMPILE)
+    if (NOT SAVED_EMSCRIPTEN_ROOT_PATH)
+        if (NOT EMSCRIPTEN_ROOT_PATH)
+            if (DEFINED ENV{EMSCRIPTEN_ROOT_PATH})
+                file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_ROOT_PATH} EMSCRIPTEN_ROOT_PATH)
+            elseif (DEFINED ENV{EMSCRIPTEN})
+                file (TO_CMAKE_PATH $ENV{EMSCRIPTEN} EMSCRIPTEN_ROOT_PATH)
+            endif ()
+        endif ()
+        set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten only)")
+        if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT})
+            message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
+                "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain. "
+                "Or use the canonical EMSCRIPTEN environment variable by calling emsdk_env script.")
+        endif ()
+    endif ()
+    if (NOT SAVED_EMSCRIPTEN_SYSROOT)
+        if (NOT EMSCRIPTEN_SYSROOT)
+            if (DEFINED ENV{EMSCRIPTEN_SYSROOT})
+                file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_SYSROOT} EMSCRIPTEN_SYSROOT)
+            else ()
+                set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_ROOT_PATH}/system)
+            endif ()
+        endif ()
+        set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten only)")
+        if (NOT EXISTS ${EMSCRIPTEN_SYSROOT})
+            message (FATAL_ERROR "Could not find Emscripten system root. "
+                "Use EMSCRIPTEN_SYSROOT environment variable or build option to specify the location of system root.")
+        endif ()
+    endif ()
+endif ()
+set (CMAKE_SYSROOT ${EMSCRIPTEN_SYSROOT})
+# Only search libraries and headers in sysroot
+set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+
+# Cross compiler tools
 if (CMAKE_HOST_WIN32)
     set (TOOL_EXT .bat)
 endif ()
-if (NOT EMSCRIPTEN_ROOT_PATH)
-    if (DEFINED ENV{EMSCRIPTEN_ROOT_PATH})
-        file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_ROOT_PATH} EMSCRIPTEN_ROOT_PATH)
-    elseif (DEFINED ENV{EMSCRIPTEN})
-        file (TO_CMAKE_PATH $ENV{EMSCRIPTEN} EMSCRIPTEN_ROOT_PATH)
-    endif ()
-endif ()
-if (NOT EXISTS ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT})
-    message (FATAL_ERROR "Could not find Emscripten cross compilation tool. "
-        "Use EMSCRIPTEN_ROOT_PATH environment variable or build option to specify the location of the toolchain. "
-        "Or use the canonical EMSCRIPTEN environment variable by calling emsdk_env script.")
-endif ()
 if (NOT EMSCRIPTEN_EMCC_VERSION)
-    if (DEFINED ENV{EMSCRIPTEN_EMCC_VERSION})
-        set (EMSCRIPTEN_EMCC_VERSION $ENV{EMSCRIPTEN_EMCC_VERSION})
+    execute_process (COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT} --version RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE EMSCRIPTEN_EMCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0)
+        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMSCRIPTEN_EMCC_VERSION "${EMSCRIPTEN_EMCC_VERSION}")
     else ()
-        execute_process (COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT} --version RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE EMSCRIPTEN_EMCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (EXIT_CODE EQUAL 0)
-            string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMSCRIPTEN_EMCC_VERSION "${EMSCRIPTEN_EMCC_VERSION}")
-        else ()
-            message (FATAL_ERROR "Could not determine the emcc version. Make sure you have installed and activated the Emscripten SDK correctly.")
-        endif ()
+        message (FATAL_ERROR "Could not determine the emcc version. Make sure you have installed and activated the Emscripten SDK correctly.")
     endif ()
     set (EMSCRIPTEN_EMCC_VERSION ${EMSCRIPTEN_EMCC_VERSION} CACHE INTERNAL "emcc version being used in this build tree")
 endif ()
-set (COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
 # ccache support could only be enabled for emcc prior to 1.31.3 when the CCACHE_CPP2 env var is also set to 1, newer emcc version could enable ccache support without this caveat (see https://github.com/kripken/emscripten/issues/3365 for more detail)
 # The CCACHE_CPP2 env var tells ccache to fallback to use original input source file instead of preprocessed one when passing on the compilation task to the compiler proper
-if (NOT CMAKE_C_COMPILER)
-    if (DEFINED ENV{CMAKE_C_COMPILER} AND DEFINED ENV{CMAKE_CXX_COMPILER})
-        set (CMAKE_C_COMPILER $ENV{CMAKE_C_COMPILER})
-        set (CMAKE_CXX_COMPILER $ENV{CMAKE_CXX_COMPILER})
-    elseif ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMSCRIPTEN_EMCC_VERSION VERSION_LESS 1.31.3))
+if (NOT EMSCRIPTEN_COMPILER_PATH)
+    set (EMSCRIPTEN_COMPILER_PATH ${EMSCRIPTEN_ROOT_PATH})
+    if ("$ENV{USE_CCACHE}" AND NOT CMAKE_HOST_WIN32 AND ("$ENV{CCACHE_CPP2}" OR NOT EMSCRIPTEN_EMCC_VERSION VERSION_LESS 1.31.3))
         execute_process (COMMAND whereis -b ccache COMMAND grep -o \\S*lib\\S* OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
         if (CCACHE_SYMLINK AND EXISTS ${CCACHE_SYMLINK}/emcc AND EXISTS ${CCACHE_SYMLINK}/em++)
-            set (COMPILER_PATH ${CCACHE_SYMLINK})
+            set (EMSCRIPTEN_COMPILER_PATH ${CCACHE_SYMLINK})
         else ()
             # Fallback to create the ccache symlink in the build tree itself
             execute_process (COMMAND which ccache RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -85,7 +119,7 @@ if (NOT CMAKE_C_COMPILER)
                 foreach (TOOL emcc em++)
                     execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCACHE} ${CMAKE_BINARY_DIR}/${TOOL})
                 endforeach ()
-                set (COMPILER_PATH ${CMAKE_BINARY_DIR})
+                set (EMSCRIPTEN_COMPILER_PATH ${CMAKE_BINARY_DIR})
             else ()
                 message (WARNING "ccache may not have been installed on this host system. "
                     "This is required to enable ccache support for Emscripten compiler toolchain. "
@@ -93,14 +127,15 @@ if (NOT CMAKE_C_COMPILER)
                     "In order to rectify this, the build tree must be regenerated after installing ccache.")
             endif ()
         endif ()
-        if (NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH} AND NOT COMPILER_PATH STREQUAL EMSCRIPTEN_ROOT_PATH)
+        if (NOT EMSCRIPTEN_COMPILER_PATH STREQUAL EMSCRIPTEN_ROOT_PATH AND NOT $ENV{PATH} MATCHES ${EMSCRIPTEN_ROOT_PATH})
             message (FATAL_ERROR "The bin directory containing the compiler toolchain (${EMSCRIPTEN_ROOT_PATH}) has not been added in the PATH environment variable. "
                 "This is required to enable ccache support for Emscripten compiler toolchain.")
         endif ()
     endif ()
+    set (EMSCRIPTEN_COMPILER_PATH ${EMSCRIPTEN_COMPILER_PATH} CACHE INTERNAL "Path to C/C++ compiler tool symlinks or to the actual tools if not using ccache")
 endif ()
-set (CMAKE_C_COMPILER   ${COMPILER_PATH}/emcc${TOOL_EXT}            CACHE PATH "C compiler")
-set (CMAKE_CXX_COMPILER ${COMPILER_PATH}/em++${TOOL_EXT}            CACHE PATH "C++ compiler")
+set (CMAKE_C_COMPILER   ${EMSCRIPTEN_COMPILER_PATH}/emcc${TOOL_EXT} CACHE PATH "C compiler")
+set (CMAKE_CXX_COMPILER ${EMSCRIPTEN_COMPILER_PATH}/em++${TOOL_EXT} CACHE PATH "C++ compiler")
 set (CMAKE_AR           ${EMSCRIPTEN_ROOT_PATH}/emar${TOOL_EXT}     CACHE PATH "archive")
 set (CMAKE_RANLIB       ${EMSCRIPTEN_ROOT_PATH}/emranlib${TOOL_EXT} CACHE PATH "ranlib")
 set (CMAKE_LINKER       ${EMSCRIPTEN_ROOT_PATH}/emlink.py           CACHE PATH "linker")
@@ -108,27 +143,6 @@ set (CMAKE_LINKER       ${EMSCRIPTEN_ROOT_PATH}/emlink.py           CACHE PATH "
 set (EMRUN              ${EMSCRIPTEN_ROOT_PATH}/emrun${TOOL_EXT}    CACHE PATH "emrun")
 set (EMPACKAGER         python ${EMSCRIPTEN_ROOT_PATH}/tools/file_packager.py CACHE PATH "file_packager.py")
 set (EMBUILDER          python ${EMSCRIPTEN_ROOT_PATH}/embuilder.py CACHE PATH "embuilder.py")
-
-# specify the system root
-if (NOT EMSCRIPTEN_SYSROOT)
-    if (DEFINED ENV{EMSCRIPTEN_SYSROOT})
-        file (TO_CMAKE_PATH $ENV{EMSCRIPTEN_SYSROOT} EMSCRIPTEN_SYSROOT)
-    else ()
-        set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_ROOT_PATH}/system)
-    endif ()
-    if (NOT EXISTS ${EMSCRIPTEN_SYSROOT})
-        message (FATAL_ERROR "Could not find Emscripten system root. "
-            "Use EMSCRIPTEN_SYSROOT environment variable or build option to specify the location of system root.")
-    endif ()
-    set (EMSCRIPTEN_ROOT_PATH ${EMSCRIPTEN_ROOT_PATH} CACHE STRING "Root path to Emscripten cross-compiler tools (Emscripten only)" FORCE)
-    set (EMSCRIPTEN_SYSROOT ${EMSCRIPTEN_SYSROOT} CACHE PATH "Path to Emscripten system root (Emscripten only)" FORCE)
-endif ()
-set (CMAKE_FIND_ROOT_PATH ${EMSCRIPTEN_SYSROOT})
-
-# only search libraries and headers in the target directories
-set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # Still perform the compiler checks except for those stated otherwise below
 foreach (LANG C CXX)
@@ -159,14 +173,15 @@ if (CMAKE_HOST_WIN32)
 endif ()
 
 # Workaround try_compile() limitation where it cannot yet see cache variables during initial configuration
-get_property(IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
 if (NOT IN_TRY_COMPILE)
     get_cmake_property (CACHE_VARIABLES CACHE_VARIABLES)
     foreach (VAR ${CACHE_VARIABLES})
         if (VAR MATCHES ^EMSCRIPTEN_|CMAKE_CX*_COMPILER)
             set (ENV{${VAR}} ${${VAR}})
+            list (APPEND VARS ${VAR})
         endif ()
     endforeach ()
+    set (ENV{VARS} "${VARS}")   # Stringify to keep the list together
 endif ()
 
 set (WEB 1)
