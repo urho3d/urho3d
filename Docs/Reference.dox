@@ -3091,6 +3091,9 @@ Note: outputting only bone rotations may help when using an animation in a diffe
 
 Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem. The file data can optionally be compressed using the LZ4 compression library.
 
+Use caution when using package files on Android, as the .apk is already a package itself, where arbitrary seeks can perform poorly due to compression already being used. Experimentally it looks that on Android it can be favorable
+to compress the package, because in that case the .apk packaging may skip its own compression, allowing better seek & read performance.
+
 Usage:
 
 \verbatim
