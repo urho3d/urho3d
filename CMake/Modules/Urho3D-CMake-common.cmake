@@ -1281,7 +1281,11 @@ macro (setup_main_executable)
         # Populate all the variables required by resource packaging
         foreach (DIR ${RESOURCE_DIRS})
             get_filename_component (NAME ${DIR} NAME)
-            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
+            if (ANDROID)
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_BINARY_DIR}/assets/${NAME}.pak)
+            else ()
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
+            endif ()
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
                 # Set the custom EMCC_OPTION property to preload the *.pak individually
@@ -1349,10 +1353,6 @@ macro (setup_main_executable)
     list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
 
     if (ANDROID)
-        # todo: Fix this later - Android build tree has a hard-coded resource dirs symlinks
-        if (URHO3D_PACKAGING)
-            message (WARNING "Resource packaging is not fully supported for Android build currently.")
-        endif ()
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
             HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
@@ -1800,11 +1800,13 @@ if (ANDROID)
     endif ()
     # Create symbolic links in the build tree
     file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
-    foreach (I CoreData Data)
-        if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
+    if (NOT URHO3D_PACKAGING)
+        foreach (I CoreData Data)
+            if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
+                create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+            endif ()
+        endforeach ()
+    endif ()
     foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
