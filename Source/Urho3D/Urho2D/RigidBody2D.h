@@ -115,7 +115,7 @@ public:
     void RemoveConstraint2D(Constraint2D* constraint);
 
     /// Return body type.
-    BodyType2D GetBodyType() const { body_ ? (BodyType2D)body_->GetType() : (BodyType2D)bodyDef_.type; }
+    BodyType2D GetBodyType() const { return body_ ? (BodyType2D)body_->GetType() : (BodyType2D)bodyDef_.type; }
 
     /// Return mass.
     float GetMass() const;
@@ -128,22 +128,22 @@ public:
     bool GetUseFixtureMass() const { return useFixtureMass_; }
 
     /// Return linear damping.
-    float GetLinearDamping() const { body_ ? body_->GetLinearDamping() : bodyDef_.linearDamping; }
+    float GetLinearDamping() const { return body_ ? body_->GetLinearDamping() : bodyDef_.linearDamping; }
 
     /// Return angular damping.
-    float GetAngularDamping() const { body_ ? body_->GetAngularDamping() : bodyDef_.angularDamping; }
+    float GetAngularDamping() const { return body_ ? body_->GetAngularDamping() : bodyDef_.angularDamping; }
 
     /// Return allow sleep.
-    bool IsAllowSleep() const { body_ ? body_->IsSleepingAllowed() : bodyDef_.allowSleep; }
+    bool IsAllowSleep() const { return body_ ? body_->IsSleepingAllowed() : bodyDef_.allowSleep; }
 
     /// Return fixed rotation.
-    bool IsFixedRotation() const { body_ ? body_->IsFixedRotation() : bodyDef_.fixedRotation; }
+    bool IsFixedRotation() const { return body_ ? body_->IsFixedRotation() : bodyDef_.fixedRotation; }
 
     /// Return bullet mode.
-    bool IsBullet() const { body_ ? body_->IsBullet() : bodyDef_.bullet; }
+    bool IsBullet() const { return body_ ? body_->IsBullet() : bodyDef_.bullet; }
 
     /// Return gravity scale.
-    float GetGravityScale() const { body_ ? body_->GetGravityScale() : bodyDef_.gravityScale; }
+    float GetGravityScale() const { return body_ ? body_->GetGravityScale() : bodyDef_.gravityScale; }
 
     /// Return awake.
     bool IsAwake() const;
