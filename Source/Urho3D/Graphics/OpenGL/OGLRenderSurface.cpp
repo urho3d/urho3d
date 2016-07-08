@@ -51,51 +51,6 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
 {
 }
 
-RenderSurface::~RenderSurface()
-{
-    Release();
-}
-
-void RenderSurface::SetNumViewports(unsigned num)
-{
-    viewports_.Resize(num);
-}
-
-void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
-{
-    if (index >= viewports_.Size())
-        viewports_.Resize(index + 1);
-
-    viewports_[index] = viewport;
-}
-
-void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode)
-{
-    updateMode_ = mode;
-}
-
-void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
-{
-    if (renderTarget != this)
-        linkedRenderTarget_ = renderTarget;
-}
-
-void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
-{
-    if (depthStencil != this)
-        linkedDepthStencil_ = depthStencil;
-}
-
-void RenderSurface::QueueUpdate()
-{
-    updateQueued_ = true;
-}
-
-void RenderSurface::ResetUpdateQueued()
-{
-    updateQueued_ = false;
-}
-
 bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
 {
     Graphics* graphics = parentTexture_->GetGraphics();
@@ -157,31 +112,6 @@ void RenderSurface::Release()
     }
 
     renderBuffer_ = 0;
-}
-
-int RenderSurface::GetWidth() const
-{
-    return parentTexture_->GetWidth();
-}
-
-int RenderSurface::GetHeight() const
-{
-    return parentTexture_->GetHeight();
-}
-
-TextureUsage RenderSurface::GetUsage() const
-{
-    return parentTexture_->GetUsage();
-}
-
-Viewport* RenderSurface::GetViewport(unsigned index) const
-{
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
-}
-
-void RenderSurface::SetTarget(unsigned target)
-{
-    target_ = target;
 }
 
 }

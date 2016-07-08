@@ -39,68 +39,19 @@
 namespace Urho3D
 {
 
-Texture2D::Texture2D(Context* context) :
-    Texture(context)
+void Texture2D::OnDeviceLost()
 {
+    // No-op on Direct3D11
 }
 
-Texture2D::~Texture2D()
+void Texture2D::OnDeviceReset()
 {
-    Release();
-}
-
-void Texture2D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture2D>();
-}
-
-bool Texture2D::BeginLoad(Deserializer& source)
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // Load the image data for EndLoad()
-    loadImage_ = new Image(context_);
-    if (!loadImage_->Load(source))
-    {
-        loadImage_.Reset();
-        return false;
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-        loadImage_->PrecalculateLevels();
-
-    // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
-    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
-
-    return true;
-}
-
-bool Texture2D::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    bool success = SetData(loadImage_);
-
-    loadImage_.Reset();
-    loadParameters_.Reset();
-
-    return success;
+    // No-op on Direct3D11
 }
 
 void Texture2D::Release()
 {
-    if (graphics_ && object_)
+    if (graphics_ && object_.ptr_)
     {
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
@@ -112,53 +63,16 @@ void Texture2D::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
-}
-
-bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative texture dimensions");
-        return false;
-    }
-
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-    usage_ = usage;
-
-    if (usage_ == TEXTURE_RENDERTARGET || usage_ == TEXTURE_DEPTHSTENCIL)
-    {
-        renderSurface_ = new RenderSurface(this);
-
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
-    }
-    else if (usage_ == TEXTURE_DYNAMIC)
-        requestedLevels_ = 1;
-
-    if (usage_ == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
-    width_ = width;
-    height_ = height;
-    format_ = format;
-
-    return Create();
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -211,7 +125,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -222,7 +136,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         {
             for (int row = 0; row < height; ++row)
                 memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
@@ -235,7 +149,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         destBox.front = 0;
         destBox.back = 1;
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, 0);
     }
 
@@ -366,7 +280,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -416,7 +330,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = 1;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -470,7 +384,7 @@ bool Texture2D::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
@@ -481,7 +395,7 @@ bool Texture2D::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
@@ -497,7 +411,7 @@ bool Texture2D::Create()
         renderTargetViewDesc.Format = textureDesc.Format;
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
-        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_.ptr_, &renderTargetViewDesc,
             (ID3D11RenderTargetView**)&renderSurface_->renderTargetView_);
         if (FAILED(hr))
         {
@@ -513,7 +427,7 @@ bool Texture2D::Create()
         depthStencilViewDesc.Format = (DXGI_FORMAT)GetDSVFormat(textureDesc.Format);
         depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_.ptr_, &depthStencilViewDesc,
             (ID3D11DepthStencilView**)&renderSurface_->renderTargetView_);
         if (FAILED(hr))
         {
@@ -524,7 +438,7 @@ bool Texture2D::Create()
 
         // Create also a read-only version of the view for simultaneous depth testing and sampling in shader
         depthStencilViewDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
-        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_, &depthStencilViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_.ptr_, &depthStencilViewDesc,
             (ID3D11DepthStencilView**)&renderSurface_->readOnlyView_);
         if (FAILED(hr))
         {
@@ -534,17 +448,6 @@ bool Texture2D::Create()
     }
 
     return true;
-}
-
-void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
-    {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->QueueRenderSurface(renderSurface_);
-        renderSurface_->ResetUpdateQueued();
-    }
 }
 
 }

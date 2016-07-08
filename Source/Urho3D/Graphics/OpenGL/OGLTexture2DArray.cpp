@@ -43,107 +43,6 @@
 namespace Urho3D
 {
 
-Texture2DArray::Texture2DArray(Context* context) :
-    Texture(context),
-    layers_(0)
-{
-#ifndef GL_ES_VERSION_2_0
-    target_ = GL_TEXTURE_2D_ARRAY;
-#else
-    target_ = 0;
-#endif
-}
-
-Texture2DArray::~Texture2DArray()
-{
-    Release();
-}
-
-void Texture2DArray::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture2DArray>();
-}
-
-bool Texture2DArray::BeginLoad(Deserializer& source)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If device is lost, retry later
-    if (graphics_->IsDeviceLost())
-    {
-        URHO3D_LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
-        return true;
-    }
-
-    cache->ResetDependencies(this);
-
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-
-    loadParameters_ = (new XMLFile(context_));
-    if (!loadParameters_->Load(source))
-    {
-        loadParameters_.Reset();
-        return false;
-    }
-
-    loadImages_.Clear();
-
-    XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement layerElem = textureElem.GetChild("layer");
-    while (layerElem)
-    {
-        String name = layerElem.GetAttribute("name");
-
-        // If path is empty, add the XML file path
-        if (GetPath(name).Empty())
-            name = texPath + name;
-
-        loadImages_.Push(cache->GetTempResource<Image>(name));
-        cache->StoreResourceDependency(this, name);
-
-        layerElem = layerElem.GetNext("layer");
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-    {
-        for (unsigned i = 0; i < loadImages_.Size(); ++i)
-        {
-            if (loadImages_[i])
-                loadImages_[i]->PrecalculateLevels();
-        }
-    }
-
-    return true;
-}
-
-bool Texture2DArray::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    SetLayers(loadImages_.Size());
-
-    for (unsigned i = 0; i < loadImages_.Size(); ++i)
-        SetData(i, loadImages_[i]);
-
-    loadImages_.Clear();
-    loadParameters_.Reset();
-
-    return true;
-}
-
 void Texture2DArray::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
@@ -154,14 +53,14 @@ void Texture2DArray::OnDeviceLost()
 
 void Texture2DArray::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -173,7 +72,7 @@ void Texture2DArray::OnDeviceReset()
 
 void Texture2DArray::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -186,73 +85,21 @@ void Texture2DArray::Release()
                     graphics_->SetTexture(i, 0);
             }
 
-            glDeleteTextures(1, &object_);
+            glDeleteTextures(1, &object_.name_);
         }
 
         if (renderSurface_)
             renderSurface_->Release();
 
-        object_ = 0;
+        object_.name_ = 0;
     }
-}
-
-void Texture2DArray::SetLayers(unsigned layers)
-{
-    Release();
-
-    layers_ = layers;
-}
-
-bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative texture array size");
-        return false;
-    }
-    if (usage == TEXTURE_DEPTHSTENCIL)
-    {
-        URHO3D_LOGERROR("Depth-stencil usage not supported for texture arrays");
-        return false;
-    }
-
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-
-    usage_ = usage;
-
-    if (usage == TEXTURE_RENDERTARGET)
-    {
-        renderSurface_ = new RenderSurface(this);
-
-        // Nearest filtering and mipmaps disabled by default
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
-    }
-
-    if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2DArray, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
-    width_ = width;
-    height_ = height;
-    format_ = format;
-    if (layers)
-        layers_ = layers;
-
-    layerMemoryUse_.Resize(layers_);
-    for (unsigned i = 0; i < layers_; ++i)
-        layerMemoryUse_[i] = 0;
-
-    return Create();
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("Texture array not created, can not set data");
         return false;
@@ -420,7 +267,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -476,7 +323,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.name_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -519,7 +366,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("Texture array not created, can not get data");
         return false;
@@ -582,7 +429,7 @@ bool Texture2DArray::Create()
         return true;
     }
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);
@@ -604,17 +451,7 @@ bool Texture2DArray::Create()
         URHO3D_LOGERROR("Failed to create texture array");
 
     // Set mipmapping
-    levels_ = requestedLevels_;
-    if (!levels_)
-    {
-        unsigned maxSize = (unsigned)Max(width_, height_);
-        while (maxSize)
-        {
-            maxSize >>= 1;
-            ++levels_;
-        }
-    }
-
+    levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
 
@@ -624,17 +461,6 @@ bool Texture2DArray::Create()
 
     return success;
 #endif
-}
-
-void Texture2DArray::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
-    {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->QueueRenderSurface(renderSurface_);
-        renderSurface_->ResetUpdateQueued();
-    }
 }
 
 }
