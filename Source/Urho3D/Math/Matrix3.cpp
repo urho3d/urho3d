@@ -38,16 +38,19 @@ const Matrix3 Matrix3::ZERO(
 
 const Matrix3 Matrix3::IDENTITY;
 
+float Matrix3::Determinant() const
+{
+    return m00_ * m11_ * m22_ +
+           m10_ * m21_ * m02_ +
+           m20_ * m01_ * m12_ -
+           m20_ * m11_ * m02_ -
+           m10_ * m01_ * m22_ -
+           m00_ * m21_ * m12_;
+}
+
 Matrix3 Matrix3::Inverse() const
 {
-    float det = m00_ * m11_ * m22_ +
-                m10_ * m21_ * m02_ +
-                m20_ * m01_ * m12_ -
-                m20_ * m11_ * m02_ -
-                m10_ * m01_ * m22_ -
-                m00_ * m21_ * m12_;
-
-    float invDet = 1.0f / det;
+    float invDet = 1.0f / Determinant();
 
     return Matrix3(
         (m11_ * m22_ - m21_ * m12_) * invDet,

@@ -108,7 +108,7 @@ private:
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
-
+public: // TODO remove
     PODVector<GravityVector*> gravityVectors_;
 
     float gravity_;
