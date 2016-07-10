@@ -23,7 +23,6 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
