@@ -149,7 +149,10 @@ void MessageBox::RemoveWindow()
     {
         Window* window = dynamic_cast<Window*>(window_.Get());
         if (window)
+        {
+            UnsubscribeFromEvent(E_MODALCHANGED);
             window->SetModal(false);
+        }
         RemoveChild(window_);
         window_.Reset();
     }
