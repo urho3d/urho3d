@@ -30,6 +30,7 @@ namespace Urho3D
 class Context;
 class DebugRenderer;
 class GravityVector;
+class TetrahedralMesh;
 
 
 /*!
@@ -108,8 +109,9 @@ private:
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
     void HandleNodeAdded(StringHash eventType, VariantMap& eventData);
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
-public: // TODO remove
+
     PODVector<GravityVector*> gravityVectors_;
+    SharedPtr<TetrahedralMesh> tetrahedralMesh_;
 
     float gravity_;
 };

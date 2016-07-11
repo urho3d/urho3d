@@ -24,6 +24,7 @@
 #include "../IceWeaselMods/Gravity.h"
 #include "../IceWeaselMods/GravityVector.h"
 #include "../IceWeaselMods/IceWeasel.h"
+#include "../IceWeaselMods/TetrahedralMesh.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Node.h"
 
@@ -58,6 +59,7 @@ void Gravity::RegisterObject(Context* context)
 // ----------------------------------------------------------------------------
 Vector3 Gravity::QueryGravity(Vector3 worldLocation)
 {
+    /*
     // TODO Really shitty method of finding closest node
     float distance = std::numeric_limits<float>::max();
     PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
@@ -76,7 +78,16 @@ Vector3 Gravity::QueryGravity(Vector3 worldLocation)
     if(foundGravityVector == NULL)
         return Vector3::DOWN * gravity_;
 
-    return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;
+    return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;*/
+
+    // No node was found? No gravity nodes exist. Provide default vector
+    if(!tetrahedralMesh_)
+        return Vector3::DOWN * gravity_;
+
+    Vector4 bary;
+    Tetrahedron* tetrahedron = tetrahedralMesh_->Query(worldLocation);
+    if(!tetrahedron)
+        return Vector3::DOWN * gravity_;
 }
 
 // ----------------------------------------------------------------------------
@@ -90,7 +101,13 @@ void Gravity::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 // ----------------------------------------------------------------------------
 void Gravity::RebuildTetrahedralMesh()
 {
-    // TODO Build tetrahedral mesh from gravity probes
+    Vector<Vector3> pointList;
+    PODVector<GravityVector*>::ConstIterator gravityVector = gravityVectors_.Begin();
+    pointList.Reserve(gravityVectors_.Size());
+    for(; gravityVector != gravityVectors_.End(); ++gravityVector)
+        pointList.Push((*gravityVector)->GetPosition());
+
+    tetrahedralMesh_->Build(pointList);
 }
 
 // ----------------------------------------------------------------------------
