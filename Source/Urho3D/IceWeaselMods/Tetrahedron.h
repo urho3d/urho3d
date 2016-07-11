@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Urho3D/Math/Vector3.h>
-#include <Urho3D/Math/Vector4.h>
-#include <Urho3D/Math/Matrix4.h>
+#include "../Math/Vector3.h"
+#include "../Math/Vector4.h"
+#include "../Math/Matrix4.h"
 
 
 namespace Urho3D
 {
 
-class DebugRenderer;
 class Color;
+class DebugRenderer;
 
 
 class Tetrahedron
@@ -22,23 +22,17 @@ public:
      * @brief Constructs a tetrahedron from 4 vertex locations in cartesian
      * space.
      */
-    Tetrahedron(const Vector3& v0,
-                const Vector3& v1,
-                const Vector3& v2,
-                const Vector3& v3);
-
-    void SetValues(const Vector3& value0,
-                   const Vector3& value1,
-                   const Vector3& value2,
-                   const Vector3& value3);
+    Tetrahedron(const Vector3 vertices[4],
+                const Vector3 directions[4],
+                const float forceFactors[4]);
 
     /*!
      * @brief Returns true if the specified 3D point lies inside the
      * tetrahedron.
      */
-    bool PointLiesInside(const Vector3& point) const
+    bool PointLiesInside(const Vector3& cartesian) const
     {
-        return PointLiesInside(TransformToBarycentric(point));
+        return PointLiesInside(TransformToBarycentric(cartesian));
     }
 
     /*!
@@ -62,9 +56,9 @@ public:
      * This is useful for checking if point lies inside the tetrahedron, or for
      * interpolating values.
      */
-    Vector4 TransformToBarycentric(const Vector3& point) const
+    Vector4 TransformToBarycentric(const Vector3& cartesian) const
     {
-        return transform_ * Vector4(point, 1.0f);
+        return transform_ * Vector4(cartesian, 1.0f);
     }
 
     Vector3 TransformToCartesian(const Vector4& barycentric) const
@@ -75,23 +69,30 @@ public:
                barycentric.w_ * vertices_[3];
     }
 
-    Vector3 interpolate(const Vector3& point) const
-    {
-        return interpolate(TransformToBarycentric(point));
-    }
-
-    Vector3 interpolate(const Vector4& barycentric) const
-    {
-        return barycentric.x_ * value_[0] +
-               barycentric.y_ * value_[1] +
-               barycentric.z_ * value_[2] +
-               barycentric.w_ * value_[3];
-    }
-
     Vector3 GetVertexPosition(unsigned vertexID) const
     {
         assert(vertexID < 4);
         return vertices_[vertexID];
+    }
+
+    Vector3 Interpolate(const Vector3& cartesian) const
+    {
+        return Interpolate(TransformToBarycentric(cartesian));
+    }
+
+    Vector3 Interpolate(const Vector4& barycentric) const
+    {
+        return (
+            directions_[0] * barycentric.x_ +
+            directions_[1] * barycentric.x_ +
+            directions_[2] * barycentric.x_ +
+            directions_[3] * barycentric.x_
+        ).Normalized() * (
+            forceFactors_[0] * barycentric.x_ +
+            forceFactors_[1] * barycentric.x_ +
+            forceFactors_[2] * barycentric.x_ +
+            forceFactors_[3] * barycentric.x_
+        );
     }
 
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color);
@@ -101,7 +102,9 @@ private:
     Matrix4 CalculateBarycentricTransformationMatrix() const;
 
     Vector3 vertices_[4];
-    Vector3 value_[4];
+    Vector3 directions_[4];
+    float forceFactors_[4];
+
     Matrix4 transform_;
 };
 

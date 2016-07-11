@@ -9,29 +9,32 @@ namespace Urho3D
 {
 
 // ----------------------------------------------------------------------------
-Tetrahedron::Tetrahedron(const Vector3& v0,
-                         const Vector3& v1,
-                         const Vector3& v2,
-                         const Vector3& v3)
+Tetrahedron::Tetrahedron(const Vector3 vertices[4],
+                         const Vector3 directions[4],
+                         const float forceFactors[4])
 {
-    vertices_[0] = v0;
-    vertices_[1] = v1;
-    vertices_[2] = v2;
-    vertices_[3] = v3;
+    vertices_[0]         = *vertices++;
+    vertices_[1]         = *vertices++;
+    vertices_[2]         = *vertices++;
+    vertices_[3]         = *vertices++;
+
+    if(directions)
+    {
+        directions_[0]   = *directions++;
+        directions_[1]   = *directions++;
+        directions_[2]   = *directions++;
+        directions_[3]   = *directions++;
+    }
+
+    if(forceFactors)
+    {
+        forceFactors_[0] = *forceFactors++;
+        forceFactors_[1] = *forceFactors++;
+        forceFactors_[2] = *forceFactors++;
+        forceFactors_[3] = *forceFactors++;
+    }
 
     transform_ = CalculateBarycentricTransformationMatrix();
-}
-
-// ----------------------------------------------------------------------------
-void Tetrahedron::SetValues(const Vector3& value0,
-                            const Vector3& value1,
-                            const Vector3& value2,
-                            const Vector3& value3)
-{
-    value_[0] = value0;
-    value_[1] = value1;
-    value_[2] = value2;
-    value_[3] = value3;
 }
 
 // ----------------------------------------------------------------------------

@@ -35,6 +35,7 @@ namespace Urho3D
 // ----------------------------------------------------------------------------
 Gravity::Gravity(Context* context)
     : Component(context),
+    tetrahedralMesh_(new TetrahedralMesh),
     gravity_(9.81f)
 {
     SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(Gravity, HandleComponentAdded));
@@ -85,9 +86,12 @@ Vector3 Gravity::QueryGravity(Vector3 worldLocation)
         return Vector3::DOWN * gravity_;
 
     Vector4 bary;
-    Tetrahedron* tetrahedron = tetrahedralMesh_->Query(worldLocation);
+    const Tetrahedron* tetrahedron = tetrahedralMesh_->Query(&bary, worldLocation);
     if(!tetrahedron)
         return Vector3::DOWN * gravity_;
+
+    Vector3 interpolatedGravity = tetrahedron->Interpolate(bary);
+    return interpolatedGravity * gravity_;
 }
 
 // ----------------------------------------------------------------------------
@@ -101,13 +105,7 @@ void Gravity::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 // ----------------------------------------------------------------------------
 void Gravity::RebuildTetrahedralMesh()
 {
-    Vector<Vector3> pointList;
-    PODVector<GravityVector*>::ConstIterator gravityVector = gravityVectors_.Begin();
-    pointList.Reserve(gravityVectors_.Size());
-    for(; gravityVector != gravityVectors_.End(); ++gravityVector)
-        pointList.Push((*gravityVector)->GetPosition());
-
-    tetrahedralMesh_->Build(pointList);
+    tetrahedralMesh_->Build(gravityVectors_);
 }
 
 // ----------------------------------------------------------------------------

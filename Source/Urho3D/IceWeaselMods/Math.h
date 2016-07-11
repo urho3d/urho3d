@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Urho3D/Math/Vector3.h>
-#include <Urho3D/Math/Matrix3.h>
+#include "../Math/Vector3.h"
+#include "../Math/Matrix3.h"
 
 namespace Urho3D
 {

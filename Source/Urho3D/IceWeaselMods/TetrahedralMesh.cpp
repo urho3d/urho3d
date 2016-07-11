@@ -1,6 +1,7 @@
 #include "../IceWeaselMods/TetrahedralMesh.h"
 #include "../IceWeaselMods/Tetrahedron.h"
 #include "../IceWeaselMods/Math.h"
+#include "../IceWeaselMods/GravityVector.h"
 
 #include "../Container/Ptr.h"
 #include "../Graphics/DebugRenderer.h"
@@ -17,16 +18,22 @@ namespace internal {
 class Vertex : public RefCounted
 {
 public:
-    Vertex(const Vector3& position) : position_(position) {}
+    Vertex(const Vector3& position, const Vector3& direction=Vector3::ZERO, float forceFactor=0.0f) :
+        position_(position),
+        direction_(direction),
+        forceFactor_(forceFactor)
+    {}
     Vector3 position_;
+    Vector3 direction_;
+    float forceFactor_;
 };
 
 class Tetrahedron : public RefCounted
 {
 public:
     Tetrahedron();
-    Tetrahedron(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4) { Set(v1, v2, v3, v4); }
-    void Set(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4) {
+    Tetrahedron(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* v4)
+    {
         v_[0] = v1; v_[1] = v2; v_[2] = v3; v_[3] = v4;
         circumscibedSphereCenter_ = Math::CircumscribeSphere(v1->position_, v2->position_, v3->position_, v4->position_);
     }
@@ -61,19 +68,21 @@ public:
 } // namespace internal
 
 // ----------------------------------------------------------------------------
-static internal::Tetrahedron* ConstructSuperTetrahedron(const Vector<Vector3>& pointList)
+static internal::Tetrahedron* ConstructSuperTetrahedron(const PODVector<GravityVector*>& gravityVectors)
 {
     // Compute bounding box
     BoundingBox aabb;
-    Vector<Vector3>::ConstIterator it = pointList.Begin();
-    for(; it != pointList.End(); ++it)
+    for(PODVector<GravityVector*>::ConstIterator it = gravityVectors.Begin();
+        it != gravityVectors.End();
+        ++it)
     {
-        if(aabb.min_.x_ > it->x_) aabb.min_.x_ = it->x_;
-        if(aabb.min_.y_ > it->y_) aabb.min_.y_ = it->y_;
-        if(aabb.min_.z_ > it->z_) aabb.min_.z_ = it->z_;
-        if(aabb.max_.x_ < it->x_) aabb.max_.x_ = it->x_;
-        if(aabb.max_.y_ < it->y_) aabb.max_.y_ = it->y_;
-        if(aabb.max_.z_ < it->z_) aabb.max_.z_ = it->z_;
+        const Vector3& pos = (*it)->GetPosition();
+        if(aabb.min_.x_ > pos.x_) aabb.min_.x_ = pos.x_;
+        if(aabb.min_.y_ > pos.y_) aabb.min_.y_ = pos.y_;
+        if(aabb.min_.z_ > pos.z_) aabb.min_.z_ = pos.z_;
+        if(aabb.max_.x_ < pos.x_) aabb.max_.x_ = pos.x_;
+        if(aabb.max_.y_ < pos.y_) aabb.max_.y_ = pos.y_;
+        if(aabb.max_.z_ < pos.z_) aabb.max_.z_ = pos.z_;
     }
 
     // Expand bounding box by factor 3 plus a small error margin
@@ -94,13 +103,13 @@ static internal::Tetrahedron* ConstructSuperTetrahedron(const Vector<Vector3>& p
 }
 
 // ----------------------------------------------------------------------------
-TetrahedralMesh::TetrahedralMesh(const Vector<Vector3>& pointList)
+TetrahedralMesh::TetrahedralMesh(const PODVector<GravityVector*>& gravityVectors)
 {
-    Build(pointList);
+    Build(gravityVectors);
 }
 
 // ----------------------------------------------------------------------------
-const Tetrahedron* TetrahedralMesh::Query(const Vector3& position, Vector4* barycentric) const
+const Tetrahedron* TetrahedralMesh::Query(Vector4* barycentric, const Vector3& position) const
 {
     // Use a linear search for now. Can optimise later
     Vector<Tetrahedron>::ConstIterator tetrahedron = tetrahedrons_.Begin();
@@ -202,37 +211,45 @@ static void CreatePolyhedronFromBadTetrahedrons(Vector<internal::Vertex*>* polyh
 }
 
 // ----------------------------------------------------------------------------
-void TetrahedralMesh::Build(const Vector<Vector3>& pointList)
+void TetrahedralMesh::Build(const PODVector<GravityVector*>& gravityVectors)
 {
     tetrahedrons_.Clear();
 
     // Create triangulation list and add super tetrahedron to it.
     Vector<SharedPtr<internal::Tetrahedron> > triangulationResult;
-    SharedPtr<internal::Tetrahedron> superTetrahedron(ConstructSuperTetrahedron(pointList));
+    SharedPtr<internal::Tetrahedron> superTetrahedron(ConstructSuperTetrahedron(gravityVectors));
     triangulationResult.Push(superTetrahedron);
 
     Vector<SharedPtr<internal::Tetrahedron> > badTetrahedrons;
     Vector<internal::Vertex*> polyhedron;
 
-    Vector<Vector3>::ConstIterator point = pointList.Begin();
-    for(; point != pointList.End(); ++point)
+    for(PODVector<GravityVector*>::ConstIterator gravityVectorsIt = gravityVectors.Begin();
+        gravityVectorsIt != gravityVectors.End();
+        ++gravityVectorsIt)
     {
+        GravityVector* gravityVector = *gravityVectorsIt;
+
         // First find all tetrahedrons that are no longer valid due to the insertion
-        FindBadTetrahedrons(&badTetrahedrons, triangulationResult, *point);
+        FindBadTetrahedrons(&badTetrahedrons, triangulationResult, gravityVector->GetPosition());
 
         // Find the boundary of the hole
         CreatePolyhedronFromBadTetrahedrons(&polyhedron, badTetrahedrons);
 
         // Remove bad tetrahedrons from triangulation
-        Vector<SharedPtr<internal::Tetrahedron> >::ConstIterator tetrahedron = badTetrahedrons.Begin();
-        for(; tetrahedron != badTetrahedrons.End(); ++tetrahedron)
+        for(Vector<SharedPtr<internal::Tetrahedron> >::ConstIterator tetrahedronIt = badTetrahedrons.Begin();
+            tetrahedronIt != badTetrahedrons.End();
+            ++tetrahedronIt)
         {
-            triangulationResult.Remove(*tetrahedron);
+            triangulationResult.Remove(*tetrahedronIt);
         }
 
         // Re-triangulate the hole
         Vector<internal::Vertex*>::Iterator vertex = polyhedron.Begin();
-        SharedPtr<internal::Vertex> connectToVertex(new internal::Vertex(*point));
+        SharedPtr<internal::Vertex> connectToVertex(new internal::Vertex(
+            gravityVector->GetPosition(),
+            gravityVector->GetDirection(),
+            gravityVector->GetForceFactor()
+        ));
         while(vertex != polyhedron.End())
         {
             internal::Vertex* v1 = *vertex++;
@@ -248,18 +265,30 @@ void TetrahedralMesh::Build(const Vector<Vector3>& pointList)
     for(; tetIt != triangulationResult.End(); ++tetIt)
     {
         internal::Tetrahedron* t = *tetIt;
+        Vector3 vertices[4] = {
+            t->v_[0]->position_,
+            t->v_[1]->position_,
+            t->v_[2]->position_,
+            t->v_[3]->position_};
+        Vector3 directions[4] = {
+            t->v_[0]->direction_,
+            t->v_[1]->direction_,
+            t->v_[2]->direction_,
+            t->v_[3]->direction_
+        };
+        float forceFactors[4] = {
+            t->v_[0]->forceFactor_,
+            t->v_[1]->forceFactor_,
+            t->v_[2]->forceFactor_,
+            t->v_[3]->forceFactor_
+        };
 
         for(int i = 0; i != 4; ++i)
             for(int j = 0; j != 4; ++j)
                 if(t->v_[i] == superTetrahedron->v_[j])
                     goto break_skip;
 
-        tetrahedrons_.Push(Tetrahedron(
-            t->v_[0]->position_,
-            t->v_[1]->position_,
-            t->v_[2]->position_,
-            t->v_[3]->position_
-        ));
+        tetrahedrons_.Push(Tetrahedron(vertices, directions, forceFactors));
 
         break_skip: continue;
     }
