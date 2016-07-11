@@ -23,7 +23,6 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
@@ -39,7 +38,7 @@ namespace Urho3D
 
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,
     XMLFile* styleFile) :
-    Object(context),
+    UIElement(context),
     titleText_(0),
     messageText_(0),
     okButton_(0)
@@ -53,11 +52,16 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             return;         // Note: windowless MessageBox should not be used!
     }
 
+    // MessageBox itself doesn't render anything. Add self to UI root for lifetime management
     UI* ui = GetSubsystem<UI>();
     window_ = ui->LoadLayout(layoutFile, styleFile);
     if (!window_)   // Error is already logged
         return;
-    ui->GetRoot()->AddChild(window_);
+
+    AddChild(window_);
+    UIElement* root = ui->GetRoot();
+    // Add self to UI hierarchy for lifetime management
+    root->AddChild(this);
 
     // Set the title and message strings if they are given
     titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
@@ -71,15 +75,8 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     Window* window = dynamic_cast<Window*>(window_.Get());
     if (window)
     {
-        Graphics* graphics = GetSubsystem<Graphics>();  // May be null if headless
-        if (graphics)
-        {
-            const IntVector2& size = window->GetSize();
-            window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
-        }
-        else
-            URHO3D_LOGWARNING("Instantiating a modal window in headless mode!");
-
+        const IntVector2& size = window->GetSize();
+        window->SetPosition((root->GetWidth() - size.x_) / 2, (root->GetHeight() - size.y_) / 2);
         window->SetModal(true);
         SubscribeToEvent(window, E_MODALCHANGED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
@@ -101,8 +98,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
 
 MessageBox::~MessageBox()
 {
-    if (window_)
-        window_->Remove();
+    RemoveWindow();
 }
 
 void MessageBox::RegisterObject(Context* context)
@@ -140,7 +136,26 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
     newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
     SendEvent(E_MESSAGEACK, newEventData);
 
-    this->ReleaseRef();
+    // Remove the modal window now
+    RemoveWindow();
+
+    // Remove self from UI hierarchy. This should cause destruction of self in case no other strong refs exist
+    Remove();
+}
+
+void MessageBox::RemoveWindow()
+{
+    if (window_)
+    {
+        Window* window = dynamic_cast<Window*>(window_.Get());
+        if (window)
+        {
+            UnsubscribeFromEvent(E_MODALCHANGED);
+            window->SetModal(false);
+        }
+        RemoveChild(window_);
+        window_.Reset();
+    }
 }
 
 }

@@ -3485,7 +3485,7 @@ Properties:
 - int acceleratorQualifiers (readonly)
 
 <a name="Class_MessageBox"></a>
-### MessageBox : Object
+### MessageBox : UIElement
 
 Methods:
 

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../Core/Object.h"
+#include "../UI/UIElement.h"
 
 namespace Urho3D
 {
@@ -32,10 +32,10 @@ class Text;
 class UIElement;
 class XMLFile;
 
-/// Message box dialog.
-class URHO3D_API MessageBox : public Object
+/// Message box dialog. Manages its lifetime automatically using the UI hierarchy, so the application does not need to hold a reference to it, and shouldn't attempt to destroy it manually.
+class URHO3D_API MessageBox : public UIElement
 {
-    URHO3D_OBJECT(MessageBox, Object);
+    URHO3D_OBJECT(MessageBox, UIElement);
 
 public:
     /// Construct. If layout file is not given, use the default message box layout. If style file is not given, use the default style file from root UI element.
@@ -60,6 +60,8 @@ public:
     UIElement* GetWindow() const { return window_; }
 
 private:
+    /// Remove the dialog window from the UI hierarchy.
+    void RemoveWindow();
     /// Handle events that dismiss the message box.
     void HandleMessageAcknowledged(StringHash eventType, VariantMap& eventData);
 

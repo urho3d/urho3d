@@ -1032,11 +1032,14 @@ static XMLFile* UIElementGetDefaultStyle(UIElement* ptr)
 #endif
 
 /// Template function for registering a class derived from UIElement.
-template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className, bool isSprite = false)
+template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* className, bool isSprite = false, bool registerConstructor = true)
 {
     RegisterAnimatable<T>(engine, className);
-    RegisterObjectConstructor<T>(engine, className);
-    RegisterNamedObjectConstructor<T>(engine, className);
+    if (registerConstructor)
+    {
+        RegisterObjectConstructor<T>(engine, className);
+        RegisterNamedObjectConstructor<T>(engine, className);
+    }
     RegisterSubclass<UIElement, T>(engine, "UIElement", className);
     engine->RegisterObjectMethod(className, "bool LoadXML(const XMLElement&in, XMLFile@+, bool arg2 = false)", asMETHODPR(T, LoadXML, (const XMLElement&, XMLFile*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
