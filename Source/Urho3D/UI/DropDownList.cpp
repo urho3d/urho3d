@@ -189,7 +189,7 @@ void DropDownList::SetSelection(unsigned index)
 
 void DropDownList::SetPlaceholderText(const String& text)
 {
-    static_cast<Text*>(placeholder_->GetChild(0))->SetText(text);
+    placeholder_->GetChildStaticCast<Text>(0)->SetText(text);
 }
 
 void DropDownList::SetResizePopup(bool enable)
@@ -224,7 +224,7 @@ UIElement* DropDownList::GetSelectedItem() const
 
 const String& DropDownList::GetPlaceholderText() const
 {
-    return static_cast<Text*>(placeholder_->GetChild(0))->GetText();
+    return placeholder_->GetChildStaticCast<Text>(0)->GetText();
 }
 
 void DropDownList::SetSelectionAttr(unsigned index)

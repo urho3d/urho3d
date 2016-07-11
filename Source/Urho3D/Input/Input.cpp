@@ -987,7 +987,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             ++numButtons;
 
             // Check whether the button has key binding
-            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1014,7 +1014,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             }
 
             // Check whether the button has mouse button binding
-            text = dynamic_cast<Text*>(element->GetChild("MouseButtonBinding", false));
+            text = element->GetChildDynamicCast<Text>("MouseButtonBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1039,7 +1039,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
         {
             ++numHats;
 
-            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
