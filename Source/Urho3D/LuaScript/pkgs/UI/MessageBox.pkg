@@ -1,6 +1,6 @@
 $#include "UI/MessageBox.h"
 
-class MessageBox : public UIElement
+class MessageBox : public Object
 {
     MessageBox(const String messageString = String::EMPTY, const String titleString = String::EMPTY, XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
     virtual ~MessageBox();

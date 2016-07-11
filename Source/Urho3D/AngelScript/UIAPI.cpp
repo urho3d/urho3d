@@ -500,8 +500,7 @@ static MessageBox* ConstructMessageBox(const String& messageString, const String
 
 static void RegisterMessageBox(asIScriptEngine* engine)
 {
-    // Do not register default UIElement constructor due to possible ambiguity with the Messagebox parameter constructor
-    RegisterUIElement<MessageBox>(engine, "MessageBox", false, false);
+    RegisterObject<MessageBox>(engine, "MessageBox");
     engine->RegisterObjectBehaviour("MessageBox", asBEHAVE_FACTORY, "MessageBox@+ f(const String&in messageString = String(), const String&in titleString = String(), XMLFile@+ layoutFile = null, XMLFile@+ styleFile = null)", asFUNCTION(ConstructMessageBox), asCALL_CDECL);
     engine->RegisterObjectMethod("MessageBox", "void set_title(const String&in)", asMETHOD(MessageBox, SetTitle), asCALL_THISCALL);
     engine->RegisterObjectMethod("MessageBox", "const String& get_title() const", asMETHOD(MessageBox, GetTitle), asCALL_THISCALL);
