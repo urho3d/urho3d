@@ -38,7 +38,8 @@ namespace Urho3D
 
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,
     XMLFile* styleFile) :
-    UIElement(context),
+    Object(context),
+    window_(0),
     titleText_(0),
     messageText_(0),
     okButton_(0)
@@ -52,16 +53,15 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
             return;         // Note: windowless MessageBox should not be used!
     }
 
-    // MessageBox itself doesn't render anything. Add self to UI root for lifetime management
     UI* ui = GetSubsystem<UI>();
-    window_ = ui->LoadLayout(layoutFile, styleFile);
-    if (!window_)   // Error is already logged
-        return;
-
-    AddChild(window_);
     UIElement* root = ui->GetRoot();
-    // Add self to UI hierarchy for lifetime management
-    root->AddChild(this);
+    {
+        SharedPtr<UIElement> holder = ui->LoadLayout(layoutFile, styleFile);
+        if (!holder)    // Error is already logged
+            return;
+        window_ = holder;
+        root->AddChild(window_);    // Take ownership of the object before SharedPtr goes out of scope
+    }
 
     // Set the title and message strings if they are given
     titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
@@ -72,7 +72,7 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
         messageText_->SetText(messageString);
 
     // Center window after the message is set
-    Window* window = dynamic_cast<Window*>(window_.Get());
+    Window* window = dynamic_cast<Window*>(window_);
     if (window)
     {
         const IntVector2& size = window->GetSize();
@@ -94,11 +94,16 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
     if (closeButton)
         SubscribeToEvent(closeButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
+
+    // Increase reference count to keep Self alive
+    AddRef();
 }
 
 MessageBox::~MessageBox()
 {
-    RemoveWindow();
+    // This would remove the UI-element regardless of whether it is parented to UI's root or UI's modal-root
+    if (window_)
+        window_->Remove();
 }
 
 void MessageBox::RegisterObject(Context* context)
@@ -136,26 +141,8 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
     newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
     SendEvent(E_MESSAGEACK, newEventData);
 
-    // Remove the modal window now
-    RemoveWindow();
-
-    // Remove self from UI hierarchy. This should cause destruction of self in case no other strong refs exist
-    Remove();
-}
-
-void MessageBox::RemoveWindow()
-{
-    if (window_)
-    {
-        Window* window = dynamic_cast<Window*>(window_.Get());
-        if (window)
-        {
-            UnsubscribeFromEvent(E_MODALCHANGED);
-            window->SetModal(false);
-        }
-        RemoveChild(window_);
-        window_.Reset();
-    }
+    // Self destruct
+    ReleaseRef();
 }
 
 }
