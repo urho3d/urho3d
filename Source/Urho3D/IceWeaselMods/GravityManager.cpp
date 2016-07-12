@@ -21,10 +21,10 @@
 //
 
 #include "../Core/Context.h"
-#include "../IceWeaselMods/Gravity.h"
+#include "../IceWeaselMods/GravityManager.h"
 #include "../IceWeaselMods/GravityVector.h"
 #include "../IceWeaselMods/IceWeasel.h"
-#include "../IceWeaselMods/TetrahedralMesh.h"
+#include "../IceWeaselMods/GravityMesh.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Node.h"
 
@@ -33,32 +33,32 @@ namespace Urho3D
 
 
 // ----------------------------------------------------------------------------
-Gravity::Gravity(Context* context)
+GravityManager::GravityManager(Context* context)
     : Component(context),
-    tetrahedralMesh_(new TetrahedralMesh),
+    gravityMesh_(new GravityMesh),
     gravity_(9.81f)
 {
-    SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(Gravity, HandleComponentAdded));
-    SubscribeToEvent(E_COMPONENTREMOVED, URHO3D_HANDLER(Gravity, HandleComponentRemoved));
-    SubscribeToEvent(E_NODEADDED, URHO3D_HANDLER(Gravity, HandleNodeAdded));
-    SubscribeToEvent(E_NODEREMOVED, URHO3D_HANDLER(Gravity, HandleNodeRemoved));
+    SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(GravityManager, HandleComponentAdded));
+    SubscribeToEvent(E_COMPONENTREMOVED, URHO3D_HANDLER(GravityManager, HandleComponentRemoved));
+    SubscribeToEvent(E_NODEADDED, URHO3D_HANDLER(GravityManager, HandleNodeAdded));
+    SubscribeToEvent(E_NODEREMOVED, URHO3D_HANDLER(GravityManager, HandleNodeRemoved));
 }
 
 // ----------------------------------------------------------------------------
-Gravity::~Gravity()
+GravityManager::~GravityManager()
 {
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::RegisterObject(Context* context)
+void GravityManager::RegisterObject(Context* context)
 {
-    context->RegisterFactory<Gravity>(ICEWEASELMODS_CATEGORY);
+    context->RegisterFactory<GravityManager>(ICEWEASELMODS_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Global Gravity", GetGlobalGravity, SetGlobalGravity, float, 9.81, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
-Vector3 Gravity::QueryGravity(Vector3 worldLocation)
+Vector3 GravityManager::QueryGravity(Vector3 worldLocation)
 {
     /*
     // TODO Really shitty method of finding closest node
@@ -82,11 +82,11 @@ Vector3 Gravity::QueryGravity(Vector3 worldLocation)
     return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;*/
 
     // No node was found? No gravity nodes exist. Provide default vector
-    if(!tetrahedralMesh_)
+    if(!gravityMesh_)
         return Vector3::DOWN * gravity_;
 
     Vector4 bary;
-    const Tetrahedron* tetrahedron = tetrahedralMesh_->Query(&bary, worldLocation);
+    const GravityTetrahedron* tetrahedron = gravityMesh_->Query(&bary, worldLocation);
     if(!tetrahedron)
         return Vector3::DOWN * gravity_;
 
@@ -95,7 +95,7 @@ Vector3 Gravity::QueryGravity(Vector3 worldLocation)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+void GravityManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
     for(; it != gravityVectors_.End(); ++it)
@@ -103,9 +103,11 @@ void Gravity::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::RebuildTetrahedralMesh()
+void GravityManager::RebuildTetrahedralMesh()
 {
-    tetrahedralMesh_->Build(gravityVectors_);
+    GravityMeshBuilder builder;
+    builder.Build(gravityVectors_);
+    gravityMesh_->SetMesh(builder.GetSharedVertexMesh());
 }
 
 // ----------------------------------------------------------------------------
@@ -122,7 +124,7 @@ void Gravity::RebuildTetrahedralMesh()
  */
 
 // ----------------------------------------------------------------------------
-void Gravity::OnSceneSet(Scene* scene)
+void GravityManager::OnSceneSet(Scene* scene)
 {
     (void)scene;
 
@@ -133,7 +135,7 @@ void Gravity::OnSceneSet(Scene* scene)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::AddGravityVectorsRecursively(Node* node)
+void GravityManager::AddGravityVectorsRecursively(Node* node)
 {
     // Recursively retrieve all nodes that have a gravity probe component and
     // add them to our internal list of gravity probe nodes. Note that it
@@ -151,7 +153,7 @@ void Gravity::AddGravityVectorsRecursively(Node* node)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::RemoveGravityVectorsRecursively(Node* node)
+void GravityManager::RemoveGravityVectorsRecursively(Node* node)
 {
     // Recursively retrieve all nodes that have a gravity probe component
     PODVector<Node*> gravityVectorNodesToRemove;
@@ -171,7 +173,7 @@ void Gravity::RemoveGravityVectorsRecursively(Node* node)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
+void GravityManager::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
 {
     using namespace ComponentAdded;
     (void)eventType;
@@ -191,7 +193,7 @@ void Gravity::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
+void GravityManager::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
 {
     using namespace ComponentRemoved;
     (void)eventType;
@@ -211,7 +213,7 @@ void Gravity::HandleComponentRemoved(StringHash eventType, VariantMap& eventData
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
+void GravityManager::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeAdded;
     (void)eventType;
@@ -226,7 +228,7 @@ void Gravity::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 }
 
 // ----------------------------------------------------------------------------
-void Gravity::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+void GravityManager::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeRemoved;
     (void)eventType;

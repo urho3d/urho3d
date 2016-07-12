@@ -12,19 +12,19 @@ class Color;
 class DebugRenderer;
 
 
-class Tetrahedron
+class GravityTetrahedron
 {
 public:
 
-    Tetrahedron() { assert(false); } // Required for Vector<Tetrahedron>
+    GravityTetrahedron() { assert(false); } // Required for Vector<Tetrahedron>
 
     /*!
      * @brief Constructs a tetrahedron from 4 vertex locations in cartesian
      * space.
      */
-    Tetrahedron(const Vector3 vertices[4],
-                const Vector3 directions[4],
-                const float forceFactors[4]);
+    GravityTetrahedron(const Vector3 vertices[4],
+                       const Vector3 directions[4],
+                       const float forceFactors[4]);
 
     /*!
      * @brief Returns true if the specified 3D point lies inside the

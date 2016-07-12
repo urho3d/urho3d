@@ -22,7 +22,7 @@
 
 #include "../IceWeaselMods/IceWeasel.h"
 #include "../IceWeaselMods/GravityVector.h"
-#include "../IceWeaselMods/Gravity.h"
+#include "../IceWeaselMods/GravityManager.h"
 
 
 namespace Urho3D
@@ -33,7 +33,7 @@ const char* ICEWEASELMODS_CATEGORY = "Ice Weasel";
 // ----------------------------------------------------------------------------
 void RegisterIceWeaselMods(Context* context)
 {
-    Gravity::RegisterObject(context);
+    GravityManager::RegisterObject(context);
     GravityVector::RegisterObject(context);
 }
 

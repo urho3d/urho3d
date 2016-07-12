@@ -2,24 +2,26 @@
 
 #include "../Math/Vector3.h"
 #include "../Container/Ptr.h"
-#include "../IceWeaselMods/Tetrahedron.h"
+#include "../IceWeaselMods/GravityMeshBuilder.h"
+#include "../IceWeaselMods/GravityTetrahedron.h"
 
 
 namespace Urho3D
 {
 
+class DebugRenderer;
 class GravityVector;
 
 
-class TetrahedralMesh : public RefCounted
+class GravityMesh : public RefCounted
 {
 public:
-    TetrahedralMesh() {}
+    GravityMesh() {}
 
     /*!
      * @brief Triangulates the list of 3D positions into a tetrahedral mesh.
      */
-    TetrahedralMesh(const PODVector<GravityVector*>& gravityVectors);
+    GravityMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh);
 
     /*!
      * @brief Queries which tetrahedron a point is located in.
@@ -31,14 +33,14 @@ public:
      * the mesh's hull), then NULL is returned.
      * @param[in] position The position to query.
      */
-    const Tetrahedron* Query(Vector4* barycentric, const Vector3& position) const;
+    const GravityTetrahedron* Query(Vector4* barycentric, const Vector3& position) const;
 
-    void Build(const PODVector<GravityVector*>& gravityVectors);
+    void SetMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh);
 
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos);
 
 private:
-    Vector<Tetrahedron> tetrahedrons_;
+    Vector<GravityTetrahedron> tetrahedrons_;
 };
 
 } // namespace Urho3D

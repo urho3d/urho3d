@@ -30,7 +30,7 @@ namespace Urho3D
 class Context;
 class DebugRenderer;
 class GravityVector;
-class TetrahedralMesh;
+class GravityMesh;
 
 
 /*!
@@ -46,20 +46,20 @@ class TetrahedralMesh;
  * force (defined by this class) and a resulting interpolated vector from
  * nearby gravity probes.
  */
-class URHO3D_API Gravity : public Component
+class URHO3D_API GravityManager : public Component
 {
-    URHO3D_OBJECT(Gravity, Component)
+    URHO3D_OBJECT(GravityManager, Component)
 
 public:
     /*!
      * @brief Creates a new gravity component.
      */
-    Gravity(Context* context);
+    GravityManager(Context* context);
 
     /*!
      * @brief Destructs the gravity component.
      */
-    virtual ~Gravity();
+    virtual ~GravityManager();
 
     /*!
      * @brief Registers this class as an object factory.
@@ -111,7 +111,7 @@ private:
     void HandleNodeRemoved(StringHash eventType, VariantMap& eventData);
 
     PODVector<GravityVector*> gravityVectors_;
-    SharedPtr<TetrahedralMesh> tetrahedralMesh_;
+    SharedPtr<GravityMesh> gravityMesh_;
 
     float gravity_;
 };

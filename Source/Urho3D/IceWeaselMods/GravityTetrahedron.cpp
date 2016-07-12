@@ -1,4 +1,4 @@
-#include "../IceWeaselMods/Tetrahedron.h"
+#include "../IceWeaselMods/GravityTetrahedron.h"
 #include "../IceWeaselMods/Math.h"
 
 #include "../Graphics/DebugRenderer.h"
@@ -9,9 +9,9 @@ namespace Urho3D
 {
 
 // ----------------------------------------------------------------------------
-Tetrahedron::Tetrahedron(const Vector3 vertices[4],
-                         const Vector3 directions[4],
-                         const float forceFactors[4])
+GravityTetrahedron::GravityTetrahedron(const Vector3 vertices[4],
+                                       const Vector3 directions[4],
+                                       const float forceFactors[4])
 {
     vertices_[0]         = *vertices++;
     vertices_[1]         = *vertices++;
@@ -48,7 +48,7 @@ void Tetrahedron::ExtendIntoInfinity(unsigned vertexID)
 }*/
 
 // ----------------------------------------------------------------------------
-Matrix4 Tetrahedron::CalculateSurfaceProjectionMatrix(unsigned excludeVertex) const
+Matrix4 GravityTetrahedron::CalculateSurfaceProjectionMatrix(unsigned excludeVertex) const
 {
     // This function builds a projection matrix that will project a 3D point
     // onto one of the tetrahedron's triangles (namely the face that doesn't
@@ -113,7 +113,7 @@ Matrix4 Tetrahedron::CalculateSurfaceProjectionMatrix(unsigned excludeVertex) co
 }
 
 // ----------------------------------------------------------------------------
-Matrix4 Tetrahedron::CalculateBarycentricTransformationMatrix() const
+Matrix4 GravityTetrahedron::CalculateBarycentricTransformationMatrix() const
 {
     // Barycentric transformation matrix
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system#Conversion_between_barycentric_and_Cartesian_coordinates
@@ -126,7 +126,7 @@ Matrix4 Tetrahedron::CalculateBarycentricTransformationMatrix() const
 }
 
 // ----------------------------------------------------------------------------
-void Tetrahedron::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color)
+void GravityTetrahedron::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color)
 {
     for(unsigned i = 0; i != 4; ++i)
     {
