@@ -95,11 +95,12 @@ Vector3 GravityManager::QueryGravity(Vector3 worldLocation)
 }
 
 // ----------------------------------------------------------------------------
-void GravityManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+void GravityManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos)
 {
     PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
     for(; it != gravityVectors_.End(); ++it)
         (*it)->DrawDebugGeometry(debug, depthTest);
+    gravityMesh_->DrawDebugGeometry(debug, depthTest, pos);
 }
 
 // ----------------------------------------------------------------------------

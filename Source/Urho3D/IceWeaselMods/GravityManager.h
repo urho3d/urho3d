@@ -85,7 +85,7 @@ public:
      */
     Vector3 QueryGravity(Vector3 worldLocation);
 
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos);
 
 private:
     void RebuildTetrahedralMesh();

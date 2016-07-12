@@ -72,8 +72,8 @@ const GravityTetrahedron* GravityMesh::Query(Vector4* barycentric, const Vector3
 // ----------------------------------------------------------------------------
 void GravityMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos)
 {
-    Vector<GravityTetrahedron>::Iterator it = tetrahedrons_.Begin();
     unsigned count = 0;
+    Vector<GravityTetrahedron>::Iterator it = tetrahedrons_.Begin();
     for(; it != tetrahedrons_.End(); ++it)
         if(it->PointLiesInside(pos))
         {
@@ -83,7 +83,16 @@ void GravityMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector
         else
             it->DrawDebugGeometry(debug, depthTest, Color::WHITE);
 
-    assert(count < 2); // Detects overlapping tetrahedrons (should never happen)
+    for(it = tetrahedrons_.Begin(); it != tetrahedrons_.End(); ++it)
+        for(unsigned i = 0; i != 4; ++i)
+            for(unsigned j = 0; j != 4; ++j)
+            {
+                Vector3 a = it->GetVertexPosition(i);
+                Vector3 b = it->GetVertexPosition(j);
+                debug->AddLine(a, b, Color::GRAY, depthTest);
+            }
+
+    //assert(count < 2); // Detects overlapping tetrahedrons (should never happen)
 }
 
 } // namespace Urho3D
