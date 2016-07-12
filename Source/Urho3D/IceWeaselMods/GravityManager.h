@@ -30,6 +30,7 @@ namespace Urho3D
 class Context;
 class DebugRenderer;
 class GravityVector;
+class GravityHull;
 class GravityMesh;
 
 
@@ -112,6 +113,7 @@ private:
 
     PODVector<GravityVector*> gravityVectors_;
     SharedPtr<GravityMesh> gravityMesh_;
+    SharedPtr<GravityHull> gravityHull_;
 
     float gravity_;
 };

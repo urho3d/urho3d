@@ -65,7 +65,8 @@ struct Face
 static GravityMeshBuilder::SharedVertexTetrahedron*
 ConstructSuperTetrahedron(const PODVector<GravityVector*>& gravityVectors)
 {
-    typedef GravityMeshBuilder gmb;
+    typedef GravityMeshBuilder::Vertex Vertex;
+    typedef GravityMeshBuilder::SharedVertexTetrahedron SharedVertexTetrahedron;
 
     // Compute bounding box
     BoundingBox aabb;
@@ -91,11 +92,11 @@ ConstructSuperTetrahedron(const PODVector<GravityVector*>& gravityVectors)
     aabb.max_.z_ += Abs(aabb.max_.z_ * 0.1f);
 
     // This tetrahedron should encompass all vertices in the list
-    return new gmb::SharedVertexTetrahedron(
-        new gmb::Vertex(aabb.max_),
-        new gmb::Vertex(Vector3(aabb.min_.x_, aabb.max_.y_, aabb.max_.z_)),
-        new gmb::Vertex(Vector3(aabb.max_.x_, aabb.min_.y_, aabb.max_.z_)),
-        new gmb::Vertex(Vector3(aabb.max_.x_, aabb.max_.y_, aabb.min_.z_))
+    return new SharedVertexTetrahedron(
+        new Vertex(aabb.max_),
+        new Vertex(Vector3(aabb.min_.x_, aabb.max_.y_, aabb.max_.z_)),
+        new Vertex(Vector3(aabb.max_.x_, aabb.min_.y_, aabb.max_.z_)),
+        new Vertex(Vector3(aabb.max_.x_, aabb.max_.y_, aabb.min_.z_))
     );
 }
 
@@ -103,14 +104,16 @@ ConstructSuperTetrahedron(const PODVector<GravityVector*>& gravityVectors)
 void GravityMeshBuilder::Build(const PODVector<GravityVector*>& gravityVectors)
 {
     triangulationResult_.Clear();
+    hull_.Clear();
+
+    SharedTetrahedralMesh badTetrahedrons;
+    Polyhedron polyhedron;
 
     // Add super tetrahedron as the first tetrahedron to the list.
     SharedPtr<SharedVertexTetrahedron> superTetrahedron(ConstructSuperTetrahedron(gravityVectors));
     triangulationResult_.Push(superTetrahedron);
 
-    SharedVertexMesh badTetrahedrons;
-    Polyhedron polyhedron;
-
+    // Iterate over all gravity vectors, add each as a vertex to the mesh one by one
     for(PODVector<GravityVector*>::ConstIterator gravityVectorsIt = gravityVectors.Begin();
         gravityVectorsIt != gravityVectors.End();
         ++gravityVectorsIt)
@@ -118,23 +121,35 @@ void GravityMeshBuilder::Build(const PODVector<GravityVector*>& gravityVectors)
         GravityVector* gravityVector = *gravityVectorsIt;
 
         FindBadTetrahedrons(&badTetrahedrons, gravityVector->GetPosition());
-        CreatePolyhedronFromBadTetrahedrons(&polyhedron, badTetrahedrons);
-        RemoveBadTetrahedronsFromTriangulation(badTetrahedrons);
+        CreateHullFromTetrahedrons(&polyhedron, badTetrahedrons);
+        RemoveTetrahedronsFromTriangulation(badTetrahedrons);
         ReTriangulateGap(polyhedron, *gravityVector);
     }
 
     CleanUp(superTetrahedron);
+
+    // The mesh is built. We can extract the hull by marking all tetrahedrons
+    // in the mesh as "bad" and running it through the face-face comparison
+    // code. This will return a list of all triangles that don't touch each
+    // other, i.e. the hull.
+    CreateHullFromTetrahedrons(&hull_, triangulationResult_);
 }
 
 // ----------------------------------------------------------------------------
-const GravityMeshBuilder::SharedVertexMesh& GravityMeshBuilder::GetSharedVertexMesh() const
+const GravityMeshBuilder::SharedTetrahedralMesh& GravityMeshBuilder::GetSharedTetrahedralMesh() const
 {
     return triangulationResult_;
 }
 
 // ----------------------------------------------------------------------------
+const GravityMeshBuilder::Polyhedron& GravityMeshBuilder::GetHullMesh() const
+{
+    return hull_;
+}
+
+// ----------------------------------------------------------------------------
 void GravityMeshBuilder::FindBadTetrahedrons(
-    SharedVertexMesh* badTetrahedrons,
+    SharedTetrahedralMesh* badTetrahedrons,
     Vector3 point) const
 {
     badTetrahedrons->Clear();
@@ -142,7 +157,7 @@ void GravityMeshBuilder::FindBadTetrahedrons(
     // Iterate all tetrahedrons in current triangulation and calculate their
     // circumsphere. If the vertex location (point) we are adding is within the
     // sphere, then we add that tetrahedron to the bad list.
-    for(SharedVertexMesh::ConstIterator tetrahedron = triangulationResult_.Begin();
+    for(SharedTetrahedralMesh::ConstIterator tetrahedron = triangulationResult_.Begin();
         tetrahedron != triangulationResult_.End();
         ++tetrahedron)
     {
@@ -163,18 +178,18 @@ void GravityMeshBuilder::FindBadTetrahedrons(
 }
 
 // ----------------------------------------------------------------------------
-void GravityMeshBuilder::CreatePolyhedronFromBadTetrahedrons(
+void GravityMeshBuilder::CreateHullFromTetrahedrons(
     Polyhedron* polyhedron,
-    const SharedVertexMesh& badTetrahedrons)
+    const SharedTetrahedralMesh& tetrahedrons)
 {
     polyhedron->Clear();
 
     // Create a list of faces from the bad tetrahedrons. Note that by default
     // all faces are marked initially.
-    unsigned numFaces = badTetrahedrons.Size() * 4;
+    unsigned numFaces = tetrahedrons.Size() * 4;
     Face* face = new Face[numFaces];
-    SharedVertexMesh::ConstIterator tetrahedron = badTetrahedrons.Begin();
-    for(unsigned i = 0; tetrahedron != badTetrahedrons.End(); ++tetrahedron, i += 4)
+    SharedTetrahedralMesh::ConstIterator tetrahedron = tetrahedrons.Begin();
+    for(unsigned i = 0; tetrahedron != tetrahedrons.End(); ++tetrahedron, i += 4)
     {
         SharedVertexTetrahedron* t = *tetrahedron;
         face[i+0] = Face(t->v_[0], t->v_[1], t->v_[2]);
@@ -207,11 +222,11 @@ void GravityMeshBuilder::CreatePolyhedronFromBadTetrahedrons(
 }
 
 // ----------------------------------------------------------------------------
-void GravityMeshBuilder::RemoveBadTetrahedronsFromTriangulation(
-    const GravityMeshBuilder::SharedVertexMesh& badTetrahedrons)
+void GravityMeshBuilder::RemoveTetrahedronsFromTriangulation(
+    const GravityMeshBuilder::SharedTetrahedralMesh& tetrahedrons)
 {
-    for(SharedVertexMesh::ConstIterator tetrahedronIt = badTetrahedrons.Begin();
-        tetrahedronIt != badTetrahedrons.End();
+    for(SharedTetrahedralMesh::ConstIterator tetrahedronIt = tetrahedrons.Begin();
+        tetrahedronIt != tetrahedrons.End();
         ++tetrahedronIt)
     {
         triangulationResult_.Remove(*tetrahedronIt);
@@ -247,7 +262,7 @@ void GravityMeshBuilder::ReTriangulateGap(const Polyhedron& polyhedron,
 // ----------------------------------------------------------------------------
 void GravityMeshBuilder::CleanUp(SharedPtr<SharedVertexTetrahedron> superTetrahedron)
 {
-    SharedVertexMesh::Iterator tetrahedron = triangulationResult_.Begin();
+    SharedTetrahedralMesh::Iterator tetrahedron = triangulationResult_.Begin();
     while(tetrahedron != triangulationResult_.End())
     {
         SharedVertexTetrahedron* t = *tetrahedron;

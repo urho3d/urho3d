@@ -24,6 +24,7 @@
 #include "../IceWeaselMods/GravityManager.h"
 #include "../IceWeaselMods/GravityVector.h"
 #include "../IceWeaselMods/IceWeasel.h"
+#include "../IceWeaselMods/GravityHull.h"
 #include "../IceWeaselMods/GravityMesh.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/Node.h"
@@ -36,6 +37,7 @@ namespace Urho3D
 GravityManager::GravityManager(Context* context)
     : Component(context),
     gravityMesh_(new GravityMesh),
+    gravityHull_(new GravityHull),
     gravity_(9.81f)
 {
     SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(GravityManager, HandleComponentAdded));
@@ -85,13 +87,29 @@ Vector3 GravityManager::QueryGravity(Vector3 worldLocation)
     if(!gravityMesh_)
         return Vector3::DOWN * gravity_;
 
-    Vector4 bary;
-    const GravityTetrahedron* tetrahedron = gravityMesh_->Query(&bary, worldLocation);
-    if(!tetrahedron)
-        return Vector3::DOWN * gravity_;
+    // Query gravity mesh. This will fail if the point is outside of the hull.
+    {
+        Vector4 barycentric;
+        const GravityTetrahedron* tetrahedron = gravityMesh_->Query(&barycentric, worldLocation);
+        if(tetrahedron)
+        {
+            Vector3 interpolatedGravity = tetrahedron->Interpolate(barycentric);
+            return interpolatedGravity * gravity_;
+        }
+    }
 
-    Vector3 interpolatedGravity = tetrahedron->Interpolate(bary);
-    return interpolatedGravity * gravity_;
+    // Intersect the hull instead.
+    {
+        Vector3 barycentric;
+        const GravityTriangle* triangle = gravityHull_->Query(&barycentric, worldLocation);
+        if(triangle)
+        {
+            Vector3 interpolatedGravity = triangle->Interpolate(barycentric);
+            return interpolatedGravity * gravity_;
+        }
+    }
+
+    return Vector3::DOWN * gravity_;
 }
 
 // ----------------------------------------------------------------------------
@@ -100,7 +118,8 @@ void GravityManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vec
     PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
     for(; it != gravityVectors_.End(); ++it)
         (*it)->DrawDebugGeometry(debug, depthTest);
-    gravityMesh_->DrawDebugGeometry(debug, depthTest, pos);
+    //gravityMesh_->DrawDebugGeometry(debug, depthTest, pos);
+    gravityHull_->DrawDebugGeometry(debug, depthTest, pos);
 }
 
 // ----------------------------------------------------------------------------
@@ -108,7 +127,8 @@ void GravityManager::RebuildTetrahedralMesh()
 {
     GravityMeshBuilder builder;
     builder.Build(gravityVectors_);
-    gravityMesh_->SetMesh(builder.GetSharedVertexMesh());
+    gravityMesh_->SetMesh(builder.GetSharedTetrahedralMesh());
+    gravityHull_->SetMesh(builder.GetHullMesh());
 }
 
 // ----------------------------------------------------------------------------

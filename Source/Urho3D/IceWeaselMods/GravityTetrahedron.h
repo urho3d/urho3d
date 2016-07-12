@@ -16,7 +16,7 @@ class GravityTetrahedron
 {
 public:
 
-    GravityTetrahedron() { assert(false); } // Required for Vector<Tetrahedron>
+    GravityTetrahedron() { assert(false); } // Required for Vector<GravityTetrahedron>
 
     /*!
      * @brief Constructs a tetrahedron from 4 vertex locations in cartesian
@@ -84,14 +84,14 @@ public:
     {
         return (
             directions_[0] * barycentric.x_ +
-            directions_[1] * barycentric.x_ +
-            directions_[2] * barycentric.x_ +
-            directions_[3] * barycentric.x_
+            directions_[1] * barycentric.y_ +
+            directions_[2] * barycentric.z_ +
+            directions_[3] * barycentric.w_
         ).Normalized() * (
             forceFactors_[0] * barycentric.x_ +
-            forceFactors_[1] * barycentric.x_ +
-            forceFactors_[2] * barycentric.x_ +
-            forceFactors_[3] * barycentric.x_
+            forceFactors_[1] * barycentric.y_ +
+            forceFactors_[2] * barycentric.z_ +
+            forceFactors_[3] * barycentric.w_
         );
     }
 

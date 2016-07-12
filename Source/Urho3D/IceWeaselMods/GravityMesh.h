@@ -19,9 +19,12 @@ public:
     GravityMesh() {}
 
     /*!
-     * @brief Triangulates the list of 3D positions into a tetrahedral mesh.
+     * @brief Creates the gravity mesh from a shared vertex mesh (provided by
+     * GravityMeshBuilder).
+     *
+     * The mesh is split into individual tetrahedron objects.
      */
-    GravityMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh);
+    GravityMesh(const GravityMeshBuilder::SharedTetrahedralMesh& sharedVertexMesh);
 
     /*!
      * @brief Queries which tetrahedron a point is located in.
@@ -35,11 +38,18 @@ public:
      */
     const GravityTetrahedron* Query(Vector4* barycentric, const Vector3& position) const;
 
-    void SetMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh);
+    /*!
+     * @brief Replaces the existing gravity mesh (if any) with a shared vertex
+     * mesh (provided by GravityMeshBuilder).
+     *
+     * The mesh is split into individual tetrahedron objects.
+     */
+    void SetMesh(const GravityMeshBuilder::SharedTetrahedralMesh& sharedVertexMesh);
 
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos);
 
 private:
+    // TODO consider just using GravityMeshBuilder::SharedTetrahedralMesh directly
     Vector<GravityTetrahedron> tetrahedrons_;
 };
 

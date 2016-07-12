@@ -14,15 +14,15 @@ namespace Urho3D
 
 
 // ----------------------------------------------------------------------------
-GravityMesh::GravityMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh)
+GravityMesh::GravityMesh(const GravityMeshBuilder::SharedTetrahedralMesh& sharedVertexMesh)
 {
     SetMesh(sharedVertexMesh);
 }
-void GravityMesh::SetMesh(const GravityMeshBuilder::SharedVertexMesh& sharedVertexMesh)
+void GravityMesh::SetMesh(const GravityMeshBuilder::SharedTetrahedralMesh& sharedVertexMesh)
 {
     tetrahedrons_.Clear();
 
-    for(GravityMeshBuilder::SharedVertexMesh::ConstIterator it = sharedVertexMesh.Begin();
+    for(GravityMeshBuilder::SharedTetrahedralMesh::ConstIterator it = sharedVertexMesh.Begin();
         it != sharedVertexMesh.End();
         ++it)
     {
