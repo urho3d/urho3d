@@ -576,7 +576,7 @@ else ()
     if (NOT ANDROID)    # Most of the flags are already setup in android.toolchain.cmake module
         if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux)
             # Common compiler flags for aarch64-linux-gnu and arm-linux-gnueabihf, we do not support Windows on arm for now
-            set (ARM_CFLAGS "${ARM_CFLAGS} -pipe")
+            set (ARM_CFLAGS "${ARM_CFLAGS} -fsigned-char -pipe")
             if (NOT URHO3D_64BIT)
                 # We only support armhf distros, so turn on hard-float by default
                 set (ARM_CFLAGS "${ARM_CFLAGS} -mfloat-abi=hard -Wno-psabi")
