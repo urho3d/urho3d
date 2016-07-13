@@ -102,15 +102,15 @@ mat3 GetFaceCameraRotation(vec3 cameraPos, vec3 position, vec3 direction)
     );
 }
 
-vec3 GetBillboardPos(vec4 iPos, vec3 iDirection, vec3 iCameraPos, mat4 modelMatrix)
+vec3 GetBillboardPos(vec4 iPos, vec3 iDirection, mat4 modelMatrix)
 {
-    return (iPos * modelMatrix).xyz +
-        vec3(iTexCoord1.x, 0.0, iTexCoord1.y) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
+    return (iPos * modelMatrix).xyz + 
+        vec3(iTexCoord1.x, 0.0, iTexCoord1.y) * GetFaceCameraRotation(cCameraPos, iPos.xyz, iDirection);
 }
 
-vec3 GetBillboardNormal(vec4 iPos, vec3 iDirection, vec3 iCameraPos)
+vec3 GetBillboardNormal(vec4 iPos, vec3 iDirection)
 {
-    return vec3(0.0, 1.0, 0.0) * GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection);
+    return vec3(0.0, 1.0, 0.0) * GetFaceCameraRotation(cCameraPos, iPos.xyz, iDirection);
 }
 #endif
 
@@ -156,7 +156,7 @@ vec3 GetWorldPos(mat4 modelMatrix)
     #if defined(BILLBOARD)
         return GetBillboardPos(iPos, iTexCoord1, modelMatrix);
     #elif defined(DIRBILLBOARD)
-        return GetBillboardPos(iPos, iNormal, iTangent.xyz, modelMatrix);
+        return GetBillboardPos(iPos, iNormal, modelMatrix);
     #elif defined(TRAILFACECAM)
         return GetTrailPos(iPos, iTangent.xyz, iTangent.w, modelMatrix);
     #elif defined(TRAILBONE)
@@ -171,7 +171,7 @@ vec3 GetWorldNormal(mat4 modelMatrix)
     #if defined(BILLBOARD)
         return GetBillboardNormal();
     #elif defined(DIRBILLBOARD)
-        return GetBillboardNormal(iPos, iNormal, iTangent.xyz);
+        return GetBillboardNormal(iPos, iNormal);
     #elif defined(TRAILFACECAM)
         return GetTrailNormal(iPos);
     #elif defined(TRAILBONE)
