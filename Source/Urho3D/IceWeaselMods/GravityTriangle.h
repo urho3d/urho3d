@@ -76,6 +76,25 @@ public:
         return Vector3(1.0f - u - v, u, v);
     }
 
+    /*!
+     * @brief Transforms the specified point from a cartesian coordinate system
+     * into the tetrahedron's barycentric coordinate system.
+     *
+     * This is useful for checking if point lies inside the tetrahedron, or for
+     * interpolating values.
+     */
+    Vector4 TransformToBarycentric(const Vector3& cartesian) const
+    {
+        return transform_ * Vector4(cartesian, 1.0f);
+    }
+
+    Vector3 TransformToCartesian(const Vector3& barycentric) const
+    {
+        return barycentric.x_ * vertices_[0] +
+               barycentric.y_ * vertices_[1] +
+               barycentric.z_ * vertices_[2];
+    }
+
     Vector3 Interpolate(const Vector3& barycentric) const
     {
         return (
@@ -89,19 +108,17 @@ public:
         );
     }
 
-    Vector3 TransformToCartesian(const Vector3& barycentric) const
-    {
-        return barycentric.x_ * vertices_[0] +
-               barycentric.y_ * vertices_[1] +
-               barycentric.z_ * vertices_[2];
-    }
-
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color) const;
 
 private:
+    Matrix4 CalculateSurfaceProjectionMatrix() const;
+    Matrix4 CalculateBarycentricTransformationMatrix() const;
+
     Vector3 vertices_[3];
     Vector3 directions_[3];
     float forceFactors_[3];
+
+    Matrix4 transform_;
 };
 
 } // namespace Urho3D

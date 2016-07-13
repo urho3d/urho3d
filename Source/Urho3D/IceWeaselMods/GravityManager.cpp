@@ -37,7 +37,7 @@ namespace Urho3D
 GravityManager::GravityManager(Context* context)
     : Component(context),
     gravityMesh_(new GravityMesh),
-    gravityHull_(new GravityHull),
+    extrapolatedFaces_(new GravityMesh),
     gravity_(9.81f)
 {
     SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(GravityManager, HandleComponentAdded));
@@ -88,26 +88,26 @@ Vector3 GravityManager::QueryGravity(Vector3 worldLocation)
         return Vector3::DOWN * gravity_;
 
     // Query gravity mesh. This will fail if the point is outside of the hull.
+    Vector4 barycentric;
+    const GravityTetrahedron* tetrahedron = gravityMesh_->Query(&barycentric, worldLocation);
+    if(tetrahedron)
     {
-        Vector4 barycentric;
-        const GravityTetrahedron* tetrahedron = gravityMesh_->Query(&barycentric, worldLocation);
-        if(tetrahedron)
-        {
-            Vector3 interpolatedGravity = tetrahedron->Interpolate(barycentric);
-            return interpolatedGravity * gravity_;
-        }
+        Vector3 interpolatedGravity = tetrahedron->Interpolate(barycentric);
+        return interpolatedGravity * gravity_;
     }
 
-    // Intersect the hull instead.
+    // Project our location onto the faces of the hull. This will fail if we
+    // aren't perpendicular to any visible faces.
+    tetrahedron = extrapolatedFaces_->Query(&barycentric, worldLocation);
+    if(tetrahedron)
     {
-        Vector3 barycentric;
-        const GravityTriangle* triangle = gravityHull_->Query(&barycentric, worldLocation);
-        if(triangle)
-        {
-            Vector3 interpolatedGravity = triangle->Interpolate(barycentric);
-            return interpolatedGravity * gravity_;
-        }
+        Vector3 interpolatedGravity = tetrahedron->Interpolate(barycentric);
+        return interpolatedGravity * gravity_;
     }
+
+    // Project our location onto edges of the hull. This will fail if we aren't
+    // perpendicular to any visible edges.
+    tetrahedron = 
 
     return Vector3::DOWN * gravity_;
 }
@@ -119,16 +119,27 @@ void GravityManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vec
     for(; it != gravityVectors_.End(); ++it)
         (*it)->DrawDebugGeometry(debug, depthTest);
     //gravityMesh_->DrawDebugGeometry(debug, depthTest, pos);
-    gravityHull_->DrawDebugGeometry(debug, depthTest, pos);
+    extrapolatedFaces_->DrawDebugGeometry(debug, depthTest, pos);
 }
 
 // ----------------------------------------------------------------------------
 void GravityManager::RebuildTetrahedralMesh()
 {
+    typedef GravityMeshBuilder::Polyhedron Polyhedron;
+
     GravityMeshBuilder builder;
     builder.Build(gravityVectors_);
+
+    // Create tetrahedral mesh
     gravityMesh_->SetMesh(builder.GetSharedTetrahedralMesh());
-    gravityHull_->SetMesh(builder.GetHullMesh());
+
+    // Using the hull, create tetrahedrons connecting each face to a vertex
+    // that is slightly offset from the face
+    const Polyhedron& hullMesh = builder.GetHullMesh();
+    for(Polyhedron::ConstIterator it = hullMesh.Begin(); it != hullMesh.End(); ++it)
+    {
+
+    }
 }
 
 // ----------------------------------------------------------------------------

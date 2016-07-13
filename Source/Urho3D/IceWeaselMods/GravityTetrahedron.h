@@ -27,15 +27,6 @@ public:
                        const float forceFactors[4]);
 
     /*!
-     * @brief Returns true if the specified 3D point lies inside the
-     * tetrahedron.
-     */
-    bool PointLiesInside(const Vector3& cartesian) const
-    {
-        return PointLiesInside(TransformToBarycentric(cartesian));
-    }
-
-    /*!
      * @brief Returns true if the specified barycentric coordinate lies inside
      * the tetrahedron.
      */
@@ -69,15 +60,10 @@ public:
                barycentric.w_ * vertices_[3];
     }
 
-    Vector3 GetVertexPosition(unsigned vertexID) const
+    Vector3 GetVertexPosition(unsigned char vertexID) const
     {
         assert(vertexID < 4);
         return vertices_[vertexID];
-    }
-
-    Vector3 Interpolate(const Vector3& cartesian) const
-    {
-        return Interpolate(TransformToBarycentric(cartesian));
     }
 
     Vector3 Interpolate(const Vector4& barycentric) const
@@ -98,7 +84,6 @@ public:
     void DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color);
 
 private:
-    Matrix4 CalculateSurfaceProjectionMatrix(unsigned excludeVertex) const;
     Matrix4 CalculateBarycentricTransformationMatrix() const;
 
     Vector3 vertices_[4];

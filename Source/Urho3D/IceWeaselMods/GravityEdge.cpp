@@ -1,4 +1,4 @@
-#include "../IceWeaselMods/GravityTriangle.h"
+#include "../IceWeaselMods/GravityEdge.h"
 #include "../Graphics/DebugRenderer.h"
 #include "../Math/Matrix2.h"
 
@@ -7,9 +7,9 @@ namespace Urho3D
 {
 
 // ----------------------------------------------------------------------------
-GravityTriangle::GravityTriangle(const Vector3 vertices[3],
-                                 const Vector3 directions[3],
-                                 const float forceFactors[3])
+GravityEdge::GravityEdge(const Vector3 vertices[2],
+                         const Vector3 directions[2],
+                         const float forceFactors[2])
 {
     vertices_[0]         = *vertices++;
     vertices_[1]         = *vertices++;
@@ -31,10 +31,10 @@ GravityTriangle::GravityTriangle(const Vector3 vertices[3],
 }
 
 // ----------------------------------------------------------------------------
-Matrix4 GravityTriangle::CalculateSurfaceProjectionMatrix() const
+Matrix4 GravityEdge::CalculateEdgeProjectionMatrix() const
 {
     // This function builds a projection matrix that will project a 3D point
-    // onto one of the tetrahedron's triangles (namely the face that doesn't
+    // onto one of the tetrahedron's edges (namely the edges that doesn't
     // contain any vertices in the infinity mask) before transforming the
     // projected point into barycentric coordinates.
     //
@@ -43,34 +43,26 @@ Matrix4 GravityTriangle::CalculateSurfaceProjectionMatrix() const
     // https://en.wikipedia.org/wiki/Projection_(linear_algebra)#Properties_and_classification
 
     // Let vertex 0 be our anchor point.
-    Vector3 span1 = *vertices_[1] - *vertices_[0];
-    Vector3 span2 = *vertices_[2] - *vertices_[0];
+    Vector3 span = *vertices_[1] - *vertices_[0];
 
     // First calculate (A^T * A)^-1
-    Matrix2 B = Matrix2(
-        span1.x_*span1.x_ + span1.y_*span1.y_ + span1.z_*span1.z_,
-        span1.x_*span2.x_ + span1.y_*span2.y_ + span1.z_*span2.z_,
-        span2.x_*span1.x_ + span2.y_*span1.y_ + span2.z_*span1.z_,
-        span2.x_*span2.x_ + span2.y_*span2.y_ + span2.z_*span2.z_
-    ).Inverse();
+    float B = span.x_*span.x_ + span.y_*span.y_ + span.z_*span.z_;
+    B = 1.0f / B; // Inverse
 
     // Sandwich the resulting vector with A * B * A^T. The result is a
     // projection matrix without offset.
     Matrix3 projectOntoTriangle = Matrix3(
         // This is matrix A
-        span1.x_, span2.x_, 0,
-        span1.y_, span2.y_, 0,
-        span1.z_, span2.z_, 0
+        span.x_, 0, 0,
+        span.y_, 0, 0,
+        span.z_, 0, 0
     ) * Matrix3(
         // Matrix multiplication B * A^T
-        B.m00_*span1.x_ + B.m01_*span2.x_,
-        B.m00_*span1.y_ + B.m01_*span2.y_,
-        B.m00_*span1.z_ + B.m01_*span2.z_,
+        B*span.x_,
+        B*span.y_,
+        B*span.z_,
 
-        B.m10_*span1.x_ + B.m11_*span2.x_,
-        B.m10_*span1.y_ + B.m11_*span2.y_,
-        B.m10_*span1.z_ + B.m11_*span2.z_,
-
+        0, 0, 0,
         0, 0, 0
     );
 
@@ -92,7 +84,7 @@ Matrix4 GravityTriangle::CalculateSurfaceProjectionMatrix() const
 }
 
 // ----------------------------------------------------------------------------
-Matrix4 GravityTriangle::CalculateBarycentricTransformationMatrix() const
+Matrix4 GravityEdge::CalculateBarycentricTransformationMatrix() const
 {
     // Barycentric transformation matrix
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system#Conversion_between_barycentric_and_Cartesian_coordinates
@@ -105,7 +97,7 @@ Matrix4 GravityTriangle::CalculateBarycentricTransformationMatrix() const
 }
 
 // ----------------------------------------------------------------------------
-void GravityTriangle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color) const
+void GravityEdge::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color) const
 {
     for(unsigned i = 0; i != 2; ++i)
     {
