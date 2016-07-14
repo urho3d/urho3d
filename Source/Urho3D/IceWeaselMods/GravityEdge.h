@@ -27,16 +27,32 @@ public:
                 const Vector3& boundaryNormal0,
                 const Vector3& boundaryNormal1);
 
+    void FlipBoundaryCheck()
+    {
+        Vector3 tmp = boundaryNormal_[0];
+        boundaryNormal_[0] = boundaryNormal_[1];
+        boundaryNormal_[1] = tmp;
+    }
+
     /*!
      * @brief Returns true if the specified barycentric coordinate lies inside
      * the triangle.
      */
-    bool PointLiesInside(const Vector2& bary) const
+    bool PointLiesInside(Vector2 bary) const
     {
         return (
             bary.x_ >= 0.0f &&
             bary.y_ >= 0.0f
         );
+    }
+
+    bool ProjectionAngleIsInBounds(const Vector3& cartesianTransform, const Vector3& position) const
+    {
+        Vector3 check = cartesianTransform - position;
+        Vector3 cross = boundaryNormal_[0].CrossProduct(check);
+        if(cross.DotProduct(check.CrossProduct(boundaryNormal_[1])) > 0 && (vertex_[1].position_ - vertex_[0].position_).DotProduct(cross) > 0)
+            return true;
+        return false;
     }
 
     /*!

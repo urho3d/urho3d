@@ -72,10 +72,10 @@ public:
     Vector3 InterpolateGravity(const Vector4& barycentric) const
     {
         return (
-            vertex_[0].position_ * barycentric.x_ +
-            vertex_[1].position_ * barycentric.y_ +
-            vertex_[2].position_ * barycentric.z_ +
-            vertex_[3].position_ * barycentric.w_
+            vertex_[0].direction_ * barycentric.x_ +
+            vertex_[1].direction_ * barycentric.y_ +
+            vertex_[2].direction_ * barycentric.z_ +
+            vertex_[3].direction_ * barycentric.w_
         ).Normalized() * (
             vertex_[0].forceFactor_ * barycentric.x_ +
             vertex_[1].forceFactor_ * barycentric.y_ +

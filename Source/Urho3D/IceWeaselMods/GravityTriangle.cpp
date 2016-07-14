@@ -16,6 +16,9 @@ GravityTriangle::GravityTriangle(const GravityPoint& p0,
     vertex_[2] = p2;
 
     normal_ = (vertex_[1].position_ - vertex_[0].position_).CrossProduct(vertex_[2].position_ - vertex_[0].position_).Normalized();
+
+    transform_ = CalculateBarycentricTransformationMatrix() *
+                 CalculateSurfaceProjectionMatrix();
 }
 
 // ----------------------------------------------------------------------------
@@ -95,17 +98,15 @@ Matrix4 GravityTriangle::CalculateBarycentricTransformationMatrix() const
 // ----------------------------------------------------------------------------
 void GravityTriangle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color) const
 {
-    for(unsigned i = 0; i != 2; ++i)
+    Vector3 average(Vector3::ZERO);
+    for(unsigned i = 0; i != 3; ++i)
     {
-        for(unsigned j = i + 1; j != 2; ++j)
-            debug->AddLine(
-                Vector3(vertex_[i].position_.x_, vertex_[i].position_.y_, vertex_[i].position_.z_),
-                Vector3(vertex_[j].position_.x_, vertex_[j].position_.y_, vertex_[j].position_.z_),
-                color, depthTest
-            );
+        for(unsigned j = i + 1; j != 3; ++j)
+            debug->AddLine(vertex_[i].position_, vertex_[j].position_, color, depthTest);
+        average += vertex_[i].position_;
     }
-
-    //debug->AddSphere(Sphere(sphereCenter_, (vertices_[0] - sphereCenter_).Length()), Color::GRAY, depthTest);
+    average /= 3.0f;
+    debug->AddLine(average, average + normal_, Color::CYAN, depthTest);
 }
 
 } // namespace Urho3D

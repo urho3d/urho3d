@@ -14,9 +14,13 @@ GravityEdge::GravityEdge(const GravityPoint& p0,
 {
     vertex_[0] = p0;
     vertex_[1] = p1;
-
     boundaryNormal_[0] = boundaryNormal0;
     boundaryNormal_[1] = boundaryNormal1;
+
+    Matrix4 bt = CalculateBarycentricTransformationMatrix();
+    Matrix4 et = CalculateEdgeProjectionMatrix();
+    transform_ = bt * et;
+                 ;
 }
 
 // ----------------------------------------------------------------------------
@@ -75,12 +79,14 @@ Matrix4 GravityEdge::CalculateEdgeProjectionMatrix() const
 // ----------------------------------------------------------------------------
 Matrix4 GravityEdge::CalculateBarycentricTransformationMatrix() const
 {
+    Vector3 fix1 = vertex_[0].position_.CrossProduct(vertex_[1].position_);
+    Vector3 fix2 = fix1 + vertex_[0].position_;
     // Barycentric transformation matrix
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system#Conversion_between_barycentric_and_Cartesian_coordinates
     return Matrix4(
-        vertex_[0].position_.x_, vertex_[1].position_.x_, vertex_[2].position_.x_, 0,
-        vertex_[0].position_.y_, vertex_[1].position_.y_, vertex_[2].position_.y_, 0,
-        vertex_[0].position_.z_, vertex_[1].position_.z_, vertex_[2].position_.z_, 0,
+        vertex_[0].position_.x_, vertex_[1].position_.x_, fix1.x_, fix2.x_,
+        vertex_[0].position_.y_, vertex_[1].position_.y_, fix1.y_, fix2.y_,
+        vertex_[0].position_.z_, vertex_[1].position_.z_, fix1.z_, fix2.z_,
         1, 1, 1, 1
     ).Inverse();
 }
@@ -88,17 +94,12 @@ Matrix4 GravityEdge::CalculateBarycentricTransformationMatrix() const
 // ----------------------------------------------------------------------------
 void GravityEdge::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, const Color& color) const
 {
-    for(unsigned i = 0; i != 2; ++i)
-    {
-        for(unsigned j = i + 1; j != 2; ++j)
-            debug->AddLine(
-                Vector3(vertex_[i].position_.x_, vertex_[i].position_.y_, vertex_[i].position_.z_),
-                Vector3(vertex_[j].position_.x_, vertex_[j].position_.y_, vertex_[j].position_.z_),
-                color, depthTest
-            );
-    }
+    debug->AddLine(vertex_[0].position_, vertex_[1].position_, color, depthTest);
 
-    //debug->AddSphere(Sphere(sphereCenter_, (vertex_[0] - sphereCenter_).Length()), Color::GRAY, depthTest);
+    debug->AddLine(vertex_[0].position_, vertex_[0].position_ + boundaryNormal_[0], Color::CYAN, depthTest);
+    debug->AddLine(vertex_[0].position_, vertex_[0].position_ + boundaryNormal_[1], Color::CYAN, depthTest);
+    debug->AddLine(vertex_[1].position_, vertex_[1].position_ + boundaryNormal_[0], Color::CYAN, depthTest);
+    debug->AddLine(vertex_[1].position_, vertex_[1].position_ + boundaryNormal_[1], Color::CYAN, depthTest);
 }
 
 } // namespace Urho3D

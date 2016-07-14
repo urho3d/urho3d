@@ -70,16 +70,7 @@ void GravityMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector
             ++count;
         }
         else
-            it->DrawDebugGeometry(debug, depthTest, Color::WHITE);
-
-    for(it = tetrahedrons_.Begin(); it != tetrahedrons_.End(); ++it)
-        for(unsigned i = 0; i != 4; ++i)
-            for(unsigned j = 0; j != 4; ++j)
-            {
-                Vector3 a = it->GetVertexPosition(i);
-                Vector3 b = it->GetVertexPosition(j);
-                debug->AddLine(a, b, Color::GRAY, depthTest);
-            }
+            it->DrawDebugGeometry(debug, depthTest, Color::GRAY);
 
     //assert(count < 2); // Detects overlapping tetrahedrons (should never happen)
 }

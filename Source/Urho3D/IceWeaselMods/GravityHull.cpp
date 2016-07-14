@@ -123,6 +123,12 @@ void GravityHull::SetMesh(const GravityMeshBuilder::Polyhedron& polyhedron)
                 triangleIt->GetNormal(),
                 triangleIt2->GetNormal()
             ));
+
+            // Make sure edge boundary check points outwards from the hull's
+            // centre
+            Vector2 bary = edges_.Back().ProjectAndTransformToBarycentric(centre_);
+            if(edges_.Back().ProjectionAngleIsInBounds(edges_.Back().TransformToCartesian(bary), centre_))
+                edges_.Back().FlipBoundaryCheck();
         }
     }
 }
@@ -155,7 +161,7 @@ bool GravityHull::Query(Vector3* gravity, const Vector3& position)
         }
     }*/
 
-    Vector3 distanceVec = centre_ - position;
+    Vector3 distanceVec =  position - centre_;
 
     // Try all faces first
     for(Vector<GravityTriangle>::ConstIterator triangle = triangles_.Begin();
@@ -172,7 +178,7 @@ bool GravityHull::Query(Vector3* gravity, const Vector3& position)
             // We found the triangle, interpolate gravity vector and return
             if(gravity != NULL)
                 *gravity = triangle->InterpolateGravity(bary);
-            printf("Intersection: %f,%f,%f\n", bary.x_, bary.y_, bary.z_);
+            lastIntersection_ = triangle->TransformToCartesian(bary);
             return true;
         }
     }
@@ -186,13 +192,12 @@ bool GravityHull::Query(Vector3* gravity, const Vector3& position)
         if(edge->PointLiesInside(bary))
         {
             // It's possible we're not projecting from the correct angle
-            // TODO
-            continue;
+            if(!edge->ProjectionAngleIsInBounds(edge->TransformToCartesian(bary), position))
+                continue;
 
             // Found the edge, interpolate gravity vector and return
             if(gravity != NULL)
                 *gravity = edge->InterpolateGravity(bary);
-            printf("Intersection: %f,%f\n", bary.x_, bary.y_);
             lastIntersection_ = edge->TransformToCartesian(bary);
             return true;
         }
@@ -226,12 +231,13 @@ bool GravityHull::Query(Vector3* gravity, const Vector3& position)
 // ----------------------------------------------------------------------------
 void GravityHull::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector3 pos) const
 {
-    for(Vector<GravityEdge>::ConstIterator it = edges_.Begin(); it != edges_.End(); ++it)
-    {
+    for(Vector<GravityTriangle>::ConstIterator it = triangles_.Begin(); it != triangles_.End(); ++it)
         it->DrawDebugGeometry(debug, depthTest, Color::WHITE);
-    }
 
-    debug->AddSphere(Sphere(lastIntersection_, 0.1f), Color::RED, depthTest);
+    for(Vector<GravityEdge>::ConstIterator it = edges_.Begin(); it != edges_.End(); ++it)
+        it->DrawDebugGeometry(debug, depthTest, Color::WHITE);
+
+    debug->AddSphere(Sphere(lastIntersection_, 1.0f), Color::RED, depthTest);
 }
 
 } // namespace Urho3D
