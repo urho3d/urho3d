@@ -3,6 +3,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Vector4.h"
 #include "../Math/Matrix4.h"
+#include "../IceWeaselMods/GravityPoint.h"
 
 
 namespace Urho3D
@@ -21,9 +22,11 @@ public:
      * @brief Constructs a triangle from 4 vertex locations in cartesian
      * space.
      */
-    GravityEdge(const Vector3 vertices[2],
-                const Vector3 directions[2],
-                const float forceFactors[2]);
+    GravityEdge(const GravityPoint& p0,
+                const GravityPoint& p1,
+                const Vector3& boundaryNormal0,
+                const Vector3& boundaryNormal1);
+
     /*!
      * @brief Returns true if the specified barycentric coordinate lies inside
      * the triangle.
@@ -43,25 +46,26 @@ public:
      * This is useful for checking if point lies inside the tetrahedron, or for
      * interpolating values.
      */
-    Vector4 TransformToBarycentric(const Vector3& cartesian) const
+    Vector2 ProjectAndTransformToBarycentric(const Vector3& cartesian) const
     {
-        return transform_ * Vector4(cartesian, 1.0f);
+        Vector4 result = transform_ * Vector4(cartesian, 1.0f);
+        return Vector2(result.x_, result.y_);
     }
 
     Vector3 TransformToCartesian(const Vector2& barycentric) const
     {
-        return barycentric.x_ * vertices_[0] +
-               barycentric.y_ * vertices_[1];
+        return barycentric.x_ * vertex_[0].position_ +
+               barycentric.y_ * vertex_[1].position_;
     }
 
-    Vector3 Interpolate(const Vector2& barycentric) const
+    Vector3 InterpolateGravity(const Vector2& barycentric) const
     {
         return (
-            directions_[0] * barycentric.x_ +
-            directions_[1] * barycentric.y_
+            vertex_[0].direction_ * barycentric.x_ +
+            vertex_[1].direction_ * barycentric.y_
         ).Normalized() * (
-            forceFactors_[0] * barycentric.x_ +
-            forceFactors_[1] * barycentric.y_
+            vertex_[0].forceFactor_ * barycentric.x_ +
+            vertex_[1].forceFactor_ * barycentric.y_
         );
     }
 
@@ -71,9 +75,8 @@ private:
     Matrix4 CalculateEdgeProjectionMatrix() const;
     Matrix4 CalculateBarycentricTransformationMatrix() const;
 
-    Vector3 vertices_[2];
-    Vector3 directions_[2];
-    float forceFactors_[2];
+    GravityPoint vertex_[2];
+    Vector3 boundaryNormal_[2];
 
     Matrix4 transform_;
 };

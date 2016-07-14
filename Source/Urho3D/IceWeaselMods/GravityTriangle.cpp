@@ -7,27 +7,15 @@ namespace Urho3D
 {
 
 // ----------------------------------------------------------------------------
-GravityTriangle::GravityTriangle(const Vector3 vertices[3],
-                                 const Vector3 directions[3],
-                                 const float forceFactors[3])
+GravityTriangle::GravityTriangle(const GravityPoint& p0,
+                                 const GravityPoint& p1,
+                                 const GravityPoint& p2)
 {
-    vertices_[0]         = *vertices++;
-    vertices_[1]         = *vertices++;
-    vertices_[2]         = *vertices++;
+    vertex_[0] = p0;
+    vertex_[1] = p1;
+    vertex_[2] = p2;
 
-    if(directions)
-    {
-        directions_[0]   = *directions++;
-        directions_[1]   = *directions++;
-        directions_[2]   = *directions++;
-    }
-
-    if(forceFactors)
-    {
-        forceFactors_[0] = *forceFactors++;
-        forceFactors_[1] = *forceFactors++;
-        forceFactors_[2] = *forceFactors++;
-    }
+    normal_ = (vertex_[1].position_ - vertex_[0].position_).CrossProduct(vertex_[2].position_ - vertex_[0].position_).Normalized();
 }
 
 // ----------------------------------------------------------------------------
@@ -43,8 +31,8 @@ Matrix4 GravityTriangle::CalculateSurfaceProjectionMatrix() const
     // https://en.wikipedia.org/wiki/Projection_(linear_algebra)#Properties_and_classification
 
     // Let vertex 0 be our anchor point.
-    Vector3 span1 = *vertices_[1] - *vertices_[0];
-    Vector3 span2 = *vertices_[2] - *vertices_[0];
+    Vector3 span1 = vertex_[1].position_ - vertex_[0].position_;
+    Vector3 span2 = vertex_[2].position_ - vertex_[0].position_;
 
     // First calculate (A^T * A)^-1
     Matrix2 B = Matrix2(
@@ -78,9 +66,9 @@ Matrix4 GravityTriangle::CalculateSurfaceProjectionMatrix() const
     // point before being projected, then translated back. This is because
     // the tetrahedron very likely isn't located at (0, 0, 0)
     Matrix4 translateToOrigin(
-        1, 0, 0, -vertices_[0].x_,
-        0, 1, 0, -vertices_[0].y_,
-        0, 0, 1, -vertices_[0].z_,
+        1, 0, 0, -vertex_[0].position_.x_,
+        0, 1, 0, -vertex_[0].position_.y_,
+        0, 0, 1, -vertex_[0].position_.z_,
         0, 0, 0, 1
     );
 
@@ -97,9 +85,9 @@ Matrix4 GravityTriangle::CalculateBarycentricTransformationMatrix() const
     // Barycentric transformation matrix
     // https://en.wikipedia.org/wiki/Barycentric_coordinate_system#Conversion_between_barycentric_and_Cartesian_coordinates
     return Matrix4(
-        vertices_[0].x_, vertices_[1].x_, vertices_[2].x_, 0,
-        vertices_[0].y_, vertices_[1].y_, vertices_[2].y_, 0,
-        vertices_[0].z_, vertices_[1].z_, vertices_[2].z_, 0,
+        vertex_[0].position_.x_, vertex_[1].position_.x_, vertex_[2].position_.x_, 0,
+        vertex_[0].position_.y_, vertex_[1].position_.y_, vertex_[2].position_.y_, 0,
+        vertex_[0].position_.z_, vertex_[1].position_.z_, vertex_[2].position_.z_, 0,
         1, 1, 1, 1
     ).Inverse();
 }
@@ -111,8 +99,8 @@ void GravityTriangle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, co
     {
         for(unsigned j = i + 1; j != 2; ++j)
             debug->AddLine(
-                Vector3(vertices_[i].x_, vertices_[i].y_, vertices_[i].z_),
-                Vector3(vertices_[j].x_, vertices_[j].y_, vertices_[j].z_),
+                Vector3(vertex_[i].position_.x_, vertex_[i].position_.y_, vertex_[i].position_.z_),
+                Vector3(vertex_[j].position_.x_, vertex_[j].position_.y_, vertex_[j].position_.z_),
                 color, depthTest
             );
     }

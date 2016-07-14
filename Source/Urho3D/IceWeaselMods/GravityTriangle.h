@@ -3,6 +3,7 @@
 #include "../Math/Vector3.h"
 #include "../Math/Vector4.h"
 #include "../Math/Matrix4.h"
+#include "../IceWeaselMods/GravityPoint.h"
 
 
 namespace Urho3D
@@ -21,9 +22,22 @@ public:
      * @brief Constructs a triangle from 4 vertex locations in cartesian
      * space.
      */
-    GravityTriangle(const Vector3 vertices[3],
-                    const Vector3 directions[3],
-                    const float forceFactors[3]);
+    GravityTriangle(const GravityPoint& p0,
+                    const GravityPoint& p1,
+                    const GravityPoint& p2);
+
+    const GravityPoint& GetVertex(unsigned char vertexID)
+    {
+        assert(vertexID < 3);
+        return vertex_[vertexID];
+    }
+
+    const Vector3& GetNormal() const
+            { return normal_; }
+
+    void FlipNormal()
+            { normal_ *= -1; }
+
     /*!
      * @brief Returns true if the specified barycentric coordinate lies inside
      * the triangle.
@@ -45,8 +59,8 @@ public:
         // Algorithm taken from:
         // "Fast, Minimum Storage Ray/Triangle Intersection"
         // See doc/research/
-        Vector3 edge1 = vertices_[1] - vertices_[0];
-        Vector3 edge2 = vertices_[2] - vertices_[0];
+        Vector3 edge1 = vertex_[1].position_ - vertex_[0].position_;
+        Vector3 edge2 = vertex_[2].position_ - vertex_[0].position_;
 
         Vector3 p = direction.CrossProduct(edge2);
         float determinant = p.DotProduct(edge1);
@@ -55,7 +69,7 @@ public:
             return NO_INTERSECTION;
 #endif
 
-        Vector3 ray = origin - vertices_[0];
+        Vector3 ray = origin - vertex_[0].position_;
         float u = p.DotProduct(ray);
 #if DO_CULL
         if(u < 0.0f || u > determinant)
@@ -83,28 +97,29 @@ public:
      * This is useful for checking if point lies inside the tetrahedron, or for
      * interpolating values.
      */
-    Vector4 TransformToBarycentric(const Vector3& cartesian) const
+    Vector3 ProjectAndTransformToBarycentric(const Vector3& cartesian) const
     {
-        return transform_ * Vector4(cartesian, 1.0f);
+        Vector4 result = transform_ * Vector4(cartesian, 1.0f);
+        return Vector3(result.x_, result.y_, result.z_);
     }
 
     Vector3 TransformToCartesian(const Vector3& barycentric) const
     {
-        return barycentric.x_ * vertices_[0] +
-               barycentric.y_ * vertices_[1] +
-               barycentric.z_ * vertices_[2];
+        return barycentric.x_ * vertex_[0].position_ +
+               barycentric.y_ * vertex_[1].position_ +
+               barycentric.z_ * vertex_[2].position_;
     }
 
-    Vector3 Interpolate(const Vector3& barycentric) const
+    Vector3 InterpolateGravity(const Vector3& barycentric) const
     {
         return (
-            directions_[0] * barycentric.x_ +
-            directions_[1] * barycentric.y_ +
-            directions_[2] * barycentric.z_
+            vertex_[0].direction_ * barycentric.x_ +
+            vertex_[1].direction_ * barycentric.y_ +
+            vertex_[2].direction_ * barycentric.z_
         ).Normalized() * (
-            forceFactors_[0] * barycentric.x_ +
-            forceFactors_[1] * barycentric.y_ +
-            forceFactors_[2] * barycentric.z_
+            vertex_[0].forceFactor_ * barycentric.x_ +
+            vertex_[1].forceFactor_ * barycentric.y_ +
+            vertex_[2].forceFactor_ * barycentric.z_
         );
     }
 
@@ -114,9 +129,8 @@ private:
     Matrix4 CalculateSurfaceProjectionMatrix() const;
     Matrix4 CalculateBarycentricTransformationMatrix() const;
 
-    Vector3 vertices_[3];
-    Vector3 directions_[3];
-    float forceFactors_[3];
+    GravityPoint vertex_[3];
+    Vector3 normal_;
 
     Matrix4 transform_;
 };

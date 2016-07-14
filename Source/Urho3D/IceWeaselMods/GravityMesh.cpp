@@ -18,6 +18,8 @@ GravityMesh::GravityMesh(const GravityMeshBuilder::SharedTetrahedralMesh& shared
 {
     SetMesh(sharedVertexMesh);
 }
+
+// ----------------------------------------------------------------------------
 void GravityMesh::SetMesh(const GravityMeshBuilder::SharedTetrahedralMesh& sharedVertexMesh)
 {
     tetrahedrons_.Clear();
@@ -28,30 +30,17 @@ void GravityMesh::SetMesh(const GravityMeshBuilder::SharedTetrahedralMesh& share
     {
         GravityMeshBuilder::SharedVertexTetrahedron* t = *it;
 
-        Vector3 vertices[4] = {
-            t->v_[0]->position_,
-            t->v_[1]->position_,
-            t->v_[2]->position_,
-            t->v_[3]->position_};
-        Vector3 directions[4] = {
-            t->v_[0]->direction_,
-            t->v_[1]->direction_,
-            t->v_[2]->direction_,
-            t->v_[3]->direction_
-        };
-        float forceFactors[4] = {
-            t->v_[0]->forceFactor_,
-            t->v_[1]->forceFactor_,
-            t->v_[2]->forceFactor_,
-            t->v_[3]->forceFactor_
-        };
-
-        tetrahedrons_.Push(GravityTetrahedron(vertices, directions, forceFactors));
+        tetrahedrons_.Push(GravityTetrahedron(
+            GravityPoint(t->v_[0]->position_, t->v_[0]->direction_, t->v_[0]->forceFactor_),
+            GravityPoint(t->v_[1]->position_, t->v_[1]->direction_, t->v_[1]->forceFactor_),
+            GravityPoint(t->v_[2]->position_, t->v_[2]->direction_, t->v_[2]->forceFactor_),
+            GravityPoint(t->v_[3]->position_, t->v_[3]->direction_, t->v_[3]->forceFactor_)
+        ));
     }
 }
 
 // ----------------------------------------------------------------------------
-const GravityTetrahedron* GravityMesh::Query(Vector4* barycentric, const Vector3& position) const
+bool GravityMesh::Query(Vector3* gravity, const Vector3& position) const
 {
     // Use a linear search for now. Can optimise later
     Vector<GravityTetrahedron>::ConstIterator tetrahedron = tetrahedrons_.Begin();
@@ -60,13 +49,13 @@ const GravityTetrahedron* GravityMesh::Query(Vector4* barycentric, const Vector3
         Vector4 bary = tetrahedron->TransformToBarycentric(position);
         if(tetrahedron->PointLiesInside(bary))
         {
-            if(barycentric != NULL)
-                *barycentric = bary;
-            return &(*tetrahedron);
+            if(gravity != NULL)
+                *gravity = tetrahedron->InterpolateGravity(bary);
+            return true;
         }
     }
 
-    return NULL;
+    return false;
 }
 
 // ----------------------------------------------------------------------------
@@ -75,7 +64,7 @@ void GravityMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest, Vector
     unsigned count = 0;
     Vector<GravityTetrahedron>::Iterator it = tetrahedrons_.Begin();
     for(; it != tetrahedrons_.End(); ++it)
-        if(it->PointLiesInside(pos))
+        if(it->PointLiesInside(it->TransformToBarycentric(pos)))
         {
             it->DrawDebugGeometry(debug, false, Color::RED);
             ++count;

@@ -36,7 +36,7 @@ public:
      * the mesh's hull), then NULL is returned.
      * @param[in] position The position to query.
      */
-    const GravityTetrahedron* Query(Vector4* barycentric, const Vector3& position) const;
+    bool Query(Vector3* gravity, const Vector3& position) const;
 
     /*!
      * @brief Replaces the existing gravity mesh (if any) with a shared vertex

@@ -113,8 +113,7 @@ private:
 
     PODVector<GravityVector*> gravityVectors_;
     SharedPtr<GravityMesh> gravityMesh_;
-    SharedPtr<GravityMesh> extrapolatedFaces_;
-    SharedPtr<GravityMesh> extrapolatedEdges_;
+    SharedPtr<GravityHull> gravityHull_;
 
     float gravity_;
 };
