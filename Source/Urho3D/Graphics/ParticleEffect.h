@@ -215,6 +215,8 @@ public:
     void SetNumTextureFrames(unsigned number);
     /// Sort the list of texture frames based on time.
     void SortTextureFrames();
+    /// Clone the particle effect.
+    SharedPtr<ParticleEffect> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return material.
     Material* GetMaterial() const { return material_; }
