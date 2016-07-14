@@ -684,6 +684,7 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
+        eventData[P_CONTACT] = (void*)contactInfo.contact_;
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
     }
@@ -707,6 +708,7 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_BODYB] = contactInfo.bodyB_.Get();
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
+        eventData[P_CONTACT] = (void*)contactInfo.contact_;
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
     }
@@ -726,13 +728,15 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     bodyB_ = (RigidBody2D*)(fixtureB->GetBody()->GetUserData());
     nodeA_ = bodyA_->GetNode();
     nodeB_ = bodyB_->GetNode();
+    contact_ = contact;
 }
 
 PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
     bodyA_(other.bodyA_),
     bodyB_(other.bodyB_),
     nodeA_(other.nodeA_),
-    nodeB_(other.nodeB_)
+    nodeB_(other.nodeB_),
+    contact_(other.contact_)
 {
 }
 

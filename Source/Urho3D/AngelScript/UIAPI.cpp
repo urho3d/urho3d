@@ -495,10 +495,7 @@ static void RegisterMenu(asIScriptEngine* engine)
 
 static MessageBox* ConstructMessageBox(const String& messageString, const String& titleString, XMLFile* layoutFile, XMLFile* styleFile)
 {
-    SharedPtr<MessageBox> messageBox(new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile));
-    if (messageBox)
-        messageBox->AddRef();
-    return messageBox.Get();
+    return new MessageBox(GetScriptContext(), messageString, titleString, layoutFile, styleFile);
 }
 
 static void RegisterMessageBox(asIScriptEngine* engine)

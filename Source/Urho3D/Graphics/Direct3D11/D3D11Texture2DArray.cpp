@@ -43,93 +43,14 @@
 namespace Urho3D
 {
 
-Texture2DArray::Texture2DArray(Context* context) :
-    Texture(context),
-    layers_(0),
-    lockedLevel_(-1)
+void Texture2DArray::OnDeviceLost()
 {
+    // No-op on Direct3D11
 }
 
-Texture2DArray::~Texture2DArray()
+void Texture2DArray::OnDeviceReset()
 {
-    Release();
-}
-
-void Texture2DArray::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture2DArray>();
-}
-
-bool Texture2DArray::BeginLoad(Deserializer& source)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    cache->ResetDependencies(this);
-
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-
-    loadParameters_ = (new XMLFile(context_));
-    if (!loadParameters_->Load(source))
-    {
-        loadParameters_.Reset();
-        return false;
-    }
-
-    loadImages_.Clear();
-
-    XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement layerElem = textureElem.GetChild("layer");
-    while (layerElem)
-    {
-        String name = layerElem.GetAttribute("name");
-
-        // If path is empty, add the XML file path
-        if (GetPath(name).Empty())
-            name = texPath + name;
-
-        loadImages_.Push(cache->GetTempResource<Image>(name));
-        cache->StoreResourceDependency(this, name);
-
-        layerElem = layerElem.GetNext("layer");
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-    {
-        for (unsigned i = 0; i < loadImages_.Size(); ++i)
-        {
-            if (loadImages_[i])
-                loadImages_[i]->PrecalculateLevels();
-        }
-    }
-
-    return true;
-}
-
-bool Texture2DArray::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    SetLayers(loadImages_.Size());
-
-    for (unsigned i = 0; i < loadImages_.Size(); ++i)
-        SetData(i, loadImages_[i]);
-
-    loadImages_.Clear();
-    loadParameters_.Reset();
-
-    return true;
+    // No-op on Direct3D11
 }
 
 void Texture2DArray::Release()
@@ -146,70 +67,16 @@ void Texture2DArray::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
-}
-
-void Texture2DArray::SetLayers(unsigned layers)
-{
-    Release();
-
-    layers_ = layers;
-}
-
-bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative texture array size");
-        return false;
-    }
-    if (usage == TEXTURE_DEPTHSTENCIL)
-    {
-        URHO3D_LOGERROR("Depth-stencil usage not supported for texture arrays");
-        return false;
-    }
-
-    // Delete the old rendersurfaces if any
-    renderSurface_.Reset();
-
-    usage_ = usage;
-
-    if (usage_ == TEXTURE_RENDERTARGET)
-    {
-        renderSurface_ = new RenderSurface(this);
-
-        // Nearest filtering and mipmaps disabled by default
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
-    }
-    else if (usage_ == TEXTURE_DYNAMIC)
-        requestedLevels_ = 1;
-
-    if (usage_ == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2DArray, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
-    width_ = width;
-    height_ = height;
-    format_ = format;
-    if (layers)
-        layers_ = layers;
-
-    layerMemoryUse_.Resize(layers_);
-    for (unsigned i = 0; i < layers_; ++i)
-        layerMemoryUse_[i] = 0;
-
-    return Create();
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("Texture array not created, can not set data");
         return false;
@@ -268,7 +135,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -279,7 +146,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         {
             for (int row = 0; row < height; ++row)
                 memcpy((unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart, src + row * rowSize, rowSize);
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
@@ -292,7 +159,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
         destBox.front = 0;
         destBox.back = 1;
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, 0);
     }
 
@@ -384,7 +251,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -440,7 +307,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
         }
         else
         {
-            if (!object_)
+            if (!object_.ptr_)
             {
                 URHO3D_LOGERROR("Texture array layer 0 must be loaded first");
                 return false;
@@ -482,7 +349,7 @@ bool Texture2DArray::SetData(unsigned layer, Image* image, bool useAlpha)
 
 bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("Texture array not created, can not get data");
         return false;
@@ -538,7 +405,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = 1;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -592,7 +459,7 @@ bool Texture2DArray::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture array", hr);
         return false;
     }
@@ -615,7 +482,7 @@ bool Texture2DArray::Create()
         srvDesc.Texture2DArray.MostDetailedMip = 0;
     }
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &srvDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &srvDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
@@ -642,7 +509,7 @@ bool Texture2DArray::Create()
             renderTargetViewDesc.Texture2DArray.FirstArraySlice = 0;
         }
 
-        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_, &renderTargetViewDesc,
+        hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_.ptr_, &renderTargetViewDesc,
             (ID3D11RenderTargetView**)&renderSurface_->renderTargetView_);
 
         if (FAILED(hr))
@@ -654,17 +521,6 @@ bool Texture2DArray::Create()
     }
 
     return true;
-}
-
-void Texture2DArray::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
-    {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->QueueRenderSurface(renderSurface_);
-        renderSurface_->ResetUpdateQueued();
-    }
 }
 
 }

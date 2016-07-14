@@ -30,7 +30,6 @@
 #include "../Core/StringUtils.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
-#include "../Graphics/GraphicsImpl.h"
 #include "../Input/Input.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
@@ -395,7 +394,7 @@ void Input::Update()
 #endif
 
     // Check for focus change this frame
-    SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    SDL_Window* window = graphics_->GetWindow();
     unsigned flags = window ? SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS) : 0;
 #ifndef __EMSCRIPTEN__
     if (window)
@@ -791,14 +790,14 @@ void Input::ResetMouseGrabbed()
 #ifndef __EMSCRIPTEN__
 void Input::SetMouseModeAbsolute(SDL_bool enable)
 {
-    SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+    SDL_Window* const window = graphics_->GetWindow();
 
     SDL_SetWindowGrab(window, enable);
 }
 
 void Input::SetMouseModeRelative(SDL_bool enable)
 {
-    SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+    SDL_Window* const window = graphics_->GetWindow();
 
     int result = SDL_SetRelativeMouseMode(enable);
     sdlMouseRelative_ = enable && (result == 0);
@@ -820,7 +819,7 @@ void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
         SuppressNextMouseMove();
 
         mouseMode_ = mode;
-        SDL_Window* const window = graphics_->GetImpl()->GetWindow();
+        SDL_Window* const window = graphics_->GetWindow();
 
         UI* const ui = GetSubsystem<UI>();
         Cursor* const cursor = ui->GetCursor();
@@ -988,7 +987,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             ++numButtons;
 
             // Check whether the button has key binding
-            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1015,7 +1014,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
             }
 
             // Check whether the button has mouse button binding
-            text = dynamic_cast<Text*>(element->GetChild("MouseButtonBinding", false));
+            text = element->GetChildDynamicCast<Text>("MouseButtonBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1040,7 +1039,7 @@ SDL_JoystickID Input::AddScreenJoystick(XMLFile* layoutFile, XMLFile* styleFile)
         {
             ++numHats;
 
-            Text* text = dynamic_cast<Text*>(element->GetChild("KeyBinding", false));
+            Text* text = element->GetChildDynamicCast<Text>("KeyBinding", false);
             if (text)
             {
                 text->SetVisible(false);
@@ -1448,7 +1447,7 @@ bool Input::IsScreenKeyboardVisible() const
 {
     if (graphics_)
     {
-        SDL_Window* window = graphics_->GetImpl()->GetWindow();
+        SDL_Window* window = graphics_->GetWindow();
         return SDL_IsScreenKeyboardShown(window) != SDL_FALSE;
     }
     else
@@ -1785,7 +1784,7 @@ void Input::SetMousePosition(const IntVector2& position)
     if (!graphics_)
         return;
 
-    SDL_WarpMouseInWindow(graphics_->GetImpl()->GetWindow(), position.x_, position.y_);
+    SDL_WarpMouseInWindow(graphics_->GetWindow(), position.x_, position.y_);
 }
 
 void Input::CenterMousePosition()
@@ -2292,11 +2291,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
             case SDL_WINDOWEVENT_RESIZED:
                 inResize_ = true;
-                graphics_->WindowResized();
+                graphics_->OnWindowResized();
                 inResize_ = false;
                 break;
             case SDL_WINDOWEVENT_MOVED:
-                graphics_->WindowMoved();
+                graphics_->OnWindowMoved();
                 break;
 
             default: break;
@@ -2331,7 +2330,7 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 
     // Re-enable cursor clipping, and re-center the cursor (if needed) to the new screen size, so that there is no erroneous
     // mouse move event. Also get new window ID if it changed
-    SDL_Window* window = graphics_->GetImpl()->GetWindow();
+    SDL_Window* window = graphics_->GetWindow();
     windowID_ = SDL_GetWindowID(window);
 
     // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes

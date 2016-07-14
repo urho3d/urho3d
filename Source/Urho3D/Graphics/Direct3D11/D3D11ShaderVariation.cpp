@@ -51,21 +51,9 @@ const char* ShaderVariation::elementSemanticNames[] =
     "OBJECTINDEX"
 };
 
-ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
-    GPUObject(owner->GetSubsystem<Graphics>()),
-    owner_(owner),
-    type_(type),
-    elementHash_(0)
+void ShaderVariation::OnDeviceLost()
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        constantBufferSizes_[i] = 0;
-}
-
-ShaderVariation::~ShaderVariation()
-{
-    Release();
+    // No-op on Direct3D11
 }
 
 bool ShaderVariation::Create()
@@ -104,10 +92,10 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_);
+            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_);
+                URHO3D_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -118,10 +106,10 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_);
+            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_);
+                URHO3D_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -129,17 +117,17 @@ bool ShaderVariation::Create()
             compilerOutput_ = "Could not create pixel shader, empty bytecode";
     }
 
-    return object_ != 0;
+    return object_.ptr_ != 0;
 }
 
 void ShaderVariation::Release()
 {
-    if (object_)
+    if (object_.ptr_)
     {
         if (!graphics_)
             return;
 
-        graphics_->CleanUpShaderPrograms(this);
+        graphics_->CleanupShaderPrograms(this);
 
         if (type_ == VS)
         {
@@ -152,7 +140,7 @@ void ShaderVariation::Release()
                 graphics_->SetShaders(0, 0);
         }
 
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
     }
 
     compilerOutput_.Clear();
@@ -166,11 +154,6 @@ void ShaderVariation::Release()
     elementHash_ = 0;
 }
 
-void ShaderVariation::SetName(const String& name)
-{
-    name_ = name;
-}
-
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
@@ -179,11 +162,6 @@ void ShaderVariation::SetDefines(const String& defines)
     definesClipPlane_ = defines;
     if (!definesClipPlane_.EndsWith(" CLIPPLANE"))
         definesClipPlane_ += " CLIPPLANE";
-}
-
-Shader* ShaderVariation::GetOwner() const
-{
-    return owner_;
 }
 
 bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
@@ -220,7 +198,12 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter(type_, name_, buffer, offset, size);
+        ShaderParameter parameter;
+        parameter.type_ = type_;
+        parameter.name_ = name;
+        parameter.buffer_ = buffer;
+        parameter.offset_ = offset;
+        parameter.size_ = size;
         parameters_[StringHash(name)] = parameter;
     }
 
@@ -416,7 +399,13 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                parameters_[varName] = ShaderParameter(type_, varName, cbRegister, varDesc.StartOffset, varDesc.Size);
+                ShaderParameter parameter;
+                parameter.type_ = type_;
+                parameter.name_ = varName;
+                parameter.buffer_ = cbRegister;
+                parameter.offset_ = varDesc.StartOffset;
+                parameter.size_ = varDesc.Size;
+                parameters_[varName] = parameter;
             }
         }
     }

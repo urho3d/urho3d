@@ -39,133 +39,22 @@
 namespace Urho3D
 {
 
-Texture3D::Texture3D(Context* context) :
-    Texture(context)
-{
-}
-
-Texture3D::~Texture3D()
-{
-    Release();
-}
-
-void Texture3D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture3D>();
-}
-
-bool Texture3D::BeginLoad(Deserializer& source)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If device is lost, retry later
-    if (graphics_->IsDeviceLost())
-    {
-        URHO3D_LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
-        return true;
-    }
-
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-
-    cache->ResetDependencies(this);
-
-    loadParameters_ = new XMLFile(context_);
-    if (!loadParameters_->Load(source))
-    {
-        loadParameters_.Reset();
-        return false;
-    }
-
-    XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement volumeElem = textureElem.GetChild("volume");
-    XMLElement colorlutElem = textureElem.GetChild("colorlut");
-
-    if (volumeElem)
-    {
-        String name = volumeElem.GetAttribute("name");
-
-        String volumeTexPath, volumeTexName, volumeTexExt;
-        SplitPath(name, volumeTexPath, volumeTexName, volumeTexExt);
-        // If path is empty, add the XML file path
-        if (volumeTexPath.Empty())
-            name = texPath + name;
-
-        loadImage_ = cache->GetTempResource<Image>(name);
-        // Precalculate mip levels if async loading
-        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
-            loadImage_->PrecalculateLevels();
-        cache->StoreResourceDependency(this, name);
-        return true;
-    }
-    else if (colorlutElem)
-    {
-        String name = colorlutElem.GetAttribute("name");
-
-        String colorlutTexPath, colorlutTexName, colorlutTexExt;
-        SplitPath(name, colorlutTexPath, colorlutTexName, colorlutTexExt);
-        // If path is empty, add the XML file path
-        if (colorlutTexPath.Empty())
-            name = texPath + name;
-
-        SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(name);
-        loadImage_ = new Image(context_);
-        if (!loadImage_->LoadColorLUT(*(file.Get())))
-        {
-            loadParameters_.Reset();
-            loadImage_.Reset();
-            return false;
-        }
-        // Precalculate mip levels if async loading
-        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
-            loadImage_->PrecalculateLevels();
-        cache->StoreResourceDependency(this, name);
-        return true;
-    }
-
-    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
-    return false;
-}
-
-bool Texture3D::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    bool success = SetData(loadImage_);
-
-    loadImage_.Reset();
-    loadParameters_.Reset();
-
-    return success;
-}
-
 void Texture3D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void Texture3D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.ptr_)
         {
             Create();
             dataLost_ = true;
@@ -186,44 +75,14 @@ void Texture3D::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
-}
-
-bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0 || depth <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative 3D texture dimensions");
-        return false;
-    }
-    if (usage >= TEXTURE_RENDERTARGET)
-    {
-        URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
-        return false;
-    }
-
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
-
-    if (usage == TEXTURE_DYNAMIC)
-    {
-        usage_ |= D3DUSAGE_DYNAMIC;
-        pool_ = D3DPOOL_DEFAULT;
-    }
-
-    width_ = width;
-    height_ = height;
-    depth_ = depth;
-    format_ = format;
-
-    return Create();
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -275,10 +134,10 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
 
     DWORD flags = 0;
     if (level == 0 && x == 0 && y == 0 && z == 0 && width == levelWidth && height == levelHeight && depth == levelDepth &&
-        pool_ == D3DPOOL_DEFAULT)
+        usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DVolumeTexture9*)object_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags);
+    HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, (flags & D3DLOCK_DISCARD) ? 0 : &d3dBox, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -353,7 +212,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         break;
     }
 
-    ((IDirect3DVolumeTexture9*)object_)->UnlockBox(level);
+    ((IDirect3DVolumeTexture9*)object_.ptr_)->UnlockBox(level);
     return true;
 }
 
@@ -487,7 +346,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 
 bool Texture3D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -524,7 +383,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     d3dBox.Bottom = (UINT)levelHeight;
     d3dBox.Back = (UINT)levelDepth;
 
-    HRESULT hr = ((IDirect3DVolumeTexture9*)object_)->LockBox(level, &d3dLockedBox, &d3dBox, D3DLOCK_READONLY);
+    HRESULT hr = ((IDirect3DVolumeTexture9*)object_.ptr_)->LockBox(level, &d3dLockedBox, &d3dBox, D3DLOCK_READONLY);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -593,7 +452,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
         break;
     }
 
-    ((IDirect3DVolumeTexture9*)object_)->UnlockBox(level);
+    ((IDirect3DVolumeTexture9*)object_.ptr_)->UnlockBox(level);
     return true;
 }
 
@@ -610,25 +469,28 @@ bool Texture3D::Create()
         return true;
     }
 
+    unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+    unsigned d3dUsage = usage_ == TEXTURE_DYNAMIC ? D3DUSAGE_DYNAMIC : 0;
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     HRESULT hr = device->CreateVolumeTexture(
         (UINT)width_,
         (UINT)height_,
         (UINT)depth_,
         requestedLevels_,
-        usage_,
+        d3dUsage,
         (D3DFORMAT)format_,
-        (D3DPOOL)pool_,
+        (D3DPOOL)pool,
         (IDirect3DVolumeTexture9**)&object_,
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create texture", hr);
         return false;
     }
 
-    levels_ = ((IDirect3DVolumeTexture9*)object_)->GetLevelCount();
+    levels_ = ((IDirect3DVolumeTexture9*)object_.ptr_)->GetLevelCount();
 
     return true;
 }

@@ -602,11 +602,11 @@ public:
     /// Return iterator to the end.
     ConstIterator End() const { return ConstIterator(Tail()); }
 
-    /// Return first key.
-    const T& Front() const { return *Begin(); }
+    /// Return first pair.
+    const KeyValue& Front() const { return *Begin(); }
 
-    /// Return last key.
-    const T& Back() const { return *(--End()); }
+    /// Return last pair.
+    const KeyValue& Back() const { return *(--End()); }
 
 private:
     /// Return the head node.

@@ -39,112 +39,19 @@
 namespace Urho3D
 {
 
-Texture3D::Texture3D(Context* context) :
-    Texture(context)
+void Texture3D::OnDeviceLost()
 {
+    // No-op on Direct3D11
 }
 
-Texture3D::~Texture3D()
+void Texture3D::OnDeviceReset()
 {
-    Release();
-}
-
-void Texture3D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture3D>();
-}
-
-bool Texture3D::BeginLoad(Deserializer& source)
-{
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    String texPath, texName, texExt;
-    SplitPath(GetName(), texPath, texName, texExt);
-
-    cache->ResetDependencies(this);
-
-    loadParameters_ = new XMLFile(context_);
-    if (!loadParameters_->Load(source))
-    {
-        loadParameters_.Reset();
-        return false;
-    }
-
-    XMLElement textureElem = loadParameters_->GetRoot();
-    XMLElement volumeElem = textureElem.GetChild("volume");
-    XMLElement colorlutElem = textureElem.GetChild("colorlut");
-
-    if (volumeElem)
-    {
-        String name = volumeElem.GetAttribute("name");
-
-        String volumeTexPath, volumeTexName, volumeTexExt;
-        SplitPath(name, volumeTexPath, volumeTexName, volumeTexExt);
-        // If path is empty, add the XML file path
-        if (volumeTexPath.Empty())
-            name = texPath + name;
-
-        loadImage_ = cache->GetTempResource<Image>(name);
-        // Precalculate mip levels if async loading
-        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
-            loadImage_->PrecalculateLevels();
-        cache->StoreResourceDependency(this, name);
-        return true;
-    }
-    else if (colorlutElem)
-    {
-        String name = colorlutElem.GetAttribute("name");
-
-        String colorlutTexPath, colorlutTexName, colorlutTexExt;
-        SplitPath(name, colorlutTexPath, colorlutTexName, colorlutTexExt);
-        // If path is empty, add the XML file path
-        if (colorlutTexPath.Empty())
-            name = texPath + name;
-
-        SharedPtr<File> file = GetSubsystem<ResourceCache>()->GetFile(name);
-        loadImage_ = new Image(context_);
-        if (!loadImage_->LoadColorLUT(*(file.Get())))
-        {
-            loadParameters_.Reset();
-            loadImage_.Reset();
-            return false;
-        }
-        // Precalculate mip levels if async loading
-        if (loadImage_ && GetAsyncLoadState() == ASYNC_LOADING)
-            loadImage_->PrecalculateLevels();
-        cache->StoreResourceDependency(this, name);
-        return true;
-    }
-
-    URHO3D_LOGERROR("Texture3D XML data for " + GetName() + " did not contain either volume or colorlut element");
-    return false;
-}
-
-bool Texture3D::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    bool success = SetData(loadImage_);
-
-    loadImage_.Reset();
-    loadParameters_.Reset();
-
-    return success;
+    // No-op on Direct3D11
 }
 
 void Texture3D::Release()
 {
-    if (graphics_ && object_)
+    if (graphics_ && object_.ptr_)
     {
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
@@ -153,41 +60,16 @@ void Texture3D::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
+    URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
-}
-
-bool Texture3D::SetSize(int width, int height, int depth, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0 || depth <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative 3D texture dimensions");
-        return false;
-    }
-    if (usage >= TEXTURE_RENDERTARGET)
-    {
-        URHO3D_LOGERROR("Rendertarget or depth-stencil usage not supported for 3D textures");
-        return false;
-    }
-    if (usage_ == TEXTURE_DYNAMIC)
-        requestedLevels_ = 1;
-
-    usage_ = usage;
-
-    width_ = width;
-    height_ = height;
-    depth_ = depth;
-    format_ = format;
-
-    return Create();
 }
 
 bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int height, int depth, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -242,7 +124,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
         if (FAILED(hr) || !mappedData.pData)
         {
@@ -260,7 +142,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
                 }
             }
 
-            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_, subResource);
+            graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)object_.ptr_, subResource);
         }
     }
     else
@@ -276,7 +158,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
         destBox.front = (UINT)z;
         destBox.back = (UINT)(z + depth);
 
-        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_, subResource, &destBox, data,
+        graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Resource*)object_.ptr_, subResource, &destBox, data,
             rowSize, levelHeight * rowSize);
     }
 
@@ -412,7 +294,7 @@ bool Texture3D::SetData(Image* image, bool useAlpha)
 
 bool Texture3D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -461,7 +343,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = (UINT)levelDepth;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -512,10 +394,10 @@ bool Texture3D::Create()
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_);
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_.ptr_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
         return false;
     }
@@ -526,7 +408,7 @@ bool Texture3D::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
     resourceViewDesc.Texture3D.MipLevels = (UINT)levels_;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_, &resourceViewDesc,
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {

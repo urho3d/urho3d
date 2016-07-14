@@ -39,74 +39,6 @@
 namespace Urho3D
 {
 
-Texture2D::Texture2D(Context* context) :
-    Texture(context)
-{
-    target_ = GL_TEXTURE_2D;
-}
-
-Texture2D::~Texture2D()
-{
-    Release();
-}
-
-void Texture2D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture2D>();
-}
-
-bool Texture2D::BeginLoad(Deserializer& source)
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If device is lost, retry later
-    if (graphics_->IsDeviceLost())
-    {
-        URHO3D_LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
-        return true;
-    }
-
-    // Load the image data for EndLoad()
-    loadImage_ = new Image(context_);
-    if (!loadImage_->Load(source))
-    {
-        loadImage_.Reset();
-        return false;
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-        loadImage_->PrecalculateLevels();
-
-    // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
-    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
-
-    return true;
-}
-
-bool Texture2D::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    bool success = SetData(loadImage_);
-
-    loadImage_.Reset();
-    loadParameters_.Reset();
-
-    return success;
-}
-
 void Texture2D::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
@@ -117,14 +49,14 @@ void Texture2D::OnDeviceLost()
 
 void Texture2D::OnDeviceReset()
 {
-    if (!object_ || dataPending_)
+    if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.name_)
         {
             Create();
             dataLost_ = true;
@@ -136,7 +68,7 @@ void Texture2D::OnDeviceReset()
 
 void Texture2D::Release()
 {
-    if (object_)
+    if (object_.name_)
     {
         if (!graphics_)
             return;
@@ -149,62 +81,26 @@ void Texture2D::Release()
                     graphics_->SetTexture(i, 0);
             }
 
-            glDeleteTextures(1, &object_);
+            glDeleteTextures(1, &object_.name_);
         }
 
         if (renderSurface_)
             renderSurface_->Release();
 
-        object_ = 0;
+        object_.name_ = 0;
     }
     else
     {
         if (renderSurface_)
             renderSurface_->Release();
     }
-}
-
-bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative texture dimensions");
-        return false;
-    }
-
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-
-    usage_ = usage;
-
-    if (usage >= TEXTURE_RENDERTARGET)
-    {
-        renderSurface_ = new RenderSurface(this);
-
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
-    }
-
-    if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
-    width_ = width;
-    height_ = height;
-    format_ = format;
-
-    return Create();
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -336,7 +232,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
         if (IsCompressed() && requestedLevels_ > 1)
             requestedLevels_ = 0;
         SetSize(levelWidth, levelHeight, format);
-        if (!object_)
+        if (!object_.name_)
             return false;
 
         for (unsigned i = 0; i < levels_; ++i)
@@ -403,7 +299,7 @@ bool Texture2D::SetData(Image* image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-    if (!object_ || !graphics_)
+    if (!object_.name_ || !graphics_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -488,7 +384,7 @@ bool Texture2D::Create()
             return false;
     }
 
-    glGenTextures(1, &object_);
+    glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
     graphics_->SetTextureForUpdate(this);
@@ -508,17 +404,7 @@ bool Texture2D::Create()
     }
 
     // Set mipmapping
-    levels_ = requestedLevels_;
-    if (!levels_)
-    {
-        unsigned maxSize = Max((int)width_, (int)height_);
-        while (maxSize)
-        {
-            maxSize >>= 1;
-            ++levels_;
-        }
-    }
-
+    levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(target_, GL_TEXTURE_MAX_LEVEL, levels_ - 1);
@@ -529,17 +415,6 @@ bool Texture2D::Create()
     graphics_->SetTexture(0, 0);
 
     return success;
-}
-
-void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
-    {
-        Renderer* renderer = GetSubsystem<Renderer>();
-        if (renderer)
-            renderer->QueueRenderSurface(renderSurface_);
-        renderSurface_->ResetUpdateQueued();
-    }
 }
 
 }

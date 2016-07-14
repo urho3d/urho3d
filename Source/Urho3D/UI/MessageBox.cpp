@@ -23,7 +23,6 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Graphics/Graphics.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
@@ -40,6 +39,7 @@ namespace Urho3D
 MessageBox::MessageBox(Context* context, const String& messageString, const String& titleString, XMLFile* layoutFile,
     XMLFile* styleFile) :
     Object(context),
+    window_(0),
     titleText_(0),
     messageText_(0),
     okButton_(0)
@@ -54,53 +54,54 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     }
 
     UI* ui = GetSubsystem<UI>();
-    window_ = ui->LoadLayout(layoutFile, styleFile);
-    if (!window_)   // Error is already logged
-        return;
-    ui->GetRoot()->AddChild(window_);
+    UIElement* root = ui->GetRoot();
+    {
+        SharedPtr<UIElement> holder = ui->LoadLayout(layoutFile, styleFile);
+        if (!holder)    // Error is already logged
+            return;
+        window_ = holder;
+        root->AddChild(window_);    // Take ownership of the object before SharedPtr goes out of scope
+    }
 
     // Set the title and message strings if they are given
-    titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
+    titleText_ = window_->GetChildDynamicCast<Text>("TitleText", true);
     if (titleText_ && !titleString.Empty())
         titleText_->SetText(titleString);
-    messageText_ = dynamic_cast<Text*>(window_->GetChild("MessageText", true));
+    messageText_ = window_->GetChildDynamicCast<Text>("MessageText", true);
     if (messageText_ && !messageString.Empty())
         messageText_->SetText(messageString);
 
     // Center window after the message is set
-    Window* window = dynamic_cast<Window*>(window_.Get());
+    Window* window = dynamic_cast<Window*>(window_);
     if (window)
     {
-        Graphics* graphics = GetSubsystem<Graphics>();  // May be null if headless
-        if (graphics)
-        {
-            const IntVector2& size = window->GetSize();
-            window->SetPosition((graphics->GetWidth() - size.x_) / 2, (graphics->GetHeight() - size.y_) / 2);
-        }
-        else
-            URHO3D_LOGWARNING("Instantiating a modal window in headless mode!");
-
+        const IntVector2& size = window->GetSize();
+        window->SetPosition((root->GetWidth() - size.x_) / 2, (root->GetHeight() - size.y_) / 2);
         window->SetModal(true);
         SubscribeToEvent(window, E_MODALCHANGED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
 
     // Bind the buttons (if any in the loaded UI layout) to event handlers
-    okButton_ = dynamic_cast<Button*>(window_->GetChild("OkButton", true));
+    okButton_ = window_->GetChildDynamicCast<Button>("OkButton", true);
     if (okButton_)
     {
         ui->SetFocusElement(okButton_);
         SubscribeToEvent(okButton_, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
-    Button* cancelButton = dynamic_cast<Button*>(window_->GetChild("CancelButton", true));
+    Button* cancelButton = window_->GetChildDynamicCast<Button>("CancelButton", true);
     if (cancelButton)
         SubscribeToEvent(cancelButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
-    Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
+    Button* closeButton = window_->GetChildDynamicCast<Button>("CloseButton", true);
     if (closeButton)
         SubscribeToEvent(closeButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
+
+    // Increase reference count to keep Self alive
+    AddRef();
 }
 
 MessageBox::~MessageBox()
 {
+    // This would remove the UI-element regardless of whether it is parented to UI's root or UI's modal-root
     if (window_)
         window_->Remove();
 }
@@ -140,7 +141,8 @@ void MessageBox::HandleMessageAcknowledged(StringHash eventType, VariantMap& eve
     newEventData[P_OK] = eventData[Released::P_ELEMENT] == okButton_;
     SendEvent(E_MESSAGEACK, newEventData);
 
-    this->ReleaseRef();
+    // Self destruct
+    ReleaseRef();
 }
 
 }

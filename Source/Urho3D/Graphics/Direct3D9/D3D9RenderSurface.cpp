@@ -42,51 +42,6 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
 {
 }
 
-RenderSurface::~RenderSurface()
-{
-    Release();
-}
-
-void RenderSurface::SetNumViewports(unsigned num)
-{
-    viewports_.Resize(num);
-}
-
-void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
-{
-    if (index >= viewports_.Size())
-        viewports_.Resize(index + 1);
-
-    viewports_[index] = viewport;
-}
-
-void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode)
-{
-    updateMode_ = mode;
-}
-
-void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
-{
-    if (renderTarget != this)
-        linkedRenderTarget_ = renderTarget;
-}
-
-void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
-{
-    if (depthStencil != this)
-        linkedDepthStencil_ = depthStencil;
-}
-
-void RenderSurface::QueueUpdate()
-{
-    updateQueued_ = true;
-}
-
-void RenderSurface::ResetUpdateQueued()
-{
-    updateQueued_ = false;
-}
-
 void RenderSurface::Release()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
@@ -105,24 +60,15 @@ void RenderSurface::Release()
     URHO3D_SAFE_RELEASE(surface_);
 }
 
-int RenderSurface::GetWidth() const
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
 {
-    return parentTexture_->GetWidth();
+    // Not used on Direct3D
+    return false;
 }
 
-int RenderSurface::GetHeight() const
+void RenderSurface::OnDeviceLost()
 {
-    return parentTexture_->GetHeight();
-}
-
-TextureUsage RenderSurface::GetUsage() const
-{
-    return parentTexture_->GetUsage();
-}
-
-Viewport* RenderSurface::GetViewport(unsigned index) const
-{
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+    // No-op on Direct3D
 }
 
 }

@@ -20,47 +20,61 @@
 // THE SOFTWARE.
 //
 
-#pragma once
+#include "../Precompiled.h"
 
-#include "../../Container/Ptr.h"
+#include "../Graphics/Graphics.h"
+#include "../Graphics/GPUObject.h"
+
+#include "../DebugNew.h"
 
 namespace Urho3D
 {
 
-class Graphics;
-
-/// Base class for GPU resources.
-class URHO3D_API GPUObject
+GPUObject::GPUObject(Graphics* graphics) :
+    graphics_(graphics),
+    dataLost_(false),
+    dataPending_(false)
 {
-public:
-    /// Construct with graphics subsystem pointer.
-    GPUObject(Graphics* graphics);
-    /// Destruct. Remove from the graphics subsystem.
-    virtual ~GPUObject();
+#ifdef URHO3D_OPENGL
+    object_.name_ = 0;
+#else
+    object_.ptr_ = 0;
+#endif
 
-    /// Unconditionally release the GPU resource.
-    virtual void Release() { }
+    if (graphics_)
+        graphics->AddGPUObject(this);
+}
 
-    /// Clear the data lost flag. No-op on D3D11.
-    void ClearDataLost() { }
+GPUObject::~GPUObject()
+{
+    if (graphics_)
+        graphics_->RemoveGPUObject(this);
+}
 
-    /// Return the graphics subsystem.
-    Graphics* GetGraphics() const;
+void GPUObject::OnDeviceLost()
+{
+#ifdef URHO3D_OPENGL
+    // On OpenGL the object has already been lost at this point; reset object name
+    object_.name_ = 0;
+#endif
+}
 
-    /// Return Direct3D object.
-    void* GetGPUObject() const { return object_; }
+void GPUObject::OnDeviceReset()
+{
+}
 
-    /// Return whether data is lost due to device loss. Always false on D3D11.
-    bool IsDataLost() const { return false; }
+void GPUObject::Release()
+{
+}
 
-    /// Return whether has pending data assigned while device was lost. Always false on D3D11.
-    bool HasPendingData() const { return false; }
+void GPUObject::ClearDataLost()
+{
+    dataLost_ = false;
+}
 
-protected:
-    /// Graphics subsystem.
-    WeakPtr<Graphics> graphics_;
-    /// Direct3D object.
-    void* object_;
-};
+Graphics* GPUObject::GetGraphics() const
+{
+    return graphics_;
+}
 
 }

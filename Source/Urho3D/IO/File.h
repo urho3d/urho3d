@@ -109,6 +109,13 @@ public:
     bool IsPackaged() const { return offset_ != 0; }
 
 private:
+    /// Open file internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful.
+    bool OpenInternal(const String& fileName, FileMode mode, bool fromPackage = false);
+    /// Perform the file read internally using either C standard IO functions or SDL RWops for Android asset files. Return true if successful. This does not handle compressed package file reading.
+    bool ReadInternal(void* dest, unsigned size);
+    /// Seek in file internally using either C standard IO functions or SDL RWops for Android asset files.
+    void SeekInternal(unsigned newPosition);
+
     /// File name.
     String fileName_;
     /// Open mode.

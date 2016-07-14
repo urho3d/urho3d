@@ -200,6 +200,10 @@ public:
     void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
+    /// Set text attribute.
+    void SetTextAttr(const String& value);
+    /// Return text attribute.
+    String GetTextAttr() const;
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -269,7 +273,7 @@ protected:
     PODVector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
-    /// Storage string id. Used when enabled autoLocalizable.
+    /// Localization string id storage. Used when autoLocalizable flag is set.
     String stringId_;
     /// Handle change Language.
     void HandleChangeLanguage(StringHash eventType, VariantMap& eventData);
