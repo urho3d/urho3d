@@ -59,7 +59,7 @@ class ParticleEffect : public Resource
     void SetMinRotation(float rotation);
     void SetMaxRotation(float rotation);
     void SetMinRotationSpeed(float speed);
-    void SetMaxRotationSpeed(float speed);    
+    void SetMaxRotationSpeed(float speed);
     void SetSizeAdd(float sizeAdd);
     void SetSizeMul(float sizeMul);
     void AddColorTime(const Color& color, const float time);
@@ -74,6 +74,9 @@ class ParticleEffect : public Resource
     void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
     void SetNumTextureFrames(unsigned number);
     void SortTextureFrames();
+    
+    // SharedPtr<ParticleEffect> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside ParticleEffect* ParticleEffectClone @ Clone(const String cloneName = String::EMPTY) const;
 
     Material* GetMaterial() const;
     unsigned GetNumParticles() const;
@@ -155,5 +158,17 @@ static int tolua_GraphicsLuaAPI_ParticleEffect_new00(lua_State* tolua_S)
 static int tolua_GraphicsLuaAPI_ParticleEffect_new00_local(lua_State* tolua_S)
 {
     return ToluaNewObjectGC<ParticleEffect>(tolua_S);
+}
+
+static ParticleEffect* ParticleEffectClone(const ParticleEffect* effect, const String& cloneName = String::EMPTY)
+{
+    if (!effect)
+        return 0;
+        
+    SharedPtr<ParticleEffect> clonedEffectPtr = effect->Clone(cloneName);
+    ParticleEffect* clonedEffect = clonedEffectPtr.Get();
+    clonedEffectPtr.Detach();
+    
+    return clonedEffect;
 }
 $}
