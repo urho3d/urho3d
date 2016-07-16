@@ -1471,6 +1471,15 @@ static void RegisterBillboardSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("BillboardSet", "Zone@+ get_zone() const", asMETHOD(BillboardSet, GetZone), asCALL_THISCALL);
 }
 
+static ParticleEffect* ParticleEffectClone(const String& cloneName, ParticleEffect* ptr)
+{
+    SharedPtr<ParticleEffect> clone = ptr->Clone(cloneName);
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
+}
+
 static void RegisterParticleEffect(asIScriptEngine* engine)
 {
     engine->RegisterEnum("EmitterType");
@@ -1492,6 +1501,7 @@ static void RegisterParticleEffect(asIScriptEngine* engine)
     RegisterResource<ParticleEffect>(engine, "ParticleEffect");
     engine->RegisterObjectMethod("ParticleEffect", "bool Load(const XMLElement&in)", asMETHODPR(ParticleEffect, Load, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "bool Save(XMLElement&) const", asMETHODPR(ParticleEffect, Save, (XMLElement&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEffect", "ParticleEffect@ Clone(const String&in cloneName = String()) const", asFUNCTION(ParticleEffectClone), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ParticleEffect", "void set_material(Material@+)", asMETHOD(ParticleEffect, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "Material@+ get_material() const", asMETHOD(ParticleEffect, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEffect", "void set_numParticles(uint) const", asMETHOD(ParticleEffect, SetNumParticles), asCALL_THISCALL);

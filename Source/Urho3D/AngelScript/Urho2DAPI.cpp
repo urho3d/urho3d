@@ -162,6 +162,15 @@ static void RegisterAnimatedSprite2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimatedSprite2D", "float get_speed() const", asMETHOD(AnimatedSprite2D, GetSpeed), asCALL_THISCALL);
 }
 
+static ParticleEffect2D* ParticleEffect2DClone(const String& cloneName, ParticleEffect2D* ptr)
+{
+    SharedPtr<ParticleEffect2D> clone = ptr->Clone(cloneName);
+    // The shared pointer will go out of scope, so have to increment the reference count
+    // (here an auto handle can not be used)
+    clone->AddRef();
+    return clone.Get();
+}
+
 static void RegisterParticleEffect2D(asIScriptEngine* engine)
 {
     engine->RegisterEnum("EmitterType2D");
@@ -169,6 +178,7 @@ static void RegisterParticleEffect2D(asIScriptEngine* engine)
     engine->RegisterEnumValue("EmitterType2D", "EMITTER_TYPE_RADIAL", EMITTER_TYPE_RADIAL);
 
     RegisterResource<ParticleEffect2D>(engine, "ParticleEffect2D");
+    engine->RegisterObjectMethod("ParticleEffect2D", "ParticleEffect2D@ Clone(const String&in cloneName = String()) const", asFUNCTION(ParticleEffect2DClone), asCALL_CDECL_OBJLAST);
 }
 
 static void RegisterParticleEmitter2D(asIScriptEngine* engine)

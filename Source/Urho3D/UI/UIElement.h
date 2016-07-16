@@ -358,6 +358,18 @@ public:
 
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    /// Template version of returning child element by index using static cast.
+    template <class T> T* GetChildStaticCast(unsigned index) const;
+    /// Template version of returning child element by name using static cast.
+    template <class T> T* GetChildStaticCast(const String& name, bool recursive = false) const;
+    /// Template version of returning child element by variable using static cast. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
+    template <class T> T* GetChildStaticCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
+    /// Template version of returning child element by index using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(unsigned index) const;
+    /// Template version of returning child element by name using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(const String& name, bool recursive = false) const;
+    /// Template version of returning child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
     /// Return name.
     const String& GetName() const { return name_; }
@@ -457,7 +469,7 @@ public:
 
     /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
-    
+
     /// Return whether element is effectively visible (parent element chain is visible.)
     bool IsVisibleEffective() const;
 
@@ -580,7 +592,7 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
-    
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
@@ -739,6 +751,36 @@ private:
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
 {
     return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(unsigned index) const
+{
+    return static_cast<T*>(GetChild(index));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive) const
+{
+    return static_cast<T*>(GetChild(name, recursive));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value, bool recursive) const
+{
+    return static_cast<T*>(GetChild(key, value, recursive));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(unsigned index) const
+{
+    return dynamic_cast<T*>(GetChild(index));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive) const
+{
+    return dynamic_cast<T*>(GetChild(name, recursive));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value, bool recursive) const
+{
+    return dynamic_cast<T*>(GetChild(key, value, recursive));
 }
 
 }
