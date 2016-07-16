@@ -119,10 +119,10 @@ void PS()
         float distTerm = Distribution(ndh, roughness);
         float visTerm = Visibility(ndl, ndv, roughness);
 
-        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
+        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
     #endif
 
     gl_FragColor.a = 1.0;
-    gl_FragColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
+    gl_FragColor.rgb = pow((diffuseFactor + specularFactor) * lightColor * diff / M_PI, vec3(1.0 / 2.2));
 
 }

@@ -125,9 +125,9 @@ void PS(
         const float distTerm = Distribution(ndh, roughness);
         const float visTerm = Visibility(ndl, ndv, roughness);
 
-        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
+        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
     #endif
 
     oColor.a = 1;
-    oColor.rgb  = (diffuseFactor + specularFactor) * lightColor * diff;
+    oColor.rgb  = pow((diffuseFactor + specularFactor) * lightColor * diff / M_PI, 1.0 / 2.2);
 }

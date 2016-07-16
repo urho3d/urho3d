@@ -25,7 +25,7 @@ void VS(float4 iPos : POSITION,
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
-        float4 iBlendWeights : BLENDWEIGHT,
+        float4 iBlendWeights : BLENDWEIGHT, 
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
@@ -271,7 +271,7 @@ void PS(
         const float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
         const float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
-        const float3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
+        const float3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness * roughness, ndv, ndl, vdh);
         float3 specularFactor = 0;
 
         #ifdef SPECULAR
@@ -279,10 +279,12 @@ void PS(
             const float distTerm = Distribution(ndh, roughness);
             const float visTerm = Visibility(ndl, ndv, roughness);
 
-            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
+            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
         #endif
 
-        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
+        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff / M_PI;
+
+        finalColor.rgb = pow(finalColor.rgb, 1.0 / 2.2);
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;

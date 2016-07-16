@@ -190,7 +190,7 @@ void PS()
         float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
         float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
-        vec3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness, ndv, ndl, vdh);
+        vec3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness * roughness, ndv, ndl, vdh);
         vec3 specularFactor = vec3(0,0,0);
 
         #ifdef SPECULAR
@@ -198,10 +198,11 @@ void PS()
             float distTerm = Distribution(ndh, roughness);
             float visTerm = Visibility(ndl, ndv, roughness);
 
-            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
+            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
         #endif
 
-        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
+        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff / M_PI;
+        finalColor.rgb = pow(finalColor.rgb, vec3(1.0/ 2.2));
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
