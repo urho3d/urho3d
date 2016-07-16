@@ -151,9 +151,9 @@ public:
     Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
     /// Return ray corresponding to normalized screen coordinates (0.0 - 1.0), with origin on the near clip plane.
     Ray GetScreenRay(float x, float y) const;
-    // Convert a world space point to normalized screen coordinates (0.0 - 1.0).
+    /// Convert a world space point to normalized screen coordinates (0.0 - 1.0).
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
-    // Convert normalized screen coordinates (0.0 - 1.0) and distance (in Z coordinate) to a world space point. The distance can not be closer than the near clip plane.
+    /// Convert normalized screen coordinates (0.0 - 1.0) and distance (in Z coordinate) to a world space point. The distance can not be closer than the near clip plane.
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
 
     /// Return projection offset.
