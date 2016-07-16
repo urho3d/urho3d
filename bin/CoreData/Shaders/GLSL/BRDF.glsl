@@ -181,8 +181,8 @@
     float GGXDistribution(in float NdotH, in float roughness)
     {
         float rough2 = roughness * roughness;
-        float tmp = roughness / max(M_EPSILON, NdotH * NdotH * (rough2 - 1.0) + 1.0);
-        return tmp * tmp / M_PI;
+        float tmp = (NdotH * rough2 - NdotH) * NdotH + 1;
+        return rough2 / (tmp * tmp);
     }
 
     float Distribution(in float NdotH, in float roughness)
