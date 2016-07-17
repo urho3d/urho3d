@@ -38,7 +38,8 @@ GravityManager::GravityManager(Context* context)
     : Component(context),
     gravityMesh_(new GravityMesh),
     gravityHull_(new GravityHull),
-    gravity_(9.81f)
+    gravity_(9.81f),
+    strategy_(SHORTEST_DISTANCE)
 {
     SubscribeToEvent(E_COMPONENTADDED, URHO3D_HANDLER(GravityManager, HandleComponentAdded));
     SubscribeToEvent(E_COMPONENTREMOVED, URHO3D_HANDLER(GravityManager, HandleComponentRemoved));
@@ -62,42 +63,47 @@ void GravityManager::RegisterObject(Context* context)
 // ----------------------------------------------------------------------------
 Vector3 GravityManager::QueryGravity(Vector3 worldLocation)
 {
-    /*
-    // TODO Really shitty method of finding closest node
-    float distance = std::numeric_limits<float>::max();
-    PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
-    GravityVector* foundGravityVector = NULL;
-    for(; it != gravityVectors_.End(); ++it)
+    if(strategy_ == SHORTEST_DISTANCE)
     {
-        float newDistance = (worldLocation - (*it)->GetPosition()).Length();
-        if(newDistance < distance)
+        // TODO Really shitty method of finding closest node
+        float distance = std::numeric_limits<float>::max();
+        PODVector<GravityVector*>::ConstIterator it = gravityVectors_.Begin();
+        GravityVector* foundGravityVector = NULL;
+        for(; it != gravityVectors_.End(); ++it)
         {
-            foundGravityVector = *it;
-            distance = newDistance;
+            float newDistance = (worldLocation - (*it)->GetPosition()).Length();
+            if(newDistance < distance)
+            {
+                foundGravityVector = *it;
+                distance = newDistance;
+            }
         }
+
+        // No node was found? No gravity nodes exist. Provide default vector
+        if(foundGravityVector == NULL)
+            return Vector3::DOWN * gravity_;
+
+        return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;
     }
-
-    // No node was found? No gravity nodes exist. Provide default vector
-    if(foundGravityVector == NULL)
-        return Vector3::DOWN * gravity_;
-
-    return foundGravityVector->GetDirection() * foundGravityVector->GetForceFactor() * gravity_;*/
-
-    // No node was found? No gravity nodes exist. Provide default vector
-    if(!gravityMesh_)
-        return Vector3::DOWN * gravity_;
-
-    // Query gravity mesh. This will fail if the point is outside of the hull.
-    Vector3 gravityVector;
-    if(gravityMesh_->Query(&gravityVector, worldLocation))
+    else if(strategy_ == TETRAHEDRAL_MESH)
     {
-        return gravityVector * gravity_;
-    }
 
-    // Project our location onto the the hull.
-    if(gravityHull_->Query(&gravityVector, worldLocation))
-    {
-        return gravityVector * gravity_;
+        // No node was found? No gravity nodes exist. Provide default vector
+        if(!gravityMesh_)
+            return Vector3::DOWN * gravity_;
+
+        // Query gravity mesh. This will fail if the point is outside of the hull.
+        Vector3 gravityVector;
+        if(gravityMesh_->Query(&gravityVector, worldLocation))
+        {
+            return gravityVector * gravity_;
+        }
+
+        // Project our location onto the the hull.
+        if(gravityHull_->Query(&gravityVector, worldLocation))
+        {
+            return gravityVector * gravity_;
+        }
     }
 
     return Vector3::DOWN * gravity_;

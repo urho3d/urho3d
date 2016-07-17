@@ -52,6 +52,14 @@ class URHO3D_API GravityManager : public Component
     URHO3D_OBJECT(GravityManager, Component)
 
 public:
+
+    enum Strategy
+    {
+        TETRAHEDRAL_MESH,
+        SHORTEST_DISTANCE,
+        DISABLE
+    };
+
     /*!
      * @brief Creates a new gravity component.
      */
@@ -77,6 +85,9 @@ public:
 
     float GetGlobalGravity() const
             { return gravity_; }
+
+    void SetStrategy(Strategy strategy)
+            { strategy_ = strategy; }
 
     /*!
      * @brief Queries all gravity probes and calculates the effective
@@ -116,6 +127,8 @@ private:
     SharedPtr<GravityHull> gravityHull_;
 
     float gravity_;
+
+    Strategy strategy_;
 };
 
 } // namespace Urho3D
