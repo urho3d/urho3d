@@ -133,7 +133,7 @@
         float lambdaV = NdotL  * sqrt((-NdotV * rough2 + NdotV) * NdotV + rough2);   
         float lambdaL = NdotV  * sqrt((-NdotL * rough2 + NdotL) * NdotL + rough2);
     
-        return 0.5 / (lamdaV + lamdaL);
+        return 0.5 / (lambdaV + lambdaL);
     }
 
     float SmithGGXSchlickVisibility2(in float NdotL, in float NdotV, in float roughness)
