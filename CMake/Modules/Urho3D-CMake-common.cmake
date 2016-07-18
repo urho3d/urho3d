@@ -1702,11 +1702,12 @@ endmacro ()
 #  PATTERN <list> - Pattern list to be used in file pattern matching option
 #  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
 #  DESTINATION <value> - A relative destination path to be installed to
+#  ACCUMULATE <value> - Accumulate the header files into the specified CMake variable, implies USE_FILE_SYMLINK when input list is a directory
 macro (install_header_files)
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_INCLUDE_DIR)
         # Parse the arguments for the underlying install command for the SDK
-        cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
+        cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION;ACCUMULATE" "FILES;DIRECTORY;PATTERN" ${ARGN})
         unset (INSTALL_MATCHING)
         if (ARG_FILES)
             set (INSTALL_TYPE FILES)
@@ -1741,7 +1742,7 @@ macro (install_header_files)
             endif ()
             if (INSTALL_SOURCE MATCHES /$)
                 # Source is a directory
-                if (ARG_USE_FILE_SYMLINK)
+                if (ARG_USE_FILE_SYMLINK OR ARG_ACCUMULATE)
                     # Use file symlink for each individual files in the source directory
                     set (GLOBBING_EXPRESSION RELATIVE ${INSTALL_SOURCE})
                     if (ARG_FILES_MATCHING)
@@ -1759,6 +1760,9 @@ macro (install_header_files)
                             file (MAKE_DIRECTORY ${ARG_BASE}/${PATH})
                         endif ()
                         create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+                        if (ARG_ACCUMULATE)
+                            list (APPEND ${ARG_ACCUMULATE} ${ARG_DESTINATION}/${NAME})
+                        endif ()
                     endforeach ()
                 else ()
                     # Use a single symlink pointing to the source directory
@@ -1768,6 +1772,9 @@ macro (install_header_files)
                 # Source is a file (it could also be actually a directory to be treated as a "file", i.e. for creating symlink pointing to the directory)
                 get_filename_component (NAME ${INSTALL_SOURCE} NAME)
                 create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+                if (ARG_ACCUMULATE)
+                    list (APPEND ${ARG_ACCUMULATE} ${ARG_DESTINATION}/${NAME})
+                endif ()
             endif ()
         endforeach ()
     endif ()
