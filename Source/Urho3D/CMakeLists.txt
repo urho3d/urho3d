@@ -425,8 +425,35 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Install headers for using the Urho3D library
-install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR} ACCUMULATE GENERATED_HEADERS)
+install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h ACCUMULATE URHO_HEADERS)    # Note: the trailing slash is significant
+# Generate the include-all-headers header file even though we do not encourage Urho3D library users to use it
+list (SORT URHO_HEADERS)
+list (REVERSE URHO_HEADERS)
+set (OPTIONAL_SUBS AngelScript Database Lua Navigation Network Physics Urho2D)
+foreach (SUB ${OPTIONAL_SUBS})
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+        list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
+        if (FOUND_INDEX GREATER -1)
+            list (INSERT URHO_HEADERS ${FOUND_INDEX} "#endif")
+        endif ()
+    endif ()
+endforeach ()
+list (REVERSE URHO_HEADERS)
+foreach (SUB ${OPTIONAL_SUBS})
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+        list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
+        if (FOUND_INDEX GREATER -1)
+            string (TOUPPER ${SUB} SUB)
+            list (INSERT URHO_HEADERS ${FOUND_INDEX} "#if URHO3D_${SUB}")
+        endif ()
+    endif ()
+endforeach ()
+string (REGEX REPLACE "include/[^;]+(DebugNew|Direct3D|ODBC|OpenGL|Precompiled|SQLite|ToluaUtils)[^;]+;" "" URHO_HEADERS "${URHO_HEADERS}")
+string (REGEX REPLACE "include/([^;]+)" "#include <\\1>" URHO_HEADERS "${GENERATED_HEADERS};;${URHO_HEADERS};")
+string (REPLACE ";" \n URHO_HEADERS "${URHO_HEADERS}")
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3DAll.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3DAll.h)
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3DAll.h ${CMAKE_CURRENT_BINARY_DIR}/librevision.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)

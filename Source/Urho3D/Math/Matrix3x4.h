@@ -125,7 +125,7 @@ public:
 #endif
     }
 
-    // Construct from values.
+    /// Construct from values.
     Matrix3x4(float v00, float v01, float v02, float v03,
               float v10, float v11, float v12, float v13,
               float v20, float v21, float v22, float v23) :
@@ -711,8 +711,7 @@ public:
 
 #ifdef URHO3D_SSE
 private:
-    // Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters.
-    // Note: the w component of the scale parameter passed to this function must be 1.
+    /// \brief Sets this matrix from the given translation, rotation (as quaternion (w,x,y,z)), and nonuniform scale (x,y,z) parameters. Note: the w component of the scale parameter passed to this function must be 1.
     void inline SetFromTRS(__m128 t, __m128 q, __m128 s)
     {
         q = _mm_shuffle_ps(q, q, _MM_SHUFFLE(0, 3, 2, 1));

@@ -303,7 +303,7 @@ public:
     XPathResultSet();
     /// Construct with result set from XPath query.
     XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet);
-    // Copy-construct.
+    /// Copy-construct.
     XPathResultSet(const XPathResultSet& rhs);
     /// Destruct.
     ~XPathResultSet();

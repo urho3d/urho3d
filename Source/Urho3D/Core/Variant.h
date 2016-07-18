@@ -143,7 +143,7 @@ struct URHO3D_API ResourceRef
     {
     }
 
-    // Construct from another ResourceRef.
+    /// Construct from another ResourceRef.
     ResourceRef(const ResourceRef& rhs) :
         type_(rhs.type_),
         name_(rhs.name_)
@@ -591,7 +591,7 @@ public:
         return *this;
     }
 
-    // Assign from a string vector.
+    /// Assign from a string vector.
     Variant& operator =(const StringVector& rhs)
     {
         SetType(VAR_STRINGVECTOR);

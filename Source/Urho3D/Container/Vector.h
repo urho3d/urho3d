@@ -312,13 +312,12 @@ public:
         unsigned trailingCount = size_ - shiftStartIndex;
         if (trailingCount <= length)
         {
-            // We're removing more elements from the array than exist past the end of the range being removed, so
-            // perform a normal shift and destroy.
+            // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
             MoveRange(pos, shiftStartIndex, trailingCount);
         }
         else
         {
-            // Swap elements from the end of the array into the empty space.
+            // Swap elements from the end of the array into the empty space
             CopyElements(Buffer() + pos, Buffer() + newSize, length);
         }
         Resize(newSize, 0);
@@ -555,7 +554,7 @@ private:
             *dest++ = *src++;
     }
 
-    // Call the elements' destructors.
+    /// Call the elements' destructors.
     static void DestructElements(T* dest, unsigned count)
     {
         while (count--)
@@ -861,13 +860,12 @@ public:
         unsigned trailingCount = size_ - shiftStartIndex;
         if (trailingCount <= length)
         {
-            // We're removing more elements from the array than exist past the end of the range being removed, so
-            // perform a normal shift and destroy.
+            // We're removing more elements from the array than exist past the end of the range being removed, so perform a normal shift and destroy
             MoveRange(pos, shiftStartIndex, trailingCount);
         }
         else
         {
-            // Swap elements from the end of the array into the empty space.
+            // Swap elements from the end of the array into the empty space
             CopyElements(Buffer() + pos, Buffer() + newSize, length);
         }
         Resize(newSize);
