@@ -9,7 +9,7 @@
 #include "IBL.glsl"
 #line 30010
 
-#if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+#if defined(NORMALMAP) || defined(IBL)
     varying vec4 vTexCoord;
     varying vec4 vTangent;
 #else

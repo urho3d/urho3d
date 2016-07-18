@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if defined(NORMALMAP)|| defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -34,7 +34,7 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(IBL)
         out float4 oTexCoord : TEXCOORD0,
         out float4 oTangent : TEXCOORD3,
     #else
@@ -89,7 +89,7 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(IBL)
         const float3 tangent = GetWorldTangent(modelMatrix);
         const float3 bitangent = cross(tangent, oNormal) * iTangent.w;
         oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
@@ -140,7 +140,7 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(IBL)
         float4 iTexCoord : TEXCOORD0,
         float4 iTangent : TEXCOORD3,
     #else
