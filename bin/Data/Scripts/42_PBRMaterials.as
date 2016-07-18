@@ -68,7 +68,7 @@ void SetupViewport()
     RenderPath@ effectRenderPath = viewport.renderPath.Clone();
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/BloomHDR.xml"));
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/FXAA2.xml"));
-    //effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
+    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
 
     viewport.renderPath = effectRenderPath;
 }

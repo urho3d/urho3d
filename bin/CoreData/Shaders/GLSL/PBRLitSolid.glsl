@@ -5,7 +5,7 @@
 #include "Lighting.glsl"
 #include "Constants.glsl"
 #include "Fog.glsl"
-#include "BRDF.glsl"
+#include "PBR.glsl"
 #include "IBL.glsl"
 #line 30010
 
@@ -132,7 +132,7 @@ void PS()
         float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
         float metalness = clamp(roughMetalSrc.g + cMetallicPS, METALNESS_FLOOR, 1.0);
     #else
-        float roughness = clamp(pow(cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
+        float roughness = clamp(cRoughnessPS, 0.03, 1.0);
         float metalness = clamp(cMetallicPS, METALNESS_FLOOR, 1.0);
     #endif
 
@@ -167,10 +167,11 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        float diff = GetDiffuse(normal, vWorldPos.xyz, lightDir);
-
+        #line 200
+        float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
+        float shadow = 1;
         #ifdef SHADOW
-            diff *= GetShadow(vShadowPos, vWorldPos.w);
+            shadow = GetShadow(vShadowPos, vWorldPos.w);
         #endif
 
         #if defined(SPOTLIGHT)
@@ -180,28 +181,14 @@ void PS()
         #else
             lightColor = cLightColor.rgb;
         #endif
-
         vec3 toCamera = normalize(cCameraPosPS - vWorldPos.xyz);
         vec3 lightVec = normalize(lightDir);
+        float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
 
-        vec3 Hn = normalize(toCamera + lightDir);
-        float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
-        float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
-        float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
-        float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
+        #line 250
+        vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
 
-        vec3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness * roughness, ndv, ndl, vdh);
-        vec3 specularFactor = vec3(0,0,0);
-
-        #ifdef SPECULAR
-            vec3 fresnelTerm = Fresnel(specColor, vdh) ;
-            float distTerm = Distribution(ndh, roughness);
-            float visTerm = Visibility(ndl, ndv, roughness);
-
-            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
-        #endif
-
-        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff / M_PI;
+        finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
         finalColor.rgb = pow(finalColor.rgb, vec3(1.0/ 2.2));
 
         #ifdef AMBIENT
@@ -243,7 +230,7 @@ void PS()
         #ifdef IBL
           vec3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor.rgb, specColor.rgb, roughness, cubeColor);
           float gamma = 0.0;
-          finalColor.rgb += iblColor * (cubeColor + gamma);
+          finalColor.rgb += iblColor;
         #endif
 
         #ifdef ENVCUBEMAP

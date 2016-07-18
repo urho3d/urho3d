@@ -5,7 +5,7 @@
 #include "Lighting.hlsl"
 #include "Constants.hlsl"
 #include "Fog.hlsl"
-#include "BDRF.hlsl"
+#include "PBR.hlsl"
 #include "IBL.hlsl"
 
 void VS(float4 iPos : POSITION,
@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -248,10 +248,12 @@ void PS(
         float3 lightColor;
         float3 finalColor;
 
-        float diff = GetDiffuse(normal, iWorldPos.xyz, lightDir);
+        float atten = GetAtten(normal, iWorldPos.xyz, lightDir);
+
+        float shadow = 1;
 
         #ifdef SHADOW
-            diff *= GetShadow(iShadowPos, iWorldPos.w);
+            shadow *= GetShadow(iShadowPos, iWorldPos.w);
         #endif
 
         #if defined(SPOTLIGHT)
@@ -263,27 +265,15 @@ void PS(
         #endif
 
         const float3 toCamera = normalize(cCameraPosPS - iWorldPos.xyz);
+
         const float3 lightVec = normalize(lightDir);
+        const float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
 
-        const float3 Hn = normalize(toCamera + lightDir);
-        const float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
-        const float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
-        const float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
-        const float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
-        const float3 diffuseFactor = BurleyDiffuse(diffColor.rgb, roughness * roughness, ndv, ndl, vdh);
-        float3 specularFactor = 0;
+        float3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
+        finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
 
-        #ifdef SPECULAR
-            const float3 fresnelTerm = Fresnel(specColor, vdh) ;
-            const float distTerm = Distribution(ndh, roughness);
-            const float visTerm = Visibility(ndl, ndv, roughness);
-
-            specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv) / M_PI;
-        #endif
-
-        finalColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff / M_PI;
-
+        // Convert to SRGB
         finalColor.rgb = pow(finalColor.rgb, 1.0 / 2.2);
 
         #ifdef AMBIENT
@@ -325,7 +315,7 @@ void PS(
         #ifdef IBL
             const float3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor, specColor, roughness, cubeColor);
             const float gamma = 0;
-            finalColor += iblColor * (cubeColor + gamma);
+            finalColor += iblColor;
         #endif
 
         #ifdef ENVCUBEMAP

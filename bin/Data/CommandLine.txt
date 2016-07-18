@@ -1,1 +1,1 @@
-Scripts/Editor.as -w -s
+Scripts/NinjaSnowWar.as
