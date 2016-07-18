@@ -22,7 +22,7 @@ void VS(float4 iPos : POSITION,
     #if defined(DIRBILLBOARD) || defined(TRAILBONE)
         float3 iNormal : NORMAL,
     #endif
-    #if defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef DIFFMAP

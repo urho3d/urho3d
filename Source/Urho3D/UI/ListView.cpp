@@ -99,7 +99,7 @@ public:
         for (unsigned i = 0; i < children_.Size(); ++i)
         {
             const IntVector2& position = children_[i]->GetPosition();
-            CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->GetChild(i));
+            CheckBox* overlay = overlayContainer_->GetChildStaticCast<CheckBox>(i);
             bool visible = children_[i]->IsVisible() && GetItemHierarchyParent(children_[i]);
             overlay->SetVisible(visible);
             if (visible)

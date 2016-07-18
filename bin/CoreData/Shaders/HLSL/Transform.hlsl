@@ -49,9 +49,9 @@ float3 GetBillboardNormal()
 #endif
 
 #ifdef DIRBILLBOARD
-float3x3 GetFaceCameraRotation(float3 cameraPos, float3 position, float3 direction)
+float3x3 GetFaceCameraRotation(float3 position, float3 direction)
 {
-    float3 cameraDir = normalize(position - cameraPos);
+    float3 cameraDir = normalize(position - cCameraPos);
     float3 front = normalize(direction);
     float3 right = normalize(cross(front, cameraDir));
     float3 up = normalize(cross(front, right));
@@ -63,15 +63,16 @@ float3x3 GetFaceCameraRotation(float3 cameraPos, float3 position, float3 directi
     );
 }
 
-float3 GetBillboardPos(float4 iPos, float2 iSize, float3 iDirection, float3 iCameraPos, float4x3 modelMatrix)
+float3 GetBillboardPos(float4 iPos, float2 iSize, float3 iDirection, float4x3 modelMatrix)
 {
-    return mul(iPos, modelMatrix) + 
-        mul(float3(iSize.x, 0.0, iSize.y), GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection));
+    float3 worldPos = mul(iPos, modelMatrix);
+    return worldPos + mul(float3(iSize.x, 0.0, iSize.y), GetFaceCameraRotation(worldPos, iDirection));
 }
 
-float3 GetBillboardNormal(float4 iPos, float3 iDirection, float3 iCameraPos)
+float3 GetBillboardNormal(float4 iPos, float3 iDirection, float4x3 modelMatrix)
 {
-    return mul(float3(0.0, 1.0, 0.0), GetFaceCameraRotation(iCameraPos, iPos.xyz, iDirection));
+    float3 worldPos = mul(iPos, modelMatrix);
+    return mul(float3(0.0, 1.0, 0.0), GetFaceCameraRotation(worldPos, iDirection));
 }
 #endif
 
@@ -115,7 +116,7 @@ float3 GetTrailNormal(float4 iPos, float3 iParentPos, float3 iForward)
 #if defined(BILLBOARD)
     #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, modelMatrix)
 #elif defined(DIRBILLBOARD)
-    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, iNormal, iTangent.xyz, modelMatrix)
+    #define GetWorldPos(modelMatrix) GetBillboardPos(iPos, iSize, iNormal, modelMatrix)
 #elif defined(TRAILFACECAM)
     #define GetWorldPos(modelMatrix) GetTrailPos(iPos, iTangent.xyz, iTangent.w, modelMatrix)
 #elif defined(TRAILBONE)
@@ -127,7 +128,7 @@ float3 GetTrailNormal(float4 iPos, float3 iParentPos, float3 iForward)
 #if defined(BILLBOARD)
     #define GetWorldNormal(modelMatrix) GetBillboardNormal()
 #elif defined(DIRBILLBOARD)
-    #define GetWorldNormal(modelMatrix) GetBillboardNormal(iPos, iNormal, iTangent.xyz)
+    #define GetWorldNormal(modelMatrix) GetBillboardNormal(iPos, iNormal, modelMatrix)
 #elif defined(TRAILFACECAM)
     #define GetWorldNormal(modelMatrix) GetTrailNormal(iPos)
 #elif defined(TRAILBONE)

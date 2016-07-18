@@ -208,7 +208,7 @@ void HelloGUI::HandleClosePressed(StringHash eventType, VariantMap& eventData)
 void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
 {
     // Get the Text control acting as the Window's title
-    Text* windowTitle = static_cast<Text*>(window_->GetChild("WindowTitle", true));
+    Text* windowTitle = window_->GetChildStaticCast<Text>("WindowTitle", true);
 
     // Get control that was clicked
     UIElement* clicked = static_cast<UIElement*>(eventData[UIMouseClick::P_ELEMENT].GetPtr());

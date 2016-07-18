@@ -8,4 +8,21 @@ enum EmitterType2D
 
 class ParticleEffect2D : public Resource
 {
+    // SharedPtr<ParticleEffect2D> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside ParticleEffect2D* ParticleEffect2DClone @ Clone(const String cloneName = String::EMPTY) const;
+
 };
+
+${
+static ParticleEffect2D* ParticleEffect2DClone(const ParticleEffect2D* effect, const String& cloneName = String::EMPTY)
+{
+    if (!effect)
+        return 0;
+        
+    SharedPtr<ParticleEffect2D> clonedEffectPtr = effect->Clone(cloneName);
+    ParticleEffect2D* clonedEffect = clonedEffectPtr.Get();
+    clonedEffectPtr.Detach();
+
+    return clonedEffect;
+}
+$}

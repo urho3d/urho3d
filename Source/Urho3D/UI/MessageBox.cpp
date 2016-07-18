@@ -64,10 +64,10 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     }
 
     // Set the title and message strings if they are given
-    titleText_ = dynamic_cast<Text*>(window_->GetChild("TitleText", true));
+    titleText_ = window_->GetChildDynamicCast<Text>("TitleText", true);
     if (titleText_ && !titleString.Empty())
         titleText_->SetText(titleString);
-    messageText_ = dynamic_cast<Text*>(window_->GetChild("MessageText", true));
+    messageText_ = window_->GetChildDynamicCast<Text>("MessageText", true);
     if (messageText_ && !messageString.Empty())
         messageText_->SetText(messageString);
 
@@ -82,16 +82,16 @@ MessageBox::MessageBox(Context* context, const String& messageString, const Stri
     }
 
     // Bind the buttons (if any in the loaded UI layout) to event handlers
-    okButton_ = dynamic_cast<Button*>(window_->GetChild("OkButton", true));
+    okButton_ = window_->GetChildDynamicCast<Button>("OkButton", true);
     if (okButton_)
     {
         ui->SetFocusElement(okButton_);
         SubscribeToEvent(okButton_, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
     }
-    Button* cancelButton = dynamic_cast<Button*>(window_->GetChild("CancelButton", true));
+    Button* cancelButton = window_->GetChildDynamicCast<Button>("CancelButton", true);
     if (cancelButton)
         SubscribeToEvent(cancelButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
-    Button* closeButton = dynamic_cast<Button*>(window_->GetChild("CloseButton", true));
+    Button* closeButton = window_->GetChildDynamicCast<Button>("CloseButton", true);
     if (closeButton)
         SubscribeToEvent(closeButton, E_RELEASED, URHO3D_HANDLER(MessageBox, HandleMessageAcknowledged));
 

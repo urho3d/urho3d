@@ -4224,6 +4224,7 @@ Methods:
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
 - void SetNumTextureFrames(unsigned number)
 - void SortTextureFrames()
+- ParticleEffect* Clone(const String cloneName = String::EMPTY) const
 - Material* GetMaterial() const
 - unsigned GetNumParticles() const
 - bool GetUpdateInvisible() const
@@ -4296,6 +4297,10 @@ Properties:
 
 <a name="Class_ParticleEffect2D"></a>
 ### ParticleEffect2D : Resource
+
+Methods:
+
+- ParticleEffect2D* Clone(const String cloneName = String::EMPTY) const
 
 <a name="Class_ParticleEmitter"></a>
 ### ParticleEmitter : BillboardSet

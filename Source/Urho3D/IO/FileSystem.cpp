@@ -641,7 +641,7 @@ bool FileSystem::DirExists(const String& pathName) const
         unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
-            parentPath = assetPath.Substring(0, pos - 1);
+            parentPath = assetPath.Substring(0, pos);
             assetPath = assetPath.Substring(pos + 1);
         }
         assetPath.Resize(assetPath.Length() - 1);
