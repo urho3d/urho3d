@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include <Urho3D/Engine/Application.h>
+#include <Urho3D/Input/Input.h>
 
 namespace Urho3D
 {
@@ -69,6 +70,8 @@ protected:
     virtual String GetScreenJoystickPatchString() const { return String::EMPTY; }
     /// Initialize touch input on mobile platform.
     void InitTouchInput();
+    /// Initialize mouse mode on non-web platform.
+    void InitMouseMode(MouseMode mode);
     /// Control logo visibility.
     void SetLogoVisible(bool enable);
 
@@ -84,6 +87,8 @@ protected:
     float pitch_;
     /// Flag to indicate whether touch input has been enabled.
     bool touchEnabled_;
+    /// Mouse mode option to use in the sample.
+    MouseMode useMouseMode_;
 
 private:
     /// Create logo.
@@ -92,8 +97,14 @@ private:
     void SetWindowTitleAndIcon();
     /// Create console and debug HUD.
     void CreateConsoleAndDebugHud();
+    /// Handle request for mouse mode on web platform.
+    void HandleMouseModeRequest(StringHash eventType, VariantMap& eventData);
+    /// Handle request for mouse mode change on web platform.
+    void HandleMouseModeChange(StringHash eventType, VariantMap& eventData);
     /// Handle key down event to process key controls common to all samples.
     void HandleKeyDown(StringHash eventType, VariantMap& eventData);
+    /// Handle key up event to process key controls common to all samples.
+    void HandleKeyUp(StringHash eventType, VariantMap& eventData);
     /// Handle scene update event to control camera's pitch and yaw for all samples.
     void HandleSceneUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle touch begin event to initialize touch input on desktop platform.

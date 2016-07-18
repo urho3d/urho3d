@@ -94,6 +94,7 @@ const StringHash BINARY_TYPE_PACKAGE("UPAK");
 const StringHash BINARY_TYPE_COMPRESSED_PACKAGE("ULZ4");
 const StringHash BINARY_TYPE_ANGLESCRIPT("ASBC");
 const StringHash BINARY_TYPE_MODEL("UMDL");
+const StringHash BINARY_TYPE_MODEL2("UMD2");
 const StringHash BINARY_TYPE_SHADER("USHD");
 const StringHash BINARY_TYPE_ANIMATION("UANI");
 
@@ -105,6 +106,7 @@ const StringHash EXTENSION_TYPE_DDS(".dds");
 const StringHash EXTENSION_TYPE_PNG(".png");
 const StringHash EXTENSION_TYPE_JPG(".jpg");
 const StringHash EXTENSION_TYPE_JPEG(".jpeg");
+const StringHash EXTENSION_TYPE_HDR(".hdr");
 const StringHash EXTENSION_TYPE_BMP(".bmp");
 const StringHash EXTENSION_TYPE_TGA(".tga");
 const StringHash EXTENSION_TYPE_KTX(".ktx");
@@ -265,7 +267,7 @@ void CreateResourceFilterUI()
     sorted.Sort();
     sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNKNOWN, ResourceTypeName(RESOURCE_TYPE_UNKNOWN)) );
     sorted.Insert(0, ResourceType(RESOURCE_TYPE_UNUSABLE,  ResourceTypeName(RESOURCE_TYPE_UNUSABLE)) );
-    int halfColumns = Ceil( float(sorted.length) / float(columns) );
+    uint halfColumns = uint( Ceil( float(sorted.length) / float(columns) ) );
 
     for (uint i = 0; i < sorted.length; ++i)
     {
@@ -1007,6 +1009,27 @@ void HandleBrowserFileDragEnd(StringHash eventType, VariantMap& eventData)
             AssignMaterial(model, browserDragFile.resourceKey);
         }
     }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_PREFAB)
+    {
+        LoadNode(browserDragFile.GetFullPath(), null, true);
+    }
+    else if (browserDragFile.resourceType == RESOURCE_TYPE_MODEL)
+    {
+        Node@ createdNode = CreateNode(REPLICATED, true);
+        Model@ model = cache.GetResource("Model", browserDragFile.resourceKey);
+        if (model.skeleton.numBones > 0)
+        {
+            AnimatedModel@ am = createdNode.CreateComponent("AnimatedModel");
+            am.model = model;
+        }
+        else
+        {
+            StaticModel@ sm = createdNode.CreateComponent("StaticModel");
+            sm.model = model;
+        }
+        
+        AdjustNodePositionByAABB(createdNode);
+    }
 
     browserDragFile = null;
     browserDragComponent = null;
@@ -1064,7 +1087,7 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_UNUSABLE;
     else if (fileType == BINARY_TYPE_ANGLESCRIPT)
         return RESOURCE_TYPE_SCRIPTFILE;
-    else if (fileType == BINARY_TYPE_MODEL)
+    else if (fileType == BINARY_TYPE_MODEL || fileType == BINARY_TYPE_MODEL2)
         return RESOURCE_TYPE_MODEL;
     else if (fileType == BINARY_TYPE_SHADER)
         return RESOURCE_TYPE_UNUSABLE;
@@ -1156,6 +1179,8 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_JPEG)
         return RESOURCE_TYPE_IMAGE;
+    else if(fileType == EXTENSION_TYPE_HDR)
+        return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_BMP)
         return RESOURCE_TYPE_IMAGE;
     else if(fileType == EXTENSION_TYPE_TGA)
@@ -1209,6 +1234,8 @@ bool GetExtensionType(String path, StringHash &out fileType)
         fileType = EXTENSION_TYPE_JPG;
     else if(type == EXTENSION_TYPE_JPEG)
         fileType = EXTENSION_TYPE_JPEG;
+    else if(type == EXTENSION_TYPE_HDR)
+        fileType =  EXTENSION_TYPE_HDR;    
     else if(type == EXTENSION_TYPE_BMP)
         fileType = EXTENSION_TYPE_BMP;
     else if(type == EXTENSION_TYPE_TGA)
@@ -1279,7 +1306,7 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
         fileType = BINARY_TYPE_COMPRESSED_PACKAGE;
     else if (type == BINARY_TYPE_ANGLESCRIPT)
         fileType = BINARY_TYPE_ANGLESCRIPT;
-    else if (type == BINARY_TYPE_MODEL)
+    else if (type == BINARY_TYPE_MODEL || type == BINARY_TYPE_MODEL2)
         fileType = BINARY_TYPE_MODEL;
     else if (type == BINARY_TYPE_SHADER)
         fileType = BINARY_TYPE_SHADER;

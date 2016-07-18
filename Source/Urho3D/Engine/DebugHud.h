@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ static const unsigned DEBUGHUD_SHOW_PROFILER = 0x4;
 static const unsigned DEBUGHUD_SHOW_MEMORY = 0x8;
 static const unsigned DEBUGHUD_SHOW_ALL = 0x7;
 static const unsigned DEBUGHUD_SHOW_ALL_MEMORY = 0xB;
+static const unsigned DEBUGHUD_SHOW_EVENTPROFILER = 0x10;
 
 /// Displays rendering stats and profiling information.
 class URHO3D_API DebugHud : public Object
@@ -115,6 +116,8 @@ private:
     SharedPtr<Text> modeText_;
     /// Profiling information text.
     SharedPtr<Text> profilerText_;
+    /// Event profiling information text.
+    SharedPtr<Text> eventProfilerText_;
     /// Memory stats text.
     SharedPtr<Text> memoryText_;
     /// Hashmap containing application specific stats.

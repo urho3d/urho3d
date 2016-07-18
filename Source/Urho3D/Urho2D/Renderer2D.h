@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Graphics/Drawable.h"
+#include "../Math/Frustum.h"
 
 namespace Urho3D
 {
@@ -123,9 +124,7 @@ private:
     /// View batch info.
     HashMap<Camera*, ViewBatchInfo2D> viewBatchInfos_;
     /// Frustum for current frame.
-    const Frustum* frustum_;
-    /// Frustum bounding box for current frame.
-    BoundingBox frustumBoundingBox_;
+    Frustum frustum_;
     /// View mask of current camera for visibility checking.
     unsigned viewMask_;
     /// Cached materials.

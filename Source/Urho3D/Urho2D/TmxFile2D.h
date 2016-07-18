@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -168,11 +168,21 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return information.
+    /// Set Tilemap information.
+    bool SetInfo(Orientation2D orientation, int width, int height, float tileWidth, float tileHeight);
+
+    /// Add layer at index, if index > number of layers then append to end.
+    void AddLayer(unsigned index, TmxLayer2D *layer);
+
+    /// Append layer to end.
+    void AddLayer(Urho3D::TmxLayer2D* layer);
+
+    /// Return Tilemap information.
     const TileMapInfo2D& GetInfo() const { return info_; }
 
     /// Return tile sprite by gid, if not exist return 0.
     Sprite2D* GetTileSprite(int gid) const;
+
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(int gid) const;
 

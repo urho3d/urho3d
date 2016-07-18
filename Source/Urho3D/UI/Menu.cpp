@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ void Menu::OnHover(const IntVector2& position, const IntVector2& screenPosition,
 {
     Button::OnHover(position, screenPosition, buttons, qualifiers, cursor);
 
-    Menu* sibling = static_cast<Menu*>(parent_->GetChild(VAR_SHOW_POPUP, true));
+    Menu* sibling = parent_->GetChildStaticCast<Menu>(VAR_SHOW_POPUP, true);
     if (popup_ && !showPopup_)
     {
         // Check if popup is shown by one of the siblings
@@ -333,7 +333,7 @@ void Menu::ShowPopup(bool enable)
 
 void Menu::SetAccelerator(int key, int qualifiers)
 {
-    acceleratorKey_ = key;
+    acceleratorKey_ = ToLower(key);
     acceleratorQualifiers_ = qualifiers;
 
     if (key)

@@ -21,7 +21,11 @@ varying vec4 vWorldPos;
 #endif
 #ifdef PERPIXEL
     #ifdef SHADOW
-        varying vec4 vShadowPos[NUMCASCADES];
+        #ifndef GL_ES
+            varying vec4 vShadowPos[NUMCASCADES];
+        #else
+            varying highp vec4 vShadowPos[NUMCASCADES];
+        #endif
     #endif
     #ifdef SPOTLIGHT
         varying vec4 vSpotPos;
@@ -75,7 +79,7 @@ void VS()
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
             for (int i = 0; i < NUMCASCADES; i++)
-                vShadowPos[i] = GetShadowPos(i, projWorldPos);
+                vShadowPos[i] = GetShadowPos(i, vNormal, projWorldPos);
         #endif
 
         #ifdef SPOTLIGHT
@@ -92,7 +96,7 @@ void VS()
             // If using lightmap, disregard zone ambient light
             // If using AO, calculate ambient in the PS
             vVertexLight = vec3(0.0, 0.0, 0.0);
-            vTexCoord2 = iTexCoord2;
+            vTexCoord2 = iTexCoord1;
         #else
             vVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif

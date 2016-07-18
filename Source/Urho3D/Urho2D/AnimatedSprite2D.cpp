@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -136,14 +136,14 @@ void AnimatedSprite2D::SetAnimationSet(AnimationSet2D* animationSet)
 #endif
     if (animationSet_->GetSpriterData())
     {
-        spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
+        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
 
-        if (animationSet_->GetSpriterData()->entities_.Empty())
+        if (!animationSet_->GetSpriterData()->entities_.Empty())
         {
             // If entity is empty use first entity in spriter
             if (entity_.Empty())
                 entity_ = animationSet_->GetSpriterData()->entities_[0]->name_;
-            spriterInstance_->SetEntity(entity_.CString());
+            spriterInstance_->SetEntity(entity_);
         }
     }
 
@@ -406,7 +406,7 @@ void AnimatedSprite2D::UpdateSourceBatchesSpine()
 void AnimatedSprite2D::SetSpriterAnimation()
 {
     if (!spriterInstance_)
-        spriterInstance_ = new Spriter::SpriterInstance(animationSet_->GetSpriterData());
+        spriterInstance_ = new Spriter::SpriterInstance(this, animationSet_->GetSpriterData());
 
     // Use entity is empty first entity
     if (entity_.Empty())

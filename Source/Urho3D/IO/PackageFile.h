@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,6 +73,9 @@ public:
     /// Return total size of the package file.
     unsigned GetTotalSize() const { return totalSize_; }
 
+    /// Return total data size from all the file entries in the package file.
+    unsigned GetTotalDataSize() const { return totalDataSize_; }
+
     /// Return checksum of the package file contents.
     unsigned GetChecksum() const { return checksum_; }
 
@@ -91,6 +94,8 @@ private:
     StringHash nameHash_;
     /// Package file total size.
     unsigned totalSize_;
+    /// Total data size in the package using each entry's actual size if it is a compressed package file.
+    unsigned totalDataSize_;
     /// Package file checksum.
     unsigned checksum_;
     /// Compressed flag.

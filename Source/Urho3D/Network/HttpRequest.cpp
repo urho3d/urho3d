@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -207,18 +207,20 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 
     for (;;)
     {
-        unsigned bytesAvailable;
+        Pair<unsigned, bool> status;
 
         for (;;)
         {
-            bytesAvailable = CheckEofAndAvailableSize();
-            if (bytesAvailable || IsEof())
+            status = CheckAvailableSizeAndEof();
+            if (status.first_ || status.second_)
                 break;
             // While no bytes and connection is still open, block until has some data
             mutex_.Release();
             Time::Sleep(5);
             mutex_.Acquire();
         }
+
+        unsigned bytesAvailable = status.first_;
 
         if (bytesAvailable)
         {
@@ -247,8 +249,6 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
             break;
     }
 
-    // Check for end-of-file once more after reading the bytes
-    CheckEofAndAvailableSize();
     mutex_.Release();
     return totalRead;
 #else
@@ -259,35 +259,39 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 
 unsigned HttpRequest::Seek(unsigned position)
 {
-    return position_;
+    return 0;
+}
+
+bool HttpRequest::IsEof() const
+{
+    MutexLock lock(mutex_);
+    return CheckAvailableSizeAndEof().second_;
 }
 
 String HttpRequest::GetError() const
 {
     MutexLock lock(mutex_);
-    const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
     return error_;
 }
 
 HttpRequestState HttpRequest::GetState() const
 {
     MutexLock lock(mutex_);
-    const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
     return state_;
 }
 
 unsigned HttpRequest::GetAvailableSize() const
 {
     MutexLock lock(mutex_);
-    return const_cast<HttpRequest*>(this)->CheckEofAndAvailableSize();
+    return CheckAvailableSizeAndEof().first_;
 }
 
-unsigned HttpRequest::CheckEofAndAvailableSize()
+Pair<unsigned, bool> HttpRequest::CheckAvailableSizeAndEof() const
 {
-    unsigned bytesAvailable = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
-    if (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !bytesAvailable))
-        position_ = M_MAX_UNSIGNED;
-    return bytesAvailable;
+    Pair<unsigned, bool> ret;
+    ret.first_ = (writePosition_ - readPosition_) & (READ_BUFFER_SIZE - 1);
+    ret.second_ = (state_ == HTTP_ERROR || (state_ == HTTP_CLOSED && !ret.first_));
+    return ret;
 }
 
 }

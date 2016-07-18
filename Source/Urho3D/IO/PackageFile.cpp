@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ namespace Urho3D
 PackageFile::PackageFile(Context* context) :
     Object(context),
     totalSize_(0),
+    totalDataSize_(0),
     checksum_(0),
     compressed_(false)
 {
@@ -40,6 +41,7 @@ PackageFile::PackageFile(Context* context) :
 PackageFile::PackageFile(Context* context, const String& fileName, unsigned startOffset) :
     Object(context),
     totalSize_(0),
+    totalDataSize_(0),
     checksum_(0),
     compressed_(false)
 {
@@ -52,14 +54,6 @@ PackageFile::~PackageFile()
 
 bool PackageFile::Open(const String& fileName, unsigned startOffset)
 {
-#ifdef ANDROID
-    if (URHO3D_IS_ASSET(fileName))
-    {
-        URHO3D_LOGERROR("Package files within the apk are not supported on Android");
-        return false;
-    }
-#endif
-
     SharedPtr<File> file(new File(context_, fileName));
     if (!file->IsOpen())
         return false;
@@ -104,7 +98,7 @@ bool PackageFile::Open(const String& fileName, unsigned startOffset)
         String entryName = file->ReadString();
         PackageEntry newEntry;
         newEntry.offset_ = file->ReadUInt() + startOffset;
-        newEntry.size_ = file->ReadUInt();
+        totalDataSize_ += (newEntry.size_ = file->ReadUInt());
         newEntry.checksum_ = file->ReadUInt();
         if (!compressed_ && newEntry.offset_ + newEntry.size_ > totalSize_)
         {

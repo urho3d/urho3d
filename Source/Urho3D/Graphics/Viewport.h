@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,9 +88,9 @@ public:
 
     /// Return ray corresponding to normalized screen coordinates.
     Ray GetScreenRay(int x, int y) const;
-    // Convert a world space point to normalized screen coordinates.
+    /// Convert a world space point to normalized screen coordinates.
     IntVector2 WorldToScreenPoint(const Vector3& worldPos) const;
-    // Convert screen coordinates and depth to a world space point.
+    /// Convert screen coordinates and depth to a world space point.
     Vector3 ScreenToWorldPoint(int x, int y, float depth) const;
 
     /// Allocate the view structure. Called by Renderer.

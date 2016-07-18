@@ -7,17 +7,20 @@ public:
     void SetRectangle(const IntRect& rectangle);
     void SetHotSpot(const Vector2& hotSpot);
     void SetOffset(const IntVector2& offset);
+    void SetTextureEdgeOffset(float offset);
     void SetSpriteSheet(SpriteSheet2D* spriteSheet);
 
     Texture2D* GetTexture() const;
     const IntRect& GetRectangle() const;
     const Vector2& GetHotSpot() const;
     const IntVector2& GetOffset() const;
+    float GetTextureEdgeOffset() const;
     SpriteSheet2D* GetSpriteSheet() const;
 
     tolua_property__get_set Texture2D* texture;
     tolua_property__get_set IntRect rectangle;
     tolua_property__get_set Vector2 hotSpot;
     tolua_property__get_set IntVector2 offset;
+    tolua_property__get_set float textureEdgeOffset;
     tolua_property__get_set SpriteSheet2D* spriteSheet;
 };

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -360,6 +360,7 @@ static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
 static void RegisterJSONFile(asIScriptEngine* engine)
 {
     RegisterResource<JSONFile>(engine, "JSONFile");
+    engine->RegisterObjectMethod("JSONFile", "bool FromString(const String&in)", asMETHOD(JSONFile, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "JSONValue& GetRoot()", asMETHODPR(JSONFile, GetRoot, () const, const JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONFile", "bool Save(File@+, const String&in) const", asFUNCTION(JSONFileSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONFile", "JSONValue& get_root()", asMETHODPR(JSONFile, GetRoot, () const, const JSONValue&), asCALL_THISCALL);

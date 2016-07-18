@@ -1,7 +1,7 @@
 /**
- * pugixml parser - version 1.5
+ * pugixml parser - version 1.7
  * --------------------------------------------------------
- * Copyright (C) 2006-2014, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+ * Copyright (C) 2006-2015, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
  * Report bugs and download new versions at http://pugixml.org/
  *
  * This library is distributed under the MIT License. See notice at the end
@@ -11,9 +11,11 @@
  * Copyright (C) 2003, by Kristen Wegner (kristen@tima.net)
  */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef PUGIXML_VERSION
 // Define version macro; evaluates to major * 100 + minor so that it's safe to use in less-than comparisons
-#	define PUGIXML_VERSION 150
+#	define PUGIXML_VERSION 170
 #endif
 
 // Include user configuration file (this can define various configuration macros)
@@ -65,7 +67,7 @@
 
 // If the platform is known to have long long support, enable long long functions
 #ifndef PUGIXML_HAS_LONG_LONG
-#	if defined(__cplusplus) && __cplusplus >= 201103
+#	if __cplusplus >= 201103
 #		define PUGIXML_HAS_LONG_LONG
 #	elif defined(_MSC_VER) && _MSC_VER >= 1400
 #		define PUGIXML_HAS_LONG_LONG
@@ -203,10 +205,13 @@ namespace pugi
 	// Open file using text mode in xml_document::save_file. This enables special character (i.e. new-line) conversions on some systems. This flag is off by default.
 	const unsigned int format_save_file_text = 0x20;
 
+	// Write every attribute on a new line with appropriate indentation. This flag is off by default.
+	const unsigned int format_indent_attributes = 0x40;
+
 	// The default set of formatting flags.
 	// Nodes are indented depending on their depth in DOM tree, a default declaration is output if document has none.
 	const unsigned int format_default = format_indent;
-		
+
 	// Forward declarations
 	struct xml_attribute_struct;
 	struct xml_node_struct;
@@ -352,6 +357,7 @@ namespace pugi
 		bool set_value(int rhs);
 		bool set_value(unsigned int rhs);
 		bool set_value(double rhs);
+		bool set_value(float rhs);
 		bool set_value(bool rhs);
 
 	#ifdef PUGIXML_HAS_LONG_LONG
@@ -364,6 +370,7 @@ namespace pugi
 		xml_attribute& operator=(int rhs);
 		xml_attribute& operator=(unsigned int rhs);
 		xml_attribute& operator=(double rhs);
+		xml_attribute& operator=(float rhs);
 		xml_attribute& operator=(bool rhs);
 
 	#ifdef PUGIXML_HAS_LONG_LONG
@@ -431,7 +438,7 @@ namespace pugi
 		const char_t* name() const;
 
 		// Get node value, or "" if node is empty or it has no value
-        // Note: For <node>text</node> node.value() does not return "text"! Use child_value() or text() methods to access text inside nodes.
+		// Note: For <node>text</node> node.value() does not return "text"! Use child_value() or text() methods to access text inside nodes.
 		const char_t* value() const;
 	
 		// Get attribute list
@@ -460,6 +467,9 @@ namespace pugi
 		xml_attribute attribute(const char_t* name) const;
 		xml_node next_sibling(const char_t* name) const;
 		xml_node previous_sibling(const char_t* name) const;
+
+		// Get attribute, starting the search from a hint (and updating hint so that searching for a sequence of attributes is fast)
+		xml_attribute attribute(const char_t* name, xml_attribute& hint) const;
 
 		// Get child value of current node; that is, value of the first child node of type PCDATA/CDATA
 		const char_t* child_value() const;
@@ -694,6 +704,7 @@ namespace pugi
 		bool set(int rhs);
 		bool set(unsigned int rhs);
 		bool set(double rhs);
+		bool set(float rhs);
 		bool set(bool rhs);
 
 	#ifdef PUGIXML_HAS_LONG_LONG
@@ -706,6 +717,7 @@ namespace pugi
 		xml_text& operator=(int rhs);
 		xml_text& operator=(unsigned int rhs);
 		xml_text& operator=(double rhs);
+		xml_text& operator=(float rhs);
 		xml_text& operator=(bool rhs);
 
 	#ifdef PUGIXML_HAS_LONG_LONG
@@ -935,7 +947,7 @@ namespace pugi
 		
 		// Non-copyable semantics
 		xml_document(const xml_document&);
-		const xml_document& operator=(const xml_document&);
+		xml_document& operator=(const xml_document&);
 
 		void create();
 		void destroy();
@@ -1036,7 +1048,7 @@ namespace pugi
 		xpath_value_type _type;
 		xpath_variable* _next;
 
-		xpath_variable();
+		xpath_variable(xpath_value_type type);
 
 		// Non-copyable semantics
 		xpath_variable(const xpath_variable&);
@@ -1068,16 +1080,28 @@ namespace pugi
 	private:
 		xpath_variable* _data[64];
 
-		// Non-copyable semantics
-		xpath_variable_set(const xpath_variable_set&);
-		xpath_variable_set& operator=(const xpath_variable_set&);
+		void _assign(const xpath_variable_set& rhs);
+		void _swap(xpath_variable_set& rhs);
 
-		xpath_variable* find(const char_t* name) const;
+		xpath_variable* _find(const char_t* name) const;
+
+		static bool _clone(xpath_variable* var, xpath_variable** out_result);
+		static void _destroy(xpath_variable* var);
 
 	public:
 		// Default constructor/destructor
 		xpath_variable_set();
 		~xpath_variable_set();
+
+		// Copy constructor/assignment operator
+		xpath_variable_set(const xpath_variable_set& rhs);
+		xpath_variable_set& operator=(const xpath_variable_set& rhs);
+
+	#if __cplusplus >= 201103
+		// Move semantics support
+		xpath_variable_set(xpath_variable_set&& rhs);
+		xpath_variable_set& operator=(xpath_variable_set&& rhs);
+	#endif
 
 		// Add a new variable or get the existing one, if the types match
 		xpath_variable* add(const char_t* name, xpath_value_type type);
@@ -1111,8 +1135,17 @@ namespace pugi
 		// If PUGIXML_NO_EXCEPTIONS is not defined, throws xpath_exception on compilation errors.
 		explicit xpath_query(const char_t* query, xpath_variable_set* variables = 0);
 
+		// Constructor
+		xpath_query();
+
 		// Destructor
 		~xpath_query();
+
+	#if __cplusplus >= 201103
+		// Move semantics support
+		xpath_query(xpath_query&& rhs);
+		xpath_query& operator=(xpath_query&& rhs);
+	#endif
 
 		// Get query expression return type
 		xpath_value_type return_type() const;
@@ -1189,10 +1222,9 @@ namespace pugi
 	public:
 		// Default constructor; constructs empty XPath node
 		xpath_node();
-		// Modified by YaoWT for Urho3D
-		// Copy constructor from another xpath_node
+		// Urho3D - copy constructor from another xpath_node
 		xpath_node(const xpath_node& rhs);
-		
+
 		// Construct XPath node from XML node/attribute
 		xpath_node(const xml_node& node);
 		xpath_node(const xml_attribute& attribute, const xml_node& parent);
@@ -1252,6 +1284,12 @@ namespace pugi
 		xpath_node_set(const xpath_node_set& ns);
 		xpath_node_set& operator=(const xpath_node_set& ns);
 
+	#if __cplusplus >= 201103
+		// Move semantics support
+		xpath_node_set(xpath_node_set&& rhs);
+		xpath_node_set& operator=(xpath_node_set&& rhs);
+	#endif
+
 		// Get collection type
 		type_t type() const;
 		
@@ -1282,7 +1320,8 @@ namespace pugi
 		xpath_node* _begin;
 		xpath_node* _end;
 
-		void _assign(const_iterator begin, const_iterator end);
+		void _assign(const_iterator begin, const_iterator end, type_t type);
+		void _move(xpath_node_set& rhs);
 	};
 #endif
 
@@ -1332,8 +1371,15 @@ namespace std
 
 #endif
 
+// Make sure implementation is included in header-only mode
+// Use macro expansion in #include to work around QMake (QTBUG-11923)
+#if defined(PUGIXML_HEADER_ONLY) && !defined(PUGIXML_SOURCE)
+#	define PUGIXML_SOURCE "pugixml.cpp"
+#	include PUGIXML_SOURCE
+#endif
+
 /**
- * Copyright (c) 2006-2014 Arseny Kapoulkine
+ * Copyright (c) 2006-2015 Arseny Kapoulkine
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

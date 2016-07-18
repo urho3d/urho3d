@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -117,6 +117,12 @@ public:
     void SetHoverColor(const Color& color);
     /// Set text effect.
     void SetTextEffect(TextEffect textEffect);
+    /// Set shadow offset.
+    void SetEffectShadowOffset(const IntVector2& offset);
+    /// Set stroke thickness.
+    void SetEffectStrokeThickness(int thickness);
+    /// Set stroke rounding. Corners of the font will be rounded off in the stroke so the stroke won't have corners.
+    void SetEffectRoundStroke(bool roundStroke);
     /// Set effect color.
     void SetEffectColor(const Color& effectColor);
 
@@ -156,6 +162,15 @@ public:
     /// Return text effect.
     TextEffect GetTextEffect() const { return textEffect_; }
 
+    /// Return effect shadow offset.
+    const IntVector2& GetEffectShadowOffset() const { return shadowOffset_; }
+
+    /// Return effect stroke thickness.
+    int GetEffectStrokeThickness() const { return strokeThickness_; }
+
+    /// Return effect round stroke.
+    bool GetEffectRoundStroke() const { return roundStroke_; }
+
     /// Return effect color.
     const Color& GetEffectColor() const { return effectColor_; }
 
@@ -175,8 +190,6 @@ public:
     /// Return size of character by index.
     IntVector2 GetCharSize(unsigned index);
 
-    /// Set used in Text3D.
-    void SetUsedInText3D(bool usedInText3D);
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
 
@@ -187,6 +200,10 @@ public:
     void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
+    /// Set text attribute.
+    void SetTextAttr(const String& value);
+    /// Return text attribute.
+    String GetTextAttr() const;
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -204,8 +221,6 @@ protected:
         (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
             float depthBias = 0.0f);
 
-    /// Used in Text3D.
-    bool usedInText3D_;
     /// Font.
     SharedPtr<Font> font_;
     /// Current face.
@@ -232,6 +247,12 @@ protected:
     Color hoverColor_;
     /// Text effect.
     TextEffect textEffect_;
+    /// Text effect shadow offset.
+    IntVector2 shadowOffset_;
+    /// Text effect stroke thickness.
+    int strokeThickness_;
+    /// Text effect stroke rounding flag.
+    bool roundStroke_;
     /// Effect color.
     Color effectColor_;
     /// Text effect Z bias.
@@ -252,7 +273,7 @@ protected:
     PODVector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
-    /// Storage string id. Used when enabled autoLocalizable.
+    /// Localization string id storage. Used when autoLocalizable flag is set.
     String stringId_;
     /// Handle change Language.
     void HandleChangeLanguage(StringHash eventType, VariantMap& eventData);

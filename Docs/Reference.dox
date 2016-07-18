@@ -20,6 +20,21 @@ The list, set and map classes use a fixed-size allocator internally. This can al
 
 In script, the String class is exposed as it is. The template containers can not be directly exposed to script, but instead a template Array type exists, which behaves like a Vector, but does not expose iterators. In addition the VariantMap is available, which is a HashMap<StringHash, Variant>.
 
+\section Containers_cxx11 C++11 features
+
+Aggregate initializers:
+
+\code
+VariantMap parameters = { {"Key1", "Value1"}, {"Key2", "Value2"} };
+\endcode
+
+Range-base for loop:
+\code
+for (auto&& item: container)
+{
+
+}
+\endcode
 
 \page ObjectTypes Object types and factories
 
@@ -62,6 +77,7 @@ After Engine initialization, the following subsystems will always exist:
 The following subsystems are optional, so GetSubsystem() may return null if they have not been created:
 
 - Profiler: Provides hierarchical function execution time measurement using the operating system performance counter. Exists if profiling has been compiled in (configurable from the root CMakeLists.txt)
+- EventProfiler: Same as Profiler but for events.
 - Graphics: Manages the application window, the rendering context and resources. Exists if not in headless mode.
 - Renderer: Renders scenes in 3D and manages rendering quality settings. Exists if not in headless mode.
 - Script: Provides the AngelScript execution environment. Needs to be created and registered manually.
@@ -95,12 +111,12 @@ In C++ events must always be handled by a member function. In script procedural 
 
 Events can also be unsubscribed from. See \ref Object::UnsubscribeFromEvent "UnsubscribeFromEvent()" for details.
 
-To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. Note the parameter name hashes being inside a namespace which matches the event name:
+To send an event, fill the event parameters (if necessary) and call \ref Object::SendEvent "SendEvent()". For example, this (in C++) is how the Engine subsystem sends the Update event on each frame. For performance reason, in C++ the same map objects are being reused in each frame by calling \ref Context::GetEventDataMap "GetEventDataMap()" instead of creating a new VariantMap object each time. Note the parameter name hashes being inside a namespace which matches the event name:
 
 \code
 using namespace Update;
 
-VariantMap eventData;
+VariantMap& eventData = GetEventDataMap();
 eventData[P_TIMESTEP] = timeStep_;
 SendEvent(E_UPDATE, eventData);
 \endcode
@@ -117,6 +133,46 @@ SendEvent("Update", eventData);
 
 Because the \ref Object::SendEvent "SendEvent()" function is public, an event can be "masqueraded" as originating from any object, even when not actually sent by that object's member function code. This can be used to simplify communication, particularly between components in the scene. For example, the \ref Physics "physics simulation" signals collision events by using the participating \ref Node "scene nodes" as senders. This means that any component can easily subscribe to its own node's collisions without having to know of the actual physics components involved. The same principle can also be used in any game-specific messaging, for example making a "damage received" event originate from the scene node, though it itself has no concept of damage or health.
 
+\section Events_cxx11 C++11 event binding and sending
+
+Events can be bound to lambda functions including capturing context:
+
+\code
+SubscribeToEvent(E_UPDATE, [&](StringHash type, VariantMap& args) {
+
+});
+\endcode
+
+std::bind() class methods:
+
+\code
+void MyObject::OnUpdate(StringHash type, VariantMap& args)
+{
+
+}
+
+SubscribeToEvent(E_UPDATE, std::bind(&MyObject::OnUpdate, this)));
+\endcode
+
+std::bind() discarding unneeded parameters:
+
+\code
+void Class::OnUpdate(VariantMap& args)
+{
+
+}
+
+SubscribeToEvent(E_UPDATE, std::bind(&Class::OnUpdate, this, _2)));
+\endcode
+
+There is a convenient method to send event using C++ variadic template which reduces the amount of boilerplate code required. Using the same example above, in C++11 standard the code can be rewritten as:
+
+\code
+using namespace Update;
+SendEvent(E_UPDATE, P_TIMESTEP, timeStep_);
+\endcode
+
+There is only one parameter pair in the above example, however, this overload method accepts any number of parameter pairs.
 
 \page MainLoop Engine initialization and main loop
 
@@ -130,6 +186,7 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
+- EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
 - ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.
@@ -141,9 +198,10 @@ The full list of supported parameters, their datatypes and default values:
 - WindowHeight (int) %Window vertical dimension. Default 0 (use desktop resolution, or 768 in windowed mode.)
 - WindowPositionX (int) %Window horizontal position. Default center to screen.
 - WindowPositionY (int) %Window vertical position. Default center to screen.
-- WindowResizable (bool) Whether window is resizable. Default false.
 - FullScreen (bool) Whether to create a full-screen window. Default true.
 - Borderless (bool) Whether to create the window as borderless. Default false.
+- WindowResizable (bool) Whether window is resizable. Default false.
+- HighDPI (bool) Whether window is high DPI. Default false. Currently only supported by Apple platforms (OSX, iOS, and tvOS).
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.
@@ -245,7 +303,7 @@ public:
 
         // Check for pressing ESC. Note the engine_ member variable for convenience access to the Engine object
         int key = eventData[P_KEY].GetInt();
-        if (key == KEY_ESC)
+        if (key == KEY_ESCAPE)
             engine_->Exit();
     }
 };
@@ -255,7 +313,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(MyApp)
 
 \page SceneModel Scene model
 
-Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID, and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
+Urho3D's scene model can be described as a component-based scene graph. The Scene consists of a hierarchy of scene nodes, starting from the root node, which also represents the whole scene. Each Node has a 3D transform (position, rotation and scale), a name and an ID + optionally tag(s) and a freeform VariantMap for \ref Node::GetVars "user variables", but no other functionality.
 
 \section SceneModel_Components Components
 
@@ -280,13 +338,19 @@ Components created into the Scene itself have a special role: to implement scene
 
 "Ordinary" components like Light, Camera or StaticModel should not be created directly into the Scene, but rather into child nodes.
 
-\section SceneModel_Identification Identification and scene hierarchy
+\section SceneModel_Identification Identification and queries
+
+Nodes can be queried by name from the Scene (or any parent node) with the function \ref Node::GetChild "GetChild()". The query can be optionally recursive, meaning it traverses into child hierarchies. This is relatively slow, since string compares are involved.
 
 Unlike nodes, components do not have names; components inside the same node are only identified by their type, and index in the node's component list, which is filled in creation order. See the various overloads of \ref Node::GetComponent "GetComponent()" or \ref Node::GetComponents "GetComponents()" for details.
 
-When created, both nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNodeByID "GetNodeByID()" and \ref Scene::GetComponentByID "GetComponentByID()". This is much faster than for example doing recursive name-based scene node queries.
+When created, both nodes and components get scene-global integer IDs. They can be queried from the Scene by using the functions \ref Scene::GetNode "GetNode()" and \ref Scene::GetComponent "GetComponent()". This is much faster than for example doing recursive name-based scene node queries.
 
-There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and in which nodes to place any scripted logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
+%String tags can be optionally assigned into scene nodes to aid in identification. See e.g. the functions \ref Node::AddTag "AddTag()", \ref Node::RemoveTag "RemoveTag()" and \ref Node::SetTags "SetTags()". Nodes with a specific tag can be queried from the Scene by calling the \ref Scene::GetNodesWithTag "GetNodesWithTag()" function.
+
+\section SceneModel_Hierarchy Scene hierarchy
+
+There is no inbuilt concept of an entity or a game object; rather it is up to the programmer to decide the node hierarchy, and in which nodes to place any logic. Typically, free-moving objects in the 3D world would be created as children of the root node. Nodes can be created either with or without a name, see \ref Node::CreateChild "CreateChild()". Uniqueness of node names is not enforced.
 
 Whenever there is some hierarchical composition, it is recommended (and in fact necessary, because components do not have their own 3D transforms) to create a child node. For example if a character was holding an object in his hand, the object should have its own node, which would be parented to the character's hand bone (also a Node.) The exception is the physics CollisionShape, which can be offsetted and rotated individually in relation to the node. See \ref Physics "Physics" for more details. Note that Scene's own transform is purposefully ignored as an optimization when calculating world derived transforms of child nodes, so changing it has no effect and it should be left as it is (position at origin, no rotation, no scaling.)
 
@@ -707,7 +771,7 @@ By using the LuaScriptInstance component, Lua script objects can be added to sce
 
 \code
 LuaScriptInstance* instance = node->CreateComponent<LuaScriptInstance>();
-instance->CreateObject("LuaScripts/Rotator.lua", "Rotator");
+instance->CreateObject("LuaScripts/Utilities/Rotator.lua", "Rotator");
 \endcode
 
 After instantiation, use \ref LuaScriptInstance::GetScriptObjectFunction "GetScriptObjectFunction()" to get the object's functions by name; calling happens like above.
@@ -897,6 +961,7 @@ The rendering-related components defined by the %Graphics and %UI libraries are:
 - AnimationController: drives animations forward automatically and controls animation fade-in/out.
 - BillboardSet: a group of camera-facing billboards, which can have varying sizes, rotations and texture coordinates.
 - ParticleEmitter: a subclass of BillboardSet that emits particle billboards.
+- RibbonTrail: creates tail geometry following an object.
 - Light: illuminates the scene. Can optionally cast shadows.
 - Terrain: renders heightmap terrain.
 - CustomGeometry: renders runtime-defined unindexed geometry. The geometry data is not serialized or replicated over the network.
@@ -934,9 +999,18 @@ Textures that have been loaded from a file, as well as vertex & index buffers th
 
 See \ref GPUObject::IsDataLost "IsDataLost()" function in VertexBuffer, IndexBuffer, Texture2D, TextureCube and Texture3D classes for detecting data loss. Inbuilt classes such as Model, BillboardSet and Font already handle data loss for their internal GPU resources, so checking for it is only necessary for custom buffers and textures. Watch out especially for trying to render with an index buffer that has uninitialized data after a loss, as this can cause a crash inside the GPU driver due to referencing non-existent (garbage) vertices.
 
+\section Rendering_ExtraInstanceData Defining extra instancing data
+
+The only per-instance data that the rendering system supplies by itself are the objects' world transform matrices. If you want to define extra per-instance data in your custom Drawable subclasses, follow these steps:
+
+- Call \ref Renderer::SetNumExtraInstancingBufferElements "SetNumExtraInstancingBufferElements()". This defines the amount of extra Vector4's (in addition to the transform matrices) that the instancing data will contain.
+- The SourceBatch structure(s) of your custom Drawable need to point to the extra data. See the \ref SourceBatch::instancingData_ "instancingData_" member. Null pointer is allowed for objects that do not need to define extra data; be aware that the instancing vertex buffer will contain undefined data in that case.
+- Because non-instanced rendering will not have access to the extra data, you should disable non-instanced rendering of GEOM_STATIC drawables. Call \ref Renderer::SetMinInstances "SetMinInstances()" with a parameter 1 to accomplish this.
+- Use the extra data as texcoord 7 onward in your vertex shader (texcoord 4-6 are the transform matrix.)
+
 \section Rendering_Further Further details
 
-See also \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
+See also \ref VertexBuffers "Vertex buffers", \ref Materials "Materials", \ref Shaders "Shaders", \ref Lights "Lights and shadows", \ref RenderPaths "Render path", \ref SkeletalAnimation "Skeletal animation", \ref Particles "Particle systems", \ref Zones "Zones", and \ref AuxiliaryViews "Auxiliary views".
 
 See \ref RenderingModes "Rendering modes" for detailed discussion on the forward, light pre-pass and deferred rendering modes.
 
@@ -1030,7 +1104,50 @@ OpenGL ES 2.0 has further limitations:
 
 - Custom clip planes are not currently supported.
 
-- 3D textures are not currently supported.
+- 3D and 2D array textures are not currently supported.
+
+\page VertexBuffers Vertex buffers
+
+%Geometry data is defined by VertexBuffer objects, which hold a number of vertices of a certain vertex format. For rendering, the data is uploaded to the GPU, but optionally a shadow copy of
+the vertex data can exist in CPU memory, see \ref VertexBuffer::SetShadowed "SetShadowed()" to allow e.g. raycasts into the geometry without having to lock and read GPU memory.
+
+The vertex format can be defined in two ways by two overloads of \ref VertexBuffer::SetSize "SetSize()":
+
+1) With a bitmask representing hardcoded vertex element semantics and datatypes. Each of the following elements may or may not be present, but the order or datatypes may not change. The order is defined by the LegacyVertexElement enum in GraphicsDefs.h, while bitmask defines exist as MASK_POSITION, MASK_NORMAL etc.
+
+- Position (%Vector3)
+- Normal (%Vector3)
+- %Color (unsigned char[4], normalized)
+- Texcoord1 (%Vector2)
+- Texcoord2 (%Vector2)
+- Cubetexcoord1 (%Vector3)
+- Cubetexcoord2 (%Vector3)
+- Tangent (V%ector4)
+- Blendweights (float[4])
+- Blendindices (unsigned char[4])
+- Instancematrix1-3 (%Vector4)
+- %Object index (int, not supported on D3D9)
+
+Note that the texcoord numbers are misleading as the actual texcoord inputs in shaders are zero-based. Instancematrix1-3 are reserved to be used by the engine for instancing and map to shader texcoord inputs 4-6.
+
+2) By defining VertexElement structures, which tell the data type, semantic, and zero-based semantic index (for e.g. multiple texcoords), and whether the data is per-vertex or per-instance data.
+This allows to freely define the order and meaning of the elements. However for 3D objects, the first element should always be "Position" and use the Vector3 type to ensure e.g. raycasts and occlusion rendering work properly.
+
+The third parameter of \ref VertexBuffer::SetSize "SetSize()" is whether to create the buffer as static or dynamic. This is a hint to the underlying graphics API how to allocate the buffer data. Dynamic will suit frequent (every frame) modification better, while static has likely better overall performance for world geometry rendering.
+
+After the size and format are defined, the vertex data can be set either by calling \ref VertexBuffer::SetData "SetData()" / \ref VertexBuffer::SetDataRange "SetDataRange()" or locking the vertex buffer for access, writing the data to the memory space returned from the lock, then unlocking when done.
+
+\section VertexBuffers_MultipleBuffers Multiple vertex buffers
+
+Multiple vertex buffers can be set to the Graphics subsystem at once, or defined into a drawable's Geometry definition for rendering.
+
+In case the buffers both contain the same semantic, for example position, a higher index buffer overrides a lower buffer index. This is used by the AnimatedModel component to apply vertex morphs: it creates a separate clone vertex buffer which overrides the original model's position, normal and tangent data, and assigns it on index 1 while index 0 is the original model's vertex buffer.
+
+A vertex buffer should either only contain per-vertex data, or per-instance data. Instancing in the high-level rendering (Renderer & View classes) works by momentarily appending the instance vertex buffer to the geometry being rendered in an instanced fashion.
+
+\section VertexBuffers_IndexBuffers Index buffers
+
+A vertex buffer is often accompanied by an index buffer (IndexBuffer class) to allow indexed rendering which avoids repeating the same vertices over and over. Its API is similar to vertex buffers, but an index buffer only needs to define the number of indices, whether the indices are 16- or 32-bit (largeIndices flag) and whether the buffer is dynamic.
 
 \page Materials Materials
 
@@ -1069,7 +1186,7 @@ The techniques for different LOD levels and quality settings must appear in a sp
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
-Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later.
+Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. Read below for caveats regarding it.
 
 \section Materials_Textures Material textures
 
@@ -1105,16 +1222,16 @@ The sRGB flag controls both whether the texture should be sampled with sRGB to l
 
 Using cube map textures requires an XML file to define the cube map face images, or a single image with layout. In this case the XML file *is* the texture resource name in material scripts or in LoadResource() calls.
 
-Individual face textures are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
+Individual face images are defined in the XML like this: (see bin/Data/Textures/Skybox.xml for an example)
 
 \code
 <cubemap>
-    <face name="PositiveX_TextureName" />
-    <face name="NegativeX_TextureName" />
-    <face name="PositiveY_TextureName" />
-    <face name="NegativeY_TextureName" />
-    <face name="PositiveZ_TextureName" />
-    <face name="NegativeZ_TextureName" />
+    <face name="PositiveX_ImageName" />
+    <face name="NegativeX_ImageName" />
+    <face name="PositiveY_ImageName" />
+    <face name="NegativeY_ImageName" />
+    <face name="PositiveZ_ImageName" />
+    <face name="NegativeZ_ImageName" />
 </cubemap>
 \endcode
 
@@ -1122,7 +1239,7 @@ Using a single image texture and a layout is used like this:
 
 \code
 <cubemap>
-    <image name="TextureName" layout="horizontal|horizontalnvidia|horizontalcross|verticalcross|blender" />
+    <image name="ImageName" layout="horizontal|horizontalnvidia|horizontalcross|verticalcross|blender" />
 </cubemap>
 \endcode
 
@@ -1140,6 +1257,18 @@ For the layout definitions, see http://www.cgtextures.com/content.php?action=tut
 
 Using a 3D texture for color correction postprocess (see bin/Data/PostProcess/ColorCorrection.xml) requires the 3D texture to be assigned to the "volume" texture unit, so that the effect knows to load the texture as the correct type. The lookup for the corrected color happens by using the original color's red channel as the X coordinate, the green channel as the Y coordinate, and blue as the Z. Therefore the identity LUT's slices (which shouldn't transform the color at all) grow red from left to right and green from top to bottom, and finally the slices themselves turn blue from left to right.
 
+\section Materials_2DArrayTextures 2D array textures
+
+2D array textures (Texture2DArray class) are available on OpenGL and Direct3D 11. They are also defined via an XML file defining the images to use on each array layer:
+
+\code
+<texturearray>
+    <layer name="Layer1_ImageName" />
+    <layer name="Layer2_ImageName" />
+    <layer name="Layer3_ImageName" />
+</texturearray>
+\endcode
+
 \section Materials_Techniques Techniques and passes
 
 A technique definition looks like this:
@@ -1150,6 +1279,7 @@ A technique definition looks like this:
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
+        [cull="cw|ccw|none"]
         depthtest="always|equal|less|lessequal|greater|greaterequal"
         depthwrite="true|false"
         alphamask="true|false" />
@@ -1159,6 +1289,8 @@ A technique definition looks like this:
 \endcode
 
 The "desktop" attribute in either technique or pass allows to specify it requires desktop graphics hardware (exclude mobile devices.) Omitting it is the same as specifying false.
+
+A pass should normally not define culling mode, but it can optionally specify it to override the value in the material.
 
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
@@ -1190,6 +1322,18 @@ The optional "litbase" pass reduces draw call count by combining ambient lightin
 
 The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 
+\section Materials_RenderOrder Render order caveats
+
+Render order works well when you know a material is going to render only a single pass, for example a deferred G-buffer pass. However when forward rendering and per-pixel lights are used, rendering of typical lit geometry can be split over the "base", "litbase" and "light" passes. If you use
+render order combined with depth test manipulation to force some object to render in front of others, the pass order may not be obvious. "Base"
+pass would be rendered first, but objects often don't use it, rather they render later as part of the forward light loop using the "litbase" pass. This may throw off the depth test manipulation and cause a different result than expected.
+
+An easy fix is to simply disable the "litbase" optimization pass altogether, though this costs performance. This can be done globally from the forward renderpath (Bin/CoreData/RenderPaths/Forward.xml) by modifying the forwardlights command to read:
+
+\code
+<command type="forwardlights" pass="light" uselitbase="false" />
+\endcode
+
 \page Shaders Shaders
 
 Urho3D uses an ubershader-like approach: permutations of each shader will be built with different compilation defines, to produce eg. static or skinned, deferred or forward or shadowed/unshadowed rendering.
@@ -1207,6 +1351,7 @@ Vertex shader:
 - NUMVERTEXLIGHTS=1,2,3 or 4: number of vertex lights influencing the object
 - DIRLIGHT, SPOTLIGHT, POINTLIGHT: a per-pixel forward light is being used. Accompanied by the define PERPIXEL
 - SHADOW: the per-pixel forward light has shadowing
+- NORMALOFFSET: shadow receiver UV coordinates should be adjusted according to normals
 - SKINNED, INSTANCED, BILLBOARD: choosing the geometry type
 
 Pixel shader:
@@ -1228,13 +1373,14 @@ Vertex shader uniforms:
 - float3 cAmbientStartColor: the start color value for a zone's ambient gradient
 - float3 cAmbientEndColor: the end color value for a zone's ambient gradient
 - float3 cCameraPos: camera's world position
-- float3x3 cCameraRot: camera's world rotation matrix
 - float cNearClip: camera's near clip distance
 - float cFarClip: camera's far clip distance
 - float cDeltaTime: the timestep of the current frame
 - float4 cDepthMode: parameters for calculating a linear depth value between 0-1 to pass to the pixel shader in an interpolator.
 - float cElapsedTime: scene's elapsed time value. Can be used to implement animating materials
 - float4x3 cModel: the world transform matrix of the object being rendered
+- float4x3 cView: the camera's view matrix
+- float4x3 cViewInv: the inverse of the camera's view matrix (camera world transform)
 - float4x4 cViewProj: the camera's concatenated view and projection matrices
 - float4x3 cZone: zone's transform matrix; used for ambient gradient calculations
 
@@ -1274,7 +1420,9 @@ gl_Position = GetClipPos(worldPos);
 
 On both Direct3D and OpenGL the vertex and pixel shaders are written into the same file, and the entrypoint functions must be called VS() and PS(). In OpenGL mode one of these is transformed behind the scenes to the main() function required by GLSL. When compiling a vertex shader, the compilation define "COMPILEVS" is always present, and likewise "COMPILEPS" when compiling a pixel shader. These are heavily used in the shader include files to prevent constructs that are illegal for the "wrong" type of shader, and to reduce compilation time.
 
-The uniforms must be prefixed in a certain way so that the engine understands them:
+Vertex shader inputs need to be matched to vertex element semantics to render properly.. In HLSL semantics for inputs are defined in each shader with uppercase words (POSITION, NORMAL, TEXCOORD0 etc.) while in GLSL the default attributes are defined in Transform.glsl and are matched to the vertex element semantics with a case-insensitive string "contains" operation, with an optional number postfix to define the semantic index. For example iTexCoord is the first (semantic index 0) texture coordinate, and iTexCoord1 is the second (semantic index 1).
+
+Uniforms must be prefixed in a certain way so that the engine understands them:
 
 - c for uniform constants, for example cMatDiffColor. The c is stripped when referred to inside the engine, so it would be called "MatDiffColor" in eg. \ref Material::SetShaderParameter "SetShaderParameter()"
 - s for texture samplers, for example sDiffMap.
@@ -1335,6 +1483,7 @@ The available commands are:
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 - renderui: Render the UI into the output rendertarget. Using this will cause the default %UI render to the backbuffer to be skipped.
+- sendevent: Send an event with a specified string parameter ("event name"). This can be used to call custom code,typically custom low-level rendering, in the middle of the renderpath execution.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
@@ -1362,6 +1511,7 @@ The render path XML definition looks like this:
         <texture unit="unit" name="viewport|RTName|TextureName" />
     </command>
     <command type="renderui" output="viewport|RTName" depthstencil="DSName" />
+    <command type="sendevent" name="EventName" />
 </renderpath>
 \endcode
 
@@ -1461,9 +1611,9 @@ In light pre-pass and deferred rendering, light culling happens by writing the o
 
 Shadow rendering is easily the most complex aspect of using lights, and therefore a wide range of per-light parameters exists for controlling the shadows:
 
-- BiasParameters: define constant and slope-scaled depth bias values for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
+- BiasParameters: define constant & slope-scaled depth bias values and normal offset for preventing self-shadowing artifacts. In practice, need to be determined experimentally. Orthographic (directional) and projective (point and spot) shadows may require rather different bias values. Normal offset is an alternative shadow biasing method which is based on modifying the shadow receiver UV coordinates in the direction of the receiver geometry normal, rather than modifying the depth during shadow rendering. Yet another way of fighting self-shadowing issues is to render shadowcaster backfaces, see \ref Rendering_Materials "Materials".
 
-- CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0.
+- CascadeParameters: these have effect only for directional lights. They specify the far clip distance of each of the cascaded shadow map splits (maximum 4), and the fade start point relative to the maximum shadow range. Unused splits can be set to far clip 0. This structure also includes the biasAutoAdjust setting for adjusting the depth bias automatically based on cascade split distance. By default it is on at 1x strength (value 1) but could be disabled (value 0) or adjusted stronger (values larger than 1.)
 
 - FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic size reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
@@ -1477,13 +1627,11 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
-Finally, there are global settings for the shadow map base resolution and shadow map depth (16 or 24 bit) & filtering quality (1 or 4 samples) in Renderer.
+\section Lights_ShadowGlobal Global shadow settings
 
-\section Lights_ShadowCulling Shadow culling
+The shadow map base resolution and quality (bit depth & sampling mode) are set through functions in the Renderer subsystem, see \ref Renderer::SetShadowMapSize "SetShadowMapSize()" and \ref Renderer::SetShadowQuality "SetShadowQuality()".
 
-Similarly to light culling with lightmasks, shadowmasks can be used to select which objects should cast shadows with respect to each light. See \ref Drawable::SetShadowMask "SetShadowMask()". A potential shadow caster's shadow mask will be ANDed with the light's lightmask to see if it should be rendered to the light's shadow map. Also, when an object is inside a zone, its shadowmask will be ANDed with the zone's shadowmask as well. By default all bits are set in the shadowmask.
-
-For an example of shadow culling, imagine a house (which itself is a shadow caster) containing several objects inside, and a shadowed directional light shining in from the windows. In that case shadow map rendering can be avoided for objects already in shadow by clearing the respective bit from their shadowmasks.
+The shadow quality enum allows choosing also variance (VSM) shadows instead of the default hardware depth shadows. VSM shadows behave markedly differently; depth bias settings are no longer relevant, but you should make sure all your large surfaces (also ground & terrain) are marked as shadow casters, otherwise shadows cast by objects moving over them can appear unnaturally thin. For VSM shadows, see the functions \ref Renderer::SetShadowSoftness "SetShadowSoftness()" and \ref Renderer::SetVSMShadowParameters "SetVSMShadowParameters()" to control the softness (blurring) and in-shadow detection behavior. Instead of self-shadowing artifacts common with hardware depth shadows, you may encounter light bleeding when shadow casting surfaces are close in light direction to each other, which adjusting the VSM shadow parameters may help.
 
 \section Lights_ShadowMapReuse Shadow map reuse
 
@@ -1492,6 +1640,12 @@ The Renderer can be configured to either reuse shadow maps, or not. To reuse is 
 When reuse is enabled, only one shadow texture of each shadow map size needs to be reserved, and shadow maps are rendered "on the fly" before rendering a single shadowed light's contribution onto opaque geometry. This has the downside that shadow maps are no longer available during transparent geometry rendering, so transparent objects will not receive shadows.
 
 When reuse is disabled, all shadow maps are rendered before the actual scene rendering. Now multiple shadow textures need to be reserved based on the number of simultaneous shadow casting lights. See the function \ref Renderer::SetNumShadowMaps "SetNumShadowMaps()". If there are not enough shadow textures, they will be assigned to the closest/brightest lights, and the rest will be rendered unshadowed. Now more texture memory is needed, but the advantage is that also transparent objects can receive shadows.
+
+\section Lights_ShadowCulling Shadow culling
+
+Similarly to light culling with lightmasks, shadowmasks can be used to select which objects should cast shadows with respect to each light. See \ref Drawable::SetShadowMask "SetShadowMask()". A potential shadow caster's shadow mask will be ANDed with the light's lightmask to see if it should be rendered to the light's shadow map. Also, when an object is inside a zone, its shadowmask will be ANDed with the zone's shadowmask as well. By default all bits are set in the shadowmask.
+
+For an example of shadow culling, imagine a house (which itself is a shadow caster) containing several objects inside, and a shadowed directional light shining in from the windows. In that case shadow map rendering can be avoided for objects already in shadow by clearing the respective bit from their shadowmasks.
 
 
 \page SkeletalAnimation Skeletal animation
@@ -1510,6 +1664,8 @@ Note that AnimationController does not by default stop non-looping animations au
 %Animation blending uses the concept of numbered layers. Layer numbers are unsigned 8-bit integers, and the active \ref AnimationState "AnimationStates" on each layer are processed in order from the lowest layer to the highest. As animations are applied by lerp-blending between absolute bone transforms, the effect is that the higher layer numbers have higher priority, as they will remain in effect last.
 
 By default an Animation is played back by using all the available bone tracks. However an animation can be only partially applied by setting a start bone, see \ref AnimationState::SetStartBone "SetStartBone()". Once set, the bone tracks will be applied hierarchically starting from the start bone. For example, to apply an animation only to a bipedal character's upper body, which is typically parented to the spine bone, one could set the spine as the start bone.
+
+It is also possible to enable additive (difference) blending mode on an animation, by using \ref AnimationState::SetBlendMode "SetBlendMode()" with the ABM_ADDITIVE parameter. In this mode the AnimationState applies a difference of the animation pose to the model's base pose, instead of straightforward lerp blending. This allows an animation to be applied "on top" of the other animations, but the end result can be unpredictable in case of large difference from the base pose. Additive animations should reside on higher priority layers than lerp blended animations or otherwise the lerp blending will "blend out" the additive animation.
 
 \section SkeletalAnimation_Triggers Animation triggers
 
@@ -1563,6 +1719,7 @@ The parameters of the particle system are stored in a ParticleEffect resource cl
     <relative enable="true|false" />
     <scaled enable="true|false" />
     <sorted enable="true|false" />
+    <fixedscreensize enable="true|false" />
     <emittertype value="sphere|box" />
     <emittersize value="x y z" />
     <emitterradius value="x" />
@@ -1722,7 +1879,9 @@ The Audio subsystem implements an audio output stream. Once it has been initiali
 - Playing raw audio, Ogg Vorbis or WAV Sound resources using the SoundSource component. This allows manual stereo panning of mono sounds; stereo sounds will be output with their original stereo mix.
 - Playing the above sound formats in pseudo-3D using the SoundSource3D component. It has stereo positioning and distance attenuation, but does not (at least yet) filter the sound depending on the direction.
 
-To hear pseudo-3D positional sounds, a SoundListener component must exist in a scene node and be assigned to the audio subsystem by calling \ref Audio::SetListener "SetListener()". If the sound listener's scene node exists within a specific scene, it will only hear sounds from that scene, but if it has been created into a "sceneless" node it will hear sounds from all scenes.
+A sound source component needs to be created into a Node to be considered "enabled" and be able to play, however that node does not need to belong to a scene (e.g. for positionless %UI / HUD sounds, which would be just unnecessarily clutter in a 3D scene, you can just instantiate a node in application code, similar to a camera existing outside the scene.)
+
+To hear pseudo-3D positional sounds, a SoundListener component must likewise exist in a node and be assigned to the audio subsystem by calling \ref Audio::SetListener "SetListener()". The node's position & rotation define the listening spot. If the sound listener's node belongs to a scene, it only hears sounds from within that specific scene, but if it has been created outside of a scene it will hear any sounds.
 
 The output is software mixed for an unlimited amount of simultaneous sounds. Ogg Vorbis sounds are decoded on the fly, and decoding them can be memory- and CPU-intensive, so WAV files are recommended when a large number of short sound effects need to be played.
 
@@ -1916,7 +2075,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 
 The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
-Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data.
+Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data, and the possibility to add tags for identification: see \ref UIElement::AddTag "AddTag()", \ref UIElement::RemoveTag "RemoveTag()", \ref UIElement::SetTags "SetTags()" and \ref UIElement::GetChildrenWithTag "GetChildrenWithTag()".
 
 To allow the elements react to mouse input, either a mouse cursor element must be defined using \ref UI::SetCursor "SetCursor()" or the operating system mouse cursor must be set visible from the Input subsystem.
 
@@ -2764,7 +2923,7 @@ ObjectAnimation * lightAnimation = cache->GetResource<ObjectAnimation>("Scene/Li
 lightNode->SetObjectAnimation (lightAnimation);
 \endcode
 
-Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).
+Attribute animation uses either linear or spline interpolation for floating point types (like float, Vector2, Vector3 etc), and no interpolation for integer and non-numeric types (like int, bool).  Alternatively interpolation can be turned off for any data type by setting the interpolation method IM_NONE (see \ref ValueAnimation::SetInterpolationMethod "SetInterpolationMethod()"). This allows e.g. animating %UI elements by modifying the element's image rect to cover a series of animation frames.
 
 \section AttributeAnimation_Classes Attribute animation classes
 
@@ -2860,6 +3019,7 @@ AssetImporter <command> <input file> <output file> [options]
 
 Commands:
 model       Output a model
+anim        Output animation(s)
 scene       Output a scene
 node        Output a node and its children (prefab)
 dump        Dump scene node structure. No output file is generated
@@ -2898,6 +3058,8 @@ Options:
 -ctn        Check and do not overwrite if texture has newer timestamp
 -am         Export all meshes even if identical (scene mode only)
 -bp         Move bones to bind pose before saving model
+-split <start> <end> (animation model only)
+            Split animation, will only import from start frame to end frame
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -2929,6 +3091,9 @@ Note: outputting only bone rotations may help when using an animation in a diffe
 
 Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem. The file data can optionally be compressed using the LZ4 compression library.
 
+Use caution when using package files on Android, as the .apk is already a package itself, where arbitrary seeks can perform poorly due to compression already being used. Experimentally it looks that on Android it can be favorable
+to compress the package, because in that case the .apk packaging may skip its own compression, allowing better seek & read performance.
+
 Usage:
 
 \verbatim
@@ -2937,6 +3102,20 @@ PackageTool <directory to process> <package name> [basepath] [options]
 Options:
 -c      Enable package file LZ4 compression
 -q      Enable quiet mode
+
+Basepath is an optional prefix that will be added to the file entries.
+
+\endverbatim
+
+Alternate output usage:
+
+\verbatim
+PackageTool <output option> <package name>
+
+Output option:
+-i      Output package file information
+-l      Output file names (including their paths) contained in the package
+-L      Similar to -l but also output compression ratio (compressed package file only)
 
 \endverbatim
 
@@ -3016,15 +3195,20 @@ Urho3D tries to use existing file formats whenever possible, and define custom f
 \verbatim
 Model geometry and vertex morph data
 
-byte[4]    Identifier "UMDL"
+byte[4]    Identifier "UMDL" or "UMD2"
 uint       Number of vertex buffers
 
   For each vertex buffer:
   uint       Vertex count
-  uint       Vertex element mask (determines vertex size)
+  uint       Legacy vertex element mask (determines vertex size)
   uint       Morphable vertex range start index
   uint       Morphable vertex count
   byte[]     Vertex data (vertex count * vertex size)
+
+  In "UMD2" format, the legacy vertex element mask is replaced with the following:
+  uint       Vertex element count
+  uint[]     Descriptions for each vertex element, where
+             bits 0-7 = element data type, bits 8-15 = semantic, bits 16-23 = semantic index
 
 uint    Number of index buffers
 
@@ -3152,7 +3336,7 @@ byte[4]    Identifier "USHD"
 
 short      Shader type (0 = vertex, 1 = pixel)
 short      Shader model (4)
-uint       Vertex element mask (0 for pixel shaders)
+uint       Vertex element hash code (0 for pixel shaders)
 
 uint       Number of constant parameters
 
@@ -3204,15 +3388,15 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
-- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example DebugRenderer, FreeTypeLibrary, Graphics.
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example %DebugRenderer, FreeTypeLibrary, %Graphics.
 
 - Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
 
 - Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
 
-- Constants and enumerations are in uppercase. For example Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
 
-- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, Serializer& dest.
+- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3233,7 +3417,7 @@ When contributing code to the Urho3D project, there are a few things to check so
 
 First of all, the contribution should be wholly your own, so that you hold the copyright. If you are borrowing anything (for example a specific implementation of a math formula), you must be sure that you're allowed to do so, and give credit appropriately. For example borrowing code that is in the public domain would be OK.
 
-Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2015 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
+Second, you need to agree that code is released under the MIT license with the copyright statement "Copyright (c) 2008-2016 the Urho3D project." Note here that "Urho3D project" is not an actual legal entity, but just shorthand to avoid listing all the contributors. You certainly retain your individual copyright. You should copy-paste the license statement from an existing .cpp or .h file to each new file that you contribute, to avoid having to add it later.
 
 Third, there are requirements for new code that come from Urho3D striving to be a cohesive, easy-to-use package where features like events, serialization and script bindings integrate tightly. Check all that apply:
 

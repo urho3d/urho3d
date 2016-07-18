@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,11 @@
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-    cmake_minimum_required (VERSION 2.8.6)
+    if (WIN32)
+        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
+    else ()
+        cmake_minimum_required (VERSION 2.8.6)
+    endif ()
     if (COMMAND cmake_policy)
         cmake_policy (SET CMP0003 NEW)
         if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
@@ -47,7 +51,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     include (Urho3D-CMake-common)
 
     # Add dependency targets
-    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/Lua${JIT} host/Lua${JIT})
+    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/Lua host/Lua)
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/lib host/toluapp)
 endif ()
 
@@ -70,11 +74,11 @@ add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c
 define_source_files (EXTRA_CPP_FILES tolua.c ${CMAKE_CURRENT_BINARY_DIR}/generated/toluabind.c)
 
 # Define dependency libs
-set (LIBS toluapp Lua${JIT})
+set (LIBS toluapp Lua)
 if (NOT MSVC)
     list (APPEND LIBS m)
 endif ()
-set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua${JIT}/src)
+set (INCLUDE_DIRS ../../include ../../../../ThirdParty/Lua/src)
 
 # Setup target
 setup_executable (TOOL NODEPS)

@@ -21,6 +21,9 @@ void Start()
     // Setup the viewports for displaying the scene
     SetupViewports();
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_RELATIVE);
+
     // Hook up to the frame update and render post-update events
     SubscribeToEvents();
 }
@@ -188,20 +191,20 @@ void MoveCamera(float timeStep)
     cameraNode.rotation = Quaternion(pitch, yaw, 0.0f);
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input.keyDown['W'])
+    if (input.keyDown[KEY_W])
         cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['S'])
+    if (input.keyDown[KEY_S])
         cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['A'])
+    if (input.keyDown[KEY_A])
         cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown['D'])
+    if (input.keyDown[KEY_D])
         cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
 
     // Toggle post processing effects on the front viewport. Note that the rear viewport is unaffected
     RenderPath@ effectRenderPath = renderer.viewports[0].renderPath;
-    if (input.keyPress['B'])
+    if (input.keyPress[KEY_B])
         effectRenderPath.ToggleEnabled("Bloom");
-    if (input.keyPress['F'])
+    if (input.keyPress[KEY_F])
         effectRenderPath.ToggleEnabled("FXAA2");
 
     // Toggle debug geometry with space

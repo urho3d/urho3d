@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ const char* AUDIO_CATEGORY = "Audio";
 static const int MIN_BUFFERLENGTH = 20;
 static const int MIN_MIXRATE = 11025;
 static const int MAX_MIXRATE = 48000;
-static const StringHash SOUND_MASTER_HASH("MASTER");
+static const StringHash SOUND_MASTER_HASH("Master");
 
 static void SDLAudioCallback(void* userdata, Uint8* stream, int len);
 
@@ -128,7 +128,7 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
     stereo_ = obtained.channels == 2;
     sampleSize_ = (unsigned)(stereo_ ? sizeof(int) : sizeof(short));
     // Guarantee a fragment size that is low enough so that Vorbis decoding buffers do not wrap
-    fragmentSize_ = (unsigned)Min((int)NextPowerOfTwo((unsigned)(mixRate >> 6)), (int)obtained.samples);
+    fragmentSize_ = Min(NextPowerOfTwo((unsigned)(mixRate >> 6)), (unsigned)obtained.samples);
     mixRate_ = obtained.freq;
     interpolation_ = interpolation;
     clipBuffer_ = new int[stereo ? fragmentSize_ << 1 : fragmentSize_];
@@ -141,11 +141,10 @@ bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpo
 
 void Audio::Update(float timeStep)
 {
-    URHO3D_PROFILE(UpdateAudio);
+    if (!playing_)
+        return;
 
-    // Update in reverse order, because sound sources might remove themselves
-    for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)
-        soundSources_[i]->Update(timeStep);
+    UpdateInternal(timeStep);
 }
 
 bool Audio::Play()
@@ -160,6 +159,9 @@ bool Audio::Play()
     }
 
     SDL_PauseAudioDevice(deviceID_, 0);
+
+    // Update sound sources before resuming playback to make sure 3D positions are up to date
+    UpdateInternal(0.0f);
 
     playing_ = true;
     return true;
@@ -176,6 +178,27 @@ void Audio::SetMasterGain(const String& type, float gain)
 
     for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
         (*i)->UpdateMasterGain();
+}
+
+void Audio::PauseSoundType(const String& type)
+{
+    pausedSoundTypes_.Insert(type);
+}
+
+void Audio::ResumeSoundType(const String& type)
+{
+    MutexLock lock(audioMutex_);
+    pausedSoundTypes_.Erase(type);
+    // Update sound sources before resuming playback to make sure 3D positions are up to date
+    // Done under mutex to ensure no mixing happens before we are ready
+    UpdateInternal(0.0f);
+}
+
+void Audio::ResumeAll()
+{
+    MutexLock lock(audioMutex_);
+    pausedSoundTypes_.Clear();
+    UpdateInternal(0.0f);
 }
 
 void Audio::SetListener(SoundListener* listener)
@@ -200,6 +223,11 @@ float Audio::GetMasterGain(const String& type) const
         return 1.0f;
 
     return findIt->second_.GetFloat();
+}
+
+bool Audio::IsSoundTypePaused(const String& type) const
+{
+    return pausedSoundTypes_.Contains(type);
 }
 
 SoundListener* Audio::GetListener() const
@@ -258,7 +286,7 @@ void Audio::MixOutput(void* dest, unsigned samples)
     while (samples)
     {
         // If sample count exceeds the fragment (clip buffer) size, split the work
-        unsigned workSamples = (unsigned)Min((int)samples, (int)fragmentSize_);
+        unsigned workSamples = Min(samples, fragmentSize_);
         unsigned clipSamples = workSamples;
         if (stereo_)
             clipSamples <<= 1;
@@ -269,8 +297,18 @@ void Audio::MixOutput(void* dest, unsigned samples)
 
         // Mix samples to clip buffer
         for (PODVector<SoundSource*>::Iterator i = soundSources_.Begin(); i != soundSources_.End(); ++i)
-            (*i)->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
+        {
+            SoundSource* source = *i;
 
+            // Check for pause if necessary
+            if (!pausedSoundTypes_.Empty())
+            {
+                if (pausedSoundTypes_.Contains(source->GetSoundType()))
+                    continue;
+            }
+
+            source->Mix(clipPtr, workSamples, mixRate_, stereo_, interpolation_);
+        }
         // Copy output from clip buffer to destination
 #ifdef __EMSCRIPTEN__
         float* destPtr = (float*)dest;
@@ -302,6 +340,26 @@ void Audio::Release()
         SDL_CloseAudioDevice(deviceID_);
         deviceID_ = 0;
         clipBuffer_.Reset();
+    }
+}
+
+void Audio::UpdateInternal(float timeStep)
+{
+    URHO3D_PROFILE(UpdateAudio);
+
+    // Update in reverse order, because sound sources might remove themselves
+    for (unsigned i = soundSources_.Size() - 1; i < soundSources_.Size(); --i)
+    {
+        SoundSource* source = soundSources_[i];
+
+        // Check for pause if necessary; do not update paused sound sources
+        if (!pausedSoundTypes_.Empty())
+        {
+            if (pausedSoundTypes_.Contains(source->GetSoundType()))
+                continue;
+        }
+
+        source->Update(timeStep);
     }
 }
 

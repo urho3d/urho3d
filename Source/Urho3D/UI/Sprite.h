@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,10 @@ public:
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to position change.
     virtual void OnPositionSet();
+    /// Convert screen coordinates to element coordinates.
+    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    /// Convert element coordinates to screen coordinates.
+    virtual IntVector2 ElementToScreen(const IntVector2& position);
 
     /// Set floating point position.
     void SetPosition(const Vector2& position);

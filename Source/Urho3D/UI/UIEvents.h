@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-/// Mouse click in the UI.
+/// Global mouse click in the UI. Sent by the UI subsystem.
 URHO3D_EVENT(E_UIMOUSECLICK, UIMouseClick)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -38,7 +38,7 @@ URHO3D_EVENT(E_UIMOUSECLICK, UIMouseClick)
     URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Mouse click end in the UI.
+/// Global mouse click end in the UI. Sent by the UI subsystem.
 URHO3D_EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
@@ -50,8 +50,42 @@ URHO3D_EVENT(E_UIMOUSECLICKEND, UIMouseClickEnd)
     URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
 }
 
-/// Mouse double click in the UI.
+/// Global mouse double click in the UI. Sent by the UI subsystem.
 URHO3D_EVENT(E_UIMOUSEDOUBLECLICK, UIMouseDoubleClick)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
+/// Mouse click on a UI element. Parameters are same as in UIMouseClick event, but is sent by the element.
+URHO3D_EVENT(E_CLICK, Click)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
+/// Mouse click end on a UI element. Parameters are same as in UIMouseClickEnd event, but is sent by the element.
+URHO3D_EVENT(E_CLICKEND, ClickEnd)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_BEGINELEMENT, BeginElement);    // UIElement pointer
+    URHO3D_PARAM(P_X, X);                          // int
+    URHO3D_PARAM(P_Y, Y);                          // int
+    URHO3D_PARAM(P_BUTTON, Button);                // int
+    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
+    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+}
+
+/// Mouse double click on a UI element. Parameters are same as in UIMouseDoubleClick event, but is sent by the element.
+URHO3D_EVENT(E_DOUBLECLICK, DoubleClick)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_X, X);                          // int

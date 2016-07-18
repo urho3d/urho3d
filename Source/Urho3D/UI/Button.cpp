@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,9 @@ void Button::OnClickEnd(const IntVector2& position, const IntVector2& screenPosi
     if (pressed_ && button == MOUSEB_LEFT)
     {
         SetPressed(false);
+        // If mouse was released on top of the element, consider it hovering on this frame yet (see issue #1453)
+        if (IsInside(screenPosition, true))
+            hovering_ = true;
 
         using namespace Released;
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,100 +32,14 @@
 namespace Urho3D
 {
 
-const unsigned VertexBuffer::elementSize[] =
+void VertexBuffer::OnDeviceLost()
 {
-    3 * sizeof(float), // Position
-    3 * sizeof(float), // Normal
-    4 * sizeof(unsigned char), // Color
-    2 * sizeof(float), // Texcoord1
-    2 * sizeof(float), // Texcoord2
-    3 * sizeof(float), // Cubetexcoord1
-    3 * sizeof(float), // Cubetexcoord2
-    4 * sizeof(float), // Tangent
-    4 * sizeof(float), // Blendweights
-    4 * sizeof(unsigned char), // Blendindices
-    4 * sizeof(float), // Instancematrix1
-    4 * sizeof(float), // Instancematrix2
-    4 * sizeof(float), // Instancematrix3
-    sizeof(int) // Objectindex
-};
-
-const char* VertexBuffer::elementSemantics[] =
-{
-    "POSITION",
-    "NORMAL",
-    "COLOR",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TANGENT",
-    "BLENDWEIGHT",
-    "BLENDINDICES",
-    "TEXCOORD",
-    "TEXCOORD",
-    "TEXCOORD",
-    "OBJECTINDEX"
-};
-
-const unsigned VertexBuffer::elementSemanticIndices[] =
-{
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    1,
-    0,
-    0,
-    0,
-    2,
-    3,
-    4,
-    0
-};
-
-const unsigned VertexBuffer::elementFormats[] =
-{
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R8G8B8A8_UNORM,
-    DXGI_FORMAT_R32G32_FLOAT,
-    DXGI_FORMAT_R32G32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R8G8B8A8_UINT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32G32B32A32_FLOAT,
-    DXGI_FORMAT_R32_SINT
-};
-
-VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
-    Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
-    vertexCount_(0),
-    elementMask_(0),
-    lockState_(LOCK_NONE),
-    lockStart_(0),
-    lockCount_(0),
-    lockScratchData_(0),
-    dynamic_(false),
-    shadowed_(false)
-{
-    UpdateOffsets();
-
-    // Force shadowing mode if graphics subsystem does not exist
-    if (!graphics_)
-        shadowed_ = true;
+    // No-op on Direct3D11
 }
 
-VertexBuffer::~VertexBuffer()
+void VertexBuffer::OnDeviceReset()
 {
-    Release();
+    // No-op on Direct3D11
 }
 
 void VertexBuffer::Release()
@@ -141,42 +55,7 @@ void VertexBuffer::Release()
         }
     }
 
-    URHO3D_SAFE_RELEASE(object_);
-}
-
-void VertexBuffer::SetShadowed(bool enable)
-{
-    // If no graphics subsystem, can not disable shadowing
-    if (!graphics_)
-        enable = true;
-
-    if (enable != shadowed_)
-    {
-        if (enable && vertexSize_ && vertexCount_)
-            shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
-        else
-            shadowData_.Reset();
-
-        shadowed_ = enable;
-    }
-}
-
-bool VertexBuffer::SetSize(unsigned vertexCount, unsigned elementMask, bool dynamic)
-{
-    Unlock();
-
-    dynamic_ = dynamic;
-    vertexCount_ = vertexCount;
-    elementMask_ = elementMask;
-
-    UpdateOffsets();
-
-    if (shadowed_ && vertexCount_ && vertexSize_)
-        shadowData_ = new unsigned char[vertexCount_ * vertexSize_];
-    else
-        shadowData_.Reset();
-
-    return Create();
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 bool VertexBuffer::SetData(const void* data)
@@ -196,7 +75,7 @@ bool VertexBuffer::SetData(const void* data)
     if (shadowData_ && data != shadowData_.Get())
         memcpy(shadowData_.Get(), data, vertexCount_ * vertexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (dynamic_)
         {
@@ -219,7 +98,7 @@ bool VertexBuffer::SetData(const void* data)
             destBox.front = 0;
             destBox.back = 1;
 
-            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_, 0, &destBox, data, 0, 0);
+            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_.ptr_, 0, &destBox, data, 0, 0);
         }
     }
 
@@ -255,7 +134,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
     if (shadowData_ && shadowData_.Get() + start * vertexSize_ != data)
         memcpy(shadowData_.Get() + start * vertexSize_, data, count * vertexSize_);
 
-    if (object_)
+    if (object_.ptr_)
     {
         if (dynamic_)
         {
@@ -278,7 +157,7 @@ bool VertexBuffer::SetDataRange(const void* data, unsigned start, unsigned count
             destBox.front = 0;
             destBox.back = 1;
 
-            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_, 0, &destBox, data, 0, 0);
+            graphics_->GetImpl()->GetDeviceContext()->UpdateSubresource((ID3D11Buffer*)object_.ptr_, 0, &destBox, data, 0, 0);
         }
     }
 
@@ -312,7 +191,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
     lockCount_ = count;
 
     // Because shadow data must be kept in sync, can only lock hardware buffer if not shadowed
-    if (object_ && !shadowData_ && dynamic_)
+    if (object_.ptr_ && !shadowData_ && dynamic_)
         return MapBuffer(start, count, discard);
     else if (shadowData_)
     {
@@ -354,66 +233,6 @@ void VertexBuffer::Unlock()
     }
 }
 
-void VertexBuffer::UpdateOffsets()
-{
-    unsigned elementOffset = 0;
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        if (elementMask_ & (1 << i))
-        {
-            elementOffset_[i] = elementOffset;
-            elementOffset += elementSize[i];
-        }
-        else
-            elementOffset_[i] = NO_ELEMENT;
-    }
-    vertexSize_ = elementOffset;
-}
-
-unsigned long long VertexBuffer::GetBufferHash(unsigned streamIndex, unsigned useMask)
-{
-    unsigned long long bufferHash = elementMask_;
-    unsigned long long maskHash;
-    if (useMask == MASK_DEFAULT)
-        maskHash = ((unsigned long long)elementMask_) * 0x100000000ULL;
-    else
-        maskHash = ((unsigned long long)useMask) * 0x100000000ULL;
-
-    bufferHash |= maskHash;
-    bufferHash <<= streamIndex * MAX_VERTEX_ELEMENTS;
-
-    return bufferHash;
-}
-
-unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
-{
-    unsigned vertexSize = 0;
-
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        if (elementMask & (1 << i))
-            vertexSize += elementSize[i];
-    }
-
-    return vertexSize;
-}
-
-unsigned VertexBuffer::GetElementOffset(unsigned elementMask, VertexElement element)
-{
-    unsigned offset = 0;
-
-    for (unsigned i = 0; i < MAX_VERTEX_ELEMENTS; ++i)
-    {
-        if (i == element)
-            break;
-
-        if (elementMask & (1 << i))
-            offset += elementSize[i];
-    }
-
-    return offset;
-}
-
 bool VertexBuffer::Create()
 {
     Release();
@@ -430,10 +249,10 @@ bool VertexBuffer::Create()
         bufferDesc.Usage = dynamic_ ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
         bufferDesc.ByteWidth = (UINT)(vertexCount_ * vertexSize_);
 
-        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_);
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateBuffer(&bufferDesc, 0, (ID3D11Buffer**)&object_.ptr_);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Failed to create vertex buffer", hr);
             return false;
         }
@@ -444,7 +263,7 @@ bool VertexBuffer::Create()
 
 bool VertexBuffer::UpdateToGPU()
 {
-    if (object_ && shadowData_)
+    if (object_.ptr_ && shadowData_)
         return SetData(shadowData_.Get());
     else
         return false;
@@ -454,12 +273,12 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     void* hwData = 0;
 
-    if (object_)
+    if (object_.ptr_)
     {
         D3D11_MAPPED_SUBRESOURCE mappedData;
         mappedData.pData = 0;
 
-        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
+        HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Buffer*)object_.ptr_, 0, discard ? D3D11_MAP_WRITE_DISCARD :
             D3D11_MAP_WRITE, 0, &mappedData);
         if (FAILED(hr) || !mappedData.pData)
             URHO3D_LOGD3DERROR("Failed to map vertex buffer", hr);
@@ -475,9 +294,9 @@ void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 
 void VertexBuffer::UnmapBuffer()
 {
-    if (object_ && lockState_ == LOCK_HARDWARE)
+    if (object_.ptr_ && lockState_ == LOCK_HARDWARE)
     {
-        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Buffer*)object_, 0);
+        graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Buffer*)object_.ptr_, 0);
         lockState_ = LOCK_NONE;
     }
 }

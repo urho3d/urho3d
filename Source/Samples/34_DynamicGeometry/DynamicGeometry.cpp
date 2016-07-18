@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,9 @@ void DynamicGeometry::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void DynamicGeometry::CreateScene()
@@ -220,7 +223,12 @@ void DynamicGeometry::CreateScene()
 
         // Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
         vb->SetShadowed(true);
-        vb->SetSize(numVertices, MASK_POSITION|MASK_NORMAL);
+        // We could use the "legacy" element bitmask to define elements for more compact code, but let's demonstrate
+        // defining the vertex elements explicitly to allow any element types and order
+        PODVector<VertexElement> elements;
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+        elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+        vb->SetSize(numVertices, elements);
         vb->SetData(vertexData);
 
         ib->SetShadowed(true);
@@ -307,13 +315,13 @@ void DynamicGeometry::MoveCamera(float timeStep)
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 

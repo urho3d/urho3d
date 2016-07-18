@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 extern int X11_SetClipboardText(_THIS, const char *text);
 extern char *X11_GetClipboardText(_THIS);
 extern SDL_bool X11_HasClipboardText(_THIS);
+extern Atom X11_GetSDLCutBufferClipboardType(Display *display);
 
 #endif /* _SDL_x11clipboard_h */
 

@@ -1,6 +1,6 @@
 /*
 ** IR CALL* instruction definitions.
-** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_IRCALL_H
@@ -76,6 +76,12 @@ typedef struct CCallInfo {
 #else
 #define IRCALLCOND_SOFTFP(x)		NULL
 #define IRCALLCOND_SOFTFP_FFI(x)	NULL
+#endif
+
+#if LJ_SOFTFP && LJ_TARGET_MIPS
+#define IRCALLCOND_SOFTFP_MIPS(x)	x
+#else
+#define IRCALLCOND_SOFTFP_MIPS(x)	NULL
 #endif
 
 #define LJ_NEED_FP64	(LJ_TARGET_ARM || LJ_TARGET_PPC || LJ_TARGET_MIPS)
@@ -189,6 +195,8 @@ typedef struct CCallInfo {
   _(SOFTFP,	softfp_cmp,		4,   N, NIL, 0) \
   _(SOFTFP,	softfp_i2d,		1,   N, NUM, 0) \
   _(SOFTFP,	softfp_d2i,		2,   N, INT, 0) \
+  _(SOFTFP_MIPS, lj_vm_sfmin,		4,   N, NUM, 0) \
+  _(SOFTFP_MIPS, lj_vm_sfmax,		4,   N, NUM, 0) \
   _(SOFTFP_FFI,	softfp_ui2d,		1,   N, NUM, 0) \
   _(SOFTFP_FFI,	softfp_f2d,		1,   N, NUM, 0) \
   _(SOFTFP_FFI,	softfp_d2ui,		2,   N, INT, 0) \
@@ -305,6 +313,10 @@ extern float softfp_i2f(int32_t a);
 extern float softfp_ui2f(uint32_t a);
 extern int32_t softfp_f2i(float a);
 extern uint32_t softfp_f2ui(float a);
+#endif
+#if LJ_TARGET_MIPS
+extern double lj_vm_sfmin(double a, double b);
+extern double lj_vm_sfmax(double a, double b);
 #endif
 #endif
 

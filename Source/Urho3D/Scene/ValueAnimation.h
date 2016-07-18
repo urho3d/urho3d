@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,10 @@ class JSONValue;
 /// Interpolation method.
 enum InterpMethod
 {
+    /// No interpolation.
+    IM_NONE = 0,
     /// Linear interpolation (default).
-    IM_LINEAR = 0,
+    IM_LINEAR,
     /// Cardinal spline interpolation, default tension value is 0.5f. For more information please refer to http://cubic.org/docs/hermite.htm.
     IM_SPLINE,
 };

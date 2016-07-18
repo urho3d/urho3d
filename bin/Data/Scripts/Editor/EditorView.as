@@ -346,6 +346,7 @@ ViewportContext@ activeViewport;
 
 Text@ editorModeText;
 Text@ renderStatsText;
+Text@ modelInfoText;
 
 EditMode editMode = EDIT_MOVE;
 AxisMode axisMode = AXIS_WORLD;
@@ -1110,6 +1111,8 @@ void CreateStatsBar()
     ui.root.AddChild(editorModeText);
     renderStatsText = Text();
     ui.root.AddChild(renderStatsText);
+    modelInfoText = Text();
+    ui.root.AddChild(modelInfoText);
 }
 
 void SetupStatsBarText(Text@ text, Font@ font, int x, int y, HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -1153,11 +1156,13 @@ void UpdateStats(float timeStep)
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
+        SetupStatsBarText(modelInfoText, font, 35, 88, HA_LEFT, VA_TOP);
     }
     else
     {
         SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
+        SetupStatsBarText(modelInfoText, font, 35, 102, HA_LEFT, VA_TOP);
     }
 }
 
@@ -1231,32 +1236,32 @@ void UpdateView(float timeStep)
     {
         if (hotKeyMode == HOTKEYS_MODE_STANDARD || (hotKeyMode == HOTKEYS_MODE_BLENDER && cameraFlyMode && !input.keyDown[KEY_LSHIFT])) 
         {
-            if (input.keyDown['W'] || input.keyDown[KEY_UP])
+            if (input.keyDown[KEY_W] || input.keyDown[KEY_UP])
             {
                 cameraNode.Translate(Vector3(0, 0, cameraBaseSpeed) * timeStep * speedMultiplier);
                 FadeUI();
             }
-            if (input.keyDown['S'] || input.keyDown[KEY_DOWN])
+            if (input.keyDown[KEY_S] || input.keyDown[KEY_DOWN])
             {
                 cameraNode.Translate(Vector3(0, 0, -cameraBaseSpeed) * timeStep * speedMultiplier);
                 FadeUI();
             }
-            if (input.keyDown['A'] || input.keyDown[KEY_LEFT])
+            if (input.keyDown[KEY_A] || input.keyDown[KEY_LEFT])
             {
                 cameraNode.Translate(Vector3(-cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
                 FadeUI();
             }
-            if (input.keyDown['D'] || input.keyDown[KEY_RIGHT])
+            if (input.keyDown[KEY_D] || input.keyDown[KEY_RIGHT])
             {
                 cameraNode.Translate(Vector3(cameraBaseSpeed, 0, 0) * timeStep * speedMultiplier);
                 FadeUI();
             }
-            if (input.keyDown['E'] || input.keyDown[KEY_PAGEUP])
+            if (input.keyDown[KEY_E] || input.keyDown[KEY_PAGEUP])
             {
                 cameraNode.Translate(Vector3(0, cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
                 FadeUI();
             }
-            if (input.keyDown['Q'] || input.keyDown[KEY_PAGEDOWN])
+            if (input.keyDown[KEY_Q] || input.keyDown[KEY_PAGEDOWN])
             {
                 cameraNode.Translate(Vector3(0, -cameraBaseSpeed, 0) * timeStep * speedMultiplier, TS_WORLD);
                 FadeUI();
@@ -1342,7 +1347,7 @@ void UpdateView(float timeStep)
     {
         changeCamViewButton = input.mouseButtonDown[MOUSEB_MIDDLE] || cameraFlyMode;
 
-        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESC])
+        if (input.mouseButtonPress[MOUSEB_RIGHT] || input.keyDown[KEY_ESCAPE])
             cameraFlyMode = false;
     }
 
@@ -1438,7 +1443,7 @@ void UpdateView(float timeStep)
             }
             else
             {
-                for (int i = 0; i < selectedNodes.length; i++)
+                for (uint i = 0; i < selectedNodes.length; i++)
                 {
                     bb.Merge(selectedNodes[i].position);
                 }
@@ -1872,13 +1877,13 @@ void ViewRaycast(bool mouseClick)
     }
 }
 
-Vector3 GetNewNodePosition()
+Vector3 GetNewNodePosition(bool raycastToMouse = false)
 {
     if (newNodeMode == NEW_NODE_IN_CENTER)
         return Vector3(0, 0, 0);
     if (newNodeMode == NEW_NODE_RAYCAST)
     {
-        Ray cameraRay = camera.GetScreenRay(0.5, 0.5);
+        Ray cameraRay = raycastToMouse ? GetActiveViewportCameraRay() : camera.GetScreenRay(0.5, 0.5);
         Vector3 position, normal;
         if (GetSpawnPosition(cameraRay, camera.farClip, position, normal, 0, false))
             return position;
@@ -1993,44 +1998,6 @@ Vector3 SelectedNodesCenterPoint()
         lastSelectedNodesCenterPoint = centerPoint;
         return centerPoint;
     }
-}
-
-Vector3 GetScreenCollision(IntVector2 pos)
-{
-    Ray cameraRay = camera.GetScreenRay(float(pos.x) / activeViewport.viewport.rect.width, float(pos.y) / activeViewport.viewport.rect.height);
-    Vector3 res = cameraNode.position + cameraRay.direction * Vector3(0, 0, newNodeDistance);
-
-    bool physicsFound = false;
-    if (editorScene.physicsWorld !is null)
-    {
-        if (!runUpdate)
-            editorScene.physicsWorld.UpdateCollisions();
-
-        PhysicsRaycastResult result = editorScene.physicsWorld.RaycastSingle(cameraRay, camera.farClip);
-
-        if (result.body !is null)
-        {
-            physicsFound = true;
-            result.position;
-        }
-    }
-
-    if (editorScene.octree is null)
-        return res;
-
-    RayQueryResult result = editorScene.octree.RaycastSingle(cameraRay, RAY_TRIANGLE, camera.farClip,
-        DRAWABLE_GEOMETRY, 0x7fffffff);
-
-    if (result.drawable !is null)
-    {
-        // take the closer of the results
-        if (physicsFound && (cameraNode.position - res).length < (cameraNode.position - result.position).length)
-            return res;
-        else
-            return result.position;
-    }
-
-    return res;
 }
 
 Drawable@ GetDrawableAtMousePostion()

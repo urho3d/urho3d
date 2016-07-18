@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,8 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
 
 /**
  *  \file SDL_platform.h
@@ -58,7 +56,7 @@
 #undef __IRIX__
 #define __IRIX__    1
 #endif
-#if defined(linux) || defined(__linux) || defined(__linux__)
+#if (defined(linux) || defined(__linux) || defined(__linux__))
 #undef __LINUX__
 #define __LINUX__   1
 #endif
@@ -111,16 +109,14 @@
 #undef __RISCOS__
 #define __RISCOS__  1
 #endif
-#if defined(__SVR4)
+#if defined(__sun) && defined(__SVR4)
 #undef __SOLARIS__
 #define __SOLARIS__ 1
 #endif
 
-#if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 /* Try to find out if we're compiling for WinRT or non-WinRT */
 /* If _USING_V110_SDK71_ is defined it means we are using the v110_xp or v120_xp toolset. */
-// Urho3D: not all MinGW versions contain the winapifamily.h include file. Only check for WinRT
-// on Visual Studio
 #if (defined(_MSC_VER) && (_MSC_VER >= 1700) && !_USING_V110_SDK71_)	/* _MSC_VER==1700 for MSVC 2012 */
 #include <winapifamily.h>
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -145,6 +141,23 @@
 #undef __PSP__
 #define __PSP__ 1
 #endif
+
+/* The NACL compiler defines __native_client__ and __pnacl__
+ * Ref: http://www.chromium.org/nativeclient/pnacl/stability-of-the-pnacl-bitcode-abi
+ */
+#if defined(__native_client__)
+#undef __LINUX__
+#undef __NACL__
+#define __NACL__ 1
+#endif
+#if defined(__pnacl__)
+#undef __LINUX__
+#undef __PNACL__
+#define __PNACL__ 1
+/* PNACL with newlib supports static linking only */
+#define __SDL_NOGETPROCADDR__
+#endif
+
 
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */

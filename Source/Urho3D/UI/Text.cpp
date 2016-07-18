@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,6 @@ extern const char* UI_CATEGORY;
 
 Text::Text(Context* context) :
     UIElement(context),
-    usedInText3D_(false),
     fontSize_(DEFAULT_FONT_SIZE),
     textAlignment_(HA_LEFT),
     rowSpacing_(1.0f),
@@ -65,6 +64,9 @@ Text::Text(Context* context) :
     selectionColor_(Color::TRANSPARENT),
     hoverColor_(Color::TRANSPARENT),
     textEffect_(TE_NONE),
+    shadowOffset_(IntVector2(1, 1)),
+    strokeThickness_(1),
+    roundStroke_(false),
     effectColor_(Color::BLACK),
     effectDepthBias_(0.0f),
     rowHeight_(0)
@@ -85,7 +87,7 @@ void Text::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
     URHO3D_ATTRIBUTE("Font Size", int, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
-    URHO3D_ATTRIBUTE("Text", String, text_, String::EMPTY, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
     URHO3D_ATTRIBUTE("Word Wrap", bool, wordWrap_, false, AM_FILE);
@@ -93,6 +95,9 @@ void Text::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Selection Color", GetSelectionColor, SetSelectionColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Hover Color", GetHoverColor, SetHoverColor, Color, Color::TRANSPARENT, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Effect", textEffect_, textEffects, TE_NONE, AM_FILE);
+    URHO3D_ATTRIBUTE("Shadow Offset", IntVector2, shadowOffset_, IntVector2(1, 1), AM_FILE);
+    URHO3D_ATTRIBUTE("Stroke Thickness", int, strokeThickness_, 1, AM_FILE);
+    URHO3D_ATTRIBUTE("Round Stroke", bool, roundStroke_, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Effect Color", GetEffectColor, SetEffectColor, Color, Color::BLACK, AM_FILE);
 
     // Change the default value for UseDerivedOpacity
@@ -103,9 +108,17 @@ void Text::ApplyAttributes()
 {
     UIElement::ApplyAttributes();
 
+    // Localize now if attributes were loaded out-of-order
+    if (autoLocalizable_ && stringId_.Length())
+    {
+        Localization* l10n = GetSubsystem<Localization>();
+        text_ = l10n->Get(stringId_);
+    }
+
     DecodeToUnicode();
 
     fontSize_ = Max(fontSize_, 1);
+    strokeThickness_ = Abs(strokeThickness_);
     ValidateSelection();
     UpdateText();
 }
@@ -192,19 +205,44 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
             break;
 
         case TE_SHADOW:
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            ConstructBatch(pageBatch, pageGlyphLocation, shadowOffset_.x_, shadowOffset_.y_, &effectColor_, effectDepthBias_);
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
 
         case TE_STROKE:
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, -1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 0, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, -1, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 0, 1, &effectColor_, effectDepthBias_);
-            ConstructBatch(pageBatch, pageGlyphLocation, 1, 1, &effectColor_, effectDepthBias_);
+            if (roundStroke_)
+            {
+                // Samples should be even or glyph may be redrawn in wrong x y pos making stroke corners rough
+                // Adding to thickness helps with thickness of 1 not having enought samples for this formula
+                // or certain fonts with reflex corners requiring more glyph samples for a smooth stroke when large
+                int thickness = Min(strokeThickness_, fontSize_);
+                int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
+                float angle = 360.f / samples;
+                float floatThickness = (float)thickness;
+                for (int i = 0; i < samples; ++i)
+                {
+                    float x = Cos(angle * i) * floatThickness;
+                    float y = Sin(angle * i) * floatThickness;
+                    ConstructBatch(pageBatch, pageGlyphLocation, (int)x, (int)y, &effectColor_, effectDepthBias_);
+                }
+            }
+            else
+            {
+                int thickness = Min(strokeThickness_, fontSize_);
+                int x, y;
+                for (x = -thickness; x <= thickness; ++x)
+                {
+                    for (y = -thickness; y <= thickness; ++y)
+                    {
+                        // Don't draw glyphs that aren't on the edges
+                        if (x > -thickness && x < thickness &&
+                            y > -thickness && y < thickness)
+                            continue;
+    
+                        ConstructBatch(pageBatch, pageGlyphLocation, x, y, &effectColor_, effectDepthBias_);
+                    }
+                }
+            }
             ConstructBatch(pageBatch, pageGlyphLocation, 0, 0);
             break;
         }
@@ -366,14 +404,24 @@ void Text::SetTextEffect(TextEffect textEffect)
     textEffect_ = textEffect;
 }
 
+void Text::SetEffectShadowOffset(const IntVector2& offset)
+{
+    shadowOffset_ = offset;
+}
+
+void Text::SetEffectStrokeThickness(int thickness)
+{
+    strokeThickness_ = Abs(thickness);
+}
+
+void Text::SetEffectRoundStroke(bool roundStroke)
+{
+    roundStroke_ = roundStroke;
+}
+
 void Text::SetEffectColor(const Color& effectColor)
 {
     effectColor_ = effectColor;
-}
-
-void Text::SetUsedInText3D(bool usedInText3D)
-{
-    usedInText3D_ = usedInText3D;
 }
 
 void Text::SetEffectDepthBias(float bias)
@@ -419,6 +467,21 @@ void Text::SetFontAttr(const ResourceRef& value)
 ResourceRef Text::GetFontAttr() const
 {
     return GetResourceRef(font_, Font::GetTypeStatic());
+}
+
+void Text::SetTextAttr(const String& value)
+{
+    text_ = value;
+    if (autoLocalizable_)
+        stringId_ = value;
+}
+
+String Text::GetTextAttr() const
+{
+    if (autoLocalizable_ && stringId_.Length())
+        return stringId_;
+    else
+        return text_;
 }
 
 bool Text::FilterImplicitAttributes(XMLElement& dest) const
@@ -531,7 +594,7 @@ void Text::UpdateText(bool onResize)
                             printToText_.Pop();
                         }
                         printText_.Push('\n');
-                        printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
+                        printToText_.Push(Min(i, unicodeText_.Size() - 1));
                         rowWidth = 0;
                         nextBreak = lineStart = i;
                     }
@@ -557,7 +620,7 @@ void Text::UpdateText(bool onResize)
                 else
                 {
                     printText_.Push('\n');
-                    printToText_.Push((unsigned)Min((int)i, (int)unicodeText_.Size() - 1));
+                    printToText_.Push(Min(i, unicodeText_.Size() - 1));
                     rowWidth = 0;
                     nextBreak = lineStart = i;
                 }

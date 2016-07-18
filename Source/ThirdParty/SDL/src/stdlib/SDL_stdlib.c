@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,10 @@
 */
 
 // Modified by Lasse Oorni for Urho3D
+
+#if defined(__clang_analyzer__) && !defined(SDL_DISABLE_ANALYZE_MACROS)
+#define SDL_DISABLE_ANALYZE_MACROS 1
+#endif
 
 #include "../SDL_internal.h"
 
@@ -211,6 +215,36 @@ SDL_sqrt(double x)
     return sqrt(x);
 #else
     return SDL_uclibc_sqrt(x);
+#endif
+}
+
+float
+SDL_sqrtf(float x)
+{
+#if defined(HAVE_SQRTF)
+    return sqrtf(x);
+#else
+    return (float)SDL_sqrt((double)x);
+#endif
+}
+
+double
+SDL_tan(double x)
+{
+#if defined(HAVE_TAN)
+    return tan(x);
+#else
+    return SDL_uclibc_tan(x);
+#endif
+}
+
+float
+SDL_tanf(float x)
+{
+#if defined(HAVE_TANF)
+    return tanf(x);
+#else
+    return (float)SDL_tan((double)x);
 #endif
 }
 

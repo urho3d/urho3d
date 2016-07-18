@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@
 #include <Urho3D/Core/Timer.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/IO/Log.h>
 
 Sample::Sample(Context* context) :
     Application(context),
@@ -47,7 +48,8 @@ Sample::Sample(Context* context) :
     touchEnabled_(false),
     screenJoystickIndex_(M_MAX_UNSIGNED),
     screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
-    paused_(false)
+    paused_(false),
+    useMouseMode_(MM_ABSOLUTE)
 {
 }
 
@@ -87,6 +89,8 @@ void Sample::Start()
 
     // Subscribe key down event
     SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(Sample, HandleKeyDown));
+    // Subscribe key up event
+    SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(Sample, HandleKeyUp));
     // Subscribe scene update event
     SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(Sample, HandleSceneUpdate));
 }
@@ -113,6 +117,33 @@ void Sample::InitTouchInput()
     }
     screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
     input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
+}
+
+void Sample::InitMouseMode(MouseMode mode)
+{
+    useMouseMode_ = mode;
+
+    Input* input = GetSubsystem<Input>();
+
+    if (GetPlatform() != "Web")
+    {
+        if (useMouseMode_ == MM_FREE)
+            input->SetMouseVisible(true);
+
+        Console* console = GetSubsystem<Console>();
+        if (useMouseMode_ != MM_ABSOLUTE)
+        {
+            input->SetMouseMode(useMouseMode_);
+            if (console && console->IsVisible())
+                input->SetMouseMode(MM_ABSOLUTE, true);
+        }
+    }
+    else
+    {
+        input->SetMouseVisible(true);
+        SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Sample, HandleMouseModeRequest));
+        SubscribeToEvent(E_MOUSEMODECHANGED, URHO3D_HANDLER(Sample, HandleMouseModeChange));
+    }
 }
 
 void Sample::SetLogoVisible(bool enable)
@@ -183,24 +214,41 @@ void Sample::CreateConsoleAndDebugHud()
     debugHud->SetDefaultStyle(xmlFile);
 }
 
+
+void Sample::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+{
+    using namespace KeyUp;
+
+    int key = eventData[P_KEY].GetInt();
+
+    // Close console (if open) or exit when ESC is pressed
+    if (key == KEY_ESCAPE)
+    {
+        Console* console = GetSubsystem<Console>();
+        if (console->IsVisible())
+            console->SetVisible(false);
+        else
+        {
+            if (GetPlatform() == "Web")
+            {
+                GetSubsystem<Input>()->SetMouseVisible(true);
+                if (useMouseMode_ != MM_ABSOLUTE)
+                    GetSubsystem<Input>()->SetMouseMode(MM_FREE);
+            }
+            else
+                engine_->Exit();
+        }
+    }
+}
+
 void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     using namespace KeyDown;
 
     int key = eventData[P_KEY].GetInt();
 
-    // Close console (if open) or exit when ESC is pressed
-    if (key == KEY_ESC)
-    {
-        Console* console = GetSubsystem<Console>();
-        if (console->IsVisible())
-            console->SetVisible(false);
-        else
-            engine_->Exit();
-    }
-
     // Toggle console with F1
-    else if (key == KEY_F1)
+    if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
 
     // Toggle debug HUD with F2
@@ -356,4 +404,25 @@ void Sample::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
     // On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput();
     UnsubscribeFromEvent("TouchBegin");
+}
+
+// If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+void Sample::HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
+{
+    Console* console = GetSubsystem<Console>();
+    if (console && console->IsVisible())
+        return;
+    Input* input = GetSubsystem<Input>();
+    if (useMouseMode_ == MM_ABSOLUTE)
+        input->SetMouseVisible(false);
+    else if (useMouseMode_ == MM_FREE)
+        input->SetMouseVisible(true);
+    input->SetMouseMode(useMouseMode_);
+}
+
+void Sample::HandleMouseModeChange(StringHash eventType, VariantMap& eventData)
+{
+    Input* input = GetSubsystem<Input>();
+    bool mouseLocked = eventData[MouseModeChanged::P_MOUSELOCKED].GetBool();
+    input->SetMouseVisible(!mouseLocked);
 }

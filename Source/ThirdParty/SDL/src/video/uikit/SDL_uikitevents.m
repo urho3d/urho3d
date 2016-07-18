@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,8 +40,9 @@ SDL_iPhoneSetEventPump(SDL_bool enabled)
 void
 UIKit_PumpEvents(_THIS)
 {
-    if (!UIKit_EventPumpEnabled)
+    if (!UIKit_EventPumpEnabled) {
         return;
+    }
 
     /* Let the run loop run for a short amount of time: long enough for
        touch events to get processed (which is important to get certain

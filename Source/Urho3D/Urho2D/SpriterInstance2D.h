@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@
 namespace Urho3D
 {
 
+class Component;
+
 namespace Spriter
 {
 
@@ -43,7 +45,7 @@ class SpriterInstance
 {
 public:
     /// Constructor with spriter data.
-    SpriterInstance(SpriterData* spriteData);
+    SpriterInstance(Component* owner, SpriterData* spriteData);
     /// Destructor.
     ~SpriterInstance();
 
@@ -85,6 +87,8 @@ private:
     /// Clear mainline key and timeline keys.
     void Clear();
 
+    /// Parent component.
+    Component* owner_;
     /// Spriter data.
     SpriterData* spriterData_;
     /// Current entity.
@@ -101,7 +105,6 @@ private:
     MainlineKey* mainlineKey_;
     /// Current timeline keys.
     PODVector<SpatialTimelineKey*> timelineKeys_;
-        
 };
 
 }

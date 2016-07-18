@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,18 @@
 */
 
 /* *INDENT-OFF* */
+
+#ifndef SDL_WAYLAND_MODULE
+#define SDL_WAYLAND_MODULE(modname)
+#endif
+
+#ifndef SDL_WAYLAND_SYM
+#define SDL_WAYLAND_SYM(rc,fn,params)
+#endif
+
+#ifndef SDL_WAYLAND_INTERFACE
+#define SDL_WAYLAND_INTERFACE(iface)
+#endif
 
 SDL_WAYLAND_MODULE(WAYLAND_CLIENT)
 SDL_WAYLAND_SYM(void, wl_proxy_marshal, (struct wl_proxy *, uint32_t, ...))
@@ -54,6 +66,9 @@ SDL_WAYLAND_SYM(void, wl_list_insert_list, (struct wl_list *, struct wl_list *))
 /* These functions are available in Wayland >= 1.4 */
 SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_4)
 SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor, (struct wl_proxy *, uint32_t opcode, const struct wl_interface *interface, ...))
+
+SDL_WAYLAND_MODULE(WAYLAND_CLIENT_1_10)
+SDL_WAYLAND_SYM(struct wl_proxy *, wl_proxy_marshal_constructor_versioned, (struct wl_proxy *proxy, uint32_t opcode, const struct wl_interface *interface, uint32_t version, ...))
 
 SDL_WAYLAND_INTERFACE(wl_seat_interface)
 SDL_WAYLAND_INTERFACE(wl_surface_interface)
@@ -99,8 +114,10 @@ SDL_WAYLAND_SYM(enum xkb_state_component, xkb_state_update_mask, (struct xkb_sta
                       xkb_layout_index_t latched_layout,\
                       xkb_layout_index_t locked_layout) )
 
+#undef SDL_WAYLAND_MODULE
+#undef SDL_WAYLAND_SYM
+#undef SDL_WAYLAND_INTERFACE
 
 /* *INDENT-ON* */
 
 /* vi: set ts=4 sw=4 expandtab: */
-//SDL_WAYLAND_SYM(ret, fn, params)

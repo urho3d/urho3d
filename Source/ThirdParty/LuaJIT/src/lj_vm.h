@@ -1,6 +1,6 @@
 /*
 ** Assembler VM interface definitions.
-** Copyright (C) 2005-2015 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_VM_H
@@ -66,6 +66,9 @@ LJ_ASMF double lj_vm_log2(double);
 #else
 #define lj_vm_log2	log2
 #endif
+#if !(defined(_LJ_DISPATCH_H) && LJ_TARGET_MIPS)
+LJ_ASMF int32_t LJ_FASTCALL lj_vm_modi(int32_t, int32_t);
+#endif
 
 #if LJ_HASJIT
 #if LJ_TARGET_X86ORX64
@@ -90,7 +93,6 @@ LJ_ASMF double lj_vm_exp2(double);
 #else
 #define lj_vm_exp2	exp2
 #endif
-LJ_ASMF int32_t LJ_FASTCALL lj_vm_modi(int32_t, int32_t);
 #if LJ_HASFFI
 LJ_ASMF int lj_vm_errno(void);
 #endif

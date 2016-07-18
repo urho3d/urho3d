@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Resource/JSONValue.h"
 #include "../Scene/Component.h"
 #include "../Scene/ReplicationState.h"
 #include "../Scene/Scene.h"
@@ -35,7 +36,6 @@
 #endif
 
 #include "../DebugNew.h"
-#include "./Resource/JSONValue.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:6293)

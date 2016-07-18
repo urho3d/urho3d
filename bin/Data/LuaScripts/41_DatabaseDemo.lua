@@ -33,6 +33,9 @@ function Start()
     -- Show OS mouse cursor
     input.mouseVisible = true
 
+    -- Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE)
+
     -- Open the operating system console window (for stdin / stdout) if not open yet
     -- Do not open in fullscreen, as this would cause constant device loss
     if not graphics.fullscreen then
@@ -90,7 +93,7 @@ end
 
 function HandleEscKeyDown(eventType, eventData)
     -- Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if eventData["Key"]:GetInt() == KEY_ESC then
+    if eventData["Key"]:GetInt() == KEY_ESCAPE then
         engine:Exit()
     end
 end

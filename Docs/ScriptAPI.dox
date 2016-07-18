@@ -81,8 +81,9 @@ namespace Urho3D
 - %Width : int
 - %Height : int
 - %Fullscreen : bool
-- %Resizable : bool
 - %Borderless : bool
+- %Resizable : bool
+- %HighDPI : bool
 
 ### WindowPos
 - %X : int
@@ -121,6 +122,9 @@ namespace Urho3D
 - %Surface : RenderSurface pointer
 - %Scene : Scene pointer
 - %Camera : Camera pointer
+
+### RenderPathEvent
+- %Name : String
 
 ### DeviceLost
 
@@ -164,7 +168,6 @@ namespace Urho3D
 ### KeyDown
 - %Key : int
 - %Scancode : int
-- %Raw : uint
 - %Buttons : int
 - %Qualifiers : int
 - %Repeat : bool
@@ -172,7 +175,6 @@ namespace Urho3D
 ### KeyUp
 - %Key : int
 - %Scancode : int
-- %Raw : uint
 - %Buttons : int
 - %Qualifiers : int
 
@@ -253,6 +255,7 @@ namespace Urho3D
 
 ### MouseModeChanged
 - %Mode : MouseMode
+- %MouseLocked : bool
 
 ### ExitRequested
 
@@ -388,6 +391,7 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
+- %Contact : b2Contact pointer
 
 ### PhysicsEndContact2D
 - %World : PhysicsWorld2D pointer
@@ -395,6 +399,7 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
+- %Contact : b2Contact pointer
 
 ## %Physics events
 
@@ -571,6 +576,16 @@ namespace Urho3D
 ### TemporaryChanged
 - %Serializable : Serializable pointer
 
+### NodeCloned
+- %Scene : Scene pointer
+- %Node : Node pointer
+- %CloneNode : Node pointer
+
+### ComponentCloned
+- %Scene : Scene pointer
+- %Component : Component pointer
+- %CloneComponent : Component pointer
+
 ### InterceptNetworkUpdate
 - %Serializable : Serializable pointer
 - %TimeStamp : unsigned (0-255)
@@ -598,6 +613,31 @@ namespace Urho3D
 - %Qualifiers : int
 
 ### UIMouseDoubleClick
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### Click
+- %Element : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### ClickEnd
+- %Element : UIElement pointer
+- %BeginElement : UIElement pointer
+- %X : int
+- %Y : int
+- %Button : int
+- %Buttons : int
+- %Qualifiers : int
+
+### DoubleClick
 - %Element : UIElement pointer
 - %X : int
 - %Y : int
@@ -850,6 +890,7 @@ namespace Urho3D
 - %Relative %Position : bool
 - %Relative %Scale : bool
 - %Sort %By %Distance : bool
+- %Fixed %Screen %Size : bool
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Face %Camera %Mode : int
@@ -1389,6 +1430,7 @@ namespace Urho3D
 - %View %Size %Minimum : float
 - %Depth %Constant %Bias : float
 - %Depth %Slope %Bias : float
+- %Normal %Offset : float
 - %Near/Farclip %Ratio : float
 - %View %Mask : int
 - %Light %Mask : int
@@ -1652,6 +1694,28 @@ namespace Urho3D
 - %Velocity %Iterations : int
 - %Position %Iterations : int
 
+### RibbonTrail
+- %Is %Enabled : bool
+- %Max %Lights : int
+- %View %Mask : int
+- %Light %Mask : int
+- %Shadow %Mask : int
+- %Zone %Mask : int
+- %Material : ResourceRef
+- %Emitting : bool
+- %Update %Invisible : bool
+- %Trail %Type : int
+- %Tail %Lifetime : float
+- %Tail %Column : int
+- %Vertex %Distance : float
+- %Width : float
+- %Start %Scale : float
+- %End %Scale : float
+- %Start %Color : Color
+- %End %Color : Color
+- %Animation %LOD %Bias : float
+- %Sort %By %Distance : bool
+
 ### RigidBody
 - %Is %Enabled : bool
 - %Mass : float
@@ -1742,6 +1806,13 @@ namespace Urho3D
 - %Indent %Spacing : int
 - %Variables : VariantMap
 - %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
 - %Orientation : int
 - %Range : float
 - %Value : float
@@ -2029,6 +2100,9 @@ namespace Urho3D
 - %Selection %Color : Color
 - %Hover %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 
 ### Text3D
@@ -2041,17 +2115,22 @@ namespace Urho3D
 - %Row %Spacing : float
 - %Word %Wrap : bool
 - %Can %Be %Occluded : bool
+- %Fixed %Screen %Size : bool
 - %Face %Camera %Mode : int
 - %Draw %Distance : float
 - %Width : int
 - %Horiz %Alignment : int
 - %Vert %Alignment : int
+- %Opacity : float
 - %Color : Color
 - %Top %Left %Color : Color
 - %Top %Right %Color : Color
 - %Bottom %Left %Color : Color
 - %Bottom %Right %Color : Color
 - %Text %Effect : int
+- %Shadow %Offset : IntVector2
+- %Stroke %Thickness : int
+- %Round %Stroke : bool
 - %Effect %Color : Color
 - %Effect %Depth %Bias : float
 
@@ -2355,12 +2434,14 @@ namespace Urho3D
 <a href="#Class_Localization"><b>Localization</b></a>
 <a href="#Class_Log"><b>Log</b></a>
 <a href="#Class_Material"><b>Material</b></a>
+<a href="#Class_Matrix2"><b>Matrix2</b></a>
 <a href="#Class_Matrix3"><b>Matrix3</b></a>
 <a href="#Class_Matrix3x4"><b>Matrix3x4</b></a>
 <a href="#Class_Matrix4"><b>Matrix4</b></a>
 <a href="#Class_Menu"><b>Menu</b></a>
 <a href="#Class_MessageBox"><b>MessageBox</b></a>
 <a href="#Class_Model"><b>Model</b></a>
+<a href="#Class_NamedPipe"><b>NamedPipe</b></a>
 <a href="#Class_NavArea"><b>NavArea</b></a>
 <a href="#Class_Navigable"><b>Navigable</b></a>
 <a href="#Class_NavigationMesh"><b>NavigationMesh</b></a>
@@ -2399,6 +2480,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
 <a href="#Class_Scene"><b>Scene</b></a>
@@ -2437,6 +2519,7 @@ namespace Urho3D
 <a href="#Class_Text3D"><b>Text3D</b></a>
 <a href="#Class_Texture"><b>Texture</b></a>
 <a href="#Class_Texture2D"><b>Texture2D</b></a>
+<a href="#Class_Texture2DArray"><b>Texture2DArray</b></a>
 <a href="#Class_Texture3D"><b>Texture3D</b></a>
 <a href="#Class_TextureCube"><b>TextureCube</b></a>
 <a href="#Class_TextureFrame"><b>TextureFrame</b></a>
@@ -2460,6 +2543,7 @@ namespace Urho3D
 <a href="#Class_Vector4"><b>Vector4</b></a>
 <a href="#Class_VectorBuffer"><b>VectorBuffer</b></a>
 <a href="#Class_VertexBuffer"><b>VertexBuffer</b></a>
+<a href="#Class_VertexElement"><b>VertexElement</b></a>
 <a href="#Class_View3D"><b>View3D</b></a>
 <a href="#Class_Viewport"><b>Viewport</b></a>
 <a href="#Class_WeakHandle"><b>WeakHandle</b></a>
@@ -2576,6 +2660,7 @@ Methods:
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetMorphWeight(uint, float)
+- void UpdateBoneBoundingBox()
 
 Properties:
 
@@ -2723,6 +2808,7 @@ Methods:
 
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
+- Animation@ Clone(const String& = String ( )) const
 - AnimationTrack@ CreateTrack(const String&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
@@ -2772,6 +2858,7 @@ Methods:
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
 - float GetAutoFade(const String&) const
+- AnimationBlendMode GetBlendMode(const String&) const
 - float GetFadeTarget(const String&) const
 - float GetFadeTime(const String&) const
 - bool GetInterceptNetworkUpdate(const String&) const
@@ -2812,6 +2899,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - bool SetAutoFade(const String&, float)
+- bool SetBlendMode(const String&, AnimationBlendMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - bool SetLayer(const String&, uint8)
 - bool SetLooped(const String&, bool)
@@ -2902,6 +2990,7 @@ Methods:
 Properties:
 
 - Animation@ animation // readonly
+- AnimationBlendMode blendMode
 - float[] boneWeights
 - bool enabled // readonly
 - uint8 layer
@@ -2992,7 +3081,11 @@ Methods:
 - bool HasMasterGain(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
+- bool IsSoundTypePaused(const String&)
+- void PauseSoundType(const String&)
 - bool Play()
+- void ResumeAll()
+- void ResumeSoundType(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetMode(int, int, bool, bool = true)
 - void Stop()
@@ -3020,6 +3113,7 @@ Properties:
 Properties:
 
 - float constantBias
+- float normalOffset
 - float slopeScaledBias
 
 <a name="Class_Billboard"></a>
@@ -3093,6 +3187,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -6919,7 +7014,7 @@ Methods:
 - bool SetDrawRange(PrimitiveType, uint, uint, bool = true)
 - bool SetDrawRange(PrimitiveType, uint, uint, uint, uint, bool = true)
 - void SetIndexBuffer(IndexBuffer@)
-- bool SetVertexBuffer(uint, VertexBuffer@, uint = MASK_DEFAULT)
+- bool SetVertexBuffer(uint, VertexBuffer@)
 
 Properties:
 
@@ -6936,7 +7031,6 @@ Properties:
 - String typeName // readonly
 - VertexBuffer@[] vertexBuffers // readonly
 - uint vertexCount // readonly
-- uint[] vertexElementMasks // readonly
 - uint vertexStart // readonly
 - int weakRefs // readonly
 
@@ -6957,7 +7051,7 @@ Methods:
 - void PrecacheShaders(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
-- bool SetMode(int, int, bool, bool, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int)
 - void SetWindowPosition(int, int)
 - bool TakeScreenShot(Image@)
 - bool ToggleFullscreen()
@@ -7161,12 +7255,16 @@ Methods:
 - void RemoveAllGestures()
 - bool RemoveGesture(uint)
 - bool RemoveScreenJoystick(int)
+- void ResetMouseGrabbed()
+- void ResetMouseMode()
 - void ResetMouseVisible()
 - bool SaveGesture(File@, uint)
 - bool SaveGesture(VectorBuffer&, uint)
 - bool SaveGestures(File@)
 - bool SaveGestures(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetMouseGrabbed(bool, bool = false)
+- void SetMouseMode(MouseMode, bool = false)
 - void SetMouseVisible(bool, bool = false)
 
 Properties:
@@ -7175,12 +7273,14 @@ Properties:
 - bool focus // readonly
 - JoystickState@[] joysticks // readonly
 - JoystickState@[] joysticksByIndex // readonly
+- JoystickState@[] joysticksByName // readonly
 - bool[] keyDown // readonly
 - bool[] keyPress // readonly
 - bool minimized // readonly
 - bool[] mouseButtonDown // readonly
 - bool[] mouseButtonPress // readonly
 - bool mouseGrabbed
+- bool mouseLocked // readonly
 - MouseMode mouseMode
 - IntVector2 mouseMove // readonly
 - int mouseMoveWheel // readonly
@@ -7245,6 +7345,7 @@ Properties:
 
 Methods:
 
+- bool FromString(const String&)
 - JSONValue& GetRoot()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
@@ -7925,6 +8026,28 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_Matrix2"></a>
+
+### Matrix2
+
+Methods:
+
+- bool Equals(const Matrix2&) const
+- Matrix2 Inverse() const
+- Vector2 Scale() const
+- Matrix2 Scaled(const Vector2&) const
+- void SetScale(const Vector2&)
+- void SetScale(float)
+- String ToString() const
+- Matrix2 Transpose() const
+
+Properties:
+
+- float m00
+- float m01
+- float m10
+- float m11
+
 <a name="Class_Matrix3"></a>
 
 ### Matrix3
@@ -8272,6 +8395,98 @@ Properties:
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
+- int weakRefs // readonly
+
+<a name="Class_NamedPipe"></a>
+
+### NamedPipe
+
+Methods:
+
+- void Close()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Open(const String&, bool)
+- uint8[]@ Read(uint)
+- bool ReadBool()
+- BoundingBox ReadBoundingBox()
+- int8 ReadByte()
+- Color ReadColor()
+- double ReadDouble()
+- String ReadFileID()
+- float ReadFloat()
+- int ReadInt()
+- IntRect ReadIntRect()
+- IntVector2 ReadIntVector2()
+- String ReadLine()
+- Matrix3 ReadMatrix3()
+- Matrix3x4 ReadMatrix3x4()
+- Matrix4 ReadMatrix4()
+- uint ReadNetID()
+- Quaternion ReadPackedQuaternion()
+- Vector3 ReadPackedVector3(float)
+- Quaternion ReadQuaternion()
+- int16 ReadShort()
+- String ReadString()
+- StringHash ReadStringHash()
+- uint8 ReadUByte()
+- uint ReadUInt()
+- uint16 ReadUShort()
+- uint ReadVLE()
+- Variant ReadVariant()
+- VariantMap ReadVariantMap()
+- Vector2 ReadVector2()
+- Vector3 ReadVector3()
+- Vector4 ReadVector4()
+- VectorBuffer ReadVectorBuffer(uint)
+- uint Seek(uint)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Write(uint8[]@)
+- bool WriteBool(bool)
+- bool WriteBoundingBox(const BoundingBox&)
+- bool WriteByte(int8)
+- bool WriteColor(const Color&)
+- bool WriteDouble(double)
+- bool WriteFileID(const String&)
+- bool WriteFloat(float)
+- bool WriteInt(int)
+- bool WriteIntRect(const IntRect&)
+- bool WriteIntVector2(const IntVector2&)
+- bool WriteLine(const String&)
+- bool WriteMatrix3(const Matrix3&)
+- bool WriteMatrix3x4(const Matrix3x4&)
+- bool WriteMatrix4(const Matrix4&)
+- bool WriteNetID(uint)
+- bool WritePackedQuaternion(const Quaternion&)
+- bool WritePackedVector3(const Vector3&, float)
+- bool WriteQuaternion(const Quaternion&)
+- bool WriteShort(int16)
+- bool WriteString(const String&)
+- bool WriteStringHash(const StringHash&)
+- bool WriteUByte(uint8)
+- bool WriteUInt(uint)
+- bool WriteUShort(uint16)
+- bool WriteVLE(uint)
+- bool WriteVariant(const Variant&)
+- bool WriteVariantMap(const VariantMap&)
+- bool WriteVector2(const Vector2&)
+- bool WriteVector3(const Vector3&)
+- bool WriteVector4(const Vector4&)
+- bool WriteVectorBuffer(const VectorBuffer&)
+
+Properties:
+
+- String category // readonly
+- uint checksum // readonly
+- bool eof // readonly
+- String name // readonly
+- bool open // readonly
+- uint position // readonly
+- int refs // readonly
+- bool server // readonly
+- uint size // readonly
+- StringHash type // readonly
+- String typeName // readonly
 - int weakRefs // readonly
 
 <a name="Class_NavArea"></a>
@@ -9028,6 +9243,7 @@ Properties:
 - String name // readonly
 - uint numFiles // readonly
 - int refs // readonly
+- uint totalDataSize // readonly
 - uint totalSize // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -9043,6 +9259,7 @@ Methods:
 - void AddColorTime(Color&, float)
 - void AddTextureFrame(TextureFrame@)
 - void AddTextureTime(Rect&, float)
+- ParticleEffect@ Clone(const String& = String ( )) const
 - ColorFrame@ GetColorFrame(uint) const
 - TextureFrame@ GetTextureFrame(uint) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -9071,6 +9288,7 @@ Properties:
 - Vector3 emitterSize
 - EmitterType emitterType
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - float inactiveTime
 - Material@ material
 - Vector3 maxDirection
@@ -9110,6 +9328,7 @@ Properties:
 
 Methods:
 
+- ParticleEffect2D@ Clone(const String& = String ( )) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
@@ -9192,6 +9411,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - uint id // readonly
 - bool inView // readonly
 - uint lightMask
@@ -9308,6 +9528,7 @@ Properties:
 
 - bool alphaMask
 - BlendMode blendMode
+- CullMode cullMode
 - CompareMode depthTestMode
 - bool depthWrite
 - bool desktop
@@ -9572,15 +9793,18 @@ Properties:
 
 Methods:
 
+- Quaternion Conjugate() const
 - float DotProduct(const Quaternion&) const
 - bool Equals(const Quaternion&) const
 - void FromAngleAxis(float, const Vector3&)
 - void FromAxes(const Vector3&, const Vector3&, const Vector3&)
 - void FromEulerAngles(float, float, float)
-- bool FromLookRotation(const Vector3&, const Vector3&)
+- bool FromLookRotation(const Vector3&, const Vector3& = Vector3 ( 0.0 , 1.0 , 0.0 ))
+- void FromRotationMatrix(const Matrix3&)
 - void FromRotationTo(const Vector3&, const Vector3&)
 - Quaternion Inverse() const
 - bool IsNaN() const
+- float LengthSquared() const
 - Quaternion Nlerp(Quaternion, float, bool) const
 - void Normalize()
 - Quaternion Normalized() const
@@ -9592,6 +9816,7 @@ Properties:
 - Vector3 eulerAngles // readonly
 - float pitch // readonly
 - float roll // readonly
+- Matrix3 rotationMatrix // readonly
 - float w
 - float x
 - float y
@@ -9720,6 +9945,7 @@ Properties:
 - uint clearStencil
 - String depthStencilName
 - bool enabled
+- String eventName
 - bool markToStencil
 - String metadata
 - uint numOutputs
@@ -9797,6 +10023,7 @@ Properties:
 - Material@ defaultLightSpot // readonly
 - Material@ defaultMaterial // readonly
 - RenderPath@ defaultRenderPath
+- Technique@ defaultTechnique
 - Zone@ defaultZone // readonly
 - bool drawShadows
 - bool dynamicInstancing
@@ -9806,9 +10033,11 @@ Properties:
 - int maxShadowMaps
 - int maxSortedInstances
 - int minInstances
+- float mobileNormalOffsetMul
 - float mobileShadowBiasAdd
 - float mobileShadowBiasMul
 - uint numBatches // readonly
+- int numExtraInstancingBufferElements
 - uint[] numGeometries // readonly
 - uint[] numLights // readonly
 - uint[] numOccluders // readonly
@@ -9936,6 +10165,96 @@ Properties:
 - uint length // readonly
 - String[] names
 - StringHash type
+
+<a name="Class_RibbonTrail"></a>
+
+### RibbonTrail
+
+Methods:
+
+- void ApplyAttributes()
+- void Commit()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool IsInView(Camera@) const
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- float animationLodBias
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- BoundingBox boundingBox // readonly
+- bool castShadows
+- String category // readonly
+- float drawDistance
+- bool emitting
+- bool enabled
+- bool enabledEffective // readonly
+- Color endColor
+- float endScale
+- uint id // readonly
+- bool inView // readonly
+- float lifetime
+- uint lightMask
+- float lodBias
+- Material@ material
+- uint maxLights
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- bool occludee
+- bool occluder
+- int refs // readonly
+- float shadowDistance
+- uint shadowMask
+- bool sorted
+- Color startColor
+- float startScale
+- uint tailColumn
+- bool temporary
+- TrailType trailType
+- StringHash type // readonly
+- String typeName // readonly
+- bool updateInvisible
+- float vertexDistance
+- uint viewMask
+- int weakRefs // readonly
+- float width
+- BoundingBox worldBoundingBox // readonly
+- Zone@ zone // readonly
+- uint zoneMask
 
 <a name="Class_RigidBody"></a>
 
@@ -11597,6 +11916,9 @@ Methods:
 - void ApplyAttributes()
 - void BringToFront()
 - UIElement@ CreateChild(const String&, const String& = String ( ), uint = M_MAX_UNSIGNED)
+- void DisableLayoutUpdate()
+- IntVector2 ElementToScreen(const IntVector2&)
+- void EnableLayoutUpdate()
 - uint FindChild(UIElement@) const
 - Variant GetAttribute(const String&) const
 - ValueAnimation@ GetAttributeAnimation(const String&) const
@@ -11615,6 +11937,8 @@ Methods:
 - bool HasSubscribedToEvent(const String&)
 - bool HasTag(const String&) const
 - void InsertChild(uint, UIElement@)
+- bool IsInside(IntVector2, bool)
+- bool IsInsideCombined(IntVector2, bool)
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadChildXML(XMLFile@, XMLFile@ = null)
@@ -11635,6 +11959,7 @@ Methods:
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - bool RemoveTag(const String&)
+- void ResetDeepEnabled()
 - void ResetToDefault()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
@@ -11642,6 +11967,7 @@ Methods:
 - bool SaveXML(File@, const String& = "\t")
 - bool SaveXML(VectorBuffer&, const String& = "\t")
 - bool SaveXML(XMLElement&) const
+- IntVector2 ScreenToElement(const IntVector2&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAlignment(HorizontalAlignment, VerticalAlignment)
 - void SetAnimationTime(float)
@@ -11650,12 +11976,15 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetDeepEnabled(bool)
+- void SetEnabledRecursive(bool)
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
 - void SetFullImageRect()
 - void SetHotSpot(int, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
 - void SetMaxSize(int, int)
 - void SetMinSize(int, int)
 - void SetParent(UIElement@, uint = M_MAX_UNSIGNED)
@@ -11666,6 +11995,7 @@ Methods:
 - bool SetStyle(const String&, XMLFile@ = null)
 - bool SetStyle(const XMLElement&)
 - bool SetStyleAuto(XMLFile@ = null)
+- void UpdateLayout()
 - const Variant& GetVar(const StringHash&)
 
 Properties:
@@ -11678,19 +12008,47 @@ Properties:
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
+- IntVector2 childOffset // readonly
 - UIElement@[] children // readonly
+- IntRect clipBorder
+- bool clipChildren
 - Color color // writeonly
 - bool colorGradient // readonly
 - Color[] colors
+- IntRect combinedScreenRect // readonly
 - XMLFile@ defaultStyle
 - float derivedOpacity // readonly
 - uint dragButtonCombo // readonly
 - int dragButtonCount // readonly
+- uint dragDropMode
+- bool editable
 - bool elementEventSender
+- bool enabled
+- bool enabledSelf // readonly
+- bool fixedHeight // readonly
+- bool fixedSize // readonly
+- bool fixedWidth // readonly
+- bool focus
+- FocusMode focusMode
 - int height
 - HorizontalAlignment horizontalAlignment
 - IntVector2 hotSpot
+- bool hovering // readonly
 - IntRect imageRect
+- int indent
+- int indentSpacing
+- int indentWidth // readonly
+- bool internal
+- IntRect layoutBorder
+- Vector2 layoutFlexScale
+- LayoutMode layoutMode
+- int layoutSpacing
+- int maxHeight
+- IntVector2 maxSize
+- int maxWidth
+- int minHeight
+- IntVector2 minSize
+- int minWidth
 - String name
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
@@ -11704,12 +12062,15 @@ Properties:
 - UIElement@ root // readonly
 - float rotation
 - Vector2 scale
+- IntVector2 screenPosition // readonly
+- bool selected
 - IntVector2 size
 - bool sortChildren
 - String style
 - String[]@ tags // readonly
 - bool temporary
 - Texture@ texture
+- TraversalMode traversalMode
 - StringHash type // readonly
 - String typeName // readonly
 - bool useDerivedOpacity
@@ -11744,6 +12105,7 @@ Properties:
 - IntRect rectangle
 - int refs // readonly
 - Texture2D@ texture
+- float textureEdgeOffset
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -11771,7 +12133,7 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
-- Texture2D@ texture // readonly
+- Texture2D@ texture
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
@@ -12108,6 +12470,7 @@ Properties:
 
 Methods:
 
+- Technique@ Clone(const String& = String ( )) const
 - Pass@ CreatePass(const String&)
 - Pass@ GetPass(const String&)
 - Pass@ GetSupportedPass(const String&)
@@ -12427,6 +12790,9 @@ Properties:
 - uint dragDropMode
 - bool editable
 - Color effectColor
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool elementEventSender
 - bool enabled
 - bool enabledSelf // readonly
@@ -12556,9 +12922,13 @@ Properties:
 - float drawDistance
 - Color effectColor
 - float effectDepthBias
+- bool effectRoundStroke
+- IntVector2 effectShadowOffset
+- int effectStrokeThickness
 - bool enabled
 - bool enabledEffective // readonly
 - FaceCameraMode faceCameraMode
+- bool fixedScreenSize
 - Font@ font // readonly
 - int fontSize // readonly
 - HorizontalAlignment horizontalAlignment
@@ -12686,6 +13056,53 @@ Properties:
 - int weakRefs // readonly
 - int width // readonly
 
+<a name="Class_Texture2DArray"></a>
+
+### Texture2DArray
+
+Methods:
+
+- void ClearDataLost()
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@)
+- bool Load(VectorBuffer&)
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- bool SetData(uint, Image@, bool = false)
+- void SetNumLevels(uint)
+- bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC)
+
+Properties:
+
+- TextureAddressMode[] addressMode
+- Texture@ backupTexture
+- Color borderColor
+- String category // readonly
+- uint components // readonly
+- bool compressed // readonly
+- bool dataLost // readonly
+- TextureFilterMode filterMode
+- uint format // readonly
+- int height // readonly
+- uint layers
+- int[] levelHeight // readonly
+- int[] levelWidth // readonly
+- uint levels // readonly
+- uint memoryUse // readonly
+- int[] mipsToSkip
+- String name
+- int refs // readonly
+- RenderSurface@ renderSurface // readonly
+- bool sRGB
+- StringHash type // readonly
+- String typeName // readonly
+- TextureUsage usage // readonly
+- uint useTimer // readonly
+- int weakRefs // readonly
+- int width // readonly
+
 <a name="Class_Texture3D"></a>
 
 ### Texture3D
@@ -12738,6 +13155,7 @@ Properties:
 Methods:
 
 - void ClearDataLost()
+- Image@ GetImage(CubeMapFace) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
@@ -13477,6 +13895,7 @@ Methods:
 - void FromString(VariantType, const String&)
 - void FromString(const String&, const String&)
 - bool GetBool() const
+- VectorBuffer GetBuffer() const
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
@@ -13500,7 +13919,6 @@ Methods:
 - const Vector2& GetVector2() const
 - const Vector3& GetVector3() const
 - const Vector4& GetVector4() const
-- const VectorBuffer GetBuffer() const
 
 Properties:
 
@@ -13535,6 +13953,7 @@ Methods:
 
 - Vector2 Abs() const
 - float AbsDotProduct(const Vector2&) const
+- float Angle(const Vector2&) const
 - float DotProduct(const Vector2&) const
 - bool Equals(const Vector2&) const
 - bool IsNaN() const
@@ -13689,12 +14108,17 @@ Properties:
 
 Methods:
 
-- VectorBuffer GetData()
+- VectorBuffer GetData() const
+- uint GetElementOffset(VertexElementSemantic, uint8 = 0) const
+- uint GetElementOffset(VertexElementType, VertexElementSemantic, uint8 = 0) const
+- bool HasElement(VertexElementSemantic, uint8 = 0) const
+- bool HasElement(VertexElementType, VertexElementSemantic, uint8 = 0) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(VectorBuffer&)
 - bool SetDataRange(VectorBuffer&, uint, uint, bool = false)
+- void SetSize(uint, VertexElement[]@, bool = false)
 - void SetSize(uint, uint, bool = false)
 
 Properties:
@@ -13702,6 +14126,7 @@ Properties:
 - String category // readonly
 - bool dynamic // readonly
 - uint elementMask // readonly
+- VertexElement[]@ elements // readonly
 - int refs // readonly
 - bool shadowed
 - StringHash type // readonly
@@ -13709,6 +14134,18 @@ Properties:
 - uint vertexCount // readonly
 - uint vertexSize // readonly
 - int weakRefs // readonly
+
+<a name="Class_VertexElement"></a>
+
+### VertexElement
+
+Properties:
+
+- uint8 index
+- uint offset
+- bool perInstance
+- VertexElementSemantic semantic
+- VertexElementType type
 
 <a name="Class_View3D"></a>
 
@@ -14371,6 +14808,12 @@ Properties:
 
 \section ScriptAPI_Enums Enumerations
 
+### AnimationBlendMode
+
+- ABM_LERP
+- ABM_ADDITIVE
+
+
 ### BlendMode
 
 - BLEND_REPLACE
@@ -14583,6 +15026,7 @@ Properties:
 
 ### InterpMethod
 
+- IM_NONE
 - IM_LINEAR
 - IM_SPLINE
 
@@ -14679,6 +15123,7 @@ Properties:
 - O_ORTHOGONAL
 - O_ISOMETRIC
 - O_STAGGERED
+- O_HEXAGONAL
 
 
 ### PassLightingMode
@@ -14721,6 +15166,7 @@ Properties:
 - CMD_FORWARDLIGHTS
 - CMD_LIGHTVOLUMES
 - CMD_RENDERUI
+- CMD_SENDEVENT
 
 
 ### RenderSurfaceUpdateMode
@@ -14841,6 +15287,12 @@ Properties:
 - OT_INVALID
 
 
+### TrailType
+
+- TT_FACE_CAMERA
+- TT_BONE
+
+
 ### TransformSpace
 
 - TS_LOCAL
@@ -14880,6 +15332,32 @@ Properties:
 - VAR_MATRIX4
 - VAR_DOUBLE
 - VAR_STRINGVECTOR
+
+
+### VertexElementSemantic
+
+- SEM_POSITION
+- SEM_NORMAL
+- SEM_BINORMAL
+- SEM_TANGENT
+- SEM_TEXCOORD
+- SEM_COLOR
+- SEM_BLENDWEIGHTS
+- SEM_BLENDINDICES
+- SEM_OBJECTINDEX
+- MAX_VERTEX_ELEMENT_SEMANTICS
+
+
+### VertexElementType
+
+- TYPE_INT
+- TYPE_FLOAT
+- TYPE_VECTOR2
+- TYPE_VECTOR3
+- TYPE_VECTOR4
+- TYPE_UBYTE4
+- TYPE_UBYTE4_NORM
+- MAX_VERTEX_ELEMENT_TYPES
 
 
 ### VerticalAlignment
@@ -14926,6 +15404,7 @@ Properties:
 - uint GetFloat16Format()
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
+- Variant GetGlobalVar(const String&)
 - String GetInternalPath(const String&)
 - uint GetLinearDepthFormat()
 - uint GetLuminanceAlphaFormat()
@@ -14982,11 +15461,13 @@ Properties:
 - int RandomInt(int)
 - int RandomInt(int, int)
 - float RandomNormal(float, float)
+- void RegisterEventName(const String&)
 - void Remove()
 - String RemoveTrailingSlash(const String&)
 - String ReplaceExtension(const String&, const String&)
 - uint SDBMHash(uint, uint8)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetGlobalVar(const String&, Variant&)
 - void SetMiniDumpDir(const String&)
 - void SetRandomSeed(uint)
 - float Sign(float)
@@ -15016,6 +15497,7 @@ Properties:
 - DebugRenderer@ debugRenderer
 - Engine@ engine
 - FileSystem@ fileSystem
+- VariantMap globalVars
 - Graphics@ graphics
 - Input@ input
 - Localization@ localization
@@ -15078,6 +15560,7 @@ Properties:
 - uint DD_TARGET
 - uint DEBUGHUD_SHOW_ALL
 - uint DEBUGHUD_SHOW_ALL_MEMORY
+- uint DEBUGHUD_SHOW_EVENTPROFILER
 - uint DEBUGHUD_SHOW_MEMORY
 - uint DEBUGHUD_SHOW_MODE
 - uint DEBUGHUD_SHOW_NONE
@@ -15122,7 +15605,7 @@ Properties:
 - int KEY_DOWN
 - int KEY_E
 - int KEY_END
-- int KEY_ESC
+- int KEY_ESCAPE
 - int KEY_F
 - int KEY_F1
 - int KEY_F10
@@ -15223,7 +15706,6 @@ Properties:
 - uint MASK_COLOR
 - uint MASK_CUBETEXCOORD1
 - uint MASK_CUBETEXCOORD2
-- uint MASK_DEFAULT
 - uint MASK_INSTANCEMATRIX1
 - uint MASK_INSTANCEMATRIX2
 - uint MASK_INSTANCEMATRIX3
@@ -15250,6 +15732,7 @@ Properties:
 - uint M_MIN_UNSIGNED
 - float M_PI
 - float M_RADTODEG
+- uint NPOS
 - float PIXEL_SIZE
 - int QUALITY_HIGH
 - int QUALITY_LOW
@@ -15520,7 +16003,6 @@ Properties:
 - uint VO_NONE
 - Color WHITE
 - Color YELLOW
-- VariantMap globalVars
 */
 
 }

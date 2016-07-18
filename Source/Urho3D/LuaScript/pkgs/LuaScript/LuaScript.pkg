@@ -16,7 +16,19 @@ void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventDat
 void LuaScriptSetExecuteConsoleCommands @ SetExecuteConsoleCommands(bool enable);
 bool LuaScriptGetExecuteConsoleCommands @ GetExecuteConsoleCommands();
 
+void LuaScriptSetGlobalVar @ SetGlobalVar(const String key, Variant value);
+Variant LuaScriptGetGlobalVar @ GetGlobalVar(const String key);
+VariantMap& LuaScriptGetGlobalVars @ GetGlobalVars();
+
+void RegisterEventName(const String eventName);
+
 ${
+
+static void RegisterEventName(const String eventName)
+{
+    EventNameRegistrar::RegisterEventName(eventName.CString());
+}
+
 static LuaScript* GetLuaScript(lua_State* L)
 {
     return GetContext(L)->GetSubsystem<LuaScript>();
@@ -32,6 +44,10 @@ static LuaScript* GetLuaScript(lua_State* L)
 #define LuaScriptSendEvent GetLuaScript(tolua_S)->SendEvent
 #define LuaScriptSetExecuteConsoleCommands GetLuaScript(tolua_S)->SetExecuteConsoleCommands
 #define LuaScriptGetExecuteConsoleCommands GetLuaScript(tolua_S)->GetExecuteConsoleCommands
+
+#define LuaScriptSetGlobalVar GetLuaScript(tolua_S)->SetGlobalVar
+#define LuaScriptGetGlobalVar GetLuaScript(tolua_S)->GetGlobalVar
+#define LuaScriptGetGlobalVars GetLuaScript(tolua_S)->GetGlobalVars
 
 static bool tolua_isfunctionorurho3dstring(lua_State* L, int lo, int def, tolua_Error* err)
 {

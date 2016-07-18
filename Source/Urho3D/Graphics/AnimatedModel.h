@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -163,6 +163,9 @@ public:
     /// Return per-geometry skin matrices. If empty, uses global skinning
     const Vector<PODVector<Matrix3x4> >& GetGeometrySkinMatrices() const { return geometrySkinMatrices_; }
 
+    /// Recalculate the bone bounding box. Normally called internally, but can also be manually called if up-to-date information before rendering is necessary.
+    void UpdateBoneBoundingBox();
+
 protected:
     /// Handle node being assigned.
     virtual void OnNodeSet(Node* node);
@@ -174,6 +177,8 @@ protected:
 private:
     /// Assign skeleton and animation bone node references as a postprocess. Called by ApplyAttributes.
     void AssignBoneNodes();
+    /// Finalize master model bone bounding boxes by merging from matching non-master bones.. Performed whenever any of the AnimatedModels in the same node changes its model.
+    void FinalizeBoneBoundingBoxes();
     /// Remove (old) skeleton root bone.
     void RemoveRootBone();
     /// Mark animation and skinning to require an update.
@@ -192,8 +197,6 @@ private:
     void CopyMorphVertices(void* dest, void* src, unsigned vertexCount, VertexBuffer* clone, VertexBuffer* original);
     /// Recalculate animations. Called from Update().
     void UpdateAnimation(const FrameInfo& frame);
-    /// Recalculate the bone bounding box.
-    void UpdateBoneBoundingBox();
     /// Recalculate skinning.
     void UpdateSkinning();
     /// Reapply all vertex morphs.

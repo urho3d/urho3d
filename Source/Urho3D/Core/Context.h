@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,11 @@ public:
     /// Destruct.
     ~Context();
 
+    /// Create an object by type. Return pointer to it or null if no factory found.
+    template <class T> inline SharedPtr<T> CreateObject()
+    {
+        return StaticCast<T>(CreateObject(T::GetTypeStatic()));
+    }
     /// Create an object by type hash. Return pointer to it or null if no factory found.
     SharedPtr<Object> CreateObject(StringHash objectType);
     /// Register a factory for an object type.
@@ -78,6 +83,15 @@ public:
 
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
+    
+    /// Return global variable based on key
+    const Variant& GetGlobalVar(StringHash key) const ;
+
+    /// Return all global variables.
+    const VariantMap& GetGlobalVars() const { return globalVars_; }
+
+    /// Set global variable with the respective key and value
+    void SetGlobalVar(StringHash key, const Variant& value);
 
     /// Return all subsystems.
     const HashMap<StringHash, SharedPtr<Object> >& GetSubsystems() const { return subsystems_; }
@@ -181,6 +195,8 @@ private:
     EventHandler* eventHandler_;
     /// Object categories.
     HashMap<String, Vector<StringHash> > objectCategories_;
+    /// Variant map for global variables that can persist throughout application execution.
+    VariantMap globalVars_;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }

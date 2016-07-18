@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -131,7 +131,7 @@ void LogicComponent::UpdateEventSubscription()
         SubscribeToEvent(scene, E_SCENEPOSTUPDATE, URHO3D_HANDLER(LogicComponent, HandleScenePostUpdate));
         currentEventMask_ |= USE_POSTUPDATE;
     }
-    else if (!needUpdate && (currentEventMask_ & USE_POSTUPDATE))
+    else if (!needPostUpdate && (currentEventMask_ & USE_POSTUPDATE))
     {
         UnsubscribeFromEvent(scene, E_SCENEPOSTUPDATE);
         currentEventMask_ &= ~USE_POSTUPDATE;
@@ -204,6 +204,13 @@ void LogicComponent::HandleScenePostUpdate(StringHash eventType, VariantMap& eve
 void LogicComponent::HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
 {
     using namespace PhysicsPreStep;
+
+    // Execute user-defined delayed start function before first fixed update if not called yet
+    if (!delayedStartCalled_)
+    {
+        DelayedStart();
+        delayedStartCalled_ = true;
+    }
 
     // Execute user-defined fixed update function
     FixedUpdate(eventData[P_TIMESTEP].GetFloat());

@@ -469,7 +469,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 {
     int key = eventData["Key"].GetInt();
 
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         if (!console.visible)
             engine.Exit();
@@ -489,13 +489,25 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (key == KEY_F4)
         drawOctreeDebug = !drawOctreeDebug;
 
+    if (key == KEY_F5)
+        debugHud.Toggle(DEBUGHUD_SHOW_EVENTPROFILER);
+                // Take screenshot
+    if (key == KEY_F6)
+    {
+        Image@ screenshot = Image();
+        graphics.TakeScreenShot(screenshot);
+        // Here we save in the Data folder with date and time appended
+        screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
+                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+    }
     // Allow pause only in singleplayer
-    if (key == 'P' && singlePlayer && !console.visible && gameOn)
+    if (key == KEY_P && singlePlayer && !console.visible && gameOn)
     {
         gameScene.updateEnabled = !gameScene.updateEnabled;
         if (!gameScene.updateEnabled)
         {
             SetMessage("PAUSED");
+            audio.PauseSoundType(SOUND_EFFECT);
             
             // Open the settings joystick only if the controls screen joystick was already open
             if (screenJoystickID >= 0)
@@ -510,6 +522,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         else
         {
             SetMessage("");
+            audio.ResumeSoundType(SOUND_EFFECT);
 
             // Hide the settings joystick
             if (screenJoystickSettingsID >= 0)
@@ -945,13 +958,13 @@ void UpdateControls()
         // and the key was already released
         if (console is null || !console.visible)
         {
-            if (input.keyDown['W'])
+            if (input.keyDown[KEY_W])
                 playerControls.Set(CTRL_UP, true);
-            if (input.keyDown['S'])
+            if (input.keyDown[KEY_S])
                 playerControls.Set(CTRL_DOWN, true);
-            if (input.keyDown['A'])
+            if (input.keyDown[KEY_A])
                 playerControls.Set(CTRL_LEFT, true);
-            if (input.keyDown['D'])
+            if (input.keyDown[KEY_D])
                 playerControls.Set(CTRL_RIGHT, true);
             if (input.keyDown[KEY_LCTRL] || input.keyPress[KEY_LCTRL])
                 playerControls.Set(CTRL_FIRE, true);
@@ -1064,13 +1077,13 @@ void UpdateFreelookCamera()
         if (input.keyDown[KEY_LCTRL])
             speedMultiplier = 0.1;
 
-        if (input.keyDown['W'])
+        if (input.keyDown[KEY_W])
             gameCameraNode.Translate(Vector3(0, 0, 10) * timeStep * speedMultiplier);
-        if (input.keyDown['S'])
+        if (input.keyDown[KEY_S])
             gameCameraNode.Translate(Vector3(0, 0, -10) * timeStep * speedMultiplier);
-        if (input.keyDown['A'])
+        if (input.keyDown[KEY_A])
             gameCameraNode.Translate(Vector3(-10, 0, 0) * timeStep * speedMultiplier);
-        if (input.keyDown['D'])
+        if (input.keyDown[KEY_D])
             gameCameraNode.Translate(Vector3(10, 0, 0) * timeStep * speedMultiplier);
 
         playerControls.yaw += mouseSensitivity * input.mouseMoveX;

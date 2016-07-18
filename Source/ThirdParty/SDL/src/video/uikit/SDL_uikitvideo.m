@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 
 #include "SDL_video.h"
 #include "SDL_mouse.h"
+#include "SDL_hints.h"
 #include "../SDL_sysvideo.h"
 #include "../SDL_pixels_c.h"
 #include "../../events/SDL_events_c.h"
@@ -74,15 +75,16 @@ UIKit_CreateDevice(int devindex)
     device->GetDisplayModes = UIKit_GetDisplayModes;
     device->SetDisplayMode = UIKit_SetDisplayMode;
     device->PumpEvents = UIKit_PumpEvents;
+    device->SuspendScreenSaver = UIKit_SuspendScreenSaver;
     device->CreateWindow = UIKit_CreateWindow;
+    device->SetWindowTitle = UIKit_SetWindowTitle;
     device->ShowWindow = UIKit_ShowWindow;
     device->HideWindow = UIKit_HideWindow;
     device->RaiseWindow = UIKit_RaiseWindow;
+    device->SetWindowBordered = UIKit_SetWindowBordered;
     device->SetWindowFullscreen = UIKit_SetWindowFullscreen;
     device->DestroyWindow = UIKit_DestroyWindow;
     device->GetWindowWMInfo = UIKit_GetWindowWMInfo;
-
-    /* !!! FIXME: implement SetWindowBordered */
 
 #if SDL_IPHONE_KEYBOARD
     device->HasScreenKeyboardSupport = UIKit_HasScreenKeyboardSupport;
@@ -93,12 +95,13 @@ UIKit_CreateDevice(int devindex)
 #endif
 
     /* OpenGL (ES) functions */
-    device->GL_MakeCurrent        = UIKit_GL_MakeCurrent;
-    device->GL_SwapWindow        = UIKit_GL_SwapWindow;
+    device->GL_MakeCurrent      = UIKit_GL_MakeCurrent;
+    device->GL_GetDrawableSize  = UIKit_GL_GetDrawableSize;
+    device->GL_SwapWindow       = UIKit_GL_SwapWindow;
     device->GL_CreateContext    = UIKit_GL_CreateContext;
     device->GL_DeleteContext    = UIKit_GL_DeleteContext;
     device->GL_GetProcAddress   = UIKit_GL_GetProcAddress;
-    device->GL_LoadLibrary        = UIKit_GL_LoadLibrary;
+    device->GL_LoadLibrary      = UIKit_GL_LoadLibrary;
     device->free = UIKit_DeleteDevice;
 
     device->gl_config.accelerated = 1;
@@ -127,6 +130,40 @@ void
 UIKit_VideoQuit(_THIS)
 {
     UIKit_QuitModes(_this);
+}
+
+void
+UIKit_SuspendScreenSaver(_THIS)
+{
+    @autoreleasepool {
+        /* Ignore ScreenSaver API calls if the idle timer hint has been set. */
+        /* FIXME: The idle timer hint should be deprecated for SDL 2.1. */
+        if (SDL_GetHint(SDL_HINT_IDLE_TIMER_DISABLED) == NULL) {
+            UIApplication *app = [UIApplication sharedApplication];
+
+            /* Prevent the display from dimming and going to sleep. */
+            app.idleTimerDisabled = (_this->suspend_screensaver != SDL_FALSE);
+        }
+    }
+}
+
+BOOL
+UIKit_IsSystemVersionAtLeast(double version)
+{
+    return [[UIDevice currentDevice].systemVersion doubleValue] >= version;
+}
+
+CGRect
+UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen)
+{
+    BOOL hasiOS7 = UIKit_IsSystemVersionAtLeast(7.0);
+
+    if (hasiOS7 || (window->flags & (SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN))) {
+        /* The view should always show behind the status bar in iOS 7+. */
+        return screen.bounds;
+    } else {
+        return screen.applicationFrame;
+    }
 }
 
 /*

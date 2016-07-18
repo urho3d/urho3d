@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -45,6 +45,7 @@ typedef enum
     PendingWindowOperation pendingWindowOperation;
     BOOL isMoving;
     int pendingWindowWarpX, pendingWindowWarpY;
+    BOOL isDragAreaRunning;
 }
 
 -(void) listen:(SDL_WindowData *) data;
@@ -69,11 +70,15 @@ typedef enum
 -(void) windowDidDeminiaturize:(NSNotification *) aNotification;
 -(void) windowDidBecomeKey:(NSNotification *) aNotification;
 -(void) windowDidResignKey:(NSNotification *) aNotification;
+-(void) windowDidChangeBackingProperties:(NSNotification *) aNotification;
 -(void) windowWillEnterFullScreen:(NSNotification *) aNotification;
 -(void) windowDidEnterFullScreen:(NSNotification *) aNotification;
 -(void) windowWillExitFullScreen:(NSNotification *) aNotification;
 -(void) windowDidExitFullScreen:(NSNotification *) aNotification;
 -(NSApplicationPresentationOptions)window:(NSWindow *)window willUseFullScreenPresentationOptions:(NSApplicationPresentationOptions)proposedOptions;
+
+/* See if event is in a drag area, toggle on window dragging. */
+-(BOOL) processHitTest:(NSEvent *)theEvent;
 
 /* Window event handling */
 -(void) mouseDown:(NSEvent *) theEvent;
@@ -93,13 +98,7 @@ typedef enum
 -(void) touchesCancelledWithEvent:(NSEvent *) theEvent;
 
 /* Touch event handling */
-typedef enum {
-    COCOA_TOUCH_DOWN,
-    COCOA_TOUCH_UP,
-    COCOA_TOUCH_MOVE,
-    COCOA_TOUCH_CANCELLED
-} cocoaTouchType;
--(void) handleTouches:(cocoaTouchType)type withEvent:(NSEvent*) event;
+-(void) handleTouches:(NSTouchPhase) phase withEvent:(NSEvent*) theEvent;
 
 @end
 /* *INDENT-ON* */
@@ -138,8 +137,8 @@ extern int Cocoa_SetWindowGammaRamp(_THIS, SDL_Window * window, const Uint16 * r
 extern int Cocoa_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp);
 extern void Cocoa_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void Cocoa_DestroyWindow(_THIS, SDL_Window * window);
-extern SDL_bool Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window,
-                                      struct SDL_SysWMinfo *info);
+extern SDL_bool Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window, struct SDL_SysWMinfo *info);
+extern int Cocoa_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
 
 #endif /* _SDL_cocoawindow_h */
 

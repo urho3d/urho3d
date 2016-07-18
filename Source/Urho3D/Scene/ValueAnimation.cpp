@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/StringUtils.h"
 #include "../IO/Deserializer.h"
 #include "../IO/Log.h"
 #include "../IO/Serializer.h"
@@ -39,6 +40,7 @@ namespace Urho3D
 
 const char* interpMethodNames[] =
 {
+    "None",
     "Linear",
     "Spline",
     0
@@ -92,15 +94,7 @@ bool ValueAnimation::LoadXML(const XMLElement& source)
     eventFrames_.Clear();
 
     String interpMethodString = source.GetAttribute("interpolationmethod");
-    InterpMethod method = IM_LINEAR;
-    for (int i = 0; i <= IM_SPLINE; ++i)
-    {
-        if (interpMethodString == interpMethodNames[i])
-        {
-            method = (InterpMethod)i;
-            break;
-        }
-    }
+    InterpMethod method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
 
     SetInterpolationMethod(method);
     if (interpolationMethod_ == IM_SPLINE)
@@ -162,15 +156,7 @@ bool ValueAnimation::LoadJSON(const JSONValue& source)
     eventFrames_.Clear();
 
     String interpMethodString = source.Get("interpolationmethod").GetString();
-    InterpMethod method = IM_LINEAR;
-    for (int i = 0; i <= IM_SPLINE; ++i)
-    {
-        if (interpMethodString == interpMethodNames[i])
-        {
-            method = (InterpMethod)i;
-            break;
-        }
-    }
+    InterpMethod method = (InterpMethod)GetStringListIndex(interpMethodString.CString(), interpMethodNames, IM_LINEAR);
 
     SetInterpolationMethod(method);
     if (interpolationMethod_ == IM_SPLINE)
@@ -253,7 +239,8 @@ void ValueAnimation::SetValueType(VariantType valueType)
     {
         interpolatable_ = true;
         // Force linear interpolation for IntRect and IntVector2
-        interpolationMethod_ = IM_LINEAR;
+        if (interpolationMethod_ == IM_SPLINE)
+            interpolationMethod_ = IM_LINEAR;
     }
 
     keyFrames_.Clear();
@@ -273,7 +260,7 @@ void ValueAnimation::SetInterpolationMethod(InterpMethod method)
         return;
 
     // Force linear interpolation for IntRect and IntVector2
-    if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2))
+    if (method == IM_SPLINE && (valueType_ == VAR_INTRECT || valueType_ == VAR_INTVECTOR2))
         method = IM_LINEAR;
 
     interpolationMethod_ = method;
@@ -345,7 +332,8 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
 
 bool ValueAnimation::IsValid() const
 {
-    return (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) ||
+    return (interpolationMethod_ == IM_NONE) ||
+           (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) ||
            (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
 }
 
@@ -358,7 +346,7 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime)
             break;
     }
 
-    if (index >= keyFrames_.Size() || !interpolatable_)
+    if (index >= keyFrames_.Size() || !interpolatable_ || interpolationMethod_ == IM_NONE)
         return keyFrames_[index - 1].value_;
     else
     {

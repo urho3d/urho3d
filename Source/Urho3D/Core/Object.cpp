@@ -1,6 +1,5 @@
-
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +25,11 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
+#include "../Core/EventProfiler.h"
+#include "../Container/HashMap.h"
 
 #include "../DebugNew.h"
+
 
 namespace Urho3D
 {
@@ -181,6 +183,18 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     context_->AddEventReceiver(this, sender, eventType);
 }
 
+#if URHO3D_CXX11
+void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
+{
+    SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
+}
+
+void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
+{
+    SubscribeToEvent(sender, eventType, new EventHandler11Impl(function, userData));
+}
+#endif
+
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
     for (;;)
@@ -291,6 +305,16 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         return;
     }
 
+#ifdef URHO3D_PROFILING
+    EventProfiler* eventProfiler = 0;
+    if (EventProfiler::IsActive())
+    {
+        eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->BeginBlock(eventType);
+    }
+#endif
+
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
@@ -317,6 +341,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
             if (self.Expired())
             {
                 context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                if (eventProfiler)
+                    eventProfiler->EndBlock();
+#endif
                 return;
             }
 
@@ -349,6 +377,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                 if (self.Expired())
                 {
                     context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                    if (eventProfiler)
+                         eventProfiler->EndBlock();
+#endif
                     return;
                 }
 
@@ -375,6 +407,10 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
                     if (self.Expired())
                     {
                         context->EndSendEvent();
+#ifdef URHO3D_PROFILING
+                        if (eventProfiler)
+                            eventProfiler->EndBlock();
+#endif
                         return;
                     }
 
@@ -386,11 +422,31 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     }
 
     context->EndSendEvent();
+
+#ifdef URHO3D_PROFILING
+    if (eventProfiler)
+        eventProfiler->EndBlock();
+#endif
 }
 
 VariantMap& Object::GetEventDataMap() const
 {
     return context_->GetEventDataMap();
+}
+
+const Variant& Object::GetGlobalVar(StringHash key) const
+{
+    return context_->GetGlobalVar(key);
+}
+
+const VariantMap& Object::GetGlobalVars() const 
+{ 
+    return context_->GetGlobalVars(); 
+}
+
+void Object::SetGlobalVar(StringHash key, const Variant& value)
+{
+    context_->SetGlobalVar(key, value);
 }
 
 Object* Object::GetSubsystem(StringHash type) const
@@ -506,6 +562,26 @@ void Object::RemoveEventSender(Object* sender)
             handler = eventHandlers_.Next(handler);
         }
     }
+}
+
+
+Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
+{  
+    StringHash id(eventName);
+    GetEventNameMap()[id] = eventName;
+    return id;
+}
+
+const String& EventNameRegistrar::GetEventName(StringHash eventID) 
+{
+    HashMap<StringHash, String>::ConstIterator it = GetEventNameMap().Find(eventID);
+    return  it != GetEventNameMap().End() ? it->second_ : String::EMPTY ;
+}
+
+HashMap<StringHash, String>& EventNameRegistrar::GetEventNameMap()
+{
+    static HashMap<StringHash, String> eventNames_;
+    return eventNames_;
 }
 
 }

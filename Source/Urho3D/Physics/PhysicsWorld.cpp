@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -271,7 +271,7 @@ void PhysicsWorld::Update(float timeStep)
     while (!delayedWorldTransforms_.Empty())
     {
         for (HashMap<RigidBody*, DelayedWorldTransform>::Iterator i = delayedWorldTransforms_.Begin();
-             i != delayedWorldTransforms_.End(); ++i)
+             i != delayedWorldTransforms_.End();)
         {
             const DelayedWorldTransform& transform = i->second_;
 
@@ -279,8 +279,10 @@ void PhysicsWorld::Update(float timeStep)
             if (!delayedWorldTransforms_.Contains(transform.parentRigidBody_))
             {
                 transform.rigidBody_->ApplyWorldTransform(transform.worldPosition_, transform.worldRotation_);
-                delayedWorldTransforms_.Erase(i);
+                i = delayedWorldTransforms_.Erase(i);
             }
+            else
+                ++i;
         }
     }
 }

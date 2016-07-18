@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,6 +93,20 @@ const IntVector2& Sprite::GetScreenPosition() const
     // This updates screen position for a sprite
     GetTransform();
     return screenPosition_;
+}
+
+IntVector2 Sprite::ScreenToElement(const IntVector2& screenPosition)
+{
+    Vector3 floatPos((float)screenPosition.x_, (float)screenPosition.y_, 0.0f);
+    Vector3 transformedPos = GetTransform().Inverse() * floatPos;
+    return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
+}
+
+IntVector2 Sprite::ElementToScreen(const IntVector2& position)
+{
+    Vector3 floatPos((float)position.x_, (float)position.y_, 0.0f);
+    Vector3 transformedPos = GetTransform() * floatPos;
+    return IntVector2((int)transformedPos.x_, (int)transformedPos.y_);
 }
 
 void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)

@@ -29,7 +29,7 @@ void VS(float4 iPos : POSITION,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
-        float4x3 iModelInstance : TEXCOORD2,
+        float4x3 iModelInstance : TEXCOORD4,
     #endif
     float2 iTexCoord : TEXCOORD0,
     out float2 oTexCoord : TEXCOORD0,

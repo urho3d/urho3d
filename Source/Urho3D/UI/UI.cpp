@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,7 +98,7 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(ANDROID) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
@@ -824,6 +824,10 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
             graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+        float elapsedTime = GetSubsystem<Time>()->GetElapsedTime();
+        graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
+        graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
+
         IntRect scissor = batch.scissor_;
         scissor.left_ = (int)(scissor.left_ * uiScale_);
         scissor.top_ = (int)(scissor.top_ * uiScale_);
@@ -1171,7 +1175,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             if (!HasModalElement())
                 SetFocusElement(0);
             SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
-            
+
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
                 SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
         }
@@ -1370,6 +1374,18 @@ void UI::SendClickEvent(StringHash eventType, UIElement* beginElement, UIElement
     if (eventType == E_UIMOUSECLICKEND)
         eventData[UIMouseClickEnd::P_BEGINELEMENT] = beginElement;
 
+    if (endElement)
+    {
+        // Send also element version of the event
+        if (eventType == E_UIMOUSECLICK)
+            endElement->SendEvent(E_CLICK, eventData);
+        else if (eventType == E_UIMOUSECLICKEND)
+            endElement->SendEvent(E_CLICKEND, eventData);
+        else if (eventType == E_UIMOUSEDOUBLECLICK)
+            endElement->SendEvent(E_DOUBLECLICK, eventData);
+    }
+
+    // Send the global event from the UI subsystem last
     SendEvent(eventType, eventData);
 }
 
@@ -1438,9 +1454,11 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
     {
         if (!input->IsMouseVisible())
         {
-            // Relative mouse motion: move cursor only when visible
-            if (cursor_->IsVisible())
+            if (!input->IsMouseLocked())
+                cursor_->SetPosition(IntVector2(eventData[P_X].GetInt(), eventData[P_Y].GetInt()));
+            else if (cursor_->IsVisible())
             {
+                // Relative mouse motion: move cursor only when visible
                 IntVector2 pos = cursor_->GetPosition();
                 pos.x_ += eventData[P_DX].GetInt();
                 pos.y_ += eventData[P_DY].GetInt();
@@ -1592,7 +1610,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     int key = eventData[P_KEY].GetInt();
 
     // Cancel UI dragging
-    if (key == KEY_ESC && dragElementsCount_ > 0)
+    if (key == KEY_ESCAPE && dragElementsCount_ > 0)
     {
         ProcessDragCancel();
 
@@ -1600,7 +1618,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 
     // Dismiss modal element if any when ESC key is pressed
-    if (key == KEY_ESC && HasModalElement())
+    if (key == KEY_ESCAPE && HasModalElement())
     {
         UIElement* element = rootModalElement_->GetChild(rootModalElement_->GetNumChildren() - 1);
         if (element->GetVars().Contains(VAR_ORIGIN))
@@ -1650,7 +1668,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             }
         }
         // Defocus the element
-        else if (key == KEY_ESC && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
+        else if (key == KEY_ESCAPE && element->GetFocusMode() == FM_FOCUSABLE_DEFOCUSABLE)
             element->SetFocus(false);
         // If none of the special keys, pass the key to the focused element
         else

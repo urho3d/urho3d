@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -116,7 +116,7 @@ else ()
             endif ()
         endif ()
         # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so"
-        if (WEB)
+        if (EMSCRIPTEN)
             string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
         endif ()
         # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
@@ -170,7 +170,7 @@ else ()
     set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
-        if ((MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT EQUAL URHO3D_DEFAULT_64BIT)
+        if ((MSVC OR MINGW OR ANDROID OR ARM OR WEB) AND NOT ABI_64BIT EQUAL NATIVE_64BIT)
             break ()
         endif ()
         # Set to search in 'lib' or 'lib64' based on the ABI being tested
@@ -223,13 +223,12 @@ else ()
         if (URHO3D_COMPILE_RESULT)
             break ()    # Use the cached result instead of redoing try_run() each time
         elseif (URHO3D_LIBRARIES)
-            if (NOT (MSVC OR MINGW OR ANDROID OR RPI OR WEB) AND NOT ABI_64BIT)
-                set (COMPILER_32BIT_FLAG -DCOMPILE_DEFINITIONS:STRING=-m32)
+            if (NOT (MSVC OR MINGW OR ANDROID OR ARM OR WEB OR XCODE) AND NOT ABI_64BIT)
+                set (COMPILER_32BIT_FLAG -m32)
             endif ()
             # Below variables are loop invariant but there is no harm to keep them here
-            if (IOS)
-                set (IOS_FLAGS -DCMAKE_MACOSX_BUNDLE=1 -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0)
-            elseif (ANDROID)
+            if (ANDROID)
+                # TODO - remove this hard-coding when we do the library dependency refactoring
                 set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
             elseif (WIN32)
                 set (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED ${CMAKE_TRY_COMPILE_CONFIGURATION})
@@ -252,22 +251,32 @@ else ()
                 set (URHO3D_RUN_RESULT 0)
                 file (READ ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h URHO3D_RUN_RESULT__TRYRUN_OUTPUT)
             endif ()
-            while (NOT URHO3D_COMPILE_RESULT)
-                # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
-                try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                    CMAKE_FLAGS ${IOS_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_32BIT_FLAG} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+            # Due to a bug in CMake where setting the CMAKE_EXECUTABLE_SUFFIX variable in the current local scope does not being honored by try_run(), we could not tell the command the correct suffix to expect (.js); it still thinks the suffix is empty string (as per Linux platform, see also comments in emscripten.toolchain.cmake module)
+            # Workaround it by just doing try_compile() and fake the run output which is anyway the case for all the cross-compiling cases
+            if (EMSCRIPTEN)
+                try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+                    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CMAKE_REQUIRED_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE}
+                    OUTPUT_VARIABLE TRY_COMPILE_OUT)
+                set (TRY_RUN_OUT ${URHO3D_RUN_RESULT__TRYRUN_OUTPUT})
+            else ()
+                set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
+                while (NOT URHO3D_COMPILE_RESULT)
+                    # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
+                    try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
+                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
                         COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
-                if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
-                    # Give a second chance for MSVC to use static runtime flag
-                    if (URHO3D_LIBRARIES_REL)
-                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MT)
+                    if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
+                        # Give a second chance for MSVC to use static runtime flag
+                        if (URHO3D_LIBRARIES_REL)
+                            set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MT)
+                        else ()
+                            set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MTd)
+                        endif ()
                     else ()
-                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MTd)
+                        break ()    # Other compilers break immediately rendering the while-loop a no-ops
                     endif ()
-                else ()
-                    break ()    # Other compilers break immediately rendering the while-loop a no-ops
-                endif ()
-            endwhile ()
+                endwhile ()
+            endif ()
             set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
             if (URHO3D_COMPILE_RESULT AND URHO3D_RUN_RESULT EQUAL 0)
                 # Auto-discover build options used by the found library
@@ -349,4 +358,4 @@ elseif (Urho3D_FIND_REQUIRED)
         "Use URHO3D_HOME environment variable or build option to specify the location of the non-default SDK installation or build tree. ${NOT_FOUND_MESSAGE} ${TRY_COMPILE_OUT}")
 endif ()
 
-mark_as_advanced (URHO3D_BASE_INCLUDE_DIR URHO3D_LIBRARIES URHO3D_LIBRARIES_DBG URHO3D_DLL_REL URHO3D_DLL_DBG URHO3D_HOME)
+mark_as_advanced (URHO3D_BASE_INCLUDE_DIR URHO3D_LIBRARIES URHO3D_LIBRARIES_DBG URHO3D_DLL_REL URHO3D_DLL_DBG)

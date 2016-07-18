@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,15 +31,37 @@
 /* OpenGLES functions */
 #define WINRT_GLES_GetAttribute SDL_EGL_GetAttribute
 #define WINRT_GLES_GetProcAddress SDL_EGL_GetProcAddress
-#define WINRT_GLES_UnloadLibrary SDL_EGL_UnloadLibrary
 #define WINRT_GLES_SetSwapInterval SDL_EGL_SetSwapInterval
 #define WINRT_GLES_GetSwapInterval SDL_EGL_GetSwapInterval
 #define WINRT_GLES_DeleteContext SDL_EGL_DeleteContext
 
 extern int WINRT_GLES_LoadLibrary(_THIS, const char *path);
+extern void WINRT_GLES_UnloadLibrary(_THIS);
 extern SDL_GLContext WINRT_GLES_CreateContext(_THIS, SDL_Window * window);
 extern void WINRT_GLES_SwapWindow(_THIS, SDL_Window * window);
 extern int WINRT_GLES_MakeCurrent(_THIS, SDL_Window * window, SDL_GLContext context);
+
+
+#ifdef __cplusplus
+
+/* Typedefs for ANGLE/WinRT's C++-based native-display and native-window types,
+ * which are used when calling eglGetDisplay and eglCreateWindowSurface.
+ */
+typedef Microsoft::WRL::ComPtr<IUnknown> WINRT_EGLNativeWindowType_Old;
+
+/* Function pointer typedefs for 'old' ANGLE/WinRT's functions, which may
+ * require that C++ objects be passed in:
+ */
+typedef EGLDisplay (EGLAPIENTRY *eglGetDisplay_Old_Function)(WINRT_EGLNativeWindowType_Old);
+typedef EGLSurface (EGLAPIENTRY *eglCreateWindowSurface_Old_Function)(EGLDisplay, EGLConfig, WINRT_EGLNativeWindowType_Old, const EGLint *);
+typedef HRESULT (EGLAPIENTRY *CreateWinrtEglWindow_Old_Function)(Microsoft::WRL::ComPtr<IUnknown>, int, IUnknown ** result);
+
+#endif /* __cplusplus */
+
+/* Function pointer typedefs for 'new' ANGLE/WinRT functions, which, unlike
+ * the old functions, do not require C++ support and work with plain C.
+ */
+typedef EGLDisplay (EGLAPIENTRY *eglGetPlatformDisplayEXT_Function)(EGLenum, void *, const EGLint *);
 
 #endif /* SDL_VIDEO_DRIVER_WINRT && SDL_VIDEO_OPENGL_EGL */
 

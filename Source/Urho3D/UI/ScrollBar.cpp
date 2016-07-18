@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ extern const char* orientations[];
 extern const char* UI_CATEGORY;
 
 ScrollBar::ScrollBar(Context* context) :
-    UIElement(context),
+    BorderImage(context),
     scrollStep_(DEFAULT_SCROLL_STEP),
     stepFactor_(1.0f),
     leftRect_(IntRect::ZERO),
@@ -62,6 +62,9 @@ ScrollBar::ScrollBar(Context* context) :
     forwardButton_->SetRepeat(DEFAULT_REPEAT_DELAY, DEFAULT_REPEAT_RATE);
     forwardButton_->SetFocusMode(FM_NOTFOCUSABLE);
 
+    // For backward compatibility
+    SetColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+
     SubscribeToEvent(backButton_, E_PRESSED, URHO3D_HANDLER(ScrollBar, HandleBackButtonPressed));
     SubscribeToEvent(forwardButton_, E_PRESSED, URHO3D_HANDLER(ScrollBar, HandleForwardButtonPressed));
     SubscribeToEvent(slider_, E_SLIDERCHANGED, URHO3D_HANDLER(ScrollBar, HandleSliderChanged));
@@ -79,7 +82,7 @@ void ScrollBar::RegisterObject(Context* context)
 {
     context->RegisterFactory<ScrollBar>(UI_CATEGORY);
 
-    URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
+    URHO3D_COPY_BASE_ATTRIBUTES(BorderImage);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Orientation", GetOrientation, SetOrientation, Orientation, orientations, O_HORIZONTAL, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, 1.0f, AM_FILE);
@@ -94,7 +97,7 @@ void ScrollBar::RegisterObject(Context* context)
 
 void ScrollBar::ApplyAttributes()
 {
-    UIElement::ApplyAttributes();
+    BorderImage::ApplyAttributes();
 
     // Reapply orientation to the button images
     if (slider_->GetOrientation() == O_HORIZONTAL)
@@ -219,7 +222,7 @@ float ScrollBar::GetEffectiveScrollStep() const
 
 bool ScrollBar::FilterImplicitAttributes(XMLElement& dest) const
 {
-    if (!UIElement::FilterImplicitAttributes(dest))
+    if (!BorderImage::FilterImplicitAttributes(dest))
         return false;
 
     if (!RemoveChildXML(dest, "Layout Mode"))

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,168 +35,158 @@ namespace Urho3D
 
 const BYTE d3dElementType[] =
 {
-    D3DDECLTYPE_FLOAT3, // Position
-    D3DDECLTYPE_FLOAT3, // Normal
-    D3DDECLTYPE_UBYTE4N, // Color
-    D3DDECLTYPE_FLOAT2, // Texcoord1
-    D3DDECLTYPE_FLOAT2, // Texcoord2
-    D3DDECLTYPE_FLOAT3, // Cubetexcoord1
-    D3DDECLTYPE_FLOAT3, // Cubetexcoord2
-    D3DDECLTYPE_FLOAT4, // Tangent
-    D3DDECLTYPE_FLOAT4, // Blendweights
-    D3DDECLTYPE_UBYTE4, // Blendindices
-    D3DDECLTYPE_FLOAT4, // Instancematrix1
-    D3DDECLTYPE_FLOAT4, // Instancematrix2
-    D3DDECLTYPE_FLOAT4 // Instancematrix3
+    D3DDECLTYPE_UNUSED, // Int (not supported by D3D9)
+    D3DDECLTYPE_FLOAT1, // Float
+    D3DDECLTYPE_FLOAT2, // Vector2
+    D3DDECLTYPE_FLOAT3, // Vector3
+    D3DDECLTYPE_FLOAT4, // Vector4
+    D3DDECLTYPE_UBYTE4, // 4 bytes, not normalized
+    D3DDECLTYPE_UBYTE4N // 4 bytes, normalized
 };
 
 const BYTE d3dElementUsage[] =
 {
-    D3DDECLUSAGE_POSITION, // Position
-    D3DDECLUSAGE_NORMAL, // Normal
-    D3DDECLUSAGE_COLOR, // Color
-    D3DDECLUSAGE_TEXCOORD, // Texcoord1
-    D3DDECLUSAGE_TEXCOORD, // Texcoord2
-    D3DDECLUSAGE_TEXCOORD, // Cubetexcoord1
-    D3DDECLUSAGE_TEXCOORD, // Cubetexcoord2
-    D3DDECLUSAGE_TANGENT, // Tangent
-    D3DDECLUSAGE_BLENDWEIGHT, // Blendweights
-    D3DDECLUSAGE_BLENDINDICES, // Blendindices
-    D3DDECLUSAGE_TEXCOORD, // Instancematrix1
-    D3DDECLUSAGE_TEXCOORD, // Instancematrix2
-    D3DDECLUSAGE_TEXCOORD // Instancematrix3
+    D3DDECLUSAGE_POSITION,
+    D3DDECLUSAGE_NORMAL,
+    D3DDECLUSAGE_BINORMAL,
+    D3DDECLUSAGE_TANGENT,
+    D3DDECLUSAGE_TEXCOORD,
+    D3DDECLUSAGE_COLOR,
+    D3DDECLUSAGE_BLENDWEIGHT,
+    D3DDECLUSAGE_BLENDINDICES, 
+    D3DDECLUSAGE_TEXCOORD // Object index (not supported by D3D9)
 };
 
-const BYTE d3dElementUsageIndex[] =
-{
-    0, // Position
-    0, // Normal
-    0, // Color
-    0, // Texcoord1
-    1, // Texcoord2
-    0, // Cubetexcoord1
-    1, // Cubetexcoord2
-    0, // Tangent
-    0, // Blendweights
-    0, // Blendindices
-    2, // Instancematrix1
-    3, // Instancematrix2
-    4 // Instancematrix3
-};
-
-VertexDeclaration::VertexDeclaration(Graphics* graphics, unsigned elementMask) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexElement>& srcElements) :
     declaration_(0)
 {
     PODVector<VertexDeclarationElement> elements;
-    unsigned offset = 0;
 
-    if (elementMask & MASK_OBJECTINDEX)
-        URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
-
-    for (unsigned i = 0; i < ELEMENT_OBJECTINDEX; ++i)
+    for (unsigned i = 0; i < srcElements.Size(); ++i)
     {
-        VertexElement element = (VertexElement)i;
+        const VertexElement& srcElement = srcElements[i];
 
-        if (elementMask & (1 << i))
+        if (srcElement.semantic_ == SEM_OBJECTINDEX)
         {
-            VertexDeclarationElement newElement;
-            newElement.stream_ = 0;
-            newElement.element_ = element;
-            newElement.offset_ = offset;
-            offset += VertexBuffer::elementSize[i];
-
-            elements.Push(newElement);
+            URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+            continue;
         }
+
+        VertexDeclarationElement element;
+        element.semantic_ = srcElement.semantic_;
+        element.type_ = srcElement.type_;
+        element.index_ = srcElement.index_;
+        element.streamIndex_ = 0;
+        element.offset_ = srcElement.offset_;
+        elements.Push(element);
     }
 
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers,
-    const PODVector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const PODVector<VertexBuffer*>& buffers) :
     declaration_(0)
 {
-    unsigned usedElementMask = 0;
     PODVector<VertexDeclarationElement> elements;
+    unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (buffers[i])
-        {
-            unsigned elementMask = elementMasks[i];
+        if (!buffers[i])
+            continue;
 
-            if (elementMask == MASK_DEFAULT)
-                elementMask = buffers[i]->GetElementMask();
-            else
+        const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
+        bool isExisting = false;
+
+        for (unsigned j = 0; j < srcElements.Size(); ++j)
+        {
+            const VertexElement& srcElement = srcElements[j];
+
+            if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
-                    return;
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                continue;
             }
 
-            if (elementMask & MASK_OBJECTINDEX)
-                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
-
-            for (unsigned j = 0; j < ELEMENT_OBJECTINDEX; ++j)
+            // Override existing element if necessary
+            for (unsigned k = 0; k < prevBufferElements; ++k)
             {
-                VertexElement element = (VertexElement)j;
-
-                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
+                if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
                 {
-                    VertexDeclarationElement newElement;
-                    newElement.stream_ = i;
-                    newElement.element_ = element;
-                    newElement.offset_ = buffers[i]->GetElementOffset(element);
-                    usedElementMask |= 1 << j;
-
-                    elements.Push(newElement);
+                    isExisting = true;
+                    elements[k].streamIndex_ = i;
+                    elements[k].offset_ = srcElement.offset_;
+                    break;
                 }
             }
+
+            if (isExisting)
+                continue;
+
+            VertexDeclarationElement element;
+            element.semantic_ = srcElement.semantic_;
+            element.type_ = srcElement.type_;
+            element.index_ = srcElement.index_;
+            element.streamIndex_ = i;
+            element.offset_ = srcElement.offset_;
+            elements.Push(element);
         }
+
+        prevBufferElements = elements.Size();
     }
 
     Create(graphics, elements);
 }
 
-VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers,
-    const PODVector<unsigned>& elementMasks) :
+VertexDeclaration::VertexDeclaration(Graphics* graphics, const Vector<SharedPtr<VertexBuffer> >& buffers) :
     declaration_(0)
 {
-    unsigned usedElementMask = 0;
     PODVector<VertexDeclarationElement> elements;
+    unsigned prevBufferElements = 0;
 
     for (unsigned i = 0; i < buffers.Size(); ++i)
     {
-        if (buffers[i])
-        {
-            unsigned elementMask = elementMasks[i];
+        if (!buffers[i])
+            continue;
 
-            if (elementMask == MASK_DEFAULT)
-                elementMask = buffers[i]->GetElementMask();
-            else
+        const PODVector<VertexElement>& srcElements = buffers[i]->GetElements();
+        bool isExisting = false;
+
+        for (unsigned j = 0; j < srcElements.Size(); ++j)
+        {
+            const VertexElement& srcElement = srcElements[j];
+
+            if (srcElement.semantic_ == SEM_OBJECTINDEX)
             {
-                if ((buffers[i]->GetElementMask() & elementMask) != elementMask)
-                    return;
+                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
+                continue;
             }
 
-            if (elementMask & MASK_OBJECTINDEX)
-                URHO3D_LOGWARNING("Object index attribute is not supported on Direct3D9 and will be ignored");
-
-            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
+            // Override existing element if necessary
+            for (unsigned k = 0; k < prevBufferElements; ++k)
             {
-                VertexElement element = (VertexElement)j;
-
-                if (elementMask & (1 << j) && !(usedElementMask & (1 << j)))
+                if (elements[k].semantic_ == srcElement.semantic_ && elements[k].index_ == srcElement.index_)
                 {
-                    VertexDeclarationElement newElement;
-                    newElement.stream_ = i;
-                    newElement.element_ = element;
-                    newElement.offset_ = buffers[i]->GetElementOffset(element);
-                    usedElementMask |= 1 << j;
-
-                    elements.Push(newElement);
+                    isExisting = true;
+                    elements[k].streamIndex_ = i;
+                    elements[k].offset_ = srcElement.offset_;
+                    break;
                 }
             }
+
+            if (isExisting)
+                continue;
+
+            VertexDeclarationElement element;
+            element.semantic_ = srcElement.semantic_;
+            element.type_ = srcElement.type_;
+            element.index_ = srcElement.index_;
+            element.streamIndex_ = i;
+            element.offset_ = srcElement.offset_;
+            elements.Push(element);
         }
+
+        prevBufferElements = elements.Size();
     }
 
     Create(graphics, elements);
@@ -214,12 +204,12 @@ void VertexDeclaration::Create(Graphics* graphics, const PODVector<VertexDeclara
     D3DVERTEXELEMENT9* dest = elementArray;
     for (Vector<VertexDeclarationElement>::ConstIterator i = elements.Begin(); i != elements.End(); ++i)
     {
-        dest->Stream = (WORD)i->stream_;
+        dest->Stream = (WORD)i->streamIndex_;
         dest->Offset = (WORD)i->offset_;
-        dest->Type = d3dElementType[i->element_];
+        dest->Type = d3dElementType[i->type_];
         dest->Method = D3DDECLMETHOD_DEFAULT;
-        dest->Usage = d3dElementUsage[i->element_];
-        dest->UsageIndex = d3dElementUsageIndex[i->element_];
+        dest->Usage = d3dElementUsage[i->semantic_];
+        dest->UsageIndex = i->index_;
         dest++;
     }
 

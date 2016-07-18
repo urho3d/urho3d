@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -211,8 +211,8 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
 
     switch (key)
     {
-    case 'X':
-    case 'C':
+    case KEY_X:
+    case KEY_C:
         if (textCopyable_ && qualifiers & QUAL_CTRL)
         {
             unsigned start = text_->GetSelectionStart();
@@ -221,7 +221,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
             if (text_->GetSelectionLength())
                 GetSubsystem<UI>()->SetClipboardText(line_.SubstringUTF8(start, length));
 
-            if (key == 'X' && editable_)
+            if (key == KEY_X && editable_)
             {
                 if (start + length < line_.LengthUTF8())
                     line_ = line_.SubstringUTF8(0, start) + line_.SubstringUTF8(start + length);
@@ -234,7 +234,7 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         }
         break;
 
-    case 'V':
+    case KEY_V:
         if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
         {
             const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();

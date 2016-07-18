@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,14 +31,16 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    window_(0),
     interface_(0),
     device_(0),
     defaultColorSurface_(0),
     defaultDepthStencilSurface_(0),
     frameQuery_(0),
     adapter_(D3DADAPTER_DEFAULT),
-    deviceType_(D3DDEVTYPE_HAL)
+    deviceType_(D3DDEVTYPE_HAL),
+    shaderProgram_(0),
+    deviceLost_(false),
+    queryIssued_(false)
 {
     memset(&presentParams_, 0, sizeof presentParams_);
 }

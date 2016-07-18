@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ static const unsigned char CTRL_AUTOFADE = 0x4;
 static const unsigned char CTRL_SETTIME = 0x08;
 static const unsigned char CTRL_SETWEIGHT = 0x10;
 static const unsigned char CTRL_REMOVEONCOMPLETION = 0x20;
+static const unsigned char CTRL_ADDITIVE = 0x40;
 static const float EXTRA_ANIM_FADEOUT_TIME = 0.1f;
 static const float COMMAND_STAY_TIME = 0.25f;
 static const unsigned MAX_NODE_ANIMATION_STATES = 256;
@@ -393,6 +394,17 @@ bool AnimationController::SetLooped(const String& name, bool enable)
     return true;
 }
 
+bool AnimationController::SetBlendMode(const String& name, AnimationBlendMode mode)
+{
+    AnimationState* state = GetAnimationState(name);
+    if (!state)
+        return false;
+
+    state->SetBlendMode(mode);
+    MarkNetworkUpdate();
+    return true;
+}
+
 bool AnimationController::SetAutoFade(const String& name, float fadeOutTime)
 {
     unsigned index;
@@ -482,6 +494,12 @@ bool AnimationController::IsLooped(const String& name) const
 {
     AnimationState* state = GetAnimationState(name);
     return state ? state->IsLooped() : false;
+}
+
+AnimationBlendMode AnimationController::GetBlendMode(const String& name) const
+{
+    AnimationState* state = GetAnimationState(name);
+    return state ? state->GetBlendMode() : ABM_LERP;
 }
 
 float AnimationController::GetLength(const String& name) const
@@ -617,6 +635,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         unsigned char ctrl = buf.ReadUByte();
         state->SetLayer(buf.ReadUByte());
         state->SetLooped((ctrl & CTRL_LOOPED) != 0);
+        state->SetBlendMode((ctrl & CTRL_ADDITIVE) != 0 ? ABM_ADDITIVE : ABM_LERP);
         animations_[index].speed_ = (float)buf.ReadShort() / 2048.0f; // 11 bits of decimal precision, max. 16x playback speed
         animations_[index].targetWeight_ = (float)buf.ReadUByte() / 255.0f; // 8 bits of decimal precision
         animations_[index].fadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
@@ -743,6 +762,8 @@ const PODVector<unsigned char>& AnimationController::GetNetAnimationsAttr() cons
         Bone* startBone = state->GetStartBone();
         if (state->IsLooped())
             ctrl |= CTRL_LOOPED;
+        if (state->GetBlendMode() == ABM_ADDITIVE)
+            ctrl |= CTRL_ADDITIVE;
         if (startBone && model && startBone != model->GetSkeleton().GetRootBone())
             ctrl |= CTRL_STARTBONE;
         if (i->autoFadeTime_ > 0.0f)

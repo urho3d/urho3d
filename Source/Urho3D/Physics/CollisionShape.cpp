@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,12 +103,12 @@ public:
             SharedArrayPtr<unsigned char> indexData;
             unsigned vertexSize;
             unsigned indexSize;
-            unsigned elementMask;
+            const PODVector<VertexElement>* elements;
 
-            geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elementMask);
-            if (!vertexData || !indexData)
+            geometry->GetRawDataShared(vertexData, vertexSize, indexData, indexSize, elements);
+            if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
             {
-                URHO3D_LOGWARNING("Skipping geometry with no CPU-side geometry data for triangle mesh collision");
+                URHO3D_LOGWARNING("Skipping geometry with no or unsuitable CPU-side geometry data for triangle mesh collision");
                 continue;
             }
 
@@ -237,8 +237,8 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
 
     for (unsigned i = 0; i < numGeometries; ++i)
     {
-        Geometry* geom = model->GetGeometry(i, lodLevel);
-        if (!geom)
+        Geometry* geometry = model->GetGeometry(i, lodLevel);
+        if (!geometry)
         {
             URHO3D_LOGWARNING("Skipping null geometry for convex hull collision");
             continue;
@@ -248,17 +248,17 @@ ConvexData::ConvexData(Model* model, unsigned lodLevel)
         const unsigned char* indexData;
         unsigned vertexSize;
         unsigned indexSize;
-        unsigned elementMask;
+        const PODVector<VertexElement>* elements;
 
-        geom->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-        if (!vertexData)
+        geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
+        if (!vertexData || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         {
-            URHO3D_LOGWARNING("Skipping geometry with no CPU-side geometry data for convex hull collision");
+            URHO3D_LOGWARNING("Skipping geometry with no or unsuitable CPU-side geometry data for convex hull collision");
             continue;
         }
 
-        unsigned vertexStart = geom->GetVertexStart();
-        unsigned vertexCount = geom->GetVertexCount();
+        unsigned vertexStart = geometry->GetVertexStart();
+        unsigned vertexCount = geometry->GetVertexCount();
 
         // Copy vertex data
         for (unsigned j = 0; j < vertexCount; ++j)

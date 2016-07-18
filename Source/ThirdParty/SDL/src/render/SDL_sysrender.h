@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -142,6 +142,10 @@ struct SDL_Renderer
     /* The clip rectangle within the window */
     SDL_Rect clip_rect;
     SDL_Rect clip_rect_backup;
+
+    /* Wether or not the clipping rectangle is used. */
+    SDL_bool clipping_enabled;
+    SDL_bool clipping_enabled_backup;
 
     /* The render output coordinate scale */
     SDL_FPoint scale;

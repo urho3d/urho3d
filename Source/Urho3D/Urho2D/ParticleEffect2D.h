@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -128,6 +128,8 @@ public:
     void SetRotationEnd(float rotationEnd);
     /// Set rotation end variance.
     void SetRotationEndVariance(float rotationEndVariance);
+    /// Clone the 2D particle effect.
+    SharedPtr<ParticleEffect2D> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return sprite.
     Sprite2D* GetSprite() const { return sprite_; }
@@ -193,7 +195,7 @@ public:
     float GetFinishParticleSize() const { return finishParticleSize_; }
 
     /// Return finish particle size variance.
-    float GetFinishParticleSizeVariance() const { return FinishParticleSizeVariance_; }
+    float GetFinishParticleSizeVariance() const { return finishParticleSizeVariance_; }
 
     /// Return duration.
     float GetDuration() const { return duration_; }
@@ -295,7 +297,7 @@ private:
     /// Finish particle size.
     float finishParticleSize_;
     /// Finish particle size variance.
-    float FinishParticleSizeVariance_;
+    float finishParticleSizeVariance_;
     /// Duration.
     float duration_;
     /// Emitter type.

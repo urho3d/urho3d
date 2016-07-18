@@ -2,5 +2,25 @@ $#include "Graphics/TextureCube.h"
 
 class TextureCube : public Texture
 {
+    TextureCube();
+    ~TextureCube();
+
+    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    bool SetData(CubeMapFace face, Image* image, bool useAlpha = false);
+
     RenderSurface* GetRenderSurface(CubeMapFace face) const;
 };
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_TextureCube_new00
+static int tolua_GraphicsLuaAPI_TextureCube_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<TextureCube>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_TextureCube_new00_local
+static int tolua_GraphicsLuaAPI_TextureCube_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<TextureCube>(tolua_S);
+}
+$}

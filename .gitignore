@@ -56,9 +56,7 @@ generated/
 /*.workspace
 
 # Android project settings
-/Android/project.properties
 /Android/local.properties
-/Android/proguard-project.txt
 
 # Android output directories
 /Android/Urho3D/
@@ -76,6 +74,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 CTestTestfile.cmake
 /Source/**/*.cmake
+!/Source/ThirdParty/SDL/cmake/*.cmake
 /Docs/**/*.cmake
 
 # Precompiled header files
@@ -85,6 +84,7 @@ CTestTestfile.cmake
 
 # Custom rake tasks
 /.rake/
+.rake_t_cache
 
 # Misc.
 configure*
@@ -94,3 +94,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+.directory

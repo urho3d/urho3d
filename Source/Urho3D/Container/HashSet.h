@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,9 @@
 #include "../Container/Sort.h"
 
 #include <cassert>
+#if URHO3D_CXX11
+#include <initializer_list>
+#endif
 
 namespace Urho3D
 {
@@ -192,7 +195,16 @@ public:
         head_ = tail_ = ReserveNode();
         *this = set;
     }
-
+#if URHO3D_CXX11
+    /// Aggregate initialization constructor.
+    HashSet(const std::initializer_list<T>& list) : HashSet()
+    {
+        for (auto it = list.begin(); it != list.end(); it++)
+        {
+            Insert(*it);
+        }
+    }
+#endif
     /// Destruct.
     ~HashSet()
     {
@@ -286,6 +298,15 @@ public:
         }
 
         return Iterator(newNode);
+    }
+
+    /// Insert a key. Return an iterator and set exists flag according to whether the key already existed.
+    Iterator Insert(const T& key, bool& exists)
+    {
+        unsigned oldSize = Size();
+        Iterator ret = Insert(key);
+        exists = (Size() == oldSize);
+        return ret;
     }
 
     /// Insert a set.
@@ -606,11 +627,6 @@ private:
     /// Compute a hash based on the key and the bucket size
     unsigned Hash(const T& key) const { return MakeHash(key) & (NumBuckets() - 1); }
 };
-
-}
-
-namespace std
-{
 
 template <class T> typename Urho3D::HashSet<T>::ConstIterator begin(const Urho3D::HashSet<T>& v) { return v.Begin(); }
 

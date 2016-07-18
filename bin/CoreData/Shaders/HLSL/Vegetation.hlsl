@@ -27,7 +27,7 @@ cbuffer CustomVS : register(b6)
 #endif
 
 void VS(float4 iPos : POSITION,
-    #ifndef BILLBOARD
+    #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
     #endif
     #ifndef NOUV
@@ -39,7 +39,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD)
+    #if defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -47,7 +47,7 @@ void VS(float4 iPos : POSITION,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
-        float4x3 iModelInstance : TEXCOORD2,
+        float4x3 iModelInstance : TEXCOORD4,
     #endif
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
@@ -129,7 +129,7 @@ void VS(float4 iPos : POSITION,
 
         #ifdef SHADOW
             // Shadow projection: transform from world space to shadow space
-            GetShadowPos(projWorldPos, oShadowPos);
+            GetShadowPos(projWorldPos, oNormal, oShadowPos);
         #endif
 
         #ifdef SPOTLIGHT

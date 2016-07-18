@@ -60,7 +60,7 @@ void CreateHierarchyWindow()
     hierarchyWindow = LoadEditorUI("UI/EditorHierarchyWindow.xml");
     hierarchyList = hierarchyWindow.GetChild("HierarchyList");
     ui.root.AddChild(hierarchyWindow);
-    int height = Min(ui.root.height - 60, 460);
+    int height = Min(ui.root.height - 60, 500);
     hierarchyWindow.SetSize(300, height);
     hierarchyWindow.SetPosition(35, 100);
     hierarchyWindow.opacity = uiMaxOpacity;
@@ -475,7 +475,7 @@ String GetNodeTitle(Node@ node)
         ret = node.typeName;
     else
         ret = node.name;
-    
+
     if (showID)
     {
         if (node.id >= FIRST_LOCAL_ID)
@@ -615,6 +615,50 @@ void SelectUIElement(UIElement@ element, bool multiselect)
         hierarchyList.ClearSelection();
 }
 
+// Find the first selected StaticModel/AtimatedModel component or node with it
+Model@ FindFirstSelectedModel()
+{
+    for (uint i = 0; i < selectedComponents.length; ++i)
+    {
+        // Get SM, but also works well for AnimatedModel
+        StaticModel@ sm = cast<StaticModel>(selectedComponents[i]);
+        if (sm !is null && sm.model !is null)
+            return sm.model;
+    }
+
+    for (uint i = 0; i < selectedNodes.length; ++i)
+    {
+        for (uint j = 0; j < selectedNodes[i].numComponents; ++j)
+        {
+            StaticModel@ sm = cast<StaticModel>(selectedNodes[i].components[j]);
+            if (sm !is null && sm.model !is null)
+                return sm.model;
+        }
+    }
+    
+    return null;
+}
+
+void UpdateModelInfo(Model@ model)
+{
+    if (model is null)
+    {
+        modelInfoText.text = "";
+        return;
+    }
+    
+    String infoStr = "Model: " + model.name;
+
+    infoStr += "\n  Morphs: " + model.numMorphs;
+    
+    for (uint g = 0; g < model.numGeometries; ++g)
+    {
+        infoStr += "\n  Geometry " + g + "\n    Lods: " + model.numGeometryLodLevels[g];
+    }
+    
+    modelInfoText.text = infoStr;
+}
+
 void HandleHierarchyListSelectionChange()
 {
     if (inSelectionModify)
@@ -675,6 +719,8 @@ void HandleHierarchyListSelectionChange()
         }
         editNode = commonNode;
     }
+    
+    UpdateModelInfo(FindFirstSelectedModel());
 
     // Now check if the component(s) can be edited. If many selected, must have same type or have same edit node
     if (!selectedComponents.empty)
@@ -1088,9 +1134,9 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 
                 if (item_.vars[TYPE_VAR] == ITEM_NODE)
                 {
-                    Node@ node = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
-                    if (node !is null)
-                        nodeList.Push(node);
+                    Node@ n = editorScene.GetNode(item_.vars[NODE_ID_VAR].GetUInt());
+                    if (n !is null)
+                        nodeList.Push(n);
                 }
             }
         }

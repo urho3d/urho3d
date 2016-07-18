@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,7 @@ ParticleEffect::ParticleEffect(Context* context) :
     relative_(true),
     scaled_(true),
     sorted_(false),
+    fixedScreenSize_(false),
     animationLodBias_(0.0f),
     emitterType_(EMITTER_SPHERE),
     emitterSize_(Vector3::ZERO),
@@ -136,6 +137,7 @@ bool ParticleEffect::Load(const XMLElement& source)
     relative_ = true;
     scaled_ = true;
     sorted_ = false;
+    fixedScreenSize_ = false;
     animationLodBias_ = 0.0f;
     emitterType_ = EMITTER_SPHERE;
     emitterSize_ = Vector3::ZERO;
@@ -191,6 +193,9 @@ bool ParticleEffect::Load(const XMLElement& source)
 
     if (source.HasChild("sorted"))
         sorted_ = source.GetChild("sorted").GetBool("enable");
+
+    if (source.HasChild("fixedscreensize"))
+        fixedScreenSize_ = source.GetChild("fixedscreensize").GetBool("enable");
 
     if (source.HasChild("animlodbias"))
         SetAnimationLodBias(source.GetChild("animlodbias").GetFloat("value"));
@@ -346,6 +351,9 @@ bool ParticleEffect::Save(XMLElement& dest) const
     childElem = dest.CreateChild("sorted");
     childElem.SetBool("enable", sorted_);
 
+    childElem = dest.CreateChild("fixedscreensize");
+    childElem.SetBool("enable", fixedScreenSize_);
+
     childElem = dest.CreateChild("animlodbias");
     childElem.SetFloat("value", animationLodBias_);
 
@@ -435,7 +443,7 @@ void ParticleEffect::SetMaterial(Material* material)
 
 void ParticleEffect::SetNumParticles(unsigned num)
 {
-    numParticles_ = (unsigned)Max(0, num);
+    numParticles_ = Max(0U, num);
 }
 
 void ParticleEffect::SetUpdateInvisible(bool enable)
@@ -456,6 +464,11 @@ void ParticleEffect::SetScaled(bool enable)
 void ParticleEffect::SetSorted(bool enable)
 {
     sorted_ = enable;
+}
+
+void ParticleEffect::SetFixedScreenSize(bool enable)
+{
+    fixedScreenSize_ = enable;
 }
 
 void ParticleEffect::SetAnimationLodBias(float lodBias)
@@ -717,6 +730,50 @@ void ParticleEffect::SortTextureFrames()
     textureFrames_.Clear();
     for (unsigned i = 0; i < tf.Size(); i++)
         AddTextureFrame(tf[i]);
+}
+
+SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
+{
+    SharedPtr<ParticleEffect> ret(new ParticleEffect(context_));
+
+    ret->SetName(cloneName);
+    ret->material_ = material_;
+    ret->numParticles_ = numParticles_;
+    ret->updateInvisible_ = updateInvisible_;
+    ret->relative_ = relative_;
+    ret->scaled_ = scaled_;
+    ret->sorted_ = sorted_;
+    ret->fixedScreenSize_ = fixedScreenSize_;
+    ret->animationLodBias_ = animationLodBias_;
+    ret->emitterType_ = emitterType_;
+    ret->emitterSize_ = emitterSize_;
+    ret->directionMin_ = directionMin_;
+    ret->directionMax_ = directionMax_;
+    ret->constantForce_ = constantForce_;
+    ret->dampingForce_ = dampingForce_;
+    ret->activeTime_ = activeTime_;
+    ret->inactiveTime_ = inactiveTime_;
+    ret->emissionRateMin_ = emissionRateMin_;
+    ret->emissionRateMax_ = emissionRateMax_;
+    ret->sizeMin_ = sizeMin_;
+    ret->sizeMax_ = sizeMax_;
+    ret->timeToLiveMin_ = timeToLiveMin_;
+    ret->timeToLiveMax_ = timeToLiveMax_;
+    ret->velocityMin_ = velocityMin_;
+    ret->velocityMax_ = velocityMax_;
+    ret->rotationMin_ = rotationMin_;
+    ret->rotationMax_ = rotationMax_;
+    ret->rotationSpeedMin_ = rotationSpeedMin_;
+    ret->rotationSpeedMax_ = rotationSpeedMax_;
+    ret->sizeAdd_ = sizeAdd_;
+    ret->sizeMul_ = sizeMul_;
+    ret->colorFrames_ = colorFrames_;
+    ret->textureFrames_ = textureFrames_;
+    ret->faceCameraMode_ = faceCameraMode_;
+    /// \todo Zero if source was created programmatically
+    ret->SetMemoryUse(GetMemoryUse());
+
+    return ret;
 }
 
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const

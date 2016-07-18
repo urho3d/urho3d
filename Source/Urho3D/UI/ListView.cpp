@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,7 @@ public:
         for (unsigned i = 0; i < children_.Size(); ++i)
         {
             const IntVector2& position = children_[i]->GetPosition();
-            CheckBox* overlay = static_cast<CheckBox*>(overlayContainer_->GetChild(i));
+            CheckBox* overlay = overlayContainer_->GetChildStaticCast<CheckBox>(i);
             bool visible = children_[i]->IsVisible() && GetItemHierarchyParent(children_[i]);
             overlay->SetVisible(visible);
             if (visible)

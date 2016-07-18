@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -75,32 +75,21 @@ static struct
     SDL_mutex *lock;
     volatile SDL_bool active;
     volatile int count;
+    volatile int max_events_seen;
     SDL_EventEntry *head;
     SDL_EventEntry *tail;
     SDL_EventEntry *free;
     SDL_SysWMEntry *wmmsg_used;
     SDL_SysWMEntry *wmmsg_free;
-} SDL_EventQ = { NULL, SDL_TRUE };
+} SDL_EventQ = { NULL, SDL_TRUE, 0, 0, NULL, NULL, NULL, NULL, NULL };
 
-
-static SDL_INLINE SDL_bool
-SDL_ShouldPollJoystick()
-{
-#if !SDL_JOYSTICK_DISABLED
-    if ((!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] ||
-         SDL_JoystickEventState(SDL_QUERY)) &&
-        SDL_PrivateJoystickNeedsPolling()) {
-        return SDL_TRUE;
-    }
-#endif
-    return SDL_FALSE;
-}
 
 /* Public functions */
 
 void
 SDL_StopEventLoop(void)
 {
+    const char *report = SDL_GetHint("SDL_EVENT_QUEUE_STATISTICS");
     int i;
     SDL_EventEntry *entry;
     SDL_SysWMEntry *wmmsg;
@@ -110,6 +99,11 @@ SDL_StopEventLoop(void)
     }
 
     SDL_EventQ.active = SDL_FALSE;
+
+    if (report && SDL_atoi(report)) {
+        SDL_Log("SDL EVENT QUEUE: Maximum events in-flight: %d\n",
+                SDL_EventQ.max_events_seen);
+    }
 
     /* Clean out EventQ */
     for (entry = SDL_EventQ.head; entry; ) {
@@ -132,7 +126,9 @@ SDL_StopEventLoop(void)
         SDL_free(wmmsg);
         wmmsg = next;
     }
+
     SDL_EventQ.count = 0;
+    SDL_EventQ.max_events_seen = 0;
     SDL_EventQ.head = NULL;
     SDL_EventQ.tail = NULL;
     SDL_EventQ.free = NULL;
@@ -231,6 +227,10 @@ SDL_AddEvent(SDL_Event * event)
     }
     ++SDL_EventQ.count;
 
+    if (SDL_EventQ.count > SDL_EventQ.max_events_seen) {
+        SDL_EventQ.max_events_seen = SDL_EventQ.count;
+    }
+
     return 1;
 }
 
@@ -315,7 +315,6 @@ SDL_PeepEvents(SDL_Event * events, int numevents, SDL_eventaction action,
                            For now we'll guarantee it's valid at least until
                            the next call to SDL_PeepEvents()
                          */
-                        SDL_SysWMEntry *wmmsg;
                         if (SDL_EventQ.wmmsg_free) {
                             wmmsg = SDL_EventQ.wmmsg_free;
                             SDL_EventQ.wmmsg_free = wmmsg->next;
@@ -403,10 +402,12 @@ SDL_PumpEvents(void)
     }
 #if !SDL_JOYSTICK_DISABLED
     /* Check for joystick state change */
-    if (SDL_ShouldPollJoystick()) {
+    if ((!SDL_disabled_events[SDL_JOYAXISMOTION >> 8] || SDL_JoystickEventState(SDL_QUERY))) {
         SDL_JoystickUpdate();
     }
 #endif
+
+    SDL_SendPendingQuit();  /* in case we had a signal handler fire, etc. */
 }
 
 /* Public functions */
@@ -550,7 +551,7 @@ SDL_DelEventWatch(SDL_EventFilter filter, void *userdata)
 void
 SDL_FilterEvents(SDL_EventFilter filter, void *userdata)
 {
-    if (SDL_LockMutex(SDL_EventQ.lock) == 0) {
+    if (SDL_EventQ.lock && SDL_LockMutex(SDL_EventQ.lock) == 0) {
         SDL_EventEntry *entry, *next;
         for (entry = SDL_EventQ.head; entry; entry = next) {
             next = entry->next;
@@ -646,6 +647,12 @@ SDL_SendSysWMEvent(SDL_SysWMmsg * message)
     }
     /* Update internal event state */
     return (posted);
+}
+
+int
+SDL_SendKeymapChangedEvent(void)
+{
+    return SDL_SendAppEvent(SDL_KEYMAPCHANGED);
 }
 
 /* vi: set ts=4 sw=4 expandtab: */

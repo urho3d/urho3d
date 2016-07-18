@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Scene/ValueAnimation.h>
 #include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Sprite.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
 
@@ -65,6 +66,9 @@ void LightAnimation::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void LightAnimation::CreateScene()
@@ -119,6 +123,17 @@ void LightAnimation::CreateScene()
     textAnimation->SetKeyFrame(3.0f, "GREEN");
     textAnimation->SetKeyFrame(4.0f, "WHITE");
     GetSubsystem<UI>()->GetRoot()->GetChild(String("animatingText"))->SetAttributeAnimation("Text", textAnimation);
+
+    // Create UI element animation
+    // (note: a spritesheet and "Image Rect" attribute should be used in real use cases for better performance)
+    SharedPtr<ValueAnimation> spriteAnimation(new ValueAnimation(context_));
+    spriteAnimation->SetKeyFrame(0.0f, ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png"));
+    spriteAnimation->SetKeyFrame(0.1f, ResourceRef("Texture2D", "Urho2D/GoldIcon/2.png"));
+    spriteAnimation->SetKeyFrame(0.2f, ResourceRef("Texture2D", "Urho2D/GoldIcon/3.png"));
+    spriteAnimation->SetKeyFrame(0.3f, ResourceRef("Texture2D", "Urho2D/GoldIcon/4.png"));
+    spriteAnimation->SetKeyFrame(0.4f, ResourceRef("Texture2D", "Urho2D/GoldIcon/5.png"));
+    spriteAnimation->SetKeyFrame(0.5f, ResourceRef("Texture2D", "Urho2D/GoldIcon/1.png"));
+    GetSubsystem<UI>()->GetRoot()->GetChild(String("animatingSprite"))->SetAttributeAnimation("Texture", spriteAnimation);
 
     // Create light color animation
     SharedPtr<ValueAnimation> colorAnimation(new ValueAnimation(context_));
@@ -182,6 +197,11 @@ void LightAnimation::CreateInstructions()
     text->SetHorizontalAlignment(HA_CENTER);
     text->SetVerticalAlignment(VA_CENTER);
     text->SetPosition(0, ui->GetRoot()->GetHeight() / 4 + 20);
+
+    // Animating sprite in the top left corner
+    Sprite* sprite = ui->GetRoot()->CreateChild<Sprite>("animatingSprite");
+    sprite->SetPosition(8, 8);
+    sprite->SetSize(64, 64);
 }
 
 void LightAnimation::SetupViewport()
@@ -219,13 +239,13 @@ void LightAnimation::MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the Translate() function (default local space) to move relative to the node's orientation.
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 

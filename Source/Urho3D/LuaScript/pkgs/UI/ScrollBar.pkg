@@ -1,6 +1,6 @@
 $#include "UI/ScrollBar.h"
 
-class ScrollBar : public UIElement
+class ScrollBar : public BorderImage
 {
     ScrollBar();
     virtual ~ScrollBar();

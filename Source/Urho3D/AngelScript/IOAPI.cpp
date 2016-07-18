@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "../AngelScript/APITemplates.h"
 #include "../IO/Compression.h"
 #include "../IO/FileSystem.h"
+#include "../IO/NamedPipe.h"
 #include "../IO/PackageFile.h"
 
 namespace Urho3D
@@ -109,18 +110,18 @@ static void LogError(const String& str, Log* ptr)
 
 #else
 
-static void Print(const String& value, bool error) {}
-static void Print(int value, bool error) {}
-static void Print(unsigned value, bool error) {}
-static void Print(float value, bool error) {}
-static void Print(bool value, bool error) {}
-static void Print(const Variant& value, bool error) {}
-static void PrintCallStack(bool error) {}
-static void LogWrite(const String& str, bool error, Log* ptr) {}
-static void LogDebug(const String& str, Log* ptr) {}
-static void LogInfo(const String& str, Log* ptr) {}
-static void LogWarning(const String& str, Log* ptr) {}
-static void LogError(const String& str, Log* ptr) {}
+static void Print(const String& value, bool error) { }
+static void Print(int value, bool error) { }
+static void Print(unsigned value, bool error) { }
+static void Print(float value, bool error) { }
+static void Print(bool value, bool error) { }
+static void Print(const Variant& value, bool error) { }
+static void PrintCallStack(bool error) { }
+static void LogWrite(const String& str, bool error, Log* ptr) { }
+static void LogDebug(const String& str, Log* ptr) { }
+static void LogInfo(const String& str, Log* ptr) { }
+static void LogWarning(const String& str, Log* ptr) { }
+static void LogError(const String& str, Log* ptr) { }
 
 #endif
 
@@ -167,6 +168,16 @@ static File* ConstructFile()
 static File* ConstructFileAndOpen(const String& fileName, FileMode mode)
 {
     return new File(GetScriptContext(), fileName, mode);
+}
+
+static NamedPipe* ConstructNamedPipe()
+{
+    return new NamedPipe(GetScriptContext());
+}
+
+static NamedPipe* ConstructNamedPipeAndOpen(const String& fileName, bool isServer)
+{
+    return new NamedPipe(GetScriptContext(), fileName, isServer);
 }
 
 static void ConstructVectorBuffer(VectorBuffer* ptr)
@@ -291,6 +302,16 @@ static void RegisterSerialization(asIScriptEngine* engine)
     RegisterSerializer<File>(engine, "File");
     RegisterDeserializer<File>(engine, "File");
 
+    RegisterObject<NamedPipe>(engine, "NamedPipe");
+    engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f()", asFUNCTION(ConstructNamedPipe), asCALL_CDECL);
+    engine->RegisterObjectBehaviour("NamedPipe", asBEHAVE_FACTORY, "NamedPipe@+ f(const String&in, bool)", asFUNCTION(ConstructNamedPipeAndOpen), asCALL_CDECL);
+    engine->RegisterObjectMethod("NamedPipe", "bool Open(const String&in, bool)", asMETHODPR(NamedPipe, Open, (const String&, bool), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "void Close()", asMETHOD(NamedPipe, Close), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "bool get_server() const", asMETHOD(NamedPipe, IsServer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("NamedPipe", "bool get_open() const", asMETHOD(NamedPipe, IsOpen), asCALL_THISCALL);
+    RegisterSerializer<File>(engine, "NamedPipe");
+    RegisterDeserializer<File>(engine, "NamedPipe");
+
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVectorBufferCopy), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VectorBuffer", asBEHAVE_CONSTRUCT, "void f(Deserializer@+, uint)", asFUNCTION(ConstructVectorBufferFromStream), asCALL_CDECL_OBJLAST);
@@ -308,7 +329,7 @@ static void RegisterSerialization(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("Variant", asBEHAVE_CONSTRUCT, "void f(const VectorBuffer&in)", asFUNCTION(ConstructVariantVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Variant", "Variant& opAssign(const VectorBuffer&in)", asMETHODPR(Variant, operator =, (const VectorBuffer&), Variant&), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "bool opEquals(const VectorBuffer&in) const", asMETHODPR(Variant, operator ==, (const VectorBuffer&) const, bool), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Variant", "const VectorBuffer GetBuffer() const", asMETHOD(Variant, GetVectorBuffer), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Variant", "VectorBuffer GetBuffer() const", asMETHOD(Variant, GetVectorBuffer), asCALL_THISCALL);
 
     // Register VectorBuffer compression functions
     engine->RegisterGlobalFunction("VectorBuffer CompressVectorBuffer(VectorBuffer&in)", asFUNCTION(CompressVectorBuffer), asCALL_CDECL);
@@ -378,6 +399,7 @@ static void RegisterPackageFile(asIScriptEngine* engine)
     engine->RegisterObjectMethod("PackageFile", "const String& get_name() const", asMETHOD(PackageFile, GetName), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_numFiles() const", asMETHOD(PackageFile, GetNumFiles), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_totalSize() const", asMETHOD(PackageFile, GetTotalSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("PackageFile", "uint get_totalDataSize() const", asMETHOD(PackageFile, GetTotalDataSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "uint get_checksum() const", asMETHOD(PackageFile, GetChecksum), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "bool compressed() const", asMETHOD(PackageFile, IsCompressed), asCALL_THISCALL);
     engine->RegisterObjectMethod("PackageFile", "Array<String>@ GetEntryNames() const", asFUNCTION(PackageFileGetEntryNames), asCALL_CDECL_OBJLAST);

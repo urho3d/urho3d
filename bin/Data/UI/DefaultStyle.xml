@@ -297,7 +297,7 @@
         <attribute name="Max Size" value="2147483647 11" />
     </element>
     <element type="EditorVerticalDivider" style="BorderImage" auto="false">
-        <attribute name="Image Rect" value="144 64 155 80" />
+        <attribute name="Image Rect" value="144 48 155 64" />
         <attribute name="Border" value="4 4 4 4" />
         <attribute name="Min Size" value="11 0" />
         <attribute name="Max Size" value="11 2147483647" />
@@ -356,7 +356,7 @@
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Border" value="6 2 6 2" />
         <attribute name="Image Rect" value="48 0 64 16" />
-        <attribute name="Border" value="6 2 2 2" />
+        <attribute name="Border" value="4 4 4 4" />
     </element>
     <element type="ToolTipText" style="Text">
         <attribute name="Font" value="Font;Fonts/Anonymous Pro.ttf" />

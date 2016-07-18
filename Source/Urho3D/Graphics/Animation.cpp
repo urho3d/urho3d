@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -362,6 +362,20 @@ void Animation::RemoveAllTriggers()
 void Animation::SetNumTriggers(unsigned num)
 {
     triggers_.Resize(num);
+}
+
+SharedPtr<Animation> Animation::Clone(const String& cloneName) const
+{
+    SharedPtr<Animation> ret(new Animation(context_));
+
+    ret->SetName(cloneName);
+    ret->SetAnimationName(animationName_);
+    ret->length_ = length_;
+    ret->tracks_ = tracks_;
+    ret->triggers_ = triggers_;
+    ret->SetMemoryUse(GetMemoryUse());
+    
+    return ret;
 }
 
 AnimationTrack* Animation::GetTrack(const String& name)

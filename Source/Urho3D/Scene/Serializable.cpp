@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -548,12 +548,6 @@ bool Serializable::SaveXML(XMLElement& dest) const
 
 bool Serializable::SaveJSON(JSONValue& dest) const
 {
-    if (dest.IsNull())
-    {
-        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination JSON value");
-        return false;
-    }
-
     const Vector<AttributeInfo>* attributes = GetAttributes();
     if (!attributes)
         return true;

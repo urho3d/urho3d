@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ struct AnimationKeyFrame
 };
 
 /// Skeletal animation track, stores keyframes of a single bone.
-struct AnimationTrack
+struct URHO3D_API AnimationTrack
 {
     /// Construct.
     AnimationTrack() :
@@ -69,7 +69,7 @@ struct AnimationTrack
     void RemoveKeyFrame(unsigned index);
     /// Remove all keyframes.
     void RemoveAllKeyFrames();
-    
+
     /// Return keyframe at index, or null if not found.
     AnimationKeyFrame* GetKeyFrame(unsigned index);
     /// Return number of keyframes.
@@ -134,8 +134,6 @@ public:
     bool RemoveTrack(const String& name);
     /// Remove all tracks. This is unsafe if the animation is currently used in playback.
     void RemoveAllTracks();
-    /// Set all animation tracks.
-    void SetTracks(const HashMap<StringHash, AnimationTrack>& tracks);
     /// Set a trigger point at index.
     void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger);
     /// Add a trigger point.
@@ -148,6 +146,8 @@ public:
     void RemoveAllTriggers();
     /// Resize trigger point vector.
     void SetNumTriggers(unsigned num);
+    /// Clone the animation.
+    SharedPtr<Animation> Clone(const String& cloneName = String::EMPTY) const;
 
     /// Return animation name.
     const String& GetAnimationName() const { return animationName_; }

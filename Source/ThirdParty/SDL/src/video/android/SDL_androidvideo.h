@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@
 #include "../SDL_sysvideo.h"
 
 /* Called by the JNI layer when the screen changes size or format */
-extern void Android_SetScreenResolution(int width, int height, Uint32 format);
+extern void Android_SetScreenResolution(int width, int height, Uint32 format, float rate);
 
 /* Private display data */
 

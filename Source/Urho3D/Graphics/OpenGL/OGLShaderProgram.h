@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,30 +26,13 @@
 #include "../../Container/RefCounted.h"
 #include "../../Graphics/GPUObject.h"
 #include "../../Graphics/GraphicsDefs.h"
+#include "../../Graphics/ShaderVariation.h"
 
 namespace Urho3D
 {
 
 class ConstantBuffer;
 class Graphics;
-class ShaderVariation;
-
-/// %Shader parameter definition.
-struct ShaderParameter
-{
-    /// Construct with defaults.
-    ShaderParameter() :
-        bufferPtr_(0)
-    {
-    }
-
-    /// Uniform location or byte offset in constant buffer.
-    int location_;
-    /// Element type.
-    unsigned type_;
-    /// Constant buffer pointer.
-    ConstantBuffer* bufferPtr_;
-};
 
 /// Linked shader program on the GPU.
 class URHO3D_API ShaderProgram : public RefCounted, public GPUObject
@@ -84,6 +67,12 @@ public:
     /// Return linker output.
     const String& GetLinkerOutput() const { return linkerOutput_; }
 
+    /// Return semantic to vertex attributes location mappings used by the shader.
+    const HashMap<Pair<unsigned char, unsigned char>, unsigned>& GetVertexAttributes() const { return vertexAttributes_; }
+
+    /// Return attribute location use bitmask.
+    unsigned GetUsedVertexAttributes() const { return usedVertexAttributes_; }
+
     /// Return all constant buffers.
     const SharedPtr<ConstantBuffer>* GetConstantBuffers() const { return &constantBuffers_[0]; }
 
@@ -106,6 +95,10 @@ private:
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
     bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    /// Vertex attributes.
+    HashMap<Pair<unsigned char, unsigned char>, unsigned> vertexAttributes_;
+    /// Used vertex attribute location bitmask.
+    unsigned usedVertexAttributes_;
     /// Constant buffers by binding index.
     SharedPtr<ConstantBuffer> constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
     /// Remembered shader parameter sources for individual uniform mode.

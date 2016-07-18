@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,15 @@
 # Define target name
 set (TARGET_NAME AngelScript)
 
+# Add compiler define to build the library with the normal function/method macros
+add_definitions (-DAS_IS_BUILDING)
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
-if (IOS OR ANDROID OR RPI)
+if (ARM)
     enable_language (ASM)
-    if (IOS)
+    if (XCODE)
+        # It is safe to add this assembler code in universal binary build because it has sufficient preprocessor define guards to exclude unsupported archs
         set (ASM_FILES source/as_callfunc_arm_xcode.S)
     else ()
         set (ASM_FILES source/as_callfunc_arm_gcc.S)

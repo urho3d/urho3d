@@ -34,6 +34,9 @@ void Start()
     // Show OS mouse cursor
     input.mouseVisible = true;
 
+    // Set the mouse mode to use in the sample
+    SampleInitMouseMode(MM_FREE);
+
     // Open the operating system console window (for stdin / stdout) if not open yet
     // Do not open in fullscreen, as this would cause constant device loss
     if (!graphics.fullscreen)
@@ -91,7 +94,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 void HandleEscKeyDown(StringHash eventType, VariantMap& eventData)
 {
     // Unlike the other samples, exiting the engine when ESC is pressed instead of just closing the console
-    if (eventData["Key"].GetInt() == KEY_ESC)
+    if (eventData["Key"].GetInt() == KEY_ESCAPE)
         engine.Exit();
 }
 

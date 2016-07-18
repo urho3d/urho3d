@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
     URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
     URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
     URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 /// Physics end contact.
@@ -49,6 +50,7 @@ URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
     URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
     URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
     URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,6 +80,13 @@ void TileMap2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         break;
 
     case O_STAGGERED:
+        debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
+        debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
+        debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);
+        debug->AddLine(Vector2(0.0f, mapH), Vector2(0.0f, 0.0f), color);
+        break;
+
+    case O_HEXAGONAL:
         debug->AddLine(Vector2(0.0f, 0.0f), Vector2(mapW, 0.0f), color);
         debug->AddLine(Vector2(mapW, 0.0f), Vector2(mapW, mapH), color);
         debug->AddLine(Vector2(mapW, mapH), Vector2(0.0f, mapH), color);

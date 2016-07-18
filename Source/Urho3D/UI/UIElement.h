@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -146,14 +146,14 @@ public:
     virtual void OnHover(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse click end.
     virtual void OnClickEnd
         (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor,
-            UIElement* beginElement);
+            UIElement* beginElement) { }
     /// React to double mouse click.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) { }
     /// React to mouse drag begin.
     virtual void
         OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
@@ -172,11 +172,11 @@ public:
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
     virtual bool OnDragDropFinish(UIElement* source);
     /// React to mouse wheel.
-    virtual void OnWheel(int delta, int buttons, int qualifiers);
+    virtual void OnWheel(int delta, int buttons, int qualifiers) { }
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) { }
     /// React to text input event.
-    virtual void OnTextInput(const String& text, int buttons, int qualifiers);
+    virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
 
     /// React to resize.
     virtual void OnResize() { }
@@ -189,6 +189,11 @@ public:
 
     /// React to indent change.
     virtual void OnIndentSet() { }
+
+    /// Convert screen coordinates to element coordinates.
+    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    /// Convert element coordinates to screen coordinates.
+    virtual IntVector2 ElementToScreen(const IntVector2& position);
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);
@@ -353,6 +358,18 @@ public:
 
     /// Template version of creating a child element.
     template <class T> T* CreateChild(const String& name = String::EMPTY, unsigned index = M_MAX_UNSIGNED);
+    /// Template version of returning child element by index using static cast.
+    template <class T> T* GetChildStaticCast(unsigned index) const;
+    /// Template version of returning child element by name using static cast.
+    template <class T> T* GetChildStaticCast(const String& name, bool recursive = false) const;
+    /// Template version of returning child element by variable using static cast. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against.
+    template <class T> T* GetChildStaticCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
+    /// Template version of returning child element by index using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(unsigned index) const;
+    /// Template version of returning child element by name using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(const String& name, bool recursive = false) const;
+    /// Template version of returning child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against using dynamic cast. May return 0 when casting failed.
+    template <class T> T* GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
     /// Return name.
     const String& GetName() const { return name_; }
@@ -452,7 +469,7 @@ public:
 
     /// Return whether element itself should be visible. Elements can be also hidden due to the parent being not visible, use IsVisibleEffective() to check.
     bool IsVisible() const { return visible_; }
-    
+
     /// Return whether element is effectively visible (parent element chain is visible.)
     bool IsVisibleEffective() const;
 
@@ -531,10 +548,6 @@ public:
     /// Return the number of buttons dragging this element.
     unsigned GetDragButtonCount() const { return dragButtonCount_; }
 
-    /// Convert screen coordinates to element coordinates.
-    IntVector2 ScreenToElement(const IntVector2& screenPosition);
-    /// Convert element coordinates to screen coordinates.
-    IntVector2 ElementToScreen(const IntVector2& position);
     /// Return whether a point (either in element or screen coordinates) is inside the element.
     bool IsInside(IntVector2 position, bool isScreen);
     /// Return whether a point (either in element or screen coordinates) is inside the combined rect of the element and its children.
@@ -579,7 +592,7 @@ public:
 
     /// Return effective minimum size, also considering layout. Used internally.
     IntVector2 GetEffectiveMinSize() const;
-    
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded();
@@ -738,6 +751,36 @@ private:
 template <class T> T* UIElement::CreateChild(const String& name, unsigned index)
 {
     return static_cast<T*>(CreateChild(T::GetTypeStatic(), name, index));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(unsigned index) const
+{
+    return static_cast<T*>(GetChild(index));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(const String& name, bool recursive) const
+{
+    return static_cast<T*>(GetChild(name, recursive));
+}
+
+template <class T> T* UIElement::GetChildStaticCast(const StringHash& key, const Variant& value, bool recursive) const
+{
+    return static_cast<T*>(GetChild(key, value, recursive));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(unsigned index) const
+{
+    return dynamic_cast<T*>(GetChild(index));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(const String& name, bool recursive) const
+{
+    return dynamic_cast<T*>(GetChild(name, recursive));
+}
+
+template <class T> T* UIElement::GetChildDynamicCast(const StringHash& key, const Variant& value, bool recursive) const
+{
+    return dynamic_cast<T*>(GetChild(key, value, recursive));
 }
 
 }

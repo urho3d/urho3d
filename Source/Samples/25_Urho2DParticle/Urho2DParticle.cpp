@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ void Urho2DParticle::Start()
     // Execute base class startup
     Sample::Start();
 
-    // Set mouse visibile
+    // Set mouse visible
     Input* input = GetSubsystem<Input>();
     input->SetMouseVisible(true);
 
@@ -66,6 +66,9 @@ void Urho2DParticle::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+    
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DParticle::CreateScene()

@@ -14,14 +14,14 @@ class Text3D : public Drawable
 {
     Text3D();
     ~Text3D();
-    
+
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    
+
     void SetMaterial(Material* material);
-    
+
     void SetText(const String text);
-    
+
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     void SetHorizontalAlignment(HorizontalAlignment align);
     void SetVerticalAlignment(VerticalAlignment align);
@@ -29,14 +29,18 @@ class Text3D : public Drawable
     void SetRowSpacing(float spacing);
     void SetWordwrap(bool enable);
     void SetTextEffect(TextEffect textEffect);
+    void SetEffectShadowOffset(const IntVector2& offset);
+    void SetEffectStrokeThickness(int thickness);
+    void SetEffectRoundStroke(bool roundStroke);
     void SetEffectColor(const Color& effectColor);
     void SetEffectDepthBias(float bias);
     void SetWidth(int width);
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
     void SetOpacity(float opacity);
+    void SetFixedScreenSize(bool enable);
     void SetFaceCameraMode(FaceCameraMode mode);
-    
+
     Font* GetFont() const;
     Material* GetMaterial() const;
     int GetFontSize() const;
@@ -47,6 +51,9 @@ class Text3D : public Drawable
     float GetRowSpacing() const;
     bool GetWordwrap() const;
     TextEffect GetTextEffect() const;
+    const IntVector2& GetEffectShadowOffset() const;
+    int GetEffectStrokeThickness() const;
+    bool GetEffectRoundStroke() const;
     const Color& GetEffectColor() const;
     float GetEffectDepthBias() const;
     int GetWidth() const;
@@ -58,8 +65,9 @@ class Text3D : public Drawable
     IntVector2 GetCharSize(unsigned index);
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
+    bool IsFixedScreenSize() const;
     FaceCameraMode GetFaceCameraMode() const;
-    
+
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
     tolua_readonly tolua_property__get_set int fontSize;
@@ -70,6 +78,9 @@ class Text3D : public Drawable
     tolua_property__get_set float rowSpacing;
     tolua_property__get_set bool wordwrap;
     tolua_property__get_set TextEffect textEffect;
+    tolua_property__get_set IntVector2& effectShadowOffset;
+    tolua_property__get_set int effectStrokeThickness;
+    tolua_property__get_set bool effectRoundStroke;
     tolua_property__get_set Color& effectColor;
     tolua_property__get_set float effectDepthBias;
     tolua_property__get_set int width;
@@ -78,6 +89,7 @@ class Text3D : public Drawable
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;
+    tolua_property__is_set bool fixedScreenSize;
     tolua_property__get_set FaceCameraMode faceCameraMode;
 };
 

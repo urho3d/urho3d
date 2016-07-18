@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,11 @@ define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_P
 # Define dependency libs
 if (READLINE_FOUND)
     add_definitions (-DLUA_USE_READLINE)
-    list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+    # FIXME: temporary quick fix
+    if (SYSROOT)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
+    endif ()
+    list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
     list (APPEND LIBS ${READLINE_LIBRARIES})
 endif ()
 

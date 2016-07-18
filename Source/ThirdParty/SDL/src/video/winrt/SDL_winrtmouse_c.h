@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -35,6 +35,6 @@ extern SDL_bool WINRT_UsingRelativeMouseMode;
 }
 #endif
 
-#endif /* _SDL_windowsmouse_h */
+#endif /* _SDL_winrtmouse_h */
 
 /* vi: set ts=4 sw=4 expandtab: */

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,9 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
+    if (EMSCRIPTEN OR (ARM AND NATIVE_64BIT))
+        add_subdirectory (ThirdParty/boost)
+    endif ()
 endif ()
 
 if (URHO3D_LUA)
@@ -98,13 +101,15 @@ if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
-if (NOT IOS AND NOT ANDROID AND NOT RPI AND NOT WEB)
+if (NOT ANDROID AND NOT ARM AND NOT WEB)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
     elseif (NOT URHO3D_D3D11)
         add_subdirectory (ThirdParty/MojoShader)
     endif ()
-    add_subdirectory (ThirdParty/LibCpuId)
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL Linux)
+        add_subdirectory (ThirdParty/LibCpuId)
+    endif ()
 endif ()
 
 # Urho3D game engine library

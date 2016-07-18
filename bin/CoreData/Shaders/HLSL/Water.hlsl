@@ -36,6 +36,9 @@ cbuffer CustomPS : register(b6)
 void VS(float4 iPos : POSITION,
     float3 iNormal: NORMAL,
     float2 iTexCoord : TEXCOORD0,
+    #ifdef INSTANCED
+        float4x3 iModelInstance : TEXCOORD4,
+    #endif
     out float4 oScreenPos : TEXCOORD0,
     out float2 oReflectUV : TEXCOORD1,
     out float2 oWaterUV : TEXCOORD2,

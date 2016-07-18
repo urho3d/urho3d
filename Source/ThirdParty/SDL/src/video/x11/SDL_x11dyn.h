@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,6 +50,9 @@
 #if SDL_VIDEO_DRIVER_X11_XCURSOR
 #include <X11/Xcursor/Xcursor.h>
 #endif
+#if SDL_VIDEO_DRIVER_X11_XDBE
+#include <X11/extensions/Xdbe.h>
+#endif
 #if SDL_VIDEO_DRIVER_X11_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -83,13 +86,10 @@ int SDL_X11_LoadSymbols(void);
 void SDL_X11_UnloadSymbols(void);
 
 /* Declare all the function pointers and wrappers... */
-#define SDL_X11_MODULE(modname)
 #define SDL_X11_SYM(rc,fn,params,args,ret) \
     typedef rc (*SDL_DYNX11FN_##fn) params; \
     extern SDL_DYNX11FN_##fn X11_##fn;
 #include "SDL_x11sym.h"
-#undef SDL_X11_MODULE
-#undef SDL_X11_SYM
 
 /* Annoying varargs entry point... */
 #ifdef X_HAVE_UTF8_STRING
@@ -101,10 +101,7 @@ extern SDL_DYNX11FN_XGetICValues X11_XGetICValues;
 
 /* These SDL_X11_HAVE_* flags are here whether you have dynamic X11 or not. */
 #define SDL_X11_MODULE(modname) extern int SDL_X11_HAVE_##modname;
-#define SDL_X11_SYM(rc,fn,params,args,ret)
 #include "SDL_x11sym.h"
-#undef SDL_X11_MODULE
-#undef SDL_X11_SYM
 
 #ifdef __cplusplus
 }

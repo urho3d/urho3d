@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,69 +43,6 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
 {
 }
 
-RenderSurface::~RenderSurface()
-{
-    Release();
-}
-
-void RenderSurface::SetNumViewports(unsigned num)
-{
-    viewports_.Resize(num);
-}
-
-void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
-{
-    if (index >= viewports_.Size())
-        viewports_.Resize(index + 1);
-
-    viewports_[index] = viewport;
-}
-
-void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode)
-{
-    updateMode_ = mode;
-}
-
-void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
-{
-    if (renderTarget != this)
-        linkedRenderTarget_ = renderTarget;
-}
-
-void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
-{
-    if (depthStencil != this)
-        linkedDepthStencil_ = depthStencil;
-}
-
-void RenderSurface::QueueUpdate()
-{
-    if (!updateQueued_)
-    {
-        bool hasValidView = false;
-
-        // Verify that there is at least 1 non-null viewport, as otherwise Renderer will not accept the surface and the update flag
-        // will be left on
-        for (unsigned i = 0; i < viewports_.Size(); ++i)
-        {
-            if (viewports_[i])
-            {
-                hasValidView = true;
-                break;
-            }
-        }
-
-        if (hasValidView)
-        {
-            Renderer* renderer = parentTexture_->GetSubsystem<Renderer>();
-            if (renderer)
-                renderer->QueueRenderSurface(this);
-
-            updateQueued_ = true;
-        }
-    }
-}
-
 void RenderSurface::Release()
 {
     Graphics* graphics = parentTexture_->GetGraphics();
@@ -125,29 +62,15 @@ void RenderSurface::Release()
     URHO3D_SAFE_RELEASE(readOnlyView_);
 }
 
-int RenderSurface::GetWidth() const
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
 {
-    return parentTexture_->GetWidth();
+    // Not used on Direct3D
+    return false;
 }
 
-int RenderSurface::GetHeight() const
+void RenderSurface::OnDeviceLost()
 {
-    return parentTexture_->GetHeight();
-}
-
-TextureUsage RenderSurface::GetUsage() const
-{
-    return parentTexture_->GetUsage();
-}
-
-Viewport* RenderSurface::GetViewport(unsigned index) const
-{
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
-}
-
-void RenderSurface::WasUpdated()
-{
-    updateQueued_ = false;
+    // No-op on Direct3D
 }
 
 }

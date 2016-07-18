@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -337,6 +337,7 @@ void ParticleEmitter::ApplyEffect()
     SetRelative(effect_->IsRelative());
     SetScaled(effect_->IsScaled());
     SetSorted(effect_->IsSorted());
+    SetFixedScreenSize(effect_->IsFixedScreenSize());
     SetAnimationLodBias(effect_->GetAnimationLodBias());
     SetFaceCameraMode(effect_->GetFaceCameraMode());
 }
@@ -485,7 +486,7 @@ bool ParticleEmitter::EmitNewParticle()
     particle.colorIndex_ = 0;
     particle.texIndex_ = 0;
 
-    if(faceCameraMode_ == FC_DIRECTION)
+    if (faceCameraMode_ == FC_DIRECTION)
     {
         startPos += startDir * particle.size_.y_;
     }

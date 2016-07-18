@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@ namespace Urho3D
 extern const char* GEOMETRY_CATEGORY;
 
 static const Vector3 DEFAULT_SPACING(1.0f, 0.25f, 1.0f);
+static const unsigned MIN_LOD_LEVELS = 1;
 static const unsigned MAX_LOD_LEVELS = 4;
 static const int DEFAULT_PATCH_SIZE = 32;
 static const int MIN_PATCH_SIZE = 4;
@@ -193,7 +194,7 @@ void Terrain::SetSpacing(const Vector3& spacing)
 
 void Terrain::SetMaxLodLevels(unsigned levels)
 {
-    levels = Clamp((int)levels, 1, MAX_LOD_LEVELS);
+    levels = Clamp(levels, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     if (levels != maxLodLevels_)
     {
         maxLodLevels_ = levels;
@@ -481,12 +482,12 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
         return IntVector2::ZERO;
 
     Vector3 position = node_->GetWorldTransform().Inverse() * worldPosition;
-    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_);
-    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_);
-    Clamp(xPos, 0, numVertices_.x_);
-    Clamp(zPos, 0, numVertices_.y_);
+    int xPos = (int)((position.x_ - patchWorldOrigin_.x_) / spacing_.x_ + 0.5f);
+    int zPos = (int)((position.z_ - patchWorldOrigin_.y_) / spacing_.z_ + 0.5f);
+    xPos = Clamp(xPos, 0, numVertices_.x_ - 1);
+    zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
-    return IntVector2(xPos, numVertices_.y_ - zPos);
+    return IntVector2(xPos, numVertices_.y_ - 1 - zPos);
 }
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
@@ -589,13 +590,13 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 
         geometry->SetIndexBuffer(indexBuffer_);
         geometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        geometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        geometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         maxLodGeometry->SetIndexBuffer(indexBuffer_);
         maxLodGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[0].first_, drawRanges_[0].second_, false);
-        maxLodGeometry->SetRawVertexData(cpuVertexData, sizeof(Vector3), MASK_POSITION);
+        maxLodGeometry->SetRawVertexData(cpuVertexData, MASK_POSITION);
         occlusionGeometry->SetIndexBuffer(indexBuffer_);
         occlusionGeometry->SetDrawRange(TRIANGLE_LIST, drawRanges_[occlusionDrawRange].first_, drawRanges_[occlusionDrawRange].second_, false);
-        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, sizeof(Vector3), MASK_POSITION);
+        occlusionGeometry->SetRawVertexData(occlusionCpuVertexData, MASK_POSITION);
     }
 
     patch->ResetLod();
@@ -656,7 +657,7 @@ void Terrain::SetPatchSizeAttr(int value)
 
 void Terrain::SetMaxLodLevelsAttr(unsigned value)
 {
-    value = Clamp((int)value, 1, MAX_LOD_LEVELS);
+    value = Clamp(value, MIN_LOD_LEVELS, MAX_LOD_LEVELS);
     
     if (value != maxLodLevels_)
     {
@@ -1095,7 +1096,7 @@ void Terrain::CreateIndexData()
                     indices.Push((unsigned short)((z + 2 * skip) * row + x));
                     indices.Push((unsigned short)((z + skip) * row + x + skip));
                     indices.Push((unsigned short)(z * row + x));
-                    if (x < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
+                    if (z < patchSize_ - skip * 2 || (j & STITCH_NORTH) == 0)
                     {
                         indices.Push((unsigned short)((z + 2 * skip) * row + x));
                         indices.Push((unsigned short)((z + 2 * skip) * row + x + skip));

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,7 @@ Geometry::Geometry(Context* context) :
     indexCount_(0),
     vertexStart_(0),
     vertexCount_(0),
-    positionBufferIndex_(M_MAX_UNSIGNED),
     rawVertexSize_(0),
-    rawElementMask_(0),
     rawIndexSize_(0),
     lodDistance_(0.0f)
 {
@@ -64,16 +62,11 @@ bool Geometry::SetNumVertexBuffers(unsigned num)
 
     unsigned oldSize = vertexBuffers_.Size();
     vertexBuffers_.Resize(num);
-    elementMasks_.Resize(num);
 
-    for (unsigned i = oldSize; i < num; ++i)
-        elementMasks_[i] = MASK_NONE;
-
-    GetPositionBufferIndex();
     return true;
 }
 
-bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned elementMask)
+bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer)
 {
     if (index >= vertexBuffers_.Size())
     {
@@ -82,16 +75,6 @@ bool Geometry::SetVertexBuffer(unsigned index, VertexBuffer* buffer, unsigned el
     }
 
     vertexBuffers_[index] = buffer;
-
-    if (buffer)
-    {
-        if (elementMask == MASK_DEFAULT)
-            elementMasks_[index] = buffer->GetElementMask();
-        else
-            elementMasks_[index] = elementMask;
-    }
-
-    GetPositionBufferIndex();
     return true;
 }
 
@@ -172,11 +155,18 @@ void Geometry::SetLodDistance(float distance)
     lodDistance_ = distance;
 }
 
-void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned vertexSize, unsigned elementMask)
+void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, const PODVector<VertexElement>& elements)
 {
     rawVertexData_ = data;
-    rawVertexSize_ = vertexSize;
-    rawElementMask_ = elementMask;
+    rawVertexSize_ = VertexBuffer::GetVertexSize(elements);
+    rawElements_ = elements;
+}
+
+void Geometry::SetRawVertexData(SharedArrayPtr<unsigned char> data, unsigned elementMask)
+{
+    rawVertexData_ = data;
+    rawVertexSize_ = VertexBuffer::GetVertexSize(elementMask);
+    rawElements_ = VertexBuffer::GetElements(elementMask);
 }
 
 void Geometry::SetRawIndexData(SharedArrayPtr<unsigned char> data, unsigned indexSize)
@@ -190,12 +180,12 @@ void Geometry::Draw(Graphics* graphics)
     if (indexBuffer_ && indexCount_ > 0)
     {
         graphics->SetIndexBuffer(indexBuffer_);
-        graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
+        graphics->SetVertexBuffers(vertexBuffers_);
         graphics->Draw(primitiveType_, indexStart_, indexCount_, vertexStart_, vertexCount_);
     }
     else if (vertexCount_ > 0)
     {
-        graphics->SetVertexBuffers(vertexBuffers_, elementMasks_);
+        graphics->SetVertexBuffers(vertexBuffers_);
         graphics->Draw(primitiveType_, vertexStart_, vertexCount_);
     }
 }
@@ -203,11 +193,6 @@ void Geometry::Draw(Graphics* graphics)
 VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
 {
     return index < vertexBuffers_.Size() ? vertexBuffers_[index] : (VertexBuffer*)0;
-}
-
-unsigned Geometry::GetVertexElementMask(unsigned index) const
-{
-    return index < elementMasks_.Size() ? elementMasks_[index] : 0;
 }
 
 unsigned short Geometry::GetBufferHash() const
@@ -227,36 +212,25 @@ unsigned short Geometry::GetBufferHash() const
 }
 
 void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize, const unsigned char*& indexData,
-    unsigned& indexSize, unsigned& elementMask) const
+    unsigned& indexSize, const PODVector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
         vertexData = rawVertexData_;
         vertexSize = rawVertexSize_;
-        elementMask = rawElementMask_;
+        elements = &rawElements_;
+    }
+    else if (vertexBuffers_.Size() && vertexBuffers_[0])
+    {
+        vertexData = vertexBuffers_[0]->GetShadowData();
+        vertexSize = vertexBuffers_[0]->GetVertexSize();
+        elements = &vertexBuffers_[0]->GetElements();
     }
     else
     {
-        if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
-        {
-            vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowData();
-            if (vertexData)
-            {
-                vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
-                elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
-            }
-            else
-            {
-                vertexSize = 0;
-                elementMask = 0;
-            }
-        }
-        else
-        {
-            vertexData = 0;
-            vertexSize = 0;
-            elementMask = 0;
-        }
+        vertexData = 0;
+        vertexSize = 0;
+        elements = 0;
     }
 
     if (rawIndexData_)
@@ -283,36 +257,25 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
 }
 
 void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsigned& vertexSize,
-    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, unsigned& elementMask) const
+    SharedArrayPtr<unsigned char>& indexData, unsigned& indexSize, const PODVector<VertexElement>*& elements) const
 {
     if (rawVertexData_)
     {
         vertexData = rawVertexData_;
         vertexSize = rawVertexSize_;
-        elementMask = rawElementMask_;
+        elements = &rawElements_;
+    }
+    else if (vertexBuffers_.Size() && vertexBuffers_[0])
+    {
+        vertexData = vertexBuffers_[0]->GetShadowDataShared();
+        vertexSize = vertexBuffers_[0]->GetVertexSize();
+        elements = &vertexBuffers_[0]->GetElements();
     }
     else
     {
-        if (positionBufferIndex_ < vertexBuffers_.Size() && vertexBuffers_[positionBufferIndex_])
-        {
-            vertexData = vertexBuffers_[positionBufferIndex_]->GetShadowDataShared();
-            if (vertexData)
-            {
-                vertexSize = vertexBuffers_[positionBufferIndex_]->GetVertexSize();
-                elementMask = vertexBuffers_[positionBufferIndex_]->GetElementMask();
-            }
-            else
-            {
-                vertexSize = 0;
-                elementMask = 0;
-            }
-        }
-        else
-        {
-            vertexData = 0;
-            vertexSize = 0;
-            elementMask = 0;
-        }
+        vertexData = 0;
+        vertexSize = 0;
+        elements = 0;
     }
 
     if (rawIndexData_)
@@ -344,32 +307,25 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    unsigned elementMask;
-    unsigned uvOffset = 0;
+    const PODVector<VertexElement>* elements;
 
-    GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
+    
+    if (!vertexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
+        return M_INFINITY;
 
-    if (vertexData)
+    unsigned uvOffset = VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR2, SEM_TEXCOORD);
+    
+    if (outUV && uvOffset == M_MAX_UNSIGNED)
     {
-        if (outUV)
-        {
-            if ((elementMask & MASK_TEXCOORD1) == 0)
-            {
-                // requested UV output, but no texture data in vertex buffer
-                URHO3D_LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
-                *outUV = Vector2::ZERO;
-                outUV = 0;
-            }
-            else
-                uvOffset = VertexBuffer::GetElementOffset(elementMask, ELEMENT_TEXCOORD1);
-        }
-
-        return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV,
-            uvOffset) :
-               ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
+        // requested UV output, but no texture data in vertex buffer
+        URHO3D_LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
+        *outUV = Vector2::ZERO;
+        outUV = 0;
     }
 
-    return M_INFINITY;
+    return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV,
+        uvOffset) : ray.HitDistance(vertexData, vertexSize, vertexStart_, vertexCount_, outNormal, outUV, uvOffset);
 }
 
 bool Geometry::IsInside(const Ray& ray) const
@@ -378,27 +334,12 @@ bool Geometry::IsInside(const Ray& ray) const
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    unsigned elementMask;
+    const PODVector<VertexElement>* elements;
 
-    GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
+    GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
 
     return vertexData ? (indexData ? ray.InsideGeometry(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_) :
                          ray.InsideGeometry(vertexData, vertexSize, vertexStart_, vertexCount_)) : false;
-}
-
-void Geometry::GetPositionBufferIndex()
-{
-    for (unsigned i = 0; i < vertexBuffers_.Size(); ++i)
-    {
-        if (vertexBuffers_[i] && vertexBuffers_[i]->GetElementMask() & MASK_POSITION)
-        {
-            positionBufferIndex_ = i;
-            return;
-        }
-    }
-
-    // No vertex buffer with positions
-    positionBufferIndex_ = M_MAX_UNSIGNED;
 }
 
 }

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ set (TARGET_NAME sqlite)
 
 # https://www.sqlite.org/compile.html
 add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)
-# Do not use pthread and dl libraries for Emscripten
+# Do not use pthread and dl libraries for Web platform
 if (WEB)
     add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
 endif ()
@@ -53,7 +53,11 @@ if (NOT IOS AND NOT WEB)
     endif ()
     if (READLINE_FOUND)
         add_definitions (-DHAVE_READLINE)
-        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIR})
+        # FIXME: temporary quick fix
+        if (SYSROOT)
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
+        endif ()
+        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
         list (APPEND LIBS ${READLINE_LIBRARIES})
     endif ()
 

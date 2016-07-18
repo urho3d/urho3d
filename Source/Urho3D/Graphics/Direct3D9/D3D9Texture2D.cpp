@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,89 +39,22 @@
 namespace Urho3D
 {
 
-Texture2D::Texture2D(Context* context) :
-    Texture(context)
-{
-}
-
-Texture2D::~Texture2D()
-{
-    Release();
-}
-
-void Texture2D::RegisterObject(Context* context)
-{
-    context->RegisterFactory<Texture2D>();
-}
-
-bool Texture2D::BeginLoad(Deserializer& source)
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_)
-        return true;
-
-    // If device is lost, retry later
-    if (graphics_->IsDeviceLost())
-    {
-        URHO3D_LOGWARNING("Texture load while device is lost");
-        dataPending_ = true;
-        return true;
-    }
-
-    // Load the image data for EndLoad()
-    loadImage_ = new Image(context_);
-    if (!loadImage_->Load(source))
-    {
-        loadImage_.Reset();
-        return false;
-    }
-
-    // Precalculate mip levels if async loading
-    if (GetAsyncLoadState() == ASYNC_LOADING)
-        loadImage_->PrecalculateLevels();
-
-    // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    String xmlName = ReplaceExtension(GetName(), ".xml");
-    loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
-
-    return true;
-}
-
-bool Texture2D::EndLoad()
-{
-    // In headless mode, do not actually load the texture, just return success
-    if (!graphics_ || graphics_->IsDeviceLost())
-        return true;
-
-    // If over the texture budget, see if materials can be freed to allow textures to be freed
-    CheckTextureBudget(GetTypeStatic());
-
-    SetParameters(loadParameters_);
-    bool success = SetData(loadImage_);
-
-    loadImage_.Reset();
-    loadParameters_.Reset();
-
-    return success;
-}
-
 void Texture2D::OnDeviceLost()
 {
-    if (pool_ == D3DPOOL_DEFAULT)
+    if (usage_ > TEXTURE_STATIC)
         Release();
 }
 
 void Texture2D::OnDeviceReset()
 {
-    if (pool_ == D3DPOOL_DEFAULT || !object_ || dataPending_)
+    if (usage_ > TEXTURE_STATIC || !object_.ptr_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
         ResourceCache* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
-        if (!object_)
+        if (!object_.ptr_)
         {
             Create();
             dataLost_ = true;
@@ -145,60 +78,14 @@ void Texture2D::Release()
     if (renderSurface_)
         renderSurface_->Release();
 
-    URHO3D_SAFE_RELEASE(object_);
-}
-
-bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
-{
-    if (width <= 0 || height <= 0)
-    {
-        URHO3D_LOGERROR("Zero or negative texture dimensions");
-        return false;
-    }
-
-    // Delete the old rendersurface if any
-    renderSurface_.Reset();
-    pool_ = D3DPOOL_MANAGED;
-    usage_ = 0;
-
-    if (usage == TEXTURE_RENDERTARGET || usage == TEXTURE_DEPTHSTENCIL)
-    {
-        renderSurface_ = new RenderSurface(this);
-        if (usage == TEXTURE_RENDERTARGET)
-            usage_ |= D3DUSAGE_RENDERTARGET;
-        else
-            usage_ |= D3DUSAGE_DEPTHSTENCIL;
-        pool_ = D3DPOOL_DEFAULT;
-
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
-        addressMode_[COORD_U] = ADDRESS_CLAMP;
-        addressMode_[COORD_V] = ADDRESS_CLAMP;
-        filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
-    }
-    else if (usage == TEXTURE_DYNAMIC)
-    {
-        usage_ |= D3DUSAGE_DYNAMIC;
-        pool_ = D3DPOOL_DEFAULT;
-    }
-
-    if (usage == TEXTURE_RENDERTARGET)
-        SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
-    else
-        UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
-
-    width_ = width;
-    height_ = height;
-    format_ = format;
-
-    return Create();
+    URHO3D_SAFE_RELEASE(object_.ptr_);
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
 {
     URHO3D_PROFILE(SetTextureData);
 
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not set data");
         return false;
@@ -245,10 +132,10 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     d3dRect.bottom = y + height;
 
     DWORD flags = 0;
-    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && pool_ == D3DPOOL_DEFAULT)
+    if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
+    HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -311,11 +198,11 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
         break;
     }
 
-    ((IDirect3DTexture9*)object_)->UnlockRect(level);
+    ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
     return true;
 }
 
-bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
+bool Texture2D::SetData(Image* image, bool useAlpha)
 {
     if (!image)
     {
@@ -323,8 +210,9 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         return false;
     }
 
+    // Use a shared ptr for managing the temporary mip images created during this function
+    SharedPtr<Image> mipImage;
     unsigned memoryUse = sizeof(Texture2D);
-
     int quality = QUALITY_HIGH;
     Renderer* renderer = GetSubsystem<Renderer>();
     if (renderer)
@@ -341,7 +229,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         // Discard unnecessary mip levels
         for (unsigned i = 0; i < mipsToSkip_[quality]; ++i)
         {
-            image = image->GetNextLevel();
+            mipImage = image->GetNextLevel(); image = mipImage;
             levelData = image->GetData();
             levelWidth = image->GetWidth();
             levelHeight = image->GetHeight();
@@ -382,7 +270,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
             if (i < levels_ - 1)
             {
-                image = image->GetNextLevel();
+                mipImage = image->GetNextLevel(); image = mipImage;
                 levelData = image->GetData();
                 levelWidth = image->GetWidth();
                 levelHeight = image->GetHeight();
@@ -411,7 +299,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
         width /= (1 << mipsToSkip);
         height /= (1 << mipsToSkip);
 
-        SetNumLevels((unsigned)Max((int)(levels - mipsToSkip), 1));
+        SetNumLevels(Max((levels - mipsToSkip), 1U));
         SetSize(width, height, format);
 
         for (unsigned i = 0; i < levels_ && i < levels - mipsToSkip; ++i)
@@ -439,7 +327,7 @@ bool Texture2D::SetData(SharedPtr<Image> image, bool useAlpha)
 
 bool Texture2D::GetData(unsigned level, void* dest) const
 {
-    if (!object_)
+    if (!object_.ptr_)
     {
         URHO3D_LOGERROR("No texture created, can not get data");
         return false;
@@ -509,7 +397,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     }
     else
     {
-        HRESULT hr = ((IDirect3DTexture9*)object_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
+        HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -576,7 +464,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         offscreenSurface->Release();
     }
     else
-        ((IDirect3DTexture9*)object_)->UnlockRect(level);
+        ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
 
     return true;
 }
@@ -594,9 +482,27 @@ bool Texture2D::Create()
         return true;
     }
 
+    unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+    unsigned d3dUsage = 0;
+
+    switch (usage_)
+    {
+    case TEXTURE_DYNAMIC:
+        d3dUsage |= D3DUSAGE_DYNAMIC;
+        break;
+    case TEXTURE_RENDERTARGET:
+        d3dUsage |= D3DUSAGE_RENDERTARGET;
+        break;
+    case TEXTURE_DEPTHSTENCIL:
+        d3dUsage |= D3DUSAGE_DEPTHSTENCIL;
+        break;
+    default:
+        break;
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
-    if (usage_ & D3DUSAGE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, usage_, D3DRTYPE_TEXTURE))
+    if (usage_ == TEXTURE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, d3dUsage, D3DRTYPE_TEXTURE))
     {
         HRESULT hr = device->CreateDepthStencilSurface(
             (UINT)width_,
@@ -622,35 +528,29 @@ bool Texture2D::Create()
             (UINT)width_,
             (UINT)height_,
             requestedLevels_,
-            usage_,
+            d3dUsage,
             (D3DFORMAT)format_,
-            (D3DPOOL)pool_,
+            (D3DPOOL)pool,
             (IDirect3DTexture9**)&object_,
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Could not create texture", hr);
             return false;
         }
 
-        levels_ = ((IDirect3DTexture9*)object_)->GetLevelCount();
+        levels_ = ((IDirect3DTexture9*)object_.ptr_)->GetLevelCount();
 
-        if (usage_ & (D3DUSAGE_RENDERTARGET | D3DUSAGE_DEPTHSTENCIL))
+        if (usage_ >= TEXTURE_RENDERTARGET)
         {
-            hr = ((IDirect3DTexture9*)object_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
+            hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
         }
     }
 
     return true;
-}
-
-void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
-{
-    if (renderSurface_ && renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS)
-        renderSurface_->QueueUpdate();
 }
 
 }

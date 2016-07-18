@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -218,12 +218,6 @@ bool UnknownComponent::SaveXML(XMLElement& dest) const
 
 bool UnknownComponent::SaveJSON(JSONValue& dest) const
 {
-    if (dest.IsNull())
-    {
-        URHO3D_LOGERROR("Could not save " + GetTypeName() + ", null destination element");
-        return false;
-    }
-
     if (!useXML_)
         URHO3D_LOGWARNING("UnknownComponent loaded in binary mode, attributes will be empty for JSON save");
 

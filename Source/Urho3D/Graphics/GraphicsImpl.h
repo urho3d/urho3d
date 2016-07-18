@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,9 @@
 //
 
 #pragma once
+
+// Note: GraphicsImpl class is purposefully API-specific. It should not be used by Urho3D client applications,
+// unless required for e.g. integration of 3rd party libraries that interface directly with the graphics device.
 
 #if defined(URHO3D_OPENGL)
 #include "OpenGL/OGLGraphicsImpl.h"

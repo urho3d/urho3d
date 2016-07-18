@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ struct CompressedLevel
     /// Construct empty.
     CompressedLevel() :
         data_(0),
+        format_(CF_NONE),
         width_(0),
         height_(0),
         depth_(0),

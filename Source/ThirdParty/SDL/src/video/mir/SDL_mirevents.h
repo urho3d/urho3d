@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -29,7 +29,7 @@
 #include <mir_toolkit/mir_client_library.h>
 
 extern void
-MIR_HandleInput(MirSurface* surface, MirEvent const* ev, void* context);
+MIR_HandleEvent(MirSurface* surface, MirEvent const* ev, void* context);
 
 #endif /* _SDL_mirevents_h */
 

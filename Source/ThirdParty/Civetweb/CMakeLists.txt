@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,19 @@
 
 # Define target name
 set (TARGET_NAME Civetweb)
+
+# Define preprocessor macros
+if (WIN32)
+    include (CheckStructHasMember)
+    check_struct_has_member (struct\ timespec tv_sec time.h HAVE_STRUCT_TIMESPEC_TV_SEC)
+    if (HAVE_STRUCT_TIMESPEC_TV_SEC)
+        include (CheckSymbolExists)
+        check_symbol_exists (_TIMESPEC_DEFINED time.h HAVE__TIMESPEC_DEFINED)
+        if (NOT HAVE__TIMESPEC_DEFINED)
+            add_definitions (-D_TIMESPEC_DEFINED)
+        endif ()
+    endif ()
+endif ()
 
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS include/*.h)

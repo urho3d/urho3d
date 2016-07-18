@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -683,6 +683,14 @@ void LuaScriptInstance::HandlePostUpdate(StringHash eventType, VariantMap& event
 
 void LuaScriptInstance::HandleFixedUpdate(StringHash eventType, VariantMap& eventData)
 {
+    // Execute delayed start before first fixed update if not called yet
+    if (scriptObjectMethods_[LSOM_DELAYEDSTART])
+    {
+        if (scriptObjectMethods_[LSOM_DELAYEDSTART]->BeginCall(this))
+            scriptObjectMethods_[LSOM_DELAYEDSTART]->EndCall();
+        scriptObjectMethods_[LSOM_DELAYEDSTART] = 0;  // Only execute once
+    }
+
     using namespace PhysicsPreStep;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
 

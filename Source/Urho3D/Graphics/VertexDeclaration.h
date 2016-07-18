@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,9 @@
 
 #pragma once
 
-#if defined(URHO3D_D3D11)
+#if defined(URHO3D_OPENGL)
+//#error OpenGL Graphics API does not have VertexDeclaration class, remove this header file in your build to fix this error
+#elif defined(URHO3D_D3D11)
 #include "Direct3D11/D3D11VertexDeclaration.h"
 #else
 #include "Direct3D9/D3D9VertexDeclaration.h"

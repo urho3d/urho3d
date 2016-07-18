@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -276,7 +276,6 @@ static void RegisterScript(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Script", "void set_executeConsoleCommands(bool)", asMETHOD(Script, SetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterObjectMethod("Script", "bool get_executeConsoleCommands() const", asMETHOD(Script, GetExecuteConsoleCommands), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Script@+ get_script()", asFUNCTION(GetScript), asCALL_CDECL);
-    engine->RegisterGlobalProperty("VariantMap globalVars", &Script::globalVars);
 }
 
 static void RegisterScriptObject(asIScriptEngine* engine)

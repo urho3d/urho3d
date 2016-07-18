@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 #include "../Graphics/Model.h"
 #include "../Graphics/StaticModel.h"
 #include "../Graphics/TerrainPatch.h"
+#include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/CrowdAgent.h"
@@ -94,8 +95,6 @@ struct FindPathData
     Vector3 pathPoints_[MAX_POLYS];
     // Flags on the path.
     unsigned char pathFlags_[MAX_POLYS];
-    // Area Ids on the path.
-    unsigned char pathAreras_[MAX_POLYS];
 };
 
 NavigationMesh::NavigationMesh(Context* context) :
@@ -221,11 +220,9 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         // Draw NavArea components
         if (drawNavAreas_)
         {
-            PODVector<Node*> areas;
-            scene->GetChildrenWithComponent<NavArea>(areas, true);
-            for (unsigned i = 0; i < areas.Size(); ++i)
+            for (unsigned i = 0; i < areas_.Size(); ++i)
             {
-                NavArea* area = areas[i]->GetComponent<NavArea>();
+                NavArea* area = areas_[i];
                 if (area && area->IsEnabledEffective())
                     area->DrawDebugGeometry(debug, depthTest);
             }
@@ -529,13 +526,12 @@ void NavigationMesh::FindPath(PODVector<Vector3>& dest, const Vector3& start, co
     FindPath(navPathPoints, start, end, extents, filter);
 
     dest.Clear();
-    for (int i = 0; i < navPathPoints.Size(); ++i)
+    for (unsigned i = 0; i < navPathPoints.Size(); ++i)
         dest.Push(navPathPoints[i].position_);
 }
 
 void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector3& start, const Vector3& end,
-    const Vector3& extents,
-    const dtQueryFilter* filter)
+    const Vector3& extents, const dtQueryFilter* filter)
 {
     URHO3D_PROFILE(FindPath);
     dest.Clear();
@@ -582,7 +578,29 @@ void NavigationMesh::FindPath(PODVector<NavigationPathPoint>& dest, const Vector
         NavigationPathPoint pt;
         pt.position_ = transform * pathData_->pathPoints_[i];
         pt.flag_ = (NavigationPathPointFlag)pathData_->pathFlags_[i];
-        pt.areaID_ = pathData_->pathAreras_[i];
+
+        // Walk through all NavAreas and find nearest
+        unsigned nearestNavAreaID = 0;       // 0 is the default nav area ID
+        float nearestDistance = M_LARGE_VALUE;
+        for (unsigned j = 0; j < areas_.Size(); j++)
+        {
+            NavArea* area = areas_[j].Get();
+            if (area && area->IsEnabledEffective())
+            {
+                BoundingBox bb = area->GetWorldBoundingBox();
+                if (bb.IsInside(pt.position_) == INSIDE)
+                {
+                    Vector3 areaWorldCenter = area->GetNode()->GetWorldPosition();
+                    float distance = (areaWorldCenter - pt.position_).LengthSquared();
+                    if (distance < nearestDistance)
+                    {
+                        nearestDistance = distance;
+                        nearestNavAreaID = area->GetAreaID();
+                    }
+                }
+            }
+        }
+        pt.areaID_ = (unsigned char)nearestNavAreaID;
 
         dest.Push(pt);
     }
@@ -868,16 +886,17 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     // Get nav area volumes
     PODVector<NavArea*> navAreas;
     node_->GetComponents<NavArea>(navAreas, true);
+    areas_.Clear();
     for (unsigned i = 0; i < navAreas.Size(); ++i)
     {
         NavArea* area = navAreas[i];
-        // Ignore disabled AND any areas that have no meaningful settings
-        if (area->IsEnabledEffective() && area->GetAreaID() != 0)
+        if (area->IsEnabledEffective())
         {
             NavigationGeometryInfo info;
             info.component_ = area;
             info.boundingBox_ = area->GetWorldBoundingBox();
             geometryList.Push(info);
+            areas_.Push(WeakPtr<NavArea>(area));
         }
     }
 }
@@ -1081,10 +1100,10 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     const unsigned char* indexData;
     unsigned vertexSize;
     unsigned indexSize;
-    unsigned elementMask;
+    const PODVector<VertexElement>* elements;
 
-    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elementMask);
-    if (!vertexData || !indexData || (elementMask & MASK_POSITION) == 0)
+    geometry->GetRawData(vertexData, vertexSize, indexData, indexSize, elements);
+    if (!vertexData || !indexData || !elements || VertexBuffer::GetElementOffset(*elements, TYPE_VECTOR3, SEM_POSITION) != 0)
         return;
 
     unsigned srcIndexStart = geometry->GetIndexStart();

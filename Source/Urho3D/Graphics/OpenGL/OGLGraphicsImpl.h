@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,17 @@
 
 #include "../../Container/HashMap.h"
 #include "../../Core/Timer.h"
+#include "../../Graphics/ConstantBuffer.h"
+#include "../../Graphics/ShaderProgram.h"
+#include "../../Graphics/Texture2D.h"
 #include "../../Math/Color.h"
 
-#if defined(ANDROID) || defined (RPI) || defined (__EMSCRIPTEN__)
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-#elif defined(IOS)
+#if defined(IOS)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 #else
 #include <GLEW/glew.h>
 #endif
@@ -61,12 +64,15 @@
 #define COMPRESSED_RGBA_PVRTC_2BPPV1_IMG 0x8c03
 #endif
 
-#include <SDL/SDL.h>
+typedef void *SDL_GLContext;
 
 namespace Urho3D
 {
 
 class Context;
+
+typedef HashMap<unsigned, SharedPtr<ConstantBuffer> > ConstantBufferMap;
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
 
 /// Cached state of a frame buffer object
 struct FrameBufferObject
@@ -102,22 +108,24 @@ public:
     /// Construct.
     GraphicsImpl();
 
-    /// Return the SDL window.
-    SDL_Window* GetWindow() const { return window_; }
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
 
 private:
-    /// SDL window.
-    SDL_Window* window_;
     /// SDL OpenGL context.
     SDL_GLContext context_;
     /// IOS system framebuffer handle.
     unsigned systemFBO_;
     /// Active texture unit.
     unsigned activeTexture_;
-    /// Vertex attributes in use.
-    unsigned enabledAttributes_;
+    /// Enabled vertex attributes bitmask.
+    unsigned enabledVertexAttributes_;
+    /// Vertex attributes bitmask used by the current shader program.
+    unsigned usedVertexAttributes_;
+    /// Vertex attribute instancing bitmask for keeping track of divisors.
+    unsigned instancingVertexAttributes_;
+    /// Current mapping of vertex attribute locations by semantic. The map is owned by the shader program, so care must be taken to switch a null shader program when it's destroyed.
+    const HashMap<Pair<unsigned char, unsigned char>, unsigned>* vertexAttributes_;
     /// Currently bound frame buffer object.
     unsigned boundFBO_;
     /// Currently bound vertex buffer object.
@@ -128,8 +136,26 @@ private:
     int pixelFormat_;
     /// Map for FBO's per resolution and format.
     HashMap<unsigned long long, FrameBufferObject> frameBuffers_;
+    /// OpenGL texture types in use.
+    unsigned textureTypes_[MAX_TEXTURE_UNITS];
+    /// Constant buffer search map.
+    ConstantBufferMap allConstantBuffers_;
+    /// Currently bound constant buffers.
+    ConstantBuffer* constantBuffers_[MAX_SHADER_PARAMETER_GROUPS * 2];
+    /// Dirty constant buffers.
+    PODVector<ConstantBuffer*> dirtyConstantBuffers_;
+    /// Last used instance data offset.
+    unsigned lastInstanceOffset_;
+    /// Map for additional depth textures, to emulate Direct3D9 ability to mix render texture and backbuffer rendering.
+    HashMap<int, SharedPtr<Texture2D> > depthTextures_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
+    /// Linked shader programs.
+    ShaderProgramMap shaderPrograms_;
     /// Need FBO commit flag.
     bool fboDirty_;
+    /// Need vertex attribute pointer update flag.
+    bool vertexBuffersDirty_;
     /// sRGB write mode flag.
     bool sRGBWrite_;
 };

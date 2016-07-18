@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ struct URHO3D_API Billboard
 {
     /// Position.
     Vector3 position_;
-    /// Two-dimensional size.
+    /// Two-dimensional size. If BillboardSet has fixed screen size enabled, this is measured in pixels instead of world units.
     Vector2 size_;
     /// UV coordinates.
     Rect uv_;
@@ -51,8 +51,10 @@ struct URHO3D_API Billboard
     Vector3 direction_;
     /// Enabled flag.
     bool enabled_;
-    /// Sort distance.
+    /// Sort distance. Used internally.
     float sortDistance_;
+    /// Scale factor for fixed screen size mode. Used internally.
+    float screenScaleFactor_;
 };
 
 static const unsigned MAX_BILLBOARDS = 65536 / 4;
@@ -89,6 +91,8 @@ public:
     void SetScaled(bool enable);
     /// Set whether billboards are sorted by distance. Default false.
     void SetSorted(bool enable);
+    /// Set whether billboards have fixed size on screen (measured in pixels) regardless of distance to camera. Default false.
+    void SetFixedScreenSize(bool enable);
     /// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
     void SetFaceCameraMode(FaceCameraMode mode);
     /// Set animation LOD bias.
@@ -117,6 +121,9 @@ public:
     /// Return whether billboards are sorted.
     bool IsSorted() const { return sorted_; }
 
+    /// Return whether billboards are fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
+
     /// Return how the billboards rotate in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
 
@@ -144,8 +151,6 @@ protected:
 
     /// Billboards.
     PODVector<Billboard> billboards_;
-    /// Coordinate axes on which camera facing is done.
-    Vector3 faceCameraAxes_;
     /// Animation LOD bias.
     float animationLodBias_;
     /// Animation LOD timer.
@@ -156,6 +161,8 @@ protected:
     bool scaled_;
     /// Billboards sorted flag.
     bool sorted_;
+    /// Billboards fixed screen size flag.
+    bool fixedScreenSize_;
     /// Billboard rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
 
@@ -164,6 +171,8 @@ private:
     void UpdateBufferSize();
     /// Rewrite billboard vertex buffer.
     void UpdateVertexBuffer(const FrameInfo& frame);
+    /// Calculate billboard scale factors in fixed screen size mode.
+    void CalculateFixedScreenSize(const FrameInfo& frame);
 
     /// Geometry.
     SharedPtr<Geometry> geometry_;
@@ -183,6 +192,8 @@ private:
     bool geometryTypeUpdate_;
     /// Sorting flag. Triggers a vertex buffer rewrite for each view this billboard set is rendered from.
     bool sortThisFrame_;
+    /// Whether was last rendered from an ortho camera.
+    bool hasOrthoCamera_;
     /// Frame number on which was last sorted.
     unsigned sortFrameNumber_;
     /// Previous offset to camera for determining whether sorting is necessary.

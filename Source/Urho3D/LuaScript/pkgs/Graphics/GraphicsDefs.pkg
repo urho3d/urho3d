@@ -78,7 +78,7 @@ enum LockState
     LOCK_SCRATCH
 };
 
-enum VertexElement
+enum LegacyVertexElement
 {
     ELEMENT_POSITION = 0,
     ELEMENT_NORMAL,
@@ -94,7 +94,33 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX2,
     ELEMENT_INSTANCEMATRIX3,
     ELEMENT_OBJECTINDEX,
-    MAX_VERTEX_ELEMENTS
+    MAX_LEGACY_VERTEX_ELEMENTS
+};
+
+enum VertexElementType
+{
+    TYPE_INT = 0,
+    TYPE_FLOAT,
+    TYPE_VECTOR2,
+    TYPE_VECTOR3,
+    TYPE_VECTOR4,
+    TYPE_UBYTE4,
+    TYPE_UBYTE4_NORM,
+    MAX_VERTEX_ELEMENT_TYPES
+};
+
+enum VertexElementSemantic
+{
+    SEM_POSITION = 0,
+    SEM_NORMAL,
+    SEM_BINORMAL,
+    SEM_TANGENT,
+    SEM_TEXCOORD,
+    SEM_COLOR,
+    SEM_BLENDWEIGHTS,
+    SEM_BLENDINDICES,
+    SEM_OBJECTINDEX,
+    MAX_VERTEX_ELEMENT_SEMANTICS
 };
 
 enum TextureFilterMode
@@ -189,6 +215,18 @@ enum ShadowQuality
     SHADOWQUALITY_BLUR_VSM
 };
 
+struct VertexElement
+{
+    VertexElement();
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false);
+
+    VertexElementType type_ @ type;
+    VertexElementSemantic semantic_ @ semantic;
+    unsigned char index_ @ index;
+    bool perInstance_ @ perInstance;
+    unsigned offset_ @ offset;
+};
+
 
 static const int QUALITY_LOW;
 static const int QUALITY_MEDIUM;
@@ -214,4 +252,3 @@ static const unsigned MASK_INSTANCEMATRIX1;
 static const unsigned MASK_INSTANCEMATRIX2;
 static const unsigned MASK_INSTANCEMATRIX3;
 static const unsigned MASK_OBJECTINDEX;
-static const unsigned MASK_DEFAULT;

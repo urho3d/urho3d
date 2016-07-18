@@ -83,9 +83,6 @@ bool ResetScene()
     }
     else
         messageBoxCallback = null;
-        
-    // Clear stored script attributes
-    scriptAttributes.Clear();
 
     suppressSceneChanges = true;
 
@@ -200,9 +197,6 @@ bool LoadScene(const String&in fileName)
         MessageBox("Could not open file.\n" + fileName);
         return false;
     }
-    
-    // Reset stored script attributes.
-    scriptAttributes.Clear();
 
     // Add the scene's resource path in case it's necessary
     String newScenePath = GetPath(fileName);
@@ -248,9 +242,6 @@ bool LoadScene(const String&in fileName)
     CreateGrid();
     SetActiveViewport(viewports[0]);
 
-    // Store all ScriptInstance and LuaScriptInstance attributes
-    UpdateScriptInstances();
-
     return loaded;
 }
 
@@ -269,11 +260,11 @@ bool SaveScene(const String&in fileName)
     String extension = GetExtension(fileName);
     bool success;
     if (extension == ".xml")
-        editorScene.SaveXML(file);
+        success = editorScene.SaveXML(file);
     else if (extension == ".json")
-        editorScene.SaveJSON(file);
+        success = editorScene.SaveJSON(file);
     else
-        editorScene.Save(file);
+        success = editorScene.Save(file);
     RemoveBackup(success, fileName);
 
     editorScene.updateEnabled = false;
@@ -298,14 +289,14 @@ bool SaveSceneWithExistingName()
         return SaveScene(editorScene.fileName);
 }
 
-Node@ CreateNode(CreateMode mode)
+Node@ CreateNode(CreateMode mode, bool raycastToMouse = false)
 {
     Node@ newNode = null;
     if (editNode !is null)
         newNode = editNode.CreateChild("", mode);
     else
         newNode = editorScene.CreateChild("", mode);
-    newNode.worldPosition = GetNewNodePosition();
+    newNode.worldPosition = GetNewNodePosition(raycastToMouse);
 
     // Create an undo action for the create
     CreateNodeAction action;
@@ -361,7 +352,7 @@ void CreateLoadedComponent(Component@ component)
     FocusComponent(component);
 }
 
-Node@ LoadNode(const String&in fileName, Node@ parent = null)
+Node@ LoadNode(const String&in fileName, Node@ parent = null, bool raycastToMouse = false)
 {
     if (fileName.empty)
         return null;
@@ -384,11 +375,7 @@ Node@ LoadNode(const String&in fileName, Node@ parent = null)
     // Before instantiating, add object's resource path if necessary
     SetResourcePath(GetPath(fileName), true, true);
 
-    Ray cameraRay = camera.GetScreenRay(0.5, 0.5); // Get ray at view center
-    Vector3 position, normal;
-    GetSpawnPosition(cameraRay, newNodeDistance, position, normal, 0, true);
-
-    Node@ newNode = InstantiateNodeFromFile(file, position, Quaternion(), 1, parent, instantiateMode);
+    Node@ newNode = InstantiateNodeFromFile(file, GetNewNodePosition(raycastToMouse), Quaternion(), 1, parent, instantiateMode);
     if (newNode !is null)
     {
         FocusNode(newNode);
@@ -423,17 +410,8 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     if (newNode !is null)
     {
         newNode.scale = newNode.scale * scaleMod;
-        if (alignToAABBBottom)
-        {
-            Drawable@ drawable = GetFirstDrawable(newNode);
-            if (drawable !is null)
-            {
-                BoundingBox aabb = drawable.worldBoundingBox;
-                Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
-                Vector3 offset = aabbBottomCenter - newNode.worldPosition;
-                newNode.worldPosition = newNode.worldPosition - offset;
-            }
-        }
+        
+        AdjustNodePositionByAABB(newNode);
 
         // Create an undo action for the load
         CreateNodeAction action;
@@ -448,6 +426,21 @@ Node@ InstantiateNodeFromFile(File@ file, const Vector3& position, const Quatern
     }
 
     return newNode;
+}
+
+void AdjustNodePositionByAABB(Node@ newNode)
+{
+    if (alignToAABBBottom)
+    {
+        Drawable@ drawable = GetFirstDrawable(newNode);
+        if (drawable !is null)
+        {
+            BoundingBox aabb = drawable.worldBoundingBox;
+            Vector3 aabbBottomCenter(aabb.center.x, aabb.min.y, aabb.center.z);
+            Vector3 offset = aabbBottomCenter - newNode.worldPosition;
+            newNode.worldPosition = newNode.worldPosition - offset;
+        }
+    }
 }
 
 bool SaveNode(const String&in fileName)
@@ -1253,10 +1246,10 @@ bool SceneRenderZoneCubemaps()
     Array<Zone@> capturedThisCall;
     bool alreadyCapturing = activeCubeCapture.length > 0; // May have managed to quickly queue up a second round of zones to render cubemaps for
     
-    for (int i = 0; i < selectedNodes.length; ++i)
+    for (uint i = 0; i < selectedNodes.length; ++i)
     {
         Array<Component@>@ zones = selectedNodes[i].GetComponents("Zone", true);
-        for (int z = 0; z < zones.length; ++z)
+        for (uint z = 0; z < zones.length; ++z)
         {
             Zone@ zone = cast<Zone>(zones[z]);
             if (zone !is null)
@@ -1267,7 +1260,7 @@ bool SceneRenderZoneCubemaps()
         }
     }
     
-    for (int i = 0; i < selectedComponents.length; ++i)
+    for (uint i = 0; i < selectedComponents.length; ++i)
     {
         Zone@ zone = cast<Zone>(selectedComponents[i]);
         if (zone !is null)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,15 +48,14 @@ public:
     virtual const String& GetName() const;
     /// Return a checksum if applicable.
     virtual unsigned GetChecksum();
+    /// Return whether the end of stream has been reached.
+    virtual bool IsEof() const { return position_ >= size_; }
 
     /// Return current position.
     unsigned GetPosition() const { return position_; }
 
     /// Return size.
     unsigned GetSize() const { return size_; }
-
-    /// Return whether the end of stream has been reached.
-    bool IsEof() const { return position_ >= size_; }
 
     /// Read a 32-bit integer.
     int ReadInt();

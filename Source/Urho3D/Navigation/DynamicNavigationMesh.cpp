@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@
 // DebugNew is deliberately not used because the macro 'free' conflicts with DetourTileCache's LinearAllocator interface
 //#include "../DebugNew.h"
 
-#define TILECACHE_MAXLAYERS 255
+static const unsigned TILECACHE_MAXLAYERS = 255;
 
 namespace Urho3D
 {
@@ -668,7 +668,7 @@ void DynamicNavigationMesh::SetMaxLayers(unsigned maxLayers)
 {
     // Set 3 as a minimum due to the tendency of layers to be constructed inside the hollow space of stacked objects
     // That behavior is unlikely to be expected by the end user
-    maxLayers_ = Max(3, Min(maxLayers, TILECACHE_MAXLAYERS));
+    maxLayers_ = Max(3U, Min(maxLayers, TILECACHE_MAXLAYERS));
 }
 
 int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z, TileCacheData* tiles)

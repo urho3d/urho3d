@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,21 +38,22 @@
 namespace Urho3D
 {
 
-ShaderVariation::ShaderVariation(Shader* owner, ShaderType type) :
-    GPUObject(owner->GetSubsystem<Graphics>()),
-    owner_(owner),
-    type_(type),
-    elementMask_(0)
+const char* ShaderVariation::elementSemanticNames[] =
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
-        constantBufferSizes_[i] = 0;
-}
+    "POSITION",
+    "NORMAL",
+    "BINORMAL",
+    "TANGENT",
+    "TEXCOORD",
+    "COLOR",
+    "BLENDWEIGHT",
+    "BLENDINDICES",
+    "OBJECTINDEX"
+};
 
-ShaderVariation::~ShaderVariation()
+void ShaderVariation::OnDeviceLost()
 {
-    Release();
+    // No-op on Direct3D11
 }
 
 bool ShaderVariation::Create()
@@ -91,10 +92,10 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_);
+            HRESULT hr = device->CreateVertexShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11VertexShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_);
+                URHO3D_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create vertex shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -105,10 +106,10 @@ bool ShaderVariation::Create()
     {
         if (device && byteCode_.Size())
         {
-            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_);
+            HRESULT hr = device->CreatePixelShader(&byteCode_[0], byteCode_.Size(), 0, (ID3D11PixelShader**)&object_.ptr_);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(object_);
+                URHO3D_SAFE_RELEASE(object_.ptr_);
                 compilerOutput_ = "Could not create pixel shader (HRESULT " + ToStringHex((unsigned)hr) + ")";
             }
         }
@@ -116,17 +117,17 @@ bool ShaderVariation::Create()
             compilerOutput_ = "Could not create pixel shader, empty bytecode";
     }
 
-    return object_ != 0;
+    return object_.ptr_ != 0;
 }
 
 void ShaderVariation::Release()
 {
-    if (object_)
+    if (object_.ptr_)
     {
         if (!graphics_)
             return;
 
-        graphics_->CleanUpShaderPrograms(this);
+        graphics_->CleanupShaderPrograms(this);
 
         if (type_ == VS)
         {
@@ -139,7 +140,7 @@ void ShaderVariation::Release()
                 graphics_->SetShaders(0, 0);
         }
 
-        URHO3D_SAFE_RELEASE(object_);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
     }
 
     compilerOutput_.Clear();
@@ -150,22 +151,17 @@ void ShaderVariation::Release()
         constantBufferSizes_[i] = 0;
     parameters_.Clear();
     byteCode_.Clear();
-    elementMask_ = 0;
-}
-
-void ShaderVariation::SetName(const String& name)
-{
-    name_ = name;
+    elementHash_ = 0;
 }
 
 void ShaderVariation::SetDefines(const String& defines)
 {
     defines_ = defines;
-}
 
-Shader* ShaderVariation::GetOwner() const
-{
-    return owner_;
+    // Internal mechanism for appending the CLIPPLANE define, prevents runtime (every frame) string manipulation
+    definesClipPlane_ = defines;
+    if (!definesClipPlane_.EndsWith(" CLIPPLANE"))
+        definesClipPlane_ += " CLIPPLANE";
 }
 
 bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
@@ -191,7 +187,8 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
     /// \todo Check that shader type and model match
     /*unsigned short shaderType = */file->ReadUShort();
     /*unsigned short shaderModel = */file->ReadUShort();
-    elementMask_ = file->ReadUInt();
+    elementHash_ = file->ReadUInt();
+    elementHash_ <<= 32;
 
     unsigned numParameters = file->ReadUInt();
     for (unsigned i = 0; i < numParameters; ++i)
@@ -201,7 +198,12 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned offset = file->ReadUInt();
         unsigned size = file->ReadUInt();
 
-        ShaderParameter parameter(type_, name_, buffer, offset, size);
+        ShaderParameter parameter;
+        parameter.type_ = type_;
+        parameter.name_ = name;
+        parameter.buffer_ = buffer;
+        parameter.offset_ = offset;
+        parameter.size_ = size;
         parameters_[StringHash(name)] = parameter;
     }
 
@@ -358,16 +360,14 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         {
             D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
             reflection->GetInputParameterDesc((UINT)i, &paramDesc);
-            for (unsigned j = 0; j < MAX_VERTEX_ELEMENTS; ++j)
+            VertexElementSemantic semantic = (VertexElementSemantic)GetStringListIndex(paramDesc.SemanticName, elementSemanticNames, MAX_VERTEX_ELEMENT_SEMANTICS, true);
+            if (semantic != MAX_VERTEX_ELEMENT_SEMANTICS)
             {
-                if (!String::Compare(paramDesc.SemanticName, VertexBuffer::elementSemantics[j], true) &&
-                    paramDesc.SemanticIndex == VertexBuffer::elementSemanticIndices[j])
-                {
-                    elementMask_ |= (1 << j);
-                    break;
-                }
+                elementHash_ <<= 4;
+                elementHash_ += ((int)semantic + 1) * (paramDesc.SemanticIndex + 1);
             }
         }
+        elementHash_ <<= 32;
     }
 
     HashMap<String, unsigned> cbRegisterMap;
@@ -399,7 +399,13 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (varName[0] == 'c')
             {
                 varName = varName.Substring(1); // Strip the c to follow Urho3D constant naming convention
-                parameters_[varName] = ShaderParameter(type_, varName, cbRegister, varDesc.StartOffset, varDesc.Size);
+                ShaderParameter parameter;
+                parameter.type_ = type_;
+                parameter.name_ = varName;
+                parameter.buffer_ = cbRegister;
+                parameter.offset_ = varDesc.StartOffset;
+                parameter.size_ = varDesc.Size;
+                parameters_[varName] = parameter;
             }
         }
     }
@@ -424,7 +430,7 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     file->WriteFileID("USHD");
     file->WriteShort((unsigned short)type_);
     file->WriteShort(4);
-    file->WriteUInt(elementMask_);
+    file->WriteUInt(elementHash_ >> 32);
 
     file->WriteUInt(parameters_.Size());
     for (HashMap<StringHash, ShaderParameter>::ConstIterator i = parameters_.Begin(); i != parameters_.End(); ++i)

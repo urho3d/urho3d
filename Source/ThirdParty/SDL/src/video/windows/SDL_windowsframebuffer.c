@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -42,6 +42,9 @@ int WIN_CreateWindowFramebuffer(_THIS, SDL_Window * window, Uint32 * format, voi
     /* Find out the format of the screen */
     size = sizeof(BITMAPINFOHEADER) + 256 * sizeof (RGBQUAD);
     info = (LPBITMAPINFO)SDL_stack_alloc(Uint8, size);
+    if (!info) {
+        return SDL_OutOfMemory();
+    }
 
     SDL_memset(info, 0, size);
     info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);

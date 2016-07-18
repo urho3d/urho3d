@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,12 @@
 
 #include "../../Database/DatabaseEvents.h"
 #include "../../IO/Log.h"
+
+#ifdef _WIN32
+// Needs to be included above sql.h for windows
+#define NOMINMAX
+#include <windows.h>
+#endif
 
 #include <sqlext.h>
 

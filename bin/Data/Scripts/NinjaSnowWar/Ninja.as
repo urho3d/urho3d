@@ -47,14 +47,13 @@ class Ninja : GameObject
         aimY = 0;
     }
 
-    void Start()
-    {
-        SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
-        aimX = node.rotation.yaw;
-    }
-    
     void DelayedStart()
     {
+        SubscribeToEvent(node, "NodeCollision", "HandleNodeCollision");
+        
+        // Get horizontal aim from initial rotation
+        aimX = controls.yaw = node.rotation.yaw;
+
         // Start playing the idle animation immediately, even before the first physics update
         AnimationController@ animCtrl = node.children[0].GetComponent("AnimationController");
         animCtrl.PlayExclusive("Models/NinjaSnowWar/Ninja_Idle3.ani", LAYER_MOVE, true);

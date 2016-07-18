@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +69,9 @@ void AngelScriptIntegration::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void AngelScriptIntegration::CreateScene()
@@ -108,7 +111,7 @@ void AngelScriptIntegration::CreateScene()
         // Add our custom Rotator script object (using the ScriptInstance C++ component to instantiate / store it) which will
         // rotate the scene node each frame, when the scene sends its update event
         ScriptInstance* instance = boxNode->CreateComponent<ScriptInstance>();
-        instance->CreateObject(cache->GetResource<ScriptFile>("Scripts/Rotator.as"), "Rotator");
+        instance->CreateObject(cache->GetResource<ScriptFile>("Scripts/Utilities/Rotator.as"), "Rotator");
         // Call the script object's "SetRotationSpeed" function. Function arguments need to be passed in a VariantVector
         VariantVector parameters;
         parameters.Push(Vector3(10.0f, 20.0f, 30.0f));
@@ -181,13 +184,13 @@ void AngelScriptIntegration::MoveCamera(float timeStep)
     cameraNode_->SetRotation(Quaternion(pitch_, yaw_, 0.0f));
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 

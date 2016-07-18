@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@ enum NavmeshPartitionType
 };
 
 class Geometry;
+class NavArea;
 
 struct FindPathData;
 struct NavBuildData;
@@ -77,11 +78,11 @@ enum NavigationPathPointFlag
 
 struct URHO3D_API NavigationPathPoint
 {
-    /// World-space position of the path point
+    /// World-space position of the path point.
     Vector3 position_;
-    /// Detour flag
+    /// Detour flag.
     NavigationPathPointFlag flag_;
-    /// Detour area ID
+    /// Detour area ID.
     unsigned char areaID_;
 };
 
@@ -314,16 +315,16 @@ protected:
     int numTilesZ_;
     /// Whole navigation mesh bounding box.
     BoundingBox boundingBox_;
-
     /// Type of the heightfield partitioning.
     NavmeshPartitionType partitionType_;
     /// Keep internal build resources for debug draw modes.
     bool keepInterResults_;
-
     /// Debug draw OffMeshConnection components.
     bool drawOffMeshConnections_;
     /// Debug draw NavArea components.
     bool drawNavAreas_;
+    /// NavAreas for this NavMesh
+    Vector<WeakPtr<NavArea> > areas_;
 };
 
 /// Register Navigation library objects.

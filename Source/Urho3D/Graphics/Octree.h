@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -208,8 +208,8 @@ private:
 
     /// Drawable objects that require update.
     PODVector<Drawable*> drawableUpdates_;
-    /// Drawable objects that require reinsertion.
-    PODVector<Drawable*> drawableReinsertions_;
+    /// Drawable objects that were inserted during threaded update phase.
+    PODVector<Drawable*> threadedDrawableUpdates_;
     /// Mutex for octree reinsertions.
     Mutex octreeMutex_;
     /// Ray query temporary list of drawables.

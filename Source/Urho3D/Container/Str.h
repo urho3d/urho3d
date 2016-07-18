@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -475,7 +475,7 @@ public:
     static void EncodeUTF16(wchar_t*& dest, unsigned unicodeChar);
     /// Decode Unicode character from UTF16. Pointer will be incremented.
     static unsigned DecodeUTF16(const wchar_t*& src);
-    #endif
+#endif
 
     /// Return length of a C string.
     static unsigned CStringLength(const char* str)

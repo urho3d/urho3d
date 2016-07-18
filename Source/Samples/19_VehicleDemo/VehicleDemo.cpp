@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,9 @@ void VehicleDemo::Start()
 
     // Subscribe to necessary events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void VehicleDemo::CreateScene()
@@ -212,10 +215,10 @@ void VehicleDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
         if (!ui->GetFocusElement())
         {
-            vehicle_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-            vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-            vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-            vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+            vehicle_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+            vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+            vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+            vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
 
             // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
             if (touchEnabled_)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,9 @@ URHO3D_EVENT(E_SCREENMODE, ScreenMode)
     URHO3D_PARAM(P_WIDTH, Width);                  // int
     URHO3D_PARAM(P_HEIGHT, Height);                // int
     URHO3D_PARAM(P_FULLSCREEN, Fullscreen);        // bool
-    URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
     URHO3D_PARAM(P_BORDERLESS, Borderless);        // bool
+    URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
+    URHO3D_PARAM(P_HIGHDPI, HighDPI);              // bool
 }
 
 /// Window position changed.
@@ -44,7 +45,7 @@ URHO3D_EVENT(E_WINDOWPOS, WindowPos)
     URHO3D_PARAM(P_Y, Y);                          // int
 }
 
-/// Request for queuing autoupdated rendersurfaces.
+/// Request for queuing rendersurfaces either in manual or always-update mode.
 URHO3D_EVENT(E_RENDERSURFACEUPDATE, RenderSurfaceUpdate)
 {
 }
@@ -97,6 +98,12 @@ URHO3D_EVENT(E_ENDVIEWRENDER, EndViewRender)
     URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
     URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// A render path event has occurred.
+URHO3D_EVENT(E_RENDERPATHEVENT, RenderPathEvent)
+{
+    URHO3D_PARAM(P_NAME, Name);                    // String
 }
 
 /// Graphics context has been lost. Some or all (depending on the API) GPU objects have lost their contents.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,9 @@ enum Orientation2D
     /// Isometric.
     O_ISOMETRIC,
     /// Staggered.
-    O_STAGGERED
+    O_STAGGERED,
+    /// Hexagonal
+    O_HEXAGONAL
 };
 
 /// Tile map information.

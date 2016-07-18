@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ bool OcclusionBuffer::SetSize(int width, int height, bool threaded)
 
     if (!IsPowerOfTwo((unsigned)width))
     {
-        URHO3D_LOGERROR("Width is not a power of two");
+        URHO3D_LOGERRORF("Requested occlusion buffer width %d is not a power of two", width);
         return false;
     }
 

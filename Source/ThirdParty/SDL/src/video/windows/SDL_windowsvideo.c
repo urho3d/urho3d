@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,6 +27,7 @@
 
 #include "SDL_main.h"
 #include "SDL_video.h"
+#include "SDL_hints.h"
 #include "SDL_mouse.h"
 #include "SDL_system.h"
 #include "../SDL_sysvideo.h"
@@ -39,6 +40,28 @@
 /* Initialization/Query functions */
 static int WIN_VideoInit(_THIS);
 static void WIN_VideoQuit(_THIS);
+
+/* Hints */
+SDL_bool g_WindowsEnableMessageLoop = SDL_TRUE;
+SDL_bool g_WindowFrameUsableWhileCursorHidden = SDL_TRUE;
+
+static void UpdateWindowsEnableMessageLoop(void *userdata, const char *name, const char *oldValue, const char *newValue)
+{
+    if (newValue && *newValue == '0') {
+        g_WindowsEnableMessageLoop = SDL_FALSE;
+    } else {
+        g_WindowsEnableMessageLoop = SDL_TRUE;
+    }
+}
+
+static void UpdateWindowFrameUsableWhileCursorHidden(void *userdata, const char *name, const char *oldValue, const char *newValue)
+{
+    if (newValue && *newValue == '0') {
+        g_WindowFrameUsableWhileCursorHidden = SDL_FALSE;
+    } else {
+        g_WindowFrameUsableWhileCursorHidden = SDL_TRUE;
+    }
+}
 
 
 /* Windows driver bootstrap functions */
@@ -57,6 +80,9 @@ WIN_DeleteDevice(SDL_VideoDevice * device)
     SDL_UnregisterApp();
     if (data->userDLL) {
         SDL_UnloadObject(data->userDLL);
+    }
+    if (data->shcoreDLL) {
+        SDL_UnloadObject(data->shcoreDLL);
     }
 
     SDL_free(device->driverdata);
@@ -87,20 +113,26 @@ WIN_CreateDevice(int devindex)
 
     data->userDLL = SDL_LoadObject("USER32.DLL");
     if (data->userDLL) {
-        data->CloseTouchInputHandle = (BOOL (WINAPI *)( HTOUCHINPUT )) SDL_LoadFunction(data->userDLL, "CloseTouchInputHandle");
-        data->GetTouchInputInfo = (BOOL (WINAPI *)( HTOUCHINPUT, UINT, PTOUCHINPUT, int )) SDL_LoadFunction(data->userDLL, "GetTouchInputInfo");
-        data->RegisterTouchWindow = (BOOL (WINAPI *)( HWND, ULONG )) SDL_LoadFunction(data->userDLL, "RegisterTouchWindow");
-        
+        data->CloseTouchInputHandle = (BOOL (WINAPI *)(HTOUCHINPUT)) SDL_LoadFunction(data->userDLL, "CloseTouchInputHandle");
+        data->GetTouchInputInfo = (BOOL (WINAPI *)(HTOUCHINPUT, UINT, PTOUCHINPUT, int)) SDL_LoadFunction(data->userDLL, "GetTouchInputInfo");
+        data->RegisterTouchWindow = (BOOL (WINAPI *)(HWND, ULONG)) SDL_LoadFunction(data->userDLL, "RegisterTouchWindow");
+
         // Urho3D: call SetProcessDPIAware if available to prevent Windows 8.1 from performing unwanted scaling
         data->SetProcessDPIAware = (BOOL (WINAPI *)()) SDL_LoadFunction(data->userDLL, "SetProcessDPIAware");
         if (data->SetProcessDPIAware)
             data->SetProcessDPIAware();
     }
 
+    data->shcoreDLL = SDL_LoadObject("SHCORE.DLL");
+    if (data->shcoreDLL) {
+        data->GetDpiForMonitor = (HRESULT (WINAPI *)(HMONITOR, MONITOR_DPI_TYPE, UINT *, UINT *)) SDL_LoadFunction(data->shcoreDLL, "GetDpiForMonitor");
+    }
+
     /* Set the function pointers */
     device->VideoInit = WIN_VideoInit;
     device->VideoQuit = WIN_VideoQuit;
     device->GetDisplayBounds = WIN_GetDisplayBounds;
+    device->GetDisplayDPI = WIN_GetDisplayDPI;
     device->GetDisplayModes = WIN_GetDisplayModes;
     device->SetDisplayMode = WIN_SetDisplayMode;
     device->PumpEvents = WIN_PumpEvents;
@@ -129,6 +161,7 @@ WIN_CreateDevice(int devindex)
     device->UpdateWindowFramebuffer = WIN_UpdateWindowFramebuffer;
     device->DestroyWindowFramebuffer = WIN_DestroyWindowFramebuffer;
     device->OnWindowEnter = WIN_OnWindowEnter;
+    device->SetWindowHitTest = WIN_SetWindowHitTest;
 
     device->shape_driver.CreateShaper = Win32_CreateShaper;
     device->shape_driver.SetWindowShape = Win32_SetWindowShape;
@@ -144,6 +177,17 @@ WIN_CreateDevice(int devindex)
     device->GL_GetSwapInterval = WIN_GL_GetSwapInterval;
     device->GL_SwapWindow = WIN_GL_SwapWindow;
     device->GL_DeleteContext = WIN_GL_DeleteContext;
+#elif SDL_VIDEO_OPENGL_EGL        
+    /* Use EGL based functions */
+    device->GL_LoadLibrary = WIN_GLES_LoadLibrary;
+    device->GL_GetProcAddress = WIN_GLES_GetProcAddress;
+    device->GL_UnloadLibrary = WIN_GLES_UnloadLibrary;
+    device->GL_CreateContext = WIN_GLES_CreateContext;
+    device->GL_MakeCurrent = WIN_GLES_MakeCurrent;
+    device->GL_SetSwapInterval = WIN_GLES_SetSwapInterval;
+    device->GL_GetSwapInterval = WIN_GLES_GetSwapInterval;
+    device->GL_SwapWindow = WIN_GLES_SwapWindow;
+    device->GL_DeleteContext = WIN_GLES_DeleteContext;
 #endif
     device->StartTextInput = WIN_StartTextInput;
     device->StopTextInput = WIN_StopTextInput;
@@ -158,6 +202,7 @@ WIN_CreateDevice(int devindex)
     return device;
 }
 
+
 VideoBootStrap WINDOWS_bootstrap = {
     "windows", "SDL Windows video driver", WIN_Available, WIN_CreateDevice
 };
@@ -171,6 +216,9 @@ WIN_VideoInit(_THIS)
 
     WIN_InitKeyboard(_this);
     WIN_InitMouse(_this);
+
+    SDL_AddHintCallback(SDL_HINT_WINDOWS_ENABLE_MESSAGELOOP, UpdateWindowsEnableMessageLoop, NULL);
+    SDL_AddHintCallback(SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN, UpdateWindowFrameUsableWhileCursorHidden, NULL);
 
     return 0;
 }
@@ -188,159 +236,196 @@ WIN_VideoQuit(_THIS)
 #include <d3d9.h>
 
 SDL_bool 
-D3D_LoadDLL( void **pD3DDLL, IDirect3D9 **pDirect3D9Interface )
+D3D_LoadDLL(void **pD3DDLL, IDirect3D9 **pDirect3D9Interface)
 {
-	*pD3DDLL = SDL_LoadObject("D3D9.DLL");
-	if (*pD3DDLL) {
-		IDirect3D9 *(WINAPI * D3DCreate) (UINT SDKVersion);
+    *pD3DDLL = SDL_LoadObject("D3D9.DLL");
+    if (*pD3DDLL) {
+        typedef IDirect3D9 *(WINAPI *Direct3DCreate9_t) (UINT SDKVersion);
+        Direct3DCreate9_t Direct3DCreate9Func;
 
-		D3DCreate =
-			(IDirect3D9 * (WINAPI *) (UINT)) SDL_LoadFunction(*pD3DDLL,
-			"Direct3DCreate9");
-		if (D3DCreate) {
-			*pDirect3D9Interface = D3DCreate(D3D_SDK_VERSION);
-		}
-		if (!*pDirect3D9Interface) {
-			SDL_UnloadObject(*pD3DDLL);
-			*pD3DDLL = NULL;
-			return SDL_FALSE;
-		}
+#ifdef USE_D3D9EX
+        typedef HRESULT (WINAPI *Direct3DCreate9Ex_t)(UINT SDKVersion, IDirect3D9Ex **ppD3D);
+        Direct3DCreate9Ex_t Direct3DCreate9ExFunc;
 
-		return SDL_TRUE;
-	} else {
-		*pDirect3D9Interface = NULL;
-		return SDL_FALSE;
-	}
+        Direct3DCreate9ExFunc = (Direct3DCreate9Ex_t)SDL_LoadFunction(*pD3DDLL, "Direct3DCreate9Ex");
+        if (Direct3DCreate9ExFunc) {
+            IDirect3D9Ex *pDirect3D9ExInterface;
+            HRESULT hr = Direct3DCreate9ExFunc(D3D_SDK_VERSION, &pDirect3D9ExInterface);
+            if (SUCCEEDED(hr)) {
+                const GUID IDirect3D9_GUID = { 0x81bdcbca, 0x64d4, 0x426d, { 0xae, 0x8d, 0xad, 0x1, 0x47, 0xf4, 0x27, 0x5c } };
+                hr = IDirect3D9Ex_QueryInterface(pDirect3D9ExInterface, &IDirect3D9_GUID, (void**)pDirect3D9Interface);
+                IDirect3D9Ex_Release(pDirect3D9ExInterface);
+                if (SUCCEEDED(hr)) {
+                    return SDL_TRUE;
+                }
+            }
+        }
+#endif /* USE_D3D9EX */
+
+        Direct3DCreate9Func = (Direct3DCreate9_t)SDL_LoadFunction(*pD3DDLL, "Direct3DCreate9");
+        if (Direct3DCreate9Func) {
+            *pDirect3D9Interface = Direct3DCreate9Func(D3D_SDK_VERSION);
+            if (*pDirect3D9Interface) {
+                return SDL_TRUE;
+            }
+        }
+
+        SDL_UnloadObject(*pD3DDLL);
+        *pD3DDLL = NULL;
+    }
+    *pDirect3D9Interface = NULL;
+    return SDL_FALSE;
 }
 
 
 int
-SDL_Direct3D9GetAdapterIndex( int displayIndex )
+SDL_Direct3D9GetAdapterIndex(int displayIndex)
 {
-	void *pD3DDLL;
-	IDirect3D9 *pD3D;
-	if (!D3D_LoadDLL(&pD3DDLL, &pD3D)) {
-		SDL_SetError("Unable to create Direct3D interface");
-		return D3DADAPTER_DEFAULT;
-	} else {
-		SDL_DisplayData *pData = (SDL_DisplayData *)SDL_GetDisplayDriverData(displayIndex);
-		int adapterIndex = D3DADAPTER_DEFAULT;
+    void *pD3DDLL;
+    IDirect3D9 *pD3D;
+    if (!D3D_LoadDLL(&pD3DDLL, &pD3D)) {
+        SDL_SetError("Unable to create Direct3D interface");
+        return D3DADAPTER_DEFAULT;
+    } else {
+        SDL_DisplayData *pData = (SDL_DisplayData *)SDL_GetDisplayDriverData(displayIndex);
+        int adapterIndex = D3DADAPTER_DEFAULT;
 
-		if (!pData) {
-			SDL_SetError("Invalid display index");
-			adapterIndex = -1; /* make sure we return something invalid */
-		} else {
-			char *displayName = WIN_StringToUTF8(pData->DeviceName);
-			unsigned int count = IDirect3D9_GetAdapterCount(pD3D);
-			unsigned int i;
-			for (i=0; i<count; i++) {
-				D3DADAPTER_IDENTIFIER9 id;
-				IDirect3D9_GetAdapterIdentifier(pD3D, i, 0, &id);
+        if (!pData) {
+            SDL_SetError("Invalid display index");
+            adapterIndex = -1; /* make sure we return something invalid */
+        } else {
+            char *displayName = WIN_StringToUTF8(pData->DeviceName);
+            unsigned int count = IDirect3D9_GetAdapterCount(pD3D);
+            unsigned int i;
+            for (i=0; i<count; i++) {
+                D3DADAPTER_IDENTIFIER9 id;
+                IDirect3D9_GetAdapterIdentifier(pD3D, i, 0, &id);
 
-				if (SDL_strcmp(id.DeviceName, displayName) == 0) {
-					adapterIndex = i;
-					break;
-				}
-			}
-			SDL_free(displayName);
-		}
+                if (SDL_strcmp(id.DeviceName, displayName) == 0) {
+                    adapterIndex = i;
+                    break;
+                }
+            }
+            SDL_free(displayName);
+        }
 
-		/* free up the D3D stuff we inited */
-		IDirect3D9_Release(pD3D);
-		SDL_UnloadObject(pD3DDLL);
+        /* free up the D3D stuff we inited */
+        IDirect3D9_Release(pD3D);
+        SDL_UnloadObject(pD3DDLL);
 
-		return adapterIndex;
-	}
+        return adapterIndex;
+    }
 }
 
-// Urho3D: dxgi may not be available on MinGW
-#ifdef _MSC_VER
-
+#if HAVE_DXGI_H
 #define CINTERFACE
 #define COBJMACROS
 #include <dxgi.h>
 
-SDL_bool 
-DXGI_LoadDLL( void **pDXGIDLL , IDXGIFactory **pDXGIFactory )
+static SDL_bool
+DXGI_LoadDLL(void **pDXGIDLL, IDXGIFactory **pDXGIFactory)
 {
-	*pDXGIDLL = SDL_LoadObject("DXGI.DLL");
-	if (*pDXGIDLL ) {
-		HRESULT (WINAPI *CreateDXGI)( REFIID riid, void **ppFactory );
+    *pDXGIDLL = SDL_LoadObject("DXGI.DLL");
+    if (*pDXGIDLL) {
+        HRESULT (WINAPI *CreateDXGI)(REFIID riid, void **ppFactory);
 
-		CreateDXGI =
-			(HRESULT (WINAPI *) (REFIID, void**)) SDL_LoadFunction(*pDXGIDLL,
-			"CreateDXGIFactory");
-		if (CreateDXGI) {
-			GUID dxgiGUID = {0x7b7166ec,0x21c7,0x44ae,{0xb2,0x1a,0xc9,0xae,0x32,0x1a,0xe3,0x69}};
-			if( !SUCCEEDED( CreateDXGI( &dxgiGUID, (void**)pDXGIFactory ))) {
-				*pDXGIFactory = NULL;
-			}
-		}
-		if (!*pDXGIFactory) {
-			SDL_UnloadObject(*pDXGIDLL);
-			*pDXGIDLL = NULL;
-			return SDL_FALSE;
-		}
+        CreateDXGI =
+            (HRESULT (WINAPI *) (REFIID, void**)) SDL_LoadFunction(*pDXGIDLL,
+            "CreateDXGIFactory");
+        if (CreateDXGI) {
+            GUID dxgiGUID = {0x7b7166ec,0x21c7,0x44ae,{0xb2,0x1a,0xc9,0xae,0x32,0x1a,0xe3,0x69}};
+            if (!SUCCEEDED(CreateDXGI(&dxgiGUID, (void**)pDXGIFactory))) {
+                *pDXGIFactory = NULL;
+            }
+        }
+        if (!*pDXGIFactory) {
+            SDL_UnloadObject(*pDXGIDLL);
+            *pDXGIDLL = NULL;
+            return SDL_FALSE;
+        }
 
-		return SDL_TRUE;
-	} else {
-		*pDXGIFactory = NULL;
-		return SDL_FALSE;
-	}
-}
-
-
-void
-SDL_DXGIGetOutputInfo( int displayIndex, int *adapterIndex, int *outputIndex )
-{
-	void *pDXGIDLL;
-	IDXGIFactory *pDXGIFactory;
-
-	*adapterIndex = -1;
-	*outputIndex = -1;
-
-	if (!DXGI_LoadDLL(&pDXGIDLL, &pDXGIFactory)) {
-		SDL_SetError("Unable to create DXGI interface");
-	} else {
-		SDL_DisplayData *pData = (SDL_DisplayData *)SDL_GetDisplayDriverData(displayIndex);
-
-		if (!pData) {
-			SDL_SetError("Invalid display index");
-		} else {
-			char *displayName = WIN_StringToUTF8(pData->DeviceName);
-			int nAdapter = 0, nOutput = 0;
-			IDXGIAdapter* pDXGIAdapter;
-			while ( *adapterIndex == -1 && IDXGIFactory_EnumAdapters(pDXGIFactory, nAdapter, &pDXGIAdapter) != DXGI_ERROR_NOT_FOUND ) {
-				IDXGIOutput* pDXGIOutput;
-				while ( *adapterIndex == -1 && IDXGIAdapter_EnumOutputs(pDXGIAdapter, nOutput, &pDXGIOutput) != DXGI_ERROR_NOT_FOUND ) {
-					DXGI_OUTPUT_DESC outputDesc;
-					if (SUCCEEDED(IDXGIOutput_GetDesc(pDXGIOutput, &outputDesc))) {
-						char *outputName = WIN_StringToUTF8(outputDesc.DeviceName);
-
-						if(!SDL_strcmp(outputName, displayName)) {
-							*adapterIndex = nAdapter;
-							*outputIndex = nOutput;
-						}
-
-						SDL_free( outputName );
-					}
-
-					IDXGIOutput_Release( pDXGIOutput );
-					nOutput++;
-				}
-
-				IDXGIAdapter_Release( pDXGIAdapter );
-				nAdapter++;
-			}
-			SDL_free(displayName);
-		}
-
-		/* free up the D3D stuff we inited */
-		IDXGIFactory_AddRef( pDXGIFactory );
-		SDL_UnloadObject(pDXGIDLL);
-	}
+        return SDL_TRUE;
+    } else {
+        *pDXGIFactory = NULL;
+        return SDL_FALSE;
+    }
 }
 #endif
+
+
+SDL_bool
+SDL_DXGIGetOutputInfo(int displayIndex, int *adapterIndex, int *outputIndex)
+{
+#if !HAVE_DXGI_H
+    if (adapterIndex) *adapterIndex = -1;
+    if (outputIndex) *outputIndex = -1;
+    SDL_SetError("SDL was compiled without DXGI support due to missing dxgi.h header");
+    return SDL_FALSE;
+#else
+    SDL_DisplayData *pData = (SDL_DisplayData *)SDL_GetDisplayDriverData(displayIndex);
+    void *pDXGIDLL;
+    char *displayName;
+    int nAdapter, nOutput;
+    IDXGIFactory *pDXGIFactory;
+    IDXGIAdapter *pDXGIAdapter;
+    IDXGIOutput* pDXGIOutput;
+
+    if (!adapterIndex) {
+        SDL_InvalidParamError("adapterIndex");
+        return SDL_FALSE;
+    }
+
+    if (!outputIndex) {
+        SDL_InvalidParamError("outputIndex");
+        return SDL_FALSE;
+    }
+
+    *adapterIndex = -1;
+    *outputIndex = -1;
+
+    if (!pData) {
+        SDL_SetError("Invalid display index");
+        return SDL_FALSE;
+    }
+
+    if (!DXGI_LoadDLL(&pDXGIDLL, &pDXGIFactory)) {
+        SDL_SetError("Unable to create DXGI interface");
+        return SDL_FALSE;
+    }
+
+    displayName = WIN_StringToUTF8(pData->DeviceName);
+    nAdapter = 0;
+    while (*adapterIndex == -1 && SUCCEEDED(IDXGIFactory_EnumAdapters(pDXGIFactory, nAdapter, &pDXGIAdapter))) {
+        nOutput = 0;
+        while (*adapterIndex == -1 && SUCCEEDED(IDXGIAdapter_EnumOutputs(pDXGIAdapter, nOutput, &pDXGIOutput))) {
+            DXGI_OUTPUT_DESC outputDesc;
+            if (SUCCEEDED(IDXGIOutput_GetDesc(pDXGIOutput, &outputDesc))) {
+                char *outputName = WIN_StringToUTF8(outputDesc.DeviceName);
+                if (SDL_strcmp(outputName, displayName) == 0) {
+                    *adapterIndex = nAdapter;
+                    *outputIndex = nOutput;
+                }
+                SDL_free(outputName);
+            }
+            IDXGIOutput_Release(pDXGIOutput);
+            nOutput++;
+        }
+        IDXGIAdapter_Release(pDXGIAdapter);
+        nAdapter++;
+    }
+    SDL_free(displayName);
+
+    /* free up the DXGI factory */
+    IDXGIFactory_Release(pDXGIFactory);
+    SDL_UnloadObject(pDXGIDLL);
+
+    if (*adapterIndex == -1) {
+        return SDL_FALSE;
+    } else {
+        return SDL_TRUE;
+    }
+#endif
+}
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */
 

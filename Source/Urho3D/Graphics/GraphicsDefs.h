@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2015 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ namespace Urho3D
 class Vector3;
 
 /// Graphics capability support level. Web platform (Emscripten) also uses OpenGL ES, but is considered a desktop platform capability-wise
-#if defined(ANDROID) || defined(IOS) || defined(RPI)
+#if defined(IOS) || defined(__ANDROID__) || defined(__arm__) || defined(__aarch64__)
 #define MOBILE_GRAPHICS
 #else
 #define DESKTOP_GRAPHICS
@@ -56,8 +56,10 @@ enum GeometryType
     GEOM_INSTANCED = 2,
     GEOM_BILLBOARD = 3,
     GEOM_DIRBILLBOARD = 4,
-    GEOM_STATIC_NOINSTANCING = 5,
-    MAX_GEOMETRYTYPES = 5,
+    GEOM_TRAIL_FACE_CAMERA = 5,
+    GEOM_TRAIL_BONE = 6,
+    GEOM_STATIC_NOINSTANCING = 7,
+    MAX_GEOMETRYTYPES = 7,
 };
 
 /// Blending mode.
@@ -124,8 +126,8 @@ enum LockState
     LOCK_SCRATCH
 };
 
-/// Vertex elements.
-enum VertexElement
+/// Hardcoded legacy vertex elements.
+enum LegacyVertexElement
 {
     ELEMENT_POSITION = 0,
     ELEMENT_NORMAL,
@@ -142,8 +144,83 @@ enum VertexElement
     ELEMENT_INSTANCEMATRIX3,
     // Custom 32-bit integer object index. Due to API limitations, not supported on D3D9
     ELEMENT_OBJECTINDEX,
-    MAX_VERTEX_ELEMENTS
+    MAX_LEGACY_VERTEX_ELEMENTS
 };
+
+/// Arbitrary vertex declaration element datatypes.
+enum VertexElementType
+{
+    TYPE_INT = 0,
+    TYPE_FLOAT,
+    TYPE_VECTOR2,
+    TYPE_VECTOR3,
+    TYPE_VECTOR4,
+    TYPE_UBYTE4,
+    TYPE_UBYTE4_NORM,
+    MAX_VERTEX_ELEMENT_TYPES
+};
+
+/// Arbitrary vertex declaration element semantics.
+enum VertexElementSemantic
+{
+    SEM_POSITION = 0,
+    SEM_NORMAL,
+    SEM_BINORMAL,
+    SEM_TANGENT,
+    SEM_TEXCOORD,
+    SEM_COLOR,
+    SEM_BLENDWEIGHTS,
+    SEM_BLENDINDICES,
+    SEM_OBJECTINDEX,
+    MAX_VERTEX_ELEMENT_SEMANTICS
+};
+
+/// Vertex element description for arbitrary vertex declarations.
+struct URHO3D_API VertexElement
+{
+    /// Default-construct.
+    VertexElement() :
+        type_(TYPE_VECTOR3),
+        semantic_(SEM_POSITION),
+        index_(0),
+        perInstance_(false),
+        offset_(0)
+    {
+    }
+
+    /// Construct with type, semantic, index and whether is per-instance data.
+    VertexElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false) :
+        type_(type),
+        semantic_(semantic),
+        index_(index),
+        perInstance_(perInstance),
+        offset_(0)
+    {
+    }
+
+    /// Test for equality with another vertex element. Offset is intentionally not compared, as it's relevant only when an element exists within a vertex buffer.
+    bool operator ==(const VertexElement& rhs) const { return type_ == rhs.type_ && semantic_ == rhs.semantic_ && index_ == rhs.index_ && perInstance_ == rhs.perInstance_; }
+
+    /// Test for inequality with another vertex element.
+    bool operator !=(const VertexElement& rhs) const { return !(*this == rhs); }
+
+    /// Data type of element.
+    VertexElementType type_;
+    /// Semantic of element.
+    VertexElementSemantic semantic_;
+    /// Semantic index of element, for example multi-texcoords.
+    unsigned char index_;
+    /// Per-instance flag.
+    bool perInstance_;
+    /// Offset of element from vertex start. Filled by VertexBuffer once the vertex declaration is built.
+    unsigned offset_;
+};
+
+/// Sizes of vertex element types.
+extern URHO3D_API const unsigned ELEMENT_TYPESIZES[];
+
+/// Vertex element definitions for the legacy elements.
+extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[];
 
 /// Texture filtering mode.
 enum TextureFilterMode
@@ -289,13 +366,11 @@ enum ShadowQuality
     SHADOWQUALITY_BLUR_VSM
 };
 
-
 // Inbuilt shader parameters.
 extern URHO3D_API const StringHash VSP_AMBIENTSTARTCOLOR;
 extern URHO3D_API const StringHash VSP_AMBIENTENDCOLOR;
 extern URHO3D_API const StringHash VSP_BILLBOARDROT;
 extern URHO3D_API const StringHash VSP_CAMERAPOS;
-extern URHO3D_API const StringHash VSP_CAMERAROT;
 extern URHO3D_API const StringHash VSP_CLIPPLANE;
 extern URHO3D_API const StringHash VSP_NEARCLIP;
 extern URHO3D_API const StringHash VSP_FARCLIP;
@@ -306,6 +381,7 @@ extern URHO3D_API const StringHash VSP_FRUSTUMSIZE;
 extern URHO3D_API const StringHash VSP_GBUFFEROFFSETS;
 extern URHO3D_API const StringHash VSP_LIGHTDIR;
 extern URHO3D_API const StringHash VSP_LIGHTPOS;
+extern URHO3D_API const StringHash VSP_NORMALOFFSETSCALE;
 extern URHO3D_API const StringHash VSP_MODEL;
 extern URHO3D_API const StringHash VSP_VIEW;
 extern URHO3D_API const StringHash VSP_VIEWINV;
@@ -327,6 +403,7 @@ extern URHO3D_API const StringHash PSP_GBUFFERINVSIZE;
 extern URHO3D_API const StringHash PSP_LIGHTCOLOR;
 extern URHO3D_API const StringHash PSP_LIGHTDIR;
 extern URHO3D_API const StringHash PSP_LIGHTPOS;
+extern URHO3D_API const StringHash PSP_NORMALOFFSETSCALE;
 extern URHO3D_API const StringHash PSP_MATDIFFCOLOR;
 extern URHO3D_API const StringHash PSP_MATEMISSIVECOLOR;
 extern URHO3D_API const StringHash PSP_MATENVMAPCOLOR;
@@ -340,6 +417,8 @@ extern URHO3D_API const StringHash PSP_SHADOWMAPINVSIZE;
 extern URHO3D_API const StringHash PSP_SHADOWSPLITS;
 extern URHO3D_API const StringHash PSP_LIGHTMATRICES;
 extern URHO3D_API const StringHash PSP_VSMSHADOWPARAMS;
+extern URHO3D_API const StringHash PSP_ROUGHNESS;
+extern URHO3D_API const StringHash PSP_METALLIC;
 
 // Scale calculation from bounding box diagonal.
 extern URHO3D_API const Vector3 DOT_SCALE;
@@ -353,6 +432,7 @@ static const unsigned CLEAR_COLOR = 0x1;
 static const unsigned CLEAR_DEPTH = 0x2;
 static const unsigned CLEAR_STENCIL = 0x4;
 
+// Legacy vertex element bitmasks.
 static const unsigned MASK_NONE = 0x0;
 static const unsigned MASK_POSITION = 0x1;
 static const unsigned MASK_NORMAL = 0x2;
@@ -368,8 +448,6 @@ static const unsigned MASK_INSTANCEMATRIX1 = 0x400;
 static const unsigned MASK_INSTANCEMATRIX2 = 0x800;
 static const unsigned MASK_INSTANCEMATRIX3 = 0x1000;
 static const unsigned MASK_OBJECTINDEX = 0x2000;
-static const unsigned MASK_DEFAULT = 0xffffffff;
-static const unsigned NO_ELEMENT = 0xffffffff;
 
 static const int MAX_RENDERTARGETS = 4;
 static const int MAX_VERTEX_STREAMS = 4;
