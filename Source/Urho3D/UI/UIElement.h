@@ -351,9 +351,9 @@ public:
     void AddTags(const String& tags, char separator = ';');
     /// Add tags.
     void AddTags(const StringVector& tags);
-    // Remove specific tag. Return true if existed.
+    /// Remove specific tag. Return true if existed.
     bool RemoveTag(const String& tag);
-    // Remove all tags.
+    /// Remove all tags.
     void RemoveAllTags();
 
     /// Template version of creating a child element.

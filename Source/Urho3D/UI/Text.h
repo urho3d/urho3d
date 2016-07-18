@@ -53,7 +53,7 @@ struct CharLocation
 /// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
-    // Construct.
+    /// Construct.
     GlyphLocation(int x, int y, const FontGlyph* glyph) :
         x_(x),
         y_(y),

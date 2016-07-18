@@ -66,7 +66,7 @@ public:
 
     /// Return current entity.
     Entity* GetEntity() const { return entity_; }
-    // Return current animation.
+    /// Return current animation.
     Animation* GetAnimation() const { return animation_; }
     /// Return root spatial info.
     const SpatialInfo& GetSpatialInfo() const { return spatialInfo_; }

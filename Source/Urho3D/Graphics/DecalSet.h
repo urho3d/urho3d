@@ -48,7 +48,7 @@ struct DecalVertex
     {
     }
 
-    // Construct with position, normal and skinning information.
+    /// Construct with position, normal and skinning information.
     DecalVertex(const Vector3& position, const Vector3& normal, const float* blendWeights, const unsigned char* blendIndices) :
         position_(position),
         normal_(normal)
