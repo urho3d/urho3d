@@ -5,10 +5,10 @@
 	<attribute name="Smoothing Constant" value="50" />
 	<attribute name="Snap Threshold" value="5" />
 	<attribute name="Elapsed Time" value="36.5594" />
-	<attribute name="Next Replicated Node ID" value="215" />
-	<attribute name="Next Replicated Component ID" value="234" />
-	<attribute name="Next Local Node ID" value="16777255" />
-	<attribute name="Next Local Component ID" value="16777661" />
+	<attribute name="Next Replicated Node ID" value="216" />
+	<attribute name="Next Replicated Component ID" value="235" />
+	<attribute name="Next Local Node ID" value="16777256" />
+	<attribute name="Next Local Component ID" value="16777673" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -1609,17 +1609,17 @@
 			<attribute name="Width" value="262" />
 		</component>
 	</node>
-	<node id="214">
+	<node id="215">
 		<attribute name="Is Enabled" value="true" />
-		<attribute name="Name" value="Cerberus_LP" />
+		<attribute name="Name" value="HoverBike" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="1.1271 4.76735 -11.8164" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="0.05 0.05 0.05" />
+		<attribute name="Position" value="1.34172 2.37148 -10.6186" />
+		<attribute name="Rotation" value="0.707107 0.707107 0 0" />
+		<attribute name="Scale" value="0.02 0.02 0.02" />
 		<attribute name="Variables" />
-		<component type="StaticModel" id="233">
-			<attribute name="Model" value="Model;Models/Cerberus_LP.mdl" />
-			<attribute name="Material" value="Material;Materials/08 - Default.xml" />
+		<component type="StaticModel" id="234">
+			<attribute name="Model" value="Model;Models/HoverBike.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/HoverBikeGlass.xml;Materials/PBR/HoverBikeHull.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
