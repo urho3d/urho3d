@@ -930,7 +930,7 @@
 			<component type="Text3D" id="185">
 				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 				<attribute name="Font Size" value="15" />
-				<attribute name="Text" value="Exanple Materials" />
+				<attribute name="Text" value="Example Materials" />
 				<attribute name="Width" value="149" />
 			</component>
 		</node>
