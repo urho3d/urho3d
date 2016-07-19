@@ -15,5 +15,9 @@ void VS()
 
 void PS()
 {
-    gl_FragColor = cMatDiffColor * textureCube(sDiffCubeMap, vTexCoord);
+    vec4 sky = cMatDiffColor * textureCube(sDiffCubeMap, vTexCoord);
+    #ifdef HDRSCALE
+        sky = mix(sky, pow(sky + 0.25, vec4(6.0)), max(cAmbientColor.a, 0.0));
+    #endif
+    gl_FragColor = sky;
 }

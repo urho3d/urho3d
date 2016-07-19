@@ -26,7 +26,7 @@ varying vec4 vWorldPos;
             varying vec4 vShadowPos[NUMCASCADES];
         #else
             varying highp vec4 vShadowPos[NUMCASCADES];
-        #endif 
+        #endif
     #endif
     #ifdef SPOTLIGHT
         varying vec4 vSpotPos;
@@ -189,7 +189,6 @@ void PS()
         vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
 
         finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
-        finalColor.rgb = pow(finalColor.rgb, vec3(1.0/ 2.2));
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;

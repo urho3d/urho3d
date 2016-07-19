@@ -25,7 +25,7 @@ void VS(float4 iPos : POSITION,
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
-        float4 iBlendWeights : BLENDWEIGHT, 
+        float4 iBlendWeights : BLENDWEIGHT,
         int4 iBlendIndices : BLENDINDICES,
     #endif
     #ifdef INSTANCED
@@ -272,9 +272,6 @@ void PS(
 
         float3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
         finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
-
-        // Convert to SRGB
-        finalColor.rgb = pow(finalColor.rgb, 1.0 / 2.2);
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;

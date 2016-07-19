@@ -254,14 +254,19 @@
     {
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
-        
-        const float mipSelect = roughness  * 9;
+
+        const float mipSelect = roughness  * 9.0;
+
 
         float3 cube = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, mipSelect)).rgb;
+        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, 9.0)).rgb;
+        // Fake the HDR texture
+        float3 hdrCube = lerp(cube, pow(cube + 0.25, 6.0), max(cAmbientColor.a, 0.0));
+        float3 hdrCubeD = lerp(cubeD, pow(cubeD + 0.25, 3.0), max(cAmbientColor.a, 0.0));
         const float3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
-        const float3 environmentDiffuse = EnvBRDFApprox(diffColor, roughness, ndv);
+        const float3 environmentDiffuse = EnvBRDFApprox(diffColor * (1.0 - roughness), 1.0, ndv);
 
-        return cube * environmentSpecular + environmentDiffuse / M_PI;
+        return hdrCube * environmentSpecular + hdrCubeD * environmentDiffuse;
         //return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
     }
 #endif
