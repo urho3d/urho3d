@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="36.5594" />
 	<attribute name="Next Replicated Node ID" value="216" />
 	<attribute name="Next Replicated Component ID" value="235" />
-	<attribute name="Next Local Node ID" value="16777256" />
-	<attribute name="Next Local Component ID" value="16777673" />
+	<attribute name="Next Local Node ID" value="16777257" />
+	<attribute name="Next Local Component ID" value="16777685" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -931,7 +931,7 @@
 				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 				<attribute name="Font Size" value="15" />
 				<attribute name="Text" value="Example Materials" />
-				<attribute name="Width" value="149" />
+				<attribute name="Width" value="155" />
 			</component>
 		</node>
 		<node id="167">
