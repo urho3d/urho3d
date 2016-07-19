@@ -12,6 +12,15 @@
         return specular + (vec3(1.0, 1.0, 1.0) - specular) * pow(1.0 - VdotH, 5.0);
     }
 
+    //Schlick Gaussian Fresnel
+    //specular  = the rgb specular color value of the pixel
+    //VdotH     = the dot product of the camera view direction and the half vector 
+    vec3 SchlickGaussianFresnel(in vec3 specular, in float VdotH)
+    {
+        float sphericalGaussian = pow(2.0, (-5.55473 * VdotH - 6.98316) * VdotH);
+        return specular + (vec3(1.0, 1.0, 1.0) - specular) * sphericalGaussian;
+    }
+
     //Get Fresnel
     //specular  = the rgb specular color value of the pixel
     //VdotH     = the dot product of the camera view direction and the half vector 
@@ -40,6 +49,27 @@
     float Visibility(float NdotL, float NdotV, float roughness)
     {
         return SmithGGXSchlickVisibility(NdotL, NdotV, roughness);
+    }
+
+    // Blinn Distribution
+    // NdotH        = the dot product of the normal and the half vector
+    // roughness    = the roughness of the pixel
+    float BlinnPhongDistribution(in float NdotH, in float roughness)
+    {
+        float specPower = max((2.0 / (roughness * roughness)) - 2.0, 1e-4); // Calculate specular power from roughness
+        return pow(clamp(NdotH, 0.0, 1.0), specPower);
+    }
+
+    // Beckmann Distribution
+    // NdotH        = the dot product of the normal and the half vector
+    // roughness    = the roughness of the pixel
+    float BeckmannDistribution(in float NdotH, in float roughness)
+    {
+        float rough2 = roughness * roughness;
+        float roughnessA = 1.0 / (4.0 * rough2 * pow(NdotH, 4.0));
+        float roughnessB = NdotH * NdotH - 1.0;
+        float roughnessC = rough2 * NdotH * NdotH;
+        return roughnessA * exp(roughnessB / roughnessC);
     }
 
     // GGX Distribution
