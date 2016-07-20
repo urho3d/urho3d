@@ -29,6 +29,6 @@
             specularFactor = distTerm * visTerm * fresnelTerm / M_PI;
         #endif
 
-        return diffuseFactor + specularFactor;
+        return diffuseFactor * diffColor.rgb + specularFactor;
 	}
 #endif

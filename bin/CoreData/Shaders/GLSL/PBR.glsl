@@ -11,7 +11,6 @@
 	// specColor = the rgb specular color of the pixel
 	vec3 GetBRDF(vec3 lightDir, vec3 lightVec, vec3 toCamera, vec3 normal, float roughness, vec3 diffColor, vec3 specColor)
 	{
-        #line 260
         vec3 Hn = normalize(toCamera + lightDir);
         float vdh = clamp((dot(toCamera, Hn)), M_EPSILON, 1.0);
         float ndh = clamp((dot(normal, Hn)), M_EPSILON, 1.0);
@@ -29,6 +28,6 @@
             specularFactor = fresnelTerm * distTerm * visTerm  / M_PI;
         #endif
 
-        return diffuseFactor + specularFactor;
+        return diffuseFactor * diffColor.rgb + specularFactor;
 	}
 #endif
