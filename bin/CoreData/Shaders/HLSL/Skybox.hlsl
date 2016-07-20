@@ -19,7 +19,7 @@ void PS(float3 iTexCoord : TEXCOORD0,
 {
     float4 sky = cMatDiffColor * SampleCube(DiffCubeMap, iTexCoord);
     #ifdef HDRSCALE
-        sky = lerp(sky, pow(sky + 0.25, 6.0), max(cAmbientColor.a, 0.0));
+        sky = pow(sky + clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25), max(cAmbientColor.a, 1.0)) * clamp(cAmbientColor.a, 0.0, 1.0);
     #endif
     oColor = sky;
 }
