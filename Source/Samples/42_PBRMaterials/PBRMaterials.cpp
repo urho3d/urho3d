@@ -47,7 +47,9 @@ URHO3D_DEFINE_APPLICATION_MAIN(PBRMaterials)
 
 PBRMaterials::PBRMaterials(Context* context) :
     Sample(context),
-    dynamicMaterial_(0)
+    dynamicMaterial_(0),
+    roughnessLabel_(0),
+    metallicLabel_(0)
 {
 }
 
@@ -136,6 +138,16 @@ void PBRMaterials::CreateUI()
     Graphics* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
 
+    roughnessLabel_ = ui->GetRoot()->CreateChild<Text>();
+    roughnessLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    roughnessLabel_->SetPosition(370, 50);
+    roughnessLabel_->SetTextEffect(TE_SHADOW);
+
+    metallicLabel_ = ui->GetRoot()->CreateChild<Text>();
+    metallicLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    metallicLabel_->SetPosition(370, 100);
+    metallicLabel_->SetTextEffect(TE_SHADOW);
+
     Slider* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
     roughnessSlider->SetStyleAuto();
     roughnessSlider->SetPosition(50, 50);
@@ -157,12 +169,14 @@ void PBRMaterials::HandleRoughnessSliderChanged(StringHash eventType, VariantMap
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
     dynamicMaterial_->SetShaderParameter("RoughnessPS", newValue);
+    roughnessLabel_->SetText("Roughness: " + String(newValue));
 }
 
 void PBRMaterials::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
     dynamicMaterial_->SetShaderParameter("MetallicPS", newValue);
+    metallicLabel_->SetText("Metallic: " + String(newValue));
 }
 
 void PBRMaterials::SetupViewport()

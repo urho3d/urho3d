@@ -72,4 +72,8 @@ private:
     
     /// Dynamic material.
     Material* dynamicMaterial_;
+    /// Roughness label.
+    Text* roughnessLabel_;
+    /// Metallic label.
+    Text* metallicLabel_;
 };

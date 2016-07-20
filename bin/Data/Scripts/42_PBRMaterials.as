@@ -8,6 +8,8 @@
 #include "Scripts/Utilities/Sample.as"
 
 Material@ dynamicMaterial;
+Text@ roughnessLabel;
+Text@ metallicLabel;
 
 void Start()
 {
@@ -78,6 +80,16 @@ void CreateUI()
     ui.cursor = cursor;
     // Set starting position of the cursor at the rendering window center
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
+
+    roughnessLabel = ui.root.CreateChild("Text");
+    roughnessLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    roughnessLabel.SetPosition(370, 50);
+    roughnessLabel.textEffect = TE_SHADOW;
+
+    metallicLabel = ui.root.CreateChild("Text");
+    metallicLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    metallicLabel.SetPosition(370, 100);
+    metallicLabel.textEffect = TE_SHADOW;
     
     Slider@ roughnessSlider = ui.root.CreateChild("Slider");
     roughnessSlider.SetStyleAuto();
@@ -100,12 +112,14 @@ void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData["Value"].GetFloat();
     dynamicMaterial.shaderParameters["RoughnessPS"] = newValue;
+    roughnessLabel.text = "Roughness: " + newValue;
 }
 
 void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData["Value"].GetFloat();
     dynamicMaterial.shaderParameters["MetallicPS"] = newValue;
+    metallicLabel.text = "Metallic: " + newValue;
 }
 
 void SetupViewport()

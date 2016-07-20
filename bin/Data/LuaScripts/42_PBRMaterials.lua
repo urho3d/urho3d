@@ -7,7 +7,9 @@
 
 require "LuaScripts/Utilities/Sample"
 
-dynamicMaterial = nil
+local dynamicMaterial = nil
+local roughnessLabel = nil
+local metallicLabel = nil
 
 function Start()
     -- Execute the common startup for samples
@@ -77,6 +79,16 @@ function CreateUI()
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
     cursor:SetPosition(graphics.width / 2, graphics.height / 2)
+
+    roughnessLabel = ui.root:CreateChild("Text")
+    roughnessLabel:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+    roughnessLabel:SetPosition(370, 50)
+    roughnessLabel.textEffect = TE_SHADOW
+
+    metallicLabel = ui.root:CreateChild("Text")
+    metallicLabel:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+    metallicLabel:SetPosition(370, 100)
+    metallicLabel.textEffect = TE_SHADOW
     
     local roughnessSlider = ui.root:CreateChild("Slider")
     roughnessSlider:SetStyleAuto()
@@ -98,11 +110,13 @@ end
 function HandleRoughnessSliderChanged(eventType, eventData)
     local newValue = eventData["Value"]:GetFloat()
     dynamicMaterial:SetShaderParameter("RoughnessPS", Variant(newValue))
+    roughnessLabel.text = "Roughness: " .. newValue
 end
 
 function HandleMetallicSliderChanged(eventType, eventData)
     local newValue = eventData["Value"]:GetFloat()
     dynamicMaterial:SetShaderParameter("MetallicPS", Variant(newValue))
+    metallicLabel.text = "Metallic: " .. newValue
 end
 
 function SetupViewport()
