@@ -63,4 +63,17 @@ private:
     void MoveCamera(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Construct an instruction text to the UI.
+    void CreateInstructions();
+    /// Handle the roughness slider drag event.
+    void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle the metallic slider drag event.
+    void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData);
+    
+    /// Dynamic material.
+    Material* dynamicMaterial_;
+    /// Roughness label.
+    Text* roughnessLabel_;
+    /// Metallic label.
+    Text* metallicLabel_;
 };

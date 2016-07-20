@@ -7,6 +7,10 @@
 
 #include "Scripts/Utilities/Sample.as"
 
+Material@ dynamicMaterial;
+Text@ roughnessLabel;
+Text@ metallicLabel;
+
 void Start()
 {
     // Execute the common startup for samples
@@ -17,12 +21,28 @@ void Start()
 
     // Create the UI content and subscribe to UI events
     CreateUI();
+    
+    CreateInstructions();
 
     // Setup the viewport for displaying the scene
     SetupViewport();
 
     // Subscribe to global events for camera movement
     SubscribeToEvents();
+}
+
+void CreateInstructions()
+{
+    // Construct new Text object, set string to display and font to use
+    Text@ instructionText = ui.root.CreateChild("Text");
+    instructionText.text = "Use sliders to change Roughness and Metallic\n" +
+                           "Hold RMB and use WASD keys and mouse to move";
+    instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+
+    // Position the text relative to the screen center
+    instructionText.horizontalAlignment = HA_CENTER;
+    instructionText.verticalAlignment = VA_CENTER;
+    instructionText.SetPosition(0, ui.root.height / 4);
 }
 
 void CreateScene()
@@ -32,13 +52,19 @@ void CreateScene()
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
     scene_.LoadXML(cache.GetFile("Scenes/PBRExample.xml"));
+    
+    Node@ sphereWithDynamicMatNode = scene_.GetChild("SphereWithDynamicMat");
+    StaticModel@ staticModel = sphereWithDynamicMatNode.GetComponent("StaticModel");
+    dynamicMaterial = staticModel.materials[0];
 
     // Create the camera (not included in the scene file)
     cameraNode = scene_.CreateChild("Camera");
     cameraNode.CreateComponent("Camera");
 
-    // Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0f, 4.0f, 0.0f);
+    cameraNode.position = sphereWithDynamicMatNode.position + Vector3(2.0f, 2.0f, 2.0f);
+    cameraNode.LookAt(sphereWithDynamicMatNode.position);
+    yaw = cameraNode.rotation.yaw;
+    pitch = cameraNode.rotation.pitch;
 }
 
 void CreateUI()
@@ -54,6 +80,46 @@ void CreateUI()
     ui.cursor = cursor;
     // Set starting position of the cursor at the rendering window center
     cursor.SetPosition(graphics.width / 2, graphics.height / 2);
+
+    roughnessLabel = ui.root.CreateChild("Text");
+    roughnessLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    roughnessLabel.SetPosition(370, 50);
+    roughnessLabel.textEffect = TE_SHADOW;
+
+    metallicLabel = ui.root.CreateChild("Text");
+    metallicLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    metallicLabel.SetPosition(370, 100);
+    metallicLabel.textEffect = TE_SHADOW;
+    
+    Slider@ roughnessSlider = ui.root.CreateChild("Slider");
+    roughnessSlider.SetStyleAuto();
+    roughnessSlider.SetPosition(50, 50);
+    roughnessSlider.SetSize(300, 20);
+    roughnessSlider.range = 1.0f; // 0 - 1 range
+    SubscribeToEvent(roughnessSlider, "SliderChanged", "HandleRoughnessSliderChanged");
+    roughnessSlider.value = 0.5f;
+    
+    Slider@ metallicSlider = ui.root.CreateChild("Slider");
+    metallicSlider.SetStyleAuto();
+    metallicSlider.SetPosition(50, 100);
+    metallicSlider.SetSize(300, 20);
+    metallicSlider.range = 1.0f; // 0 - 1 range
+    SubscribeToEvent(metallicSlider, "SliderChanged", "HandleMetallicSliderChanged");
+    metallicSlider.value = 0.5f;
+}
+
+void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData["Value"].GetFloat();
+    dynamicMaterial.shaderParameters["RoughnessPS"] = newValue;
+    roughnessLabel.text = "Roughness: " + newValue;
+}
+
+void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData["Value"].GetFloat();
+    dynamicMaterial.shaderParameters["MetallicPS"] = newValue;
+    metallicLabel.text = "Metallic: " + newValue;
 }
 
 void SetupViewport()
