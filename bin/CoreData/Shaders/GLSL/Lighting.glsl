@@ -133,10 +133,14 @@ float GetAtten(vec3 normal, vec3 worldPos, out vec3 lightDir)
     #else
         vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
-        float falloff = pow(clamp(1 - pow(lightDist / 1, 4), 0.0, 1.0),2);
 
-        lightDir = lightVec / vec3(lightDist, lightDist, lightDist);
-        return clamp(dot(normal, lightDir), 0.0, 1.0) * falloff;
+        lightDir = lightVec / lightDist;
+
+        float d = length(cLightPosPS.xyz - worldPos);
+        float r = clamp(1.0 - d * cLightPosPS.w, 0.0, 1.0);
+
+        float i = 1.0 / (lightDist * lightDist);
+        return clamp(dot(normal, lightDir), 0.0, 1.0) * i * r;
     #endif
 }
 
@@ -153,7 +157,7 @@ float GetDiffuseVolumetric(vec3 worldPos)
 
 float GetSpecular(vec3 normal, vec3 eyeVec, vec3 lightDir, float specularPower)
 {
-    vec3 halfVec = normalize(normalize(eyeVec) + lightDir);  
+    vec3 halfVec = normalize(normalize(eyeVec) + lightDir);
     return pow(max(dot(normal, halfVec), 0.0), specularPower);
 }
 
@@ -171,23 +175,23 @@ float GetIntensity(vec3 color)
 #endif
 
 #ifdef VSM_SHADOW
-float ReduceLightBleeding(float min, float p_max)  
-{  
-    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);  
+float ReduceLightBleeding(float min, float p_max)
+{
+    return clamp((p_max - min) / (1.0 - min), 0.0, 1.0);
 }
 
-float Chebyshev(vec2 Moments, float depth)  
-{  
-    //One-tailed inequality valid if depth > Moments.x  
-    float p = float(depth <= Moments.x);  
-    //Compute variance.  
-    float Variance = Moments.y - (Moments.x * Moments.x); 
+float Chebyshev(vec2 Moments, float depth)
+{
+    //One-tailed inequality valid if depth > Moments.x
+    float p = float(depth <= Moments.x);
+    //Compute variance.
+    float Variance = Moments.y - (Moments.x * Moments.x);
 
     float minVariance = cVSMShadowParams.x;
     Variance = max(Variance, minVariance);
-    //Compute probabilistic upper bound.  
-    float d = depth - Moments.x;  
-    float p_max = Variance / (Variance + d*d); 
+    //Compute probabilistic upper bound.
+    float d = depth - Moments.x;
+    float p_max = Variance / (Variance + d*d);
     // Prevent light bleeding
     p_max = ReduceLightBleeding(cVSMShadowParams.y, p_max);
 
@@ -226,7 +230,7 @@ float GetShadow(vec4 shadowPos)
                 textureProj(sShadowMap, vec4(shadowPos.xy + offsets.xy, shadowPos.zw)));
         #endif
     #elif defined(VSM_SHADOW)
-        vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg; 
+        vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg;
         return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z / shadowPos.w);
     #endif
 }
@@ -247,7 +251,7 @@ float GetShadow(highp vec4 shadowPos)
         );
         return cShadowIntensity.y + dot(inLight, vec4(cShadowIntensity.x));
     #elif defined(VSM_SHADOW)
-        vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg; 
+        vec2 samples = texture2D(sShadowMap, shadowPos.xy / shadowPos.w).rg;
         return cShadowIntensity.y + cShadowIntensity.x * Chebyshev(samples, shadowPos.z / shadowPos.w);
     #endif
 }
@@ -294,7 +298,7 @@ float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
         shadowPos = iShadowPos[2];
     else
         shadowPos = iShadowPos[3];
-        
+
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 #else
