@@ -7,6 +7,8 @@
 
 require "LuaScripts/Utilities/Sample"
 
+dynamicMaterial = nil
+
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -16,12 +18,27 @@ function Start()
 
     -- Create the UI content
     CreateUI()
+    
+    CreateInstructions()
 
     -- Setup the viewport for displaying the scene
     SetupViewport()
 
     -- Subscribe to global events for camera movement
     SubscribeToEvents()
+end
+
+function CreateInstructions()
+    -- Construct new Text object, set string to display and font to use
+    local instructionText = ui.root:CreateChild("Text")
+    instructionText:SetText("Use sliders to change Roughness and Metallic\n" ..
+                            "Hold RMB and use WASD keys and mouse to move")
+    instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+
+    -- Position the text relative to the screen center
+    instructionText.horizontalAlignment = HA_CENTER
+    instructionText.verticalAlignment = VA_CENTER
+    instructionText:SetPosition(0, ui.root.height / 4)
 end
 
 function CreateScene()
@@ -33,13 +50,19 @@ function CreateScene()
     scene_:LoadXML(file)
     -- In Lua the file returned by GetFile() needs to be deleted manually
     file:delete()
+    
+    local sphereWithDynamicMatNode = scene_:GetChild("SphereWithDynamicMat")
+    local staticModel = sphereWithDynamicMatNode:GetComponent("StaticModel")
+    dynamicMaterial = staticModel:GetMaterial(0)
 
     -- Create the camera (not included in the scene file)
     cameraNode = scene_:CreateChild("Camera")
     cameraNode:CreateComponent("Camera")
 
-    -- Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0, 4.0, 0.0)
+    cameraNode.position = sphereWithDynamicMatNode.position + Vector3(2.0, 2.0, 2.0)
+    cameraNode:LookAt(sphereWithDynamicMatNode.position)
+    yaw = cameraNode.rotation:YawAngle()
+    pitch = cameraNode.rotation:PitchAngle()
 end
 
 function CreateUI()
@@ -54,6 +77,32 @@ function CreateUI()
     ui.cursor = cursor
     -- Set starting position of the cursor at the rendering window center
     cursor:SetPosition(graphics.width / 2, graphics.height / 2)
+    
+    local roughnessSlider = ui.root:CreateChild("Slider")
+    roughnessSlider:SetStyleAuto()
+    roughnessSlider:SetPosition(50, 50)
+    roughnessSlider:SetSize(300, 20)
+    roughnessSlider.range = 1.0    -- 0 - 1 range
+    SubscribeToEvent(roughnessSlider, "SliderChanged", "HandleRoughnessSliderChanged")
+    roughnessSlider.value = 0.5
+    
+    local metallicSlider = ui.root:CreateChild("Slider")
+    metallicSlider:SetStyleAuto()
+    metallicSlider:SetPosition(50, 100)
+    metallicSlider:SetSize(300, 20)
+    metallicSlider.range = 1.0    -- 0 - 1 range
+    SubscribeToEvent(metallicSlider, "SliderChanged", "HandleMetallicSliderChanged")
+    metallicSlider.value = 0.5
+end
+
+function HandleRoughnessSliderChanged(eventType, eventData)
+    local newValue = eventData["Value"]:GetFloat()
+    dynamicMaterial:SetShaderParameter("RoughnessPS", Variant(newValue))
+end
+
+function HandleMetallicSliderChanged(eventType, eventData)
+    local newValue = eventData["Value"]:GetFloat()
+    dynamicMaterial:SetShaderParameter("MetallicPS", Variant(newValue))
 end
 
 function SetupViewport()
@@ -67,7 +116,6 @@ function SetupViewport()
     local effectRenderPath = viewport:GetRenderPath():Clone()
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/BloomHDR.xml"))
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/FXAA2.xml"))
-    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/GammaCorrection.xml"))
 
     viewport.renderPath = effectRenderPath;
 end
