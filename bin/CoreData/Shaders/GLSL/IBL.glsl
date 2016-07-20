@@ -267,13 +267,13 @@
         float mipSelect = roughness * 9.0;
 
         vec3 cube = textureLod(sZoneCubeMap, reflectVec, mipSelect).rgb;
-        vec3 cubeD = textureLod(sZoneCubeMap, reflectVec, 9.0).rgb;
+        vec3 cubeD = textureLod(sZoneCubeMap, wsNormal, 9.0).rgb;
         // Fake the HDR texture
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
         float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);
 
-        vec3 hdrCube = pow(cube + darknessCutoff, vec3(cAmbientColor.a));
-        vec3 hdrCubeD = pow(cubeD + darknessCutoff, vec3(cAmbientColor.a));
+        vec3 hdrCube = pow(cube + darknessCutoff, vec3(max(1.0, cAmbientColor.a)));
+        vec3 hdrCubeD = pow(cubeD + darknessCutoff, vec3(max(1.0, cAmbientColor.a * 0.5)));
 
         vec3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
         vec3 environmentDiffuse = EnvBRDFApprox( diffColor * (1.0 - roughness), 1.0, ndv);

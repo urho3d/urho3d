@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="36.5594" />
 	<attribute name="Next Replicated Node ID" value="216" />
 	<attribute name="Next Replicated Component ID" value="235" />
-	<attribute name="Next Local Node ID" value="16777263" />
-	<attribute name="Next Local Component ID" value="16777757" />
+	<attribute name="Next Local Node ID" value="16777264" />
+	<attribute name="Next Local Component ID" value="16777769" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -1135,7 +1135,7 @@
 				<attribute name="Variables" />
 				<component type="Light" id="4">
 					<attribute name="Light Type" value="Directional" />
-					<attribute name="Brightness Multiplier" value="2" />
+					<attribute name="Brightness Multiplier" value="8" />
 					<attribute name="Cast Shadows" value="true" />
 					<attribute name="CSM Splits" value="10 20 30 40" />
 				</component>
