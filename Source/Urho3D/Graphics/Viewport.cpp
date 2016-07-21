@@ -171,6 +171,7 @@ IntVector2 Viewport::WorldToScreenPoint(const Vector3& worldPos) const
     int y;
     if (rect_ == IntRect::ZERO)
     {
+        /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
         Graphics* graphics = GetSubsystem<Graphics>();
         x = (int)(screenPoint.x_ * graphics->GetWidth());
         y = (int)(screenPoint.y_ * graphics->GetHeight());
@@ -194,6 +195,7 @@ Vector3 Viewport::ScreenToWorldPoint(int x, int y, float depth) const
 
     if (rect_ == IntRect::ZERO)
     {
+        /// \todo This is incorrect if the viewport is used on a texture rendertarget instead of the backbuffer, as it may have different dimensions.
         Graphics* graphics = GetSubsystem<Graphics>();
         screenX = (float)x / (float)graphics->GetWidth();
         screenY = (float)y / (float)graphics->GetHeight();
