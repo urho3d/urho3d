@@ -155,7 +155,7 @@ else ()
             file (STRINGS ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h MSVC_STATIC_LIB REGEX "^#define URHO3D_STATIC_DEFINE$")
         endif ()
     endif ()
-    # For Android platform, search in path similar to ANDROID_LIBRARY_OUTPUT_PATH variable
+    # For Android platform, search in path based on the chosen Android ABI
     if (ANDROID)
         if (URHO3D_HOME)
             set (URHO3D_LIB_SEARCH_HINT HINTS ${URHO3D_HOME}/libs/${ANDROID_NDK_ABI_NAME})
@@ -237,10 +237,6 @@ else ()
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
             string (REPLACE .js ";" COMPILER_FLAGS "${COMPILER_FLAGS}")     # Emscripten-specific - revise SmileyHack to inject empty suffix to keep try_compile() happy
-            # FIXME: For yet an unknown reason, CMake seems to fail to setup the sysroot as expected here, so we have to set it manually
-            if (ANDROID)
-                set (COMPILER_FLAGS "${COMPILER_FLAGS} --sysroot=\"${CMAKE_SYSROOT}\"")
-            endif ()
             while (NOT URHO3D_COMPILE_RESULT)
                 try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
                     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}

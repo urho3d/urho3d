@@ -53,7 +53,7 @@ else ()
     set (SCRIPT_EXT .sh)
 endif ()
 if (ANDROID)
-    # For Android platform, install to a path similar to ANDROID_LIBRARY_OUTPUT_PATH variable, e.g. libs/armeabi-v7a
+    # For Android platform, install to a path based on the chosen Android ABI, e.g. libs/armeabi-v7a
     set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
 elseif (URHO3D_64BIT)
     # Install to 'lib64' when one of these conditions is true

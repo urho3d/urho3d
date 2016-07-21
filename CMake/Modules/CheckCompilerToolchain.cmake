@@ -33,12 +33,16 @@
 # Compiler version in major.minor.patch format, except MSVC where it follows its own format:
 #  COMPILER_VERSION
 #
-# CPU SIMD instruction extensions support:
+# CPU SIMD instruction extensions support for x86/x86_64 archs:
 #  HAVE_MMX
 #  HAVE_3DNOW
 #  HAVE_SSE
 #  HAVE_SSE2
 #  HAVE_ALTIVEC
+#
+# CPU SIMD instruction extension support for arm/arm64 archs:
+#  HAVE_NEON
+#  NEON
 #
 
 if (EMSCRIPTEN AND CMAKE_HOST_WIN32)
@@ -47,25 +51,25 @@ if (EMSCRIPTEN AND CMAKE_HOST_WIN32)
     execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${NULL_DEVICE${EMCC_FIX}})
 endif ()
 
-if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
+if (NOT MSVC AND NOT DEFINED CCT_NATIVE_PREDEFINED_MACROS)
     if (IOS OR TVOS)
         # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
         set (ARCH_FLAGS -arch arm64)
-    elseif (ANDROID_COMPILER_IS_CLANG)
+    elseif (ANDROID AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
         # Use the same target flag as configured by Android/CMake toolchain file
-        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${ANDROID_CXX_FLAGS}")  # Stringify for string replacement
+        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
     endif ()
-    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE CCT_NATIVE_PREDEFINED_MACROS ERROR_QUIET)
     if (NOT CC_EXIT_STATUS EQUAL 0)
         message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler flags correctly")
     endif ()
-    string (REPLACE \n ";" NATIVE_PREDEFINED_MACROS "${NATIVE_PREDEFINED_MACROS}")    # Stringify for string replacement
-    set (NATIVE_PREDEFINED_MACROS ${NATIVE_PREDEFINED_MACROS} CACHE INTERNAL "Compiler toolchain native predefined macros")
+    string (REPLACE \n ";" CCT_NATIVE_PREDEFINED_MACROS "${CCT_NATIVE_PREDEFINED_MACROS}")    # Stringify for string replacement
+    set (CCT_NATIVE_PREDEFINED_MACROS ${CCT_NATIVE_PREDEFINED_MACROS} CACHE INTERNAL "Compiler toolchain native predefined macros")
 endif ()
 
 macro (check_native_define REGEX OUTPUT_VAR)
-    if (NOT DEFINED ${OUTPUT_VAR})
-        string (REGEX MATCH "#define +${REGEX} +([^;]+)" matched "${NATIVE_PREDEFINED_MACROS}")
+    if (NOT DEFINED CCT_${OUTPUT_VAR})
+        string (REGEX MATCH "#define +${REGEX} +([^;]+)" matched "${CCT_NATIVE_PREDEFINED_MACROS}")
         if (matched)
             string (REGEX MATCH "\\(.*\\)" captured "${REGEX}")
             if (captured)
@@ -78,8 +82,9 @@ macro (check_native_define REGEX OUTPUT_VAR)
         else ()
             set (${OUTPUT_VAR} 0)
         endif ()
-        set (${OUTPUT_VAR} ${${OUTPUT_VAR}} CACHE INTERNAL "Compiler toolchain has predefined macros matching ${REGEX}")
+        set (CCT_${OUTPUT_VAR} ${${OUTPUT_VAR}} CACHE INTERNAL "Compiler toolchain has predefined macros matching ${REGEX}")
     endif ()
+    set (${OUTPUT_VAR} ${CCT_${OUTPUT_VAR}})
 endmacro ()
 
 if (MSVC)
@@ -109,10 +114,11 @@ else ()
     endif ()
 endif ()
 
-macro (check_extension CPU_INSTRUCTION_EXTENSION)
-    string (TOUPPER "${CPU_INSTRUCTION_EXTENSION}" UCASE_EXT_NAME)   # Stringify to guard against empty variable
-    if (NOT DEFINED HAVE_${UCASE_EXT_NAME})
-        execute_process (COMMAND ${CMAKE_C_COMPILER} -m${CPU_INSTRUCTION_EXTENSION} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+macro (check_extension EXTENSION)
+    string (TOUPPER "${EXTENSION}" UCASE_EXT_NAME)   # Stringify to guard against empty variable
+    string (REGEX REPLACE [^=]+= "" UCASE_EXT_NAME "${UCASE_EXT_NAME}")
+    if (NOT DEFINED CCT_HAVE_${UCASE_EXT_NAME})
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -m${EXTENSION} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
         if (NOT CC_EXIT_STATUS EQUAL 0)
             message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler flags correctly")
         endif ()
@@ -127,11 +133,47 @@ macro (check_extension CPU_INSTRUCTION_EXTENSION)
         else ()
             set (matched 0)
         endif ()
-        set (HAVE_${UCASE_EXT_NAME} ${matched} CACHE INTERNAL "Compiler toolchain supports ${UCASE_EXT_NAME} CPU instruction extension")
+        set (CCT_HAVE_${UCASE_EXT_NAME} ${matched} CACHE INTERNAL "Compiler toolchain supports ${UCASE_EXT_NAME} CPU instruction extension")
     endif ()
+    set (HAVE_${UCASE_EXT_NAME} ${CCT_HAVE_${UCASE_EXT_NAME}})
 endmacro ()
 
-if (NOT ARM)
+macro (check_extension_enabled EXTENSION)
+    if (NOT DEFINED CCT_${EXTENSION})
+        set (COMPILER_FLAGS ${CMAKE_C_FLAGS})
+        separate_arguments (COMPILER_FLAGS)
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${COMPILER_FLAGS} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        if (NOT CC_EXIT_STATUS EQUAL 0)
+            message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler flags correctly")
+        endif ()
+        if (NOT ${ARGN} STREQUAL "")
+            set (EXPECTED_MACRO ${ARGN})
+        else ()
+            set (EXPECTED_MACRO __${EXTENSION}__)
+        endif ()
+        string (REGEX MATCH "#define +${EXPECTED_MACRO} +1" matched "${PREDEFINED_MACROS}")
+        if (matched)
+            set (matched 1)
+        else ()
+            set (matched 0)
+        endif ()
+        set (CCT_${EXTENSION} ${matched} CACHE INTERNAL "Is ${EXTENSION} enabled")
+    endif ()
+    set (${EXTENSION} ${CCT_${EXTENSION}})
+endmacro ()
+
+if (ARM)
+    if (MSVC)
+        message (FATAL_ERROR "This build system does not support ARM build using MSVC compiler toolchain yet. Contribution is welcome.")
+    else ()
+        check_extension_enabled (NEON __ARM_NEON)
+        if (NEON)
+            set (HAVE_NEON 1)
+        else ()
+            check_extension (fpu=neon __ARM_NEON)
+        endif ()
+    endif ()
+else ()
     if (MSVC)
         # In our documentation we have already declared that we only support CPU with SSE2 extension on Windows platform, so we can safely hard-code these for MSVC compiler
         foreach (VAR HAVE_MMX HAVE_SSE HAVE_SSE2)
@@ -159,7 +201,7 @@ if (NOT ARM)
 endif ()
 
 # Explicitly set the variable to 1 when it is defined and truthy or 0 when it is not defined or falsy
-foreach (VAR NATIVE_64BIT HAVE_MMX HAVE_3DNOW HAVE_SSE HAVE_SSE2 HAVE_ALTIVEC)
+foreach (VAR NATIVE_64BIT HAVE_MMX HAVE_3DNOW HAVE_SSE HAVE_SSE2 HAVE_ALTIVEC HAVE_NEON NEON)
     if (${VAR})
         set (${VAR} 1)
     else ()
