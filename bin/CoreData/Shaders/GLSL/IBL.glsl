@@ -1,10 +1,10 @@
 #line 10001
-#ifdef COMPILEPS    
+#ifdef COMPILEPS
 
     //
     // Legacy Importance Sampled IBL
     //
-    
+
     // vec3 ImportanceSampleSimple(in vec2 Xi, in float roughness, in vec3 T, in vec3 B, in vec3 N)
     // {
     //     float a = roughness * roughness;
@@ -263,14 +263,22 @@
     {
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         float ndv = clamp(dot(-toCamera, wsNormal), 0.0, 1.0);
-        
-        float mipSelect = roughness  * 9;
 
-        vec3 cube = texture2DLod(sZoneCubeMap, reflectVec, mipSelect).rgb;
+        float mipSelect = roughness * 9.0;
+
+        vec3 cube = textureLod(sZoneCubeMap, reflectVec, mipSelect).rgb;
+        vec3 cubeD = textureLod(sZoneCubeMap, wsNormal, 9.0).rgb;
+        // Fake the HDR texture
+        float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
+        float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);
+
+        vec3 hdrCube = pow(cube + darknessCutoff, vec3(max(1.0, cAmbientColor.a)));
+        vec3 hdrCubeD = pow(cubeD + darknessCutoff, vec3(max(1.0, cAmbientColor.a * 0.5)));
+
         vec3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
-        vec3 environmentDiffuse = EnvBRDFApprox(diffColor, roughness, ndv);
+        vec3 environmentDiffuse = EnvBRDFApprox( diffColor * (1.0 - roughness), 1.0, ndv);
 
-        return cube * environmentSpecular + environmentDiffuse / M_PI;
+        return (hdrCube * environmentSpecular + hdrCubeD * environmentDiffuse) * brightness;
         //return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
     }
 #endif

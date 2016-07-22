@@ -254,14 +254,22 @@
     {
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
-        
-        const float mipSelect = roughness  * 9;
+
+        const float mipSelect = roughness  * 9.0;
 
         float3 cube = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, mipSelect)).rgb;
-        const float3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
-        const float3 environmentDiffuse = EnvBRDFApprox(diffColor, roughness, ndv);
+        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.0)).rgb;
+        // Fake the HDR texture
+        float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
+        float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);
 
-        return cube * environmentSpecular + environmentDiffuse / M_PI;
+        float3 hdrCube = pow(cube + darknessCutoff, max(1.0, cAmbientColor.a));
+        float3 hdrCubeD = pow(cubeD + darknessCutoff, max(1.0, cAmbientColor.a * 0.5));
+
+        const float3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
+        const float3 environmentDiffuse = EnvBRDFApprox(diffColor * (1.0 - roughness), 1.0, ndv);
+
+        return (hdrCube * environmentSpecular + hdrCubeD * environmentDiffuse) * brightness;
         //return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);
     }
 #endif

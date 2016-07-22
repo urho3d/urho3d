@@ -52,7 +52,7 @@ uniform mat4 cZone;
     precision mediump float;
 #endif
 
-uniform vec3 cAmbientColor;
+uniform vec4 cAmbientColor;
 uniform vec3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform vec4 cDepthReconstruct;
@@ -171,7 +171,7 @@ uniform CameraPS
 
 uniform ZonePS
 {
-    vec3 cAmbientColor;
+    vec4 cAmbientColor;
     vec4 cFogParams;
     vec3 cFogColor;
 };
