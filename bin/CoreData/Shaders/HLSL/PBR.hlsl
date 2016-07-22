@@ -18,7 +18,7 @@
         const float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
         const float ndv = clamp((dot(normal, toCamera)), M_EPSILON, 1.0);
 
-        const float3 diffuseFactor = Diffuse(diffColor, roughness * roughness, ndv, ndl, vdh);
+        const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, vdh);
         float3 specularFactor = 0;
 
         #ifdef SPECULAR

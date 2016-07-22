@@ -17,7 +17,7 @@
         float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
         float ndv = clamp((dot(normal, toCamera)), M_EPSILON, 1.0);
 
-        vec3 diffuseFactor = Diffuse(diffColor, roughness * roughness, ndv, ndl, vdh);
+        vec3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, vdh);
         vec3 specularFactor = vec3(0.0, 0.0, 0.0);
 
         #ifdef SPECULAR

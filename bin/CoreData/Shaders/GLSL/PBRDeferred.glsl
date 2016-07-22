@@ -76,7 +76,7 @@ void PS()
     // Position acquired via near/far ray is relative to camera. Bring position to world space
     vec3 eyeVec = -worldPos;
     worldPos += cCameraPosPS;
-    
+
     vec3 normal = normalInput.rgb;
     float roughness = length(normal);
     normal = normalize(normal);
@@ -112,6 +112,6 @@ void PS()
     vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, albedoInput.rgb, specColor);
 
     gl_FragColor.a = 1.0;
-    gl_FragColor.rgb = pow(BRDF * lightColor * (atten * shadow * ndl) / M_PI, vec3(1.0 / 2.2));
+    gl_FragColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
 
 }
