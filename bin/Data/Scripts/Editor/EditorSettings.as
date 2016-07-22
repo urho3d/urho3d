@@ -111,6 +111,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ frameLimiterToggle = settingsDialog.GetChild("FrameLimiterToggle", true);
     frameLimiterToggle.checked = engine.maxFps > 0;
     
+    CheckBox@ gammaCorrectionToggle = settingsDialog.GetChild("GammaCorrectionToggle", true);
+    gammaCorrectionToggle.checked = gammaCorrection;
+
     LineEdit@ cubemapPath = settingsDialog.GetChild("CubeMapGenPath", true);
     cubemapPath.text = cubeMapGen_Path;
     LineEdit@ cubemapName = settingsDialog.GetChild("CubeMapGenKey", true);
@@ -165,6 +168,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(specularLightingToggle, "Toggled", "EditSpecularLighting");
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
+        SubscribeToEvent(gammaCorrectionToggle, "Toggled", "EditGammaCorrection");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         
         SubscribeToEvent(cubemapPath, "TextChanged",  "EditCubemapPath");
@@ -418,6 +422,12 @@ void EditFrameLimiter(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetPtr();
     engine.maxFps = edit.checked ? 200 : 0;
+}
+
+void EditGammaCorrection(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    SetGammaCorrection(edit.checked);
 }
 
 void EditCubemapPath(StringHash eventType, VariantMap& eventData)
