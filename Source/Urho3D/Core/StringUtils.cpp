@@ -399,7 +399,7 @@ Variant ToVectorVariant(const char* source)
         break;
 
     default:
-        assert(false);  // Should not get here
+        // Illegal input. Return variant remains empty
         break;
     }
 

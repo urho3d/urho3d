@@ -79,9 +79,9 @@ URHO3D_API Vector3 ToVector3(const char* source);
 URHO3D_API Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Parse a Vector4 from a C string.
 URHO3D_API Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
-/// Parse a float, Vector or Matrix variant from a string.
+/// Parse a float, Vector or Matrix variant from a string. Return empty variant on illegal input.
 URHO3D_API Variant ToVectorVariant(const String& source);
-/// Parse a float, Vector or Matrix variant from a C string.
+/// Parse a float, Vector or Matrix variant from a C string. Return empty variant on illegal input.
 URHO3D_API Variant ToVectorVariant(const char* source);
 /// Parse a Matrix3 from a string.
 URHO3D_API Matrix3 ToMatrix3(const String& source);
