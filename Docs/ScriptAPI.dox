@@ -12802,7 +12802,7 @@ Properties:
 - bool focus
 - FocusMode focusMode
 - Font@ font // readonly
-- int fontSize // readonly
+- int fontSize
 - int height
 - HorizontalAlignment horizontalAlignment
 - Color hoverColor
@@ -12930,7 +12930,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 - bool fixedScreenSize
 - Font@ font // readonly
-- int fontSize // readonly
+- int fontSize
 - HorizontalAlignment horizontalAlignment
 - uint id // readonly
 - bool inView // readonly
