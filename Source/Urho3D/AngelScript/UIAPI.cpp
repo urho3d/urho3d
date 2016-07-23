@@ -367,6 +367,7 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "Font@+ get_font() const", asMETHOD(Text, GetFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool set_fontSize(int)", asMETHOD(Text, SetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "int get_fontSize() const", asMETHOD(Text, GetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_text(const String&in)", asMETHOD(Text, SetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const String& get_text() const", asMETHOD(Text, GetText), asCALL_THISCALL);
@@ -409,6 +410,7 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "bool SetFont(Font@+, int)", asMETHODPR(Text3D, SetFont, (Font*, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(Text3D, SetAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHOD(Text3D, GetFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool set_fontSize(int)", asMETHOD(Text3D, SetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_fontSize() const", asMETHOD(Text3D, GetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_material(Material@+)", asMETHOD(Text3D, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "Material@+ get_material() const", asMETHOD(Text3D, GetMaterial), asCALL_THISCALL);

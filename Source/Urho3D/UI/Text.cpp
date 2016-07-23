@@ -291,6 +291,15 @@ bool Text::SetFont(Font* font, int size)
     return true;
 }
 
+bool Text::SetFontSize(int size)
+{
+    // Initial font must be set
+    if (!font_)
+        return false;
+    else
+        return SetFont(font_, size);
+}
+
 void Text::DecodeToUnicode()
 {
     unicodeText_.Clear();

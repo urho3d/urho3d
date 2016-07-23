@@ -17,6 +17,7 @@ class Text3D : public Drawable
 
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFontSize(int size);
 
     void SetMaterial(Material* material);
 
@@ -70,7 +71,7 @@ class Text3D : public Drawable
 
     tolua_property__get_set Font* font;
     tolua_property__get_set Material* material;
-    tolua_readonly tolua_property__get_set int fontSize;
+    tolua_property__get_set int fontSize;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;

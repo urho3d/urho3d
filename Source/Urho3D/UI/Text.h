@@ -93,10 +93,12 @@ public:
     /// React to indent change.
     virtual void OnIndentSet();
 
-    /// Set font and font size and use signed distance field.
+    /// Set font by looking from resource cache by name and font size. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size and use signed distance field.
+    /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    /// Set font size only while retaining the existing font. Return true if successful.
+    bool SetFontSize(int size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
