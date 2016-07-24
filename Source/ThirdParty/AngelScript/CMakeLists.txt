@@ -23,6 +23,10 @@
 # Define target name
 set (TARGET_NAME AngelScript)
 
+# Define preprocessor macros
+if (NOT EXCEPTIONS)
+    add_definitions (-DAS_NO_EXCEPTIONS)
+endif ()
 # Add compiler define to build the library with the normal function/method macros
 add_definitions (-DAS_IS_BUILDING)
 

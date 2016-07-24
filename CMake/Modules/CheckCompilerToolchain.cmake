@@ -27,8 +27,9 @@
 #
 # Target architecture:
 #  ARM
-#  RPI
+#  MIPS
 #  POWERPC
+#  X86
 #
 # Compiler version in major.minor.patch format, except MSVC where it follows its own format:
 #  COMPILER_VERSION
@@ -44,27 +45,15 @@
 #  HAVE_NEON
 #  NEON
 #
+# C++ features:
+#  RTTI
+#  EXCEPTIONS
+#
 
 if (EMSCRIPTEN AND CMAKE_HOST_WIN32)
     set (EMCC_FIX EMCC_FIX)
     set (NULL_DEVICE${EMCC_FIX} ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/null.c)
     execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${NULL_DEVICE${EMCC_FIX}})
-endif ()
-
-if (NOT MSVC AND NOT DEFINED CCT_NATIVE_PREDEFINED_MACROS)
-    if (IOS OR TVOS)
-        # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
-        set (ARCH_FLAGS -arch arm64)
-    elseif (ANDROID AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Use the same target flag as configured by Android/CMake toolchain file
-        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
-    endif ()
-    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE CCT_NATIVE_PREDEFINED_MACROS ERROR_QUIET)
-    if (NOT CC_EXIT_STATUS EQUAL 0)
-        message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler flags correctly")
-    endif ()
-    string (REPLACE \n ";" CCT_NATIVE_PREDEFINED_MACROS "${CCT_NATIVE_PREDEFINED_MACROS}")    # Stringify for string replacement
-    set (CCT_NATIVE_PREDEFINED_MACROS ${CCT_NATIVE_PREDEFINED_MACROS} CACHE INTERNAL "Compiler toolchain native predefined macros")
 endif ()
 
 macro (check_native_define REGEX OUTPUT_VAR)
@@ -86,33 +75,6 @@ macro (check_native_define REGEX OUTPUT_VAR)
     endif ()
     set (${OUTPUT_VAR} ${CCT_${OUTPUT_VAR}})
 endmacro ()
-
-if (MSVC)
-    # TODO: revisit this later because VS may use Clang as compiler in the future
-    # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
-    set (NATIVE_64BIT ${CMAKE_CL_64})
-    # Determine MSVC compiler version based on CMake informational variables
-    set (COMPILER_VERSION ${MSVC_VERSION})
-else ()
-    # Determine the native ABI based on the size of pointer
-    check_native_define (__SIZEOF_POINTER__ SIZEOF_POINTER)
-    if (SIZEOF_POINTER EQUAL 8)
-        set (NATIVE_64BIT 1)
-    endif ()
-    # Android arm64 compiler only emits __aarch64__ while iOS arm64 emits __aarch64__, __arm64__, and __arm__; for armv7a all emit __arm__
-    check_native_define ("__(arm|aarch64)__" ARM)
-    # For completeness sake as currently we do not support PowerPC (yet)
-    check_native_define ("__(ppc|PPC|powerpc|POWERPC)(64)*__" POWERPC)
-    # GCC/Clang and all their derivatives should understand this command line option to get the compiler version
-    if (NOT DEFINED COMPILER_VERSION)
-        if (EMSCRIPTEN)
-            set (COMPILER_VERSION ${EMSCRIPTEN_EMCC_VERSION})
-        else ()
-            execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        endif ()
-        set (COMPILER_VERSION ${COMPILER_VERSION} CACHE INTERNAL "GCC/Clang Compiler version")
-    endif ()
-endif ()
 
 macro (check_extension EXTENSION)
     string (TOUPPER "${EXTENSION}" UCASE_EXT_NAME)   # Stringify to guard against empty variable
@@ -138,18 +100,18 @@ macro (check_extension EXTENSION)
     set (HAVE_${UCASE_EXT_NAME} ${CCT_HAVE_${UCASE_EXT_NAME}})
 endmacro ()
 
-macro (check_extension_enabled EXTENSION)
-    if (NOT DEFINED CCT_${EXTENSION})
-        set (COMPILER_FLAGS ${CMAKE_C_FLAGS})
+macro (check_feature_enabled FEATURE)
+    if (NOT DEFINED CCT_${FEATURE})
+        set (COMPILER_FLAGS ${CMAKE_CXX_FLAGS})
         separate_arguments (COMPILER_FLAGS)
-        execute_process (COMMAND ${CMAKE_C_COMPILER} ${COMPILER_FLAGS} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
-        if (NOT CC_EXIT_STATUS EQUAL 0)
+        execute_process (COMMAND ${CMAKE_CXX_COMPILER} ${COMPILER_FLAGS} -E -dM -xc++ ${NULL_DEVICE} RESULT_VARIABLE CXX_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        if (NOT CXX_EXIT_STATUS EQUAL 0)
             message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler flags correctly")
         endif ()
         if (NOT ${ARGN} STREQUAL "")
             set (EXPECTED_MACRO ${ARGN})
         else ()
-            set (EXPECTED_MACRO __${EXTENSION}__)
+            set (EXPECTED_MACRO __${FEATURE})
         endif ()
         string (REGEX MATCH "#define +${EXPECTED_MACRO} +1" matched "${PREDEFINED_MACROS}")
         if (matched)
@@ -157,16 +119,78 @@ macro (check_extension_enabled EXTENSION)
         else ()
             set (matched 0)
         endif ()
-        set (CCT_${EXTENSION} ${matched} CACHE INTERNAL "Is ${EXTENSION} enabled")
+        set (CCT_${FEATURE} ${matched} CACHE INTERNAL "Is ${FEATURE} enabled")
     endif ()
-    set (${EXTENSION} ${CCT_${EXTENSION}})
+    set (${FEATURE} ${CCT_${FEATURE}})
 endmacro ()
+
+if (INVALIDATE_CCT)
+    get_cmake_property (CACHE_VARIABLES CACHE_VARIABLES)
+    foreach (VAR ${CACHE_VARIABLES})
+        if (VAR MATCHES ^CCT_)
+            unset (${VAR} CACHE)
+        endif ()
+    endforeach ()
+endif ()
+
+if (NOT MSVC AND NOT DEFINED CCT_NATIVE_PREDEFINED_MACROS)
+    if (IOS OR TVOS)
+        # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
+        set (ARCH_FLAGS -arch arm64)
+    elseif (ANDROID AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        # Use the same target flag as configured by Android/CMake toolchain file
+        string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
+    endif ()
+    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE CCT_NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    if (NOT CC_EXIT_STATUS EQUAL 0)
+        message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler flags correctly")
+    endif ()
+    string (REPLACE \n ";" CCT_NATIVE_PREDEFINED_MACROS "${CCT_NATIVE_PREDEFINED_MACROS}")    # Stringify for string replacement
+    set (CCT_NATIVE_PREDEFINED_MACROS ${CCT_NATIVE_PREDEFINED_MACROS} CACHE INTERNAL "Compiler toolchain native predefined macros")
+endif ()
+
+if (MSVC)
+    # TODO: revisit this later because VS may use Clang as compiler in the future
+    # On MSVC compiler, use the chosen CMake/VS generator to determine the ABI
+    set (NATIVE_64BIT ${CMAKE_CL_64})
+    # We only support one target arch when using MSVC for now
+    set (X86 1)
+    # Determine MSVC compiler version based on CMake informational variables
+    set (COMPILER_VERSION ${MSVC_VERSION})
+    # Assume all C++ features are ON
+    set (RTTI 1)
+    set (EXCEPTIONS 1)
+else ()
+    # Determine the native ABI based on the size of pointer
+    check_native_define (__SIZEOF_POINTER__ SIZEOF_POINTER)
+    if (SIZEOF_POINTER EQUAL 8)
+        set (NATIVE_64BIT 1)
+    endif ()
+    # Android arm64 compiler only emits __aarch64__ while iOS arm64 emits __aarch64__, __arm64__, and __arm__; for armv7a all emit __arm__
+    check_native_define ("__(arm|aarch64)__" ARM)
+    # Compiler should emit __x86_64__, __i686__, or __i386__, etc when targeting archs using Intel or AMD processors
+    check_native_define ("__(i.86|x86_64)__" X86)
+    # For completeness sake as currently we do not support MIPS and PowerPC (yet)
+    check_native_define ("__MIPSEL__" MIPS)
+    check_native_define ("__(ppc|PPC|powerpc|POWERPC)(64)*__" POWERPC)
+    # GCC/Clang and all their derivatives should understand this command line option to get the compiler version
+    if (NOT DEFINED COMPILER_VERSION)
+        if (EMSCRIPTEN)
+            set (COMPILER_VERSION ${EMSCRIPTEN_EMCC_VERSION})
+        else ()
+            execute_process (COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE COMPILER_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+        endif ()
+        set (COMPILER_VERSION ${COMPILER_VERSION} CACHE INTERNAL "GCC/Clang Compiler version")
+    endif ()
+    check_feature_enabled (RTTI __GXX_RTTI)
+    check_feature_enabled (EXCEPTIONS)
+endif ()
 
 if (ARM)
     if (MSVC)
         message (FATAL_ERROR "This build system does not support ARM build using MSVC compiler toolchain yet. Contribution is welcome.")
     else ()
-        check_extension_enabled (NEON __ARM_NEON)
+        check_feature_enabled (NEON __ARM_NEON)
         if (NEON)
             set (HAVE_NEON 1)
         else ()

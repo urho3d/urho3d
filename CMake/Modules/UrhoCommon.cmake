@@ -106,7 +106,8 @@ cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set ba
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
-cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB" FALSE)
+# Urho's Network subsystem depends on kNet library which uses C++ exceptions feature
+cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB AND EXCEPTIONS" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)

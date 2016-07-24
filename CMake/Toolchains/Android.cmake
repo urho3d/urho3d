@@ -246,12 +246,7 @@ if (NOT IN_TRY_COMPILE)
         # Invalidate internal caches that depend on ANDROID_ABI, if any
         unset (ANDROID_STL_SAVED CACHE)     # This should cause ANDROID_STL option to be revalidated
         if (CLANG)
-            get_cmake_property (CACHE_VARIABLES CACHE_VARIABLES)
-            foreach (VAR ${CACHE_VARIABLES})
-                if (VAR MATCHES ^CCT_)
-                    unset (${VAR} CACHE)
-                endif ()
-            endforeach ()
+            set (INVALIDATE_CCT 1)
         endif ()
     endif ()
     # First, derive variable values based on chosen compiler toolchain
@@ -344,8 +339,14 @@ if (NOT IN_TRY_COMPILE)
 
     # C++ STL runtimes
     option (ANDROID_STL_FORCE_FEATURES "Automatically configure rtti and exceptions support based on the chosen C++ STL runtime" TRUE)
-    cmake_dependent_option (ANDROID_RTTI "Set ON to enable RTTI" TRUE "NOT ANDROID_STL_FORCE_FEATURES" TRUE)
+    # Urho3D - always use RTTI due to dynamic cast usage in the codebase
+    #cmake_dependent_option (ANDROID_RTTI "Set ON to enable RTTI" TRUE "NOT ANDROID_STL_FORCE_FEATURES" TRUE)
+    set (ANDROID_RTTI 1)
     cmake_dependent_option (ANDROID_EXCEPTIONS "Set ON to enable C++ exceptions" TRUE "NOT ANDROID_STL_FORCE_FEATURES" TRUE)
+    if (NOT FEATURE_SIGNATURE STREQUAL "${ANDROID_STL_FORCE_FEATURES}-${ANDROID_RTTI}-${ANDROID_EXCEPTIONS}")
+        set (INVALIDATE_CCT 1)
+        set (FEATURE_SIGNATURE "${ANDROID_STL_FORCE_FEATURES}-${ANDROID_RTTI}-${ANDROID_EXCEPTIONS}" CACHE INTERNAL "Signature when the C++ features are last cached")
+    endif ()
     # Urho3D - warn if static runtime is chosen when using SHARED Urho3D library type
     if (URHO3D_LIB_TYPE STREQUAL SHARED AND ANDROID_STL MATCHES static)
         message (WARNING "Using static C++ STL runtime (${ANDROID_STL}) with SHARED Urho3D library type may result in unpredictable runtime behavior.")

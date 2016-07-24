@@ -62,11 +62,10 @@ Application::Application(Context* context) :
 
 int Application::Run()
 {
-    // Emscripten-specific: C++ exceptions are turned off by default in -O1 (and above), unless '-s DISABLE_EXCEPTION_CATCHING=0' flag is set
-    // Urho3D build configuration uses -O3 (Release), -O2 (RelWithDebInfo), and -O0 (Debug)
-    // Thus, the try-catch block below should be optimised out except in Debug build configuration
+#if !defined(__GNUC__) || __EXCEPTIONS
     try
     {
+#endif
         Setup();
         if (exitCode_)
             return exitCode_;
@@ -98,12 +97,14 @@ int Application::Run()
 #endif
 
         return exitCode_;
+#if !defined(__GNUC__) || __EXCEPTIONS
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog(GetTypeName(), "An out-of-memory error occurred. The application will now exit.");
         return EXIT_FAILURE;
     }
+#endif
 }
 
 void Application::ErrorExit(const String& message)
