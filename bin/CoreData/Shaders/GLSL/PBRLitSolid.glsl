@@ -129,11 +129,11 @@ void PS()
     #ifdef METALLIC
         vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
 
-        float roughness = roughMetalSrc.r + cRoughnessPS;
-        float metalness = roughMetalSrc.g + cMetallicPS;
+        float roughness = roughMetalSrc.r + cRoughness;
+        float metalness = roughMetalSrc.g + cMetallic;
     #else
-        float roughness = cRoughnessPS;
-        float metalness = cMetallicPS;
+        float roughness = cRoughness;
+        float metalness = cMetallic;
     #endif
 
     roughness *= roughness;

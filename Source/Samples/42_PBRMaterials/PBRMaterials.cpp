@@ -168,14 +168,14 @@ void PBRMaterials::CreateUI()
 void PBRMaterials::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
-    dynamicMaterial_->SetShaderParameter("RoughnessPS", newValue);
+    dynamicMaterial_->SetShaderParameter("Roughness", newValue);
     roughnessLabel_->SetText("Roughness: " + String(newValue));
 }
 
 void PBRMaterials::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
-    dynamicMaterial_->SetShaderParameter("MetallicPS", newValue);
+    dynamicMaterial_->SetShaderParameter("Metallic", newValue);
     metallicLabel_->SetText("Metallic: " + String(newValue));
 }
 

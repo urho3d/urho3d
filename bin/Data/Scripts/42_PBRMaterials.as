@@ -125,14 +125,14 @@ void CreateUI()
 void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData["Value"].GetFloat();
-    dynamicMaterial.shaderParameters["RoughnessPS"] = newValue;
+    dynamicMaterial.shaderParameters["Roughness"] = newValue;
     roughnessLabel.text = "Roughness: " + newValue;
 }
 
 void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData["Value"].GetFloat();
-    dynamicMaterial.shaderParameters["MetallicPS"] = newValue;
+    dynamicMaterial.shaderParameters["Metallic"] = newValue;
     metallicLabel.text = "Metallic: " + newValue;
 }
 

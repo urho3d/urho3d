@@ -209,11 +209,11 @@ void PS(
     #ifdef METALLIC // METALNESS
         float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
 
-        float roughness = roughMetalSrc.r + cRoughnessPS;
-        float metalness = roughMetalSrc.g + cMetallicPS;
+        float roughness = roughMetalSrc.r + cRoughness;
+        float metalness = roughMetalSrc.g + cMetallic;
     #else
-        float roughness = cRoughnessPS;
-        float metalness = cMetallicPS;
+        float roughness = cRoughness;
+        float metalness = cMetallic;
     #endif
 
     roughness *= roughness;
