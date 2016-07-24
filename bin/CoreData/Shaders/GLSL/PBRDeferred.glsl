@@ -4,7 +4,7 @@
 #include "ScreenPos.glsl"
 #include "Lighting.glsl"
 #include "Constants.glsl"
-#include "BRDF.glsl"
+#include "PBR.glsl"
 #line 40007
 
 #ifdef DIRLIGHT
@@ -76,7 +76,7 @@ void PS()
     // Position acquired via near/far ray is relative to camera. Bring position to world space
     vec3 eyeVec = -worldPos;
     worldPos += cCameraPosPS;
-    
+
     vec3 normal = normalInput.rgb;
     float roughness = length(normal);
     normal = normalize(normal);
@@ -86,10 +86,11 @@ void PS()
     vec4 projWorldPos = vec4(worldPos, 1.0);
 
     vec3 lightDir;
-    float diff = GetDiffuse(normal, worldPos, lightDir);
+    float atten = GetAtten(normal, worldPos, lightDir);
 
+    float shadow = 1;
     #ifdef SHADOW
-        diff *= GetShadowDeferred(projWorldPos, normal, depth);
+        shadow *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -105,24 +106,12 @@ void PS()
     vec3 toCamera = normalize(eyeVec);
     vec3 lightVec = normalize(lightDir);
 
-    vec3 Hn = normalize(toCamera + lightVec);
-    float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
-    float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
     float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
-    float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
-    vec3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
-    vec3 specularFactor = vec3(0,0,0);
 
-     #ifdef SPECULAR
-        vec3 fresnelTerm = Fresnel(specColor, vdh) ;
-        float distTerm = Distribution(ndh, roughness);
-        float visTerm = Visibility(ndl, ndv, roughness);
-
-        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-    #endif
+    vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, albedoInput.rgb, specColor);
 
     gl_FragColor.a = 1.0;
-    gl_FragColor.rgb = (diffuseFactor + specularFactor) * lightColor * diff;
+    gl_FragColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
 }
