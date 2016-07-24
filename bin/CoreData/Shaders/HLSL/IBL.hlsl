@@ -255,7 +255,10 @@
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
 
-        const float mipSelect = roughness  * 9.0;
+        // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
+        const float GlossScale = 16.0;
+        const float GlossBias = 5.0;
+        const float mipSelect = exp2(GlossScale * roughness + GlossBias) - exp2(GlossBias);
 
         float3 cube = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, mipSelect)).rgb;
         float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.0)).rgb;
@@ -263,11 +266,15 @@
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
         float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);
 
+        const float hdrMaxBrightness = 5.0;
         float3 hdrCube = pow(cube + darknessCutoff, max(1.0, cAmbientColor.a));
-        float3 hdrCubeD = pow(cubeD + darknessCutoff, max(1.0, cAmbientColor.a * 0.5));
+        hdrCube += max(0.0, hdrCube - 1.0) * hdrMaxBrightness;
+
+        float3 hdrCubeD = pow(cubeD + darknessCutoff, max(1.0, cAmbientColor.a));
+        hdrCubeD += max(0.0, hdrCubeD - 1.0) * hdrMaxBrightness;
 
         const float3 environmentSpecular = EnvBRDFApprox(specColor, roughness, ndv);
-        const float3 environmentDiffuse = EnvBRDFApprox(diffColor * (1.0 - roughness), 1.0, ndv);
+        const float3 environmentDiffuse = EnvBRDFApprox(diffColor, 1.0, ndv);
 
         return (hdrCube * environmentSpecular + hdrCubeD * environmentDiffuse) * brightness;
         //return ImportanceSampling(reflectVec, tangent, bitangent, wsNormal, toCamera, diffColor, specColor, roughness, reflectionCubeColor);

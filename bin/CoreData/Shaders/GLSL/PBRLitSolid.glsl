@@ -129,12 +129,17 @@ void PS()
     #ifdef METALLIC
         vec4 roughMetalSrc = texture2D(sSpecMap, vTexCoord.xy);
 
-        float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
-        float metalness = clamp(roughMetalSrc.g + cMetallicPS, METALNESS_FLOOR, 1.0);
+        float roughness = roughMetalSrc.r + cRoughnessPS;
+        float metalness = roughMetalSrc.g + cMetallicPS;
     #else
-        float roughness = clamp(cRoughnessPS, 0.03, 1.0);
-        float metalness = clamp(cMetallicPS, METALNESS_FLOOR, 1.0);
+        float roughness = cRoughnessPS;
+        float metalness = cMetallicPS;
     #endif
+
+    roughness *= roughness;
+
+    roughness = clamp(roughness, ROUGHNESS_FLOOR, 1.0);
+    metalness = clamp(metalness, METALNESS_FLOOR, 1.0);
 
     vec3 specColor = mix(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness;
@@ -167,7 +172,6 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-        #line 200
         float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
         float shadow = 1;
         #ifdef SHADOW
@@ -185,10 +189,9 @@ void PS()
         vec3 lightVec = normalize(lightDir);
         float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
 
-        #line 250
         vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
 
-        finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
+        finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;

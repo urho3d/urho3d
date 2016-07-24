@@ -207,14 +207,19 @@ void PS(
 
     // Get material specular albedo
     #ifdef METALLIC // METALNESS
-        const float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
+        float4 roughMetalSrc = Sample2D(RoughMetalFresnel, iTexCoord.xy);
 
-        const float roughness = clamp(pow(roughMetalSrc.r + cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
-        const float metalness = clamp(roughMetalSrc.g + cMetallicPS, METALNESS_FLOOR, 1.0);
+        float roughness = roughMetalSrc.r + cRoughnessPS;
+        float metalness = roughMetalSrc.g + cMetallicPS;
     #else
-        const float roughness = clamp(pow(cRoughnessPS, 2.0), ROUGHNESS_FLOOR, 1.0);
-        const float metalness = clamp(cMetallicPS, METALNESS_FLOOR, 1.0);
+        float roughness = cRoughnessPS;
+        float metalness = cMetallicPS;
     #endif
+
+    roughness *= roughness;
+
+    roughness = clamp(roughness, ROUGHNESS_FLOOR, 1.0);
+    metalness = clamp(metalness, METALNESS_FLOOR, 1.0);
 
     float3 specColor = lerp(0.08 * cMatSpecColor.rgb, diffColor.rgb, metalness);
     specColor *= cMatSpecColor.rgb;
@@ -271,7 +276,7 @@ void PS(
 
 
         float3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
-        finalColor.rgb = BRDF * lightColor * (atten * shadow * ndl) / M_PI;
+        finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
         #ifdef AMBIENT
             finalColor += cAmbientColor * diffColor.rgb;
