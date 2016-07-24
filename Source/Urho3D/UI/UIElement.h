@@ -257,6 +257,9 @@ public:
     /// Set minimum anchor.
     void SetMinAnchor(float x, float y);
     /// Set maximum anchor.
+    /// Maximum anchor is position where right and bottom sides of UI elements starts.
+    /// Right and bottom sides of UI elements are calculated like following:
+    ///  Final value = ParentSize * MaxAnchor + MaxOffset
     void SetMaxAnchor(const Vector2& anchor);
     /// Set maximum anchor.
     void SetMaxAnchor(float x, float y);
