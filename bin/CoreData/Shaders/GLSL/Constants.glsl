@@ -2,6 +2,6 @@
 #define M_EPSILON 0.0001
 
 #ifdef PBR
-#define ROUGHNESS_FLOOR 0.04
-#define METALNESS_FLOOR 0.05
+#define ROUGHNESS_FLOOR 0.003
+#define METALNESS_FLOOR 0.03
 #endif
