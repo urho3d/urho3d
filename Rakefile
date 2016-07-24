@@ -37,7 +37,7 @@ task :scaffolding do
   puts "In order to configure and generate your project build tree you may need to first set"
   puts "'URHO3D_HOME' environment variable or use 'URHO3D_HOME' build option to point to the"
   puts "Urho3D project build tree or custom Urho3D SDK installation location.\n\n"
-  puts "Please see http://urho3d.github.io/documentation/HEAD/_using_library.html for more detail.\nFor example:\n\n"
+  puts "Please see https://urho3d.github.io/documentation/HEAD/_using_library.html for more detail.\nFor example:\n\n"
   puts "$ cd #{abs_path}\n$ rake cmake URHO3D_HOME=/path/to/Urho3D/build-tree\n$ rake make\n\n"
 end
 
