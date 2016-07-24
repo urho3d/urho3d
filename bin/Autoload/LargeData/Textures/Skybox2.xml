@@ -8,4 +8,5 @@
     <face name="output_pmrem_negz.dds" />
     <address coord="uv" mode="clamp" />
     <mipmap enable="true" />
+    <filter mode="trilinear" />
 </cubemap>

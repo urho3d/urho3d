@@ -10,6 +10,7 @@
 Material@ dynamicMaterial;
 Text@ roughnessLabel;
 Text@ metallicLabel;
+Text@ ambientLabel;
 
 void Start()
 {
@@ -21,7 +22,7 @@ void Start()
 
     // Create the UI content and subscribe to UI events
     CreateUI();
-    
+
     CreateInstructions();
 
     // Setup the viewport for displaying the scene
@@ -52,7 +53,7 @@ void CreateScene()
     // Load scene content prepared in the editor (XML format). GetFile() returns an open file from the resource system
     // which scene.LoadXML() will read
     scene_.LoadXML(cache.GetFile("Scenes/PBRExample.xml"));
-    
+
     Node@ sphereWithDynamicMatNode = scene_.GetChild("SphereWithDynamicMat");
     StaticModel@ staticModel = sphereWithDynamicMatNode.GetComponent("StaticModel");
     dynamicMaterial = staticModel.materials[0];
@@ -90,7 +91,12 @@ void CreateUI()
     metallicLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     metallicLabel.SetPosition(370, 100);
     metallicLabel.textEffect = TE_SHADOW;
-    
+
+    ambientLabel = ui.root.CreateChild("Text");
+    ambientLabel.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
+    ambientLabel.SetPosition(370, 150);
+    ambientLabel.textEffect = TE_SHADOW;
+
     Slider@ roughnessSlider = ui.root.CreateChild("Slider");
     roughnessSlider.SetStyleAuto();
     roughnessSlider.SetPosition(50, 50);
@@ -98,7 +104,7 @@ void CreateUI()
     roughnessSlider.range = 1.0f; // 0 - 1 range
     SubscribeToEvent(roughnessSlider, "SliderChanged", "HandleRoughnessSliderChanged");
     roughnessSlider.value = 0.5f;
-    
+
     Slider@ metallicSlider = ui.root.CreateChild("Slider");
     metallicSlider.SetStyleAuto();
     metallicSlider.SetPosition(50, 100);
@@ -106,6 +112,14 @@ void CreateUI()
     metallicSlider.range = 1.0f; // 0 - 1 range
     SubscribeToEvent(metallicSlider, "SliderChanged", "HandleMetallicSliderChanged");
     metallicSlider.value = 0.5f;
+
+    Slider@ ambientSlider = ui.root.CreateChild("Slider");
+    ambientSlider.SetStyleAuto();
+    ambientSlider.SetPosition(50, 150);
+    ambientSlider.SetSize(300, 20);
+    ambientSlider.range = 10.0f; // 0 - 1 range
+    SubscribeToEvent(ambientSlider, "SliderChanged", "HandleAmbientSliderChanged");
+    ambientSlider.value = 5.0f;
 }
 
 void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
@@ -120,6 +134,16 @@ void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
     float newValue = eventData["Value"].GetFloat();
     dynamicMaterial.shaderParameters["MetallicPS"] = newValue;
     metallicLabel.text = "Metallic: " + newValue;
+}
+
+void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData["Value"].GetFloat();
+    Node@ zoneNode = scene_.GetChild("Zone");
+    Zone@ zone = zoneNode.GetComponent("Zone");
+    Color col = Color(0.0, 0.0, 0.0, newValue);
+    zone.SetAttribute("Ambient Color", Variant(col));
+    ambientLabel.text = "Ambient HDR Scale: " + zone.ambientColor.a;
 }
 
 void SetupViewport()
