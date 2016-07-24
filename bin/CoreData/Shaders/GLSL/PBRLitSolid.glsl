@@ -173,7 +173,7 @@ void PS()
         vec3 finalColor;
 
         float atten = GetAtten(normal, vWorldPos.xyz, lightDir);
-        float shadow = 1;
+        float shadow = 1.0;
         #ifdef SHADOW
             shadow = GetShadow(vShadowPos, vWorldPos.w);
         #endif
@@ -194,7 +194,7 @@ void PS()
         finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
         #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cAmbientColor.rgb * diffColor.rgb;
             finalColor += cMatEmissiveColor;
             gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
@@ -212,7 +212,7 @@ void PS()
         vec3 finalColor = vVertexLight * diffColor.rgb;
         #ifdef AO
             // If using AO, the vertex light ambient is black, calculate occluded ambient here
-            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor * diffColor.rgb;
+            finalColor += texture2D(sEmissiveMap, vTexCoord2).rgb * cAmbientColor.rgb * diffColor.rgb;
         #endif
 
         #ifdef MATERIAL

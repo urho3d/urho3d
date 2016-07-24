@@ -201,7 +201,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cAmbientColor.rgb * diffColor.rgb;
             finalColor += cMatEmissiveColor;
             oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
         #else
