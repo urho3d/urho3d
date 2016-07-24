@@ -265,9 +265,9 @@
         float ndv = clamp(dot(-toCamera, wsNormal), 0.0, 1.0);
 
         // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
-        float GlossScale = 16.0;
-        float GlossBias = 5.0;
-        float mipSelect = exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
+        //float GlossScale = 16.0;
+        //float GlossBias = 5.0;
+        float mipSelect = roughness * 9.0; //exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
 
         vec3 cube = textureLod(sZoneCubeMap, reflectVec, mipSelect).rgb;
         vec3 cubeD = textureLod(sZoneCubeMap, wsNormal, 9.0).rgb;
