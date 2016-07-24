@@ -35,7 +35,8 @@ enum HorizontalAlignment
 {
     HA_LEFT = 0,
     HA_CENTER,
-    HA_RIGHT
+    HA_RIGHT,
+    HA_CUSTOM
 };
 
 /// %UI element vertical alignment.
@@ -43,7 +44,8 @@ enum VerticalAlignment
 {
     VA_TOP = 0,
     VA_CENTER,
-    VA_BOTTOM
+    VA_BOTTOM,
+    VA_CUSTOM
 };
 
 /// %UI element corners.
@@ -246,6 +248,22 @@ public:
     void SetHorizontalAlignment(HorizontalAlignment align);
     /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
+    /// Set minimum offset.
+    void SetMinOffset(const IntVector2& offset);
+    /// Set maximum offset.
+    void SetMaxOffset(const IntVector2& offset);
+    /// Set minimum anchor.
+    void SetMinAnchor(const Vector2& anchor);
+    /// Set minimum anchor.
+    void SetMinAnchor(float x, float y);
+    /// Set maximum anchor.
+    void SetMaxAnchor(const Vector2& anchor);
+    /// Set maximum anchor.
+    void SetMaxAnchor(float x, float y);
+    /// Set pivot.
+    void SetPivot(const Vector2& pivot);
+    /// Set pivot.
+    void SetPivot(float x, float y);
     /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
     /// Set color on all corners.
@@ -417,10 +435,52 @@ public:
     const IntVector2& GetChildOffset() const { return childOffset_; }
 
     /// Return horizontal alignment.
-    HorizontalAlignment GetHorizontalAlignment() const { return horizontalAlignment_; }
+    HorizontalAlignment GetHorizontalAlignment() const 
+    {
+        if (anchorMin_.x_ == 0.0f && anchorMax_.x_ == 0.0f)
+        {
+            return HA_LEFT;
+        }
+        else if (anchorMin_.x_ == 0.5f && anchorMax_.x_ == 0.5f)
+        {
+            return HA_CENTER;
+        }
+        else if (anchorMin_.x_ == 1.0f && anchorMax_.x_ == 1.0f)
+        {
+            return HA_RIGHT;
+        }
+        return HA_CUSTOM;
+    }
 
     /// Return vertical alignment.
-    VerticalAlignment GetVerticalAlignment() const { return verticalAlignment_; }
+    VerticalAlignment GetVerticalAlignment() const 
+    {
+        if (anchorMin_.y_ == 0.0f && anchorMax_.y_ == 0.0f)
+        {
+            return VA_TOP;
+        }
+        else if (anchorMin_.y_ == 0.5f && anchorMax_.y_ == 0.5f)
+        {
+            return VA_CENTER;
+        }
+        else if (anchorMin_.y_ == 1.0f && anchorMax_.y_ == 1.0f)
+        {
+            return VA_BOTTOM;
+        }
+        return VA_CUSTOM;
+    }
+
+    /// Return minimum anchor.
+    const Vector2& GetMinAnchor() const { return anchorMin_; }
+
+    /// Return maximum anchor.
+    const Vector2& GetMaxAnchor() const { return anchorMax_; }
+
+    // Return maximum offset.
+    const IntVector2& GetMaxOffset() const { return maxOffset_; }
+
+    /// Return pivot.
+    const Vector2& GetPivot() const { return pivot_; }
 
     /// Return child element clipping border.
     const IntRect& GetClipBorder() const { return clipBorder_; }
@@ -610,6 +670,10 @@ protected:
     bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const;
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    /// Recalculates maxOffset.
+    void AdjustMaxOffset();
+    /// Adjust size using anchor.
+    void AdjustAnchoredSize();
 
     /// Name.
     String name_;
@@ -649,6 +713,8 @@ protected:
     bool hovering_;
     /// Internally created flag.
     bool internal_;
+    /// Recalculate maxOffset from size.
+    bool recalcMaxOffset_;
     /// Focus mode.
     FocusMode focusMode_;
     /// Drag and drop flags.
@@ -716,10 +782,14 @@ private:
     IntVector2 childOffset_;
     /// Parent's minimum size calculated by layout. Used internally.
     IntVector2 layoutMinSize_;
-    /// Horizontal alignment.
-    HorizontalAlignment horizontalAlignment_;
-    /// Vertical alignment.
-    VerticalAlignment verticalAlignment_;
+    /// Relative size.
+    IntVector2 maxOffset_;
+    /// Anchor Minimum Position
+    Vector2 anchorMin_;
+    /// Anchor Maximum Position
+    Vector2 anchorMax_;
+    /// Pivot Position
+    Vector2 pivot_;
     /// Opacity.
     float opacity_;
     /// Derived opacity.
