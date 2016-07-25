@@ -1150,7 +1150,7 @@
 				<attribute name="Variables" />
 				<component type="Light" id="4">
 					<attribute name="Light Type" value="Directional" />
-					<attribute name="Brightness Multiplier" value="4" />
+					<attribute name="Brightness Multiplier" value="2" />
 					<attribute name="Cast Shadows" value="true" />
 					<attribute name="CSM Splits" value="10 20 30 40" />
 				</component>
