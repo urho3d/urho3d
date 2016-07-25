@@ -169,10 +169,6 @@ else ()
     endif ()
     set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
-        # Break if the compiler is not multilib-capable and the ABI is not its native
-        if ((MSVC OR ANDROID OR ARM OR WEB) AND NOT ABI_64BIT EQUAL NATIVE_64BIT)
-            break ()
-        endif ()
         # Set to search in 'lib' or 'lib64' based on the ABI being tested
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ${ABI_64BIT})    # Leave this global property setting afterwards, do not restore it to its previous value
         find_library (URHO3D_LIBRARIES NAMES Urho3D ${URHO3D_LIB_SEARCH_HINT} PATH_SUFFIXES ${PATH_SUFFIX} ${SEARCH_OPT} DOC "Urho3D library directory")
@@ -281,6 +277,10 @@ else ()
                 set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE_SAVED})
                 unset (URHO3D_LIBRARIES CACHE)
             endif ()
+        endif ()
+        # Break if the compiler is not multilib-capable
+        if (MSVC OR ANDROID OR ARM OR WEB)
+            break ()
         endif ()
     endforeach ()
     # If both the non-debug and debug version of the libraries are found on Windows platform then use them both

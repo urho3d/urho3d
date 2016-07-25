@@ -149,6 +149,7 @@ foreach (LANG C CXX)
     # Since currently CMake does not able to identify Emscripten compiler toolchain, set the compiler identification explicitly
     set (CMAKE_${LANG}_COMPILER_ID_RUN TRUE)
     set (CMAKE_${LANG}_COMPILER_ID Clang)
+    set (CMAKE_${LANG}_COMPILER_VERSION ${EMSCRIPTEN_EMCC_VERSION})
     # The ABI info could not be checked as per normal as CMake does not understand the test build output from Emscripten, so bypass it also
     set (CMAKE_${LANG}_ABI_COMPILED TRUE)
     set (CMAKE_${LANG}_SIZEOF_DATA_PTR 4)   # Assume it is always 32-bit for now (we could have used our CheckCompilerToolChains.cmake module here)
@@ -184,5 +185,4 @@ if (NOT IN_TRY_COMPILE)
     set (ENV{VARS} "${VARS}")   # Stringify to keep the list together
 endif ()
 
-set (WEB 1)
 set (EMSCRIPTEN 1)
