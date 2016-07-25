@@ -144,7 +144,7 @@ float GetAtten(float3 normal, float3 worldPos, out float3 lightDir)
     #else
         float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
         float lightDist = length(lightVec);
-        float falloff = pow(saturate(1 - pow(lightDist / 1, 4)),2) / (pow(lightDist, 2.0) + 1.0);
+        float falloff = pow(saturate(1.0 - pow(lightDist / 1.0, 4.0)), 2.0) / (pow(lightDist, 2.0) + 1.0);
 
         lightDir = lightVec / lightDist;
         return saturate(dot(normal, lightDir)) * falloff;

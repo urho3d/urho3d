@@ -206,7 +206,7 @@ void PS()
         gl_FragData[0] = vec4(specColor, spareData.r);
         gl_FragData[1] = vec4(diffColor.rgb, spareData.g);
         gl_FragData[2] = vec4(normal * roughness, spareData.b);
-        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), 0);
+        gl_FragData[3] = vec4(EncodeDepth(vWorldPos.w), 0.0);
     #else
         // Ambient & per-vertex lighting
         vec3 finalColor = vVertexLight * diffColor.rgb;

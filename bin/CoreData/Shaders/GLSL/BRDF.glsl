@@ -78,7 +78,7 @@
     float GGXDistribution(float NdotH, float roughness)
     {
         float rough2 = roughness * roughness;
-        float tmp =  (NdotH * rough2 - NdotH) * NdotH + 1;
+        float tmp =  (NdotH * rough2 - NdotH) * NdotH + 1.0;
         return rough2 / (tmp * tmp);
     }
 
@@ -109,7 +109,7 @@
     // VdotH        = the camera view direction dot with the half vector
     vec3 BurleyDiffuse(vec3 diffuseColor, float roughness, float NdotV, float NdotL, float VdotH)
     {
-        float energyBias = mix(roughness, 0, 0.5);
+        float energyBias = mix(roughness, 0.0, 0.5);
         float energyFactor = mix(roughness, 1.0, 1.0 / 1.51);
         float fd90 = energyBias + 2.0 * VdotH * VdotH * roughness;
         float f0 = 1.0;
