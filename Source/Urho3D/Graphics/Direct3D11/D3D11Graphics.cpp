@@ -440,6 +440,11 @@ void Graphics::SetSRGB(bool enable)
     }
 }
 
+void Graphics::SetDither(bool enable)
+{
+    // No effect on Direct3D11
+}
+
 void Graphics::SetFlushGPU(bool enable)
 {
     flushGPU_ = enable;
@@ -1795,10 +1800,15 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
+bool Graphics::GetDither() const
+{
+    return false;
+}
+
 bool Graphics::IsDeviceLost() const
 {
     // Direct3D11 graphics context is never considered lost
-    /// \todo The device could be lost in case of graphics adapters getting disabled during runtime. This is not handled
+    /// \todo The device could be lost in case of graphics adapters getting disabled during runtime. This is not currently handled
     return false;
 }
 

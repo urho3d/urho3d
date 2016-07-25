@@ -550,8 +550,17 @@ void Graphics::SetSRGB(bool enable)
     }
 }
 
+void Graphics::SetDither(bool enable)
+{
+    if (enable)
+        glEnable(GL_DITHER);
+    else
+        glDisable(GL_DITHER);
+}
+
 void Graphics::SetFlushGPU(bool enable)
 {
+    // Currently unimplemented on OpenGL
 }
 
 void Graphics::SetForceGL2(bool enable)
@@ -1913,6 +1922,11 @@ void Graphics::PrecacheShaders(Deserializer& source)
 bool Graphics::IsInitialized() const
 {
     return window_ != 0;
+}
+
+bool Graphics::GetDither() const
+{
+    return glIsEnabled(GL_DITHER) ? true : false;
 }
 
 bool Graphics::IsDeviceLost() const

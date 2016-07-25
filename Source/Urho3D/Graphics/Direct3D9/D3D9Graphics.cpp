@@ -524,6 +524,11 @@ void Graphics::SetSRGB(bool enable)
     sRGB_ = enable && sRGBWriteSupport_;
 }
 
+void Graphics::SetDither(bool enable)
+{
+    // No effect on Direct3D9
+}
+
 void Graphics::SetFlushGPU(bool enable)
 {
     flushGPU_ = enable;
@@ -1993,6 +1998,11 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     }
 
     return IntVector2(width, height);
+}
+
+bool Graphics::GetDither() const
+{
+    return false;
 }
 
 bool Graphics::IsDeviceLost() const

@@ -12,6 +12,7 @@ class Graphics : public Object
     bool SetMode(int width, int height);
 
     void SetSRGB(bool enable);
+    void SetDither(bool enable);
     void SetFlushGPU(bool enable);
     void SetOrientations(const String orientations);
     bool ToggleFullscreen();
@@ -38,6 +39,7 @@ class Graphics : public Object
     bool GetVSync() const;
     bool GetTripleBuffer() const;
     bool GetSRGB() const;
+    bool GetDither() const;
     bool GetFlushGPU() const;
     const String GetOrientations() const;
     bool IsDeviceLost() const;
@@ -87,6 +89,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool vSync;
     tolua_readonly tolua_property__get_set bool tripleBuffer;
     tolua_property__get_set bool sRGB;
+    tolua_property__get_set bool dither;
     tolua_property__get_set bool flushGPU;
     tolua_property__get_set String orientations;
     tolua_readonly tolua_property__is_set bool deviceLost;

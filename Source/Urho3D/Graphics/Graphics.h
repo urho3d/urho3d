@@ -106,6 +106,8 @@ public:
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.
     void SetSRGB(bool enable);
+    /// Set whether rendering output is dithered. Default true on OpenGL. No effect on Direct3D.
+    void SetDither(bool enable);
     /// Set whether to flush the GPU command buffer to prevent multiple frames being queued and uneven frame timesteps. Default off, may decrease performance if enabled. Not currently implemented on OpenGL.
     void SetFlushGPU(bool enable);
     /// Set forced use of OpenGL 2 even if OpenGL 3 is available. Must be called before setting the screen mode for the first time. Default false. No effect on Direct3D9 & 11.
@@ -290,6 +292,9 @@ public:
 
     /// Return whether the main window is using sRGB conversion on write.
     bool GetSRGB() const { return sRGB_; }
+    
+    /// Return whether rendering output is dithered.
+    bool GetDither() const;
 
     /// Return whether the GPU command buffer is flushed each frame.
     bool GetFlushGPU() const { return flushGPU_; }
