@@ -7064,6 +7064,7 @@ Properties:
 - bool deferredSupport // readonly
 - IntVector2 desktopResolution // readonly
 - bool deviceLost // readonly
+- bool dither
 - bool flushGPU
 - bool fullscreen // readonly
 - bool hardwareShadowSupport // readonly

@@ -2522,6 +2522,7 @@ Methods:
 - bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
+- void SetDither(bool enable)
 - void SetFlushGPU(bool enable)
 - void SetOrientations(const String orientations)
 - bool ToggleFullscreen()
@@ -2547,6 +2548,7 @@ Methods:
 - bool GetVSync() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
+- bool GetDither() const
 - bool GetFlushGPU() const
 - const String GetOrientations() const
 - bool IsDeviceLost() const
@@ -2597,6 +2599,7 @@ Properties:
 - bool vSync (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
+- bool dither
 - bool flushGPU
 - String orientations
 - bool deviceLost (readonly)

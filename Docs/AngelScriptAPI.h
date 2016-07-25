@@ -5122,6 +5122,7 @@ bool deferredSupport;
 IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
+bool dither;
 bool flushGPU;
 /* readonly */
 bool fullscreen;
