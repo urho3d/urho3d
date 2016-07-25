@@ -249,6 +249,7 @@ void LoadConfig()
         if (renderingElem.HasAttribute("specularlighting")) renderer.specularLighting = renderingElem.GetBool("specularlighting");
         if (renderingElem.HasAttribute("dynamicinstancing")) renderer.dynamicInstancing = renderingElem.GetBool("dynamicinstancing");
         if (renderingElem.HasAttribute("framelimiter")) engine.maxFps = renderingElem.GetBool("framelimiter") ? 200 : 0;
+        if (renderingElem.HasAttribute("gammacorrection")) gammaCorrection = renderingElem.GetBool("gammacorrection");
     }
 
     if (!uiElem.isNull)
@@ -382,6 +383,7 @@ void SaveConfig()
     }
 
     renderingElem.SetBool("framelimiter", engine.maxFps > 0);
+    renderingElem.SetBool("gammacorrection", gammaCorrection);
 
     uiElem.SetFloat("minopacity", uiMinOpacity);
     uiElem.SetFloat("maxopacity", uiMaxOpacity);

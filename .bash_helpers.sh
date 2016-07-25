@@ -98,7 +98,7 @@ post_cmake() {
         fi
     elif [ -e "$BUILD"/*.xcodeproj/project.pbxproj ] && perl -v >/dev/null 2>&1; then
         echo -- post_cmake: Fix generated Xcode project
-        # Temporary workaround to fix file references being added into multiple groups warnings (CMake bug http://www.cmake.org/Bug/view.php?id=15272, stil exists in 3.1)
+        # Temporary workaround to fix file references being added into multiple groups warnings (CMake bug https://www.cmake.org/Bug/view.php?id=15272, stil exists in 3.1)
         perl -i -pe 'BEGIN {$/=undef} s/(Begin PBXGroup section.*?\/\* Sources \*\/,).*?,/\1/s' "$BUILD"/*.xcodeproj/project.pbxproj
         # Speed up build for Debug build configuration by building only active arch (currently this is not doable via CMake generator-expression as it only works for individual target instead of global)
         perl -i -pe 'BEGIN {$/=undef} s/(Debug \*\/ = {[^}]+?)SDKROOT/\1ONLY_ACTIVE_ARCH = YES; SDKROOT/s' "$BUILD"/*.xcodeproj/project.pbxproj

@@ -6169,6 +6169,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6211,7 +6212,7 @@ Methods:
 Properties:
 
 - Font* font
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6240,6 +6241,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6291,7 +6293,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment

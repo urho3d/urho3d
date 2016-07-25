@@ -1195,7 +1195,7 @@ Diffuse maps specify the surface color in the RGB channels. Optionally they can 
 Normal maps encode the tangent-space surface normal for normal mapping. There are two options for storing normals, which require choosing the correct material technique, as the pixel shader is different in each case:
 
 - Store as RGB. In this case use the DiffNormal techniques. This is the default used by AssetImporter, to ensure no conversion of normal textures needs to happen.
-- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx
+- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see https://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx.
 
 Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
 
@@ -1243,7 +1243,7 @@ Using a single image texture and a layout is used like this:
 </cubemap>
 \endcode
 
-For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
+For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and https://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
 
 \section Materials_3DTextures 3D textures
 
@@ -2310,7 +2310,7 @@ Both are rendered using StaticSprite2D class (Drawable component):
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
 - StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
-Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (https://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
@@ -2377,7 +2377,7 @@ Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full 
 
 Several collision shapes may exist in the same node to create compound shapes. This can be handy to approximate complex or concave shapes.
 
-Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (https://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
 
 Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
 

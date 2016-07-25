@@ -52,7 +52,7 @@ public:
                 psConstantBuffers_[i] = graphics->GetOrCreateConstantBuffer(PS, i, psBufferSizes[i]);
         }
 
-        // Copy parameters. Add direct links to constant buffers.
+        // Copy parameters, add direct links to constant buffers
         const HashMap<StringHash, ShaderParameter>& vsParams = vertexShader->GetParameters();
         for (HashMap<StringHash, ShaderParameter>::ConstIterator i = vsParams.Begin(); i != vsParams.End(); ++i)
         {

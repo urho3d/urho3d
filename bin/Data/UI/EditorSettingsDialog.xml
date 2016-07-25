@@ -337,6 +337,15 @@
                 </element>
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="GammaCorrectionToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Gamma correction" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
                         <attribute name="Text" value="Texture quality" />
                     </element>

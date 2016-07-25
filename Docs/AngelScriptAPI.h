@@ -11610,7 +11610,6 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -11765,7 +11764,6 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 HorizontalAlignment horizontalAlignment;
 /* readonly */

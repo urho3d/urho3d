@@ -6,7 +6,7 @@
 
 **Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
 
-Main website: [http://urho3d.github.io/](http://urho3d.github.io/)
+Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 
 ##License
 Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho3D/blob/master/License.txt) for details.
@@ -122,7 +122,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 - Networked Physics by Glenn Fiedler
   http://gafferongames.com/game-physics/networked-physics/
 - Euler Angle Formulas by David Eberly
-  http://www.geometrictools.com/Documentation/EulerAngles.pdf
+  https://www.geometrictools.com/Documentation/EulerAngles.pdf
 - Red Black Trees by Julienne Walker
   http://eternallyconfuzzled.com/tuts/datastructures/jsw_tut_rbtree.aspx
 - Comparison of several sorting algorithms by Juha Nieminen
@@ -134,33 +134,33 @@ Urho3D uses the following third-party libraries:
 - Box2D 2.3.0 (http://box2d.org)
 - Bullet 2.83.6 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.5.0 (http://www.freetype.org)
+- FreeType 2.5.0 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
 - libcpuid 0.2.2 (https://github.com/anrieff/libcpuid)
-- Lua 5.1 (http://www.lua.org)
+- Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
 - LZ4 r131 (https://github.com/Cyan4973/lz4)
-- MojoShader (http://icculus.org/mojoshader)
-- Mustache 1.0 (http://mustache.github.io, https://github.com/kainjow/Mustache)
-- nanodbc 2.12.4 (http://lexicalunit.github.io/nanodbc)
+- MojoShader (https://icculus.org/mojoshader)
+- Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
+- nanodbc 2.12.4 (https://lexicalunit.github.io/nanodbc)
 - Open Asset Import Library (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
-- SDL 2.0.4 (http://www.libsdl.org)
+- SDL 2.0.4 (https://www.libsdl.org)
 - SQLite 3.13.0 (https://www.sqlite.org)
-- StanHull (http://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
-- stb_image 2.12 (http://nothings.org)
-- stb_image_write 1.02 (http://nothings.org)
-- stb_rect_pack 0.08 (http://nothings.org)
-- stb_vorbis 1.09 (http://nothings.org)
-- tolua++ 1.0.93 (http://www.codenix.com/~tolua)
+- StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
+- stb_image 2.12 (https://nothings.org)
+- stb_image_write 1.02 (https://nothings.org)
+- stb_rect_pack 0.08 (https://nothings.org)
+- stb_vorbis 1.09 (https://nothings.org)
+- tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.
-Jack and mushroom models from the realXtend project. (http://www.realxtend.org)
+Jack and mushroom models from the realXtend project. (https://www.realxtend.org)
 Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.
 BlueHighway font from Larabie Fonts.
 Anonymous Pro font by Mark Simonson.
@@ -175,12 +175,12 @@ See section "Documentation build" below on how to automate documentation
 generation as part of the build process.
 
 The documentation is also available online at
-  http://urho3d.github.io/documentation/HEAD/index.html
+  https://urho3d.github.io/documentation/HEAD/index.html
 
 Documentation on how to build Urho3D:
-  http://urho3d.github.io/documentation/HEAD/_building.html
+  https://urho3d.github.io/documentation/HEAD/_building.html
 Documentation on how to use Urho3D as external library
-  http://urho3d.github.io/documentation/HEAD/_using_library.html
+  https://urho3d.github.io/documentation/HEAD/_using_library.html
 
 Replace HEAD with a specific release version in the above links to obtain the
 documentation pertinent to the specified release. Alternatively, use the
@@ -188,4 +188,4 @@ document-switcher in the documentation website to do so.
 
 ##History
 The change history is available online at
-  http://urho3d.github.io/documentation/HEAD/_history.html
+  https://urho3d.github.io/documentation/HEAD/_history.html
