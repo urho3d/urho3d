@@ -1813,6 +1813,9 @@ The input events include:
 - E_INPUTFOCUS : application input focus or window minimization state changed.
 - E_MOUSEVISIBLECHANGED : the visibility of the operating system mouse cursor was changed.
 - E_EXITREQUESTED : application exit was requested (eg. with the window close button.)
+- E_INPUTBEGIN : input handling starts.
+- E_INPUTEND : input handling ends.
+- E_SDLRAWINPUT : raw SDL event is sent for customized event processing.
 
 \section InputKeyboard Keyboard and mouse input
 

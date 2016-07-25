@@ -1837,6 +1837,14 @@ void Input::HandleSDLEvent(void* sdlEvent)
             return;
     }
 
+    VariantMap eventData;
+    eventData[SdlRawInput::P_SDL_EVENT] = &evt;
+    eventData[SdlRawInput::P_CONSUMED] = false;
+    SendEvent(E_SDLRAWINPUT, eventData);
+
+    if (eventData[SdlRawInput::P_CONSUMED].GetBool())
+        return;
+
     switch (evt.type)
     {
         case SDL_KEYDOWN:
@@ -2364,7 +2372,9 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // Update input right at the beginning of the frame
+    SendEvent(E_INPUTBEGIN);
     Update();
+    SendEvent(E_INPUTEND);
 }
 
 #ifdef __EMSCRIPTEN__
