@@ -258,6 +258,66 @@ public:
         return ret;
     }
 
+    /// Add an integer.
+    String operator +(int rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a short integer.
+    String operator +(short rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long integer.
+    String operator +(long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long long integer.
+    String operator +(long long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add an unsigned integer.
+    String operator +(unsigned rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a short unsigned integer.
+    String operator +(unsigned short rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long unsigned integer.
+    String operator +(unsigned long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a long long unsigned integer.
+    String operator +(unsigned long long rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a float.
+    String operator +(float rhs) const
+    {
+        return *this + String(rhs);
+    }
+
+    /// Add a bool.
+    String operator +(bool rhs) const
+    {
+        return *this + String(rhs);
+    }
+
     /// Test for equality with another string.
     bool operator ==(const String& rhs) const { return strcmp(CString(), rhs.CString()) == 0; }
 
