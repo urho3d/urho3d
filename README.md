@@ -62,6 +62,7 @@ Urho3D development, contributions and bugfixes by:
 - Yusuf Umar
 - Daniel Wiberg
 - Steven Zhang
+- Rokas Kupstys
 - AGreatFish
 - BlueMagnificent
 - Enhex
@@ -99,7 +100,6 @@ Urho3D development, contributions and bugfixes by:
 - reattiva
 - rifai
 - rikorin
-- r-ku
 - skaiware
 - ssinai1
 - svifylabs
