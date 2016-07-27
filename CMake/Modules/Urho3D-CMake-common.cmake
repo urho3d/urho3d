@@ -810,7 +810,7 @@ macro (create_symlink SOURCE DESTINATION)
     if (IS_ABSOLUTE ${SOURCE})
         set (ABS_SOURCE ${SOURCE})
     else ()
-        set (ABS_SOURCE ${CMAKE_SOURCE_DIR}/${SOURCE})
+        set (ABS_SOURCE ${Urho3D_SOURCE_DIR}/${SOURCE})
     endif ()
     if (IS_ABSOLUTE ${DESTINATION})
         set (ABS_DESTINATION ${DESTINATION})
@@ -1270,7 +1270,7 @@ macro (setup_main_executable)
     # Define resources
     if (NOT RESOURCE_DIRS)
         # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
-        foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
+        foreach (DIR ${Urho3D_SOURCE_DIR}/bin/CoreData ${Urho3D_SOURCE_DIR}/bin/Data)
             # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
             if (IS_DIRECTORY ${DIR})
                 list (APPEND RESOURCE_DIRS ${DIR})
@@ -1335,10 +1335,10 @@ macro (setup_main_executable)
     if (XCODE)
         if (NOT RESOURCE_FILES)
             # Default app bundle icon
-            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
+            set (RESOURCE_FILES ${Urho3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
             if (IOS)
                 # Default app icon on the iOS home screen
-                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
+                list (APPEND RESOURCE_FILES ${Urho3D_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
             endif ()
         endif ()
         # Group them together under 'Resources' in Xcode IDE
@@ -1355,7 +1355,7 @@ macro (setup_main_executable)
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
-            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
+            HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${Urho3D_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
             DOC "Path to SDL_android_main.c" MSG_MODE FATAL_ERROR)
         list (APPEND SOURCE_FILES ${ANDROID_MAIN_C_PATH})
         # Setup shared library output path
@@ -1809,14 +1809,14 @@ if (ANDROID)
     file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
     if (NOT URHO3D_PACKAGING)
         foreach (I CoreData Data)
-            if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-                create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+            if (NOT EXISTS ${Urho3D_SOURCE_DIR}/Android/assets/${I})
+                create_symlink (${Urho3D_SOURCE_DIR}/bin/${I} ${Urho3D_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
             endif ()
         endforeach ()
     endif ()
     foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-            create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
+            create_symlink (${Urho3D_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
 elseif (WEB)
@@ -1835,7 +1835,7 @@ else ()
     # Create symbolic links in the build tree
     foreach (I Autoload CoreData Data)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
-            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
+            create_symlink (${Urho3D_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
     # Warn user if PATH environment variable has not been correctly set for using ccache
