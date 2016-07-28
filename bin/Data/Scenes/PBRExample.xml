@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="36.5594" />
 	<attribute name="Next Replicated Node ID" value="232" />
 	<attribute name="Next Replicated Component ID" value="251" />
-	<attribute name="Next Local Node ID" value="16777266" />
-	<attribute name="Next Local Component ID" value="16777793" />
+	<attribute name="Next Local Node ID" value="16777267" />
+	<attribute name="Next Local Component ID" value="16777805" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -669,7 +669,7 @@
 		<component type="Zone" id="11">
 			<attribute name="Bounding Box Min" value="-1000 -1000 -1000" />
 			<attribute name="Bounding Box Max" value="1000 1000 1000" />
-			<attribute name="Ambient Color" value="0 0 0 5" />
+			<attribute name="Ambient Color" value="0 0 0 1" />
 			<attribute name="Zone Texture" value="TextureCube;Textures/Skybox2.xml" />
 		</component>
 	</node>

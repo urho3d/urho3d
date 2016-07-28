@@ -346,6 +346,15 @@
                 </element>
                 <element style="ListRow">
                     <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="HDRToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Enable HDR" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
                     <element type="Text">
                         <attribute name="Text" value="Texture quality" />
                     </element>
