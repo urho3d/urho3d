@@ -6,9 +6,11 @@ class Serializer
     tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
     
     bool WriteInt(int value);
+    bool WriteInt64(long long value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);
     bool WriteUInt(unsigned value);
+    bool WriteUInt64(unsigned long long value);
     bool WriteUShort(unsigned short value);
     bool WriteUByte(unsigned char value);
     bool WriteBool(bool value);

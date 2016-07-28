@@ -12,9 +12,11 @@ class Deserializer
     bool IsEof() const;
     
     int ReadInt();
+    long long ReadInt64();
     short ReadShort();
     signed char ReadByte();
     unsigned ReadUInt();
+    unsigned long long ReadUInt64();
     unsigned short ReadUShort();
     unsigned char ReadUByte();
     bool ReadBool();
