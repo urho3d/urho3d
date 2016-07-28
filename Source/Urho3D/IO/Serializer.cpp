@@ -35,6 +35,11 @@ Serializer::~Serializer()
 {
 }
 
+bool Serializer::WriteInt64(long long value)
+{
+    return Write(&value, sizeof value) == sizeof value;
+}
+
 bool Serializer::WriteInt(int value)
 {
     return Write(&value, sizeof value) == sizeof value;
@@ -46,6 +51,11 @@ bool Serializer::WriteShort(short value)
 }
 
 bool Serializer::WriteByte(signed char value)
+{
+    return Write(&value, sizeof value) == sizeof value;
+}
+
+bool Serializer::WriteUInt64(unsigned long long value)
 {
     return Write(&value, sizeof value) == sizeof value;
 }
