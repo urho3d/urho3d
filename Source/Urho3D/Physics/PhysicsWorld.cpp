@@ -58,6 +58,8 @@ static const int MAX_SOLVER_ITERATIONS = 256;
 static const int DEFAULT_FPS = 60;
 static const Vector3 DEFAULT_GRAVITY = Vector3(0.0f, -9.81f, 0.0f);
 
+PhysicsWorldConfig PhysicsWorld::config;
+
 static bool CompareRaycastResults(const PhysicsRaycastResult& lhs, const PhysicsRaycastResult& rhs)
 {
     return lhs.distance_ < rhs.distance_;
@@ -114,6 +116,7 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     unsigned collisionMask_;
 };
 
+
 PhysicsWorld::PhysicsWorld(Context* context) :
     Component(context),
     collisionConfiguration_(0),
@@ -135,7 +138,11 @@ PhysicsWorld::PhysicsWorld(Context* context) :
 {
     gContactAddedCallback = CustomMaterialCombinerCallback;
 
-    collisionConfiguration_ = new btDefaultCollisionConfiguration();
+    if (PhysicsWorld::config.collisionConfig)
+        collisionConfiguration_ = PhysicsWorld::config.collisionConfig;
+    else
+        collisionConfiguration_ = new btDefaultCollisionConfiguration();
+
     collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
     broadphase_ = new btDbvtBroadphase();
     solver_ = new btSequentialImpulseConstraintSolver();
@@ -148,6 +155,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     world_->setInternalTickCallback(InternalPreTickCallback, static_cast<void*>(this), true);
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);
 }
+
 
 PhysicsWorld::~PhysicsWorld()
 {

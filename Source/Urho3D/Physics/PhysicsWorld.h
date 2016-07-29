@@ -96,6 +96,19 @@ struct DelayedWorldTransform
     Quaternion worldRotation_;
 };
 
+/**
+ * Custom overrides of physics internals.
+ *
+ * Must be modified before the physics component is created.
+ */
+struct PhysicsWorldConfig
+{
+    /// Override for the collision configuration (default btDefaultCollisionConfiguration).
+    btCollisionConfiguration*    collisionConfig;
+
+    PhysicsWorldConfig() : collisionConfig(NULL) {}
+};
+
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Physics simulation world component. Should be added only to the root scene node.
@@ -107,6 +120,9 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
     friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);
 
 public:
+    /// Allow overrides of the internal configuration.
+    static struct PhysicsWorldConfig config;
+
     /// Construct.
     PhysicsWorld(Context* scontext);
     /// Destruct.
