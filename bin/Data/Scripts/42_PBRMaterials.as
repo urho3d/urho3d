@@ -156,7 +156,6 @@ void SetupViewport()
 
     // Add post-processing effects appropriate with the example scene
     RenderPath@ effectRenderPath = viewport.renderPath.Clone();
-    effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/BloomHDR.xml"));
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/FXAA2.xml"));
     effectRenderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
 

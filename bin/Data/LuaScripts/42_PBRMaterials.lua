@@ -128,8 +128,8 @@ function SetupViewport()
 
     -- Add post-processing effects appropriate with the example scene
     local effectRenderPath = viewport:GetRenderPath():Clone()
-    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/BloomHDR.xml"))
     effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/FXAA2.xml"))
+    effectRenderPath:Append(cache:GetResource("XMLFile", "PostProcess/GammaCorrection.xml"))
 
     viewport.renderPath = effectRenderPath;
 end
