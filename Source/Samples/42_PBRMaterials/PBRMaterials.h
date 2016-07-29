@@ -30,6 +30,7 @@ namespace Urho3D
 class Drawable;
 class Node;
 class Scene;
+class Zone;
 
 }
 
@@ -69,6 +70,8 @@ private:
     void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData);
     /// Handle the metallic slider drag event.
     void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle the ambient HDR scale slider drag event.
+    void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
     
     /// Dynamic material.
     Material* dynamicMaterial_;
@@ -76,4 +79,8 @@ private:
     Text* roughnessLabel_;
     /// Metallic label.
     Text* metallicLabel_;
+    /// Ambient HDR scale label.
+    Text* ambientLabel_;
+    /// Zone component in scene.
+    WeakPtr<Zone> zone_;
 };

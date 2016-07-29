@@ -10,6 +10,8 @@ require "LuaScripts/Utilities/Sample"
 local dynamicMaterial = nil
 local roughnessLabel = nil
 local metallicLabel = nil
+local ambientLabel = nil
+local zone = nil
 
 function Start()
     -- Execute the common startup for samples
@@ -57,6 +59,9 @@ function CreateScene()
     local staticModel = sphereWithDynamicMatNode:GetComponent("StaticModel")
     dynamicMaterial = staticModel:GetMaterial(0)
 
+    local zoneNode = scene_:GetChild("Zone");
+    zone = zoneNode:GetComponent("Zone");
+
     -- Create the camera (not included in the scene file)
     cameraNode = scene_:CreateChild("Camera")
     cameraNode:CreateComponent("Camera")
@@ -89,7 +94,12 @@ function CreateUI()
     metallicLabel:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     metallicLabel:SetPosition(370, 100)
     metallicLabel.textEffect = TE_SHADOW
-    
+
+    ambientLabel = ui.root:CreateChild("Text")
+    ambientLabel:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
+    ambientLabel:SetPosition(370, 150)
+    ambientLabel.textEffect = TE_SHADOW
+
     local roughnessSlider = ui.root:CreateChild("Slider")
     roughnessSlider:SetStyleAuto()
     roughnessSlider:SetPosition(50, 50)
@@ -105,6 +115,14 @@ function CreateUI()
     metallicSlider.range = 1.0    -- 0 - 1 range
     SubscribeToEvent(metallicSlider, "SliderChanged", "HandleMetallicSliderChanged")
     metallicSlider.value = 0.5
+
+    local ambientSlider = ui.root:CreateChild("Slider")
+    ambientSlider:SetStyleAuto()
+    ambientSlider:SetPosition(50, 150)
+    ambientSlider:SetSize(300, 20)
+    ambientSlider.range = 10.0    -- 0 - 10 range
+    SubscribeToEvent(ambientSlider, "SliderChanged", "HandleAmbientSliderChanged")
+    ambientSlider.value = zone.ambientColor.a
 end
 
 function HandleRoughnessSliderChanged(eventType, eventData)
@@ -117,6 +135,13 @@ function HandleMetallicSliderChanged(eventType, eventData)
     local newValue = eventData["Value"]:GetFloat()
     dynamicMaterial:SetShaderParameter("Metallic", Variant(newValue))
     metallicLabel.text = "Metallic: " .. newValue
+end
+
+function HandleAmbientSliderChanged(eventType, eventData)
+    local newValue = eventData["Value"]:GetFloat()
+    local col = Color(0, 0, 0, newValue)
+    zone.ambientColor = col
+    ambientLabel.text = "Ambient HDR Scale: " .. zone.ambientColor.a
 end
 
 function SetupViewport()

@@ -350,7 +350,7 @@
                         <attribute name="Name" value="HDRToggle" />
                     </element>
                     <element type="Text">
-                        <attribute name="Text" value="Enable HDR" />
+                        <attribute name="Text" value="HDR rendering" />
                     </element>
                 </element>
                 <element style="ListRow">

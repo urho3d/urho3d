@@ -489,7 +489,7 @@ void SetGammaCorrection(bool enable)
 void SetHDR(bool enable)
 {
     HDR = enable;
-    if (renderPath !is null)
+    if (renderer !is null)
         renderer.hdrRendering = HDR;
 }
 

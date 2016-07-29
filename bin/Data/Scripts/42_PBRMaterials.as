@@ -11,6 +11,7 @@ Material@ dynamicMaterial;
 Text@ roughnessLabel;
 Text@ metallicLabel;
 Text@ ambientLabel;
+Zone@ zone;
 
 void Start()
 {
@@ -57,6 +58,9 @@ void CreateScene()
     Node@ sphereWithDynamicMatNode = scene_.GetChild("SphereWithDynamicMat");
     StaticModel@ staticModel = sphereWithDynamicMatNode.GetComponent("StaticModel");
     dynamicMaterial = staticModel.materials[0];
+
+    Node@ zoneNode = scene_.GetChild("Zone");
+    zone = zoneNode.GetComponent("Zone");
 
     // Create the camera (not included in the scene file)
     cameraNode = scene_.CreateChild("Camera");
@@ -117,9 +121,9 @@ void CreateUI()
     ambientSlider.SetStyleAuto();
     ambientSlider.SetPosition(50, 150);
     ambientSlider.SetSize(300, 20);
-    ambientSlider.range = 10.0f; // 0 - 1 range
+    ambientSlider.range = 10.0f; // 0 - 10 range
     SubscribeToEvent(ambientSlider, "SliderChanged", "HandleAmbientSliderChanged");
-    ambientSlider.value = 5.0f;
+    ambientSlider.value = zone.ambientColor.a;
 }
 
 void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
@@ -139,10 +143,8 @@ void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
 void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
 {
     float newValue = eventData["Value"].GetFloat();
-    Node@ zoneNode = scene_.GetChild("Zone");
-    Zone@ zone = zoneNode.GetComponent("Zone");
     Color col = Color(0.0, 0.0, 0.0, newValue);
-    zone.SetAttribute("Ambient Color", Variant(col));
+    zone.ambientColor = col;
     ambientLabel.text = "Ambient HDR Scale: " + zone.ambientColor.a;
 }
 

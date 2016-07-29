@@ -26,6 +26,7 @@
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/RenderPath.h>
 #include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
@@ -49,7 +50,8 @@ PBRMaterials::PBRMaterials(Context* context) :
     Sample(context),
     dynamicMaterial_(0),
     roughnessLabel_(0),
-    metallicLabel_(0)
+    metallicLabel_(0),
+    ambientLabel_(0)
 {
 }
 
@@ -110,6 +112,9 @@ void PBRMaterials::CreateScene()
     StaticModel* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
     dynamicMaterial_ = staticModel->GetMaterial(0);
 
+    Node* zoneNode = scene_->GetChild("Zone");
+    zone_ = zoneNode->GetComponent<Zone>();
+
     // Create the camera (not included in the scene file)
     cameraNode_ = scene_->CreateChild("Camera");
     cameraNode_->CreateComponent<Camera>();
@@ -148,6 +153,11 @@ void PBRMaterials::CreateUI()
     metallicLabel_->SetPosition(370, 100);
     metallicLabel_->SetTextEffect(TE_SHADOW);
 
+    ambientLabel_ = ui->GetRoot()->CreateChild<Text>();
+    ambientLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    ambientLabel_->SetPosition(370, 150);
+    ambientLabel_->SetTextEffect(TE_SHADOW);
+
     Slider* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
     roughnessSlider->SetStyleAuto();
     roughnessSlider->SetPosition(50, 50);
@@ -163,6 +173,14 @@ void PBRMaterials::CreateUI()
     metallicSlider->SetRange(1.0f); // 0 - 1 range
     SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleMetallicSliderChanged));
     metallicSlider->SetValue(0.5f);
+
+    Slider* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
+    ambientSlider->SetStyleAuto();
+    ambientSlider->SetPosition(50, 150);
+    ambientSlider->SetSize(300, 20);
+    ambientSlider->SetRange(10.0f); // 0 - 10 range
+    SubscribeToEvent(ambientSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleAmbientSliderChanged));
+    ambientSlider->SetValue(zone_->GetAmbientColor().a_);
 }
 
 void PBRMaterials::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
@@ -179,6 +197,14 @@ void PBRMaterials::HandleMetallicSliderChanged(StringHash eventType, VariantMap&
     metallicLabel_->SetText("Metallic: " + String(newValue));
 }
 
+void PBRMaterials::HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
+    Color col = Color(0.0, 0.0, 0.0, newValue);
+    zone_->SetAmbientColor(col);
+    ambientLabel_->SetText("Ambient HDR Scale: " + String(zone_->GetAmbientColor().a_));
+}
+
 void PBRMaterials::SetupViewport()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
@@ -192,7 +218,6 @@ void PBRMaterials::SetupViewport()
 
     // Add post-processing effects appropriate with the example scene
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
 
