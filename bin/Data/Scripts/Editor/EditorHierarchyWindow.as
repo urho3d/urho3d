@@ -1013,10 +1013,18 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
         if (sourceNodes.length > 0)
         {
-            if (sourceNodes.length > 1)
-                SceneChangeParent(sourceNodes[0], sourceNodes, targetNode);
+            if (!input.qualifierDown[QUAL_CTRL])
+            {
+                if (sourceNodes.length > 1)
+                    SceneChangeParent(sourceNodes[0], sourceNodes, targetNode);
+                else
+                    SceneChangeParent(sourceNodes[0], targetNode);
+            }
             else
-                SceneChangeParent(sourceNodes[0], targetNode);
+            {
+                if (sourceNodes.length == 1)
+                    SceneReorder(sourceNodes[0], targetNode);
+            }
 
             // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
             FocusNode(sourceNodes[0]);
@@ -1031,9 +1039,16 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         if (targetElement is null)
             return;
 
-        // Perform the reparenting
-        if (!UIElementChangeParent(sourceElement, targetElement))
-            return;
+        if (!input.qualifierDown[QUAL_CTRL])
+        {
+            if (!UIElementChangeParent(sourceElement, targetElement))
+                return;
+        }
+        else
+        {
+            if (!UIElementReorder(sourceElement, targetElement))
+                return;
+        }
 
         // Focus the element at its new position in the list which in turn should trigger a refresh in attribute inspector
         FocusUIElement(sourceElement);
@@ -1164,10 +1179,21 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         {
             itemType = ITEM_NODE;
 
-            if (sourceNode.parent is targetNode)
-                return false;
-            if (targetNode.parent is sourceNode)
-                return false;
+            // No ctrl: Reparent
+            if (!input.qualifierDown[QUAL_CTRL])
+            {
+                if (sourceNode.parent is targetNode)
+                    return false;
+                if (targetNode.parent is sourceNode)
+                    return false;
+            }
+            // Ctrl pressed: reorder
+            else
+            {
+                // Must be within the same parent
+                if (sourceNode.parent is null || sourceNode.parent !is targetNode.parent)
+                    return false;
+            }
         }
 
         // Resource browser
@@ -1199,10 +1225,21 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         {
             itemType = ITEM_UI_ELEMENT;
 
-            if (sourceElement.parent is targetElement)
-                return false;
-            if (targetElement.parent is sourceElement)
-                return false;
+            // No ctrl: Reparent
+            if (!input.qualifierDown[QUAL_CTRL])
+            {
+                if (sourceElement.parent is targetElement)
+                    return false;
+                if (targetElement.parent is sourceElement)
+                    return false;
+            }
+            // Ctrl pressed: reorder
+            else
+            {
+                // Must be within the same parent
+                if (sourceElement.parent is null || sourceElement.parent !is targetElement.parent)
+                    return false;
+            }
         }
 
         return true;

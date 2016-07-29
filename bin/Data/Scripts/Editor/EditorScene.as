@@ -1062,6 +1062,46 @@ bool SceneChangeParent(Node@ sourceNode, Array<Node@> sourceNodes, Node@ targetN
         return false;
 }
 
+bool SceneReorder(Node@ sourceNode, Node@ targetNode)
+{
+    if (sourceNode is null || targetNode is null || sourceNode.parent is null || sourceNode.parent !is targetNode.parent)
+        return false;
+    if (sourceNode is targetNode)
+        return true; // No-op
+
+    Node@ parent = sourceNode.parent;
+    uint destIndex = SceneFindChild(parent, targetNode);
+
+    ReorderNodeAction action;
+    action.Define(sourceNode, destIndex);
+    SaveEditAction(action);
+
+    PerformReorder(parent, sourceNode, destIndex);
+    UpdateHierarchyItem(parent); // Force update to make sure the order is current
+    SetSceneModified();
+    return true;
+}
+
+void PerformReorder(Node@ parent, Node@ child, uint destIndex)
+{
+    // Removal from scene zeroes the ID. Be prepared to restore it
+    uint oldId = child.id;
+    parent.RemoveChild(child);
+    child.id = oldId;
+    parent.AddChild(child, destIndex);
+}
+
+uint SceneFindChild(Node@ parent, Node@ child)
+{
+    for (uint i = 0; i < parent.numChildren; ++i)
+    {
+        if (parent.children[i] is child)
+            return i;
+    }
+    
+    return -1;
+}
+
 bool SceneResetPosition()
 {
     if (editNode !is null)

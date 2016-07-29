@@ -268,6 +268,46 @@ class ReparentNodeAction : EditAction
     }
 }
 
+class ReorderNodeAction : EditAction
+{
+    uint nodeID;
+    uint parentID;
+    uint oldChildIndex;
+    uint newChildIndex;
+
+    void Define(Node@ node, uint newIndex)
+    {
+        nodeID = node.id;
+        parentID = node.parent.id;
+        oldChildIndex = SceneFindChild(node.parent, node);
+        newChildIndex = newIndex;
+    }
+
+    void Undo()
+    {
+        Node@ parent = editorScene.GetNode(parentID);
+        Node@ node = editorScene.GetNode(nodeID);
+        if (parent !is null && node !is null)
+        {
+            PerformReorder(parent, node, oldChildIndex);
+            UpdateHierarchyItem(parent); // Force update to make sure the order is current
+            SetSceneModified();
+        }
+    }
+
+    void Redo()
+    {
+        Node@ parent = editorScene.GetNode(parentID);
+        Node@ node = editorScene.GetNode(nodeID);
+        if (parent !is null && node !is null)
+        {
+            PerformReorder(parent, node, newChildIndex);
+            UpdateHierarchyItem(parent); // Force update to make sure the order is current
+            SetSceneModified();
+        }
+    }
+}
+
 class CreateComponentAction : EditAction
 {
     uint nodeID;
@@ -771,6 +811,48 @@ class ReparentUIElementAction : EditAction
         if (parent !is null && element !is null)
         {
             element.parent = parent;
+            SetUIElementModified(parent);
+        }
+    }
+}
+
+class ReorderUIElementAction : EditAction
+{
+    Variant elementID;
+    Variant parentID;
+    uint oldChildIndex;
+    uint newChildIndex;
+
+    void Define(UIElement@ element, uint newIndex)
+    {
+        elementID = GetUIElementID(element);
+        parentID = GetUIElementID(element.parent);
+        oldChildIndex = element.parent.FindChild(element);
+        newChildIndex = newIndex;
+    }
+
+    void Undo()
+    {
+        UIElement@ parent = GetUIElementByID(parentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+        {
+            parent.RemoveChild(element);
+            parent.InsertChild(oldChildIndex, element);
+            UpdateHierarchyItem(parent); // Force update to make sure the order is current
+            SetUIElementModified(parent);
+        }
+    }
+
+    void Redo()
+    {
+        UIElement@ parent = GetUIElementByID(parentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+        {
+            parent.RemoveChild(element);
+            parent.InsertChild(newChildIndex, element);
+            UpdateHierarchyItem(parent); // Force update to make sure the order is current
             SetUIElementModified(parent);
         }
     }

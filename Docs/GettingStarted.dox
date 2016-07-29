@@ -878,7 +878,9 @@ New scene nodes and components are created from the Create menu at the top. Thei
 
 As an alternative to using the transform gizmo, scene nodes can be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2,3 to change the manipulation mode, and Ctrl+4 to toggle between world relative and scene node relative movement.
 
-To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
+To reparent scene nodes or UI elements, drag and drop them onto the new parent in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
+
+To reorder nodes or UI elements within the same parent instead of reparenting, hold down Ctrl while dragging and dropping.
 
 To locate a scene node from the scene, double-click it in the hierarchy window.
 
