@@ -7273,7 +7273,6 @@ Vector3 direction;
 bool enabled;
 /* readonly */
 bool enabledSelf;
-/* readonly */
 uint id;
 String name;
 /* readonly */
@@ -9100,7 +9099,6 @@ Vector3 direction;
 float elapsedTime;
 /* readonly */
 String fileName;
-/* readonly */
 uint id;
 String name;
 /* readonly */

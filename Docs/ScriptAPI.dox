@@ -8946,7 +8946,7 @@ Properties:
 - Vector3 direction
 - bool enabled
 - bool enabledSelf // readonly
-- uint id // readonly
+- uint id
 - String name
 - uint numAllChildren // readonly
 - uint numAttributes // readonly
@@ -10604,7 +10604,7 @@ Properties:
 - Vector3 direction
 - float elapsedTime
 - String fileName // readonly
-- uint id // readonly
+- uint id
 - String name
 - uint numAllChildren // readonly
 - uint numAttributes // readonly

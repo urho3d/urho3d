@@ -3994,6 +3994,7 @@ Methods:
 - bool HasTag(const String tag) const
 - const StringVector& GetTags() const
 - const PODVector<Node*>& GetChildrenWithTag(const String tag, bool recursive = false) const
+- void SetID(unsigned id)
 
 Properties:
 
