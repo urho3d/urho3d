@@ -499,10 +499,16 @@ public:
 
     /// Return child scene nodes, optionally recursive.
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
+    /// Return child scene nodes, optionally recursive.
+    PODVector<Node*> GetChildren(bool recursive) const;
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
+    /// Return child scene nodes with a specific component.
+    PODVector<Node*> GetChildrenWithComponent(StringHash type, bool recursive = false) const;
     /// Return child scene nodes with a specific tag.
     void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    /// Return child scene nodes with a specific tag.
+    PODVector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
