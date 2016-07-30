@@ -419,6 +419,10 @@ endif ()
 # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
+    if (CMAKE_COMPILER_IS_GNUCXX)
+        # Required for Ubuntu 16.04 to use STB library: https://github.com/nothings/stb/issues/280
+        target_link_libraries(${TARGET_NAME} gcc_s gcc)
+    endif ()
     if (NOT MSVC AND NOT (MINGW AND CMAKE_CROSSCOMPILING) AND CMAKE_VERSION VERSION_LESS 2.8.9)  # todo: Remove this when CMake minimum version is 2.8.9
         set_property (TARGET ${STATIC_LIBRARY_TARGETS} APPEND PROPERTY COMPILE_FLAGS -fPIC)
     endif ()
