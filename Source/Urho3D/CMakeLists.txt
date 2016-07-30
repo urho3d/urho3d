@@ -419,7 +419,7 @@ endif ()
 # Use PIC on platforms that support it (shared library type has this property set to true by default, so we only have to deal with those static ones that the shared library links against)
 if (URHO3D_LIB_TYPE STREQUAL SHARED)
     set_target_properties (${STATIC_LIBRARY_TARGETS} PROPERTIES POSITION_INDEPENDENT_CODE true)
-    if (CMAKE_COMPILER_IS_GNUCXX)
+    if (NOT WIN32 AND CMAKE_COMPILER_IS_GNUCXX)
         # Required for Ubuntu 16.04 to use STB library: https://github.com/nothings/stb/issues/280
         target_link_libraries(${TARGET_NAME} gcc_s gcc)
     endif ()
