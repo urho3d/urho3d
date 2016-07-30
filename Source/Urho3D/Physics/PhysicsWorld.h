@@ -106,7 +106,7 @@ struct PhysicsWorldConfig
     /// Override for the collision configuration (default btDefaultCollisionConfiguration).
     btCollisionConfiguration*    collisionConfig;
 
-    PhysicsWorldConfig() : collisionConfig(NULL) {}
+    PhysicsWorldConfig() : collisionConfig(0) {}
 };
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
