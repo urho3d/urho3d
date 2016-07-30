@@ -3922,6 +3922,7 @@ Methods:
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - void RemoveComponents(const String type)
 - void RemoveAllComponents()
+- void ReorderComponent(Component* component, unsigned index)
 - Node* Clone(CreateMode mode = REPLICATED)
 - void Remove()
 - void SetParent(Node* parent)
