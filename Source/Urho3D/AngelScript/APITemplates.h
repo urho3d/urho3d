@@ -705,6 +705,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void RemoveComponents(bool, bool)", asMETHODPR(T, RemoveComponents, (bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponents(const String&in)", asFUNCTION(NodeRemoveComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllComponents()", asMETHOD(T, RemoveAllComponents), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, uint)", asMETHOD(T, ReorderComponent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddTags(const String&in, int8 separator = ';')", asMETHODPR(T, AddTags, (const String&, char), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);

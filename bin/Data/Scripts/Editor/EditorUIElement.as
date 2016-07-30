@@ -705,10 +705,19 @@ bool UIElementReorder(UIElement@ sourceElement, UIElement@ targetElement)
     ReorderUIElementAction action;
     action.Define(sourceElement, destIndex);
     SaveEditAction(action);
+    PerformReorder(parent, sourceElement, destIndex);
 
-    parent.RemoveChild(sourceElement);
-    parent.InsertChild(destIndex, sourceElement);
+    return true;
+}
+
+void PerformReorder(UIElement@ parent, UIElement@ child, uint destIndex)
+{
+    suppressSceneChanges = true;
+
+    parent.RemoveChild(child);
+    parent.InsertChild(destIndex, child);
     UpdateHierarchyItem(parent); // Force update to make sure the order is current
     SetUIElementModified(parent);
-    return true;
+
+    suppressSceneChanges = false;
 }

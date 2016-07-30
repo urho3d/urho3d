@@ -899,7 +899,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     if (!accept)
         return;
 
-    // resource browser
+    // Resource browser
     if (source !is null && source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt() > 0)
     {
         int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
@@ -1055,60 +1055,73 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     }
     else if (itemType == ITEM_COMPONENT)
     {
-        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
         Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetUInt());
-        if (targetComponent !is null && sourceNodes.length > 0)
+
+        if (!input.qualifierDown[QUAL_CTRL])
         {
-            // Drag node to StaticModelGroup to make it an instance
-            StaticModelGroup@ smg = cast<StaticModelGroup>(targetComponent);
-            if (smg !is null)
+            Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
+            if (targetComponent !is null && sourceNodes.length > 0)
             {
-                // Save undo action
-                EditAttributeAction action;
-                uint attrIndex = GetAttributeIndex(smg, "Instance Nodes");
-                Variant oldIDs = smg.attributes[attrIndex];
+                // Drag node to StaticModelGroup to make it an instance
+                StaticModelGroup@ smg = cast<StaticModelGroup>(targetComponent);
+                if (smg !is null)
+                {
+                    // Save undo action
+                    EditAttributeAction action;
+                    uint attrIndex = GetAttributeIndex(smg, "Instance Nodes");
+                    Variant oldIDs = smg.attributes[attrIndex];
 
-                for (uint i = 0; i < sourceNodes.length; ++i)
-                    smg.AddInstanceNode(sourceNodes[i]);
+                    for (uint i = 0; i < sourceNodes.length; ++i)
+                        smg.AddInstanceNode(sourceNodes[i]);
 
-                action.Define(smg, attrIndex, oldIDs);
-                SaveEditAction(action);
-                SetSceneModified();
+                    action.Define(smg, attrIndex, oldIDs);
+                    SaveEditAction(action);
+                    SetSceneModified();
+                    UpdateAttributeInspector(false);
+                }
+
+                // Drag node to SplinePath to make it a control point
+                SplinePath@ spline = cast<SplinePath>(targetComponent);
+                if (spline !is null)
+                {
+                    // Save undo action
+                    EditAttributeAction action;
+                    uint attrIndex = GetAttributeIndex(spline, "Control Points");
+                    Variant oldIDs = spline.attributes[attrIndex];
+
+                    for (uint i = 0; i < sourceNodes.length; ++i)
+                        spline.AddControlPoint(sourceNodes[i]);
+
+                    action.Define(spline, attrIndex, oldIDs);
+                    SaveEditAction(action);
+                    SetSceneModified();
+                    UpdateAttributeInspector(false);
+                }
+
+                // Drag a node to Constraint to make it the remote end of the constraint
+                Constraint@ constraint = cast<Constraint>(targetComponent);
+                RigidBody@ rigidBody = sourceNodes[0].GetComponent("RigidBody");
+                if (constraint !is null && rigidBody !is null)
+                {
+                    // Save undo action
+                    EditAttributeAction action;
+                    uint attrIndex = GetAttributeIndex(constraint, "Other Body NodeID");
+                    Variant oldID = constraint.attributes[attrIndex];
+
+                    constraint.otherBody = rigidBody;
+
+                    action.Define(constraint, attrIndex, oldID);
+                    SaveEditAction(action);
+                    SetSceneModified();
+                    UpdateAttributeInspector(false);
+                }
             }
-
-            // Drag node to SplinePath to make it a control point
-            SplinePath@ spline = cast<SplinePath>(targetComponent);
-            if (spline !is null)
-            {
-                // Save undo action
-                EditAttributeAction action;
-                uint attrIndex = GetAttributeIndex(spline, "Control Points");
-                Variant oldIDs = spline.attributes[attrIndex];
-
-                for (uint i = 0; i < sourceNodes.length; ++i)
-                    spline.AddControlPoint(sourceNodes[i]);
-
-                action.Define(spline, attrIndex, oldIDs);
-                SaveEditAction(action);
-                SetSceneModified();
-            }
-
-            // Drag a node to Constraint to make it the remote end of the constraint
-            Constraint@ constraint = cast<Constraint>(targetComponent);
-            RigidBody@ rigidBody = sourceNodes[0].GetComponent("RigidBody");
-            if (constraint !is null && rigidBody !is null)
-            {
-                // Save undo action
-                EditAttributeAction action;
-                uint attrIndex = GetAttributeIndex(constraint, "Other Body NodeID");
-                Variant oldID = constraint.attributes[attrIndex];
-
-                constraint.otherBody = rigidBody;
-
-                action.Define(constraint, attrIndex, oldID);
-                SaveEditAction(action);
-                SetSceneModified();
-            }
+        }
+        else
+        {
+            // Reorder components within node
+            Component@ sourceComponent = editorScene.GetComponent(source.vars[COMPONENT_ID_VAR].GetUInt());
+            SceneReorder(sourceComponent, targetComponent);
         }
     }
 }
@@ -1116,7 +1129,7 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
 Array<Node@> GetMultipleSourceNodes(UIElement@ source)
 {
     Array<Node@> nodeList;
-    
+
     Node@ node = editorScene.GetNode(source.vars[NODE_ID_VAR].GetUInt());
     if (node !is null)
         nodeList.Push(node);
@@ -1246,8 +1259,8 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     }
     else if (targetItemType == ITEM_COMPONENT)
     {
-        // Now only support dragging of nodes to StaticModelGroup, SplinePath or Constraint. Can be expanded to support others
         Node@ sourceNode;
+        Component@ sourceComponent;
         Component@ targetComponent;
         Variant variant = source.GetVar(NODE_ID_VAR);
         if (!variant.empty)
@@ -1255,17 +1268,30 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         variant = target.GetVar(COMPONENT_ID_VAR);
         if (!variant.empty)
             targetComponent = editorScene.GetComponent(variant.GetUInt());
+        variant = source.GetVar(COMPONENT_ID_VAR);
+        if (!variant.empty)
+            sourceComponent = editorScene.GetComponent(variant.GetUInt());
 
         itemType = ITEM_COMPONENT;
 
-        if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE ||
-            targetComponent.type == CONSTRAINT_TYPE || targetComponent.type == SPLINEPATH_TYPE))
-            return true;
+        if (!input.qualifierDown[QUAL_CTRL])
+        {
+            // Dragging of nodes to StaticModelGroup, SplinePath or Constraint
+            if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE ||
+                targetComponent.type == CONSTRAINT_TYPE || targetComponent.type == SPLINEPATH_TYPE))
+                return true;
 
-        // resource browser
-        int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
-        if (targetComponent.type == STATICMODEL_TYPE || targetComponent.type == ANIMATEDMODEL_TYPE)
-            return type == RESOURCE_TYPE_MATERIAL || type == RESOURCE_TYPE_MODEL;
+            // Resource browser
+            int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
+            if (targetComponent.type == STATICMODEL_TYPE || targetComponent.type == ANIMATEDMODEL_TYPE)
+                return type == RESOURCE_TYPE_MATERIAL || type == RESOURCE_TYPE_MODEL;
+        }
+        else
+        {
+            // Reorder components within node
+            if (sourceComponent !is null && targetComponent !is null && sourceComponent.node is targetComponent.node)
+                return true;
+        }
 
         return false;
     }
@@ -1273,7 +1299,7 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
     {
         int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
 
-        // test against resource pickers
+        // Test against resource pickers
         LineEdit@ lineEdit = cast<LineEdit>(target);
         if (lineEdit !is null)
         {
