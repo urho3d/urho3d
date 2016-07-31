@@ -306,8 +306,7 @@ void AddComponentItem(uint compItemIndex, Component@ component, UIElement@ paren
     text.vars[COMPONENT_ID_VAR] = component.id;
     text.text = GetComponentTitle(component);
     text.color = componentTextColor;
-    // Components currently act only as drag targets
-    text.dragDropMode = DD_TARGET;
+    text.dragDropMode = DD_SOURCE_AND_TARGET;
 
     IconizeUIElement(text, component.typeName);
     SetIconEnabledColor(text, component.enabledEffective);
@@ -1005,25 +1004,22 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     if (itemType == ITEM_NODE)
     {
         Node@ targetNode = editorScene.GetNode(target.vars[NODE_ID_VAR].GetUInt());
-
-        // If target is null, parent to scene
-        if (targetNode is null)
-            targetNode = editorScene;
-
         Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
+        
         if (sourceNodes.length > 0)
         {
-            if (!input.qualifierDown[QUAL_CTRL])
+            if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
+                SceneReorder(sourceNodes[0], targetNode);
+            else
             {
+                // If target is null, parent to scene
+                if (targetNode is null)
+                    targetNode = editorScene;
+
                 if (sourceNodes.length > 1)
                     SceneChangeParent(sourceNodes[0], sourceNodes, targetNode);
                 else
                     SceneChangeParent(sourceNodes[0], targetNode);
-            }
-            else
-            {
-                if (sourceNodes.length == 1)
-                    SceneReorder(sourceNodes[0], targetNode);
             }
 
             // Focus the node at its new position in the list which in turn should trigger a refresh in attribute inspector
@@ -1039,14 +1035,14 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
         if (targetElement is null)
             return;
 
-        if (!input.qualifierDown[QUAL_CTRL])
+        if (input.qualifierDown[QUAL_CTRL])
         {
-            if (!UIElementChangeParent(sourceElement, targetElement))
+            if (!UIElementReorder(sourceElement, targetElement))
                 return;
         }
         else
         {
-            if (!UIElementReorder(sourceElement, targetElement))
+            if (!UIElementChangeParent(sourceElement, targetElement))
                 return;
         }
 
@@ -1056,10 +1052,16 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
     else if (itemType == ITEM_COMPONENT)
     {
         Component@ targetComponent = editorScene.GetComponent(target.vars[COMPONENT_ID_VAR].GetUInt());
+        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
-        if (!input.qualifierDown[QUAL_CTRL])
+        if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
         {
-            Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
+            // Reorder components within node
+            Component@ sourceComponent = editorScene.GetComponent(source.vars[COMPONENT_ID_VAR].GetUInt());
+            SceneReorder(sourceComponent, targetComponent);
+        }
+        else
+        {
             if (targetComponent !is null && sourceNodes.length > 0)
             {
                 // Drag node to StaticModelGroup to make it an instance
@@ -1117,12 +1119,6 @@ void HandleDragDropFinish(StringHash eventType, VariantMap& eventData)
                 }
             }
         }
-        else
-        {
-            // Reorder components within node
-            Component@ sourceComponent = editorScene.GetComponent(source.vars[COMPONENT_ID_VAR].GetUInt());
-            SceneReorder(sourceComponent, targetComponent);
-        }
     }
 }
 
@@ -1140,7 +1136,7 @@ Array<Node@> GetMultipleSourceNodes(UIElement@ source)
         ListView@ listView_ = cast<ListView>(source.parent.parent.parent);
         if (listView_ is null)
             return nodeList;
-        
+
         bool sourceIsSelected = false;
         for (uint i = 0; i < listView_.selectedItems.length; ++i)
         {
@@ -1187,24 +1183,25 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         variant = target.GetVar(NODE_ID_VAR);
         if (!variant.empty)
             targetNode = editorScene.GetNode(variant.GetUInt());
+        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         if (sourceNode !is null && targetNode !is null)
         {
             itemType = ITEM_NODE;
 
+            // Ctrl pressed: reorder
+            if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
+            {
+                // Must be within the same parent
+                if (sourceNode.parent is null || sourceNode.parent !is targetNode.parent)
+                    return false;
+            }
             // No ctrl: Reparent
-            if (!input.qualifierDown[QUAL_CTRL])
+            else
             {
                 if (sourceNode.parent is targetNode)
                     return false;
                 if (targetNode.parent is sourceNode)
-                    return false;
-            }
-            // Ctrl pressed: reorder
-            else
-            {
-                // Must be within the same parent
-                if (sourceNode.parent is null || sourceNode.parent !is targetNode.parent)
                     return false;
             }
         }
@@ -1214,9 +1211,9 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         {
             itemType = ITEM_NODE;
             int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
-            return type == RESOURCE_TYPE_PREFAB || 
-                type == RESOURCE_TYPE_SCRIPTFILE || 
-                type == RESOURCE_TYPE_MODEL || 
+            return type == RESOURCE_TYPE_PREFAB ||
+                type == RESOURCE_TYPE_SCRIPTFILE ||
+                type == RESOURCE_TYPE_MODEL ||
                 type == RESOURCE_TYPE_PARTICLEEFFECT ||
                 type == RESOURCE_TYPE_2D_PARTICLE_EFFECT;
         }
@@ -1238,19 +1235,19 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         {
             itemType = ITEM_UI_ELEMENT;
 
-            // No ctrl: Reparent
-            if (!input.qualifierDown[QUAL_CTRL])
+            // Ctrl pressed: reorder
+            if (input.qualifierDown[QUAL_CTRL])
+            {
+                // Must be within the same parent
+                if (sourceElement.parent is null || sourceElement.parent !is targetElement.parent)
+                    return false;
+            }
+            // No ctrl: reparent
+            else
             {
                 if (sourceElement.parent is targetElement)
                     return false;
                 if (targetElement.parent is sourceElement)
-                    return false;
-            }
-            // Ctrl pressed: reorder
-            else
-            {
-                // Must be within the same parent
-                if (sourceElement.parent is null || sourceElement.parent !is targetElement.parent)
                     return false;
             }
         }
@@ -1271,10 +1268,17 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
         variant = source.GetVar(COMPONENT_ID_VAR);
         if (!variant.empty)
             sourceComponent = editorScene.GetComponent(variant.GetUInt());
+        Array<Node@> sourceNodes = GetMultipleSourceNodes(source);
 
         itemType = ITEM_COMPONENT;
 
-        if (!input.qualifierDown[QUAL_CTRL])
+        if (input.qualifierDown[QUAL_CTRL] && sourceNodes.length == 1)
+        {
+            // Reorder components within node
+            if (sourceComponent !is null && targetComponent !is null && sourceComponent.node is targetComponent.node)
+                return true;
+        }
+        else
         {
             // Dragging of nodes to StaticModelGroup, SplinePath or Constraint
             if (sourceNode !is null && targetComponent !is null && (targetComponent.type == STATICMODELGROUP_TYPE ||
@@ -1285,12 +1289,6 @@ bool TestDragDrop(UIElement@ source, UIElement@ target, int& itemType)
             int type = source.GetVar(TEXT_VAR_RESOURCE_TYPE).GetInt();
             if (targetComponent.type == STATICMODEL_TYPE || targetComponent.type == ANIMATEDMODEL_TYPE)
                 return type == RESOURCE_TYPE_MATERIAL || type == RESOURCE_TYPE_MODEL;
-        }
-        else
-        {
-            // Reorder components within node
-            if (sourceComponent !is null && targetComponent !is null && sourceComponent.node is targetComponent.node)
-                return true;
         }
 
         return false;
