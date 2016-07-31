@@ -138,8 +138,8 @@ PhysicsWorld::PhysicsWorld(Context* context) :
 {
     gContactAddedCallback = CustomMaterialCombinerCallback;
 
-    if (PhysicsWorld::config.collisionConfig)
-        collisionConfiguration_ = PhysicsWorld::config.collisionConfig;
+    if (PhysicsWorld::config.collisionConfig_)
+        collisionConfiguration_ = PhysicsWorld::config.collisionConfig_;
     else
         collisionConfiguration_ = new btDefaultCollisionConfiguration();
 
@@ -184,7 +184,9 @@ PhysicsWorld::~PhysicsWorld()
     delete collisionDispatcher_;
     collisionDispatcher_ = 0;
 
-    delete collisionConfiguration_;
+    // Delete configuration only if it was the default created by PhysicsWorld
+    if (!PhysicsWorld::config.collisionConfig_)
+        delete collisionConfiguration_;
     collisionConfiguration_ = 0;
 }
 

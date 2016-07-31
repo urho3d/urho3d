@@ -96,17 +96,16 @@ struct DelayedWorldTransform
     Quaternion worldRotation_;
 };
 
-/**
- * Custom overrides of physics internals.
- *
- * Must be modified before the physics component is created.
- */
+/// Custom overrides of physics internals. To use overrides, must be set before the physics component is created.
 struct PhysicsWorldConfig
 {
-    /// Override for the collision configuration (default btDefaultCollisionConfiguration).
-    btCollisionConfiguration*    collisionConfig;
+    PhysicsWorldConfig() :
+        collisionConfig_(0)
+    {
+    }
 
-    PhysicsWorldConfig() : collisionConfig(0) {}
+    /// Override for the collision configuration (default btDefaultCollisionConfiguration).
+    btCollisionConfiguration* collisionConfig_;
 };
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
@@ -120,9 +119,6 @@ class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
     friend void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep);
 
 public:
-    /// Allow overrides of the internal configuration.
-    static struct PhysicsWorldConfig config;
-
     /// Construct.
     PhysicsWorld(Context* scontext);
     /// Destruct.
@@ -268,6 +264,9 @@ public:
 
     /// Return whether is currently inside the Bullet substep loop.
     bool IsSimulating() const { return simulating_; }
+
+    /// Overrides of the internal configuration.
+    static struct PhysicsWorldConfig config;
 
 protected:
     /// Handle scene being assigned.

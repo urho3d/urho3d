@@ -1159,7 +1159,7 @@ void CollisionShape::UpdateShape()
             break;
 
         default:
-        	shape_ = this->UpdateDerivedShape(shapeType_, newWorldScale);
+            shape_ = this->UpdateDerivedShape(shapeType_, newWorldScale);
             break;
         }
 
@@ -1182,7 +1182,7 @@ void CollisionShape::UpdateShape()
 btCollisionShape* CollisionShape::UpdateDerivedShape(int shapeType, const Vector3& newWorldScale)
 {
     // To be overridden in derived classes.
-	return NULL;
+    return 0;
 }
 
 
