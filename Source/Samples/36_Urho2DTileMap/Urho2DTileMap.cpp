@@ -68,7 +68,7 @@ void Urho2DTileMap::Start()
     SubscribeToEvents();
 
     // Set the mouse mode to use in the sample
-    Sample::InitMouseMode(MM_FREE);
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void Urho2DTileMap::CreateScene()

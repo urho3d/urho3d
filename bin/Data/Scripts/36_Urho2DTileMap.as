@@ -25,7 +25,7 @@ void Start()
     SetupViewport();
 
     // Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE);
+    SampleInitMouseMode(MM_RELATIVE);
 
     // Hook up to the frame update events
     SubscribeToEvents();
