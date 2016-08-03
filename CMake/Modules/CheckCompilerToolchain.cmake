@@ -41,6 +41,12 @@
 #  HAVE_ALTIVEC
 #
 
+if (EMSCRIPTEN AND CMAKE_HOST_WIN32)
+    set (EMCC_FIX EMCC_FIX)
+    set (NULL_DEVICE${EMCC_FIX} ${CMAKE_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/null.c)
+    execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${NULL_DEVICE${EMCC_FIX}})
+endif ()
+
 if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
     if (IOS OR TVOS)
         # Assume arm64 is the native arch (this does not prevent our build system to target armv7 later in universal binary build)
@@ -49,7 +55,7 @@ if (NOT MSVC AND NOT DEFINED NATIVE_PREDEFINED_MACROS)
         # Use the same target flag as configured by Android/CMake toolchain file
         string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${ANDROID_CXX_FLAGS}")  # Stringify for string replacement
     endif ()
-    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+    execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
     if (NOT CC_EXIT_STATUS EQUAL 0)
         message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler flags correctly")
     endif ()
@@ -102,7 +108,7 @@ endif ()
 macro (check_extension CPU_INSTRUCTION_EXTENSION)
     string (TOUPPER "${CPU_INSTRUCTION_EXTENSION}" UCASE_EXT_NAME)   # Stringify to guard against empty variable
     if (NOT DEFINED HAVE_${UCASE_EXT_NAME})
-        execute_process (COMMAND ${CMAKE_C_COMPILER} -m${CPU_INSTRUCTION_EXTENSION} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
+        execute_process (COMMAND ${CMAKE_C_COMPILER} -m${CPU_INSTRUCTION_EXTENSION} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE PREDEFINED_MACROS ERROR_QUIET)
         if (NOT CC_EXIT_STATUS EQUAL 0)
             message (FATAL_ERROR "Could not check compiler toolchain CPU instruction extension as it does not handle '-E -dM' compiler flags correctly")
         endif ()
