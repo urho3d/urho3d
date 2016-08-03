@@ -35,6 +35,7 @@ Urho3D development, contributions and bugfixes by:
 - Jason Kinzer
 - Eugene Kozlov
 - Gunnar Kriik
+- Aliaksandr Kryvashein
 - Artem Kulyk
 - Ali Kämäräinen
 - Pete Leigh
