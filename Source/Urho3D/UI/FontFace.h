@@ -34,7 +34,7 @@ class Image;
 class Texture2D;
 
 /// %Font glyph description.
-struct FontGlyph
+struct URHO3D_API FontGlyph
 {
     /// Construct.
     FontGlyph();
