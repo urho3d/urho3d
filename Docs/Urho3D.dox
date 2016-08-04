@@ -353,6 +353,7 @@ V1.6
 - AssetImporter: support multiple color & UV channels.
 - Fix various missing script bindings & missing export specifiers for classes.
 - Fix various uninitialized variables.
+- Fix hardware shadow support always returning false on OpenGL after the Graphics headers refactor.
 - Fix wrong UV index in drawable OBJ export.
 - Fix backbuffer not getting cleared when just %UI & texture viewports are being rendered.
 - Fix DirExists() on Android.

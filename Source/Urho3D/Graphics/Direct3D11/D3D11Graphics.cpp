@@ -217,6 +217,7 @@ Graphics::Graphics(Context* context) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     instancingSupport_(false),

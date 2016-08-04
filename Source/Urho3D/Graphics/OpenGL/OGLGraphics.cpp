@@ -243,6 +243,7 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
     numPrimitives_(0),
@@ -2689,6 +2690,9 @@ void Graphics::CheckFeatureSupport()
 #endif
     }
 #endif
+
+    // Consider OpenGL shadows always hardware sampled, if supported at all
+    hardwareShadowSupport_ = shadowMapFormat_ != 0;
 }
 
 void Graphics::PrepareDraw()

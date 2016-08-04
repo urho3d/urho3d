@@ -145,12 +145,11 @@ void InitScene()
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
 
-    // On mobile devices render the shadowmap first. Also adjust the shadow quality for performance
+    // On mobile devices render the shadowmap first for better performance, adjust the cascaded shadows
     String platform = GetPlatform();
     if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
     {
         renderer.reuseShadowMaps = false;
-        renderer.shadowQuality = SHADOWQUALITY_SIMPLE_16BIT;
         // Adjust the directional light shadow range slightly further, as only the first
         // cascade is supported
         Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);
@@ -158,7 +157,6 @@ void InitScene()
         {
             Light@ dirLight = dirLightNode.GetComponent("Light");
             dirLight.shadowCascade = CascadeParameters(15.0f, 0.0f, 0.0f, 0.0f, 0.9f);
-            dirLight.shadowIntensity = 0.333f;
         }
     }
 
