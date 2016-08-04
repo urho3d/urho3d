@@ -269,6 +269,7 @@ V1.6
 - %IntRect / %IntVector2 setters & getters added to %XMLElement.
 - TryAcquire() added to %Mutex class.
 - %Vector2 Angle() function added.
+- StringUtils ToInt() & ToUInt() take an optional base parameter.
 - Convenience function %Context::CreateObject<T>.
 - Convenience template version of ReleaseResource().
 - Allow %Vector4 to substitute for %Color in %Variant::GetColor().
