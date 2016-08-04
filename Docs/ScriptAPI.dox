@@ -12447,7 +12447,7 @@ Methods:
 - Color ToColor() const
 - double ToDouble() const
 - float ToFloat() const
-- int ToInt() const
+- int ToInt(int = 10) const
 - IntRect ToIntRect() const
 - IntVector2 ToIntVector2() const
 - String ToLower() const
@@ -12455,7 +12455,7 @@ Methods:
 - Matrix3x4 ToMatrix3x4() const
 - Matrix4 ToMatrix4() const
 - Quaternion ToQuaternion() const
-- uint ToUInt() const
+- uint ToUInt(int = 10) const
 - String ToUpper() const
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
