@@ -277,7 +277,7 @@ V1.6
 - Allow %Vector4 to substitute for %Color in %Variant::GetColor().
 - Additional %Variant types can function as parameters for AngelScript function / method calls.
 - Improve FixedUpdate event to allow it to originate from either %PhysicsWorld or %PhysicsWorld2D.
-- %Particle effect & animation playback finish events.
+- %Particle effect, animation playback & sound playback finish events.
 - %CrowdAgent emits events also from its node.
 - Event sent after cloning a %Node or %Component is done.
 - b2Contact pointer added to %PhysicsWorld2D collision events.
