@@ -316,7 +316,7 @@ V1.6
 - Update to SQLite 3.13.0.
 - Update to stb_image 2.12, stb_image_write 1.02, stb_rect_pack 0.08 & stb_vorbis 1.09.
 - Use Readline library if available for Lua & SQLite.
-- Generic ARM platform support.
+- Generic ARM on Linux platform support.
 - Android NDK r11 & r12 support.
 - Reduce exposure to SDL headers from Urho's headers.
 - Support for Codelite CMake invocation.
