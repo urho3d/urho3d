@@ -54,7 +54,9 @@ For Urho3D related links and projects, see \ref ExternalLinks "External links".
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
-For release history and major changes, see \ref History.
+For release history and major changes, see \ref History. 
+
+Also see \ref PortingNotes for necessary changes when moving to a newer Urho3D version.
 
 \page Credits Credits
 
@@ -1003,6 +1005,25 @@ Related projects:
 - ParticleEditor2D for Urho3D (https://github.com/aster2013/ParticleEditor2D)
 
 - Urho3D libRocket Integration (https://github.com/realrunner/urho3d-librocket)
+
+\page PortingNotes Porting notes
+
+From 1.4 to 1.5:
+
+- Urho preprocessor macros are now prefixed URHO3D_ , for example URHO3D_LOGINFO, URHO3D_HANDLER, URHO3D_DEFINE_APPLICATION_MAIN.
+
+From 1.5 to 1.6:
+
+- The keycode constant KEY_ESC was renamed to KEY_ESCAPE to match SDL's convention.
+- Alphabetic keycode constants are now lowercase to match SDL's convention. It's preferable to always use these constants instead of character literals.
+  For compatibility, passing uppercase letters to e.g. Input::GetKeyDown() still works, but comparing to uppercase literals in key event handling will cause a mismatch and non-functioning controls.
+- Bitmask based vertex declarations are emulated by converting to corresponding VertexElement declarations. This should not cause issues, but it's recommended to migrate to %VertexElement based declarations
+  for better flexibility and control, and to go through any application code that uses the VertexBuffer class to verify correctness.
+- As part of the freeform vertex declaration change, GLSL vertex attributes' semantic indices are now zero-based. The first texcoord would be called iTexCoord or iTexCoord0, and the second iTexCoord1. This matches HLSL semantics
+  that are also zero-based. Instance transform is passed in texcoord semantic indices 4-6 on both GLSL & HLSL.
+- cCameraRot matrix uniform has been removed. %Camera rotation can instead be extracted from the cViewInv uniform.
+- Deferred lighting calculations are now performed in true world space, instead of camera-centered world space.
+- SoundSource autoremove functionality is deprecated and will be removed in the future. The SoundFinished event can be used instead to react to playback finishing and to perform the necessary action, for example to remove the sound component or its owner node.
 
 */
 
