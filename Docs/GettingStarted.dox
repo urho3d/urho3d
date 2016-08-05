@@ -153,9 +153,9 @@ A number of build options can be defined when invoking the build scripts or when
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
-|ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (Linux on ARM cross-compiling build only)|
-|ARM_SYSROOT          |-|Path to ARM system root (Linux on ARM cross-compiling build only)|
-|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
+|ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
+|ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
+|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
 |EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
@@ -254,7 +254,7 @@ You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclip
 
 For native build on ARM board itself, use the similar process for \ref Building_Native "Native build process" described above for Linux platform.
 
-> At the moment we only support Linux on generic ARM. Other OSes are not supported yet.
+> At the moment we only support generic ARM on Linux platform. Other platforms/OSes are not supported yet.
 
 For cross-compiling build on a Linux host system, firstly set the ARM_PREFIX environment variable or build option to point to your ARM cross-compiling tools are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from http://www.linaro.org/downloads/. You need to obtain the little-endian version of the armhf or aarch64 compiler toolchains for setting up a 32-bit or 64-bit build environment, respectively. Secondly, set the ARM_SYSROOT environment variable or build option to point to your generic ARM system root. Similarly you need to obtain the armhf (hard float) sysroot for 32-bit or arm64 (aarch64) sysroot for 64-bit. You must install the Urho3D prerequisites software development packages for Linux platform (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. There are a few ways to obtain and prepare the sysroots yourself but the easiest way is to download the already prepared one from https://github.com/urho3d/armhf-sysroot or https://github.com/urho3d/arm64-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual ARM board to your host system via SSHFS and set the ARM_SYSROOT to use the mount point.
 

@@ -100,7 +100,7 @@ cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
-    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
+    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
 if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (URHO3D_64BIT OR "${ARM_ABI_FLAGS}" MATCHES neon)))    # Stringify in case RPI_ABI/ARM_ABI_FLAGS is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
