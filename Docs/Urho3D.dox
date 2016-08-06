@@ -54,7 +54,7 @@ For Urho3D related links and projects, see \ref ExternalLinks "External links".
 
 For credits, copyright and licensing information, see \ref Credits & \ref License.
 
-For release history and major changes, see \ref History. 
+For release history and major changes, see \ref History.
 
 Also see \ref PortingNotes for necessary changes when moving to a newer Urho3D version.
 
@@ -1011,6 +1011,7 @@ Related projects:
 From 1.4 to 1.5:
 
 - Urho preprocessor macros are now prefixed URHO3D_ , for example URHO3D_LOGINFO, URHO3D_HANDLER, URHO3D_DEFINE_APPLICATION_MAIN.
+- Build system - for projects using GCC/Clang compiler toolchain, set the URHO3D_DEPLOYMENT_TARGET build option according to the target audience of the downstream projects. The default value for this build option is 'native' which is great for Urho3D newbie but may potentially cause issue when this build option is not observed and set accordingly for production. The same is true for CMAKE_OSX_DEPLOYMENT_TARGET and IPHONEOS_DEPLOYMENT_TARGET build options when targeting macOS and iOS platforms, however, the latter two build options are not new.
 
 From 1.5 to 1.6:
 
@@ -1024,6 +1025,9 @@ From 1.5 to 1.6:
 - cCameraRot matrix uniform has been removed. %Camera rotation can instead be extracted from the cViewInv uniform.
 - Deferred lighting calculations are now performed in true world space, instead of camera-centered world space.
 - SoundSource autoremove functionality is deprecated and will be removed in the future. The SoundFinished event can be used instead to react to playback finishing and to perform the necessary action, for example to remove the sound component or its owner node.
+- Build system - Windows users need to upgrade CMake version to 3.2.3 or higher. CMake version 3.2.3 will be the minimum version required for building Urho3D library on any host systems in the future releases. Mac users need to upgrade CMake version to 3.4.1 or higher when using URHO3D_LUAJIT build option.
+- Build system - the inclusion of Urho3D-CMake-common.cmake module into downstream project's CMakeLists.txt would implicitly instruct CMake to find all the required software packages, including Urho3D library. There is no need now for downstream's CMakeLists.txt to call "find_package (Urho3D)" explicitly, to avoid the Urho3D library from being searched twice. The enhanced FindUrho3D.cmake module now auto-discovers the build options used when building Urho3D library and reapply them to downstream projects. There is no need for users to remember and to supply the same set of build options when performing the initial configuration/generation of the downstream project's build tree.
+- Build system - the Urho3DAll.h header file is now auto-generated for downstream project that needs it. It is not a good practice though to use this "convenience header" as it would slow down the build process unnecessarily.
 
 */
 
