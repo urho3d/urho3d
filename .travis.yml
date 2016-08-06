@@ -316,7 +316,7 @@ before_script:
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${ARM_PREFIX%/*}:$PATH
   - rake ci_setup_cache
-script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ "$SYSROOT" == "arm64-sysroot" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 ---
