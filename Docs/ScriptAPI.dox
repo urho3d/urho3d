@@ -259,6 +259,14 @@ namespace Urho3D
 
 ### ExitRequested
 
+### SDLRawInput
+- %SDLEvent : SDL_Event*
+- %Consumed : bool
+
+### InputBegin
+
+### InputEnd
+
 ## %Navigation events
 
 ### NavigationMeshRebuilt
