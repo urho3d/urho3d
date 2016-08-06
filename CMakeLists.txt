@@ -116,7 +116,7 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)
     elseif (ARM)
-        set (CPACK_SYSTEM_NAME Arm)     # Generic ARM
+        set (CPACK_SYSTEM_NAME ARM)     # Generic ARM
     endif ()
     if (NOT URHO3D_64BIT OR HAS_LIB64)
         list (APPEND CPACK_GENERATOR RPM)
