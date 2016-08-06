@@ -222,9 +222,9 @@ URHO3D_EVENT(E_EXITREQUESTED, ExitRequested)
 }
 
 /// Raw SDL input event.
-URHO3D_EVENT(E_SDLRAWINPUT, SdlRawInput)
+URHO3D_EVENT(E_SDLRAWINPUT, SDLRawInput)
 {
-    URHO3D_PARAM(P_SDL_EVENT, SdlEvent);           // SDL_Event*
+    URHO3D_PARAM(P_SDLEVENT, SDLEvent);           // SDL_Event*
     URHO3D_PARAM(P_CONSUMED, Consumed);            // bool
 }
 

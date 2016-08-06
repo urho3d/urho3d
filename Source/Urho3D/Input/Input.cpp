@@ -1837,13 +1837,18 @@ void Input::HandleSDLEvent(void* sdlEvent)
             return;
     }
 
-    VariantMap eventData;
-    eventData[SdlRawInput::P_SDL_EVENT] = &evt;
-    eventData[SdlRawInput::P_CONSUMED] = false;
-    SendEvent(E_SDLRAWINPUT, eventData);
+    // Possibility for custom handling or suppression of default handling for the SDL event
+    {
+        using namespace SDLRawInput;
+    
+        VariantMap eventData = GetEventDataMap();
+        eventData[P_SDLEVENT] = &evt;
+        eventData[P_CONSUMED] = false;
+        SendEvent(E_SDLRAWINPUT, eventData);
 
-    if (eventData[SdlRawInput::P_CONSUMED].GetBool())
-        return;
+        if (eventData[P_CONSUMED].GetBool())
+            return;
+    }
 
     switch (evt.type)
     {

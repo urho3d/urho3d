@@ -37,6 +37,7 @@ Urho3D development, contributions and bugfixes by:
 - Gunnar Kriik
 - Aliaksandr Kryvashein
 - Artem Kulyk
+- Rokas Kupstys
 - Ali Kämäräinen
 - Pete Leigh
 - Frode 'Modanung' Lindeijer
@@ -62,7 +63,6 @@ Urho3D development, contributions and bugfixes by:
 - Yusuf Umar
 - Daniel Wiberg
 - Steven Zhang
-- Rokas Kupstys
 - AGreatFish
 - BlueMagnificent
 - Enhex
