@@ -590,7 +590,7 @@ task :ci_package_upload do
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time
      end
-    system "bash -c '#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI']) ? 'setarch i686' : ''} rake make target=package'" or abort 'Failed to make binary package'
+    system "bash -c '#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package'" or abort 'Failed to make binary package'
   end
   next if timeup
   # Determine the upload location
