@@ -223,7 +223,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 V1.6
 
 - Physically based rendering shaders, techniques, renderpaths and example materials / demo scene.
-- AngelScript support on also on Emscripten and 64-bit iOS, based on generic bindings.
+- AngelScript support on Emscripten and 64-bit iOS, based on generic bindings.
 - JSON load/save option for scenes, nodes and materials.
 - Tags added to nodes & %UI elements.
 - %EventProfiler subsystem.
