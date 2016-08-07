@@ -1454,15 +1454,13 @@ if( ARMEABI_V7A )
  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--fix-cortex-a8" )
 endif()
 
+# Urho3D - bug fix - fix the common linker problem as it may happen to all archs (not just MIPS) when ld.bfd is used
+if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
+  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
+endif()
+
 if( ANDROID_NO_UNDEFINED )
- if( MIPS )
-  # there is some sysroot-related problem in mips linker...
-  if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
-   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
-  endif()
- else()
   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined" )
- endif()
 endif()
 
 if( ANDROID_SO_UNDEFINED )
