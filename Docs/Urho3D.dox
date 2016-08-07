@@ -244,7 +244,6 @@ V1.6
 - C++11 binding to Urho events using std::bind.
 - C++11 variadic template version of SendEvent().
 - 64-bit integer support in %Serializer / %Deserializer.
-- %String + number operators.
 - Template versions of math functions.
 - Container class API improvements.
 - %SharedPtr / %WeakPtr implicit upcasting support.

@@ -202,28 +202,28 @@ public:
         return *this;
     }
 
-    /// Add-assign an integer.
+    /// Add-assign (concatenate as string) an integer.
     String& operator +=(int rhs);
-    /// Add-assign a short integer.
+    /// Add-assign (concatenate as string) a short integer.
     String& operator +=(short rhs);
-    /// Add-assign a long integer.
+    /// Add-assign (concatenate as string) a long integer.
     String& operator +=(long rhs);
-    /// Add-assign a long long integer.
+    /// Add-assign (concatenate as string) a long long integer.
     String& operator +=(long long rhs);
-    /// Add-assign an unsigned integer.
+    /// Add-assign (concatenate as string) an unsigned integer.
     String& operator +=(unsigned rhs);
-    /// Add-assign a short unsigned integer.
+    /// Add-assign (concatenate as string) a short unsigned integer.
     String& operator +=(unsigned short rhs);
-    /// Add-assign a long unsigned integer.
+    /// Add-assign (concatenate as string) a long unsigned integer.
     String& operator +=(unsigned long rhs);
-    /// Add-assign a long long unsigned integer.
+    /// Add-assign (concatenate as string) a long long unsigned integer.
     String& operator +=(unsigned long long rhs);
-    /// Add-assign a float.
+    /// Add-assign (concatenate as string) a float.
     String& operator +=(float rhs);
-    /// Add-assign a bool.
+    /// Add-assign (concatenate as string) a bool.
     String& operator +=(bool rhs);
 
-    /// Add-assign an arbitraty type.
+    /// Add-assign (concatenate as string) an arbitrary type.
     template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
@@ -247,75 +247,6 @@ public:
         CopyChars(ret.buffer_ + length_, rhs, rhsLength);
 
         return ret;
-    }
-
-    /// Add a character.
-    String operator +(char rhs) const
-    {
-        String ret(*this);
-        ret += rhs;
-
-        return ret;
-    }
-
-    /// Add an integer.
-    String operator +(int rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a short integer.
-    String operator +(short rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a long integer.
-    String operator +(long rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a long long integer.
-    String operator +(long long rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add an unsigned integer.
-    String operator +(unsigned rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a short unsigned integer.
-    String operator +(unsigned short rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a long unsigned integer.
-    String operator +(unsigned long rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a long long unsigned integer.
-    String operator +(unsigned long long rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a float.
-    String operator +(float rhs) const
-    {
-        return *this + String(rhs);
-    }
-
-    /// Add a bool.
-    String operator +(bool rhs) const
-    {
-        return *this + String(rhs);
     }
 
     /// Test for equality with another string.
