@@ -580,6 +580,9 @@ public:
     /// Return child elements with a specific tag either recursively or non-recursively.
     void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
 
+    /// Return child elements with a specific tag either recursively or non-recursively.
+    PODVector<UIElement*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
+
     /// Return the drag button combo if this element is being dragged.
     int GetDragButtonCombo() const { return dragButtonCombo_; }
 
