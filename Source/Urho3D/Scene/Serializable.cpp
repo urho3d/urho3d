@@ -690,11 +690,11 @@ void Serializable::SetTemporary(bool enable)
 
 void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool enable)
 {
-    const Vector<AttributeInfo>* attributes = GetNetworkAttributes();
+    AllocateNetworkState();
+
+    const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     if (!attributes)
         return;
-
-    AllocateNetworkState();
 
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
@@ -712,11 +712,26 @@ void Serializable::SetInterceptNetworkUpdate(const String& attributeName, bool e
 
 void Serializable::AllocateNetworkState()
 {
-    if (!networkState_)
+    if (networkState_)
+        return;
+
+    const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
+    networkState_ = new NetworkState();
+    networkState_->attributes_ = networkAttributes;
+
+    if (!networkAttributes)
+        return;
+
+    unsigned numAttributes = networkAttributes->Size();
+
+    if (networkState_->currentValues_.Size() != numAttributes)
     {
-        const Vector<AttributeInfo>* networkAttributes = GetNetworkAttributes();
-        networkState_ = new NetworkState();
-        networkState_->attributes_ = networkAttributes;
+        networkState_->currentValues_.Resize(numAttributes);
+        networkState_->previousValues_.Resize(numAttributes);
+
+        // Copy the default attribute values to the previous state as a starting point
+        for (unsigned i = 0; i < numAttributes; ++i)
+            networkState_->previousValues_[i] = networkAttributes->At(i).defaultValue_;
     }
 }
 
