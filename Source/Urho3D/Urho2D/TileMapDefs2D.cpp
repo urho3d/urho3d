@@ -103,10 +103,11 @@ bool TileMapInfo2D::PositionToTileIndex(int& x, int& y, const Vector2& position)
     {
     case O_ISOMETRIC:
     {
-        int x_sub_y = (int)(position.x_ * 2.0f / tileWidth_ + 1 - width_);
-        int x_add_y = (int)(height_ * 2.0f - position.y_ * 2.0f / tileHeight_ - 2.0f);
-        x = (x_sub_y - x_add_y) / 2;
-        y = (x_sub_y - x_add_y) / 2;
+        float ox = position.x_ / tileWidth_ - height_ * 0.5f;
+        float oy = position.y_ / tileHeight_;
+
+        x = (int)(width_ - oy + ox);
+        y = (int)(height_ - oy - ox);
     }
         break;
 

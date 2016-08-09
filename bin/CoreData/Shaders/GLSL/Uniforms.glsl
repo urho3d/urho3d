@@ -52,7 +52,7 @@ uniform mat4 cZone;
     precision mediump float;
 #endif
 
-uniform vec3 cAmbientColor;
+uniform vec4 cAmbientColor;
 uniform vec3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform vec4 cDepthReconstruct;
@@ -69,8 +69,8 @@ uniform vec3 cMatEmissiveColor;
 uniform vec3 cMatEnvMapColor;
 uniform vec4 cMatSpecColor;
 #ifdef PBR
-    uniform float cRoughnessPS;
-    uniform float cMetallicPS;
+    uniform float cRoughness;
+    uniform float cMetallic;
 #endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
@@ -171,7 +171,7 @@ uniform CameraPS
 
 uniform ZonePS
 {
-    vec3 cAmbientColor;
+    vec4 cAmbientColor;
     vec4 cFogParams;
     vec3 cFogColor;
 };
@@ -201,8 +201,8 @@ uniform MaterialPS
     vec3 cMatEnvMapColor;
     vec4 cMatSpecColor;
     #ifdef PBR
-        float cRoughnessPS;
-        float cMetallicPS;
+        float cRoughness;
+        float cMetallic;
     #endif
 };
 #endif

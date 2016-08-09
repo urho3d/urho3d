@@ -710,8 +710,17 @@ void Renderer::Render()
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
     graphics_->SetTextureAnisotropy((unsigned)textureAnisotropy_);
 
-    // If no views, just clear the screen
-    if (views_.Empty())
+    // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
+    bool hasBackbufferViews = false;
+    for (unsigned i = 0; i < views_.Size(); ++i)
+    {
+        if (!views_[i]->GetRenderTarget())
+        {
+            hasBackbufferViews = true;
+            break;
+        }
+    }
+    if (!hasBackbufferViews)
     {
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
@@ -720,41 +729,36 @@ void Renderer::Render()
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, defaultZone_->GetFogColor());
-
-        numPrimitives_ = 0;
-        numBatches_ = 0;
     }
-    else
+
+    // Render views from last to first. Each main (backbuffer) view is rendered after the auxiliary views it depends on
+    for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
     {
-        // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
-        for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
-        {
-            if (!views_[i])
-                continue;
+        if (!views_[i])
+            continue;
 
-            using namespace BeginViewRender;
+        using namespace BeginViewRender;
 
-            RenderSurface* renderTarget = views_[i]->GetRenderTarget();
+        RenderSurface* renderTarget = views_[i]->GetRenderTarget();
 
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_VIEW] = views_[i];
-            eventData[P_SURFACE] = renderTarget;
-            eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
-            eventData[P_SCENE] = views_[i]->GetScene();
-            eventData[P_CAMERA] = views_[i]->GetCamera();
-            SendEvent(E_BEGINVIEWRENDER, eventData);
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_VIEW] = views_[i];
+        eventData[P_SURFACE] = renderTarget;
+        eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
+        eventData[P_SCENE] = views_[i]->GetScene();
+        eventData[P_CAMERA] = views_[i]->GetCamera();
+        SendEvent(E_BEGINVIEWRENDER, eventData);
 
-            // Screen buffers can be reused between views, as each is rendered completely
-            PrepareViewRender();
-            views_[i]->Render();
+        // Screen buffers can be reused between views, as each is rendered completely
+        PrepareViewRender();
+        views_[i]->Render();
 
-            SendEvent(E_ENDVIEWRENDER, eventData);
-        }
-
-        // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
-        numPrimitives_ = graphics_->GetNumPrimitives();
-        numBatches_ = graphics_->GetNumBatches();
+        SendEvent(E_ENDVIEWRENDER, eventData);
     }
+
+    // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
+    numPrimitives_ = graphics_->GetNumPrimitives();
+    numBatches_ = graphics_->GetNumBatches();
 
     // Remove unused occlusion buffers and renderbuffers
     RemoveUnusedBuffers();

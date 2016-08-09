@@ -260,6 +260,7 @@ Graphics::Graphics(Context* context) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     lightPrepassSupport_(false),
     deferredSupport_(false),
     instancingSupport_(false),
@@ -522,6 +523,11 @@ bool Graphics::SetMode(int width, int height)
 void Graphics::SetSRGB(bool enable)
 {
     sRGB_ = enable && sRGBWriteSupport_;
+}
+
+void Graphics::SetDither(bool enable)
+{
+    // No effect on Direct3D9
 }
 
 void Graphics::SetFlushGPU(bool enable)
@@ -1993,6 +1999,11 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     }
 
     return IntVector2(width, height);
+}
+
+bool Graphics::GetDither() const
+{
+    return false;
 }
 
 bool Graphics::IsDeviceLost() const

@@ -39,14 +39,14 @@ URHO3D_API float ToFloat(const char* source);
 URHO3D_API double ToDouble(const String& source);
 /// Parse a double from a C string.
 URHO3D_API double ToDouble(const char* source);
-/// Parse an integer from a string.
-URHO3D_API int ToInt(const String& source);
-/// Parse an integer from a C string.
-URHO3D_API int ToInt(const char* source);
-/// Parse an unsigned integer from a string.
-URHO3D_API unsigned ToUInt(const String& source);
-/// Parse an unsigned integer from a C string.
-URHO3D_API unsigned ToUInt(const char* source);
+/// Parse an integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API int ToInt(const String& source, int base = 10);
+/// Parse an integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API int ToInt(const char* source, int base = 10);
+/// Parse an unsigned integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned ToUInt(const String& source, int base = 10);
+/// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned ToUInt(const char* source, int base = 10);
 /// Parse a Color from a string.
 URHO3D_API Color ToColor(const String& source);
 /// Parse a Color from a C string.
@@ -79,9 +79,9 @@ URHO3D_API Vector3 ToVector3(const char* source);
 URHO3D_API Vector4 ToVector4(const String& source, bool allowMissingCoords = false);
 /// Parse a Vector4 from a C string.
 URHO3D_API Vector4 ToVector4(const char* source, bool allowMissingCoords = false);
-/// Parse a float, Vector or Matrix variant from a string.
+/// Parse a float, Vector or Matrix variant from a string. Return empty variant on illegal input.
 URHO3D_API Variant ToVectorVariant(const String& source);
-/// Parse a float, Vector or Matrix variant from a C string.
+/// Parse a float, Vector or Matrix variant from a C string. Return empty variant on illegal input.
 URHO3D_API Variant ToVectorVariant(const char* source);
 /// Parse a Matrix3 from a string.
 URHO3D_API Matrix3 ToMatrix3(const String& source);

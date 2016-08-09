@@ -1159,6 +1159,7 @@ void CollisionShape::UpdateShape()
             break;
 
         default:
+            shape_ = this->UpdateDerivedShape(shapeType_, newWorldScale);
             break;
         }
 
@@ -1177,6 +1178,13 @@ void CollisionShape::UpdateShape()
     recreateShape_ = false;
     retryCreation_ = false;
 }
+
+btCollisionShape* CollisionShape::UpdateDerivedShape(int shapeType, const Vector3& newWorldScale)
+{
+    // To be overridden in derived classes.
+    return 0;
+}
+
 
 void CollisionShape::HandleTerrainCreated(StringHash eventType, VariantMap& eventData)
 {

@@ -72,6 +72,8 @@ void CreateUI()
     uiStyle = GetEditorUIXMLFile("UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
     iconStyle = GetEditorUIXMLFile("UI/EditorIcons.xml");
+    
+    graphics.windowIcon = cache.GetResource("Image", "Textures/UrhoIcon.png");
 
     CreateCursor();
     CreateMenuBar();

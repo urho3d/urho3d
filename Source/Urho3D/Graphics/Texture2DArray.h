@@ -67,7 +67,7 @@ public:
     /// Set data of one layer from an image. Return true if successful. Optionally make a single channel image alpha-only.
     bool SetData(unsigned layer, Image* image, bool useAlpha = false);
 
-    // Return number of layers in the texture.
+    /// Return number of layers in the texture.
     unsigned GetLayers() const { return layers_; }
     /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(unsigned layer, unsigned level, void* dest) const;

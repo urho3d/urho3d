@@ -41,8 +41,8 @@ class CreateDrawableMaskAction : EditAction
             case EDIT_ZONE_MASK:
                 oldMask = drawable.zoneMask;
                 break;
-        } 
-                
+        }
+
         typeMask = editMaskType;
         redoMask = oldMask;
     }
@@ -265,6 +265,70 @@ class ReparentNodeAction : EditAction
             if (parent !is null && node !is null)
                 node.parent = parent;
         }
+    }
+}
+
+class ReorderNodeAction : EditAction
+{
+    uint nodeID;
+    uint parentID;
+    uint oldChildIndex;
+    uint newChildIndex;
+
+    void Define(Node@ node, uint newIndex)
+    {
+        nodeID = node.id;
+        parentID = node.parent.id;
+        oldChildIndex = SceneFindChildIndex(node.parent, node);
+        newChildIndex = newIndex;
+    }
+
+    void Undo()
+    {
+        Node@ parent = editorScene.GetNode(parentID);
+        Node@ node = editorScene.GetNode(nodeID);
+        if (parent !is null && node !is null)
+            PerformReorder(parent, node, oldChildIndex);
+    }
+
+    void Redo()
+    {
+        Node@ parent = editorScene.GetNode(parentID);
+        Node@ node = editorScene.GetNode(nodeID);
+        if (parent !is null && node !is null)
+            PerformReorder(parent, node, newChildIndex);
+    }
+}
+
+class ReorderComponentAction : EditAction
+{
+    uint componentID;
+    uint nodeID;
+    uint oldComponentIndex;
+    uint newComponentIndex;
+
+    void Define(Component@ component, uint newIndex)
+    {
+        componentID = component.id;
+        nodeID = component.node.id;
+        oldComponentIndex = SceneFindComponentIndex(component.node, component);
+        newComponentIndex = newIndex;
+    }
+
+    void Undo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Component@ component = editorScene.GetComponent(componentID);
+        if (node !is null && component !is null)
+            PerformReorder(node, component, oldComponentIndex);
+    }
+
+    void Redo()
+    {
+        Node@ node = editorScene.GetNode(nodeID);
+        Component@ component = editorScene.GetComponent(componentID);
+        if (node !is null && component !is null)
+            PerformReorder(node, component, newComponentIndex);
     }
 }
 
@@ -773,6 +837,38 @@ class ReparentUIElementAction : EditAction
             element.parent = parent;
             SetUIElementModified(parent);
         }
+    }
+}
+
+class ReorderUIElementAction : EditAction
+{
+    Variant elementID;
+    Variant parentID;
+    uint oldChildIndex;
+    uint newChildIndex;
+
+    void Define(UIElement@ element, uint newIndex)
+    {
+        elementID = GetUIElementID(element);
+        parentID = GetUIElementID(element.parent);
+        oldChildIndex = element.parent.FindChild(element);
+        newChildIndex = newIndex;
+    }
+
+    void Undo()
+    {
+        UIElement@ parent = GetUIElementByID(parentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+            PerformReorder(parent, element, oldChildIndex);
+    }
+
+    void Redo()
+    {
+        UIElement@ parent = GetUIElementByID(parentID);
+        UIElement@ element = GetUIElementByID(elementID);
+        if (parent !is null && element !is null)
+            PerformReorder(parent, element, newChildIndex);
     }
 }
 

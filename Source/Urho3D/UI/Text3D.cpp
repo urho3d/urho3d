@@ -208,6 +208,17 @@ bool Text3D::SetFont(Font* font, int size)
     return success;
 }
 
+bool Text3D::SetFontSize(int size)
+{
+    bool success = text_.SetFontSize(size);
+
+    MarkTextDirty();
+    UpdateTextBatches();
+    UpdateTextMaterials();
+
+    return success;
+}
+
 void Text3D::SetText(const String& text)
 {
     text_.SetText(text);

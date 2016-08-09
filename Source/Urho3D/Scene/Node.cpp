@@ -1063,6 +1063,24 @@ void Node::RemoveAllComponents()
     RemoveComponents(true, true);
 }
 
+void Node::ReorderComponent(Component* component, unsigned index)
+{
+    if (!component || component->GetNode() != this)
+        return;
+
+    for (Vector<SharedPtr<Component> >::Iterator i = components_.Begin(); i != components_.End(); ++i)
+    {
+        if (*i == component)
+        {
+            // Need shared ptr to insert. Also, prevent destruction when removing first
+            SharedPtr<Component> componentShared(component);
+            components_.Erase(i);
+            components_.Insert(index, componentShared);
+            return;
+        }
+    }
+}
+
 Node* Node::Clone(CreateMode mode)
 {
     // The scene itself can not be cloned

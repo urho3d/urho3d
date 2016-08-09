@@ -1080,7 +1080,7 @@ String Scene::GetVarNamesAttr() const
     if (!varNames_.Empty())
     {
         for (HashMap<StringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
-            ret += i->second_ + ';';
+            ret += i->second_ + ";";
 
         ret.Resize(ret.Length() - 1);
     }

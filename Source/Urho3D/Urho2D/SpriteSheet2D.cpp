@@ -329,7 +329,7 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
         JSONValue frameWidthVal = subTextureVal.Get("frameWidth");
         JSONValue frameHeightVal = subTextureVal.Get("frameHeight");
 
-        if (!frameHeightVal.IsNull() && !frameHeightVal.IsNull())
+        if (!frameWidthVal.IsNull() && !frameHeightVal.IsNull())
         {
             offset.x_ = subTextureVal.Get("frameX").GetInt();
             offset.y_ = subTextureVal.Get("frameY").GetInt();

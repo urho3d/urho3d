@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "../Container/HashSet.h"
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
-#include "../Container/HashSet.h"
 
 namespace Urho3D
 {
@@ -83,7 +83,7 @@ public:
 
     /// Return subsystem by type.
     Object* GetSubsystem(StringHash type) const;
-    
+
     /// Return global variable based on key
     const Variant& GetGlobalVar(StringHash key) const ;
 
@@ -165,15 +165,13 @@ private:
     void RemoveEventReceiver(Object* receiver, Object* sender, StringHash eventType);
     /// Remove event receiver from non-specific events.
     void RemoveEventReceiver(Object* receiver, StringHash eventType);
+    /// Begin event send.
+    void BeginSendEvent(Object* sender, StringHash eventType);
+    /// End event send. Clean up event receivers removed in the meanwhile.
+    void EndSendEvent();
 
     /// Set current event handler. Called by Object.
     void SetEventHandler(EventHandler* handler) { eventHandler_ = handler; }
-
-    /// Begin event send.
-    void BeginSendEvent(Object* sender) { eventSenders_.Push(sender); }
-
-    /// End event send. Clean up event receivers removed in the meanwhile.
-    void EndSendEvent() { eventSenders_.Pop(); }
 
     /// Object factories.
     HashMap<StringHash, SharedPtr<ObjectFactory> > factories_;

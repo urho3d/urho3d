@@ -10,8 +10,8 @@
 	<parameter name="MatEmissiveColor" value="0 0 0" />
 	<parameter name="MatEnvMapColor" value="1 1 1" />
 	<parameter name="MatSpecColor" value="1 1 1 1" />
-	<parameter name="RoughnessPS" value="0.1" />
-	<parameter name="MetallicPS" value="0" />
+	<parameter name="Roughness" value="0" />
+	<parameter name="Metallic" value="0" />
 	<cull value="ccw" />
 	<shadowcull value="ccw" />
 	<fill value="solid" />

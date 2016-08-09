@@ -14,6 +14,7 @@ class Text : public UIElement
 
     bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFontSize(int size);
 
     void SetText(const String text);
 
@@ -59,7 +60,7 @@ class Text : public UIElement
     float GetEffectDepthBias() const;
 
     tolua_property__get_set Font* font;
-    tolua_readonly tolua_property__get_set int fontSize;
+    tolua_property__get_set int fontSize;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;

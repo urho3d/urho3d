@@ -208,7 +208,7 @@ public:
     /// Return required package files.
     const Vector<SharedPtr<PackageFile> >& GetRequiredPackageFiles() const { return requiredPackageFiles_; }
 
-    // Return a node user variable name, or empty if not registered.
+    /// Return a node user variable name, or empty if not registered.
     const String& GetVarName(StringHash hash) const;
 
     /// Update scene. Called by HandleUpdate.

@@ -5,9 +5,8 @@ static const unsigned DEBUGHUD_SHOW_STATS;
 static const unsigned DEBUGHUD_SHOW_MODE;
 static const unsigned DEBUGHUD_SHOW_PROFILER;
 static const unsigned DEBUGHUD_SHOW_MEMORY;
-static const unsigned DEBUGHUD_SHOW_ALL;
-static const unsigned DEBUGHUD_SHOW_ALL_MEMORY;
 static const unsigned DEBUGHUD_SHOW_EVENTPROFILER;
+static const unsigned DEBUGHUD_SHOW_ALL;
 
 class DebugHud : public Object
 {
@@ -19,7 +18,7 @@ class DebugHud : public Object
     void SetUseRendererStats(bool enable);
     void Toggle(unsigned mode);
     void ToggleAll();
-    
+
     XMLFile* GetDefaultStyle() const;
     Text* GetStatsText() const;
     Text* GetModeText() const;
@@ -28,12 +27,12 @@ class DebugHud : public Object
     unsigned GetProfilerMaxDepth() const;
     float GetProfilerInterval() const;
     bool GetUseRendererStats() const;
-    
+
     void SetAppStats(const String label, const Variant stats);
     void SetAppStats(const String label, const String stats);
     bool ResetAppStats(const String label);
     void ClearAppStats();
-    
+
     tolua_property__get_set XMLFile* defaultStyle;
     tolua_readonly tolua_property__get_set Text* statsText;
     tolua_readonly tolua_property__get_set Text* modeText;

@@ -35,7 +35,7 @@ class URHO3D_API DbResult
     friend class DbConnection;
 
 public:
-    // Default constructor constructs an empty result object.
+    /// Default constructor constructs an empty result object.
     DbResult() :
         numAffectedRows_(-1)
     {

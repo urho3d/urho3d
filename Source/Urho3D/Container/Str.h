@@ -202,28 +202,28 @@ public:
         return *this;
     }
 
-    /// Add-assign an integer.
+    /// Add-assign (concatenate as string) an integer.
     String& operator +=(int rhs);
-    /// Add-assign a short integer.
+    /// Add-assign (concatenate as string) a short integer.
     String& operator +=(short rhs);
-    /// Add-assign a long integer.
+    /// Add-assign (concatenate as string) a long integer.
     String& operator +=(long rhs);
-    /// Add-assign a long long integer.
+    /// Add-assign (concatenate as string) a long long integer.
     String& operator +=(long long rhs);
-    /// Add-assign an unsigned integer.
+    /// Add-assign (concatenate as string) an unsigned integer.
     String& operator +=(unsigned rhs);
-    /// Add-assign a short unsigned integer.
+    /// Add-assign (concatenate as string) a short unsigned integer.
     String& operator +=(unsigned short rhs);
-    /// Add-assign a long unsigned integer.
+    /// Add-assign (concatenate as string) a long unsigned integer.
     String& operator +=(unsigned long rhs);
-    /// Add-assign a long long unsigned integer.
+    /// Add-assign (concatenate as string) a long long unsigned integer.
     String& operator +=(unsigned long long rhs);
-    /// Add-assign a float.
+    /// Add-assign (concatenate as string) a float.
     String& operator +=(float rhs);
-    /// Add-assign a bool.
+    /// Add-assign (concatenate as string) a bool.
     String& operator +=(bool rhs);
 
-    /// Add-assign an arbitraty type.
+    /// Add-assign (concatenate as string) an arbitrary type.
     template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
@@ -245,15 +245,6 @@ public:
         ret.Resize(length_ + rhsLength);
         CopyChars(ret.buffer_, buffer_, length_);
         CopyChars(ret.buffer_ + length_, rhs, rhsLength);
-
-        return ret;
-    }
-
-    /// Add a character.
-    String operator +(char rhs) const
-    {
-        String ret(*this);
-        ret += rhs;
 
         return ret;
     }
@@ -478,19 +469,7 @@ public:
 #endif
 
     /// Return length of a C string.
-    static unsigned CStringLength(const char* str)
-    {
-        if (!str)
-            return 0;
-#ifdef _MSC_VER
-        return (unsigned)strlen(str);
-#else
-        const char* ptr = str;
-        while (*ptr)
-            ++ptr;
-        return (unsigned)(ptr - str);
-#endif
-    }
+    static unsigned CStringLength(const char* str) { return str ? (unsigned)strlen(str) : 0; }
 
     /// Append to string using formatting.
     String& AppendWithFormat(const char* formatString, ...);
