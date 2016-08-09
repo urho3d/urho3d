@@ -574,7 +574,7 @@ public:
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
-    /// Add a pre-created component.
+    /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
     /// Calculate number of non-temporary child nodes.
     unsigned GetNumPersistentChildren() const;
