@@ -59,6 +59,8 @@ class IntVector2
     IntVector2 operator / (int rhs) const;
 
     String ToString() const;
+    unsigned ToHash() const;
+	float Length() const;
 
     int x_ @ x;
     int y_ @ y;

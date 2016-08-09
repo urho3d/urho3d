@@ -187,6 +187,8 @@ static void RegisterIntVector2(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opMul(int) const", asMETHODPR(IntVector2, operator *, (int) const, IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "IntVector2 opDiv(int) const", asMETHODPR(IntVector2, operator /, (int) const, IntVector2), asCALL_THISCALL);
     engine->RegisterObjectMethod("IntVector2", "String ToString() const", asMETHOD(IntVector2, ToString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "uint ToHash() const", asMETHOD(IntVector2, ToHash), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IntVector2", "float Length() const", asMETHOD(IntVector2, Length), asCALL_THISCALL);
     engine->RegisterObjectProperty("IntVector2", "int x", offsetof(IntVector2, x_));
     engine->RegisterObjectProperty("IntVector2", "int y", offsetof(IntVector2, y_));
     engine->RegisterGlobalFunction("IntVector2 VectorMin(const IntVector2&in, const IntVector2&in)", asFUNCTIONPR(VectorMin, (const IntVector2&, const IntVector2&), IntVector2), asCALL_CDECL);
