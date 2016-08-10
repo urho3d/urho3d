@@ -25,6 +25,10 @@
 #include "../Scene/Component.h"
 #include "../Urho2D/TileMapDefs2D.h"
 
+#ifdef GetObject
+#undef GetObject
+#endif
+
 namespace Urho3D
 {
 
