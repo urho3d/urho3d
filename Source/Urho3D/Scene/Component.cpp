@@ -166,16 +166,6 @@ void Component::PrepareNetworkUpdate()
 
     unsigned numAttributes = attributes->Size();
 
-    if (networkState_->currentValues_.Size() != numAttributes)
-    {
-        networkState_->currentValues_.Resize(numAttributes);
-        networkState_->previousValues_.Resize(numAttributes);
-
-        // Copy the default attribute values to the previous state as a starting point
-        for (unsigned i = 0; i < numAttributes; ++i)
-            networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
-    }
-
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
     {

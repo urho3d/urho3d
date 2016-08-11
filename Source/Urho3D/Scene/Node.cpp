@@ -832,6 +832,9 @@ void Node::AddChild(Node* node, unsigned index)
     node->parent_ = this;
     node->MarkDirty();
     node->MarkNetworkUpdate();
+    // If the child node has components, also mark network update on them to ensure they have a valid NetworkState
+    for (Vector<SharedPtr<Component> >::Iterator i = node->components_.Begin(); i != node->components_.End(); ++i)
+        (*i)->MarkNetworkUpdate();
 
     // Send change event
     if (scene_)
@@ -1648,16 +1651,6 @@ void Node::PrepareNetworkUpdate()
 
     const Vector<AttributeInfo>* attributes = networkState_->attributes_;
     unsigned numAttributes = attributes->Size();
-
-    if (networkState_->currentValues_.Size() != numAttributes)
-    {
-        networkState_->currentValues_.Resize(numAttributes);
-        networkState_->previousValues_.Resize(numAttributes);
-
-        // Copy the default attribute values to the previous state as a starting point
-        for (unsigned i = 0; i < numAttributes; ++i)
-            networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
-    }
 
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
