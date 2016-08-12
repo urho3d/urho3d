@@ -56,6 +56,7 @@ static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 static const float DEFAULT_SHADOWSPLIT = 1000.0f;
+static const float DEFAULT_TEMPERATURE = 6590.0f;
 
 static const char* typeNames[] =
 {
@@ -92,6 +93,7 @@ Light::Light(Context* context) :
     shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
+	temperature_(6590.0f),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
@@ -117,6 +119,7 @@ void Light::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
+	URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
@@ -288,6 +291,12 @@ void Light::SetColor(const Color& color)
 {
     color_ = Color(color.r_, color.g_, color.b_, 1.0f);
     MarkNetworkUpdate();
+}
+
+void Light::SetTemperature(float temperature)
+{
+	temperature_ = temperature;
+	MarkNetworkUpdate();
 }
 
 void Light::SetSpecularIntensity(float intensity)

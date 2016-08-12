@@ -99,8 +99,8 @@ void PS(
 
     #ifdef SPECULAR
         float spec = GetSpecular(normal, eyeVec, lightDir, normalInput.a * 255.0);
-        oColor = diff * float4(lightColor * (albedoInput.rgb + spec * cLightColor.a * albedoInput.aaa), 0.0);
+        oColor = diff * float4(lightColor * GetColorTemperatureToRGB(cLightTemperature) * (albedoInput.rgb + spec * cLightColor.a * albedoInput.aaa), 0.0);
     #else
-        oColor = diff * float4(lightColor * albedoInput.rgb, 0.0);
+        oColor = diff * float4(lightColor * GetColorTemperatureToRGB(cLightTemperature) * albedoInput.rgb, 0.0);
     #endif
 }
