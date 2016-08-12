@@ -599,8 +599,15 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     ResetRenderTargets();
 
+#ifndef GL_ES_VERSION_2_0
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+#else
+    // Use RGBA format on OpenGL ES, as otherwise (at least on Android) the produced image is all black
+    destImage.SetSize(width_, height_, 4);
+    glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, destImage.GetData());
+#endif
+
     // On OpenGL we need to flip the image vertically after reading
     destImage.FlipVertical();
 
