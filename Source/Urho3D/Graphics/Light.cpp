@@ -405,8 +405,6 @@ void Light::SetShapeTexture(Texture* texture)
 
 Color Light::GetColorFromTemperature() const
 {
-   // float temperature_ = Clamp(temperature_, 1000.0f, 15000.0f);
-
     // Approximate Planckian locus in CIE 1960 UCS
     float u = (0.860117757f + 1.54118254e-4f * temperature_ + 1.28641212e-7f * temperature_ * temperature_) / (1.0f + 8.42420235e-4f * temperature_ + 7.08145163e-7f * temperature_ * temperature_);
     float v = (0.317398726f + 4.22806245e-5f * temperature_ + 4.20481691e-8f * temperature_ * temperature_) / (1.0f - 2.89741816e-5f * temperature_ + 1.61456053e-7f * temperature_ * temperature_);
@@ -415,16 +413,16 @@ Color Light::GetColorFromTemperature() const
     float y = 2.0f * v / (2.0f * u - 8.0f * v + 4.0f);
     float z = 1.0f - x - y;
 
-    float Y = 1.0f;
-    float X = Y / y * x;
-    float Z = Y / y * z;
+    float y_ = 1.0f;
+    float x_ = y_ / y * x;
+    float z_ = y_ / y * z;
 
-    // XYZ to RGB with BT.709 primaries
-    float R = 3.2404542f * X + -1.5371385f * Y + -0.4985314f * Z;
-    float G = -0.9692660f * X + 1.8760108f * Y + 0.0415560f * Z;
-    float B = 0.0556434f * X + -0.2040259f * Y + 1.0572252f * Z;
 
-    return Color(R, G, B);
+    float red = 3.2404542f * x_ + -1.5371385f * y_ + -0.4985314f * z_;
+    float green = -0.9692660f * x_ + 1.8760108f * y_ + 0.0415560f * z_;
+    float blue = 0.0556434f * x_ + -0.2040259f * y_ + 1.0572252f * z_;
+
+    return Color(red, green, blue);
 }
 
 Color Light::GetEffectiveColor() const
