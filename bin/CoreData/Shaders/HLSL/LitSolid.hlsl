@@ -241,9 +241,9 @@ void PS(
     
         #ifdef SPECULAR
             float spec = GetSpecular(normal, cCameraPosPS - iWorldPos.xyz, lightDir, cMatSpecColor.a);
-            finalColor = diff * lightColor * GetColorTemperatureToRGB(cLightTemperature) * (diffColor.rgb + spec * specColor * cLightColor.a);
+            finalColor = diff * lightColor * (diffColor.rgb + spec * specColor * cLightColor.a);
         #else
-            finalColor = diff * lightColor * GetColorTemperatureToRGB(cLightTemperature) * diffColor.rgb;
+            finalColor = diff * lightColor * diffColor.rgb;
         #endif
 
         #ifdef AMBIENT

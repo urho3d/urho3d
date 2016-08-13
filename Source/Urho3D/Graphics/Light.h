@@ -179,7 +179,9 @@ public:
     /// Set color.
     void SetColor(const Color& color);
 	/// Set Temperature of the light
-	void SetTemperature(float temputure);
+	void SetTemperature(float temperature);
+    /// Set use temperature
+    void SetUseTemperature(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
     void SetSpecularIntensity(float intensity);
     /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this to get final values for rendering.
@@ -223,6 +225,12 @@ public:
 	/// Return the Temperature of the light.
 	float GetTemperature() const { return temperature_; }
 
+    /// Return if to use temperature.
+    bool GetUseTemperature() const { return useTemperature_; }
+
+    /// Return the color value of the temperature in kelvin
+    Color GetColorFromTemperature() const;
+
     /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
 
@@ -230,7 +238,7 @@ public:
     float GetBrightness() const { return brightness_; }
 
     /// Return effective color, multiplied by brightness. Do not multiply the alpha so that can compare against the default black color to detect a light with no effect.
-    Color GetEffectiveColor() const { return Color(color_ * brightness_, 1.0f); }
+    Color GetEffectiveColor() const; 
 
     /// Return effective specular intensity, multiplied by absolute value of brightness.
     float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
@@ -362,6 +370,8 @@ private:
     float shadowNearFarRatio_;
     /// Per-vertex lighting flag.
     bool perVertex_;
+    /// Temperature color flag.
+    bool useTemperature_;
 };
 
 inline bool CompareLights(Light* lhs, Light* rhs)

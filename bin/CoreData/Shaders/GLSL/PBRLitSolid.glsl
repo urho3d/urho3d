@@ -191,7 +191,7 @@ void PS()
 
         vec3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
 
-        finalColor.rgb = BRDF * lightColor * GetColorTemperatureToRGB(cLightTemperature) * (atten * shadow) / M_PI;
+        finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
         #ifdef AMBIENT
             finalColor += cAmbientColor.rgb * diffColor.rgb;
