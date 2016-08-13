@@ -55,23 +55,23 @@ static const unsigned SCOPE_NAVIGATION_PUSHINESS_PARAMS = 2;
 static const unsigned SCOPE_BASE_PARAMS = M_MAX_UNSIGNED & ~SCOPE_NAVIGATION_QUALITY_PARAMS & ~SCOPE_NAVIGATION_PUSHINESS_PARAMS;
 
 static const char* crowdAgentRequestedTargetTypeNames[] = {
-    "none",
-    "position",
-    "velocity",
+    "None",
+    "Position",
+    "Velocity",
     0
 };
 
 static const char* crowdAgentAvoidanceQualityNames[] = {
-    "low",
-    "medium",
-    "high",
+    "Low",
+    "Medium",
+    "High",
     0
 };
 
 static const char* crowdAgentPushinessNames[] = {
-    "low",
-    "medium",
-    "high",
+    "Low",
+    "Medium",
+    "High",
     0
 };
 
