@@ -45,6 +45,11 @@ static void RegisterSerializable(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint AM_COMPONENTID", (void*)&AM_COMPONENTID);
     engine->RegisterGlobalProperty("const uint AM_NODEIDVECTOR", (void*)&AM_NODEIDVECTOR);
 
+    engine->RegisterEnum("AutoRemoveMode");
+    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_DISABLED", REMOVE_DISABLED);
+    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_COMPONENT", REMOVE_COMPONENT);
+    engine->RegisterEnumValue("AutoRemoveMode", "REMOVE_NODE", REMOVE_NODE);
+
     RegisterSerializable<Serializable>(engine, "Serializable");
 }
 
