@@ -286,7 +286,7 @@ else ()
                     endif ()
                 endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
-                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE STRING "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
                 foreach (VAR ${AUTO_DISCOVER_VARS})
                     if (TRY_RUN_OUT MATCHES "#define ${VAR}")
                         set (AUTO_DISCOVERED_${VAR} 1)
