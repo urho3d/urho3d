@@ -1661,6 +1661,7 @@ namespace Urho3D
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
 - %Is %Emitting : bool
+- %Autoremove %Mode : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -1949,7 +1950,7 @@ namespace Urho3D
 - %Attenuation : float
 - %Panning : float
 - %Is %Playing : bool
-- %Autoremove %on %Stop : bool
+- %Autoremove %Mode : int
 - %Play %Position : int
 
 ### SoundSource3D
@@ -1959,7 +1960,7 @@ namespace Urho3D
 - %Frequency : float
 - %Gain : float
 - %Is %Playing : bool
-- %Autoremove %on %Stop : bool
+- %Autoremove %Mode : int
 - %Play %Position : int
 - %Near %Distance : float
 - %Far %Distance : float
@@ -9423,6 +9424,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- AutoRemoveMode autoRemoveMode
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -11708,7 +11710,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -11783,7 +11785,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -14841,6 +14843,13 @@ Properties:
 
 - ABM_LERP
 - ABM_ADDITIVE
+
+
+### AutoRemoveMode
+
+- REMOVE_DISABLED
+- REMOVE_COMPONENT
+- REMOVE_NODE
 
 
 ### BlendMode

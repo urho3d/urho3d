@@ -7810,6 +7810,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -10362,7 +10363,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -10449,7 +10450,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -13942,6 +13943,13 @@ enum AnimationBlendMode
 {
 ABM_LERP,
 ABM_ADDITIVE,
+};
+
+enum AutoRemoveMode
+{
+REMOVE_DISABLED,
+REMOVE_COMPONENT,
+REMOVE_NODE,
 };
 
 enum BlendMode
