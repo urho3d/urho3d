@@ -50,7 +50,7 @@ static const unsigned MAX_CASCADE_SPLITS = 4;
 static const unsigned MAX_CASCADE_SPLITS = 1;
 #endif
 
-/// Shadow depth bias parameters.
+/// Depth bias parameters. Used both by lights (for shadow mapping) and materials.
 struct URHO3D_API BiasParameters
 {
     /// Construct undefined.
