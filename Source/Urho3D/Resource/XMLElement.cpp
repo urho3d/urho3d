@@ -566,6 +566,20 @@ XMLElement XMLElement::GetChild(const char* name) const
         return XMLElement(file_, node.child(name).internal_object());
 }
 
+XMLElement XMLElement::GetChildByAttribute(const String& name, const String& attr_name, const String& attr_value)
+{
+    GetChildByAttribute(name.CString(), attr_name.CString(), attr_value.CString());
+}
+
+XMLElement XMLElement::GetChildByAttribute(const char* name, const char* attr_name, const char* attr_value)
+{
+    if (!file_ || (!node_ && !xpathNode_))
+        return XMLElement();
+
+    const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
+    return XMLElement(file_, node.find_child_by_attribute(name, attr_name, attr_value).internal_object());
+}
+
 XMLElement XMLElement::GetNext(const String& name) const
 {
     return GetNext(name.CString());

@@ -175,6 +175,10 @@ public:
     XMLElement GetChild(const String& name = String::EMPTY) const;
     /// Return child element, or null if missing.
     XMLElement GetChild(const char* name) const;
+    /// Get the child element with the specified attribute name/value pair
+    XMLElement GetChildByAttribute(const char* name, const char* attr_name, const char* attr_value);
+    /// Get the child element with the specified attribute name/value pair
+    XMLElement GetChildByAttribute(const String& name, const String& attr_name, const String& attr_value);
     /// Return next sibling element.
     XMLElement GetNext(const String& name = String::EMPTY) const;
     /// Return next sibling element.

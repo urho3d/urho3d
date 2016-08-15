@@ -16,7 +16,7 @@ class DebugRenderer;
 class GravityEdge
 {
 public:
-    GravityEdge() { assert(false); } // Required for Vector<GravityEdge>
+    GravityEdge() { assert(false); } // Required for Vector<GravityEdge>, but should never be called
 
     /*!
      * @brief Constructs a triangle from 4 vertex locations in cartesian
