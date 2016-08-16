@@ -105,7 +105,7 @@ Light::Light(Context* context) :
     shadowResolution_(1.0f),
     shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
     perVertex_(false),
-    useTemperature_(false)
+    usePhysicalValues_(false)
 {
 }
 
@@ -121,7 +121,7 @@ void Light::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Light Type", GetLightType, SetLightType, LightType, typeNames, DEFAULT_LIGHTTYPE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("UseTemperature", bool, useTemperature_, false, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("UsePhysicalValues", bool, usePhysicalValues_, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
@@ -301,9 +301,9 @@ void Light::SetTemperature(float temperature)
     MarkNetworkUpdate();
 }
 
-void Light::SetUseTemperature(bool enable)
+void Light::SetUsePhysicalValues(bool enable)
 {
-    useTemperature_ = enable;
+    usePhysicalValues_ = enable;
     MarkNetworkUpdate();
 }
 
@@ -427,10 +427,13 @@ Color Light::GetColorFromTemperature() const
 
 Color Light::GetEffectiveColor() const
 {
-    if (useTemperature_)
+    if (usePhysicalValues_)
     {
+        // Light color in kelvin.
         Color tempColor = GetColorFromTemperature();
-        return Color(tempColor * brightness_, 1.0);
+        // Light brightness in lumens
+        float energy = (brightness_ * 4 * M_PI) * 16 / (100 * 100) / M_PI;
+        return Color(tempColor.r_ * color_.r_ * energy, tempColor.g_ * color_.g_ * energy, tempColor.b_ * color_.b_ * energy, 1.0f);
     }
     else
     {
