@@ -1595,6 +1595,8 @@ A specular intensity of 0 disables specular calculations from a per-pixel light,
 
 Negative (subtractive) lights can be achieved by setting either the color components or the brightness multiplier to a negative value. These can be used to locally reduce the ambient light level, for example to create a dark cave. Negative per-pixel lights will not work in light pre-pass rendering mode, as it uses a light accumulation buffer with a black initial value, so there is nothing to subtract from.
 
+Lights can alternatively enable the use of physical values, in which case the brightness multiplier is specified in lumens, and a light temperature value in Kelvin becomes available to also modulate the color (typically the color value itself would be left white in this case.) See \ref Light::SetUsePhysicalValues "SetUsePhysicalValues()" and \ref Light::SetTemperature "SetTemperature()".
+
 \section Lights_LightCulling Light culling
 
 When occlusion is used, a light will automatically be culled if its bounding box is fully behind an occluder. However, directional lights have an infinite bounding box, and can not be culled this way.
