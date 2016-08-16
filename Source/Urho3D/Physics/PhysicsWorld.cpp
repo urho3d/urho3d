@@ -896,25 +896,19 @@ void PhysicsWorld::SendCollisionEvents()
             // First only store the collision pair as weak pointers and the manifold pointer, so user code can safely destroy
             // objects during collision event handling
             currentCollisions_[bodyPair] = contactManifold;
-        }
 
-        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
-             i != currentCollisions_.End(); ++i)
-        {
-            RigidBody* bodyA = i->first_.first_;
-            RigidBody* bodyB = i->first_.second_;
+            // Send start/ongoing collision events
             if (!bodyA || !bodyB)
                 continue;
 
-            btPersistentManifold* contactManifold = i->second_;
-
+            // Using the original body A & B order so m_normalWorldOnB matches them
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
             WeakPtr<Node> nodeWeakA(nodeA);
             WeakPtr<Node> nodeWeakB(nodeB);
 
             bool trigger = bodyA->IsTrigger() || bodyB->IsTrigger();
-            bool newCollision = !previousCollisions_.Contains(i->first_);
+            bool newCollision = !previousCollisions_.Contains(bodyPair);
 
             physicsCollisionData_[PhysicsCollision::P_NODEA] = nodeA;
             physicsCollisionData_[PhysicsCollision::P_NODEB] = nodeB;
@@ -940,13 +934,13 @@ void PhysicsWorld::SendCollisionEvents()
             {
                 SendEvent(E_PHYSICSCOLLISIONSTART, physicsCollisionData_);
                 // Skip rest of processing if either of the nodes or bodies is removed as a response to the event
-                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
+                if (!nodeWeakA || !nodeWeakB || !bodyPair.first_ || !bodyPair.second_)
                     continue;
             }
 
             // Then send the ongoing collision event
             SendEvent(E_PHYSICSCOLLISION, physicsCollisionData_);
-            if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
+            if (!nodeWeakA || !nodeWeakB || !bodyPair.first_ || !bodyPair.second_)
                 continue;
 
             nodeCollisionData_[NodeCollision::P_BODY] = bodyA;
@@ -958,12 +952,12 @@ void PhysicsWorld::SendCollisionEvents()
             if (newCollision)
             {
                 nodeA->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData_);
-                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
+                if (!nodeWeakA || !nodeWeakB || !bodyPair.first_ || !bodyPair.second_)
                     continue;
             }
 
             nodeA->SendEvent(E_NODECOLLISION, nodeCollisionData_);
-            if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
+            if (!nodeWeakA || !nodeWeakB || !bodyPair.first_ || !bodyPair.second_)
                 continue;
 
             contacts_.Clear();
@@ -984,7 +978,7 @@ void PhysicsWorld::SendCollisionEvents()
             if (newCollision)
             {
                 nodeB->SendEvent(E_NODECOLLISIONSTART, nodeCollisionData_);
-                if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
+                if (!nodeWeakA || !nodeWeakB || !bodyPair.first_ || !bodyPair.second_)
                     continue;
             }
 
