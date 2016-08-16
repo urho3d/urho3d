@@ -98,9 +98,13 @@ public:
     /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
     void SetScale(float scale);
     /// Scale %UI to the specified width in pixels.
-    void SetWidth(float size);
+    void SetWidth(float width);
     /// Scale %UI to the specified height in pixels.
-    void SetHeight(float size);
+    void SetHeight(float height);
+    /// Set custom size of the root element. This disables automatic resizing of the root element according to window size. Set custom size 0,0 to return to automatic resizing.
+    void SetCustomSize(const IntVector2& size);
+    /// Set custom size of the root element.
+    void SetCustomSize(int width, int height);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -170,6 +174,12 @@ public:
     /// Return whether a drag is in progress.
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
 
+    /// Return current UI scale.
+    float GetScale() const { return uiScale_; }
+
+    /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
+    const IntVector2& GetCustomSize() const { return customSize_; }
+
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
     {
@@ -186,9 +196,6 @@ public:
         /// Drag start position.
         IntVector2 dragBeginSumPos;
     };
-
-    /// Return current UI scale.
-    float GetScale() const { return uiScale_; }
 
 private:
     /// Initialize when screen mode initially set.
@@ -212,7 +219,7 @@ private:
     void SetCursorShape(CursorShape shape);
     /// Force release of font faces when global font properties change.
     void ReleaseFontFaces();
-    /// Handle button or touch hover
+    /// Handle button or touch hover.
     void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void
@@ -263,6 +270,10 @@ private:
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
     IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
+    /// Resize root element to effective size.
+    void ResizeRootElement();
+    /// Return effective size of the root element, according to UI scale and resolution / custom size.
+    IntVector2 GetEffectiveRootElementSize(bool applyScale = true) const;
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -340,8 +351,10 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
-    /// Current scale of UI
+    /// Current scale of UI.
     float uiScale_;
+    /// Root element custom size. 0,0 for automatic resizing (default.)
+    IntVector2 customSize_;
 };
 
 /// Register UI library objects.
