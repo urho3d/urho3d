@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Techniques/DiffNormal.xml" />
+	<texture unit="diffuse" name="Models/Mutant/Textures/Mutant_diffuse.jpg" />
+	<texture unit="normal" name="Models/Mutant/Textures/Mutant_normal.jpg" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatSpecColor" value="0.2 0.2 0.2 6.15385" />
+	<parameter name="MatEmissiveColor" value="0 0 0 1" />
+</material>
