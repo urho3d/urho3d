@@ -3014,6 +3014,8 @@ Methods:
 - void SetLightType(LightType type)
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
+- void SetTemperature(float temperature)
+- void SetUsePhysicalValues(bool enable)
 - void SetSpecularIntensity(float intensity)
 - void SetBrightness(float brightness)
 - void SetRange(float range)
@@ -3032,9 +3034,12 @@ Methods:
 - LightType GetLightType() const
 - bool GetPerVertex() const
 - const Color& GetColor() const
+- float GetTemperature() const
 - float GetSpecularIntensity() const
 - float GetBrightness() const
 - Color GetEffectiveColor() const
+- Color GetColorFromTemperature() const
+- bool GetUsePhysicalValues() const
 - float GetEffectiveSpecularIntensity() const
 - float GetRange() const
 - float GetFov() const
@@ -3058,6 +3063,8 @@ Properties:
 - LightType lightType
 - bool perVertex
 - Color& color
+- float temperature
+- bool usePhysicalValues
 - float specularIntensity
 - float brightness
 - float range
