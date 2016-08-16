@@ -6644,8 +6644,10 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetScale(float scale)
-- void SetWidth(float size)
-- void SetHeight(float size)
+- void SetWidth(float width)
+- void SetHeight(float height)
+- void SetCustomSize(const IntVector2& size)
+- void SetCustomSize(int width, int height)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6669,6 +6671,7 @@ Methods:
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
+- const IntVector2& GetCustomSize() const
 
 Properties:
 
@@ -6691,6 +6694,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 - float scale
+- IntVector2& customSize
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable

@@ -12657,6 +12657,7 @@ UIElement LoadLayout(XMLFile, XMLFile);
 bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetCustomSize(int, int);
 void SetFocusElement(UIElement, bool = false);
 void SetHeight(float);
 void SetWidth(float);
@@ -12669,6 +12670,7 @@ String clipBoardText;
 Cursor cursor;
 /* readonly */
 IntVector2 cursorPosition;
+IntVector2 customSize;
 float defaultToolTipDelay;
 float doubleClickInterval;
 int dragBeginDistance;
