@@ -50,7 +50,6 @@ uniform float4 cFogParams;
 uniform float3 cFogColor;
 uniform float2 cGBufferInvSize;
 uniform float4 cLightColor;
-uniform float  cLightTemperature;
 uniform float4 cLightPosPS;
 uniform float3 cLightDirPS;
 uniform float4 cNormalOffsetScalePS;
@@ -169,7 +168,6 @@ cbuffer ZonePS : register(b2)
 cbuffer LightPS : register(b3)
 {
     float4 cLightColor;
-    float  cLightTemperature;
     float4 cLightPosPS;
     float3 cLightDirPS;
     float4 cNormalOffsetScalePS;

@@ -61,7 +61,6 @@ uniform vec4 cFogParams;
 uniform vec3 cFogColor;
 uniform vec2 cGBufferInvSize;
 uniform vec4 cLightColor;
-uniform float cLightTemperature;
 uniform vec4 cLightPosPS;
 uniform vec3 cLightDirPS;
 uniform vec4 cNormalOffsetScalePS;
@@ -180,7 +179,6 @@ uniform ZonePS
 uniform LightPS
 {
     vec4 cLightColor;
-    float cLightTemperature;
     vec4 cLightPosPS;
     vec3 cLightDirPS;
     vec4 cNormalOffsetScalePS;

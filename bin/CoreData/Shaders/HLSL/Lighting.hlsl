@@ -151,36 +151,6 @@ float GetAtten(float3 normal, float3 worldPos, out float3 lightDir)
     #endif
 }
 
-float3 GetColorTemperatureToRGB(float temperatureInKelvins)
-{
-    float3 retColor;
-    
-    temperatureInKelvins = clamp(temperatureInKelvins, 1000.0, 10000.0) / 100.0;
-    
-    if (temperatureInKelvins <= 66.0)
-    {
-        retColor.r = 1.0;
-        retColor.g = saturate(0.39008157876901960784 * log(temperatureInKelvins) - 0.63184144378862745098);
-    }
-    else
-    {
-        float t = temperatureInKelvins - 60.0;
-        retColor.r = saturate(1.29293618606274509804 * pow(t, -0.6));
-        retColor.g = saturate(1.12989086089529411765 * pow(t, -0.0755148492));
-    }
-    
-    if (temperatureInKelvins >= 66.0)
-    {
-        retColor.b = 1.0;
-    }
-    else if(temperatureInKelvins <= 19.0)
-        retColor.b = 0.0;
-    else
-        retColor.b = saturate(0.54320678911019607843 * log(temperatureInKelvins - 10.0) - 1.19625408914);
-
-    return retColor;
-}
-
 float GetDiffuseVolumetric(float3 worldPos)
 {
     #ifdef DIRLIGHT

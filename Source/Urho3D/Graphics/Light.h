@@ -178,8 +178,8 @@ public:
     void SetPerVertex(bool enable);
     /// Set color.
     void SetColor(const Color& color);
-	/// Set Temperature of the light
-	void SetTemperature(float temperature);
+    /// Set Temperature of the light
+    void SetTemperature(float temperature);
     /// Set use temperature
     void SetUseTemperature(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
@@ -222,8 +222,8 @@ public:
     /// Return color.
     const Color& GetColor() const { return color_; }
 
-	/// Return the Temperature of the light.
-	float GetTemperature() const { return temperature_; }
+    /// Return the Temperature of the light.
+    float GetTemperature() const { return temperature_; }
 
     /// Return if to use temperature.
     bool GetUseTemperature() const { return useTemperature_; }
@@ -332,8 +332,8 @@ private:
     LightType lightType_;
     /// Color.
     Color color_;
-	/// Light Temperature.
-	float temperature_;
+    /// Light Temperature.
+    float temperature_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
     /// Directional light cascaded shadow parameters.
