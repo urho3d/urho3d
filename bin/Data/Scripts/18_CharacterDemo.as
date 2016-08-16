@@ -144,7 +144,7 @@ void CreateCharacter()
     characterNode.position = Vector3(0.0f, 1.0f, 0.0f);
 
     Node@ adjNode = characterNode.CreateChild("AdjNode");
-	adjNode.rotation = Quaternion(180, Vector3(0,1,0) );
+    adjNode.rotation = Quaternion(180, Vector3(0,1,0) );
 
     // Create the rendering component + animation controller
     AnimatedModel@ object = adjNode.CreateComponent("AnimatedModel");
@@ -438,30 +438,30 @@ class Character : ScriptObject
                 {
                     body.ApplyImpulse(Vector3(0.0f, 1.0f, 0.0f) * JUMP_FORCE);
                     okToJump = false;
-					animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+                    animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
                 }
             }
             else
                 okToJump = true;
         }
 
-		if (!onGround)
-		{
+        if (!onGround)
+        {
             animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
-		}
-		else
-		{
-			// Play walk animation if moving on ground, otherwise fade it out
-			if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
-			{
-				animCtrl.PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
-				// Set walk animation speed proportional to velocity
-				animCtrl.SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.length * 0.3f);
-			}
-			else
-				animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
+        }
+        else
+        {
+            // Play walk animation if moving on ground, otherwise fade it out
+            if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
+            {
+                animCtrl.PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
+                // Set walk animation speed proportional to velocity
+                animCtrl.SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.length * 0.3f);
+            }
+            else
+                animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
 
-		}
+        }
 
         // Reset grounded flag for next frame
         onGround = false;
