@@ -1113,8 +1113,9 @@ void View::GetLightBatches()
                         maxLightsDrawables_.Insert(drawable);
                 }
 
-                // In deferred modes, store the light volume batch now
-                if (deferred_)
+                // In deferred modes, store the light volume batch now. Since light mask 8 lowest bits are output to the stencil,
+                // lights that have all zeroes in the low 8 bits can be skipped; they would not affect geometry anyway
+                if (deferred_ && (light->GetLightMask() & 0xff) != 0)
                 {
                     Batch volumeBatch;
                     volumeBatch.geometry_ = renderer_->GetLightGeometry(light);
@@ -1437,7 +1438,7 @@ void View::ExecuteRenderPathCommands()
 
         for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
         {
-            if (i->shadowMap_)
+            if (NeedRenderShadowMap(*i))
                 RenderShadowMap(*i);
         }
     }
@@ -1591,7 +1592,7 @@ void View::ExecuteRenderPathCommands()
                     for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
                     {
                         // If reusing shadowmaps, render each of them before the lit batches
-                        if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
+                        if (renderer_->GetReuseShadowMaps() && NeedRenderShadowMap(*i))
                         {
                             RenderShadowMap(*i);
                             SetRenderTargets(command);
@@ -1629,7 +1630,7 @@ void View::ExecuteRenderPathCommands()
                     for (Vector<LightBatchQueue>::Iterator i = actualView->lightQueues_.Begin(); i != actualView->lightQueues_.End(); ++i)
                     {
                         // If reusing shadowmaps, render each of them before the lit batches
-                        if (renderer_->GetReuseShadowMaps() && i->shadowMap_)
+                        if (renderer_->GetReuseShadowMaps() && NeedRenderShadowMap(*i))
                         {
                             RenderShadowMap(*i);
                             SetRenderTargets(command);
@@ -2964,6 +2965,13 @@ void View::SetupLightVolumeBatch(Batch& batch)
         graphics_->SetStencilTest(true, CMP_NOTEQUAL, OP_KEEP, OP_KEEP, OP_KEEP, 0, light->GetLightMask());
     else
         graphics_->SetStencilTest(false);
+}
+
+bool View::NeedRenderShadowMap(const LightBatchQueue& queue)
+{
+    // Must have a shadow map, and either forward or deferred lit batches
+    return queue.shadowMap_ && (!queue.litBatches_.IsEmpty() || !queue.litBaseBatches_.IsEmpty() ||
+        !queue.volumeBatches_.Empty());
 }
 
 void View::RenderShadowMap(const LightBatchQueue& queue)

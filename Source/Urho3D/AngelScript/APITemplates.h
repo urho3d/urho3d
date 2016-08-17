@@ -872,8 +872,8 @@ template <class T> void RegisterSoundSource(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "Sound@+ get_sound() const", asMETHOD(T, GetSound), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_timePosition() const", asMETHOD(T, GetTimePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_attenuation() const", asMETHOD(T, GetAttenuation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_autoRemove(bool)", asMETHOD(T, SetAutoRemove), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_autoRemove() const", asMETHOD(T, GetAutoRemove), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_autoRemoveMode(AutoRemoveMode)", asMETHOD(T, SetAutoRemoveMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AutoRemoveMode get_autoRemoveMode() const", asMETHOD(T, GetAutoRemoveMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_playing() const", asMETHOD(T, IsPlaying), asCALL_THISCALL);
 }
 

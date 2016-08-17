@@ -1414,6 +1414,8 @@ namespace Urho3D
 - %Color : Color
 - %Specular %Intensity : float
 - %Brightness %Multiplier : float
+- %Temperature : float
+- %Use %Physical %Values : bool
 - %Range : float
 - %Spot %FOV : float
 - %Spot %Aspect %Ratio : float
@@ -1661,6 +1663,7 @@ namespace Urho3D
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
 - %Is %Emitting : bool
+- %Autoremove %Mode : int
 - %Max %Lights : int
 - %View %Mask : int
 - %Light %Mask : int
@@ -1949,7 +1952,7 @@ namespace Urho3D
 - %Attenuation : float
 - %Panning : float
 - %Is %Playing : bool
-- %Autoremove %on %Stop : bool
+- %Autoremove %Mode : int
 - %Play %Position : int
 
 ### SoundSource3D
@@ -1959,7 +1962,7 @@ namespace Urho3D
 - %Frequency : float
 - %Gain : float
 - %Is %Playing : bool
-- %Autoremove %on %Stop : bool
+- %Autoremove %Mode : int
 - %Play %Position : int
 - %Near %Distance : float
 - %Far %Distance : float
@@ -7489,6 +7492,7 @@ Properties:
 - bool castShadows
 - String category // readonly
 - Color color
+- Color colorFromTemperature // readonly
 - float drawDistance
 - Color effectiveColor // readonly
 - float effectiveSpecularIntensity // readonly
@@ -7525,9 +7529,11 @@ Properties:
 - float shadowResolution
 - Texture@ shapeTexture
 - float specularIntensity
+- float temperature
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
+- bool usePhysicalValues
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -9423,6 +9429,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
+- AutoRemoveMode autoRemoveMode
 - Billboard@[] billboards // readonly
 - BoundingBox boundingBox // readonly
 - bool castShadows
@@ -11708,7 +11715,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -11783,7 +11790,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - String category // readonly
 - bool enabled
 - bool enabledEffective // readonly
@@ -13681,6 +13688,7 @@ Methods:
 - bool SaveLayout(File@, UIElement@)
 - bool SaveLayout(VectorBuffer&, UIElement@)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetCustomSize(int, int)
 - void SetFocusElement(UIElement@, bool = false)
 - void SetHeight(float)
 - void SetWidth(float)
@@ -13692,6 +13700,7 @@ Properties:
 - String clipBoardText
 - Cursor@ cursor
 - IntVector2 cursorPosition // readonly
+- IntVector2 customSize
 - float defaultToolTipDelay
 - float doubleClickInterval
 - int dragBeginDistance
@@ -14841,6 +14850,13 @@ Properties:
 
 - ABM_LERP
 - ABM_ADDITIVE
+
+
+### AutoRemoveMode
+
+- REMOVE_DISABLED
+- REMOVE_COMPONENT
+- REMOVE_NODE
 
 
 ### BlendMode

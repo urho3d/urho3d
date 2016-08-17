@@ -56,6 +56,7 @@ static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
 static const float DEFAULT_SHADOWSPLIT = 1000.0f;
+static const float DEFAULT_TEMPERATURE = 6590.0f;
 
 static const char* typeNames[] =
 {
@@ -92,6 +93,7 @@ Light::Light(Context* context) :
     shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
     lightQueue_(0),
+    temperature_(6590.0f),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
@@ -102,7 +104,8 @@ Light::Light(Context* context) :
     shadowIntensity_(0.0f),
     shadowResolution_(1.0f),
     shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
-    perVertex_(false)
+    perVertex_(false),
+    usePhysicalValues_(false)
 {
 }
 
@@ -120,6 +123,8 @@ void Light::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Specular Intensity", GetSpecularIntensity, SetSpecularIntensity, float, DEFAULT_SPECULARINTENSITY,
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Use Physical Values", bool, usePhysicalValues_, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Spot FOV", GetFov, SetFov, float, DEFAULT_LIGHT_FOV, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Spot Aspect Ratio", GetAspectRatio, SetAspectRatio, float, 1.0f, AM_DEFAULT);
@@ -290,6 +295,18 @@ void Light::SetColor(const Color& color)
     MarkNetworkUpdate();
 }
 
+void Light::SetTemperature(float temperature)
+{
+    temperature_ = Clamp(temperature, 1000.0f, 10000.0f);
+    MarkNetworkUpdate();
+}
+
+void Light::SetUsePhysicalValues(bool enable)
+{
+    usePhysicalValues_ = enable;
+    MarkNetworkUpdate();
+}
+
 void Light::SetSpecularIntensity(float intensity)
 {
     specularIntensity_ = Max(intensity, 0.0f);
@@ -384,6 +401,45 @@ void Light::SetShapeTexture(Texture* texture)
 {
     shapeTexture_ = texture;
     MarkNetworkUpdate();
+}
+
+Color Light::GetColorFromTemperature() const
+{
+    // Approximate Planckian locus in CIE 1960 UCS
+    float u = (0.860117757f + 1.54118254e-4f * temperature_ + 1.28641212e-7f * temperature_ * temperature_) /
+        (1.0f + 8.42420235e-4f * temperature_ + 7.08145163e-7f * temperature_ * temperature_);
+    float v = (0.317398726f + 4.22806245e-5f * temperature_ + 4.20481691e-8f * temperature_ * temperature_) /
+        (1.0f - 2.89741816e-5f * temperature_ + 1.61456053e-7f * temperature_ * temperature_);
+
+    float x = 3.0f * u / (2.0f * u - 8.0f * v + 4.0f);
+    float y = 2.0f * v / (2.0f * u - 8.0f * v + 4.0f);
+    float z = 1.0f - x - y;
+
+    float y_ = 1.0f;
+    float x_ = y_ / y * x;
+    float z_ = y_ / y * z;
+
+    float red = 3.2404542f * x_ + -1.5371385f * y_ + -0.4985314f * z_;
+    float green = -0.9692660f * x_ + 1.8760108f * y_ + 0.0415560f * z_;
+    float blue = 0.0556434f * x_ + -0.2040259f * y_ + 1.0572252f * z_;
+
+    return Color(red, green, blue);
+}
+
+Color Light::GetEffectiveColor() const
+{
+    if (usePhysicalValues_)
+    {
+        // Light color in kelvin.
+        Color tempColor = GetColorFromTemperature();
+        // Light brightness in lumens
+        float energy = (brightness_ * 4.0f * M_PI) * 16.0f / (100.0f * 100.0f) / M_PI;
+        return Color(tempColor.r_ * color_.r_ * energy, tempColor.g_ * color_.g_ * energy, tempColor.b_ * color_.b_ * energy, 1.0f);
+    }
+    else
+    {
+        return Color(color_ * brightness_, 1.0f);
+    }
 }
 
 Frustum Light::GetFrustum() const

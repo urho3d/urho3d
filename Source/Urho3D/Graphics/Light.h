@@ -50,7 +50,7 @@ static const unsigned MAX_CASCADE_SPLITS = 4;
 static const unsigned MAX_CASCADE_SPLITS = 1;
 #endif
 
-/// Shadow depth bias parameters.
+/// Depth bias parameters. Used both by lights (for shadow mapping) and materials.
 struct URHO3D_API BiasParameters
 {
     /// Construct undefined.
@@ -178,9 +178,13 @@ public:
     void SetPerVertex(bool enable);
     /// Set color.
     void SetColor(const Color& color);
+    /// Set temperature of the light in Kelvin. Modulates the light color when "use physical values" is enabled.
+    void SetTemperature(float temperature);
+    /// Set use physical light values.
+    void SetUsePhysicalValues(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
     void SetSpecularIntensity(float intensity);
-    /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this to get final values for rendering.
+    /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this. When "use physical values" is enabled, the value is specified in lumens.
     void SetBrightness(float brightness);
     /// Set range.
     void SetRange(float range);
@@ -218,14 +222,23 @@ public:
     /// Return color.
     const Color& GetColor() const { return color_; }
 
+    /// Return the temperature of the light in Kelvin.
+    float GetTemperature() const { return temperature_; }
+
+    /// Return if light uses temperature and brightness in lumens.
+    bool GetUsePhysicalValues() const { return usePhysicalValues_; }
+
+    /// Return the color value of the temperature in Kelvin.
+    Color GetColorFromTemperature() const;
+
     /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
 
-    /// Return brightness multiplier.
+    /// Return brightness multiplier. Specified in lumens when "use physical values" is enabled.
     float GetBrightness() const { return brightness_; }
 
-    /// Return effective color, multiplied by brightness. Do not multiply the alpha so that can compare against the default black color to detect a light with no effect.
-    Color GetEffectiveColor() const { return Color(color_ * brightness_, 1.0f); }
+    /// Return effective color, multiplied by brightness and affected by temperature when "use physical values" is enabled. Alpha is always 1 so that can compare against the default black color to detect a light with no effect.
+    Color GetEffectiveColor() const;
 
     /// Return effective specular intensity, multiplied by absolute value of brightness.
     float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
@@ -319,6 +332,8 @@ private:
     LightType lightType_;
     /// Color.
     Color color_;
+    /// Light Temperature.
+    float temperature_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
     /// Directional light cascaded shadow parameters.
@@ -355,6 +370,8 @@ private:
     float shadowNearFarRatio_;
     /// Per-vertex lighting flag.
     bool perVertex_;
+    /// Use physical light values flag.
+    bool usePhysicalValues_;
 };
 
 inline bool CompareLights(Light* lhs, Light* rhs)

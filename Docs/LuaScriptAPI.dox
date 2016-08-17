@@ -3014,6 +3014,8 @@ Methods:
 - void SetLightType(LightType type)
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
+- void SetTemperature(float temperature)
+- void SetUsePhysicalValues(bool enable)
 - void SetSpecularIntensity(float intensity)
 - void SetBrightness(float brightness)
 - void SetRange(float range)
@@ -3032,9 +3034,12 @@ Methods:
 - LightType GetLightType() const
 - bool GetPerVertex() const
 - const Color& GetColor() const
+- float GetTemperature() const
 - float GetSpecularIntensity() const
 - float GetBrightness() const
 - Color GetEffectiveColor() const
+- Color GetColorFromTemperature() const
+- bool GetUsePhysicalValues() const
 - float GetEffectiveSpecularIntensity() const
 - float GetRange() const
 - float GetFov() const
@@ -3058,6 +3063,8 @@ Properties:
 - LightType lightType
 - bool perVertex
 - Color& color
+- float temperature
+- bool usePhysicalValues
 - float specularIntensity
 - float brightness
 - float range
@@ -4322,6 +4329,7 @@ Methods:
 - void SetNumParticles(unsigned num)
 - void SetEmitting(bool enable)
 - void SetSerializeParticles(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - void ResetEmissionTimer()
 - void RemoveAllParticles()
 - void Reset()
@@ -4330,6 +4338,7 @@ Methods:
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
 - bool GetSerializeParticles() const
+- AutoRemoveMode GetAutoRemoveMode() const
 
 Properties:
 
@@ -4337,6 +4346,7 @@ Properties:
 - unsigned numParticles
 - bool emitting
 - bool serializeParticles
+- AutoRemoveMode autoRemoveMode
 
 <a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
@@ -5695,7 +5705,7 @@ Methods:
 - void SetGain(float gain)
 - void SetAttenuation(float attenuation)
 - void SetPanning(float panning)
-- void SetAutoRemove(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - Sound* GetSound() const
 - String GetSoundType() const
 - float GetTimePosition() const
@@ -5703,7 +5713,7 @@ Methods:
 - float GetGain() const
 - float GetAttenuation() const
 - float GetPanning() const
-- bool GetAutoRemove() const
+- AutoRemoveMode GetAutoRemoveMode() const
 - bool IsPlaying() const
 
 Properties:
@@ -5715,7 +5725,7 @@ Properties:
 - float gain
 - float attenuation
 - float panning
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - bool playing (readonly)
 
 <a name="Class_SoundSource3D"></a>
@@ -6641,8 +6651,10 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetScale(float scale)
-- void SetWidth(float size)
-- void SetHeight(float size)
+- void SetWidth(float width)
+- void SetHeight(float height)
+- void SetCustomSize(const IntVector2& size)
+- void SetCustomSize(int width, int height)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6666,6 +6678,7 @@ Methods:
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
+- const IntVector2& GetCustomSize() const
 
 Properties:
 
@@ -6688,6 +6701,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 - float scale
+- IntVector2& customSize
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable
@@ -7573,6 +7587,12 @@ Properties:
 - int ABM_LERP
 - int ABM_ADDITIVE
 
+### AutoRemoveMode
+
+- int REMOVE_DISABLED
+- int REMOVE_COMPONENT
+- int REMOVE_NODE
+
 ### BlendMode
 
 - int BLEND_REPLACE
@@ -7719,7 +7739,6 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
-- int FC_DIRECTION
 
 ### FaceCameraMode
 
@@ -7728,6 +7747,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_DIRECTION
 
 ### FileMode
 

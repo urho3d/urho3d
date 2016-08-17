@@ -263,6 +263,8 @@ private:
     void PrepareInstancingBuffer();
     /// Set up a light volume rendering batch.
     void SetupLightVolumeBatch(Batch& batch);
+    /// Check whether a light queue needs shadow rendering.
+    bool NeedRenderShadowMap(const LightBatchQueue& queue);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     /// Return the proper depth-stencil surface to use for a rendertarget.

@@ -24,8 +24,10 @@ class UI : public Object
     void SetUseMutableGlyphs(bool enable);
     void SetForceAutoHint(bool enable);
     void SetScale(float scale);
-    void SetWidth(float size);
-    void SetHeight(float size);
+    void SetWidth(float width);
+    void SetHeight(float height);
+    void SetCustomSize(const IntVector2& size);
+    void SetCustomSize(int width, int height);
 
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
@@ -51,6 +53,7 @@ class UI : public Object
     bool HasModalElement() const;
     bool IsDragging() const;
     float GetScale() const;
+    const IntVector2& GetCustomSize() const;
 
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set UIElement* rootModalElement;
@@ -72,6 +75,7 @@ class UI : public Object
     tolua_property__get_set bool forceAutoHint;
     tolua_readonly tolua_property__has_set bool modalElement;
     tolua_property__get_set float scale;
+    tolua_property__get_set IntVector2& customSize;
 };
 
 UI* GetUI();

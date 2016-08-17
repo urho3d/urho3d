@@ -44,6 +44,13 @@
 namespace Urho3D
 {
 
+const char* autoRemoveModeNames[] = {
+    "Disabled",
+    "Component",
+    "Node",
+    0
+};
+
 Component::Component(Context* context) :
     Animatable(context),
     node_(0),
@@ -294,6 +301,24 @@ Component* Component::GetFixedUpdateSource()
     }
 
     return ret;
+}
+
+void Component::DoAutoRemove(AutoRemoveMode mode)
+{
+    switch (mode)
+    {
+    case REMOVE_COMPONENT:
+        Remove();
+        return;
+
+    case REMOVE_NODE:
+        if (node_)
+            node_->Remove();
+        return;
+
+    default:
+        return;
+    }
 }
 
 }
