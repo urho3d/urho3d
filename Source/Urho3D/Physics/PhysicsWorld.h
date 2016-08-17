@@ -96,6 +96,22 @@ struct DelayedWorldTransform
     Quaternion worldRotation_;
 };
 
+/// Manifold pointers stored during collision processing.
+struct ManifoldPair
+{
+    /// Construct with defaults.
+    ManifoldPair() :
+        manifold_(0),
+        flippedManifold_(0)
+    {
+    }
+
+    /// Manifold without the body pointers flipped.
+    btPersistentManifold* manifold_;
+    /// Manifold with the body pointers flipped.
+    btPersistentManifold* flippedManifold_;
+};
+
 /// Custom overrides of physics internals. To use overrides, must be set before the physics component is created.
 struct PhysicsWorldConfig
 {
@@ -301,9 +317,9 @@ private:
     /// Constraints in the world.
     PODVector<Constraint*> constraints_;
     /// Collision pairs on this frame.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*> currentCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair> currentCollisions_;
     /// Collision pairs on the previous frame. Used to check if a collision is "new." Manifolds are not guaranteed to exist anymore.
-    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*> previousCollisions_;
+    HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair> previousCollisions_;
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for trimesh geometry data by model and LOD level.
