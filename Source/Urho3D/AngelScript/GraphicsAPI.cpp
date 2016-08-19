@@ -1728,7 +1728,9 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "float GetHeight(const Vector3&in) const", asMETHOD(Terrain, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "Vector3 GetNormal(const Vector3&in) const", asMETHOD(Terrain, GetNormal), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetPatch(int, int) const", asMETHODPR(Terrain, GetPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetNeighborPatch(int, int) const", asMETHODPR(Terrain, GetNeighborPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "IntVector2 WorldToHeightMap(const Vector3&in) const", asMETHOD(Terrain, WorldToHeightMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void SetNeighbors(Terrain@+, Terrain@+, Terrain@+, Terrain@+)", asMETHOD(Terrain, SetNeighbors), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_material(Material@+)", asMETHOD(Terrain, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "Material@+ get_material() const", asMETHOD(Terrain, GetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_maxLodLevels(uint)", asMETHOD(Terrain, SetMaxLodLevels), asCALL_THISCALL);
@@ -1768,6 +1770,14 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "uint get_zoneMask() const", asMETHOD(Terrain, GetZoneMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_maxLights(uint)", asMETHOD(Terrain, SetMaxLights), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "uint get_maxLights() const", asMETHOD(Terrain, GetMaxLights), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_northNeighbor(Terrain@+)", asMETHOD(Terrain, SetNorthNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Terrain@+ get_northNeighbor() const", asMETHOD(Terrain, GetNorthNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_southNeighbor(Terrain@+)", asMETHOD(Terrain, SetSouthNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Terrain@+ get_southNeighbor() const", asMETHOD(Terrain, GetSouthNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_westNeighbor(Terrain@+)", asMETHOD(Terrain, SetEastNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Terrain@+ get_westNeighbor() const", asMETHOD(Terrain, GetEastNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "void set_eastNeighbor(Terrain@+)", asMETHOD(Terrain, SetWestNeighbor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Terrain@+ get_eastNeighbor() const", asMETHOD(Terrain, GetWestNeighbor), asCALL_THISCALL);
 }
 
 

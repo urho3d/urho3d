@@ -105,7 +105,12 @@ Terrain::Terrain(Context* context) :
     shadowDistance_(0.0f),
     lodBias_(1.0f),
     maxLights_(0),
-    recreateTerrain_(false)
+    northID_(0),
+    southID_(0),
+    westID_(0),
+    eastID_(0),
+    recreateTerrain_(false),
+    neighborsDirty_(false)
 {
     indexBuffer_->SetShadowed(true);
 }
@@ -123,6 +128,10 @@ void Terrain::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
+    URHO3D_ATTRIBUTE("North Neighbor NodeID", unsigned, northID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("South Neighbor NodeID", unsigned, southID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("West Neighbor NodeID", unsigned, westID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("East Neighbor NodeID", unsigned, eastID_, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ATTRIBUTE("Vertex Spacing", Vector3, spacing_, DEFAULT_SPACING, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Patch Size", GetPatchSize, SetPatchSizeAttr, int, DEFAULT_PATCH_SIZE, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max LOD Levels", GetMaxLodLevels, SetMaxLodLevelsAttr, unsigned, MAX_LOD_LEVELS, AM_DEFAULT);
@@ -145,15 +154,35 @@ void Terrain::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);
 
-    // Change of any non-accessor attribute requires recreation of the terrain
+    // Change of any non-accessor attribute requires recreation of the terrain, or setting the neighbor terrains
     if (!attr.accessor_)
-        recreateTerrain_ = true;
+    {
+        if (attr.mode_ & AM_NODEID)
+            neighborsDirty_ = true;
+        else
+            recreateTerrain_ = true;
+    }
 }
 
 void Terrain::ApplyAttributes()
 {
     if (recreateTerrain_)
         CreateGeometry();
+    
+    if (neighborsDirty_)
+    {
+        Scene* scene = GetScene();
+        Node* north = scene ? scene->GetNode(northID_) : (Node*)0;
+        Node* south = scene ? scene->GetNode(southID_) : (Node*)0;
+        Node* west = scene ? scene->GetNode(westID_) : (Node*)0;
+        Node* east = scene ? scene->GetNode(eastID_) : (Node*)0;
+        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : (Terrain*)0;
+        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : (Terrain*)0;
+        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : (Terrain*)0;
+        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : (Terrain*)0;
+        SetNeighbors(northTerrain, southTerrain, westTerrain, eastTerrain);
+        neighborsDirty_ = false;
+    }
 }
 
 void Terrain::OnSetEnabled()
@@ -245,6 +274,122 @@ void Terrain::SetMaterial(Material* material)
             patches_[i]->SetMaterial(material);
     }
 
+    MarkNetworkUpdate();
+}
+
+void Terrain::SetNorthNeighbor(Terrain* north)
+{
+    if (north == north_)
+        return;
+
+    if (north_ && north_->GetNode())
+        UnsubscribeFromEvent(north_->GetNode(), E_TERRAINCREATED);
+
+    north_ = north;
+    if (north_ && north_->GetNode())
+    {
+        northID_ = north_->GetNode()->GetID();
+        SubscribeToEvent(north_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+
+    UpdateEdgePatchNeighbors();
+    MarkNetworkUpdate();
+}
+
+void Terrain::SetSouthNeighbor(Terrain* south)
+{
+    if (south == south_)
+        return;
+
+    if (south_ && south_->GetNode())
+        UnsubscribeFromEvent(south_->GetNode(), E_TERRAINCREATED);
+
+    south_ = south;
+    if (south_ && south_->GetNode())
+    {
+        southID_ = south_->GetNode()->GetID();
+        SubscribeToEvent(south_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+
+    UpdateEdgePatchNeighbors();
+    MarkNetworkUpdate();
+}
+
+void Terrain::SetWestNeighbor(Terrain* west)
+{
+    if (west == west_)
+        return;
+
+    if (west_ && west_->GetNode())
+        UnsubscribeFromEvent(west_->GetNode(), E_TERRAINCREATED);
+
+    west_ = west;
+    if (west_ && west_->GetNode())
+    {
+        westID_ = west_->GetNode()->GetID();
+        SubscribeToEvent(west_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+
+    UpdateEdgePatchNeighbors();
+    MarkNetworkUpdate();
+}
+
+void Terrain::SetEastNeighbor(Terrain* east)
+{
+    if (east == east_)
+        return;
+
+    if (east_ && east_->GetNode())
+        UnsubscribeFromEvent(east_->GetNode(), E_TERRAINCREATED);
+
+    east_ = east;
+    if (east_ && east_->GetNode())
+    {
+        eastID_ = east_->GetNode()->GetID();
+        SubscribeToEvent(east_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+
+    UpdateEdgePatchNeighbors();
+    MarkNetworkUpdate();
+}
+
+void Terrain::SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrain* east)
+{
+    if (north_ && north_->GetNode())
+        UnsubscribeFromEvent(north_->GetNode(), E_TERRAINCREATED);
+    if (south_ && south_->GetNode())
+        UnsubscribeFromEvent(south_->GetNode(), E_TERRAINCREATED);
+    if (west_ && west_->GetNode())
+        UnsubscribeFromEvent(west_->GetNode(), E_TERRAINCREATED);
+    if (east_ && east_->GetNode())
+        UnsubscribeFromEvent(east_->GetNode(), E_TERRAINCREATED);
+
+    north_ = north;
+    if (north_ && north_->GetNode())
+    {
+        northID_ = north_->GetNode()->GetID();
+        SubscribeToEvent(north_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+    south_ = south;
+    if (south_ && south_->GetNode())
+    {
+        southID_ = south_->GetNode()->GetID();
+        SubscribeToEvent(south_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+    west_ = west;
+    if (west_ && west_->GetNode())
+    {
+        westID_ = west_->GetNode()->GetID();
+        SubscribeToEvent(west_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+    east_ = east;
+    if (east_ && east_->GetNode())
+    {
+        eastID_ = east_->GetNode()->GetID();
+        SubscribeToEvent(east_->GetNode(), E_TERRAINCREATED, URHO3D_HANDLER(Terrain, HandleNeighborTerrainCreated));
+    }
+
+    UpdateEdgePatchNeighbors();
     MarkNetworkUpdate();
 }
 
@@ -407,6 +552,20 @@ TerrainPatch* Terrain::GetPatch(int x, int z) const
         return 0;
     else
         return GetPatch((unsigned)(z * numPatches_.x_ + x));
+}
+
+TerrainPatch* Terrain::GetNeighborPatch(int x, int z) const
+{
+    if (z >= numPatches_.y_ && north_)
+        return north_->GetPatch(x, z - numPatches_.y_);
+    else if (z < 0 && south_)
+        return south_->GetPatch(x, z + south_->GetNumPatches().y_);
+    else if (x < 0 && west_)
+        return west_->GetPatch(x + west_->GetNumPatches().x_, z);
+    else if (x >= numPatches_.x_ && east_)
+        return east_->GetPatch(x - numPatches_.x_, z);
+    else 
+        return GetPatch(x, z);
 }
 
 float Terrain::GetHeight(const Vector3& worldPosition) const
@@ -962,7 +1121,7 @@ void Terrain::CreateGeometry()
                 CalculateLodErrors(patch);
             }
 
-            SetNeighbors(patch);
+            SetPatchNeighbors(patch);
         }
     }
 
@@ -1247,11 +1406,14 @@ void Terrain::CalculateLodErrors(TerrainPatch* patch)
     }
 }
 
-void Terrain::SetNeighbors(TerrainPatch* patch)
+void Terrain::SetPatchNeighbors(TerrainPatch* patch)
 {
+    if (!patch)
+        return;
+
     const IntVector2& coords = patch->GetCoordinates();
-    patch->SetNeighbors(GetPatch(coords.x_, coords.y_ + 1), GetPatch(coords.x_, coords.y_ - 1),
-        GetPatch(coords.x_ - 1, coords.y_), GetPatch(coords.x_ + 1, coords.y_));
+    patch->SetNeighbors(GetNeighborPatch(coords.x_, coords.y_ + 1), GetNeighborPatch(coords.x_, coords.y_ - 1),
+        GetNeighborPatch(coords.x_ - 1, coords.y_), GetNeighborPatch(coords.x_ + 1, coords.y_));
 }
 
 bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
@@ -1281,6 +1443,30 @@ bool Terrain::SetHeightMapInternal(Image* image, bool recreateNow)
 void Terrain::HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData)
 {
     CreateGeometry();
+}
+
+void Terrain::HandleNeighborTerrainCreated(StringHash eventType, VariantMap& eventData)
+{
+    UpdateEdgePatchNeighbors();
+}
+
+void Terrain::UpdateEdgePatchNeighbors()
+{
+    for (int x = 1; x < numPatches_.x_ - 1; ++x)
+    {
+        SetPatchNeighbors(GetPatch(x, 0));
+        SetPatchNeighbors(GetPatch(x, numPatches_.y_ - 1));
+    }
+    for (int z = 1; z < numPatches_.y_ - 1; ++z)
+    {
+        SetPatchNeighbors(GetPatch(0, z));
+        SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, z));
+    }
+
+    SetPatchNeighbors(GetPatch(0, 0));
+    SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, 0));
+    SetPatchNeighbors(GetPatch(0, numPatches_.y_ - 1));
+    SetPatchNeighbors(GetPatch(numPatches_.x_ - 1, numPatches_.y_ - 1));
 }
 
 }
