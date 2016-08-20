@@ -11316,6 +11316,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetHeight(const Vector3&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
+TerrainPatch GetNeighborPatch(int, int) const;
 Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -11342,6 +11343,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
+void SetNeighbors(Terrain, Terrain, Terrain, Terrain);
 IntVector2 WorldToHeightMap(const Vector3&) const;
 
 // Properties:
@@ -11355,6 +11357,7 @@ bool castShadows;
 /* readonly */
 String category;
 float drawDistance;
+Terrain eastNeighbor;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -11368,6 +11371,7 @@ uint maxLights;
 uint maxLodLevels;
 /* readonly */
 Node node;
+Terrain northNeighbor;
 /* readonly */
 uint numAttributes;
 /* readonly */
@@ -11386,6 +11390,7 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 bool smoothing;
+Terrain southNeighbor;
 Vector3 spacing;
 bool temporary;
 /* readonly */
@@ -11395,6 +11400,7 @@ String typeName;
 uint viewMask;
 /* readonly */
 int weakRefs;
+Terrain westNeighbor;
 uint zoneMask;
 };
 
