@@ -98,7 +98,7 @@ set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKE
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
+cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)

@@ -110,10 +110,10 @@ class GameObject : ScriptObject
             float contactDistance = contacts.ReadFloat();
             float contactImpulse = contacts.ReadFloat();
 
-            // If contact is below node center and mostly vertical, assume it's ground contact
+            // If contact is below node center and pointing up, assume it's ground contact
             if (contactPosition.y < node.position.y)
             {
-                float level = Abs(contactNormal.y);
+                float level = contactNormal.y;
                 if (level > 0.75)
                     onGround = true;
                 else
