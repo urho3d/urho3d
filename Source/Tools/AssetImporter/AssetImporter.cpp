@@ -2721,7 +2721,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
         for (unsigned i = 0; i < scalekeyFrames; ++i)
         {
             if ( i < channel->mNumScalingKeys)
-                newKeys[i] = aiVectorKey(channel->mPositionKeys[i].mTime, channel->mPositionKeys[i].mValue);
+                newKeys[i] = aiVectorKey(channel->mScalingKeys[i].mTime, channel->mScalingKeys[i].mValue);
             else
                 newKeys[i].mValue = aiVector3D(1.0f,1.0f,1.0f);
         }
