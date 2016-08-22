@@ -509,10 +509,8 @@ void Run(const Vector<String>& arguments)
         PrintLine("Reading file " + inFile);
 
         if (suppressFbxPivotNodes_)
-        {
             if (!inFile.EndsWith(".fbx", false))
                 suppressFbxPivotNodes_ = false;
-        }
 
         // only do this for the "model" command. "anim" command extrapolates animation from the original bone definition
         if (suppressFbxPivotNodes_ && command == "model")
@@ -2854,19 +2852,19 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
                                 {
                                     aiMatrix4x4::Translation(animchannel->mPositionKeys[k].mValue, transMat);
                                     animtform = animtform * transMat;
-                                    frameTime = max(animchannel->mPositionKeys[k].mTime, frameTime);
+                                    frameTime = Max(animchannel->mPositionKeys[k].mTime, frameTime);
                                 }
                                 if (k < animchannel->mNumRotationKeys)
                                 {
                                     rotMat = aiMatrix4x4(animchannel->mRotationKeys[k].mValue.GetMatrix());
                                     animtform = animtform * rotMat;
-                                    frameTime = max(animchannel->mRotationKeys[k].mTime, frameTime);
+                                    frameTime = Max(animchannel->mRotationKeys[k].mTime, frameTime);
                                 }
                                 if (k < animchannel->mNumScalingKeys)
                                 {
                                     aiMatrix4x4::Scaling(animchannel->mScalingKeys[k].mValue, scaleMat);
                                     animtform = animtform * scaleMat;
-                                    frameTime = max(animchannel->mScalingKeys[k].mTime, frameTime);
+                                    frameTime = Max(animchannel->mScalingKeys[k].mTime, frameTime);
                                 }
 
                                 finalTransform = finalTransform * animtform;
