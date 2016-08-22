@@ -91,7 +91,7 @@ struct OutScene
     PODVector<unsigned> nodeModelIndices_;
 };
 
-// fbx transform chain
+// FBX transform chain
 enum TransformationComp
 {
     TransformationComp_Translation = 0,
@@ -106,8 +106,8 @@ enum TransformationComp
     TransformationComp_ScalingPivot,
     TransformationComp_Scaling,
 
-    //*** not checking these
-    // they are typically flushed out in the fbxconverter, but there 
+    // Not checking these
+    // They are typically flushed out in the fbxconverter, but there
     // might be cases where they're not, hence, leaving them.
     #ifdef EXT_TRANSFORMATION_CHECK
     TransformationComp_ScalingPivotInverse,
@@ -122,22 +122,22 @@ enum TransformationComp
 const char *transformSuffix[TransformationComp_MAXIMUM] =
 {
     "Translation",          // TransformationComp_Translation = 0,
-    "RotationOffset",       // TransformationComp_RotationOffset, 
-    "RotationPivot",        // TransformationComp_RotationPivot,  
-    "PreRotation",          // TransformationComp_PreRotation,    
-    "Rotation",             // TransformationComp_Rotation,       
-    "PostRotation",         // TransformationComp_PostRotation,   
+    "RotationOffset",       // TransformationComp_RotationOffset,
+    "RotationPivot",        // TransformationComp_RotationPivot,
+    "PreRotation",          // TransformationComp_PreRotation,
+    "Rotation",             // TransformationComp_Rotation,
+    "PostRotation",         // TransformationComp_PostRotation,
     "RotationPivotInverse", // TransformationComp_RotationPivotInverse,
 
-    "ScalingOffset",        // TransformationComp_ScalingOffset,       
-    "ScalingPivot",         // TransformationComp_ScalingPivot,        
-    "Scaling",              // TransformationComp_Scaling,             
+    "ScalingOffset",        // TransformationComp_ScalingOffset,
+    "ScalingPivot",         // TransformationComp_ScalingPivot,
+    "Scaling",              // TransformationComp_Scaling,
 
     #ifdef EXT_TRANSFORMATION_CHECK
-    "ScalingPivotInverse",  // TransformationComp_ScalingPivotInverse, 
+    "ScalingPivotInverse",  // TransformationComp_ScalingPivotInverse,
     "GeometricTranslation", // TransformationComp_GeometricTranslation,
-    "GeometricRotation",    // TransformationComp_GeometricRotation,   
-    "GeometricScaling",     // TransformationComp_GeometricScaling,    
+    "GeometricRotation",    // TransformationComp_GeometricRotation,
+    "GeometricScaling",     // TransformationComp_GeometricScaling,
     #endif
 };
 
@@ -512,7 +512,7 @@ void Run(const Vector<String>& arguments)
             if (!inFile.EndsWith(".fbx", false))
                 suppressFbxPivotNodes_ = false;
 
-        // only do this for the "model" command. "anim" command extrapolates animation from the original bone definition
+        // Only do this for the "model" command. "anim" command extrapolates animation from the original bone definition
         if (suppressFbxPivotNodes_ && command == "model")
         {
             PrintLine("Suppressing $fbx nodes");
@@ -2637,14 +2637,14 @@ void FillChainTransforms(OutModel &model, aiMatrix4x4 *chain, const String& main
     }
 }
 
-int InitAnimatedChainTransfromIndeces(aiAnimation* anim, const String& mainBoneName, int *channelIndeces)
+int InitAnimatedChainTransfromIndices(aiAnimation* anim, const String& mainBoneName, int *channelIndices)
 {
     int numTransforms = 0;
 
     for (unsigned j = 0; j < TransformationComp_MAXIMUM; ++j)
     {
         String transfBoneName = mainBoneName + "_$AssimpFbx$_" + String(transformSuffix[j]);
-        channelIndeces[j] = -1;
+        channelIndices[j] = -1;
 
         for (unsigned k = 0; k < anim->mNumChannels; ++k)
         {
@@ -2653,8 +2653,8 @@ int InitAnimatedChainTransfromIndeces(aiAnimation* anim, const String& mainBoneN
 
             if (channelName == transfBoneName)
             {
-                numTransforms++;
-                channelIndeces[j] = k;
+                ++numTransforms;
+                channelIndices[j] = k;
                 break;
             }
         }
@@ -2663,17 +2663,17 @@ int InitAnimatedChainTransfromIndeces(aiAnimation* anim, const String& mainBoneN
     return numTransforms;
 }
 
-void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *channelIndeces)
+void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *channelIndices)
 {
     aiNodeAnim* channel = anim->mChannels[mainChannel];
     unsigned int poskeyFrames = channel->mNumPositionKeys;
     unsigned int rotkeyFrames = channel->mNumRotationKeys;
     unsigned int scalekeyFrames = channel->mNumScalingKeys;
     
-    // get max key frames
+    // Get max key frames
     for (unsigned i = 0; i < TransformationComp_MAXIMUM; ++i)
     {
-        if (channelIndeces[i] != -1 && i != mainChannel)
+        if (channelIndices[i] != -1 && i != mainChannel)
         {
             aiNodeAnim* channel2 = anim->mChannels[i];
 
@@ -2686,7 +2686,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
         }
     }
 
-    // resize and init vector key array
+    // Resize and init vector key array
     if (poskeyFrames > channel->mNumPositionKeys)
     {
         aiVectorKey* newKeys  = new aiVectorKey[poskeyFrames];
@@ -2695,9 +2695,9 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
             if (i < channel->mNumPositionKeys )
                 newKeys[i] = aiVectorKey(channel->mPositionKeys[i].mTime, channel->mPositionKeys[i].mValue);
             else
-                newKeys[i].mValue = aiVector3D(0.0f,0.0f,0.0f);
+                newKeys[i].mValue = aiVector3D(0.0f, 0.0f, 0.0f);
         }
-        delete [] channel->mPositionKeys;
+        delete[] channel->mPositionKeys;
         channel->mPositionKeys = newKeys;
         channel->mNumPositionKeys = poskeyFrames;
     }
@@ -2711,7 +2711,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
             else
                 newKeys[i].mValue = aiQuaternion();
         }
-        delete [] channel->mRotationKeys;
+        delete[] channel->mRotationKeys;
         channel->mRotationKeys = newKeys;
         channel->mNumRotationKeys = rotkeyFrames;
     }
@@ -2723,9 +2723,9 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
             if ( i < channel->mNumScalingKeys)
                 newKeys[i] = aiVectorKey(channel->mScalingKeys[i].mTime, channel->mScalingKeys[i].mValue);
             else
-                newKeys[i].mValue = aiVector3D(1.0f,1.0f,1.0f);
+                newKeys[i].mValue = aiVector3D(1.0f, 1.0f, 1.0f);
         }
-        delete [] channel->mScalingKeys;
+        delete[] channel->mScalingKeys;
         channel->mScalingKeys = newKeys;
         channel->mNumScalingKeys = scalekeyFrames;
     }
@@ -2733,7 +2733,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
 
 void CreatePivotlessFbxBoneStruct(OutModel &model)
 {
-    // init
+    // Init
     model.pivotlessBones_.Clear();
     aiMatrix4x4 chain[TransformationComp_MAXIMUM];
 
@@ -2741,14 +2741,14 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
     {
         String mainBoneName = String(model.bones_[i]->mName.data);
 
-        // skip $fbx nodes
+        // Skip $fbx nodes
         if (mainBoneName.Find("$AssimpFbx$") != String::NPOS)
             continue;
 
         std::fill_n(chain, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
         FillChainTransforms(model, &chain[0], mainBoneName);
 
-        // calculate chained transform
+        // Calculate chained transform
         aiMatrix4x4 finalTransform;
         for (unsigned j = 0; j < TransformationComp_MAXIMUM; ++j)
             finalTransform = finalTransform * chain[j];
@@ -2768,10 +2768,10 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
     {
         PrintLine("Suppressing $fbx nodes");
 
-        // construct new bone structure from suppressed $fbx pivot nodes
+        // Construct new bone structure from suppressed $fbx pivot nodes
         CreatePivotlessFbxBoneStruct(*model);
 
-        // extrapolate anim
+        // Extrapolate anim
         const PODVector<aiAnimation *> &animations = model->animations_;
 
         #ifdef DBG_DUMP_ANIMFBXNODES
@@ -2803,7 +2803,7 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
 
                 if (pos != String::NPOS)
                 {
-                    // every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
+                    // Every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
                     // skip subsequent $fbx animation channel for the same bone
                     String mainBoneName = channelName.Substring(0, pos);
 
@@ -2812,18 +2812,18 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
 
                     mainBoneCompleteList.Push(mainBoneName);
 
-                    // init chain and chain transfer indeces
+                    // Init chain and chain transfer indeces
                     unsigned boneIdx = GetBoneIndex(*model, mainBoneName);
                     aiMatrix4x4 mainboneTransform = model->bones_[boneIdx]->mTransformation;
                     aiMatrix4x4 chain[TransformationComp_MAXIMUM];
-                    int channelIndeces[TransformationComp_MAXIMUM];
-                    int numTransfIndeces = InitAnimatedChainTransfromIndeces(anim, mainBoneName, &channelIndeces[0]);
+                    int channelIndices[TransformationComp_MAXIMUM];
+                    int numTransfIndices = InitAnimatedChainTransfromIndices(anim, mainBoneName, &channelIndices[0]);
 
-                    // expand key arrays
-                    if (numTransfIndeces > 1)
-                        ExpandAnimatedChannelKeys(anim, j, &channelIndeces[0]);
+                    // Expand key arrays
+                    if (numTransfIndices > 1)
+                        ExpandAnimatedChannelKeys(anim, j, &channelIndices[0]);
 
-                    // fill chain transforms
+                    // Fill chain transforms
                     std::fill_n(chain, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
                     FillChainTransforms(*model, &chain[0], mainBoneName);
 
@@ -2838,15 +2838,15 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
                         double frameTime = 0.0;
                         aiMatrix4x4 finalTransform;
 
-                        // chain transform animated values
+                        // Chain transform animated values
                         for (unsigned l = 0; l < TransformationComp_MAXIMUM; ++l)
                         {
-                            // it's either chain transform or replaced by channel animation
-                            if (channelIndeces[l] != -1)
+                            // It's either chain transform or replaced by channel animation
+                            if (channelIndices[l] != -1)
                             {
                                 aiMatrix4x4 animtform;
                                 aiMatrix4x4 transMat, scaleMat, rotMat;
-                                aiNodeAnim* animchannel = anim->mChannels[channelIndeces[l]];
+                                aiNodeAnim* animchannel = anim->mChannels[channelIndices[l]];
 
                                 if (k < animchannel->mNumPositionKeys)
                                 {
@@ -2878,7 +2878,7 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
                         finalTransform = finalTransform * mainboneTransform;
                         finalTransform.Decompose(animScale, animRot, animPos);
 
-                        // new values
+                        // New values
                         if (k < channel->mNumPositionKeys)
                         {
                             channel->mPositionKeys[k].mValue = animPos;
