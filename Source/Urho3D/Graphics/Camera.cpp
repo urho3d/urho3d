@@ -249,7 +249,6 @@ void Camera::SetClipPlane(const Plane& plane)
 void Camera::SetFlipVertical(bool enable)
 {
     flipVertical_ = enable;
-    projectionDirty_ = true;
     MarkNetworkUpdate();
 }
 
@@ -322,7 +321,7 @@ Ray Camera::GetScreenRay(float x, float y) const
         return ret;
     }
 
-    Matrix4 viewProjInverse = (GetProjection(false) * GetView()).Inverse();
+    Matrix4 viewProjInverse = (GetProjection() * GetView()).Inverse();
 
     // The parameters range from 0.0 to 1.0. Expand to normalized device coordinates (-1.0 to 1.0) & flip Y axis
     x = 2.0f * x - 1.0f;
@@ -342,7 +341,7 @@ Vector2 Camera::WorldToScreenPoint(const Vector3& worldPos) const
 
     if (eyeSpacePos.z_ > 0.0f)
     {
-        Vector3 screenSpacePos = GetProjection(false) * eyeSpacePos;
+        Vector3 screenSpacePos = GetProjection() * eyeSpacePos;
         ret.x_ = screenSpacePos.x_;
         ret.y_ = screenSpacePos.y_;
     }
@@ -382,85 +381,66 @@ const Frustum& Camera::GetFrustum() const
     return frustum_;
 }
 
-const Matrix4& Camera::GetProjection() const
+Matrix4 Camera::GetProjection() const
 {
     if (projectionDirty_)
     {
-        projection_ = GetProjection(true);
+        if (!orthographic_)
+        {
+            float nearClip = GetNearClip();
+            float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
+            float w = h / aspectRatio_;
+            float q = farClip_ / (farClip_ - nearClip);
+            float r = -q * nearClip;
+
+            projection_.m00_ = w;
+            projection_.m02_ = projectionOffset_.x_ * 2.0f;
+            projection_.m11_ = h;
+            projection_.m12_ = projectionOffset_.y_ * 2.0f;
+            projection_.m22_ = q;
+            projection_.m23_ = r;
+            projection_.m32_ = 1.0f;
+            projection_.m33_ = 0.0f;
+        }
+        else
+        {
+            // Disregard near clip, because it does not affect depth precision as with perspective projection
+            float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
+            float w = h / aspectRatio_;
+            float q = 1.0f / farClip_;
+            float r = 0.0f;
+
+            projection_.m00_ = w;
+            projection_.m03_ = projectionOffset_.x_ * 2.0f;
+            projection_.m11_ = h;
+            projection_.m13_ = projectionOffset_.y_ * 2.0f;
+            projection_.m22_ = q;
+            projection_.m23_ = r;
+            projection_.m32_ = 0.0f;
+            projection_.m33_ = 1.0f;
+        }
+
         projectionDirty_ = false;
     }
 
-    return projection_;
+    return flipVertical_ ? flipMatrix * projection_ : projection_;
 }
 
-Matrix4 Camera::GetProjection(bool apiSpecific) const
+Matrix4 Camera::GetGPUProjection() const
 {
-    Matrix4 ret(Matrix4::ZERO);
-
-    // Whether to construct matrix using OpenGL or Direct3D clip space convention
-#ifdef URHO3D_OPENGL
-    bool openGLFormat = apiSpecific;
+#ifndef URHO3D_OPENGL
+    return GetProjection(); // Already matches API-specific format
 #else
-    bool openGLFormat = false;
-#endif
-
-    if (!orthographic_)
-    {
-        float nearClip = GetNearClip();
-        float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
-        float w = h / aspectRatio_;
-        float q, r;
-
-        if (openGLFormat)
-        {
-            q = (farClip_ + nearClip) / (farClip_ - nearClip);
-            r = -2.0f * farClip_ * nearClip / (farClip_ - nearClip);
-        }
-        else
-        {
-            q = farClip_ / (farClip_ - nearClip);
-            r = -q * nearClip;
-        }
-
-        ret.m00_ = w;
-        ret.m02_ = projectionOffset_.x_ * 2.0f;
-        ret.m11_ = h;
-        ret.m12_ = projectionOffset_.y_ * 2.0f;
-        ret.m22_ = q;
-        ret.m23_ = r;
-        ret.m32_ = 1.0f;
-    }
-    else
-    {
-        // Disregard near clip, because it does not affect depth precision as with perspective projection
-        float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
-        float w = h / aspectRatio_;
-        float q, r;
-
-        if (openGLFormat)
-        {
-            q = 2.0f / farClip_;
-            r = -1.0f;
-        }
-        else
-        {
-            q = 1.0f / farClip_;
-            r = 0.0f;
-        }
-
-        ret.m00_ = w;
-        ret.m03_ = projectionOffset_.x_ * 2.0f;
-        ret.m11_ = h;
-        ret.m13_ = projectionOffset_.y_ * 2.0f;
-        ret.m22_ = q;
-        ret.m23_ = r;
-        ret.m33_ = 1.0f;
-    }
-
-    if (flipVertical_)
-        ret = flipMatrix * ret;
+    // See formulation for depth range conversion at http://www.ogre3d.org/forums/viewtopic.php?f=4&t=13357
+    Matrix4 ret = GetProjection();
+    
+    ret.m20_ = 2.0f * ret.m20_ - ret.m30_;
+    ret.m21_ = 2.0f * ret.m21_ - ret.m31_;
+    ret.m22_ = 2.0f * ret.m22_ - ret.m32_;
+    ret.m23_ = 2.0f * ret.m23_ - ret.m33_;
 
     return ret;
+#endif
 }
 
 void Camera::GetFrustumSize(Vector3& near, Vector3& far) const

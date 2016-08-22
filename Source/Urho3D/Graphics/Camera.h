@@ -133,10 +133,10 @@ public:
 
     /// Return frustum in world space.
     const Frustum& GetFrustum() const;
-    /// Return API-specific projection matrix.
-    const Matrix4& GetProjection() const;
-    /// Return either API-specific or API-independent (D3D convention) projection matrix.
-    Matrix4 GetProjection(bool apiSpecific) const;
+    /// Return projection matrix. It's in D3D convention with depth range 0-1.
+    Matrix4 GetProjection() const;
+    /// Return projection matrix converted to API-specific format for use as a shader parameter.
+    Matrix4 GetGPUProjection() const;
     /// Return view matrix.
     const Matrix3x4& GetView() const;
     /// Return frustum near and far sizes.

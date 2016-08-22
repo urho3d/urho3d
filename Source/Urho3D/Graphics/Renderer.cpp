@@ -1400,7 +1400,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
 
         Geometry* geometry = GetLightGeometry(light);
         const Matrix3x4& view = camera->GetView();
-        const Matrix4& projection = camera->GetProjection();
+        const Matrix4& projection = camera->GetGPUProjection();
         Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
         float lightDist;
 
