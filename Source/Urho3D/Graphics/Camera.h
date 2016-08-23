@@ -212,11 +212,14 @@ protected:
     virtual void OnMarkedDirty(Node* node);
 
 private:
+    /// Recalculate projection matrix.
+    void UpdateProjection() const;
+
     /// Cached view matrix.
     mutable Matrix3x4 view_;
     /// Cached projection matrix.
     mutable Matrix4 projection_;
-    /// Cached frustum.
+    /// Cached world space frustum.
     mutable Frustum frustum_;
     /// View matrix dirty flag.
     mutable bool viewDirty_;

@@ -262,50 +262,62 @@ float Camera::GetNearClip() const
         return 0.0f;
 }
 
+const Frustum& Camera::GetFrustum() const
+{
+    if (frustumDirty_)
+    {
+        // Use projection_ instead of GetProjection() so that Y-flip has no effect. Update first if necessary
+        if (projectionDirty_)
+            UpdateProjection();
+
+        frustum_.Define(projection_ * GetView());
+        frustumDirty_ = false;
+    }
+
+    return frustum_;
+}
+
 Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
 {
-    Frustum ret;
+    if (projectionDirty_)
+        UpdateProjection();
 
-    Matrix3x4 worldTransform = GetEffectiveWorldTransform();
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
         farClip = nearClip;
 
-    if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
-    else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, worldTransform);
+    Frustum ret;
+    // DefineSplit() needs to project the near & far distances, so can not use a combined view-projection matrix.
+    // Transform to world space afterward instead
+    ret.DefineSplit(projection_, nearClip, farClip);
+    ret.Transform(GetEffectiveWorldTransform());
 
     return ret;
 }
 
 Frustum Camera::GetViewSpaceFrustum() const
 {
+    if (projectionDirty_)
+        UpdateProjection();
+
     Frustum ret;
-
-    if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_);
-    else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_);
-
+    ret.Define(projection_);
     return ret;
 }
 
 Frustum Camera::GetViewSpaceSplitFrustum(float nearClip, float farClip) const
 {
-    Frustum ret;
+    if (projectionDirty_)
+        UpdateProjection();
 
     nearClip = Max(nearClip, GetNearClip());
     farClip = Min(farClip, farClip_);
     if (farClip < nearClip)
         farClip = nearClip;
-
-    if (!orthographic_)
-        ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip);
-    else
-        ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip);
-
+    
+    Frustum ret;
+    ret.DefineSplit(projection_, nearClip, farClip);
     return ret;
 }
 
@@ -364,64 +376,10 @@ Vector3 Camera::ScreenToWorldPoint(const Vector3& screenPos) const
     return ray.origin_ + ray.direction_ * rayDistance;
 }
 
-const Frustum& Camera::GetFrustum() const
-{
-    if (frustumDirty_)
-    {
-        Matrix3x4 worldTransform = GetEffectiveWorldTransform();
-
-        if (!orthographic_)
-            frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
-        else
-            frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), farClip_, worldTransform);
-
-        frustumDirty_ = false;
-    }
-
-    return frustum_;
-}
-
 Matrix4 Camera::GetProjection() const
 {
     if (projectionDirty_)
-    {
-        if (!orthographic_)
-        {
-            float nearClip = GetNearClip();
-            float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
-            float w = h / aspectRatio_;
-            float q = farClip_ / (farClip_ - nearClip);
-            float r = -q * nearClip;
-
-            projection_.m00_ = w;
-            projection_.m02_ = projectionOffset_.x_ * 2.0f;
-            projection_.m11_ = h;
-            projection_.m12_ = projectionOffset_.y_ * 2.0f;
-            projection_.m22_ = q;
-            projection_.m23_ = r;
-            projection_.m32_ = 1.0f;
-            projection_.m33_ = 0.0f;
-        }
-        else
-        {
-            // Disregard near clip, because it does not affect depth precision as with perspective projection
-            float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
-            float w = h / aspectRatio_;
-            float q = 1.0f / farClip_;
-            float r = 0.0f;
-
-            projection_.m00_ = w;
-            projection_.m03_ = projectionOffset_.x_ * 2.0f;
-            projection_.m11_ = h;
-            projection_.m13_ = projectionOffset_.y_ * 2.0f;
-            projection_.m22_ = q;
-            projection_.m23_ = r;
-            projection_.m32_ = 0.0f;
-            projection_.m33_ = 1.0f;
-        }
-
-        projectionDirty_ = false;
-    }
+        UpdateProjection();
 
     return flipVertical_ ? flipMatrix * projection_ : projection_;
 }
@@ -445,24 +403,15 @@ Matrix4 Camera::GetGPUProjection() const
 
 void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
 {
-    near.z_ = GetNearClip();
-    far.z_ = farClip_;
+    // Use projection_ instead of GetProjection() so that Y-flip has no effect. Update first if necessary
+    if (projectionDirty_)
+        UpdateProjection();
+    Matrix4 projInverse = projection_.Inverse();
 
-    if (!orthographic_)
-    {
-        float halfViewSize = tanf(fov_ * M_DEGTORAD * 0.5f) / zoom_;
-        near.y_ = near.z_ * halfViewSize;
-        near.x_ = near.y_ * aspectRatio_;
-        far.y_ = far.z_ * halfViewSize;
-        far.x_ = far.y_ * aspectRatio_;
-    }
-    else
-    {
-        float halfViewSize = orthoSize_ * 0.5f / zoom_;
-        near.y_ = far.y_ = halfViewSize;
-        near.x_ = far.x_ = near.y_ * aspectRatio_;
-    }
+    near = projInverse * Vector3(1.0f, 1.0f, 0.0f);
+    far = projInverse * Vector3(1.0f, 1.0f, 1.0f);
 
+    /// \todo Necessary? Explain this
     if (flipVertical_)
     {
         near.y_ = -near.y_;
@@ -628,6 +577,46 @@ void Camera::OnMarkedDirty(Node* node)
 {
     frustumDirty_ = true;
     viewDirty_ = true;
+}
+
+void Camera::UpdateProjection() const
+{
+    if (!orthographic_)
+    {
+        float nearClip = GetNearClip();
+        float h = (1.0f / tanf(fov_ * M_DEGTORAD * 0.5f)) * zoom_;
+        float w = h / aspectRatio_;
+        float q = farClip_ / (farClip_ - nearClip);
+        float r = -q * nearClip;
+
+        projection_.m00_ = w;
+        projection_.m02_ = projectionOffset_.x_ * 2.0f;
+        projection_.m11_ = h;
+        projection_.m12_ = projectionOffset_.y_ * 2.0f;
+        projection_.m22_ = q;
+        projection_.m23_ = r;
+        projection_.m32_ = 1.0f;
+        projection_.m33_ = 0.0f;
+    }
+    else
+    {
+        // Disregard near clip, because it does not affect depth precision as with perspective projection
+        float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
+        float w = h / aspectRatio_;
+        float q = 1.0f / farClip_;
+        float r = 0.0f;
+
+        projection_.m00_ = w;
+        projection_.m03_ = projectionOffset_.x_ * 2.0f;
+        projection_.m11_ = h;
+        projection_.m13_ = projectionOffset_.y_ * 2.0f;
+        projection_.m22_ = q;
+        projection_.m23_ = r;
+        projection_.m32_ = 0.0f;
+        projection_.m33_ = 1.0f;
+    }
+
+    projectionDirty_ = false;
 }
 
 }
