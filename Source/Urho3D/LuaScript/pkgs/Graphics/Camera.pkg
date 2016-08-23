@@ -27,6 +27,7 @@ class Camera : public Component
     void SetReflectionPlane(const Plane& reflectionPlane);
     void SetUseClipping(bool enable);
     void SetClipPlane(const Plane& clipPlane);
+    void SetProjection(const Matrix4& projection);
 
     float GetFarClip() const;
     float GetNearClip() const;
