@@ -28,6 +28,7 @@
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
 #include "../Graphics/AnimationState.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
@@ -866,7 +867,7 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
 
 void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const
 {
-    StringHash nameHash(name);
+    StringHash nameHash(GetInternalPath(name));
 
     // Find the AnimationState
     state = GetAnimationState(nameHash);
