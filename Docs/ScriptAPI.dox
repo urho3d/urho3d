@@ -409,6 +409,18 @@ namespace Urho3D
 - %NodeB : Node pointer
 - %Contact : b2Contact pointer
 
+### NodeBeginContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Contact : b2Contact pointer
+
+### NodeEndContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Contact : b2Contact pointer
+
 ## %Physics events
 
 ### PhysicsPreStep
