@@ -311,7 +311,7 @@ void Run(const Vector<String>& arguments)
             "-bp         Move bones to bind pose before saving model\n"
             "-split <start> <end> (animation model only)\n"
             "            Split animation, will only import from start frame to end frame\n"
-            "-np         Do not suppress $fbx pivot nodes (fbx files only)\n"
+            "-np         Do not suppress $fbx pivot nodes (FBX files only)\n"
         );
     }
 
