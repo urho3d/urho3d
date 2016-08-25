@@ -26,7 +26,8 @@ set (TARGET_NAME Bullet)
 # Workaround for MinGW 6.1.0 and above where it throws ICE (internal compilation error) when -O3 is used
 # Also suppress the compilation error caused by narrowing conversion from double to float inside {}
 if (MINGW AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.1.0)  # 6.1.0 is the last known bad version
-    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -Wno-narrowing")
+    string (REPLACE -O3 -O2 CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-narrowing")
 endif ()
 
 # Define source files
