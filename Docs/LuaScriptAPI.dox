@@ -802,6 +802,7 @@ Methods:
 - void SetReflectionPlane(const Plane& reflectionPlane)
 - void SetUseClipping(bool enable)
 - void SetClipPlane(const Plane& clipPlane)
+- void SetProjection(const Matrix4& projection)
 - float GetFarClip() const
 - float GetNearClip() const
 - float GetFov() const
@@ -815,7 +816,8 @@ Methods:
 - bool IsOrthographic() const
 - bool GetAutoAspectRatio() const
 - const Frustum& GetFrustum() const
-- const Matrix4& GetProjection() const
+- Matrix4 GetProjection() const
+- Matrix4 GetGPUProjection() const
 - const Matrix3x4& GetView() const
 - void GetFrustumSize(Vector3& near, Vector3& far) const
 - float GetHalfViewSize() const
@@ -851,7 +853,8 @@ Properties:
 - bool orthographic
 - bool autoAspectRatio
 - Frustum& frustum (readonly)
-- Matrix4& projection (readonly)
+- Matrix4 projection (readonly)
+- Matrix4 GPUProjection (readonly)
 - Matrix3x4& view (readonly)
 - float halfViewSize (readonly)
 - Frustum viewSpaceFrustum (readonly)
@@ -2464,8 +2467,10 @@ Methods:
 - void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform)
 - void Define(const BoundingBox& box)
 - void Define(const BoundingBox& box, const Matrix3x4& transform)
+- void Define(const Matrix4& projection)
 - void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ)
 - void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
+- void DefineSplit(const Matrix4& projection, float near, float far)
 - void Transform(const Matrix3& transform)
 - void Transform(const Matrix3x4& transform)
 - Intersection IsInside(const Vector3& point) const
