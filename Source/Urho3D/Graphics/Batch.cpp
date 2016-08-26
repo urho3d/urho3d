@@ -86,7 +86,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
     Matrix3x4 shadowView(shadowCamera->GetView());
-    Matrix4 shadowProj(shadowCamera->GetProjection());
+    Matrix4 shadowProj(shadowCamera->GetGPUProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
 
     Texture2D* shadowMap = queue->shadowMap_;

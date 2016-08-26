@@ -746,7 +746,7 @@ void View::SetCameraShaderParameters(Camera* camera)
     camera->GetFrustumSize(nearVector, farVector);
     graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
 
-    Matrix4 projection = camera->GetProjection();
+    Matrix4 projection = camera->GetGPUProjection();
 #ifdef URHO3D_OPENGL
     // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
     float constantBias = 2.0f * graphics_->GetDepthConstantBias();
@@ -1565,7 +1565,7 @@ void View::ExecuteRenderPathCommands()
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
-                            camera_->GetProjection());
+                            camera_->GetGPUProjection());
                         queue.Draw(this, camera_, command.markToStencil_, false, allowDepthWrite);
                     }
                 }
@@ -1600,7 +1600,7 @@ void View::ExecuteRenderPathCommands()
 
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
-                            camera_->GetProjection());
+                            camera_->GetGPUProjection());
 
                         // Draw base (replace blend) batches first
                         i->litBaseBatches_.Draw(this, camera_, false, false, allowDepthWrite);
