@@ -409,6 +409,18 @@ namespace Urho3D
 - %NodeB : Node pointer
 - %Contact : b2Contact pointer
 
+### NodeBeginContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Contact : b2Contact pointer
+
+### NodeEndContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Contact : b2Contact pointer
+
 ## %Physics events
 
 ### PhysicsPreStep
@@ -2050,6 +2062,10 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Height %Map : ResourceRef
 - %Material : ResourceRef
+- %North %Neighbor %NodeID : int
+- %South %Neighbor %NodeID : int
+- %West %Neighbor %NodeID : int
+- %East %Neighbor %NodeID : int
 - %Vertex %Spacing : Vector3
 - %Patch %Size : int
 - %Max %LOD %Levels : int
@@ -12559,6 +12575,7 @@ Methods:
 - Variant GetAttributeDefault(const String&) const
 - float GetHeight(const Vector3&) const
 - bool GetInterceptNetworkUpdate(const String&) const
+- TerrainPatch@ GetNeighborPatch(int, int) const
 - Vector3 GetNormal(const Vector3&) const
 - TerrainPatch@ GetPatch(int, int) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -12585,6 +12602,7 @@ Methods:
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
 - void SetInterceptNetworkUpdate(const String&, bool)
+- void SetNeighbors(Terrain@, Terrain@, Terrain@, Terrain@)
 - IntVector2 WorldToHeightMap(const Vector3&) const
 
 Properties:
@@ -12596,6 +12614,7 @@ Properties:
 - bool castShadows
 - String category // readonly
 - float drawDistance
+- Terrain@ eastNeighbor
 - bool enabled
 - bool enabledEffective // readonly
 - Image@ heightMap
@@ -12606,6 +12625,7 @@ Properties:
 - uint maxLights
 - uint maxLodLevels
 - Node@ node // readonly
+- Terrain@ northNeighbor
 - uint numAttributes // readonly
 - IntVector2 numPatches // readonly
 - IntVector2 numVertices // readonly
@@ -12619,12 +12639,14 @@ Properties:
 - float shadowDistance
 - uint shadowMask
 - bool smoothing
+- Terrain@ southNeighbor
 - Vector3 spacing
 - bool temporary
 - StringHash type // readonly
 - String typeName // readonly
 - uint viewMask
 - int weakRefs // readonly
+- Terrain@ westNeighbor
 - uint zoneMask
 
 <a name="Class_TerrainPatch"></a>

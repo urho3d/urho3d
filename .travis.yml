@@ -325,7 +325,7 @@ after_script: rake ci_teardown_cache
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}
-osx_image: xcode7.1
+osx_image: xcode7.3
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -348,17 +348,18 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - travis_retry brew update >/dev/null
+  - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  # travis_retry brew update >/dev/null
   - which cmake >/dev/null 2>&1 || cmake=cmake
-  - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
+  - if [[ $PACKAGE_UPLOAD ]]; then doxygen='doxygen graphviz';
+      whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline';
+      for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done &&
+      for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done &&
+      brew cleanup;
+    fi
   - travis_retry brew install ccache $cmake $doxygen
-  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
-  - for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
-  # for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
-  - brew cleanup
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
+  - if [ $XCODE ]; then pushd $(dirname $(xcodebuild -find-executable clang)) && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
   - rake ci_setup_cache
 script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache

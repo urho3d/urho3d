@@ -3073,6 +3073,7 @@ Options:
 -bp         Move bones to bind pose before saving model
 -split <start> <end> (animation model only)
             Split animation, will only import from start frame to end frame
+-np         Do not suppress $fbx pivot nodes (FBX files only)
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.

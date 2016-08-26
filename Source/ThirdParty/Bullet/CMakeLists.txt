@@ -23,19 +23,26 @@
 # Define target name
 set (TARGET_NAME Bullet)
 
+# Workaround for MinGW 6.1.0 and above where it throws ICE (internal compilation error) when -O3 is used
+# Also suppress the compilation error caused by narrowing conversion from double to float inside {}
+if (MINGW AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.1.0)  # 6.1.0 is the last known bad version
+    string (REPLACE -O3 -O2 CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-narrowing")
+endif ()
+
 # Define source files
-file (GLOB CPP_FILES src/BulletCollision/BroadphaseCollision/*.cpp 
-    src/BulletCollision/CollisionDispatch/*.cpp src/BulletCollision/CollisionShapes/*.cpp 
-    src/BulletCollision/Gimpact/*.cpp src/BulletCollision/NarrowPhaseCollision/*.cpp 
+file (GLOB CPP_FILES src/BulletCollision/BroadphaseCollision/*.cpp
+    src/BulletCollision/CollisionDispatch/*.cpp src/BulletCollision/CollisionShapes/*.cpp
+    src/BulletCollision/Gimpact/*.cpp src/BulletCollision/NarrowPhaseCollision/*.cpp
     src/BulletDynamics/Character/*.cpp src/BulletDynamics/ConstraintSolver/*.cpp
-    src/BulletDynamics/Dynamics/*.cpp src/BulletDynamics/Featherstone/*.cpp 
+    src/BulletDynamics/Dynamics/*.cpp src/BulletDynamics/Featherstone/*.cpp
     src/BulletDynamics/MLCPSolvers/*.cpp src/BulletDynamics/Vehicle/*.cpp src/BulletSoftBody/*.cpp
     src/LinearMath/*.cpp)
 file (GLOB H_FILES *.h src/BulletCollision/BroadphaseCollision/*.h
     src/BulletCollision/CollisionDispatch/*.h src/BulletCollision/CollisionShapes/*.h
     src/BulletCollision/Gimpact/*.h src/BulletCollision/NarrowPhaseCollision/*.h
     src/BulletDynamics/Character/*.h src/BulletDynamics/ConstraintSolver/*.h
-    src/BulletDynamics/Dynamics/*.h src/BulletDynamics/Featherstone/*.h 
+    src/BulletDynamics/Dynamics/*.h src/BulletDynamics/Featherstone/*.h
     src/BulletDynamics/MLCPSolvers/*.h src/BulletDynamics/Vehicle/*.h src/BulletSoftBody/*.h
     src/LinearMath/*.h)
 set (SOURCE_FILES ${CPP_FILES} ${H_FILES})

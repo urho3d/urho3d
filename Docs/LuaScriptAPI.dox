@@ -6080,6 +6080,11 @@ Methods:
 - void SetSmoothing(bool enable)
 - bool SetHeightMap(Image* image)
 - void SetMaterial(Material* material)
+- void SetNorthNeighbor(Terrain* north)
+- void SetSouthNeighbor(Terrain* south)
+- void SetWestNeighbor(Terrain* west)
+- void SetEastNeighbor(Terrain* east)
+- void SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrain* east)
 - void SetDrawDistance(float distance)
 - void SetShadowDistance(float distance)
 - void SetLodBias(float bias)
@@ -6101,8 +6106,13 @@ Methods:
 - bool GetSmoothing() const
 - Image* GetHeightMap() const
 - Material* GetMaterial() const
+- Terrain* GetNorthNeighbor() const
+- Terrain* GetSouthNeighbor() const
+- Terrain* GetWestNeighbor() const
+- Terrain* GetEastNeighbor() const
 - TerrainPatch* GetPatch(unsigned index) const
 - TerrainPatch* GetPatch(int x, int z) const
+- TerrainPatch* GetNeighborPatch(int x, int z) const
 - float GetHeight(const Vector3& worldPosition) const
 - Vector3 GetNormal(const Vector3& worldPosition) const
 - IntVector2 WorldToHeightMap(const Vector3& worldPosition) const
@@ -6131,6 +6141,10 @@ Properties:
 - bool smoothing
 - Image* heightMap
 - Material* material
+- Terrain* northNeighbor
+- Terrain* southNeighbor
+- Terrain* westNeighbor
+- Terrain* eastNeighbor
 - float drawDistance
 - float shadowDistance
 - float lodBias

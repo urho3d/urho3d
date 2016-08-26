@@ -684,7 +684,7 @@ void PhysicsWorld::GetCollidingBodies(PODVector<RigidBody*>& result, const Rigid
 
     result.Clear();
 
-    for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
+    for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair>::Iterator i = currentCollisions_.Begin();
          i != currentCollisions_.End(); ++i)
     {
         if (i->first_.first_ == body)
@@ -887,26 +887,28 @@ void PhysicsWorld::SendCollisionEvents()
             WeakPtr<RigidBody> bodyWeakA(bodyA);
             WeakPtr<RigidBody> bodyWeakB(bodyB);
 
-            Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> > bodyPair;
-            if (bodyA < bodyB)
-                bodyPair = MakePair(bodyWeakA, bodyWeakB);
-            else
-                bodyPair = MakePair(bodyWeakB, bodyWeakA);
-
             // First only store the collision pair as weak pointers and the manifold pointer, so user code can safely destroy
             // objects during collision event handling
-            currentCollisions_[bodyPair] = contactManifold;
+            Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> > bodyPair;
+            if (bodyA < bodyB)
+            {
+                bodyPair = MakePair(bodyWeakA, bodyWeakB);
+                currentCollisions_[bodyPair].manifold_ = contactManifold;
+            }
+            else
+            {
+                bodyPair = MakePair(bodyWeakB, bodyWeakA);
+                currentCollisions_[bodyPair].flippedManifold_ = contactManifold;
+            }
         }
 
-        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator i = currentCollisions_.Begin();
+        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair>::Iterator i = currentCollisions_.Begin();
              i != currentCollisions_.End(); ++i)
         {
             RigidBody* bodyA = i->first_.first_;
             RigidBody* bodyB = i->first_.second_;
             if (!bodyA || !bodyB)
                 continue;
-
-            btPersistentManifold* contactManifold = i->second_;
 
             Node* nodeA = bodyA->GetNode();
             Node* nodeB = bodyB->GetNode();
@@ -924,13 +926,31 @@ void PhysicsWorld::SendCollisionEvents()
 
             contacts_.Clear();
 
-            for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+            // "Pointers not flipped"-manifold, send unmodified normals
+            btPersistentManifold* contactManifold = i->second_.manifold_;
+            if (contactManifold)
             {
-                btManifoldPoint& point = contactManifold->getContactPoint(j);
-                contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
-                contacts_.WriteVector3(ToVector3(point.m_normalWorldOnB));
-                contacts_.WriteFloat(point.m_distance1);
-                contacts_.WriteFloat(point.m_appliedImpulse);
+                for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+                {
+                    btManifoldPoint& point = contactManifold->getContactPoint(j);
+                    contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                    contacts_.WriteVector3(ToVector3(point.m_normalWorldOnB));
+                    contacts_.WriteFloat(point.m_distance1);
+                    contacts_.WriteFloat(point.m_appliedImpulse);
+                }
+            }
+            // "Pointers flipped"-manifold, flip normals also
+            contactManifold = i->second_.flippedManifold_;
+            if (contactManifold)
+            {
+                for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+                {
+                    btManifoldPoint& point = contactManifold->getContactPoint(j);
+                    contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                    contacts_.WriteVector3(-ToVector3(point.m_normalWorldOnB));
+                    contacts_.WriteFloat(point.m_distance1);
+                    contacts_.WriteFloat(point.m_appliedImpulse);
+                }
             }
 
             physicsCollisionData_[PhysicsCollision::P_CONTACTS] = contacts_.GetBuffer();
@@ -966,14 +986,31 @@ void PhysicsWorld::SendCollisionEvents()
             if (!nodeWeakA || !nodeWeakB || !i->first_.first_ || !i->first_.second_)
                 continue;
 
+            // Flip perspective to body B
             contacts_.Clear();
-            for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+            contactManifold = i->second_.manifold_;
+            if (contactManifold)
             {
-                btManifoldPoint& point = contactManifold->getContactPoint(j);
-                contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
-                contacts_.WriteVector3(-ToVector3(point.m_normalWorldOnB));
-                contacts_.WriteFloat(point.m_distance1);
-                contacts_.WriteFloat(point.m_appliedImpulse);
+                for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+                {
+                    btManifoldPoint& point = contactManifold->getContactPoint(j);
+                    contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                    contacts_.WriteVector3(-ToVector3(point.m_normalWorldOnB));
+                    contacts_.WriteFloat(point.m_distance1);
+                    contacts_.WriteFloat(point.m_appliedImpulse);
+                }
+            }
+            contactManifold = i->second_.flippedManifold_;
+            if (contactManifold)
+            {
+                for (int j = 0; j < contactManifold->getNumContacts(); ++j)
+                {
+                    btManifoldPoint& point = contactManifold->getContactPoint(j);
+                    contacts_.WriteVector3(ToVector3(point.m_positionWorldOnB));
+                    contacts_.WriteVector3(ToVector3(point.m_normalWorldOnB));
+                    contacts_.WriteFloat(point.m_distance1);
+                    contacts_.WriteFloat(point.m_appliedImpulse);
+                }
             }
 
             nodeCollisionData_[NodeCollision::P_BODY] = bodyB;
@@ -996,7 +1033,7 @@ void PhysicsWorld::SendCollisionEvents()
     {
         physicsCollisionData_[PhysicsCollisionEnd::P_WORLD] = this;
 
-        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, btPersistentManifold*>::Iterator
+        for (HashMap<Pair<WeakPtr<RigidBody>, WeakPtr<RigidBody> >, ManifoldPair>::Iterator
                  i = previousCollisions_.Begin(); i != previousCollisions_.End(); ++i)
         {
             if (!currentCollisions_.Contains(i->first_))

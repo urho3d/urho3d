@@ -368,11 +368,11 @@ for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache)
 On Xcode 6 or above:
 \verbatim
 cd $(dirname $(xcodebuild -find-executable clang))
-cp -p $(which ccache) .
-for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
+sudo cp -p $(which ccache) .
+for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done
 \endverbatim
 
-Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
+Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
 
 \page Running Running Urho3D player application
 
