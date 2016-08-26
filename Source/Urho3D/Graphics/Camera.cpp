@@ -622,7 +622,6 @@ void Camera::UpdateProjection() const
     }
     else
     {
-        // Disregard near clip, because it does not affect depth precision as with perspective projection
         float h = (1.0f / (orthoSize_ * 0.5f)) * zoom_;
         float w = h / aspectRatio_;
         float q = 1.0f / farClip_;
