@@ -94,11 +94,16 @@ public:
     void SetClipPlane(const Plane& plane);
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
+    /// Set custom projection matrix, which should be specified in D3D convention with depth range 0 - 1. Disables auto aspect ratio.
+    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection. 
+        Note that the custom projection is not serialized or replicated through the network.
+     */
+    void SetProjection(const Matrix4& projection);
 
-    /// Return far clip distance.
-    float GetFarClip() const { return farClip_; }
+    /// Return far clip distance. If a custom projection matrix is in use, is calculated from it instead of the value assigned with SetFarClip().
+    float GetFarClip() const;
 
-    /// Return near clip distance.
+    /// Return near clip distance. If a custom projection matrix is in use, is calculated from it instead of the value assigned with SetNearClip().
     float GetNearClip() const;
 
     /// Return vertical field of view in degrees.
@@ -133,10 +138,10 @@ public:
 
     /// Return frustum in world space.
     const Frustum& GetFrustum() const;
-    /// Return API-specific projection matrix.
-    const Matrix4& GetProjection() const;
-    /// Return either API-specific or API-independent (D3D convention) projection matrix.
-    Matrix4 GetProjection(bool apiSpecific) const;
+    /// Return projection matrix. It's in D3D convention with depth range 0 - 1.
+    Matrix4 GetProjection() const;
+    /// Return projection matrix converted to API-specific format for use as a shader parameter.
+    Matrix4 GetGPUProjection() const;
     /// Return view matrix.
     const Matrix3x4& GetView() const;
     /// Return frustum near and far sizes.
@@ -149,11 +154,11 @@ public:
     Frustum GetViewSpaceFrustum() const;
     /// Return split frustum in view space.
     Frustum GetViewSpaceSplitFrustum(float nearClip, float farClip) const;
-    /// Return ray corresponding to normalized screen coordinates (0.0 - 1.0), with origin on the near clip plane.
+    /// Return ray corresponding to normalized screen coordinates (0 - 1), with origin on the near clip plane.
     Ray GetScreenRay(float x, float y) const;
-    /// Convert a world space point to normalized screen coordinates (0.0 - 1.0).
+    /// Convert a world space point to normalized screen coordinates (0 - 1).
     Vector2 WorldToScreenPoint(const Vector3& worldPos) const;
-    /// Convert normalized screen coordinates (0.0 - 1.0) and distance along view Z axis (in Z coordinate) to a world space point. The distance can not be closer than the near clip plane.
+    /// Convert normalized screen coordinates (0 - 1) and distance along view Z axis (in Z coordinate) to a world space point. The distance can not be closer than the near clip plane.
     /** Note that a HitDistance() from the camera screen ray is not the same as distance along the view Z axis, as under a perspective projection the ray is likely to not be Z-aligned.
      */
     Vector3 ScreenToWorldPoint(const Vector3& screenPos) const;
@@ -212,11 +217,14 @@ protected:
     virtual void OnMarkedDirty(Node* node);
 
 private:
+    /// Recalculate projection matrix.
+    void UpdateProjection() const;
+
     /// Cached view matrix.
     mutable Matrix3x4 view_;
     /// Cached projection matrix.
     mutable Matrix4 projection_;
-    /// Cached frustum.
+    /// Cached world space frustum.
     mutable Frustum frustum_;
     /// View matrix dirty flag.
     mutable bool viewDirty_;
@@ -226,6 +234,10 @@ private:
     mutable bool frustumDirty_;
     /// Orthographic mode flag.
     bool orthographic_;
+    /// Cached actual near clip distance.
+    mutable float projNearClip_;
+    /// Cached actual far clip distance.
+    mutable float projFarClip_;
     /// Near clip distance.
     float nearClip_;
     /// Far clip distance.

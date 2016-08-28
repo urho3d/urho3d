@@ -1276,6 +1276,8 @@ float fov;
 /* readonly */
 Frustum frustum;
 /* readonly */
+Matrix4 gpuProjection;
+/* readonly */
 float halfViewSize;
 /* readonly */
 uint id;
@@ -1288,7 +1290,6 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 float orthoSize;
 bool orthographic;
-/* readonly */
 Matrix4 projection;
 Vector2 projectionOffset;
 Plane reflectionPlane;
@@ -5036,9 +5037,11 @@ class Frustum
 {
 // Methods:
 void Define(const BoundingBox&, const Matrix3x4&);
+void Define(const Matrix4&);
 void Define(const Vector3&, const Vector3&, const Matrix3x4&);
 void Define(float, float, float, float, float, const Matrix3x4&);
 void DefineOrtho(float, float, float, float, float, const Matrix3x4&);
+void DefineSplit(const Matrix4&, float, float);
 float Distance(const Vector3&) const;
 Intersection IsInside(const BoundingBox&);
 Intersection IsInside(const Sphere&);

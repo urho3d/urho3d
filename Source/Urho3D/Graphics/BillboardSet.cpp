@@ -736,7 +736,7 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
 
     if (!frame.camera_->IsOrthographic())
     {
-        Matrix4 viewProj(frame.camera_->GetProjection(false) * frame.camera_->GetView());
+        Matrix4 viewProj(frame.camera_->GetProjection() * frame.camera_->GetView());
         const Matrix3x4& worldTransform = node_->GetWorldTransform();
         Matrix3x4 billboardTransform = relative_ ? worldTransform : Matrix3x4::IDENTITY;
 
