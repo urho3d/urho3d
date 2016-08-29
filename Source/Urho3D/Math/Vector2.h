@@ -323,6 +323,9 @@ public:
     /// Return as string.
     String ToString() const;
 
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return x_ * 15485863 + y_ * 32452843; }
+
     /// X coordinate.
     int x_;
     /// Y coordinate.
