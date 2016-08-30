@@ -72,7 +72,8 @@ Camera::Camera(Context* context) :
     autoAspectRatio_(true),
     flipVertical_(false),
     useReflection_(false),
-    useClipping_(false)
+    useClipping_(false),
+    customProjection_(false)
 {
     reflectionMatrix_ = reflectionPlane_.ReflectionMatrix();
 }
@@ -261,6 +262,7 @@ void Camera::SetProjection(const Matrix4& projection)
     projectionDirty_ = false;
     autoAspectRatio_ = false;
     frustumDirty_ = true;
+    customProjection_ = true;
     // Called due to autoAspectRatio changing state, the projection itself is not serialized
     MarkNetworkUpdate();
 }
@@ -283,13 +285,24 @@ float Camera::GetFarClip() const
 
 const Frustum& Camera::GetFrustum() const
 {
+    // Use projection_ instead of GetProjection() so that Y-flip has no effect. Update first if necessary
+    if (projectionDirty_)
+        UpdateProjection();
+
     if (frustumDirty_)
     {
-        // Use projection_ instead of GetProjection() so that Y-flip has no effect. Update first if necessary
-        if (projectionDirty_)
-            UpdateProjection();
-
-        frustum_.Define(projection_ * GetView());
+        if (customProjection_)
+            frustum_.Define(projection_ * GetView());
+        else
+        {
+            // If not using a custom projection, prefer calculating frustum from projection parameters instead of matrix
+            // for better accuracy
+            if (!orthographic_)
+                frustum_.Define(fov_, aspectRatio_, zoom_, GetNearClip(), GetFarClip(), GetEffectiveWorldTransform());
+            else
+                frustum_.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), GetFarClip(), GetEffectiveWorldTransform());
+        }
+        
         frustumDirty_ = false;
     }
 
@@ -307,10 +320,21 @@ Frustum Camera::GetSplitFrustum(float nearClip, float farClip) const
         farClip = nearClip;
 
     Frustum ret;
-    // DefineSplit() needs to project the near & far distances, so can not use a combined view-projection matrix.
-    // Transform to world space afterward instead
-    ret.DefineSplit(projection_, nearClip, farClip);
-    ret.Transform(GetEffectiveWorldTransform());
+
+    if (customProjection_)
+    {
+        // DefineSplit() needs to project the near & far distances, so can not use a combined view-projection matrix.
+        // Transform to world space afterward instead
+        ret.DefineSplit(projection_, nearClip, farClip);
+        ret.Transform(GetEffectiveWorldTransform());
+    }
+    else
+    {
+        if (!orthographic_)
+            ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip, GetEffectiveWorldTransform());
+        else
+            ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip, GetEffectiveWorldTransform());
+    }
 
     return ret;
 }
@@ -321,7 +345,17 @@ Frustum Camera::GetViewSpaceFrustum() const
         UpdateProjection();
 
     Frustum ret;
-    ret.Define(projection_);
+
+    if (customProjection_)
+        ret.Define(projection_);
+    else
+    {
+        if (!orthographic_)
+            ret.Define(fov_, aspectRatio_, zoom_, GetNearClip(), GetFarClip());
+        else
+            ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, GetNearClip(), GetFarClip());
+    }
+
     return ret;
 }
 
@@ -336,7 +370,17 @@ Frustum Camera::GetViewSpaceSplitFrustum(float nearClip, float farClip) const
         farClip = nearClip;
     
     Frustum ret;
-    ret.DefineSplit(projection_, nearClip, farClip);
+
+    if (customProjection_)
+        ret.DefineSplit(projection_, nearClip, farClip);
+    else
+    {
+        if (!orthographic_)
+            ret.Define(fov_, aspectRatio_, zoom_, nearClip, farClip);
+        else
+            ret.DefineOrtho(orthoSize_, aspectRatio_, zoom_, nearClip, farClip);
+    }
+    
     return ret;
 }
 
@@ -422,13 +466,9 @@ Matrix4 Camera::GetGPUProjection() const
 
 void Camera::GetFrustumSize(Vector3& near, Vector3& far) const
 {
-    // Use projection_ instead of GetProjection() so that Y-flip has no effect. Update first if necessary
-    if (projectionDirty_)
-        UpdateProjection();
-    Matrix4 projInverse = projection_.Inverse();
-
-    near = projInverse * Vector3(1.0f, 1.0f, 0.0f);
-    far = projInverse * Vector3(1.0f, 1.0f, 1.0f);
+    Frustum viewSpaceFrustum = GetViewSpaceFrustum();
+    near = viewSpaceFrustum.vertices_[0];
+    far = viewSpaceFrustum.vertices_[4];
 
     /// \todo Necessary? Explain this
     if (flipVertical_)
@@ -640,6 +680,7 @@ void Camera::UpdateProjection() const
     }
 
     projectionDirty_ = false;
+    customProjection_ = false;
 }
 
 }
