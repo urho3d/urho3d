@@ -1195,7 +1195,7 @@ Diffuse maps specify the surface color in the RGB channels. Optionally they can 
 Normal maps encode the tangent-space surface normal for normal mapping. There are two options for storing normals, which require choosing the correct material technique, as the pixel shader is different in each case:
 
 - Store as RGB. In this case use the DiffNormal techniques. This is the default used by AssetImporter, to ensure no conversion of normal textures needs to happen.
-- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx
+- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see https://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx.
 
 Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
 
@@ -1243,7 +1243,7 @@ Using a single image texture and a layout is used like this:
 </cubemap>
 \endcode
 
-For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
+For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and https://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
 
 \section Materials_3DTextures 3D textures
 
@@ -1595,6 +1595,8 @@ A specular intensity of 0 disables specular calculations from a per-pixel light,
 
 Negative (subtractive) lights can be achieved by setting either the color components or the brightness multiplier to a negative value. These can be used to locally reduce the ambient light level, for example to create a dark cave. Negative per-pixel lights will not work in light pre-pass rendering mode, as it uses a light accumulation buffer with a black initial value, so there is nothing to subtract from.
 
+Lights can alternatively enable the use of physical values, in which case the brightness multiplier is specified in lumens, and a light temperature value in Kelvin becomes available to also modulate the color (typically the color value itself would be left white in this case.) See \ref Light::SetUsePhysicalValues "SetUsePhysicalValues()" and \ref Light::SetTemperature "SetTemperature()".
+
 \section Lights_LightCulling Light culling
 
 When occlusion is used, a light will automatically be culled if its bounding box is fully behind an occluder. However, directional lights have an infinite bounding box, and can not be culled this way.
@@ -1813,6 +1815,9 @@ The input events include:
 - E_INPUTFOCUS : application input focus or window minimization state changed.
 - E_MOUSEVISIBLECHANGED : the visibility of the operating system mouse cursor was changed.
 - E_EXITREQUESTED : application exit was requested (eg. with the window close button.)
+- E_INPUTBEGIN : input handling starts.
+- E_INPUTEND : input handling ends.
+- E_SDLRAWINPUT : raw SDL event is sent for customized event processing.
 
 \section InputKeyboard Keyboard and mouse input
 
@@ -2073,7 +2078,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - View3D: a window that renders a 3D viewport
 - Window: a movable and resizable window
 
-The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
+The root %UI element can be queried from the UI subsystem with the function \ref UI::GetRoot "GetRoot()". It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data, and the possibility to add tags for identification: see \ref UIElement::AddTag "AddTag()", \ref UIElement::RemoveTag "RemoveTag()", \ref UIElement::SetTags "SetTags()" and \ref UIElement::GetChildrenWithTag "GetChildrenWithTag()".
 
@@ -2092,9 +2097,9 @@ The absolute pixel rects interact poorly with the Renderer's texture quality set
 </texture>
 \endcode
 
-\section UI_Defining Defining UI elements in XML
+\section UI_Definition UI layout and style definition files
 
-User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
+User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two use cases for %UI definition files: either defining just the %UI element style (for example the image rects for a button's each state, or the font to use for a text) and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
 
 The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root-level %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
@@ -2125,13 +2130,21 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
 
 3) The popup element shown by Menu and DropDownList is not an actual child element. In XML serialization, it is nevertheless stored as a child element, but is marked with the attribute popup="true".
 
-\section UI_Layouts UI element layout
+\section UI_Programmatic Defining UI layouts programmatically
+
+Instead of loading a %UI element hierarchy from a definition file, it is just as valid (though cumbersome for larger hierarchies) to create the elements in code, which is demonstrated by several of the Urho3D samples.
+
+In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element.
+
+\section UI_Layouts Child element layouting
 
 By default %UI elements operate in a "free" layout mode, where child elements' positions can be specified relative to any of the parent element corners, but they are not automatically positioned or resized.
 
-To create automatically adjusting layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
+To create automatically adjusting child layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
 
 Left, top, right & bottom border widths and spacing between elements can also be specified for the layout. A grid layout is not directly supported, but it can be manually created with a horizontal layout inside a vertical layout, or vice versa.
+
+Use the functions \ref UIElement::SetLayout "SetLayout()" or \ref UIElement::SetLayoutMode "SetLayoutMode()" to control the layouting.
 
 \section UI_Fonts Fonts
 
@@ -2310,7 +2323,7 @@ Both are rendered using StaticSprite2D class (Drawable component):
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
 - StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
-Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (https://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
@@ -2377,7 +2390,7 @@ Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full 
 
 Several collision shapes may exist in the same node to create compound shapes. This can be handy to approximate complex or concave shapes.
 
-Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (https://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
 
 Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
 

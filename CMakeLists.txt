@@ -63,9 +63,6 @@ if (ANDROID)
     # For Android platform, install to a path similar to ANDROID_LIBRARY_OUTPUT_PATH variable, e.g. libs/armeabi-v7a
     set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
 elseif (URHO3D_64BIT)
-    if (EXISTS /usr/lib64)
-        set (HAS_LIB64 TRUE)
-    endif ()
     # Install to 'lib64' when one of these conditions is true
     if ((MINGW AND CMAKE_CROSSCOMPILING) OR URHO3D_USE_LIB64_RPM OR (HAS_LIB64 AND NOT URHO3D_USE_LIB_DEB))
         set (LIB_SUFFIX 64)
@@ -76,8 +73,6 @@ set (DEST_SHARE_DIR share/${PATH_SUFFIX})
 set (DEST_BUNDLE_DIR ${DEST_SHARE_DIR}/Applications)
 # Note to package maintainer: ${PATH_SUFFIX} for library could be removed if the extra path is not desired, but if so then the RPATH setting in Source's CMakeLists.txt needs to be adjusted accordingly
 set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
-# TODO: Investigate the implication of using CMAKE_SYSROOT variable (available since 3.0.0) instead of our own SYSROOT variable
-set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
@@ -121,7 +116,7 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)
     elseif (ARM)
-        set (CPACK_SYSTEM_NAME Arm)     # Generic ARM
+        set (CPACK_SYSTEM_NAME ARM)     # Generic ARM
     endif ()
     if (NOT URHO3D_64BIT OR HAS_LIB64)
         list (APPEND CPACK_GENERATOR RPM)
@@ -158,6 +153,8 @@ elseif (RPI AND RPI_ABI MATCHES ^armeabi-v7a)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-v7a)
 elseif (ARM_ABI_FLAGS)
     string (REGEX REPLACE "^.*mcpu=([^ ]+).*$" -\\1 CPU_NAME "${ARM_ABI_FLAGS}")
+    string (REGEX REPLACE .*- - CPU_NAME "${CPU_NAME}")
+    string (TOUPPER "${CPU_NAME}" CPU_NAME)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})

@@ -36,9 +36,11 @@ class File : public Object
     bool IsEof() const;
     
     int ReadInt();
+    long long ReadInt64();
     short ReadShort();
     signed char ReadByte();
     unsigned ReadUInt();
+    unsigned long long ReadUInt64();
     unsigned short ReadUShort();
     unsigned char ReadUByte();
     bool ReadBool();
@@ -80,9 +82,11 @@ class File : public Object
     tolua_outside unsigned SerializerWrite @ Write(const VectorBuffer& buffer);
     
     bool WriteInt(int value);
+    bool WriteInt64(long long value);
     bool WriteShort(short value);
     bool WriteByte(signed char value);
     bool WriteUInt(unsigned value);
+    bool WriteUInt64(unsigned long long value);
     bool WriteUShort(unsigned short value);
     bool WriteUByte(unsigned char value);
     bool WriteBool(bool value);

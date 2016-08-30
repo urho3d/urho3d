@@ -41,7 +41,7 @@ uniform float4x3 cZone;
 #ifdef COMPILEPS
 
 // Pixel shader uniforms
-uniform float3 cAmbientColor;
+uniform float4 cAmbientColor;
 uniform float3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform float4 cDepthReconstruct;
@@ -58,8 +58,8 @@ uniform float3 cMatEmissiveColor;
 uniform float3 cMatEnvMapColor;
 uniform float4 cMatSpecColor;
 #ifdef PBR
-    uniform float cRoughnessPS; 
-    uniform float cMetallicPS;
+    uniform float cRoughness;
+    uniform float cMetallic;
 #endif
 uniform float cNearClipPS;
 uniform float cFarClipPS;
@@ -160,7 +160,7 @@ cbuffer CameraPS : register(b1)
 
 cbuffer ZonePS : register(b2)
 {
-    float3 cAmbientColor;
+    float4 cAmbientColor;
     float4 cFogParams;
     float3 cFogColor;
 }
@@ -188,8 +188,8 @@ cbuffer MaterialPS : register(b4)
     float3 cMatEnvMapColor;
     float4 cMatSpecColor;
     #ifdef PBR
-        float cRoughnessPS; 
-        float cMetallicPS;
+        float cRoughness;
+        float cMetallic;
     #endif
 }
 #endif

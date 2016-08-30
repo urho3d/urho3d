@@ -25,12 +25,17 @@
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/RenderPath.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Button.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Slider.h>
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/UIEvents.h>
+#include <Urho3D/UI/Text.h>
 #ifdef URHO3D_ANGELSCRIPT
 #include <Urho3D/AngelScript/Script.h>
 #endif
@@ -42,7 +47,11 @@
 URHO3D_DEFINE_APPLICATION_MAIN(PBRMaterials)
 
 PBRMaterials::PBRMaterials(Context* context) :
-    Sample(context)
+    Sample(context),
+    dynamicMaterial_(0),
+    roughnessLabel_(0),
+    metallicLabel_(0),
+    ambientLabel_(0)
 {
 }
 
@@ -56,12 +65,31 @@ void PBRMaterials::Start()
 
     // Create the UI content
     CreateUI();
+    CreateInstructions();
 
     // Setup the viewport for displaying the scene
     SetupViewport();
 
     // Subscribe to global events for camera movement
     SubscribeToEvents();
+}
+
+void PBRMaterials::CreateInstructions()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    UI* ui = GetSubsystem<UI>();
+
+    // Construct new Text object, set string to display and font to use
+    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    instructionText->SetText("Use sliders to change Roughness and Metallic\n"
+        "Hold RMB and use WASD keys and mouse to move");
+    instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    instructionText->SetTextAlignment(HA_CENTER);
+
+    // Position the text relative to the screen center
+    instructionText->SetHorizontalAlignment(HA_CENTER);
+    instructionText->SetVerticalAlignment(VA_CENTER);
+    instructionText->SetPosition(0, ui->GetRoot()->GetHeight() / 4);
 }
 
 void PBRMaterials::CreateScene()
@@ -80,12 +108,21 @@ void PBRMaterials::CreateScene()
     SharedPtr<File> file = cache->GetFile("Scenes/PBRExample.xml");
     scene_->LoadXML(*file);
 
+    Node* sphereWithDynamicMatNode = scene_->GetChild("SphereWithDynamicMat");
+    StaticModel* staticModel = sphereWithDynamicMatNode->GetComponent<StaticModel>();
+    dynamicMaterial_ = staticModel->GetMaterial(0);
+
+    Node* zoneNode = scene_->GetChild("Zone");
+    zone_ = zoneNode->GetComponent<Zone>();
+
     // Create the camera (not included in the scene file)
     cameraNode_ = scene_->CreateChild("Camera");
     cameraNode_->CreateComponent<Camera>();
 
-    // Set an initial position for the camera scene node above the plane
-    cameraNode_->SetPosition(Vector3(0.0f, 4.0f, 0.0f));
+    cameraNode_->SetPosition(sphereWithDynamicMatNode->GetPosition() + Vector3(2.0f, 2.0f, 2.0f));
+    cameraNode_->LookAt(sphereWithDynamicMatNode->GetPosition());
+    yaw_ = cameraNode_->GetRotation().YawAngle();
+    pitch_ = cameraNode_->GetRotation().PitchAngle();
 }
 
 void PBRMaterials::CreateUI()
@@ -105,6 +142,67 @@ void PBRMaterials::CreateUI()
     // Set starting position of the cursor at the rendering window center
     Graphics* graphics = GetSubsystem<Graphics>();
     cursor->SetPosition(graphics->GetWidth() / 2, graphics->GetHeight() / 2);
+
+    roughnessLabel_ = ui->GetRoot()->CreateChild<Text>();
+    roughnessLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    roughnessLabel_->SetPosition(370, 50);
+    roughnessLabel_->SetTextEffect(TE_SHADOW);
+
+    metallicLabel_ = ui->GetRoot()->CreateChild<Text>();
+    metallicLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    metallicLabel_->SetPosition(370, 100);
+    metallicLabel_->SetTextEffect(TE_SHADOW);
+
+    ambientLabel_ = ui->GetRoot()->CreateChild<Text>();
+    ambientLabel_->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
+    ambientLabel_->SetPosition(370, 150);
+    ambientLabel_->SetTextEffect(TE_SHADOW);
+
+    Slider* roughnessSlider = ui->GetRoot()->CreateChild<Slider>();
+    roughnessSlider->SetStyleAuto();
+    roughnessSlider->SetPosition(50, 50);
+    roughnessSlider->SetSize(300, 20);
+    roughnessSlider->SetRange(1.0f); // 0 - 1 range
+    SubscribeToEvent(roughnessSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleRoughnessSliderChanged));
+    roughnessSlider->SetValue(0.5f);
+
+    Slider* metallicSlider = ui->GetRoot()->CreateChild<Slider>();
+    metallicSlider->SetStyleAuto();
+    metallicSlider->SetPosition(50, 100);
+    metallicSlider->SetSize(300, 20);
+    metallicSlider->SetRange(1.0f); // 0 - 1 range
+    SubscribeToEvent(metallicSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleMetallicSliderChanged));
+    metallicSlider->SetValue(0.5f);
+
+    Slider* ambientSlider = ui->GetRoot()->CreateChild<Slider>();
+    ambientSlider->SetStyleAuto();
+    ambientSlider->SetPosition(50, 150);
+    ambientSlider->SetSize(300, 20);
+    ambientSlider->SetRange(10.0f); // 0 - 10 range
+    SubscribeToEvent(ambientSlider, E_SLIDERCHANGED, URHO3D_HANDLER(PBRMaterials, HandleAmbientSliderChanged));
+    ambientSlider->SetValue(zone_->GetAmbientColor().a_);
+}
+
+void PBRMaterials::HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
+    dynamicMaterial_->SetShaderParameter("Roughness", newValue);
+    roughnessLabel_->SetText("Roughness: " + String(newValue));
+}
+
+void PBRMaterials::HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
+    dynamicMaterial_->SetShaderParameter("Metallic", newValue);
+    metallicLabel_->SetText("Metallic: " + String(newValue));
+}
+
+void PBRMaterials::HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData)
+{
+    float newValue = eventData[SliderChanged::P_VALUE].GetFloat();
+    Color col = Color(0.0, 0.0, 0.0, newValue);
+    zone_->SetAmbientColor(col);
+    ambientLabel_->SetText("Ambient HDR Scale: " + String(zone_->GetAmbientColor().a_));
 }
 
 void PBRMaterials::SetupViewport()
@@ -112,13 +210,14 @@ void PBRMaterials::SetupViewport()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Renderer* renderer = GetSubsystem<Renderer>();
 
+    renderer->SetHDRRendering(true);
+
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
     renderer->SetViewport(0, viewport);
 
     // Add post-processing effects appropriate with the example scene
     SharedPtr<RenderPath> effectRenderPath = viewport->GetRenderPath()->Clone();
-    effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/BloomHDR.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/FXAA2.xml"));
     effectRenderPath->Append(cache->GetResource<XMLFile>("PostProcess/GammaCorrection.xml"));
 

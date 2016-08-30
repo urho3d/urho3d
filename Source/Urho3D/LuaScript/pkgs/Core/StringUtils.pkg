@@ -2,8 +2,8 @@ $#include "Core/StringUtils.h"
 
 bool ToBool(const String source);
 float ToFloat(const String source);
-int ToInt(const String source);
-unsigned ToUInt(const String source);
+int ToInt(const String source, int base = 10);
+unsigned ToUInt(const String source, int base = 10);
 
 Color ToColor(const String source);
 IntRect ToIntRect(const String source);

@@ -243,6 +243,12 @@ void StaticModel::SetModel(Model* model)
         return;
     }
 
+    if (!node_)
+    {
+        URHO3D_LOGERROR("Can not set model while model component is not attached to a scene node");
+        return;
+    }
+
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);

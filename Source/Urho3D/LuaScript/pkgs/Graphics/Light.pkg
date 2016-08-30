@@ -46,6 +46,8 @@ class Light : public Drawable
     void SetLightType(LightType type);
     void SetPerVertex(bool enable);
     void SetColor(const Color& color);
+    void SetTemperature(float temperature);
+    void SetUsePhysicalValues(bool enable);
     void SetSpecularIntensity(float intensity);
     void SetBrightness(float brightness);
     void SetRange(float range);
@@ -61,13 +63,16 @@ class Light : public Drawable
     void SetShadowNearFarRatio(float nearFarRatio);
     void SetRampTexture(Texture* texture);
     void SetShapeTexture(Texture* texture);
-    
+
     LightType GetLightType() const;
     bool GetPerVertex() const;
     const Color& GetColor() const;
+    float GetTemperature() const;
     float GetSpecularIntensity() const;
     float GetBrightness() const;
     Color GetEffectiveColor() const;
+    Color GetColorFromTemperature() const;
+    bool GetUsePhysicalValues() const;
     float GetEffectiveSpecularIntensity() const;
     float GetRange() const;
     float GetFov() const;
@@ -89,6 +94,8 @@ class Light : public Drawable
     tolua_property__get_set LightType lightType;
     tolua_property__get_set bool perVertex;
     tolua_property__get_set Color& color;
+    tolua_property__get_set float temperature;
+    tolua_property__get_set bool usePhysicalValues;
     tolua_property__get_set float specularIntensity;
     tolua_property__get_set float brightness;
     tolua_property__get_set float range;

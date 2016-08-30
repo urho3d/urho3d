@@ -44,6 +44,13 @@
 namespace Urho3D
 {
 
+const char* autoRemoveModeNames[] = {
+    "Disabled",
+    "Component",
+    "Node",
+    0
+};
+
 Component::Component(Context* context) :
     Animatable(context),
     node_(0),
@@ -165,16 +172,6 @@ void Component::PrepareNetworkUpdate()
         return;
 
     unsigned numAttributes = attributes->Size();
-
-    if (networkState_->currentValues_.Size() != numAttributes)
-    {
-        networkState_->currentValues_.Resize(numAttributes);
-        networkState_->previousValues_.Resize(numAttributes);
-
-        // Copy the default attribute values to the previous state as a starting point
-        for (unsigned i = 0; i < numAttributes; ++i)
-            networkState_->previousValues_[i] = attributes->At(i).defaultValue_;
-    }
 
     // Check for attribute changes
     for (unsigned i = 0; i < numAttributes; ++i)
@@ -304,6 +301,24 @@ Component* Component::GetFixedUpdateSource()
     }
 
     return ret;
+}
+
+void Component::DoAutoRemove(AutoRemoveMode mode)
+{
+    switch (mode)
+    {
+    case REMOVE_COMPONENT:
+        Remove();
+        return;
+
+    case REMOVE_NODE:
+        if (node_)
+            node_->Remove();
+        return;
+
+    default:
+        return;
+    }
 }
 
 }

@@ -102,6 +102,7 @@ class Node : public Animatable
     void RemoveComponents(bool removeReplicated, bool removeLocal);
     void RemoveComponents(const String type);
     void RemoveAllComponents();
+    void ReorderComponent(Component* component, unsigned index);
 
     Node* Clone(CreateMode mode = REPLICATED);
 
@@ -201,6 +202,8 @@ class Node : public Animatable
 
     // void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
     tolua_outside const PODVector<Node*>& NodeGetChildrenWithTag @ GetChildrenWithTag(const String& tag, bool recursive = false) const; 
+
+    void SetID(unsigned id);
 
     tolua_readonly tolua_property__get_set unsigned ID;
     tolua_property__get_set String name;

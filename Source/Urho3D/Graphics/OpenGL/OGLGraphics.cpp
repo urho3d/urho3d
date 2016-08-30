@@ -243,6 +243,7 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
     numPrimitives_(0),
@@ -550,8 +551,17 @@ void Graphics::SetSRGB(bool enable)
     }
 }
 
+void Graphics::SetDither(bool enable)
+{
+    if (enable)
+        glEnable(GL_DITHER);
+    else
+        glDisable(GL_DITHER);
+}
+
 void Graphics::SetFlushGPU(bool enable)
 {
+    // Currently unimplemented on OpenGL
 }
 
 void Graphics::SetForceGL2(bool enable)
@@ -589,8 +599,15 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     ResetRenderTargets();
 
+#ifndef GL_ES_VERSION_2_0
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+#else
+    // Use RGBA format on OpenGL ES, as otherwise (at least on Android) the produced image is all black
+    destImage.SetSize(width_, height_, 4);
+    glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, destImage.GetData());
+#endif
+
     // On OpenGL we need to flip the image vertically after reading
     destImage.FlipVertical();
 
@@ -1915,6 +1932,11 @@ bool Graphics::IsInitialized() const
     return window_ != 0;
 }
 
+bool Graphics::GetDither() const
+{
+    return glIsEnabled(GL_DITHER) ? true : false;
+}
+
 bool Graphics::IsDeviceLost() const
 {
     // On iOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
@@ -2675,6 +2697,9 @@ void Graphics::CheckFeatureSupport()
 #endif
     }
 #endif
+
+    // Consider OpenGL shadows always hardware sampled, if supported at all
+    hardwareShadowSupport_ = shadowMapFormat_ != 0;
 }
 
 void Graphics::PrepareDraw()
@@ -3074,7 +3099,7 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
     textureUnits_["LightCubeMap"] = TU_LIGHTSHAPE;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
-#ifdef DESKTOP_GRAPHICS
+#ifndef GL_ES_VERSION_2_0
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;

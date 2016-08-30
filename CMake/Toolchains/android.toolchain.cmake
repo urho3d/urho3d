@@ -218,15 +218,14 @@
 
 cmake_minimum_required( VERSION 2.6.3 )
 
+if( DEFINED CMAKE_CROSSCOMPILING )
+ return()
+endif()
+
 # Urho3D: on Windows Cygwin-based NDK tools may fail in the linking phase with too long command line. Turn on response files to avoid this
 if( CMAKE_HOST_WIN32 )
  set( CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
  set( CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
-endif()
-
-if( DEFINED CMAKE_CROSSCOMPILING )
- # subsequent toolchain loading is not really needed
- return()
 endif()
 
 if( CMAKE_TOOLCHAIN_FILE )
@@ -1455,15 +1454,13 @@ if( ARMEABI_V7A )
  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--fix-cortex-a8" )
 endif()
 
+# Urho3D - bug fix - fix the common linker problem as it may happen to all archs (not just MIPS) when ld.bfd is used
+if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
+  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
+endif()
+
 if( ANDROID_NO_UNDEFINED )
- if( MIPS )
-  # there is some sysroot-related problem in mips linker...
-  if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
-   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
-  endif()
- else()
   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined" )
- endif()
 endif()
 
 if( ANDROID_SO_UNDEFINED )

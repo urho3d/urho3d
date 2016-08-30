@@ -552,7 +552,7 @@ public:
     }
 
     /// Try to copy value to output. Return true if was found.
-    bool TryGetValue(const T& key, U& out)
+    bool TryGetValue(const T& key, U& out) const
     {
         if (!ptrs_)
             return false;

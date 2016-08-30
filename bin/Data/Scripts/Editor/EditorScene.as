@@ -865,7 +865,7 @@ bool SceneSmartDuplicateNode()
     
     // get bb for offset  
     Drawable@ drawable = GetFirstDrawable(node);
-    if (drawable !is null) 
+    if (drawable !is null)
     {
         bb = drawable.boundingBox;
         size =  bb.size * drawable.node.worldScale;
@@ -1060,6 +1060,88 @@ bool SceneChangeParent(Node@ sourceNode, Array<Node@> sourceNodes, Node@ targetN
     }
     else
         return false;
+}
+
+bool SceneReorder(Node@ sourceNode, Node@ targetNode)
+{
+    if (sourceNode is null || targetNode is null || sourceNode.parent is null || sourceNode.parent !is targetNode.parent)
+        return false;
+    if (sourceNode is targetNode)
+        return true; // No-op
+
+    Node@ parent = sourceNode.parent;
+    uint destIndex = SceneFindChildIndex(parent, targetNode);
+
+    ReorderNodeAction action;
+    action.Define(sourceNode, destIndex);
+    SaveEditAction(action);
+    PerformReorder(parent, sourceNode, destIndex);
+    return true;
+}
+
+bool SceneReorder(Component@ sourceComponent, Component@ targetComponent)
+{
+    if (sourceComponent is null || targetComponent is null || sourceComponent.node !is targetComponent.node)
+        return false;
+    if (sourceComponent is targetComponent)
+        return true; // No-op
+
+    Node@ node = sourceComponent.node;
+    uint destIndex = SceneFindComponentIndex(node, targetComponent);
+
+    ReorderComponentAction action;
+    action.Define(sourceComponent, destIndex);
+    SaveEditAction(action);
+    PerformReorder(node, sourceComponent, destIndex);
+    return true;
+}
+
+void PerformReorder(Node@ parent, Node@ child, uint destIndex)
+{
+    suppressSceneChanges = true;
+
+    // Removal from scene zeroes the ID. Be prepared to restore it
+    uint oldId = child.id;
+    parent.RemoveChild(child);
+    child.id = oldId;
+    parent.AddChild(child, destIndex);
+    UpdateHierarchyItem(parent); // Force update to make sure the order is current
+    SetSceneModified();
+
+    suppressSceneChanges = false;
+}
+
+void PerformReorder(Node@ node, Component@ component, uint destIndex)
+{
+    suppressSceneChanges = true;
+
+    node.ReorderComponent(component, destIndex);
+    UpdateHierarchyItem(node); // Force update to make sure the order is current
+    SetSceneModified();
+
+    suppressSceneChanges = false;
+}
+
+uint SceneFindChildIndex(Node@ parent, Node@ child)
+{
+    for (uint i = 0; i < parent.numChildren; ++i)
+    {
+        if (parent.children[i] is child)
+            return i;
+    }
+    
+    return -1;
+}
+
+uint SceneFindComponentIndex(Node@ node, Component@ component)
+{
+    for (uint i = 0; i < node.numComponents; ++i)
+    {
+        if (node.components[i] is component)
+            return i;
+    }
+    
+    return -1;
 }
 
 bool SceneResetPosition()

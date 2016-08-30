@@ -17,6 +17,8 @@ IntRect viewportArea; // the area where the editor viewport is. if we ever want 
 IntRect viewportUIClipBorder = IntRect(27, 60, 0, 0); // used to clip viewport borders, the borders are ugly when going behind the transparent toolbars
 RenderPath@ renderPath; // Renderpath to use on all views
 String renderPathName;
+bool gammaCorrection = false;
+bool HDR = false;
 bool mouseWheelCameraPosition = false;
 bool contextMenuActionWaitFrame = false;
 bool cameraFlyMode = true;
@@ -457,8 +459,16 @@ void SetRenderPath(const String&in newRenderPathName)
             }
         }
     }
-    
-    // If renderPath is null, the engine default will be used
+
+    if (renderPath is null)
+        renderPath = renderer.defaultRenderPath.Clone();
+
+    // Append gamma correction postprocess and disable/enable it as requested
+    renderPath.Append(cache.GetResource("XMLFile", "PostProcess/GammaCorrection.xml"));
+    renderPath.SetEnabled("GammaCorrection", gammaCorrection);
+
+    renderer.hdrRendering = HDR;
+
     for (uint i = 0; i < renderer.numViewports; ++i)
         renderer.viewports[i].renderPath = renderPath;
 
@@ -467,6 +477,20 @@ void SetRenderPath(const String&in newRenderPathName)
         
     if (particleEffectPreview !is null && particleEffectPreview.viewport !is null)
         particleEffectPreview.viewport.renderPath = renderPath;
+}
+
+void SetGammaCorrection(bool enable)
+{
+    gammaCorrection = enable;
+    if (renderPath !is null)
+        renderPath.SetEnabled("GammaCorrection", gammaCorrection);
+}
+
+void SetHDR(bool enable)
+{
+    HDR = enable;
+    if (renderer !is null)
+        renderer.hdrRendering = HDR;
 }
 
 void CreateCamera()

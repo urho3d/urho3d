@@ -33,6 +33,14 @@ class Scene;
 
 struct ComponentReplicationState;
 
+/// Autoremove is used by some components for automatic removal from the scene hierarchy upon completion of an action, for example sound or particle effect.
+enum AutoRemoveMode
+{
+    REMOVE_DISABLED = 0,
+    REMOVE_COMPONENT,
+    REMOVE_NODE
+};
+
 /// Base class for components. Components can be created to scene nodes.
 class URHO3D_API Component : public Animatable
 {
@@ -119,6 +127,8 @@ protected:
     void HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& eventData);
     /// Return a component from the scene root that sends out fixed update events (either PhysicsWorld or PhysicsWorld2D). Return null if neither exists.
     Component* GetFixedUpdateSource();
+    /// Perform autoremove. Called by subclasses. Caller should keep a weak pointer to itself to check whether was actually removed, and return immediately without further member operations in that case.
+    void DoAutoRemove(AutoRemoveMode mode);
 
     /// Scene node.
     Node* node_;

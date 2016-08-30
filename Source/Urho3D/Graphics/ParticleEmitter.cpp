@@ -41,6 +41,8 @@ extern const char* GEOMETRY_CATEGORY;
 extern const char* faceCameraModeNames[];
 static const unsigned MAX_PARTICLES_IN_FRAME = 100;
 
+extern const char* autoRemoveModeNames[];
+
 ParticleEmitter::ParticleEmitter(Context* context) :
     BillboardSet(context),
     periodTimer_(0.0f),
@@ -50,7 +52,8 @@ ParticleEmitter::ParticleEmitter(Context* context) :
     emitting_(true),
     needUpdate_(false),
     serializeParticles_(true),
-    sendFinishEvent_(true)
+    sendFinishedEvent_(true),
+    autoRemove_(REMOVE_DISABLED)
 {
     SetNumParticles(DEFAULT_NUM_PARTICLES);
 }
@@ -74,6 +77,7 @@ void ParticleEmitter::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
     URHO3D_ATTRIBUTE("Period Timer", float, periodTimer_, 0.0f, AM_FILE | AM_NOEDIT);
     URHO3D_ATTRIBUTE("Emission Timer", float, emissionTimer_, 0.0f, AM_FILE | AM_NOEDIT);
+    URHO3D_ENUM_ATTRIBUTE("Autoremove Mode", autoRemove_, autoRemoveModeNames, REMOVE_DISABLED, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Particles", GetParticlesAttr, SetParticlesAttr, VariantVector, Variant::emptyVariantVector,
         AM_FILE | AM_NOEDIT);
@@ -128,7 +132,7 @@ void ParticleEmitter::Update(const FrameInfo& frame)
         if (inactiveTime && periodTimer_ >= inactiveTime)
         {
             emitting_ = true;
-            sendFinishEvent_ = true;
+            sendFinishedEvent_ = true;
             periodTimer_ -= inactiveTime;
         }
         // If emitter has an indefinite stop interval, keep period timer reset to allow restarting emission in the editor
@@ -295,7 +299,7 @@ void ParticleEmitter::SetEmitting(bool enable)
     if (enable != emitting_)
     {
         emitting_ = enable;
-        sendFinishEvent_ = enable;
+        sendFinishedEvent_ = enable;
         periodTimer_ = 0.0f;
         // Note: network update does not need to be marked as this is a file only attribute
     }
@@ -305,6 +309,12 @@ void ParticleEmitter::SetSerializeParticles(bool enable)
 {
     serializeParticles_ = enable;
     // Note: network update does not need to be marked as this is a file only attribute
+}
+
+void ParticleEmitter::SetAutoRemoveMode(AutoRemoveMode mode)
+{
+    autoRemove_ = mode;
+    MarkNetworkUpdate();
 }
 
 void ParticleEmitter::ResetEmissionTimer()
@@ -538,7 +548,7 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         MarkForUpdate();
     }
 
-    if (node_ && !emitting_ && sendFinishEvent_)
+    if (node_ && !emitting_ && sendFinishedEvent_)
     {
         // Send finished event only once all billboards are gone
         bool hasEnabledBillboards = false;
@@ -554,7 +564,10 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
 
         if (!hasEnabledBillboards)
         {
-            sendFinishEvent_ = false;
+            sendFinishedEvent_ = false;
+
+            // Make a weak pointer to self to check for destruction during event handling
+            WeakPtr<ParticleEmitter> self(this);
 
             using namespace ParticleEffectFinished;
 
@@ -563,6 +576,11 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
             eventData[P_EFFECT] = effect_;
 
             node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
+
+            if (self.Expired())
+                return;
+
+            DoAutoRemove(autoRemove_);
         }
     }
 }

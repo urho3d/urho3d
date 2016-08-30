@@ -4,7 +4,7 @@
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
 #include "Constants.hlsl"
-#include "BDRF.hlsl"
+#include "PBR.hlsl"
 #line 9
 
 void VS(float4 iPos : POSITION,
@@ -93,10 +93,11 @@ void PS(
     const float4 projWorldPos = float4(worldPos, 1.0);
 
     float3 lightDir;
-    float diff = GetDiffuse(normal, worldPos, lightDir);
+    float atten = GetAtten(normal, worldPos, lightDir);
 
+    float shadow = 1;
     #ifdef SHADOW
-        diff *= GetShadowDeferred(projWorldPos, normal, depth);
+        shadow *= GetShadowDeferred(projWorldPos, normal, depth);
     #endif
 
     #if defined(SPOTLIGHT)
@@ -110,24 +111,10 @@ void PS(
 
     const float3 toCamera = normalize(eyeVec);
     const float3 lightVec = normalize(lightDir);
-
-    const float3 Hn = normalize(toCamera + lightVec);
-    const float vdh = clamp(abs(dot(toCamera, Hn)), M_EPSILON, 1.0);
-    const float ndh = clamp(abs(dot(normal, Hn)), M_EPSILON, 1.0);
     const float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
-    const float ndv = clamp(abs(dot(normal, toCamera)), M_EPSILON, 1.0);
 
-    const float3 diffuseFactor = BurleyDiffuse(albedoInput.rgb, roughness, ndv, ndl, vdh);
-    float3 specularFactor = 0;
-
-    #ifdef SPECULAR
-        const float3 fresnelTerm = Fresnel(specColor, vdh);
-        const float distTerm = Distribution(ndh, roughness);
-        const float visTerm = Visibility(ndl, ndv, roughness);
-
-        specularFactor = SpecularBRDF(distTerm, fresnelTerm, visTerm, ndl, ndv);
-    #endif
+    float3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, albedoInput.rgb, specColor);
 
     oColor.a = 1;
-    oColor.rgb  = (diffuseFactor + specularFactor) * lightColor * diff;
+    oColor.rgb  = BRDF * lightColor * shadow * atten / M_PI;
 }

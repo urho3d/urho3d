@@ -145,12 +145,11 @@ void InitScene()
 
     gameScene.LoadXML(cache.GetFile("Scenes/NinjaSnowWar.xml"));
 
-    // On mobile devices render the shadowmap first. Also adjust the shadow quality for performance
+    // On mobile devices render the shadowmap first for better performance, adjust the cascaded shadows
     String platform = GetPlatform();
     if (platform == "Android" || platform == "iOS" || platform == "Raspberry Pi")
     {
         renderer.reuseShadowMaps = false;
-        renderer.shadowQuality = SHADOWQUALITY_SIMPLE_16BIT;
         // Adjust the directional light shadow range slightly further, as only the first
         // cascade is supported
         Node@ dirLightNode = gameScene.GetChild("GlobalLight", true);
@@ -158,7 +157,6 @@ void InitScene()
         {
             Light@ dirLight = dirLightNode.GetComponent("Light");
             dirLight.shadowCascade = CascadeParameters(15.0f, 0.0f, 0.0f, 0.0f, 0.9f);
-            dirLight.shadowIntensity = 0.333f;
         }
     }
 
@@ -491,14 +489,15 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     if (key == KEY_F5)
         debugHud.Toggle(DEBUGHUD_SHOW_EVENTPROFILER);
-                // Take screenshot
+
+    // Take screenshot
     if (key == KEY_F6)
     {
         Image@ screenshot = Image();
         graphics.TakeScreenShot(screenshot);
         // Here we save in the Data folder with date and time appended
         screenshot.SavePNG(fileSystem.programDir + "Data/Screenshot_" +
-                time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
+            time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
     }
     // Allow pause only in singleplayer
     if (key == KEY_P && singlePlayer && !console.visible && gameOn)
@@ -508,7 +507,7 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
         {
             SetMessage("PAUSED");
             audio.PauseSoundType(SOUND_EFFECT);
-            
+
             // Open the settings joystick only if the controls screen joystick was already open
             if (screenJoystickID >= 0)
             {

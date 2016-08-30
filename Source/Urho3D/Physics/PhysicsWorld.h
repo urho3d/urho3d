@@ -96,6 +96,18 @@ struct DelayedWorldTransform
     Quaternion worldRotation_;
 };
 
+/// Custom overrides of physics internals. To use overrides, must be set before the physics component is created.
+struct PhysicsWorldConfig
+{
+    PhysicsWorldConfig() :
+        collisionConfig_(0)
+    {
+    }
+
+    /// Override for the collision configuration (default btDefaultCollisionConfiguration).
+    btCollisionConfiguration* collisionConfig_;
+};
+
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
 /// Physics simulation world component. Should be added only to the root scene node.
@@ -252,6 +264,9 @@ public:
 
     /// Return whether is currently inside the Bullet substep loop.
     bool IsSimulating() const { return simulating_; }
+
+    /// Overrides of the internal configuration.
+    static struct PhysicsWorldConfig config;
 
 protected:
     /// Handle scene being assigned.

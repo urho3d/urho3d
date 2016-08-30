@@ -367,6 +367,7 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "Font@+ get_font() const", asMETHOD(Text, GetFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool set_fontSize(int)", asMETHOD(Text, SetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "int get_fontSize() const", asMETHOD(Text, GetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void set_text(const String&in)", asMETHOD(Text, SetText), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "const String& get_text() const", asMETHOD(Text, GetText), asCALL_THISCALL);
@@ -409,6 +410,7 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "bool SetFont(Font@+, int)", asMETHODPR(Text3D, SetFont, (Font*, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(Text3D, SetAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "Font@+ get_font() const", asMETHOD(Text3D, GetFont), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "bool set_fontSize(int)", asMETHOD(Text3D, SetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "int get_fontSize() const", asMETHOD(Text3D, GetFontSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "void set_material(Material@+)", asMETHOD(Text3D, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "Material@+ get_material() const", asMETHOD(Text3D, GetMaterial), asCALL_THISCALL);
@@ -711,8 +713,9 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool SaveLayout(File@+, UIElement@+)", asFUNCTION(UISaveLayout), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "bool SaveLayout(VectorBuffer&, UIElement@+)", asFUNCTION(UISaveLayoutVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("UI", "void SetFocusElement(UIElement@+, bool byKey = false)", asMETHOD(UI, SetFocusElement), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void SetWidth(float value)", asMETHOD(UI, SetWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void SetHeight(float value)", asMETHOD(UI, SetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetWidth(float)", asMETHOD(UI, SetWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetHeight(float)", asMETHOD(UI, SetHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void SetCustomSize(int, int)", asMETHODPR(UI, SetCustomSize, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(const IntVector2&in, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (const IntVector2&, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "UIElement@+ GetElementAt(int, int, bool activeOnly = true)", asMETHODPR(UI, GetElementAt, (int, int, bool), UIElement*), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool HasModalElement() const", asMETHOD(UI, HasModalElement), asCALL_THISCALL);
@@ -750,6 +753,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_scale(float value)", asMETHOD(UI, SetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHOD(UI, GetScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "const IntVector2& get_customSize() const", asMETHOD(UI, GetCustomSize), asCALL_THISCALL);
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 

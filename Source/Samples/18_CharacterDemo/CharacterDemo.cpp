@@ -187,15 +187,19 @@ void CharacterDemo::CreateCharacter()
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
 
+    // spin node
+    Node* adjustNode = objectNode->CreateChild("AdjNode");
+    adjustNode->SetRotation( Quaternion(180, Vector3(0,1,0) ) );
+    
     // Create the rendering component + animation controller
-    AnimatedModel* object = objectNode->CreateComponent<AnimatedModel>();
-    object->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
-    object->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
+    AnimatedModel* object = adjustNode->CreateComponent<AnimatedModel>();
+    object->SetModel(cache->GetResource<Model>("Models/Mutant/Mutant.mdl"));
+    object->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/mutant_M.xml"));
     object->SetCastShadows(true);
-    objectNode->CreateComponent<AnimationController>();
+    adjustNode->CreateComponent<AnimationController>();
 
     // Set the head bone for manual control
-    object->GetSkeleton().GetBone("Bip01_Head")->animated_ = false;
+    object->GetSkeleton().GetBone("Mutant:Head")->animated_ = false;
 
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody* body = objectNode->CreateComponent<RigidBody>();
@@ -349,14 +353,12 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
 
     // Turn head to camera pitch, but limit to avoid unnatural animation
-    Node* headNode = characterNode->GetChild("Bip01_Head", true);
+    Node* headNode = characterNode->GetChild("Mutant:Head", true);
     float limitPitch = Clamp(character_->controls_.pitch_, -45.0f, 45.0f);
     Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
     // This could be expanded to look at an arbitrary target, now just look at a point in front
-    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, -1.0f);
     headNode->LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
-    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
-    headNode->Rotate(Quaternion(0.0f, 90.0f, 90.0f));
 
     if (firstPerson_)
     {

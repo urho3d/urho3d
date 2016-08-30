@@ -49,7 +49,7 @@
 extern "C" int SDL_AddTouch(SDL_TouchID touchID, const char* name);
 
 // Use a "click inside window to focus" mechanism on desktop platforms when the mouse cursor is hidden
-// TODO: For now, in this particular case only, treat all the Linux on ARM as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" Linux on ARM
+// TODO: For now, in this particular case only, treat all the ARM on Linux as "desktop" (e.g. RPI, odroid, etc), revisit this again when we support "mobile" ARM on Linux
 #if defined(_WIN32) || (defined(__APPLE__) && !defined(IOS)) || (defined(__linux__) && !defined(__ANDROID__))
 #define REQUIRE_CLICK_TO_FOCUS
 #endif
@@ -1837,6 +1837,19 @@ void Input::HandleSDLEvent(void* sdlEvent)
             return;
     }
 
+    // Possibility for custom handling or suppression of default handling for the SDL event
+    {
+        using namespace SDLRawInput;
+    
+        VariantMap eventData = GetEventDataMap();
+        eventData[P_SDLEVENT] = &evt;
+        eventData[P_CONSUMED] = false;
+        SendEvent(E_SDLRAWINPUT, eventData);
+
+        if (eventData[P_CONSUMED].GetBool())
+            return;
+    }
+
     switch (evt.type)
     {
         case SDL_KEYDOWN:
@@ -2364,7 +2377,9 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
 {
     // Update input right at the beginning of the frame
+    SendEvent(E_INPUTBEGIN);
     Update();
+    SendEvent(E_INPUTEND);
 }
 
 #ifdef __EMSCRIPTEN__

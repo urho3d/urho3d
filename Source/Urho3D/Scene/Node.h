@@ -289,6 +289,8 @@ public:
     void RemoveComponents(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
+    /// Adjust index order of an existing component in this node.
+    void ReorderComponent(Component* component, unsigned index);
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
@@ -572,7 +574,7 @@ public:
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
-    /// Add a pre-created component.
+    /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
     /// Calculate number of non-temporary child nodes.
     unsigned GetNumPersistentChildren() const;

@@ -1995,9 +1995,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -2230,9 +2232,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -2267,9 +2271,11 @@ Methods:
 - String ReadLine()
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -2522,6 +2528,7 @@ Methods:
 - bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
+- void SetDither(bool enable)
 - void SetFlushGPU(bool enable)
 - void SetOrientations(const String orientations)
 - bool ToggleFullscreen()
@@ -2547,6 +2554,7 @@ Methods:
 - bool GetVSync() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
+- bool GetDither() const
 - bool GetFlushGPU() const
 - const String GetOrientations() const
 - bool IsDeviceLost() const
@@ -2597,6 +2605,7 @@ Properties:
 - bool vSync (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
+- bool dither
 - bool flushGPU
 - String orientations
 - bool deviceLost (readonly)
@@ -3005,6 +3014,8 @@ Methods:
 - void SetLightType(LightType type)
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
+- void SetTemperature(float temperature)
+- void SetUsePhysicalValues(bool enable)
 - void SetSpecularIntensity(float intensity)
 - void SetBrightness(float brightness)
 - void SetRange(float range)
@@ -3023,9 +3034,12 @@ Methods:
 - LightType GetLightType() const
 - bool GetPerVertex() const
 - const Color& GetColor() const
+- float GetTemperature() const
 - float GetSpecularIntensity() const
 - float GetBrightness() const
 - Color GetEffectiveColor() const
+- Color GetColorFromTemperature() const
+- bool GetUsePhysicalValues() const
 - float GetEffectiveSpecularIntensity() const
 - float GetRange() const
 - float GetFov() const
@@ -3049,6 +3063,8 @@ Properties:
 - LightType lightType
 - bool perVertex
 - Color& color
+- float temperature
+- bool usePhysicalValues
 - float specularIntensity
 - float brightness
 - float range
@@ -3913,6 +3929,7 @@ Methods:
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - void RemoveComponents(const String type)
 - void RemoveAllComponents()
+- void ReorderComponent(Component* component, unsigned index)
 - Node* Clone(CreateMode mode = REPLICATED)
 - void Remove()
 - void SetParent(Node* parent)
@@ -3985,6 +4002,7 @@ Methods:
 - bool HasTag(const String tag) const
 - const StringVector& GetTags() const
 - const PODVector<Node*>& GetChildrenWithTag(const String tag, bool recursive = false) const
+- void SetID(unsigned id)
 
 Properties:
 
@@ -4311,6 +4329,7 @@ Methods:
 - void SetNumParticles(unsigned num)
 - void SetEmitting(bool enable)
 - void SetSerializeParticles(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - void ResetEmissionTimer()
 - void RemoveAllParticles()
 - void Reset()
@@ -4319,6 +4338,7 @@ Methods:
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
 - bool GetSerializeParticles() const
+- AutoRemoveMode GetAutoRemoveMode() const
 
 Properties:
 
@@ -4326,6 +4346,7 @@ Properties:
 - unsigned numParticles
 - bool emitting
 - bool serializeParticles
+- AutoRemoveMode autoRemoveMode
 
 <a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
@@ -5540,9 +5561,11 @@ Methods:
 
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -5682,7 +5705,7 @@ Methods:
 - void SetGain(float gain)
 - void SetAttenuation(float attenuation)
 - void SetPanning(float panning)
-- void SetAutoRemove(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - Sound* GetSound() const
 - String GetSoundType() const
 - float GetTimePosition() const
@@ -5690,7 +5713,7 @@ Methods:
 - float GetGain() const
 - float GetAttenuation() const
 - float GetPanning() const
-- bool GetAutoRemove() const
+- AutoRemoveMode GetAutoRemoveMode() const
 - bool IsPlaying() const
 
 Properties:
@@ -5702,7 +5725,7 @@ Properties:
 - float gain
 - float attenuation
 - float panning
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - bool playing (readonly)
 
 <a name="Class_SoundSource3D"></a>
@@ -6169,6 +6192,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6211,7 +6235,7 @@ Methods:
 Properties:
 
 - Font* font
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6240,6 +6264,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6291,7 +6316,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
@@ -6626,8 +6651,10 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetScale(float scale)
-- void SetWidth(float size)
-- void SetHeight(float size)
+- void SetWidth(float width)
+- void SetHeight(float height)
+- void SetCustomSize(const IntVector2& size)
+- void SetCustomSize(int width, int height)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6651,6 +6678,7 @@ Methods:
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
+- const IntVector2& GetCustomSize() const
 
 Properties:
 
@@ -6673,6 +6701,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 - float scale
+- IntVector2& customSize
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable
@@ -7154,9 +7183,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -7191,9 +7222,11 @@ Methods:
 - String ReadLine()
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -7554,6 +7587,12 @@ Properties:
 - int ABM_LERP
 - int ABM_ADDITIVE
 
+### AutoRemoveMode
+
+- int REMOVE_DISABLED
+- int REMOVE_COMPONENT
+- int REMOVE_NODE
+
 ### BlendMode
 
 - int BLEND_REPLACE
@@ -7700,7 +7739,6 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
-- int FC_DIRECTION
 
 ### FaceCameraMode
 
@@ -7709,6 +7747,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_DIRECTION
 
 ### FileMode
 
@@ -8225,7 +8264,7 @@ Properties:
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
-- int ToInt(const String source)
+- int ToInt(const String source, int base = 10)
 - IntRect ToIntRect(const String source)
 - IntVector2 ToIntVector2(const String source)
 - unsigned ToLower(unsigned ch)
@@ -8236,7 +8275,7 @@ Properties:
 - Rect ToRect(const String source)
 - String ToString(void* value)
 - String ToStringHex(unsigned value)
-- unsigned ToUInt(const String source)
+- unsigned ToUInt(const String source, int base = 10)
 - unsigned ToUpper(unsigned ch)
 - Vector2 ToVector2(const String source)
 - Vector3 ToVector3(const String source)
@@ -8302,7 +8341,6 @@ Properties:
 - unsigned DD_SOURCE_AND_TARGET
 - unsigned DD_TARGET
 - unsigned DEBUGHUD_SHOW_ALL
-- unsigned DEBUGHUD_SHOW_ALL_MEMORY
 - unsigned DEBUGHUD_SHOW_EVENTPROFILER
 - unsigned DEBUGHUD_SHOW_MEMORY
 - unsigned DEBUGHUD_SHOW_MODE

@@ -1177,8 +1177,8 @@ void Material::ResetToDefaults()
     SetShaderParameter("MatEmissiveColor", Vector3::ZERO);
     SetShaderParameter("MatEnvMapColor", Vector3::ONE);
     SetShaderParameter("MatSpecColor", Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-    SetShaderParameter("RoughnessPS", 0.5f);
-    SetShaderParameter("MetallicPS", 0.0f);
+    SetShaderParameter("Roughness", 0.5f);
+    SetShaderParameter("Metallic", 0.0f);
     batchedParameterUpdate_ = false;
 
     cullMode_ = CULL_CCW;

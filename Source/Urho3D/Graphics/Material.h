@@ -155,7 +155,7 @@ public:
     void SetShadowCullMode(CullMode mode);
     /// Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
     void SetFillMode(FillMode mode);
-    /// Set depth bias.
+    /// Set depth bias parameters for depth write and compare. Note that the normal offset parameter is not used and will not be saved, as it affects only shadow map sampling during light rendering.
     void SetDepthBias(const BiasParameters& parameters);
     /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
     void SetRenderOrder(unsigned char order);

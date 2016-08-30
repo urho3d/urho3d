@@ -87,7 +87,7 @@ DebugHud::DebugHud(Context* context) :
     uiRoot->AddChild(profilerText_);
 
     memoryText_ = new Text(context_);
-    memoryText_->SetAlignment(HA_RIGHT, VA_TOP);
+    memoryText_->SetAlignment(HA_LEFT, VA_BOTTOM);
     memoryText_->SetPriority(100);
     memoryText_->SetVisible(false);
     uiRoot->AddChild(memoryText_);
@@ -186,20 +186,14 @@ void DebugHud::Update()
             profilerTimer_.Reset();
 
             if (profilerText_->IsVisible())
-            {
-                String profilerOutput = profiler->PrintData(false, false, profilerMaxDepth_);
-                profilerText_->SetText(profilerOutput);
-            }
+                profilerText_->SetText(profiler->PrintData(false, false, profilerMaxDepth_));
 
             profiler->BeginInterval();
 
             if (eventProfiler)
             {
                 if (eventProfilerText_->IsVisible())
-                {
-                    String profilerOutput = eventProfiler->PrintData(false, false, profilerMaxDepth_);
-                    eventProfilerText_->SetText(profilerOutput);
-                }
+                    eventProfilerText_->SetText(eventProfiler->PrintData(false, false, profilerMaxDepth_));
 
                 eventProfiler->BeginInterval();
             }
@@ -207,10 +201,7 @@ void DebugHud::Update()
     }
 
     if (memoryText_->IsVisible())
-    {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
-        memoryText_->SetText(cache->PrintMemoryUsage());
-    }
+        memoryText_->SetText(GetSubsystem<ResourceCache>()->PrintMemoryUsage());
 }
 
 void DebugHud::SetDefaultStyle(XMLFile* style)
@@ -237,12 +228,16 @@ void DebugHud::SetMode(unsigned mode)
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
     memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
     eventProfilerText_->SetVisible((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
+
+    memoryText_->SetPosition(0, modeText_->IsVisible() ? modeText_->GetHeight() * -2 : 0);
+
 #ifdef URHO3D_PROFILING
     // Event profiler is created on engine initialization if "EventProfiler" parameter is set
     EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
     if (eventProfiler)
         EventProfiler::SetActive((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
 #endif
+
     mode_ = mode;
 }
 

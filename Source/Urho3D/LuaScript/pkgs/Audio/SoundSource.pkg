@@ -12,7 +12,7 @@ class SoundSource : public Component
     void SetGain(float gain);
     void SetAttenuation(float attenuation);
     void SetPanning(float panning);
-    void SetAutoRemove(bool enable);
+    void SetAutoRemoveMode(AutoRemoveMode mode);
 
     Sound* GetSound() const;
     String GetSoundType() const;
@@ -21,7 +21,7 @@ class SoundSource : public Component
     float GetGain() const;
     float GetAttenuation() const;
     float GetPanning() const;
-    bool GetAutoRemove() const;
+    AutoRemoveMode GetAutoRemoveMode() const;
     bool IsPlaying() const;
     
     tolua_readonly tolua_property__get_set Sound* sound;
@@ -31,6 +31,6 @@ class SoundSource : public Component
     tolua_property__get_set float gain;
     tolua_property__get_set float attenuation;
     tolua_property__get_set float panning;
-    tolua_property__get_set bool autoRemove;
+    tolua_property__get_set AutoRemoveMode autoRemoveMode;
     tolua_readonly tolua_property__is_set bool playing;
 };

@@ -4169,6 +4169,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -4184,6 +4185,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -4804,6 +4806,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -4819,6 +4822,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -4838,6 +4842,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -4853,6 +4858,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -5122,6 +5128,7 @@ bool deferredSupport;
 IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
+bool dither;
 bool flushGPU;
 /* readonly */
 bool fullscreen;
@@ -5187,6 +5194,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -5202,6 +5210,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -5625,6 +5634,8 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+/* readonly */
+Color colorFromTemperature;
 float drawDistance;
 /* readonly */
 Color effectiveColor;
@@ -5672,11 +5683,13 @@ float shadowNearFarRatio;
 float shadowResolution;
 Texture shapeTexture;
 float specularIntensity;
+float temperature;
 bool temporary;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
+bool usePhysicalValues;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -6687,6 +6700,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -6702,6 +6716,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -6721,6 +6736,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -6736,6 +6752,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -7193,6 +7210,7 @@ void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
 bool RemoveTag(const String&);
+void ReorderComponent(Component, uint);
 void ResetDeepEnabled();
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
@@ -7260,7 +7278,6 @@ Vector3 direction;
 bool enabled;
 /* readonly */
 bool enabledSelf;
-/* readonly */
 uint id;
 String name;
 /* readonly */
@@ -7797,6 +7814,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -9007,6 +9025,7 @@ void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
 bool RemoveTag(const String&);
+void ReorderComponent(Component, uint);
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
 void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
@@ -9087,7 +9106,6 @@ Vector3 direction;
 float elapsedTime;
 /* readonly */
 String fileName;
-/* readonly */
 uint id;
 String name;
 /* readonly */
@@ -9770,6 +9788,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -9785,6 +9804,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -10347,7 +10367,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -10434,7 +10454,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -11194,7 +11214,7 @@ bool ToBool() const;
 Color ToColor() const;
 double ToDouble() const;
 float ToFloat() const;
-int ToInt() const;
+int ToInt(int = 10) const;
 IntRect ToIntRect() const;
 IntVector2 ToIntVector2() const;
 String ToLower() const;
@@ -11202,7 +11222,7 @@ Matrix3 ToMatrix3() const;
 Matrix3x4 ToMatrix3x4() const;
 Matrix4 ToMatrix4() const;
 Quaternion ToQuaternion() const;
-uint ToUInt() const;
+uint ToUInt(int = 10) const;
 String ToUpper() const;
 Vector2 ToVector2() const;
 Vector3 ToVector3() const;
@@ -11610,7 +11630,6 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -11765,7 +11784,6 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 HorizontalAlignment horizontalAlignment;
 /* readonly */
@@ -12643,6 +12661,7 @@ UIElement LoadLayout(XMLFile, XMLFile);
 bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetCustomSize(int, int);
 void SetFocusElement(UIElement, bool = false);
 void SetHeight(float);
 void SetWidth(float);
@@ -12655,6 +12674,7 @@ String clipBoardText;
 Cursor cursor;
 /* readonly */
 IntVector2 cursorPosition;
+IntVector2 customSize;
 float defaultToolTipDelay;
 float doubleClickInterval;
 int dragBeginDistance;
@@ -13057,6 +13077,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -13072,6 +13093,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -13092,6 +13114,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -13107,6 +13130,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -13927,6 +13951,13 @@ ABM_LERP,
 ABM_ADDITIVE,
 };
 
+enum AutoRemoveMode
+{
+REMOVE_DISABLED,
+REMOVE_COMPONENT,
+REMOVE_NODE,
+};
+
 enum BlendMode
 {
 BLEND_REPLACE,
@@ -14675,7 +14706,6 @@ uint DD_SOURCE;
 uint DD_SOURCE_AND_TARGET;
 uint DD_TARGET;
 uint DEBUGHUD_SHOW_ALL;
-uint DEBUGHUD_SHOW_ALL_MEMORY;
 uint DEBUGHUD_SHOW_EVENTPROFILER;
 uint DEBUGHUD_SHOW_MEMORY;
 uint DEBUGHUD_SHOW_MODE;
