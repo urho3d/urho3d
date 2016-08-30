@@ -293,7 +293,7 @@ public:
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
-        (classPtr->*setFunction_)(value.Get < U > ());
+        (classPtr->*setFunction_)(value.Get<U>());
     }
 
     /// Class-specific pointer to getter function.
@@ -331,7 +331,7 @@ public:
     {
         assert(ptr);
         T* classPtr = static_cast<T*>(ptr);
-        (*setFunction_)(classPtr, value.Get < U >());
+        (*setFunction_)(classPtr, value.Get<U>());
     }
 
     /// Class-specific pointer to getter function.
