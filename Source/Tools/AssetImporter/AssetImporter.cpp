@@ -2732,7 +2732,7 @@ void InitAnimatedChainTransformIndices(aiAnimation* anim, unsigned mainChannel, 
 
     // resize animated channel key size
     if (numTransforms > 1)
-        ExpandAnimatedChannelKeys(anim, mainChannel, &channelIndices[0]);
+        ExpandAnimatedChannelKeys(anim, mainChannel, channelIndices);
 }
 
 void CreatePivotlessFbxBoneStruct(OutModel &model)
