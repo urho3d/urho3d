@@ -1324,6 +1324,13 @@ void BuildAndSaveAnimations(OutModel* model)
                         continue;
 
                     boneIndex = GetPivotlessBoneIndex(*model, channelName);
+                    if (boneIndex == M_MAX_UNSIGNED)
+                    {
+                        PrintLine("Warning: skipping animation track " + channelName + " not found in model skeleton");
+                        outAnim->RemoveTrack(channelName);
+                        continue;
+                    }
+
                     boneNode = model->pivotlessBones_[boneIndex];
                 }
                 isRootBone = boneIndex == 0;
