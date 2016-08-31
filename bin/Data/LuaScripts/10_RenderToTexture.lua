@@ -132,6 +132,9 @@ function CreateScene()
     local renderMaterial = Material:new()
     renderMaterial:SetTechnique(0, cache:GetResource("Technique", "Techniques/DiffUnlit.xml"))
     renderMaterial:SetTexture(TU_DIFFUSE, renderTexture)
+    -- Since the screen material is on top of the box model and may Z-fight, use negative depth bias
+    -- to push it forward (particularly necessary on mobiles with possibly less Z resolution)
+    renderMaterial.depthBias = BiasParameters(-0.001, 0.0)
     screenObject.material = renderMaterial
 
     -- Get the texture's RenderSurface object (exists when the texture has been created in rendertarget mode)

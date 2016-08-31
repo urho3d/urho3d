@@ -1707,9 +1707,8 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         if (slopeScaledBias != 0.0f)
         {
             // OpenGL constant bias is unreliable and dependant on depth buffer bitdepth, apply in the projection matrix instead
-            float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(adjustedSlopeScaledBias, 0.0f);
+            glPolygonOffset(slopeScaledBias, 0.0f);
         }
         else
             glDisable(GL_POLYGON_OFFSET_FILL);

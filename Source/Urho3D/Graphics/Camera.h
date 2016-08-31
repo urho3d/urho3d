@@ -274,6 +274,8 @@ private:
     bool useReflection_;
     /// Use custom clip plane flag.
     bool useClipping_;
+    /// Use custom projection matrix flag. Used internally.
+    mutable bool customProjection_;
 };
 
 }
