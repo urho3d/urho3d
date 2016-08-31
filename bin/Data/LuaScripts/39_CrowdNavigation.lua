@@ -438,7 +438,7 @@ function HandleCrowdAgentReposition(eventType, eventData)
             animCtrl:Play(WALKING_ANI, 0, true, 0.1)
         end
 
-        -- If speed is too low then stopping the animation
+        -- If speed is too low then stop the animation
         if speed < agent.radius then
             animCtrl:Stop(WALKING_ANI, 0.8)
         end
