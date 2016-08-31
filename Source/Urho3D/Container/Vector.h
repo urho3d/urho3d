@@ -36,6 +36,8 @@
 #pragma warning(disable:6293)
 #endif
 
+#define URHO3D_VECTOR_ISINSIDE(val) (&val >= Buffer() && &val < Buffer() + size_)
+
 namespace Urho3D
 {
 
@@ -188,7 +190,17 @@ public:
 
     /// Add an element at the end.
 #ifndef COVERITY_SCAN_MODEL
-    void Push(const T& value) { Resize(size_ + 1, &value); }
+    void Push(const T& value)
+    {
+        if (!URHO3D_VECTOR_ISINSIDE(value))
+            Resize(size_ + 1, &value);
+        else
+        {
+            // Value is inside vector; make copy to avoid iterator invalidation
+            T valueCopy(value);
+            Resize(size_ + 1, &valueCopy);
+        }
+    }
 #else
     // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
     // Probably because the model had generated a different mangled name than the one used by static analyzer
@@ -216,9 +228,20 @@ public:
             pos = size_;
 
         unsigned oldSize = size_;
-        Resize(size_ + 1, 0);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
+
+        if (!URHO3D_VECTOR_ISINSIDE(value))
+        {
+            Resize(size_ + 1, 0);
+            MoveRange(pos + 1, pos, oldSize - pos);
+            Buffer()[pos] = value;
+        }
+        else
+        {
+            T valueCopy(value);
+            Resize(size_ + 1, 0);
+            MoveRange(pos + 1, pos, oldSize - pos);
+            Buffer()[pos] = valueCopy;
+        }
     }
 
     /// Insert another vector at position.
@@ -715,11 +738,24 @@ public:
     /// Add an element at the end.
     void Push(const T& value)
     {
-        if (size_ < capacity_)
-            ++size_;
+        if (!URHO3D_VECTOR_ISINSIDE(value))
+        {
+            if (size_ < capacity_)
+                ++size_;
+            else
+                Resize(size_ + 1);
+            Back() = value;
+        }
         else
-            Resize(size_ + 1);
-        Back() = value;
+        {
+            // Value is inside vector; make copy to avoid iterator invalidation
+            T valueCopy(value);
+            if (size_ < capacity_)
+                ++size_;
+            else
+                Resize(size_ + 1);
+            Back() = valueCopy;
+        }
     }
 
     /// Add another vector at the end.
@@ -744,9 +780,20 @@ public:
             pos = size_;
 
         unsigned oldSize = size_;
-        Resize(size_ + 1);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
+
+        if (!URHO3D_VECTOR_ISINSIDE(value))
+        {
+            Resize(size_ + 1);
+            MoveRange(pos + 1, pos, oldSize - pos);
+            Buffer()[pos] = value;
+        }
+        else
+        {
+            T valueCopy(value);
+            Resize(size_ + 1);
+            MoveRange(pos + 1, pos, oldSize - pos);
+            Buffer()[pos] = valueCopy;
+        }
     }
 
     /// Insert another vector at position.
