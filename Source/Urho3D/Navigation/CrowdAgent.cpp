@@ -519,6 +519,13 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
         {
             previousPosition_ = newPos;
 
+            if (updateNodePosition_)
+            {
+                ignoreTransformChanges_ = true;
+                node_->SetPosition(newPos);
+                ignoreTransformChanges_ = false;
+            }
+
             using namespace CrowdAgentReposition;
 
             VariantMap& map = GetEventDataMap();
@@ -530,13 +537,6 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_TIMESTEP] = dt;
             crowdManager_->SendEvent(E_CROWD_AGENT_REPOSITION, map);
             node_->SendEvent(E_CROWD_AGENT_NODE_REPOSITION, map);
-
-            if (updateNodePosition_)
-            {
-                ignoreTransformChanges_ = true;
-                node_->SetPosition(newPos);
-                ignoreTransformChanges_ = false;
-            }
         }
 
         // Send a notification event if we've reached the destination
@@ -603,11 +603,18 @@ void CrowdAgent::OnMarkedDirty(Node* node)
         dtCrowdAgent* agent = const_cast<dtCrowdAgent*>(GetDetourCrowdAgent());
         if (agent)
         {
-            memcpy(agent->npos, node->GetWorldPosition().Data(), sizeof(float) * 3);
+            Vector3& agentPos = reinterpret_cast<Vector3&>(agent->npos);
+            Vector3 nodeWorldPos = node->GetWorldPosition();
+            
+            // Only reset position / state if actually changed
+            if (nodeWorldPos != agentPos)
+            {
+                agentPos = nodeWorldPos;
 
-            // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
-            if (agent->state == CA_STATE_INVALID)
-                agent->state = CA_STATE_WALKING;
+                // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
+                if (agent->state == CA_STATE_INVALID)
+                    agent->state = CA_STATE_WALKING;
+            }
         }
     }
 }
