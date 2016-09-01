@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/StringUtils.h"
 #include "../IO/Log.h"
 #include "../Resource/JSONValue.h"
 
@@ -30,6 +31,26 @@
 
 namespace Urho3D
 {
+
+static const char* valueTypeNames[] =
+{
+    "Null",
+    "Bool",
+    "Number",
+    "String",
+    "Array",
+    "Object",
+    0
+};
+
+static const char* numberTypeNames[] =
+{
+    "NaN",
+    "Int",
+    "Unsigned",
+    "Real",
+    0
+};
 
 const JSONValue JSONValue::EMPTY;
 const JSONArray JSONValue::emptyArray;
@@ -150,6 +171,16 @@ JSONValueType JSONValue::GetValueType() const
 JSONNumberType JSONValue::GetNumberType() const
 {
     return (JSONNumberType)(type_ & 0xffff);
+}
+
+String JSONValue::GetValueTypeName() const
+{
+    return GetValueTypeName(GetValueType());
+}
+
+String JSONValue::GetNumberTypeName() const
+{
+    return GetNumberTypeName(GetNumberType());
 }
 
 JSONValue& JSONValue::operator [](unsigned index)
@@ -584,6 +615,36 @@ VariantVector JSONValue::GetVariantVector() const
     }
 
     return variantVector;
+}
+
+String JSONValue::GetValueTypeName(JSONValueType type)
+{
+    return valueTypeNames[type];
+}
+
+String JSONValue::GetNumberTypeName(JSONNumberType type)
+{
+    return numberTypeNames[type];
+}
+
+JSONValueType JSONValue::GetValueTypeFromName(const String& typeName)
+{
+    return GetValueTypeFromName(typeName.CString());
+}
+
+JSONValueType JSONValue::GetValueTypeFromName(const char* typeName)
+{
+    return (JSONValueType)GetStringListIndex(typeName, valueTypeNames, JSON_NULL);
+}
+
+JSONNumberType JSONValue::GetNumberTypeFromName(const String& typeName)
+{
+    return GetNumberTypeFromName(typeName.CString());
+}
+
+JSONNumberType JSONValue::GetNumberTypeFromName(const char* typeName)
+{
+    return (JSONNumberType)GetStringListIndex(typeName, numberTypeNames, JSONNT_NAN);
 }
 
 }
