@@ -5555,9 +5555,15 @@ bool isObject;
 /* readonly */
 bool isString;
 /* readonly */
+JSONNumberType numberType;
+/* readonly */
+String numberTypeName;
+/* readonly */
 uint size;
 /* readonly */
 JSONValueType valueType;
+/* readonly */
+String valueTypeName;
 };
 
 class JoystickState
@@ -14197,6 +14203,14 @@ enum Intersection
 OUTSIDE,
 INTERSECTS,
 INSIDE,
+};
+
+enum JSONNumberType
+{
+JSONNT_NAN,
+JSONNT_INT,
+JSONNT_UINT,
+JSONNT_FLOAT_DOUBLE,
 };
 
 enum JSONValueType

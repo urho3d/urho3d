@@ -2951,6 +2951,9 @@ Methods:
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
 - JSONValueType GetValueType() const
+- JSONNumberType GetNumberType() const
+- String GetValueTypeName() const
+- String GetNumberTypeName() const
 - bool IsNull() const
 - bool IsBool() const
 - bool IsNumber() const
@@ -2986,6 +2989,10 @@ Properties:
 - const JSONArray emptyArray
 - const JSONObject emptyObject
 - bool null (readonly)
+- JSONValueType valueType (readonly)
+- JSONNumberType numberType (readonly)
+- String valueTypeName (readonly)
+- String numberTypeName (readonly)
 
 <a name="Class_JoystickState"></a>
 ### JoystickState
@@ -7842,6 +7849,13 @@ Properties:
 - int OUTSIDE
 - int INTERSECTS
 - int INSIDE
+
+### JSONNumberType
+
+- int JSONNT_NAN
+- int JSONNT_INT
+- int JSONNT_UINT
+- int JSONNT_FLOAT_DOUBLE
 
 ### JSONValueType
 
