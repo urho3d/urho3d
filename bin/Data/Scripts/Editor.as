@@ -74,8 +74,8 @@ void FirstFrame()
     ParseArguments();
     // Switch to real frame handler after initialization
     SubscribeToEvent("Update", "HandleUpdate");
-    SubscribeToEvent("ReloadFinished", "HandleReloadFinished");
-    SubscribeToEvent("ReloadFailed", "HandleReloadFailed");
+    SubscribeToEvent("ReloadFinished", "HandleReloadFinishOrFail");
+    SubscribeToEvent("ReloadFailed", "HandleReloadFinishOrFail");
     EditorSubscribeToEvents();
 }
 
@@ -148,14 +148,12 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void HandleReloadFinished(StringHash eventType, VariantMap& eventData)
+void HandleReloadFinishOrFail(StringHash eventType, VariantMap& eventData)
 {
-    attributesFullDirty = true;
-}
-
-void HandleReloadFailed(StringHash eventType, VariantMap& eventData)
-{
-    attributesFullDirty = true;
+    Resource@ res = cast<Resource>(GetEventSender());
+    // Only refresh inspector when reloading scripts (script attributes may change)
+    if (res !is null && (res.typeName == "ScriptFile" || res.typeName == "LuaFile"))
+        attributesFullDirty = true;
 }
 
 void LoadConfig()
