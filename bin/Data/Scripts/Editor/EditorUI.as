@@ -1328,6 +1328,8 @@ void HandleHotKeysBlender( VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+    else if (key == KEY_F5)
+        ToggleNavigationDebug();
     else if (key == KEY_F11)
     {
         Image@ screenshot = Image();
@@ -1519,6 +1521,8 @@ void HandleHotKeysStandard(VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+    else if (key == KEY_F5)
+        ToggleNavigationDebug();
     else if (key == KEY_F11)
     {
         Image@ screenshot = Image();
