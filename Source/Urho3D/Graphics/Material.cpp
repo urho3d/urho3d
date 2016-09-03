@@ -872,7 +872,14 @@ void Material::SetShaderParameter(const String& name, const Variant& value)
 {
     MaterialShaderParameter newParam;
     newParam.name_ = name;
-    newParam.value_ = value;
+    if (value.GetType() != VAR_DOUBLE)
+        newParam.value_ = value;
+    else
+    {
+        // Lua scripts may end up creating Double variants, which are unsuitable for shader data. Convert if necessary.
+        newParam.value_ = value.GetFloat();
+    }
+
     StringHash nameHash(name);
     shaderParameters_[nameHash] = newParam;
 
