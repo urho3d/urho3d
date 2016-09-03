@@ -97,8 +97,12 @@ public:
     /// Assign from another vector.
     Vector<T>& operator =(const Vector<T>& rhs)
     {
-        Clear();
-        InsertElements(0, rhs.Begin(), rhs.End());
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Clear();
+            InsertElements(0, rhs.Begin(), rhs.End());
+        }
         return *this;
     }
 
@@ -614,8 +618,12 @@ public:
     /// Assign from another vector.
     PODVector<T>& operator =(const PODVector<T>& rhs)
     {
-        Clear();
-        InsertElements(0, rhs.Begin(), rhs.End());
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Clear();
+            InsertElements(0, rhs.Begin(), rhs.End());
+        }
         return *this;
     }
 
