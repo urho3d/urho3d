@@ -996,6 +996,8 @@ private:
     template <typename RandomIteratorT>
     Iterator InsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end)
     {
+        assert(start <= end);
+
         if (pos > size_)
             pos = size_;
         unsigned length = (unsigned)(end - start);
