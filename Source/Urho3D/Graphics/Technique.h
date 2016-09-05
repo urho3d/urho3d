@@ -57,8 +57,6 @@ public:
     void SetLightingMode(PassLightingMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
-    /// Set alpha masking hint. Completely opaque draw calls will be performed before alpha masked.
-    void SetAlphaMask(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Set vertex shader name.
@@ -98,9 +96,6 @@ public:
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
 
-    /// Return alpha masking hint.
-    bool GetAlphaMask() const { return alphaMask_; }
-
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
 
@@ -137,8 +132,6 @@ private:
     unsigned shadersLoadedFrameNumber_;
     /// Depth write mode.
     bool depthWrite_;
-    /// Alpha masking hint.
-    bool alphaMask_;
     /// Require desktop level hardware flag.
     bool isDesktop_;
     /// Vertex shader name.
@@ -221,6 +214,9 @@ public:
     /// Return all passes.
     PODVector<Pass*> GetPasses() const;
 
+    /// Return a clone with added shader compilation defines. Called internally by Material.
+    SharedPtr<Technique> CloneWithDefines(const String& vsDefines, const String& psDefines);
+
     /// Return a pass type index by name. Allocate new if not used yet.
     static unsigned GetPassIndex(const String& passName);
 
@@ -248,6 +244,8 @@ private:
     bool desktopSupport_;
     /// Passes.
     Vector<SharedPtr<Pass> > passes_;
+    /// Cached clones with added shader compilation defines.
+    HashMap<Pair<StringHash, StringHash>, SharedPtr<Technique> > cloneTechniques_;
 
     /// Pass index assignments.
     static HashMap<String, unsigned> passIndices;

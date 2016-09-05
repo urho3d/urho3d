@@ -1162,6 +1162,7 @@ A material definition looks like this:
     <technique name="TechniqueName" quality="q" loddistance="d" />
     <texture unit="diffuse|normal|specular|emissive|environment" name="TextureName" />
     <texture ... />
+    <shader vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" />
     <parameter name="name" value="x y z w" />
     <parameter ... />
     <cull value="cw|ccw|none" />
@@ -1169,10 +1170,11 @@ A material definition looks like this:
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
     <renderorder value="x" />
+    <occlusion enable="true|false" />
 </material>
 \endcode
 
-Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". It is also possible for a technique to require %Shader %Model 3, in this case it will be skipped on SM2 hardware.
+Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()".
 
 The techniques for different LOD levels and quality settings must appear in a specific order:
 
@@ -1187,6 +1189,11 @@ The techniques for different LOD levels and quality settings must appear in a sp
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
 Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. Read below for caveats regarding it.
+
+Occlusion flag allows to disable software occlusion rendering per material, for example if parts of a model are transparent. By default occlusion is enabled.
+
+Materials can optionally set shader compilation defines (vsdefines & psdefines). In this case they will be added to the techniques' own compilation defines, and the techniques are cloned as necessary
+to ensure uniqueness.
 
 \section Materials_Textures Material textures
 
@@ -1281,8 +1288,7 @@ A technique definition looks like this:
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
         [cull="cw|ccw|none"]
         depthtest="always|equal|less|lessequal|greater|greaterequal"
-        depthwrite="true|false"
-        alphamask="true|false" />
+        depthwrite="true|false" />
     <pass ... />
     <pass ... />
 </technique>
@@ -1317,8 +1323,6 @@ The purposes of the different passes are:
 More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader permutations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
-
-"Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
 
 The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 

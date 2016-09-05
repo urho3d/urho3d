@@ -173,6 +173,7 @@ TechniqueEntry::TechniqueEntry() :
 
 TechniqueEntry::TechniqueEntry(Technique* tech, unsigned qualityLevel, float lodDistance) :
     technique_(tech),
+    original_(tech),
     qualityLevel_(qualityLevel),
     lodDistance_(lodDistance)
 {
@@ -423,6 +424,13 @@ bool Material::Load(const XMLElement& source)
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
+    XMLElement shaderElem = source.GetChild("shader");
+    if (shaderElem)
+    {
+        vertexShaderDefines_ = shaderElem.GetAttribute("vsdefines");
+        pixelShaderDefines_ = shaderElem.GetAttribute("psdefines");
+    }
+
     XMLElement techniqueElem = source.GetChild("technique");
     techniques_.Clear();
 
@@ -432,7 +440,7 @@ bool Material::Load(const XMLElement& source)
         if (tech)
         {
             TechniqueEntry newTechnique;
-            newTechnique.technique_ = tech;
+            newTechnique.technique_ = newTechnique.original_ = tech;
             if (techniqueElem.HasAttribute("quality"))
                 newTechnique.qualityLevel_ = techniqueElem.GetInt("quality");
             if (techniqueElem.HasAttribute("loddistance"))
@@ -444,6 +452,7 @@ bool Material::Load(const XMLElement& source)
     }
 
     SortTechniques();
+    ApplyShaderDefines();
 
     XMLElement textureElem = source.GetChild("texture");
     while (textureElem)
@@ -537,9 +546,12 @@ bool Material::Load(const XMLElement& source)
     if (renderOrderElem)
         SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
 
+    XMLElement occlusionElem = source.GetChild("occlusion");
+    if (occlusionElem)
+        SetOcclusion(occlusionElem.GetBool("enable"));
+
     RefreshShaderParameterHash();
     RefreshMemoryUse();
-    CheckOcclusion();
     return true;
 }
 
@@ -555,6 +567,13 @@ bool Material::Load(const JSONValue& source)
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
+    const JSONValue& shaderVal = source.Get("shader");
+    if (!shaderVal.IsNull())
+    {
+        vertexShaderDefines_ = shaderVal.Get("vsdefines").GetString();
+        pixelShaderDefines_ = shaderVal.Get("psdefines").GetString();
+    }
+
     // Load techniques
     JSONArray techniquesArray = source.Get("techniques").GetArray();
     techniques_.Clear();
@@ -567,7 +586,7 @@ bool Material::Load(const JSONValue& source)
         if (tech)
         {
             TechniqueEntry newTechnique;
-            newTechnique.technique_ = tech;
+            newTechnique.technique_ = newTechnique.original_ = tech;
             JSONValue qualityVal = techVal.Get("quality");
             if (!qualityVal.IsNull())
                 newTechnique.qualityLevel_ = qualityVal.GetInt();
@@ -579,6 +598,7 @@ bool Material::Load(const JSONValue& source)
     }
 
     SortTechniques();
+    ApplyShaderDefines();
 
     // Load textures
     JSONObject textureObject = source.Get("textures").GetObject();
@@ -677,11 +697,14 @@ bool Material::Load(const JSONValue& source)
 
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
-        SetRenderOrder((unsigned char)renderOrderVal.Get("value").GetUInt());
+        SetRenderOrder((unsigned char)renderOrderVal.GetUInt());
+
+    JSONValue occlusionVal = source.Get("occlusion");
+    if (!occlusionVal.IsNull())
+        SetOcclusion(occlusionVal.GetBool());
 
     RefreshShaderParameterHash();
     RefreshMemoryUse();
-    CheckOcclusion();
     return true;
 }
 
@@ -716,6 +739,16 @@ bool Material::Save(XMLElement& dest) const
             textureElem.SetString("unit", textureUnitNames[j]);
             textureElem.SetString("name", texture->GetName());
         }
+    }
+
+    // Write shader compile defines
+    if (!vertexShaderDefines_.Empty() || !pixelShaderDefines_.Empty())
+    {
+        XMLElement shaderElem = dest.CreateChild("shader");
+        if (!vertexShaderDefines_.Empty())
+            shaderElem.SetString("vsdefines", vertexShaderDefines_);
+        if (!pixelShaderDefines_.Empty())
+            shaderElem.SetString("psdefines", pixelShaderDefines_);
     }
 
     // Write shader parameters
@@ -767,6 +800,10 @@ bool Material::Save(XMLElement& dest) const
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
     renderOrderElem.SetUInt("value", renderOrder_);
 
+    // Write occlusion
+    XMLElement occlusionElem = dest.CreateChild("occlusion");
+    occlusionElem.SetBool("enable", occlusion_);
+
     return true;
 }
 
@@ -798,6 +835,17 @@ bool Material::Save(JSONValue& dest) const
             texturesValue.Set(textureUnitNames[j], texture->GetName());
     }
     dest.Set("textures", texturesValue);
+
+    // Write shader compile defines
+    if (!vertexShaderDefines_.Empty() || !pixelShaderDefines_.Empty())
+    {
+        JSONValue shaderVal;
+        if (!vertexShaderDefines_.Empty())
+            shaderVal.Set("vsdefines", vertexShaderDefines_);
+        if (!pixelShaderDefines_.Empty())
+            shaderVal.Set("psdefines", pixelShaderDefines_);
+        dest.Set("shader", shaderVal);
+    }
 
     // Write shader parameters
     JSONValue shaderParamsVal;
@@ -843,9 +891,13 @@ bool Material::Save(JSONValue& dest) const
     JSONValue depthBiasValue;
     depthBiasValue.Set("constant", depthBias_.constantBias_);
     depthBiasValue.Set("slopescaled", depthBias_.slopeScaledBias_);
+    dest.Set("depthbias", depthBiasValue);
 
     // Write render order
     dest.Set("renderorder", (unsigned) renderOrder_);
+
+    // Write occlusion
+    dest.Set("occlusion", occlusion_);
 
     return true;
 }
@@ -865,7 +917,25 @@ void Material::SetTechnique(unsigned index, Technique* tech, unsigned qualityLev
         return;
 
     techniques_[index] = TechniqueEntry(tech, qualityLevel, lodDistance);
-    CheckOcclusion();
+    ApplyShaderDefines(index);
+}
+
+void Material::SetVertexShaderDefines(const String& defines)
+{
+    if (defines != vertexShaderDefines_)
+    {
+        vertexShaderDefines_ = defines;
+        ApplyShaderDefines();
+    }
+}
+
+void Material::SetPixelShaderDefines(const String& defines)
+{
+    if (defines != pixelShaderDefines_)
+    {
+        pixelShaderDefines_ = defines;
+        ApplyShaderDefines();
+    }
 }
 
 void Material::SetShaderParameter(const String& name, const Variant& value)
@@ -1021,6 +1091,11 @@ void Material::SetRenderOrder(unsigned char order)
     renderOrder_ = order;
 }
 
+void Material::SetOcclusion(bool enable)
+{
+    occlusion_ = enable;
+}
+
 void Material::SetScene(Scene* scene)
 {
     UnsubscribeFromEvent(E_UPDATE);
@@ -1058,6 +1133,8 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
 
     ret->SetName(cloneName);
     ret->techniques_ = techniques_;
+    ret->vertexShaderDefines_ = vertexShaderDefines_;
+    ret->pixelShaderDefines_ = pixelShaderDefines_;
     ret->shaderParameters_ = shaderParameters_;
     ret->shaderParameterHash_ = shaderParameterHash_;
     ret->textures_ = textures_;
@@ -1147,27 +1224,14 @@ Variant Material::ParseShaderParameterValue(const String& value)
         return ToVectorVariant(valueTrimmed);
 }
 
-void Material::CheckOcclusion()
-{
-    // Determine occlusion by checking the base pass of each technique
-    occlusion_ = false;
-    for (unsigned i = 0; i < techniques_.Size(); ++i)
-    {
-        Technique* tech = techniques_[i].technique_;
-        if (tech)
-        {
-            Pass* pass = tech->GetPass("base");
-            if (pass && pass->GetDepthWrite() && !pass->GetAlphaMask())
-                occlusion_ = true;
-        }
-    }
-}
-
 void Material::ResetToDefaults()
 {
     // Needs to be a no-op when async loading, as this does a GetResource() which is not allowed from worker threads
     if (!Thread::IsMainThread())
         return;
+
+    vertexShaderDefines_.Clear();
+    pixelShaderDefines_.Clear();
 
     SetNumTechniques(1);
     Renderer* renderer = GetSubsystem<Renderer>();
@@ -1193,6 +1257,7 @@ void Material::ResetToDefaults()
     fillMode_ = FILL_SOLID;
     depthBias_ = BiasParameters(0.0f, 0.0f);
     renderOrder_ = DEFAULT_RENDER_ORDER;
+    occlusion_ = true;
 
     RefreshShaderParameterHash();
     RefreshMemoryUse();
@@ -1269,6 +1334,24 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
     // Remove finished animations
     for (unsigned i = 0; i < finishedNames.Size(); ++i)
         SetShaderParameterAnimation(finishedNames[i], 0);
+}
+
+void Material::ApplyShaderDefines(unsigned index)
+{
+    if (index == M_MAX_UNSIGNED)
+    {
+        for (unsigned i = 0; i < techniques_.Size(); ++i)
+            ApplyShaderDefines(i);
+        return;
+    }
+
+    if (index >= techniques_.Size() || !techniques_[index].original_)
+        return;
+
+    if (vertexShaderDefines_.Empty() && pixelShaderDefines_.Empty())
+        techniques_[index].technique_ = techniques_[index].original_;
+    else
+        techniques_[index].technique_ = techniques_[index].original_->CloneWithDefines(vertexShaderDefines_, pixelShaderDefines_);
 }
 
 }

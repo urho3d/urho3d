@@ -896,8 +896,6 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Pass", "PassLightingMode get_lightingMode() const", asMETHOD(Pass, GetLightingMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_depthWrite(bool)", asMETHOD(Pass, SetDepthWrite), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_depthWrite() const", asMETHOD(Pass, GetDepthWrite), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "void set_alphaMask(bool)", asMETHOD(Pass, SetAlphaMask), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Pass", "bool get_alphaMask() const", asMETHOD(Pass, GetAlphaMask), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_desktop(bool)", asMETHOD(Technique, SetIsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "bool get_desktop() const", asMETHOD(Technique, IsDesktop), asCALL_THISCALL);
     engine->RegisterObjectMethod("Pass", "void set_vertexShader(const String&in)", asMETHOD(Pass, SetVertexShader), asCALL_THISCALL);
@@ -960,6 +958,11 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "Array<String>@ get_shaderParameterNames() const", asFUNCTION(MaterialGetShaderParameterNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Material", "void set_textures(uint, Texture@+)", asMETHOD(Material, SetTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "Texture@+ get_textures(uint) const", asMETHOD(Material, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_vertexShaderDefines(const String&in)", asMETHOD(Material, SetVertexShaderDefines), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const String& get_vertexShaderDefines() const", asMETHOD(Material, GetVertexShaderDefines), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_pixelShaderDefines(const String&in)", asMETHOD(Material, SetPixelShaderDefines), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "const String& get_pixelShaderDefines() const", asMETHOD(Material, GetPixelShaderDefines), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_occlusion(bool)", asMETHOD(Material, SetOcclusion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_occlusion()", asMETHOD(Material, GetOcclusion), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_cullMode(CullMode)", asMETHOD(Material, SetCullMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "CullMode get_cullMode() const", asMETHOD(Material, GetCullMode), asCALL_THISCALL);
