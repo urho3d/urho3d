@@ -352,7 +352,7 @@ enum FaceCameraMode
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
     FC_LOOKAT_Y,
-    FC_LOOKAT_Y_RESTRICTED,
+    FC_LOOKAT_MIXED,
     FC_DIRECTION,
 };
 

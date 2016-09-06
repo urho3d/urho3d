@@ -52,7 +52,7 @@ const char* faceCameraModeNames[] =
     "Rotate Y",
     "LookAt XYZ",
     "LookAt Y",
-    "LookAt Y (Restricted)",
+    "LookAt Mixed",
     "Direction",
     0
 };

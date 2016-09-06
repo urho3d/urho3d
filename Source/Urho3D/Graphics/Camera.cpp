@@ -562,7 +562,7 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
             return Quaternion(euler.x_, euler.y_, euler.z_);
         }
 
-    case FC_LOOKAT_Y_RESTRICTED:
+    case FC_LOOKAT_MIXED:
         {
             // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions
             // or singularities
