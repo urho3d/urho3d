@@ -200,6 +200,8 @@ protected:
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Minimal angle between text normal and look-at direction.
+    float minAngle_;
     /// Fixed screen size flag.
     bool fixedScreenSize_;
     /// Text needs update flag.

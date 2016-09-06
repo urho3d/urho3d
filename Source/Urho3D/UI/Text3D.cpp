@@ -53,6 +53,7 @@ Text3D::Text3D(Context* context) :
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
     faceCameraMode_(FC_NONE),
+    minAngle_(0.0f),
     fixedScreenSize_(false),
     textDirty_(true),
     geometryDirty_(true),
@@ -82,6 +83,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Min Angle", float, minAngle_, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
@@ -722,7 +724,7 @@ void Text3D::CalculateFixedScreenSize(const FrameInfo& frame)
     }
 
     customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
-        worldPosition, node_->GetWorldRotation(), faceCameraMode_), worldScale);
+        worldPosition, node_->GetWorldRotation(), faceCameraMode_, minAngle_), worldScale);
     worldBoundingBoxDirty_ = true;
 }
 

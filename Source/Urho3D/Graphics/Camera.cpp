@@ -520,7 +520,7 @@ float Camera::GetLodDistance(float distance, float scale, float bias) const
         return orthoSize_ / d;
 }
 
-Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaternion& rotation, FaceCameraMode mode)
+Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaternion& rotation, FaceCameraMode mode, float minAngle)
 {
     if (!node_)
         return rotation;
@@ -558,6 +558,26 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
             lookAt.FromLookRotation(lookAtVec);
 
             Vector3 euler = rotation.EulerAngles();
+            euler.y_ = lookAt.EulerAngles().y_;
+            return Quaternion(euler.x_, euler.y_, euler.z_);
+        }
+
+    case FC_LOOKAT_Y_RESTRICTED:
+        {
+            // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions
+            // or singularities
+            Vector3 lookAtVec(position - node_->GetWorldPosition());
+            const float angle = lookAtVec.Angle(rotation * Vector3::UP);
+            lookAtVec.y_ = 0.0f;
+
+            Quaternion lookAt;
+            lookAt.FromLookRotation(lookAtVec);
+
+            Vector3 euler = rotation.EulerAngles();
+            if (angle > 180 - minAngle)
+                euler.x_ += minAngle - (180 - angle);
+            else if (angle < minAngle)
+                euler.x_ -= minAngle - angle;
             euler.y_ = lookAt.EulerAngles().y_;
             return Quaternion(euler.x_, euler.y_, euler.z_);
         }
