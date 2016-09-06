@@ -1,6 +1,0 @@
-<technique vs="Unlit" ps="Unlit" psdefines="DIFFMAP ALPHAMASK" alphamask="true" >
-    <pass name="base" />
-    <pass name="prepass" psdefines="PREPASS" />
-    <pass name="material" />
-    <pass name="deferred" psdefines="DEFERRED" />
-</technique>
