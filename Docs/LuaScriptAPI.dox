@@ -3041,6 +3041,7 @@ Methods:
 - void SetShadowIntensity(float intensity)
 - void SetShadowResolution(float resolution)
 - void SetShadowNearFarRatio(float nearFarRatio)
+- void SetShadowMaxExtrusion(float extrusion)
 - void SetRampTexture(Texture* texture)
 - void SetShapeTexture(Texture* texture)
 - LightType GetLightType() const
@@ -3064,6 +3065,7 @@ Methods:
 - float GetShadowIntensity() const
 - float GetShadowResolution() const
 - float GetShadowNearFarRatio() const
+- float GetShadowMaxExtrusion() const
 - Texture* GetRampTexture() const
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
@@ -3090,6 +3092,7 @@ Properties:
 - float shadowIntensity
 - float shadowResolution
 - float shadowNearFarRatio
+- float shadowMaxExtrusion
 - Texture* rampTexture
 - Texture* shapeTexture
 - Frustum frustum (readonly)
