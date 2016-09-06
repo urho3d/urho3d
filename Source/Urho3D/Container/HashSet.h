@@ -217,8 +217,12 @@ public:
     /// Assign a hash set.
     HashSet& operator =(const HashSet<T>& rhs)
     {
-        Clear();
-        Insert(rhs);
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Clear();
+            Insert(rhs);
+        }
         return *this;
     }
 

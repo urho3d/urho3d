@@ -832,6 +832,7 @@ F1                 - Toggle console
 F2                 - Toggle rendering debug geometry
 F3                 - Toggle physics debug geometry
 F4                 - Toggle octree debug geometry
+F5                 - Toggle navigation debug geometry
 F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
