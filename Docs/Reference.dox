@@ -1188,7 +1188,7 @@ The techniques for different LOD levels and quality settings must appear in a sp
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
-Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. Read below for caveats regarding it.
+Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. One example use of render order is to ensure that materials which use discard in pixel shader (ALPHAMASK define) are rendered after full opaques to ensure the hardware depth buffer will behave optimally; in this case the render order should be increased. Read below for caveats regarding it.
 
 Occlusion flag allows to disable software occlusion rendering per material, for example if parts of a model are transparent. By default occlusion is enabled.
 
