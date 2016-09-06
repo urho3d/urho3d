@@ -54,7 +54,6 @@ void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 CrowdManager::CrowdManager(Context* context) :
     Component(context),
     crowd_(0),
-    navigationMesh_(0),
     navigationMeshId_(0),
     maxAgents_(DEFAULT_MAX_AGENTS),
     maxAgentRadius_(DEFAULT_MAX_AGENT_RADIUS),

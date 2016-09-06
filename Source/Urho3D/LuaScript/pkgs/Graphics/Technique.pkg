@@ -14,7 +14,6 @@ class Pass : public RefCounted
     void SetDepthTestMode(CompareMode mode);
     void SetLightingMode(PassLightingMode mode);
     void SetDepthWrite(bool enable);
-    void SetAlphaMask(bool enable);
     void SetIsDesktop(bool enable);
     void SetVertexShader(const String name);
     void SetPixelShader(const String name);
@@ -29,7 +28,6 @@ class Pass : public RefCounted
     CompareMode GetDepthTestMode() const;
     PassLightingMode GetLightingMode() const;
     bool GetDepthWrite() const;
-    bool GetAlphaMask() const;
     bool IsDesktop() const;
     const String GetVertexShader() const;
     const String GetPixelShader() const;
@@ -43,7 +41,6 @@ class Pass : public RefCounted
     tolua_property__get_set CompareMode depthTestMode;
     tolua_property__get_set PassLightingMode lightingMode;
     tolua_property__get_set bool depthWrite;
-    tolua_property__get_set bool alphaMask;
     tolua_readonly tolua_property__is_set bool desktop;
     tolua_property__get_set String vertexShader;
     tolua_property__get_set String pixelShader;

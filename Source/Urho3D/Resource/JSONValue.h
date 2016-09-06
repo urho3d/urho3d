@@ -220,7 +220,7 @@ public:
     void Erase(unsigned pos, unsigned length = 1);
     /// Resize array.
     void Resize(unsigned newSize);
-    /// Return size of array.
+    /// Return size of array or number of keys in object.
     unsigned Size() const;
 
     // JSON object functions

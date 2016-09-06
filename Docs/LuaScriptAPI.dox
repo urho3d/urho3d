@@ -3278,6 +3278,8 @@ Methods:
 - void delete()
 - void SetNumTechniques(unsigned num)
 - void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
+- void SetVertexShaderDefines(const String defines)
+- void SetPixelShaderDefines(const String defines)
 - void SetShaderParameter(const String name, const Variant& value)
 - void SetShaderParameterAnimation(const String name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void SetShaderParameterAnimationWrapMode(const String name, WrapMode wrapMode)
@@ -3290,6 +3292,7 @@ Methods:
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetRenderOrder(char renderOrder)
+- void SetOcclusion(bool enable)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
@@ -3300,6 +3303,8 @@ Methods:
 - Technique* GetTechnique(unsigned index) const
 - Pass* GetPass(unsigned index, const String passName) const
 - Texture* GetTexture(TextureUnit unit) const
+- const String GetVertexShaderDefines() const
+- const String GetPixelShaderDefines() const
 - ValueAnimation* GetShaderParameterAnimation(const String name) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String name) const
 - float GetShaderParameterAnimationSpeed(const String name) const
@@ -3314,12 +3319,14 @@ Methods:
 
 Properties:
 
+- String vertexShaderDefines
+- String pixelShaderDefines
 - CullMode cullMode
 - CullMode shadowCullMode
 - FillMode fillMode
 - BiasParameters depthBias
 - char renderOrder
-- bool occlusion (readonly)
+- bool occlusion
 - bool specular (readonly)
 - Scene* scene
 
@@ -4388,7 +4395,6 @@ Methods:
 - void SetDepthTestMode(CompareMode mode)
 - void SetLightingMode(PassLightingMode mode)
 - void SetDepthWrite(bool enable)
-- void SetAlphaMask(bool enable)
 - void SetIsDesktop(bool enable)
 - void SetVertexShader(const String name)
 - void SetPixelShader(const String name)
@@ -4402,7 +4408,6 @@ Methods:
 - CompareMode GetDepthTestMode() const
 - PassLightingMode GetLightingMode() const
 - bool GetDepthWrite() const
-- bool GetAlphaMask() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
@@ -4418,7 +4423,6 @@ Properties:
 - CompareMode depthTestMode
 - PassLightingMode lightingMode
 - bool depthWrite
-- bool alphaMask
 - bool desktop (readonly)
 - String vertexShader
 - String pixelShader

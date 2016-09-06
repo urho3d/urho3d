@@ -243,6 +243,8 @@ unsigned JSONValue::Size() const
 {
     if (GetValueType() == JSON_ARRAY)
         return arrayValue_->Size();
+    else if (GetValueType() == JSON_OBJECT)
+        return objectValue_->Size();
 
     return 0;
 }
