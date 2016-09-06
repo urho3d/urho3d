@@ -8056,7 +8056,8 @@ Properties:
 - uint memoryUse // readonly
 - String name
 - uint numTechniques
-- bool occlusion // readonly
+- bool occlusion
+- String pixelShaderDefines
 - int refs // readonly
 - uint8 renderOrder
 - Scene@ scene
@@ -8069,6 +8070,7 @@ Properties:
 - StringHash type // readonly
 - String typeName // readonly
 - uint useTimer // readonly
+- String vertexShaderDefines
 - int weakRefs // readonly
 
 <a name="Class_Matrix2"></a>
@@ -9577,7 +9579,6 @@ Properties:
 
 Properties:
 
-- bool alphaMask
 - BlendMode blendMode
 - CullMode cullMode
 - CompareMode depthTestMode
