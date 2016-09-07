@@ -1454,6 +1454,7 @@ namespace Urho3D
 - %Depth %Slope %Bias : float
 - %Normal %Offset : float
 - %Near/Farclip %Ratio : float
+- %Max %Extrusion : float
 - %View %Mask : int
 - %Light %Mask : int
 
@@ -7547,6 +7548,7 @@ Properties:
 - FocusParameters shadowFocus
 - float shadowIntensity
 - uint shadowMask
+- float shadowMaxExtrusion
 - float shadowNearFarRatio
 - float shadowResolution
 - Texture@ shapeTexture

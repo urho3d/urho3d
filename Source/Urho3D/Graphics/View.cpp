@@ -2551,7 +2551,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
 {
     Node* shadowCameraNode = shadowCamera->GetNode();
     Node* lightNode = light->GetNode();
-    float extrusionDistance = cullCamera_->GetFarClip();
+    float extrusionDistance = Min(cullCamera_->GetFarClip(), light->GetShadowMaxExtrusion());
     const FocusParameters& parameters = light->GetShadowFocus();
 
     // Calculate initial position & rotation

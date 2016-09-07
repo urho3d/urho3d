@@ -1623,7 +1623,7 @@ Shadow rendering is easily the most complex aspect of using lights, and therefor
 
 - FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic size reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
-Additionally there are shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
+Additionally there are shadow fade distance, shadow intensity, shadow resolution, shadow near/far ratio and shadow max extrusion parameters:
 
 - If both shadow distance and shadow fade distance are greater than zero, shadows start to fade at the shadow fade distance, and vanish completely at the shadow distance.
 
@@ -1632,6 +1632,8 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 - The shadow resolution parameter scales the global shadow map size set in Renderer to determine the actual shadow map size. Maximum is 1.0 (full size) and minimum is 0.125 (one eighth size.) Choose according to the size and importance of the light; smaller shadow maps will be less performance hungry.
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
+
+- The shadow max extrusion distance controls how far from the view position directional light shadow cameras are positioned. The effective value will be the minimum of this parameter and the camera far clip distance. The default is 1000; increase this if you have shadow cascades to a far distance and are using tall objects, and notice missing shadows. The extrusion distance affects shadow map depth resolution and therefore the effect of shadow bias parameters.
 
 \section Lights_ShadowGlobal Global shadow settings
 
