@@ -47,9 +47,9 @@ public:
 
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Create Joint.
+    /// Create joint.
     void CreateJoint();
-    /// Release Joint.
+    /// Release joint.
     void ReleaseJoint();
 
     /// Set other rigid body.

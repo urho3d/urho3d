@@ -395,10 +395,12 @@ void RigidBody2D::ReleaseBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
-    for (unsigned i = 0; i < constraints_.Size(); ++i)
+    // Make a copy for iteration
+    Vector<WeakPtr<Constraint2D> > constraints = constraints_;
+    for (unsigned i = 0; i < constraints.Size(); ++i)
     {
-        if (constraints_[i])
-            constraints_[i]->ReleaseJoint();
+        if (constraints[i])
+            constraints[i]->ReleaseJoint();
     }
 
     for (unsigned i = 0; i < collisionShapes_.Size(); ++i)

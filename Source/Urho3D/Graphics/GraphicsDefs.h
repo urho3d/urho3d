@@ -356,7 +356,7 @@ enum FaceCameraMode
     FC_DIRECTION,
 };
 
-/// Shadow type
+/// Shadow type.
 enum ShadowQuality
 {
     SHADOWQUALITY_SIMPLE_16BIT = 0,
