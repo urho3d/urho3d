@@ -711,6 +711,7 @@ uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
+float minAngle;
 /* readonly */
 Node node;
 /* readonly */
@@ -14137,6 +14138,7 @@ FC_ROTATE_XYZ,
 FC_ROTATE_Y,
 FC_LOOKAT_XYZ,
 FC_LOOKAT_Y,
+FC_LOOKAT_MIXED,
 FC_DIRECTION,
 };
 
