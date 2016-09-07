@@ -7776,6 +7776,7 @@ Properties:
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
 - int FC_LOOKAT_MIXED
+- int FC_DIRECTION
 
 ### FaceCameraMode
 
