@@ -9591,9 +9591,11 @@ Properties:
 - bool desktop
 - PassLightingMode lightingMode
 - String pixelShader
+- String pixelShaderDefineExcludes
 - String pixelShaderDefines
 - int refs // readonly
 - String vertexShader
+- String vertexShaderDefineExcludes
 - String vertexShaderDefines
 - int weakRefs // readonly
 

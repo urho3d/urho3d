@@ -7983,10 +7983,12 @@ bool depthWrite;
 bool desktop;
 PassLightingMode lightingMode;
 String pixelShader;
+String pixelShaderDefineExcludes;
 String pixelShaderDefines;
 /* readonly */
 int refs;
 String vertexShader;
+String vertexShaderDefineExcludes;
 String vertexShaderDefines;
 /* readonly */
 int weakRefs;

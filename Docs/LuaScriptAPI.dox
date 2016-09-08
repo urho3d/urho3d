@@ -4406,6 +4406,8 @@ Methods:
 - void SetPixelShader(const String name)
 - void SetVertexShaderDefines(const String defines)
 - void SetPixelShaderDefines(const String defines)
+- void SetVertexShaderDefineExcludes(const String excludes)
+- void SetPixelShaderDefineExcludes(const String excludes)
 - void ReleaseShaders()
 - const String GetName() const
 - unsigned GetIndex() const
@@ -4419,6 +4421,8 @@ Methods:
 - const String GetPixelShader() const
 - const String GetVertexShaderDefines() const
 - const String GetPixelShaderDefines() const
+- const String GetVertexShaderDefineExcludes() const
+- const String GetPixelShaderDefineExcludes() const
 
 Properties:
 
@@ -4434,6 +4438,8 @@ Properties:
 - String pixelShader
 - String vertexShaderDefines
 - String pixelShaderDefines
+- String vertexShaderDefineExcludes
+- String pixelShaderDefineExcludes
 
 <a name="Class_PhysicsRaycastResult"></a>
 ### PhysicsRaycastResult
