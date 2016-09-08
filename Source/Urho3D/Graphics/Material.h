@@ -136,9 +136,9 @@ public:
     void SetNumTechniques(unsigned num);
     /// Set technique.
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
-    /// Set additional vertex shader defines. Causes the technique(s) to be cloned in case they weren't already.
+    /// Set additional vertex shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
     void SetVertexShaderDefines(const String& defines);
-    /// Set additional pixel shader defines. Causes the technique(s) to be cloned in case they weren't already.
+    /// Set additional pixel shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
     void SetPixelShaderDefines(const String& defines);
     /// Set shader parameter.
     void SetShaderParameter(const String& name, const Variant& value);

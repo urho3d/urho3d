@@ -19,6 +19,8 @@ class Pass : public RefCounted
     void SetPixelShader(const String name);
     void SetVertexShaderDefines(const String defines);
     void SetPixelShaderDefines(const String defines);
+    void SetVertexShaderDefineExcludes(const String excludes);
+    void SetPixelShaderDefineExcludes(const String excludes);
     void ReleaseShaders();
 
     const String GetName() const;
@@ -33,6 +35,8 @@ class Pass : public RefCounted
     const String GetPixelShader() const;
     const String GetVertexShaderDefines() const;
     const String GetPixelShaderDefines() const;
+    const String GetVertexShaderDefineExcludes() const;
+    const String GetPixelShaderDefineExcludes() const;
 
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned index;
@@ -46,6 +50,8 @@ class Pass : public RefCounted
     tolua_property__get_set String pixelShader;
     tolua_property__get_set String vertexShaderDefines;
     tolua_property__get_set String pixelShaderDefines;
+    tolua_property__get_set String vertexShaderDefineExcludes;
+    tolua_property__get_set String pixelShaderDefineExcludes;
 };
 
 class Technique : public Resource
