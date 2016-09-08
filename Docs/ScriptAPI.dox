@@ -914,6 +914,7 @@ namespace Urho3D
 - %Can %Be %Occluded : bool
 - %Cast %Shadows : bool
 - %Face %Camera %Mode : int
+- %Min %Angle : float
 - %Draw %Distance : float
 - %Shadow %Distance : float
 - %Animation %LOD %Bias : float
@@ -2145,6 +2146,7 @@ namespace Urho3D
 - %Can %Be %Occluded : bool
 - %Fixed %Screen %Size : bool
 - %Face %Camera %Mode : int
+- %Min %Angle : float
 - %Draw %Distance : float
 - %Width : int
 - %Horiz %Alignment : int
@@ -3222,6 +3224,7 @@ Properties:
 - float lodBias
 - Material@ material
 - uint maxLights
+- float minAngle
 - Node@ node // readonly
 - uint numAttributes // readonly
 - uint numBillboards
@@ -15053,6 +15056,7 @@ Properties:
 - FC_ROTATE_Y
 - FC_LOOKAT_XYZ
 - FC_LOOKAT_Y
+- FC_LOOKAT_MIXED
 - FC_DIRECTION
 
 

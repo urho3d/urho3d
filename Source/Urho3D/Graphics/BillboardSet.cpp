@@ -52,6 +52,7 @@ const char* faceCameraModeNames[] =
     "Rotate Y",
     "LookAt XYZ",
     "LookAt Y",
+    "LookAt Mixed",
     "Direction",
     0
 };
@@ -70,6 +71,7 @@ BillboardSet::BillboardSet(Context* context) :
     sorted_(false),
     fixedScreenSize_(false),
     faceCameraMode_(FC_ROTATE_XYZ),
+    minAngle_(0.0f),
     geometry_(new Geometry(context)),
     vertexBuffer_(new VertexBuffer(context_)),
     indexBuffer_(new IndexBuffer(context_)),
@@ -109,6 +111,7 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Cast Shadows", bool, castShadows_, false, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Face Camera Mode", GetFaceCameraMode, SetFaceCameraMode, FaceCameraMode, faceCameraModeNames, FC_ROTATE_XYZ, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Angle", GetMinAngle, SetMinAngle, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
@@ -206,7 +209,7 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
     transforms_[0] = relative_ ? node_->GetWorldTransform() : Matrix3x4::IDENTITY;
     // Billboard rotation
     transforms_[1] = Matrix3x4(Vector3::ZERO, faceCameraMode_ != FC_NONE ? frame.camera_->GetFaceCameraRotation(
-        node_->GetWorldPosition(), node_->GetWorldRotation(), faceCameraMode_) : node_->GetWorldRotation(), Vector3::ONE);
+        node_->GetWorldPosition(), node_->GetWorldRotation(), faceCameraMode_, minAngle_) : node_->GetWorldRotation(), Vector3::ONE);
 }
 
 void BillboardSet::UpdateGeometry(const FrameInfo& frame)
@@ -219,7 +222,7 @@ void BillboardSet::UpdateGeometry(const FrameInfo& frame)
     if (faceCameraMode_ != FC_NONE)
     {
         transforms_[1] = Matrix3x4(Vector3::ZERO, frame.camera_->GetFaceCameraRotation(node_->GetWorldPosition(),
-            node_->GetWorldRotation(), faceCameraMode_), Vector3::ONE);
+            node_->GetWorldRotation(), faceCameraMode_, minAngle_), Vector3::ONE);
     }
 
     if (bufferSizeDirty_ || indexBuffer_->IsDataLost())
@@ -318,6 +321,12 @@ void BillboardSet::SetFaceCameraMode(FaceCameraMode mode)
         faceCameraMode_ = mode;
         MarkNetworkUpdate();
     }
+}
+
+void BillboardSet::SetMinAngle(float angle)
+{
+    minAngle_ = angle;
+    MarkNetworkUpdate();
 }
 
 void BillboardSet::SetAnimationLodBias(float bias)

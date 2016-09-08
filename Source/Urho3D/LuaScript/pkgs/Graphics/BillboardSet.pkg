@@ -19,6 +19,7 @@ class BillboardSet : public Drawable
     void SetSorted(bool enable);
     void SetFixedScreenSize(bool enable);
     void SetFaceCameraMode(FaceCameraMode mode);
+    void SetMinAngle(float angle);
     void SetAnimationLodBias(float bias);
 
     void Commit();
@@ -31,6 +32,7 @@ class BillboardSet : public Drawable
     bool IsSorted() const;
     bool IsFixedScreenSize() const;
     FaceCameraMode GetFaceCameraMode() const;
+    float GetMinAngle() const;
     float GetAnimationLodBias() const;
     
     tolua_property__get_set Material* material;
@@ -40,5 +42,6 @@ class BillboardSet : public Drawable
     tolua_property__is_set bool sorted;
     tolua_property__is_set bool fixedScreenSize;
     tolua_property__get_set FaceCameraMode faceCameraMode;
+    tolua_property__get_set float minAngle;
     tolua_property__get_set float animationLodBias;
 };

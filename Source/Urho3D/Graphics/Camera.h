@@ -191,7 +191,7 @@ public:
     /// Return a scene node's LOD scaled distance.
     float GetLodDistance(float distance, float scale, float bias) const;
     /// Return a world rotation for facing a camera on certain axes based on the existing world rotation.
-    Quaternion GetFaceCameraRotation(const Vector3& position, const Quaternion& rotation, FaceCameraMode mode);
+    Quaternion GetFaceCameraRotation(const Vector3& position, const Quaternion& rotation, FaceCameraMode mode, float minAngle = 0.0f);
     /// Get effective world transform for matrix and frustum calculations including reflection but excluding node scaling.
     Matrix3x4 GetEffectiveWorldTransform() const;
     /// Return if projection parameters are valid for rendering and raycasting.

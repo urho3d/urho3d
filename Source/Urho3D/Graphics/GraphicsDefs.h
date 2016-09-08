@@ -352,10 +352,11 @@ enum FaceCameraMode
     FC_ROTATE_Y,
     FC_LOOKAT_XYZ,
     FC_LOOKAT_Y,
-    FC_DIRECTION
+    FC_LOOKAT_MIXED,
+    FC_DIRECTION,
 };
 
-/// Shadow type
+/// Shadow type.
 enum ShadowQuality
 {
     SHADOWQUALITY_SIMPLE_16BIT = 0,

@@ -604,6 +604,7 @@ Methods:
 - void SetSorted(bool enable)
 - void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
+- void SetMinAngle(float angle)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -614,6 +615,7 @@ Methods:
 - bool IsSorted() const
 - bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
+- float GetMinAngle() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -625,6 +627,7 @@ Properties:
 - bool sorted
 - bool fixedScreenSize
 - FaceCameraMode faceCameraMode
+- float minAngle
 - float animationLodBias
 
 <a name="Class_Bone"></a>
@@ -7772,6 +7775,8 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_LOOKAT_MIXED
+- int FC_DIRECTION
 
 ### FaceCameraMode
 
@@ -7780,6 +7785,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_LOOKAT_MIXED
 - int FC_DIRECTION
 
 ### FileMode
