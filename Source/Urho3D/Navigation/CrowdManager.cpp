@@ -126,8 +126,9 @@ void CrowdManager::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             crowdAgent->DrawDebugGeometry(debug, depthTest);
 
             // Draw move target if any
-            if (crowdAgent->GetTargetState() == CA_TARGET_NONE)
+            if (crowdAgent->GetTargetState() == CA_TARGET_NONE || crowdAgent->GetTargetState() == CA_TARGET_VELOCITY)
                 continue;
+            URHO3D_LOGINFO("Agent state: " + String((int)crowdAgent->GetTargetState()));
 
             Color color(0.6f, 0.2f, 0.2f, 1.0f);
 

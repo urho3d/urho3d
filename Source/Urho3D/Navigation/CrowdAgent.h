@@ -96,7 +96,7 @@ public:
     void SetTargetPosition(const Vector3& position);
     /// Submit a new target velocity request for this agent.
     void SetTargetVelocity(const Vector3& velocity);
-    /// Reset any target request for the specified agent.
+    /// Reset any target request for the specified agent. Note that the agent will continue to move into the current direction; set a zero target velocity to actually stop.
     void ResetTarget();
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
     void SetUpdateNodePosition(bool unodepos);
