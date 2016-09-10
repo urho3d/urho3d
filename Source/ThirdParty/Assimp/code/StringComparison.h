@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StringComparison.h"
 
 #include <string.h>
+#include <strings.h>
 // Urho3D: VS2008 compatibility
 #if !defined(_MSC_VER) || (_MSC_VER >= 1600)
 #include <stdint.h>

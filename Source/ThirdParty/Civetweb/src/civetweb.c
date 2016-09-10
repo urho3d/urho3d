@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #if defined(_WIN32)
+#define _WIN32_WINNT 0x0501
 #if !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS /* Disable deprecation warning in VS2005 */
 #endif
