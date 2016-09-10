@@ -568,7 +568,7 @@ XMLElement XMLElement::GetChild(const char* name) const
 
 XMLElement XMLElement::GetChildByAttribute(const String& name, const String& attr_name, const String& attr_value)
 {
-    GetChildByAttribute(name.CString(), attr_name.CString(), attr_value.CString());
+    return GetChildByAttribute(name.CString(), attr_name.CString(), attr_value.CString());
 }
 
 XMLElement XMLElement::GetChildByAttribute(const char* name, const char* attr_name, const char* attr_value)
