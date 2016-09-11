@@ -896,6 +896,8 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "TextureFilterMode get_filterMode() const", asMETHOD(T, GetFilterMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHOD(T, SetAddressMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHOD(T, GetAddressMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_anisotropy(uint)", asMETHOD(T, SetAnisotropy), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_anisotropy() const", asMETHOD(T, GetAnisotropy), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_borderColor(const Color&in)", asMETHOD(T, SetBorderColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& get_borderColor() const", asMETHOD(T, GetBorderColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sRGB(bool)", asMETHOD(T, SetSRGB), asCALL_THISCALL);

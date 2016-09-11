@@ -708,7 +708,7 @@ void Renderer::Render()
         SetIndirectionTextureData();
 
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
-    graphics_->SetTextureAnisotropy((unsigned)textureAnisotropy_);
+    graphics_->SetDefaultTextureAnisotropy((unsigned)textureAnisotropy_);
 
     // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
     bool hasBackbufferViews = false;

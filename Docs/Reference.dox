@@ -1216,7 +1216,7 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 <texture>
     <address coord="u|v|w" mode="wrap|mirror|clamp|border" />
     <border color="r g b a" />
-    <filter mode="nearest|bilinear|trilinear|anisotropic|default" />
+    <filter mode="nearest|bilinear|trilinear|anisotropic|default" anisotropy="x" />
     <mipmap enable="false|true" />
     <quality low="x" medium="y" high="z" />
     <srgb enable="false|true" />
@@ -1224,6 +1224,8 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 \endcode
 
 The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it. To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+
+Anisotropy level can be optionally specified. If omitted (or if the value 0 is specified), the default from the Renderer class will be used.
 
 \section Materials_CubeMapTextures Cube map textures
 

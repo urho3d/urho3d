@@ -188,12 +188,12 @@ public:
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
     void SetTextureForUpdate(Texture* texture);
-    /// Set default texture filtering mode.
-    void SetDefaultTextureFilterMode(TextureFilterMode mode);
-    /// Set texture anisotropy.
-    void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
+    /// Set default texture filtering mode. Called by Renderer before rendering.
+    void SetDefaultTextureFilterMode(TextureFilterMode mode);
+    /// Set default texture anisotropy level. Called by Renderer before rendering.
+    void SetDefaultTextureAnisotropy(unsigned level);
     /// Reset all rendertargets, depth-stencil surface and viewport.
     void ResetRenderTargets();
     /// Reset specific rendertarget.
@@ -384,6 +384,9 @@ public:
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
 
+    /// Return default texture max. anisotropy level.
+    unsigned GetDefaultTextureAnisotropy() const { return defaultTextureAnisotropy_; }
+
     /// Return current rendertarget by index.
     RenderSurface* GetRenderTarget(unsigned index) const;
 
@@ -392,9 +395,6 @@ public:
 
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
-
-    /// Return texture anisotropy.
-    unsigned GetTextureAnisotropy() const { return textureAnisotropy_; }
 
     /// Return blending mode.
     BlendMode GetBlendMode() const { return blendMode_; }
@@ -686,8 +686,8 @@ private:
     IntRect viewport_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Texture anisotropy level.
-    unsigned textureAnisotropy_;
+    /// Default texture max. anisotropy level.
+    unsigned defaultTextureAnisotropy_;
     /// Blending mode.
     BlendMode blendMode_;
     /// Color write enable.

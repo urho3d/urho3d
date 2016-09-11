@@ -270,6 +270,7 @@ Graphics::Graphics(Context* context) :
     numBatches_(0),
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -1426,6 +1427,14 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 impl_->wAddressModes_[index] = w;
             }
         }
+        unsigned maxAnisotropy = texture->GetAnisotropy();
+        if (!maxAnisotropy)
+            maxAnisotropy = defaultTextureAnisotropy_;
+        if (maxAnisotropy != impl_->maxAnisotropy_[index])
+        {
+            impl_->device_->SetSamplerState(index, D3DSAMP_MAXANISOTROPY, maxAnisotropy);
+            impl_->maxAnisotropy_[index] = maxAnisotropy;
+        }
         if (u == D3DTADDRESS_BORDER || v == D3DTADDRESS_BORDER)
         {
             const Color& borderColor = texture->GetBorderColor();
@@ -1450,6 +1459,11 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
 {
     defaultTextureFilterMode_ = mode;
+}
+
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
+{
+    defaultTextureAnisotropy_ = Max(level, 1U);
 }
 
 void Graphics::ResetRenderTargets()
@@ -1593,20 +1607,6 @@ void Graphics::SetViewport(const IntRect& rect)
 
     // Disable scissor test, needs to be re-enabled by the user
     SetScissorTest(false);
-}
-
-void Graphics::SetTextureAnisotropy(unsigned level)
-{
-    if (level < 1)
-        level = 1;
-
-    if (level != textureAnisotropy_)
-    {
-        for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-            impl_->device_->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, level);
-
-        textureAnisotropy_ = level;
-    }
 }
 
 void Graphics::SetBlendMode(BlendMode mode)
@@ -2522,6 +2522,7 @@ void Graphics::ResetCachedState()
         impl_->uAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->vAddressModes_[i] = D3DTADDRESS_WRAP;
         impl_->wAddressModes_[i] = D3DTADDRESS_WRAP;
+        impl_->maxAnisotropy_[i] = M_MAX_UNSIGNED;
         impl_->borderColors_[i] = Color(0.0f, 0.0f, 0.0f, 0.0f);
         impl_->sRGBModes_[i] = false;
     }
@@ -2544,7 +2545,6 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
     colorWrite_ = true;
     cullMode_ = CULL_CCW;
     constantDepthBias_ = 0.0f;

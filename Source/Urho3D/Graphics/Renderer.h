@@ -194,9 +194,9 @@ public:
     void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// Set texture anisotropy.
+    /// Set default texture max anisotropy level.
     void SetTextureAnisotropy(int level);
-    /// Set texture filtering.
+    /// Set default texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
     /// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetTextureQuality(int quality);
@@ -265,10 +265,10 @@ public:
     /// Return whether drawing shadows is enabled.
     bool GetDrawShadows() const { return drawShadows_; }
 
-    /// Return texture anisotropy.
+    /// Return default texture max. anisotropy level.
     int GetTextureAnisotropy() const { return textureAnisotropy_; }
 
-    /// Return texture filtering.
+    /// Return default texture filtering mode.
     TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
 
     /// Return texture quality level.

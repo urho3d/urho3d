@@ -68,6 +68,7 @@ Texture::Texture(Context* context) :
     depth_(0),
     shadowCompare_(false),
     filterMode_(FILTER_DEFAULT),
+    anisotropy_(0),
     sRGB_(false),
     parametersDirty_(true)
 {
@@ -98,6 +99,12 @@ void Texture::SetFilterMode(TextureFilterMode mode)
 void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 {
     addressMode_[coord] = mode;
+    parametersDirty_ = true;
+}
+
+void Texture::SetAnisotropy(unsigned level)
+{
+    anisotropy_ = level;
     parametersDirty_ = true;
 }
 
@@ -214,6 +221,8 @@ void Texture::SetParameters(const XMLElement& element)
         {
             String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
+            if (paramElem.HasAttribute("anisotropy"))
+                SetAnisotropy(paramElem.GetUInt("anisotropy"));
         }
 
         if (name == "mipmap")

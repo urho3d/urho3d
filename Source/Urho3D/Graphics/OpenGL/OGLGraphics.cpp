@@ -253,6 +253,7 @@ Graphics::Graphics(Context* context_) :
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -1511,11 +1512,13 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
     }
 }
 
-void Graphics::SetTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
-    if (level != textureAnisotropy_)
+    level = Max(level, 1U);
+    
+    if (level != defaultTextureAnisotropy_)
     {
-        textureAnisotropy_ = level;
+        defaultTextureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
 }
@@ -3039,7 +3042,6 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
     colorWrite_ = true;
     cullMode_ = CULL_NONE;
     constantDepthBias_ = 0.0f;
