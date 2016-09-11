@@ -64,7 +64,8 @@ enum NavigationPushiness
 {
     NAVIGATIONPUSHINESS_LOW = 0,
     NAVIGATIONPUSHINESS_MEDIUM,
-    NAVIGATIONPUSHINESS_HIGH
+    NAVIGATIONPUSHINESS_HIGH,
+    NAVIGATIONPUSHINESS_NONE
 };
 
 /// Crowd agent component, requires a CrowdManager component in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
