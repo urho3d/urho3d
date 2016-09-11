@@ -291,6 +291,7 @@ void RegisterCrowdAgent(asIScriptEngine* engine)
     engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_LOW", NAVIGATIONPUSHINESS_LOW);
     engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_MEDIUM", NAVIGATIONPUSHINESS_MEDIUM);
     engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_HIGH", NAVIGATIONPUSHINESS_HIGH);
+    engine->RegisterEnumValue("NavigationPushiness", "NAVIGATIONPUSHINESS_NONE", NAVIGATIONPUSHINESS_NONE);
 
     RegisterComponent<CrowdAgent>(engine, "CrowdAgent");
     engine->RegisterObjectMethod("CrowdAgent", "void DrawDebugGeometry(bool)", asMETHODPR(CrowdAgent, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
