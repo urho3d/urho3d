@@ -11868,6 +11868,7 @@ void SetNumLevels(uint);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11928,6 +11929,7 @@ bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11989,6 +11991,7 @@ bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12051,6 +12054,7 @@ bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12111,6 +12115,7 @@ bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -14269,6 +14274,7 @@ enum NavigationPushiness
 NAVIGATIONPUSHINESS_LOW,
 NAVIGATIONPUSHINESS_MEDIUM,
 NAVIGATIONPUSHINESS_HIGH,
+NAVIGATIONPUSHINESS_NONE,
 };
 
 enum NavigationQuality

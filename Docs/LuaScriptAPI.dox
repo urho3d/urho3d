@@ -6388,6 +6388,7 @@ Methods:
 - void SetNumLevels(unsigned levels)
 - void SetFilterMode(TextureFilterMode filter)
 - void SetAddressMode(TextureCoordinate coord, TextureAddressMode address)
+- void SetAnisotropy(unsigned level)
 - void SetBorderColor(const Color& color)
 - void SetSRGB(bool enable)
 - void SetBackupTexture(Texture* texture)
@@ -6399,6 +6400,7 @@ Methods:
 - int GetHeight() const
 - TextureFilterMode GetFilterMode() const
 - TextureAddressMode GetAddressMode(TextureCoordinate coord) const
+- unsigned GetAnisotropy() const
 - const Color& GetBorderColor() const
 - bool GetSRGB() const
 - Texture* GetBackupTexture() const
@@ -6419,6 +6421,7 @@ Properties:
 - int height (readonly)
 - unsigned components (readonly)
 - TextureFilterMode filterMode
+- unsigned anisotropy
 - Color& borderColor
 - bool sRGB
 - Texture* backupTexture
@@ -7946,6 +7949,7 @@ Properties:
 - int NAVIGATIONPUSHINESS_LOW
 - int NAVIGATIONPUSHINESS_MEDIUM
 - int NAVIGATIONPUSHINESS_HIGH
+- int NAVIGATIONPUSHINESS_NONE
 
 ### NavigationQuality
 
