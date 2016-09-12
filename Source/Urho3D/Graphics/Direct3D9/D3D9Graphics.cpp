@@ -1609,7 +1609,7 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool /* alphaToCoverage */)
 {
     if (mode != blendMode_)
     {
@@ -2545,6 +2545,7 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_CCW;
     constantDepthBias_ = 0.0f;

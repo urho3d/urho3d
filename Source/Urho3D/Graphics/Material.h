@@ -163,6 +163,8 @@ public:
     void SetFillMode(FillMode mode);
     /// Set depth bias parameters for depth write and compare. Note that the normal offset parameter is not used and will not be saved, as it affects only shadow map sampling during light rendering.
     void SetDepthBias(const BiasParameters& parameters);
+    /// Set alpha-to-coverage mode on all passes.
+    void SetAlphaToCoverage(bool enable);
     /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
     void SetRenderOrder(unsigned char order);
     /// Set whether to use in occlusion rendering. Default true.
@@ -227,6 +229,9 @@ public:
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
 
+    /// Return alpha-to-coverage mode.
+    bool GetAlphaToCoverage() const { return alphaToCoverage_; }
+
     /// Return render order.
     unsigned char GetRenderOrder() const { return renderOrder_; }
     
@@ -251,9 +256,9 @@ public:
     static Variant ParseShaderParameterValue(const String& value);
 
 private:
-    /// Helper function for loading JSON files
+    /// Helper function for loading JSON files.
     bool BeginLoadJSON(Deserializer& source);
-    /// Helper function for loading XML files
+    /// Helper function for loading XML files.
     bool BeginLoadXML(Deserializer& source);
 
     /// Reset to defaults.
@@ -297,6 +302,8 @@ private:
     unsigned auxViewFrameNumber_;
     /// Shader parameter hash value.
     unsigned shaderParameterHash_;
+    /// Alpha-to-coverage mode.
+    bool alphaToCoverage_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.

@@ -370,6 +370,18 @@
                         <attribute name="Layout Mode" value="Horizontal" />
                         <attribute name="Layout Spacing" value="10" />
                         <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Alpha-to-coverage" />
+                        </element>
+                        <element type="CheckBox">
+                            <attribute name="Name" value="AlphaToCoverageEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
                             <attribute name="Text" value="Occlusion" />
                         </element>
                         <element type="CheckBox">

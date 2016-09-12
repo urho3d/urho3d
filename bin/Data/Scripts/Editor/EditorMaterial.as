@@ -53,6 +53,7 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("ShadowCullModeEdit", true), "ItemSelected", "EditShadowCullMode");
     SubscribeToEvent(materialWindow.GetChild("FillModeEdit", true), "ItemSelected", "EditFillMode");
     SubscribeToEvent(materialWindow.GetChild("OcclusionEdit", true), "Toggled", "EditOcclusion");
+    SubscribeToEvent(materialWindow.GetChild("AlphaToCoverageEdit", true), "Toggled", "EditAlphaToCoverage");
 }
 
 bool ToggleMaterialEditor()
@@ -354,6 +355,8 @@ void RefreshMaterialMiscParameters()
 
     CheckBox@ attrCheckBox = materialWindow.GetChild("OcclusionEdit", true);
     attrCheckBox.checked = editMaterial.occlusion;
+    attrCheckBox = materialWindow.GetChild("AlphaToCoverageEdit", true);
+    attrCheckBox.checked = editMaterial.alphaToCoverage;
 
     inMaterialRefresh = false;
 }
@@ -924,11 +927,24 @@ void EditOcclusion(StringHash eventType, VariantMap& eventData)
 {
     if (editMaterial is null || inMaterialRefresh)
         return;
-        
+
     BeginMaterialEdit();
-    
+
     CheckBox@ attrEdit = eventData["Element"].GetPtr();
     editMaterial.occlusion = attrEdit.checked;
+
+    EndMaterialEdit();
+}
+
+void EditAlphaToCoverage(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+
+    BeginMaterialEdit();
+
+    CheckBox@ attrEdit = eventData["Element"].GetPtr();
+    editMaterial.alphaToCoverage = attrEdit.checked;
 
     EndMaterialEdit();
 }
