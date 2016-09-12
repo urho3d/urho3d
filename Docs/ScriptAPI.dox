@@ -8054,6 +8054,7 @@ Methods:
 
 Properties:
 
+- bool alphaToCoverage
 - String category // readonly
 - CullMode cullMode
 - BiasParameters depthBias
@@ -9584,6 +9585,7 @@ Properties:
 
 Properties:
 
+- bool alphaToCoverage
 - BlendMode blendMode
 - CullMode cullMode
 - CompareMode depthTestMode

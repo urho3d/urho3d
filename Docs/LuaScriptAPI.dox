@@ -3297,6 +3297,7 @@ Methods:
 - void SetShadowCullMode(CullMode mode)
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
+- void SetAlphaToCoverage(bool enable)
 - void SetRenderOrder(char renderOrder)
 - void SetOcclusion(bool enable)
 - void SetScene(Scene* scene)
@@ -3318,6 +3319,7 @@ Methods:
 - CullMode GetShadowCullMode() const
 - FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
+- bool GetAlphaToCoverage() const
 - char GetRenderOrder() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
@@ -3331,6 +3333,7 @@ Properties:
 - CullMode shadowCullMode
 - FillMode fillMode
 - BiasParameters depthBias
+- bool alphaToCoverage
 - char renderOrder
 - bool occlusion
 - bool specular (readonly)
@@ -4401,6 +4404,7 @@ Methods:
 - void SetDepthTestMode(CompareMode mode)
 - void SetLightingMode(PassLightingMode mode)
 - void SetDepthWrite(bool enable)
+- void SetAlphaToCoverage(bool enable)
 - void SetIsDesktop(bool enable)
 - void SetVertexShader(const String name)
 - void SetPixelShader(const String name)
@@ -4416,6 +4420,7 @@ Methods:
 - CompareMode GetDepthTestMode() const
 - PassLightingMode GetLightingMode() const
 - bool GetDepthWrite() const
+- bool GetAlphaToCoverage() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
@@ -4433,6 +4438,7 @@ Properties:
 - CompareMode depthTestMode
 - PassLightingMode lightingMode
 - bool depthWrite
+- bool alphaToCoverage
 - bool desktop (readonly)
 - String vertexShader
 - String pixelShader
