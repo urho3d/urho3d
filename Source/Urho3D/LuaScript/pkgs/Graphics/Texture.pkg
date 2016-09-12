@@ -5,6 +5,7 @@ class Texture : public Resource
     void SetNumLevels(unsigned levels);
     void SetFilterMode(TextureFilterMode filter);
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetAnisotropy(unsigned level);
     void SetBorderColor(const Color& color);
     void SetSRGB(bool enable);
     void SetBackupTexture(Texture* texture);
@@ -17,6 +18,7 @@ class Texture : public Resource
     int GetHeight() const;
     TextureFilterMode GetFilterMode() const;
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const;
+    unsigned GetAnisotropy() const;
     const Color& GetBorderColor() const;
     bool GetSRGB() const;
     Texture* GetBackupTexture() const;
@@ -35,6 +37,7 @@ class Texture : public Resource
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set unsigned components;
     tolua_property__get_set TextureFilterMode filterMode;
+    tolua_property__get_set unsigned anisotropy;
     tolua_property__get_set Color& borderColor;
     tolua_property__get_set bool sRGB;
     tolua_property__get_set Texture* backupTexture;

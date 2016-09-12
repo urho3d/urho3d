@@ -118,7 +118,7 @@ void SceneResolver::Resolve()
             else if (info.mode_ & AM_NODEIDVECTOR)
             {
                 hasIDAttributes = true;
-                const VariantVector& oldNodeIDs = component->GetAttribute(j).GetVariantVector();
+                VariantVector oldNodeIDs = component->GetAttribute(j).GetVariantVector();
 
                 if (oldNodeIDs.Size())
                 {

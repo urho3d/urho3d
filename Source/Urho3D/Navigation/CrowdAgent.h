@@ -64,7 +64,8 @@ enum NavigationPushiness
 {
     NAVIGATIONPUSHINESS_LOW = 0,
     NAVIGATIONPUSHINESS_MEDIUM,
-    NAVIGATIONPUSHINESS_HIGH
+    NAVIGATIONPUSHINESS_HIGH,
+    NAVIGATIONPUSHINESS_NONE
 };
 
 /// Crowd agent component, requires a CrowdManager component in the scene. When not set explicitly, agent's radius and height are defaulted to navigation mesh's agent radius and height, respectively.
@@ -96,7 +97,7 @@ public:
     void SetTargetPosition(const Vector3& position);
     /// Submit a new target velocity request for this agent.
     void SetTargetVelocity(const Vector3& velocity);
-    /// Reset any target request for the specified agent.
+    /// Reset any target request for the specified agent. Note that the agent will continue to move into the current direction; set a zero target velocity to actually stop.
     void ResetTarget();
     /// Update the node position. When set to false, the node position should be updated by other means (e.g. using Physics) in response to the E_CROWD_AGENT_REPOSITION event.
     void SetUpdateNodePosition(bool unodepos);

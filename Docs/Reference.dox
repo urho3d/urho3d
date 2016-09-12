@@ -1216,7 +1216,7 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 <texture>
     <address coord="u|v|w" mode="wrap|mirror|clamp|border" />
     <border color="r g b a" />
-    <filter mode="nearest|bilinear|trilinear|anisotropic|default" />
+    <filter mode="nearest|bilinear|trilinear|anisotropic|default" anisotropy="x" />
     <mipmap enable="false|true" />
     <quality low="x" medium="y" high="z" />
     <srgb enable="false|true" />
@@ -1224,6 +1224,8 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 \endcode
 
 The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it. To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+
+Anisotropy level can be optionally specified. If omitted (or if the value 0 is specified), the default from the Renderer class will be used.
 
 \section Materials_CubeMapTextures Cube map textures
 
@@ -1284,6 +1286,7 @@ A technique definition looks like this:
 <technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" desktop="false|true" >
     <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" desktop="false|true" >
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
+        vsexcludes="EXCLUDE1 EXCLUDE2" psexcludes="EXCLUDE3 EXCLUDE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
         [cull="cw|ccw|none"]
@@ -1301,6 +1304,8 @@ A pass should normally not define culling mode, but it can optionally specify it
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
 Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
+
+As a material can set further shader defines, which would be applied to all passes, the "vsexcludes" and "psexcludes" mechanism allows per-pass control to prevent them from being included. This is intended for eliminating the compilation of unnecessary shader variations, for example a shadow shader attempting to read a normal map.
 
 The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
 

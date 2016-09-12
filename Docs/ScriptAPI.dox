@@ -9591,9 +9591,11 @@ Properties:
 - bool desktop
 - PassLightingMode lightingMode
 - String pixelShader
+- String pixelShaderDefineExcludes
 - String pixelShaderDefines
 - int refs // readonly
 - String vertexShader
+- String vertexShaderDefineExcludes
 - String vertexShaderDefines
 - int weakRefs // readonly
 
@@ -13051,6 +13053,7 @@ Methods:
 Properties:
 
 - TextureAddressMode[] addressMode
+- uint anisotropy
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13097,6 +13100,7 @@ Methods:
 Properties:
 
 - TextureAddressMode[] addressMode
+- uint anisotropy
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13143,6 +13147,7 @@ Methods:
 Properties:
 
 - TextureAddressMode[] addressMode
+- uint anisotropy
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13190,6 +13195,7 @@ Methods:
 Properties:
 
 - TextureAddressMode[] addressMode
+- uint anisotropy
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13236,6 +13242,7 @@ Methods:
 Properties:
 
 - TextureAddressMode[] addressMode
+- uint anisotropy
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -15185,6 +15192,7 @@ Properties:
 - NAVIGATIONPUSHINESS_LOW
 - NAVIGATIONPUSHINESS_MEDIUM
 - NAVIGATIONPUSHINESS_HIGH
+- NAVIGATIONPUSHINESS_NONE
 
 
 ### NavigationQuality

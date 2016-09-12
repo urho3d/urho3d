@@ -708,7 +708,7 @@ void Renderer::Render()
         SetIndirectionTextureData();
 
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
-    graphics_->SetTextureAnisotropy((unsigned)textureAnisotropy_);
+    graphics_->SetDefaultTextureAnisotropy((unsigned)textureAnisotropy_);
 
     // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
     bool hasBackbufferViews = false;
@@ -1665,6 +1665,9 @@ void Renderer::LoadPassShaders(Pass* pass)
         extraShaderDefines = " VSM_SHADOW ";
     }
 
+    String vsDefines = pass->GetEffectiveVertexShaderDefines();
+    String psDefines = pass->GetEffectivePixelShaderDefines();
+
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
         // Load forward pixel lit variations
@@ -1677,7 +1680,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
 
             vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                pass->GetVertexShaderDefines() + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
+                vsDefines + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
@@ -1687,12 +1690,12 @@ void Renderer::LoadPassShaders(Pass* pass)
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
+                    psDefines + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
                     heightFogVariations[h]);
             }
             else
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
+                    psDefines + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
         }
     }
     else
@@ -1706,7 +1709,7 @@ void Renderer::LoadPassShaders(Pass* pass)
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
+                    vsDefines + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
             }
         }
         else
@@ -1715,7 +1718,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + extraShaderDefines + geometryVSVariations[j]);
+                    vsDefines + extraShaderDefines + geometryVSVariations[j]);
             }
         }
 
@@ -1723,7 +1726,7 @@ void Renderer::LoadPassShaders(Pass* pass)
         for (unsigned j = 0; j < 2; ++j)
         {
             pixelShaders[j] =
-                graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + extraShaderDefines + heightFogVariations[j]);
+                graphics_->GetShader(PS, pass->GetPixelShader(), psDefines + extraShaderDefines + heightFogVariations[j]);
         }
     }
 

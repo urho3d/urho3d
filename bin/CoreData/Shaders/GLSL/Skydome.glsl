@@ -4,9 +4,6 @@
 
 varying vec2 vTexCoord;
 
-uniform mat4 gl_ModelViewMatrix;
-uniform mat4 gl_ProjectionMatrix;
-
 void VS()
 {
     mat4 modelMatrix = iModelMatrix;
@@ -17,6 +14,6 @@ void VS()
 }
 
 void PS()
-{   
-    gl_FragColor = texture2D(sDiffMap, vTexCoord);       
+{
+    gl_FragColor = texture2D(sDiffMap, vTexCoord);
 }

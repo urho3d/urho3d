@@ -133,8 +133,9 @@ void Texture::UpdateParameters()
     // Anisotropy
     if (graphics_->GetAnisotropySupport())
     {
+        unsigned maxAnisotropy = anisotropy_ ? anisotropy_ : graphics_->GetDefaultTextureAnisotropy();
         glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-            filterMode == FILTER_ANISOTROPIC ? (float)graphics_->GetTextureAnisotropy() : 1.0f);
+            filterMode == FILTER_ANISOTROPIC ? (float)maxAnisotropy : 1.0f);
     }
 
     // Shadow compare

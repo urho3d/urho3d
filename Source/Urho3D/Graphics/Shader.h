@@ -48,9 +48,9 @@ public:
     /// Finish resource loading. Always called from the main thread. Return true if successful.
     virtual bool EndLoad();
 
-    /// Return a variation with defines.
+    /// Return a variation with defines. Separate multiple defines with spaces.
     ShaderVariation* GetVariation(ShaderType type, const String& defines);
-    /// Return a variation with defines.
+    /// Return a variation with defines. Separate multiple defines with spaces.
     ShaderVariation* GetVariation(ShaderType type, const char* defines);
 
     /// Return either vertex or pixel shader source code.

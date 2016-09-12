@@ -151,6 +151,18 @@ void Pass::SetPixelShaderDefines(const String& defines)
     ReleaseShaders();
 }
 
+void Pass::SetVertexShaderDefineExcludes(const String& excludes)
+{
+    vertexShaderDefineExcludes_ = excludes;
+    ReleaseShaders();
+}
+
+void Pass::SetPixelShaderDefineExcludes(const String& excludes)
+{
+    pixelShaderDefineExcludes_ = excludes;
+    ReleaseShaders();
+}
+
 void Pass::ReleaseShaders()
 {
     vertexShaders_.Clear();
@@ -162,6 +174,34 @@ void Pass::MarkShadersLoaded(unsigned frameNumber)
     shadersLoadedFrameNumber_ = frameNumber;
 }
 
+String Pass::GetEffectiveVertexShaderDefines() const
+{
+    // Prefer to return just the original defines if possible
+    if (vertexShaderDefineExcludes_.Empty())
+        return vertexShaderDefines_;
+
+    Vector<String> vsDefines = vertexShaderDefines_.Split(' ');
+    Vector<String> vsExcludes = vertexShaderDefineExcludes_.Split(' ');
+    for (unsigned i = 0; i < vsExcludes.Size(); ++i)
+        vsDefines.Remove(vsExcludes[i]);
+
+    return String::Joined(vsDefines, " ");
+}
+
+String Pass::GetEffectivePixelShaderDefines() const
+{
+    // Prefer to return just the original defines if possible
+    if (pixelShaderDefineExcludes_.Empty())
+        return pixelShaderDefines_;
+
+    Vector<String> psDefines = pixelShaderDefines_.Split(' ');
+    Vector<String> psExcludes = pixelShaderDefineExcludes_.Split(' ');
+    for (unsigned i = 0; i < psExcludes.Size(); ++i)
+        psDefines.Remove(psExcludes[i]);
+
+    return String::Joined(psDefines, " ");
+}
+
 unsigned Technique::basePassIndex = 0;
 unsigned Technique::alphaPassIndex = 0;
 unsigned Technique::materialPassIndex = 0;
@@ -170,6 +210,7 @@ unsigned Technique::lightPassIndex = 0;
 unsigned Technique::litBasePassIndex = 0;
 unsigned Technique::litAlphaPassIndex = 0;
 unsigned Technique::shadowPassIndex = 0;
+
 HashMap<String, unsigned> Technique::passIndices;
 
 Technique::Technique(Context* context) :
@@ -249,6 +290,9 @@ bool Technique::BeginLoad(Deserializer& source)
                 newPass->SetPixelShaderDefines(globalPSDefines + passElem.GetAttribute("psdefines"));
             }
 
+            newPass->SetVertexShaderDefineExcludes(passElem.GetAttribute("vsexcludes"));
+            newPass->SetPixelShaderDefineExcludes(passElem.GetAttribute("psexcludes"));
+
             if (passElem.HasAttribute("lighting"))
             {
                 String lighting = passElem.GetAttributeLower("lighting");
@@ -327,6 +371,8 @@ SharedPtr<Technique> Technique::Clone(const String& cloneName) const
         newPass->SetPixelShader(srcPass->GetPixelShader());
         newPass->SetVertexShaderDefines(srcPass->GetVertexShaderDefines());
         newPass->SetPixelShaderDefines(srcPass->GetPixelShaderDefines());
+        newPass->SetVertexShaderDefineExcludes(srcPass->GetVertexShaderDefineExcludes());
+        newPass->SetPixelShaderDefineExcludes(srcPass->GetPixelShaderDefineExcludes());
     }
 
     return ret;

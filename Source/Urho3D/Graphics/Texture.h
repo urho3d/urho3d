@@ -50,6 +50,8 @@ public:
     void SetFilterMode(TextureFilterMode filter);
     /// Set addressing mode by texture coordinate.
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    /// Set texture max. anisotropy level. No effect if not using anisotropic filtering. Value 0 (default) uses the default setting from Renderer.
+    void SetAnisotropy(unsigned level);
     /// Set shadow compare mode. Not used on Direct3D9.
     void SetShadowCompare(bool enable);
     /// Set border color for border addressing mode.
@@ -84,6 +86,9 @@ public:
 
     /// Return addressing mode by texture coordinate.
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+
+    /// Return texture max. anisotropy level. Value 0 means to use the default value from Renderer.
+    unsigned GetAnisotropy() const { return anisotropy_; }
 
     /// Return whether shadow compare is enabled. Not used on Direct3D9.
     bool GetShadowCompare() const { return shadowCompare_; }
@@ -192,6 +197,8 @@ protected:
     TextureFilterMode filterMode_;
     /// Addressing mode.
     TextureAddressMode addressMode_[MAX_COORDS];
+    /// Texture anisotropy level.
+    unsigned anisotropy_;
     /// Mip levels to skip when loading per texture quality setting.
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
     /// Border color.

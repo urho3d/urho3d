@@ -63,10 +63,14 @@ public:
     void SetVertexShader(const String& name);
     /// Set pixel shader name.
     void SetPixelShader(const String& name);
-    /// Set vertex shader defines.
+    /// Set vertex shader defines. Separate multiple defines with spaces.
     void SetVertexShaderDefines(const String& defines);
-    /// Set pixel shader defines.
+    /// Set pixel shader defines. Separate multiple defines with spaces.
     void SetPixelShaderDefines(const String& defines);
+    /// Set vertex shader define excludes. Use to mark defines that the shader code will not recognize, to prevent compiling redundant shader variations.
+    void SetVertexShaderDefineExcludes(const String& excludes);
+    /// Set pixel shader define excludes. Use to mark defines that the shader code will not recognize, to prevent compiling redundant shader variations.
+    void SetPixelShaderDefineExcludes(const String& excludes);
     /// Reset shader pointers.
     void ReleaseShaders();
     /// Mark shaders loaded this frame.
@@ -110,12 +114,23 @@ public:
 
     /// Return pixel shader defines.
     const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
+    
+    /// Return vertex shader define excludes.
+    const String& GetVertexShaderDefineExcludes() const { return vertexShaderDefineExcludes_; }
+
+    /// Return pixel shader define excludes.
+    const String& GetPixelShaderDefineExcludes() const { return pixelShaderDefineExcludes_; }
 
     /// Return vertex shaders.
     Vector<SharedPtr<ShaderVariation> >& GetVertexShaders() { return vertexShaders_; }
 
     /// Return pixel shaders.
     Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
+
+    /// Return the effective vertex shader defines, accounting for excludes. Called internally by Renderer.
+    String GetEffectiveVertexShaderDefines() const;
+    /// Return the effective pixel shader defines, accounting for excludes. Called internally by Renderer.
+    String GetEffectivePixelShaderDefines() const;
 
 private:
     /// Pass index.
@@ -142,6 +157,10 @@ private:
     String vertexShaderDefines_;
     /// Pixel shader defines.
     String pixelShaderDefines_;
+    /// Vertex shader define excludes.
+    String vertexShaderDefineExcludes_;
+    /// Pixel shader define excludes.
+    String pixelShaderDefineExcludes_;
     /// Vertex shaders.
     Vector<SharedPtr<ShaderVariation> > vertexShaders_;
     /// Pixel shaders.
