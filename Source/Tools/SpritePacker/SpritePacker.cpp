@@ -327,7 +327,7 @@ void Run(Vector<String>& arguments)
                 packedHeight = size.y_;
             }
         }
-        delete packerRects;
+        delete[] packerRects;
         if (!success)
             ErrorExit("Could not allocate for all images.  The max sprite sheet texture size is " + String(MAX_TEXTURE_SIZE) + "x" + String(MAX_TEXTURE_SIZE) + ".");
     }
