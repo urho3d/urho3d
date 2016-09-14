@@ -367,6 +367,10 @@ bool AnimationController::SetWeight(const String& name, float weight)
     animations_[index].setWeight_ = (unsigned char)(weight * 255.0f);
     animations_[index].setWeightTtl_ = COMMAND_STAY_TIME;
     ++animations_[index].setWeightRev_;
+    // Cancel any ongoing weight fade
+    animations_[index].targetWeight_ = weight;
+    animations_[index].fadeTime_ = 0.0f;
+
     MarkNetworkUpdate();
     return true;
 }
