@@ -79,6 +79,7 @@ Pass::Pass(const String& name) :
     depthTestMode_(CMP_LESSEQUAL),
     lightingMode_(LIGHTING_UNLIT),
     shadersLoadedFrameNumber_(0),
+    alphaToCoverage_(false),
     depthWrite_(true),
     isDesktop_(false)
 {
@@ -121,6 +122,12 @@ void Pass::SetDepthWrite(bool enable)
 {
     depthWrite_ = enable;
 }
+
+void Pass::SetAlphaToCoverage(bool enable)
+{
+    alphaToCoverage_ = enable;
+}
+
 
 void Pass::SetIsDesktop(bool enable)
 {
@@ -323,6 +330,9 @@ bool Technique::BeginLoad(Deserializer& source)
 
             if (passElem.HasAttribute("depthwrite"))
                 newPass->SetDepthWrite(passElem.GetBool("depthwrite"));
+
+            if (passElem.HasAttribute("alphatocoverage"))
+                newPass->SetAlphaToCoverage(passElem.GetBool("alphatocoverage"));
         }
         else
             URHO3D_LOGERROR("Missing pass name");
@@ -366,6 +376,7 @@ SharedPtr<Technique> Technique::Clone(const String& cloneName) const
         newPass->SetDepthTestMode(srcPass->GetDepthTestMode());
         newPass->SetLightingMode(srcPass->GetLightingMode());
         newPass->SetDepthWrite(srcPass->GetDepthWrite());
+        newPass->SetAlphaToCoverage(srcPass->GetAlphaToCoverage());
         newPass->SetIsDesktop(srcPass->IsDesktop());
         newPass->SetVertexShader(srcPass->GetVertexShader());
         newPass->SetPixelShader(srcPass->GetPixelShader());

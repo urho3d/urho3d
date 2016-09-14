@@ -210,8 +210,8 @@ public:
     void SetDepthStencil(Texture2D* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
-    /// Set blending mode.
-    void SetBlendMode(BlendMode mode);
+    /// Set blending and alpha-to-coverage modes. Alpha-to-coverage is not supported on Direct3D9.
+    void SetBlendMode(BlendMode mode, bool alphaToCoverage = false);
     /// Set color write on/off.
     void SetColorWrite(bool enable);
     /// Set hardware culling mode.
@@ -398,6 +398,9 @@ public:
 
     /// Return blending mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
+    /// Return whether alpha-to-coverage is enabled.
+    bool GetAlphaToCoverage() const { return alphaToCoverage_; }
 
     /// Return whether color write is enabled.
     bool GetColorWrite() const { return colorWrite_; }
@@ -690,6 +693,8 @@ private:
     unsigned defaultTextureAnisotropy_;
     /// Blending mode.
     BlendMode blendMode_;
+    /// Alpha-to-coverage enable.
+    bool alphaToCoverage_;
     /// Color write enable.
     bool colorWrite_;
     /// Hardware culling mode.

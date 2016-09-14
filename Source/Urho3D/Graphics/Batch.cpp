@@ -201,7 +201,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             else if (blend == BLEND_ADDALPHA)
                 blend = BLEND_SUBTRACTALPHA;
         }
-        graphics->SetBlendMode(blend);
+        graphics->SetBlendMode(blend, pass_->GetAlphaToCoverage() || material_->GetAlphaToCoverage());
 
         bool isShadowPass = pass_->GetIndex() == Technique::shadowPassIndex;
         CullMode effectiveCullMode = pass_->GetCullMode();

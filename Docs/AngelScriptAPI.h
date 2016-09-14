@@ -6264,6 +6264,7 @@ void SetUVTransform(const Vector2&, float, float);
 void SortTechniques();
 
 // Properties:
+bool alphaToCoverage;
 /* readonly */
 String category;
 CullMode cullMode;
@@ -7976,6 +7977,7 @@ class Pass
 {
 
 // Properties:
+bool alphaToCoverage;
 BlendMode blendMode;
 CullMode cullMode;
 CompareMode depthTestMode;

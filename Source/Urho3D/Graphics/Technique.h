@@ -57,6 +57,8 @@ public:
     void SetLightingMode(PassLightingMode mode);
     /// Set depth write on/off.
     void SetDepthWrite(bool enable);
+    /// Set alpha-to-coverage on/off.
+    void SetAlphaToCoverage(bool enable);
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);
     /// Set vertex shader name.
@@ -99,6 +101,9 @@ public:
 
     /// Return depth write mode.
     bool GetDepthWrite() const { return depthWrite_; }
+
+    /// Return alpha-to-coverage mode.
+    bool GetAlphaToCoverage() const { return alphaToCoverage_; }
 
     /// Return whether requires desktop level hardware.
     bool IsDesktop() const { return isDesktop_; }
@@ -147,6 +152,8 @@ private:
     unsigned shadersLoadedFrameNumber_;
     /// Depth write mode.
     bool depthWrite_;
+    /// Alpha-to-coverage mode.
+    bool alphaToCoverage_;
     /// Require desktop level hardware flag.
     bool isDesktop_;
     /// Vertex shader name.

@@ -1655,7 +1655,7 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool alphaToCoverage)
 {
     if (mode != blendMode_)
     {
@@ -1669,6 +1669,16 @@ void Graphics::SetBlendMode(BlendMode mode)
         }
 
         blendMode_ = mode;
+    }
+
+    if (alphaToCoverage != alphaToCoverage_)
+    {
+        if (alphaToCoverage)
+            glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        else
+            glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+        alphaToCoverage_ = alphaToCoverage;
     }
 }
 
@@ -3042,6 +3052,7 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_NONE;
     constantDepthBias_ = 0.0f;

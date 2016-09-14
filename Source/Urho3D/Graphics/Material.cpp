@@ -542,6 +542,10 @@ bool Material::Load(const XMLElement& source)
     if (depthBiasElem)
         SetDepthBias(BiasParameters(depthBiasElem.GetFloat("constant"), depthBiasElem.GetFloat("slopescaled")));
 
+    XMLElement alphaToCoverageElem = source.GetChild("alphatocoverage");
+    if (alphaToCoverageElem)
+        SetAlphaToCoverage(alphaToCoverageElem.GetBool("enable"));
+
     XMLElement renderOrderElem = source.GetChild("renderorder");
     if (renderOrderElem)
         SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
@@ -695,6 +699,10 @@ bool Material::Load(const JSONValue& source)
     if (!depthBiasVal.IsNull())
         SetDepthBias(BiasParameters(depthBiasVal.Get("constant").GetFloat(), depthBiasVal.Get("slopescaled").GetFloat()));
 
+    JSONValue alphaToCoverageVal = source.Get("alphatocoverage");
+    if (!alphaToCoverageVal.IsNull())
+        SetAlphaToCoverage(alphaToCoverageVal.GetBool());
+
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
         SetRenderOrder((unsigned char)renderOrderVal.GetUInt());
@@ -796,6 +804,10 @@ bool Material::Save(XMLElement& dest) const
     depthBiasElem.SetFloat("constant", depthBias_.constantBias_);
     depthBiasElem.SetFloat("slopescaled", depthBias_.slopeScaledBias_);
 
+    // Write alpha-to-coverage
+    XMLElement alphaToCoverageElem = dest.CreateChild("alphatocoverage");
+    alphaToCoverageElem.SetBool("enable", alphaToCoverage_);
+
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
     renderOrderElem.SetUInt("value", renderOrder_);
@@ -892,6 +904,9 @@ bool Material::Save(JSONValue& dest) const
     depthBiasValue.Set("constant", depthBias_.constantBias_);
     depthBiasValue.Set("slopescaled", depthBias_.slopeScaledBias_);
     dest.Set("depthbias", depthBiasValue);
+
+    // Write alpha-to-coverage
+    dest.Set("alphatocoverage", alphaToCoverage_);
 
     // Write render order
     dest.Set("renderorder", (unsigned) renderOrder_);
@@ -1086,6 +1101,11 @@ void Material::SetDepthBias(const BiasParameters& parameters)
     depthBias_.Validate();
 }
 
+void Material::SetAlphaToCoverage(bool enable)
+{
+    alphaToCoverage_ = enable;
+}
+
 void Material::SetRenderOrder(unsigned char order)
 {
     renderOrder_ = order;
@@ -1138,6 +1158,8 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->shaderParameters_ = shaderParameters_;
     ret->shaderParameterHash_ = shaderParameterHash_;
     ret->textures_ = textures_;
+    ret->depthBias_ = depthBias_;
+    ret->alphaToCoverage_ = alphaToCoverage_;
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;

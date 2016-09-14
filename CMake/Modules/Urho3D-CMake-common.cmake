@@ -1739,7 +1739,7 @@ macro (install_header_files)
             endif ()
             if (INSTALL_SOURCE MATCHES /$)
                 # Source is a directory
-                if (ARG_USE_FILE_SYMLINK OR ARG_ACCUMULATE)
+                if (ARG_USE_FILE_SYMLINK OR ARG_ACCUMULATE OR BASH_ON_WINDOWS)
                     # Use file symlink for each individual files in the source directory
                     if (IS_SYMLINK ${ARG_DESTINATION} AND NOT CMAKE_HOST_WIN32)
                         execute_process (COMMAND ${CMAKE_COMMAND} -E remove ${ARG_DESTINATION})
