@@ -548,11 +548,11 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
     case FC_LOOKAT_MIXED:
         {
             // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions or singularities
-            Vector3 lookAtVec(position - node_->GetWorldPosition());
-            lookAtVec.y_ = 0.0f;
+            const Vector3 lookAtVec(position - node_->GetWorldPosition());
+            const Vector3 lookAtVecXZ(lookAtVec.x_, 0.0f, lookAtVec.z_);
 
             Quaternion lookAt;
-            lookAt.FromLookRotation(lookAtVec);
+            lookAt.FromLookRotation(lookAtVecXZ);
 
             Vector3 euler = rotation.EulerAngles();
             if (mode == FC_LOOKAT_MIXED)
