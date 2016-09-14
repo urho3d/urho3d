@@ -547,8 +547,9 @@ Quaternion Camera::GetFaceCameraRotation(const Vector3& position, const Quaterni
     case FC_LOOKAT_Y:
     case FC_LOOKAT_MIXED:
         {
-            // Make the Y-only lookat happen on an XZ plane to make sure there are no unwanted transitions or singularities
+            // Mixed mode needs true look-at vector
             const Vector3 lookAtVec(position - node_->GetWorldPosition());
+            // While Y-only lookat happens on an XZ plane to make sure there are no unwanted transitions or singularities
             const Vector3 lookAtVecXZ(lookAtVec.x_, 0.0f, lookAtVec.z_);
 
             Quaternion lookAt;
