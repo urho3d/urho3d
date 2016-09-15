@@ -513,7 +513,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RenderSurface", "RenderSurface@+ get_linkedDepthStencil() const", asMETHOD(RenderSurface, GetLinkedDepthStencil), asCALL_THISCALL);
 
     RegisterTexture<Texture2D>(engine, "Texture2D");
-    engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Texture2D", "bool SetSize(int, int, uint, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)", asMETHOD(Texture2D, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "bool SetData(Image@+, bool useAlpha = false)", asMETHODPR(Texture2D, SetData, (Image*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "RenderSurface@+ get_renderSurface() const", asMETHOD(Texture2D, GetRenderSurface), asCALL_THISCALL);
     engine->RegisterObjectMethod("Texture2D", "Image@+ GetImage() const", asFUNCTION(Texture2DGetImage), asCALL_CDECL_OBJLAST);

@@ -7,7 +7,7 @@ class Texture2D : public Texture
     Texture2D();
     ~Texture2D();
 
-    bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true);
     bool SetData(Image* image, bool useAlpha = false);
 
     RenderSurface* GetRenderSurface() const;

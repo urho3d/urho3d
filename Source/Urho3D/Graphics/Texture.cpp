@@ -69,8 +69,11 @@ Texture::Texture(Context* context) :
     shadowCompare_(false),
     filterMode_(FILTER_DEFAULT),
     anisotropy_(0),
+    multiSample_(1),
     sRGB_(false),
-    parametersDirty_(true)
+    parametersDirty_(true),
+    autoResolve_(false),
+    resolveDirty_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;

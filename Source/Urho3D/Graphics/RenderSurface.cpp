@@ -94,6 +94,16 @@ TextureUsage RenderSurface::GetUsage() const
     return parentTexture_->GetUsage();
 }
 
+int RenderSurface::GetMultiSample() const
+{
+    return parentTexture_->GetMultiSample();
+}
+
+bool RenderSurface::GetAutoResolve() const
+{
+    return parentTexture_->GetAutoResolve();
+}
+
 Viewport* RenderSurface::GetViewport(unsigned index) const
 {
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;

@@ -1005,7 +1005,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb,
+Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb,
     unsigned persistentKey)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat()) || (format == Graphics::GetReadableDepthFormat());
@@ -1018,13 +1018,19 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
     if (cubemap)
         height = width;
 
-    long long searchKey = ((long long)format << 32) | (width << 16) | height;
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample == 1)
+        autoResolve = false;
+
+    long long searchKey = ((long long)format << 32) | (multiSample << 24) | (width << 12) | height;
     if (filtered)
         searchKey |= 0x8000000000000000LL;
     if (srgb)
         searchKey |= 0x4000000000000000LL;
     if (cubemap)
         searchKey |= 0x2000000000000000LL;
+    if (autoResolve)
+        searchKey |= 0x1000000000000000LL;
 
     // Add persistent key if defined
     if (persistentKey)
@@ -1046,7 +1052,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
         if (!cubemap)
         {
             SharedPtr<Texture2D> newTex2D(new Texture2D(context_));
-            newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
+            newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET, multiSample, autoResolve);
 
 #ifdef URHO3D_OPENGL
             // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
@@ -1088,7 +1094,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
     }
 }
 
-RenderSurface* Renderer::GetDepthStencil(int width, int height)
+RenderSurface* Renderer::GetDepthStencil(int width, int height, int multiSample, bool autoResolve)
 {
     // Return the default depth-stencil surface if applicable
     // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
@@ -1096,8 +1102,8 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height)
         return 0;
     else
     {
-        return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), false, false,
-            false))->GetRenderSurface();
+        return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), multiSample, autoResolve,
+            false, false, false))->GetRenderSurface();
     }
 }
 
@@ -1962,9 +1968,11 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap, float blurScale)
     graphics_->SetScissorTest(false);
 
     // Get a temporary render buffer
-    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetFormat(), false, false, false));
+    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(),
+        shadowMap->GetFormat(), 1, false, false, false, false));
     graphics_->SetRenderTarget(0, tmpBuffer->GetRenderSurface());
-    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetMultiSample(),
+        shadowMap->GetAutoResolve()));
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
 
     // Get shaders

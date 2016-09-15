@@ -500,15 +500,28 @@ bool Texture2D::Create()
         break;
     }
 
+    // Fall back to non-multisampled if unsupported multisampling mode
+    if (multiSample_ > 1)
+    {
+        GraphicsImpl* impl = graphics_->GetImpl();
+        if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_,  multiSample_))
+        {
+            multiSample_ = 1;
+            autoResolve_ = false;
+        }
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
-    if (usage_ == TEXTURE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, d3dUsage, D3DRTYPE_TEXTURE))
+    // Multisampled surfaces need also to be created this way
+    if (usage_ == TEXTURE_DEPTHSTENCIL && (multiSample_ > 1 || !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, 
+        d3dUsage, D3DRTYPE_TEXTURE)))
     {
         HRESULT hr = device->CreateDepthStencilSurface(
             (UINT)width_,
             (UINT)height_,
             (D3DFORMAT)format_,
-            D3DMULTISAMPLE_NONE,
+            (multiSample_ > 1) ? (D3DMULTISAMPLE_TYPE)multiSample_ : D3DMULTISAMPLE_NONE,
             0,
             FALSE,
             (IDirect3DSurface9**)&renderSurface_->surface_,
@@ -542,8 +555,28 @@ bool Texture2D::Create()
 
         levels_ = ((IDirect3DTexture9*)object_.ptr_)->GetLevelCount();
 
-        if (usage_ >= TEXTURE_RENDERTARGET)
+        // Create the multisampled rendertarget for rendering to if necessary
+        if (usage_ == TEXTURE_RENDERTARGET && multiSample_ > 1)
         {
+            HRESULT hr = device->CreateRenderTarget(
+                (UINT)width_,
+                (UINT)height_,
+                (D3DFORMAT)format_,
+                (multiSample_ > 1) ? (D3DMULTISAMPLE_TYPE)multiSample_ : D3DMULTISAMPLE_NONE,
+                0,
+                FALSE,
+                (IDirect3DSurface9**)&renderSurface_->surface_,
+                0);
+            if (FAILED(hr))
+            {
+                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
+                URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                return false;
+            }
+        }
+        else if (usage_ >= TEXTURE_RENDERTARGET)
+        {
+            // Else use the texture surface directly for rendering
             hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);

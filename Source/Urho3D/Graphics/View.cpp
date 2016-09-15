@@ -1707,7 +1707,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
                 if (!depthOnlyDummyTexture_)
                 {
                     depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
-                        graphics_->GetDummyColorFormat(), false, false, false);
+                        graphics_->GetDummyColorFormat(), texture->GetMultiSample(), texture->GetAutoResolve(), false, false, false);
                 }
 #endif
                 graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
@@ -2005,13 +2005,15 @@ void View::AllocateScreenBuffers()
     // Allocate screen buffers with filtering active in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
+    int multiSample = renderTarget_ ? renderTarget_->GetMultiSample() : 1;
+    bool autoResolve = renderTarget_ ? renderTarget_->GetAutoResolve() : false;
     substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
-        format, false, true, sRGB)) : (RenderSurface*)0;
+        format, multiSample, autoResolve, false, true, sRGB)) : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
         viewportTextures_[i] =
-            i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, false, true, sRGB) :
-                (Texture*)0;
+            i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, multiSample, autoResolve,
+                false, true, sRGB) : (Texture*)0;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
     if (numViewportTextures == 1 && substituteRenderTarget_)
@@ -2043,7 +2045,7 @@ void View::AllocateScreenBuffers()
 
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
         renderTargets_[rtInfo.name_] =
-            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_,
+            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, 1, false, rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_,
                 rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
     }
 }
@@ -3007,7 +3009,8 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
-        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight(),
+            shadowMap->GetMultiSample(), shadowMap->GetAutoResolve()));
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
 
@@ -3064,7 +3067,8 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
     RenderSurface* depthStencil = renderTarget->GetLinkedDepthStencil();
     // Finally get one from Renderer
     if (!depthStencil)
-        depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
+        depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight(),
+            renderTarget->GetMultiSample(), renderTarget->GetAutoResolve());
     return depthStencil;
 }
 

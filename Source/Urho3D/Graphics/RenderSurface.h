@@ -71,6 +71,12 @@ public:
     /// Return usage.
     TextureUsage GetUsage() const;
 
+    /// Return multisampling level.
+    int GetMultiSample() const;
+
+    /// Return multisampling autoresolve mode.
+    bool GetAutoResolve() const;
+
     /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
 
