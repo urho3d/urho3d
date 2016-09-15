@@ -37,42 +37,44 @@
         float3 pos   = (cLightPosPS.xyz - worldPos);
         float3 reflectVec  = reflect(-toCamera, normal);
         
-        float3 tubeStart  = pos * (lightVec * LightLengh);
-        float3 tubeEnd    = pos * (lightVec * LightLengh);
-        float3 L0         = pos - 0.5 * tubeStart;
-        float3 L1         = pos + 0.5 * tubeEnd;
-        float distL0      = length( L0 );
-        float distL1      = length( L1 );
-        
+        float3 L01 = lightVec * LightLengh;
+        float3 L0 = pos - 0.5 * L01;
+        float3 L1 = pos + 0.5 * L01;
+        float3 ld = L1 - L0;
+
+        float distL0    = length( L0 );
+        float distL1    = length( L1 );
+
         float NoL0      = dot( L0, normal ) / ( 2.0 * distL0 );
         float NoL1      = dot( L1, normal ) / ( 2.0 * distL1 );
-        ndl             = ( 2.0 * saturate( NoL0 + NoL1) ) 
+        ndl             = ( 2.0 * clamp( NoL0 + NoL1, 0.0, 1.0 ) ) 
                         / ( distL0 * distL1 + dot( L0, L1 ) + 2.0 );
+    
+        float RoL0      = dot( reflectVec, L0 );
+        float RoLd      = dot( reflectVec, ld );
+        float L0oLd     = dot( L0, ld );
+        float distLd    = length( ld );
+        float t         = ( RoL0 * RoLd - L0oLd ) 
+                    / ( distLd * distLd - RoLd * RoLd );
         
-        float3 Ld         = L1 - L0;
-        float RoL0        = dot( reflectVec, L0 );
-        float RoLd        = dot( reflectVec, Ld );
-        float L0oLd       = dot( L0, Ld );
-        float distLd      = length( Ld );
-        float t           = ( RoL0 * RoLd - L0oLd ) 
-                          / ( distLd * distLd - RoLd * RoLd );
-        
-        float3 closestPoint   = L0 + Ld * saturate( t);
-        float3 centerToRay    = dot( closestPoint, reflectVec ) * reflectVec - closestPoint;
-        closestPoint          = closestPoint + centerToRay * saturate( LightRad / length( centerToRay ));
-        float3 l              = normalize( closestPoint );
-        float3 h              = normalize( toCamera + l );
-        
-        float HoN       = saturate( dot( h, normal ) );
-        float HoV       = dot( h, toCamera );
-        float ndv       = saturate(dot(normal, toCamera));
-        
-        float distLight     = length( closestPoint );
-        float alpha         = roughness * roughness;
-        float alphaPrime    = saturate( LightRad / ( distLight * 2.0 ) + alpha);
+        float3 closestPoint   = L0 + ld * saturate( t);
+        float3 centreToRay    = dot( closestPoint, reflectVec ) * reflectVec - closestPoint;
+        closestPoint = closestPoint + centreToRay * saturate(LightRad / length(centreToRay));
 
-        const float3 fresnelTerm = Fresnel(specColor, HoV) ;
-        const float distTerm     = Distribution(HoN, alphaPrime);
+        float3 l = normalize(closestPoint);
+        float3 h = normalize(toCamera + l);
+
+        ndl       = saturate(dot(normal, l));
+        float hdn = saturate(dot(h, normal));
+        float hdv = dot(h, toCamera);
+        float ndv = saturate(dot(normal, toCamera));
+
+        float distL      = length(closestPoint);
+        float alpha      = roughness * roughness;
+        float alphaPrime = saturate(LightRad / (distL * 2.0) + alpha);
+
+        const float3 fresnelTerm = Fresnel(specColor, hdv) ;
+        const float distTerm     = Distribution(hdn, alphaPrime);
         const float visTerm      = Visibility(ndl, ndv, roughness);
 
         return distTerm * visTerm * fresnelTerm ;
