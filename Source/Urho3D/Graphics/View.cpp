@@ -2002,18 +2002,15 @@ void View::AllocateScreenBuffers()
             ++numViewportTextures;
     }
 
-    // Allocate screen buffers with filtering active in case the quad commands need that
+    // Allocate screen buffers. Enable filtering in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
-    int multiSample = renderTarget_ ? renderTarget_->GetMultiSample() : 1;
-    bool autoResolve = renderTarget_ ? renderTarget_->GetAutoResolve() : false;
     substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
-        format, multiSample, autoResolve, false, true, sRGB)) : (RenderSurface*)0;
+        format, 1, false, false, true, sRGB)) : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
-        viewportTextures_[i] =
-            i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, multiSample, autoResolve,
-                false, true, sRGB) : (Texture*)0;
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, 1, false,
+            false, true, sRGB) : (Texture*)0;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
     if (numViewportTextures == 1 && substituteRenderTarget_)
