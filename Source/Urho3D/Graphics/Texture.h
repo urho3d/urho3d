@@ -99,9 +99,6 @@ public:
     /// Return whether is using sRGB sampling and writing.
     bool GetSRGB() const { return sRGB_; }
 
-    /// Return backup texture.
-    Texture* GetBackupTexture() const { return backupTexture_; }
-
     /// Return texture multisampling level (1 = no multisampling).
     int GetMultiSample() const { return multiSample_; }
 
@@ -110,6 +107,9 @@ public:
 
     /// Return whether multisampled texture needs resolve.
     bool IsResolveDirty() const { return resolveDirty_; }
+    
+    /// Return backup texture.
+    Texture* GetBackupTexture() const { return backupTexture_; }
 
     /// Return mip levels to skip on a quality setting when loading.
     int GetMipsToSkip(int quality) const;

@@ -21,6 +21,9 @@ class Texture : public Resource
     unsigned GetAnisotropy() const;
     const Color& GetBorderColor() const;
     bool GetSRGB() const;
+    int GetMultiSample() const;
+	bool GetAutoResolve() const;
+	bool IsResolveDirty() const;
     Texture* GetBackupTexture() const;
     int GetMipsToSkip(int quality) const;
     int GetLevelWidth(unsigned level) const;
@@ -40,6 +43,9 @@ class Texture : public Resource
     tolua_property__get_set unsigned anisotropy;
     tolua_property__get_set Color& borderColor;
     tolua_property__get_set bool sRGB;
+    tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set bool autoResolve;
+    tolua_readonly tolua_property__is_set bool resolveDirty;
     tolua_property__get_set Texture* backupTexture;
     tolua_readonly tolua_property__get_set TextureUsage usage;
 };
