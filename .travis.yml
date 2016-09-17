@@ -325,15 +325,17 @@ after_script: rake ci_teardown_cache
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}
-osx_image: xcode7.3
+osx_image: xcode8
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
     - numjobs=3
     - OSX=1
+    # ccache 3.3.1 does not play well together with Clang + PCH, temporary workaround by turning off PCH
+    - URHO3D_PCH=0
     - USE_CCACHE=1
-    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    # CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
@@ -349,7 +351,6 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  # travis_retry brew update >/dev/null
   - which cmake >/dev/null 2>&1 || cmake=cmake
   - if [[ $PACKAGE_UPLOAD ]]; then doxygen='doxygen graphviz';
       whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline';
