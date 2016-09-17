@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-// Modified by cosmy1, Yao Wei Tjong, Lasse Oorni & Josh Engebretson for Urho3D
+// Modified by cosmy1, Yao Wei Tjong & Lasse Oorni for Urho3D
 
 #if defined(_WIN32)
 #if !defined(_CRT_SECURE_NO_WARNINGS)
@@ -123,6 +123,9 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 #ifdef __MACH__
 
+// Urho3D: prefer own implementation of clock_gettime regardless of XCode / SDK version
+#define _DARWIN_FEATURE_CLOCK_GETTIME 0
+
 #define CLOCK_MONOTONIC (1)
 #define CLOCK_REALTIME (2)
 
@@ -131,19 +134,6 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <assert.h>
-
-/* Determine if the current OSX version supports clock_gettime */
-#ifdef __APPLE__
-#include <AvailabilityMacros.h>
-#ifndef MAC_OS_X_VERSION_10_12
-#define MAC_OS_X_VERSION_10_12 101200
-#endif
-#endif
-
-// Urho3D: Instead of using MAC_OS_X_VERSION_MIN_REQUIRED, which it doesn't appear time.h is guarded by, use MAC_OS_X_VERSION_MAX_ALLOWED
-#define CIVETWEB_APPLE_HAVE_CLOCK_GETTIME defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
-#if !(CIVETWEB_APPLE_HAVE_CLOCK_GETTIME)
-int clock_gettime(int clk_id, struct timespec *t);
 
 int clock_gettime(int clk_id, struct timespec *t)
 {
@@ -184,7 +174,6 @@ int clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
-#endif
 #endif
 
 // Urho3D: Prevent inclusion of pthread_time.h on MinGW, instead prefer own implementation of clock_gettime()
