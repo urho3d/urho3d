@@ -85,7 +85,7 @@ void GetShadowPos(float4 projWorldPos, float3 normal, out float4 shadowPos[NUMCA
         #ifdef DIRLIGHT
             float cosAngle = saturate(1.0 - dot(normal, cLightDir));
         #else
-            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)));
+            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPos.xyz - projWorldPos.xyz)));
         #endif
 
         #if defined(DIRLIGHT)
@@ -191,7 +191,7 @@ float Chebyshev(float2 Moments, float depth)
 {  
     //One-tailed inequality valid if depth > Moments.x  
     float p = float(depth <= Moments.x);  
-    //Compute variance.  
+    //Compute variance.
     float Variance = Moments.y - (Moments.x * Moments.x); 
 
     float minVariance = cVSMShadowParams.x;
@@ -351,7 +351,7 @@ float GetShadowDeferred(float4 projWorldPos, float3 normal, float depth)
         return GetDirShadowDeferred(projWorldPos, normal, depth);
     #else
         #ifdef NORMALOFFSET
-            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPosPS - projWorldPos.xyz)));
+            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPosPS.xyz - projWorldPos.xyz)));
             projWorldPos.xyz += cosAngle * cNormalOffsetScalePS.x * normal;
         #endif
 

@@ -86,7 +86,7 @@ vec4 GetShadowPos(int index, vec3 normal, vec4 projWorldPos)
         #ifdef DIRLIGHT
             float cosAngle = clamp(1.0 - dot(normal, cLightDir), 0.0, 1.0);
         #else
-            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)), 0.0, 1.0);
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPos.xyz - projWorldPos.xyz)), 0.0, 1.0);
         #endif
         projWorldPos.xyz += cosAngle * normalOffsetScale[index] * normal;
     #endif
@@ -353,7 +353,7 @@ float GetShadowDeferred(vec4 projWorldPos, vec3 normal, float depth)
         return GetDirShadowDeferred(projWorldPos, normal, depth);
     #else
         #ifdef NORMALOFFSET
-            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPosPS - projWorldPos.xyz)), 0.0, 1.0);
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPosPS.xyz - projWorldPos.xyz)), 0.0, 1.0);
             projWorldPos.xyz += cosAngle * cNormalOffsetScalePS.x * normal;
         #endif
 

@@ -197,6 +197,12 @@ public:
     SDL_Surface* GetSDLSurface(const IntRect& rect = IntRect::ZERO) const;
     /// Precalculate the mip levels. Used by asynchronous texture loading.
     void PrecalculateLevels();
+    /// Clean up the mip levels.
+    void CleanupLevels();
+    /// Get all stored mip levels starting from this.
+    void GetLevels(PODVector<Image*>& levels);
+    /// Get all stored mip levels starting from this.
+    void GetLevels(PODVector<const Image*>& levels) const;
 
 private:
     /// Decode an image using stb_image.
