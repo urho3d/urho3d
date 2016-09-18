@@ -51,7 +51,7 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
 {
 }
 
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
@@ -61,7 +61,15 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
 
     glGenRenderbuffersEXT(1, &renderBuffer_);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
+
+    /// \todo Multisampled renderbuffer on GLES
+#ifndef GL_ES_VERSION_2_0
+    if (multiSample > 1)
+        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, multiSample, format, width, height);
+    else
+#endif
     glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
+    
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
     return true;
 }

@@ -60,7 +60,7 @@ public:
     /// Mark the GPU resource destroyed on graphics context destruction. Only used on OpenGL.
     void OnDeviceLost();
     /// Create renderbuffer that cannot be sampled as a texture. Only used on OpenGL.
-    bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);
+    bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample);
 
     /// Return width.
     int GetWidth() const;

@@ -1572,7 +1572,8 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
         }
 
         // If multisampled, mark the texture needing resolve
-        parentTexture->SetResolveDirty(true);
+        if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            parentTexture->SetResolveDirty(true);
     }
 
     // First rendertarget controls sRGB write mode

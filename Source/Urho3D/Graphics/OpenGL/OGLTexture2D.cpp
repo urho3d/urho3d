@@ -377,11 +377,17 @@ bool Texture2D::Create()
     {
         if (renderSurface_)
         {
-            renderSurface_->CreateRenderBuffer(width_, height_, format);
+            renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
             return true;
         }
         else
             return false;
+    }
+    else
+    {
+        // Multisample with autoresolve: create a renderbuffer for rendering, but also a texture
+        if (multiSample_ > 1 && autoResolve_)
+            renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
     }
 
     glGenTextures(1, &object_.name_);
