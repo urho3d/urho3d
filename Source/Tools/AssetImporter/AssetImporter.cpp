@@ -692,10 +692,10 @@ void ExportAnimation(const String& outName, bool animationOnly)
 
         // Most fbx animation files contain only skeleton and no model skinned mesh.
         // -create model's bone struct and assign scene animation
+        sceneFbxModel_.bones_.Clear();
         if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
         {
             sceneFbxModel_.animations_ = sceneAnimations_;
-            sceneFbxModel_.bones_.Clear();
 
             CollectSceneNodesAsBones(rootNode_);
         }
@@ -2813,7 +2813,7 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
 void ExtrapolatePivotlessAnimation(OutModel* model)
 {
     // If there was no model present in the scene, use sceneFbxModel_
-    if ( suppressFbxPivotNodes_ && model == NULL && sceneFbxModel_.bones_.Size() > 0)
+    if (model == NULL && sceneFbxModel_.bones_.Size() > 0)
     {
         model = &sceneFbxModel_;
     }
