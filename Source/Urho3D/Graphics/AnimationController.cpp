@@ -431,6 +431,18 @@ bool AnimationController::IsPlaying(const String& name) const
     return index != M_MAX_UNSIGNED;
 }
 
+bool AnimationController::IsPlaying(unsigned char layer) const
+{
+    for (Vector<AnimationControl>::ConstIterator i = animations_.Begin(); i != animations_.End(); ++i)
+    {
+        AnimationState* state = GetAnimationState(i->hash_);
+        if (state && state->GetLayer() == layer)
+            return true;
+    }
+
+    return false;
+}
+
 bool AnimationController::IsFadingIn(const String& name) const
 {
     unsigned index;
