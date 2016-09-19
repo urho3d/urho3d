@@ -182,7 +182,6 @@ float defaultTicksPerSecond_ = 4800.0f;
 float importStartTime_ = 0.0f;
 float importEndTime_ = 0.0f;
 bool suppressFbxPivotNodes_ = true;
-OutModel sceneFbxModel_;
 
 int main(int argc, char** argv);
 void Run(const Vector<String>& arguments);
@@ -247,7 +246,7 @@ String SanitateAssetName(const String& name);
 
 unsigned GetPivotlessBoneIndex(OutModel& model, const String& boneName);
 void ExtrapolatePivotlessAnimation(OutModel* model);
-void CollectSceneNodesAsBones(aiNode* rootNode);
+void CollectSceneNodesAsBones(OutModel &model, aiNode* rootNode);
 
 int main(int argc, char** argv)
 {
@@ -535,6 +534,7 @@ void Run(const Vector<String>& arguments)
         }
         else
             scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
+
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile + ": " + String(aiGetErrorString()));
 
@@ -684,22 +684,17 @@ void ExportAnimation(const String& outName, bool animationOnly)
     //    BuildAndSaveModel(model);
     if (!noAnimations_)
     {
+        // Most fbx animation files contain only a skeleton and no skinned mesh.
+        // Assume the scene node contains the model's bone definition and, 
+        // transfer the info to the model.
+        if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
+            CollectSceneNodesAsBones(model, rootNode_);
+
         CollectAnimations(&model);
         BuildAndSaveAnimations(&model);
 
         // Save scene-global animations
         CollectAnimations();
-
-        // Most fbx animation files contain only skeleton and no model skinned mesh.
-        // -create model's bone struct and assign scene animation
-        sceneFbxModel_.bones_.Clear();
-        if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
-        {
-            sceneFbxModel_.animations_ = sceneAnimations_;
-
-            CollectSceneNodesAsBones(rootNode_);
-        }
-
         BuildAndSaveAnimations();
     }
 }
@@ -1350,36 +1345,12 @@ void BuildAndSaveAnimations(OutModel* model)
             }
             else
             {
-                unsigned pos = channelName.Find("_$AssimpFbx$");
-
-                if (!suppressFbxPivotNodes_ || pos == String::NPOS || sceneFbxModel_.bones_.Size() == 0)
+                boneNode = GetNode(channelName, scene_->mRootNode);
+                if (!boneNode)
                 {
-                    boneNode = GetNode(channelName, scene_->mRootNode);
-                    if (!boneNode)
-                    {
-                        PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
-                        outAnim->RemoveTrack(channelName);
-                        continue;
-                    }
-                }
-                else
-                {
-                    channelName = channelName.Substring(0, pos);
-
-                    // every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
-                    // skip subsequent $fbx animation channel for the same bone
-                    if (outAnim->GetTrack(channelName) != NULL)
-                        continue;
-
-                    unsigned boneIndex = GetPivotlessBoneIndex(sceneFbxModel_, channelName);
-                    if (boneIndex == M_MAX_UNSIGNED)
-                    {
-                        PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
-                        outAnim->RemoveTrack(channelName);
-                        continue;
-                    }
-
-                    boneNode = sceneFbxModel_.pivotlessBones_[boneIndex];
+                    PrintLine("Warning: skipping animation track " + channelName + " whose scene node was not found");
+                    outAnim->RemoveTrack(channelName);
+                    continue;
                 }
             }
 
@@ -2812,12 +2783,6 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
 
 void ExtrapolatePivotlessAnimation(OutModel* model)
 {
-    // If there was no model present in the scene, use sceneFbxModel_
-    if (model == NULL && sceneFbxModel_.bones_.Size() > 0)
-    {
-        model = &sceneFbxModel_;
-    }
-
     if (suppressFbxPivotNodes_ && model)
     {
         PrintLine("Suppressing $fbx nodes");
@@ -2939,16 +2904,16 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
     }
 }
 
-void CollectSceneNodesAsBones(aiNode* rootNode)
+void CollectSceneNodesAsBones(OutModel &model, aiNode* rootNode)
 {
     if (!rootNode)
         return;
 
-    sceneFbxModel_.bones_.Push(rootNode);
+    model.bones_.Push(rootNode);
 
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
     {
-        CollectSceneNodesAsBones(rootNode->mChildren[i]);
+        CollectSceneNodesAsBones(model, rootNode->mChildren[i]);
     }
 }
 
