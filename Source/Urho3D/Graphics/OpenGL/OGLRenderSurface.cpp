@@ -59,18 +59,35 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
 
     Release();
 
+#ifdef GL_ES_VERSION_2_0
     glGenRenderbuffersEXT(1, &renderBuffer_);
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
-
     /// \todo Multisampled renderbuffer on GLES
-#ifndef GL_ES_VERSION_2_0
-    if (multiSample > 1)
-        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, multiSample, format, width, height);
-    else
-#endif
     glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
-    
     glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+#else
+    if (Graphics::GetGL3Support())
+    {
+        glGenRenderbuffers(1, &renderBuffer_);
+        glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer_);
+        if (multiSample > 1)
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, multiSample, format, width, height);
+        else
+            glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+    else
+    {
+        glGenRenderbuffersEXT(1, &renderBuffer_);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
+        if (multiSample > 1)
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, multiSample, format, width, height);
+        else
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    }
+#endif
+
     return true;
 }
 

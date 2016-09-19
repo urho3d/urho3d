@@ -385,9 +385,30 @@ bool Texture2D::Create()
     }
     else
     {
-        // Multisample with autoresolve: create a renderbuffer for rendering, but also a texture
-        if (multiSample_ > 1 && autoResolve_)
-            renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
+        if (multiSample_ > 1)
+        {
+            if (autoResolve_)
+            {
+                // Multisample with autoresolve: create a renderbuffer for rendering, but also a texture
+                renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
+            }
+            else
+            {
+                // Multisample without autoresolve: create a texture only
+                /// \todo Check corresponding GLES extension
+#ifndef GL_ES_VERSION_2_0
+                if (!Graphics::GetGL3Support() && !GLEW_ARB_texture_multisample)
+                {
+                    URHO3D_LOGERROR("Multisampled texture extension not available");
+                    return false;
+                }
+
+                target_ = GL_TEXTURE_2D_MULTISAMPLE;
+                if (renderSurface_)
+                    renderSurface_->target_ = GL_TEXTURE_2D_MULTISAMPLE;
+#endif
+            }
+        }
     }
 
     glGenTextures(1, &object_.name_);
@@ -401,6 +422,12 @@ bool Texture2D::Create()
     if (!IsCompressed())
     {
         glGetError();
+        /// \todo Multisampled texture on GLES
+#ifndef GL_ES_VERSION_2_0
+        if (multiSample_ > 1 && !autoResolve_)
+            glTexImage2DMultisample(target_, multiSample_, format, width_, height_, GL_TRUE);
+        else
+#endif
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
