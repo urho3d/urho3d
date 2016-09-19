@@ -2042,8 +2042,9 @@ void View::AllocateScreenBuffers()
 
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
         renderTargets_[rtInfo.name_] =
-            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, 1, false, rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_,
-                rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
+            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.multiSample_, rtInfo.autoResolve_,
+                rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_, rtInfo.persistent_ ? StringHash(rtInfo.name_).Value()
+                + (unsigned)(size_t)this : 0);
     }
 }
 
