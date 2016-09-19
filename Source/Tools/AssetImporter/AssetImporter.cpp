@@ -246,6 +246,7 @@ String SanitateAssetName(const String& name);
 
 unsigned GetPivotlessBoneIndex(OutModel& model, const String& boneName);
 void ExtrapolatePivotlessAnimation(OutModel* model);
+void CollectSceneNodesAsBones(OutModel &model, aiNode* rootNode);
 
 int main(int argc, char** argv)
 {
@@ -533,6 +534,7 @@ void Run(const Vector<String>& arguments)
         }
         else
             scene_ = aiImportFile(GetNativePath(inFile).CString(), flags);
+
         if (!scene_)
             ErrorExit("Could not open or parse input file " + inFile + ": " + String(aiGetErrorString()));
 
@@ -682,6 +684,12 @@ void ExportAnimation(const String& outName, bool animationOnly)
     //    BuildAndSaveModel(model);
     if (!noAnimations_)
     {
+        // Most fbx animation files contain only a skeleton and no skinned mesh.
+        // Assume the scene node contains the model's bone definition and, 
+        // transfer the info to the model.
+        if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
+            CollectSceneNodesAsBones(model, rootNode_);
+
         CollectAnimations(&model);
         BuildAndSaveAnimations(&model);
 
@@ -2893,6 +2901,19 @@ void ExtrapolatePivotlessAnimation(OutModel* model)
                 }
             }
         }
+    }
+}
+
+void CollectSceneNodesAsBones(OutModel &model, aiNode* rootNode)
+{
+    if (!rootNode)
+        return;
+
+    model.bones_.Push(rootNode);
+
+    for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
+    {
+        CollectSceneNodesAsBones(model, rootNode->mChildren[i]);
     }
 }
 
