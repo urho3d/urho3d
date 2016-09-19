@@ -500,14 +500,19 @@ bool Texture2D::Create()
         break;
     }
 
-    // Fall back to non-multisampled if unsupported multisampling mode
     if (multiSample_ > 1)
     {
+        // Fall back to non-multisampled if unsupported multisampling mode
         GraphicsImpl* impl = graphics_->GetImpl();
         if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_,  multiSample_))
         {
             multiSample_ = 1;
             autoResolve_ = false;
+        }
+        else if (!autoResolve_)
+        {
+            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported on Direct3D9");
+            return false;
         }
     }
 
