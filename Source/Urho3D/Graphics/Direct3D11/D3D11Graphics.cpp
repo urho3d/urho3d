@@ -730,6 +730,20 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     return true;
 }
 
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+    if (!texture)
+        return false;
+
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    impl_->deviceContext_->ResolveSubresource(dest, 0, source, 0, (DXGI_FORMAT)texture->GetFormat());
+    return true;
+}
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount || !impl_->shaderProgram_)
@@ -1280,6 +1294,16 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                texture->SetResolveDirty(false);
+            }
+        }
     }
 
     if (texture && texture->GetParametersDirty())
@@ -1387,6 +1411,11 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
+            
+
+            // If multisampled, mark the texture needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+                parentTexture->SetResolveDirty(true);
         }
     }
 }

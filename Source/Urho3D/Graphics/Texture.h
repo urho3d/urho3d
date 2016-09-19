@@ -150,6 +150,9 @@ public:
     /// Return sampler state object. Only used on Direct3D11.
     void* GetSampler() const { return sampler_; }
 
+    /// Return resolve texture. Only used on Direct3D11.
+    void* GetResolveTexture() const { return resolveTexture_; }
+
     /// Return texture's target. Only used on OpenGL.
     unsigned GetTarget() const { return target_; }
 
@@ -188,6 +191,8 @@ protected:
 
     /// Direct3D11 sampler state object.
     void* sampler_;
+    /// Direct3D11 resolve texture object when multisample with autoresolve is used.
+    void* resolveTexture_;
 
     /// Texture format.
     unsigned format_;

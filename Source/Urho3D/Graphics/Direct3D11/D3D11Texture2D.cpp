@@ -64,6 +64,7 @@ void Texture2D::Release()
         renderSurface_->Release();
 
     URHO3D_SAFE_RELEASE(object_.ptr_);
+    URHO3D_SAFE_RELEASE(resolveTexture_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
 }
@@ -371,8 +372,8 @@ bool Texture2D::Create()
     textureDesc.MipLevels = levels_;
     textureDesc.ArraySize = 1;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
-    textureDesc.SampleDesc.Count = 1;
-    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.SampleDesc.Count = (UINT)multiSample_;
+    textureDesc.SampleDesc.Quality = multiSample_ > 1 ? 0xffffffff : 0;
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     if (usage_ == TEXTURE_RENDERTARGET)
@@ -389,13 +390,30 @@ bool Texture2D::Create()
         return false;
     }
 
+    // Create resolve texture for multisampling if necessary
+    if (multiSample_ > 1 && autoResolve_)
+    {
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&resolveTexture_);
+        if (FAILED(hr))
+        {
+            URHO3D_SAFE_RELEASE(resolveTexture_);
+            URHO3D_LOGD3DERROR("Failed to create resolve texture", hr);
+            return false;
+        }
+    }
+
     D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
     memset(&resourceViewDesc, 0, sizeof resourceViewDesc);
     resourceViewDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
-    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    resourceViewDesc.ViewDimension = (multiSample_ > 1 && !autoResolve_) ? D3D11_SRV_DIMENSION_TEXTURE2DMS :
+        D3D11_SRV_DIMENSION_TEXTURE2D;
     resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
+    // Sample the resolve texture if created, otherwise the original
+    ID3D11Resource* viewObject = resolveTexture_ ? (ID3D11Resource*)resolveTexture_ : (ID3D11Resource*)object_.ptr_;
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView(viewObject, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
@@ -409,7 +427,7 @@ bool Texture2D::Create()
         D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
         memset(&renderTargetViewDesc, 0, sizeof renderTargetViewDesc);
         renderTargetViewDesc.Format = textureDesc.Format;
-        renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        renderTargetViewDesc.ViewDimension = multiSample_ > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
 
         hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_.ptr_, &renderTargetViewDesc,
             (ID3D11RenderTargetView**)&renderSurface_->renderTargetView_);
@@ -425,7 +443,7 @@ bool Texture2D::Create()
         D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
         memset(&depthStencilViewDesc, 0, sizeof depthStencilViewDesc);
         depthStencilViewDesc.Format = (DXGI_FORMAT)GetDSVFormat(textureDesc.Format);
-        depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+        depthStencilViewDesc.ViewDimension = multiSample_ > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
 
         hr = graphics_->GetImpl()->GetDevice()->CreateDepthStencilView((ID3D11Resource*)object_.ptr_, &depthStencilViewDesc,
             (ID3D11DepthStencilView**)&renderSurface_->renderTargetView_);
