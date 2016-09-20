@@ -136,8 +136,10 @@ UIElement::UIElement(Context* context) :
     maxOffset_(IntVector2::ZERO),
     anchorMin_(0, 0),
     anchorMax_(0, 0),
-    pivot_(0, 0),
-    recalcMaxOffset_(false)
+    recalcMaxOffset_(false),
+    anchorEnable_(false),
+    pivot_(FLT_MAX, FLT_MAX),
+    pivotSet_(false)
 {
     SetEnabled(false);
 }
@@ -169,7 +171,7 @@ void UIElement::RegisterObject(Context* context)
         VA_TOP, AM_FILEREADONLY);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2, Vector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2, Vector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(FLT_MAX, FLT_MAX), AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
@@ -622,6 +624,7 @@ void UIElement::SetMaxOffset(const IntVector2& offset)
     if (maxOffset_ != offset)
     {
         maxOffset_ = offset;
+        anchorEnable_ = true;
         AdjustAnchoredSize();
         MarkDirty();
     }
@@ -631,17 +634,10 @@ void UIElement::AdjustAnchoredSize()
 {
     IntVector2 newSize = size_;
 
-    if (parent_)
+    if (parent_ && anchorEnable_)
     {
-        if (anchorMin_.x_ < anchorMax_.x_)
-        {
-            newSize.x_ = (int)(parent_->size_.x_ * (anchorMax_.x_ - anchorMin_.x_)) + maxOffset_.x_ - position_.x_;
-        }
-
-        if (anchorMin_.y_ < anchorMax_.y_)
-        {
-            newSize.y_ = (int)(parent_->size_.y_ * (anchorMax_.y_ - anchorMin_.y_)) + maxOffset_.y_ - position_.y_;
-        }
+        newSize.x_ = (int)(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - position_.x_;
+        newSize.y_ = (int)(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - position_.y_;
 
         if (size_ != newSize)
         {
@@ -893,6 +889,7 @@ void UIElement::SetPivot(const Vector2& pivot)
 {
     if (pivot != pivot_)
     {
+        pivotSet_ = true;
         pivot_ = pivot;
         MarkDirty();
     }

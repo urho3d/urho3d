@@ -440,15 +440,15 @@ public:
     /// Return horizontal alignment.
     HorizontalAlignment GetHorizontalAlignment() const 
     {
-        if (anchorMin_.x_ == 0.0f && anchorMax_.x_ == 0.0f)
+        if (anchorMin_.x_ == 0.0f && anchorMax_.x_ == 0.0f && (!pivotSet_ || pivot_.x_ == 0.0f))
         {
             return HA_LEFT;
         }
-        else if (anchorMin_.x_ == 0.5f && anchorMax_.x_ == 0.5f)
+        else if (anchorMin_.x_ == 0.5f && anchorMax_.x_ == 0.5f && (!pivotSet_ || pivot_.x_ == 0.5f))
         {
             return HA_CENTER;
         }
-        else if (anchorMin_.x_ == 1.0f && anchorMax_.x_ == 1.0f)
+        else if (anchorMin_.x_ == 1.0f && anchorMax_.x_ == 1.0f && (!pivotSet_ || pivot_.x_ == 1.0f))
         {
             return HA_RIGHT;
         }
@@ -458,15 +458,15 @@ public:
     /// Return vertical alignment.
     VerticalAlignment GetVerticalAlignment() const 
     {
-        if (anchorMin_.y_ == 0.0f && anchorMax_.y_ == 0.0f)
+        if (anchorMin_.y_ == 0.0f && anchorMax_.y_ == 0.0f && (!pivotSet_ || pivot_.y_ == 0.0f))
         {
             return VA_TOP;
         }
-        else if (anchorMin_.y_ == 0.5f && anchorMax_.y_ == 0.5f)
+        else if (anchorMin_.y_ == 0.5f && anchorMax_.y_ == 0.5f && (!pivotSet_ || pivot_.y_ == 0.5f))
         {
             return VA_CENTER;
         }
-        else if (anchorMin_.y_ == 1.0f && anchorMax_.y_ == 1.0f)
+        else if (anchorMin_.y_ == 1.0f && anchorMax_.y_ == 1.0f && (!pivotSet_ || pivot_.y_ == 1.0f))
         {
             return VA_BOTTOM;
         }
@@ -787,6 +787,10 @@ private:
     IntVector2 layoutMinSize_;
     /// Relative size.
     IntVector2 maxOffset_;
+    /// Use max offset instead of size.
+    bool anchorEnable_ : 1;
+    /// Has pivot changed manually.
+    bool pivotSet_ : 1;
     /// Anchor Minimum Position
     Vector2 anchorMin_;
     /// Anchor Maximum Position
