@@ -64,6 +64,8 @@ class Input : public Object
     tolua_outside unsigned InputLoadGestures @ LoadGestures(const String fileName);
     bool RemoveGesture(unsigned gestureID);
     void RemoveAllGestures();
+    void SetMousePosition(const IntVector2& position);
+    void CenterMousePosition();
 
     int GetKeyFromName(const String name) const;
     int GetKeyFromScancode(int scancode) const;
@@ -103,7 +105,7 @@ class Input : public Object
     bool IsMinimized() const;
 
     tolua_readonly tolua_property__get_set int qualifiers;
-    tolua_readonly tolua_property__get_set IntVector2 mousePosition;
+    tolua_property__get_set IntVector2 mousePosition;
     tolua_readonly tolua_property__get_set IntVector2& mouseMove;
     tolua_readonly tolua_property__get_set int mouseMoveX;
     tolua_readonly tolua_property__get_set int mouseMoveY;

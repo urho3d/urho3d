@@ -212,6 +212,10 @@ public:
     bool RemoveGesture(unsigned gestureID);
     /// Remove all in-memory gestures.
     void RemoveAllGestures();
+    /// Set the mouse cursor position.
+    void SetMousePosition(const IntVector2& position);
+    /// Center the mouse position.
+    void CenterMousePosition();
 
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;
@@ -296,11 +300,6 @@ public:
 
     /// Return whether application window is minimized.
     bool IsMinimized() const;
-
-    /// Set the mouse cursor position.
-    void SetMousePosition(const IntVector2& position);
-    /// Center the mouse position.
-    void CenterMousePosition();
 
 private:
     /// Initialize when screen mode initially set.
