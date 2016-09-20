@@ -2799,6 +2799,8 @@ Methods:
 - unsigned LoadGestures(const String fileName)
 - bool RemoveGesture(unsigned gestureID)
 - void RemoveAllGestures()
+- void SetMousePosition(const IntVector2& position)
+- void CenterMousePosition()
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2839,7 +2841,7 @@ Methods:
 Properties:
 
 - int qualifiers (readonly)
-- IntVector2 mousePosition (readonly)
+- IntVector2 mousePosition
 - IntVector2& mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
