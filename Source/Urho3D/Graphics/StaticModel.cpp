@@ -403,7 +403,7 @@ const ResourceRefList& StaticModel::GetMaterialsAttr() const
 {
     materialsAttr_.names_.Resize(batches_.Size());
     for (unsigned i = 0; i < batches_.Size(); ++i)
-        materialsAttr_.names_[i] = GetResourceName(batches_[i].material_);
+        materialsAttr_.names_[i] = GetResourceName(GetMaterial(i));
 
     return materialsAttr_;
 }
