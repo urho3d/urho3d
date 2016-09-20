@@ -750,6 +750,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
 
 bool Graphics::ResolveToTexture(Texture2D* texture)
 {
+#ifndef GL_ES_VERSION_2_0
     if (!texture)
         return false;
     RenderSurface* surface = texture->GetRenderSurface();
@@ -758,8 +759,6 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
 
     URHO3D_PROFILE(ResolveToTexture);
 
-    /// \todo Resolve on GLES if possible
-#ifndef GL_ES_VERSION_2_0
     // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
     if (!impl_->resolveSrcFBO_)
         impl_->resolveSrcFBO_ = CreateFramebuffer();
@@ -789,10 +788,11 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
 
     // Restore previously bound FBO
     BindFramebuffer(impl_->boundFBO_);
-
-#endif
-
     return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
@@ -1174,7 +1174,6 @@ void Graphics::SetShaderParameter(StringHash param, float value)
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     // \todo Not tested
-
     if (impl_->shaderProgram_)
     {
         const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);

@@ -362,6 +362,15 @@ bool Texture2D::Create()
         return true;
     }
 
+#ifdef GL_ES_VERSION_2_0
+    if (multiSample_ > 1)
+    {
+        URHO3D_LOGWARNING("Multisampled texture is not supported on OpenGL ES");
+        multiSample_ = 1;
+        autoResolve_ = false;
+    }
+#endif
+
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
@@ -395,7 +404,6 @@ bool Texture2D::Create()
             else
             {
                 // Multisample without autoresolve: create a texture only
-                /// \todo Check corresponding GLES extension
 #ifndef GL_ES_VERSION_2_0
                 if (!Graphics::GetGL3Support() && !GLEW_ARB_texture_multisample)
                 {
@@ -422,7 +430,6 @@ bool Texture2D::Create()
     if (!IsCompressed())
     {
         glGetError();
-        /// \todo Multisampled texture on GLES
 #ifndef GL_ES_VERSION_2_0
         if (multiSample_ > 1 && !autoResolve_)
             glTexImage2DMultisample(target_, multiSample_, format, width_, height_, GL_TRUE);
