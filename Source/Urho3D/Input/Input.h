@@ -212,6 +212,10 @@ public:
     bool RemoveGesture(unsigned gestureID);
     /// Remove all in-memory gestures.
     void RemoveAllGestures();
+    /// Set the mouse cursor position.
+    void SetMousePosition(const IntVector2& position);
+    /// Center the mouse position.
+    void CenterMousePosition();
 
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;
@@ -328,10 +332,6 @@ private:
     void SetKey(int key, int scancode, bool newState);
     /// Handle mouse wheel change.
     void SetMouseWheel(int delta);
-    /// Internal function to set the mouse cursor position.
-    void SetMousePosition(const IntVector2& position);
-    /// Center the mouse position.
-    void CenterMousePosition();
     /// Suppress next mouse movement.
     void SuppressNextMouseMove();
     /// Unsuppress mouse movement.
