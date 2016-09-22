@@ -116,6 +116,20 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### ViewBuffersReady
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### ViewGlobalShaderParameters
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
 ### EndViewRender
 - %View : View pointer
 - %Texture : Texture pointer
