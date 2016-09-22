@@ -56,8 +56,8 @@ public:
     /// Release the texture.
     virtual void Release();
 
-    /// Set size, format and usage. Return true if successful.
-    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    /// Set size, format, usage and multisampling parameters for rendertargets. Autoresolve false means that texture will be read as individual samples in the shader and is not supported on Direct3D9. Return true if successful.
+    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true);
     /// Set data either partially or fully on a face's mip level. Return true if successful.
     bool SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data);
     /// Set data of one face from a stream. Return true if successful.

@@ -563,6 +563,22 @@ bool TextureCube::Create()
         break;
     }
 
+    if (multiSample_ > 1)
+    {
+        // Fall back to non-multisampled if unsupported multisampling mode
+        GraphicsImpl* impl = graphics_->GetImpl();
+        if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_, multiSample_))
+        {
+            multiSample_ = 1;
+            autoResolve_ = false;
+        }
+        else if (!autoResolve_)
+        {
+            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported on Direct3D9");
+            return false;
+        }
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     HRESULT hr = device->CreateCubeTexture(
         (UINT)width_,
@@ -585,10 +601,36 @@ bool TextureCube::Create()
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
-                (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
-            if (FAILED(hr))
-                URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+            if (multiSample_ > 1)
+            {
+                // Create the multisampled face rendertarget if necessary
+                HRESULT hr = device->CreateRenderTarget(
+                    (UINT)width_,
+                    (UINT)height_,
+                    (D3DFORMAT)format_,
+                    (D3DMULTISAMPLE_TYPE)multiSample_,
+                    0,
+                    FALSE,
+                    (IDirect3DSurface9**)&renderSurfaces_[i]->surface_,
+                    0);
+                if (FAILED(hr))
+                {
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
+                    URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                    return false;
+                }
+            }
+            else
+            {
+                hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
+                    (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
+                if (FAILED(hr))
+                {
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
+                    URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+                    return false;
+                }
+            }
         }
     }
 

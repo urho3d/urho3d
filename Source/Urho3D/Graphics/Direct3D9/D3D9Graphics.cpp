@@ -836,13 +836,18 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
 
     URHO3D_PROFILE(ResolveToTexture);
 
+    // Clear dirty flag already, because if resolve fails it's no use to retry (e.g. on the same frame)
+    RenderSurface* surface = texture->GetRenderSurface();
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+
     RECT rect;
     rect.left = 0;
     rect.top = 0;
     rect.right = texture->GetWidth();
     rect.bottom = texture->GetHeight();
 
-    IDirect3DSurface9* srcSurface = (IDirect3DSurface9*)texture->GetRenderSurface()->GetSurface();
+    IDirect3DSurface9* srcSurface = (IDirect3DSurface9*)surface->GetSurface();
     IDirect3DTexture9* destTexture = (IDirect3DTexture9*)texture->GetGPUObject();
     IDirect3DSurface9* destSurface = 0;
     HRESULT hr = destTexture->GetSurfaceLevel(0, &destSurface);
@@ -861,6 +866,51 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
     }
     else
         return true;
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+    if (!texture || !texture->GetRenderSurface(FACE_POSITIVE_X) || !texture->GetGPUObject() || texture->GetMultiSample() < 2)
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+    
+    texture->SetResolveDirty(false);
+
+    RECT rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = texture->GetWidth();
+    rect.bottom = texture->GetHeight();
+
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        // Resolve only the surface(s) that were actually rendered to
+        RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+        if (!surface->IsResolveDirty())
+            continue;
+
+        surface->SetResolveDirty(false);
+        IDirect3DSurface9* srcSurface = (IDirect3DSurface9*)surface->GetSurface();
+        IDirect3DCubeTexture9* destTexture = (IDirect3DCubeTexture9*)texture->GetGPUObject();
+        IDirect3DSurface9* destSurface = 0;
+        HRESULT hr = destTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0, &destSurface);
+        if (FAILED(hr))
+        {
+            URHO3D_LOGD3DERROR("Failed to get destination surface for resolve", hr);
+            return false;
+        }
+
+        hr = impl_->device_->StretchRect(srcSurface, &rect, destSurface, &rect, D3DTEXF_NONE);
+        URHO3D_SAFE_RELEASE(destSurface);
+        if (FAILED(hr))
+        {
+            URHO3D_LOGD3DERROR("Failed to resolve to texture", hr);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
@@ -1413,7 +1463,8 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             {
                 if (texture->GetType() == Texture2D::GetTypeStatic())
                     ResolveToTexture(static_cast<Texture2D*>(texture));
-                texture->SetResolveDirty(false);
+                else if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
             }
         }
     }
@@ -1571,9 +1622,12 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 SetTexture(i, textures_[i]->GetBackupTexture());
         }
 
-        // If multisampled, mark the texture needing resolve
+        // If multisampled, mark the texture & surface needing resolve
         if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+        {
             parentTexture->SetResolveDirty(true);
+            renderTarget->SetResolveDirty(true);
+        }
     }
 
     // First rendertarget controls sRGB write mode

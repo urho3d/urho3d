@@ -38,7 +38,8 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
     surface_(0),
     updateMode_(SURFACE_UPDATEVISIBLE),
-    updateQueued_(false)
+    updateQueued_(false),
+    resolveDirty_(false)
 {
 }
 

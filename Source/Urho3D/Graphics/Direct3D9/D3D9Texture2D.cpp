@@ -567,7 +567,7 @@ bool Texture2D::Create()
                 (UINT)width_,
                 (UINT)height_,
                 (D3DFORMAT)format_,
-                (multiSample_ > 1) ? (D3DMULTISAMPLE_TYPE)multiSample_ : D3DMULTISAMPLE_NONE,
+                (D3DMULTISAMPLE_TYPE)multiSample_,
                 0,
                 FALSE,
                 (IDirect3DSurface9**)&renderSurface_->surface_,

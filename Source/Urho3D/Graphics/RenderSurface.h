@@ -116,6 +116,12 @@ public:
     /// Return OpenGL renderbuffer if created.
     unsigned GetRenderBuffer() const { return renderBuffer_; }
 
+    /// Return whether multisampled rendertarget needs resolve.
+    bool IsResolveDirty() const { return resolveDirty_; }
+
+    /// Set or clear the need resolve flag. Called internally by Graphics.
+    void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
+
 private:
     /// Parent texture.
     Texture* parentTexture_;
@@ -148,6 +154,8 @@ private:
     RenderSurfaceUpdateMode updateMode_;
     /// Update queued flag.
     bool updateQueued_;
+    /// Multisampled resolve dirty flag.
+    bool resolveDirty_;
 };
 
 }

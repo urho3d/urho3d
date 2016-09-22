@@ -130,6 +130,8 @@ public:
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
     /// Resolve a multisampled texture on itself.
     bool ResolveToTexture(Texture2D* texture);
+    /// Resolve a multisampled cube texture on itself.
+    bool ResolveToTexture(TextureCube* texture);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.

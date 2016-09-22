@@ -258,7 +258,7 @@ bool TextureCube::EndLoad()
     return true;
 }
 
-bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
+bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int multiSample, bool autoResolve)
 {
     if (size <= 0)
     {
@@ -268,6 +268,15 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
         URHO3D_LOGERROR("Depth-stencil usage not supported for cube maps");
+        return false;
+    }
+
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample == 1)
+        autoResolve = false;
+    else if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
+    {
+        URHO3D_LOGERROR("Multisampling is only supported for rendertarget cube maps");
         return false;
     }
 
@@ -303,6 +312,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     width_ = size;
     height_ = size;
     format_ = format;
+    multiSample_ = multiSample;
+    autoResolve_ = autoResolve;
 
     return Create();
 }
