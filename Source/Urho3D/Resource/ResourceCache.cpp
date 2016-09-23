@@ -784,8 +784,6 @@ unsigned long long ResourceCache::GetTotalMemoryUse() const
 
 String ResourceCache::GetResourceFileName(const String& name) const
 {
-    MutexLock lock(resourceMutex_);
-
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
     for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
     {
@@ -793,7 +791,10 @@ String ResourceCache::GetResourceFileName(const String& name) const
             return resourceDirs_[i] + name;
     }
 
-    return String();
+    if (IsAbsolutePath(name) && fileSystem->FileExists(name))
+        return name;
+    else
+        return String();
 }
 
 ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
