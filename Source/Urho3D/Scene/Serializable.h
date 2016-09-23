@@ -165,7 +165,7 @@ public:
     {
         assert(ptr);
         const T* classPtr = static_cast<const T*>(ptr);
-        dest = (classPtr->*getFunction_)();
+        dest = (int)(classPtr->*getFunction_)();
     }
 
     /// Invoke setter function.
