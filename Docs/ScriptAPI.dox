@@ -7138,6 +7138,7 @@ Properties:
 - bool sRGB
 - bool sRGBSupport // readonly
 - bool sRGBWriteSupport // readonly
+- String shaderCacheDir
 - bool tripleBuffer // readonly
 - StringHash type // readonly
 - String typeName // readonly

@@ -5168,6 +5168,7 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
+String shaderCacheDir;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
