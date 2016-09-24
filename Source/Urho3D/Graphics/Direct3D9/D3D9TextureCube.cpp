@@ -574,7 +574,7 @@ bool TextureCube::Create()
         }
         else if (!autoResolve_)
         {
-            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported on Direct3D9");
+            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported");
             return false;
         }
     }

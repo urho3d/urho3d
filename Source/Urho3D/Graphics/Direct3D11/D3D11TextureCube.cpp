@@ -430,6 +430,12 @@ bool TextureCube::Create()
     if (!graphics_ || !width_ || !height_)
         return false;
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGERROR("Multisampled cube texture without autoresolve is not supported");
+        return false;
+    }
+
     levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 
     D3D11_TEXTURE2D_DESC textureDesc;
@@ -448,7 +454,10 @@ bool TextureCube::Create()
     else if (usage_ == TEXTURE_DEPTHSTENCIL)
         textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
     textureDesc.CPUAccessFlags = usage_ == TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
-    textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+    // When multisample is specified, creating an actual cube texture will fail. Rather create as a 2D texture array
+    // whose faces will be rendered to; only the resolve texture will be an actual cube texture
+    if (multiSample_ < 2)
+        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_.ptr_);
     if (FAILED(hr))
@@ -463,6 +472,7 @@ bool TextureCube::Create()
     {
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
+        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
         HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&resolveTexture_);
         if (FAILED(hr))
         {
@@ -478,7 +488,9 @@ bool TextureCube::Create()
     resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
     resourceViewDesc.Texture2D.MipLevels = (UINT)levels_;
 
-    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView((ID3D11Resource*)object_.ptr_, &resourceViewDesc,
+    // Sample the resolve texture if created, otherwise the original
+    ID3D11Resource* viewObject = resolveTexture_ ? (ID3D11Resource*)resolveTexture_ : (ID3D11Resource*)object_.ptr_;
+    hr = graphics_->GetImpl()->GetDevice()->CreateShaderResourceView(viewObject, &resourceViewDesc,
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
@@ -494,10 +506,19 @@ bool TextureCube::Create()
             D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
             memset(&renderTargetViewDesc, 0, sizeof renderTargetViewDesc);
             renderTargetViewDesc.Format = textureDesc.Format;
-            renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-            renderTargetViewDesc.Texture2DArray.ArraySize = 1;
-            renderTargetViewDesc.Texture2DArray.FirstArraySlice = i;
-            renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+            if (multiSample_ > 1)
+            {
+                renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+                renderTargetViewDesc.Texture2DMSArray.ArraySize = 1;
+                renderTargetViewDesc.Texture2DMSArray.FirstArraySlice = i;
+            }
+            else
+            {
+                renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+                renderTargetViewDesc.Texture2DArray.ArraySize = 1;
+                renderTargetViewDesc.Texture2DArray.FirstArraySlice = i;
+                renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+            }
 
             hr = graphics_->GetImpl()->GetDevice()->CreateRenderTargetView((ID3D11Resource*)object_.ptr_, &renderTargetViewDesc,
                 (ID3D11RenderTargetView**)&renderSurfaces_[i]->renderTargetView_);

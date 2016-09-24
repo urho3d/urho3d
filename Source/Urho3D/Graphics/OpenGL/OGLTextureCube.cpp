@@ -438,7 +438,7 @@ bool TextureCube::Create()
 #else
     if (multiSample_ > 1 && !autoResolve_)
     {
-        URHO3D_LOGERROR("Multisampled cube texture without autoresolve is not supported on OpenGL");
+        URHO3D_LOGERROR("Multisampled cube texture without autoresolve is not supported");
         return false;
     }
 #endif
