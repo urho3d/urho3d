@@ -376,22 +376,22 @@ bool Texture2D::GetData(unsigned level, void* dest) const
             D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(offscreenSurface);
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         hr = offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not lock surface for getting rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
     }
@@ -461,7 +461,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     if (offscreenSurface)
     {
         offscreenSurface->UnlockRect();
-        offscreenSurface->Release();
+        URHO3D_SAFE_RELEASE(offscreenSurface);
     }
     else
         ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
@@ -533,8 +533,8 @@ bool Texture2D::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(renderSurface_->surface_);
             URHO3D_LOGD3DERROR("Could not create depth-stencil surface", hr);
+            URHO3D_SAFE_RELEASE(renderSurface_->surface_);
             return false;
         }
 
@@ -553,8 +553,8 @@ bool Texture2D::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Could not create texture", hr);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             return false;
         }
 
@@ -574,8 +574,8 @@ bool Texture2D::Create()
                 0);
             if (FAILED(hr))
             {
-                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
                 URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
                 return false;
             }
         }

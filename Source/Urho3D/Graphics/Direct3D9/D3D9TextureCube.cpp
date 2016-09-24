@@ -443,21 +443,21 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(offscreenSurface);
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurfaces_[face]->GetSurface(), offscreenSurface);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
         {
             URHO3D_LOGD3DERROR("Could not lock surface for getting rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
     }
@@ -527,7 +527,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     if (offscreenSurface)
     {
         offscreenSurface->UnlockRect();
-        offscreenSurface->Release();
+        URHO3D_SAFE_RELEASE(offscreenSurface);
     }
     else
         ((IDirect3DCubeTexture9*)object_.ptr_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
@@ -590,8 +590,8 @@ bool TextureCube::Create()
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create cube texture", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 
@@ -615,8 +615,8 @@ bool TextureCube::Create()
                     0);
                 if (FAILED(hr))
                 {
-                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
                     URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
                     return false;
                 }
             }
@@ -626,8 +626,8 @@ bool TextureCube::Create()
                     (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
                 if (FAILED(hr))
                 {
-                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
                     URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
                     return false;
                 }
             }
