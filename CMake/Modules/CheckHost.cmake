@@ -31,7 +31,7 @@
 #  HAS_LIB64 (multilib capable)
 #  CCACHE_VERSION (when using Clang with ccache enabled)
 #
-# Neither here or there:
+# Neither here nor there:
 #  BASH_ON_WINDOWS
 #
 
@@ -75,7 +75,8 @@ else ()
     # Test if PCH could be enabled in tandem with ccache when using Clang compiler toolchain
     if ("$ENV{USE_CCACHE}" AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
         if (NOT DEFINED CCACHE_VERSION)
-            execute_process (COMMAND ccache --version COMMAND head -1 COMMAND grep -oP "(?:\\d+\\.)?(?:\\d+\\.)?\\d+" RESULT_VARIABLE CCACHE_EXIT_CODE OUTPUT_VARIABLE CCACHE_VERSION ERROR_QUIET)
+            execute_process (COMMAND ccache --version COMMAND head -1 RESULT_VARIABLE CCACHE_EXIT_CODE OUTPUT_VARIABLE CCACHE_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+            string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" CCACHE_VERSION "${CCACHE_VERSION}")    # Stringify as it could be empty when an error has occured
             if (CCACHE_EXIT_CODE EQUAL 0)
                set (CCACHE_VERSION ${CCACHE_VERSION} CACHE INTERNAL "ccache version")
            endif ()
