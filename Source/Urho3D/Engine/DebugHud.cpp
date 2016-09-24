@@ -45,7 +45,8 @@ static const char* qualityTexts[] =
 {
     "Low",
     "Med",
-    "High"
+    "High",
+    "High+"
 };
 
 static const char* shadowQualityTexts[] =
@@ -165,7 +166,7 @@ void DebugHud::Update()
         String mode;
         mode.AppendWithFormat("Tex:%s Mat:%s Spec:%s Shadows:%s Size:%i Quality:%s Occlusion:%s Instancing:%s API:%s",
             qualityTexts[renderer->GetTextureQuality()],
-            qualityTexts[renderer->GetMaterialQuality()],
+            qualityTexts[Min(renderer->GetMaterialQuality(), 3)],
             renderer->GetSpecularLighting() ? "On" : "Off",
             renderer->GetDrawShadows() ? "On" : "Off",
             renderer->GetShadowMapSize(),
