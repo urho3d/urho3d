@@ -37,6 +37,7 @@
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
@@ -759,6 +760,9 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
 
     URHO3D_PROFILE(ResolveToTexture);
 
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+
     // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
     if (!impl_->resolveSrcFBO_)
         impl_->resolveSrcFBO_ = CreateFramebuffer();
@@ -768,10 +772,13 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
     if (!gl3Support)
     {
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
-        glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, surface->GetRenderBuffer());
+        glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+            surface->GetRenderBuffer());
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
-        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texture->GetGPUObjectName(), 0);
-        glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texture->GetGPUObjectName(),
+            0);
+        glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
     }
@@ -781,7 +788,78 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetGPUObjectName(), 0);
-        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), 
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    // Restore previously bound FBO
+    BindFramebuffer(impl_->boundFBO_);
+    return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!texture)
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+
+    texture->SetResolveDirty(false);
+
+    // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
+    if (!impl_->resolveSrcFBO_)
+        impl_->resolveSrcFBO_ = CreateFramebuffer();
+    if (!impl_->resolveDestFBO_)
+        impl_->resolveDestFBO_ = CreateFramebuffer();
+
+    if (!gl3Support)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            // Resolve only the surface(s) that were actually rendered to
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+
+            surface->SetResolveDirty(false);
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
+            glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+                surface->GetRenderBuffer());
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    }
+    else
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+            
+            surface->SetResolveDirty(false);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
+            glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
@@ -1493,7 +1571,8 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             {
                 if (texture->GetType() == Texture2D::GetTypeStatic())
                     ResolveToTexture(static_cast<Texture2D*>(texture));
-                texture->SetResolveDirty(false);
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
             }
         }
     }
@@ -1629,9 +1708,12 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
 
-            // If multisampled, mark the texture needing resolve
+            // If multisampled, mark the texture & surface needing resolve
             if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
                 parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
+            }
         }
 
         impl_->fboDirty_ = true;
