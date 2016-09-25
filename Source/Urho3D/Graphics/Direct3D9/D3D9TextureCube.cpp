@@ -572,11 +572,6 @@ bool TextureCube::Create()
             multiSample_ = 1;
             autoResolve_ = false;
         }
-        else if (!autoResolve_)
-        {
-            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported");
-            return false;
-        }
     }
 
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();

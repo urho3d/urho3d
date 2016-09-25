@@ -5,7 +5,7 @@ class TextureCube : public Texture
     TextureCube();
     ~TextureCube();
 
-    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true);
+    bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1);
     bool SetData(CubeMapFace face, Image* image, bool useAlpha = false);
 
     RenderSurface* GetRenderSurface(CubeMapFace face) const;

@@ -430,12 +430,6 @@ bool TextureCube::Create()
     if (!graphics_ || !width_ || !height_)
         return false;
 
-    if (multiSample_ > 1 && !autoResolve_)
-    {
-        URHO3D_LOGERROR("Multisampled cube texture without autoresolve is not supported");
-        return false;
-    }
-
     levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 
     D3D11_TEXTURE2D_DESC textureDesc;
@@ -467,8 +461,8 @@ bool TextureCube::Create()
         return false;
     }
 
-    // Create resolve texture for multisampling if necessary
-    if (multiSample_ > 1 && autoResolve_)
+    // Create resolve texture for multisampling
+    if (multiSample_ > 1)
     {
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;

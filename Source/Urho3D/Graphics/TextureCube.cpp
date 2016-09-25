@@ -258,7 +258,7 @@ bool TextureCube::EndLoad()
     return true;
 }
 
-bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int multiSample, bool autoResolve)
+bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int multiSample)
 {
     if (size <= 0)
     {
@@ -272,9 +272,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int mul
     }
 
     multiSample = Clamp(multiSample, 1, 16);
-    if (multiSample == 1)
-        autoResolve = false;
-    else if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
+    if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
     {
         URHO3D_LOGERROR("Multisampling is only supported for rendertarget cube textures");
         return false;
@@ -313,7 +311,7 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int mul
     height_ = size;
     format_ = format;
     multiSample_ = multiSample;
-    autoResolve_ = autoResolve;
+    autoResolve_ = multiSample > 1;
 
     return Create();
 }

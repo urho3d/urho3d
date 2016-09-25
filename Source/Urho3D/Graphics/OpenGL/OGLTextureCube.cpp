@@ -435,12 +435,6 @@ bool TextureCube::Create()
         multiSample_ = 1;
         autoResolve_ = false;
     }
-#else
-    if (multiSample_ > 1 && !autoResolve_)
-    {
-        URHO3D_LOGERROR("Multisampled cube texture without autoresolve is not supported");
-        return false;
-    }
 #endif
     
     glGenTextures(1, &object_.name_);
@@ -453,8 +447,8 @@ bool TextureCube::Create()
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
 
-    // If multisample and autoresolve, create renderbuffers for each face
-    if (multiSample_ > 1 && autoResolve_)
+    // If multisample, create renderbuffers for each face
+    if (multiSample_ > 1)
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
             renderSurfaces_[i]->CreateRenderBuffer(width_, height_, format, multiSample_);

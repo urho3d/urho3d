@@ -1073,7 +1073,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
         else
         {
             SharedPtr<TextureCube> newTexCube(new TextureCube(context_));
-            newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET, multiSample, autoResolve);
+            newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET, multiSample);
 
             newBuffer = newTexCube;
         }

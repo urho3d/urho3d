@@ -482,6 +482,12 @@ bool Texture2D::Create()
         return true;
     }
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGWARNING("Multisampled texture without autoresolve is not supported on Direct3D9");
+        autoResolve_ = true;
+    }
+
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
 
@@ -508,11 +514,6 @@ bool Texture2D::Create()
         {
             multiSample_ = 1;
             autoResolve_ = false;
-        }
-        else if (!autoResolve_)
-        {
-            URHO3D_LOGERROR("Multisampled texture without autoresolve is not supported on Direct3D9");
-            return false;
         }
     }
 

@@ -533,7 +533,7 @@ static void RegisterTextures(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Texture3D", "bool SetData(Image@+, bool useAlpha = false)", asMETHODPR(Texture3D, SetData, (Image*, bool), bool), asCALL_THISCALL);
 
     RegisterTexture<TextureCube>(engine, "TextureCube");
-    engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("TextureCube", "bool SetSize(int, uint, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)", asMETHOD(TextureCube, SetSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "bool SetData(CubeMapFace, Image@+, bool useAlpha = false)", asMETHODPR(TextureCube, SetData, (CubeMapFace, Image*, bool), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("TextureCube", "Image@+ GetImage(CubeMapFace) const", asFUNCTION(TextureCubeGetImage), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("TextureCube", "RenderSurface@+ get_renderSurfaces(CubeMapFace) const", asMETHOD(TextureCube, GetRenderSurface), asCALL_THISCALL);
