@@ -278,6 +278,7 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_PCF_16BIT),
     shadowSoftness_(1.0f),
     vsmShadowParams_(0.0000001f, 0.2f),
+    vsmMultiSample_(1),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -454,6 +455,16 @@ void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingRedu
 {
     vsmShadowParams_.x_ = Max(minVariance, 0.0f);
     vsmShadowParams_.y_ = Clamp(lightBleedingReduction, 0.0f, 1.0f);
+}
+
+void Renderer::SetVSMMultiSample(int multiSample)
+{
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample != vsmMultiSample_)
+    {
+        vsmMultiSample_ = multiSample;
+        ResetShadowMaps();
+    }
 }
 
 void Renderer::SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr)
@@ -930,6 +941,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     // Find format and usage of the shadow map
     unsigned shadowMapFormat = 0;
     TextureUsage shadowMapUsage = TEXTURE_DEPTHSTENCIL;
+    int multiSample = 1;
 
     switch (shadowQuality_)
     {
@@ -947,6 +959,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     case SHADOWQUALITY_BLUR_VSM:
         shadowMapFormat = graphics_->GetRGFloat32Format();
         shadowMapUsage = TEXTURE_RENDERTARGET;
+        multiSample = vsmMultiSample_;
         break;
     }
 
@@ -959,7 +972,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
     while (retries)
     {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage))
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage, multiSample))
         {
             width >>= 1;
             height >>= 1;

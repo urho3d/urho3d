@@ -1946,6 +1946,8 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "float get_shadowSoftness() const", asMETHOD(Renderer, GetShadowSoftness), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_vsmShadowParameters(const Vector2&in)", asFUNCTION(RendererSetVSMShadowParameters), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Renderer", "Vector2 get_vsmShadowParameters() const", asMETHOD(Renderer, GetVSMShadowParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "void set_vsmMultiSample(int)", asMETHOD(Renderer, SetVSMMultiSample), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "int get_vsmMultiSample() const", asMETHOD(Renderer, GetVSMMultiSample), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_maxShadowMaps(int)", asMETHOD(Renderer, SetMaxShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "int get_maxShadowMaps() const", asMETHOD(Renderer, GetMaxShadowMaps), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_reuseShadowMaps(bool)", asMETHOD(Renderer, SetReuseShadowMaps), asCALL_THISCALL);

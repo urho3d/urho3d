@@ -212,6 +212,8 @@ public:
     void SetShadowSoftness(float shadowSoftness);
     /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
+    /// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+    void SetVSMMultiSample(int multiSample);
     /// Set post processing filter to the shadow map
     void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
@@ -286,8 +288,11 @@ public:
     /// Return shadow softness.
     float GetShadowSoftness() const { return shadowSoftness_; }
 
-    /// Return VSM shadow parameters
+    /// Return VSM shadow parameters.
     Vector2 GetVSMShadowParameters() const { return vsmShadowParams_; };
+
+    /// Return VSM shadow multisample level.
+    int GetVSMMultiSample() const { return vsmMultiSample_; }
 
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
@@ -545,6 +550,8 @@ private:
     float shadowSoftness_;
     /// Shadow parameters when VSM is used, they help to reduce light bleeding.
     Vector2 vsmShadowParams_;
+    /// Multisample level for VSM shadows.
+    int vsmMultiSample_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.
