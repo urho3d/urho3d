@@ -116,6 +116,20 @@ namespace Urho3D
 - %Scene : Scene pointer
 - %Camera : Camera pointer
 
+### ViewBuffersReady
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
+### ViewGlobalShaderParameters
+- %View : View pointer
+- %Texture : Texture pointer
+- %Surface : RenderSurface pointer
+- %Scene : Scene pointer
+- %Camera : Camera pointer
+
 ### EndViewRender
 - %View : View pointer
 - %Texture : Texture pointer
@@ -7124,6 +7138,7 @@ Properties:
 - bool sRGB
 - bool sRGBSupport // readonly
 - bool sRGBWriteSupport // readonly
+- String shaderCacheDir
 - bool tripleBuffer // readonly
 - StringHash type // readonly
 - String typeName // readonly
@@ -7284,6 +7299,7 @@ Properties:
 Methods:
 
 - int AddScreenJoystick(XMLFile@ = null, XMLFile@ = null)
+- void CenterMousePosition()
 - int GetKeyFromName(const String&) const
 - int GetKeyFromScancode(int) const
 - String GetKeyName(int) const
@@ -7329,7 +7345,7 @@ Properties:
 - int mouseMoveWheel // readonly
 - int mouseMoveX // readonly
 - int mouseMoveY // readonly
-- IntVector2 mousePosition // readonly
+- IntVector2 mousePosition
 - bool mouseVisible
 - uint numJoysticks // readonly
 - uint numTouches // readonly

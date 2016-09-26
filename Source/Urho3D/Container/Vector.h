@@ -353,6 +353,16 @@ public:
     /// Resize the vector.
     void Resize(unsigned newSize) { Vector<T> tempBuffer; Resize(newSize, 0, tempBuffer); }
 
+    /// Resize the vector and fill new elements with default value.
+    void Resize(unsigned newSize, const T& value)
+    {
+        unsigned oldSize = Size();
+        Vector<T> tempBuffer;
+        Resize(newSize, 0, tempBuffer);
+        for (unsigned i = oldSize; i < newSize; ++i)
+            At(i) = value;
+    }
+
     /// Set new capacity.
     void Reserve(unsigned newCapacity)
     {
@@ -869,6 +879,16 @@ public:
     {
         PODVector<T> tempBuffer;
         Resize(newSize, tempBuffer);
+    }
+
+    /// Resize the vector and fill new elements with default value.
+    void Resize(unsigned newSize, const T& value)
+    {
+        unsigned oldSize = Size();
+        PODVector<T> tempBuffer;
+        Resize(newSize, tempBuffer);
+        for (unsigned i = oldSize; i < newSize; ++i)
+            At(i) = value;
     }
 
     /// Set new capacity.

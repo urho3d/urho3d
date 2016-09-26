@@ -1722,23 +1722,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
     }
 }
 
-void Graphics::BeginDumpShaders(const String& fileName)
-{
-    shaderPrecache_ = new ShaderPrecache(context_, fileName);
-}
-
-void Graphics::EndDumpShaders()
-{
-    shaderPrecache_.Reset();
-}
-
-void Graphics::PrecacheShaders(Deserializer& source)
-{
-    URHO3D_PROFILE(PrecacheShaders);
-
-    ShaderPrecache::LoadShaders(this, source);
-}
-
 bool Graphics::IsInitialized() const
 {
     return window_ != 0 && impl_->GetDevice() != 0;

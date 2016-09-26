@@ -748,23 +748,9 @@ void Renderer::Render()
         if (!views_[i])
             continue;
 
-        using namespace BeginViewRender;
-
-        RenderSurface* renderTarget = views_[i]->GetRenderTarget();
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_VIEW] = views_[i];
-        eventData[P_SURFACE] = renderTarget;
-        eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
-        eventData[P_SCENE] = views_[i]->GetScene();
-        eventData[P_CAMERA] = views_[i]->GetCamera();
-        SendEvent(E_BEGINVIEWRENDER, eventData);
-
         // Screen buffers can be reused between views, as each is rendered completely
         PrepareViewRender();
         views_[i]->Render();
-
-        SendEvent(E_ENDVIEWRENDER, eventData);
     }
 
     // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only

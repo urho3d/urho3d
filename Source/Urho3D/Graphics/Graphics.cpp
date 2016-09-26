@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Core/Profiler.h"
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
@@ -37,6 +38,7 @@
 #include "../Graphics/ParticleEmitter.h"
 #include "../Graphics/RibbonTrail.h"
 #include "../Graphics/Shader.h"
+#include "../Graphics/ShaderPrecache.h"
 #include "../Graphics/Skybox.h"
 #include "../Graphics/StaticModelGroup.h"
 #include "../Graphics/Technique.h"
@@ -47,6 +49,7 @@
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/Zone.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
 #include <SDL/SDL.h>
@@ -169,6 +172,30 @@ void Graphics::Minimize()
         return;
 
     SDL_MinimizeWindow(window_);
+}
+
+void Graphics::BeginDumpShaders(const String& fileName)
+{
+    shaderPrecache_ = new ShaderPrecache(context_, fileName);
+}
+
+void Graphics::EndDumpShaders()
+{
+    shaderPrecache_.Reset();
+}
+
+void Graphics::PrecacheShaders(Deserializer& source)
+{
+    URHO3D_PROFILE(PrecacheShaders);
+
+    ShaderPrecache::LoadShaders(this, source);
+}
+
+void Graphics::SetShaderCacheDir(const String& path)
+{
+    String trimmedPath = path.Trimmed();
+    if (trimmedPath.Length())
+        shaderCacheDir_ = AddTrailingSlash(trimmedPath);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)

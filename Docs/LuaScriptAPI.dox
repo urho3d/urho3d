@@ -2548,6 +2548,7 @@ Methods:
 - void EndDumpShaders()
 - void PrecacheShaders(Deserializer& source)
 - void PrecacheShaders(const String fileName)
+- void SetShaderCacheDir(const String path)
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const
@@ -2579,6 +2580,7 @@ Methods:
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 - IntVector2 GetDesktopResolution() const
+- const String GetShaderCacheDir() const
 - unsigned GetAlphaFormat()
 - unsigned GetLuminanceFormat()
 - unsigned GetLuminanceAlphaFormat()
@@ -2630,6 +2632,7 @@ Properties:
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
+- String shaderCacheDir
 
 <a name="Class_HierarchyContainer"></a>
 ### HierarchyContainer : UIElement
@@ -2799,6 +2802,8 @@ Methods:
 - unsigned LoadGestures(const String fileName)
 - bool RemoveGesture(unsigned gestureID)
 - void RemoveAllGestures()
+- void SetMousePosition(const IntVector2& position)
+- void CenterMousePosition()
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2839,7 +2844,7 @@ Methods:
 Properties:
 
 - int qualifiers (readonly)
-- IntVector2 mousePosition (readonly)
+- IntVector2 mousePosition
 - IntVector2& mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)

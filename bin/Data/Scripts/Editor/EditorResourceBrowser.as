@@ -1327,6 +1327,8 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 
 bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
+    if (GetFileName(path).length == 0)
+        return false; // .gitignore etc.
     String extension = GetExtension(path);
     if (extension == ".txt" || extension == ".json" || extension == ".icns" || extension == ".atlas")
         return false;

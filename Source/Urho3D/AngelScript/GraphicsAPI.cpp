@@ -1857,6 +1857,8 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool get_flushGPU() const", asMETHOD(Graphics, GetFlushGPU), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void set_orientations(const String&in)", asMETHOD(Graphics, SetOrientations), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "const String& get_orientations() const", asMETHOD(Graphics, GetOrientations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "void set_shaderCacheDir(const String&in)", asMETHOD(Graphics, SetShaderCacheDir), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "const String& get_shaderCacheDir() const", asMETHOD(Graphics, GetShaderCacheDir), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "int get_width() const", asMETHOD(Graphics, GetWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "int get_height() const", asMETHOD(Graphics, GetHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "int get_multiSample() const", asMETHOD(Graphics, GetMultiSample), asCALL_THISCALL);

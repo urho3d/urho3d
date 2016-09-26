@@ -546,13 +546,7 @@ void View::Update(const FrameInfo& frame)
 
     using namespace BeginViewUpdate;
 
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_VIEW] = this;
-    eventData[P_SURFACE] = renderTarget_;
-    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
-    eventData[P_SCENE] = scene_;
-    eventData[P_CAMERA] = cullCamera_;
-    renderer_->SendEvent(E_BEGINVIEWUPDATE, eventData);
+    SendViewEvent(E_BEGINVIEWUPDATE);
 
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
 
@@ -569,7 +563,7 @@ void View::Update(const FrameInfo& frame)
 
     if (hasScenePasses_ && (!cullCamera_ || !octree_))
     {
-        renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
+        SendViewEvent(E_ENDVIEWUPDATE);
         return;
     }
 
@@ -581,18 +575,24 @@ void View::Update(const FrameInfo& frame)
     GetBatches();
     renderer_->StorePreparedView(this, cullCamera_);
 
-    renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
+    SendViewEvent(E_ENDVIEWUPDATE);
 }
 
 void View::Render()
 {
+    SendViewEvent(E_BEGINVIEWRENDER);
+
     if (hasScenePasses_ && (!octree_ || !camera_))
+    {
+        SendViewEvent(E_ENDVIEWRENDER);
         return;
+    }
 
     UpdateGeometries();
 
     // Allocate screen buffers as necessary
     AllocateScreenBuffers();
+    SendViewEvent(E_VIEWBUFFERSREADY);
 
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
@@ -672,6 +672,8 @@ void View::Render()
     // (backbuffer should contain proper depth already)
     if (currentRenderTarget_ != renderTarget_)
         BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, !usedResolve_);
+
+    SendViewEvent(E_ENDVIEWRENDER);
 }
 
 Graphics* View::GetGraphics() const
@@ -700,6 +702,8 @@ void View::SetGlobalShaderParameters()
         graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
         graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
     }
+
+    SendViewEvent(E_VIEWGLOBALSHADERPARAMETERS);
 }
 
 void View::SetCameraShaderParameters(Camera* camera)
@@ -3083,6 +3087,21 @@ RenderSurface* View::GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace f
         return static_cast<TextureCube*>(texture)->GetRenderSurface(face);
     else
         return 0;
+}
+
+void View::SendViewEvent(StringHash eventType)
+{
+    using namespace BeginViewRender;
+    
+    VariantMap& eventData = GetEventDataMap();
+    
+    eventData[P_VIEW] = this;
+    eventData[P_SURFACE] = renderTarget_;
+    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
+    eventData[P_SCENE] = scene_;
+    eventData[P_CAMERA] = cullCamera_;
+
+    renderer_->SendEvent(eventType, eventData);
 }
 
 Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap)

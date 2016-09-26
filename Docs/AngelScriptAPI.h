@@ -5168,6 +5168,7 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
+String shaderCacheDir;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -5362,6 +5363,7 @@ class Input
 {
 // Methods:
 int AddScreenJoystick(XMLFile = null, XMLFile = null);
+void CenterMousePosition();
 int GetKeyFromName(const String&) const;
 int GetKeyFromScancode(int) const;
 String GetKeyName(int) const;
@@ -5421,7 +5423,6 @@ int mouseMoveWheel;
 int mouseMoveX;
 /* readonly */
 int mouseMoveY;
-/* readonly */
 IntVector2 mousePosition;
 bool mouseVisible;
 /* readonly */

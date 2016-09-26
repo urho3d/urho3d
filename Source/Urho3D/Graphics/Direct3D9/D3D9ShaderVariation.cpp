@@ -92,7 +92,7 @@ bool ShaderVariation::Create()
     SplitPath(owner_->GetName(), path, name, extension);
     extension = type_ == VS ? ".vs3" : ".ps3";
 
-    String binaryShaderName = path + "Cache/" + name + "_" + StringHash(defines_).ToString() + extension;
+    String binaryShaderName = graphics_->GetShaderCacheDir() + name + "_" + StringHash(defines_).ToString() + extension;
 
     if (!LoadByteCode(binaryShaderName))
     {
@@ -372,8 +372,17 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     ResourceCache* cache = owner_->GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = owner_->GetSubsystem<FileSystem>();
 
-    String path = GetPath(cache->GetResourceFileName(owner_->GetName())) + "Cache/";
-    String fullName = path + GetFileNameAndExtension(binaryShaderName);
+    // Filename may or may not be inside the resource system
+    String fullName = binaryShaderName;
+    if (!IsAbsolutePath(fullName))
+    {
+        // If not absolute, use the resource dir of the shader
+        String shaderFileName = cache->GetResourceFileName(owner_->GetName());
+        if (shaderFileName.Empty())
+            return;
+        fullName = shaderFileName.Substring(0, shaderFileName.Find(owner_->GetName())) + binaryShaderName;
+    }
+    String path = GetPath(fullName);
     if (!fileSystem->DirExists(path))
         fileSystem->CreateDir(path);
 

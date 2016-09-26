@@ -222,6 +222,8 @@ The full list of supported parameters, their datatypes and default values:
 - SoundStereo (bool) Stereo sound output mode. Default true.
 - SoundInterpolation (bool) Interpolated sound output mode to improve quality. Default true.
 - TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
+- ShaderCacheDir (string) Shader binary cache directory for Direct3D. Default "urho3d/shadercache" within the user's application preferences directory.
+- PackageCacheDir (string) Package cache directory for Network subsystem. Not specified by default.
 
 \section MainLoop_Frame Main loop iteration
 
@@ -1509,9 +1511,9 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" cubemap="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" 
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false"
         multisample="x" autoresolve="true|false" />
-    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
+    <command type="clear" tag="TagName" enabled="true|false" color="r g b a|fog" depth="x" stencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" face="0|1|2|3|4|5" />
         <output index="1" name="RTName2" />
