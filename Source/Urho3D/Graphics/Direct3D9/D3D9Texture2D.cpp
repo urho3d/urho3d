@@ -585,7 +585,11 @@ bool Texture2D::Create()
             // Else use the texture surface directly for rendering
             hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
+            {
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
+                return false;
+            }
         }
     }
 

@@ -854,6 +854,7 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Failed to get destination surface for resolve", hr);
+        URHO3D_SAFE_RELEASE(destSurface);
         return false;
     }
 
@@ -898,6 +899,7 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Failed to get destination surface for resolve", hr);
+            URHO3D_SAFE_RELEASE(destSurface);
             return false;
         }
 
