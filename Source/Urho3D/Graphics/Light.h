@@ -337,7 +337,7 @@ private:
     LightType lightType_;
     /// Color.
     Color color_;
-    /// Light Temperature.
+    /// Light temperature.
     float temperature_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
