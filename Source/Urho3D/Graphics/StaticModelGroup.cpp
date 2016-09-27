@@ -42,6 +42,7 @@ extern const char* GEOMETRY_CATEGORY;
 
 StaticModelGroup::StaticModelGroup(Context* context) :
     StaticModel(context),
+    nodesDirty_(false),
     nodeIDsDirty_(false)
 {
     // Initialize the default node IDs attribute
@@ -63,11 +64,10 @@ void StaticModelGroup::RegisterObject(Context* context)
 
 void StaticModelGroup::ApplyAttributes()
 {
-    if (!nodeIDsDirty_)
+    if (!nodesDirty_)
         return;
 
-    // Remove all old instance nodes before searching for new. Can not call RemoveAllInstances() as that would modify
-    // the ID list on its own
+    // Remove all old instance nodes before searching for new
     for (unsigned i = 0; i < instanceNodes_.Size(); ++i)
     {
         Node* node = instanceNodes_[i];
@@ -78,7 +78,6 @@ void StaticModelGroup::ApplyAttributes()
     instanceNodes_.Clear();
 
     Scene* scene = GetScene();
-
     if (scene)
     {
         // The first index stores the number of IDs redundantly. This is for editing
@@ -95,7 +94,9 @@ void StaticModelGroup::ApplyAttributes()
     }
 
     worldTransforms_.Resize(instanceNodes_.Size());
-    nodeIDsDirty_ = false;
+    numWorldTransforms_ = 0; // Correct amount will be found during world bounding box update
+    nodesDirty_ = false;
+
     OnMarkedDirty(GetNode());
 }
 
@@ -278,10 +279,7 @@ void StaticModelGroup::AddInstanceNode(Node* node)
     // Add as a listener for the instance node, so that we know to dirty the transforms when the node moves or is enabled/disabled
     node->AddListener(this);
     instanceNodes_.Push(instanceWeak);
-
-    UpdateNodeIDs();
-    OnMarkedDirty(GetNode());
-    MarkNetworkUpdate();
+    UpdateNumTransforms();
 }
 
 void StaticModelGroup::RemoveInstanceNode(Node* node)
@@ -290,12 +288,13 @@ void StaticModelGroup::RemoveInstanceNode(Node* node)
         return;
 
     WeakPtr<Node> instanceWeak(node);
-    node->RemoveListener(this);
-    instanceNodes_.Remove(instanceWeak);
+    Vector<WeakPtr<Node> >::Iterator i = instanceNodes_.Find(instanceWeak);
+    if (i == instanceNodes_.End())
+        return;
 
-    UpdateNodeIDs();
-    OnMarkedDirty(GetNode());
-    MarkNetworkUpdate();
+    node->RemoveListener(this);
+    instanceNodes_.Erase(i);
+    UpdateNumTransforms();
 }
 
 void StaticModelGroup::RemoveAllInstanceNodes()
@@ -308,10 +307,7 @@ void StaticModelGroup::RemoveAllInstanceNodes()
     }
 
     instanceNodes_.Clear();
-
-    UpdateNodeIDs();
-    OnMarkedDirty(GetNode());
-    MarkNetworkUpdate();
+    UpdateNumTransforms();
 }
 
 Node* StaticModelGroup::GetInstanceNode(unsigned index) const
@@ -348,7 +344,17 @@ void StaticModelGroup::SetNodeIDsAttr(const VariantVector& value)
         nodeIDsAttr_.Clear();
         nodeIDsAttr_.Push(0);
     }
-    nodeIDsDirty_ = true;
+
+    nodesDirty_ = true;
+    nodeIDsDirty_ = false;
+}
+
+const VariantVector& StaticModelGroup::GetNodeIDsAttr() const
+{
+    if (nodeIDsDirty_)
+        UpdateNodeIDs();
+
+    return nodeIDsAttr_;
 }
 
 void StaticModelGroup::OnNodeSetEnabled(Node* node)
@@ -381,20 +387,30 @@ void StaticModelGroup::OnWorldBoundingBoxUpdate()
     numWorldTransforms_ = index;
 }
 
-void StaticModelGroup::UpdateNodeIDs()
+void StaticModelGroup::UpdateNumTransforms()
+{
+    worldTransforms_.Resize(instanceNodes_.Size());
+    numWorldTransforms_ = 0; // Correct amount will be during world bounding box update
+    nodeIDsDirty_ = true;
+
+    OnMarkedDirty(GetNode());
+    MarkNetworkUpdate();
+}
+
+void StaticModelGroup::UpdateNodeIDs() const
 {
     unsigned numInstances = instanceNodes_.Size();
 
     nodeIDsAttr_.Clear();
     nodeIDsAttr_.Push(numInstances);
-    worldTransforms_.Resize(numInstances);
-    numWorldTransforms_ = 0; // For safety. OnWorldBoundingBoxUpdate() will calculate the proper amount
 
     for (unsigned i = 0; i < numInstances; ++i)
     {
         Node* node = instanceNodes_[i];
         nodeIDsAttr_.Push(node ? node->GetID() : 0);
     }
+
+    nodeIDsDirty_ = false;
 }
 
 }

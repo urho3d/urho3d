@@ -969,7 +969,7 @@ void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform)
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
     {
         i->position_ = transform * i->position_;
-        i->normal_ = (transform * i->normal_).Normalized();
+        i->normal_ = (transform * Vector4(i->normal_, 0.0f)).Normalized();
     }
 }
 
