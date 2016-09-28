@@ -8446,6 +8446,8 @@ RenderSurface linkedRenderTarget;
 uint numViewports;
 /* readonly */
 Texture parentTexture;
+/* readonly */
+bool resolveDirty;
 RenderSurfaceUpdateMode updateMode;
 /* readonly */
 TextureUsage usage;
@@ -8458,10 +8460,12 @@ class RenderTargetInfo
 {
 
 // Properties:
+bool autoResolve;
 bool cubemap;
 bool enabled;
 bool filtered;
 uint format;
+int multiSample;
 String name;
 bool persistent;
 bool sRGB;
@@ -8539,6 +8543,7 @@ StringHash type;
 /* readonly */
 String typeName;
 Array<Viewport> viewports;
+int vsmMultiSample;
 Vector2 vsmShadowParameters;
 /* readonly */
 int weakRefs;
@@ -11872,6 +11877,8 @@ void SetNumLevels(uint);
 // Properties:
 Array<TextureAddressMode> addressMode;
 uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11896,9 +11903,13 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -11928,11 +11939,13 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC, int = 1, bool = true);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
 uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11957,11 +11970,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 RenderSurface renderSurface;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -11995,6 +12012,8 @@ bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12020,11 +12039,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 RenderSurface renderSurface;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -12058,6 +12081,8 @@ bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC);
 // Properties:
 Array<TextureAddressMode> addressMode;
 uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12082,9 +12107,13 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -12114,11 +12143,13 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(CubeMapFace, Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC, int = 1);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
 uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12143,11 +12174,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 Array<RenderSurface> renderSurfaces;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
