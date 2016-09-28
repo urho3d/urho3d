@@ -2231,6 +2231,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 {
     Light* light = query.light_;
     LightType type = light->GetLightType();
+    unsigned lightMask = light->GetLightMask();
     const Frustum& frustum = cullCamera_->GetFrustum();
 
     // Check if light should be shadowed
@@ -2252,7 +2253,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     case LIGHT_DIRECTIONAL:
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
-            if (GetLightMask(geometries_[i]) & light->GetLightMask())
+            if (GetLightMask(geometries_[i]) & lightMask)
                 query.litGeometries_.Push(geometries_[i]);
         }
         break;
@@ -2264,7 +2265,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & light->GetLightMask()))
+                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
                     query.litGeometries_.Push(tempDrawables[i]);
             }
         }
@@ -2277,7 +2278,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & light->GetLightMask()))
+                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
                     query.litGeometries_.Push(tempDrawables[i]);
             }
         }
@@ -2332,6 +2333,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex)
 {
     Light* light = query.light_;
+    unsigned lightMask = light->GetLightMask();
 
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
     const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
@@ -2368,7 +2370,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         if (!drawable->GetCastShadows())
             continue;
         // Check shadow mask
-        if (!(GetShadowMask(drawable) & light->GetLightMask()))
+        if (!(GetShadowMask(drawable) & lightMask))
             continue;
         // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
@@ -2578,13 +2580,16 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     if (parameters.focus_)
     {
         BoundingBox litGeometriesBox;
+        unsigned lightMask = light->GetLightMask();
+
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             Drawable* drawable = geometries_[i];
             if (drawable->GetMinZ() <= farSplit && drawable->GetMaxZ() >= nearSplit &&
-                (GetLightMask(drawable) & light->GetLightMask()))
+                (GetLightMask(drawable) & lightMask))
                 litGeometriesBox.Merge(drawable->GetWorldBoundingBox());
         }
+
         if (litGeometriesBox.Defined())
         {
             frustumVolume.Clip(litGeometriesBox);
