@@ -414,6 +414,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Sound
 - Technique
 - Texture2D
+- Texture2DArray
 - Texture3D
 - TextureCube
 - XMLFile
@@ -1110,6 +1111,8 @@ OpenGL ES 2.0 has further limitations:
 
 - 3D and 2D array textures are not currently supported.
 
+- Multisampled texture rendertargets are not supported.
+
 \page VertexBuffers Vertex buffers
 
 %Geometry data is defined by VertexBuffer objects, which hold a number of vertices of a certain vertex format. For rendering, the data is uploaded to the GPU, but optionally a shadow copy of
@@ -1511,7 +1514,8 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" cubemap="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" />
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false"
+        multisample="x" autoresolve="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" color="r g b a|fog" depth="x" stencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" face="0|1|2|3|4|5" />
@@ -1588,6 +1592,14 @@ Post-processing effects are usually implemented by using the quad command. When 
 
 In OpenGL post-processing shaders it is important to distinguish between sampling a rendertarget texture and a regular texture resource, because intermediate rendertargets (such as the G-buffer) may be vertically inverted. Use the GetScreenPos() or GetQuadTexCoord() functions to get rendertarget UV coordinates from the clip coordinates; this takes flipping into account automatically. For sampling a regular texture, use GetQuadTexCoordNoFlip() function, which requires world coordinates instead of clip coordinates.
 
+\section RenderPaths_MultiSample Multisampled rendertargets
+
+Texture2D and TextureCube support multisampling. Programmatically, multisampling is enabled through the \ref Texture2D::SetSize "SetSize()" function when defining the dimensions and format. Multisampling can also be set in a renderpath's rendertarget definition.
+
+The normal operation is that a multisampled rendertarget will be automatically resolved to 1-sample before being sampled as a texture. This is denoted by the \ref Texture2D::GetAutoResolve() "autoResolve" parameter, whose default value is true. On OpenGL (when supported) and Direct3D11, it's also possible to access the individual samples of a Texture2D in shader code by defining a multisampled sampler and using specialized functions (texelFetch on OpenGL, Texture2DMS.Load on Direct3D11). In this case the "autoResolve" parameter should be set to false. Note that accessing individual samples is not possible for cube textures, or when using Direct3D9.
+
+By accessing the individual samples of multisampled G-buffer textures, a deferred MSAA renderer could be implemented. This has some performance considerations / complexities (you should avoid running the lighting calculations per sample when not on triangle edges) and is not implemented by default.
+
 \page Lights Lights and shadows
 
 Lights in Urho3D can be directional, point, or spot lights, either per-pixel or per-vertex. Shadow mapping is supported for all per-pixel lights.
@@ -1653,6 +1665,8 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 The shadow map base resolution and quality (bit depth & sampling mode) are set through functions in the Renderer subsystem, see \ref Renderer::SetShadowMapSize "SetShadowMapSize()" and \ref Renderer::SetShadowQuality "SetShadowQuality()".
 
 The shadow quality enum allows choosing also variance (VSM) shadows instead of the default hardware depth shadows. VSM shadows behave markedly differently; depth bias settings are no longer relevant, but you should make sure all your large surfaces (also ground & terrain) are marked as shadow casters, otherwise shadows cast by objects moving over them can appear unnaturally thin. For VSM shadows, see the functions \ref Renderer::SetShadowSoftness "SetShadowSoftness()" and \ref Renderer::SetVSMShadowParameters "SetVSMShadowParameters()" to control the softness (blurring) and in-shadow detection behavior. Instead of self-shadowing artifacts common with hardware depth shadows, you may encounter light bleeding when shadow casting surfaces are close in light direction to each other, which adjusting the VSM shadow parameters may help.
+
+VSM shadow maps can also be multisampled for better quality, though this has a performance cost. See \ref Renderer::SetVSMMultiSample "SetVSMMultiSample()".
 
 \section Lights_ShadowMapReuse Shadow map reuse
 

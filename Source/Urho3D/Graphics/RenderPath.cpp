@@ -106,6 +106,11 @@ void RenderTargetInfo::Load(const XMLElement& element)
         size_.x_ = element.GetFloat("width");
     if (element.HasAttribute("height"))
         size_.y_ = element.GetFloat("height");
+
+    if (element.HasAttribute("multisample"))
+        multiSample_ = Clamp(element.GetInt("multisample"), 1, 16);
+    if (element.HasAttribute("autoresolve"))
+        autoResolve_ = element.GetBool("autoresolve");
 }
 
 void RenderPathCommand::Load(const XMLElement& element)

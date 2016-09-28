@@ -69,6 +69,8 @@ struct URHO3D_API RenderTargetInfo
     RenderTargetInfo() :
         size_(Vector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
+        multiSample_(1),
+        autoResolve_(true),
         enabled_(true),
         cubemap_(false),
         filtered_(false),
@@ -90,6 +92,10 @@ struct URHO3D_API RenderTargetInfo
     Vector2 size_;
     /// Size mode.
     RenderTargetSizeMode sizeMode_;
+    /// Multisampling level (1 = no multisampling).
+    int multiSample_;
+    /// Multisampling autoresolve flag.
+    bool autoResolve_;
     /// Enabled flag.
     bool enabled_;
     /// Cube map flag.

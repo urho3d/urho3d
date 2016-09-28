@@ -59,6 +59,7 @@ Texture::Texture(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     shaderResourceView_(0),
     sampler_(0),
+    resolveTexture_(0),
     format_(0),
     usage_(TEXTURE_STATIC),
     levels_(0),
@@ -69,8 +70,11 @@ Texture::Texture(Context* context) :
     shadowCompare_(false),
     filterMode_(FILTER_DEFAULT),
     anisotropy_(0),
+    multiSample_(1),
     sRGB_(false),
-    parametersDirty_(true)
+    parametersDirty_(true),
+    autoResolve_(false),
+    resolveDirty_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;

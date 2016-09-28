@@ -38,7 +38,8 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
     surface_(0),
     updateMode_(SURFACE_UPDATEVISIBLE),
-    updateQueued_(false)
+    updateQueued_(false),
+    resolveDirty_(false)
 {
 }
 
@@ -60,7 +61,7 @@ void RenderSurface::Release()
     URHO3D_SAFE_RELEASE(surface_);
 }
 
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     // Not used on Direct3D
     return false;

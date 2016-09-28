@@ -330,8 +330,8 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, &stagingTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(stagingTexture);
         URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return false;
     }
 
@@ -355,7 +355,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     if (FAILED(hr) || !mappedData.pData)
     {
         URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
-        stagingTexture->Release();
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return false;
     }
     else
@@ -369,7 +369,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
             }
         }
         graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
-        stagingTexture->Release();
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return true;
     }
 }
@@ -397,8 +397,8 @@ bool Texture3D::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture3D(&textureDesc, 0, (ID3D11Texture3D**)&object_.ptr_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 
@@ -412,8 +412,8 @@ bool Texture3D::Create()
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(shaderResourceView_);
         URHO3D_LOGD3DERROR("Failed to create shader resource view for texture", hr);
+        URHO3D_SAFE_RELEASE(shaderResourceView_);
         return false;
     }
 

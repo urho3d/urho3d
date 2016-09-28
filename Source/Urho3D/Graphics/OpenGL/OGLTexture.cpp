@@ -89,6 +89,15 @@ void Texture::UpdateParameters()
     if (!object_.name_ || !graphics_)
         return;
 
+    // If texture is multisampled, do not attempt to set parameters as it's illegal, just return
+#ifndef GL_ES_VERSION_2_0
+    if (target_ == GL_TEXTURE_2D_MULTISAMPLE)
+    {
+        parametersDirty_ = false;
+        return;
+    }
+#endif
+
     // Wrapping
     glTexParameteri(target_, GL_TEXTURE_WRAP_S, GetWrapMode(addressMode_[COORD_U]));
     glTexParameteri(target_, GL_TEXTURE_WRAP_T, GetWrapMode(addressMode_[COORD_V]));
