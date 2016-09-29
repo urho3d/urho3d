@@ -1047,6 +1047,7 @@ From 1.6 to master:
 - Direct3D binary shaders are now cached by default to the user preferences directory "urho3d/shadercache" to avoid writing into the application installation directory, to which the user may not have rights.
   If you ship a prewarmed (read-only) cache with your application you can set the directory yourself from the engine startup parameter "ShaderCacheDir" or call Graphics::SetShaderCacheDir() on initialization.
   Use the directory "Shaders/HLSL/Cache" to get the old behavior.
+- Signatures of UIElement virtual functions OnResize() and OnPositionSet() have changed.
 */
 
 }

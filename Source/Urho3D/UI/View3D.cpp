@@ -68,10 +68,10 @@ void View3D::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
 }
 
-void View3D::OnResize()
+void View3D::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
-    int width = GetWidth();
-    int height = GetHeight();
+    int width = newSize.x_;
+    int height = newSize.y_;
 
     if (width > 0 && height > 0)
     {
@@ -108,7 +108,7 @@ void View3D::SetFormat(unsigned format)
     if (format != rttFormat_)
     {
         rttFormat_ = format;
-        OnResize();
+        OnResize(GetSize(), IntVector2::ZERO);
     }
 }
 

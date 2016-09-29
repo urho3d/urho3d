@@ -112,11 +112,11 @@ void ScrollBar::ApplyAttributes()
     }
 }
 
-void ScrollBar::OnResize()
+void ScrollBar::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
     if (slider_->GetOrientation() == O_HORIZONTAL)
     {
-        int height = GetHeight();
+        int height = newSize.y_;
         int sliderWidth = Max(GetWidth() - 2 * height, 0);
 
         backButton_->SetSize(height, height);
@@ -129,7 +129,7 @@ void ScrollBar::OnResize()
     }
     else
     {
-        int width = GetWidth();
+        int width = newSize.x_;
         int sliderHeight = Max(GetHeight() - 2 * width, 0);
 
         backButton_->SetSize(width, width);
@@ -162,7 +162,7 @@ void ScrollBar::SetOrientation(Orientation orientation)
         forwardButton_->SetImageRect(downRect_);
     }
 
-    OnResize();
+    OnResize(GetSize(), IntVector2::ZERO);
 }
 
 void ScrollBar::SetRange(float range)

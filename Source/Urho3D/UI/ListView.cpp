@@ -314,9 +314,9 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     SendEvent(E_UNHANDLEDKEY, eventData);
 }
 
-void ListView::OnResize()
+void ListView::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
-    ScrollView::OnResize();
+    ScrollView::OnResize(newSize, delta);
 
     // When in hierarchy mode also need to resize the overlay container
     if (hierarchyMode_)
