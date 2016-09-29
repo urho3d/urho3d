@@ -20,6 +20,10 @@
 # THE SOFTWARE.
 #
 
+if (NOT URHO3D_IMUI)
+    return ()
+endif ()
+
 # Define target name
 set (TARGET_NAME 45_HelloIMUI)
 

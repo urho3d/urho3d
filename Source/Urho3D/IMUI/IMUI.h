@@ -53,7 +53,7 @@ namespace Urho3D
 	//		 for now simple one touch input handling implemented.  
 	// TODO: Replace font handling with Urho3d font ?
 	// TODO: imgui saves window positions and sizes to an ini file, use urho3d file system for that ?
-	class IMUI : public Object
+	class URHO3D_API IMUI : public Object
 	{
 		URHO3D_OBJECT(IMUI, Object);
 	public:
