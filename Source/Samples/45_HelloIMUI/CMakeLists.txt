@@ -21,7 +21,7 @@
 #
 
 # Define target name
-set (TARGET_NAME 43_HelloIMUI)
+set (TARGET_NAME 45_HelloIMUI)
 
 # Define source files
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
