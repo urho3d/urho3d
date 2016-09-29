@@ -24,7 +24,7 @@
 set (TARGET_NAME imgui)
 
 # Define source files
-define_source_files (GLOB_CPP_PATTERNS *.cpp GLOB_H_PATTERNS *.h)
+define_source_files (GLOB_CPP_PATTERNS *.cpp GLOB_H_PATTERNS *.h GLOB_H_PATTERNS *.inl)
 
 # Setup target
 setup_library ()
