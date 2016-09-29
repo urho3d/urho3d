@@ -4945,6 +4945,7 @@ Methods:
 - RenderSurfaceUpdateMode GetUpdateMode() const
 - RenderSurface* GetLinkedRenderTarget() const
 - RenderSurface* GetLinkedDepthStencil() const
+- bool IsResolveDirty() const
 
 Properties:
 
@@ -4956,6 +4957,7 @@ Properties:
 - RenderSurfaceUpdateMode updateMode
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
+- bool resolveDirty (readonly)
 
 <a name="Class_RenderTargetInfo"></a>
 ### RenderTargetInfo
@@ -4974,6 +4976,8 @@ Properties:
 - unsigned format
 - Vector2 size
 - RenderTargetSizeMode sizeMode
+- int multiSample
+- bool autoResolve
 - bool enabled
 - bool cubemap
 - bool filtered
@@ -5002,6 +5006,7 @@ Methods:
 - void SetShadowQuality(ShadowQuality quality)
 - void SetShadowSoftness(float shadowSoftness)
 - void SetVSMShadowParameters(float minVariance, float lightBleedingReduction)
+- void SetVSMMultiSample(int multiSample)
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
@@ -5031,6 +5036,7 @@ Methods:
 - ShadowQuality GetShadowQuality() const
 - float GetShadowSoftness() const
 - Vector2 GetVSMShadowParameters() const
+- int GetVSMMultiSample() const
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
@@ -5072,6 +5078,7 @@ Properties:
 - int shadowMapSize
 - ShadowQuality shadowQuality
 - float shadowSoftness
+- int VSMMultiSample
 - bool reuseShadowMaps
 - int maxShadowMaps
 - bool dynamicInstancing
@@ -6414,6 +6421,9 @@ Methods:
 - unsigned GetAnisotropy() const
 - const Color& GetBorderColor() const
 - bool GetSRGB() const
+- int GetMultiSample() const
+- bool GetAutoResolve() const
+- bool IsResolveDirty() const
 - Texture* GetBackupTexture() const
 - int GetMipsToSkip(int quality) const
 - int GetLevelWidth(unsigned level) const
@@ -6435,6 +6445,9 @@ Properties:
 - unsigned anisotropy
 - Color& borderColor
 - bool sRGB
+- int multiSample (readonly)
+- bool autoResolve (readonly)
+- bool resolveDirty (readonly)
 - Texture* backupTexture
 - TextureUsage usage (readonly)
 
@@ -6446,7 +6459,7 @@ Methods:
 - Texture2D() (GC)
 - Texture2D* new()
 - void delete()
-- bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
 - bool SetData(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
@@ -6492,7 +6505,7 @@ Methods:
 - TextureCube() (GC)
 - TextureCube* new()
 - void delete()
-- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
 - bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 

@@ -99,6 +99,15 @@ public:
     /// Return whether is using sRGB sampling and writing.
     bool GetSRGB() const { return sRGB_; }
 
+    /// Return texture multisampling level (1 = no multisampling).
+    int GetMultiSample() const { return multiSample_; }
+
+    /// Return texture multisampling autoresolve mode. When true, the texture is resolved before being sampled on SetTexture(). When false, the texture will not be resolved and must be read as individual samples in the shader.
+    bool GetAutoResolve() const { return autoResolve_; }
+
+    /// Return whether multisampled texture needs resolve.
+    bool IsResolveDirty() const { return resolveDirty_; }
+    
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
 
@@ -141,11 +150,17 @@ public:
     /// Return sampler state object. Only used on Direct3D11.
     void* GetSampler() const { return sampler_; }
 
+    /// Return resolve texture. Only used on Direct3D11.
+    void* GetResolveTexture() const { return resolveTexture_; }
+
     /// Return texture's target. Only used on OpenGL.
     unsigned GetTarget() const { return target_; }
 
     /// Convert format to sRGB. Not used on Direct3D9.
     unsigned GetSRGBFormat(unsigned format);
+
+    /// Set or clear the need resolve flag. Called internally by Graphics.
+    void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
 
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
@@ -176,6 +191,8 @@ protected:
 
     /// Direct3D11 sampler state object.
     void* sampler_;
+    /// Direct3D11 resolve texture object when multisample with autoresolve is used.
+    void* resolveTexture_;
 
     /// Texture format.
     unsigned format_;
@@ -203,10 +220,16 @@ protected:
     unsigned mipsToSkip_[MAX_TEXTURE_QUALITY_LEVELS];
     /// Border color.
     Color borderColor_;
+    /// Multisampling level.
+    int multiSample_;
     /// sRGB sampling and writing mode flag.
     bool sRGB_;
     /// Parameters dirty flag.
     bool parametersDirty_;
+    /// Multisampling autoresolve flag.
+    bool autoResolve_;
+    /// Multisampling resolve needed -flag.
+    bool resolveDirty_;
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

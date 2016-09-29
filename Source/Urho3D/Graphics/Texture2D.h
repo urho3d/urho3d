@@ -56,8 +56,11 @@ public:
     /// Release the texture.
     virtual void Release();
 
-    /// Set size, format and usage. Zero size will follow application window size. Return true if successful.
-    bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    /// Set size, format, usage and multisampling parameters for rendertargets. Zero size will follow application window size. Return true if successful.
+    /** Autoresolve true means the multisampled texture will be automatically resolved to 1-sample after being rendered to and before being sampled as a texture.
+        Autoresolve false means the multisampled texture will be read as individual samples in the shader and is not supported on Direct3D9.
+        */
+    bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true);
     /// Set data either partially or fully on a mip level. Return true if successful.
     bool SetData(unsigned level, int x, int y, int width, int height, const void* data);
     /// Set data from an image. Return true if successful. Optionally make a single channel image alpha-only.

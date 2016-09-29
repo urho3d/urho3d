@@ -51,4 +51,10 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
         false;
 }
 
+bool GraphicsImpl::CheckMultiSampleSupport(D3DFORMAT format, int level)
+{
+    return interface_ ? SUCCEEDED(interface_->CheckDeviceMultiSampleType(adapter_, deviceType_, format, FALSE,
+        (D3DMULTISAMPLE_TYPE)level, NULL)) : false;
+}
+
 }

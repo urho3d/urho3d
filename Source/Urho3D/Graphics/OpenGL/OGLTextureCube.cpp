@@ -428,6 +428,15 @@ bool TextureCube::Create()
         return true;
     }
 
+#ifdef GL_ES_VERSION_2_0
+    if (multiSample_ > 1)
+    {
+        URHO3D_LOGWARNING("Multisampled texture is not supported on OpenGL ES");
+        multiSample_ = 1;
+        autoResolve_ = false;
+    }
+#endif
+    
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
@@ -437,6 +446,13 @@ bool TextureCube::Create()
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
+
+    // If multisample, create renderbuffers for each face
+    if (multiSample_ > 1)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+            renderSurfaces_[i]->CreateRenderBuffer(width_, height_, format, multiSample_);
+    }
 
     bool success = true;
     if (!IsCompressed())

@@ -128,6 +128,10 @@ public:
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
     /// Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
+    /// Resolve a multisampled texture on itself.
+    bool ResolveToTexture(Texture2D* texture);
+    /// Resolve a multisampled cube texture on itself.
+    bool ResolveToTexture(TextureCube* texture);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.
@@ -584,7 +588,7 @@ private:
     /// Bind a framebuffer using either extension or core functionality. Used only on OpenGL.
     void BindFramebuffer(unsigned fbo);
     /// Bind a framebuffer color attachment using either extension or core functionality. Used only on OpenGL.
-    void BindColorAttachment(unsigned index, unsigned target, unsigned object);
+    void BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer);
     /// Bind a framebuffer depth attachment using either extension or core functionality. Used only on OpenGL.
     void BindDepthAttachment(unsigned object, bool isRenderBuffer);
     /// Bind a framebuffer stencil attachment using either extension or core functionality. Used only on OpenGL.

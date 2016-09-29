@@ -18,6 +18,7 @@ class Renderer
     void SetShadowQuality(ShadowQuality quality);
     void SetShadowSoftness(float shadowSoftness);
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
+    void SetVSMMultiSample(int multiSample);
     void SetReuseShadowMaps(bool enable);
     void SetMaxShadowMaps(int shadowMaps);
     void SetDynamicInstancing(bool enable);
@@ -32,7 +33,7 @@ class Renderer
     void SetMobileShadowBiasAdd(float add);
     void SetMobileNormalOffsetMul(float mul);
     void ReloadShaders();
-    
+
     unsigned GetNumViewports() const;
     Viewport* GetViewport(unsigned index) const;
     RenderPath* GetDefaultRenderPath() const;
@@ -48,6 +49,7 @@ class Renderer
     ShadowQuality GetShadowQuality() const;
     float GetShadowSoftness() const;
     Vector2 GetVSMShadowParameters() const;
+    int GetVSMMultiSample() const;
     bool GetReuseShadowMaps() const;
     int GetMaxShadowMaps() const;
     bool GetDynamicInstancing() const;
@@ -88,6 +90,7 @@ class Renderer
     tolua_property__get_set int shadowMapSize;
     tolua_property__get_set ShadowQuality shadowQuality;
     tolua_property__get_set float shadowSoftness;
+    tolua_property__get_set int VSMMultiSample;
     tolua_property__get_set bool reuseShadowMaps;
     tolua_property__get_set int maxShadowMaps;
     tolua_property__get_set bool dynamicInstancing;

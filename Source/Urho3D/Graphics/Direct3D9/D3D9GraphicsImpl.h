@@ -59,6 +59,9 @@ public:
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
 
+    /// Return whether a multisample level is supported.
+    bool CheckMultiSampleSupport(D3DFORMAT format, int level);
+
 private:
     /// Direct3D interface.
     IDirect3D9* interface_;

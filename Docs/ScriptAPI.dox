@@ -10057,6 +10057,7 @@ Properties:
 - RenderSurface@ linkedRenderTarget
 - uint numViewports
 - Texture@ parentTexture // readonly
+- bool resolveDirty // readonly
 - RenderSurfaceUpdateMode updateMode
 - TextureUsage usage // readonly
 - Viewport@[] viewports
@@ -10068,10 +10069,12 @@ Properties:
 
 Properties:
 
+- bool autoResolve
 - bool cubemap
 - bool enabled
 - bool filtered
 - uint format
+- int multiSample
 - String name
 - bool persistent
 - bool sRGB
@@ -10137,6 +10140,7 @@ Properties:
 - StringHash type // readonly
 - String typeName // readonly
 - Viewport@[] viewports
+- int vsmMultiSample
 - Vector2 vsmShadowParameters
 - int weakRefs // readonly
 
@@ -13072,6 +13076,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - uint anisotropy
+- bool autoResolve // readonly
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13086,8 +13091,10 @@ Properties:
 - uint levels // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
+- int multiSample // readonly
 - String name
 - int refs // readonly
+- bool resolveDirty // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
@@ -13113,12 +13120,13 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(Image@, bool = false)
 - void SetNumLevels(uint)
-- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC)
+- bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC, int = 1, bool = true)
 
 Properties:
 
 - TextureAddressMode[] addressMode
 - uint anisotropy
+- bool autoResolve // readonly
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13133,9 +13141,11 @@ Properties:
 - uint levels // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
+- int multiSample // readonly
 - String name
 - int refs // readonly
 - RenderSurface@ renderSurface // readonly
+- bool resolveDirty // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
@@ -13166,6 +13176,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - uint anisotropy
+- bool autoResolve // readonly
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13181,9 +13192,11 @@ Properties:
 - uint levels // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
+- int multiSample // readonly
 - String name
 - int refs // readonly
 - RenderSurface@ renderSurface // readonly
+- bool resolveDirty // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
@@ -13214,6 +13227,7 @@ Properties:
 
 - TextureAddressMode[] addressMode
 - uint anisotropy
+- bool autoResolve // readonly
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13228,8 +13242,10 @@ Properties:
 - uint levels // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
+- int multiSample // readonly
 - String name
 - int refs // readonly
+- bool resolveDirty // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly
@@ -13255,12 +13271,13 @@ Methods:
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetData(CubeMapFace, Image@, bool = false)
 - void SetNumLevels(uint)
-- bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC)
+- bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC, int = 1)
 
 Properties:
 
 - TextureAddressMode[] addressMode
 - uint anisotropy
+- bool autoResolve // readonly
 - Texture@ backupTexture
 - Color borderColor
 - String category // readonly
@@ -13275,9 +13292,11 @@ Properties:
 - uint levels // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
+- int multiSample // readonly
 - String name
 - int refs // readonly
 - RenderSurface@[] renderSurfaces // readonly
+- bool resolveDirty // readonly
 - bool sRGB
 - StringHash type // readonly
 - String typeName // readonly

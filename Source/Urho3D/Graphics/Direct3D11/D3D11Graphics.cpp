@@ -36,6 +36,7 @@
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
@@ -730,6 +731,52 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     return true;
 }
 
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+    if (!texture)
+        return false;
+    RenderSurface* surface = texture->GetRenderSurface();
+    if (!surface)
+        return false;
+
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    impl_->deviceContext_->ResolveSubresource(dest, 0, source, 0, (DXGI_FORMAT)texture->GetFormat());
+    return true;
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+    if (!texture)
+        return false;
+
+    texture->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        // Resolve only the surface(s) that were actually rendered to
+        RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+        if (!surface->IsResolveDirty())
+            continue;
+
+        surface->SetResolveDirty(false);
+        unsigned subResource = D3D11CalcSubresource(0, i, texture->GetLevels());
+        impl_->deviceContext_->ResolveSubresource(dest, subResource, source, subResource, (DXGI_FORMAT)texture->GetFormat());
+    }
+
+    return true;
+}
+
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount || !impl_->shaderProgram_)
@@ -1187,6 +1234,7 @@ void Graphics::SetShaderParameter(StringHash param, const Variant& value)
         break;
 
     case VAR_FLOAT:
+    case VAR_DOUBLE:
         SetShaderParameter(param, value.GetFloat());
         break;
 
@@ -1280,6 +1328,17 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
+            }
+        }
     }
 
     if (texture && texture->GetParametersDirty())
@@ -1386,6 +1445,13 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             {
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
+            }
+            
+            // If multisampled, mark the texture & surface needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
+                parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
             }
         }
     }

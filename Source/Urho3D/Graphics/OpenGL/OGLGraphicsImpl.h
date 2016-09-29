@@ -132,6 +132,10 @@ private:
     unsigned boundVBO_;
     /// Currently bound uniform buffer object.
     unsigned boundUBO_;
+    /// Read frame buffer for multisampled texture resolves.
+    unsigned resolveSrcFBO_;
+    /// Write frame buffer for multisampled texture resolves.
+    unsigned resolveDestFBO_;
     /// Current pixel format.
     int pixelFormat_;
     /// Map for FBO's per resolution and format.
