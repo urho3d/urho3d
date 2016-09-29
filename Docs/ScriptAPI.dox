@@ -700,6 +700,8 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %Width : int
 - %Height : int
+- %DX : int
+- %DY : int
 
 ### Positioned
 - %Element : UIElement pointer
