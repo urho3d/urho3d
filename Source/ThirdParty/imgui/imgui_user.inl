@@ -109,7 +109,7 @@ namespace ImGui {
 		ImVec4 color = pColorOut ? *pColorOut : ImVec4(0, 0, 0, 1);
 		if (!supportsAlpha) color.w = 1.f;
 
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		const float smallWidth = windowWidth / 9.f;
 
 		static const ImU32 black = ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1));
@@ -330,7 +330,7 @@ namespace ImGui {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		if (window->SkipItems) return false;
 
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const ImGuiID id = window->GetID(label);
 
@@ -762,7 +762,7 @@ namespace ImGui {
 	}
 	void Separator(float height, ImGuiCol idx, bool startatWindow, bool endatWindow)
 	{
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		Separator(height, g.Style.Colors[idx], startatWindow, endatWindow);
 	}
 
@@ -793,7 +793,7 @@ namespace ImGui {
 			x1 += window->DC.IndentX;
 
 		const ImRect bb(ImVec2(x1, window->DC.CursorPos.y), ImVec2(x2, window->DC.CursorPos.y));
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 	
 
 		float temp = g.Style.ItemSpacing.y;
@@ -823,7 +823,7 @@ namespace ImGui {
 
 	void BringToFront()
 	{
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 
 		ImGuiWindow* window = GImGui->CurrentWindow;
 
@@ -868,7 +868,7 @@ namespace ImGui {
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems) return -1;
 
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 
 		const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
@@ -1154,7 +1154,7 @@ namespace ImGui {
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems) return editor;
 
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
 
@@ -1198,7 +1198,7 @@ namespace ImGui {
 	bool CurvePoint(ImVec2* points, CurveEditor& editor)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
-		auto& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 
 		ImVec2 cursor_pos_backup = ImGui::GetCursorScreenPos();
