@@ -45,7 +45,6 @@ macro (add_sample_subdirectory SOURCE_DIR)
 endmacro ()
 
 # Add samples
-<<<<<<< HEAD
 file (GLOB_RECURSE DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CMakeLists.txt)
 list (SORT DIRS)
 foreach (DIR ${DIRS})
@@ -113,4 +112,3 @@ if (URHO3D_DATABASE_ODBC OR URHO3D_DATABASE_SQLITE)
     add_sample_subdirectory (41_DatabaseDemo)
 endif ()
 add_sample_subdirectory (42_HelloIMUI)
->>>>>>> Implemented Uhro3d IMUI interface
