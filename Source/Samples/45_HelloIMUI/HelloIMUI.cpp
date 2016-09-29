@@ -206,10 +206,10 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 				if (editor.valid)
 				{
 					editor_size = ImVec2(ImGui::CalcItemWidth(), ImGui::GetItemRectSize().y);
-					static ImVec2 point1[3] = {ImVec2{0.10f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
-					static ImVec2 point2[3] = {ImVec2{0.0f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
-					static ImVec2 point3[3] = {ImVec2{0.0f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .0f}};
-					static ImVec2 point4[3] = {ImVec2{0.10f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
+					static ImVec2 point1[3] = {ImVec2(0.10f, 0.0f), ImVec2(0.0f, 0.0f), ImVec2(.0f, .10f)};
+					static ImVec2 point2[3] = {ImVec2(0.0f, 0.0f), ImVec2(0.0f, 0.0f), ImVec2(.0f, .10f)};
+					static ImVec2 point3[3] = {ImVec2(0.0f, 0.0f), ImVec2(0.0f, 0.0f), ImVec2(.0f, .0f)};
+					static ImVec2 point4[3] = {ImVec2(0.10f, 0.0f), ImVec2(0.0f, 0.0f), ImVec2(.0f, .10f)};
 					if (ImGui::CurvePoint(point1, editor))
 					{
 					//	changed = true;
