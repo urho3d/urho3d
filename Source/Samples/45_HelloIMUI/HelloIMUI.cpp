@@ -66,7 +66,6 @@ void HelloIMUI::Start()
 	// GetSubsystem<Input>()->SetTouchEmulation(true);
 
 	SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(HelloIMUI, HandleUpdate));
-
 	
 	IMUI* imui = GetSubsystem<IMUI>();
 
@@ -112,11 +111,11 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
 	IMUI* imui = GetSubsystem<IMUI>();
 	
-	// check if window "hello" is collapsed, dubble clicked on the header/title
+	// check if window "hello" is collapsed, double click on the header/title
 	if (ImGui::Begin("Hello"))
 	{
 		// normal text
-		ImGui::Text("Hallo world! ...");
+		ImGui::Text("Hello world! ...");
 		// if font icons are loaded, use u8"" to place them.
 		
 		// ImGui::Text("\uF04B"); isn't correct it is 16-bit unicode whereas ImGui takes UTF-8.
@@ -146,7 +145,6 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 				ImGui::Checkbox("Color Chooser", &colorchooser);
 				ImGui::ColorChooser(&colorchooser, &color);
 				ImGui::ColorCombo("Color Combo", &color);
-
 			}
 
 			if (ImGui::CollapsingHeader("Multiline Text"))
@@ -166,6 +164,7 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 				ImGui::InputTextMultilineWithHorizontalScrollingAndCopyCutPasteMenu("ITMWHS2", buffer2, 1024, height, popup_open, threeStaticInts);
 				ImGui::PopID();
 			}
+
 			if (ImGui::CollapsingHeader("Tabs "))
 			{
 				// Based on the code by krys-spectralpixel (https://github.com/krys-spectralpixel), posted here: https://github.com/ocornut/imgui/issues/261			
@@ -250,18 +249,12 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 					ImGui::OpenPopup("##piepopup");
 				}
 					
-
 				ImVec2 pie_menu_center = ImGui::GetIO().MouseClickedPos[mouse];
 				ImGui::PiePopupSelectMenu(pie_menu_center, "##piepopup", items, items_count, &selected);
 				
-			}
-
-	
+			}	
 			ImGui::Unindent();
 		}
-
-	
 	}
 	ImGui::End();
-
 }
