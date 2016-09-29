@@ -33,8 +33,6 @@
 
 #include <Urho3D/DebugNew.h>
 
-
-
 URHO3D_DEFINE_APPLICATION_MAIN(HelloIMUI)
 
 HelloIMUI::HelloIMUI(Context* context) :
@@ -129,7 +127,6 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 	// ImGui has some tests implemented. 
 	ImGui::ShowTestWindow();
 
-
 	// hijack Test Window and add addons
 	if (ImGui::Begin("ImGui Demo"))
 	{
@@ -165,7 +162,7 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 				ImGui::PopID();
 			}
 
-			if (ImGui::CollapsingHeader("Tabs "))
+			if (ImGui::CollapsingHeader("Tabs"))
 			{
 				// Based on the code by krys-spectralpixel (https://github.com/krys-spectralpixel), posted here: https://github.com/ocornut/imgui/issues/261			
 				ImGui::Text("TabLabels (based on the code by krys-spectralpixel):");
@@ -209,10 +206,10 @@ void HelloIMUI::HandleUpdate(StringHash eventType, VariantMap& eventData)
 				if (editor.valid)
 				{
 					editor_size = ImVec2(ImGui::CalcItemWidth(), ImGui::GetItemRectSize().y);
-					static ImVec2 point1[3] = { {0.10f,0.0f},{ 0.0f,0.0f} , {.0f,.10f} };
-					static ImVec2 point2[3] = { { 0.0f,0.0f },{ 0.0f,0.0f } ,{ .0f,.10f } };
-					static ImVec2 point3[3] = { { 0.0f,0.0f },{ 0.0f,0.0f } ,{ .0f,.0f } };
-					static ImVec2 point4[3] = { { 0.10f,0.0f },{ 0.0f,0.0f } ,{ .0f,.10f } };
+					static ImVec2 point1[3] = {ImVec2{0.10f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
+					static ImVec2 point2[3] = {ImVec2{0.0f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
+					static ImVec2 point3[3] = {ImVec2{0.0f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .0f}};
+					static ImVec2 point4[3] = {ImVec2{0.10f, 0.0f}, ImVec2{0.0f, 0.0f}, ImVec2{.0f, .10f}};
 					if (ImGui::CurvePoint(point1, editor))
 					{
 					//	changed = true;
