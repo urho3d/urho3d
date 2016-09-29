@@ -109,7 +109,7 @@ namespace ImGui {
 		ImVec4 color = pColorOut ? *pColorOut : ImVec4(0, 0, 0, 1);
 		if (!supportsAlpha) color.w = 1.f;
 
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		const float smallWidth = windowWidth / 9.f;
 
 		static const ImU32 black = ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1));
@@ -330,7 +330,7 @@ namespace ImGui {
 		ImGuiWindow* window = ImGui::GetCurrentWindow();
 		if (window->SkipItems) return false;
 
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		const ImGuiID id = window->GetID(label);
 
@@ -762,7 +762,7 @@ namespace ImGui {
 	}
 	void Separator(float height, ImGuiCol idx, bool startatWindow, bool endatWindow)
 	{
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		Separator(height, g.Style.Colors[idx], startatWindow, endatWindow);
 	}
 
@@ -793,10 +793,10 @@ namespace ImGui {
 			x1 += window->DC.IndentX;
 
 		const ImRect bb(ImVec2(x1, window->DC.CursorPos.y), ImVec2(x2, window->DC.CursorPos.y));
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 	
 
-		float temp =	g.Style.ItemSpacing.y;
+		float temp = g.Style.ItemSpacing.y;
 		g.Style.ItemSpacing.y = 0.f;
 
 		ItemSize(ImVec2(0.0f, height-1.0f)); // NB: we don't provide our width so that it doesn't get feed back into AutoFit   // FIXME: Height should be 1.0f not 0.0f ?
@@ -823,7 +823,7 @@ namespace ImGui {
 
 	void BringToFront()
 	{
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 
 		ImGuiWindow* window = GImGui->CurrentWindow;
 
@@ -868,7 +868,7 @@ namespace ImGui {
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems) return -1;
 
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 
 		const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
@@ -1154,7 +1154,7 @@ namespace ImGui {
 		ImGuiWindow* window = GetCurrentWindow();
 		if (window->SkipItems) return editor;
 
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
 
@@ -1198,7 +1198,7 @@ namespace ImGui {
 	bool CurvePoint(ImVec2* points, CurveEditor& editor)
 	{
 		ImGuiWindow* window = GetCurrentWindow();
-		ImGuiState& g = *GImGui;
+		auto& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 
 		ImVec2 cursor_pos_backup = ImGui::GetCursorScreenPos();
