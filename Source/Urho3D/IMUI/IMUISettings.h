@@ -23,6 +23,18 @@
 #pragma once
 
 #include "../Core/Object.h"
+#ifdef URHO3D_STATIC_DEFINE
+#  define URHO3D_API
+#  define URHO3D_NO_EXPORT
+#else
+#ifdef Urho3D_EXPORTS
+/* We are building this library */
+#    define IMGUI_API __declspec(dllexport)
+#  else
+/* We are using this library */
+#    define IMGUI_API __declspec(dllimport)
+#  endif
+#endif
 #include "imgui/imgui.h"
 namespace Urho3D
 {
