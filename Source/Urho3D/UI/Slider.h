@@ -62,7 +62,7 @@ public:
     virtual void
         OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);

@@ -580,15 +580,15 @@ void UIElement::SetPosition(const IntVector2& position)
     if (position != position_)
     {
         position_ = position;
-        OnPositionSet();
+        OnPositionSet(position);
         MarkDirty();
 
         using namespace Positioned;
 
         VariantMap& eventData = GetEventDataMap();
         eventData[P_ELEMENT] = this;
-        eventData[P_X] = position_.x_;
-        eventData[P_Y] = position_.y_;
+        eventData[P_X] = position.x_;
+        eventData[P_Y] = position.y_;
         SendEvent(E_POSITIONED, eventData);
     }
 }
@@ -602,6 +602,7 @@ void UIElement::SetSize(const IntVector2& size)
 {
     ++resizeNestingLevel_;
 
+    IntVector2 oldSize = size_;
     IntVector2 validatedSize;
     IntVector2 effectiveMinSize = GetEffectiveMinSize();
     validatedSize.x_ = Clamp(size.x_, effectiveMinSize.x_, maxSize_.x_);
@@ -617,8 +618,9 @@ void UIElement::SetSize(const IntVector2& size)
             if (parent_)
                 parent_->UpdateLayout();
 
+            IntVector2 delta = size_ - oldSize;
             MarkDirty();
-            OnResize();
+            OnResize(size_, delta);
             UpdateLayout();
 
             using namespace Resized;
@@ -627,6 +629,8 @@ void UIElement::SetSize(const IntVector2& size)
             eventData[P_ELEMENT] = this;
             eventData[P_WIDTH] = size_.x_;
             eventData[P_HEIGHT] = size_.y_;
+            eventData[P_DX] = delta.x_;
+            eventData[P_DY] = delta.y_;
             SendEvent(E_RESIZED, eventData);
         }
     }

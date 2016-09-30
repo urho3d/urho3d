@@ -254,7 +254,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
     hovering_ = false;
 }
 
-void Text::OnResize()
+void Text::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
     if (wordWrap_)
         UpdateText(true);

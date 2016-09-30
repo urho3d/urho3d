@@ -179,10 +179,10 @@ public:
     virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
 
     /// React to resize.
-    virtual void OnResize() { }
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) { }
 
     /// React to position change.
-    virtual void OnPositionSet() { }
+    virtual void OnPositionSet(const IntVector2& newPosition) { }
 
     /// React to editable status change.
     virtual void OnSetEditable() { }
