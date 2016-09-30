@@ -220,6 +220,12 @@
                                             <element type="Text" style="EditorEnumAttributeText">
                                                 <attribute name="Text" value="Vector4" />
                                             </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Int" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Bool" />
+                                            </element>
                                         </element>
                                     </element>
                                 </element>

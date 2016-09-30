@@ -1249,6 +1249,27 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     }
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    if (impl_->shaderProgram_)
+    {
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
+        if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(int), &value);
+                return;
+            }
+
+            glUniform1i(info->location_, value);
+        }
+    }
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     // \todo Not tested
@@ -1462,61 +1483,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 
             glUniformMatrix4fv(info->location_, 1, GL_FALSE, fullMatrix.Data());
         }
-    }
-}
-
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-    case VAR_DOUBLE:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
     }
 }
 

@@ -308,7 +308,9 @@ void RefreshMaterialShaderParameters()
         VariantType type = editMaterial.shaderParameters[parameterNames[i]].type;
         Variant value = editMaterial.shaderParameters[parameterNames[i]];
         UIElement@ parent = CreateAttributeEditorParent(list, parameterNames[i], 0, 0);
-        uint numCoords = type - VAR_FLOAT + 1;
+        uint numCoords = 1;
+        if (type >= VAR_VECTOR2 && type <= VAR_VECTOR4)
+            numCoords = type - VAR_FLOAT + 1;
 
         Array<String> coordValues = value.ToString().Split(' ');
 
@@ -571,7 +573,10 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
 
     Variant oldValue = editMaterial.shaderParameters[name];
     Array<String> coordValues = oldValue.ToString().Split(' ');
-    coordValues[coordinate] = String(attrEdit.text.ToFloat());
+    if (oldValue.type != VAR_BOOL)
+        coordValues[coordinate] = String(attrEdit.text.ToFloat());
+    else
+        coordValues[coordinate] = attrEdit.text;
 
     String valueString;
     for (uint i = 0; i < coordValues.length; ++i)
@@ -582,7 +587,7 @@ void EditShaderParameter(StringHash eventType, VariantMap& eventData)
 
     Variant newValue;
     newValue.FromString(oldValue.type, valueString);
-    
+
     BeginMaterialEdit();
     editMaterial.shaderParameters[name] = newValue;
     EndMaterialEdit();
@@ -614,6 +619,12 @@ void CreateShaderParameter(StringHash eventType, VariantMap& eventData)
         break;
     case 3:
         newValue = Vector4(0, 0, 0, 0);
+        break;
+    case 4:
+        newValue = int(0);
+        break;
+    case 5:
+        newValue = false;
         break;
     }
 

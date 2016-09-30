@@ -655,7 +655,7 @@ bool Material::Load(const JSONValue& source)
     }
     batchedParameterUpdate_ = false;
 
-    // Load shader parameter animationss
+    // Load shader parameter animations
     JSONObject paramAnimationsObject = source.Get("shaderParameterAnimations").GetObject();
     for (JSONObject::ConstIterator it = paramAnimationsObject.Begin(); it != paramAnimationsObject.End(); it++)
     {
@@ -766,7 +766,7 @@ bool Material::Save(XMLElement& dest) const
     {
         XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
-        if (j->second_.value_.GetType() != VAR_BUFFER)
+        if (j->second_.value_.GetType() != VAR_BUFFER && j->second_.value_.GetType() != VAR_INT && j->second_.value_.GetType() != VAR_BOOL)
             parameterElem.SetVectorVariant("value", j->second_.value_);
         else
         {
@@ -865,7 +865,7 @@ bool Material::Save(JSONValue& dest) const
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin();
          j != shaderParameters_.End(); ++j)
     {
-        if (j->second_.value_.GetType() != VAR_BUFFER)
+        if (j->second_.value_.GetType() != VAR_BUFFER && j->second_.value_.GetType() != VAR_INT && j->second_.value_.GetType() != VAR_BOOL)
             shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
         else
         {
