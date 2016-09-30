@@ -57,7 +57,9 @@ namespace Urho3D
 
 		unsigned elements = CountElements(source.CString(), ' '); //source.Split(' ').Size(); //
 		if (elements < 2)
+		{
 			return ret;
+		}
 
 		char* ptr = (char*)source.CString();
 		ret.x = (float)strtod(ptr, &ptr);
@@ -72,7 +74,9 @@ namespace Urho3D
 
 		unsigned elements = CountElements(source.CString(), ' '); //source.Split(' ').Size(); //
 		if (elements < 4)
+		{
 			return ret;
+		}
 
 		char* ptr = (char*)source.CString();
 		ret.x = (float)strtod(ptr, &ptr);
@@ -183,8 +187,10 @@ namespace Urho3D
 			fonts_.Clear();
 
 			// if no fonts added, add default font 	
-			 if (settings.mFonts.Empty())  // does not work if font provied by settings are all in merge mode, need one font already loaded		
+			if (settings.mFonts.Empty())  // does not work if font provied by settings are all in merge mode, need one font already loaded		
+			{
 				io.Fonts->AddFontDefault();
+			}
 
 			const HashMap< StringHash, IMUISettings::FontConfig >& fontconfigs_map = settings.getFonts();
 			HashMap< StringHash, IMUISettings::FontConfig >::ConstIterator it;
@@ -247,7 +253,9 @@ namespace Urho3D
 
 			// set colors
 			for (int i = 0; i < ImGuiCol_COUNT; i++)
+			{
 				imGuiStyle.Colors[i] = style.Colors[i];
+			}
 		}
 	}
 
@@ -255,7 +263,9 @@ namespace Urho3D
 	{
 		SharedPtr<XMLFile> xml(new XMLFile(context_));
 		if (!xml->Load(source))
+		{
 			return false;
+		}
 		return LoadStyleXML(xml->GetRoot());
 	}
 
@@ -264,7 +274,9 @@ namespace Urho3D
 		SharedPtr<XMLFile> xml(new XMLFile(context_));
 		XMLElement rootElem = xml->CreateRoot("ImGuiStyle");
 		if (!SaveStyleXML(rootElem))
+		{
 			return false;
+		}
 		return xml->Save(dest, indentation);
 	}
 
@@ -273,7 +285,9 @@ namespace Urho3D
 		ImGuiStyle* style = outStyle;
 		// if no output style defined use default style
 		if (!style)
+		{
 			style = &ImGui::GetStyle();
+		}
 
 		style->Alpha = source.GetChild("Alpha").GetFloat("value");
 		style->WindowPadding = ToImVec2(source.GetChild("WindowPadding").GetAttribute("value"));
@@ -313,7 +327,9 @@ namespace Urho3D
 		ImGuiStyle* style = outStyle;
 		// if no output style defined use default style
 		if (!style)
+		{
 			style = &ImGui::GetStyle();
+		}
 
 		dest.CreateChild("Alpha").SetFloat("value", style->Alpha);
 		dest.CreateChild("WindowPadding").SetAttribute("value", ToString(style->WindowPadding));
@@ -368,9 +384,13 @@ namespace Urho3D
 	{
 		Graphics* graphics = GetSubsystem<Graphics>();
 		if (!graphics || !graphics->IsInitialized())
+		{
 			return;
+		}
 		if (initialized_)
+		{
 			return;
+		}
 
 		graphics_ = graphics;
 		screenSize_ = IntRect(0, 0, graphics->GetWidth(), graphics->GetHeight());
@@ -438,7 +458,9 @@ namespace Urho3D
 		using namespace ScreenMode;
 
 		if (!initialized_)
+		{
 			Initialize();
+		}
 		else
 		{
 			screenSize_ = IntRect(0, 0, eventData[P_WIDTH].GetInt(), eventData[P_HEIGHT].GetInt());
@@ -482,10 +504,14 @@ namespace Urho3D
 			io.MouseDown[0] = touch_;
 			// disable tracking
 			if (!touch_)
+			{
 				touchId_ = -1;
-		}
+			}
+		}		
 		else
+		{
 			io.MouseDown[0] = input_->GetMouseButtonDown(MOUSEB_LEFT);
+		}
 
 		io.MouseDown[1] = input_->GetMouseButtonDown(MOUSEB_RIGHT);
 		io.MouseDown[2] = input_->GetMouseButtonDown(MOUSEB_MIDDLE);
@@ -500,7 +526,9 @@ namespace Urho3D
 
 		// show screenkeyboard on text edit
 		if (useScreenKeyboard_)
+		{
 			input_->SetScreenKeyboardVisible(io.WantTextInput);
+		}
 	}
 
 	void IMUI::HandleEndRendering(StringHash eventType, VariantMap& eventData)
@@ -518,7 +546,9 @@ namespace Urho3D
 		int Scancode = eventData[P_SCANCODE].GetInt();
 		//	int Qualifiers = eventData[P_QUALIFIERS].GetInt();
 		if (Scancode < 512)
+		{
 			io.KeysDown[Scancode] = false;
+		}
 	}
 
 	void IMUI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -529,7 +559,9 @@ namespace Urho3D
 		int Scancode = eventData[P_SCANCODE].GetInt();
 		//	int Qualifiers = eventData[P_QUALIFIERS].GetInt();
 		if (Scancode < 512)
+		{
 			io.KeysDown[Scancode] = true;
+		}
 	}
 
 	void IMUI::HandleTextInput(StringHash eventType, VariantMap& eventData)
@@ -591,7 +623,9 @@ namespace Urho3D
 		assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
 
 		if (cmd_lists_count == 0)
+		{
 			return;
+		}
 
 		Vector2 invScreenSize(1.0f / (float)graphics_->GetWidth(), 1.0f / (float)graphics_->GetHeight());
 		Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
@@ -629,16 +663,25 @@ namespace Urho3D
 #if defined(URHO3D_D3D11)
 		// TODO: for D3D11 : cannot set vertex/index buffer to dynamic. bug ? does it need to be dynamic ?
 		if ((int)vertexBuffer_->GetVertexCount() < data->TotalVtxCount || (int)vertexBuffer_->GetVertexCount() > data->TotalVtxCount * 2)
+		{
 			vertexBuffer_->SetSize(data->TotalVtxCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, false);
+		}
 
 		if ((int)indexBuffer_->GetIndexCount() < data->TotalIdxCount || (int)indexBuffer_->GetIndexCount() > data->TotalIdxCount * 2)
+		{
 			indexBuffer_->SetSize(data->TotalIdxCount, false, false);
+		}
 #else
+
 		if ((int)vertexBuffer_->GetVertexCount() < data->TotalVtxCount || (int)vertexBuffer_->GetVertexCount() > data->TotalVtxCount * 2)
+		{
 			vertexBuffer_->SetSize(data->TotalVtxCount, MASK_POSITION | MASK_COLOR | MASK_TEXCOORD1, true);
+		}
 
 		if ((int)indexBuffer_->GetIndexCount() < data->TotalIdxCount || (int)indexBuffer_->GetIndexCount() > data->TotalIdxCount * 2)
+		{
 			indexBuffer_->SetSize(data->TotalIdxCount, false, true);
+		}
 #endif
 
 		// Copy and convert all vertices into a single contiguous buffer
@@ -710,22 +753,31 @@ namespace Urho3D
 						vs = diffTextureVS;
 						// If texture contains only an alpha channel, use alpha shader (for fonts)
 						if (texture->GetFormat() == alphaFormat)
+						{
 							ps = alphaTexturePS;
+						}
 						// 						else if (blendMode_ != BLEND_ALPHA && batch.blendMode_ != BLEND_ADDALPHA && batch.blendMode_ != BLEND_PREMULALPHA)
 						//			 						ps = diffMaskTexturePS;
 						else
+						{
 							ps = diffTexturePS;
+						}
 					}
 
 					graphics_->SetShaders(vs, ps);
 
 					if (graphics_->NeedParameterUpdate(SP_OBJECT, this))
+					{
 						graphics_->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
+					}
 					if (graphics_->NeedParameterUpdate(SP_CAMERA, this))
+					{
 						graphics_->SetShaderParameter(VSP_VIEWPROJ, projection);
+					}
 					if (graphics_->NeedParameterUpdate(SP_MATERIAL, this))
+					{
 						graphics_->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
-
+					}
 					graphics_->SetScissorTest(true, IntRect((int)pcmd->ClipRect.x, (int)(pcmd->ClipRect.y),
 						(int)(pcmd->ClipRect.z), (int)(pcmd->ClipRect.w)));
 
