@@ -726,28 +726,24 @@ void UIElement::SetHorizontalAlignment(HorizontalAlignment align)
     Vector2 min = anchorMin_;
     Vector2 max = anchorMax_;
     float pivot = pivot_.x_;
+    float anchorSize = max.x_ - min.x_;
 
     if (align == HA_CENTER)
-    {
-        min.x_ = max.x_ = 0.5f;
-        pivot = 0.5f;
-    }
+        min.x_ = pivot = 0.5f;
     else if (align == HA_LEFT)
-    {
-        min.x_ = max.x_ = 0.0f;
-        pivot = 0.0f;
-    }
+        min.x_ = pivot = 0.0f;
     else if (align == HA_RIGHT)
-    {
-        min.x_ = max.x_ = 1.0f;
-        pivot = 1.0f;
-    }
+        min.x_ = pivot = 1.0f;
+
+    max.x_ = enableAnchor_ ? (min.x_ + anchorSize) : min.x_;
 
     if (min.x_ != anchorMin_.x_ || max.x_ != anchorMax_.x_ || pivot != pivot_.x_)
     {
         anchorMin_.x_ = min.x_;
         anchorMax_.x_ = max.x_;
         pivot_.x_ = pivot;
+        if (enableAnchor_)
+            UpdateAnchoring();
         MarkDirty();
     }
 }
@@ -763,28 +759,24 @@ void UIElement::SetVerticalAlignment(VerticalAlignment align)
     Vector2 min = anchorMin_;
     Vector2 max = anchorMax_;
     float pivot = pivot_.y_;
+    float anchorSize = max.y_ - min.y_;
 
     if (align == VA_CENTER)
-    {
-        min.y_ = max.y_ = 0.5f;
-        pivot = 0.5f;
-    }
+        min.y_ = pivot = 0.5f;
     else if (align == VA_TOP)
-    {
-        min.y_ = max.y_ = 0.0f;
-        pivot = 0.0f;
-    }
+        min.y_ = pivot = 0.0f;
     else if (align == VA_BOTTOM)
-    {
-        min.y_ = max.y_ = 1.0f;
-        pivot = 1.0f;
-    }
+        min.y_ = pivot = 1.0f;
+
+    max.y_ = enableAnchor_ ? (min.y_ + anchorSize) : min.y_;
 
     if (min.y_ != anchorMin_.y_ || max.y_ != anchorMax_.y_ || pivot != pivot_.y_)
     {
         anchorMin_.y_ = min.y_;
         anchorMax_.y_ = max.y_;
         pivot_.y_ = pivot;
+        if (enableAnchor_)
+            UpdateAnchoring();
         MarkDirty();
     }
 }
