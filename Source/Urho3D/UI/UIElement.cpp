@@ -138,7 +138,7 @@ UIElement::UIElement(Context* context) :
     anchorMax_(0, 0),
     recalcMaxOffset_(false),
     anchorEnable_(false),
-    pivot_(FLT_MAX, FLT_MAX),
+    pivot_(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
     pivotSet_(false)
 {
     SetEnabled(false);
@@ -171,7 +171,7 @@ void UIElement::RegisterObject(Context* context)
         VA_TOP, AM_FILEREADONLY);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2, Vector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2, Vector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(FLT_MAX, FLT_MAX), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
