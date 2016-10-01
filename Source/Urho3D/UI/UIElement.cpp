@@ -593,7 +593,7 @@ void UIElement::SetMinOffset(const IntVector2& position)
     {
         position_ = position;
         AdjustAnchoredSize();
-        OnPositionSet();
+        OnPositionSet(position);
         MarkDirty();
 
         using namespace Positioned;
