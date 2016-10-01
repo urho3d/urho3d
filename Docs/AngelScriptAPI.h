@@ -4140,6 +4140,7 @@ uint numVertices;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
+bool optimizeBufferSize;
 /* readonly */
 int refs;
 float shadowDistance;

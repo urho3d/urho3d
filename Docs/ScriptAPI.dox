@@ -1358,6 +1358,7 @@ namespace Urho3D
 - %Material : ResourceRef
 - %Max %Vertices : int
 - %Max %Indices : int
+- %Optimize %Buffer %Size : bool
 - %Can %Be %Occluded : bool
 - %Draw %Distance : float
 - %Max %Lights : int
@@ -6248,6 +6249,7 @@ Properties:
 - ObjectAnimation@ objectAnimation
 - bool occludee
 - bool occluder
+- bool optimizeBufferSize
 - int refs // readonly
 - float shadowDistance
 - uint shadowMask
