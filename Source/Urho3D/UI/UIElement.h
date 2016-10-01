@@ -248,18 +248,15 @@ public:
     void SetHorizontalAlignment(HorizontalAlignment align);
     /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// Set minimum offset.
+    /// Set offset of element's top left from the minimum anchor.
     void SetMinOffset(const IntVector2& offset);
-    /// Set maximum offset.
+    /// Set offset of element's bottom right from the maximum anchor.
     void SetMaxOffset(const IntVector2& offset);
-    /// Set minimum anchor.
+    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1)
     void SetMinAnchor(const Vector2& anchor);
     /// Set minimum anchor.
     void SetMinAnchor(float x, float y);
-    /// Set maximum anchor.
-    /// Maximum anchor is position where right and bottom sides of UI elements starts.
-    /// Right and bottom sides of UI elements are calculated like following:
-    ///  Final value = ParentSize * MaxAnchor + MaxOffset
+    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1)
     void SetMaxAnchor(const Vector2& anchor);
     /// Set maximum anchor.
     void SetMaxAnchor(float x, float y);
@@ -438,40 +435,10 @@ public:
     const IntVector2& GetChildOffset() const { return childOffset_; }
 
     /// Return horizontal alignment.
-    HorizontalAlignment GetHorizontalAlignment() const 
-    {
-        if (anchorMin_.x_ == 0.0f && anchorMax_.x_ == 0.0f && (!pivotSet_ || pivot_.x_ == 0.0f))
-        {
-            return HA_LEFT;
-        }
-        else if (anchorMin_.x_ == 0.5f && anchorMax_.x_ == 0.5f && (!pivotSet_ || pivot_.x_ == 0.5f))
-        {
-            return HA_CENTER;
-        }
-        else if (anchorMin_.x_ == 1.0f && anchorMax_.x_ == 1.0f && (!pivotSet_ || pivot_.x_ == 1.0f))
-        {
-            return HA_RIGHT;
-        }
-        return HA_CUSTOM;
-    }
+    HorizontalAlignment GetHorizontalAlignment() const;
 
     /// Return vertical alignment.
-    VerticalAlignment GetVerticalAlignment() const 
-    {
-        if (anchorMin_.y_ == 0.0f && anchorMax_.y_ == 0.0f && (!pivotSet_ || pivot_.y_ == 0.0f))
-        {
-            return VA_TOP;
-        }
-        else if (anchorMin_.y_ == 0.5f && anchorMax_.y_ == 0.5f && (!pivotSet_ || pivot_.y_ == 0.5f))
-        {
-            return VA_CENTER;
-        }
-        else if (anchorMin_.y_ == 1.0f && anchorMax_.y_ == 1.0f && (!pivotSet_ || pivot_.y_ == 1.0f))
-        {
-            return VA_BOTTOM;
-        }
-        return VA_CUSTOM;
-    }
+    VerticalAlignment GetVerticalAlignment() const;
 
     /// Return minimum anchor.
     const Vector2& GetMinAnchor() const { return anchorMin_; }
@@ -788,12 +755,12 @@ private:
     /// Relative size.
     IntVector2 maxOffset_;
     /// Use max offset instead of size.
-    bool anchorEnable_ : 1;
+    bool anchorEnable_;
     /// Has pivot changed manually.
-    bool pivotSet_ : 1;
-    /// Anchor Minimum Position
+    bool pivotSet_;
+    /// Anchor minimum position.
     Vector2 anchorMin_;
-    /// Anchor Maximum Position
+    /// Anchor maximum position.
     Vector2 anchorMax_;
     /// Pivot Position
     Vector2 pivot_;

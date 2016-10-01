@@ -1577,6 +1577,30 @@ void UIElement::RemoveAllTags()
     tags_.Clear();
 }
 
+HorizontalAlignment UIElement::GetHorizontalAlignment() const
+{
+    if (anchorMin_.x_ == 0.0f && anchorMax_.x_ == 0.0f && (!pivotSet_ || pivot_.x_ == 0.0f))
+        return HA_LEFT;
+    else if (anchorMin_.x_ == 0.5f && anchorMax_.x_ == 0.5f && (!pivotSet_ || pivot_.x_ == 0.5f))
+        return HA_CENTER;
+    else if (anchorMin_.x_ == 1.0f && anchorMax_.x_ == 1.0f && (!pivotSet_ || pivot_.x_ == 1.0f))
+        return HA_RIGHT;
+
+    return HA_CUSTOM;
+}
+
+VerticalAlignment UIElement::GetVerticalAlignment() const
+{
+    if (anchorMin_.y_ == 0.0f && anchorMax_.y_ == 0.0f && (!pivotSet_ || pivot_.y_ == 0.0f))
+        return VA_TOP;
+    else if (anchorMin_.y_ == 0.5f && anchorMax_.y_ == 0.5f && (!pivotSet_ || pivot_.y_ == 0.5f))
+        return VA_CENTER;
+    else if (anchorMin_.y_ == 1.0f && anchorMax_.y_ == 1.0f && (!pivotSet_ || pivot_.y_ == 1.0f))
+        return VA_BOTTOM;
+
+    return VA_CUSTOM;
+}
+
 float UIElement::GetDerivedOpacity() const
 {
     if (!useDerivedOpacity_)

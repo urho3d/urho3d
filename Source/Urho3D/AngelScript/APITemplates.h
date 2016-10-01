@@ -1069,6 +1069,9 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void SetFixedWidth(int)", asMETHOD(T, SetFixedWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedHeight(int)", asMETHOD(T, SetFixedHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(T, SetAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetMaxAnchor(float, float)", asMETHODPR(T, SetMaxAnchor, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetMinAnchor(float, float)", asMETHODPR(T, SetMinAnchor, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetPivot(float, float)", asMETHODPR(T, SetPivot, (float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetLayout(LayoutMode, int spacing = 0, const IntRect& border = IntRect(0, 0, 0, 0))", asMETHOD(T, SetLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void UpdateLayout()", asMETHOD(T, UpdateLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", asMETHOD(T, DisableLayoutUpdate), asCALL_THISCALL);
@@ -1132,6 +1135,16 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(T, GetHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_verticalAlignment(VerticalAlignment)", asMETHOD(T, SetVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment get_verticalAlignment() const", asMETHOD(T, GetVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxOffset(const IntVector2&in)", asMETHODPR(T, SetMaxOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_maxOffset() const", asMETHOD(T, GetMaxOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minOffset(const IntVector2&in)", asMETHODPR(T, SetMinOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_minOffset() const", asMETHOD(T, GetPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxAnchor(const Vector2&in)", asMETHODPR(T, SetMaxAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_maxAnchor() const", asMETHOD(T, GetMaxAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minAnchor(const Vector2&in)", asMETHODPR(T, SetMinAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_minAnchor() const", asMETHOD(T, GetMinAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_pivot(const Vector2&in)", asMETHODPR(T, SetPivot, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_pivot() const", asMETHOD(T, GetPivot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_clipBorder(const IntRect&in)", asMETHODPR(T, SetClipBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_clipBorder() const", asMETHOD(T, GetClipBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_color(const Color&in)", asMETHODPR(T, SetColor, (const Color&), void), asCALL_THISCALL);

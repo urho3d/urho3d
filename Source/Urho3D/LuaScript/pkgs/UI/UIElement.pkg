@@ -93,6 +93,14 @@ class UIElement : public Animatable
     void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign);
     void SetHorizontalAlignment(HorizontalAlignment align);
     void SetVerticalAlignment(VerticalAlignment align);
+    void SetMinOffset(const IntVector2& offset);
+    void SetMaxOffset(const IntVector2& offset);
+    void SetMinAnchor(const Vector2& anchor);
+    void SetMinAnchor(float x, float y);
+    void SetMaxAnchor(const Vector2& anchor);
+    void SetMaxAnchor(float x, float y);
+    void SetPivot(const Vector2& pivot);
+    void SetPivot(float x, float y);
     void SetClipBorder(const IntRect& rect);
     void SetColor(const Color& color);
     void SetColor(Corner corner, const Color& color);
@@ -169,6 +177,10 @@ class UIElement : public Animatable
     const IntVector2& GetChildOffset() const;
     HorizontalAlignment GetHorizontalAlignment() const;
     VerticalAlignment GetVerticalAlignment() const;
+    const Vector2& GetMinAnchor() const;
+    const Vector2& GetMaxAnchor() const;
+    const IntVector2& GetMaxOffset() const;
+    const Vector2& GetPivot() const;
     const IntRect& GetClipBorder() const;
     const Color& GetColor(Corner corner) const;
     int GetPriority() const;
@@ -250,6 +262,10 @@ class UIElement : public Animatable
     tolua_property__get_set IntVector2& childOffset;
     tolua_property__get_set HorizontalAlignment horizontalAlignment;
     tolua_property__get_set VerticalAlignment verticalAlignment;
+    tolua_property__get_set IntVector2& maxOffset;
+    tolua_property__get_set Vector2& minAnchor;
+    tolua_property__get_set Vector2& maxAnchor;
+    tolua_property__get_set Vector2& pivot;
     tolua_property__get_set IntRect clipBorder;
     tolua_property__get_set Color& colorAttr @ color;
     tolua_property__get_set int priority;

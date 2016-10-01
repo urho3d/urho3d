@@ -78,11 +78,13 @@ static void RegisterUIElement(asIScriptEngine* engine)
     engine->RegisterEnumValue("HorizontalAlignment", "HA_LEFT", HA_LEFT);
     engine->RegisterEnumValue("HorizontalAlignment", "HA_CENTER", HA_CENTER);
     engine->RegisterEnumValue("HorizontalAlignment", "HA_RIGHT", HA_RIGHT);
+    engine->RegisterEnumValue("HorizontalAlignment", "HA_CUSTOM", HA_CUSTOM);
 
     engine->RegisterEnum("VerticalAlignment");
     engine->RegisterEnumValue("VerticalAlignment", "VA_TOP", VA_TOP);
     engine->RegisterEnumValue("VerticalAlignment", "VA_CENTER", VA_CENTER);
     engine->RegisterEnumValue("VerticalAlignment", "VA_BOTTOM", VA_BOTTOM);
+    engine->RegisterEnumValue("VerticalAlignment", "VA_CUSTOM", VA_CUSTOM);
 
     engine->RegisterEnum("Corner");
     engine->RegisterEnumValue("Corner", "C_TOPLEFT", C_TOPLEFT);
