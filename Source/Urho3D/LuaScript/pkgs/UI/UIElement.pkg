@@ -5,14 +5,16 @@ enum HorizontalAlignment
 {
     HA_LEFT = 0,
     HA_CENTER,
-    HA_RIGHT
+    HA_RIGHT,
+    HA_CUSTOM
 };
 
 enum VerticalAlignment
 {
     VA_TOP = 0,
     VA_CENTER,
-    VA_BOTTOM
+    VA_BOTTOM,
+    VA_CUSTOM
 };
 
 enum Corner

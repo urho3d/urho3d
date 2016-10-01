@@ -248,7 +248,7 @@ public:
     void SetHorizontalAlignment(HorizontalAlignment align);
     /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// Enable anchor positioning & sizing of element using min/max anchor and min/max offset. Default false.
+    /// Enable automatic positioning & sizing of the element relative to its parent using min/max anchor and min/max offset. Default false.
     void SetEnableAnchor(bool enable);
     /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
     void SetMinAnchor(const Vector2& anchor);
@@ -436,10 +436,10 @@ public:
     /// Return child element offset.
     const IntVector2& GetChildOffset() const { return childOffset_; }
 
-    /// Return horizontal alignment.
+    /// Return horizontal alignment. If pivot has been adjusted to a custom horizontal setting, returns HA_CUSTOM.
     HorizontalAlignment GetHorizontalAlignment() const;
 
-    /// Return vertical alignment.
+    /// Return vertical alignment. If pivot has been adjusted to a custom vertical setting, returns VA_CUSTOM.
     VerticalAlignment GetVerticalAlignment() const;
 
     /// Return whether anchor positioning & sizing is enabled.
