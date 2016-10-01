@@ -1738,6 +1738,8 @@ static void RegisterDecalSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DecalSet", "uint get_maxVertices() const", asMETHOD(DecalSet, GetMaxVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_maxIndices(uint)", asMETHOD(DecalSet, SetMaxIndices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_maxIndices() const", asMETHOD(DecalSet, GetMaxIndices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void set_optimizeBufferSize(bool)", asMETHOD(DecalSet, SetOptimizeBufferSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "bool get_optimizeBufferSize() const", asMETHOD(DecalSet, GetOptimizeBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "Zone@+ get_zone() const", asMETHOD(DecalSet, GetZone), asCALL_THISCALL);
 }
 
