@@ -248,21 +248,23 @@ public:
     void SetHorizontalAlignment(HorizontalAlignment align);
     /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
-    /// Set offset of element's top left from the minimum anchor.
-    void SetMinOffset(const IntVector2& offset);
-    /// Set offset of element's bottom right from the maximum anchor.
-    void SetMaxOffset(const IntVector2& offset);
-    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1)
+    /// Enable anchor positioning & sizing of element using min/max anchor and min/max offset. Default false.
+    void SetEnableAnchor(bool enable);
+    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
     void SetMinAnchor(const Vector2& anchor);
     /// Set minimum anchor.
     void SetMinAnchor(float x, float y);
-    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1)
+    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
     void SetMaxAnchor(const Vector2& anchor);
     /// Set maximum anchor.
     void SetMaxAnchor(float x, float y);
-    /// Set pivot.
+    /// Set offset of element's top left from the minimum anchor in pixels. No effect when anchor is not enabled.
+    void SetMinOffset(const IntVector2& offset);
+    /// Set offset of element's bottom right from the maximum anchor in pixels. No effect when anchor is not enabled.
+    void SetMaxOffset(const IntVector2& offset);
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
     void SetPivot(const Vector2& pivot);
-    /// Set pivot.
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
     void SetPivot(float x, float y);
     /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
@@ -440,11 +442,17 @@ public:
     /// Return vertical alignment.
     VerticalAlignment GetVerticalAlignment() const;
 
+    /// Return whether anchor positioning & sizing is enabled.
+    bool GetEnableAnchor() const { return enableAnchor_; }
+
     /// Return minimum anchor.
     const Vector2& GetMinAnchor() const { return anchorMin_; }
 
     /// Return maximum anchor.
     const Vector2& GetMaxAnchor() const { return anchorMax_; }
+
+    // Return minimum offset.
+    const IntVector2& GetMinOffset() const { return minOffset_; }
 
     // Return maximum offset.
     const IntVector2& GetMaxOffset() const { return maxOffset_; }
@@ -640,10 +648,8 @@ protected:
     bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const;
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
-    /// Recalculates maxOffset.
-    void AdjustMaxOffset();
-    /// Adjust size using anchor.
-    void AdjustAnchoredSize();
+    /// Update anchored size & position. Only called when anchoring is enabled.
+    void UpdateAnchoring();
 
     /// Name.
     String name_;
@@ -683,8 +689,6 @@ protected:
     bool hovering_;
     /// Internally created flag.
     bool internal_;
-    /// Recalculate maxOffset from size.
-    bool recalcMaxOffset_;
     /// Focus mode.
     FocusMode focusMode_;
     /// Drag and drop flags.
@@ -752,10 +756,12 @@ private:
     IntVector2 childOffset_;
     /// Parent's minimum size calculated by layout. Used internally.
     IntVector2 layoutMinSize_;
-    /// Relative size.
+    /// Minimum offset.
+    IntVector2 minOffset_;
+    /// Maximum offset.
     IntVector2 maxOffset_;
-    /// Use max offset instead of size.
-    bool anchorEnable_;
+    /// Use min/max anchor & min/max offset for position & size instead of setting explicitly.
+    bool enableAnchor_;
     /// Has pivot changed manually.
     bool pivotSet_;
     /// Anchor minimum position.

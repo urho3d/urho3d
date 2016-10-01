@@ -133,11 +133,11 @@ UIElement::UIElement(Context* context) :
     colorGradient_(false),
     traversalMode_(TM_BREADTH_FIRST),
     elementEventSender_(false),
+    anchorMin_(Vector2::ZERO),
+    anchorMax_(Vector2::ZERO),
+    minOffset_(IntVector2::ZERO),
     maxOffset_(IntVector2::ZERO),
-    anchorMin_(0, 0),
-    anchorMax_(0, 0),
-    recalcMaxOffset_(false),
-    anchorEnable_(false),
+    enableAnchor_(false),
     pivot_(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
     pivotSet_(false)
 {
@@ -160,9 +160,7 @@ void UIElement::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILEREADONLY);
-    URHO3D_ACCESSOR_ATTRIBUTE("Min Offset", GetPosition, SetMinOffset, IntVector2, IntVector2::ZERO, AM_EDIT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Offset", GetMaxOffset, SetMaxOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
@@ -171,7 +169,10 @@ void UIElement::RegisterObject(Context* context)
         VA_TOP, AM_FILEREADONLY);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2, Vector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Offset", GetMinOffset, SetMinOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Offset", GetMaxOffset, SetMaxOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Enable Anchor", GetEnableAnchor, SetEnableAnchor, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
@@ -567,7 +568,6 @@ void UIElement::SetPosition(const IntVector2& position)
 {
     if (position != position_)
     {
-        maxOffset_ += position - position_;
         position_ = position;
         OnPositionSet(position);
         MarkDirty();
@@ -587,67 +587,6 @@ void UIElement::SetPosition(int x, int y)
     SetPosition(IntVector2(x, y));
 }
 
-void UIElement::SetMinOffset(const IntVector2& position)
-{
-    if (position != position_)
-    {
-        position_ = position;
-        AdjustAnchoredSize();
-        OnPositionSet(position);
-        MarkDirty();
-
-        using namespace Positioned;
-
-        VariantMap& eventData = GetEventDataMap();
-        eventData[P_ELEMENT] = this;
-        eventData[P_X] = position_.x_;
-        eventData[P_Y] = position_.y_;
-        SendEvent(E_POSITIONED, eventData);
-    }
-}
-
-void UIElement::AdjustMaxOffset()
-{
-    if (parent_)
-    {
-        maxOffset_.x_ = anchorMin_.x_ * parent_->size_.x_ + size_.x_ + position_.x_ - anchorMax_.x_ * parent_->size_.x_;
-        maxOffset_.y_ = anchorMin_.y_ * parent_->size_.y_ + size_.y_ + position_.y_ - anchorMax_.y_ * parent_->size_.y_;
-    }
-    else
-    {
-        maxOffset_ = size_;
-    }
-}
-
-void UIElement::SetMaxOffset(const IntVector2& offset)
-{
-    if (maxOffset_ != offset)
-    {
-        maxOffset_ = offset;
-        anchorEnable_ = true;
-        AdjustAnchoredSize();
-        MarkDirty();
-    }
-}
-
-void UIElement::AdjustAnchoredSize()
-{
-    IntVector2 newSize = size_;
-
-    if (parent_ && anchorEnable_)
-    {
-        newSize.x_ = (int)(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - position_.x_;
-        newSize.y_ = (int)(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - position_.y_;
-
-        if (size_ != newSize)
-        {
-            recalcMaxOffset_ = false;
-            SetSize(newSize);
-            recalcMaxOffset_ = true;
-        }
-    }
-}
-
 void UIElement::SetSize(const IntVector2& size)
 {
     ++resizeNestingLevel_;
@@ -661,11 +600,6 @@ void UIElement::SetSize(const IntVector2& size)
     if (validatedSize != size_)
     {
         size_ = validatedSize;
-
-        if (recalcMaxOffset_)
-        {
-            AdjustMaxOffset();
-        }
 
         if (resizeNestingLevel_ == 1)
         {
@@ -855,13 +789,40 @@ void UIElement::SetVerticalAlignment(VerticalAlignment align)
     }
 }
 
+void UIElement::SetEnableAnchor(bool enable)
+{
+    enableAnchor_ = enable;
+    if (enableAnchor_)
+        UpdateAnchoring();
+}
+
+void UIElement::SetMinOffset(const IntVector2& offset)
+{
+    if (offset != minOffset_)
+    {
+        minOffset_ = offset;
+        if (enableAnchor_)
+            UpdateAnchoring();
+    }
+}
+
+void UIElement::SetMaxOffset(const IntVector2& offset)
+{
+    if (offset != maxOffset_)
+    {
+        maxOffset_ = offset;
+        if (enableAnchor_)
+            UpdateAnchoring();
+    }
+}
+
 void UIElement::SetMinAnchor(const Vector2& anchor)
 {
     if (anchor != anchorMin_)
     {
         anchorMin_ = anchor;
-        MarkDirty();
-        AdjustAnchoredSize();
+        if (enableAnchor_)
+            UpdateAnchoring();
     }
 }
 
@@ -875,8 +836,8 @@ void UIElement::SetMaxAnchor(const Vector2& anchor)
     if (anchor != anchorMax_)
     {
         anchorMax_ = anchor;
-        MarkDirty();
-        AdjustAnchoredSize();
+        if (enableAnchor_)
+            UpdateAnchoring();
     }
 }
 
@@ -1276,7 +1237,8 @@ void UIElement::UpdateLayout()
     {
         for (unsigned i = 0; i < children_.Size(); ++i)
         {
-            children_[i]->AdjustAnchoredSize();
+            if (children_[i]->GetEnableAnchor())
+                children_[i]->UpdateAnchoring();
         }
     }
 
@@ -2084,6 +2046,21 @@ bool UIElement::FilterImplicitAttributes(XMLElement& dest) const
     }
 
     return true;
+}
+
+void UIElement::UpdateAnchoring()
+{
+    if (parent_ && enableAnchor_)
+    {
+        IntVector2 newSize;
+        newSize.x_ = (int)(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - minOffset_.x_;
+        newSize.y_ = (int)(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - minOffset_.y_;
+
+        if (position_ != minOffset_)
+            SetPosition(minOffset_);
+        if (size_ != newSize)
+            SetSize(newSize);
+    }
 }
 
 void UIElement::GetChildrenRecursive(PODVector<UIElement*>& dest) const
