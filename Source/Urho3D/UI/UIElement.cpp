@@ -44,6 +44,7 @@ const char* horizontalAlignments[] =
     "Left",
     "Center",
     "Right",
+    "Custom",
     0
 };
 
@@ -52,6 +53,7 @@ const char* verticalAlignments[] =
     "Top",
     "Center",
     "Bottom",
+    "Custom",
     0
 };
 
@@ -124,15 +126,20 @@ UIElement::UIElement(Context* context) :
     minSize_(IntVector2::ZERO),
     maxSize_(M_MAX_INT, M_MAX_INT),
     childOffset_(IntVector2::ZERO),
-    horizontalAlignment_(HA_LEFT),
-    verticalAlignment_(VA_TOP),
     opacity_(1.0f),
     opacityDirty_(true),
     derivedColorDirty_(true),
     sortOrderDirty_(false),
     colorGradient_(false),
     traversalMode_(TM_BREADTH_FIRST),
-    elementEventSender_(false)
+    elementEventSender_(false),
+    maxOffset_(IntVector2::ZERO),
+    anchorMin_(0, 0),
+    anchorMax_(0, 0),
+    recalcMaxOffset_(false),
+    anchorEnable_(false),
+    pivot_(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
+    pivotSet_(false)
 {
     SetEnabled(false);
 }
@@ -153,13 +160,18 @@ void UIElement::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, IntVector2, IntVector2::ZERO, AM_FILE);
-    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Size", GetSize, SetSize, IntVector2, IntVector2::ZERO, AM_FILEREADONLY);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Offset", GetPosition, SetMinOffset, IntVector2, IntVector2::ZERO, AM_EDIT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Offset", GetMaxOffset, SetMaxOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Min Size", GetMinSize, SetMinSize, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Size", GetMaxSize, SetMaxSize, IntVector2, IntVector2(M_MAX_INT, M_MAX_INT), AM_FILE);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
-        horizontalAlignments, HA_LEFT, AM_FILE);
+        horizontalAlignments, HA_LEFT, AM_FILEREADONLY);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Vert Alignment", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment, verticalAlignments,
-        VA_TOP, AM_FILE);
+        VA_TOP, AM_FILEREADONLY);
+    URHO3D_ACCESSOR_ATTRIBUTE("Min Anchor", GetMinAnchor, SetMinAnchor, Vector2, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Anchor", GetMaxAnchor, SetMaxAnchor, Vector2, Vector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Pivot", GetPivot, SetPivot, Vector2, Vector2(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Clip Border", GetClipBorder, SetClipBorder, IntRect, IntRect::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
@@ -432,34 +444,10 @@ const IntVector2& UIElement::GetScreenPosition() const
         {
             const IntVector2& parentScreenPos = parent->GetScreenPosition();
 
-            switch (horizontalAlignment_)
-            {
-            case HA_LEFT:
-                pos.x_ += parentScreenPos.x_;
-                break;
-
-            case HA_CENTER:
-                pos.x_ += parentScreenPos.x_ + parent_->size_.x_ / 2 - size_.x_ / 2;
-                break;
-
-            case HA_RIGHT:
-                pos.x_ += parentScreenPos.x_ + parent_->size_.x_ - size_.x_;
-                break;
-            }
-            switch (verticalAlignment_)
-            {
-            case VA_TOP:
-                pos.y_ += parentScreenPos.y_;
-                break;
-
-            case VA_CENTER:
-                pos.y_ += parentScreenPos.y_ + parent_->size_.y_ / 2 - size_.y_ / 2;
-                break;
-
-            case VA_BOTTOM:
-                pos.y_ += parentScreenPos.y_ + parent_->size_.y_ - size_.y_;
-                break;
-            }
+            pos.x_ += parentScreenPos.x_ + (int)Lerp(0.0f, (float)parent->size_.x_, anchorMin_.x_);
+            pos.y_ += parentScreenPos.y_ + (int)Lerp(0.0f, (float)parent->size_.y_, anchorMin_.y_);
+            pos.x_ -= (int)(size_.x_ * pivot_.x_);
+            pos.y_ -= (int)(size_.y_ * pivot_.y_);
 
             pos += parent_->childOffset_;
         }
@@ -579,6 +567,7 @@ void UIElement::SetPosition(const IntVector2& position)
 {
     if (position != position_)
     {
+        maxOffset_ += position - position_;
         position_ = position;
         OnPositionSet(position);
         MarkDirty();
@@ -598,6 +587,67 @@ void UIElement::SetPosition(int x, int y)
     SetPosition(IntVector2(x, y));
 }
 
+void UIElement::SetMinOffset(const IntVector2& position)
+{
+    if (position != position_)
+    {
+        position_ = position;
+        AdjustAnchoredSize();
+        OnPositionSet(position);
+        MarkDirty();
+
+        using namespace Positioned;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_ELEMENT] = this;
+        eventData[P_X] = position_.x_;
+        eventData[P_Y] = position_.y_;
+        SendEvent(E_POSITIONED, eventData);
+    }
+}
+
+void UIElement::AdjustMaxOffset()
+{
+    if (parent_)
+    {
+        maxOffset_.x_ = anchorMin_.x_ * parent_->size_.x_ + size_.x_ + position_.x_ - anchorMax_.x_ * parent_->size_.x_;
+        maxOffset_.y_ = anchorMin_.y_ * parent_->size_.y_ + size_.y_ + position_.y_ - anchorMax_.y_ * parent_->size_.y_;
+    }
+    else
+    {
+        maxOffset_ = size_;
+    }
+}
+
+void UIElement::SetMaxOffset(const IntVector2& offset)
+{
+    if (maxOffset_ != offset)
+    {
+        maxOffset_ = offset;
+        anchorEnable_ = true;
+        AdjustAnchoredSize();
+        MarkDirty();
+    }
+}
+
+void UIElement::AdjustAnchoredSize()
+{
+    IntVector2 newSize = size_;
+
+    if (parent_ && anchorEnable_)
+    {
+        newSize.x_ = (int)(parent_->size_.x_ * Clamp(anchorMax_.x_ - anchorMin_.x_, 0.0f, 1.0f)) + maxOffset_.x_ - position_.x_;
+        newSize.y_ = (int)(parent_->size_.y_ * Clamp(anchorMax_.y_ - anchorMin_.y_, 0.0f, 1.0f)) + maxOffset_.y_ - position_.y_;
+
+        if (size_ != newSize)
+        {
+            recalcMaxOffset_ = false;
+            SetSize(newSize);
+            recalcMaxOffset_ = true;
+        }
+    }
+}
+
 void UIElement::SetSize(const IntVector2& size)
 {
     ++resizeNestingLevel_;
@@ -611,6 +661,11 @@ void UIElement::SetSize(const IntVector2& size)
     if (validatedSize != size_)
     {
         size_ = validatedSize;
+
+        if (recalcMaxOffset_)
+        {
+            AdjustMaxOffset();
+        }
 
         if (resizeNestingLevel_ == 1)
         {
@@ -734,9 +789,31 @@ void UIElement::SetHorizontalAlignment(HorizontalAlignment align)
         align = HA_LEFT;
     }
 
-    if (horizontalAlignment_ != align)
+    Vector2 min = anchorMin_;
+    Vector2 max = anchorMax_;
+    float pivot = pivot_.x_;
+
+    if (align == HA_CENTER)
     {
-        horizontalAlignment_ = align;
+        min.x_ = max.x_ = 0.5f;
+        pivot = 0.5f;
+    }
+    else if (align == HA_LEFT)
+    {
+        min.x_ = max.x_ = 0.0f;
+        pivot = 0.0f;
+    }
+    else if (align == HA_RIGHT)
+    {
+        min.x_ = max.x_ = 1.0f;
+        pivot = 1.0f;
+    }
+
+    if (min.x_ != anchorMin_.x_ || max.x_ != anchorMax_.x_ || pivot != pivot_.x_)
+    {
+        anchorMin_.x_ = min.x_;
+        anchorMax_.x_ = max.x_;
+        pivot_.x_ = pivot;
         MarkDirty();
     }
 }
@@ -749,11 +826,78 @@ void UIElement::SetVerticalAlignment(VerticalAlignment align)
         align = VA_TOP;
     }
 
-    if (verticalAlignment_ != align)
+    Vector2 min = anchorMin_;
+    Vector2 max = anchorMax_;
+    float pivot = pivot_.y_;
+
+    if (align == VA_CENTER)
     {
-        verticalAlignment_ = align;
+        min.y_ = max.y_ = 0.5f;
+        pivot = 0.5f;
+    }
+    else if (align == VA_TOP)
+    {
+        min.y_ = max.y_ = 0.0f;
+        pivot = 0.0f;
+    }
+    else if (align == VA_BOTTOM)
+    {
+        min.y_ = max.y_ = 1.0f;
+        pivot = 1.0f;
+    }
+
+    if (min.y_ != anchorMin_.y_ || max.y_ != anchorMax_.y_ || pivot != pivot_.y_)
+    {
+        anchorMin_.y_ = min.y_;
+        anchorMax_.y_ = max.y_;
+        pivot_.y_ = pivot;
         MarkDirty();
     }
+}
+
+void UIElement::SetMinAnchor(const Vector2& anchor)
+{
+    if (anchor != anchorMin_)
+    {
+        anchorMin_ = anchor;
+        MarkDirty();
+        AdjustAnchoredSize();
+    }
+}
+
+void UIElement::SetMinAnchor(float x, float y)
+{
+    SetMinAnchor(Vector2(x, y));
+}
+
+void UIElement::SetMaxAnchor(const Vector2& anchor)
+{
+    if (anchor != anchorMax_)
+    {
+        anchorMax_ = anchor;
+        MarkDirty();
+        AdjustAnchoredSize();
+    }
+}
+
+void UIElement::SetMaxAnchor(float x, float y)
+{
+    SetMaxAnchor(Vector2(x, y));
+}
+
+void UIElement::SetPivot(const Vector2& pivot)
+{
+    if (pivot != pivot_)
+    {
+        pivotSet_ = true;
+        pivot_ = pivot;
+        MarkDirty();
+    }
+}
+
+void UIElement::SetPivot(float x, float y)
+{
+    SetPivot(Vector2(x, y));
 }
 
 void UIElement::SetClipBorder(const IntRect& rect)
@@ -1036,7 +1180,7 @@ void UIElement::SetIndentSpacing(int indentSpacing)
 
 void UIElement::UpdateLayout()
 {
-    if (layoutMode_ == LM_FREE || layoutNestingLevel_)
+    if (layoutNestingLevel_)
         return;
 
     // Prevent further updates while this update happens
@@ -1126,6 +1270,13 @@ void UIElement::UpdateLayout()
             children_[i]->SetPosition(GetLayoutChildPosition(children_[i]).x_ + baseIndentWidth, positions[j]);
             children_[i]->SetSize(width - layoutBorder_.left_ - layoutBorder_.right_, sizes[j]);
             ++j;
+        }
+    }
+    else
+    {
+        for (unsigned i = 0; i < children_.Size(); ++i)
+        {
+            children_[i]->AdjustAnchoredSize();
         }
     }
 
