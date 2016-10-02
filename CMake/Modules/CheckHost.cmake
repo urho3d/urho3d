@@ -29,7 +29,7 @@
 #
 # non-WIN32:
 #  HAS_LIB64 (multilib capable)
-#  CCACHE_VERSION (when using Clang with ccache enabled)
+#  CCACHE_VERSION (when ccache is used)
 #
 # Neither here nor there:
 #  BASH_ON_WINDOWS
@@ -72,16 +72,17 @@ else ()
         endif ()
         set (BASH_ON_WINDOWS ${BASH_ON_WINDOWS} CACHE INTERNAL "Bash on Ubuntu on Windows")
     endif ()
-    # Test if PCH could be enabled in tandem with ccache when using Clang compiler toolchain
-    if ("$ENV{USE_CCACHE}" AND CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        if (NOT DEFINED CCACHE_VERSION)
-            execute_process (COMMAND ccache --version COMMAND head -1 RESULT_VARIABLE CCACHE_EXIT_CODE OUTPUT_VARIABLE CCACHE_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-            string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" CCACHE_VERSION "${CCACHE_VERSION}")    # Stringify as it could be empty when an error has occured
-            if (CCACHE_EXIT_CODE EQUAL 0)
-               set (CCACHE_VERSION ${CCACHE_VERSION} CACHE INTERNAL "ccache version")
-           endif ()
-        endif ()
-        if (NOT CCACHE_VERSION VERSION_LESS 3.3.1)  # This is the last known bad version
+    if ("$ENV{USE_CCACHE}" AND NOT DEFINED CCACHE_VERSION)
+        execute_process (COMMAND ccache --version COMMAND head -1 RESULT_VARIABLE CCACHE_EXIT_CODE OUTPUT_VARIABLE CCACHE_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" CCACHE_VERSION "${CCACHE_VERSION}")    # Stringify as it could be empty when an error has occured
+        if (CCACHE_EXIT_CODE EQUAL 0)
+           set (CCACHE_VERSION ${CCACHE_VERSION} CACHE INTERNAL "ccache version")
+       endif ()
+    endif ()
+    # Temporary workaround - test if PCH could be enabled when using Clang compiler toolchain
+    if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        # Turn off PCH when building on macOS host with ccache 3.3.1+ (the last known bad version) and when targeting Android platform
+        if ((APPLE AND NOT CCACHE_VERSION VERSION_LESS 3.3.1) OR ANDROID)
             set (URHO3D_PCH FALSE CACHE INTERNAL "" FORCE)
         endif ()
     endif ()
