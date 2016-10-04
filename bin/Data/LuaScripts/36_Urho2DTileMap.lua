@@ -3,12 +3,16 @@
 --     - Creating a 2D scene with tile map
 --     - Displaying the scene using the Renderer subsystem
 --     - Handling keyboard to move and zoom 2D camera
+--     - Interacting with the tile map
 
 require "LuaScripts/Utilities/Sample"
 
 function Start()
     -- Execute the common startup for samples
     SampleStart()
+
+    -- Enable OS cursor
+    input.mouseVisible = true
 
     -- Create the scene content
     CreateScene()
@@ -20,7 +24,7 @@ function Start()
     SetupViewport()
 
     -- Set the mouse mode to use in the sample
-    SampleInitMouseMode(MM_FREE)
+    SampleInitMouseMode(MM_RELATIVE)
 
     -- Hook up to the frame update events
     SubscribeToEvents()
@@ -67,7 +71,7 @@ end
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
-    instructionText:SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.")
+    instructionText:SetText("Use WASD keys and mouse to move, Use PageUp PageDown to zoom.\n LMB to remove a tile, RMB to swap grass and water.")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
 
     -- Position the text relative to the screen center
@@ -122,6 +126,9 @@ function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
 
+    -- Listen to mouse clicks
+    SubscribeToEvent("MouseButtonDown", "HandleMouseButtonDown")
+
     -- Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent("SceneUpdate")
 end
@@ -132,6 +139,36 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     MoveCamera(timeStep)
+end
+
+function HandleMouseButtonDown(eventType, eventData)
+    local tileMapNode = scene_:GetChild("TileMap", true)
+    local map = tileMapNode:GetComponent("TileMap2D")
+    local layer = map:GetLayer(0)
+
+    success, x, y = map:PositionToTileIndex(GetMousePositionXY())
+    if success then
+        -- Get tile's sprite. Note that layer.GetTile(x, y).sprite is read-only, so we get the sprite through tile's node
+        local n = layer:GetTileNode(x, y)
+        if n == nil then
+            return
+        end
+        local sprite = n:GetComponent("StaticSprite2D")
+
+        if input:GetMouseButtonDown(MOUSEB_RIGHT) then
+            -- Swap grass and water
+            if layer:GetTile(x, y).gid < 9 then -- First 8 sprites in the "isometric_grass_and_water.png" tileset are mostly grass and from 9 to 24 they are mostly water
+                sprite.sprite = layer:GetTile(0, 0).sprite -- Replace grass by water sprite used in top tile
+            else sprite.sprite = layer:GetTile(24, 24).sprite end -- Replace water by grass sprite used in bottom tile
+        else sprite.sprite = nil end -- 'Remove' sprite
+    end
+end
+
+function GetMousePositionXY()
+    local camera = cameraNode:GetComponent("Camera")
+    local screenPoint = Vector3(input.mousePosition.x / graphics.width, input.mousePosition.y / graphics.height, 10)
+    local worldPoint = camera:ScreenToWorldPoint(screenPoint)
+    return Vector2(worldPoint.x, worldPoint.y)
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

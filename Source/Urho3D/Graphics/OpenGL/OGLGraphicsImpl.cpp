@@ -31,7 +31,6 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    window_(0),
     context_(0),
     systemFBO_(0),
     activeTexture_(0),
@@ -42,9 +41,12 @@ GraphicsImpl::GraphicsImpl() :
     boundFBO_(0),
     boundVBO_(0),
     boundUBO_(0),
+    resolveSrcFBO_(0),
+    resolveDestFBO_(0),
     pixelFormat_(0),
     fboDirty_(false),
-    vertexBuffersDirty_(false)
+    vertexBuffersDirty_(false),
+    shaderProgram_(0)
 {
 }
 

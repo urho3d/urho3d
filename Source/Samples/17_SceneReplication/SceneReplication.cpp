@@ -99,7 +99,6 @@ void SceneReplication::CreateScene()
 {
     scene_ = new Scene(context_);
 
-    // Create scene content on the server only
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     // Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated

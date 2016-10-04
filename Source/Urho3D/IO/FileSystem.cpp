@@ -636,12 +636,12 @@ bool FileSystem::DirExists(const String& pathName) const
     if (URHO3D_IS_ASSET(fixedName))
     {
         // Split the pathname into two components: the longest parent directory path and the last name component
-        String assetPath(URHO3D_ASSET((fixedName + '/')));
+        String assetPath(URHO3D_ASSET((fixedName + "/")));
         String parentPath;
         unsigned pos = assetPath.FindLast('/', assetPath.Length() - 2);
         if (pos != String::NPOS)
         {
-            parentPath = assetPath.Substring(0, pos - 1);
+            parentPath = assetPath.Substring(0, pos);
             assetPath = assetPath.Substring(pos + 1);
         }
         assetPath.Resize(assetPath.Length() - 1);

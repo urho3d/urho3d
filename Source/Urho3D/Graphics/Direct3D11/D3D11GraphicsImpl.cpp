@@ -31,7 +31,6 @@ namespace Urho3D
 {
 
 GraphicsImpl::GraphicsImpl() :
-    window_(0),
     device_(0),
     deviceContext_(0),
     swapChain_(0),
@@ -39,7 +38,8 @@ GraphicsImpl::GraphicsImpl() :
     defaultDepthTexture_(0),
     defaultDepthStencilView_(0),
     depthStencilView_(0),
-    resolveTexture_(0)
+    resolveTexture_(0),
+    shaderProgram_(0)
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
         renderTargetViews_[i] = 0;

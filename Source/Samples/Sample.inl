@@ -253,21 +253,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
 
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
-    {
-        DebugHud* debugHud = GetSubsystem<DebugHud>();
-        if (debugHud->GetMode() == 0 || debugHud->GetMode() == DEBUGHUD_SHOW_ALL_MEMORY)
-            debugHud->SetMode(DEBUGHUD_SHOW_ALL);
-        else
-            debugHud->SetMode(DEBUGHUD_SHOW_NONE);
-    }
-    else if (key == KEY_F3)
-    {
-        DebugHud* debugHud = GetSubsystem<DebugHud>();
-        if (debugHud->GetMode() == 0 || debugHud->GetMode() == DEBUGHUD_SHOW_ALL)
-            debugHud->SetMode(DEBUGHUD_SHOW_ALL_MEMORY);
-        else
-            debugHud->SetMode(DEBUGHUD_SHOW_NONE);
-    }
+        GetSubsystem<DebugHud>()->ToggleAll();
 
     // Common rendering quality controls, only when UI has no focused element
     else if (!GetSubsystem<UI>()->GetFocusElement())

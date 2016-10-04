@@ -32,7 +32,7 @@ class Text;
 class UIElement;
 class XMLFile;
 
-/// Message box dialog.
+/// Message box dialog. Manages its lifetime automatically, so the application does not need to hold a reference to it, and shouldn't attempt to destroy it manually.
 class URHO3D_API MessageBox : public Object
 {
     URHO3D_OBJECT(MessageBox, Object);
@@ -64,7 +64,7 @@ private:
     void HandleMessageAcknowledged(StringHash eventType, VariantMap& eventData);
 
     /// UI element containing the whole UI layout. Typically it is a Window element type.
-    SharedPtr<UIElement> window_;
+    UIElement* window_;
     /// Title text element.
     Text* titleText_;
     /// Message text element.

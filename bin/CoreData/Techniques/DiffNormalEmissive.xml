@@ -4,6 +4,6 @@
     <pass name="prepass" vsdefines="NORMALMAP" psdefines="PREPASS NORMALMAP" />
     <pass name="material" psdefines="MATERIAL EMISSIVEMAP" depthtest="equal" depthwrite="false" />
     <pass name="deferred" vsdefines="NORMALMAP" psdefines="DEFERRED NORMALMAP EMISSIVEMAP" />
-    <pass name="depth" vs="Depth" ps="Depth" />
-    <pass name="shadow" vs="Shadow" ps="Shadow" />
+    <pass name="depth" vs="Depth" ps="Depth" psexcludes="PACKEDNORMAL" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psexcludes="PACKEDNORMAL" />
 </technique>

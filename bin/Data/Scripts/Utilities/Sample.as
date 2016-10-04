@@ -183,25 +183,13 @@ void HandleKeyDown(StringHash eventType, VariantMap& eventData)
     // Toggle console with F1
     if (key == KEY_F1)
         console.Toggle();
-
+        
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
-    {
-        if (debugHud.mode == 0 || (debugHud.mode & DEBUGHUD_SHOW_MEMORY) > 0)
-            debugHud.mode = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_PROFILER;
-        else
-            debugHud.mode = 0;
-    }
-    else if (key == KEY_F3)
-    {
-        if (debugHud.mode == 0 || (debugHud.mode & DEBUGHUD_SHOW_PROFILER) > 0)
-            debugHud.mode = DEBUGHUD_SHOW_STATS | DEBUGHUD_SHOW_MODE | DEBUGHUD_SHOW_MEMORY;
-        else
-            debugHud.mode = 0;
-    }
+        debugHud.ToggleAll();
 
     // Common rendering quality controls, only when UI has no focused element
-    if (ui.focusElement is null)
+    else if (ui.focusElement is null)
     {
         // Preferences / Pause
         if (key == KEY_SELECT && touchEnabled)

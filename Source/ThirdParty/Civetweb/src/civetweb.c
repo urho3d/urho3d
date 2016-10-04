@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-// Modified by cosmy1 and Yao Wei Tjong for Urho3D
+// Modified by cosmy1, Yao Wei Tjong & Lasse Oorni for Urho3D
 
 #include <stdint.h>
 #if defined(_WIN32)
@@ -125,6 +125,9 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 #ifdef __MACH__
 
+// Urho3D: prefer own implementation of clock_gettime regardless of XCode / SDK version
+#define _DARWIN_FEATURE_CLOCK_GETTIME 0
+
 #define CLOCK_MONOTONIC (1)
 #define CLOCK_REALTIME (2)
 
@@ -133,9 +136,6 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <assert.h>
-
-/* clock_gettime is not implemented on OSX */
-int clock_gettime(int clk_id, struct timespec *t);
 
 int clock_gettime(int clk_id, struct timespec *t)
 {
@@ -176,6 +176,12 @@ int clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
+#endif
+
+// Urho3D: Prevent inclusion of pthread_time.h on MinGW, instead prefer own implementation of clock_gettime()
+// to prevent dependency on pthread library which is not needed otherwise
+#ifdef __MINGW32__
+#define WIN_PTHREADS_TIME_H
 #endif
 
 #include <time.h>
@@ -2154,7 +2160,7 @@ static int pthread_mutex_unlock(pthread_mutex_t *mutex)
 	return ReleaseMutex(*mutex) == 0 ? -1 : 0;
 }
 
-#ifndef WIN_PTHREADS_TIME_H
+// Urho3D: Prefer own implementation of clock_gettime() to prevent dependency on pthread library which is not needed otherwise
 static int clock_gettime(clockid_t clk_id, struct timespec *tp)
 {
 	FILETIME ft;
@@ -2190,7 +2196,6 @@ static int clock_gettime(clockid_t clk_id, struct timespec *tp)
 
 	return ok ? 0 : -1;
 }
-#endif
 
 static int pthread_cond_init(pthread_cond_t *cv, const void *unused)
 {

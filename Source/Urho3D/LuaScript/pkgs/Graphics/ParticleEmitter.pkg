@@ -6,6 +6,7 @@ class ParticleEmitter : public BillboardSet
     void SetNumParticles(unsigned num);
     void SetEmitting(bool enable);
     void SetSerializeParticles(bool enable);
+    void SetAutoRemoveMode(AutoRemoveMode mode);
     void ResetEmissionTimer();
     void RemoveAllParticles();
     void Reset();
@@ -15,11 +16,13 @@ class ParticleEmitter : public BillboardSet
     unsigned GetNumParticles() const;
     bool IsEmitting() const;
     bool GetSerializeParticles() const;
+    AutoRemoveMode GetAutoRemoveMode() const;
 
     tolua_property__get_set ParticleEffect* effect;
     tolua_property__get_set unsigned numParticles;
     tolua_property__is_set bool emitting;
     tolua_property__get_set bool serializeParticles;
+    tolua_property__get_set AutoRemoveMode autoRemoveMode;
 };
 
 ${

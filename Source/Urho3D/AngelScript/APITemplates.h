@@ -243,9 +243,11 @@ template <class T> void RegisterSerializer(asIScriptEngine* engine, const char* 
 {
     engine->RegisterObjectMethod(className, "uint Write(Array<uint8>@+)", asFUNCTION(SerializerWrite<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool WriteInt(int)", asMETHODPR(T, WriteInt, (int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteInt64(int64)", asMETHODPR(T, WriteInt64, (long long), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteShort(int16)", asMETHODPR(T, WriteShort, (short), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteByte(int8)", asMETHODPR(T, WriteByte, (signed char), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteUInt(uint)", asMETHODPR(T, WriteUInt, (unsigned), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool WriteUInt64(uint64)", asMETHODPR(T, WriteUInt64, (unsigned long long), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteUShort(uint16)", asMETHODPR(T, WriteUShort, (unsigned short), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteUByte(uint8)", asMETHODPR(T, WriteUByte, (unsigned char), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool WriteBool(bool)", asMETHODPR(T, WriteBool, (bool), bool), asCALL_THISCALL);
@@ -295,9 +297,11 @@ template <class T> void RegisterDeserializer(asIScriptEngine* engine, const char
 {
     engine->RegisterObjectMethod(className, "Array<uint8>@ Read(uint)", asFUNCTION(DeserializerRead<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "int ReadInt()", asMETHODPR(T, ReadInt, (), int), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int64 ReadInt64()", asMETHODPR(T, ReadInt64, (), long long), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int16 ReadShort()", asMETHODPR(T, ReadShort, (), short), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "int8 ReadByte()", asMETHODPR(T, ReadByte, (), signed char), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint ReadUInt()", asMETHODPR(T, ReadUInt, (), unsigned), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint64 ReadUInt64()", asMETHODPR(T, ReadUInt64, (), unsigned long long), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint16 ReadUShort()", asMETHODPR(T, ReadUShort, (), unsigned short), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint8 ReadUByte()", asMETHODPR(T, ReadUByte, (), unsigned char), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool ReadBool()", asMETHODPR(T, ReadBool, (), bool), asCALL_THISCALL);
@@ -701,6 +705,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void RemoveComponents(bool, bool)", asMETHODPR(T, RemoveComponents, (bool, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void RemoveComponents(const String&in)", asFUNCTION(NodeRemoveComponents), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void RemoveAllComponents()", asMETHOD(T, RemoveAllComponents), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void ReorderComponent(Component@+, uint)", asMETHOD(T, ReorderComponent), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddTag(const String&in)", asMETHOD(T, AddTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void AddTags(const String&in, int8 separator = ';')", asMETHODPR(T, AddTags, (const String&, char), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool RemoveTag(const String&in)", asMETHOD(T, RemoveTag), asCALL_THISCALL);
@@ -758,6 +763,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector2 get_worldScale2D()", asMETHOD(T, GetWorldScale2D), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Matrix3x4 get_transform() const", asMETHOD(T, GetTransform), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Matrix3x4& get_worldTransform() const", asMETHOD(T, GetWorldTransform), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_id(uint)", asMETHOD(T, SetID), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_id()", asMETHOD(T, GetID), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(NodeGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(NodeGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
@@ -866,8 +872,8 @@ template <class T> void RegisterSoundSource(asIScriptEngine* engine, const char*
     engine->RegisterObjectMethod(className, "Sound@+ get_sound() const", asMETHOD(T, GetSound), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_timePosition() const", asMETHOD(T, GetTimePosition), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float get_attenuation() const", asMETHOD(T, GetAttenuation), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "void set_autoRemove(bool)", asMETHOD(T, SetAutoRemove), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool get_autoRemove() const", asMETHOD(T, GetAutoRemove), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_autoRemoveMode(AutoRemoveMode)", asMETHOD(T, SetAutoRemoveMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "AutoRemoveMode get_autoRemoveMode() const", asMETHOD(T, GetAutoRemoveMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_playing() const", asMETHOD(T, IsPlaying), asCALL_THISCALL);
 }
 
@@ -890,10 +896,15 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "TextureFilterMode get_filterMode() const", asMETHOD(T, GetFilterMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_addressMode(TextureCoordinate, TextureAddressMode)", asMETHOD(T, SetAddressMode), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "TextureAddressMode get_addressMode(TextureCoordinate) const", asMETHOD(T, GetAddressMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_anisotropy(uint)", asMETHOD(T, SetAnisotropy), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "uint get_anisotropy() const", asMETHOD(T, GetAnisotropy), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_borderColor(const Color&in)", asMETHOD(T, SetBorderColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const Color& get_borderColor() const", asMETHOD(T, GetBorderColor), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_sRGB(bool)", asMETHOD(T, SetSRGB), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_sRGB() const", asMETHOD(T, GetSRGB), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "int get_multiSample() const", asMETHOD(T, GetMultiSample), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_autoResolve() const", asMETHOD(T, GetAutoResolve), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_resolveDirty() const", asMETHOD(T, IsResolveDirty), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_backupTexture(Texture@+)", asMETHOD(T, SetBackupTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture@+ get_backupTexture() const", asMETHOD(T, GetBackupTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_mipsToSkip(int, int)", asMETHOD(T, SetMipsToSkip), asCALL_THISCALL);
@@ -1058,6 +1069,9 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "void SetFixedWidth(int)", asMETHOD(T, SetFixedWidth), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetFixedHeight(int)", asMETHOD(T, SetFixedHeight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAlignment(HorizontalAlignment, VerticalAlignment)", asMETHOD(T, SetAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetMinAnchor(float, float)", asMETHODPR(T, SetMinAnchor, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetMaxAnchor(float, float)", asMETHODPR(T, SetMaxAnchor, (float, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetPivot(float, float)", asMETHODPR(T, SetPivot, (float, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetLayout(LayoutMode, int spacing = 0, const IntRect& border = IntRect(0, 0, 0, 0))", asMETHOD(T, SetLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void UpdateLayout()", asMETHOD(T, UpdateLayout), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void DisableLayoutUpdate()", asMETHOD(T, DisableLayoutUpdate), asCALL_THISCALL);
@@ -1121,6 +1135,18 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(T, GetHorizontalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_verticalAlignment(VerticalAlignment)", asMETHOD(T, SetVerticalAlignment), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "VerticalAlignment get_verticalAlignment() const", asMETHOD(T, GetVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_enableAnchor(bool)", asMETHOD(T, SetEnableAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_enableAnchor() const", asMETHOD(T, GetEnableAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minAnchor(const Vector2&in)", asMETHODPR(T, SetMinAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_minAnchor() const", asMETHOD(T, GetMinAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxAnchor(const Vector2&in)", asMETHODPR(T, SetMaxAnchor, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_maxAnchor() const", asMETHOD(T, GetMaxAnchor), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_minOffset(const IntVector2&in)", asMETHODPR(T, SetMinOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_minOffset() const", asMETHOD(T, GetMinOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_maxOffset(const IntVector2&in)", asMETHODPR(T, SetMaxOffset, (const IntVector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const IntVector2& get_maxOffset() const", asMETHOD(T, GetMaxOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_pivot(const Vector2&in)", asMETHODPR(T, SetPivot, (const Vector2&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Vector2& get_pivot() const", asMETHOD(T, GetPivot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_clipBorder(const IntRect&in)", asMETHODPR(T, SetClipBorder, (const IntRect&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const IntRect& get_clipBorder() const", asMETHOD(T, GetClipBorder), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_color(const Color&in)", asMETHODPR(T, SetColor, (const Color&), void), asCALL_THISCALL);

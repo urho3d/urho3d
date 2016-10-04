@@ -170,7 +170,7 @@ else ()
     set (URHO3D_LIB_TYPE_SAVED ${URHO3D_LIB_TYPE})  # We need this to reset the auto-discovered URHO3D_LIB_TYPE variable before looping
     foreach (ABI_64BIT RANGE ${URHO3D_64BIT} 0)
         # Break if the compiler is not multilib-capable and the ABI is not its native
-        if ((MSVC OR MINGW OR ANDROID OR ARM OR WEB) AND NOT ABI_64BIT EQUAL NATIVE_64BIT)
+        if ((MSVC OR ANDROID OR ARM OR WEB) AND NOT ABI_64BIT EQUAL NATIVE_64BIT)
             break ()
         endif ()
         # Set to search in 'lib' or 'lib64' based on the ABI being tested
@@ -223,14 +223,11 @@ else ()
         if (URHO3D_COMPILE_RESULT)
             break ()    # Use the cached result instead of redoing try_run() each time
         elseif (URHO3D_LIBRARIES)
-            if (NOT (MSVC OR MINGW OR ANDROID OR ARM OR WEB OR XCODE) AND NOT ABI_64BIT)
+            if (NOT (MSVC OR ANDROID OR ARM OR WEB OR XCODE) AND NOT ABI_64BIT)
                 set (COMPILER_32BIT_FLAG -m32)
             endif ()
             # Below variables are loop invariant but there is no harm to keep them here
-            if (ANDROID)
-                # TODO - remove this hard-coding when we do the library dependency refactoring
-                set (ANDROID_LIBRARIES "log\;android\;GLESv1_CM\;GLESv2")
-            elseif (WIN32)
+            if (WIN32)
                 set (CMAKE_TRY_COMPILE_CONFIGURATION_SAVED ${CMAKE_TRY_COMPILE_CONFIGURATION})
                 if (URHO3D_LIBRARIES_REL)
                     set (CMAKE_TRY_COMPILE_CONFIGURATION Release)
@@ -261,9 +258,8 @@ else ()
             else ()
                 set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
                 while (NOT URHO3D_COMPILE_RESULT)
-                    # VIDEOCORE_LIBRARIES variable is already set by FindVideoCore module on RPI platform
                     try_run (URHO3D_RUN_RESULT URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrho3DLibrary.cpp
-                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES}\;${VIDEOCORE_LIBRARIES}\;${ANDROID_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
                         COMPILE_OUTPUT_VARIABLE TRY_COMPILE_OUT RUN_OUTPUT_VARIABLE TRY_RUN_OUT)
                     if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
                         # Give a second chance for MSVC to use static runtime flag
@@ -290,7 +286,7 @@ else ()
                     endif ()
                 endif ()
                 set (URHO3D_64BIT ${ABI_64BIT} CACHE BOOL "Enable 64-bit build, the value is auto-discovered based on the found Urho3D library" FORCE) # Force it as it is more authoritative than user-specified option
-                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE BOOL "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
+                set (URHO3D_LIB_TYPE ${URHO3D_LIB_TYPE} CACHE STRING "Urho3D library type, the value is auto-discovered based on the found Urho3D library" FORCE) # Use the Force, Luke
                 foreach (VAR ${AUTO_DISCOVER_VARS})
                     if (TRY_RUN_OUT MATCHES "#define ${VAR}")
                         set (AUTO_DISCOVERED_${VAR} 1)

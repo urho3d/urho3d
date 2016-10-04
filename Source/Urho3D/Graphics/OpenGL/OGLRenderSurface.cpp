@@ -51,52 +51,7 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
 {
 }
 
-RenderSurface::~RenderSurface()
-{
-    Release();
-}
-
-void RenderSurface::SetNumViewports(unsigned num)
-{
-    viewports_.Resize(num);
-}
-
-void RenderSurface::SetViewport(unsigned index, Viewport* viewport)
-{
-    if (index >= viewports_.Size())
-        viewports_.Resize(index + 1);
-
-    viewports_[index] = viewport;
-}
-
-void RenderSurface::SetUpdateMode(RenderSurfaceUpdateMode mode)
-{
-    updateMode_ = mode;
-}
-
-void RenderSurface::SetLinkedRenderTarget(RenderSurface* renderTarget)
-{
-    if (renderTarget != this)
-        linkedRenderTarget_ = renderTarget;
-}
-
-void RenderSurface::SetLinkedDepthStencil(RenderSurface* depthStencil)
-{
-    if (depthStencil != this)
-        linkedDepthStencil_ = depthStencil;
-}
-
-void RenderSurface::QueueUpdate()
-{
-    updateQueued_ = true;
-}
-
-void RenderSurface::ResetUpdateQueued()
-{
-    updateQueued_ = false;
-}
-
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     Graphics* graphics = parentTexture_->GetGraphics();
     if (!graphics)
@@ -104,10 +59,31 @@ bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned
 
     Release();
 
-    glGenRenderbuffersEXT(1, &renderBuffer_);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
-    glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
-    glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+#ifndef GL_ES_VERSION_2_0
+    if (Graphics::GetGL3Support())
+    {
+        glGenRenderbuffers(1, &renderBuffer_);
+        glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer_);
+        if (multiSample > 1)
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, multiSample, format, width, height);
+        else
+            glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+    else
+#endif
+    {
+        glGenRenderbuffersEXT(1, &renderBuffer_);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, renderBuffer_);
+#ifndef GL_ES_VERSION_2_0
+        if (multiSample > 1)
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, multiSample, format, width, height);
+        else
+#endif
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, width, height);
+        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+    }
+
     return true;
 }
 
@@ -157,31 +133,6 @@ void RenderSurface::Release()
     }
 
     renderBuffer_ = 0;
-}
-
-int RenderSurface::GetWidth() const
-{
-    return parentTexture_->GetWidth();
-}
-
-int RenderSurface::GetHeight() const
-{
-    return parentTexture_->GetHeight();
-}
-
-TextureUsage RenderSurface::GetUsage() const
-{
-    return parentTexture_->GetUsage();
-}
-
-Viewport* RenderSurface::GetViewport(unsigned index) const
-{
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
-}
-
-void RenderSurface::SetTarget(unsigned target)
-{
-    target_ = target;
 }
 
 }

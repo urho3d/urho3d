@@ -194,9 +194,9 @@ public:
     void SetHDRRendering(bool enable);
     /// Set specular lighting on/off.
     void SetSpecularLighting(bool enable);
-    /// Set texture anisotropy.
+    /// Set default texture max anisotropy level.
     void SetTextureAnisotropy(int level);
-    /// Set texture filtering.
+    /// Set default texture filtering.
     void SetTextureFilterMode(TextureFilterMode mode);
     /// Set texture quality level. See the QUALITY constants in GraphicsDefs.h.
     void SetTextureQuality(int quality);
@@ -212,6 +212,8 @@ public:
     void SetShadowSoftness(float shadowSoftness);
     /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
+    /// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
+    void SetVSMMultiSample(int multiSample);
     /// Set post processing filter to the shadow map
     void SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr);
     /// Set reuse of shadow maps. Default is true. If disabled, also transparent geometry can be shadowed.
@@ -265,10 +267,10 @@ public:
     /// Return whether drawing shadows is enabled.
     bool GetDrawShadows() const { return drawShadows_; }
 
-    /// Return texture anisotropy.
+    /// Return default texture max. anisotropy level.
     int GetTextureAnisotropy() const { return textureAnisotropy_; }
 
-    /// Return texture filtering.
+    /// Return default texture filtering mode.
     TextureFilterMode GetTextureFilterMode() const { return textureFilterMode_; }
 
     /// Return texture quality level.
@@ -286,8 +288,11 @@ public:
     /// Return shadow softness.
     float GetShadowSoftness() const { return shadowSoftness_; }
 
-    /// Return VSM shadow parameters
+    /// Return VSM shadow parameters.
     Vector2 GetVSMShadowParameters() const { return vsmShadowParams_; };
+
+    /// Return VSM shadow multisample level.
+    int GetVSMMultiSample() const { return vsmMultiSample_; }
 
     /// Return whether shadow maps are reused.
     bool GetReuseShadowMaps() const { return reuseShadowMaps_; }
@@ -389,9 +394,9 @@ public:
     Texture2D* GetShadowMap(Light* light, Camera* camera, unsigned viewWidth, unsigned viewHeight);
     /// Allocate a rendertarget or depth-stencil texture for deferred rendering or postprocessing. Should only be called during actual rendering, not before.
     Texture* GetScreenBuffer
-        (int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0);
+        (int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb, unsigned persistentKey = 0);
     /// Allocate a depth-stencil surface that does not need to be readable. Should only be called during actual rendering, not before.
-    RenderSurface* GetDepthStencil(int width, int height);
+    RenderSurface* GetDepthStencil(int width, int height, int multiSample, bool autoResolve);
     /// Allocate an occlusion buffer.
     OcclusionBuffer* GetOcclusionBuffer(Camera* camera);
     /// Allocate a temporary shadow camera and a scene node for it. Is thread-safe.
@@ -545,6 +550,8 @@ private:
     float shadowSoftness_;
     /// Shadow parameters when VSM is used, they help to reduce light bleeding.
     Vector2 vsmShadowParams_;
+    /// Multisample level for VSM shadows.
+    int vsmMultiSample_;
     /// Maximum number of shadow maps per resolution.
     int maxShadowMaps_;
     /// Minimum number of instances required in a batch group to render as instanced.

@@ -53,21 +53,21 @@ typedef Vector<PListValue> PListValueVector;
 class URHO3D_API PListValue
 {
 public:
-    // Construct.
+    /// Construct.
     PListValue();
-    // Construct from int.
+    /// Construct from int.
     PListValue(int value);
-    // Construct from boolean.
+    /// Construct from boolean.
     PListValue(bool value);
-    // Construct from float.
+    /// Construct from float.
     PListValue(float value);
-    // Construct from string.
+    /// Construct from string.
     PListValue(const String& value);
-    // Construct from value map.
+    /// Construct from value map.
     PListValue(PListValueMap& valueMap);
-    // Construct from value vector.
+    /// Construct from value vector.
     PListValue(PListValueVector& valueVector);
-    // Construct from another value.
+    /// Construct from another value.
     PListValue(const PListValue& value);
     /// Destruct.
     ~PListValue();

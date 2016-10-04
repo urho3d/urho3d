@@ -160,7 +160,7 @@ void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void Slider::OnResize()
+void Slider::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
     UpdateSlider();
 }

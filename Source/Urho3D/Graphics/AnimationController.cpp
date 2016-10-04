@@ -28,6 +28,7 @@
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
 #include "../Graphics/AnimationState.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Resource/ResourceCache.h"
@@ -366,6 +367,10 @@ bool AnimationController::SetWeight(const String& name, float weight)
     animations_[index].setWeight_ = (unsigned char)(weight * 255.0f);
     animations_[index].setWeightTtl_ = COMMAND_STAY_TIME;
     ++animations_[index].setWeightRev_;
+    // Cancel any ongoing weight fade
+    animations_[index].targetWeight_ = weight;
+    animations_[index].fadeTime_ = 0.0f;
+
     MarkNetworkUpdate();
     return true;
 }
@@ -866,7 +871,7 @@ void AnimationController::RemoveAnimationState(AnimationState* state)
 
 void AnimationController::FindAnimation(const String& name, unsigned& index, AnimationState*& state) const
 {
-    StringHash nameHash(name);
+    StringHash nameHash(GetInternalPath(name));
 
     // Find the AnimationState
     state = GetAnimationState(nameHash);

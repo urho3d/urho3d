@@ -53,7 +53,7 @@ struct CharLocation
 /// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
-    // Construct.
+    /// Construct.
     GlyphLocation(int x, int y, const FontGlyph* glyph) :
         x_(x),
         y_(y),
@@ -89,14 +89,16 @@ public:
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
     /// React to indent change.
     virtual void OnIndentSet();
 
-    /// Set font and font size and use signed distance field.
+    /// Set font by looking from resource cache by name and font size. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
-    /// Set font and font size and use signed distance field.
+    /// Set font and font size. Return true if successful.
     bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    /// Set font size only while retaining the existing font. Return true if successful.
+    bool SetFontSize(int size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
@@ -200,6 +202,10 @@ public:
     void SetFontAttr(const ResourceRef& value);
     /// Return font attribute.
     ResourceRef GetFontAttr() const;
+    /// Set text attribute.
+    void SetTextAttr(const String& value);
+    /// Return text attribute.
+    String GetTextAttr() const;
 
 protected:
     /// Filter implicit attributes in serialization process.
@@ -269,7 +275,7 @@ protected:
     PODVector<CharLocation> charLocations_;
     /// The text will be automatically translated.
     bool autoLocalizable_;
-    /// Storage string id. Used when enabled autoLocalizable.
+    /// Localization string id storage. Used when autoLocalizable flag is set.
     String stringId_;
     /// Handle change Language.
     void HandleChangeLanguage(StringHash eventType, VariantMap& eventData);

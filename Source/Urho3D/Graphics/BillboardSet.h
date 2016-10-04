@@ -95,6 +95,8 @@ public:
     void SetFixedScreenSize(bool enable);
     /// Set how the billboards should rotate in relation to the camera. Default is to follow camera rotation on all axes (FC_ROTATE_XYZ.)
     void SetFaceCameraMode(FaceCameraMode mode);
+    /// Set minimal angle between billboard normal and look-at direction.
+    void SetMinAngle(float angle);
     /// Set animation LOD bias.
     void SetAnimationLodBias(float bias);
     /// Mark for bounding box and vertex buffer update. Call after modifying the billboards.
@@ -126,6 +128,9 @@ public:
 
     /// Return how the billboards rotate in relation to the camera.
     FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
+
+    /// Return minimal angle between billboard normal and look-at direction.
+    float GetMinAngle() const { return minAngle_; }
 
     /// Return animation LOD bias.
     float GetAnimationLodBias() const { return animationLodBias_; }
@@ -165,6 +170,8 @@ protected:
     bool fixedScreenSize_;
     /// Billboard rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Minimal angle between billboard normal and look-at direction.
+    float minAngle_;
 
 private:
     /// Resize billboard vertex and index buffers.

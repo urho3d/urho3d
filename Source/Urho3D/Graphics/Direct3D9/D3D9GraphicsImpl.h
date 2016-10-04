@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include "../../Graphics/ShaderProgram.h"
+#include "../../Graphics/VertexDeclaration.h"
 #include "../../Math/Color.h"
 
 #include <d3d9.h>
-
-struct SDL_Window;
 
 namespace Urho3D
 {
@@ -34,6 +34,9 @@ namespace Urho3D
 #define URHO3D_SAFE_RELEASE(p) if (p) { ((IUnknown*)p)->Release();  p = 0; }
 
 #define URHO3D_LOGD3DERROR(msg, hr) URHO3D_LOGERRORF("%s (HRESULT %x)", msg, (unsigned)hr)
+
+typedef HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> > ShaderProgramMap;
+typedef HashMap<unsigned long long, SharedPtr<VertexDeclaration> > VertexDeclarationMap;
 
 /// %Graphics implementation. Holds API-specific objects.
 class URHO3D_API GraphicsImpl
@@ -50,18 +53,16 @@ public:
     /// Return device capabilities.
     const D3DCAPS9& GetDeviceCaps() const { return deviceCaps_; }
 
-    /// Return window.
-    SDL_Window* GetWindow() const { return window_; }
-
     /// Return adapter identifier.
     const D3DADAPTER_IDENTIFIER9& GetAdapterIdentifier() const { return adapterIdentifier_; }
 
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
 
+    /// Return whether a multisample level is supported.
+    bool CheckMultiSampleSupport(D3DFORMAT format, int level);
+
 private:
-    /// SDL window.
-    SDL_Window* window_;
     /// Direct3D interface.
     IDirect3D9* interface_;
     /// Direct3D device.
@@ -92,8 +93,14 @@ private:
     D3DTEXTUREADDRESS vAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture W coordinate addressing modes in use.
     D3DTEXTUREADDRESS wAddressModes_[MAX_TEXTURE_UNITS];
+    /// Texture anisotropy setting in use.
+    unsigned maxAnisotropy_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use.
     Color borderColors_[MAX_TEXTURE_UNITS];
+    /// Device lost flag.
+    bool deviceLost_;
+    /// Frame query issued flag.
+    bool queryIssued_;
     /// sRGB mode in use.
     bool sRGBModes_[MAX_TEXTURE_UNITS];
     /// sRGB write flag.
@@ -110,6 +117,19 @@ private:
     D3DBLEND destBlend_;
     /// Blend operation.
     D3DBLENDOP blendOp_;
+    /// Vertex declarations.
+    VertexDeclarationMap vertexDeclarations_;
+    /// Stream frequencies by vertex buffer.
+    unsigned streamFrequencies_[MAX_VERTEX_STREAMS];
+    /// Stream offsets by vertex buffer.
+    unsigned streamOffsets_[MAX_VERTEX_STREAMS];
+    /// Vertex declaration in use.
+    VertexDeclaration* vertexDeclaration_;
+    /// Shader programs.
+    ShaderProgramMap shaderPrograms_;
+    /// Shader program in use.
+    ShaderProgram* shaderProgram_;
+
 };
 
 }

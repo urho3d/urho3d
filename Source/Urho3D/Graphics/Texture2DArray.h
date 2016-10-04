@@ -22,10 +22,76 @@
 
 #pragma once
 
-#if defined(URHO3D_OPENGL)
-#include "OpenGL/OGLTexture2DArray.h"
-#elif defined(URHO3D_D3D11)
-#include "Direct3D11/D3D11Texture2DArray.h"
-#else
-#include "Direct3D9/D3D9Texture2DArray.h"
-#endif
+#include "../Container/Ptr.h"
+#include "../Graphics/RenderSurface.h"
+#include "../Graphics/Texture.h"
+
+namespace Urho3D
+{
+
+class Deserializer;
+class Image;
+
+/// 2D texture array resource.
+class URHO3D_API Texture2DArray : public Texture
+{
+    URHO3D_OBJECT(Texture2DArray, Texture)
+
+public:
+    /// Construct.
+    Texture2DArray(Context* context);
+    /// Destruct.
+    virtual ~Texture2DArray();
+    /// Register object factory.
+    static void RegisterObject(Context* context);
+
+    /// Load resource from stream. May be called from a worker thread. Return true if successful.
+    virtual bool BeginLoad(Deserializer& source);
+    /// Finish resource loading. Always called from the main thread. Return true if successful.
+    virtual bool EndLoad();
+    /// Mark the GPU resource destroyed on context destruction.
+    virtual void OnDeviceLost();
+    /// Recreate the GPU resource and restore data if applicable.
+    virtual void OnDeviceReset();
+    /// Release the texture.
+    virtual void Release();
+
+    /// Set the number of layers in the texture. To be used before SetData.
+    void SetLayers(unsigned layers);
+    /// Set layers, size, format and usage. Set layers to zero to leave them unchanged. Return true if successful.
+    bool SetSize(unsigned layers, int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    /// Set data either partially or fully on a layer's mip level. Return true if successful.
+    bool SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data);
+    /// Set data of one layer from a stream. Return true if successful.
+    bool SetData(unsigned layer, Deserializer& source);
+    /// Set data of one layer from an image. Return true if successful. Optionally make a single channel image alpha-only.
+    bool SetData(unsigned layer, Image* image, bool useAlpha = false);
+
+    /// Return number of layers in the texture.
+    unsigned GetLayers() const { return layers_; }
+    /// Get data from a mip level. The destination buffer must be big enough. Return true if successful.
+    bool GetData(unsigned layer, unsigned level, void* dest) const;
+    /// Return render surface.
+    RenderSurface* GetRenderSurface() const { return renderSurface_; }
+
+protected:
+    /// Create the GPU texture.
+    virtual bool Create();
+
+private:
+    /// Handle render surface update event.
+    void HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData);
+
+    /// Texture array layers number.
+    unsigned layers_;
+    /// Render surface.
+    SharedPtr<RenderSurface> renderSurface_;
+    /// Memory use per layer.
+    PODVector<unsigned> layerMemoryUse_;
+    /// Layer image files acquired during BeginLoad.
+    Vector<SharedPtr<Image> > loadImages_;
+    /// Parameter file acquired during BeginLoad.
+    SharedPtr<XMLFile> loadParameters_;
+};
+
+}

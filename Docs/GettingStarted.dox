@@ -18,9 +18,9 @@ Although all required third-party libraries are included as source code, there a
     - unixodbc-dev (Debian-based) or unixODBC-devel (RedHat-based) for ODBC driver manager.
   + Display server (essential). One or more of these can be installed at the same time. When multiple display servers are available, X11 takes precedence (overridable using SDL_VIDEODRIVER environment variable during application runtime).
     - libdirectfb-dev (Debian-based only) for Direct Frame Buffer (DirectFB). Disabled by default even when installed, use SDL_OPT_VIDEO_DIRECTFB build option to enable.
-    - mir-client-platform-mesa-dev and mircommon-dev (Ubuntu only) for Mir.
-    - libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based only, pre-installed on Fedora 22+) for Wayland.
-    - libx11-dev and libxrandr-dev (Debian-based) or libX11-devel and libXrandr-devel (RedHat-based) for X11.
+    - libegl1-mesa-dev and mir-client-platform-mesa-dev (Ubuntu only) for Mir.
+    - libegl1-mesa-dev and libwayland-dev (Debian-based) or libwayland-client-devel, libwayland-cursor-devel, and mesa-libwayland-egl-devel (RedHat-based) for Wayland.
+    - libx11-dev, libxcursor-dev, libxext-dev, libxi-dev, libxinerama-dev, libxrandr-dev, libxrender-dev, libxss-dev, and libxxf86vm-dev (Debian-based) or libX11-devel, libXcursor-devel, libXext-devel, libXi-devel, libXinerama-devel, libXrandr-devel, libXrender-devel, libXScrnSaver-devel, and libXxf86vm-devel (RedHat-based) for X11 and its extensions. Alternatively, you can use xorg-devel meta package on Debian-based system, but it would install other unneeded packages as well.
   + %Sound server (essential). One or more of these can be installed at the same time. When multiple sound servers are available, PulseAudio takes precedence (overridable using SDL_AUDIODRIVER environment variable during application runtime).
     - libasound2-dev (Debian-based) or  alsa-lib-devel (RedHat-based) for Advanced Linux %Sound Architecture (ALSA).
     - arts-devel (RedHat-based only) for Analog Real %Time Synthesizer (aRts).
@@ -30,9 +30,10 @@ Although all required third-party libraries are included as source code, there a
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio.
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + Miscellaneous (optional).
-    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
+    - libdbus-1-dev (Debian-based) or dbus-devel (Redhat-based) for system-wide messaging (e.g. inhibiting screen-saver).
     - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.
     - libts-dev (Debian-based) or tslib-devel (RedHat-based) for resistive, single-touch touchscreen input for embedded Linux device, e.g. Pandora and Wiz. Modern multi-touch touchscreen does not need this.
+    - libudev-dev (Debian-based) or systemd-devel (Redhat-based) for input device hot-plugging.
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian)o or libevdev (Pidora).
 
@@ -62,7 +63,7 @@ SSE2 requirement can be eliminated by disabling the use of SSE2 instruction set,
 
 The NEON instruction set will be used by default whenever it is available. See the ANDROID_ABI and RPI_ABI build options for more detail for Android and Raspberry-Pi platforms, respectively. The NEON instruction set is always used on iOS and tVOS platforms.
 
-CMake (http://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
+CMake (https://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 2.8.6. However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
@@ -115,7 +116,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_DATABASE_ODBC |0|Enable %Database support with ODBC, requires vendor-specific ODBC driver|
 |URHO3D_DATABASE_SQLITE|0|Enable %Database support with SQLite embedded|
-|URHO3D_C++11         |0|Enable use of C++11 standard|
+|URHO3D_C++11         |0|Enable use of C++11 standard; it is not enabled by default, but certain build option combinations will force it enabled internally, such as: URHO3D_ANGELSCRIPT on Web platform and Android/ARM platforms that use aarch64 architecture, and URHO3D_DATABASE_ODBC on all platforms|
 |URHO3D_MMX           |0|Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support|
 |URHO3D_3DNOW         |0|Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support|
 |URHO3D_SSE           |*|Enable SSE/SSE2 instruction set (32-bit Web and Intel platforms only, including Android on Intel Atom); default to true on Intel and false on Web platform; the effective SSE level could be higher, see also URHO3D_DEPLOYMENT_TARGET and CMAKE_OSX_DEPLOYMENT_TARGET build options|
@@ -152,9 +153,9 @@ A number of build options can be defined when invoking the build scripts or when
 |RPI_PREFIX           |-|Prefix path to Raspberry Pi cross-compiler tools (RPI cross-compiling build only)|
 |RPI_SYSROOT          |-|Path to Raspberry Pi system root (RPI cross-compiling build only)|
 |RPI_ABI              |*|Specify target ABI (RPI build only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4|
-|ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (Linux on ARM cross-compiling build only)|
-|ARM_SYSROOT          |-|Path to ARM system root (Linux on ARM cross-compiling build only)|
-|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
+|ARM_PREFIX           |-|Prefix path to ARM cross-compiler tools (ARM on Linux cross-compiling build only)|
+|ARM_SYSROOT          |-|Path to ARM system root (ARM on Linux cross-compiling build only)|
+|ARM_ABI_FLAGS        |-|Specify ABI compiler flags (ARM on Linux cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'|
 |EMSCRIPTEN_ROOT_PATH |-|Root path to Emscripten cross-compiler tools (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_SYSROOT   |-|Path to Emscripten system root (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
@@ -185,7 +186,7 @@ Note that Eclipse requires CDT plugin to build a C/C++ project.
 
 On Windows platform Urho3D can use either Direct3D 9 (default), Direct3D 11 or OpenGL rendering. Other platforms always use OpenGL. Use the CMake options "-DURHO3D_D3D11=1" or "-DURHO3D_OPENGL=1" to choose the non-default APIs.
 
-If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D can be enabled with the "-DURHO3D_OPENGL=0" build option.
+If using MinGW to compile, DirectX headers may need to be acquired separately. They can be copied to the MinGW installation eg. from the following package: https://www.libsdl.org/extras/win32/common/directx-devel.tar.gz. These will be missing some of the headers related to shader compilation, so a MinGW build will use OpenGL by default. To build in Direct3D mode, the MinGW-w64 port is necessary: http://mingw-w64.sourceforge.net/. Using it, Direct3D can be enabled with the "-DURHO3D_OPENGL=0" build option.
 
 After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
 
@@ -241,30 +242,42 @@ To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run"
 
 \section Building_RaspberryPi Raspberry Pi build process
 
-For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above.
+For native build on Raspberry Pi itself, use the similar process for \ref Building_Native "Native build process" described above for Linux platform.
 
-For cross-compiling build on an Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi Cross-Compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
+For cross-compiling build on a Linux host system, firstly set the RPI_PREFIX environment variable or build option to point to your Raspberry Pi cross-compiling tool are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just clone one from https://github.com/raspberrypi/tools. Secondly, set the RPI_SYSROOT environment variable or build option to point to your Raspbian or Pidora system root. You must install the Urho3D prerequisites software development packages for Raspberry Pi (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. You are recommended to download the Raspbian system root with Urho3D prerequisite software installed from https://github.com/urho3d/rpi-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual Raspberry Pi device to your host system via SSHFS and set the RPI_SYSROOT to use the mount point.
 
 Execute cmake_raspi.sh then go to the build tree to execute make command. You may pass the optional RPI_ABI build option to specifically target for the Raspberry Pi 2. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
 
 You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DRPI=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target Raspberry Pi device as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target Raspberry Pi device.
 
+\section Building_GenericARM Generic ARM build process (EXPERIMENTAL)
+
+For native build on ARM board itself, use the similar process for \ref Building_Native "Native build process" described above for Linux platform.
+
+> At the moment we only support generic ARM on Linux platform. Other platforms/OSes are not supported yet.
+
+For cross-compiling build on a Linux host system, firstly set the ARM_PREFIX environment variable or build option to point to your ARM cross-compiling tools are located. You can setup the tool using <a href="http://crosstool-ng.org/">crosstool-NG</a> or just download one from http://www.linaro.org/downloads/. You need to obtain the little-endian version of the armhf or aarch64 compiler toolchains for setting up a 32-bit or 64-bit build environment, respectively. Secondly, set the ARM_SYSROOT environment variable or build option to point to your generic ARM system root. Similarly you need to obtain the armhf (hard float) sysroot for 32-bit or arm64 (aarch64) sysroot for 64-bit. You must install the Urho3D prerequisites software development packages for Linux platform (see \ref Building_Prerequisites) in the system root before attempting to do the Urho3D cross-compiling build. There are a few ways to obtain and prepare the sysroots yourself but the easiest way is to download the already prepared one from https://github.com/urho3d/armhf-sysroot or https://github.com/urho3d/arm64-sysroot. Alternatively, if you have a fast LAN connection then you can also opt to mount the system root on your actual ARM board to your host system via SSHFS and set the ARM_SYSROOT to use the mount point.
+
+Execute cmake_arm.sh then go to the build tree to execute make command. You may pass the optional ARM_ABI_FLAGS build option to specifically target the CPU and FPU on your ARM board. For example: "-mcpu=cortex-a9 -mfpu=neon-fp16" for ODROID-X2, "-mcpu=cortex-a53" for ODROID-C2, "-mcpu=cortex-a7 -mfpu=neon-vfpv4" for Orange Pi, etc. After the build is complete, the ARM executables can be found in the build tree's "bin" subdirectory.
+
+You can also build, deploy, run/debug (as C/C++ Remote %Application) using Eclipse IDE. To do that, execute cmake_eclipse.sh with "-DARM=1" build option set. Import the CMake generated Eclipse project in the build tree into Eclipse's workspace. Build the project as usual. Optionally, use the "URHO3D_SCP_TO_TARGET" build option to automatically deploy the ARM executables to target ARM board as part of build process; or configure Eclipse to perform a "download to target path" in the Run/Debug configuration for C/C++ Remote %Application. Either way, you have to configure the Run/Debug configuration to let it know how to reach your target ARM board.
+
 \section Building_MinGW MinGW cross-compile build process
 
 It is possible to cross-compile Urho3D for Windows using a Linux host system. The process is largely the same as the \ref Building_Native "Linux native build" process described above.
 
-To cross-compile, the MinGW toolchain (compiler, linker and w32api) needs to be installed on the system. You will also need the DirectX header files, those can be downloaded and installed from the following packet: http://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
+To cross-compile, the MinGW toolchain (compiler, linker and w32api) needs to be installed on the system. You will also need the DirectX header files, those can be downloaded and installed from the following packet: https://www.libsdl.org/extras/win32/common/directx-devel.tar.gz.
 
 For activating the MinGW toolchain, and to allow it to find the correct compiler, the MINGW_PREFIX environment variable needs to be set. This variable should be set to the prefix of the compiler name, e.g. /usr/bin/x86_64-w64-mingw32 where it would be used to find /usr/bin/x86_64-w64-mingw32-gcc and /usr/bin/x86_64-w64-mingw32-g++, etc. Optionally you can also set MINGW_SYSROOT environment variable or build option to point to your MinGW system root, if it is not installed in a normal expected location.
 
 Execute cmake_mingw.sh then go to the build tree to execute make command. After the build is complete, the Windows executables can be found in the build tree's "bin" subdirectory.
 
-\section Building_Emscripten Emscripten build process (EXPERIMENTAL)
+\section Building_Emscripten Emscripten build process
 
 > WHAT DOESN'T WORK:
 >    - Networking. Javascript can only use http and websockets protocols so it's not likely that kNet will ever function.
 
-This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
+This section assumes you have already updated, installed, and activated the latest Emscripten cross-compiler toolchain on your host system as per described in https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html.
 
 Set the EMSCRIPTEN_ROOT_PATH environment variable or build option to point to the root path of Emscripten cross-compiler tools. Alternatively, call the emsdk_env script to set the EMSCRIPTEN environment variable for you. The Emscripten sysroot path will be derived from the root path, usually from 'system' subdir relative to the root path. However, you can optionally set the EMSCRIPTEN_SYSROOT environment variable or build option to point to another system root path.
 
@@ -277,7 +290,7 @@ ulimit -Sn 512
 
 After the commands finish successfully, the HTMLs and its corresponding data files should have been generated in the build tree's "bin" subdirectory, from where it can be launched in a browser.
 
-On Windows building with Emscripten requires a MinGW toolchain. The one that can be installed through emsdk may not work correctly, but for example http://sourceforge.net/projects/mingw-w64/ with the default install settings has been known to work.
+On Windows building with Emscripten requires a MinGW toolchain. The one that can be installed through emsdk may not work correctly, but for example https://sourceforge.net/projects/mingw-w64/ with the default install settings has been known to work.
 
 If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <sdk-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
 
@@ -355,11 +368,11 @@ for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache)
 On Xcode 6 or above:
 \verbatim
 cd $(dirname $(xcodebuild -find-executable clang))
-cp -p $(which ccache) .
-for compiler in clang clang++; do mv $compiler{,.orig} && sudo mv /usr/bin/$compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/bin/$compiler && ln -sf ccache $compiler; done
+sudo cp -p $(which ccache) .
+for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done
 \endverbatim
 
-Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading 'ccache'.
+Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
 
 \page Running Running Urho3D player application
 
@@ -819,6 +832,7 @@ F1                 - Toggle console
 F2                 - Toggle rendering debug geometry
 F3                 - Toggle physics debug geometry
 F4                 - Toggle octree debug geometry
+F5                 - Toggle navigation debug geometry
 F11                - Captures a screenshot
 F12                - Toggle UI
 \endverbatim
@@ -878,7 +892,9 @@ New scene nodes and components are created from the Create menu at the top. Thei
 
 As an alternative to using the transform gizmo, scene nodes can be moved/rotated/scaled by Ctrl + arrow keys and Page Up / Page Down. Press Ctrl+1,2,3 to change the manipulation mode, and Ctrl+4 to toggle between world relative and scene node relative movement.
 
-To reparent scene nodes, drag and drop them onto the new parent scene node in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
+To reparent scene nodes or UI elements, drag and drop them onto the new parent in the scene hierarchy window. Reparenting should retain the effective world transform, so check afterwards from the component window that the local transform is what you expect it to be. Components can not be dragged between nodes, but can be duplicated with cut/copy/paste operations.
+
+To reorder nodes or UI elements within the same parent instead of reparenting, hold down Ctrl while dragging and dropping.
 
 To locate a scene node from the scene, double-click it in the hierarchy window.
 

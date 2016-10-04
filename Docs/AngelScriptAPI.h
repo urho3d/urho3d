@@ -711,6 +711,7 @@ uint lightMask;
 float lodBias;
 Material material;
 uint maxLights;
+float minAngle;
 /* readonly */
 Node node;
 /* readonly */
@@ -833,9 +834,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -880,6 +884,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -907,10 +912,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -923,6 +932,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -1076,9 +1086,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetPressedChildOffset(int, int);
 void SetPressedOffset(int, int);
@@ -1126,6 +1139,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -1153,10 +1167,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -1169,6 +1187,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 /* readonly */
 bool pressed;
@@ -1276,6 +1295,8 @@ float fov;
 /* readonly */
 Frustum frustum;
 /* readonly */
+Matrix4 gpuProjection;
+/* readonly */
 float halfViewSize;
 /* readonly */
 uint id;
@@ -1288,7 +1309,6 @@ uint numAttributes;
 ObjectAnimation objectAnimation;
 float orthoSize;
 bool orthographic;
-/* readonly */
 Matrix4 projection;
 Vector2 projectionOffset;
 Plane reflectionPlane;
@@ -1403,9 +1423,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -1452,6 +1475,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -1479,10 +1503,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -1495,6 +1523,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -3631,9 +3660,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetShape(CursorShape);
 void SetShape(const String&);
@@ -3680,6 +3712,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -3707,10 +3740,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -3723,6 +3760,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -4138,6 +4176,7 @@ uint numVertices;
 ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
+bool optimizeBufferSize;
 /* readonly */
 int refs;
 float shadowDistance;
@@ -4169,6 +4208,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -4184,6 +4224,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -4490,9 +4531,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetPressedChildOffset(int, int);
 void SetPressedOffset(int, int);
@@ -4545,6 +4589,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -4576,10 +4621,14 @@ LayoutMode layoutMode;
 int layoutSpacing;
 /* readonly */
 ListView listView;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -4594,6 +4643,7 @@ uint numItems;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 /* readonly */
 UIElement placeholder;
 String placeholderText;
@@ -4804,6 +4854,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -4819,6 +4870,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -4838,6 +4890,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -4853,6 +4906,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -5030,9 +5084,11 @@ class Frustum
 {
 // Methods:
 void Define(const BoundingBox&, const Matrix3x4&);
+void Define(const Matrix4&);
 void Define(const Vector3&, const Vector3&, const Matrix3x4&);
 void Define(float, float, float, float, float, const Matrix3x4&);
 void DefineOrtho(float, float, float, float, float, const Matrix3x4&);
+void DefineSplit(const Matrix4&, float, float);
 float Distance(const Vector3&) const;
 Intersection IsInside(const BoundingBox&);
 Intersection IsInside(const Sphere&);
@@ -5122,6 +5178,7 @@ bool deferredSupport;
 IntVector2 desktopResolution;
 /* readonly */
 bool deviceLost;
+bool dither;
 bool flushGPU;
 /* readonly */
 bool fullscreen;
@@ -5157,6 +5214,7 @@ bool sRGB;
 bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
+String shaderCacheDir;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -5187,6 +5245,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -5202,6 +5261,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -5349,6 +5409,7 @@ class Input
 {
 // Methods:
 int AddScreenJoystick(XMLFile = null, XMLFile = null);
+void CenterMousePosition();
 int GetKeyFromName(const String&) const;
 int GetKeyFromScancode(int) const;
 String GetKeyName(int) const;
@@ -5408,7 +5469,6 @@ int mouseMoveWheel;
 int mouseMoveX;
 /* readonly */
 int mouseMoveY;
-/* readonly */
 IntVector2 mousePosition;
 bool mouseVisible;
 /* readonly */
@@ -5543,9 +5603,15 @@ bool isObject;
 /* readonly */
 bool isString;
 /* readonly */
+JSONNumberType numberType;
+/* readonly */
+String numberTypeName;
+/* readonly */
 uint size;
 /* readonly */
 JSONValueType valueType;
+/* readonly */
+String valueTypeName;
 };
 
 class JoystickState
@@ -5625,6 +5691,8 @@ bool castShadows;
 /* readonly */
 String category;
 Color color;
+/* readonly */
+Color colorFromTemperature;
 float drawDistance;
 /* readonly */
 Color effectiveColor;
@@ -5668,15 +5736,18 @@ float shadowFadeDistance;
 FocusParameters shadowFocus;
 float shadowIntensity;
 uint shadowMask;
+float shadowMaxExtrusion;
 float shadowNearFarRatio;
 float shadowResolution;
 Texture shapeTexture;
 float specularIntensity;
+float temperature;
 bool temporary;
 /* readonly */
 StringHash type;
 /* readonly */
 String typeName;
+bool usePhysicalValues;
 uint viewMask;
 /* readonly */
 int weakRefs;
@@ -5763,9 +5834,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -5816,6 +5890,7 @@ uint dragDropMode;
 uint echoCharacter;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -5843,11 +5918,15 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
 uint maxLength;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -5860,6 +5939,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -5990,9 +6070,12 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetScrollBarsVisible(bool, bool);
 void SetSelections(Array<uint>);
@@ -6046,6 +6129,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -6076,10 +6160,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 bool multiselect;
@@ -6096,6 +6184,7 @@ ObjectAnimation objectAnimation;
 float opacity;
 float pageStep;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -6240,6 +6329,7 @@ void SetUVTransform(const Vector2&, float, float);
 void SortTechniques();
 
 // Properties:
+bool alphaToCoverage;
 /* readonly */
 String category;
 CullMode cullMode;
@@ -6249,8 +6339,8 @@ FillMode fillMode;
 uint memoryUse;
 String name;
 uint numTechniques;
-/* readonly */
 bool occlusion;
+String pixelShaderDefines;
 /* readonly */
 int refs;
 uint8 renderOrder;
@@ -6270,6 +6360,7 @@ StringHash type;
 String typeName;
 /* readonly */
 uint useTimer;
+String vertexShaderDefines;
 /* readonly */
 int weakRefs;
 };
@@ -6466,9 +6557,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPopupOffset(int, int);
 void SetPosition(int, int);
 void SetPressedChildOffset(int, int);
@@ -6521,6 +6615,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -6548,10 +6643,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -6564,6 +6663,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 UIElement popup;
 IntVector2 popupOffset;
 IntVector2 position;
@@ -6687,6 +6787,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -6702,6 +6803,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -6721,6 +6823,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -6736,6 +6839,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -7193,6 +7297,7 @@ void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
 bool RemoveTag(const String&);
+void ReorderComponent(Component, uint);
 void ResetDeepEnabled();
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
@@ -7260,7 +7365,6 @@ Vector3 direction;
 bool enabled;
 /* readonly */
 bool enabledSelf;
-/* readonly */
 uint id;
 String name;
 /* readonly */
@@ -7646,6 +7750,7 @@ void AddColorFrame(ColorFrame);
 void AddColorTime(Color&, float);
 void AddTextureFrame(TextureFrame);
 void AddTextureTime(Rect&, float);
+ParticleEffect Clone(const String& = String ( )) const;
 ColorFrame GetColorFrame(uint) const;
 TextureFrame GetTextureFrame(uint) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -7718,6 +7823,7 @@ int weakRefs;
 class ParticleEffect2D
 {
 // Methods:
+ParticleEffect2D Clone(const String& = String ( )) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -7795,6 +7901,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 Array<Billboard> billboards;
 /* readonly */
@@ -7944,7 +8051,7 @@ class Pass
 {
 
 // Properties:
-bool alphaMask;
+bool alphaToCoverage;
 BlendMode blendMode;
 CullMode cullMode;
 CompareMode depthTestMode;
@@ -7952,10 +8059,12 @@ bool depthWrite;
 bool desktop;
 PassLightingMode lightingMode;
 String pixelShader;
+String pixelShaderDefineExcludes;
 String pixelShaderDefines;
 /* readonly */
 int refs;
 String vertexShader;
+String vertexShaderDefineExcludes;
 String vertexShaderDefines;
 /* readonly */
 int weakRefs;
@@ -8410,6 +8519,8 @@ RenderSurface linkedRenderTarget;
 uint numViewports;
 /* readonly */
 Texture parentTexture;
+/* readonly */
+bool resolveDirty;
 RenderSurfaceUpdateMode updateMode;
 /* readonly */
 TextureUsage usage;
@@ -8422,10 +8533,12 @@ class RenderTargetInfo
 {
 
 // Properties:
+bool autoResolve;
 bool cubemap;
 bool enabled;
 bool filtered;
 uint format;
+int multiSample;
 String name;
 bool persistent;
 bool sRGB;
@@ -8503,6 +8616,7 @@ StringHash type;
 /* readonly */
 String typeName;
 Array<Viewport> viewports;
+int vsmMultiSample;
 Vector2 vsmShadowParameters;
 /* readonly */
 int weakRefs;
@@ -9005,6 +9119,7 @@ void RemoveComponents(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
 bool RemoveTag(const String&);
+void ReorderComponent(Component, uint);
 void ResetToDefault();
 void Roll(float, TransformSpace = TS_LOCAL);
 void Rotate(const Quaternion&, TransformSpace = TS_LOCAL);
@@ -9085,7 +9200,6 @@ Vector3 direction;
 float elapsedTime;
 /* readonly */
 String fileName;
-/* readonly */
 uint id;
 String name;
 /* readonly */
@@ -9369,9 +9483,12 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -9420,6 +9537,7 @@ bool editable;
 /* readonly */
 float effectiveScrollStep;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -9446,10 +9564,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -9463,6 +9585,7 @@ ObjectAnimation objectAnimation;
 float opacity;
 Orientation orientation;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 float range;
@@ -9577,9 +9700,12 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetScrollBarsVisible(bool, bool);
 void SetSize(int, int);
@@ -9627,6 +9753,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -9653,10 +9780,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -9670,6 +9801,7 @@ ObjectAnimation objectAnimation;
 float opacity;
 float pageStep;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -9768,6 +9900,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -9783,6 +9916,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -9981,9 +10115,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -10028,6 +10165,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -10057,10 +10195,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -10074,6 +10216,7 @@ ObjectAnimation objectAnimation;
 float opacity;
 Orientation orientation;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 float range;
@@ -10345,7 +10488,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -10432,7 +10575,7 @@ Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
 Array<Variant> attributes;
-bool autoRemove;
+AutoRemoveMode autoRemoveMode;
 /* readonly */
 String category;
 bool enabled;
@@ -10673,9 +10816,12 @@ void SetFullImageRect();
 void SetHotSpot(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(float, float);
 void SetScale(float);
 void SetScale(float, float);
@@ -10721,6 +10867,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -10747,10 +10894,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -10763,6 +10914,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 Vector2 position;
 int priority;
 /* readonly */
@@ -11192,7 +11344,7 @@ bool ToBool() const;
 Color ToColor() const;
 double ToDouble() const;
 float ToFloat() const;
-int ToInt() const;
+int ToInt(int = 10) const;
 IntRect ToIntRect() const;
 IntVector2 ToIntVector2() const;
 String ToLower() const;
@@ -11200,7 +11352,7 @@ Matrix3 ToMatrix3() const;
 Matrix3x4 ToMatrix3x4() const;
 Matrix4 ToMatrix4() const;
 Quaternion ToQuaternion() const;
-uint ToUInt() const;
+uint ToUInt(int = 10) const;
 String ToUpper() const;
 Vector2 ToVector2() const;
 Vector3 ToVector3() const;
@@ -11294,6 +11446,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 float GetHeight(const Vector3&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
+TerrainPatch GetNeighborPatch(int, int) const;
 Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -11320,6 +11473,7 @@ void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
 void SetInterceptNetworkUpdate(const String&, bool);
+void SetNeighbors(Terrain, Terrain, Terrain, Terrain);
 IntVector2 WorldToHeightMap(const Vector3&) const;
 
 // Properties:
@@ -11333,6 +11487,7 @@ bool castShadows;
 /* readonly */
 String category;
 float drawDistance;
+Terrain eastNeighbor;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -11346,6 +11501,7 @@ uint maxLights;
 uint maxLodLevels;
 /* readonly */
 Node node;
+Terrain northNeighbor;
 /* readonly */
 uint numAttributes;
 /* readonly */
@@ -11364,6 +11520,7 @@ int refs;
 float shadowDistance;
 uint shadowMask;
 bool smoothing;
+Terrain southNeighbor;
 Vector3 spacing;
 bool temporary;
 /* readonly */
@@ -11373,6 +11530,7 @@ String typeName;
 uint viewMask;
 /* readonly */
 int weakRefs;
+Terrain westNeighbor;
 uint zoneMask;
 };
 
@@ -11540,9 +11698,12 @@ bool SetFont(Font, int);
 bool SetFont(const String&, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSelection(uint, uint = M_MAX_UNSIGNED);
 void SetSize(int, int);
@@ -11595,6 +11756,7 @@ bool effectRoundStroke;
 IntVector2 effectShadowOffset;
 int effectStrokeThickness;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -11608,7 +11770,6 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -11624,10 +11785,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -11644,6 +11809,7 @@ uint numRows;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -11763,7 +11929,6 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-/* readonly */
 int fontSize;
 HorizontalAlignment horizontalAlignment;
 /* readonly */
@@ -11829,6 +11994,9 @@ void SetNumLevels(uint);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11853,9 +12021,13 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -11885,10 +12057,13 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, int, uint, TextureUsage = TEXTURE_STATIC, int = 1, bool = true);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11913,11 +12088,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 RenderSurface renderSurface;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -11950,6 +12129,9 @@ bool SetSize(uint, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -11975,11 +12157,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 RenderSurface renderSurface;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -12012,6 +12198,9 @@ bool SetSize(int, int, int, uint, TextureUsage = TEXTURE_STATIC);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12036,9 +12225,13 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -12068,10 +12261,13 @@ bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetData(CubeMapFace, Image, bool = false);
 void SetNumLevels(uint);
-bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC);
+bool SetSize(int, uint, TextureUsage = TEXTURE_STATIC, int = 1);
 
 // Properties:
 Array<TextureAddressMode> addressMode;
+uint anisotropy;
+/* readonly */
+bool autoResolve;
 Texture backupTexture;
 Color borderColor;
 /* readonly */
@@ -12096,11 +12292,15 @@ uint levels;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
+/* readonly */
+int multiSample;
 String name;
 /* readonly */
 int refs;
 /* readonly */
 Array<RenderSurface> renderSurfaces;
+/* readonly */
+bool resolveDirty;
 bool sRGB;
 /* readonly */
 StringHash type;
@@ -12490,9 +12690,12 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -12536,6 +12739,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -12560,10 +12764,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -12576,6 +12784,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -12641,6 +12850,7 @@ UIElement LoadLayout(XMLFile, XMLFile);
 bool SaveLayout(File, UIElement);
 bool SaveLayout(VectorBuffer&, UIElement);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetCustomSize(int, int);
 void SetFocusElement(UIElement, bool = false);
 void SetHeight(float);
 void SetWidth(float);
@@ -12653,6 +12863,7 @@ String clipBoardText;
 Cursor cursor;
 /* readonly */
 IntVector2 cursorPosition;
+IntVector2 customSize;
 float defaultToolTipDelay;
 float doubleClickInterval;
 int dragBeginDistance;
@@ -12757,9 +12968,12 @@ void SetFixedSize(int, int);
 void SetFixedWidth(int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -12802,6 +13016,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -12826,10 +13041,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 String name;
@@ -12842,6 +13061,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -13055,6 +13275,7 @@ double ReadDouble();
 String ReadFileID();
 float ReadFloat();
 int ReadInt();
+int64 ReadInt64();
 IntRect ReadIntRect();
 IntVector2 ReadIntVector2();
 String ReadLine();
@@ -13070,6 +13291,7 @@ String ReadString();
 StringHash ReadStringHash();
 uint8 ReadUByte();
 uint ReadUInt();
+uint64 ReadUInt64();
 uint16 ReadUShort();
 uint ReadVLE();
 Variant ReadVariant();
@@ -13090,6 +13312,7 @@ bool WriteDouble(double);
 bool WriteFileID(const String&);
 bool WriteFloat(float);
 bool WriteInt(int);
+bool WriteInt64(int64);
 bool WriteIntRect(const IntRect&);
 bool WriteIntVector2(const IntVector2&);
 bool WriteLine(const String&);
@@ -13105,6 +13328,7 @@ bool WriteString(const String&);
 bool WriteStringHash(const StringHash&);
 bool WriteUByte(uint8);
 bool WriteUInt(uint);
+bool WriteUInt64(uint64);
 bool WriteUShort(uint16);
 bool WriteVLE(uint);
 bool WriteVariant(const Variant&);
@@ -13257,9 +13481,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -13310,6 +13537,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -13340,10 +13568,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 bool modal;
@@ -13362,6 +13594,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -13526,9 +13759,12 @@ void SetFullImageRect();
 void SetHoverOffset(int, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
+void SetMaxAnchor(float, float);
 void SetMaxSize(int, int);
+void SetMinAnchor(float, float);
 void SetMinSize(int, int);
 void SetParent(UIElement, uint = M_MAX_UNSIGNED);
+void SetPivot(float, float);
 void SetPosition(int, int);
 void SetSize(int, int);
 bool SetStyle(const String&, XMLFile = null);
@@ -13573,6 +13809,7 @@ int dragButtonCount;
 uint dragDropMode;
 bool editable;
 bool elementEventSender;
+bool enableAnchor;
 bool enabled;
 /* readonly */
 bool enabledSelf;
@@ -13602,10 +13839,14 @@ IntRect layoutBorder;
 Vector2 layoutFlexScale;
 LayoutMode layoutMode;
 int layoutSpacing;
+Vector2 maxAnchor;
 int maxHeight;
+IntVector2 maxOffset;
 IntVector2 maxSize;
 int maxWidth;
+Vector2 minAnchor;
 int minHeight;
+IntVector2 minOffset;
 IntVector2 minSize;
 int minWidth;
 bool modal;
@@ -13624,6 +13865,7 @@ uint numChildren;
 ObjectAnimation objectAnimation;
 float opacity;
 UIElement parent;
+Vector2 pivot;
 IntVector2 position;
 int priority;
 /* readonly */
@@ -13925,6 +14167,13 @@ ABM_LERP,
 ABM_ADDITIVE,
 };
 
+enum AutoRemoveMode
+{
+REMOVE_DISABLED,
+REMOVE_COMPONENT,
+REMOVE_NODE,
+};
+
 enum BlendMode
 {
 BLEND_REPLACE,
@@ -14088,6 +14337,7 @@ FC_ROTATE_XYZ,
 FC_ROTATE_Y,
 FC_LOOKAT_XYZ,
 FC_LOOKAT_Y,
+FC_LOOKAT_MIXED,
 FC_DIRECTION,
 };
 
@@ -14125,6 +14375,7 @@ enum HorizontalAlignment
 HA_LEFT,
 HA_CENTER,
 HA_RIGHT,
+HA_CUSTOM,
 };
 
 enum HttpRequestState
@@ -14155,6 +14406,14 @@ enum Intersection
 OUTSIDE,
 INTERSECTS,
 INSIDE,
+};
+
+enum JSONNumberType
+{
+JSONNT_NAN,
+JSONNT_INT,
+JSONNT_UINT,
+JSONNT_FLOAT_DOUBLE,
 };
 
 enum JSONValueType
@@ -14208,6 +14467,7 @@ enum NavigationPushiness
 NAVIGATIONPUSHINESS_LOW,
 NAVIGATIONPUSHINESS_MEDIUM,
 NAVIGATIONPUSHINESS_HIGH,
+NAVIGATIONPUSHINESS_NONE,
 };
 
 enum NavigationQuality
@@ -14476,6 +14736,7 @@ enum VerticalAlignment
 VA_TOP,
 VA_CENTER,
 VA_BOTTOM,
+VA_CUSTOM,
 };
 
 enum WrapMode
@@ -14633,6 +14894,7 @@ UI ui;
 uint AM_COMPONENTID;
 uint AM_DEFAULT;
 uint AM_FILE;
+uint AM_FILEREADONLY;
 uint AM_LATESTDATA;
 uint AM_NET;
 uint AM_NODEID;
@@ -14673,7 +14935,6 @@ uint DD_SOURCE;
 uint DD_SOURCE_AND_TARGET;
 uint DD_TARGET;
 uint DEBUGHUD_SHOW_ALL;
-uint DEBUGHUD_SHOW_ALL_MEMORY;
 uint DEBUGHUD_SHOW_EVENTPROFILER;
 uint DEBUGHUD_SHOW_MEMORY;
 uint DEBUGHUD_SHOW_MODE;

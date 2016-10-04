@@ -141,15 +141,19 @@ function CreateCharacter()
     characterNode = scene_:CreateChild("Jack")
     characterNode.position = Vector3(0.0, 1.0, 0.0)
 
+    -- spin node
+    local adjNode = characterNode:CreateChild("AdjNode")
+    adjNode.rotation = Quaternion(180.0, Vector3(0.0, 1.0, 0.0))
+
     -- Create the rendering component + animation controller
-    local object = characterNode:CreateComponent("AnimatedModel")
-    object.model = cache:GetResource("Model", "Models/Jack.mdl")
-    object.material = cache:GetResource("Material", "Materials/Jack.xml")
+    local object = adjNode:CreateComponent("AnimatedModel")
+    object.model = cache:GetResource("Model", "Models/Mutant/Mutant.mdl")
+    object.material = cache:GetResource("Material", "Models/Mutant/Materials/mutant_M.xml")
     object.castShadows = true
-    characterNode:CreateComponent("AnimationController")
+    adjNode:CreateComponent("AnimationController")
 
     -- Set the head bone for manual control
-    object.skeleton:GetBone("Bip01_Head").animated = false
+    object.skeleton:GetBone("Mutant:Head").animated = false
 
     -- Create rigidbody, and set non-zero mass so that the body becomes dynamic
     local body = characterNode:CreateComponent("RigidBody")
@@ -287,14 +291,12 @@ function HandlePostUpdate(eventType, eventData)
     local dir = rot * Quaternion(character.controls.pitch, Vector3(1.0, 0.0, 0.0))
 
     -- Turn head to camera pitch, but limit to avoid unnatural animation
-    local headNode = characterNode:GetChild("Bip01_Head", true)
+    local headNode = characterNode:GetChild("Mutant:Head", true)
     local limitPitch = Clamp(character.controls.pitch, -45.0, 45.0)
     local headDir = rot * Quaternion(limitPitch, Vector3(1.0, 0.0, 0.0))
     -- This could be expanded to look at an arbitrary target, now just look at a point in front
-    local headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0, 0.0, 1.0)
+    local headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0, 0.0, -1.0)
     headNode:LookAt(headWorldTarget, Vector3(0.0, 1.0, 0.0))
-    -- Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
-    headNode:Rotate(Quaternion(0.0, 90.0, 90.0))
 
     if firstPerson then
         -- First person camera: position to the head bone + offset slightly forward & up
@@ -353,9 +355,9 @@ function Character:HandleNodeCollision(eventType, eventData)
         local contactDistance = contacts:ReadFloat()
         local contactImpulse = contacts:ReadFloat()
 
-        -- If contact is below node center and mostly vertical, assume it's a ground contact
+        -- If contact is below node center and pointing up, assume it's a ground contact
         if contactPosition.y < self.node.position.y + 1.0 then
-            local level = Abs(contactNormal.y)
+            local level = contactNormal.y
             if level > 0.75 then
                 self.onGround = true
             end
@@ -366,7 +368,7 @@ end
 function Character:FixedUpdate(timeStep)
     -- Could cache the components for faster access instead of finding them each frame
     local body = self.node:GetComponent("RigidBody")
-    local animCtrl = self.node:GetComponent("AnimationController")
+    local animCtrl = self.node:GetComponent("AnimationController", true)
 
     -- Update the in air timer. Reset if grounded
     if not self.onGround then
@@ -419,20 +421,25 @@ function Character:FixedUpdate(timeStep)
             if self.okToJump then
                 body:ApplyImpulse(Vector3(0.0, 1.0, 0.0) * JUMP_FORCE)
                 self.okToJump = false
+                animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2)
             end
         else
             self.okToJump = true
         end
     end
 
-    -- Play walk animation if moving on ground, otherwise fade it out
-    if softGrounded and not moveDir:Equals(Vector3(0.0, 0.0, 0.0)) then
-        animCtrl:PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2)
+    if not self.onGround then
+        animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2)
     else
-        animCtrl:Stop("Models/Jack_Walk.ani", 0.2)
+        -- Play walk animation if moving on ground, otherwise fade it out
+        if softGrounded and not moveDir:Equals(Vector3(0.0, 0.0, 0.0)) then
+            animCtrl:PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2)
+            -- Set walk animation speed proportional to velocity
+            animCtrl:SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity:Length() * 0.3)
+        else
+            animCtrl:PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2)
+        end
     end
-    -- Set walk animation speed proportional to velocity
-    animCtrl:SetSpeed("Models/Jack_Walk.ani", planeVelocity:Length() * 0.3)
 
     -- Reset grounded flag for next frame
     self.onGround = false

@@ -691,3 +691,33 @@ bool UIElementChangeParent(UIElement@ sourceElement, UIElement@ targetElement)
     SetUIElementModified(targetElement);
     return sourceElement.parent is targetElement;
 }
+
+bool UIElementReorder(UIElement@ sourceElement, UIElement@ targetElement)
+{
+    if (sourceElement is null || targetElement is null || sourceElement.parent is null || sourceElement.parent !is targetElement.parent)
+        return false;
+    if (sourceElement is targetElement)
+        return true; // No-op
+    UIElement@ parent = sourceElement.parent;
+    uint destIndex = parent.FindChild(targetElement);
+    Print("Reorder to dest index " + destIndex);
+
+    ReorderUIElementAction action;
+    action.Define(sourceElement, destIndex);
+    SaveEditAction(action);
+    PerformReorder(parent, sourceElement, destIndex);
+
+    return true;
+}
+
+void PerformReorder(UIElement@ parent, UIElement@ child, uint destIndex)
+{
+    suppressSceneChanges = true;
+
+    parent.RemoveChild(child);
+    parent.InsertChild(destIndex, child);
+    UpdateHierarchyItem(parent); // Force update to make sure the order is current
+    SetUIElementModified(parent);
+
+    suppressSceneChanges = false;
+}

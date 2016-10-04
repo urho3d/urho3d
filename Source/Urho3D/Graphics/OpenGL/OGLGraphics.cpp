@@ -26,40 +26,19 @@
 #include "../../Core/Mutex.h"
 #include "../../Core/ProcessUtils.h"
 #include "../../Core/Profiler.h"
-#include "../../Graphics/AnimatedModel.h"
-#include "../../Graphics/Animation.h"
-#include "../../Graphics/AnimationController.h"
-#include "../../Graphics/BillboardSet.h"
-#include "../../Graphics/Camera.h"
 #include "../../Graphics/ConstantBuffer.h"
-#include "../../Graphics/CustomGeometry.h"
-#include "../../Graphics/DebugRenderer.h"
-#include "../../Graphics/DecalSet.h"
 #include "../../Graphics/Graphics.h"
 #include "../../Graphics/GraphicsEvents.h"
 #include "../../Graphics/GraphicsImpl.h"
 #include "../../Graphics/IndexBuffer.h"
-#include "../../Graphics/Material.h"
-#include "../../Graphics/Octree.h"
-#include "../../Graphics/ParticleEffect.h"
-#include "../../Graphics/ParticleEmitter.h"
-#include "../../Graphics/RibbonTrail.h"
 #include "../../Graphics/RenderSurface.h"
 #include "../../Graphics/Shader.h"
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
-#include "../../Graphics/Skybox.h"
-#include "../../Graphics/StaticModelGroup.h"
-#include "../../Graphics/Technique.h"
-#include "../../Graphics/Terrain.h"
-#include "../../Graphics/TerrainPatch.h"
 #include "../../Graphics/Texture2D.h"
-#include "../../Graphics/Texture2DArray.h"
-#include "../../Graphics/Texture3D.h"
 #include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
-#include "../../Graphics/Zone.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
 #include "../../Resource/ResourceCache.h"
@@ -244,7 +223,7 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
-    windowIcon_(0),
+    window_(0),
     externalWindow_(0),
     width_(0),
     height_(0),
@@ -265,6 +244,7 @@ Graphics::Graphics(Context* context_) :
     dxtTextureSupport_(false),
     etcTextureSupport_(false),
     pvrtcTextureSupport_(false),
+    hardwareShadowSupport_(false),
     sRGBSupport_(false),
     sRGBWriteSupport_(false),
     numPrimitives_(0),
@@ -274,6 +254,7 @@ Graphics::Graphics(Context* context_) :
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -302,41 +283,6 @@ Graphics::~Graphics()
 
     // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
     SDL_Quit();
-}
-
-void Graphics::SetExternalWindow(void* window)
-{
-    if (!impl_->window_)
-        externalWindow_ = window;
-    else
-        URHO3D_LOGERROR("Window already opened, can not set external window");
-}
-
-void Graphics::SetWindowTitle(const String& windowTitle)
-{
-    windowTitle_ = windowTitle;
-    if (impl_->window_)
-        SDL_SetWindowTitle(impl_->window_, windowTitle_.CString());
-}
-
-void Graphics::SetWindowIcon(Image* windowIcon)
-{
-    windowIcon_ = windowIcon;
-    if (impl_->window_)
-        CreateWindowIcon();
-}
-
-void Graphics::SetWindowPosition(const IntVector2& position)
-{
-    if (impl_->window_)
-        SDL_SetWindowPosition(impl_->window_, position.x_, position.y_);
-    else
-        position_ = position; // Sets as initial position for future window creation
-}
-
-void Graphics::SetWindowPosition(int x, int y)
-{
-    SetWindowPosition(IntVector2(x, y));
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
@@ -491,17 +437,17 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         for (;;)
         {
             if (!externalWindow_)
-                impl_->window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
+                window_ = SDL_CreateWindow(windowTitle_.CString(), x, y, width, height, flags);
             else
             {
 #ifndef __EMSCRIPTEN__
-                if (!impl_->window_)
-                    impl_->window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
+                if (!window_)
+                    window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
                 fullscreen = false;
 #endif
             }
 
-            if (impl_->window_)
+            if (window_)
                 break;
             else
             {
@@ -525,7 +471,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (maximize)
         {
             Maximize();
-            SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+            SDL_GL_GetDrawableSize(window_, &width, &height);
         }
 
         // Create/restore context and GPU objects and set initial renderstate
@@ -552,16 +498,16 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
 
-    SDL_GL_GetDrawableSize(impl_->window_, &width_, &height_);
+    SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)
-        SDL_GetWindowPosition(impl_->window_, &position_.x_, &position_.y_);
+        SDL_GetWindowPosition(window_, &position_.x_, &position_.y_);
 
     // Reset rendertargets and viewport for the new screen mode
     ResetRenderTargets();
 
     // Clear the initial window contents to black
     Clear(CLEAR_COLOR);
-    SDL_GL_SwapWindow(impl_->window_);
+    SDL_GL_SwapWindow(window_);
 
     CheckFeatureSupport();
 
@@ -607,8 +553,17 @@ void Graphics::SetSRGB(bool enable)
     }
 }
 
+void Graphics::SetDither(bool enable)
+{
+    if (enable)
+        glEnable(GL_DITHER);
+    else
+        glDisable(GL_DITHER);
+}
+
 void Graphics::SetFlushGPU(bool enable)
 {
+    // Currently unimplemented on OpenGL
 }
 
 void Graphics::SetForceGL2(bool enable)
@@ -620,17 +575,6 @@ void Graphics::SetForceGL2(bool enable)
     }
 
     forceGL2_ = enable;
-}
-
-void Graphics::SetOrientations(const String& orientations)
-{
-    orientations_ = orientations.Trimmed();
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
-}
-
-bool Graphics::ToggleFullscreen()
-{
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
 void Graphics::Close()
@@ -657,8 +601,15 @@ bool Graphics::TakeScreenShot(Image& destImage)
 
     ResetRenderTargets();
 
+#ifndef GL_ES_VERSION_2_0
     destImage.SetSize(width_, height_, 3);
     glReadPixels(0, 0, width_, height_, GL_RGB, GL_UNSIGNED_BYTE, destImage.GetData());
+#else
+    // Use RGBA format on OpenGL ES, as otherwise (at least on Android) the produced image is all black
+    destImage.SetSize(width_, height_, 4);
+    glReadPixels(0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, destImage.GetData());
+#endif
+
     // On OpenGL we need to flip the image vertically after reading
     destImage.FlipVertical();
 
@@ -675,7 +626,7 @@ bool Graphics::BeginFrame()
     {
         int width, height;
 
-        SDL_GL_GetDrawableSize(impl_->window_, &width, &height);
+        SDL_GL_GetDrawableSize(window_, &width, &height);
         if (width != width_ || height != height_)
             SetMode(width, height);
     }
@@ -712,7 +663,7 @@ void Graphics::EndFrame()
 
     SendEvent(E_ENDRENDERING);
 
-    SDL_GL_SwapWindow(impl_->window_);
+    SDL_GL_SwapWindow(window_);
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
@@ -798,6 +749,130 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     return true;
 }
 
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!texture)
+        return false;
+    RenderSurface* surface = texture->GetRenderSurface();
+    if (!surface || !surface->GetRenderBuffer())
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+
+    // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
+    if (!impl_->resolveSrcFBO_)
+        impl_->resolveSrcFBO_ = CreateFramebuffer();
+    if (!impl_->resolveDestFBO_)
+        impl_->resolveDestFBO_ = CreateFramebuffer();
+
+    if (!gl3Support)
+    {
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
+        glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+            surface->GetRenderBuffer());
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
+        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texture->GetGPUObjectName(),
+            0);
+        glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    }
+    else
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
+        glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetGPUObjectName(), 0);
+        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), 
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    // Restore previously bound FBO
+    BindFramebuffer(impl_->boundFBO_);
+    return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!texture)
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+
+    texture->SetResolveDirty(false);
+
+    // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
+    if (!impl_->resolveSrcFBO_)
+        impl_->resolveSrcFBO_ = CreateFramebuffer();
+    if (!impl_->resolveDestFBO_)
+        impl_->resolveDestFBO_ = CreateFramebuffer();
+
+    if (!gl3Support)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            // Resolve only the surface(s) that were actually rendered to
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+
+            surface->SetResolveDirty(false);
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
+            glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+                surface->GetRenderBuffer());
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    }
+    else
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+            
+            surface->SetResolveDirty(false);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
+            glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    // Restore previously bound FBO
+    BindFramebuffer(impl_->boundFBO_);
+    return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
+}
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount)
@@ -817,7 +892,7 @@ void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCou
 
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned minVertex, unsigned vertexCount)
 {
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName())
         return;
 
     PrepareDraw();
@@ -837,7 +912,7 @@ void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount
 void Graphics::Draw(PrimitiveType type, unsigned indexStart, unsigned indexCount, unsigned baseVertexIndex, unsigned minVertex, unsigned vertexCount)
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject())
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName())
         return;
 
     PrepareDraw();
@@ -859,7 +934,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
     unsigned instanceCount)
 {
 #if !defined(GL_ES_VERSION_2_0) || defined(__EMSCRIPTEN__)
-    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+    if (!indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName() || !instancingSupport_)
         return;
 
     PrepareDraw();
@@ -895,7 +970,7 @@ void Graphics::DrawInstanced(PrimitiveType type, unsigned indexStart, unsigned i
         unsigned vertexCount, unsigned instanceCount)
 {
 #ifndef GL_ES_VERSION_2_0
-    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObject() || !instancingSupport_)
+    if (!gl3Support || !indexCount || !indexBuffer_ || !indexBuffer_->GetGPUObjectName() || !instancingSupport_)
         return;
 
     PrepareDraw();
@@ -931,9 +1006,9 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
         return false;
     }
 
-    if (instanceOffset != lastInstanceOffset_)
+    if (instanceOffset != impl_->lastInstanceOffset_)
     {
-        lastInstanceOffset_ = instanceOffset;
+        impl_->lastInstanceOffset_ = instanceOffset;
         impl_->vertexBuffersDirty_ = true;
     }
 
@@ -962,7 +1037,7 @@ void Graphics::SetIndexBuffer(IndexBuffer* buffer)
     if (indexBuffer_ == buffer)
         return;
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer ? buffer->GetGPUObject() : 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer ? buffer->GetGPUObjectName() : 0);
     indexBuffer_ = buffer;
 }
 
@@ -972,7 +1047,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         return;
 
     // Compile the shaders now if not yet compiled. If already attempted, do not retry
-    if (vs && !vs->GetGPUObject())
+    if (vs && !vs->GetGPUObjectName())
     {
         if (vs->GetCompilerOutput().Empty())
         {
@@ -991,7 +1066,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             vs = 0;
     }
 
-    if (ps && !ps->GetGPUObject())
+    if (ps && !ps->GetGPUObjectName())
     {
         if (ps->GetCompilerOutput().Empty())
         {
@@ -1015,7 +1090,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         glUseProgram(0);
         vertexShader_ = 0;
         pixelShader_ = 0;
-        shaderProgram_ = 0;
+        impl_->shaderProgram_ = 0;
     }
     else
     {
@@ -1023,20 +1098,20 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
         pixelShader_ = ps;
 
         Pair<ShaderVariation*, ShaderVariation*> combination(vs, ps);
-        ShaderProgramMap::Iterator i = shaderPrograms_.Find(combination);
+        ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Find(combination);
 
-        if (i != shaderPrograms_.End())
+        if (i != impl_->shaderPrograms_.End())
         {
             // Use the existing linked program
-            if (i->second_->GetGPUObject())
+            if (i->second_->GetGPUObjectName())
             {
-                glUseProgram(i->second_->GetGPUObject());
-                shaderProgram_ = i->second_;
+                glUseProgram(i->second_->GetGPUObjectName());
+                impl_->shaderProgram_ = i->second_;
             }
             else
             {
                 glUseProgram(0);
-                shaderProgram_ = 0;
+                impl_->shaderProgram_ = 0;
             }
         }
         else
@@ -1050,35 +1125,35 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 URHO3D_LOGDEBUG("Linked vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName());
                 // Note: Link() calls glUseProgram() to set the texture sampler uniforms,
                 // so it is not necessary to call it again
-                shaderProgram_ = newProgram;
+                impl_->shaderProgram_ = newProgram;
             }
             else
             {
                 URHO3D_LOGERROR("Failed to link vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName() + ":\n" +
                          newProgram->GetLinkerOutput());
                 glUseProgram(0);
-                shaderProgram_ = 0;
+                impl_->shaderProgram_ = 0;
             }
 
-            shaderPrograms_[combination] = newProgram;
+            impl_->shaderPrograms_[combination] = newProgram;
         }
     }
 
     // Update the clip plane uniform on GL3, and set constant buffers
 #ifndef GL_ES_VERSION_2_0
-    if (gl3Support && shaderProgram_)
+    if (gl3Support && impl_->shaderProgram_)
     {
-        const SharedPtr<ConstantBuffer>* constantBuffers = shaderProgram_->GetConstantBuffers();
+        const SharedPtr<ConstantBuffer>* constantBuffers = impl_->shaderProgram_->GetConstantBuffers();
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
         {
             ConstantBuffer* buffer = constantBuffers[i].Get();
-            if (buffer != currentConstantBuffers_[i])
+            if (buffer != impl_->constantBuffers_[i])
             {
-                unsigned object = buffer ? buffer->GetGPUObject() : 0;
+                unsigned object = buffer ? buffer->GetGPUObjectName() : 0;
                 glBindBufferBase(GL_UNIFORM_BUFFER, i, object);
                 // Calling glBindBufferBase also affects the generic buffer binding point
                 impl_->boundUBO_ = object;
-                currentConstantBuffers_[i] = buffer;
+                impl_->constantBuffers_[i] = buffer;
                 ShaderProgram::ClearGlobalParameterSource((ShaderParameterGroup)(i % MAX_SHADER_PARAMETER_GROUPS));
             }
         }
@@ -1091,10 +1166,10 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     if (shaderPrecache_)
         shaderPrecache_->StoreShaders(vertexShader_, pixelShader_);
 
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        impl_->usedVertexAttributes_ = shaderProgram_->GetUsedVertexAttributes();
-        impl_->vertexAttributes_ = &shaderProgram_->GetVertexAttributes();
+        impl_->usedVertexAttributes_ = impl_->shaderProgram_->GetUsedVertexAttributes();
+        impl_->vertexAttributes_ = &impl_->shaderProgram_->GetVertexAttributes();
     }
     else
     {
@@ -1107,21 +1182,21 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
 
 void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned count)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, (unsigned)(count * sizeof(float)), data);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, (unsigned)(count * sizeof(float)), data);
                 return;
             }
 
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, count, data);
@@ -1155,21 +1230,64 @@ void Graphics::SetShaderParameter(StringHash param, const float* data, unsigned 
 
 void Graphics::SetShaderParameter(StringHash param, float value)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(float), &value);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(float), &value);
                 return;
             }
 
             glUniform1fv(info->location_, 1, &value);
+        }
+    }
+}
+
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    if (impl_->shaderProgram_)
+    {
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
+        if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(int), &value);
+                return;
+            }
+
+            glUniform1i(info->location_, value);
+        }
+    }
+}
+
+void Graphics::SetShaderParameter(StringHash param, bool value)
+{
+    // \todo Not tested
+    if (impl_->shaderProgram_)
+    {
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
+        if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(bool), &value);
+                return;
+            }
+
+            glUniform1i(info->location_, (int)value);
         }
     }
 }
@@ -1181,22 +1299,22 @@ void Graphics::SetShaderParameter(StringHash param, const Color& color)
 
 void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector2), &vector);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(Vector2), &vector);
                 return;
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
@@ -1214,17 +1332,17 @@ void Graphics::SetShaderParameter(StringHash param, const Vector2& vector)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetVector3ArrayParameter((unsigned)info->location_, 3, &matrix);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetVector3ArrayParameter(info->offset_, 3, &matrix);
                 return;
             }
 
@@ -1235,22 +1353,22 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3& matrix)
 
 void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector3), &vector);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(Vector3), &vector);
                 return;
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
@@ -1272,17 +1390,17 @@ void Graphics::SetShaderParameter(StringHash param, const Vector3& vector)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Matrix4), &matrix);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(Matrix4), &matrix);
                 return;
             }
 
@@ -1293,22 +1411,22 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix4& matrix)
 
 void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             if (info->bufferPtr_)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Vector4), &vector);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(Vector4), &vector);
                 return;
             }
 
             // Check the uniform type to avoid mismatch
-            switch (info->type_)
+            switch (info->glType_)
             {
             case GL_FLOAT:
                 glUniform1fv(info->location_, 1, vector.Data());
@@ -1334,9 +1452,9 @@ void Graphics::SetShaderParameter(StringHash param, const Vector4& vector)
 
 void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        const ShaderParameter* info = shaderProgram_->GetParameter(param);
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
         if (info)
         {
             // Expand to a full Matrix4
@@ -1358,8 +1476,8 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
             {
                 ConstantBuffer* buffer = info->bufferPtr_;
                 if (!buffer->IsDirty())
-                    dirtyConstantBuffers_.Push(buffer);
-                buffer->SetParameter((unsigned)info->location_, sizeof(Matrix4), &fullMatrix);
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(Matrix4), &fullMatrix);
                 return;
             }
 
@@ -1368,79 +1486,25 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     }
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
-}
-
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
-    return shaderProgram_ ? shaderProgram_->NeedParameterUpdate(group, source) : false;
+    return impl_->shaderProgram_ ? impl_->shaderProgram_->NeedParameterUpdate(group, source) : false;
 }
 
 bool Graphics::HasShaderParameter(StringHash param)
 {
-    return shaderProgram_ && shaderProgram_->HasParameter(param);
+    return impl_->shaderProgram_ && impl_->shaderProgram_->HasParameter(param);
 }
 
 bool Graphics::HasTextureUnit(TextureUnit unit)
 {
-    return shaderProgram_ && shaderProgram_->HasTextureUnit(unit);
+    return impl_->shaderProgram_ && impl_->shaderProgram_->HasTextureUnit(unit);
 }
 
 void Graphics::ClearParameterSource(ShaderParameterGroup group)
 {
-    if (shaderProgram_)
-        shaderProgram_->ClearParameterSource(group);
+    if (impl_->shaderProgram_)
+        impl_->shaderProgram_->ClearParameterSource(group);
 }
 
 void Graphics::ClearParameterSources()
@@ -1450,10 +1514,10 @@ void Graphics::ClearParameterSources()
 
 void Graphics::ClearTransformSources()
 {
-    if (shaderProgram_)
+    if (impl_->shaderProgram_)
     {
-        shaderProgram_->ClearParameterSource(SP_CAMERA);
-        shaderProgram_->ClearParameterSource(SP_OBJECT);
+        impl_->shaderProgram_->ClearParameterSource(SP_CAMERA);
+        impl_->shaderProgram_->ClearParameterSource(SP_OBJECT);
     }
 }
 
@@ -1467,6 +1531,17 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
+            }
+        }
     }
 
     if (textures_[index] != texture)
@@ -1481,18 +1556,18 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
         {
             unsigned glType = texture->GetTarget();
             // Unbind old texture type if necessary
-            if (textureTypes_[index] && textureTypes_[index] != glType)
-                glBindTexture(textureTypes_[index], 0);
-            glBindTexture(glType, texture->GetGPUObject());
-            textureTypes_[index] = glType;
+            if (impl_->textureTypes_[index] && impl_->textureTypes_[index] != glType)
+                glBindTexture(impl_->textureTypes_[index], 0);
+            glBindTexture(glType, texture->GetGPUObjectName());
+            impl_->textureTypes_[index] = glType;
 
             if (texture->GetParametersDirty())
                 texture->UpdateParameters();
         }
-        else if (textureTypes_[index])
+        else if (impl_->textureTypes_[index])
         {
-            glBindTexture(textureTypes_[index], 0);
-            textureTypes_[index] = 0;
+            glBindTexture(impl_->textureTypes_[index], 0);
+            impl_->textureTypes_[index] = 0;
         }
 
         textures_[index] = texture;
@@ -1507,7 +1582,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
                 impl_->activeTexture_ = index;
             }
 
-            glBindTexture(texture->GetTarget(), texture->GetGPUObject());
+            glBindTexture(texture->GetTarget(), texture->GetGPUObjectName());
             texture->UpdateParameters();
         }
     }
@@ -1523,10 +1598,10 @@ void Graphics::SetTextureForUpdate(Texture* texture)
 
     unsigned glType = texture->GetTarget();
     // Unbind old texture type if necessary
-    if (textureTypes_[0] && textureTypes_[0] != glType)
-        glBindTexture(textureTypes_[0], 0);
-    glBindTexture(glType, texture->GetGPUObject());
-    textureTypes_[0] = glType;
+    if (impl_->textureTypes_[0] && impl_->textureTypes_[0] != glType)
+        glBindTexture(impl_->textureTypes_[0], 0);
+    glBindTexture(glType, texture->GetGPUObjectName());
+    impl_->textureTypes_[0] = glType;
     textures_[0] = texture;
 }
 
@@ -1539,11 +1614,13 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
     }
 }
 
-void Graphics::SetTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
-    if (level != textureAnisotropy_)
+    level = Max(level, 1U);
+    
+    if (level != defaultTextureAnisotropy_)
     {
-        textureAnisotropy_ = level;
+        defaultTextureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
 }
@@ -1597,6 +1674,13 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
+
+            // If multisampled, mark the texture & surface needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
+                parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
+            }
         }
 
         impl_->fboDirty_ = true;
@@ -1616,7 +1700,9 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
     // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth-stencil
     // Create a new depth-stencil texture as necessary to be able to provide similar behaviour as Direct3D9
-    if (renderTargets_[0] && !depthStencil)
+    // Only do this for non-multisampled rendertargets; when using multisampled target a similarly multisampled
+    // depth-stencil should also be provided (backbuffer depth isn't compatible)
+    if (renderTargets_[0] && renderTargets_[0]->GetMultiSample() == 1 && !depthStencil)
     {
         int width = renderTargets_[0]->GetWidth();
         int height = renderTargets_[0]->GetHeight();
@@ -1626,14 +1712,14 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
         if (width <= width_ && height <= height_)
         {
             int searchKey = (width << 16) | height;
-            HashMap<int, SharedPtr<Texture2D> >::Iterator i = depthTextures_.Find(searchKey);
-            if (i != depthTextures_.End())
+            HashMap<int, SharedPtr<Texture2D> >::Iterator i = impl_->depthTextures_.Find(searchKey);
+            if (i != impl_->depthTextures_.End())
                 depthStencil = i->second_->GetRenderSurface();
             else
             {
                 SharedPtr<Texture2D> newDepthTexture(new Texture2D(context_));
                 newDepthTexture->SetSize(width, height, GetDepthStencilFormat(), TEXTURE_DEPTHSTENCIL);
-                depthTextures_[searchKey] = newDepthTexture;
+                impl_->depthTextures_[searchKey] = newDepthTexture;
                 depthStencil = newDepthTexture->GetRenderSurface();
             }
         }
@@ -1680,7 +1766,7 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool alphaToCoverage)
 {
     if (mode != blendMode_)
     {
@@ -1694,6 +1780,16 @@ void Graphics::SetBlendMode(BlendMode mode)
         }
 
         blendMode_ = mode;
+    }
+
+    if (alphaToCoverage != alphaToCoverage_)
+    {
+        if (alphaToCoverage)
+            glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        else
+            glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+        alphaToCoverage_ = alphaToCoverage;
     }
 }
 
@@ -1735,9 +1831,8 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         if (slopeScaledBias != 0.0f)
         {
             // OpenGL constant bias is unreliable and dependant on depth buffer bitdepth, apply in the projection matrix instead
-            float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(adjustedSlopeScaledBias, 0.0f);
+            glPolygonOffset(slopeScaledBias, 0.0f);
         }
         else
             glDisable(GL_POLYGON_OFFSET_FILL);
@@ -1938,77 +2033,25 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 #endif
 }
 
-void Graphics::BeginDumpShaders(const String& fileName)
-{
-    shaderPrecache_ = new ShaderPrecache(context_, fileName);
-}
-
-void Graphics::EndDumpShaders()
-{
-    shaderPrecache_.Reset();
-}
-
-void Graphics::PrecacheShaders(Deserializer& source)
-{
-    URHO3D_PROFILE(PrecacheShaders);
-
-    ShaderPrecache::LoadShaders(this, source);
-}
-
 bool Graphics::IsInitialized() const
 {
-    return impl_->window_ != 0;
+    return window_ != 0;
+}
+
+bool Graphics::GetDither() const
+{
+    return glIsEnabled(GL_DITHER) ? true : false;
 }
 
 bool Graphics::IsDeviceLost() const
 {
     // On iOS treat window minimization as device loss, as it is forbidden to access OpenGL when minimized
 #ifdef IOS
-    if (impl_->window_ && (SDL_GetWindowFlags(impl_->window_) & SDL_WINDOW_MINIMIZED) != 0)
+    if (window_ && (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED) != 0)
         return true;
 #endif
 
     return impl_->context_ == 0;
-}
-
-IntVector2 Graphics::GetWindowPosition() const
-{
-    if (impl_->window_)
-        return position_;
-    return IntVector2::ZERO;
-}
-
-PODVector<IntVector2> Graphics::GetResolutions() const
-{
-    PODVector<IntVector2> ret;
-    // Emscripten is not able to return a valid list
-#ifndef __EMSCRIPTEN__
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
-
-    for (unsigned i = 0; i < numModes; ++i)
-    {
-        SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
-        int width = mode.w;
-        int height = mode.h;
-
-        // Store mode if unique
-        bool unique = true;
-        for (unsigned j = 0; j < ret.Size(); ++j)
-        {
-            if (ret[j].x_ == width && ret[j].y_ == height)
-            {
-                unique = false;
-                break;
-            }
-        }
-
-        if (unique)
-            ret.Push(IntVector2(width, height));
-    }
-#endif
-
-    return ret;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -2019,18 +2062,6 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     /// \todo Implement properly, if possible
 
     return ret;
-}
-
-IntVector2 Graphics::GetDesktopResolution() const
-{
-#if !defined(__ANDROID__) && !defined(IOS)
-    SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
-    return IntVector2(mode.w, mode.h);
-#else
-    // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
-    return IntVector2(width_, height_);
-#endif
 }
 
 unsigned Graphics::GetFormat(CompressedFormat format) const
@@ -2082,6 +2113,11 @@ unsigned Graphics::GetMaxBones()
 #endif
 }
 
+bool Graphics::GetGL3Support()
+{
+    return gl3Support;
+}
+
 ShaderVariation* Graphics::GetShader(ShaderType type, const String& name, const String& defines) const
 {
     return GetShader(type, name.CString(), defines.CString());
@@ -2108,6 +2144,11 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
     return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
+}
+
+ShaderProgram* Graphics::GetShaderProgram() const
+{
+    return impl_->shaderProgram_;
 }
 
 TextureUnit Graphics::GetTextureUnit(const String& name)
@@ -2162,14 +2203,14 @@ IntVector2 Graphics::GetRenderTargetDimensions() const
     return IntVector2(width, height);
 }
 
-void Graphics::WindowResized()
+void Graphics::OnWindowResized()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
     int newWidth, newHeight;
 
-    SDL_GL_GetDrawableSize(impl_->window_, &newWidth, &newHeight);
+    SDL_GL_GetDrawableSize(window_, &newWidth, &newHeight);
     if (newWidth == width_ && newHeight == height_)
         return;
 
@@ -2193,14 +2234,14 @@ void Graphics::WindowResized()
     SendEvent(E_SCREENMODE, eventData);
 }
 
-void Graphics::WindowMoved()
+void Graphics::OnWindowMoved()
 {
-    if (!impl_->window_ || fullscreen_)
+    if (!window_ || fullscreen_)
         return;
 
     int newX, newY;
 
-    SDL_GetWindowPosition(impl_->window_, &newX, &newY);
+    SDL_GetWindowPosition(window_, &newX, &newY);
     if (newX == position_.x_ && newY == position_.y_)
         return;
 
@@ -2215,95 +2256,6 @@ void Graphics::WindowMoved()
     eventData[P_X] = position_.x_;
     eventData[P_Y] = position_.y_;
     SendEvent(E_WINDOWPOS, eventData);
-}
-
-void Graphics::AddGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Push(object);
-}
-
-void Graphics::RemoveGPUObject(GPUObject* object)
-{
-    MutexLock lock(gpuObjectMutex_);
-
-    gpuObjects_.Remove(object);
-}
-
-void* Graphics::ReserveScratchBuffer(unsigned size)
-{
-    if (!size)
-        return 0;
-
-    if (size > maxScratchBufferRequest_)
-        maxScratchBufferRequest_ = size;
-
-    // First check for a free buffer that is large enough
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ >= size)
-        {
-            i->reserved_ = true;
-            return i->data_.Get();
-        }
-    }
-
-    // Then check if a free buffer can be resized
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_)
-        {
-            i->data_ = new unsigned char[size];
-            i->size_ = size;
-            i->reserved_ = true;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(size));
-
-            return i->data_.Get();
-        }
-    }
-
-    // Finally allocate a new buffer
-    ScratchBuffer newBuffer;
-    newBuffer.data_ = new unsigned char[size];
-    newBuffer.size_ = size;
-    newBuffer.reserved_ = true;
-    scratchBuffers_.Push(newBuffer);
-    return newBuffer.data_.Get();
-}
-
-void Graphics::FreeScratchBuffer(void* buffer)
-{
-    if (!buffer)
-        return;
-
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (i->reserved_ && i->data_.Get() == buffer)
-        {
-            i->reserved_ = false;
-            return;
-        }
-    }
-
-    URHO3D_LOGWARNING("Reserved scratch buffer " + ToStringHex((unsigned)(size_t)buffer) + " not found");
-}
-
-void Graphics::CleanupScratchBuffers()
-{
-    for (Vector<ScratchBuffer>::Iterator i = scratchBuffers_.Begin(); i != scratchBuffers_.End(); ++i)
-    {
-        if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
-        {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
-            i->size_ = maxScratchBufferRequest_;
-
-            URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));
-        }
-    }
-
-    maxScratchBufferRequest_ = 0;
 }
 
 void Graphics::CleanupRenderSurface(RenderSurface* surface)
@@ -2329,7 +2281,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
                     BindFramebuffer(i->second_.fbo_);
                     currentFBO = i->second_.fbo_;
                 }
-                BindColorAttachment(j, GL_TEXTURE_2D, 0);
+                BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
                 i->second_.colorAttachments_[j] = 0;
                 // Mark drawbuffer bits to need recalculation
                 i->second_.drawBuffers_ = M_MAX_UNSIGNED;
@@ -2355,25 +2307,28 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
 
 void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
 {
-    for (ShaderProgramMap::Iterator i = shaderPrograms_.Begin(); i != shaderPrograms_.End();)
+    for (ShaderProgramMap::Iterator i = impl_->shaderPrograms_.Begin(); i != impl_->shaderPrograms_.End();)
     {
         if (i->second_->GetVertexShader() == variation || i->second_->GetPixelShader() == variation)
-            i = shaderPrograms_.Erase(i);
+            i = impl_->shaderPrograms_.Erase(i);
         else
             ++i;
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        shaderProgram_ = 0;
+        impl_->shaderProgram_ = 0;
 }
 
-ConstantBuffer* Graphics::GetOrCreateConstantBuffer(unsigned bindingIndex, unsigned size)
+ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned bindingIndex, unsigned size)
 {
+    // Note: shaderType parameter is not used on OpenGL, instead binding index should already use the PS range
+    // for PS constant buffers
+
     unsigned key = (bindingIndex << 16) | size;
-    HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = constantBuffers_.Find(key);
-    if (i == constantBuffers_.End())
+    HashMap<unsigned, SharedPtr<ConstantBuffer> >::Iterator i = impl_->allConstantBuffers_.Find(key);
+    if (i == impl_->allConstantBuffers_.End())
     {
-        i = constantBuffers_.Insert(MakePair(key, SharedPtr<ConstantBuffer>(new ConstantBuffer(context_))));
+        i = impl_->allConstantBuffers_.Insert(MakePair(key, SharedPtr<ConstantBuffer>(new ConstantBuffer(context_))));
         i->second_->SetSize(size);
     }
     return i->second_.Get();
@@ -2381,7 +2336,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer(unsigned bindingIndex, unsig
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
     {
@@ -2391,7 +2346,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         {
             // Shutting down: release all GPU objects that still exist
             // Shader programs are also GPU objects; clear them first to avoid list modification during iteration
-            shaderPrograms_.Clear();
+            impl_->shaderPrograms_.Clear();
 
             for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
                 (*i)->Release();
@@ -2405,19 +2360,19 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 
             // In this case clear shader programs last so that they do not attempt to delete their OpenGL program
             // from a context that may no longer exist
-            shaderPrograms_.Clear();
+            impl_->shaderPrograms_.Clear();
 
             SendEvent(E_DEVICELOST);
         }
     }
 
     CleanupFramebuffers();
-    depthTextures_.Clear();
+    impl_->depthTextures_.Clear();
 
     // End fullscreen mode first to counteract transition and getting stuck problems on OS X
 #if defined(__APPLE__) && !defined(IOS)
     if (closeWindow && fullscreen_ && !externalWindow_)
-        SDL_SetWindowFullscreen(impl_->window_, 0);
+        SDL_SetWindowFullscreen(window_, 0);
 #endif
 
     if (impl_->context_)
@@ -2437,15 +2392,15 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         // Do not destroy external window except when shutting down
         if (!externalWindow_ || clearGPUObjects)
         {
-            SDL_DestroyWindow(impl_->window_);
-            impl_->window_ = 0;
+            SDL_DestroyWindow(window_);
+            window_ = 0;
         }
     }
 }
 
 void Graphics::Restore()
 {
-    if (!impl_->window_)
+    if (!window_)
         return;
 
 #ifdef __ANDROID__
@@ -2462,7 +2417,7 @@ void Graphics::Restore()
     // Ensure first that the context exists
     if (!impl_->context_)
     {
-        impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+        impl_->context_ = SDL_GL_CreateContext(window_);
 
 #ifndef GL_ES_VERSION_2_0
         // If we're trying to use OpenGL 3, but context creation fails, retry with 2
@@ -2472,7 +2427,7 @@ void Graphics::Restore()
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-            impl_->context_ = SDL_GL_CreateContext(impl_->window_);
+            impl_->context_ = SDL_GL_CreateContext(window_);
         }
 #endif
 
@@ -2548,22 +2503,6 @@ void Graphics::Restore()
     }
 
     SendEvent(E_DEVICERESET);
-}
-
-void Graphics::Maximize()
-{
-    if (!impl_->window_)
-        return;
-
-    SDL_MaximizeWindow(impl_->window_);
-}
-
-void Graphics::Minimize()
-{
-    if (!impl_->window_)
-        return;
-
-    SDL_MinimizeWindow(impl_->window_);
 }
 
 void Graphics::MarkFBODirty()
@@ -2775,19 +2714,6 @@ unsigned Graphics::GetFormat(const String& formatName)
     return GetRGBFormat();
 }
 
-void Graphics::CreateWindowIcon()
-{
-    if (windowIcon_)
-    {
-        SDL_Surface* surface = windowIcon_->GetSDLSurface();
-        if (surface)
-        {
-            SDL_SetWindowIcon(impl_->window_, surface);
-            SDL_FreeSurface(surface);
-        }
-    }
-}
-
 void Graphics::CheckFeatureSupport()
 {
     // Check supported features: light pre-pass, deferred rendering and hardware depth texture
@@ -2877,6 +2803,9 @@ void Graphics::CheckFeatureSupport()
 #endif
     }
 #endif
+
+    // Consider OpenGL shadows always hardware sampled, if supported at all
+    hardwareShadowSupport_ = shadowMapFormat_ != 0;
 }
 
 void Graphics::PrepareDraw()
@@ -2884,9 +2813,9 @@ void Graphics::PrepareDraw()
 #ifndef GL_ES_VERSION_2_0
     if (gl3Support)
     {
-        for (PODVector<ConstantBuffer*>::Iterator i = dirtyConstantBuffers_.Begin(); i != dirtyConstantBuffers_.End(); ++i)
+        for (PODVector<ConstantBuffer*>::Iterator i = impl_->dirtyConstantBuffers_.Begin(); i != impl_->dirtyConstantBuffers_.End(); ++i)
             (*i)->Apply();
-        dirtyConstantBuffers_.Clear();
+        impl_->dirtyConstantBuffers_.Clear();
     }
 #endif
 
@@ -3008,25 +2937,38 @@ void Graphics::PrepareDraw()
             {
                 Texture* texture = renderTargets_[j]->GetParentTexture();
 
-                // If texture's parameters are dirty, update before attaching
-                if (texture->GetParametersDirty())
+                // Bind either a renderbuffer or texture, depending on what is available
+                unsigned renderBufferID = renderTargets_[j]->GetRenderBuffer();
+                if (!renderBufferID)
                 {
-                    SetTextureForUpdate(texture);
-                    texture->UpdateParameters();
-                    SetTexture(0, 0);
-                }
+                    // If texture's parameters are dirty, update before attaching
+                    if (texture->GetParametersDirty())
+                    {
+                        SetTextureForUpdate(texture);
+                        texture->UpdateParameters();
+                        SetTexture(0, 0);
+                    }
 
-                if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    {
+                        BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObjectName(), false);
+                        i->second_.colorAttachments_[j] = renderTargets_[j];
+                    }
+                }
+                else
                 {
-                    BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObject());
-                    i->second_.colorAttachments_[j] = renderTargets_[j];
+                    if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    {
+                        BindColorAttachment(j, renderTargets_[j]->GetTarget(), renderBufferID, true);
+                        i->second_.colorAttachments_[j] = renderTargets_[j];
+                    }
                 }
             }
             else
             {
                 if (i->second_.colorAttachments_[j])
                 {
-                    BindColorAttachment(j, GL_TEXTURE_2D, 0);
+                    BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
                     i->second_.colorAttachments_[j] = 0;
                 }
             }
@@ -3054,8 +2996,8 @@ void Graphics::PrepareDraw()
 
                 if (i->second_.depthAttachment_ != depthStencil_)
                 {
-                    BindDepthAttachment(texture->GetGPUObject(), false);
-                    BindStencilAttachment(hasStencil ? texture->GetGPUObject() : 0, false);
+                    BindDepthAttachment(texture->GetGPUObjectName(), false);
+                    BindStencilAttachment(hasStencil ? texture->GetGPUObjectName() : 0, false);
                     i->second_.depthAttachment_ = depthStencil_;
                 }
             }
@@ -3107,7 +3049,7 @@ void Graphics::PrepareDraw()
             VertexBuffer* buffer = vertexBuffers_[i];
             // Beware buffers with missing OpenGL objects, as binding a zero buffer object means accessing CPU memory for vertex data,
             // in which case the pointer will be invalid and cause a crash
-            if (!buffer || !buffer->GetGPUObject() || !impl_->vertexAttributes_)
+            if (!buffer || !buffer->GetGPUObjectName() || !impl_->vertexAttributes_)
                 continue;
 
             const PODVector<VertexElement>& elements = buffer->GetElements();
@@ -3137,7 +3079,7 @@ void Graphics::PrepareDraw()
                     unsigned dataStart = element.offset_;
                     if (element.perInstance_)
                     {
-                        dataStart += lastInstanceOffset_ * buffer->GetVertexSize();
+                        dataStart += impl_->lastInstanceOffset_ * buffer->GetVertexSize();
                         if (!(impl_->instancingVertexAttributes_ & locationMask))
                         {
                             SetVertexAttribDivisor(location, 1);
@@ -3153,7 +3095,7 @@ void Graphics::PrepareDraw()
                         }
                     }
 
-                    SetVBO(buffer->GetGPUObject());
+                    SetVBO(buffer->GetGPUObjectName());
                     glVertexAttribPointer(location, glElementComponents[element.type_], glElementTypes[element.type_],
                         element.type_ == TYPE_UBYTE4_NORM ? GL_TRUE : GL_FALSE, (unsigned)buffer->GetVertexSize(),
                         (const void *)(size_t)dataStart);
@@ -3190,9 +3132,18 @@ void Graphics::CleanupFramebuffers()
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
              i != impl_->frameBuffers_.End(); ++i)
             DeleteFramebuffer(i->second_.fbo_);
+
+        if (impl_->resolveSrcFBO_)
+            DeleteFramebuffer(impl_->resolveSrcFBO_);
+        if (impl_->resolveDestFBO_)
+            DeleteFramebuffer(impl_->resolveDestFBO_);
     }
     else
+    {
         impl_->boundFBO_ = 0;
+        impl_->resolveSrcFBO_ = 0;
+        impl_->resolveDestFBO_ = 0;
+    }
 
     impl_->frameBuffers_.Clear();
 }
@@ -3200,15 +3151,12 @@ void Graphics::CleanupFramebuffers()
 void Graphics::ResetCachedState()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-    {
         vertexBuffers_[i] = 0;
-        elementMasks_[i] = 0;
-    }
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
         textures_[i] = 0;
-        textureTypes_[i] = 0;
+        impl_->textureTypes_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -3219,9 +3167,8 @@ void Graphics::ResetCachedState()
     indexBuffer_ = 0;
     vertexShader_ = 0;
     pixelShader_ = 0;
-    shaderProgram_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_NONE;
     constantDepthBias_ = 0.0f;
@@ -3240,7 +3187,8 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    lastInstanceOffset_ = 0;
+    impl_->shaderProgram_ = 0;
+    impl_->lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
     impl_->enabledVertexAttributes_ = 0;
     impl_->usedVertexAttributes_ = 0;
@@ -3260,8 +3208,8 @@ void Graphics::ResetCachedState()
     }
 
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
-        currentConstantBuffers_[i] = 0;
-    dirtyConstantBuffers_.Clear();
+        impl_->constantBuffers_[i] = 0;
+    impl_->dirtyConstantBuffers_.Clear();
 }
 
 void Graphics::SetTextureUnitMappings()
@@ -3279,7 +3227,7 @@ void Graphics::SetTextureUnitMappings()
     textureUnits_["LightSpotMap"] = TU_LIGHTSHAPE;
     textureUnits_["LightCubeMap"] = TU_LIGHTSHAPE;
     textureUnits_["ShadowMap"] = TU_SHADOWMAP;
-#ifdef DESKTOP_GRAPHICS
+#ifndef GL_ES_VERSION_2_0
     textureUnits_["VolumeMap"] = TU_VOLUMEMAP;
     textureUnits_["FaceSelectCubeMap"] = TU_FACESELECT;
     textureUnits_["IndirectionCubeMap"] = TU_INDIRECTION;
@@ -3322,14 +3270,27 @@ void Graphics::BindFramebuffer(unsigned fbo)
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
 
-void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object)
+void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer)
 {
+    if (!object)
+        isRenderBuffer = false;
+
 #ifndef GL_ES_VERSION_2_0
     if (!gl3Support)
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, target, object, 0);
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, target, object, 0);
+        else
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, GL_RENDERBUFFER_EXT, object);
+    }
     else
 #endif
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, object, 0);
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, object, 0);
+        else
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, object);
+    }
 }
 
 void Graphics::BindDepthAttachment(unsigned object, bool isRenderBuffer)
@@ -3401,38 +3362,6 @@ void Graphics::SetVertexAttribDivisor(unsigned location, unsigned divisor)
         glVertexAttribDivisorANGLE(location, divisor);
 #endif
 #endif
-}
-
-void RegisterGraphicsLibrary(Context* context)
-{
-    Animation::RegisterObject(context);
-    Material::RegisterObject(context);
-    Model::RegisterObject(context);
-    Shader::RegisterObject(context);
-    Technique::RegisterObject(context);
-    Texture2D::RegisterObject(context);
-    Texture2DArray::RegisterObject(context);
-    Texture3D::RegisterObject(context);
-    TextureCube::RegisterObject(context);
-    Camera::RegisterObject(context);
-    Drawable::RegisterObject(context);
-    Light::RegisterObject(context);
-    StaticModel::RegisterObject(context);
-    StaticModelGroup::RegisterObject(context);
-    Skybox::RegisterObject(context);
-    AnimatedModel::RegisterObject(context);
-    AnimationController::RegisterObject(context);
-    BillboardSet::RegisterObject(context);
-    ParticleEffect::RegisterObject(context);
-    ParticleEmitter::RegisterObject(context);
-    RibbonTrail::RegisterObject(context);
-    CustomGeometry::RegisterObject(context);
-    DecalSet::RegisterObject(context);
-    Terrain::RegisterObject(context);
-    TerrainPatch::RegisterObject(context);
-    DebugRenderer::RegisterObject(context);
-    Octree::RegisterObject(context);
-    Zone::RegisterObject(context);
 }
 
 }

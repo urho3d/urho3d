@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # ------------------------------------------------------------------------------
-#  Android CMake toolchain file, for use with the Android NDK r5-r11c
+#  Android CMake toolchain file, for use with the Android NDK r5-r12b
 #  Requires cmake 2.6.3 or newer (2.8.9 or newer is recommended).
 #  See home page: https://github.com/taka-no-me/android-cmake
 #
@@ -85,6 +85,21 @@
 #    ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-4.9 - the name of compiler
 #      toolchain to be used. The list of possible values depends on the NDK
 #      version.
+#
+#      For NDK r12b the possible values are:
+#
+#        * aarch64-linux-android-4.9
+#        * aarch64-linux-android-clang
+#        * arm-linux-androideabi-4.9 (default)
+#        * arm-linux-androideabi-clang
+#        * mips64el-linux-android-4.9
+#        * mips64el-linux-android-clang
+#        * mipsel-linux-android-4.9
+#        * mipsel-linux-android-clang
+#        * x86-4.9
+#        * x86-clang
+#        * x86_64-4.9
+#        * x86_64-clang
 #
 #      For NDK r11c the possible values are:
 #
@@ -203,15 +218,14 @@
 
 cmake_minimum_required( VERSION 2.6.3 )
 
+if( DEFINED CMAKE_CROSSCOMPILING )
+ return()
+endif()
+
 # Urho3D: on Windows Cygwin-based NDK tools may fail in the linking phase with too long command line. Turn on response files to avoid this
 if( CMAKE_HOST_WIN32 )
  set( CMAKE_C_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
  set( CMAKE_CXX_USE_RESPONSE_FILE_FOR_OBJECTS 1 )
-endif()
-
-if( DEFINED CMAKE_CROSSCOMPILING )
- # subsequent toolchain loading is not really needed
- return()
 endif()
 
 if( CMAKE_TOOLCHAIN_FILE )
@@ -239,7 +253,7 @@ set( CMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG "" )
 set( CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries." )
 
 # NDK search paths
-set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r11c -r11b -r11 -r10e -r10d -r10c -r10b -r10 -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
+set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r12b -r11c -r11b -r11 -r10e -r10d -r10c -r10b -r10 -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
 if( NOT DEFINED ANDROID_NDK_SEARCH_PATHS )
  if( CMAKE_HOST_WIN32 )
   file( TO_CMAKE_PATH "$ENV{PROGRAMFILES}" ANDROID_NDK_SEARCH_PATHS )
@@ -568,16 +582,17 @@ endif()
 
 macro( __GLOB_NDK_TOOLCHAINS __availableToolchainsVar __availableToolchainsLst __toolchain_subpath )
  foreach( __toolchain ${${__availableToolchainsLst}} )
-  if( "${__toolchain}" MATCHES "-clang3[.][0-9]$" AND NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}${__toolchain_subpath}" )
+  # Urho3D - add support for r12b which drops the Clang version number from the toolchain name
+  if( "${__toolchain}" MATCHES "-clang.*$" AND NOT EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__toolchain}${__toolchain_subpath}" )
    SET( __toolchainVersionRegex "^TOOLCHAIN_VERSION[\t ]+:=[\t ]+(.*)$" )
    FILE( STRINGS "${ANDROID_NDK_TOOLCHAINS_CONFIG_PATH}/${__toolchain}/setup.mk" __toolchainVersionStr REGEX "${__toolchainVersionRegex}" )
    if( __toolchainVersionStr )
     string( REGEX REPLACE "${__toolchainVersionRegex}" "\\1" __toolchainVersionStr "${__toolchainVersionStr}" )
-    string( REGEX REPLACE "-clang3[.][0-9]$" "-${__toolchainVersionStr}" __gcc_toolchain "${__toolchain}" )
+    string( REGEX REPLACE "-clang.*$" "-${__toolchainVersionStr}" __gcc_toolchain "${__toolchain}" )
    else()
     # Urho3D - fallback to use the latest GCC toolchain available
     foreach( __gcc_ver 4.9 4.8 4.6 )
-     string( REGEX REPLACE -clang3[.][0-9]$ -${__gcc_ver} __gcc_toolchain "${__toolchain}" )
+     string( REGEX REPLACE -clang.*$ -${__gcc_ver} __gcc_toolchain "${__toolchain}" )
      if( EXISTS "${ANDROID_NDK_TOOLCHAINS_PATH}/${__gcc_toolchain}" )
       break()
      endif()
@@ -1000,8 +1015,8 @@ if( "${ANDROID_TOOLCHAIN_NAME}" STREQUAL "standalone-clang" )
  set( ANDROID_COMPILER_IS_CLANG 1 )
  execute_process( COMMAND "${ANDROID_CLANG_TOOLCHAIN_ROOT}/bin/clang${TOOL_OS_SUFFIX}" --version OUTPUT_VARIABLE ANDROID_CLANG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE )
  string( REGEX MATCH "[0-9]+[.][0-9]+" ANDROID_CLANG_VERSION "${ANDROID_CLANG_VERSION}")
-elseif( "${ANDROID_TOOLCHAIN_NAME}" MATCHES "-clang3[.][0-9]?$" )
- string( REGEX MATCH "3[.][0-9]$" ANDROID_CLANG_VERSION "${ANDROID_TOOLCHAIN_NAME}")
+elseif( "${ANDROID_TOOLCHAIN_NAME}" MATCHES "-clang(.*)$" )
+ set (ANDROID_CLANG_VERSION ${CMAKE_MATCH_1})
  string( REGEX REPLACE "-clang${ANDROID_CLANG_VERSION}$" "-${ANDROID_COMPILER_VERSION}" ANDROID_GCC_TOOLCHAIN_NAME "${ANDROID_TOOLCHAIN_NAME}" )
  if( ANDROID_NDK_LAYOUT STREQUAL RELEASE2)
   set( ANDROID_CLANG_TOOLCHAIN_ROOT "${ANDROID_NDK_TOOLCHAINS_PATH}/llvm${ANDROID_NDK_TOOLCHAINS_SUBPATH}" )
@@ -1256,7 +1271,11 @@ set( CMAKE_ASM_SOURCE_FILE_EXTENSIONS s S asm )
 
 foreach( lang C CXX ASM )
  if( ANDROID_COMPILER_IS_CLANG )
-  set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_CLANG_VERSION} )
+  if (ANDROID_CLANG_VERSION)
+   set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_CLANG_VERSION} )
+  else ()
+   set (CMAKE_${lang}_COMPILER_VERSION 3.8)
+  endif ()
  else()
   set( CMAKE_${lang}_COMPILER_VERSION ${ANDROID_COMPILER_VERSION} )
  endif()
@@ -1435,15 +1454,13 @@ if( ARMEABI_V7A )
  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--fix-cortex-a8" )
 endif()
 
+# Urho3D - bug fix - fix the common linker problem as it may happen to all archs (not just MIPS) when ld.bfd is used
+if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
+  set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
+endif()
+
 if( ANDROID_NO_UNDEFINED )
- if( MIPS )
-  # there is some sysroot-related problem in mips linker...
-  if( NOT ANDROID_SYSROOT MATCHES "[ ;\"]" )
-   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined -Wl,-rpath-link,${ANDROID_SYSROOT}/usr/lib" )
-  endif()
- else()
   set( ANDROID_LINKER_FLAGS "${ANDROID_LINKER_FLAGS} -Wl,--no-undefined" )
- endif()
 endif()
 
 if( ANDROID_SO_UNDEFINED )
@@ -1802,7 +1819,7 @@ endif()
 #   BUILD_WITH_STANDALONE_TOOLCHAIN : TRUE if standalone toolchain is used
 #   ANDROID_NDK_HOST_SYSTEM_NAME : "windows", "linux-x86" or "darwin-x86" depending on host platform
 #   ANDROID_NDK_ABI_NAME : "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "x86_64", "mips64" depending on ANDROID_ABI
-#   ANDROID_NDK_RELEASE : from r5 to r11c; set only for NDK
+#   ANDROID_NDK_RELEASE : from r5 to r12b; set only for NDK
 #   ANDROID_NDK_VERSION : major.minor.patch; set only for NDK; e.g. r10e = 10.5.0 but r11c = 11.2.2725575 (as defined in the source.properties)
 #   ANDROID_ARCH_NAME : "arm", "x86", "mips", "arm64", "x86_64", "mips64" depending on ANDROID_ABI
 #   ANDROID_SYSROOT : path to the compiler sysroot

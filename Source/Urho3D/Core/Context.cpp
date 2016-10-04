@@ -23,7 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
-#include "../Core/Thread.h"
+#include "../Core/EventProfiler.h"
 #include "../IO/Log.h"
 
 #include "../DebugNew.h"
@@ -277,6 +277,34 @@ void Context::RemoveEventReceiver(Object* receiver, Object* sender, StringHash e
     HashSet<Object*>* group = GetEventReceivers(sender, eventType);
     if (group)
         group->Erase(receiver);
+}
+
+void Context::BeginSendEvent(Object* sender, StringHash eventType)
+{
+#ifdef URHO3D_PROFILING
+    if (EventProfiler::IsActive())
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->BeginBlock(eventType);
+    }
+#endif
+
+    eventSenders_.Push(sender);
+}
+
+void Context::EndSendEvent()
+{
+    eventSenders_.Pop();
+
+#ifdef URHO3D_PROFILING
+    if (EventProfiler::IsActive())
+    {
+        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        if (eventProfiler)
+            eventProfiler->EndBlock();
+    }
+#endif
 }
 
 }

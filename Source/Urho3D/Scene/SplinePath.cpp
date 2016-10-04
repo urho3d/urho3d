@@ -41,7 +41,6 @@ SplinePath::SplinePath(Context* context) :
     traveled_(0.f),
     length_(0.f),
     dirty_(false),
-    controlledNode_(NULL),
     controlledIdAttr_(0)
 {
     UpdateNodeIds();
@@ -271,8 +270,8 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
 void SplinePath::SetControlledIdAttr(unsigned value)
 {
     if (value > 0 && value < M_MAX_UNSIGNED)
-
         controlledIdAttr_ = value;
+
     dirty_ = true;
 }
 

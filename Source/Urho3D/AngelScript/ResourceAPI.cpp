@@ -299,6 +299,12 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterEnumValue("JSONValueType", "JSON_ARRAY", JSON_ARRAY);
     engine->RegisterEnumValue("JSONValueType", "JSON_OBJECT", JSON_OBJECT);
 
+    engine->RegisterEnum("JSONNumberType");
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_NAN", JSONNT_NAN);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_INT", JSONNT_INT);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_UINT", JSONNT_UINT);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_FLOAT_DOUBLE", JSONNT_FLOAT_DOUBLE);
+
     engine->RegisterObjectType("JSONValue", sizeof(JSONValue), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructJSONValue), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f(bool)", asFUNCTION(ConstructJSONValueBool), asCALL_CDECL_OBJLAST);
@@ -319,6 +325,9 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHODPR(JSONValue, operator =, (const JSONValue&), JSONValue&), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValueType get_valueType() const", asMETHOD(JSONValue, GetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "JSONNumberType get_numberType() const", asMETHOD(JSONValue, GetNumberType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "String get_valueTypeName() const", asMETHODPR(JSONValue, GetValueTypeName, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "String get_numberTypeName() const", asMETHODPR(JSONValue, GetNumberTypeName, () const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNull() const", asMETHOD(JSONValue, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isBool() const", asMETHOD(JSONValue, IsBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNumber() const", asMETHOD(JSONValue, IsNumber), asCALL_THISCALL);
@@ -340,7 +349,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void Insert(uint, const JSONValue&in)", asMETHODPR(JSONValue, Insert, (unsigned, const JSONValue&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Erase(uint, uint length = 1)", asMETHODPR(JSONValue, Erase, (unsigned, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Resize(uint)", asMETHOD(JSONValue, Resize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "uint get_size()", asMETHOD(JSONValue, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "uint get_size() const", asMETHOD(JSONValue, Size), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(const String&in)", asFUNCTION(JSONValueAtKey), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(const String&in) const", asFUNCTION(JSONValueAtKey), asCALL_CDECL_OBJLAST);

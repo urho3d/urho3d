@@ -31,6 +31,7 @@ namespace Urho3D
 
 class Component;
 class Connection;
+class Node;
 class Scene;
 class SceneResolver;
 
@@ -49,6 +50,23 @@ enum TransformSpace
     TS_LOCAL = 0,
     TS_PARENT,
     TS_WORLD
+};
+
+/// Internal implementation structure for less performance-critical Node variables.
+struct URHO3D_API NodeImpl
+{
+    /// Nodes this node depends on for network updates.
+    PODVector<Node*> dependencyNodes_;
+    /// Network owner connection.
+    Connection* owner_;
+    /// Name.
+    String name_;
+    /// Tag strings.
+    StringVector tags_;
+    /// Name hash.
+    StringHash nameHash_;
+    /// Attribute buffer for network updates.
+    mutable VectorBuffer attrBuffer_;
 };
 
 /// %Scene node that may contain components and child nodes.
@@ -289,6 +307,8 @@ public:
     void RemoveComponents(StringHash type);
     /// Remove all components from this node.
     void RemoveAllComponents();
+    /// Adjust index order of an existing component in this node.
+    void ReorderComponent(Component* component, unsigned index);
     /// Clone scene node, components and child nodes. Return the clone.
     Node* Clone(CreateMode mode = REPLICATED);
     /// Remove from the parent node. If no other shared pointer references exist, causes immediate deletion.
@@ -314,13 +334,13 @@ public:
     unsigned GetID() const { return id_; }
 
     /// Return name.
-    const String& GetName() const { return name_; }
+    const String& GetName() const { return impl_->name_; }
 
     /// Return name hash.
-    StringHash GetNameHash() const { return nameHash_; }
+    StringHash GetNameHash() const { return impl_->nameHash_; }
 
     /// Return all tags.
-    const StringVector& GetTags() const { return tags_; }
+    const StringVector& GetTags() const { return impl_->tags_; }
 
     /// Return whether has a specific tag.
     bool HasTag(const String& tag) const;
@@ -338,7 +358,7 @@ public:
     bool IsEnabledSelf() const { return enabledPrev_; }
 
     /// Return owner connection in networking.
-    Connection* GetOwner() const { return owner_; }
+    Connection* GetOwner() const { return impl_->owner_; }
 
     /// Return position in parent space.
     const Vector3& GetPosition() const { return position_; }
@@ -569,7 +589,7 @@ public:
     bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false,
         CreateMode mode = REPLICATED);
     /// Return the depended on nodes to order network updates.
-    const PODVector<Node*>& GetDependencyNodes() const { return dependencyNodes_; }
+    const PODVector<Node*>& GetDependencyNodes() const { return impl_->dependencyNodes_; }
 
     /// Prepare network update by comparing attributes and marking replication states dirty as necessary.
     void PrepareNetworkUpdate();
@@ -579,7 +599,7 @@ public:
     void MarkReplicationDirty();
     /// Create a child node with specific ID.
     Node* CreateChild(unsigned id, CreateMode mode);
-    /// Add a pre-created component.
+    /// Add a pre-created component. Using this function from application code is discouraged, as component operation without an owner node may not be well-defined in all cases. Prefer CreateComponent() instead.
     void AddComponent(Component* component, unsigned id, CreateMode mode);
     /// Calculate number of non-temporary child nodes.
     unsigned GetNumPersistentChildren() const;
@@ -605,11 +625,6 @@ protected:
     virtual void OnAttributeAnimationRemoved();
     /// Find target of an attribute animation from object hierarchy by name.
     virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
-
-    /// Network update queued flag.
-    bool networkUpdate_;
-    /// User variables.
-    VariantMap vars_;
 
 private:
     /// Set enabled/disabled state with optional recursion. Optionally affect the remembered enable state.
@@ -643,6 +658,12 @@ private:
     bool enabled_;
     /// Last SetEnabled flag before any SetDeepEnabled.
     bool enabledPrev_;
+
+protected:
+    /// Network update queued flag.
+    bool networkUpdate_;
+
+private:
     /// Parent scene node.
     Node* parent_;
     /// Scene (root node.)
@@ -663,18 +684,12 @@ private:
     Vector<SharedPtr<Node> > children_;
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
-    /// Nodes this node depends on for network updates.
-    PODVector<Node*> dependencyNodes_;
-    /// Network owner connection.
-    Connection* owner_;
-    /// Name.
-    String name_;
-    /// Tag strings.
-    StringVector tags_;
-    /// Name hash.
-    StringHash nameHash_;
-    /// Attribute buffer for network updates.
-    mutable VectorBuffer attrBuffer_;
+    /// Pointer to implementation.
+    NodeImpl* impl_;
+
+protected:
+    /// User variables.
+    VariantMap vars_;
 };
 
 template <class T> T* Node::CreateComponent(CreateMode mode, unsigned id)

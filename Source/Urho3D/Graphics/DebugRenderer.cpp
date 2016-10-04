@@ -71,6 +71,7 @@ void DebugRenderer::SetView(Camera* camera)
 
     view_ = camera->GetView();
     projection_ = camera->GetProjection();
+    gpuProjection_ = camera->GetGPUProjection();
     frustum_ = camera->GetFrustum();
 }
 
@@ -500,7 +501,7 @@ void DebugRenderer::Render()
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetShaderParameter(VSP_VIEW, view_);
     graphics->SetShaderParameter(VSP_VIEWINV, view_.Inverse());
-    graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
+    graphics->SetShaderParameter(VSP_VIEWPROJ, gpuProjection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     graphics->SetVertexBuffer(vertexBuffer_);
 

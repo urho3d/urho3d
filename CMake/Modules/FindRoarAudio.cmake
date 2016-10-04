@@ -27,14 +27,8 @@
 #  SNDIO_LIBRARIES
 #
 
-if (URHO3D_64BIT)
-    set (SNDIO_LIB_SEARCH_PATH /usr/lib/x86_64-linux-gnu)
-else ()
-    set (SNDIO_LIB_SEARCH_PATH /usr/lib/i386-linux-gnu)
-endif ()
-
 find_path (SNDIO_INCLUDE_DIRS NAMES RoarAudio.h DOC "RoarAudio include directory")
-find_library (SNDIO_LIBRARIES NAMES RoarAudio PATHS ${SNDIO_LIB_SEARCH_PATH} DOC "RoarAudio library")
+find_library (SNDIO_LIBRARIES NAMES RoarAudio DOC "RoarAudio library")
 
 include (FindPackageHandleStandardArgs)
 find_package_handle_standard_args (RoarAudio REQUIRED_VARS SNDIO_LIBRARIES SNDIO_INCLUDE_DIRS FAIL_MESSAGE "Could NOT find RoarAudio development library")

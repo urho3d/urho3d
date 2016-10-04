@@ -72,6 +72,8 @@ void CreateUI()
     uiStyle = GetEditorUIXMLFile("UI/DefaultStyle.xml");
     ui.root.defaultStyle = uiStyle;
     iconStyle = GetEditorUIXMLFile("UI/EditorIcons.xml");
+    
+    graphics.windowIcon = cache.GetResource("Image", "Textures/UrhoIcon.png");
 
     CreateCursor();
     CreateMenuBar();
@@ -1326,6 +1328,8 @@ void HandleHotKeysBlender( VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+    else if (key == KEY_F5)
+        ToggleNavigationDebug();
     else if (key == KEY_F11)
     {
         Image@ screenshot = Image();
@@ -1517,6 +1521,8 @@ void HandleHotKeysStandard(VariantMap& eventData)
         TogglePhysicsDebug();
     else if (key == KEY_F4)
         ToggleOctreeDebug();
+    else if (key == KEY_F5)
+        ToggleNavigationDebug();
     else if (key == KEY_F11)
     {
         Image@ screenshot = Image();

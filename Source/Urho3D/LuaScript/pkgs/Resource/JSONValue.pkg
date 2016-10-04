@@ -2,12 +2,20 @@ $#include "Resource/JSONValue.h"
 
 enum JSONValueType
 {
-    JSON_NULL,
+    JSON_NULL = 0,
     JSON_BOOL,
     JSON_NUMBER,
     JSON_STRING,
     JSON_ARRAY,
-    JSON_OBJECT,
+    JSON_OBJECT
+};
+
+enum JSONNumberType
+{
+    JSONNT_NAN = 0,
+    JSONNT_INT,
+    JSONNT_UINT,
+    JSONNT_FLOAT_DOUBLE
 };
 
 class JSONValue
@@ -31,6 +39,9 @@ class JSONValue
     tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
 
     JSONValueType GetValueType() const;
+    JSONNumberType GetNumberType() const;
+    String GetValueTypeName() const;
+    String GetNumberTypeName() const;
     bool IsNull() const;
     bool IsBool() const;
     bool IsNumber() const;
@@ -70,6 +81,10 @@ class JSONValue
     static const JSONObject emptyObject;
 
     tolua_readonly tolua_property__is_set bool null;
+    tolua_readonly tolua_property__get_set JSONValueType valueType;
+    tolua_readonly tolua_property__get_set JSONNumberType numberType;
+    tolua_readonly tolua_property__get_set String valueTypeName;
+    tolua_readonly tolua_property__get_set String numberTypeName;
 };
 
 ${

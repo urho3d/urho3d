@@ -268,6 +268,10 @@ if (URHO3D_LUA)
     # This is more practical than patching its header files in many places to make them work with relative path
     list (APPEND INCLUDE_DIRS ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty/Lua${JIT})
 endif ()
+# Workaround for GCC 5.4 and above when building a SHARED lib type for Linux platform to fix the undefined symbol "__cpu_model" issue (see #1519)
+if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.3.1 AND CMAKE_SYSTEM_NAME STREQUAL Linux AND URHO3D_LIB_TYPE STREQUAL SHARED)  # 5.3.1 was the last known good version
+    list (APPEND LIBS gcc)
+endif ()
 
 # Setup library output path
 if (ANDROID)
@@ -425,8 +429,35 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED)
 endif ()
 
 # Install headers for using the Urho3D library
-install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/librevision.h ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR})
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h DESTINATION ${DEST_INCLUDE_DIR} ACCUMULATE GENERATED_HEADERS)
+install_header_files (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${DEST_INCLUDE_DIR} FILES_MATCHING PATTERN *.h ACCUMULATE URHO_HEADERS)    # Note: the trailing slash is significant
+# Generate the include-all-headers header file even though we do not encourage Urho3D library users to use it
+list (SORT URHO_HEADERS)
+list (REVERSE URHO_HEADERS)
+set (OPTIONAL_SUBS AngelScript Database Lua Navigation Network Physics Urho2D)
+foreach (SUB ${OPTIONAL_SUBS})
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+        list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
+        if (FOUND_INDEX GREATER -1)
+            list (INSERT URHO_HEADERS ${FOUND_INDEX} "#endif")
+        endif ()
+    endif ()
+endforeach ()
+list (REVERSE URHO_HEADERS)
+foreach (SUB ${OPTIONAL_SUBS})
+    if (URHO_HEADERS MATCHES "(include/Urho3D/${SUB}[^;]+)")
+        list (FIND URHO_HEADERS ${CMAKE_MATCH_1} FOUND_INDEX)
+        if (FOUND_INDEX GREATER -1)
+            string (TOUPPER ${SUB} SUB)
+            list (INSERT URHO_HEADERS ${FOUND_INDEX} "#if URHO3D_${SUB}")
+        endif ()
+    endif ()
+endforeach ()
+string (REGEX REPLACE "include/[^;]+(DebugNew|Direct3D|ODBC|OpenGL|Precompiled|SQLite|ToluaUtils)[^;]+;" "" URHO_HEADERS "${URHO_HEADERS}")
+string (REGEX REPLACE "include/([^;]+)" "#include <\\1>" URHO_HEADERS "${GENERATED_HEADERS};;${URHO_HEADERS};")
+string (REPLACE ";" \n URHO_HEADERS "${URHO_HEADERS}")
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3DAll.h.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3DAll.h)
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/Urho3DAll.h ${CMAKE_CURRENT_BINARY_DIR}/librevision.h DESTINATION ${DEST_INCLUDE_DIR})
 
 # Generate platform specific pkg-config file for the benefit of Urho3D library users via SDK without CMake
 get_directory_property (URHO3D_COMPILE_DEFINITIONS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMPILE_DEFINITIONS)
@@ -475,6 +506,8 @@ endif ()
 # Remove compiler flags that are only used for building the library
 string (REGEX REPLACE " -fvisibility[^ ]+" "" CLEANED_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string (REGEX REPLACE " -include \"[^\"]+\"" "" CLEANED_CMAKE_CXX_FLAGS "${CLEANED_CMAKE_CXX_FLAGS}")
+string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_CXX_FLAGS "${CLEANED_CMAKE_CXX_FLAGS}")
+string (REPLACE "${SYSROOT}" "\${pc_sysrootdir}" CLEANED_CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Urho3D.pc.in ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.pc${PC_SUFFIX} @ONLY)
 if (MSVC)
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -DLIB_NAME=$<TARGET_LINKER_FILE_NAME:${TARGET_NAME}> -P ${CMAKE_SOURCE_DIR}/CMake/Modules/AdjustPkgConfigForMSVC.cmake)

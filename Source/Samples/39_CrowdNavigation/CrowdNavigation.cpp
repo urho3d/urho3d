@@ -269,7 +269,7 @@ void CrowdNavigation::SpawnJack(const Vector3& pos, Node* jackGroup)
     CrowdAgent* agent = jackNode->CreateComponent<CrowdAgent>();
     agent->SetHeight(2.0f);
     agent->SetMaxSpeed(3.0f);
-    agent->SetMaxAccel(3.0f);
+    agent->SetMaxAccel(5.0f);
 }
 
 void CrowdNavigation::CreateMushroom(const Vector3& pos)
@@ -534,14 +534,14 @@ void CrowdNavigation::HandleCrowdAgentReposition(StringHash eventType, VariantMa
             // Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
             node->SetRotation(node->GetRotation().Slerp(Quaternion(Vector3::FORWARD, velocity), 10.0f * timeStep * speedRatio));
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
-            animCtrl->SetSpeed(WALKING_ANI, speedRatio);
+            animCtrl->SetSpeed(WALKING_ANI, speedRatio * 1.5f);
         }
         else
             animCtrl->Play(WALKING_ANI, 0, true, 0.1f);
 
-        // If speed is too low then stopping the animation
+        // If speed is too low then stop the animation
         if (speed < agent->GetRadius())
-            animCtrl->Stop(WALKING_ANI, 0.8f);
+            animCtrl->Stop(WALKING_ANI, 0.5f);
     }
 }
 

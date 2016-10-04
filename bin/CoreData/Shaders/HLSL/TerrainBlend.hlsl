@@ -51,7 +51,7 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #if defined(DIRBILLBOARD) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if defined(TRAILFACECAM) || defined(TRAILBONE)
         float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,
@@ -201,7 +201,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
 
         #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cAmbientColor.rgb * diffColor.rgb;
             finalColor += cMatEmissiveColor;
             oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
         #else

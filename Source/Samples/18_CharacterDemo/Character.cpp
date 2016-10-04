@@ -64,7 +64,7 @@ void Character::FixedUpdate(float timeStep)
 {
     /// \todo Could cache the components for faster access instead of finding them each frame
     RigidBody* body = GetComponent<RigidBody>();
-    AnimationController* animCtrl = GetComponent<AnimationController>();
+    AnimationController* animCtrl = node_->GetComponent<AnimationController>(true);
 
     // Update the in air timer. Reset if grounded
     if (!onGround_)
@@ -110,19 +110,28 @@ void Character::FixedUpdate(float timeStep)
             {
                 body->ApplyImpulse(Vector3::UP * JUMP_FORCE);
                 okToJump_ = false;
+                animCtrl->PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
             }
         }
         else
             okToJump_ = true;
     }
 
-    // Play walk animation if moving on ground, otherwise fade it out
-    if (softGrounded && !moveDir.Equals(Vector3::ZERO))
-        animCtrl->PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
+    if ( !onGround_ )
+    {
+        animCtrl->PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+    }
     else
-        animCtrl->Stop("Models/Jack_Walk.ani", 0.2f);
-    // Set walk animation speed proportional to velocity
-    animCtrl->SetSpeed("Models/Jack_Walk.ani", planeVelocity.Length() * 0.3f);
+    {
+        // Play walk animation if moving on ground, otherwise fade it out
+        if (softGrounded && !moveDir.Equals(Vector3::ZERO))
+            animCtrl->PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
+        else
+            animCtrl->PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
+
+        // Set walk animation speed proportional to velocity
+        animCtrl->SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.Length() * 0.3f);
+    }
 
     // Reset grounded flag for next frame
     onGround_ = false;
@@ -142,10 +151,10 @@ void Character::HandleNodeCollision(StringHash eventType, VariantMap& eventData)
         /*float contactDistance = */contacts.ReadFloat();
         /*float contactImpulse = */contacts.ReadFloat();
 
-        // If contact is below node center and mostly vertical, assume it's a ground contact
+        // If contact is below node center and pointing up, assume it's a ground contact
         if (contactPosition.y_ < (node_->GetPosition().y_ + 1.0f))
         {
-            float level = Abs(contactNormal.y_);
+            float level = contactNormal.y_;
             if (level > 0.75)
                 onGround_ = true;
         }

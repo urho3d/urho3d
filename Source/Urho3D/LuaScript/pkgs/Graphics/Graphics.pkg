@@ -12,6 +12,7 @@ class Graphics : public Object
     bool SetMode(int width, int height);
 
     void SetSRGB(bool enable);
+    void SetDither(bool enable);
     void SetFlushGPU(bool enable);
     void SetOrientations(const String orientations);
     bool ToggleFullscreen();
@@ -23,6 +24,7 @@ class Graphics : public Object
     void EndDumpShaders();
     void PrecacheShaders(Deserializer& source);
     tolua_outside void GraphicsPrecacheShaders @ PrecacheShaders(const String fileName);
+    void SetShaderCacheDir(const String path);
 
     bool IsInitialized() const;
     void* GetExternalWindow() const;
@@ -38,6 +40,7 @@ class Graphics : public Object
     bool GetVSync() const;
     bool GetTripleBuffer() const;
     bool GetSRGB() const;
+    bool GetDither() const;
     bool GetFlushGPU() const;
     const String GetOrientations() const;
     bool IsDeviceLost() const;
@@ -54,6 +57,7 @@ class Graphics : public Object
     bool GetSRGBSupport() const;
     bool GetSRGBWriteSupport() const;
     IntVector2 GetDesktopResolution() const;
+    const String GetShaderCacheDir() const;
 
     static unsigned GetAlphaFormat();
     static unsigned GetLuminanceFormat();
@@ -87,6 +91,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool vSync;
     tolua_readonly tolua_property__get_set bool tripleBuffer;
     tolua_property__get_set bool sRGB;
+    tolua_property__get_set bool dither;
     tolua_property__get_set bool flushGPU;
     tolua_property__get_set String orientations;
     tolua_readonly tolua_property__is_set bool deviceLost;
@@ -103,6 +108,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
     tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
+    tolua_property__get_set String shaderCacheDir;
 };
 
 Graphics* GetGraphics();

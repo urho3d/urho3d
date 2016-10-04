@@ -604,6 +604,7 @@ Methods:
 - void SetSorted(bool enable)
 - void SetFixedScreenSize(bool enable)
 - void SetFaceCameraMode(FaceCameraMode mode)
+- void SetMinAngle(float angle)
 - void SetAnimationLodBias(float bias)
 - void Commit()
 - Material* GetMaterial() const
@@ -614,6 +615,7 @@ Methods:
 - bool IsSorted() const
 - bool IsFixedScreenSize() const
 - FaceCameraMode GetFaceCameraMode() const
+- float GetMinAngle() const
 - float GetAnimationLodBias() const
 
 Properties:
@@ -625,6 +627,7 @@ Properties:
 - bool sorted
 - bool fixedScreenSize
 - FaceCameraMode faceCameraMode
+- float minAngle
 - float animationLodBias
 
 <a name="Class_Bone"></a>
@@ -802,6 +805,7 @@ Methods:
 - void SetReflectionPlane(const Plane& reflectionPlane)
 - void SetUseClipping(bool enable)
 - void SetClipPlane(const Plane& clipPlane)
+- void SetProjection(const Matrix4& projection)
 - float GetFarClip() const
 - float GetNearClip() const
 - float GetFov() const
@@ -815,7 +819,8 @@ Methods:
 - bool IsOrthographic() const
 - bool GetAutoAspectRatio() const
 - const Frustum& GetFrustum() const
-- const Matrix4& GetProjection() const
+- Matrix4 GetProjection() const
+- Matrix4 GetGPUProjection() const
 - const Matrix3x4& GetView() const
 - void GetFrustumSize(Vector3& near, Vector3& far) const
 - float GetHalfViewSize() const
@@ -851,7 +856,8 @@ Properties:
 - bool orthographic
 - bool autoAspectRatio
 - Frustum& frustum (readonly)
-- Matrix4& projection (readonly)
+- Matrix4 projection (readonly)
+- Matrix4 GPUProjection (readonly)
 - Matrix3x4& view (readonly)
 - float halfViewSize (readonly)
 - Frustum viewSpaceFrustum (readonly)
@@ -1962,6 +1968,7 @@ Methods:
 - void SetMaterial(Material* material)
 - void SetMaxVertices(unsigned num)
 - void SetMaxIndices(unsigned num)
+- void SetOptimizeBufferSize(bool enable)
 - bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
 - void RemoveDecals(unsigned num)
 - void RemoveAllDecals()
@@ -1971,6 +1978,7 @@ Methods:
 - unsigned GetNumIndices() const
 - unsigned GetMaxVertices() const
 - unsigned GetMaxIndices() const
+- bool GetOptimizeBufferSize() const
 
 Properties:
 
@@ -1980,6 +1988,7 @@ Properties:
 - unsigned numIndices (readonly)
 - unsigned maxVertices
 - unsigned maxIndices
+- bool optimizeBufferSize
 
 <a name="Class_Deserializer"></a>
 ### Deserializer
@@ -1995,9 +2004,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -2230,9 +2241,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -2267,9 +2280,11 @@ Methods:
 - String ReadLine()
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -2458,8 +2473,10 @@ Methods:
 - void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform)
 - void Define(const BoundingBox& box)
 - void Define(const BoundingBox& box, const Matrix3x4& transform)
+- void Define(const Matrix4& projection)
 - void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ)
 - void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform)
+- void DefineSplit(const Matrix4& projection, float near, float far)
 - void Transform(const Matrix3& transform)
 - void Transform(const Matrix3x4& transform)
 - Intersection IsInside(const Vector3& point) const
@@ -2522,6 +2539,7 @@ Methods:
 - bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
+- void SetDither(bool enable)
 - void SetFlushGPU(bool enable)
 - void SetOrientations(const String orientations)
 - bool ToggleFullscreen()
@@ -2533,6 +2551,7 @@ Methods:
 - void EndDumpShaders()
 - void PrecacheShaders(Deserializer& source)
 - void PrecacheShaders(const String fileName)
+- void SetShaderCacheDir(const String path)
 - bool IsInitialized() const
 - void* GetExternalWindow() const
 - const String GetWindowTitle() const
@@ -2547,6 +2566,7 @@ Methods:
 - bool GetVSync() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
+- bool GetDither() const
 - bool GetFlushGPU() const
 - const String GetOrientations() const
 - bool IsDeviceLost() const
@@ -2563,6 +2583,7 @@ Methods:
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
 - IntVector2 GetDesktopResolution() const
+- const String GetShaderCacheDir() const
 - unsigned GetAlphaFormat()
 - unsigned GetLuminanceFormat()
 - unsigned GetLuminanceAlphaFormat()
@@ -2597,6 +2618,7 @@ Properties:
 - bool vSync (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
+- bool dither
 - bool flushGPU
 - String orientations
 - bool deviceLost (readonly)
@@ -2613,6 +2635,7 @@ Properties:
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
 - IntVector2 desktopResolution (readonly)
+- String shaderCacheDir
 
 <a name="Class_HierarchyContainer"></a>
 ### HierarchyContainer : UIElement
@@ -2782,6 +2805,8 @@ Methods:
 - unsigned LoadGestures(const String fileName)
 - bool RemoveGesture(unsigned gestureID)
 - void RemoveAllGestures()
+- void SetMousePosition(const IntVector2& position)
+- void CenterMousePosition()
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2822,7 +2847,7 @@ Methods:
 Properties:
 
 - int qualifiers (readonly)
-- IntVector2 mousePosition (readonly)
+- IntVector2 mousePosition
 - IntVector2& mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
@@ -2937,6 +2962,9 @@ Methods:
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
 - JSONValueType GetValueType() const
+- JSONNumberType GetNumberType() const
+- String GetValueTypeName() const
+- String GetNumberTypeName() const
 - bool IsNull() const
 - bool IsBool() const
 - bool IsNumber() const
@@ -2972,6 +3000,10 @@ Properties:
 - const JSONArray emptyArray
 - const JSONObject emptyObject
 - bool null (readonly)
+- JSONValueType valueType (readonly)
+- JSONNumberType numberType (readonly)
+- String valueTypeName (readonly)
+- String numberTypeName (readonly)
 
 <a name="Class_JoystickState"></a>
 ### JoystickState
@@ -3005,6 +3037,8 @@ Methods:
 - void SetLightType(LightType type)
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
+- void SetTemperature(float temperature)
+- void SetUsePhysicalValues(bool enable)
 - void SetSpecularIntensity(float intensity)
 - void SetBrightness(float brightness)
 - void SetRange(float range)
@@ -3018,14 +3052,18 @@ Methods:
 - void SetShadowIntensity(float intensity)
 - void SetShadowResolution(float resolution)
 - void SetShadowNearFarRatio(float nearFarRatio)
+- void SetShadowMaxExtrusion(float extrusion)
 - void SetRampTexture(Texture* texture)
 - void SetShapeTexture(Texture* texture)
 - LightType GetLightType() const
 - bool GetPerVertex() const
 - const Color& GetColor() const
+- float GetTemperature() const
 - float GetSpecularIntensity() const
 - float GetBrightness() const
 - Color GetEffectiveColor() const
+- Color GetColorFromTemperature() const
+- bool GetUsePhysicalValues() const
 - float GetEffectiveSpecularIntensity() const
 - float GetRange() const
 - float GetFov() const
@@ -3038,6 +3076,7 @@ Methods:
 - float GetShadowIntensity() const
 - float GetShadowResolution() const
 - float GetShadowNearFarRatio() const
+- float GetShadowMaxExtrusion() const
 - Texture* GetRampTexture() const
 - Texture* GetShapeTexture() const
 - Frustum GetFrustum() const
@@ -3049,6 +3088,8 @@ Properties:
 - LightType lightType
 - bool perVertex
 - Color& color
+- float temperature
+- bool usePhysicalValues
 - float specularIntensity
 - float brightness
 - float range
@@ -3062,6 +3103,7 @@ Properties:
 - float shadowIntensity
 - float shadowResolution
 - float shadowNearFarRatio
+- float shadowMaxExtrusion
 - Texture* rampTexture
 - Texture* shapeTexture
 - Frustum frustum (readonly)
@@ -3250,6 +3292,8 @@ Methods:
 - void delete()
 - void SetNumTechniques(unsigned num)
 - void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f)
+- void SetVertexShaderDefines(const String defines)
+- void SetPixelShaderDefines(const String defines)
 - void SetShaderParameter(const String name, const Variant& value)
 - void SetShaderParameterAnimation(const String name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f)
 - void SetShaderParameterAnimationWrapMode(const String name, WrapMode wrapMode)
@@ -3261,7 +3305,9 @@ Methods:
 - void SetShadowCullMode(CullMode mode)
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
+- void SetAlphaToCoverage(bool enable)
 - void SetRenderOrder(char renderOrder)
+- void SetOcclusion(bool enable)
 - void SetScene(Scene* scene)
 - void RemoveShaderParameter(const String name)
 - void ReleaseShaders()
@@ -3272,6 +3318,8 @@ Methods:
 - Technique* GetTechnique(unsigned index) const
 - Pass* GetPass(unsigned index, const String passName) const
 - Texture* GetTexture(TextureUnit unit) const
+- const String GetVertexShaderDefines() const
+- const String GetPixelShaderDefines() const
 - ValueAnimation* GetShaderParameterAnimation(const String name) const
 - WrapMode GetShaderParameterAnimationWrapMode(const String name) const
 - float GetShaderParameterAnimationSpeed(const String name) const
@@ -3279,6 +3327,7 @@ Methods:
 - CullMode GetShadowCullMode() const
 - FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
+- bool GetAlphaToCoverage() const
 - char GetRenderOrder() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
@@ -3286,12 +3335,15 @@ Methods:
 
 Properties:
 
+- String vertexShaderDefines
+- String pixelShaderDefines
 - CullMode cullMode
 - CullMode shadowCullMode
 - FillMode fillMode
 - BiasParameters depthBias
+- bool alphaToCoverage
 - char renderOrder
-- bool occlusion (readonly)
+- bool occlusion
 - bool specular (readonly)
 - Scene* scene
 
@@ -3913,6 +3965,7 @@ Methods:
 - void RemoveComponents(bool removeReplicated, bool removeLocal)
 - void RemoveComponents(const String type)
 - void RemoveAllComponents()
+- void ReorderComponent(Component* component, unsigned index)
 - Node* Clone(CreateMode mode = REPLICATED)
 - void Remove()
 - void SetParent(Node* parent)
@@ -3985,6 +4038,7 @@ Methods:
 - bool HasTag(const String tag) const
 - const StringVector& GetTags() const
 - const PODVector<Node*>& GetChildrenWithTag(const String tag, bool recursive = false) const
+- void SetID(unsigned id)
 
 Properties:
 
@@ -4224,6 +4278,7 @@ Methods:
 - void SetTextureFrame(unsigned index, const TextureFrame& textureFrame)
 - void SetNumTextureFrames(unsigned number)
 - void SortTextureFrames()
+- ParticleEffect* Clone(const String cloneName = String::EMPTY) const
 - Material* GetMaterial() const
 - unsigned GetNumParticles() const
 - bool GetUpdateInvisible() const
@@ -4297,6 +4352,10 @@ Properties:
 <a name="Class_ParticleEffect2D"></a>
 ### ParticleEffect2D : Resource
 
+Methods:
+
+- ParticleEffect2D* Clone(const String cloneName = String::EMPTY) const
+
 <a name="Class_ParticleEmitter"></a>
 ### ParticleEmitter : BillboardSet
 
@@ -4306,6 +4365,7 @@ Methods:
 - void SetNumParticles(unsigned num)
 - void SetEmitting(bool enable)
 - void SetSerializeParticles(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - void ResetEmissionTimer()
 - void RemoveAllParticles()
 - void Reset()
@@ -4314,6 +4374,7 @@ Methods:
 - unsigned GetNumParticles() const
 - bool IsEmitting() const
 - bool GetSerializeParticles() const
+- AutoRemoveMode GetAutoRemoveMode() const
 
 Properties:
 
@@ -4321,6 +4382,7 @@ Properties:
 - unsigned numParticles
 - bool emitting
 - bool serializeParticles
+- AutoRemoveMode autoRemoveMode
 
 <a name="Class_ParticleEmitter2D"></a>
 ### ParticleEmitter2D : Drawable2D
@@ -4350,12 +4412,14 @@ Methods:
 - void SetDepthTestMode(CompareMode mode)
 - void SetLightingMode(PassLightingMode mode)
 - void SetDepthWrite(bool enable)
-- void SetAlphaMask(bool enable)
+- void SetAlphaToCoverage(bool enable)
 - void SetIsDesktop(bool enable)
 - void SetVertexShader(const String name)
 - void SetPixelShader(const String name)
 - void SetVertexShaderDefines(const String defines)
 - void SetPixelShaderDefines(const String defines)
+- void SetVertexShaderDefineExcludes(const String excludes)
+- void SetPixelShaderDefineExcludes(const String excludes)
 - void ReleaseShaders()
 - const String GetName() const
 - unsigned GetIndex() const
@@ -4364,12 +4428,14 @@ Methods:
 - CompareMode GetDepthTestMode() const
 - PassLightingMode GetLightingMode() const
 - bool GetDepthWrite() const
-- bool GetAlphaMask() const
+- bool GetAlphaToCoverage() const
 - bool IsDesktop() const
 - const String GetVertexShader() const
 - const String GetPixelShader() const
 - const String GetVertexShaderDefines() const
 - const String GetPixelShaderDefines() const
+- const String GetVertexShaderDefineExcludes() const
+- const String GetPixelShaderDefineExcludes() const
 
 Properties:
 
@@ -4380,12 +4446,14 @@ Properties:
 - CompareMode depthTestMode
 - PassLightingMode lightingMode
 - bool depthWrite
-- bool alphaMask
+- bool alphaToCoverage
 - bool desktop (readonly)
 - String vertexShader
 - String pixelShader
 - String vertexShaderDefines
 - String pixelShaderDefines
+- String vertexShaderDefineExcludes
+- String pixelShaderDefineExcludes
 
 <a name="Class_PhysicsRaycastResult"></a>
 ### PhysicsRaycastResult
@@ -4880,6 +4948,7 @@ Methods:
 - RenderSurfaceUpdateMode GetUpdateMode() const
 - RenderSurface* GetLinkedRenderTarget() const
 - RenderSurface* GetLinkedDepthStencil() const
+- bool IsResolveDirty() const
 
 Properties:
 
@@ -4891,6 +4960,7 @@ Properties:
 - RenderSurfaceUpdateMode updateMode
 - RenderSurface* linkedRenderTarget
 - RenderSurface* linkedDepthStencil
+- bool resolveDirty (readonly)
 
 <a name="Class_RenderTargetInfo"></a>
 ### RenderTargetInfo
@@ -4909,6 +4979,8 @@ Properties:
 - unsigned format
 - Vector2 size
 - RenderTargetSizeMode sizeMode
+- int multiSample
+- bool autoResolve
 - bool enabled
 - bool cubemap
 - bool filtered
@@ -4937,6 +5009,7 @@ Methods:
 - void SetShadowQuality(ShadowQuality quality)
 - void SetShadowSoftness(float shadowSoftness)
 - void SetVSMShadowParameters(float minVariance, float lightBleedingReduction)
+- void SetVSMMultiSample(int multiSample)
 - void SetReuseShadowMaps(bool enable)
 - void SetMaxShadowMaps(int shadowMaps)
 - void SetDynamicInstancing(bool enable)
@@ -4966,6 +5039,7 @@ Methods:
 - ShadowQuality GetShadowQuality() const
 - float GetShadowSoftness() const
 - Vector2 GetVSMShadowParameters() const
+- int GetVSMMultiSample() const
 - bool GetReuseShadowMaps() const
 - int GetMaxShadowMaps() const
 - bool GetDynamicInstancing() const
@@ -5007,6 +5081,7 @@ Properties:
 - int shadowMapSize
 - ShadowQuality shadowQuality
 - float shadowSoftness
+- int VSMMultiSample
 - bool reuseShadowMaps
 - int maxShadowMaps
 - bool dynamicInstancing
@@ -5535,9 +5610,11 @@ Methods:
 
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -5677,7 +5754,7 @@ Methods:
 - void SetGain(float gain)
 - void SetAttenuation(float attenuation)
 - void SetPanning(float panning)
-- void SetAutoRemove(bool enable)
+- void SetAutoRemoveMode(AutoRemoveMode mode)
 - Sound* GetSound() const
 - String GetSoundType() const
 - float GetTimePosition() const
@@ -5685,7 +5762,7 @@ Methods:
 - float GetGain() const
 - float GetAttenuation() const
 - float GetPanning() const
-- bool GetAutoRemove() const
+- AutoRemoveMode GetAutoRemoveMode() const
 - bool IsPlaying() const
 
 Properties:
@@ -5697,7 +5774,7 @@ Properties:
 - float gain
 - float attenuation
 - float panning
-- bool autoRemove
+- AutoRemoveMode autoRemoveMode
 - bool playing (readonly)
 
 <a name="Class_SoundSource3D"></a>
@@ -6052,6 +6129,11 @@ Methods:
 - void SetSmoothing(bool enable)
 - bool SetHeightMap(Image* image)
 - void SetMaterial(Material* material)
+- void SetNorthNeighbor(Terrain* north)
+- void SetSouthNeighbor(Terrain* south)
+- void SetWestNeighbor(Terrain* west)
+- void SetEastNeighbor(Terrain* east)
+- void SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrain* east)
 - void SetDrawDistance(float distance)
 - void SetShadowDistance(float distance)
 - void SetLodBias(float bias)
@@ -6073,8 +6155,13 @@ Methods:
 - bool GetSmoothing() const
 - Image* GetHeightMap() const
 - Material* GetMaterial() const
+- Terrain* GetNorthNeighbor() const
+- Terrain* GetSouthNeighbor() const
+- Terrain* GetWestNeighbor() const
+- Terrain* GetEastNeighbor() const
 - TerrainPatch* GetPatch(unsigned index) const
 - TerrainPatch* GetPatch(int x, int z) const
+- TerrainPatch* GetNeighborPatch(int x, int z) const
 - float GetHeight(const Vector3& worldPosition) const
 - Vector3 GetNormal(const Vector3& worldPosition) const
 - IntVector2 WorldToHeightMap(const Vector3& worldPosition) const
@@ -6103,6 +6190,10 @@ Properties:
 - bool smoothing
 - Image* heightMap
 - Material* material
+- Terrain* northNeighbor
+- Terrain* southNeighbor
+- Terrain* westNeighbor
+- Terrain* eastNeighbor
 - float drawDistance
 - float shadowDistance
 - float lodBias
@@ -6164,6 +6255,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6206,7 +6298,7 @@ Methods:
 Properties:
 
 - Font* font
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6235,6 +6327,7 @@ Methods:
 - void delete()
 - bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
 - bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(int size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6286,7 +6379,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize (readonly)
+- int fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
@@ -6316,6 +6409,7 @@ Methods:
 - void SetNumLevels(unsigned levels)
 - void SetFilterMode(TextureFilterMode filter)
 - void SetAddressMode(TextureCoordinate coord, TextureAddressMode address)
+- void SetAnisotropy(unsigned level)
 - void SetBorderColor(const Color& color)
 - void SetSRGB(bool enable)
 - void SetBackupTexture(Texture* texture)
@@ -6327,8 +6421,12 @@ Methods:
 - int GetHeight() const
 - TextureFilterMode GetFilterMode() const
 - TextureAddressMode GetAddressMode(TextureCoordinate coord) const
+- unsigned GetAnisotropy() const
 - const Color& GetBorderColor() const
 - bool GetSRGB() const
+- int GetMultiSample() const
+- bool GetAutoResolve() const
+- bool IsResolveDirty() const
 - Texture* GetBackupTexture() const
 - int GetMipsToSkip(int quality) const
 - int GetLevelWidth(unsigned level) const
@@ -6347,8 +6445,12 @@ Properties:
 - int height (readonly)
 - unsigned components (readonly)
 - TextureFilterMode filterMode
+- unsigned anisotropy
 - Color& borderColor
 - bool sRGB
+- int multiSample (readonly)
+- bool autoResolve (readonly)
+- bool resolveDirty (readonly)
 - Texture* backupTexture
 - TextureUsage usage (readonly)
 
@@ -6360,7 +6462,7 @@ Methods:
 - Texture2D() (GC)
 - Texture2D* new()
 - void delete()
-- bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
 - bool SetData(Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface() const
 
@@ -6406,7 +6508,7 @@ Methods:
 - TextureCube() (GC)
 - TextureCube* new()
 - void delete()
-- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC)
+- bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
 - bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
@@ -6621,8 +6723,10 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetScale(float scale)
-- void SetWidth(float size)
-- void SetHeight(float size)
+- void SetWidth(float width)
+- void SetHeight(float height)
+- void SetCustomSize(const IntVector2& size)
+- void SetCustomSize(int width, int height)
 - UIElement* GetRoot() const
 - UIElement* GetRootModalElement() const
 - Cursor* GetCursor() const
@@ -6646,6 +6750,7 @@ Methods:
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
+- const IntVector2& GetCustomSize() const
 
 Properties:
 
@@ -6668,6 +6773,7 @@ Properties:
 - bool forceAutoHint
 - bool modalElement (readonly)
 - float scale
+- IntVector2& customSize
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable
@@ -6705,6 +6811,15 @@ Methods:
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 - void SetHorizontalAlignment(HorizontalAlignment align)
 - void SetVerticalAlignment(VerticalAlignment align)
+- void SetEnableAnchor(bool enable)
+- void SetMinAnchor(const Vector2& anchor)
+- void SetMinAnchor(float x, float y)
+- void SetMaxAnchor(const Vector2& anchor)
+- void SetMaxAnchor(float x, float y)
+- void SetMinOffset(const IntVector2& offset)
+- void SetMaxOffset(const IntVector2& offset)
+- void SetPivot(const Vector2& pivot)
+- void SetPivot(float x, float y)
 - void SetClipBorder(const IntRect& rect)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
@@ -6775,6 +6890,12 @@ Methods:
 - const IntVector2& GetChildOffset() const
 - HorizontalAlignment GetHorizontalAlignment() const
 - VerticalAlignment GetVerticalAlignment() const
+- bool GetEnableAnchor() const
+- const Vector2& GetMinAnchor() const
+- const Vector2& GetMaxAnchor() const
+- const IntVector2& GetMinOffset() const
+- const IntVector2& GetMaxOffset() const
+- const Vector2& GetPivot() const
 - const IntRect& GetClipBorder() const
 - const Color& GetColor(Corner corner) const
 - int GetPriority() const
@@ -6852,6 +6973,12 @@ Properties:
 - IntVector2& childOffset
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
+- bool enableAnchor
+- IntVector2& minOffset
+- IntVector2& maxOffset
+- Vector2& minAnchor
+- Vector2& maxAnchor
+- Vector2& pivot
 - IntRect clipBorder
 - Color& color
 - int priority
@@ -7149,9 +7276,11 @@ Methods:
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
+- long ReadInt64()
 - short ReadShort()
 - char ReadByte()
 - unsigned ReadUInt()
+- long ReadUInt64()
 - short ReadUShort()
 - char ReadUByte()
 - bool ReadBool()
@@ -7186,9 +7315,11 @@ Methods:
 - String ReadLine()
 - unsigned Write(const VectorBuffer& buffer)
 - bool WriteInt(int value)
+- bool WriteInt64(long value)
 - bool WriteShort(short value)
 - bool WriteByte(char value)
 - bool WriteUInt(unsigned value)
+- bool WriteUInt64(long value)
 - bool WriteUShort(short value)
 - bool WriteUByte(char value)
 - bool WriteBool(bool value)
@@ -7549,6 +7680,12 @@ Properties:
 - int ABM_LERP
 - int ABM_ADDITIVE
 
+### AutoRemoveMode
+
+- int REMOVE_DISABLED
+- int REMOVE_COMPONENT
+- int REMOVE_NODE
+
 ### BlendMode
 
 - int BLEND_REPLACE
@@ -7695,6 +7832,7 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_LOOKAT_MIXED
 - int FC_DIRECTION
 
 ### FaceCameraMode
@@ -7704,6 +7842,8 @@ Properties:
 - int FC_ROTATE_Y
 - int FC_LOOKAT_XYZ
 - int FC_LOOKAT_Y
+- int FC_LOOKAT_MIXED
+- int FC_DIRECTION
 
 ### FileMode
 
@@ -7753,6 +7893,7 @@ Properties:
 - int HA_LEFT
 - int HA_CENTER
 - int HA_RIGHT
+- int HA_CUSTOM
 
 ### HttpRequestState
 
@@ -7779,6 +7920,13 @@ Properties:
 - int OUTSIDE
 - int INTERSECTS
 - int INSIDE
+
+### JSONNumberType
+
+- int JSONNT_NAN
+- int JSONNT_INT
+- int JSONNT_UINT
+- int JSONNT_FLOAT_DOUBLE
 
 ### JSONValueType
 
@@ -7850,6 +7998,7 @@ Properties:
 - int NAVIGATIONPUSHINESS_LOW
 - int NAVIGATIONPUSHINESS_MEDIUM
 - int NAVIGATIONPUSHINESS_HIGH
+- int NAVIGATIONPUSHINESS_NONE
 
 ### NavigationQuality
 
@@ -8094,6 +8243,7 @@ Properties:
 - int VA_TOP
 - int VA_CENTER
 - int VA_BOTTOM
+- int VA_CUSTOM
 
 ### WindowDragMode
 
@@ -8220,7 +8370,7 @@ Properties:
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
-- int ToInt(const String source)
+- int ToInt(const String source, int base = 10)
 - IntRect ToIntRect(const String source)
 - IntVector2 ToIntVector2(const String source)
 - unsigned ToLower(unsigned ch)
@@ -8231,7 +8381,7 @@ Properties:
 - Rect ToRect(const String source)
 - String ToString(void* value)
 - String ToStringHex(unsigned value)
-- unsigned ToUInt(const String source)
+- unsigned ToUInt(const String source, int base = 10)
 - unsigned ToUpper(unsigned ch)
 - Vector2 ToVector2(const String source)
 - Vector3 ToVector3(const String source)
@@ -8297,7 +8447,6 @@ Properties:
 - unsigned DD_SOURCE_AND_TARGET
 - unsigned DD_TARGET
 - unsigned DEBUGHUD_SHOW_ALL
-- unsigned DEBUGHUD_SHOW_ALL_MEMORY
 - unsigned DEBUGHUD_SHOW_EVENTPROFILER
 - unsigned DEBUGHUD_SHOW_MEMORY
 - unsigned DEBUGHUD_SHOW_MODE

@@ -143,15 +143,18 @@ void CreateCharacter()
     characterNode = scene_.CreateChild("Jack");
     characterNode.position = Vector3(0.0f, 1.0f, 0.0f);
 
+    Node@ adjNode = characterNode.CreateChild("AdjNode");
+    adjNode.rotation = Quaternion(180, Vector3(0,1,0) );
+
     // Create the rendering component + animation controller
-    AnimatedModel@ object = characterNode.CreateComponent("AnimatedModel");
-    object.model = cache.GetResource("Model", "Models/Jack.mdl");
-    object.material = cache.GetResource("Material", "Materials/Jack.xml");
+    AnimatedModel@ object = adjNode.CreateComponent("AnimatedModel");
+    object.model = cache.GetResource("Model", "Models/Mutant/Mutant.mdl");
+    object.material = cache.GetResource("Material", "Models/Mutant/Materials/mutant_M.xml");
     object.castShadows = true;
-    characterNode.CreateComponent("AnimationController");
+    adjNode.CreateComponent("AnimationController");
 
     // Set the head bone for manual control
-    object.skeleton.GetBone("Bip01_Head").animated = false;
+    object.skeleton.GetBone("Mutant:Head").animated = false;
 
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody@ body = characterNode.CreateComponent("RigidBody");
@@ -299,14 +302,12 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     Quaternion dir = rot * Quaternion(character.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
 
     // Turn head to camera pitch, but limit to avoid unnatural animation
-    Node@ headNode = characterNode.GetChild("Bip01_Head", true);
+    Node@ headNode = characterNode.GetChild("Mutant:Head", true);
     float limitPitch = Clamp(character.controls.pitch, -45.0f, 45.0f);
     Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
     // This could be expanded to look at an arbitrary target, now just look at a point in front
-    Vector3 headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    Vector3 headWorldTarget = headNode.worldPosition + headDir * Vector3(0.0f, 0.0f, -1.0f);
     headNode.LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
-    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
-    headNode.Rotate(Quaternion(0.0f, 90.0f, 90.0f));
 
     if (firstPerson)
     {
@@ -377,10 +378,10 @@ class Character : ScriptObject
             float contactDistance = contacts.ReadFloat();
             float contactImpulse = contacts.ReadFloat();
 
-            // If contact is below node center and mostly vertical, assume it's a ground contact
+            // If contact is below node center and pointing up, assume it's a ground contact
             if (contactPosition.y < (node.position.y + 1.0f))
             {
-                float level = Abs(contactNormal.y);
+                float level = contactNormal.y;
                 if (level > 0.75)
                     onGround = true;
             }
@@ -391,7 +392,7 @@ class Character : ScriptObject
     {
         /// \todo Could cache the components for faster access instead of finding them each frame
         RigidBody@ body = node.GetComponent("RigidBody");
-        AnimationController@ animCtrl = node.GetComponent("AnimationController");
+        AnimationController@ animCtrl = node.GetComponent("AnimationController", true);
 
         // Update the in air timer. Reset if grounded
         if (!onGround)
@@ -437,19 +438,30 @@ class Character : ScriptObject
                 {
                     body.ApplyImpulse(Vector3(0.0f, 1.0f, 0.0f) * JUMP_FORCE);
                     okToJump = false;
+                    animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
                 }
             }
             else
                 okToJump = true;
         }
 
-        // Play walk animation if moving on ground, otherwise fade it out
-        if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
-            animCtrl.PlayExclusive("Models/Jack_Walk.ani", 0, true, 0.2f);
+        if (!onGround)
+        {
+            animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+        }
         else
-            animCtrl.Stop("Models/Jack_Walk.ani", 0.2f);
-        // Set walk animation speed proportional to velocity
-        animCtrl.SetSpeed("Models/Jack_Walk.ani", planeVelocity.length * 0.3f);
+        {
+            // Play walk animation if moving on ground, otherwise fade it out
+            if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
+            {
+                animCtrl.PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
+                // Set walk animation speed proportional to velocity
+                animCtrl.SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.length * 0.3f);
+            }
+            else
+                animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
+
+        }
 
         // Reset grounded flag for next frame
         onGround = false;

@@ -293,7 +293,7 @@ struct SpriteTimelineKey : SpatialTimelineKey
     float pivotX_;
     float pivotY_;
 
-    // Run time data.
+    /// Run time data.
     int zIndex_;
 
     SpriteTimelineKey(Timeline* timeline);

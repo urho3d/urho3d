@@ -79,12 +79,26 @@ elseif (XCODE)
     endif ()
 endif ()
 
-# Define all supported build options
+include (CheckHost)
 include (CheckCompilerToolchain)
+
+# Extra linker flags for linking against indirect dependencies (linking shared lib with dependencies)
+if (RPI)
+    # Extra linker flags for Raspbian because it installs VideoCore libraries in the "/opt/vc/lib" directory (no harm in doing so for other distros)
+    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${RPI_SYSROOT}/opt/vc/lib\"")      # RPI_SYSROOT is empty when not cross-compiling
+endif ()
+if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux AND CMAKE_CROSSCOMPILING)
+    # Cannot do this in the toolchain file because CMAKE_LIBRARY_ARCHITECTURE is not yet defined when CMake is processing toolchain file
+    set (INDIRECT_DEPS_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} -Wl,-rpath-link,\"${ARM_SYSROOT}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}\":\"${ARM_SYSROOT}/lib/${CMAKE_LIBRARY_ARCHITECTURE}\"")
+endif ()
+set (CMAKE_REQUIRED_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_REQUIRED_FLAGS}")
+set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
+
+# Define all supported build options
 include (CMakeDependentOption)
 option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
-cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT MINGW AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
+cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" ${NATIVE_64BIT} "NOT MSVC AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" ${NATIVE_64BIT})     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
 option (URHO3D_ANGELSCRIPT "Enable AngelScript scripting support" TRUE)
 option (URHO3D_LUA "Enable additional Lua scripting support" TRUE)
 option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
@@ -92,39 +106,18 @@ cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT IOS AND NOT TVOS)
-    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (Linux on ARM cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
+    set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux cross-compiling build only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
 if (IOS OR (RPI AND "${RPI_ABI}" MATCHES NEON) OR (ARM AND (URHO3D_64BIT OR "${ARM_ABI_FLAGS}" MATCHES neon)))    # Stringify in case RPI_ABI/ARM_ABI_FLAGS is not set explicitly
     # The 'NEON' CMake variable is already set by android.toolchain.cmake when the chosen ANDROID_ABI uses NEON
     set (NEON TRUE)
-endif ()
-if (CMAKE_HOST_WIN32)
-    if (NOT DEFINED URHO3D_MKLINK)
-        # Test whether the host system is capable of setting up symbolic link
-        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-        if (MKLINK_EXIT_CODE EQUAL 0)
-            set (URHO3D_MKLINK TRUE)
-            file (REMOVE ${CMAKE_BINARY_DIR}/test-link)
-        else ()
-            set (URHO3D_MKLINK FALSE)
-            message (WARNING "Could not use MKLINK to setup symbolic links as this Windows user account does not have the privilege to do so. "
-                "When MKLINK is not available then the build system will fallback to use file/directory copy of the library headers from source tree to build tree. "
-                "In order to prevent stale headers being used in the build, this file/directory copy will be redone also as a post-build step for each library targets. "
-                "This may slow down the build unnecessarily or even cause other unforseen issues due to incomplete or stale headers in the build tree. "
-                "Request your Windows Administrator to grant your user account to have privilege to create symlink via MKLINK command. "
-                "You are NOT advised to use the Administrator account directly to generate build tree in all cases.")
-        endif ()
-        set (URHO3D_MKLINK ${URHO3D_MKLINK} CACHE INTERNAL "MKLINK capability on the Windows host system")
-    endif ()
-    set (NULL_DEVICE nul)
-else ()
-    set (NULL_DEVICE /dev/null)
 endif ()
 # For Raspbery Pi, find Broadcom VideoCore IV firmware
 if (RPI)
     # TODO: this logic is earmarked to be moved into SDL's CMakeLists.txt when refactoring the library dependency handling
     find_package (VideoCore REQUIRED)
     include_directories (${VIDEOCORE_INCLUDE_DIRS})
+    link_directories (${VIDEOCORE_LIBRARY_DIRS})
 endif ()
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
@@ -305,6 +298,10 @@ if (CMAKE_VERSION VERSION_GREATER 2.8 OR CMAKE_VERSION VERSION_EQUAL 2.8)
         set_property (CACHE RPI_ABI PROPERTY STRINGS ${RPI_SUPPORTED_ABIS})
     endif ()
 endif()
+
+# Union all the sysroot variables into one so it can be referred to generically later
+# TODO: to be replaced with CMAKE_SYSROOT later if it is more beneficial
+set (SYSROOT ${ANDROID_SYSROOT} ${RPI_SYSROOT} ${ARM_SYSROOT} ${MINGW_SYSROOT} ${IOS_SYSROOT} ${EMSCRIPTEN_SYSROOT} CACHE INTERNAL "Path to system root of the cross-compiling target")  # SYSROOT is empty for native build
 
 # Clang tools building
 if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
@@ -528,13 +525,12 @@ if (APPLE)
         else ()
             set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
         endif ()
-        set (LINKER_FLAGS "-framework AudioToolbox -framework CoreAudio -framework CoreGraphics -framework CoreMotion -framework Foundation -framework GameController -framework OpenGLES -framework QuartzCore -framework UIKit")  # Need to stringify to keep it as a string instead of as a list
     else ()
         if (XCODE)
             # OSX-specific setup
             if (URHO3D_64BIT)
                 if (DEFINED ENV{XCODE_64BIT_ONLY})
-                    set (CMAKE_OSX_ARCHITECTURES x86_64)        # This is a hack, idem; the idea is to finish within the allocated time and cache the objects for subsequent builds
+                    set (CMAKE_OSX_ARCHITECTURES x86_64)
                 else ()
                     set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
                 endif ()
@@ -542,10 +538,7 @@ if (APPLE)
                 set (CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
             endif ()
         endif ()
-        set (LINKER_FLAGS "-framework AudioUnit -framework Carbon -framework Cocoa -framework CoreAudio -framework CoreServices -framework CoreVideo -framework ForceFeedback -framework IOKit -framework OpenGL")
     endif ()
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
-    set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
     # Common OSX and iOS bundle setup
     if (IOS OR URHO3D_MACOSX_BUNDLE)
         # Only set the bundle properties to its default when they are not explicitly specified by user
@@ -560,7 +553,6 @@ endif ()
 if (MSVC)
     # VS-specific setup
     add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-    # Note: All CMAKE_xxx_FLAGS variables are not in list context (although they should be)
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS-")
     set (CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELWITHDEBINFO})
@@ -583,12 +575,13 @@ if (MSVC)
 else ()
     # GCC/Clang-specific setup
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
-    if (NOT ANDROID AND NOT IOS AND NOT TVOS)    # Most of the flags are already setup in android.toolchain.cmake module or already has correct default setup for iOS
-        if (ARM)
+    if (NOT ANDROID)    # Most of the flags are already setup in android.toolchain.cmake module
+        if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux)
             # Common compiler flags for aarch64-linux-gnu and arm-linux-gnueabihf, we do not support Windows on arm for now
-            set (ARM_CFLAGS "${ARM_CFLAGS} -pipe")
+            set (ARM_CFLAGS "${ARM_CFLAGS} -fsigned-char -pipe")
             if (NOT URHO3D_64BIT)
-                set (ARM_CFLAGS "${ARM_CFLAGS} -mfloat-abi=hard -Wno-psabi")    # We only support armhf distros, so turn on hard-float by default
+                # We only support armhf distros, so turn on hard-float by default
+                set (ARM_CFLAGS "${ARM_CFLAGS} -mfloat-abi=hard -Wno-psabi")
             endif ()
             # The configuration is done here instead of in CMake toolchain file because we also support native build which does not use toolchain file at all
             if (RPI)
@@ -612,6 +605,9 @@ else ()
                 if (URHO3D_64BIT)
                     # aarch64 has only one valid arch so far
                     set (ARM_CFLAGS "${ARM_CFLAGS} -march=armv8-a")
+                elseif (URHO3D_ANGELSCRIPT)
+                    # Angelscript seems to fail to compile using Thumb states, so force to use ARM states by default
+                    set (ARM_CFLAGS "${ARM_CFLAGS} -marm")
                 endif ()
                 if (ARM_ABI_FLAGS)
                     # Instead of guessing all the possible ABIs, user would have to specify the ABI compiler flags explicitly via ARM_ABI_FLAGS build option
@@ -691,7 +687,12 @@ else ()
                 set (CMAKE_EXECUTABLE_SUFFIX_C .html)
                 set (CMAKE_EXECUTABLE_SUFFIX_CXX .html)
                 # Linker flags
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+                if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
+                    set (MEMORY_LINKER_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
+                else ()
+                    set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
+                endif ()
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MEMORY_LINKER_FLAGS} -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
                 set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
                 set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
                 if (URHO3D_TESTING)
@@ -728,10 +729,13 @@ else ()
         set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG -D_DEBUG")
     endif ()
     if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+        # Clang-specific
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Qunused-arguments")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments")
         if (NINJA OR "$ENV{USE_CCACHE}")    # Stringify to guard against undefined environment variable
             # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics -Qunused-arguments")
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics -Qunused-arguments")
+            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
+            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
         endif ()
         # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
         # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
@@ -749,20 +753,18 @@ endif ()
 # LuaJIT specific - extra linker flags for linking against LuaJIT (adapted from LuaJIT's original Makefile)
 if (URHO3D_LUAJIT)
     if (URHO3D_64BIT AND APPLE AND NOT IOS)
-        # 64-bit Mac OS X: it simply won't work without these flags; if you are reading this comment then you may want to know the follolwing also
+        # 64-bit Mac OS X: it simply won't work without these flags; if you are reading this comment then you may want to know the following also
         # it's recommended to rebase all (self-compiled) shared libraries which are loaded at runtime on OSX/x64 (e.g. C extension modules for Lua), see: man rebase
         set (LUAJIT_EXE_LINKER_FLAGS_APPLE "-pagezero_size 10000 -image_base 100000000")
         set (LUAJIT_SHARED_LINKER_FLAGS_APPLE "-image_base 7fff04c4a000")
         if (NOT XCODE)
-            foreach (TYPE EXE SHARED)
-                set (LUAJIT_${TYPE}_LINKER_FLAGS ${LUAJIT_${TYPE}_LINKER_FLAGS_APPLE})
-                set (CMAKE_${TYPE}_LINKER_FLAGS "${CMAKE_${TYPE}_LINKER_FLAGS} ${LUAJIT_${TYPE}_LINKER_FLAGS_APPLE}")
-            endforeach ()
+            set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LUAJIT_EXE_LINKER_FLAGS_APPLE}")
+            set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LUAJIT_SHARED_LINKER_FLAGS_APPLE}")
         endif ()
-    elseif (NOT WIN32 AND NOT APPLE)    # The original condition also checks: AND NOT SunOS AND NOT PS3
-        # GCC-specific: export all public symbols from main executable when linking with LuaJIT statically (LuaJIT as all other 3rd-party libs in Urho3D are static libs)
-        set (LUAJIT_EXE_LINKER_FLAGS -Wl,-E)
-        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LUAJIT_EXE_LINKER_FLAGS}")
+    elseif (URHO3D_LIB_TYPE STREQUAL STATIC AND NOT WIN32 AND NOT APPLE)    # The original condition also checks: AND NOT SunOS AND NOT PS3
+        # We assume user may want to load C modules compiled for plain Lua with require(), so we have to ensure all the public symbols are exported when linking with Urho3D (and therefore LuaJIT) statically
+        # Note: this implies that loading such modules on Windows platform may only work with SHARED library type
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-E")
     endif ()
 endif ()
 
@@ -818,7 +820,7 @@ macro (create_symlink SOURCE DESTINATION)
         else ()
             unset (SLASH_D)
         endif ()
-        if (URHO3D_MKLINK)
+        if (HAS_MKLINK)
             if (NOT EXISTS ${ABS_DESTINATION})
                 # Have to use string-REPLACE as file-TO_NATIVE_PATH does not work as expected with MinGW on "backward slash" host system
                 string (REPLACE / \\ BACKWARD_ABS_DESTINATION ${ABS_DESTINATION})
@@ -854,7 +856,7 @@ macro (enable_pch HEADER_PATHNAME)
     # No op when PCH support is not enabled
     if (URHO3D_PCH)
         # Get the optional LANG parameter to indicate whether the header should be treated as C or C++ header, default to C++
-        if ("${ARGN}" STREQUAL C)   # Stringigy as the LANG paramater could be empty
+        if ("${ARGN}" STREQUAL C)   # Stringify as the LANG paramater could be empty
             set (EXT c)
             set (LANG C)
             set (LANG_H c-header)
@@ -1097,9 +1099,7 @@ macro (setup_library)
     check_source_files ()
     add_library (${TARGET_NAME} ${ARG_UNPARSED_ARGUMENTS} ${SOURCE_FILES})
     get_target_property (LIB_TYPE ${TARGET_NAME} TYPE)
-    if (ARG_NODEPS)
-        set (CMAKE_SHARED_LINKER_FLAGS ${LUAJIT_SHARED_LINKER_FLAGS})  # Don't need extra linker flags that are meant for main shared library only, except those from LuaJIT (if enabled)
-    elseif (NOT PROJECT_NAME STREQUAL Urho3D)
+    if (NOT ARG_NODEPS AND NOT PROJECT_NAME STREQUAL Urho3D)
         define_dependency_libs (Urho3D)
     endif ()
     if (XCODE AND LUAJIT_SHARED_LINKER_FLAGS_APPLE AND LIB_TYPE STREQUAL SHARED_LIBRARY)
@@ -1153,9 +1153,7 @@ macro (setup_executable)
             set (RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin/tool)
         endif ()
     endif ()
-    if (ARG_NODEPS)
-        set (CMAKE_EXE_LINKER_FLAGS ${LUAJIT_EXE_LINKER_FLAGS})  # Don't need extra linker flags that are meant for main executable only, except those from LuaJIT (if enabled)
-    else ()
+    if (NOT ARG_NODEPS)
         define_dependency_libs (Urho3D)
     endif ()
     if (XCODE AND LUAJIT_EXE_LINKER_FLAGS_APPLE)
@@ -1276,7 +1274,11 @@ macro (setup_main_executable)
         # Populate all the variables required by resource packaging
         foreach (DIR ${RESOURCE_DIRS})
             get_filename_component (NAME ${DIR} NAME)
-            set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
+            if (ANDROID)
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_BINARY_DIR}/assets/${NAME}.pak)
+            else ()
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
+            endif ()
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
                 # Set the custom EMCC_OPTION property to preload the *.pak individually
@@ -1344,10 +1346,6 @@ macro (setup_main_executable)
     list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
 
     if (ANDROID)
-        # todo: Fix this later - Android build tree has a hard-coded resource dirs symlinks
-        if (URHO3D_PACKAGING)
-            message (WARNING "Resource packaging is not fully supported for Android build currently.")
-        endif ()
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
             HINTS ${URHO3D_HOME}/include/Urho3D/ThirdParty/SDL/android ${CMAKE_SOURCE_DIR}/Source/ThirdParty/SDL/src/main/android
@@ -1402,11 +1400,6 @@ macro (setup_main_executable)
             endif ()
         elseif (WEB)
             if (EMSCRIPTEN)
-                if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
-                    set (MEMORY_LINKER_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
-                else ()
-                    set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
-                endif ()
                 # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file
                 foreach (FILE ${SOURCE_FILES})
                     get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
@@ -1421,7 +1414,7 @@ macro (setup_main_executable)
                                 set (EMCC_EXCLUDE_FILE " --exclude-file ${EMCC_EXCLUDE_FILE}")
                             endif ()
                         endif ()
-                        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MEMORY_LINKER_FLAGS} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
+                        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
                     endif ()
                 endforeach ()
             endif ()
@@ -1566,6 +1559,12 @@ macro (define_dependency_libs TARGET)
             if (URHO3D_MINIDUMPS)
                 list (APPEND LIBS dbghelp)
             endif ()
+        elseif (APPLE)
+            if (IOS OR TVOS)
+                list (APPEND LIBS "-framework AudioToolbox" "-framework CoreAudio" "-framework CoreGraphics" "-framework CoreMotion" "-framework Foundation" "-framework GameController" "-framework OpenGLES" "-framework QuartzCore" "-framework UIKit")
+            else ()
+                list (APPEND LIBS "-framework AudioUnit" "-framework Carbon" "-framework Cocoa" "-framework CoreAudio" "-framework CoreServices" "-framework CoreVideo" "-framework ForceFeedback" "-framework IOKit" "-framework OpenGL")
+            endif ()
         endif ()
 
         # Graphics
@@ -1575,9 +1574,7 @@ macro (define_dependency_libs TARGET)
             elseif (WIN32)
                 list (APPEND LIBS opengl32)
             elseif (ANDROID OR ARM)
-                if (NOT RPI)
-                    list (APPEND LIBS GLESv1_CM GLESv2)
-                endif ()
+                list (APPEND LIBS GLESv1_CM GLESv2)
             else ()
                 list (APPEND LIBS GL)
             endif ()
@@ -1702,11 +1699,12 @@ endmacro ()
 #  PATTERN <list> - Pattern list to be used in file pattern matching option
 #  BASE <value> - An absolute base path to be prepended to the destination path when installing to build tree, default to build tree
 #  DESTINATION <value> - A relative destination path to be installed to
+#  ACCUMULATE <value> - Accumulate the header files into the specified CMake variable, implies USE_FILE_SYMLINK when input list is a directory
 macro (install_header_files)
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (DEST_INCLUDE_DIR)
         # Parse the arguments for the underlying install command for the SDK
-        cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION" "FILES;DIRECTORY;PATTERN" ${ARGN})
+        cmake_parse_arguments (ARG "FILES_MATCHING;USE_FILE_SYMLINK;BUILD_TREE_ONLY" "BASE;DESTINATION;ACCUMULATE" "FILES;DIRECTORY;PATTERN" ${ARGN})
         unset (INSTALL_MATCHING)
         if (ARG_FILES)
             set (INSTALL_TYPE FILES)
@@ -1741,8 +1739,11 @@ macro (install_header_files)
             endif ()
             if (INSTALL_SOURCE MATCHES /$)
                 # Source is a directory
-                if (ARG_USE_FILE_SYMLINK)
+                if (ARG_USE_FILE_SYMLINK OR ARG_ACCUMULATE OR BASH_ON_WINDOWS)
                     # Use file symlink for each individual files in the source directory
+                    if (IS_SYMLINK ${ARG_DESTINATION} AND NOT CMAKE_HOST_WIN32)
+                        execute_process (COMMAND ${CMAKE_COMMAND} -E remove ${ARG_DESTINATION})
+                    endif ()
                     set (GLOBBING_EXPRESSION RELATIVE ${INSTALL_SOURCE})
                     if (ARG_FILES_MATCHING)
                         foreach (PATTERN ${ARG_PATTERN})
@@ -1759,15 +1760,24 @@ macro (install_header_files)
                             file (MAKE_DIRECTORY ${ARG_BASE}/${PATH})
                         endif ()
                         create_symlink (${INSTALL_SOURCE}${NAME} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+                        if (ARG_ACCUMULATE)
+                            list (APPEND ${ARG_ACCUMULATE} ${ARG_DESTINATION}/${NAME})
+                        endif ()
                     endforeach ()
                 else ()
                     # Use a single symlink pointing to the source directory
+                    if (NOT IS_SYMLINK ${ARG_DESTINATION} AND NOT CMAKE_HOST_WIN32)
+                        execute_process (COMMAND ${CMAKE_COMMAND} -E remove_directory ${ARG_DESTINATION})
+                    endif ()
                     create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION} FALLBACK_TO_COPY)
                 endif ()
             else ()
                 # Source is a file (it could also be actually a directory to be treated as a "file", i.e. for creating symlink pointing to the directory)
                 get_filename_component (NAME ${INSTALL_SOURCE} NAME)
                 create_symlink (${INSTALL_SOURCE} ${ARG_DESTINATION}/${NAME} FALLBACK_TO_COPY)
+                if (ARG_ACCUMULATE)
+                    list (APPEND ${ARG_ACCUMULATE} ${ARG_DESTINATION}/${NAME})
+                endif ()
             endif ()
         endforeach ()
     endif ()
@@ -1800,11 +1810,13 @@ if (ANDROID)
     endif ()
     # Create symbolic links in the build tree
     file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
-    foreach (I CoreData Data)
-        if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
+    if (NOT URHO3D_PACKAGING)
+        foreach (I CoreData Data)
+            if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
+                create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
+            endif ()
+        endforeach ()
+    endif ()
     foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
         if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
             create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
@@ -1816,7 +1828,7 @@ elseif (WEB)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
             file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
             string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
-            string (REPLACE "<body>" "<body>\n\n<a href=\"http://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"http://urho3d.github.io/assets/images/logo.png\" alt=\"link to http://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
+            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
             file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
         endif ()
     endif ()

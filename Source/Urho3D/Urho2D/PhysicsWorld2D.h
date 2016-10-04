@@ -86,13 +86,13 @@ public:
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
-    // Implement b2ContactListener.
+    // Implement b2ContactListener
     /// Called when two fixtures begin to touch.
     virtual void BeginContact(b2Contact* contact);
     /// Called when two fixtures cease to touch.
     virtual void EndContact(b2Contact* contact);
 
-    // Implement b2Draw.
+    // Implement b2Draw
     /// Draw a closed polygon provided in CCW order.
     virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
     /// Draw a solid closed polygon provided in CCW order.
@@ -262,6 +262,8 @@ private:
         SharedPtr<Node> nodeA_;
         /// Node B.
         SharedPtr<Node> nodeB_;
+        /// Box2D contact.
+        b2Contact* contact_;
     };
     /// Begin contact infos.
     Vector<ContactInfo> beginContactInfos_;

@@ -99,12 +99,6 @@ public:
 
     /// Return type info static.
     static const TypeInfo* GetTypeInfoStatic() { return 0; }
-    /// Check current type is type of specified type.
-    static bool IsTypeOf(StringHash type);
-    /// Check current type is type of specified type.
-    static bool IsTypeOf(const TypeInfo* typeInfo);
-    /// Check current type is type of specified class.
-    template<typename T> static bool IsTypeOf() { return IsTypeOf(T::GetTypeInfoStatic()); }
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
     /// Check current instance is type of specified type.
@@ -359,6 +353,7 @@ private:
 /// Register event names.
 struct URHO3D_API EventNameRegistrar
 {
+    /// Register an event name for hash reverse mapping.
     static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.
     static const String& GetEventName(StringHash eventID);

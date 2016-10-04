@@ -222,6 +222,8 @@ The full list of supported parameters, their datatypes and default values:
 - SoundStereo (bool) Stereo sound output mode. Default true.
 - SoundInterpolation (bool) Interpolated sound output mode to improve quality. Default true.
 - TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
+- ShaderCacheDir (string) Shader binary cache directory for Direct3D. Default "urho3d/shadercache" within the user's application preferences directory.
+- PackageCacheDir (string) Package cache directory for Network subsystem. Not specified by default.
 
 \section MainLoop_Frame Main loop iteration
 
@@ -412,6 +414,7 @@ Resources include most things in Urho3D that are loaded from mass storage during
 - Sound
 - Technique
 - Texture2D
+- Texture2DArray
 - Texture3D
 - TextureCube
 - XMLFile
@@ -1086,6 +1089,10 @@ These differences need to be observed when using the low-level rendering functio
 
 - Direct3D11 is strict about vertex attributes referenced by shaders. A model will not render (input layout fails to create) if the shader for example asks for UV coordinates and the model does not have them. For this particular case, see the NOUV define in LitSolid shader, which is defined in the NoTexture family of techniques to prevent the attempted reading of UV coords.
 
+- Alpha-to-coverage is not supported on Direct3D9.
+
+- Bool and int shader uniforms are not supported on Direct3D9.
+
 OpenGL ES 2.0 has further limitations:
 
 - Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS) compressed textures are supported through the .ktx and .pvr file formats.
@@ -1105,6 +1112,8 @@ OpenGL ES 2.0 has further limitations:
 - Custom clip planes are not currently supported.
 
 - 3D and 2D array textures are not currently supported.
+
+- Multisampled texture rendertargets are not supported.
 
 \page VertexBuffers Vertex buffers
 
@@ -1162,17 +1171,20 @@ A material definition looks like this:
     <technique name="TechniqueName" quality="q" loddistance="d" />
     <texture unit="diffuse|normal|specular|emissive|environment" name="TextureName" />
     <texture ... />
+    <shader vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" />
     <parameter name="name" value="x y z w" />
     <parameter ... />
     <cull value="cw|ccw|none" />
     <shadowcull value="cw|ccw|none" />
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
+    <alphatocoverage enable="true|false" />
     <renderorder value="x" />
+    <occlusion enable="true|false" />
 </material>
 \endcode
 
-Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()". It is also possible for a technique to require %Shader %Model 3, in this case it will be skipped on SM2 hardware.
+Several techniques can be defined for different quality levels and LOD distances. %Technique quality levels are specified from 0 (low) to 2 (high). When rendering, the highest available technique that does not exceed the Renderer's material quality setting will be chosen, see \ref Renderer::SetMaterialQuality "SetMaterialQuality()".
 
 The techniques for different LOD levels and quality settings must appear in a specific order:
 
@@ -1186,7 +1198,14 @@ The techniques for different LOD levels and quality settings must appear in a sp
 
 Default culling mode is counterclockwise. The shadowcull element specifies the culling mode to use in the shadow pass. Note that material's depth bias settings do not apply in the shadow pass; during shadow rendering the light's depth bias is used instead.
 
-Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding the state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. Read below for caveats regarding it.
+Render order is a 8-bit unsigned value that can be used to affect rendering order within a pass, overriding state or distance sorting. The default value is 128; smaller values will render earlier, and larger values later. One example use of render order is to ensure that materials which use discard in pixel shader (ALPHAMASK define) are rendered after full opaques to ensure the hardware depth buffer will behave optimally; in this case the render order should be increased. Read below for caveats regarding it.
+
+Occlusion flag allows to disable software occlusion rendering per material, for example if parts of a model are transparent. By default occlusion is enabled.
+
+Materials can optionally set shader compilation defines (vsdefines & psdefines). In this case they will be added to the techniques' own compilation defines, and the techniques are cloned as necessary
+to ensure uniqueness.
+
+Enabling alpha-to-coverage on the material enables it on all passes. Alternatively it can be enabled per-pass in the technique for fine-grained control.
 
 \section Materials_Textures Material textures
 
@@ -1195,7 +1214,7 @@ Diffuse maps specify the surface color in the RGB channels. Optionally they can 
 Normal maps encode the tangent-space surface normal for normal mapping. There are two options for storing normals, which require choosing the correct material technique, as the pixel shader is different in each case:
 
 - Store as RGB. In this case use the DiffNormal techniques. This is the default used by AssetImporter, to ensure no conversion of normal textures needs to happen.
-- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. In this case use the DiffNormalPacked techniques: Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. To convert normal maps to this format, you can use AMD's The Compressonator utility, see http://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx
+- Store as xGxR, ie. Y-component in the green channel, and X-component in the alpha. Z will be reconstructed in the pixel shader. This encoding lends itself well to DXT5 compression. You need to use the pixel shader define PACKEDNORMAL in your materials; refer to the Stone example materials. To convert normal maps to this format, you can use AMD's The Compressonator utility, see https://developer.amd.com/Resources/archive/ArchivedTools/gpu/compressonator/Pages/default.aspx.
 
 Make sure the normal map is oriented correctly: an even surface should have the color value R 0.5 G 0.5 B 1.0.
 
@@ -1209,7 +1228,7 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 <texture>
     <address coord="u|v|w" mode="wrap|mirror|clamp|border" />
     <border color="r g b a" />
-    <filter mode="nearest|bilinear|trilinear|anisotropic|default" />
+    <filter mode="nearest|bilinear|trilinear|anisotropic|default" anisotropy="x" />
     <mipmap enable="false|true" />
     <quality low="x" medium="y" high="z" />
     <srgb enable="false|true" />
@@ -1217,6 +1236,8 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 \endcode
 
 The sRGB flag controls both whether the texture should be sampled with sRGB to linear conversion, and if used as a rendertarget, pixels should be converted back to sRGB when writing to it. To control whether the backbuffer should use sRGB conversion on write, call \ref Graphics::SetSRGB "SetSRGB()" on the Graphics subsystem.
+
+Anisotropy level can be optionally specified. If omitted (or if the value 0 is specified), the default from the Renderer class will be used.
 
 \section Materials_CubeMapTextures Cube map textures
 
@@ -1243,7 +1264,7 @@ Using a single image texture and a layout is used like this:
 </cubemap>
 \endcode
 
-For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
+For the layout definitions, see http://www.cgtextures.com/content.php?action=tutorial&name=cubemaps and https://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Build_a_skybox
 
 \section Materials_3DTextures 3D textures
 
@@ -1277,12 +1298,13 @@ A technique definition looks like this:
 <technique vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" desktop="false|true" >
     <pass name="base|litbase|light|alpha|litalpha|postopaque|refract|postalpha|prepass|material|deferred|depth|shadow" desktop="false|true" >
         vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4"
+        vsexcludes="EXCLUDE1 EXCLUDE2" psexcludes="EXCLUDE3 EXCLUDE4"
         lighting="unlit|pervertex|perpixel"
         blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha"
         [cull="cw|ccw|none"]
         depthtest="always|equal|less|lessequal|greater|greaterequal"
         depthwrite="true|false"
-        alphamask="true|false" />
+        alphatocoverage="true|false" />
     <pass ... />
     <pass ... />
 </technique>
@@ -1295,6 +1317,8 @@ A pass should normally not define culling mode, but it can optionally specify it
 Shaders are referred to by giving the name of a shader without path and file extension. For example "Basic" or "LitSolid". The engine will add the correct path and file extension (Shaders/HLSL/LitSolid.hlsl for Direct3D, and Shaders/GLSL/LitSolid.glsl for OpenGL) automatically. The same shader source file contains both the vertex and pixel shader. In addition, compilation defines can be specified, which are passed to the shader compiler. For example the define "DIFFMAP" typically enables diffuse mapping in the pixel shader.
 
 Shaders and their compilation defines can be specified on both the technique and pass level. If a pass does not override the default shaders specified on the technique level, it still can specify additional compilation defines to be used. However, if a pass overrides the shaders, then the technique-level defines are not used.
+
+As a material can set further shader defines, which would be applied to all passes, the "vsexcludes" and "psexcludes" mechanism allows per-pass control to prevent them from being included. This is intended for eliminating the compilation of unnecessary shader variations, for example a shadow shader attempting to read a normal map.
 
 The technique definition does not need to enumerate shaders used for different geometry types (non-skinned, skinned, instanced, billboard) and different per-vertex and per-pixel light combinations. Instead the engine will add certain hardcoded compilation defines for these. See \ref Shaders "Shaders" for details.
 
@@ -1317,8 +1341,6 @@ The purposes of the different passes are:
 More custom passes can be defined and referred to in the \ref RenderPaths "render path definition". For the built-in passes listed above, the lighting shader permutations to load (unlit, per-vertex or per-pixel) are recognized automatically, but for custom passes they need to be explicitly specified. The default is unlit.
 
 The optional "litbase" pass reduces draw call count by combining ambient lighting with the first per-pixel light affecting an object. However, it has intentional limitations to not require too many shader permutations: there must be no vertex lights affecting the object, and the ambient lighting can not have a gradient. In case of excessive overdraw, it is possibly better not to define it, but instead allow the base pass (which is computationally very lightweight) to run first, initializing the Z buffer for later passes.
-
-"Alphamask" is not an actual rendering state, but a hint which tells that the pixel shader will use discard based on alpha. Because this may interfere with the early-Z culling, materials without the alpha masking hint will be drawn first.
 
 The refract pass requires pingponging the scene rendertarget to a texture, but this will not be performed if there is no refractive geometry to render, so there is no unnecessary cost to it.
 
@@ -1494,8 +1516,9 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" cubemap="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false" />
-    <command type="clear" tag="TagName" enabled="true|false" clearcolor="r g b a|fog" cleardepth="x" clearstencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
+        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false"
+        multisample="x" autoresolve="true|false" />
+    <command type="clear" tag="TagName" enabled="true|false" color="r g b a|fog" depth="x" stencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
     <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" face="0|1|2|3|4|5" />
         <output index="1" name="RTName2" />
@@ -1571,6 +1594,14 @@ Post-processing effects are usually implemented by using the quad command. When 
 
 In OpenGL post-processing shaders it is important to distinguish between sampling a rendertarget texture and a regular texture resource, because intermediate rendertargets (such as the G-buffer) may be vertically inverted. Use the GetScreenPos() or GetQuadTexCoord() functions to get rendertarget UV coordinates from the clip coordinates; this takes flipping into account automatically. For sampling a regular texture, use GetQuadTexCoordNoFlip() function, which requires world coordinates instead of clip coordinates.
 
+\section RenderPaths_MultiSample Multisampled rendertargets
+
+Texture2D and TextureCube support multisampling. Programmatically, multisampling is enabled through the \ref Texture2D::SetSize "SetSize()" function when defining the dimensions and format. Multisampling can also be set in a renderpath's rendertarget definition.
+
+The normal operation is that a multisampled rendertarget will be automatically resolved to 1-sample before being sampled as a texture. This is denoted by the \ref Texture2D::GetAutoResolve() "autoResolve" parameter, whose default value is true. On OpenGL (when supported) and Direct3D11, it's also possible to access the individual samples of a Texture2D in shader code by defining a multisampled sampler and using specialized functions (texelFetch on OpenGL, Texture2DMS.Load on Direct3D11). In this case the "autoResolve" parameter should be set to false. Note that accessing individual samples is not possible for cube textures, or when using Direct3D9.
+
+By accessing the individual samples of multisampled G-buffer textures, a deferred MSAA renderer could be implemented. This has some performance considerations / complexities (you should avoid running the lighting calculations per sample when not on triangle edges) and is not implemented by default.
+
 \page Lights Lights and shadows
 
 Lights in Urho3D can be directional, point, or spot lights, either per-pixel or per-vertex. Shadow mapping is supported for all per-pixel lights.
@@ -1595,6 +1626,8 @@ A specular intensity of 0 disables specular calculations from a per-pixel light,
 
 Negative (subtractive) lights can be achieved by setting either the color components or the brightness multiplier to a negative value. These can be used to locally reduce the ambient light level, for example to create a dark cave. Negative per-pixel lights will not work in light pre-pass rendering mode, as it uses a light accumulation buffer with a black initial value, so there is nothing to subtract from.
 
+Lights can alternatively enable the use of physical values, in which case the brightness multiplier is specified in lumens, and a light temperature value in Kelvin becomes available to also modulate the color (typically the color value itself would be left white in this case.) See \ref Light::SetUsePhysicalValues "SetUsePhysicalValues()" and \ref Light::SetTemperature "SetTemperature()".
+
 \section Lights_LightCulling Light culling
 
 When occlusion is used, a light will automatically be culled if its bounding box is fully behind an occluder. However, directional lights have an infinite bounding box, and can not be culled this way.
@@ -1617,7 +1650,7 @@ Shadow rendering is easily the most complex aspect of using lights, and therefor
 
 - FocusParameters: these have effect for directional and spot lights, and control techniques to increase shadow map resolution. They consist of focus enable flag (allows focusing the shadow camera on the visible shadow casters & receivers), nonuniform scale enable flag (allows better resolution), automatic size reduction flag (reduces shadow map resolution when the light is far away), and quantization & minimum size parameters for the shadow camera view.
 
-Additionally there are shadow fade distance, shadow intensity, shadow resolution and shadow near/far ratio parameters:
+Additionally there are shadow fade distance, shadow intensity, shadow resolution, shadow near/far ratio and shadow max extrusion parameters:
 
 - If both shadow distance and shadow fade distance are greater than zero, shadows start to fade at the shadow fade distance, and vanish completely at the shadow distance.
 
@@ -1627,11 +1660,15 @@ Additionally there are shadow fade distance, shadow intensity, shadow resolution
 
 - The shadow near/far ratio controls shadow camera near clip distance for point & spot lights. The default ratio is 0.002, which means a light with range 100 would have its shadow camera near plane set at the distance of 0.2. Set this as high as you can for better shadow depth resolution, but note that the bias parameters will likely have to be adjusted as well.
 
+- The shadow max extrusion distance controls how far from the view position directional light shadow cameras are positioned. The effective value will be the minimum of this parameter and the camera far clip distance. The default is 1000; increase this if you have shadow cascades to a far distance and are using tall objects, and notice missing shadows. The extrusion distance affects shadow map depth resolution and therefore the effect of shadow bias parameters.
+
 \section Lights_ShadowGlobal Global shadow settings
 
 The shadow map base resolution and quality (bit depth & sampling mode) are set through functions in the Renderer subsystem, see \ref Renderer::SetShadowMapSize "SetShadowMapSize()" and \ref Renderer::SetShadowQuality "SetShadowQuality()".
 
 The shadow quality enum allows choosing also variance (VSM) shadows instead of the default hardware depth shadows. VSM shadows behave markedly differently; depth bias settings are no longer relevant, but you should make sure all your large surfaces (also ground & terrain) are marked as shadow casters, otherwise shadows cast by objects moving over them can appear unnaturally thin. For VSM shadows, see the functions \ref Renderer::SetShadowSoftness "SetShadowSoftness()" and \ref Renderer::SetVSMShadowParameters "SetVSMShadowParameters()" to control the softness (blurring) and in-shadow detection behavior. Instead of self-shadowing artifacts common with hardware depth shadows, you may encounter light bleeding when shadow casting surfaces are close in light direction to each other, which adjusting the VSM shadow parameters may help.
+
+VSM shadow maps can also be multisampled for better quality, though this has a performance cost. See \ref Renderer::SetVSMMultiSample "SetVSMMultiSample()".
 
 \section Lights_ShadowMapReuse Shadow map reuse
 
@@ -1813,6 +1850,9 @@ The input events include:
 - E_INPUTFOCUS : application input focus or window minimization state changed.
 - E_MOUSEVISIBLECHANGED : the visibility of the operating system mouse cursor was changed.
 - E_EXITREQUESTED : application exit was requested (eg. with the window close button.)
+- E_INPUTBEGIN : input handling starts.
+- E_INPUTEND : input handling ends.
+- E_SDLRAWINPUT : raw SDL event is sent for customized event processing.
 
 \section InputKeyboard Keyboard and mouse input
 
@@ -2073,7 +2113,7 @@ Urho3D implements a simple, hierarchical user interface system based on rectangu
 - View3D: a window that renders a 3D viewport
 - Window: a movable and resizable window
 
-The root %UI element can be queried from the UI subsystem. It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
+The root %UI element can be queried from the UI subsystem with the function \ref UI::GetRoot "GetRoot()". It is an empty canvas (UIElement) as large as the application window, into which other elements can be added.
 
 Elements are added into each other similarly as scene nodes, using the \ref UIElement::AddChild "AddChild()" and \ref UIElement::RemoveChild "RemoveChild()" functions. Each %UI element has also a \ref UIElement::GetVars "user variables" VariantMap for storing custom data, and the possibility to add tags for identification: see \ref UIElement::AddTag "AddTag()", \ref UIElement::RemoveTag "RemoveTag()", \ref UIElement::SetTags "SetTags()" and \ref UIElement::GetChildrenWithTag "GetChildrenWithTag()".
 
@@ -2092,9 +2132,9 @@ The absolute pixel rects interact poorly with the Renderer's texture quality set
 </texture>
 \endcode
 
-\section UI_Defining Defining UI elements in XML
+\section UI_Definition UI layout and style definition files
 
-User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two distinct use cases for %UI definition files: either defining just the %UI element style and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
+User interface elements derive from Serializable, so they can be serialized to/from XML using their attributes. There are two use cases for %UI definition files: either defining just the %UI element style (for example the image rects for a button's each state, or the font to use for a text) and leaving the actual position and dimensions to be filled in later, or fully defining an %UI element layout. The default element style definitions, used for example by the editor and the debug console, are in the file bin/Data/UI/DefaultStyle.xml.
 
 The function \ref UI::LoadLayout "LoadLayout()" in UI will take an XML file and instantiate the elements defined in it. To be valid XML, there should be one root-level %UI element. An optional style XML file can be specified; the idea is to first read the element's style from that file, then fill in the rest from the actual layout XML file. This way the layout file can be relatively simple, as the majority of the data is already defined.
 
@@ -2125,13 +2165,25 @@ tells to instantiate a Button element, and that it should use the style "CloseBu
 
 3) The popup element shown by Menu and DropDownList is not an actual child element. In XML serialization, it is nevertheless stored as a child element, but is marked with the attribute popup="true".
 
-\section UI_Layouts UI element layout
+\section UI_Programmatic Defining UI layouts programmatically
+
+Instead of loading a %UI element hierarchy from a definition file, it is just as valid (though cumbersome for larger hierarchies) to create the elements in code, which is demonstrated by several of the Urho3D samples.
+
+In this mode of operation, styles are not automatically applied when an element is added or created to the hierarchy, even if a parent element (or the %UI root) has a default style file assigned. This is because applying a style to an element means just setting a number of attributes and has potential to be "destructive" ie. overwrite the already set values. For each created element, you need to manually call either \ref UIElement::SetStyle "SetStyle()" to specify a style name that should be applied, or \ref UIElement::SetStyleAuto "SetStyleAuto()" to use the element's typename as the style name, e.g. the style "Button" for a Button element.
+
+\section UI_Layouts Child element layouting
 
 By default %UI elements operate in a "free" layout mode, where child elements' positions can be specified relative to any of the parent element corners, but they are not automatically positioned or resized.
 
-To create automatically adjusting layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
+To create automatically adjusting child layouts, the layout mode can be switched to either "horizontal" or "vertical". Now the child elements will be positioned left to right or top to bottom, based on the order in which they were added. They will be preferably resized to fit the parent element, taking into account their minimum and maximum sizes, but failing to do that, the parent element will be resized.
 
 Left, top, right & bottom border widths and spacing between elements can also be specified for the layout. A grid layout is not directly supported, but it can be manually created with a horizontal layout inside a vertical layout, or vice versa.
+
+Use the functions \ref UIElement::SetLayout "SetLayout()" or \ref UIElement::SetLayoutMode "SetLayoutMode()" to control the layouting.
+
+\section UI_Anchoring Child element anchoring
+
+A separate mechanism from layouting that allows automatically adjusting %UI hierarchies is to use anchoring. First enable anchoring in a child element with \ref UIElement::SetEnableAnchor "SetEnableAnchor()", after which the top-left and bottom-right corners in relation to the parent's size (range 0-1) can be set with \ref UIElement::SetMinAnchor "SetMinAnchor()" and \ref UIElement::SetMaxAnchor "SetMaxAnchor()". The corners can further be offset in pixels by calling \ref UIElement::SetMinOffset "SetMinOffset()" and \ref UIElement::SetMaxOffset "SetMaxOffset()". Finally note that instead of just setting horizontal / vertical alignment, the child element's pivot can also be expressed in a 0-1 range relative to its size by calling \ref UIElement::SetPivot "SetPivot()".
 
 \section UI_Fonts Fonts
 
@@ -2310,7 +2362,7 @@ Both are rendered using StaticSprite2D class (Drawable component):
 - Sprite2D: an image defined with texture, texture rectangle and hot spot.
 - SpriteSheet2D: a texture atlas image (that packs multiple Sprite2D images).
 - StaticSprite2D: used to display a Sprite2D. Equivalent to a 3D StaticModel.
-Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (http://www.codeandweb.com/texturepacker), ...
+Spritesheets can be created using tools like ShoeBox (http://renderhjs.net/shoebox/), darkFunction Editor (http://darkfunction.com/editor/), SpriteHelper (http://www.gamedevhelper.com/spriteHelper2Info.php), TexturePacker (https://www.codeandweb.com/texturepacker), ...
 These tools will generate an image file and a xml file mapping coordinates and size for each individual image. Note that Urho2D uses same xml file format as Sparrow/Starling engines.
 
 You can assign a material to an image by creating a xml parameter file named as the image and located in the same folder.
@@ -2377,7 +2429,7 @@ Check Box2D manual - Chapter 4 Collision Module and Chapter 7 Fixtures for full 
 
 Several collision shapes may exist in the same node to create compound shapes. This can be handy to approximate complex or concave shapes.
 
-Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (http://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
+Important: collision shapes must match your textures in order to be accurate. You can use Tiled's objects to create your shapes (see \ref Urho2D_TMX_Objects "Tile map objects"). Or you can use tools like Physics Body Editor (https://code.google.com/p/box2d-editor/), RUBE (https://www.iforce2d.net/rube/), LevelHelper (http://www.gamedevhelper.com/levelhelper/), PhysicsEditor (https://www.codeandweb.com/physicseditor), ... to help you. Other interesting tool is BisonKick (https://bisonkick.com/app/518195d06927101d38a83b66/).
 
 Use \ref PhysicsWorld2D::SetDrawShape "SetDrawShape()" in combination with \ref PhysicsWorld2D::DrawDebugGeometry "DrawDebugGeometry()" to toggle shapes visibility.
 
@@ -3060,6 +3112,7 @@ Options:
 -bp         Move bones to bind pose before saving model
 -split <start> <end> (animation model only)
             Split animation, will only import from start frame to end frame
+-np         Do not suppress $fbx pivot nodes (FBX files only)
 \endverbatim
 
 The material list is a text file, one material per line, saved alongside the Urho3D model. It is used by the scene editor to automatically apply the imported default materials when setting a new model for a StaticModel, StaticModelGroup, AnimatedModel or Skybox component, and can also be manually invoked by calling \ref StaticModel::ApplyMaterialList "ApplyMaterialList()". The list files can safely be deleted if not needed.
@@ -3090,6 +3143,9 @@ Note: outputting only bone rotations may help when using an animation in a diffe
 \section Tools_PackageTool PackageTool
 
 Examines a directory recursively for files and subdirectories and creates a PackageFile. The package file can be added to the ResourceCache and used as if the files were on a (read-only) filesystem. The file data can optionally be compressed using the LZ4 compression library.
+
+Use caution when using package files on Android, as the .apk is already a package itself, where arbitrary seeks can perform poorly due to compression already being used. Experimentally it looks that on Android it can be favorable
+to compress the package, because in that case the .apk packaging may skip its own compression, allowing better seek & read performance.
 
 Usage:
 

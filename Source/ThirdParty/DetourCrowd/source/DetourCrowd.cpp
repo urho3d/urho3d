@@ -16,7 +16,7 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-// Modified by Lasse Oorni, Yao Wei Tjong and cosmy1 for Urho3D
+// Modified by Lasse Oorni, Yao Wei Tjong, 1vanK and cosmy1 for Urho3D
 
 #define _USE_MATH_DEFINES
 #include <string.h>
@@ -1375,6 +1375,10 @@ void dtCrowd::update(const float dt, dtCrowdAgentDebugInfo* debug)
 				{
 					pen = (1.0f/dist) * (pen*0.5f) * COLLISION_RESOLVE_FACTOR;
 				}
+				
+				// Urho3D: Avoid tremble when another agent can not move away
+				if (ag->params.separationWeight < 0.0001f) 
+					continue;
 				
 				dtVmad(ag->disp, ag->disp, diff, pen);			
 				

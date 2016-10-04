@@ -732,6 +732,50 @@ void ParticleEffect::SortTextureFrames()
         AddTextureFrame(tf[i]);
 }
 
+SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
+{
+    SharedPtr<ParticleEffect> ret(new ParticleEffect(context_));
+
+    ret->SetName(cloneName);
+    ret->material_ = material_;
+    ret->numParticles_ = numParticles_;
+    ret->updateInvisible_ = updateInvisible_;
+    ret->relative_ = relative_;
+    ret->scaled_ = scaled_;
+    ret->sorted_ = sorted_;
+    ret->fixedScreenSize_ = fixedScreenSize_;
+    ret->animationLodBias_ = animationLodBias_;
+    ret->emitterType_ = emitterType_;
+    ret->emitterSize_ = emitterSize_;
+    ret->directionMin_ = directionMin_;
+    ret->directionMax_ = directionMax_;
+    ret->constantForce_ = constantForce_;
+    ret->dampingForce_ = dampingForce_;
+    ret->activeTime_ = activeTime_;
+    ret->inactiveTime_ = inactiveTime_;
+    ret->emissionRateMin_ = emissionRateMin_;
+    ret->emissionRateMax_ = emissionRateMax_;
+    ret->sizeMin_ = sizeMin_;
+    ret->sizeMax_ = sizeMax_;
+    ret->timeToLiveMin_ = timeToLiveMin_;
+    ret->timeToLiveMax_ = timeToLiveMax_;
+    ret->velocityMin_ = velocityMin_;
+    ret->velocityMax_ = velocityMax_;
+    ret->rotationMin_ = rotationMin_;
+    ret->rotationMax_ = rotationMax_;
+    ret->rotationSpeedMin_ = rotationSpeedMin_;
+    ret->rotationSpeedMax_ = rotationSpeedMax_;
+    ret->sizeAdd_ = sizeAdd_;
+    ret->sizeMul_ = sizeMul_;
+    ret->colorFrames_ = colorFrames_;
+    ret->textureFrames_ = textureFrames_;
+    ret->faceCameraMode_ = faceCameraMode_;
+    /// \todo Zero if source was created programmatically
+    ret->SetMemoryUse(GetMemoryUse());
+
+    return ret;
+}
+
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
     return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0;

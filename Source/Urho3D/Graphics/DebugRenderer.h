@@ -174,6 +174,8 @@ private:
     Matrix3x4 view_;
     /// Projection transform.
     Matrix4 projection_;
+    /// Projection transform in API-specific format.
+    Matrix4 gpuProjection_;
     /// View frustum.
     Frustum frustum_;
     /// Vertex buffer.

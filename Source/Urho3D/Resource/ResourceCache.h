@@ -178,7 +178,7 @@ public:
     unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned long long GetTotalMemoryUse() const;
-    /// Return full absolute file name of resource if possible.
+    /// Return full absolute file name of resource if possible, or empty if not found.
     String GetResourceFileName(const String& name) const;
 
     /// Return whether automatic resource reloading is enabled.

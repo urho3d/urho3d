@@ -278,6 +278,7 @@ Renderer::Renderer(Context* context) :
     shadowQuality_(SHADOWQUALITY_PCF_16BIT),
     shadowSoftness_(1.0f),
     vsmShadowParams_(0.0000001f, 0.2f),
+    vsmMultiSample_(1),
     maxShadowMaps_(1),
     minInstances_(2),
     maxSortedInstances_(1000),
@@ -454,6 +455,16 @@ void Renderer::SetVSMShadowParameters(float minVariance, float lightBleedingRedu
 {
     vsmShadowParams_.x_ = Max(minVariance, 0.0f);
     vsmShadowParams_.y_ = Clamp(lightBleedingReduction, 0.0f, 1.0f);
+}
+
+void Renderer::SetVSMMultiSample(int multiSample)
+{
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample != vsmMultiSample_)
+    {
+        vsmMultiSample_ = multiSample;
+        ResetShadowMaps();
+    }
 }
 
 void Renderer::SetShadowMapFilter(Object* instance, ShadowMapFilter functionPtr)
@@ -708,10 +719,19 @@ void Renderer::Render()
         SetIndirectionTextureData();
 
     graphics_->SetDefaultTextureFilterMode(textureFilterMode_);
-    graphics_->SetTextureAnisotropy((unsigned)textureAnisotropy_);
+    graphics_->SetDefaultTextureAnisotropy((unsigned)textureAnisotropy_);
 
-    // If no views, just clear the screen
-    if (views_.Empty())
+    // If no views that render to the backbuffer, clear the screen so that e.g. the UI is not rendered on top of previous frame
+    bool hasBackbufferViews = false;
+    for (unsigned i = 0; i < views_.Size(); ++i)
+    {
+        if (!views_[i]->GetRenderTarget())
+        {
+            hasBackbufferViews = true;
+            break;
+        }
+    }
+    if (!hasBackbufferViews)
     {
         graphics_->SetBlendMode(BLEND_REPLACE);
         graphics_->SetColorWrite(true);
@@ -720,41 +740,22 @@ void Renderer::Render()
         graphics_->SetStencilTest(false);
         graphics_->ResetRenderTargets();
         graphics_->Clear(CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL, defaultZone_->GetFogColor());
-
-        numPrimitives_ = 0;
-        numBatches_ = 0;
     }
-    else
+
+    // Render views from last to first. Each main (backbuffer) view is rendered after the auxiliary views it depends on
+    for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
     {
-        // Render views from last to first (each main view is rendered after the auxiliary views it depends on)
-        for (unsigned i = views_.Size() - 1; i < views_.Size(); --i)
-        {
-            if (!views_[i])
-                continue;
+        if (!views_[i])
+            continue;
 
-            using namespace BeginViewRender;
-
-            RenderSurface* renderTarget = views_[i]->GetRenderTarget();
-
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_VIEW] = views_[i];
-            eventData[P_SURFACE] = renderTarget;
-            eventData[P_TEXTURE] = (renderTarget ? renderTarget->GetParentTexture() : 0);
-            eventData[P_SCENE] = views_[i]->GetScene();
-            eventData[P_CAMERA] = views_[i]->GetCamera();
-            SendEvent(E_BEGINVIEWRENDER, eventData);
-
-            // Screen buffers can be reused between views, as each is rendered completely
-            PrepareViewRender();
-            views_[i]->Render();
-
-            SendEvent(E_ENDVIEWRENDER, eventData);
-        }
-
-        // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
-        numPrimitives_ = graphics_->GetNumPrimitives();
-        numBatches_ = graphics_->GetNumBatches();
+        // Screen buffers can be reused between views, as each is rendered completely
+        PrepareViewRender();
+        views_[i]->Render();
     }
+
+    // Copy the number of batches & primitives from Graphics so that we can account for 3D geometry only
+    numPrimitives_ = graphics_->GetNumPrimitives();
+    numBatches_ = graphics_->GetNumBatches();
 
     // Remove unused occlusion buffers and renderbuffers
     RemoveUnusedBuffers();
@@ -926,6 +927,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     // Find format and usage of the shadow map
     unsigned shadowMapFormat = 0;
     TextureUsage shadowMapUsage = TEXTURE_DEPTHSTENCIL;
+    int multiSample = 1;
 
     switch (shadowQuality_)
     {
@@ -943,6 +945,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     case SHADOWQUALITY_BLUR_VSM:
         shadowMapFormat = graphics_->GetRGFloat32Format();
         shadowMapUsage = TEXTURE_RENDERTARGET;
+        multiSample = vsmMultiSample_;
         break;
     }
 
@@ -955,7 +958,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
 
     while (retries)
     {
-        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage))
+        if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage, multiSample))
         {
             width >>= 1;
             height >>= 1;
@@ -1001,7 +1004,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     return newShadowMap;
 }
 
-Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool cubemap, bool filtered, bool srgb,
+Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int multiSample, bool autoResolve, bool cubemap, bool filtered, bool srgb,
     unsigned persistentKey)
 {
     bool depthStencil = (format == Graphics::GetDepthStencilFormat()) || (format == Graphics::GetReadableDepthFormat());
@@ -1014,13 +1017,19 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
     if (cubemap)
         height = width;
 
-    long long searchKey = ((long long)format << 32) | (width << 16) | height;
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample == 1)
+        autoResolve = false;
+
+    long long searchKey = ((long long)format << 32) | (multiSample << 24) | (width << 12) | height;
     if (filtered)
         searchKey |= 0x8000000000000000LL;
     if (srgb)
         searchKey |= 0x4000000000000000LL;
     if (cubemap)
         searchKey |= 0x2000000000000000LL;
+    if (autoResolve)
+        searchKey |= 0x1000000000000000LL;
 
     // Add persistent key if defined
     if (persistentKey)
@@ -1042,7 +1051,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
         if (!cubemap)
         {
             SharedPtr<Texture2D> newTex2D(new Texture2D(context_));
-            newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET);
+            newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET, multiSample, autoResolve);
 
 #ifdef URHO3D_OPENGL
             // OpenGL hack: clear persistent floating point screen buffers to ensure the initial contents aren't illegal (NaN)?
@@ -1063,7 +1072,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
         else
         {
             SharedPtr<TextureCube> newTexCube(new TextureCube(context_));
-            newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET);
+            newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET, multiSample);
 
             newBuffer = newTexCube;
         }
@@ -1084,16 +1093,17 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, bool 
     }
 }
 
-RenderSurface* Renderer::GetDepthStencil(int width, int height)
+RenderSurface* Renderer::GetDepthStencil(int width, int height, int multiSample, bool autoResolve)
 {
     // Return the default depth-stencil surface if applicable
     // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
-    if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && graphics_->GetMultiSample() <= 1)
+    if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && multiSample == 1 &&
+        graphics_->GetMultiSample() == multiSample)
         return 0;
     else
     {
-        return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), false, false,
-            false))->GetRenderSurface();
+        return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), multiSample, autoResolve,
+            false, false, false))->GetRenderSurface();
     }
 }
 
@@ -1396,7 +1406,7 @@ void Renderer::OptimizeLightByStencil(Light* light, Camera* camera)
 
         Geometry* geometry = GetLightGeometry(light);
         const Matrix3x4& view = camera->GetView();
-        const Matrix4& projection = camera->GetProjection();
+        const Matrix4& projection = camera->GetGPUProjection();
         Vector3 cameraPos = camera->GetNode()->GetWorldPosition();
         float lightDist;
 
@@ -1661,6 +1671,9 @@ void Renderer::LoadPassShaders(Pass* pass)
         extraShaderDefines = " VSM_SHADOW ";
     }
 
+    String vsDefines = pass->GetEffectiveVertexShaderDefines();
+    String psDefines = pass->GetEffectivePixelShaderDefines();
+
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
         // Load forward pixel lit variations
@@ -1673,7 +1686,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
 
             vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                pass->GetVertexShaderDefines() + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
+                vsDefines + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
@@ -1683,12 +1696,12 @@ void Renderer::LoadPassShaders(Pass* pass)
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
+                    psDefines + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
                     heightFogVariations[h]);
             }
             else
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    pass->GetPixelShaderDefines() + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
+                    psDefines + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
         }
     }
     else
@@ -1702,7 +1715,7 @@ void Renderer::LoadPassShaders(Pass* pass)
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
+                    vsDefines + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
             }
         }
         else
@@ -1711,7 +1724,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    pass->GetVertexShaderDefines() + extraShaderDefines + geometryVSVariations[j]);
+                    vsDefines + extraShaderDefines + geometryVSVariations[j]);
             }
         }
 
@@ -1719,7 +1732,7 @@ void Renderer::LoadPassShaders(Pass* pass)
         for (unsigned j = 0; j < 2; ++j)
         {
             pixelShaders[j] =
-                graphics_->GetShader(PS, pass->GetPixelShader(), pass->GetPixelShaderDefines() + extraShaderDefines + heightFogVariations[j]);
+                graphics_->GetShader(PS, pass->GetPixelShader(), psDefines + extraShaderDefines + heightFogVariations[j]);
         }
     }
 
@@ -1955,9 +1968,11 @@ void Renderer::BlurShadowMap(View* view, Texture2D* shadowMap, float blurScale)
     graphics_->SetScissorTest(false);
 
     // Get a temporary render buffer
-    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetFormat(), false, false, false));
+    Texture2D* tmpBuffer = static_cast<Texture2D*>(GetScreenBuffer(shadowMap->GetWidth(), shadowMap->GetHeight(),
+        shadowMap->GetFormat(), 1, false, false, false, false));
     graphics_->SetRenderTarget(0, tmpBuffer->GetRenderSurface());
-    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+    graphics_->SetDepthStencil(GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight(), shadowMap->GetMultiSample(),
+        shadowMap->GetAutoResolve()));
     graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
 
     // Get shaders

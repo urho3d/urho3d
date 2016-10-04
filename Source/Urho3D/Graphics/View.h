@@ -146,13 +146,19 @@ public:
 
     /// Return information of the frame being rendered.
     const FrameInfo& GetFrameInfo() const { return frame_; }
-
+    
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
 
     /// Return whether should draw debug geometry.
     bool GetDrawDebug() const { return drawDebug_; }
 
+    /// Return view rectangle.
+    const IntRect& GetViewRect() const { return viewRect_; }
+    
+    /// Return view dimensions.
+    const IntVector2& GetViewSize() const { return viewSize_; }
+    
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
 
@@ -257,12 +263,16 @@ private:
     void PrepareInstancingBuffer();
     /// Set up a light volume rendering batch.
     void SetupLightVolumeBatch(Batch& batch);
+    /// Check whether a light queue needs shadow rendering.
+    bool NeedRenderShadowMap(const LightBatchQueue& queue);
     /// Render a shadow map.
     void RenderShadowMap(const LightBatchQueue& queue);
     /// Return the proper depth-stencil surface to use for a rendertarget.
     RenderSurface* GetDepthStencil(RenderSurface* renderTarget);
     /// Helper function to get the render surface from a texture. 2D textures will always return the first face only.
     RenderSurface* GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace face = FACE_POSITIVE_X);
+    /// Send a view update or render related event through the Renderer subsystem. The parameters are the same for all of them.
+    void SendViewEvent(StringHash eventType);
 
     /// Return the drawable's zone, or camera zone if it has override mode enabled.
     Zone* GetZone(Drawable* drawable)
