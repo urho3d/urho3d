@@ -151,8 +151,9 @@ public:
     void Reset() { ReleaseRef(); }
 
     /// Detach without destroying the object even if the refcount goes zero. To be used for scripting language interoperation.
-    void Detach()
+    T* Detach()
     {
+        T* ptr = ptr_;
         if (ptr_)
         {
             RefCount* refCount = RefCountPtr();
@@ -160,6 +161,7 @@ public:
             Reset(); // 1 ref
             --refCount->refs_; // 0 refs
         }
+        return ptr;
     }
 
     /// Perform a static cast from a shared pointer of another type.

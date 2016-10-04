@@ -181,18 +181,12 @@ static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, 
 
 static Image* Texture2DGetImage(Texture2D* tex2d)
 {
-    SharedPtr<Image> sharedImage = tex2d->GetImage();
-    Image* image = sharedImage;
-    sharedImage.Detach();
-    return image;
+    return tex2d->GetImage().Detach();
 }
 
 static Image* TextureCubeGetImage(CubeMapFace face, TextureCube* texCube)
 {
-    SharedPtr<Image> sharedImage = texCube->GetImage(face);
-    Image* image = sharedImage;
-    sharedImage.Detach();
-    return image;
+    return texCube->GetImage(face).Detach();
 }
 
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
