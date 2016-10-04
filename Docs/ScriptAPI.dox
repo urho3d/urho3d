@@ -1377,6 +1377,9 @@ namespace Urho3D
 - %Shadow %Mask : int
 - %Zone %Mask : int
 
+### DebugRenderer
+- %Line %Antialias : bool
+
 ### DecalSet
 - %Is %Enabled : bool
 - %Material : ResourceRef
@@ -6300,6 +6303,7 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
+- bool lineAntiAlias
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -8238,6 +8242,7 @@ Properties:
 - CullMode cullMode
 - BiasParameters depthBias
 - FillMode fillMode
+- bool lineAntiAlias
 - uint memoryUse // readonly
 - String name
 - uint numTechniques
