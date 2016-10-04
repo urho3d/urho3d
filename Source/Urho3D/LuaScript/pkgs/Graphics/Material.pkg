@@ -91,11 +91,7 @@ static Material* MaterialClone(const Material* material, const String& cloneName
 {
     if (!material)
         return 0;
-        
-    SharedPtr<Material> clonedMaterialPtr = material->Clone(cloneName);
-    Material* clonedMaterial = clonedMaterialPtr.Get();
-    clonedMaterialPtr.Detach();
-    
-    return clonedMaterial;
+
+    return material->Clone(cloneName).Detach();
 }
 $}

@@ -87,14 +87,7 @@ static UIElement* UILoadLayout(UI* ui, File* source, XMLFile* styleFile)
     if (!source)
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(*source, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(*source, styleFile).Detach();
 }
 
 static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFile)
@@ -103,14 +96,7 @@ static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFil
     if (!file.IsOpen())
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(file, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(file, styleFile).Detach();
 }
 
 static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
@@ -118,14 +104,7 @@ static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
     if (!source)
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(source, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(source, styleFile).Detach();
 }
 
 #define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00

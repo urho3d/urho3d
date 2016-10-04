@@ -89,10 +89,6 @@ static Animation* AnimationClone(const Animation* animation, const String& clone
     if (!animation)
         return 0;
         
-    SharedPtr<Animation> clonedAnimationPtr = animation->Clone(cloneName);
-    Animation* clonedAnimation = clonedAnimationPtr.Get();
-    clonedAnimationPtr.Detach();
-    
-    return clonedAnimation;
+    return animation->Clone(cloneName).Detach();
 }
 $}
