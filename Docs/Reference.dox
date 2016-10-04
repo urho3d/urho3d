@@ -1115,6 +1115,8 @@ OpenGL ES 2.0 has further limitations:
 
 - Multisampled texture rendertargets are not supported.
 
+- Line antialiasing is not supported.
+
 \page VertexBuffers Vertex buffers
 
 %Geometry data is defined by VertexBuffer objects, which hold a number of vertices of a certain vertex format. For rendering, the data is uploaded to the GPU, but optionally a shadow copy of
@@ -1179,6 +1181,7 @@ A material definition looks like this:
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
     <alphatocoverage enable="true|false" />
+    <lineantialias enable="true|false" />
     <renderorder value="x" />
     <occlusion enable="true|false" />
 </material>

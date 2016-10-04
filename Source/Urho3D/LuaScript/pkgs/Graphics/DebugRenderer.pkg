@@ -2,6 +2,7 @@ $#include "Graphics/DebugRenderer.h"
 
 class DebugRenderer : public Component
 {
+    void SetLineAntiAlias(bool enable);
     void SetView(Camera* camera);
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
     void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true);
@@ -20,11 +21,13 @@ class DebugRenderer : public Component
     void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true);
     void Render();
 
+    bool GetLineAntiAlias() const;
     const Matrix3x4& GetView() const;
     const Matrix4& GetProjection() const;
     const Frustum& GetFrustum() const;
     bool IsInside(const BoundingBox& box) const;
 
+    tolua_property__get_set bool lineAntiAlias;
     tolua_readonly tolua_property__get_set Matrix3x4& view;
     tolua_readonly tolua_property__get_set Matrix4& projection;
     tolua_readonly tolua_property__get_set Frustum& frustum;

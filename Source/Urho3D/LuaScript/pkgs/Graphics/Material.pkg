@@ -24,6 +24,7 @@ class Material : public Resource
     void SetFillMode(FillMode mode);
     void SetDepthBias(const BiasParameters& parameters);
     void SetAlphaToCoverage(bool enable);
+    void SetLineAntiAlias(bool enable);
     void SetRenderOrder(unsigned char renderOrder);
     void SetOcclusion(bool enable);
     void SetScene(Scene* scene);
@@ -56,6 +57,7 @@ class Material : public Resource
     FillMode GetFillMode() const;
     const BiasParameters& GetDepthBias() const;
     bool GetAlphaToCoverage() const;
+    bool GetLineAntiAlias() const;
     unsigned char GetRenderOrder() const;
     bool GetOcclusion() const;
     bool GetSpecular() const;
@@ -68,6 +70,7 @@ class Material : public Resource
     tolua_property__get_set FillMode fillMode;
     tolua_property__get_set BiasParameters depthBias;
     tolua_property__get_set bool alphaToCoverage;
+    tolua_property__get_set bool lineAntiAlias;
     tolua_property__get_set unsigned char renderOrder;
     tolua_property__get_set bool occlusion;
     tolua_readonly tolua_property__get_set bool specular;
