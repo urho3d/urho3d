@@ -8,6 +8,8 @@ class TextureCube : public Texture
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1);
     bool SetData(CubeMapFace face, Image* image, bool useAlpha = false);
 
+    Image* GetImage(CubeMapFace face) const;
+
     RenderSurface* GetRenderSurface(CubeMapFace face) const;
 };
 
