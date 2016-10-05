@@ -6470,6 +6470,7 @@ Methods:
 - void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
 - bool SetData(Image* image, bool useAlpha = false)
+- Image* GetImage() const
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -6516,6 +6517,7 @@ Methods:
 - void delete()
 - bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
 - bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
+- Image* GetImage(CubeMapFace face) const
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>
