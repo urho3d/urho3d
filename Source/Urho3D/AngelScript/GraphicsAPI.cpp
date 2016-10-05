@@ -181,42 +181,12 @@ static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, 
 
 static Image* Texture2DGetImage(Texture2D* tex2d)
 {
-    Image* rawImage = new Image(tex2d->GetContext());
-    const unsigned texSize = tex2d->GetDataSize(tex2d->GetWidth(), tex2d->GetHeight());
-    const unsigned format = tex2d->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    tex2d->GetData(0, rawImage->GetData());
-    return rawImage;
+    return tex2d->GetImage().Detach();
 }
 
 static Image* TextureCubeGetImage(CubeMapFace face, TextureCube* texCube)
 {
-    Image* rawImage = new Image(texCube->GetContext());
-    const unsigned texSize = texCube->GetDataSize(texCube->GetWidth(), texCube->GetHeight());
-    const unsigned format = texCube->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    texCube->GetData(face, 0, rawImage->GetData());
-    return rawImage;
+    return texCube->GetImage(face).Detach();
 }
 
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
