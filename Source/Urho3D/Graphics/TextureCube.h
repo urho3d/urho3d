@@ -67,6 +67,8 @@ public:
 
     /// Get data from a face's mip level. The destination buffer must be big enough. Return true if successful.
     bool GetData(CubeMapFace face, unsigned level, void* dest) const;
+    /// Get image data from a face's zero mip level. Only RGB and RGBA textures are supported.
+    SharedPtr<Image> GetImage(CubeMapFace face) const;
 
     /// Return render surface for one face.
     RenderSurface* GetRenderSurface(CubeMapFace face) const { return renderSurfaces_[face]; }

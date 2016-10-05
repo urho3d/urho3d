@@ -181,42 +181,12 @@ static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, 
 
 static Image* Texture2DGetImage(Texture2D* tex2d)
 {
-    Image* rawImage = new Image(tex2d->GetContext());
-    const unsigned texSize = tex2d->GetDataSize(tex2d->GetWidth(), tex2d->GetHeight());
-    const unsigned format = tex2d->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    tex2d->GetData(0, rawImage->GetData());
-    return rawImage;
+    return tex2d->GetImage().Detach();
 }
 
 static Image* TextureCubeGetImage(CubeMapFace face, TextureCube* texCube)
 {
-    Image* rawImage = new Image(texCube->GetContext());
-    const unsigned texSize = texCube->GetDataSize(texCube->GetWidth(), texCube->GetHeight());
-    const unsigned format = texCube->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    texCube->GetData(face, 0, rawImage->GetData());
-    return rawImage;
+    return texCube->GetImage(face).Detach();
 }
 
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
@@ -983,6 +953,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_alphaToCoverage(bool)", asMETHOD(Material, SetAlphaToCoverage), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_alphaToCoverage() const", asMETHOD(Material, GetAlphaToCoverage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_lineAntiAlias(bool)", asMETHOD(Material, SetLineAntiAlias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool get_lineAntiAlias() const", asMETHOD(Material, GetLineAntiAlias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_renderOrder(uint8)", asMETHOD(Material, SetRenderOrder), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint8 get_renderOrder() const", asMETHOD(Material, GetRenderOrder), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
@@ -2004,6 +1976,8 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
+    engine->RegisterObjectMethod("DebugRenderer", "void set_lineAntiAlias(bool)", asMETHOD(DebugRenderer, SetLineAntiAlias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "bool get_lineAntiAlias() const", asMETHOD(DebugRenderer, GetLineAntiAlias), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddLine, (const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddTriangle(const Vector3&in, const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddTriangle, (const Vector3&, const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddNode(Node@+, float scale = 1.0, bool depthTest = true)", asMETHOD(DebugRenderer, AddNode), asCALL_THISCALL);

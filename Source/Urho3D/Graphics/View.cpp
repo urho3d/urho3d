@@ -629,6 +629,7 @@ void View::Render()
 
     // Reset state after commands
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
@@ -1845,6 +1846,7 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -2074,6 +2076,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(depthWrite);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -2941,6 +2944,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
 
     if (type != LIGHT_DIRECTIONAL)

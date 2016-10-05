@@ -316,6 +316,26 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int mul
     return Create();
 }
 
+SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
+{
+    if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
+    {
+        URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
+        return SharedPtr<Image>();
+    }
+
+    Image* rawImage = new Image(context_);
+    if (format_ == Graphics::GetRGBAFormat())
+        rawImage->SetSize(width_, height_, 4);
+    else if (format_ == Graphics::GetRGBFormat())
+        rawImage->SetSize(width_, height_, 3);
+    else
+        assert(0);
+
+    GetData(face, 0, rawImage->GetData());
+    return SharedPtr<Image>(rawImage);
+}
+
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
     Renderer* renderer = GetSubsystem<Renderer>();

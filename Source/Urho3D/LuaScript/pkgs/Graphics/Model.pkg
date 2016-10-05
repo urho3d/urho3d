@@ -49,11 +49,7 @@ static Model* ModelClone(const Model* model, const String& cloneName = String::E
 {
     if (!model)
         return 0;
-        
-    SharedPtr<Model> clonedModelPtr = model->Clone(cloneName);
-    Model* clonedModel = clonedModelPtr.Get();
-    clonedModelPtr.Detach();
-    
-    return clonedModel;
+
+    return model->Clone(cloneName).Detach();
 }
 $}
