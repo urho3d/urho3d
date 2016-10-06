@@ -227,6 +227,8 @@ public:
     bool Append(XMLFile* file);
     /// Enable/disable commands and rendertargets by tag.
     void SetEnabled(const String& tag, bool active);
+    /// Returns true if the specified command is enabled.
+    bool GetEnabled(const String& tag) const;
     /// Toggle enabled state of commands and rendertargets by tag.
     void ToggleEnabled(const String& tag);
     /// Assign rendertarget at index.

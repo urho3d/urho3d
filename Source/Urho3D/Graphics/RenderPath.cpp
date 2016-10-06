@@ -380,6 +380,21 @@ void RenderPath::SetEnabled(const String& tag, bool active)
     }
 }
 
+bool RenderPath::GetEnabled(const String& tag) const
+{
+    for (unsigned i = 0; i < renderTargets_.Size(); ++i)
+    {
+        if (!renderTargets_[i].tag_.Compare(tag, false))
+            return renderTargets_[i].enabled_;
+    }
+
+    for (unsigned i = 0; i < commands_.Size(); ++i)
+    {
+        if (!commands_[i].tag_.Compare(tag, false))
+            return commands_[i].enabled_;
+    }
+}
+
 void RenderPath::ToggleEnabled(const String& tag)
 {
     for (unsigned i = 0; i < renderTargets_.Size(); ++i)
