@@ -1541,6 +1541,15 @@ void Graphics::SetFillMode(FillMode mode)
     }
 }
 
+void Graphics::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        lineAntiAlias_ = enable;
+        impl_->rasterizerStateDirty_ = true;
+    }
+}
+
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
     // During some light rendering loops, a full rect is toggled on/off repeatedly.
@@ -2336,6 +2345,7 @@ void Graphics::ResetCachedState()
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
     fillMode_ = FILL_SOLID;
+    lineAntiAlias_ = false;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
@@ -2543,8 +2553,8 @@ void Graphics::PrepareDraw()
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
-            (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
-            (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 18);
+            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) | 
+            ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2562,8 +2572,8 @@ void Graphics::PrepareDraw()
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;
                 stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;
-                stateDesc.MultisampleEnable = TRUE;
-                stateDesc.AntialiasedLineEnable = FALSE;
+                stateDesc.MultisampleEnable = lineAntiAlias_ ? FALSE : TRUE;
+                stateDesc.AntialiasedLineEnable = lineAntiAlias_ ? TRUE : FALSE;
 
                 ID3D11RasterizerState* newRasterizerState = 0;
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);

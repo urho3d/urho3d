@@ -1874,6 +1874,20 @@ void Graphics::SetFillMode(FillMode mode)
 #endif
 }
 
+void Graphics::SetLineAntiAlias(bool enable)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (enable != lineAntiAlias_)
+    {
+        if (enable)
+            glEnable(GL_LINE_SMOOTH);
+        else
+            glDisable(GL_LINE_SMOOTH);
+        lineAntiAlias_ = enable;
+    }
+#endif
+}
+
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
     // During some light rendering loops, a full rect is toggled on/off repeatedly.
@@ -3175,6 +3189,7 @@ void Graphics::ResetCachedState()
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_ALWAYS;
     depthWrite_ = false;
+    lineAntiAlias_ = false;
     fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;

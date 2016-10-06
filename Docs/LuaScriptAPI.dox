@@ -1932,6 +1932,7 @@ Properties:
 
 Methods:
 
+- void SetLineAntiAlias(bool enable)
 - void SetView(Camera* camera)
 - void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true)
 - void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true)
@@ -1949,6 +1950,7 @@ Methods:
 - void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true)
 - void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true)
 - void Render()
+- bool GetLineAntiAlias() const
 - const Matrix3x4& GetView() const
 - const Matrix4& GetProjection() const
 - const Frustum& GetFrustum() const
@@ -1956,6 +1958,7 @@ Methods:
 
 Properties:
 
+- bool lineAntiAlias
 - Matrix3x4& view (readonly)
 - Matrix4& projection (readonly)
 - Frustum& frustum (readonly)
@@ -3306,6 +3309,7 @@ Methods:
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetAlphaToCoverage(bool enable)
+- void SetLineAntiAlias(bool enable)
 - void SetRenderOrder(char renderOrder)
 - void SetOcclusion(bool enable)
 - void SetScene(Scene* scene)
@@ -3328,6 +3332,7 @@ Methods:
 - FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
 - bool GetAlphaToCoverage() const
+- bool GetLineAntiAlias() const
 - char GetRenderOrder() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
@@ -3342,6 +3347,7 @@ Properties:
 - FillMode fillMode
 - BiasParameters depthBias
 - bool alphaToCoverage
+- bool lineAntiAlias
 - char renderOrder
 - bool occlusion
 - bool specular (readonly)
@@ -6464,6 +6470,7 @@ Methods:
 - void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
 - bool SetData(Image* image, bool useAlpha = false)
+- Image* GetImage() const
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -6510,6 +6517,7 @@ Methods:
 - void delete()
 - bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
 - bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
+- Image* GetImage(CubeMapFace face) const
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>

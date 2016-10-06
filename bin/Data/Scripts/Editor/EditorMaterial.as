@@ -54,6 +54,7 @@ void CreateMaterialEditor()
     SubscribeToEvent(materialWindow.GetChild("FillModeEdit", true), "ItemSelected", "EditFillMode");
     SubscribeToEvent(materialWindow.GetChild("OcclusionEdit", true), "Toggled", "EditOcclusion");
     SubscribeToEvent(materialWindow.GetChild("AlphaToCoverageEdit", true), "Toggled", "EditAlphaToCoverage");
+    SubscribeToEvent(materialWindow.GetChild("LineAntiAliasEdit", true), "Toggled", "EditLineAntiAlias");
 }
 
 bool ToggleMaterialEditor()
@@ -359,6 +360,8 @@ void RefreshMaterialMiscParameters()
     attrCheckBox.checked = editMaterial.occlusion;
     attrCheckBox = materialWindow.GetChild("AlphaToCoverageEdit", true);
     attrCheckBox.checked = editMaterial.alphaToCoverage;
+    attrCheckBox = materialWindow.GetChild("LineAntiAliasEdit", true);
+    attrCheckBox.checked = editMaterial.lineAntiAlias;
 
     inMaterialRefresh = false;
 }
@@ -956,6 +959,19 @@ void EditAlphaToCoverage(StringHash eventType, VariantMap& eventData)
 
     CheckBox@ attrEdit = eventData["Element"].GetPtr();
     editMaterial.alphaToCoverage = attrEdit.checked;
+
+    EndMaterialEdit();
+}
+
+void EditLineAntiAlias(StringHash eventType, VariantMap& eventData)
+{
+    if (editMaterial is null || inMaterialRefresh)
+        return;
+
+    BeginMaterialEdit();
+
+    CheckBox@ attrEdit = eventData["Element"].GetPtr();
+    editMaterial.lineAntiAlias = attrEdit.checked;
 
     EndMaterialEdit();
 }

@@ -4080,6 +4080,7 @@ bool enabled;
 bool enabledEffective;
 /* readonly */
 uint id;
+bool lineAntiAlias;
 /* readonly */
 Node node;
 /* readonly */
@@ -6335,6 +6336,7 @@ String category;
 CullMode cullMode;
 BiasParameters depthBias;
 FillMode fillMode;
+bool lineAntiAlias;
 /* readonly */
 uint memoryUse;
 String name;
