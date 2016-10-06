@@ -8412,6 +8412,7 @@ void Define(const Vector2&);
 void Define(const Vector2&, const Vector2&);
 bool Defined() const;
 bool Equals(const Rect&) const;
+Intersection IsInside(const Rect&) const;
 Intersection IsInside(const Vector2&) const;
 void Merge(const Rect&);
 void Merge(const Vector2&);
