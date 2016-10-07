@@ -368,6 +368,7 @@ bool IsAtEnd(const String&) const;
 bool IsFadingIn(const String&) const;
 bool IsFadingOut(const String&) const;
 bool IsPlaying(const String&) const;
+bool IsPlaying(uint8) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);

@@ -395,6 +395,7 @@ Methods:
 - bool SetAutoFade(const String name, float fadeOutTime)
 - bool SetRemoveOnCompletion(const String name, bool removeOnCompletion)
 - bool IsPlaying(const String name) const
+- bool IsPlaying(char layer) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
 - bool IsAtEnd(const String name) const
