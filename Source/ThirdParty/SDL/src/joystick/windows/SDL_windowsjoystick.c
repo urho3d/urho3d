@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Lasse Oorni for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_JOYSTICK_DINPUT || SDL_JOYSTICK_XINPUT
@@ -44,6 +47,10 @@
 #include "../SDL_sysjoystick.h"
 #if !SDL_EVENTS_DISABLED
 #include "../../events/SDL_events_c.h"
+#endif
+// Urho3D: set WINVER if not defined
+#ifndef WINVER
+#define WINVER 0x0500
 #endif
 #include "../../core/windows/SDL_windows.h"
 #if !defined(__WINRT__)

@@ -134,6 +134,8 @@ public:
 
     /// Return whether an animation is active. Note that non-looping animations that are being clamped at the end also return true.
     bool IsPlaying(const String& name) const;
+    /// Return whether any animation is active on a specific layer.
+    bool IsPlaying(unsigned char layer) const;
     /// Return whether an animation is fading in.
     bool IsFadingIn(const String& name) const;
     /// Return whether an animation is fading out.

@@ -1129,6 +1129,18 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+        return;
+
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        impl_->dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(int), &value);
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
@@ -1223,61 +1235,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     if (!buffer->IsDirty())
         impl_->dirtyConstantBuffers_.Push(buffer);
     buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
-}
-
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-    case VAR_DOUBLE:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
 }
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
@@ -1580,6 +1537,15 @@ void Graphics::SetFillMode(FillMode mode)
     if (mode != fillMode_)
     {
         fillMode_ = mode;
+        impl_->rasterizerStateDirty_ = true;
+    }
+}
+
+void Graphics::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        lineAntiAlias_ = enable;
         impl_->rasterizerStateDirty_ = true;
     }
 }
@@ -2379,6 +2345,7 @@ void Graphics::ResetCachedState()
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
     fillMode_ = FILL_SOLID;
+    lineAntiAlias_ = false;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
@@ -2586,8 +2553,8 @@ void Graphics::PrepareDraw()
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
-            (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
-            (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 18);
+            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) | 
+            ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2605,8 +2572,8 @@ void Graphics::PrepareDraw()
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;
                 stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;
-                stateDesc.MultisampleEnable = TRUE;
-                stateDesc.AntialiasedLineEnable = FALSE;
+                stateDesc.MultisampleEnable = lineAntiAlias_ ? FALSE : TRUE;
+                stateDesc.AntialiasedLineEnable = lineAntiAlias_ ? TRUE : FALSE;
 
                 ID3D11RasterizerState* newRasterizerState = 0;
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);

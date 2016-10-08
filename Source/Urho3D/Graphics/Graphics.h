@@ -158,6 +158,8 @@ public:
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
     /// Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
+    /// Set shader integer constant.
+    void SetShaderParameter(StringHash param, int value);
     /// Set shader boolean constant.
     void SetShaderParameter(StringHash param, bool value);
     /// Set shader color constant.
@@ -228,6 +230,8 @@ public:
     void SetDepthWrite(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
+    /// Set line antialiasing on/off.
+    void SetLineAntiAlias(bool enable);
     /// Set scissor test.
     void SetScissorTest(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     /// Set scissor test.
@@ -428,6 +432,9 @@ public:
 
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
+
+    /// Return whether line antialiasing is enabled.
+    bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return whether stencil test is enabled.
     bool GetStencilTest() const { return stencilTest_; }
@@ -716,12 +723,14 @@ private:
     CompareMode depthTestMode_;
     /// Depth write enable flag.
     bool depthWrite_;
+    /// Line antialiasing enable flag.
+    bool lineAntiAlias_;
     /// Polygon fill mode.
     FillMode fillMode_;
-    /// Scissor test rectangle.
-    IntRect scissorRect_;
     /// Scissor test enable flag.
     bool scissorTest_;
+    /// Scissor test rectangle.
+    IntRect scissorRect_;
     /// Stencil test compare mode.
     CompareMode stencilTestMode_;
     /// Stencil operation on pass.

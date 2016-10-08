@@ -106,6 +106,65 @@ bool Graphics::ToggleFullscreen()
     return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
 }
 
+void Graphics::SetShaderParameter(StringHash param, const Variant& value)
+{
+    switch (value.GetType())
+    {
+    case VAR_BOOL:
+        SetShaderParameter(param, value.GetBool());
+        break;
+
+    case VAR_INT:
+        SetShaderParameter(param, value.GetInt());
+        break;
+
+    case VAR_FLOAT:
+    case VAR_DOUBLE:
+        SetShaderParameter(param, value.GetFloat());
+        break;
+
+    case VAR_VECTOR2:
+        SetShaderParameter(param, value.GetVector2());
+        break;
+
+    case VAR_VECTOR3:
+        SetShaderParameter(param, value.GetVector3());
+        break;
+
+    case VAR_VECTOR4:
+        SetShaderParameter(param, value.GetVector4());
+        break;
+
+    case VAR_COLOR:
+        SetShaderParameter(param, value.GetColor());
+        break;
+
+    case VAR_MATRIX3:
+        SetShaderParameter(param, value.GetMatrix3());
+        break;
+
+    case VAR_MATRIX3X4:
+        SetShaderParameter(param, value.GetMatrix3x4());
+        break;
+
+    case VAR_MATRIX4:
+        SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
+        break;
+
+    default:
+        // Unsupported parameter type, do nothing
+        break;
+    }
+}
+
 IntVector2 Graphics::GetWindowPosition() const
 {
     if (window_)

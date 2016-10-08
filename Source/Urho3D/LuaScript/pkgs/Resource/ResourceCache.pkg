@@ -61,20 +61,11 @@ static int tolua_ResourceLuaAPI_GetCache00(lua_State* tolua_S)
 
 static File* ResourceCacheGetFile(ResourceCache* cache, const String& fileName)
 {
-    SharedPtr<File> filePtr = cache->GetFile(fileName);
-    if (!filePtr)
-        return 0;
-
-    File* file = filePtr.Get();
-    filePtr.Detach();
-
-    return file;
+    return cache->GetFile(fileName).Detach();
 }
 
 static bool ResourceCacheBackgroundLoadResource(ResourceCache* cache, StringHash type, const String& fileName, bool sendEventOnFailure)
 {
     return cache->BackgroundLoadResource(type, fileName, sendEventOnFailure);
 }
-
-
 $}

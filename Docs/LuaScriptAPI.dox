@@ -395,6 +395,7 @@ Methods:
 - bool SetAutoFade(const String name, float fadeOutTime)
 - bool SetRemoveOnCompletion(const String name, bool removeOnCompletion)
 - bool IsPlaying(const String name) const
+- bool IsPlaying(char layer) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
 - bool IsAtEnd(const String name) const
@@ -1932,6 +1933,7 @@ Properties:
 
 Methods:
 
+- void SetLineAntiAlias(bool enable)
 - void SetView(Camera* camera)
 - void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true)
 - void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true)
@@ -1949,6 +1951,7 @@ Methods:
 - void AddCross(const Vector3& center, float size, const Color& color, bool depthTest = true)
 - void AddQuad(const Vector3& center, float width, float height, const Color& color, bool depthTest = true)
 - void Render()
+- bool GetLineAntiAlias() const
 - const Matrix3x4& GetView() const
 - const Matrix4& GetProjection() const
 - const Frustum& GetFrustum() const
@@ -1956,6 +1959,7 @@ Methods:
 
 Properties:
 
+- bool lineAntiAlias
 - Matrix3x4& view (readonly)
 - Matrix4& projection (readonly)
 - Frustum& frustum (readonly)
@@ -1968,6 +1972,7 @@ Methods:
 - void SetMaterial(Material* material)
 - void SetMaxVertices(unsigned num)
 - void SetMaxIndices(unsigned num)
+- void SetOptimizeBufferSize(bool enable)
 - bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED)
 - void RemoveDecals(unsigned num)
 - void RemoveAllDecals()
@@ -1977,6 +1982,7 @@ Methods:
 - unsigned GetNumIndices() const
 - unsigned GetMaxVertices() const
 - unsigned GetMaxIndices() const
+- bool GetOptimizeBufferSize() const
 
 Properties:
 
@@ -1986,6 +1992,7 @@ Properties:
 - unsigned numIndices (readonly)
 - unsigned maxVertices
 - unsigned maxIndices
+- bool optimizeBufferSize
 
 <a name="Class_Deserializer"></a>
 ### Deserializer
@@ -3303,6 +3310,7 @@ Methods:
 - void SetFillMode(FillMode mode)
 - void SetDepthBias(const BiasParameters& parameters)
 - void SetAlphaToCoverage(bool enable)
+- void SetLineAntiAlias(bool enable)
 - void SetRenderOrder(char renderOrder)
 - void SetOcclusion(bool enable)
 - void SetScene(Scene* scene)
@@ -3325,6 +3333,7 @@ Methods:
 - FillMode GetFillMode() const
 - const BiasParameters& GetDepthBias() const
 - bool GetAlphaToCoverage() const
+- bool GetLineAntiAlias() const
 - char GetRenderOrder() const
 - bool GetOcclusion() const
 - bool GetSpecular() const
@@ -3339,6 +3348,7 @@ Properties:
 - FillMode fillMode
 - BiasParameters depthBias
 - bool alphaToCoverage
+- bool lineAntiAlias
 - char renderOrder
 - bool occlusion
 - bool specular (readonly)
@@ -4821,6 +4831,7 @@ Methods:
 - Vector2 HalfSize() const
 - bool Equals(const Rect& rhs) const
 - Intersection IsInside(const Vector2& point) const
+- Intersection IsInside(const Rect& rect) const
 - Vector4 ToVector4() const
 - String ToString() const
 
@@ -6461,6 +6472,7 @@ Methods:
 - void delete()
 - bool SetSize(int width, int height, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1, bool autoResolve = true)
 - bool SetData(Image* image, bool useAlpha = false)
+- Image* GetImage() const
 - RenderSurface* GetRenderSurface() const
 
 Properties:
@@ -6507,6 +6519,7 @@ Methods:
 - void delete()
 - bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1)
 - bool SetData(CubeMapFace face, Image* image, bool useAlpha = false)
+- Image* GetImage(CubeMapFace face) const
 - RenderSurface* GetRenderSurface(CubeMapFace face) const
 
 <a name="Class_TextureFrame"></a>
@@ -6808,6 +6821,15 @@ Methods:
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
 - void SetHorizontalAlignment(HorizontalAlignment align)
 - void SetVerticalAlignment(VerticalAlignment align)
+- void SetEnableAnchor(bool enable)
+- void SetMinAnchor(const Vector2& anchor)
+- void SetMinAnchor(float x, float y)
+- void SetMaxAnchor(const Vector2& anchor)
+- void SetMaxAnchor(float x, float y)
+- void SetMinOffset(const IntVector2& offset)
+- void SetMaxOffset(const IntVector2& offset)
+- void SetPivot(const Vector2& pivot)
+- void SetPivot(float x, float y)
 - void SetClipBorder(const IntRect& rect)
 - void SetColor(const Color& color)
 - void SetColor(Corner corner, const Color& color)
@@ -6878,6 +6900,12 @@ Methods:
 - const IntVector2& GetChildOffset() const
 - HorizontalAlignment GetHorizontalAlignment() const
 - VerticalAlignment GetVerticalAlignment() const
+- bool GetEnableAnchor() const
+- const Vector2& GetMinAnchor() const
+- const Vector2& GetMaxAnchor() const
+- const IntVector2& GetMinOffset() const
+- const IntVector2& GetMaxOffset() const
+- const Vector2& GetPivot() const
 - const IntRect& GetClipBorder() const
 - const Color& GetColor(Corner corner) const
 - int GetPriority() const
@@ -6955,6 +6983,12 @@ Properties:
 - IntVector2& childOffset
 - HorizontalAlignment horizontalAlignment
 - VerticalAlignment verticalAlignment
+- bool enableAnchor
+- IntVector2& minOffset
+- IntVector2& maxOffset
+- Vector2& minAnchor
+- Vector2& maxAnchor
+- Vector2& pivot
 - IntRect clipBorder
 - Color& color
 - int priority
@@ -7869,6 +7903,7 @@ Properties:
 - int HA_LEFT
 - int HA_CENTER
 - int HA_RIGHT
+- int HA_CUSTOM
 
 ### HttpRequestState
 
@@ -8218,6 +8253,7 @@ Properties:
 - int VA_TOP
 - int VA_CENTER
 - int VA_BOTTOM
+- int VA_CUSTOM
 
 ### WindowDragMode
 

@@ -210,6 +210,7 @@ Material::Material(Context* context) :
     auxViewFrameNumber_(0),
     shaderParameterHash_(0),
     alphaToCoverage_(false),
+    lineAntiAlias_(false),
     occlusion_(true),
     specular_(false),
     subscribed_(false),
@@ -547,6 +548,10 @@ bool Material::Load(const XMLElement& source)
     if (alphaToCoverageElem)
         SetAlphaToCoverage(alphaToCoverageElem.GetBool("enable"));
 
+    XMLElement lineAntiAliasElem = source.GetChild("lineantialias");
+    if (lineAntiAliasElem)
+        SetLineAntiAlias(lineAntiAliasElem.GetBool("enable"));
+
     XMLElement renderOrderElem = source.GetChild("renderorder");
     if (renderOrderElem)
         SetRenderOrder((unsigned char)renderOrderElem.GetUInt("value"));
@@ -655,7 +660,7 @@ bool Material::Load(const JSONValue& source)
     }
     batchedParameterUpdate_ = false;
 
-    // Load shader parameter animationss
+    // Load shader parameter animations
     JSONObject paramAnimationsObject = source.Get("shaderParameterAnimations").GetObject();
     for (JSONObject::ConstIterator it = paramAnimationsObject.Begin(); it != paramAnimationsObject.End(); it++)
     {
@@ -703,6 +708,10 @@ bool Material::Load(const JSONValue& source)
     JSONValue alphaToCoverageVal = source.Get("alphatocoverage");
     if (!alphaToCoverageVal.IsNull())
         SetAlphaToCoverage(alphaToCoverageVal.GetBool());
+
+    JSONValue lineAntiAliasVal = source.Get("lineantialias");
+    if (!lineAntiAliasVal.IsNull())
+        SetLineAntiAlias(lineAntiAliasVal.GetBool());
 
     JSONValue renderOrderVal = source.Get("renderorder");
     if (!renderOrderVal.IsNull())
@@ -766,7 +775,7 @@ bool Material::Save(XMLElement& dest) const
     {
         XMLElement parameterElem = dest.CreateChild("parameter");
         parameterElem.SetString("name", j->second_.name_);
-        if (j->second_.value_.GetType() != VAR_BUFFER)
+        if (j->second_.value_.GetType() != VAR_BUFFER && j->second_.value_.GetType() != VAR_INT && j->second_.value_.GetType() != VAR_BOOL)
             parameterElem.SetVectorVariant("value", j->second_.value_);
         else
         {
@@ -808,6 +817,10 @@ bool Material::Save(XMLElement& dest) const
     // Write alpha-to-coverage
     XMLElement alphaToCoverageElem = dest.CreateChild("alphatocoverage");
     alphaToCoverageElem.SetBool("enable", alphaToCoverage_);
+
+    // Write line anti-alias
+    XMLElement lineAntiAliasElem = dest.CreateChild("lineantialias");
+    lineAntiAliasElem.SetBool("enable", lineAntiAlias_);
 
     // Write render order
     XMLElement renderOrderElem = dest.CreateChild("renderorder");
@@ -865,7 +878,7 @@ bool Material::Save(JSONValue& dest) const
     for (HashMap<StringHash, MaterialShaderParameter>::ConstIterator j = shaderParameters_.Begin();
          j != shaderParameters_.End(); ++j)
     {
-        if (j->second_.value_.GetType() != VAR_BUFFER)
+        if (j->second_.value_.GetType() != VAR_BUFFER && j->second_.value_.GetType() != VAR_INT && j->second_.value_.GetType() != VAR_BOOL)
             shaderParamsVal.Set(j->second_.name_, j->second_.value_.ToString());
         else
         {
@@ -908,6 +921,9 @@ bool Material::Save(JSONValue& dest) const
 
     // Write alpha-to-coverage
     dest.Set("alphatocoverage", alphaToCoverage_);
+
+    // Write line anti-alias
+    dest.Set("lineantialias", lineAntiAlias_);
 
     // Write render order
     dest.Set("renderorder", (unsigned) renderOrder_);
@@ -1101,6 +1117,11 @@ void Material::SetAlphaToCoverage(bool enable)
     alphaToCoverage_ = enable;
 }
 
+void Material::SetLineAntiAlias(bool enable)
+{
+    lineAntiAlias_ = enable;
+}
+
 void Material::SetRenderOrder(unsigned char order)
 {
     renderOrder_ = order;
@@ -1155,6 +1176,7 @@ SharedPtr<Material> Material::Clone(const String& cloneName) const
     ret->textures_ = textures_;
     ret->depthBias_ = depthBias_;
     ret->alphaToCoverage_ = alphaToCoverage_;
+    ret->lineAntiAlias_ = lineAntiAlias_;
     ret->occlusion_ = occlusion_;
     ret->specular_ = specular_;
     ret->cullMode_ = cullMode_;

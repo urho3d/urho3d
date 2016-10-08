@@ -1237,9 +1237,22 @@ void Graphics::SetShaderParameter(StringHash param, float value)
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, &data.x_, 1);
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    /// \todo Int constants seem to have no effect on Direct3D9
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+        return;
+
+    if (i->second_.type_ == VS)
+        impl_->device_->SetVertexShaderConstantI(i->second_.register_, &value, 1);
+    else
+        impl_->device_->SetPixelShaderConstantI(i->second_.register_, &value, 1);
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
-    /// \todo Bool constants possibly have no effect on Direct3D9
+    /// \todo Bool constants seem to have no effect on Direct3D9
     HashMap<StringHash, ShaderParameter>::Iterator i;
     if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
         return;
@@ -1354,61 +1367,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
         impl_->device_->SetVertexShaderConstantF(i->second_.register_, matrix.Data(), 3);
     else
         impl_->device_->SetPixelShaderConstantF(i->second_.register_, matrix.Data(), 3);
-}
-
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-    case VAR_DOUBLE:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
 }
 
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
@@ -1806,6 +1764,16 @@ void Graphics::SetFillMode(FillMode mode)
         fillMode_ = mode;
     }
 }
+
+void Graphics::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        impl_->device_->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, enable ? TRUE : FALSE);
+        lineAntiAlias_ = enable;
+    }
+}
+
 
 void Graphics::SetScissorTest(bool enable, const Rect& rect, bool borderInclusive)
 {
@@ -2638,6 +2606,7 @@ void Graphics::ResetCachedState()
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
+    lineAntiAlias_ = false;
     fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;

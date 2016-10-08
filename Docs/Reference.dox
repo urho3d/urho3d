@@ -1091,6 +1091,8 @@ These differences need to be observed when using the low-level rendering functio
 
 - Alpha-to-coverage is not supported on Direct3D9.
 
+- Bool and int shader uniforms are not supported on Direct3D9.
+
 OpenGL ES 2.0 has further limitations:
 
 - Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS) compressed textures are supported through the .ktx and .pvr file formats.
@@ -1112,6 +1114,8 @@ OpenGL ES 2.0 has further limitations:
 - 3D and 2D array textures are not currently supported.
 
 - Multisampled texture rendertargets are not supported.
+
+- Line antialiasing is not supported.
 
 \page VertexBuffers Vertex buffers
 
@@ -1177,6 +1181,7 @@ A material definition looks like this:
     <fill value="solid|wireframe|point" />
     <depthbias constant="x" slopescaled="y" />
     <alphatocoverage enable="true|false" />
+    <lineantialias enable="true|false" />
     <renderorder value="x" />
     <occlusion enable="true|false" />
 </material>
@@ -2178,6 +2183,10 @@ To create automatically adjusting child layouts, the layout mode can be switched
 Left, top, right & bottom border widths and spacing between elements can also be specified for the layout. A grid layout is not directly supported, but it can be manually created with a horizontal layout inside a vertical layout, or vice versa.
 
 Use the functions \ref UIElement::SetLayout "SetLayout()" or \ref UIElement::SetLayoutMode "SetLayoutMode()" to control the layouting.
+
+\section UI_Anchoring Child element anchoring
+
+A separate mechanism from layouting that allows automatically adjusting %UI hierarchies is to use anchoring. First enable anchoring in a child element with \ref UIElement::SetEnableAnchor "SetEnableAnchor()", after which the top-left and bottom-right corners in relation to the parent's size (range 0-1) can be set with \ref UIElement::SetMinAnchor "SetMinAnchor()" and \ref UIElement::SetMaxAnchor "SetMaxAnchor()". The corners can further be offset in pixels by calling \ref UIElement::SetMinOffset "SetMinOffset()" and \ref UIElement::SetMaxOffset "SetMaxOffset()". Finally note that instead of just setting horizontal / vertical alignment, the child element's pivot can also be expressed in a 0-1 range relative to its size by calling \ref UIElement::SetPivot "SetPivot()".
 
 \section UI_Fonts Fonts
 

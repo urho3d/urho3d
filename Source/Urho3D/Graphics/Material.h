@@ -165,6 +165,8 @@ public:
     void SetDepthBias(const BiasParameters& parameters);
     /// Set alpha-to-coverage mode on all passes.
     void SetAlphaToCoverage(bool enable);
+    /// Set line antialiasing on/off. Has effect only on models that consist of line lists.
+    void SetLineAntiAlias(bool enable);
     /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
     void SetRenderOrder(unsigned char order);
     /// Set whether to use in occlusion rendering. Default true.
@@ -231,6 +233,9 @@ public:
 
     /// Return alpha-to-coverage mode.
     bool GetAlphaToCoverage() const { return alphaToCoverage_; }
+
+    /// Return whether line antialiasing is enabled.
+    bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return render order.
     unsigned char GetRenderOrder() const { return renderOrder_; }
@@ -302,8 +307,10 @@ private:
     unsigned auxViewFrameNumber_;
     /// Shader parameter hash value.
     unsigned shaderParameterHash_;
-    /// Alpha-to-coverage mode.
+    /// Alpha-to-coverage flag.
     bool alphaToCoverage_;
+    /// Line antialiasing flag.
+    bool lineAntiAlias_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.

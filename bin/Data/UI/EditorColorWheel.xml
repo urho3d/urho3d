@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <element type="Window">
 	<attribute name="Name" value="EditorColorWheel" />
-	<attribute name="Position" value="1026 364" />
 	<attribute name="Size" value="400 450" />
 	<attribute name="Is Movable" value="true" />
 	<element>

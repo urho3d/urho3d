@@ -181,42 +181,12 @@ static Viewport* ConstructViewportSceneCameraRect(Scene* scene, Camera* camera, 
 
 static Image* Texture2DGetImage(Texture2D* tex2d)
 {
-    Image* rawImage = new Image(tex2d->GetContext());
-    const unsigned texSize = tex2d->GetDataSize(tex2d->GetWidth(), tex2d->GetHeight());
-    const unsigned format = tex2d->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(tex2d->GetWidth(), tex2d->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    tex2d->GetData(0, rawImage->GetData());
-    return rawImage;
+    return tex2d->GetImage().Detach();
 }
 
 static Image* TextureCubeGetImage(CubeMapFace face, TextureCube* texCube)
 {
-    Image* rawImage = new Image(texCube->GetContext());
-    const unsigned texSize = texCube->GetDataSize(texCube->GetWidth(), texCube->GetHeight());
-    const unsigned format = texCube->GetFormat();
-
-    if (format == Graphics::GetRGBAFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 4);
-    else if (format == Graphics::GetRGBFormat())
-        rawImage->SetSize(texCube->GetWidth(), texCube->GetHeight(), 3);
-    else
-    {
-        delete rawImage;
-        return 0;
-    }
-
-    texCube->GetData(face, 0, rawImage->GetData());
-    return rawImage;
+    return texCube->GetImage(face).Detach();
 }
 
 static void ConstructRenderTargetInfo(RenderTargetInfo* ptr)
@@ -983,6 +953,8 @@ static void RegisterMaterial(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Material", "const BiasParameters& get_depthBias() const", asMETHOD(Material, GetDepthBias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_alphaToCoverage(bool)", asMETHOD(Material, SetAlphaToCoverage), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "bool get_alphaToCoverage() const", asMETHOD(Material, GetAlphaToCoverage), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "void set_lineAntiAlias(bool)", asMETHOD(Material, SetLineAntiAlias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Material", "bool get_lineAntiAlias() const", asMETHOD(Material, GetLineAntiAlias), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_renderOrder(uint8)", asMETHOD(Material, SetRenderOrder), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "uint8 get_renderOrder() const", asMETHOD(Material, GetRenderOrder), asCALL_THISCALL);
     engine->RegisterObjectMethod("Material", "void set_scene(Scene@+)", asMETHOD(Material, SetScene), asCALL_THISCALL);
@@ -1431,7 +1403,8 @@ static void RegisterAnimationController(asIScriptEngine* engine)
     engine->RegisterObjectMethod("AnimationController", "bool SetSpeed(const String&in, float)", asMETHOD(AnimationController, SetSpeed), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetAutoFade(const String&in, float)", asMETHOD(AnimationController, SetAutoFade), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool SetRemoveOnCompletion(const String&in, bool)", asMETHOD(AnimationController, SetRemoveOnCompletion), asCALL_THISCALL);
-    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String&in) const", asMETHOD(AnimationController, IsPlaying), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(const String&in) const", asMETHODPR(AnimationController, IsPlaying, (const String&) const, bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("AnimationController", "bool IsPlaying(uint8) const", asMETHODPR(AnimationController, IsPlaying, (unsigned char) const, bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingIn(const String&in) const", asMETHOD(AnimationController, IsFadingIn), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsFadingOut(const String&in) const", asMETHOD(AnimationController, IsFadingOut), asCALL_THISCALL);
     engine->RegisterObjectMethod("AnimationController", "bool IsAtEnd(const String&in) const", asMETHOD(AnimationController, IsAtEnd), asCALL_THISCALL);
@@ -1738,6 +1711,8 @@ static void RegisterDecalSet(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DecalSet", "uint get_maxVertices() const", asMETHOD(DecalSet, GetMaxVertices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "void set_maxIndices(uint)", asMETHOD(DecalSet, SetMaxIndices), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "uint get_maxIndices() const", asMETHOD(DecalSet, GetMaxIndices), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "void set_optimizeBufferSize(bool)", asMETHOD(DecalSet, SetOptimizeBufferSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DecalSet", "bool get_optimizeBufferSize() const", asMETHOD(DecalSet, GetOptimizeBufferSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("DecalSet", "Zone@+ get_zone() const", asMETHOD(DecalSet, GetZone), asCALL_THISCALL);
 }
 
@@ -2002,6 +1977,8 @@ static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
 
 static void RegisterDebugRenderer(asIScriptEngine* engine)
 {
+    engine->RegisterObjectMethod("DebugRenderer", "void set_lineAntiAlias(bool)", asMETHOD(DebugRenderer, SetLineAntiAlias), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "bool get_lineAntiAlias() const", asMETHOD(DebugRenderer, GetLineAntiAlias), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddLine(const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddLine, (const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddTriangle(const Vector3&in, const Vector3&in, const Vector3&in, const Color&in, bool depthTest = true)", asMETHODPR(DebugRenderer, AddTriangle, (const Vector3&, const Vector3&, const Vector3&, const Color&, bool), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddNode(Node@+, float scale = 1.0, bool depthTest = true)", asMETHOD(DebugRenderer, AddNode), asCALL_THISCALL);
