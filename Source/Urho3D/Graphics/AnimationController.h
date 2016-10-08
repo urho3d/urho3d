@@ -34,7 +34,7 @@ class Animation;
 struct Bone;
 
 /// Control data for an animation.
-struct AnimationControl
+struct URHO3D_API AnimationControl
 {
     /// Construct with defaults.
     AnimationControl() :
@@ -170,8 +170,10 @@ public:
     bool GetRemoveOnCompletion(const String& name) const;
     /// Find an animation state by animation name.
     AnimationState* GetAnimationState(const String& name) const;
-    /// Find an animation state by animation name hash
+    /// Find an animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash nameHash) const;
+    /// Return the animation control structures for inspection.
+    const Vector<AnimationControl>& GetAnimations() const { return animations_; }
 
     /// Set animation control structures attribute.
     void SetAnimationsAttr(const VariantVector& value);

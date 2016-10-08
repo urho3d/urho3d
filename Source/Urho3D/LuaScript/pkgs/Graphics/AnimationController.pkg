@@ -4,17 +4,13 @@ struct AnimationControl
 {
     AnimationControl();
     ~AnimationControl();
-    StringHash hash_;
-    float speed_;
-    float targetWeight_;
-    float fadeTime_;
-    float autoFadeTime_;
-    float setTimeTtl_;
-    float setWeightTtl_;
-    unsigned short setTime_;
-    unsigned char setWeight_;
-    unsigned char setTimeRev_;
-    unsigned char setWeightRev_;
+    String name_ @ name;
+    StringHash hash_ @ hash;
+    float speed_ @ speed;
+    float targetWeight_ @ targetWeifht;
+    float fadeTime_ @ fadeTime ;
+    float autoFadeTime_ @ autoFadeTime;
+    bool removeOnCompletion_ @ removeOnCompletion;
 };
 
 class AnimationController : public Component
@@ -58,4 +54,26 @@ class AnimationController : public Component
     
     AnimationState* GetAnimationState(const String name) const;
     AnimationState* GetAnimationState(StringHash nameHash) const;
+
+    tolua_outside const AnimationControl* AnimationControllerGetAnimation @ GetAnimation(unsigned index) const;
+    tolua_outside unsigned AnimationControllerGetNumAnimations @ GetNumAnimations() const;
 };
+
+${
+static const AnimationControl* AnimationControllerGetAnimation(const AnimationController* controller, unsigned index)
+{
+    if (!controller)
+        return (const AnimationControl*)0;
+
+    const Vector<AnimationControl>& animations = controller->GetAnimations();
+    return (index < animations.Size()) ? &animations[index] : (const AnimationControl*)0;
+}
+
+static unsigned AnimationControllerGetNumAnimations(const AnimationController* controller)
+{
+    if (!controller)
+        return 0;
+
+    return controller->GetAnimations().Size();
+}
+$}
