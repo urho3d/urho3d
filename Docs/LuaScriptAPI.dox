@@ -361,17 +361,13 @@ Methods:
 
 Properties:
 
-- StringHash hash_
-- float speed_
-- float targetWeight_
-- float fadeTime_
-- float autoFadeTime_
-- float setTimeTtl_
-- float setWeightTtl_
-- short setTime_
-- char setWeight_
-- char setTimeRev_
-- char setWeightRev_
+- String name
+- StringHash hash
+- float speed
+- float targetWeifht
+- float fadeTime
+- float autoFadeTime
+- bool removeOnCompletion
 
 <a name="Class_AnimationController"></a>
 ### AnimationController : Component
@@ -414,6 +410,8 @@ Methods:
 - bool GetRemoveOnCompletion(const String name) const
 - AnimationState* GetAnimationState(const String name) const
 - AnimationState* GetAnimationState(StringHash nameHash) const
+- const AnimationControl* GetAnimation(unsigned index) const
+- unsigned GetNumAnimations() const
 
 <a name="Class_AnimationKeyFrame"></a>
 ### AnimationKeyFrame
