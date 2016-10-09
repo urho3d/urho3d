@@ -194,11 +194,11 @@ bool AnimationSet2D::HasAnimation(const String& animationName) const
                 return true;
         }
     }
-#endif    
+#endif
     if (spriterData_ && !spriterData_->entities_.Empty())
     {
         const PODVector<Spriter::Animation*>& animations = spriterData_->entities_[0]->animations_;
-        for (size_t i = 0; i < animations.Size(); ++i)
+        for (unsigned i = 0; i < animations.Size(); ++i)
         {
             if (animationName == animations[i]->name_)
                 return true;
@@ -322,10 +322,10 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
             cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, true, this);
         else
         {
-            for (size_t i = 0; i < spriterData_->folders_.Size(); ++i)
+            for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
             {
                 Spriter::Folder* folder = spriterData_->folders_[i];
-                for (size_t j = 0; j < folder->files_.Size(); ++j)
+                for (unsigned j = 0; j < folder->files_.Size(); ++j)
                 {
                     Spriter::File* file = folder->files_[j];
                     String imagePath = parentPath + file->name_;
