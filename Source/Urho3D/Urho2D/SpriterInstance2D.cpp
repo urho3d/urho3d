@@ -70,7 +70,7 @@ bool SpriterInstance::SetEntity(const String& entityName)
     if (!spriterData_)
         return false;
 
-    for (size_t i = 0; i < spriterData_->entities_.Size(); ++i)
+    for (unsigned i = 0; i < spriterData_->entities_.Size(); ++i)
     {
         if (spriterData_->entities_[i]->name_ == entityName)
         {
@@ -101,7 +101,7 @@ bool SpriterInstance::SetAnimation(const String& animationName, LoopMode loopMod
     if (!entity_)
         return false;
 
-    for (size_t i = 0; i < entity_->animations_.Size(); ++i)
+    for (unsigned i = 0; i < entity_->animations_.Size(); ++i)
     {
         if (entity_->animations_[i]->name_ == animationName)
         {
@@ -194,14 +194,14 @@ void SpriterInstance::OnSetAnimation(Animation* animation, LoopMode loopMode)
         else
             looping_ = false;
     }
-        
+    
     currentTime_ = 0.0f;
-    Clear();        
+    Clear();
 }
 
 void SpriterInstance::UpdateTimelineKeys()
 {
-    for (size_t i = 0; i < mainlineKey_->boneRefs_.Size(); ++i)
+    for (unsigned i = 0; i < mainlineKey_->boneRefs_.Size(); ++i)
     {
         Ref* ref = mainlineKey_->boneRefs_[i];
         BoneTimelineKey* timelineKey = (BoneTimelineKey*)GetTimelineKey(ref);
@@ -216,11 +216,11 @@ void SpriterInstance::UpdateTimelineKeys()
         timelineKeys_.Push(timelineKey);
     }
 
-    for (size_t i = 0; i < mainlineKey_->objectRefs_.Size(); ++i)
+    for (unsigned i = 0; i < mainlineKey_->objectRefs_.Size(); ++i)
     {
         Ref* ref = mainlineKey_->objectRefs_[i];
         SpriteTimelineKey* timelineKey = (SpriteTimelineKey*)GetTimelineKey(ref);
-            
+        
         if (ref->parent_ >= 0)
         {
             timelineKey->info_ = timelineKey->info_.UnmapFromParent(timelineKeys_[ref->parent_]->info_);
@@ -239,7 +239,7 @@ void SpriterInstance::UpdateTimelineKeys()
 void SpriterInstance::UpdateMainlineKey()
 {
     const PODVector<MainlineKey*>& mainlineKeys = animation_->mainlineKeys_;
-    for (size_t i = 0; i < mainlineKeys.Size(); ++i)
+    for (unsigned i = 0; i < mainlineKeys.Size(); ++i)
     {
         if (mainlineKeys[i]->time_ <= currentTime_)
         {
@@ -267,7 +267,7 @@ TimelineKey* SpriterInstance::GetTimelineKey(Ref* ref) const
         return timelineKey;
     }
 
-    size_t nextTimelineKeyIndex = ref->key_ + 1;
+    unsigned nextTimelineKeyIndex = ref->key_ + 1;
     if (nextTimelineKeyIndex >= timeline->keys_.Size())
     {
         if (animation_->looping_)
@@ -281,7 +281,7 @@ TimelineKey* SpriterInstance::GetTimelineKey(Ref* ref) const
     }
 
     TimelineKey* nextTimelineKey = timeline->keys_[nextTimelineKeyIndex];
-        
+    
     float nextTimelineKeyTime = nextTimelineKey->time_;
     if (nextTimelineKey->time_ < timelineKey->time_)
     {
@@ -300,7 +300,7 @@ void SpriterInstance::Clear()
 
     if (!timelineKeys_.Empty())
     {
-        for (size_t i = 0; i < timelineKeys_.Size(); ++i)
+        for (unsigned i = 0; i < timelineKeys_.Size(); ++i)
         {
             delete timelineKeys_[i];
         }

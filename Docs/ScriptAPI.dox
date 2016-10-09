@@ -2492,6 +2492,7 @@ namespace Urho3D
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
+<a href="#Class_AnimationControl"><b>AnimationControl</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
 <a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
@@ -2985,6 +2986,20 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationControl"></a>
+
+### AnimationControl
+
+Properties:
+
+- float autoFadeTime
+- float fadeTime
+- StringHash hash
+- String name
+- bool removeOnCompletion
+- float speed
+- float targetWeight
+
 <a name="Class_AnimationController"></a>
 
 ### AnimationController
@@ -3063,6 +3078,7 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- AnimationControl@[] animations // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -3071,6 +3087,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - Node@ node // readonly
+- uint numAnimations // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly

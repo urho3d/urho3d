@@ -245,7 +245,6 @@ public:
         sender_(0),
         userData_(userData)
     {
-        assert(receiver_);
     }
 
     /// Destruct.
@@ -297,6 +296,7 @@ public:
         EventHandler(receiver, userData),
         function_(function)
     {
+        assert(receiver_);
         assert(function_);
     }
 
@@ -325,8 +325,7 @@ class EventHandler11Impl : public EventHandler
 public:
     /// Construct with receiver and function pointers and userdata.
     EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-        EventHandler((Object*)0xDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
-                                          * `function_` already and is not used by `EventHandler11Impl` */, userData),
+        EventHandler(0, userData),
         function_(function)
     {
         assert(function_);
