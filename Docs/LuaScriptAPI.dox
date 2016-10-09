@@ -364,7 +364,7 @@ Properties:
 - String name
 - StringHash hash
 - float speed
-- float targetWeifht
+- float targetWeight
 - float fadeTime
 - float autoFadeTime
 - bool removeOnCompletion
