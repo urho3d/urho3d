@@ -31,6 +31,7 @@ Urho3D development, contributions and bugfixes by:
 - Alex Fuller
 - Henrik Heino
 - Mika Heinonen
+- Victor Holt
 - Jukka Jylänki
 - Graham King
 - Jason Kinzer
