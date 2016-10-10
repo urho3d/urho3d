@@ -8643,6 +8643,8 @@ Methods:
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetGeometry(uint, uint, Geometry@)
+- bool SetIndexBuffers(IndexBuffer@[]@)
+- bool SetVertexBuffers(VertexBuffer@[]@, uint[]@, uint[]@)
 
 Properties:
 
