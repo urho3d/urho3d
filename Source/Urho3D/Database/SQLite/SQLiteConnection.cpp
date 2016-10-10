@@ -67,9 +67,8 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
 
     // 2016-10-09: Prevent string corruption when trimmed is returned.
     String trimmedSqlStr = sql.Trimmed();
-    const char* cSqlStr = trimmedSqlStr.CString();
 
-    int rc = sqlite3_prepare_v2(connectionImpl_, cSqlStr, -1, &pStmt, &zLeftover);
+    int rc = sqlite3_prepare_v2(connectionImpl_, trimmedSqlStr.CString(), -1, &pStmt, &zLeftover);
     if (rc != SQLITE_OK)
     {
         URHO3D_LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));
