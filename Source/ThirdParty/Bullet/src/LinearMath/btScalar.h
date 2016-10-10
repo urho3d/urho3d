@@ -336,7 +336,9 @@ inline __m128 operator * (const __m128 A, const __m128 B)
 #define btCastiTo128f(a)  ((__m128) (a))
 #define btCastdTo128f(a) ((__m128) (a))
 #define btCastdTo128i(a) ((__m128i)(a))
-#define btAssign128(r0,r1,r2,r3) (__m128){r0,r1,r2,r3}
+// Urho3D - Use static_cast<float>, since otherwise it was causing compile errors
+// about narrowing conversions if BT_INFINITY was a double.
+#define btAssign128(r0,r1,r2,r3) (__m128){static_cast<float>(r0),static_cast<float>(r1),static_cast<float>(r2),static_cast<float>(r3)}
 #define BT_INFINITY INFINITY
 #define BT_NAN NAN
 #endif//_WIN32
