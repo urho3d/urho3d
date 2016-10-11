@@ -45,7 +45,7 @@ public:
     static void RegisterObject(Context *context);
 
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
@@ -60,36 +60,28 @@ public:
     void ChangeValue(float delta);
 
     /// Return orientation type.
-    Orientation GetOrientation() const
-    { return orientation_; }
+    Orientation GetOrientation() const { return orientation_; }
 
     /// Return ProgressBar range.
-    float GetRange() const
-    { return range_; }
+    float GetRange() const { return range_; }
 
     /// Return ProgressBar current value.
-    float GetValue() const
-    { return value_; }
+    float GetValue() const { return value_; }
 
     /// Return knob element.
-    BorderImage *GetKnob() const
-    { return knob_; }
+    BorderImage *GetKnob() const { return knob_; }
 
     /// Sets the loading percent style.
-    void SetLoadingPercentStyle(const String &style)
-    { loadingPercentStyle_ = style; }
+    void SetLoadingPercentStyle(const String &style) { loadingPercentStyle_ = style; }
 
     /// Returns the loading percent style.
-    const String& GetLoadingPercentStyle() const
-    { return loadingPercentStyle_; }
+    const String& GetLoadingPercentStyle() const { return loadingPercentStyle_; }
 
     /// Sets the flag to display the percent text.
-    void SetShowPercentText(bool showPercentText)
-    { showPercentText_ = showPercentText; }
+    void SetShowPercentText(bool showPercentText);
 
     /// Returns the flag to display the percent text.
-    bool GetShowPercentText() const
-    { return showPercentText_; }
+    bool GetShowPercentText() const { return showPercentText_; }
 
 protected:
     /// Filter implicit attributes in serialization process.

@@ -69,7 +69,7 @@ void ProgressBar::RegisterObject(Context * context)
     URHO3D_ACCESSOR_ATTRIBUTE("Show Percent Text", GetShowPercentText, SetShowPercentText, bool, true, AM_FILE);
 }
 
-void ProgressBar::OnResize()
+void ProgressBar::OnResize(const IntVector2& /*newSize*/, const IntVector2& /*delta*/)
 {
     UpdateProgressBar();
 }
@@ -110,6 +110,12 @@ void ProgressBar::SetValue(float value)
 void ProgressBar::ChangeValue(float delta)
 {
     SetValue(value_ + delta);
+}
+
+void ProgressBar::SetShowPercentText(bool enable)
+{
+    showPercentText_ = enable;
+    loadingText_->SetVisible(showPercentText_);
 }
 
 bool ProgressBar::FilterImplicitAttributes(XMLElement &dest) const
@@ -159,13 +165,10 @@ void ProgressBar::UpdateProgressBar()
         knob_->SetPosition(0, 0);
     }
 
-    // Display the percent text.
-    loadingText_->SetVisible(showPercentText_);
-
     // Update the text.
     loadingText_->SetStyle(loadingPercentStyle_);
     loadingText_->SetAlignment(HA_CENTER, VA_CENTER);
-    loadingText_->SetText(Urho3D::ToString("%f %%", value_));
+    loadingText_->SetText(Urho3D::ToString("%d %%", (int)((value_ / range_) * 100.0f + 0.5f)));
 }
 
 }
