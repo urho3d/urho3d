@@ -15,7 +15,7 @@
  This source version has been altered.
  */
 
- // Modified by Yao Wei Tjong for Urho3D
+ // Modified by Yao Wei Tjong & Lasse Oorni for Urho3D
 
 #if defined (_WIN32) || defined (__i386__)
 #define BT_USE_SSE_IN_API
@@ -54,11 +54,12 @@ long _maxdot_large( const float *vv, const float *vec, unsigned long count, floa
 {
     const float4 *vertices = (const float4*) vv;
     static const unsigned char indexTable[16] = {(unsigned char)-1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
-    float4 dotMax = btAssign128( -BT_INFINITY,  -BT_INFINITY,  -BT_INFINITY,  -BT_INFINITY );
+    // Urho3D: cast to float in case BT_INFINITY is double on some MinGW derived compilers to prevent narrowing errors
+    float4 dotMax = btAssign128( static_cast<float>(-BT_INFINITY),  static_cast<float>(-BT_INFINITY), static_cast<float>(-BT_INFINITY), static_cast<float>(-BT_INFINITY) );
     float4 vvec = _mm_loadu_ps( vec );
     float4 vHi = btCastiTo128f(_mm_shuffle_epi32( btCastfTo128i( vvec), 0xaa ));          /// zzzz
     float4 vLo = _mm_movelh_ps( vvec, vvec );                               /// xyxy
-    
+
     long maxIndex = -1L;
     
     size_t segment = 0;
@@ -439,7 +440,8 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 {
     const float4 *vertices = (const float4*) vv;
     static const unsigned char indexTable[16] = {(unsigned char)-1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
-    float4 dotmin = btAssign128( BT_INFINITY,  BT_INFINITY,  BT_INFINITY,  BT_INFINITY );
+    // Urho3D: cast to float in case BT_INFINITY is double on some MinGW derived compilers to prevent narrowing errors
+    float4 dotmin = btAssign128( static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY) );
     float4 vvec = _mm_loadu_ps( vec );
     float4 vHi = btCastiTo128f(_mm_shuffle_epi32( btCastfTo128i( vvec), 0xaa ));          /// zzzz
     float4 vLo = _mm_movelh_ps( vvec, vvec );                               /// xyxy
