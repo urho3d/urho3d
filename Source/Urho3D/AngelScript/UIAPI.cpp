@@ -31,6 +31,7 @@
 #include "../UI/LineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/MessageBox.h"
+#include "../UI/ProgressBar.h"
 #include "../UI/ScrollBar.h"
 #include "../UI/Slider.h"
 #include "../UI/Sprite.h"
@@ -513,6 +514,22 @@ static void RegisterMessageBox(asIScriptEngine* engine)
     engine->RegisterObjectMethod("MessageBox", "UIElement@+ get_window() const", asMETHOD(MessageBox, GetWindow), asCALL_THISCALL);
 }
 
+static void RegisterProgressBar(asIScriptEngine* engine)
+{
+    RegisterObject<ProgressBar>(engine, "ProgressBar");
+    engine->RegisterObjectMethod("ProgressBar", "void set_orientation(Orientation)", asMETHOD(ProgressBar, SetOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "Orientation get_orientation() const", asMETHOD(ProgressBar, GetOrientation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "void set_range(float)", asMETHOD(ProgressBar, SetRange), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "float get_range() const", asMETHOD(ProgressBar, GetRange), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "void set_value(float)", asMETHOD(ProgressBar, SetValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "float get_value() const", asMETHOD(ProgressBar, GetValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "void set_showPercentText(bool)", asMETHOD(ProgressBar, SetShowPercentText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "bool get_showPercentText() const", asMETHOD(ProgressBar, GetShowPercentText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "void ChangeValue(float)", asMETHOD(ProgressBar, ChangeValue), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "BorderImage@+ get_knob() const", asMETHOD(ProgressBar, GetKnob), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ProgressBar", "void SetLoadingPercentStyle(const String&in)", asMETHOD(ProgressBar, SetLoadingPercentStyle), asCALL_THISCALL);
+}
+
 static CScriptArray* DropDownListGetItems(DropDownList* ptr)
 {
     PODVector<UIElement*> result = ptr->GetItems();
@@ -778,6 +795,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterLineEdit(engine);
     RegisterMenu(engine);
     RegisterMessageBox(engine);
+    RegisterProgressBar(engine);
     RegisterDropDownList(engine);
     RegisterWindow(engine);
     RegisterView3D(engine);

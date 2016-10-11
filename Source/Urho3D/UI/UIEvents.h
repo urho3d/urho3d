@@ -202,6 +202,13 @@ URHO3D_EVENT(E_SLIDERPAGED, SliderPaged)
     URHO3D_PARAM(P_PRESSED, Pressed);              // bool
 }
 
+/// UI progressbar value changed
+URHO3D_EVENT(E_PROGRESSBARCHANGED, ProgressBarChanged)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VALUE, Value);                  // float
+}
+
 /// UI scrollbar value changed.
 URHO3D_EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {
