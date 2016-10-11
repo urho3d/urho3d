@@ -741,6 +741,10 @@ namespace Urho3D
 - %Offset : int
 - %Pressed : bool
 
+### ProgressBarChanged
+- %Element : UIElement pointer
+- %Value : float
+
 ### ScrollBarChanged
 - %Element : UIElement pointer
 - %Value : float
@@ -1787,6 +1791,58 @@ namespace Urho3D
 - %Velocity %Iterations : int
 - %Position %Iterations : int
 
+### ProgressBar
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Min %Anchor : Vector2
+- %Max %Anchor : Vector2
+- %Min %Offset : IntVector2
+- %Max %Offset : IntVector2
+- %Pivot : Vector2
+- %Enable %Anchor : bool
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Orientation : int
+- %Range : float
+- %Value : float
+- %Show %Percent %Text : bool
+
 ### RibbonTrail
 - %Is %Enabled : bool
 - %Max %Lights : int
@@ -2612,6 +2668,7 @@ namespace Urho3D
 <a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
 <a href="#Class_Plane"><b>Plane</b></a>
 <a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_ProgressBar"><b>ProgressBar</b></a>
 <a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
@@ -10046,6 +10103,31 @@ Properties:
 
 - Vector3[]@[] face // readonly
 - uint numFaces // readonly
+
+<a name="Class_ProgressBar"></a>
+
+### ProgressBar
+
+Methods:
+
+- void ChangeValue(float)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetLoadingPercentStyle(const String&)
+
+Properties:
+
+- String category // readonly
+- BorderImage@ knob // readonly
+- Orientation orientation
+- float range
+- int refs // readonly
+- bool showPercentText
+- StringHash type // readonly
+- String typeName // readonly
+- float value
+- int weakRefs // readonly
 
 <a name="Class_PropertySet2D"></a>
 

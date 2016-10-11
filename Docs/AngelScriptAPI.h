@@ -8338,6 +8338,34 @@ Array<Array<Vector3>> face;
 uint numFaces;
 };
 
+class ProgressBar
+{
+// Methods:
+void ChangeValue(float);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetLoadingPercentStyle(const String&);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+BorderImage knob;
+Orientation orientation;
+float range;
+/* readonly */
+int refs;
+bool showPercentText;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+float value;
+/* readonly */
+int weakRefs;
+};
+
 class PropertySet2D
 {
 // Methods:
