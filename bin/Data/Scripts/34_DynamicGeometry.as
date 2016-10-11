@@ -196,6 +196,19 @@ void CreateScene()
         fromScratchModel.SetGeometry(0, 0, geom);
         fromScratchModel.boundingBox = BoundingBox(Vector3(-0.5, -0.5, -0.5), Vector3(0.5, 0.5, 0.5));
 
+        // Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
+        Array<VertexBuffer@> vertexBuffers;
+        Array<IndexBuffer@> indexBuffers;
+        vertexBuffers.Push(vb);
+        indexBuffers.Push(ib);
+        // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
+        Array<uint> morphRangeStarts;
+        Array<uint> morphRangeCounts;
+        morphRangeStarts.Push(0);
+        morphRangeCounts.Push(0);
+        fromScratchModel.SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
+        fromScratchModel.SetIndexBuffers(indexBuffers);
+
         Node@ node = scene_.CreateChild("FromScratchObject");
         node.position = Vector3(0.0, 3.0, 0.0);
         StaticModel@ object = node.CreateComponent("StaticModel");

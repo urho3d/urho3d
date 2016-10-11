@@ -972,10 +972,32 @@ static Model* ModelClone(const String& cloneName, Model* ptr)
     return clone.Get();
 }
 
+static bool ModelSetVertexBuffers(CScriptArray* vertexBuffers, CScriptArray* morphRangeStarts, CScriptArray* morphRangeCounts, Model* ptr)
+{
+    Vector<VertexBuffer*> vbRawPtrs = ArrayToVector<VertexBuffer*>(vertexBuffers);
+    Vector<SharedPtr<VertexBuffer> > vbPtrs(vbRawPtrs.Size());
+    for (unsigned i = 0; i < vbRawPtrs.Size(); ++i)
+        vbPtrs[i] = SharedPtr<VertexBuffer>(vbRawPtrs[i]);
+
+    return ptr->SetVertexBuffers(vbPtrs, ArrayToPODVector<unsigned>(morphRangeStarts), ArrayToPODVector<unsigned>(morphRangeCounts));
+}
+
+static bool ModelSetIndexBuffers(CScriptArray* indexBuffers, Model* ptr)
+{
+    Vector<IndexBuffer*> ibRawPtrs = ArrayToVector<IndexBuffer*>(indexBuffers);
+    Vector<SharedPtr<IndexBuffer> > ibPtrs(ibRawPtrs.Size());
+    for (unsigned i = 0; i < ibRawPtrs.Size(); ++i)
+        ibPtrs[i] = SharedPtr<IndexBuffer>(ibRawPtrs[i]);
+
+    return ptr->SetIndexBuffers(ibPtrs);
+}
+
 static void RegisterModel(asIScriptEngine* engine)
 {
     RegisterResource<Model>(engine, "Model");
     engine->RegisterObjectMethod("Model", "Model@ Clone(const String&in cloneName = String()) const", asFUNCTION(ModelClone), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Model", "bool SetVertexBuffers(Array<VertexBuffer@>@+, Array<uint>@+, Array<uint>@+)", asFUNCTION(ModelSetVertexBuffers), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Model", "bool SetIndexBuffers(Array<IndexBuffer@>@+)", asFUNCTION(ModelSetIndexBuffers), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Model", "bool SetGeometry(uint, uint, Geometry@+)", asMETHOD(Model, SetGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "Geometry@+ GetGeometry(uint, uint) const", asMETHOD(Model, GetGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("Model", "void set_boundingBox(const BoundingBox&in)", asMETHOD(Model, SetBoundingBox), asCALL_THISCALL);
