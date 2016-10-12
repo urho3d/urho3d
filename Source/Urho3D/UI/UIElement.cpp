@@ -304,13 +304,13 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     return true;
 }
 
-bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
+UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
 {
     bool internalElem = childElem.GetBool("internal");
     if (internalElem)
     {
         URHO3D_LOGERROR("Loading internal child element is not supported");
-        return false;
+        return NULL;
     }
 
     String typeName = childElem.GetAttribute("type");
@@ -324,10 +324,10 @@ bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bo
         if (!styleFile)
             styleFile = GetDefaultStyle();
         if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
-            return false;
+            return NULL;
     }
 
-    return true;
+    return child;
 }
 
 bool UIElement::SaveXML(XMLElement& dest) const
@@ -886,7 +886,7 @@ void UIElement::SetPriority(int priority)
 {
     if (priority_ == priority)
         return;
-    
+
     priority_ = priority;
     if (parent_)
         parent_->sortOrderDirty_ = true;
@@ -1587,14 +1587,14 @@ bool UIElement::IsVisibleEffective() const
 {
     bool visible = visible_;
     const UIElement* element = parent_;
-    
+
     // Traverse the parent chain
     while (visible && element)
     {
         visible &= element->visible_;
         element = element->parent_;
     }
-    
+
     return visible;
 }
 
