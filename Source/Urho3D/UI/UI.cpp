@@ -45,6 +45,7 @@
 #include "../UI/LineEdit.h"
 #include "../UI/ListView.h"
 #include "../UI/MessageBox.h"
+#include "../UI/ProgressBar.h"
 #include "../UI/ScrollBar.h"
 #include "../UI/Slider.h"
 #include "../UI/Sprite.h"
@@ -1897,6 +1898,7 @@ void RegisterUILibrary(Context* context)
     DropDownList::RegisterObject(context);
     FileSelector::RegisterObject(context);
     MessageBox::RegisterObject(context);
+    ProgressBar::RegisterObject(context);
     ToolTip::RegisterObject(context);
 }
 

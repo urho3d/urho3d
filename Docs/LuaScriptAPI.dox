@@ -141,6 +141,7 @@ namespace Urho3D
 <a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
 <a href="#Class_Plane"><b>Plane</b></a>
 <a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_ProgressBar"><b>ProgressBar</b></a>
 <a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
@@ -4672,6 +4673,36 @@ Methods:
 Properties:
 
 - bool empty (readonly)
+
+<a name="Class_ProgressBar"></a>
+### ProgressBar : BorderImage
+
+Methods:
+
+- ProgressBar() (GC)
+- ProgressBar* new()
+- void delete()
+- void SetOrientation(Orientation orientation)
+- void SetRange(float range)
+- void SetValue(float value)
+- void ChangeValue(float delta)
+- void SetLoadingPercentStyle(const String style)
+- void SetShowPercentText(bool showPercentText)
+- Orientation GetOrientation() const
+- float GetRange() const
+- float GetValue() const
+- BorderImage* GetKnob() const
+- const String GetLoadingPercentStyle()
+- bool GetShowPercentText() const
+
+Properties:
+
+- Orientation orientation
+- float range
+- float value
+- BorderImage* knob (readonly)
+- String loadingPercentStyle (readonly)
+- bool showPercentText
 
 <a name="Class_PropertySet2D"></a>
 ### PropertySet2D
