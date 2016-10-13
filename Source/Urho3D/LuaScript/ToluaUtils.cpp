@@ -22,8 +22,10 @@
 
 #include "../Precompiled.h"
 
+#ifndef _WIN32
 #include "../Graphics/IndexBuffer.h"
 #include "../Graphics/VertexBuffer.h"
+#endif
 #include "../IO/VectorBuffer.h"
 
 #include <toluapp/tolua++.h>
