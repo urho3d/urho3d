@@ -9,6 +9,9 @@ class Model : public Resource
     tolua_outside Model* ModelClone @ Clone(const String cloneName = String::EMPTY) const;
 
     void SetBoundingBox(const BoundingBox& box);
+    bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts,
+        const PODVector<unsigned>& morphRangeCounts);
+    bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers);
     void SetNumGeometries(unsigned num);
     bool SetNumGeometryLodLevels(unsigned index, unsigned num);
     bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry);
