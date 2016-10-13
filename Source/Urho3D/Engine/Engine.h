@@ -113,10 +113,9 @@ public:
     /// Parse the engine startup parameters map from command line arguments.
     static VariantMap ParseParameters(const Vector<String>& arguments);
     /// Return whether startup parameters contains a specific parameter.
-    static bool HasParameter(const VariantMap& parameters, const String& parameter);
+    bool HasParameter(const String& parameter);
     /// Get an engine startup parameter, with default value if missing.
-    static const Variant
-        & GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue = Variant::EMPTY);
+    const Variant& GetParameter(const String& parameter, const Variant& defaultValue = Variant::EMPTY);
 
 private:
     /// Handle exit requested event. Auto-exit if enabled.
@@ -154,6 +153,8 @@ private:
     bool headless_;
     /// Audio paused flag.
     bool audioPaused_;
+    /// Engine parameters.
+    VariantMap engineParameters_;
 };
 
 }
