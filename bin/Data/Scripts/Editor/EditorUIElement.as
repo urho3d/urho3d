@@ -559,7 +559,7 @@ bool UIElementPaste(bool duplication = false)
                 pasteElement = editUIElement;
         }
 
-        if (pasteElement.LoadChildXML(rootElem, null))
+        if (pasteElement.LoadChildXML(rootElem, null) !is null)
         {
             UIElement@ element = pasteElement.children[pasteElement.numChildren - 1];
 
