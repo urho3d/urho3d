@@ -141,6 +141,7 @@ namespace Urho3D
 <a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
 <a href="#Class_Plane"><b>Plane</b></a>
 <a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_ProgressBar"><b>ProgressBar</b></a>
 <a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
@@ -361,17 +362,13 @@ Methods:
 
 Properties:
 
-- StringHash hash_
-- float speed_
-- float targetWeight_
-- float fadeTime_
-- float autoFadeTime_
-- float setTimeTtl_
-- float setWeightTtl_
-- short setTime_
-- char setWeight_
-- char setTimeRev_
-- char setWeightRev_
+- String name
+- StringHash hash
+- float speed
+- float targetWeight
+- float fadeTime
+- float autoFadeTime
+- bool removeOnCompletion
 
 <a name="Class_AnimationController"></a>
 ### AnimationController : Component
@@ -395,6 +392,7 @@ Methods:
 - bool SetAutoFade(const String name, float fadeOutTime)
 - bool SetRemoveOnCompletion(const String name, bool removeOnCompletion)
 - bool IsPlaying(const String name) const
+- bool IsPlaying(char layer) const
 - bool IsFadingIn(const String name) const
 - bool IsFadingOut(const String name) const
 - bool IsAtEnd(const String name) const
@@ -413,6 +411,8 @@ Methods:
 - bool GetRemoveOnCompletion(const String name) const
 - AnimationState* GetAnimationState(const String name) const
 - AnimationState* GetAnimationState(StringHash nameHash) const
+- const AnimationControl* GetAnimation(unsigned index) const
+- unsigned GetNumAnimations() const
 
 <a name="Class_AnimationKeyFrame"></a>
 ### AnimationKeyFrame
@@ -3572,6 +3572,8 @@ Methods:
 - void delete()
 - Model* Clone(const String cloneName = String::EMPTY) const
 - void SetBoundingBox(const BoundingBox& box)
+- bool SetVertexBuffers(const Vector<SharedPtr<VertexBuffer> >& buffers, const PODVector<unsigned>& morphRangeStarts, const PODVector<unsigned>& morphRangeCounts)
+- bool SetIndexBuffers(const Vector<SharedPtr<IndexBuffer> >& buffers)
 - void SetNumGeometries(unsigned num)
 - bool SetNumGeometryLodLevels(unsigned index, unsigned num)
 - bool SetGeometry(unsigned index, unsigned lodLevel, Geometry* geometry)
@@ -4674,6 +4676,36 @@ Properties:
 
 - bool empty (readonly)
 
+<a name="Class_ProgressBar"></a>
+### ProgressBar : BorderImage
+
+Methods:
+
+- ProgressBar() (GC)
+- ProgressBar* new()
+- void delete()
+- void SetOrientation(Orientation orientation)
+- void SetRange(float range)
+- void SetValue(float value)
+- void ChangeValue(float delta)
+- void SetLoadingPercentStyle(const String style)
+- void SetShowPercentText(bool showPercentText)
+- Orientation GetOrientation() const
+- float GetRange() const
+- float GetValue() const
+- BorderImage* GetKnob() const
+- const String GetLoadingPercentStyle()
+- bool GetShowPercentText() const
+
+Properties:
+
+- Orientation orientation
+- float range
+- float value
+- BorderImage* knob (readonly)
+- String loadingPercentStyle (readonly)
+- bool showPercentText
+
 <a name="Class_PropertySet2D"></a>
 ### PropertySet2D
 
@@ -4830,6 +4862,7 @@ Methods:
 - Vector2 HalfSize() const
 - bool Equals(const Rect& rhs) const
 - Intersection IsInside(const Vector2& point) const
+- Intersection IsInside(const Rect& rect) const
 - Vector4 ToVector4() const
 - String ToString() const
 

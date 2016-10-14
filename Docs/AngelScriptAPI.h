@@ -335,6 +335,19 @@ uint useTimer;
 int weakRefs;
 };
 
+class AnimationControl
+{
+
+// Properties:
+float autoFadeTime;
+float fadeTime;
+StringHash hash;
+String name;
+bool removeOnCompletion;
+float speed;
+float targetWeight;
+};
+
 class AnimationController
 {
 // Methods:
@@ -368,6 +381,7 @@ bool IsAtEnd(const String&) const;
 bool IsFadingIn(const String&) const;
 bool IsFadingOut(const String&) const;
 bool IsPlaying(const String&) const;
+bool IsPlaying(uint8) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -409,6 +423,8 @@ const String& GetStartBone(const String&) const;
 // Properties:
 bool animationEnabled;
 /* readonly */
+Array<AnimationControl> animations;
+/* readonly */
 Array<Variant> attributeDefaults;
 /* readonly */
 Array<AttributeInfo> attributeInfos;
@@ -422,6 +438,8 @@ bool enabledEffective;
 uint id;
 /* readonly */
 Node node;
+/* readonly */
+uint numAnimations;
 /* readonly */
 uint numAttributes;
 ObjectAnimation objectAnimation;
@@ -6746,6 +6764,8 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetGeometry(uint, uint, Geometry);
+bool SetIndexBuffers(Array<IndexBuffer>);
+bool SetVertexBuffers(Array<Array<Array<VertexBuffer>, uint>, uint>);
 
 // Properties:
 BoundingBox boundingBox;
@@ -8318,6 +8338,34 @@ Array<Array<Vector3>> face;
 uint numFaces;
 };
 
+class ProgressBar
+{
+// Methods:
+void ChangeValue(float);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetLoadingPercentStyle(const String&);
+
+// Properties:
+/* readonly */
+String category;
+/* readonly */
+BorderImage knob;
+Orientation orientation;
+float range;
+/* readonly */
+int refs;
+bool showPercentText;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+float value;
+/* readonly */
+int weakRefs;
+};
+
 class PropertySet2D
 {
 // Methods:
@@ -8412,6 +8460,7 @@ void Define(const Vector2&);
 void Define(const Vector2&, const Vector2&);
 bool Defined() const;
 bool Equals(const Rect&) const;
+Intersection IsInside(const Rect&) const;
 Intersection IsInside(const Vector2&) const;
 void Merge(const Rect&);
 void Merge(const Vector2&);

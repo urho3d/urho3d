@@ -22,6 +22,10 @@
 
 #include "../Precompiled.h"
 
+#ifndef _WIN32
+#include "../Graphics/IndexBuffer.h"
+#include "../Graphics/VertexBuffer.h"
+#endif
 #include "../IO/VectorBuffer.h"
 
 #include <toluapp/tolua++.h>
@@ -57,7 +61,7 @@ Context* GetContext(lua_State* L)
     return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, 0)) : 0;
 }
 
-// Explicit template specialization only required for StringVector
+// Explicit template specialization for StringVector
 
 template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* /*type*/, int def, tolua_Error* err)
 {
@@ -92,7 +96,7 @@ template <> int ToluaPushVector<String>(lua_State* L, void* data, const char* /*
     return 1;
 }
 
-// Explicit template specialization only required for boolean
+// Explicit template specialization for boolean
 
 template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo, const char* /*type*/, int def, tolua_Error* err)
 {
@@ -125,6 +129,40 @@ template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void
         lua_rawseti(L, -2, i + 1);
     }
     return 1;
+}
+
+// Explicit template specialization for Vector<SharedPtr<IndexBuffer> > and Vector<SharedPtr<VertexBuffer> >
+
+template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static Vector<SharedPtr<IndexBuffer> > result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
+        result[i] = SharedPtr<IndexBuffer>(static_cast<IndexBuffer*>(tolua_tousertype(L, -1, def)));
+        lua_pop(L, 1);
+    }
+    return &result;
+}
+
+template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static Vector<SharedPtr<VertexBuffer> > result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
+        result[i] = SharedPtr<VertexBuffer>(static_cast<VertexBuffer*>(tolua_tousertype(L, -1, def)));
+        lua_pop(L, 1);
+    }
+    return &result;
 }
 
 namespace Urho3D

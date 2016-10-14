@@ -170,6 +170,17 @@ public:
             return INSIDE;
     }
 
+    /// Test if another rect is inside, outside or intersects.
+    Intersection IsInside(const Rect& rect) const
+    {
+        if (rect.max_.x_ < min_.x_ || rect.min_.x_ > max_.x_ || rect.max_.y_ < min_.y_ || rect.min_.y_ > max_.y_)
+            return OUTSIDE;
+        else if (rect.min_.x_ < min_.x_ || rect.max_.x_ > max_.x_ || rect.min_.y_ < min_.y_ || rect.max_.y_ > max_.y_)
+            return INTERSECTS;
+        else
+            return INSIDE;
+    }
+
     /// Return float data.
     const void* Data() const { return &min_.x_; }
 

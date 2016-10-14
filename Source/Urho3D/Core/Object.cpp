@@ -143,11 +143,15 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
     EventHandler* previous;
     EventHandler* oldHandler = FindSpecificEventHandler(0, eventType, &previous);
     if (oldHandler)
+    {
         eventHandlers_.Erase(oldHandler, previous);
-
-    eventHandlers_.InsertFront(handler);
-
-    context_->AddEventReceiver(this, eventType);
+        eventHandlers_.InsertFront(handler);
+    }
+    else
+    {
+        eventHandlers_.InsertFront(handler);
+        context_->AddEventReceiver(this, eventType);
+    }
 }
 
 void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
@@ -164,11 +168,15 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     EventHandler* previous;
     EventHandler* oldHandler = FindSpecificEventHandler(sender, eventType, &previous);
     if (oldHandler)
+    {
         eventHandlers_.Erase(oldHandler, previous);
-
-    eventHandlers_.InsertFront(handler);
-
-    context_->AddEventReceiver(this, sender, eventType);
+        eventHandlers_.InsertFront(handler);
+    }
+    else
+    {
+        eventHandlers_.InsertFront(handler);
+        context_->AddEventReceiver(this, sender, eventType);
+    }
 }
 
 #if URHO3D_CXX11
@@ -301,90 +309,80 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->BeginSendEvent(this, eventType);
 
     // Check first the specific event receivers
-    const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
+    // Note: group is held alive with a shared ptr, as it may get destroyed along with the sender
+    SharedPtr<EventReceiverGroup> group(context->GetEventReceivers(this, eventType));
     if (group)
     {
-        for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
-        {
-            HashSet<Object*>::ConstIterator current = i++;
-            Object* receiver = *current;
-            Object* next = 0;
-            if (i != group->End())
-                next = *i;
+        group->BeginSendEvent();
 
-            unsigned oldSize = group->Size();
+        for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+        {
+            Object* receiver = group->receivers_[i];
+            // Holes may exist if receivers removed during send
+            if (!receiver)
+                continue;
+
             receiver->OnEvent(this, eventType, eventData);
 
             // If self has been destroyed as a result of event handling, exit
             if (self.Expired())
             {
+                group->EndSendEvent();
                 context->EndSendEvent();
                 return;
             }
 
-            // If group has changed size during iteration (removed/added subscribers) try to recover
-            /// \todo This is not entirely foolproof, as a subscriber could have been added to make up for the removed one
-            if (group->Size() != oldSize)
-                i = group->Find(next);
-
             processed.Insert(receiver);
         }
+
+        group->EndSendEvent();
     }
 
     // Then the non-specific receivers
     group = context->GetEventReceivers(eventType);
     if (group)
     {
+        group->BeginSendEvent();
+
         if (processed.Empty())
         {
-            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
             {
-                HashSet<Object*>::ConstIterator current = i++;
-                Object* receiver = *current;
-                Object* next = 0;
-                if (i != group->End())
-                    next = *i;
+                Object* receiver = group->receivers_[i];
+                if (!receiver)
+                    continue;
 
-                unsigned oldSize = group->Size();
                 receiver->OnEvent(this, eventType, eventData);
 
                 if (self.Expired())
                 {
+                    group->EndSendEvent();
                     context->EndSendEvent();
                     return;
                 }
-
-                if (group->Size() != oldSize)
-                    i = group->Find(next);
             }
         }
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
             {
-                HashSet<Object*>::ConstIterator current = i++;
-                Object* receiver = *current;
-                Object* next = 0;
-                if (i != group->End())
-                    next = *i;
+                Object* receiver = group->receivers_[i];
+                if (!receiver || processed.Contains(receiver))
+                    continue;
 
-                if (!processed.Contains(receiver))
+                receiver->OnEvent(this, eventType, eventData);
+
+                if (self.Expired())
                 {
-                    unsigned oldSize = group->Size();
-                    receiver->OnEvent(this, eventType, eventData);
-
-                    if (self.Expired())
-                    {
-                        context->EndSendEvent();
-                        return;
-                    }
-
-                    if (group->Size() != oldSize)
-                        i = group->Find(next);
+                    group->EndSendEvent();
+                    context->EndSendEvent();
+                    return;
                 }
             }
         }
+
+        group->EndSendEvent();
     }
 
     context->EndSendEvent();

@@ -741,6 +741,10 @@ namespace Urho3D
 - %Offset : int
 - %Pressed : bool
 
+### ProgressBarChanged
+- %Element : UIElement pointer
+- %Value : float
+
 ### ScrollBarChanged
 - %Element : UIElement pointer
 - %Value : float
@@ -1787,6 +1791,58 @@ namespace Urho3D
 - %Velocity %Iterations : int
 - %Position %Iterations : int
 
+### ProgressBar
+- %Name : String
+- %Position : IntVector2
+- %Size : IntVector2
+- %Min %Size : IntVector2
+- %Max %Size : IntVector2
+- %Horiz %Alignment : int
+- %Vert %Alignment : int
+- %Min %Anchor : Vector2
+- %Max %Anchor : Vector2
+- %Min %Offset : IntVector2
+- %Max %Offset : IntVector2
+- %Pivot : Vector2
+- %Enable %Anchor : bool
+- %Clip %Border : IntRect
+- %Priority : int
+- %Opacity : float
+- %Color : Color
+- %Top %Left %Color : Color
+- %Top %Right %Color : Color
+- %Bottom %Left %Color : Color
+- %Bottom %Right %Color : Color
+- %Is %Enabled : bool
+- %Is %Editable : bool
+- %Is %Selected : bool
+- %Is %Visible : bool
+- %Bring %To %Front : bool
+- %Bring %To %Back : bool
+- %Clip %Children : bool
+- %Use %Derived %Opacity : bool
+- %Focus %Mode : int
+- %Drag %And %Drop %Mode : int
+- %Layout %Mode : int
+- %Layout %Spacing : int
+- %Layout %Border : IntRect
+- %Layout %Flex %Scale : Vector2
+- %Indent : int
+- %Indent %Spacing : int
+- %Variables : VariantMap
+- %Tags : StringVector
+- %Texture : ResourceRef
+- %Image %Rect : IntRect
+- %Border : IntRect
+- %Image %Border : IntRect
+- %Hover %Image %Offset : IntVector2
+- %Tiled : bool
+- %Blend %Mode : int
+- %Orientation : int
+- %Range : float
+- %Value : float
+- %Show %Percent %Text : bool
+
 ### RibbonTrail
 - %Is %Enabled : bool
 - %Max %Lights : int
@@ -2492,6 +2548,7 @@ namespace Urho3D
 <a href="#Class_AnimatedModel"><b>AnimatedModel</b></a>
 <a href="#Class_AnimatedSprite2D"><b>AnimatedSprite2D</b></a>
 <a href="#Class_Animation"><b>Animation</b></a>
+<a href="#Class_AnimationControl"><b>AnimationControl</b></a>
 <a href="#Class_AnimationController"><b>AnimationController</b></a>
 <a href="#Class_AnimationKeyFrame"><b>AnimationKeyFrame</b></a>
 <a href="#Class_AnimationSet2D"><b>AnimationSet2D</b></a>
@@ -2611,6 +2668,7 @@ namespace Urho3D
 <a href="#Class_PhysicsWorld2D"><b>PhysicsWorld2D</b></a>
 <a href="#Class_Plane"><b>Plane</b></a>
 <a href="#Class_Polyhedron"><b>Polyhedron</b></a>
+<a href="#Class_ProgressBar"><b>ProgressBar</b></a>
 <a href="#Class_PropertySet2D"><b>PropertySet2D</b></a>
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
@@ -2985,6 +3043,20 @@ Properties:
 - uint useTimer // readonly
 - int weakRefs // readonly
 
+<a name="Class_AnimationControl"></a>
+
+### AnimationControl
+
+Properties:
+
+- float autoFadeTime
+- float fadeTime
+- StringHash hash
+- String name
+- bool removeOnCompletion
+- float speed
+- float targetWeight
+
 <a name="Class_AnimationController"></a>
 
 ### AnimationController
@@ -3021,6 +3093,7 @@ Methods:
 - bool IsFadingIn(const String&) const
 - bool IsFadingOut(const String&) const
 - bool IsPlaying(const String&) const
+- bool IsPlaying(uint8) const
 - bool Load(File@, bool = false)
 - bool Load(VectorBuffer&, bool = false)
 - bool LoadJSON(const JSONValue&, bool = false)
@@ -3062,6 +3135,7 @@ Methods:
 Properties:
 
 - bool animationEnabled
+- AnimationControl@[] animations // readonly
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
@@ -3070,6 +3144,7 @@ Properties:
 - bool enabledEffective // readonly
 - uint id // readonly
 - Node@ node // readonly
+- uint numAnimations // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
@@ -8625,6 +8700,8 @@ Methods:
 - bool Save(VectorBuffer&) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetGeometry(uint, uint, Geometry@)
+- bool SetIndexBuffers(IndexBuffer@[]@)
+- bool SetVertexBuffers(VertexBuffer@[]@, uint[]@, uint[]@)
 
 Properties:
 
@@ -10027,6 +10104,31 @@ Properties:
 - Vector3[]@[] face // readonly
 - uint numFaces // readonly
 
+<a name="Class_ProgressBar"></a>
+
+### ProgressBar
+
+Methods:
+
+- void ChangeValue(float)
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetLoadingPercentStyle(const String&)
+
+Properties:
+
+- String category // readonly
+- BorderImage@ knob // readonly
+- Orientation orientation
+- float range
+- int refs // readonly
+- bool showPercentText
+- StringHash type // readonly
+- String typeName // readonly
+- float value
+- int weakRefs // readonly
+
 <a name="Class_PropertySet2D"></a>
 
 ### PropertySet2D
@@ -10125,6 +10227,7 @@ Methods:
 - void Define(const Vector2&, const Vector2&)
 - bool Defined() const
 - bool Equals(const Rect&) const
+- Intersection IsInside(const Rect&) const
 - Intersection IsInside(const Vector2&) const
 - void Merge(const Rect&)
 - void Merge(const Vector2&)
