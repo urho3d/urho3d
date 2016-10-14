@@ -129,8 +129,8 @@ public:
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
-    /// Create a child by loading from XML data with style. Return true if successful.
-    virtual bool LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
+    /// Create a child by loading from XML data with style. Returns the child element if successful, NULL if otherwise.
+    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
 

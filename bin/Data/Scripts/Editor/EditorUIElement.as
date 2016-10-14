@@ -316,7 +316,7 @@ void LoadChildUIElement(const String&in fileName)
 
     suppressUIElementChanges = true;
 
-    if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
+    if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle) !is null)
     {
         XMLElement rootElem = xmlFile.root;
         uint index = rootElem.HasAttribute("index") ? rootElem.GetUInt("index") : editUIElement.numChildren - 1;

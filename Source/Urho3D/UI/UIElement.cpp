@@ -304,13 +304,13 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
     return true;
 }
 
-bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
+UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bool setInstanceDefault)
 {
     bool internalElem = childElem.GetBool("internal");
     if (internalElem)
     {
         URHO3D_LOGERROR("Loading internal child element is not supported");
-        return false;
+        return NULL;
     }
 
     String typeName = childElem.GetAttribute("type");
@@ -324,10 +324,13 @@ bool UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFile, bo
         if (!styleFile)
             styleFile = GetDefaultStyle();
         if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
-            return false;
+        {
+            RemoveChild(child, index);
+            return NULL;
+        }
     }
 
-    return true;
+    return child;
 }
 
 bool UIElement::SaveXML(XMLElement& dest) const
