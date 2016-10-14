@@ -184,6 +184,8 @@ public:
     void SetGlobalShaderParameters();
     /// Set camera-specific shader parameters. Called by Batch and internally by View.
     void SetCameraShaderParameters(Camera* camera);
+    /// Set command's shader parameters if any. Called internally by View.
+    void SetCommandShaderParameters(const RenderPathCommand& command);
     /// Set G-buffer offset and inverse size shader parameters. Called by Batch and internally by View.
     void SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect);
 
@@ -425,6 +427,8 @@ private:
     unsigned litAlphaPassIndex_;
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_;
+    /// Pointer to the current commmand if it contains shader parameters to be set for a render pass.
+    const RenderPathCommand* passCommand_;
     /// Flag for scene being resolved from the backbuffer.
     bool usedResolve_;
 };

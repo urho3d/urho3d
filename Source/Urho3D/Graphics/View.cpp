@@ -301,7 +301,8 @@ View::View(Context* context) :
     farClipZone_(0),
     occlusionBuffer_(0),
     renderTarget_(0),
-    substituteRenderTarget_(0)
+    substituteRenderTarget_(0),
+    passCommand_(0)
 {
     // Create octree query and scene results vector for each thread
     unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
@@ -760,6 +761,17 @@ void View::SetCameraShaderParameters(Camera* camera)
 #endif
 
     graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
+
+    // If in a scene pass and the command defines shader parameters, set them now
+    if (passCommand_)
+        SetCommandShaderParameters(*passCommand_);
+}
+
+void View::SetCommandShaderParameters(const RenderPathCommand& command)
+{
+    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
+    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+        graphics_->SetShaderParameter(k->first_, k->second_);
 }
 
 void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
@@ -1454,6 +1466,7 @@ void View::ExecuteRenderPathCommands()
         // Set for safety in case of empty renderpath
         currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
         currentViewportTexture_ = 0;
+        passCommand_ = 0;
 
         bool viewportModified = false;
         bool isPingponging = false;
@@ -1571,7 +1584,18 @@ void View::ExecuteRenderPathCommands()
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
                             camera_->GetGPUProjection());
+
+                        if (command.shaderParameters_.Size())
+                        {
+                            // If pass defines shader parameters, reset parameter sources now to ensure they all will be set
+                            // (will be set after camera shader parameters)
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         queue.Draw(this, camera_, command.markToStencil_, false, allowDepthWrite);
+
+                        passCommand_ = 0;
                     }
                 }
                 break;
@@ -1607,6 +1631,12 @@ void View::ExecuteRenderPathCommands()
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
                             camera_->GetGPUProjection());
 
+                        if (command.shaderParameters_.Size())
+                        {
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         // Draw base (replace blend) batches first
                         i->litBaseBatches_.Draw(this, camera_, false, false, allowDepthWrite);
 
@@ -1618,6 +1648,8 @@ void View::ExecuteRenderPathCommands()
                                 renderer_->OptimizeLightByStencil(i->light_, camera_);
                             i->litBatches_.Draw(this, camera_, false, true, allowDepthWrite);
                         }
+
+                        passCommand_ = 0;
                     }
 
                     graphics_->SetScissorTest(false);
@@ -1643,11 +1675,19 @@ void View::ExecuteRenderPathCommands()
 
                         SetTextures(command);
 
+                        if (command.shaderParameters_.Size())
+                        {
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
                         {
                             SetupLightVolumeBatch(i->volumeBatches_[j]);
                             i->volumeBatches_[j].Draw(this, camera_, false);
                         }
+
+                        passCommand_ = 0;
                     }
 
                     graphics_->SetScissorTest(false);
@@ -1838,9 +1878,7 @@ void View::RenderQuad(RenderPathCommand& command)
     }
 
     // Set command's shader parameters last to allow them to override any of the above
-    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
-    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
-        graphics_->SetShaderParameter(k->first_, k->second_);
+    SetCommandShaderParameters(command);
 
     graphics_->SetBlendMode(command.blendMode_);
     graphics_->SetDepthTest(CMP_ALWAYS);
