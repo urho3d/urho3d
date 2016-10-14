@@ -324,7 +324,10 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
         if (!styleFile)
             styleFile = GetDefaultStyle();
         if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
+        {
+            RemoveChild(child, index);
             return NULL;
+        }
     }
 
     return child;
