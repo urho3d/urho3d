@@ -30,7 +30,7 @@ namespace Urho3D
 {
 
 /// Tracking structure for event receivers.
-class URHO3D_API EventReceiverGroup
+class URHO3D_API EventReceiverGroup : public RefCounted
 {
 public:
     /// Construct.
@@ -170,11 +170,11 @@ public:
     /// Return event receivers for a sender and event type, or null if they do not exist.
     EventReceiverGroup* GetEventReceivers(Object* sender, StringHash eventType)
     {
-        HashMap<Object*, HashMap<StringHash, EventReceiverGroup> >::Iterator i = specificEventReceivers_.Find(sender);
+        HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > >::Iterator i = specificEventReceivers_.Find(sender);
         if (i != specificEventReceivers_.End())
         {
-            HashMap<StringHash, EventReceiverGroup>::Iterator j = i->second_.Find(eventType);
-            return j != i->second_.End() ? &j->second_ : 0;
+            HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Find(eventType);
+            return j != i->second_.End() ? j->second_ : (EventReceiverGroup*)0;
         }
         else
             return 0;
@@ -183,8 +183,8 @@ public:
     /// Return event receivers for an event type, or null if they do not exist.
     EventReceiverGroup* GetEventReceivers(StringHash eventType)
     {
-        HashMap<StringHash, EventReceiverGroup>::Iterator i = eventReceivers_.Find(eventType);
-        return i != eventReceivers_.End() ? &i->second_ : 0;
+        HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator i = eventReceivers_.Find(eventType);
+        return i != eventReceivers_.End() ? i->second_ : (EventReceiverGroup*)0;
     }
 
 private:
@@ -215,9 +215,9 @@ private:
     /// Network replication attribute descriptions per object type.
     HashMap<StringHash, Vector<AttributeInfo> > networkAttributes_;
     /// Event receivers for non-specific events.
-    HashMap<StringHash, EventReceiverGroup > eventReceivers_;
+    HashMap<StringHash, SharedPtr<EventReceiverGroup> > eventReceivers_;
     /// Event receivers for specific senders' events.
-    HashMap<Object*, HashMap<StringHash, EventReceiverGroup > > specificEventReceivers_;
+    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > > specificEventReceivers_;
     /// Event sender stack.
     PODVector<Object*> eventSenders_;
     /// Event data stack.

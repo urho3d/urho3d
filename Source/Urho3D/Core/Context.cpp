@@ -287,24 +287,30 @@ AttributeInfo* Context::GetAttribute(StringHash objectType, const char* name)
 
 void Context::AddEventReceiver(Object* receiver, StringHash eventType)
 {
-    eventReceivers_[eventType].Add(receiver);
+    SharedPtr<EventReceiverGroup>& group = eventReceivers_[eventType];
+    if (!group)
+        group = new EventReceiverGroup();
+    group->Add(receiver);
 }
 
 void Context::AddEventReceiver(Object* receiver, Object* sender, StringHash eventType)
 {
-    specificEventReceivers_[sender][eventType].Add(receiver);
+    SharedPtr<EventReceiverGroup>& group = specificEventReceivers_[sender][eventType];
+    if (!group)
+        group = new EventReceiverGroup();
+    group->Add(receiver);
 }
 
 void Context::RemoveEventSender(Object* sender)
 {
-    HashMap<Object*, HashMap<StringHash, EventReceiverGroup > >::Iterator i = specificEventReceivers_.Find(sender);
+    HashMap<Object*, HashMap<StringHash, SharedPtr<EventReceiverGroup> > >::Iterator i = specificEventReceivers_.Find(sender);
     if (i != specificEventReceivers_.End())
     {
-        for (HashMap<StringHash, EventReceiverGroup>::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
+        for (HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Begin(); j != i->second_.End(); ++j)
         {
-            for (unsigned k = 0; k < j->second_.receivers_.Size(); ++k)
+            for (PODVector<Object*>::Iterator k = j->second_->receivers_.Begin(); k != j->second_->receivers_.End(); ++k)
             {
-                Object* receiver = j->second_.receivers_[k];
+                Object* receiver = *k;
                 if (receiver)
                     receiver->RemoveEventSender(sender);
             }

@@ -309,7 +309,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     context->BeginSendEvent(this, eventType);
 
     // Check first the specific event receivers
-    EventReceiverGroup* group = context->GetEventReceivers(this, eventType);
+    // Note: group is held alive with a shared ptr, as it may get destroyed along with the sender
+    SharedPtr<EventReceiverGroup> group(context->GetEventReceivers(this, eventType));
     if (group)
     {
         group->BeginSendEvent();
