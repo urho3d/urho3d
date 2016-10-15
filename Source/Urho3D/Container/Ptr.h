@@ -28,7 +28,7 @@
 #include <cstddef>
 
 #if URHO3D_CXX11
-#include <type_traits>
+#include <utility>
 #endif
 
 namespace Urho3D
