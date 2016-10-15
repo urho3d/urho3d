@@ -1242,7 +1242,7 @@ bool Image::SaveDDS(const String& fileName) const
         return false;
     }
 
-    if (components_)
+    if (components_ != 4)
     {
         URHO3D_LOGERRORF("Can not save image with %u components to DDS", components_);
         return false;
@@ -1271,8 +1271,8 @@ bool Image::SaveDDS(const String& fileName) const
     ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_ = 0xff000000;
 
     outFile.Write(&ddsd, sizeof(ddsd));
-    for (const Image* level : levels)
-        outFile.Write(level->GetData(), level->GetWidth() * level->GetHeight() * 4);
+    for (unsigned i = 0; i < levels.Size(); ++i)
+        outFile.Write(levels[i]->GetData(), levels[i]->GetWidth() * levels[i]->GetHeight() * 4);
 
     return true;
 }
