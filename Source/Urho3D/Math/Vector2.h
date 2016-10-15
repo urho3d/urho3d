@@ -338,4 +338,37 @@ public:
 /// Multiply IntVector2 with a scalar.
 inline IntVector2 operator *(int lhs, const IntVector2& rhs) { return rhs * lhs; }
 
+/// Per-component linear interpolation between two 2-vectors.
+inline Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t) { return lhs + (rhs - lhs) * t; }
+
+/// Per-component min of two 2-vectors.
+inline Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs) { return Vector2(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_)); }
+
+/// Per-component max of two 2-vectors.
+inline Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs) { return Vector2(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_)); }
+
+/// Per-component floor of 2-vector.
+inline Vector2 VectorFloor(const Vector2& vec) { return Vector2(Floor(vec.x_), Floor(vec.y_)); }
+
+/// Per-component round of 2-vector.
+inline Vector2 VectorRound(const Vector2& vec) { return Vector2(Round(vec.x_), Round(vec.y_)); }
+
+/// Per-component ceil of 2-vector.
+inline Vector2 VectorCeil(const Vector2& vec) { return Vector2(Ceil(vec.x_), Ceil(vec.y_)); }
+
+/// Per-component floor of 2-vector. Returns IntVector2.
+inline IntVector2 VectorFloorToInt(const Vector2& vec) { return IntVector2(FloorToInt(vec.x_), FloorToInt(vec.y_)); }
+
+/// Per-component round of 2-vector. Returns IntVector2.
+inline IntVector2 VectorRoundToInt(const Vector2& vec) { return IntVector2(RoundToInt(vec.x_), RoundToInt(vec.y_)); }
+
+/// Per-component ceil of 2-vector. Returns IntVector2.
+inline IntVector2 VectorCeilToInt(const Vector2& vec) { return IntVector2(CeilToInt(vec.x_), CeilToInt(vec.y_)); }
+
+/// Per-component min of two 2-vectors.
+inline IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs) { return IntVector2(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_)); }
+
+/// Per-component max of two 2-vectors.
+inline IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs) { return IntVector2(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_)); }
+
 }

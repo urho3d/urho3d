@@ -64,3 +64,15 @@ class IntVector2
 
     static const IntVector2 ZERO;
 };
+
+Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t);
+Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs);
+Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs);
+Vector2 VectorFloor(const Vector2& vec);
+Vector2 VectorRound(const Vector2& vec);
+Vector2 VectorCeil(const Vector2& vec);
+IntVector2 VectorFloorToInt(const Vector2& vec);
+IntVector2 VectorRoundToInt(const Vector2& vec);
+IntVector2 VectorCeilToInt(const Vector2& vec);
+IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs);
+IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs);

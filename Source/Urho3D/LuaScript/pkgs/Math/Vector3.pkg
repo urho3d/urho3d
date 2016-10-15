@@ -46,3 +46,10 @@ class Vector3
     static const Vector3 BACK;
     static const Vector3 ONE;
 };
+
+Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t);
+Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs);
+Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs);
+Vector3 VectorFloor(const Vector3& vec);
+Vector3 VectorRound(const Vector3& vec);
+Vector3 VectorCeil(const Vector3& vec);
