@@ -370,6 +370,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             hasScenePasses_ = sourceView_->hasScenePasses_;
             noStencil_ = sourceView_->noStencil_;
             lightVolumeCommand_ = sourceView_->lightVolumeCommand_;
+            forwardLightsCommand_ = sourceView_->forwardLightsCommand_;
             octree_ = sourceView_->octree_;
             return true;
         }
@@ -394,6 +395,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     hasScenePasses_ = false;
     noStencil_ = false;
     lightVolumeCommand_ = 0;
+    forwardLightsCommand_ = 0;
 
     scenePasses_.Clear();
     geometriesUpdated_ = false;
@@ -458,6 +460,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             if (j == batchQueues_.End())
                 j = batchQueues_.Insert(Pair<unsigned, BatchQueue>(info.passIndex_, BatchQueue()));
             info.batchQueue_ = &j->second_;
+            SetQueueShaderDefines(*info.batchQueue_, command);
 
             scenePasses_.Push(info);
         }
@@ -508,7 +511,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             deferred_ = true;
         }
         else if (command.type_ == CMD_FORWARDLIGHTS)
+        {
+            forwardLightsCommand_ = &command;
             useLitBase_ = command.useLitBase_;
+        }
     }
 
     drawShadows_ = renderer_->GetDrawShadows();
@@ -1051,6 +1057,16 @@ void View::GetLightBatches()
                 lightQueue.shadowMap_ = 0;
                 lightQueue.litBaseBatches_.Clear(maxSortedInstances);
                 lightQueue.litBatches_.Clear(maxSortedInstances);
+                if (forwardLightsCommand_)
+                {
+                    SetQueueShaderDefines(lightQueue.litBaseBatches_, *forwardLightsCommand_);
+                    SetQueueShaderDefines(lightQueue.litBatches_, *forwardLightsCommand_);
+                }
+                else
+                {
+                    lightQueue.litBaseBatches_.hasExtraDefines_ = false;
+                    lightQueue.litBatches_.hasExtraDefines_ = false;
+                }
                 lightQueue.volumeBatches_.Clear();
 
                 // Allocate shadow map now
@@ -2865,7 +2881,23 @@ void View::CheckMaterialForAuxView(Material* material)
     material->MarkForAuxView(frame_.frameNumber_);
 }
 
-void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
+void View::SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& command)
+{
+    String vsDefines = command.vertexShaderDefines_.Trimmed();
+    String psDefines = command.pixelShaderDefines_.Trimmed();
+    if (vsDefines.Length() || psDefines.Length())
+    {
+        queue.hasExtraDefines_ = true;
+        queue.vsExtraDefines_ = vsDefines;
+        queue.psExtraDefines_ = psDefines;
+        queue.vsExtraDefinesHash_ = StringHash(vsDefines);
+        queue.psExtraDefinesHash_ = StringHash(psDefines);
+    }
+    else
+        queue.hasExtraDefines_ = false;
+}
+
+void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
 {
     if (!batch.material_)
         batch.material_ = renderer_->GetDefaultMaterial();
@@ -2878,16 +2910,16 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
     {
         BatchGroupKey key(batch);
 
-        HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchQueue.batchGroups_.Find(key);
-        if (i == batchQueue.batchGroups_.End())
+        HashMap<BatchGroupKey, BatchGroup>::Iterator i = queue.batchGroups_.Find(key);
+        if (i == queue.batchGroups_.End())
         {
             // Create a new group based on the batch
             // In case the group remains below the instancing limit, do not enable instancing shaders yet
             BatchGroup newGroup(batch);
             newGroup.geometryType_ = GEOM_STATIC;
-            renderer_->SetBatchShaders(newGroup, tech, allowShadows);
+            renderer_->SetBatchShaders(newGroup, tech, allowShadows, queue);
             newGroup.CalculateSortKey();
-            i = batchQueue.batchGroups_.Insert(MakePair(key, newGroup));
+            i = queue.batchGroups_.Insert(MakePair(key, newGroup));
         }
 
         int oldSize = i->second_.instances_.Size();
@@ -2896,13 +2928,13 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         if (oldSize < minInstances_ && (int)i->second_.instances_.Size() >= minInstances_)
         {
             i->second_.geometryType_ = GEOM_INSTANCED;
-            renderer_->SetBatchShaders(i->second_, tech, allowShadows);
+            renderer_->SetBatchShaders(i->second_, tech, allowShadows, queue);
             i->second_.CalculateSortKey();
         }
     }
     else
     {
-        renderer_->SetBatchShaders(batch, tech, allowShadows);
+        renderer_->SetBatchShaders(batch, tech, allowShadows, queue);
         batch.CalculateSortKey();
 
         // If batch is static with multiple world transforms and cannot instance, we must push copies of the batch individually
@@ -2913,12 +2945,12 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             for (unsigned i = 0; i < numTransforms; ++i)
             {
                 // Move the transform pointer to generate copies of the batch which only refer to 1 world transform
-                batchQueue.batches_.Push(batch);
+                queue.batches_.Push(batch);
                 ++batch.worldTransform_;
             }
         }
         else
-            batchQueue.batches_.Push(batch);
+            queue.batches_.Push(batch);
     }
 }
 

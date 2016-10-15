@@ -51,6 +51,7 @@ class Texture2D;
 class TextureCube;
 class View;
 class Zone;
+struct BatchQueue;
 
 static const int SHADOW_MIN_PIXELS = 64;
 static const int INSTANCING_BUFFER_DEFAULT_SIZE = 1024;
@@ -405,8 +406,8 @@ public:
     void StorePreparedView(View* view, Camera* cullCamera);
     /// Return a prepared view if exists for the specified camera. Used to avoid duplicate view preparation CPU work.
     View* GetPreparedView(Camera* cullCamera);
-    /// Choose shaders for a forward rendering batch.
-    void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows = true);
+    /// Choose shaders for a forward rendering batch. The related batch queue is provided in case it has extra shader compilation defines.
+    void SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows, const BatchQueue& queue);
     /// Choose shaders for a deferred light volume batch.
     void SetLightVolumeBatchShaders
         (Batch& batch, Camera* camera, const String& vsName, const String& psName, const String& vsDefines, const String& psDefines);
@@ -433,8 +434,8 @@ private:
     void Initialize();
     /// Reload shaders.
     void LoadShaders();
-    /// Reload shaders for a material pass.
-    void LoadPassShaders(Pass* pass);
+    /// Reload shaders for a material pass. The related batch queue is provided in case it has extra shader compilation defines.
+    void LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation> >& vertexShaders, Vector<SharedPtr<ShaderVariation> >& pixelShaders, const BatchQueue& queue);
     /// Release shaders used in materials.
     void ReleaseMaterialShaders();
     /// Reload textures.

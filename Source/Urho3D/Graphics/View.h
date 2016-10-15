@@ -259,6 +259,8 @@ private:
     Technique* GetTechnique(Drawable* drawable, Material* material);
     /// Check if material should render an auxiliary view (if it has a camera attached.)
     void CheckMaterialForAuxView(Material* material);
+    /// Set shader defines for a batch queue if used.
+    void SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& command);
     /// Choose shaders for a batch and add it to queue.
     void AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, bool allowInstancing = true, bool allowShadows = true);
     /// Prepare instancing buffer by filling it with all instance transforms.
@@ -427,6 +429,8 @@ private:
     unsigned litAlphaPassIndex_;
     /// Pointer to the light volume command if any.
     const RenderPathCommand* lightVolumeCommand_;
+    /// Pointer to the forwardlights command if any.
+    const RenderPathCommand* forwardLightsCommand_;
     /// Pointer to the current commmand if it contains shader parameters to be set for a render pass.
     const RenderPathCommand* passCommand_;
     /// Flag for scene being resolved from the backbuffer.
