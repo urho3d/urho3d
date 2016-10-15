@@ -155,7 +155,7 @@ template <class T> T Sqrt(T x) { return sqrt(x); }
 /// Return floating-point remainder of X/Y.
 template <class T> T Mod(T x, T y) { return fmod(x, y); }
 
-/// Return fractional part of passed value in range [0, 1].
+/// Return fractional part of passed value in range [0, 1).
 template <class T> T Fract(T value) { return value - floor(value); }
 
 /// Round value down.

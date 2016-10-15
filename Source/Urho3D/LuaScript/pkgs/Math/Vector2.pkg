@@ -77,3 +77,5 @@ IntVector2 VectorRoundToInt(const Vector2& vec);
 IntVector2 VectorCeilToInt(const Vector2& vec);
 IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs);
 IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs);
+float StableRandom(const Vector2& seed);
+float StableRandom(float seed);

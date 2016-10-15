@@ -302,4 +302,7 @@ inline Vector3 VectorRound(const Vector3& vec) { return Vector3(Round(vec.x_), R
 /// Per-component ceil of 3-vector.
 inline Vector3 VectorCeil(const Vector3& vec) { return Vector3(Ceil(vec.x_), Ceil(vec.y_), Ceil(vec.z_)); }
 
+/// Return a random value from [0, 1) from 3-vector seed.
+inline float StableRandom(const Vector3& seed) { return StableRandom(Vector2(StableRandom(Vector2(seed.x_, seed.y_)), seed.z_)); }
+
 }

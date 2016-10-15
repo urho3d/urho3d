@@ -54,3 +54,4 @@ Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs);
 Vector3 VectorFloor(const Vector3& vec);
 Vector3 VectorRound(const Vector3& vec);
 Vector3 VectorCeil(const Vector3& vec);
+float StableRandom(const Vector3& seed);

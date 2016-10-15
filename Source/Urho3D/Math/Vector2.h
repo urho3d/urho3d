@@ -374,4 +374,11 @@ inline IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs) { retu
 /// Per-component max of two 2-vectors.
 inline IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs) { return IntVector2(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_)); }
 
+/// Return a random value from [0, 1) from 2-vector seed.
+/// http://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-rand-one-liner
+inline float StableRandom(const Vector2& seed) { return Fract(Sin(seed.DotProduct(Vector2(12.9898f, 78.233f)) * M_RADTODEG) * 43758.5453f); }
+
+/// Return a random value from [0, 1) from scalar seed.
+inline float StableRandom(float seed) { return StableRandom(Vector2(seed, seed)); }
+
 }
