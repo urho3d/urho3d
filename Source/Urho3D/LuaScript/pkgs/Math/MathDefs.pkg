@@ -42,6 +42,16 @@ float Asin(float x);
 float Acos(float x);
 float Atan(float x);
 float Atan2(float y, float x);
+float Sqrt(float x);
+float Pow(float x, float y);
+float Mod(float x, float y);
+float Fract(float x);
+float Floor(float x);
+float Round(float x);
+float Ceil(float x);
+int FloorToInt(float x);
+int RoundToInt(float x);
+int CeilToInt(float x);
 
 int Min @ MinInt(int lhs, int rhs);
 int Max @ MaxInt(int lhs, int rhs);
