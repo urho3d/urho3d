@@ -52,7 +52,7 @@ public:
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
 
     /// Set content element.
     void SetContentElement(UIElement* element);

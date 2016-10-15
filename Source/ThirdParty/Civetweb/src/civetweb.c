@@ -123,6 +123,9 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 #ifdef __MACH__
 
+// Urho3D: prefer own implementation of clock_gettime regardless of XCode / SDK version
+#define _DARWIN_FEATURE_CLOCK_GETTIME 0
+
 #define CLOCK_MONOTONIC (1)
 #define CLOCK_REALTIME (2)
 
@@ -131,9 +134,6 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <assert.h>
-
-/* clock_gettime is not implemented on OSX */
-int clock_gettime(int clk_id, struct timespec *t);
 
 int clock_gettime(int clk_id, struct timespec *t)
 {

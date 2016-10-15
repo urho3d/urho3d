@@ -307,8 +307,8 @@ matrix:
       env: SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
 before_script:
   - rake ci_timer
-  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.3-2016.02-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
-  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3-2016.02-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
+  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.3.1-2016.05-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
+  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
   - for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - git clone --depth 1 https://github.com/urho3d/$SYSROOT.git && export ARM_SYSROOT=$(pwd)/$SYSROOT
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
@@ -319,55 +319,6 @@ before_script:
   - rake ci_setup_cache
 script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ "$SYSROOT" == "arm64-sysroot" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script: rake ci_teardown_cache
-
----
-
-branch: {name: OSX-CI, active: yes, mandatory: yes}
-language: objective-c
-cache: {directories: $HOME/.ccache}
-osx_image: xcode7.1
-env:
-  global:
-    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
-    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - numjobs=3
-    - OSX=1
-    - USE_CCACHE=1
-    - CCACHE_SLOPPINESS=pch_defines,time_macros
-    - CCACHE_COMPRESS=1
-    - CCACHE_MAXSIZE=300M
-  matrix:
-    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1 sdk=iphonesimulator
-matrix:
-  fast_finish: true
-before_script:
-  - rake ci_timer
-  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
-  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
-  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [ $XCODE ] && ([ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
-  - travis_retry brew update >/dev/null
-  - which cmake >/dev/null 2>&1 || cmake=cmake
-  - if [ $PACKAGE_UPLOAD ]; then doxygen='doxygen graphviz'; fi
-  - travis_retry brew install ccache $cmake $doxygen
-  - whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline'
-  - for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done
-  # for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done
-  - brew cleanup
-  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then sudo cp -p $(which ccache) $(dirname $(xcodebuild -find-executable clang)) && for compiler in clang clang++; do path=$(xcodebuild -find-executable $compiler); sudo mv $path{,.orig} && sudo ln -sf $(dirname $path)/clang.orig /usr/bin/$compiler && sudo ln -sf ccache $path; done && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
-  - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
-after_script: rake ci_teardown_cache
-
-# Below samples are excluded from Xcode/OSX build due to build time constraint
-data:
-  excluded_sample:
-    '#2': [42_PBRMaterials]
-    '#3': [42_PBRMaterials]
 
 ---
 
@@ -405,6 +356,55 @@ before_script:
   - rake ci_setup_cache
 script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi; fi && rake ci_timer
 after_script: rake ci_teardown_cache
+
+---
+
+branch: {name: OSX-CI, active: yes, mandatory: yes}
+language: objective-c
+cache: {directories: $HOME/.ccache}
+osx_image: xcode8
+env:
+  global:
+    - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
+    - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
+    - numjobs=3
+    - OSX=1
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=300M
+  matrix:
+    # MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    # XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.11
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1 sdk=iphonesimulator
+matrix:
+  fast_finish: true
+before_script:
+  - rake ci_timer
+  - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
+  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
+  - if [[ $XCODE ]] && ([[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]')); then export PACKAGE_UPLOAD=1; fi
+  - which cmake >/dev/null 2>&1 || cmake=cmake
+  - if [[ $PACKAGE_UPLOAD ]]; then doxygen='doxygen graphviz';
+      whitelist='brew-cask ccache cmake doxygen graphviz libpng libyaml md5deep openssl pkg-config readline';
+      for f in $(brew list); do [[ $whitelist =~ $f ]] || brew uninstall --force $f; done &&
+      for f in $(brew cask list |grep -v Uninstalling); do [[ $whitelist =~ $f ]] || brew cask uninstall --force $f; done &&
+      brew cleanup;
+    fi
+  - travis_retry brew install ccache $cmake $doxygen
+  - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
+  - if [ $XCODE ]; then pushd $(dirname $(xcodebuild -find-executable clang)) && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(ccache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
+  - rake ci_setup_cache
+script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+after_script: rake ci_teardown_cache
+
+# Below samples are excluded from Xcode/OSX build due to build time constraint
+data:
+  excluded_sample:
+    '#2': [42_PBRMaterials]
+    '#3': [42_PBRMaterials]
 
 ...
 

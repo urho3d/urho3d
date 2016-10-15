@@ -4,17 +4,13 @@ struct AnimationControl
 {
     AnimationControl();
     ~AnimationControl();
-    StringHash hash_;
-    float speed_;
-    float targetWeight_;
-    float fadeTime_;
-    float autoFadeTime_;
-    float setTimeTtl_;
-    float setWeightTtl_;
-    unsigned short setTime_;
-    unsigned char setWeight_;
-    unsigned char setTimeRev_;
-    unsigned char setWeightRev_;
+    String name_ @ name;
+    StringHash hash_ @ hash;
+    float speed_ @ speed;
+    float targetWeight_ @ targetWeight;
+    float fadeTime_ @ fadeTime ;
+    float autoFadeTime_ @ autoFadeTime;
+    bool removeOnCompletion_ @ removeOnCompletion;
 };
 
 class AnimationController : public Component
@@ -24,7 +20,7 @@ class AnimationController : public Component
     bool Stop(const String name, float fadeOutTime = 0.0f);
     void StopLayer(unsigned char layer, float fadeOutTime = 0.0f);
     void StopAll(float fadeTime = 0.0f);
-    
+
     bool Fade(const String name, float targetWeight, float fadeTime);
     bool FadeOthers(const String name, float targetWeight, float fadeTime);
     bool SetLayer(const String name, unsigned char layer);
@@ -37,6 +33,7 @@ class AnimationController : public Component
     bool SetAutoFade(const String name, float fadeOutTime);
     bool SetRemoveOnCompletion(const String name, bool removeOnCompletion);
     bool IsPlaying(const String name) const;
+    bool IsPlaying(unsigned char layer) const;
     bool IsFadingIn(const String name) const;
     bool IsFadingOut(const String name) const;
     bool IsAtEnd(const String name) const;
@@ -54,7 +51,29 @@ class AnimationController : public Component
     float GetFadeTime(const String name) const;
     float GetAutoFade(const String name) const;
     bool GetRemoveOnCompletion(const String name) const;
-    
+
     AnimationState* GetAnimationState(const String name) const;
     AnimationState* GetAnimationState(StringHash nameHash) const;
+
+    tolua_outside const AnimationControl* AnimationControllerGetAnimation @ GetAnimation(unsigned index) const;
+    tolua_outside unsigned AnimationControllerGetNumAnimations @ GetNumAnimations() const;
 };
+
+${
+static const AnimationControl* AnimationControllerGetAnimation(const AnimationController* controller, unsigned index)
+{
+    if (!controller)
+        return (const AnimationControl*)0;
+
+    const Vector<AnimationControl>& animations = controller->GetAnimations();
+    return (index < animations.Size()) ? &animations[index] : (const AnimationControl*)0;
+}
+
+static unsigned AnimationControllerGetNumAnimations(const AnimationController* controller)
+{
+    if (!controller)
+        return 0;
+
+    return controller->GetAnimations().Size();
+}
+$}

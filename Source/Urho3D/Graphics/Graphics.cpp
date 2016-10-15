@@ -22,6 +22,7 @@
 
 #include "../Precompiled.h"
 
+#include "../Core/Profiler.h"
 #include "../Graphics/AnimatedModel.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationController.h"
@@ -37,6 +38,7 @@
 #include "../Graphics/ParticleEmitter.h"
 #include "../Graphics/RibbonTrail.h"
 #include "../Graphics/Shader.h"
+#include "../Graphics/ShaderPrecache.h"
 #include "../Graphics/Skybox.h"
 #include "../Graphics/StaticModelGroup.h"
 #include "../Graphics/Technique.h"
@@ -47,6 +49,7 @@
 #include "../Graphics/Texture3D.h"
 #include "../Graphics/TextureCube.h"
 #include "../Graphics/Zone.h"
+#include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 
 #include <SDL/SDL.h>
@@ -101,6 +104,65 @@ void Graphics::SetOrientations(const String& orientations)
 bool Graphics::ToggleFullscreen()
 {
     return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+}
+
+void Graphics::SetShaderParameter(StringHash param, const Variant& value)
+{
+    switch (value.GetType())
+    {
+    case VAR_BOOL:
+        SetShaderParameter(param, value.GetBool());
+        break;
+
+    case VAR_INT:
+        SetShaderParameter(param, value.GetInt());
+        break;
+
+    case VAR_FLOAT:
+    case VAR_DOUBLE:
+        SetShaderParameter(param, value.GetFloat());
+        break;
+
+    case VAR_VECTOR2:
+        SetShaderParameter(param, value.GetVector2());
+        break;
+
+    case VAR_VECTOR3:
+        SetShaderParameter(param, value.GetVector3());
+        break;
+
+    case VAR_VECTOR4:
+        SetShaderParameter(param, value.GetVector4());
+        break;
+
+    case VAR_COLOR:
+        SetShaderParameter(param, value.GetColor());
+        break;
+
+    case VAR_MATRIX3:
+        SetShaderParameter(param, value.GetMatrix3());
+        break;
+
+    case VAR_MATRIX3X4:
+        SetShaderParameter(param, value.GetMatrix3x4());
+        break;
+
+    case VAR_MATRIX4:
+        SetShaderParameter(param, value.GetMatrix4());
+        break;
+
+    case VAR_BUFFER:
+        {
+            const PODVector<unsigned char>& buffer = value.GetBuffer();
+            if (buffer.Size() >= sizeof(float))
+                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
+        }
+        break;
+
+    default:
+        // Unsupported parameter type, do nothing
+        break;
+    }
 }
 
 IntVector2 Graphics::GetWindowPosition() const
@@ -169,6 +231,30 @@ void Graphics::Minimize()
         return;
 
     SDL_MinimizeWindow(window_);
+}
+
+void Graphics::BeginDumpShaders(const String& fileName)
+{
+    shaderPrecache_ = new ShaderPrecache(context_, fileName);
+}
+
+void Graphics::EndDumpShaders()
+{
+    shaderPrecache_.Reset();
+}
+
+void Graphics::PrecacheShaders(Deserializer& source)
+{
+    URHO3D_PROFILE(PrecacheShaders);
+
+    ShaderPrecache::LoadShaders(this, source);
+}
+
+void Graphics::SetShaderCacheDir(const String& path)
+{
+    String trimmedPath = path.Trimmed();
+    if (trimmedPath.Length())
+        shaderCacheDir_ = AddTrailingSlash(trimmedPath);
 }
 
 void Graphics::AddGPUObject(GPUObject* object)

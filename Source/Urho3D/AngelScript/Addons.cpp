@@ -2086,7 +2086,6 @@ bool CScriptDictValue::Get(asIScriptEngine *engine, void *value, int typeId) con
         if ((m_typeId & asTYPEID_MASK_OBJECT) &&
             engine->RefCastObject(m_valueObj, engine->GetObjectTypeById(m_typeId), engine->GetObjectTypeById(typeId), &cast) >= 0)
         {
-            engine->AddRefScriptObject(m_valueObj, engine->GetObjectTypeById(m_typeId));
             *(void**)value = m_valueObj;
 
             return true;

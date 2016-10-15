@@ -109,11 +109,20 @@ bool Texture2D::EndLoad()
     return success;
 }
 
-bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
+bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage, int multiSample, bool autoResolve)
 {
     if (width <= 0 || height <= 0)
     {
         URHO3D_LOGERROR("Zero or negative texture dimensions");
+        return false;
+    }
+
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample == 1)
+        autoResolve = false;
+    else if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
+    {
+        URHO3D_LOGERROR("Multisampling is only supported for rendertarget or depth-stencil textures");
         return false;
     }
 
@@ -141,8 +150,30 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     width_ = width;
     height_ = height;
     format_ = format;
+    multiSample_ = multiSample;
+    autoResolve_ = autoResolve;
 
     return Create();
+}
+
+SharedPtr<Image> Texture2D::GetImage() const
+{
+    if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
+    {
+        URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
+        return SharedPtr<Image>();
+    }
+
+    Image* rawImage = new Image(context_);
+    if (format_ == Graphics::GetRGBAFormat())
+        rawImage->SetSize(width_, height_, 4);
+    else if (format_ == Graphics::GetRGBFormat())
+        rawImage->SetSize(width_, height_, 3);
+    else
+        assert(0);
+
+    GetData(0, rawImage->GetData());
+    return SharedPtr<Image>(rawImage);
 }
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

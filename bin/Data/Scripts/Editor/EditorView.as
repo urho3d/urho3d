@@ -373,6 +373,7 @@ bool scaleSnap = false;
 bool renderingDebug = false;
 bool physicsDebug = false;
 bool octreeDebug = false;
+bool navigationDebug = false;
 int pickMode = PICK_GEOMETRIES;
 bool orbiting = false;
 
@@ -1655,6 +1656,21 @@ void HandlePostRenderUpdate()
     if (octreeDebug && editorScene.octree !is null)
         editorScene.octree.DrawDebugGeometry(true);
 
+    if (navigationDebug)
+    {
+        CrowdManager@ crowdManager = editorScene.GetComponent("CrowdManager");
+        if (crowdManager !is null)
+            crowdManager.DrawDebugGeometry(true);
+
+        Array<Component@>@ navMeshes = editorScene.GetComponents("NavigationMesh", true);
+        for (uint i = 0; i < navMeshes.length; ++i)
+            cast<NavigationMesh>(navMeshes[i]).DrawDebugGeometry(true);
+
+        Array<Component@>@ dynNavMeshes = editorScene.GetComponents("DynamicNavigationMesh", true);
+        for (uint i = 0; i < dynNavMeshes.length; ++i)
+            cast<DynamicNavigationMesh>(dynNavMeshes[i]).DrawDebugGeometry(true);        
+    }
+
     if (setViewportCursor | resizingBorder > 0)
     {
         SetViewportCursor();
@@ -1959,6 +1975,11 @@ void TogglePhysicsDebug()
 void ToggleOctreeDebug()
 {
     octreeDebug = !octreeDebug;
+}
+
+void ToggleNavigationDebug()
+{
+    navigationDebug = !navigationDebug;
 }
 
 bool StopTestAnimation()

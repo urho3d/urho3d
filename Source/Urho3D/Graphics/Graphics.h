@@ -128,6 +128,10 @@ public:
     void Clear(unsigned flags, const Color& color = Color(0.0f, 0.0f, 0.0f, 0.0f), float depth = 1.0f, unsigned stencil = 0);
     /// Resolve multisampled backbuffer to a texture rendertarget. The texture's size should match the viewport size.
     bool ResolveToTexture(Texture2D* destination, const IntRect& viewport);
+    /// Resolve a multisampled texture on itself.
+    bool ResolveToTexture(Texture2D* texture);
+    /// Resolve a multisampled cube texture on itself.
+    bool ResolveToTexture(TextureCube* texture);
     /// Draw non-indexed geometry.
     void Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount);
     /// Draw indexed geometry.
@@ -154,6 +158,8 @@ public:
     void SetShaderParameter(StringHash param, const float* data, unsigned count);
     /// Set shader float constant.
     void SetShaderParameter(StringHash param, float value);
+    /// Set shader integer constant.
+    void SetShaderParameter(StringHash param, int value);
     /// Set shader boolean constant.
     void SetShaderParameter(StringHash param, bool value);
     /// Set shader color constant.
@@ -188,12 +194,12 @@ public:
     void SetTexture(unsigned index, Texture* texture);
     /// Bind texture unit 0 for update. Called by Texture. Used only on OpenGL.
     void SetTextureForUpdate(Texture* texture);
-    /// Set default texture filtering mode.
-    void SetDefaultTextureFilterMode(TextureFilterMode mode);
-    /// Set texture anisotropy.
-    void SetTextureAnisotropy(unsigned level);
     /// Dirty texture parameters of all textures (when global settings change.)
     void SetTextureParametersDirty();
+    /// Set default texture filtering mode. Called by Renderer before rendering.
+    void SetDefaultTextureFilterMode(TextureFilterMode mode);
+    /// Set default texture anisotropy level. Called by Renderer before rendering.
+    void SetDefaultTextureAnisotropy(unsigned level);
     /// Reset all rendertargets, depth-stencil surface and viewport.
     void ResetRenderTargets();
     /// Reset specific rendertarget.
@@ -210,8 +216,8 @@ public:
     void SetDepthStencil(Texture2D* texture);
     /// Set viewport.
     void SetViewport(const IntRect& rect);
-    /// Set blending mode.
-    void SetBlendMode(BlendMode mode);
+    /// Set blending and alpha-to-coverage modes. Alpha-to-coverage is not supported on Direct3D9.
+    void SetBlendMode(BlendMode mode, bool alphaToCoverage = false);
     /// Set color write on/off.
     void SetColorWrite(bool enable);
     /// Set hardware culling mode.
@@ -224,6 +230,8 @@ public:
     void SetDepthWrite(bool enable);
     /// Set polygon fill mode.
     void SetFillMode(FillMode mode);
+    /// Set line antialiasing on/off.
+    void SetLineAntiAlias(bool enable);
     /// Set scissor test.
     void SetScissorTest(bool enable, const Rect& rect = Rect::FULL, bool borderInclusive = true);
     /// Set scissor test.
@@ -241,6 +249,8 @@ public:
     void EndDumpShaders();
     /// Precache shader variations from an XML file generated with BeginDumpShaders().
     void PrecacheShaders(Deserializer& source);
+    /// Set shader cache directory, Direct3D only. This can either be an absolute path or a path within the resource system.
+    void SetShaderCacheDir(const String& path);
 
     /// Return whether rendering initialized.
     bool IsInitialized() const;
@@ -384,6 +394,9 @@ public:
     /// Return default texture filtering mode.
     TextureFilterMode GetDefaultTextureFilterMode() const { return defaultTextureFilterMode_; }
 
+    /// Return default texture max. anisotropy level.
+    unsigned GetDefaultTextureAnisotropy() const { return defaultTextureAnisotropy_; }
+
     /// Return current rendertarget by index.
     RenderSurface* GetRenderTarget(unsigned index) const;
 
@@ -393,11 +406,11 @@ public:
     /// Return the viewport coordinates.
     IntRect GetViewport() const { return viewport_; }
 
-    /// Return texture anisotropy.
-    unsigned GetTextureAnisotropy() const { return textureAnisotropy_; }
-
     /// Return blending mode.
     BlendMode GetBlendMode() const { return blendMode_; }
+
+    /// Return whether alpha-to-coverage is enabled.
+    bool GetAlphaToCoverage() const { return alphaToCoverage_; }
 
     /// Return whether color write is enabled.
     bool GetColorWrite() const { return colorWrite_; }
@@ -419,6 +432,9 @@ public:
 
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
+
+    /// Return whether line antialiasing is enabled.
+    bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return whether stencil test is enabled.
     bool GetStencilTest() const { return stencilTest_; }
@@ -452,6 +468,9 @@ public:
 
     /// Return whether a custom clipping plane is in use.
     bool GetUseClipPlane() const { return useClipPlane_; }
+
+    /// Return shader cache directory, Direct3D only.
+    const String& GetShaderCacheDir() const { return shaderCacheDir_; }
 
     /// Return current rendertarget width and height.
     IntVector2 GetRenderTargetDimensions() const;
@@ -576,7 +595,7 @@ private:
     /// Bind a framebuffer using either extension or core functionality. Used only on OpenGL.
     void BindFramebuffer(unsigned fbo);
     /// Bind a framebuffer color attachment using either extension or core functionality. Used only on OpenGL.
-    void BindColorAttachment(unsigned index, unsigned target, unsigned object);
+    void BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer);
     /// Bind a framebuffer depth attachment using either extension or core functionality. Used only on OpenGL.
     void BindDepthAttachment(unsigned object, bool isRenderBuffer);
     /// Bind a framebuffer stencil attachment using either extension or core functionality. Used only on OpenGL.
@@ -686,10 +705,12 @@ private:
     IntRect viewport_;
     /// Default texture filtering mode.
     TextureFilterMode defaultTextureFilterMode_;
-    /// Texture anisotropy level.
-    unsigned textureAnisotropy_;
+    /// Default texture max. anisotropy level.
+    unsigned defaultTextureAnisotropy_;
     /// Blending mode.
     BlendMode blendMode_;
+    /// Alpha-to-coverage enable.
+    bool alphaToCoverage_;
     /// Color write enable.
     bool colorWrite_;
     /// Hardware culling mode.
@@ -702,12 +723,14 @@ private:
     CompareMode depthTestMode_;
     /// Depth write enable flag.
     bool depthWrite_;
+    /// Line antialiasing enable flag.
+    bool lineAntiAlias_;
     /// Polygon fill mode.
     FillMode fillMode_;
-    /// Scissor test rectangle.
-    IntRect scissorRect_;
     /// Scissor test enable flag.
     bool scissorTest_;
+    /// Scissor test rectangle.
+    IntRect scissorRect_;
     /// Stencil test compare mode.
     CompareMode stencilTestMode_;
     /// Stencil operation on pass.
@@ -732,6 +755,8 @@ private:
     const void* shaderParameterSources_[MAX_SHADER_PARAMETER_GROUPS];
     /// Base directory for shaders.
     String shaderPath_;
+    /// Cache directory for Direct3D binary shaders.
+    String shaderCacheDir_;
     /// File extension for shaders.
     String shaderExtension_;
     /// Last used shader in shader variation query.

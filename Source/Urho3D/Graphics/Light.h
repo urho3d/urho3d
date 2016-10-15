@@ -206,8 +206,10 @@ public:
     void SetShadowIntensity(float intensity);
     /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
     void SetShadowResolution(float resolution);
-    /// Set shadow camera near/far clip distance ratio.
+    /// Set shadow camera near/far clip distance ratio for spot and point lights. Does not affect directional lights, since they are orthographic and have near clip 0.
     void SetShadowNearFarRatio(float nearFarRatio);
+    /// Set maximum shadow extrusion for directional lights. The actual extrusion will be the smaller of this and camera far clip. Default 1000.
+    void SetShadowMaxExtrusion(float extrusion);
     /// Set range attenuation texture.
     void SetRampTexture(Texture* texture);
     /// Set spotlight attenuation texture.
@@ -276,6 +278,9 @@ public:
     /// Return shadow camera near/far clip distance ratio.
     float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
 
+    /// Return maximum shadow extrusion distance for directional lights.
+    float GetShadowMaxExtrusion() const { return shadowMaxExtrusion_; }
+
     /// Return range attenuation texture.
     Texture* GetRampTexture() const { return rampTexture_; }
 
@@ -332,7 +337,7 @@ private:
     LightType lightType_;
     /// Color.
     Color color_;
-    /// Light Temperature.
+    /// Light temperature.
     float temperature_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
@@ -368,6 +373,8 @@ private:
     float shadowResolution_;
     /// Shadow camera near/far clip distance ratio.
     float shadowNearFarRatio_;
+    /// Directional shadow max. extrusion distance.
+    float shadowMaxExtrusion_;
     /// Per-vertex lighting flag.
     bool perVertex_;
     /// Use physical light values flag.

@@ -1,0 +1,42 @@
+$#include "UI/ProgressBar.h"
+
+class ProgressBar : public BorderImage
+{
+    ProgressBar();
+    virtual ~ProgressBar();
+
+    void SetOrientation(Orientation orientation);
+    void SetRange(float range);
+    void SetValue(float value);
+    void ChangeValue(float delta);
+    void SetLoadingPercentStyle(const String style);
+    void SetShowPercentText(bool showPercentText);
+
+    Orientation GetOrientation() const;
+    float GetRange() const;
+    float GetValue() const;
+    BorderImage* GetKnob() const;
+    const String GetLoadingPercentStyle();
+    bool GetShowPercentText() const;
+
+    tolua_property__get_set Orientation orientation;
+    tolua_property__get_set float range;
+    tolua_property__get_set float value;
+    tolua_readonly tolua_property__get_set BorderImage* knob;
+    tolua_readonly tolua_property__get_set String loadingPercentStyle;
+    tolua_property__get_set bool showPercentText;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ProgressBar_new00
+static int tolua_UILuaAPI_ProgressBar_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ProgressBar>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ProgressBar_new00_local
+static int tolua_UILuaAPI_ProgressBar_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ProgressBar>(tolua_S);
+}
+$}

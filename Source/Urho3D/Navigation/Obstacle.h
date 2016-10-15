@@ -70,8 +70,12 @@ public:
     void DrawDebugGeometry(bool depthTest);
 
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Handle scene being assigned, identify our DynamicNavigationMesh.
     virtual void OnSceneSet(Scene* scene);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
 
 private:
     /// Radius of this obstacle.

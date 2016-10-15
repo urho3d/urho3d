@@ -355,9 +355,9 @@ function Character:HandleNodeCollision(eventType, eventData)
         local contactDistance = contacts:ReadFloat()
         local contactImpulse = contacts:ReadFloat()
 
-        -- If contact is below node center and mostly vertical, assume it's a ground contact
+        -- If contact is below node center and pointing up, assume it's a ground contact
         if contactPosition.y < self.node.position.y + 1.0 then
-            local level = Abs(contactNormal.y)
+            local level = contactNormal.y
             if level > 0.75 then
                 self.onGround = true
             end

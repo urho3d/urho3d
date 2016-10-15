@@ -10,6 +10,8 @@ class Material : public Resource
     
     void SetNumTechniques(unsigned num);
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    void SetVertexShaderDefines(const String defines);
+    void SetPixelShaderDefines(const String defines);
     void SetShaderParameter(const String name, const Variant& value);
     void SetShaderParameterAnimation(const String name, ValueAnimation* animation, WrapMode wrapMode = WM_LOOP, float speed = 1.0f);
     void SetShaderParameterAnimationWrapMode(const String name, WrapMode wrapMode);
@@ -21,7 +23,10 @@ class Material : public Resource
     void SetShadowCullMode(CullMode mode);
     void SetFillMode(FillMode mode);
     void SetDepthBias(const BiasParameters& parameters);
+    void SetAlphaToCoverage(bool enable);
+    void SetLineAntiAlias(bool enable);
     void SetRenderOrder(unsigned char renderOrder);
+    void SetOcclusion(bool enable);
     void SetScene(Scene* scene);
     void RemoveShaderParameter(const String name);
     void ReleaseShaders();
@@ -37,8 +42,12 @@ class Material : public Resource
     Technique* GetTechnique(unsigned index) const;
 
     Pass* GetPass(unsigned index, const String passName) const;
-    
+
     Texture* GetTexture(TextureUnit unit) const;
+    
+    const String GetVertexShaderDefines() const;
+    const String GetPixelShaderDefines() const;
+
     ValueAnimation* GetShaderParameterAnimation(const String name) const;
     WrapMode GetShaderParameterAnimationWrapMode(const String name) const;
     float GetShaderParameterAnimationSpeed(const String name) const;
@@ -47,17 +56,23 @@ class Material : public Resource
     CullMode GetShadowCullMode() const;
     FillMode GetFillMode() const;
     const BiasParameters& GetDepthBias() const;
+    bool GetAlphaToCoverage() const;
+    bool GetLineAntiAlias() const;
     unsigned char GetRenderOrder() const;
     bool GetOcclusion() const;
     bool GetSpecular() const;
     Scene* GetScene() const;
 
+    tolua_property__get_set String vertexShaderDefines;
+    tolua_property__get_set String pixelShaderDefines;
     tolua_property__get_set CullMode cullMode;
     tolua_property__get_set CullMode shadowCullMode;
     tolua_property__get_set FillMode fillMode;
     tolua_property__get_set BiasParameters depthBias;
+    tolua_property__get_set bool alphaToCoverage;
+    tolua_property__get_set bool lineAntiAlias;
     tolua_property__get_set unsigned char renderOrder;
-    tolua_readonly tolua_property__get_set bool occlusion;
+    tolua_property__get_set bool occlusion;
     tolua_readonly tolua_property__get_set bool specular;
     tolua_property__get_set Scene* scene;
 };
@@ -79,11 +94,7 @@ static Material* MaterialClone(const Material* material, const String& cloneName
 {
     if (!material)
         return 0;
-        
-    SharedPtr<Material> clonedMaterialPtr = material->Clone(cloneName);
-    Material* clonedMaterial = clonedMaterialPtr.Get();
-    clonedMaterialPtr.Detach();
-    
-    return clonedMaterial;
+
+    return material->Clone(cloneName).Detach();
 }
 $}

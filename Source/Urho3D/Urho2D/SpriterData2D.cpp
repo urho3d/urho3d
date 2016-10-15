@@ -50,14 +50,14 @@ void SpriterData::Reset()
 {
     if (!folders_.Empty())
     {
-        for (size_t i = 0; i < folders_.Size(); ++i)
+        for (unsigned i = 0; i < folders_.Size(); ++i)
             delete folders_[i];
         folders_.Clear();
     }
 
     if (!entities_.Empty())
     {
-        for (size_t i = 0; i < entities_.Size(); ++i)
+        for (unsigned i = 0; i < entities_.Size(); ++i)
             delete entities_[i];
         entities_.Clear();
     }
@@ -112,7 +112,7 @@ Folder::~Folder()
 
 void Folder::Reset()
 {
-    for (size_t i = 0; i < files_.Size(); ++i)
+    for (unsigned i = 0; i < files_.Size(); ++i)
         delete files_[i];
     files_.Clear();
 }
@@ -173,11 +173,11 @@ Entity::~Entity()
 
 void Entity::Reset()
 {
-    for (size_t i = 0; i < characterMaps_.Size(); ++i)
+    for (unsigned i = 0; i < characterMaps_.Size(); ++i)
         delete characterMaps_[i];
     characterMaps_.Clear();
 
-    for (size_t i = 0; i < animations_.Size(); ++i)
+    for (unsigned i = 0; i < animations_.Size(); ++i)
         delete animations_[i];
     animations_.Clear();
 }
@@ -221,7 +221,7 @@ CharacterMap::~CharacterMap()
 
 void CharacterMap::Reset()
 {
-    for (size_t i = 0; i < maps_.Size(); ++i)
+    for (unsigned i = 0; i < maps_.Size(); ++i)
         delete maps_[i];
     maps_.Clear();
 }
@@ -283,12 +283,12 @@ void Animation::Reset()
 {
     if (!mainlineKeys_.Empty())
     {
-        for (size_t i = 0; i < mainlineKeys_.Size(); ++i)
+        for (unsigned i = 0; i < mainlineKeys_.Size(); ++i)
             delete mainlineKeys_[i];
         mainlineKeys_.Clear();
     }
 
-    for (size_t i = 0; i < timelines_.Size(); ++i)
+    for (unsigned i = 0; i < timelines_.Size(); ++i)
         delete timelines_[i];
     timelines_.Clear();
 }
@@ -335,11 +335,11 @@ MainlineKey::~MainlineKey()
 
 void MainlineKey::Reset()
 {
-    for (size_t i = 0; i < boneRefs_.Size(); ++i)
+    for (unsigned i = 0; i < boneRefs_.Size(); ++i)
         delete boneRefs_[i];
     boneRefs_.Clear();
 
-    for (size_t i = 0; i < objectRefs_.Size(); ++i)
+    for (unsigned i = 0; i < objectRefs_.Size(); ++i)
         delete objectRefs_[i];
     objectRefs_.Clear();
 }
@@ -401,7 +401,7 @@ Timeline::~Timeline()
 
 void Timeline::Reset()
 {
-    for (size_t i = 0; i < keys_.Size(); ++i)
+    for (unsigned i = 0; i < keys_.Size(); ++i)
         delete keys_[i];
     keys_.Clear();
 }

@@ -485,8 +485,8 @@ bool Texture3D::Create()
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create texture", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 

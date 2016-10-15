@@ -55,13 +55,21 @@ public:
     /// Construct with initial size.
     explicit Vector(unsigned size)
     {
-        Resize(size, 0);
+        Resize(size);
+    }
+
+    /// Construct with initial size and default value.
+    Vector(unsigned size, const T& value)
+    {
+        Resize(size);
+        for (unsigned i = 0; i < size; ++i)
+            At(i) = value;
     }
 
     /// Construct with initial data.
     Vector(const T* data, unsigned size)
     {
-        Resize(size, data);
+        InsertElements(0, data, data + size);
     }
 
     /// Construct from another vector.
@@ -82,15 +90,19 @@ public:
     /// Destruct.
     ~Vector()
     {
-        Clear();
+        DestructElements(Buffer(), size_);
         delete[] buffer_;
     }
 
     /// Assign from another vector.
     Vector<T>& operator =(const Vector<T>& rhs)
     {
-        Clear();
-        Resize(rhs.size_, rhs.Buffer());
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Clear();
+            InsertElements(0, rhs.Begin(), rhs.End());
+        }
         return *this;
     }
 
@@ -188,105 +200,68 @@ public:
 
     /// Add an element at the end.
 #ifndef COVERITY_SCAN_MODEL
-    void Push(const T& value) { Resize(size_ + 1, &value); }
+    void Push(const T& value)
+    {
+        InsertElements(size_, &value, &value + 1);
+    }
 #else
     // FIXME: Attempt had been made to use this model in the Coverity-Scan model file without any success
     // Probably because the model had generated a different mangled name than the one used by static analyzer
     void Push(const T& value)
     {
         T array[] = {value};
-        Resize(size_ + 1, array);
+        InsertElements(size_, array, array + 1);
     }
 #endif
 
     /// Add another vector at the end.
-    void Push(const Vector<T>& vector) { Resize(size_ + vector.size_, vector.Buffer()); }
+    void Push(const Vector<T>& vector) { InsertElements(size_, vector.Begin(), vector.End()); }
 
     /// Remove the last element.
     void Pop()
     {
         if (size_)
-            Resize(size_ - 1, 0);
+            Resize(size_ - 1);
     }
 
     /// Insert an element at position.
     void Insert(unsigned pos, const T& value)
     {
-        if (pos > size_)
-            pos = size_;
-
-        unsigned oldSize = size_;
-        Resize(size_ + 1, 0);
-        MoveRange(pos + 1, pos, oldSize - pos);
-        Buffer()[pos] = value;
+        InsertElements(pos, &value, &value + 1);
     }
 
     /// Insert another vector at position.
     void Insert(unsigned pos, const Vector<T>& vector)
     {
-        if (pos > size_)
-            pos = size_;
-
-        unsigned oldSize = size_;
-        Resize(size_ + vector.size_, 0);
-        MoveRange(pos + vector.size_, pos, oldSize - pos);
-        CopyElements(Buffer() + pos, vector.Buffer(), vector.size_);
+        InsertElements(pos, vector.Begin(), vector.End());
     }
 
     /// Insert an element by iterator.
     Iterator Insert(const Iterator& dest, const T& value)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, value);
-
-        return Begin() + pos;
+        return InsertElements(pos, &value, &value + 1);
     }
 
     /// Insert a vector by iterator.
     Iterator Insert(const Iterator& dest, const Vector<T>& vector)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        Insert(pos, vector);
-
-        return Begin() + pos;
+        return InsertElements(pos, vector.Begin(), vector.End());
     }
 
     /// Insert a vector partially by iterators.
     Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        unsigned length = (unsigned)(end - start);
-        Resize(size_ + length, 0);
-        MoveRange(pos + length, pos, size_ - pos - length);
-
-        T* destPtr = Buffer() + pos;
-        for (ConstIterator it = start; it != end; ++it)
-            *destPtr++ = *it;
-
-        return Begin() + pos;
+        return InsertElements(pos, start, end);
     }
 
     /// Insert elements.
     Iterator Insert(const Iterator& dest, const T* start, const T* end)
     {
         unsigned pos = (unsigned)(dest - Begin());
-        if (pos > size_)
-            pos = size_;
-        unsigned length = (unsigned)(end - start);
-        Resize(size_ + length, 0);
-        MoveRange(pos + length, pos, size_ - pos - length);
-
-        T* destPtr = Buffer() + pos;
-        for (const T* i = start; i != end; ++i)
-            *destPtr++ = *i;
-
-        return Begin() + pos;
+        return InsertElements(pos, start, end);
     }
 
     /// Erase a range of elements.
@@ -297,7 +272,7 @@ public:
             return;
 
         MoveRange(pos, pos + length, size_ - pos - length);
-        Resize(size_ - length, 0);
+        Resize(size_ - length);
     }
 
     /// Erase a range of elements by swapping elements from the end of the array.
@@ -320,7 +295,7 @@ public:
             // Swap elements from the end of the array into the empty space
             CopyElements(Buffer() + pos, Buffer() + newSize, length);
         }
-        Resize(newSize, 0);
+        Resize(newSize);
     }
 
     /// Erase an element by iterator. Return iterator to the next element.
@@ -376,7 +351,17 @@ public:
     void Clear() { Resize(0); }
 
     /// Resize the vector.
-    void Resize(unsigned newSize) { Resize(newSize, 0); }
+    void Resize(unsigned newSize) { Vector<T> tempBuffer; Resize(newSize, 0, tempBuffer); }
+
+    /// Resize the vector and fill new elements with default value.
+    void Resize(unsigned newSize, const T& value)
+    {
+        unsigned oldSize = Size();
+        Vector<T> tempBuffer;
+        Resize(newSize, 0, tempBuffer);
+        for (unsigned i = oldSize; i < newSize; ++i)
+            At(i) = value;
+    }
 
     /// Set new capacity.
     void Reserve(unsigned newCapacity)
@@ -480,8 +465,8 @@ public:
     T* Buffer() const { return reinterpret_cast<T*>(buffer_); }
 
 private:
-    /// Resize the vector and create/remove new elements as necessary.
-    void Resize(unsigned newSize, const T* src)
+    /// Resize the vector and create/remove new elements as necessary. Current buffer will be stored in tempBuffer in case of reallocation.
+    void Resize(unsigned newSize, const T* src, Vector<T>& tempBuffer)
     {
         // If size shrinks, destruct the removed elements
         if (newSize < size_)
@@ -491,6 +476,10 @@ private:
             // Allocate new buffer if necessary and copy the current elements
             if (newSize > capacity_)
             {
+                Swap(tempBuffer);
+                size_ = tempBuffer.size_;
+                capacity_ = tempBuffer.capacity_;
+
                 if (!capacity_)
                     capacity_ = newSize;
                 else
@@ -499,14 +488,11 @@ private:
                         capacity_ += (capacity_ + 1) >> 1;
                 }
 
-                unsigned char* newBuffer = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
-                if (buffer_)
+                buffer_ = AllocateBuffer((unsigned)(capacity_ * sizeof(T)));
+                if (tempBuffer.Buffer())
                 {
-                    ConstructElements(reinterpret_cast<T*>(newBuffer), Buffer(), size_);
-                    DestructElements(Buffer(), size_);
-                    delete[] buffer_;
+                    ConstructElements(Buffer(), tempBuffer.Buffer(), size_);
                 }
-                buffer_ = newBuffer;
             }
 
             // Initialize the new elements
@@ -514,6 +500,26 @@ private:
         }
 
         size_ = newSize;
+    }
+
+    /// Insert elements.
+    template <typename RandomIteratorT>
+    Iterator InsertElements(unsigned pos, RandomIteratorT start, RandomIteratorT end)
+    {
+        assert(start <= end);
+
+        if (pos > size_)
+            pos = size_;
+        unsigned length = (unsigned)(end - start);
+        Vector<T> tempBuffer;
+        Resize(size_ + length, 0, tempBuffer);
+        MoveRange(pos + length, pos, size_ - pos - length);
+
+        T* destPtr = Buffer() + pos;
+        for (RandomIteratorT it = start; it != end; ++it)
+            *destPtr++ = *it;
+
+        return Begin() + pos;
     }
 
     /// Move a range of elements within the vector.
@@ -565,7 +571,7 @@ private:
     }
 };
 
-/// %Vector template class for POD types. Does not call constructors or destructors and uses block move.
+/// %Vector template class for POD types. Does not call constructors or destructors and uses block move. Is intentionally (for performance reasons) unsafe for self-insertion.
 template <class T> class PODVector : public VectorBase
 {
 public:
@@ -582,6 +588,14 @@ public:
     explicit PODVector(unsigned size)
     {
         Resize(size);
+    }
+
+    /// Construct with initial size and default value.
+    PODVector(unsigned size, const T& value)
+    {
+        Resize(size);
+        for (unsigned i = 0; i < size; ++i)
+            At(i) = value;
     }
 
     /// Construct with initial data.
@@ -615,8 +629,12 @@ public:
     /// Assign from another vector.
     PODVector<T>& operator =(const PODVector<T>& rhs)
     {
-        Resize(rhs.size_);
-        CopyElements(Buffer(), rhs.Buffer(), rhs.size_);
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Resize(rhs.size_);
+            CopyElements(Buffer(), rhs.Buffer(), rhs.size_);
+        }
         return *this;
     }
 
@@ -855,7 +873,7 @@ public:
         // Return if the range is illegal
         if (shiftStartIndex > size_ || !length)
             return;
-      
+
         unsigned newSize = size_ - length;
         unsigned trailingCount = size_ - shiftStartIndex;
         if (trailingCount <= length)

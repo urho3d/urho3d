@@ -5,6 +5,7 @@ class Texture : public Resource
     void SetNumLevels(unsigned levels);
     void SetFilterMode(TextureFilterMode filter);
     void SetAddressMode(TextureCoordinate coord, TextureAddressMode address);
+    void SetAnisotropy(unsigned level);
     void SetBorderColor(const Color& color);
     void SetSRGB(bool enable);
     void SetBackupTexture(Texture* texture);
@@ -17,8 +18,12 @@ class Texture : public Resource
     int GetHeight() const;
     TextureFilterMode GetFilterMode() const;
     TextureAddressMode GetAddressMode(TextureCoordinate coord) const;
+    unsigned GetAnisotropy() const;
     const Color& GetBorderColor() const;
     bool GetSRGB() const;
+    int GetMultiSample() const;
+	bool GetAutoResolve() const;
+	bool IsResolveDirty() const;
     Texture* GetBackupTexture() const;
     int GetMipsToSkip(int quality) const;
     int GetLevelWidth(unsigned level) const;
@@ -35,8 +40,12 @@ class Texture : public Resource
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set unsigned components;
     tolua_property__get_set TextureFilterMode filterMode;
+    tolua_property__get_set unsigned anisotropy;
     tolua_property__get_set Color& borderColor;
     tolua_property__get_set bool sRGB;
+    tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set bool autoResolve;
+    tolua_readonly tolua_property__is_set bool resolveDirty;
     tolua_property__get_set Texture* backupTexture;
     tolua_readonly tolua_property__get_set TextureUsage usage;
 };

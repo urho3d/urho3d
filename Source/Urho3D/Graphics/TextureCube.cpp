@@ -258,7 +258,7 @@ bool TextureCube::EndLoad()
     return true;
 }
 
-bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
+bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int multiSample)
 {
     if (size <= 0)
     {
@@ -267,7 +267,14 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     }
     if (usage == TEXTURE_DEPTHSTENCIL)
     {
-        URHO3D_LOGERROR("Depth-stencil usage not supported for cube maps");
+        URHO3D_LOGERROR("Depth-stencil usage not supported for cube textures");
+        return false;
+    }
+
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
+    {
+        URHO3D_LOGERROR("Multisampling is only supported for rendertarget cube textures");
         return false;
     }
 
@@ -303,8 +310,30 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage)
     width_ = size;
     height_ = size;
     format_ = format;
+    multiSample_ = multiSample;
+    autoResolve_ = multiSample > 1;
 
     return Create();
+}
+
+SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
+{
+    if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
+    {
+        URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
+        return SharedPtr<Image>();
+    }
+
+    Image* rawImage = new Image(context_);
+    if (format_ == Graphics::GetRGBAFormat())
+        rawImage->SetSize(width_, height_, 4);
+    else if (format_ == Graphics::GetRGBFormat())
+        rawImage->SetSize(width_, height_, 3);
+    else
+        assert(0);
+
+    GetData(face, 0, rawImage->GetData());
+    return SharedPtr<Image>(rawImage);
 }
 
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

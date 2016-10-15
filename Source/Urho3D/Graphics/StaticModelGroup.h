@@ -68,7 +68,7 @@ public:
     void SetNodeIDsAttr(const VariantVector& value);
 
     /// Return node IDs attribute.
-    const VariantVector& GetNodeIDsAttr() const { return nodeIDsAttr_; }
+    const VariantVector& GetNodeIDsAttr() const;
 
 protected:
     /// Handle scene node enabled status changing.
@@ -77,8 +77,10 @@ protected:
     virtual void OnWorldBoundingBoxUpdate();
 
 private:
-    /// Update node IDs attribute and ensure the transforms vector has the right size.
-    void UpdateNodeIDs();
+    /// Ensure proper size of world transforms when nodes are added/removed. Also mark node IDs dirty.
+    void UpdateNumTransforms();
+    /// Update node IDs attribute from the actual nodes.
+    void UpdateNodeIDs() const;
 
     /// Instance nodes.
     Vector<WeakPtr<Node> > instanceNodes_;
@@ -89,7 +91,9 @@ private:
     /// Number of valid instance node transforms.
     unsigned numWorldTransforms_;
     /// Whether node IDs have been set and nodes should be searched for during ApplyAttributes.
-    bool nodeIDsDirty_;
+    mutable bool nodesDirty_;
+    /// Whether nodes have been manipulated by the API and node ID attribute should be refreshed.
+    mutable bool nodeIDsDirty_;
 };
 
 }

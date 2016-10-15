@@ -59,6 +59,7 @@ Texture::Texture(Context* context) :
     GPUObject(GetSubsystem<Graphics>()),
     shaderResourceView_(0),
     sampler_(0),
+    resolveTexture_(0),
     format_(0),
     usage_(TEXTURE_STATIC),
     levels_(0),
@@ -68,8 +69,12 @@ Texture::Texture(Context* context) :
     depth_(0),
     shadowCompare_(false),
     filterMode_(FILTER_DEFAULT),
+    anisotropy_(0),
+    multiSample_(1),
     sRGB_(false),
-    parametersDirty_(true)
+    parametersDirty_(true),
+    autoResolve_(false),
+    resolveDirty_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
@@ -98,6 +103,12 @@ void Texture::SetFilterMode(TextureFilterMode mode)
 void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 {
     addressMode_[coord] = mode;
+    parametersDirty_ = true;
+}
+
+void Texture::SetAnisotropy(unsigned level)
+{
+    anisotropy_ = level;
     parametersDirty_ = true;
 }
 
@@ -214,6 +225,8 @@ void Texture::SetParameters(const XMLElement& element)
         {
             String mode = paramElem.GetAttributeLower("mode");
             SetFilterMode((TextureFilterMode)GetStringListIndex(mode.CString(), filterModeNames, FILTER_DEFAULT));
+            if (paramElem.HasAttribute("anisotropy"))
+                SetAnisotropy(paramElem.GetUInt("anisotropy"));
         }
 
         if (name == "mipmap")

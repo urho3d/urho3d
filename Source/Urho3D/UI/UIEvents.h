@@ -130,6 +130,8 @@ URHO3D_EVENT(E_RESIZED, Resized)
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_WIDTH, Width);                  // int
     URHO3D_PARAM(P_HEIGHT, Height);                // int
+    URHO3D_PARAM(P_DX, DX);                        // int
+    URHO3D_PARAM(P_DY, DY);                        // int
 }
 
 /// UI element positioned.
@@ -198,6 +200,13 @@ URHO3D_EVENT(E_SLIDERPAGED, SliderPaged)
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_OFFSET, Offset);                // int
     URHO3D_PARAM(P_PRESSED, Pressed);              // bool
+}
+
+/// UI progressbar value changed
+URHO3D_EVENT(E_PROGRESSBARCHANGED, ProgressBarChanged)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VALUE, Value);                  // float
 }
 
 /// UI scrollbar value changed.

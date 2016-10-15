@@ -133,6 +133,8 @@ public:
     void SetMaxVertices(unsigned num);
     /// Set maximum number of decal vertex indices.
     void SetMaxIndices(unsigned num);
+    /// Set whether to optimize GPU buffer sizes according to current amount of decals. Default false, which will size the buffers according to the maximum vertices/indices. When true, buffers will be reallocated whenever decals are added/removed, which can be worse for performance.
+    void SetOptimizeBufferSize(bool enable);
     /// Add a decal at world coordinates, using a target drawable's geometry for reference. If the decal needs to move with the target, the decal component should be created to the target's node. Return true if successful.
     bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio,
         float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f,
@@ -159,6 +161,9 @@ public:
 
     /// Return maximum number of decal vertex indices.
     unsigned GetMaxIndices() const { return maxIndices_; }
+    
+    /// Return whether is optimizing GPU buffer sizes according to current amount of decals.
+    bool GetOptimizeBufferSize() const { return optimizeBufferSize_; }
 
     /// Set material attribute.
     void SetMaterialAttr(const ResourceRef& value);
@@ -234,11 +239,11 @@ private:
     unsigned maxVertices_;
     /// Maximum indices.
     unsigned maxIndices_;
+    /// Optimize buffer sizes flag.
+    bool optimizeBufferSize_;
     /// Skinned mode flag.
     bool skinned_;
-    /// Vertex buffer needs resize flag.
-    bool bufferSizeDirty_;
-    /// Vertex buffer needs rewrite flag.
+    /// Vertex buffer needs rewrite / resizing flag.
     bool bufferDirty_;
     /// Bounding box needs update flag.
     bool boundingBoxDirty_;

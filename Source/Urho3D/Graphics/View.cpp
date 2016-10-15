@@ -546,13 +546,7 @@ void View::Update(const FrameInfo& frame)
 
     using namespace BeginViewUpdate;
 
-    VariantMap& eventData = GetEventDataMap();
-    eventData[P_VIEW] = this;
-    eventData[P_SURFACE] = renderTarget_;
-    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
-    eventData[P_SCENE] = scene_;
-    eventData[P_CAMERA] = cullCamera_;
-    renderer_->SendEvent(E_BEGINVIEWUPDATE, eventData);
+    SendViewEvent(E_BEGINVIEWUPDATE);
 
     int maxSortedInstances = renderer_->GetMaxSortedInstances();
 
@@ -569,7 +563,7 @@ void View::Update(const FrameInfo& frame)
 
     if (hasScenePasses_ && (!cullCamera_ || !octree_))
     {
-        renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
+        SendViewEvent(E_ENDVIEWUPDATE);
         return;
     }
 
@@ -581,18 +575,24 @@ void View::Update(const FrameInfo& frame)
     GetBatches();
     renderer_->StorePreparedView(this, cullCamera_);
 
-    renderer_->SendEvent(E_ENDVIEWUPDATE, eventData);
+    SendViewEvent(E_ENDVIEWUPDATE);
 }
 
 void View::Render()
 {
+    SendViewEvent(E_BEGINVIEWRENDER);
+
     if (hasScenePasses_ && (!octree_ || !camera_))
+    {
+        SendViewEvent(E_ENDVIEWRENDER);
         return;
+    }
 
     UpdateGeometries();
 
     // Allocate screen buffers as necessary
     AllocateScreenBuffers();
+    SendViewEvent(E_VIEWBUFFERSREADY);
 
     // Forget parameter sources from the previous view
     graphics_->ClearParameterSources();
@@ -629,6 +629,7 @@ void View::Render()
 
     // Reset state after commands
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetColorWrite(true);
     graphics_->SetDepthBias(0.0f, 0.0f);
@@ -672,6 +673,8 @@ void View::Render()
     // (backbuffer should contain proper depth already)
     if (currentRenderTarget_ != renderTarget_)
         BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, !usedResolve_);
+
+    SendViewEvent(E_ENDVIEWRENDER);
 }
 
 Graphics* View::GetGraphics() const
@@ -700,6 +703,8 @@ void View::SetGlobalShaderParameters()
         graphics_->SetShaderParameter(VSP_ELAPSEDTIME, elapsedTime);
         graphics_->SetShaderParameter(PSP_ELAPSEDTIME, elapsedTime);
     }
+
+    SendViewEvent(E_VIEWGLOBALSHADERPARAMETERS);
 }
 
 void View::SetCameraShaderParameters(Camera* camera)
@@ -746,7 +751,7 @@ void View::SetCameraShaderParameters(Camera* camera)
     camera->GetFrustumSize(nearVector, farVector);
     graphics_->SetShaderParameter(VSP_FRUSTUMSIZE, farVector);
 
-    Matrix4 projection = camera->GetProjection();
+    Matrix4 projection = camera->GetGPUProjection();
 #ifdef URHO3D_OPENGL
     // Add constant depth bias manually to the projection matrix due to glPolygonOffset() inconsistency
     float constantBias = 2.0f * graphics_->GetDepthConstantBias();
@@ -1565,7 +1570,7 @@ void View::ExecuteRenderPathCommands()
                         SetRenderTargets(command);
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
-                            camera_->GetProjection());
+                            camera_->GetGPUProjection());
                         queue.Draw(this, camera_, command.markToStencil_, false, allowDepthWrite);
                     }
                 }
@@ -1600,7 +1605,7 @@ void View::ExecuteRenderPathCommands()
 
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
-                            camera_->GetProjection());
+                            camera_->GetGPUProjection());
 
                         // Draw base (replace blend) batches first
                         i->litBaseBatches_.Draw(this, camera_, false, false, allowDepthWrite);
@@ -1707,7 +1712,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
                 if (!depthOnlyDummyTexture_)
                 {
                     depthOnlyDummyTexture_ = renderer_->GetScreenBuffer(texture->GetWidth(), texture->GetHeight(),
-                        graphics_->GetDummyColorFormat(), false, false, false);
+                        graphics_->GetDummyColorFormat(), texture->GetMultiSample(), texture->GetAutoResolve(), false, false, false);
                 }
 #endif
                 graphics_->SetRenderTarget(0, GetRenderSurfaceFromTexture(depthOnlyDummyTexture_));
@@ -1841,6 +1846,7 @@ void View::RenderQuad(RenderPathCommand& command)
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -2002,22 +2008,23 @@ void View::AllocateScreenBuffers()
             ++numViewportTextures;
     }
 
-    // Allocate screen buffers with filtering active in case the quad commands need that
+    // Allocate screen buffers. Enable filtering in case the quad commands need that
     // Follow the sRGB mode of the destination render target
     bool sRGB = renderTarget_ ? renderTarget_->GetParentTexture()->GetSRGB() : graphics_->GetSRGB();
+    int multiSample = renderTarget_ ? renderTarget_->GetMultiSample() : graphics_->GetMultiSample();
+    bool autoResolve = renderTarget_ ? renderTarget_->GetAutoResolve() : true;
     substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
-        format, false, true, sRGB)) : (RenderSurface*)0;
+        format, multiSample, autoResolve, false, true, sRGB)) : (RenderSurface*)0;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
-        viewportTextures_[i] =
-            i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, false, true, sRGB) :
-                (Texture*)0;
+        viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, multiSample,
+            autoResolve, false, true, sRGB) : (Texture*)0;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
     if (numViewportTextures == 1 && substituteRenderTarget_)
         viewportTextures_[1] = substituteRenderTarget_->GetParentTexture();
 
-    // Allocate extra render targets defined by the rendering path
+    // Allocate extra render targets defined by the render path
     for (unsigned i = 0; i < renderPath_->renderTargets_.Size(); ++i)
     {
         const RenderTargetInfo& rtInfo = renderPath_->renderTargets_[i];
@@ -2043,8 +2050,9 @@ void View::AllocateScreenBuffers()
 
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
         renderTargets_[rtInfo.name_] =
-            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_,
-                rtInfo.persistent_ ? StringHash(rtInfo.name_).Value() + (unsigned)(size_t)this : 0);
+            renderer_->GetScreenBuffer(intWidth, intHeight, rtInfo.format_, rtInfo.multiSample_, rtInfo.autoResolve_,
+                rtInfo.cubemap_, rtInfo.filtered_, rtInfo.sRGB_, rtInfo.persistent_ ? StringHash(rtInfo.name_).Value()
+                + (unsigned)(size_t)this : 0);
     }
 }
 
@@ -2068,6 +2076,7 @@ void View::BlitFramebuffer(Texture* source, RenderSurface* destination, bool dep
     graphics_->SetDepthTest(CMP_ALWAYS);
     graphics_->SetDepthWrite(depthWrite);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
     graphics_->SetScissorTest(false);
     graphics_->SetStencilTest(false);
@@ -2227,6 +2236,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 {
     Light* light = query.light_;
     LightType type = light->GetLightType();
+    unsigned lightMask = light->GetLightMask();
     const Frustum& frustum = cullCamera_->GetFrustum();
 
     // Check if light should be shadowed
@@ -2248,7 +2258,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
     case LIGHT_DIRECTIONAL:
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
-            if (GetLightMask(geometries_[i]) & light->GetLightMask())
+            if (GetLightMask(geometries_[i]) & lightMask)
                 query.litGeometries_.Push(geometries_[i]);
         }
         break;
@@ -2260,7 +2270,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & light->GetLightMask()))
+                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
                     query.litGeometries_.Push(tempDrawables[i]);
             }
         }
@@ -2273,7 +2283,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
             octree_->GetDrawables(octreeQuery);
             for (unsigned i = 0; i < tempDrawables.Size(); ++i)
             {
-                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & light->GetLightMask()))
+                if (tempDrawables[i]->IsInView(frame_) && (GetLightMask(tempDrawables[i]) & lightMask))
                     query.litGeometries_.Push(tempDrawables[i]);
             }
         }
@@ -2328,6 +2338,7 @@ void View::ProcessLight(LightQueryResult& query, unsigned threadIndex)
 void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawable*>& drawables, unsigned splitIndex)
 {
     Light* light = query.light_;
+    unsigned lightMask = light->GetLightMask();
 
     Camera* shadowCamera = query.shadowCameras_[splitIndex];
     const Frustum& shadowCameraFrustum = shadowCamera->GetFrustum();
@@ -2364,7 +2375,7 @@ void View::ProcessShadowCasters(LightQueryResult& query, const PODVector<Drawabl
         if (!drawable->GetCastShadows())
             continue;
         // Check shadow mask
-        if (!(GetShadowMask(drawable) & light->GetLightMask()))
+        if (!(GetShadowMask(drawable) & lightMask))
             continue;
         // For point light, check that this drawable is inside the split shadow camera frustum
         if (type == LIGHT_POINT && shadowCameraFrustum.IsInsideFast(drawable->GetWorldBoundingBox()) == OUTSIDE)
@@ -2551,7 +2562,7 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
 {
     Node* shadowCameraNode = shadowCamera->GetNode();
     Node* lightNode = light->GetNode();
-    float extrusionDistance = cullCamera_->GetFarClip();
+    float extrusionDistance = Min(cullCamera_->GetFarClip(), light->GetShadowMaxExtrusion());
     const FocusParameters& parameters = light->GetShadowFocus();
 
     // Calculate initial position & rotation
@@ -2574,13 +2585,16 @@ void View::SetupDirLightShadowCamera(Camera* shadowCamera, Light* light, float n
     if (parameters.focus_)
     {
         BoundingBox litGeometriesBox;
+        unsigned lightMask = light->GetLightMask();
+
         for (unsigned i = 0; i < geometries_.Size(); ++i)
         {
             Drawable* drawable = geometries_[i];
             if (drawable->GetMinZ() <= farSplit && drawable->GetMaxZ() >= nearSplit &&
-                (GetLightMask(drawable) & light->GetLightMask()))
+                (GetLightMask(drawable) & lightMask))
                 litGeometriesBox.Merge(drawable->GetWorldBoundingBox());
         }
+
         if (litGeometriesBox.Defined())
         {
             frustumVolume.Clip(litGeometriesBox);
@@ -2930,6 +2944,7 @@ void View::SetupLightVolumeBatch(Batch& batch)
     graphics_->SetDepthBias(0.0f, 0.0f);
     graphics_->SetDepthWrite(false);
     graphics_->SetFillMode(FILL_SOLID);
+    graphics_->SetLineAntiAlias(false);
     graphics_->SetClipPlane(false);
 
     if (type != LIGHT_DIRECTIONAL)
@@ -3007,7 +3022,8 @@ void View::RenderShadowMap(const LightBatchQueue& queue)
         // Disable other render targets
         for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
             graphics_->SetRenderTarget(i, (RenderSurface*) 0);
-        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight()));
+        graphics_->SetDepthStencil(renderer_->GetDepthStencil(shadowMap->GetWidth(), shadowMap->GetHeight(),
+            shadowMap->GetMultiSample(), shadowMap->GetAutoResolve()));
         graphics_->SetViewport(IntRect(0, 0, shadowMap->GetWidth(), shadowMap->GetHeight()));
         graphics_->Clear(CLEAR_DEPTH | CLEAR_COLOR, Color::WHITE);
 
@@ -3064,7 +3080,8 @@ RenderSurface* View::GetDepthStencil(RenderSurface* renderTarget)
     RenderSurface* depthStencil = renderTarget->GetLinkedDepthStencil();
     // Finally get one from Renderer
     if (!depthStencil)
-        depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight());
+        depthStencil = renderer_->GetDepthStencil(renderTarget->GetWidth(), renderTarget->GetHeight(),
+            renderTarget->GetMultiSample(), renderTarget->GetAutoResolve());
     return depthStencil;
 }
 
@@ -3079,6 +3096,21 @@ RenderSurface* View::GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace f
         return static_cast<TextureCube*>(texture)->GetRenderSurface(face);
     else
         return 0;
+}
+
+void View::SendViewEvent(StringHash eventType)
+{
+    using namespace BeginViewRender;
+    
+    VariantMap& eventData = GetEventDataMap();
+    
+    eventData[P_VIEW] = this;
+    eventData[P_SURFACE] = renderTarget_;
+    eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : 0);
+    eventData[P_SCENE] = scene_;
+    eventData[P_CAMERA] = cullCamera_;
+
+    renderer_->SendEvent(eventType, eventData);
 }
 
 Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap)

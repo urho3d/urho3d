@@ -262,8 +262,12 @@ public:
     /// Assign a hash map.
     HashMap& operator =(const HashMap<T, U>& rhs)
     {
-        Clear();
-        Insert(rhs);
+        // In case of self-assignment do nothing
+        if (&rhs != this)
+        {
+            Clear();
+            Insert(rhs);
+        }
         return *this;
     }
 

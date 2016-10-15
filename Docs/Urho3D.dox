@@ -77,7 +77,9 @@ Urho3D development, contributions and bugfixes by:
 - Josh Engebretson
 - Chris Friesen
 - Alex Fuller
+- Henrik Heino
 - Mika Heinonen
+- Victor Holt
 - Jukka Jylänki
 - Graham King
 - Jason Kinzer
@@ -115,12 +117,15 @@ Urho3D development, contributions and bugfixes by:
 - BlueMagnificent
 - Enhex
 - Firegorilla
+- Gordon-F
 - Lumak
 - Magic.Lixin
 - Mike3D
 - MonkeyFirst
+- Ner'zhul
 - Newb I the Newbd
 - OvermindDL1
+- Scellow
 - Skrylar
 - TheComet93
 - Y-way
@@ -204,7 +209,11 @@ Jack and mushroom models from the realXtend project. (https://www.realxtend.org)
 Ninja model and terrain, water, smoke, flare and status bar textures from OGRE.<br>
 BlueHighway font from Larabie Fonts.<br>
 Anonymous Pro font by Mark Simonson.<br>
-NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.
+NinjaSnowWar sounds by Veli-Pekka T&auml;til&auml;.<br>
+PBR textures from Substance Share. (https://share.allegorithmic.com)<br>
+IBL textures from HDRLab's sIBL Archive.<br>
+Dieselpunk Moto model by allexandr007.<br>
+Mutant model from Mixamo.<br>
 
 
 \page License License
@@ -1032,6 +1041,15 @@ From 1.5 to 1.6:
 From 1.6 to master:
 
 - SoundSource autoremove boolean was replaced with AutoRemoveMode enum, which allows removing either the component or owner node. Also used by ParticleEmitter.
+- Getting camera projection matrix has changed. Use GetProjection() to get the API-independent matrix, and GetGPUProjection() to get the matrix converted to be usable as a shader parameter. On D3D these are the same.
+- Alpha masking hint has been removed from Technique & Pass, due to materials also now being able to define additional shader compilation defines. You can use Material::SetRenderOrder() instead to ensure that partially opaque geometry will be drawn after fully opaque for GPU depth buffer optimization.
+  Due to this change you must also manually define that a material should not take part in occlusion rendering, see Material::SetOcclusion(). 
+- Techniques that existed just for shader defines like ALPHAMASK and PACKEDNORMAL have been removed. Replace by using techniques without those defines (e.g. DiffNormal instead of DiffNormalPacked), and adding the necessary defines to your materials instead.
+- The Light class has gained a max extrusion distance parameter for directional light shadows. In case you use a large far clip distance, you can experience different shadow depth resolution and effect of bias parameters, as the far clip distance no longer alone determines the extrusion. Adjust with Light::SetShadowMaxExtrusion() as necessary.
+- Direct3D binary shaders are now cached by default to the user preferences directory "urho3d/shadercache" to avoid writing into the application installation directory, to which the user may not have rights.
+  If you ship a prewarmed (read-only) cache with your application you can set the directory yourself from the engine startup parameter "ShaderCacheDir" or call Graphics::SetShaderCacheDir() on initialization.
+  Use the directory "Shaders/HLSL/Cache" to get the old behavior.
+- Signatures of UIElement virtual functions OnResize() and OnPositionSet() have changed.
 */
 
 }

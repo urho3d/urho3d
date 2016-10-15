@@ -64,6 +64,8 @@ struct TechniqueEntry
 
     /// Technique.
     SharedPtr<Technique> technique_;
+    /// Original technique, in case the material adds shader compilation defines. The modified clones are requested from it.
+    SharedPtr<Technique> original_;
     /// Quality level.
     int qualityLevel_;
     /// LOD distance.
@@ -134,6 +136,10 @@ public:
     void SetNumTechniques(unsigned num);
     /// Set technique.
     void SetTechnique(unsigned index, Technique* tech, unsigned qualityLevel = 0, float lodDistance = 0.0f);
+    /// Set additional vertex shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
+    void SetVertexShaderDefines(const String& defines);
+    /// Set additional pixel shader defines. Separate multiple defines with spaces. Setting defines at the material level causes technique(s) to be cloned as necessary.
+    void SetPixelShaderDefines(const String& defines);
     /// Set shader parameter.
     void SetShaderParameter(const String& name, const Variant& value);
     /// Set shader parameter animation.
@@ -157,8 +163,14 @@ public:
     void SetFillMode(FillMode mode);
     /// Set depth bias parameters for depth write and compare. Note that the normal offset parameter is not used and will not be saved, as it affects only shadow map sampling during light rendering.
     void SetDepthBias(const BiasParameters& parameters);
+    /// Set alpha-to-coverage mode on all passes.
+    void SetAlphaToCoverage(bool enable);
+    /// Set line antialiasing on/off. Has effect only on models that consist of line lists.
+    void SetLineAntiAlias(bool enable);
     /// Set 8-bit render order within pass. Default 128. Lower values will render earlier and higher values later, taking precedence over e.g. state and distance sorting.
     void SetRenderOrder(unsigned char order);
+    /// Set whether to use in occlusion rendering. Default true.
+    void SetOcclusion(bool enable);
     /// Associate the material with a scene to ensure that shader parameter animation happens in sync with scene update, respecting the scene time scale. If no scene is set, the global update events will be used.
     void SetScene(Scene* scene);
     /// Remove shader parameter.
@@ -190,6 +202,11 @@ public:
     /// Return all textures.
     const HashMap<TextureUnit, SharedPtr<Texture> >& GetTextures() const { return textures_; }
 
+    /// Return additional vertex shader defines.
+    const String& GetVertexShaderDefines() const { return vertexShaderDefines_; }
+    /// Return additional pixel shader defines.
+    const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
+
     /// Return shader parameter.
     const Variant& GetShaderParameter(const String& name) const;
     /// Return shader parameter animation.
@@ -213,6 +230,12 @@ public:
 
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
+
+    /// Return alpha-to-coverage mode.
+    bool GetAlphaToCoverage() const { return alphaToCoverage_; }
+
+    /// Return whether line antialiasing is enabled.
+    bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return render order.
     unsigned char GetRenderOrder() const { return renderOrder_; }
@@ -238,19 +261,19 @@ public:
     static Variant ParseShaderParameterValue(const String& value);
 
 private:
-    /// Helper function for loading JSON files
+    /// Helper function for loading JSON files.
     bool BeginLoadJSON(Deserializer& source);
-    /// Helper function for loading XML files
+    /// Helper function for loading XML files.
     bool BeginLoadXML(Deserializer& source);
 
-    /// Re-evaluate occlusion rendering.
-    void CheckOcclusion();
     /// Reset to defaults.
     void ResetToDefaults();
     /// Recalculate shader parameter hash.
     void RefreshShaderParameterHash();
     /// Recalculate the memory used by the material.
     void RefreshMemoryUse();
+    /// Reapply shader defines to technique index. By default reapply all.
+    void ApplyShaderDefines(unsigned index = M_MAX_UNSIGNED);
     /// Return shader parameter animation info.
     ShaderParameterAnimationInfo* GetShaderParameterAnimationInfo(const String& name) const;
     /// Update whether should be subscribed to scene or global update events for shader parameter animation.
@@ -266,6 +289,10 @@ private:
     HashMap<StringHash, MaterialShaderParameter> shaderParameters_;
     /// %Shader parameters animation infos.
     HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> > shaderParameterAnimationInfos_;
+    /// Vertex shader defines.
+    String vertexShaderDefines_;
+    /// Pixel shader defines.
+    String pixelShaderDefines_;
     /// Normal culling mode.
     CullMode cullMode_;
     /// Culling mode for shadow rendering.
@@ -280,6 +307,10 @@ private:
     unsigned auxViewFrameNumber_;
     /// Shader parameter hash value.
     unsigned shaderParameterHash_;
+    /// Alpha-to-coverage flag.
+    bool alphaToCoverage_;
+    /// Line antialiasing flag.
+    bool lineAntiAlias_;
     /// Render occlusion flag.
     bool occlusion_;
     /// Specular lighting flag.

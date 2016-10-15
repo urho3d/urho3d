@@ -271,6 +271,10 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="240 32 254 46" />
     </element>
+    <element type="ProgressBar">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="0 48 14 62" />
+    </element>
     <element type="Slider">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="112 32 126 46" />

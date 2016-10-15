@@ -59,6 +59,9 @@ public:
     /// Return whether a texture format and usage is supported.
     bool CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCETYPE type);
 
+    /// Return whether a multisample level is supported.
+    bool CheckMultiSampleSupport(D3DFORMAT format, int level);
+
 private:
     /// Direct3D interface.
     IDirect3D9* interface_;
@@ -90,6 +93,8 @@ private:
     D3DTEXTUREADDRESS vAddressModes_[MAX_TEXTURE_UNITS];
     /// Texture W coordinate addressing modes in use.
     D3DTEXTUREADDRESS wAddressModes_[MAX_TEXTURE_UNITS];
+    /// Texture anisotropy setting in use.
+    unsigned maxAnisotropy_[MAX_TEXTURE_UNITS];
     /// Texture border colors in use.
     Color borderColors_[MAX_TEXTURE_UNITS];
     /// Device lost flag.

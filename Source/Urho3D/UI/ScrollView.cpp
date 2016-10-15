@@ -182,7 +182,7 @@ void ScrollView::ApplyAttributes()
     if (scrollPanel_->GetNumChildren())
         SetContentElement(scrollPanel_->GetChild(0));
 
-    OnResize();
+    OnResize(GetSize(), IntVector2::ZERO);
 
     // Reapply view position with proper content element and size
     SetViewPosition(viewPositionAttr_);
@@ -262,7 +262,7 @@ void ScrollView::OnKey(int key, int buttons, int qualifiers)
     }
 }
 
-void ScrollView::OnResize()
+void ScrollView::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
     UpdatePanelSize();
     UpdateViewSize();
@@ -297,7 +297,7 @@ void ScrollView::SetContentElement(UIElement* element)
         SubscribeToEvent(contentElement_, E_RESIZED, URHO3D_HANDLER(ScrollView, HandleElementResized));
     }
 
-    OnResize();
+    OnResize(GetSize(), IntVector2::ZERO);
 }
 
 void ScrollView::SetViewPosition(const IntVector2& position)
@@ -325,7 +325,7 @@ void ScrollView::SetScrollBarsAutoVisible(bool enable)
         scrollBarsAutoVisible_ = enable;
         // Check whether scrollbars should be visible now
         if (enable)
-            OnResize();
+            OnResize(GetSize(), IntVector2::ZERO);
         else
         {
             horizontalScrollBar_->SetVisible(true);
@@ -519,13 +519,13 @@ void ScrollView::HandleScrollBarVisibleChanged(StringHash eventType, VariantMap&
 {
     // Need to recalculate panel size when scrollbar visibility changes
     if (!ignoreEvents_)
-        OnResize();
+        OnResize(GetSize(), IntVector2::ZERO);
 }
 
 void ScrollView::HandleElementResized(StringHash eventType, VariantMap& eventData)
 {
     if (!ignoreEvents_)
-        OnResize();
+        OnResize(GetSize(), IntVector2::ZERO);
 }
 
 void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)

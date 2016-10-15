@@ -125,7 +125,7 @@ void OcclusionBuffer::SetView(Camera* camera)
         return;
 
     view_ = camera->GetView();
-    projection_ = camera->GetProjection(false);
+    projection_ = camera->GetProjection();
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
     farClip_ = camera->GetFarClip();

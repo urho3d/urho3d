@@ -270,8 +270,8 @@ void SplinePath::SetControlPointIdsAttr(const VariantVector& value)
 void SplinePath::SetControlledIdAttr(unsigned value)
 {
     if (value > 0 && value < M_MAX_UNSIGNED)
-
         controlledIdAttr_ = value;
+
     dirty_ = true;
 }
 

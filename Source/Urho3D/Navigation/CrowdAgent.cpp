@@ -72,6 +72,7 @@ static const char* crowdAgentPushinessNames[] = {
     "Low",
     "Medium",
     "High",
+    "None",
     0
 };
 
@@ -239,6 +240,11 @@ void CrowdAgent::UpdateParameters(unsigned scope)
 
             case NAVIGATIONPUSHINESS_HIGH:
                 params.separationWeight = 0.5f;
+                params.collisionQueryRange = radius_ * 1.0f;
+                break;
+
+            case NAVIGATIONPUSHINESS_NONE:
+                params.separationWeight = 0.0f;
                 params.collisionQueryRange = radius_ * 1.0f;
                 break;
             }
@@ -511,6 +517,9 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
     assert (ag);
     if (node_)
     {
+        // Use pointer to self to check for destruction after sending events
+        WeakPtr<CrowdAgent> self(this);
+
         Vector3 newPos(ag->npos);
         Vector3 newVel(ag->vel);
 
@@ -518,6 +527,13 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
         if (newPos != previousPosition_)
         {
             previousPosition_ = newPos;
+
+            if (updateNodePosition_)
+            {
+                ignoreTransformChanges_ = true;
+                node_->SetPosition(newPos);
+                ignoreTransformChanges_ = false;
+            }
 
             using namespace CrowdAgentReposition;
 
@@ -529,14 +545,11 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_ARRIVED] = HasArrived();
             map[P_TIMESTEP] = dt;
             crowdManager_->SendEvent(E_CROWD_AGENT_REPOSITION, map);
+            if (self.Expired())
+                return;
             node_->SendEvent(E_CROWD_AGENT_NODE_REPOSITION, map);
-
-            if (updateNodePosition_)
-            {
-                ignoreTransformChanges_ = true;
-                node_->SetPosition(newPos);
-                ignoreTransformChanges_ = false;
-            }
+            if (self.Expired())
+                return;
         }
 
         // Send a notification event if we've reached the destination
@@ -554,7 +567,11 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             map[P_POSITION] = newPos;
             map[P_VELOCITY] = newVel;
             crowdManager_->SendEvent(E_CROWD_AGENT_STATE_CHANGED, map);
+            if (self.Expired())
+                return;
             node_->SendEvent(E_CROWD_AGENT_NODE_STATE_CHANGED, map);
+            if (self.Expired())
+                return;
 
             // Send a failure event if either state is a failed status
             if (newAgentState == CA_STATE_INVALID || newTargetState == CA_TARGET_FAILED)
@@ -567,7 +584,11 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
                 map[P_POSITION] = newPos;
                 map[P_VELOCITY] = newVel;
                 crowdManager_->SendEvent(E_CROWD_AGENT_FAILURE, map);
+                if (self.Expired())
+                    return;
                 node_->SendEvent(E_CROWD_AGENT_NODE_FAILURE, map);
+                if (self.Expired())
+                    return;
             }
 
             // State may have been altered during the handling of the event
@@ -603,11 +624,18 @@ void CrowdAgent::OnMarkedDirty(Node* node)
         dtCrowdAgent* agent = const_cast<dtCrowdAgent*>(GetDetourCrowdAgent());
         if (agent)
         {
-            memcpy(agent->npos, node->GetWorldPosition().Data(), sizeof(float) * 3);
+            Vector3& agentPos = reinterpret_cast<Vector3&>(agent->npos);
+            Vector3 nodeWorldPos = node->GetWorldPosition();
+            
+            // Only reset position / state if actually changed
+            if (nodeWorldPos != agentPos)
+            {
+                agentPos = nodeWorldPos;
 
-            // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
-            if (agent->state == CA_STATE_INVALID)
-                agent->state = CA_STATE_WALKING;
+                // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
+                if (agent->state == CA_STATE_INVALID)
+                    agent->state = CA_STATE_WALKING;
+            }
         }
     }
 }

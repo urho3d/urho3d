@@ -31,7 +31,7 @@
 namespace Urho3D
 {
 
-/// Physics begin contact.
+/// Physics begin contact. Global event sent by PhysicsWorld2D.
 URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
 {
     URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
@@ -42,7 +42,7 @@ URHO3D_EVENT(E_PHYSICSBEGINCONTACT2D, PhysicsBeginContact2D)
     URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 
-/// Physics end contact.
+/// Physics end contact. Global event sent by PhysicsWorld2D.
 URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
 {
     URHO3D_PARAM(P_WORLD, World);                  // PhysicsWorld2D pointer
@@ -50,6 +50,24 @@ URHO3D_EVENT(E_PHYSICSENDCONTACT2D, PhysicsEndContact2D)
     URHO3D_PARAM(P_BODYB, BodyB);                  // RigidBody2D pointer
     URHO3D_PARAM(P_NODEA, NodeA);                  // Node pointer
     URHO3D_PARAM(P_NODEB, NodeB);                  // Node pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
+}
+
+/// Node begin contact. Sent by scene nodes participating in a collision.
+URHO3D_EVENT(E_NODEBEGINCONTACT2D, NodeBeginContact2D)
+{
+    URHO3D_PARAM(P_BODY, Body);                    // RigidBody2D pointer
+    URHO3D_PARAM(P_OTHERNODE, OtherNode);          // Node pointer
+    URHO3D_PARAM(P_OTHERBODY, OtherBody);          // RigidBody2D pointer
+    URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
+}
+
+/// Node end contact. Sent by scene nodes participating in a collision.
+URHO3D_EVENT(E_NODEENDCONTACT2D, NodeEndContact2D)
+{
+    URHO3D_PARAM(P_BODY, Body);                    // RigidBody2D pointer
+    URHO3D_PARAM(P_OTHERNODE, OtherNode);          // Node pointer
+    URHO3D_PARAM(P_OTHERBODY, OtherBody);          // RigidBody2D pointer
     URHO3D_PARAM(P_CONTACT, Contact);              // b2Contact pointer
 }
 

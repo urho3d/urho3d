@@ -443,21 +443,21 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(offscreenSurface);
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurfaces_[face]->GetSurface(), offscreenSurface);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
         if (FAILED(offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY)))
         {
             URHO3D_LOGD3DERROR("Could not lock surface for getting rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
     }
@@ -527,7 +527,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     if (offscreenSurface)
     {
         offscreenSurface->UnlockRect();
-        offscreenSurface->Release();
+        URHO3D_SAFE_RELEASE(offscreenSurface);
     }
     else
         ((IDirect3DCubeTexture9*)object_.ptr_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
@@ -563,6 +563,17 @@ bool TextureCube::Create()
         break;
     }
 
+    if (multiSample_ > 1)
+    {
+        // Fall back to non-multisampled if unsupported multisampling mode
+        GraphicsImpl* impl = graphics_->GetImpl();
+        if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_, multiSample_))
+        {
+            multiSample_ = 1;
+            autoResolve_ = false;
+        }
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     HRESULT hr = device->CreateCubeTexture(
         (UINT)width_,
@@ -574,8 +585,8 @@ bool TextureCube::Create()
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create cube texture", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 
@@ -585,10 +596,36 @@ bool TextureCube::Create()
     {
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
-                (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
-            if (FAILED(hr))
-                URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+            if (multiSample_ > 1)
+            {
+                // Create the multisampled face rendertarget if necessary
+                HRESULT hr = device->CreateRenderTarget(
+                    (UINT)width_,
+                    (UINT)height_,
+                    (D3DFORMAT)format_,
+                    (D3DMULTISAMPLE_TYPE)multiSample_,
+                    0,
+                    FALSE,
+                    (IDirect3DSurface9**)&renderSurfaces_[i]->surface_,
+                    0);
+                if (FAILED(hr))
+                {
+                    URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
+                    return false;
+                }
+            }
+            else
+            {
+                hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)i, 0,
+                    (IDirect3DSurface9**)&renderSurfaces_[i]->surface_);
+                if (FAILED(hr))
+                {
+                    URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+                    URHO3D_SAFE_RELEASE(renderSurfaces_[i]->surface_);
+                    return false;
+                }
+            }
         }
     }
 

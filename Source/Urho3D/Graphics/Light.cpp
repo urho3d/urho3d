@@ -55,6 +55,7 @@ static const float DEFAULT_SHADOWFADESTART = 0.8f;
 static const float DEFAULT_SHADOWQUANTIZE = 0.5f;
 static const float DEFAULT_SHADOWMINVIEW = 3.0f;
 static const float DEFAULT_SHADOWNEARFARRATIO = 0.002f;
+static const float DEFAULT_SHADOWMAXEXTRUSION = 1000.0f;
 static const float DEFAULT_SHADOWSPLIT = 1000.0f;
 static const float DEFAULT_TEMPERATURE = 6590.0f;
 
@@ -104,6 +105,7 @@ Light::Light(Context* context) :
     shadowIntensity_(0.0f),
     shadowResolution_(1.0f),
     shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
+    shadowMaxExtrusion_(DEFAULT_SHADOWMAXEXTRUSION),
     perVertex_(false),
     usePhysicalValues_(false)
 {
@@ -153,6 +155,7 @@ void Light::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Normal Offset", float, shadowBias_.normalOffset_, DEFAULT_NORMALOFFSET, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, float, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
 }
@@ -343,6 +346,12 @@ void Light::SetAspectRatio(float aspectRatio)
 void Light::SetShadowNearFarRatio(float nearFarRatio)
 {
     shadowNearFarRatio_ = Clamp(nearFarRatio, 0.0f, 0.5f);
+    MarkNetworkUpdate();
+}
+
+void Light::SetShadowMaxExtrusion(float extrusion)
+{
+    shadowMaxExtrusion_ = Max(extrusion, 0.0f);
     MarkNetworkUpdate();
 }
 

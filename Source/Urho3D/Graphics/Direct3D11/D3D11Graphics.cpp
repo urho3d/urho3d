@@ -36,6 +36,7 @@
 #include "../../Graphics/ShaderPrecache.h"
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
@@ -227,6 +228,7 @@ Graphics::Graphics(Context* context) :
     numBatches_(0),
     maxScratchBufferRequest_(0),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/HLSL/"),
     shaderExtension_(".hlsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -729,6 +731,52 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     return true;
 }
 
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+    if (!texture)
+        return false;
+    RenderSurface* surface = texture->GetRenderSurface();
+    if (!surface)
+        return false;
+
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    impl_->deviceContext_->ResolveSubresource(dest, 0, source, 0, (DXGI_FORMAT)texture->GetFormat());
+    return true;
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+    if (!texture)
+        return false;
+
+    texture->SetResolveDirty(false);
+    ID3D11Resource* source = (ID3D11Resource*)texture->GetGPUObject();
+    ID3D11Resource* dest = (ID3D11Resource*)texture->GetResolveTexture();
+    if (!source || !dest)
+        return false;
+
+    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    {
+        // Resolve only the surface(s) that were actually rendered to
+        RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+        if (!surface->IsResolveDirty())
+            continue;
+
+        surface->SetResolveDirty(false);
+        unsigned subResource = D3D11CalcSubresource(0, i, texture->GetLevels());
+        impl_->deviceContext_->ResolveSubresource(dest, subResource, source, subResource, (DXGI_FORMAT)texture->GetFormat());
+    }
+
+    return true;
+}
+
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount || !impl_->shaderProgram_)
@@ -1081,6 +1129,18 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     buffer->SetParameter(i->second_.offset_, sizeof(float), &value);
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    HashMap<StringHash, ShaderParameter>::Iterator i;
+    if (!impl_->shaderProgram_ || (i = impl_->shaderProgram_->parameters_.Find(param)) == impl_->shaderProgram_->parameters_.End())
+        return;
+
+    ConstantBuffer* buffer = i->second_.bufferPtr_;
+    if (!buffer->IsDirty())
+        impl_->dirtyConstantBuffers_.Push(buffer);
+    buffer->SetParameter(i->second_.offset_, sizeof(int), &value);
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     HashMap<StringHash, ShaderParameter>::Iterator i;
@@ -1177,60 +1237,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     buffer->SetParameter(i->second_.offset_, sizeof(Matrix3x4), &matrix);
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
-}
-
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
     if ((unsigned)(size_t)shaderParameterSources_[group] == M_MAX_UNSIGNED || shaderParameterSources_[group] != source)
@@ -1279,6 +1285,17 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
+            }
+        }
     }
 
     if (texture && texture->GetParametersDirty())
@@ -1320,11 +1337,13 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
     }
 }
 
-void Graphics::SetTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
-    if (level != textureAnisotropy_)
+    level = Max(level, 1U);
+
+    if (level != defaultTextureAnisotropy_)
     {
-        textureAnisotropy_ = level;
+        defaultTextureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
 }
@@ -1383,6 +1402,13 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
             {
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
+            }
+            
+            // If multisampled, mark the texture & surface needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
+                parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
             }
         }
     }
@@ -1448,11 +1474,12 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool alphaToCoverage)
 {
-    if (mode != blendMode_)
+    if (mode != blendMode_ || alphaToCoverage != alphaToCoverage_)
     {
         blendMode_ = mode;
+        alphaToCoverage_ = alphaToCoverage;
         impl_->blendStateDirty_ = true;
     }
 }
@@ -1510,6 +1537,15 @@ void Graphics::SetFillMode(FillMode mode)
     if (mode != fillMode_)
     {
         fillMode_ = mode;
+        impl_->rasterizerStateDirty_ = true;
+    }
+}
+
+void Graphics::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        lineAntiAlias_ = enable;
         impl_->rasterizerStateDirty_ = true;
     }
 }
@@ -1651,23 +1687,6 @@ void Graphics::SetClipPlane(bool enable, const Plane& clipPlane, const Matrix3x4
         clipPlane_ = clipPlane.Transformed(viewProj).ToVector4();
         SetShaderParameter(VSP_CLIPPLANE, clipPlane_);
     }
-}
-
-void Graphics::BeginDumpShaders(const String& fileName)
-{
-    shaderPrecache_ = new ShaderPrecache(context_, fileName);
-}
-
-void Graphics::EndDumpShaders()
-{
-    shaderPrecache_.Reset();
-}
-
-void Graphics::PrecacheShaders(Deserializer& source)
-{
-    URHO3D_PROFILE(PrecacheShaders);
-
-    ShaderPrecache::LoadShaders(this, source);
 }
 
 bool Graphics::IsInitialized() const
@@ -2318,7 +2337,7 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_CCW;
     constantDepthBias_ = 0.0f;
@@ -2326,6 +2345,7 @@ void Graphics::ResetCachedState()
     depthTestMode_ = CMP_LESSEQUAL;
     depthWrite_ = true;
     fillMode_ = FILL_SOLID;
+    lineAntiAlias_ = false;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
     stencilTest_ = false;
@@ -2437,7 +2457,7 @@ void Graphics::PrepareDraw()
 
     if (impl_->blendStateDirty_)
     {
-        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (blendMode_ << 1));
+        unsigned newBlendStateHash = (unsigned)((colorWrite_ ? 1 : 0) | (alphaToCoverage_ ? 2 : 0) | (blendMode_ << 2));
         if (newBlendStateHash != impl_->blendStateHash_)
         {
             HashMap<unsigned, ID3D11BlendState*>::Iterator i = impl_->blendStates_.Find(newBlendStateHash);
@@ -2447,7 +2467,7 @@ void Graphics::PrepareDraw()
 
                 D3D11_BLEND_DESC stateDesc;
                 memset(&stateDesc, 0, sizeof stateDesc);
-                stateDesc.AlphaToCoverageEnable = false;
+                stateDesc.AlphaToCoverageEnable = alphaToCoverage_ ? TRUE : FALSE;
                 stateDesc.IndependentBlendEnable = false;
                 stateDesc.RenderTarget[0].BlendEnable = d3dBlendEnable[blendMode_];
                 stateDesc.RenderTarget[0].SrcBlend = d3dSrcBlend[blendMode_];
@@ -2533,8 +2553,8 @@ void Graphics::PrepareDraw()
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
-            (scissorTest_ ? 1 : 0) | (fillMode_ << 1) | (cullMode_ << 3) | ((scaledDepthBias & 0x1fff) << 5) |
-            ((*((unsigned*)&slopeScaledDepthBias_) & 0x1fff) << 18);
+            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) | 
+            ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {
             HashMap<unsigned, ID3D11RasterizerState*>::Iterator i = impl_->rasterizerStates_.Find(newRasterizerStateHash);
@@ -2552,8 +2572,8 @@ void Graphics::PrepareDraw()
                 stateDesc.SlopeScaledDepthBias = slopeScaledDepthBias_;
                 stateDesc.DepthClipEnable = TRUE;
                 stateDesc.ScissorEnable = scissorTest_ ? TRUE : FALSE;
-                stateDesc.MultisampleEnable = TRUE;
-                stateDesc.AntialiasedLineEnable = FALSE;
+                stateDesc.MultisampleEnable = lineAntiAlias_ ? FALSE : TRUE;
+                stateDesc.AntialiasedLineEnable = lineAntiAlias_ ? TRUE : FALSE;
 
                 ID3D11RasterizerState* newRasterizerState = 0;
                 HRESULT hr = impl_->device_->CreateRasterizerState(&stateDesc, &newRasterizerState);

@@ -51,9 +51,11 @@ const int RESOURCE_TYPE_TEXTURE_3D = 19;
 const int RESOURCE_TYPE_CUBEMAP = 20;
 const int RESOURCE_TYPE_PARTICLEEMITTER = 21;
 const int RESOURCE_TYPE_2D_ANIMATION_SET = 22;
+const int RESOURCE_TYPE_GENERIC_XML = 23;
+const int RESOURCE_TYPE_GENERIC_JSON = 24;
 
 // any resource type > 0 is valid
-const int NUMBER_OF_VALID_RESOURCE_TYPES = 22;
+const int NUMBER_OF_VALID_RESOURCE_TYPES = 24;
 
 const StringHash XML_TYPE_SCENE("scene");
 const StringHash XML_TYPE_NODE("node");
@@ -71,6 +73,7 @@ const StringHash XML_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
 const StringHash XML_TYPE_TEXTURE_3D("texture3d");
 const StringHash XML_TYPE_CUBEMAP("cubemap");
 const StringHash XML_TYPE_SPRITER_DATA("spriter_data");
+const StringHash XML_TYPE_GENERIC("xml");
 
 const StringHash JSON_TYPE_SCENE("scene");
 const StringHash JSON_TYPE_NODE("node");
@@ -88,6 +91,7 @@ const StringHash JSON_TYPE_2D_PARTICLE_EFFECT("particleEmitterConfig");
 const StringHash JSON_TYPE_TEXTURE_3D("texture3d");
 const StringHash JSON_TYPE_CUBEMAP("cubemap");
 const StringHash JSON_TYPE_SPRITER_DATA("spriter_data");
+const StringHash JSON_TYPE_GENERIC("json");
 
 const StringHash BINARY_TYPE_SCENE("USCN");
 const StringHash BINARY_TYPE_PACKAGE("UPAK");
@@ -1075,10 +1079,9 @@ int GetResourceType(String path, StringHash &out fileType, bool useCache = false
     return RESOURCE_TYPE_UNKNOWN;
 }
 
-
 int GetResourceType(StringHash fileType)
 {
-    // binary fileTypes
+    // Binary filetypes
     if (fileType == BINARY_TYPE_SCENE)
         return RESOURCE_TYPE_SCENE;
     else if (fileType == BINARY_TYPE_PACKAGE)
@@ -1094,7 +1097,7 @@ int GetResourceType(StringHash fileType)
     else if (fileType == BINARY_TYPE_ANIMATION)
         return RESOURCE_TYPE_ANIMATION;
 
-    // xml fileTypes
+    // XML filetypes
     else if (fileType == XML_TYPE_SCENE)
         return RESOURCE_TYPE_SCENE;
     else if (fileType == XML_TYPE_NODE)
@@ -1127,8 +1130,10 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_CUBEMAP;
     else if (fileType == XML_TYPE_SPRITER_DATA)
         return RESOURCE_TYPE_2D_ANIMATION_SET;
-   
-    // JSON fileTypes
+    else if (fileType == XML_TYPE_GENERIC)
+        return RESOURCE_TYPE_GENERIC_XML;
+
+    // JSON filetypes
     else if (fileType == JSON_TYPE_SCENE)
         return RESOURCE_TYPE_SCENE;
     else if (fileType == JSON_TYPE_NODE)
@@ -1161,8 +1166,10 @@ int GetResourceType(StringHash fileType)
         return RESOURCE_TYPE_CUBEMAP;
     else if (fileType == JSON_TYPE_SPRITER_DATA)
         return RESOURCE_TYPE_2D_ANIMATION_SET;
+    else if (fileType == JSON_TYPE_GENERIC)
+        return RESOURCE_TYPE_GENERIC_JSON;
 
-    // extension fileTypes
+    // Extension filetypes
     else if (fileType == EXTENSION_TYPE_TTF)
         return RESOURCE_TYPE_FONT;
     else if (fileType == EXTENSION_TYPE_OTF)
@@ -1235,7 +1242,7 @@ bool GetExtensionType(String path, StringHash &out fileType)
     else if(type == EXTENSION_TYPE_JPEG)
         fileType = EXTENSION_TYPE_JPEG;
     else if(type == EXTENSION_TYPE_HDR)
-        fileType =  EXTENSION_TYPE_HDR;    
+        fileType =  EXTENSION_TYPE_HDR;
     else if(type == EXTENSION_TYPE_BMP)
         fileType = EXTENSION_TYPE_BMP;
     else if(type == EXTENSION_TYPE_TGA)
@@ -1320,6 +1327,8 @@ bool GetBinaryType(String path, StringHash &out fileType, bool useCache = false)
 
 bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
 {
+    if (GetFileName(path).length == 0)
+        return false; // .gitignore etc.
     String extension = GetExtension(path);
     if (extension == ".txt" || extension == ".json" || extension == ".icns" || extension == ".atlas")
         return false;
@@ -1387,7 +1396,7 @@ bool GetXmlType(String path, StringHash &out fileType, bool useCache = false)
         else if (type == XML_TYPE_SPRITER_DATA)
             fileType = XML_TYPE_SPRITER_DATA;
         else
-            found = false;
+            fileType = XML_TYPE_GENERIC;
     }
     return found;
 }
@@ -1472,7 +1481,8 @@ class BrowserDir
 
     BrowserFile@ AddFile(String name, uint resourceSourceIndex, uint sourceType)
     {
-        String path = resourceKey + "/" + name;
+        String path = resourceKey.length > 0 ? (resourceKey + "/" + name) : name;
+
         BrowserFile@ file = BrowserFile(path, resourceSourceIndex, sourceType);
         files.Push(file);
         return file;

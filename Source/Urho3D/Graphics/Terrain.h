@@ -67,6 +67,16 @@ public:
     bool SetHeightMap(Image* image);
     /// Set material.
     void SetMaterial(Material* material);
+    /// Set north (positive Z) neighbor terrain for seamless LOD changes across terrains.
+    void SetNorthNeighbor(Terrain* north);
+    /// Set south (negative Z) neighbor terrain for seamless LOD changes across terrains.
+    void SetSouthNeighbor(Terrain* south);
+    /// Set west (negative X) neighbor terrain for seamless LOD changes across terrains.
+    void SetWestNeighbor(Terrain* west);
+    /// Set east (positive X) neighbor terrain for seamless LOD changes across terrains.
+    void SetEastNeighbor(Terrain* east);
+    /// Set all neighbor terrains at once.
+    void SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrain* east);
     /// Set draw distance for patches.
     void SetDrawDistance(float distance);
     /// Set shadow draw distance for patches.
@@ -121,12 +131,26 @@ public:
     TerrainPatch* GetPatch(unsigned index) const;
     /// Return patch by patch coordinates.
     TerrainPatch* GetPatch(int x, int z) const;
+    /// Return patch by patch coordinates including neighbor terrains.
+    TerrainPatch* GetNeighborPatch(int x, int z) const;
     /// Return height at world coordinates.
     float GetHeight(const Vector3& worldPosition) const;
     /// Return normal at world coordinates.
     Vector3 GetNormal(const Vector3& worldPosition) const;
     /// Convert world position to heightmap pixel position. Note that the internal height data representation is reversed vertically, but in the heightmap image north is at the top.
     IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
+
+    /// Return north neighbor terrain.
+    Terrain* GetNorthNeighbor() const { return north_; }
+    
+    /// Return south neighbor terrain.
+    Terrain* GetSouthNeighbor() const { return south_; }
+    
+    /// Return west neighbor terrain.
+    Terrain* GetWestNeighbor() const { return west_; }
+    
+    /// Return east neighbor terrain.
+    Terrain* GetEastNeighbor() const { return east_; }
 
     /// Return raw height data.
     SharedArrayPtr<float> GetHeightData() const { return heightData_; }
@@ -202,11 +226,15 @@ private:
     /// Calculate LOD errors for a patch.
     void CalculateLodErrors(TerrainPatch* patch);
     /// Set neighbors for a patch.
-    void SetNeighbors(TerrainPatch* patch);
+    void SetPatchNeighbors(TerrainPatch* patch);
     /// Set heightmap image and optionally recreate the geometry immediately. Return true if successful.
     bool SetHeightMapInternal(Image* image, bool recreateNow);
     /// Handle heightmap image reload finished.
     void HandleHeightMapReloadFinished(StringHash eventType, VariantMap& eventData);
+    /// Handle neighbor terrain geometry being created. Update the edge patch neighbors as necessary.
+    void HandleNeighborTerrainCreated(StringHash eventType, VariantMap& eventData);
+    /// Update edge patch neighbors when neighbor terrain(s) change or are recreated.
+    void UpdateEdgePatchNeighbors();
 
     /// Shared index buffer.
     SharedPtr<IndexBuffer> indexBuffer_;
@@ -222,6 +250,14 @@ private:
     Vector<WeakPtr<TerrainPatch> > patches_;
     /// Draw ranges for different LODs and stitching combinations.
     PODVector<Pair<unsigned, unsigned> > drawRanges_;
+    /// North neighbor terrain.
+    WeakPtr<Terrain> north_;
+    /// South neighbor terrain.
+    WeakPtr<Terrain> south_;
+    /// West neighbor terrain.
+    WeakPtr<Terrain> west_;
+    /// East neighbor terrain.
+    WeakPtr<Terrain> east_;
     /// Vertex and height spacing.
     Vector3 spacing_;
     /// Vertex and height sacing at the time of last update.
@@ -272,8 +308,18 @@ private:
     float lodBias_;
     /// Maximum lights.
     unsigned maxLights_;
+    /// Node ID of north neighbor.
+    unsigned northID_;
+    /// Node ID of south neighbor.
+    unsigned southID_;
+    /// Node ID of west neighbor.
+    unsigned westID_;
+    /// Node ID of east neighbor.
+    unsigned eastID_;
     /// Terrain needs regeneration flag.
     bool recreateTerrain_;
+    /// Terrain neighbor attributes dirty flag.
+    bool neighborsDirty_;
 };
 
 }

@@ -160,8 +160,8 @@ DecalSet::DecalSet(Context* context) :
     numIndices_(0),
     maxVertices_(DEFAULT_MAX_VERTICES),
     maxIndices_(DEFAULT_MAX_INDICES),
+    optimizeBufferSize_(false),
     skinned_(false),
-    bufferSizeDirty_(true),
     bufferDirty_(true),
     boundingBoxDirty_(true),
     skinningDirty_(false),
@@ -188,6 +188,7 @@ void DecalSet::RegisterObject(Context* context)
         AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Vertices", GetMaxVertices, SetMaxVertices, unsigned, DEFAULT_MAX_VERTICES, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Indices", GetMaxIndices, SetMaxIndices, unsigned, DEFAULT_MAX_INDICES, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Optimize Buffer Size", GetOptimizeBufferSize, SetOptimizeBufferSize, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
@@ -229,9 +230,6 @@ void DecalSet::UpdateBatches(const FrameInfo& frame)
 
 void DecalSet::UpdateGeometry(const FrameInfo& frame)
 {
-    if (bufferSizeDirty_)
-        UpdateBufferSize();
-
     if (bufferDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         UpdateBuffers();
 
@@ -241,7 +239,7 @@ void DecalSet::UpdateGeometry(const FrameInfo& frame)
 
 UpdateGeometryType DecalSet::GetUpdateGeometryType()
 {
-    if (bufferDirty_ || bufferSizeDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
+    if (bufferDirty_ || vertexBuffer_->IsDataLost() || indexBuffer_->IsDataLost())
         return UPDATE_MAIN_THREAD;
     else if (skinningDirty_)
         return UPDATE_WORKER_THREAD;
@@ -262,7 +260,8 @@ void DecalSet::SetMaxVertices(unsigned num)
 
     if (num != maxVertices_)
     {
-        bufferSizeDirty_ = true;
+        if (!optimizeBufferSize_)
+            bufferDirty_ = true;
         maxVertices_ = num;
 
         while (decals_.Size() && numVertices_ > maxVertices_)
@@ -279,11 +278,23 @@ void DecalSet::SetMaxIndices(unsigned num)
 
     if (num != maxIndices_)
     {
-        bufferSizeDirty_ = true;
+        if (!optimizeBufferSize_)
+            bufferDirty_ = true;
         maxIndices_ = num;
 
         while (decals_.Size() && numIndices_ > maxIndices_)
             RemoveDecals(1);
+
+        MarkNetworkUpdate();
+    }
+}
+
+void DecalSet::SetOptimizeBufferSize(bool enable)
+{
+    if (enable != optimizeBufferSize_)
+    {
+        optimizeBufferSize_ = enable;
+        bufferDirty_ = true;
 
         MarkNetworkUpdate();
     }
@@ -311,7 +322,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     {
         RemoveAllDecals();
         skinned_ = animatedModel != 0;
-        bufferSizeDirty_ = true;
+        bufferDirty_ = true;
     }
 
     // Center the decal frustum on the world position
@@ -583,7 +594,6 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
     UpdateEventSubscription(true);
     UpdateBatch();
     MarkDecalsDirty();
-    bufferSizeDirty_ = true;
 }
 
 ResourceRef DecalSet::GetMaterialAttr() const
@@ -969,7 +979,7 @@ void DecalSet::TransformVertices(Decal& decal, const Matrix3x4& transform)
     for (PODVector<DecalVertex>::Iterator i = decal.vertices_.Begin(); i != decal.vertices_.End(); ++i)
     {
         i->position_ = transform * i->position_;
-        i->normal_ = (transform * i->normal_).Normalized();
+        i->normal_ = (transform * Vector4(i->normal_, 0.0f)).Normalized();
     }
 }
 
@@ -1000,22 +1010,21 @@ void DecalSet::CalculateBoundingBox()
     boundingBoxDirty_ = false;
 }
 
-void DecalSet::UpdateBufferSize()
-{
-    vertexBuffer_->SetSize(maxVertices_, skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK);
-    indexBuffer_->SetSize(maxIndices_, false);
-    geometry_->SetVertexBuffer(0, vertexBuffer_);
-
-    bufferDirty_ = true;
-    bufferSizeDirty_ = false;
-}
-
 void DecalSet::UpdateBuffers()
 {
+    unsigned newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
+    unsigned newVBSize = optimizeBufferSize_ ? numVertices_ : maxVertices_;
+    unsigned newIBSize = optimizeBufferSize_ ? numIndices_ : maxIndices_;
+    
+    if (vertexBuffer_->GetElementMask() != newElementMask || vertexBuffer_->GetVertexCount() != newVBSize)
+        vertexBuffer_->SetSize(newVBSize, newElementMask);
+    if (indexBuffer_->GetIndexCount() != newIBSize)
+        indexBuffer_->SetSize(newIBSize, false);
+    geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
-
-    float* vertices = (float*)vertexBuffer_->Lock(0, numVertices_);
-    unsigned short* indices = (unsigned short*)indexBuffer_->Lock(0, numIndices_);
+    
+    float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : (float*)0;
+    unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : (unsigned short*)0;
 
     if (vertices && indices)
     {

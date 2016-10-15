@@ -113,8 +113,8 @@
         float energyFactor = mix(roughness, 1.0, 1.0 / 1.51);
         float fd90 = energyBias + 2.0 * VdotH * VdotH * roughness;
         float f0 = 1.0;
-        float lightScatter = f0 + (fd90 - f0) * pow(1.0f - NdotL, 5.0f);
-        float viewScatter = f0 + (fd90 - f0) * pow(1.0f - NdotV, 5.0f);
+        float lightScatter = f0 + (fd90 - f0) * pow(1.0 - NdotL, 5.0);
+        float viewScatter = f0 + (fd90 - f0) * pow(1.0 - NdotV, 5.0);
 
         return diffuseColor * lightScatter * viewScatter * energyFactor;
     }

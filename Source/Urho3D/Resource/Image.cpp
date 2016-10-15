@@ -2029,6 +2029,35 @@ void Image::PrecalculateLevels()
     }
 }
 
+void Image::CleanupLevels()
+{
+    nextLevel_.Reset();
+}
+
+void Image::GetLevels(PODVector<Image*>& levels)
+{
+    levels.Clear();
+
+    Image* image = this;
+    while (image)
+    {
+        levels.Push(image);
+        image = image->nextLevel_;
+    }
+}
+
+void Image::GetLevels(PODVector<const Image*>& levels) const
+{
+    levels.Clear();
+
+    const Image* image = this;
+    while (image)
+    {
+        levels.Push(image);
+        image = image->nextLevel_;
+    }
+}
+
 unsigned char* Image::GetImageData(Deserializer& source, int& width, int& height, unsigned& components)
 {
     unsigned dataSize = source.GetSize();

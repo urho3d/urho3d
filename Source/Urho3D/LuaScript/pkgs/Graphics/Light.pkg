@@ -61,6 +61,7 @@ class Light : public Drawable
     void SetShadowIntensity(float intensity);
     void SetShadowResolution(float resolution);
     void SetShadowNearFarRatio(float nearFarRatio);
+    void SetShadowMaxExtrusion(float extrusion);
     void SetRampTexture(Texture* texture);
     void SetShapeTexture(Texture* texture);
 
@@ -85,6 +86,7 @@ class Light : public Drawable
     float GetShadowIntensity() const;
     float GetShadowResolution() const;
     float GetShadowNearFarRatio() const;
+    float GetShadowMaxExtrusion() const;
     Texture* GetRampTexture() const;
     Texture* GetShapeTexture() const;
     Frustum GetFrustum() const;
@@ -109,6 +111,7 @@ class Light : public Drawable
     tolua_property__get_set float shadowIntensity;
     tolua_property__get_set float shadowResolution;
     tolua_property__get_set float shadowNearFarRatio;
+    tolua_property__get_set float shadowMaxExtrusion;
     tolua_property__get_set Texture* rampTexture;
     tolua_property__get_set Texture* shapeTexture;
     tolua_readonly tolua_property__get_set Frustum frustum;

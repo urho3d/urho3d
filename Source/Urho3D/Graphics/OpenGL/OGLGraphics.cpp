@@ -37,6 +37,7 @@
 #include "../../Graphics/ShaderProgram.h"
 #include "../../Graphics/ShaderVariation.h"
 #include "../../Graphics/Texture2D.h"
+#include "../../Graphics/TextureCube.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../IO/File.h"
 #include "../../IO/Log.h"
@@ -253,6 +254,7 @@ Graphics::Graphics(Context* context_) :
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
     hiresShadowMapFormat_(GL_DEPTH_COMPONENT24),
     defaultTextureFilterMode_(FILTER_TRILINEAR),
+    defaultTextureAnisotropy_(4),
     shaderPath_("Shaders/GLSL/"),
     shaderExtension_(".glsl"),
     orientations_("LandscapeLeft LandscapeRight"),
@@ -747,6 +749,130 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     return true;
 }
 
+bool Graphics::ResolveToTexture(Texture2D* texture)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!texture)
+        return false;
+    RenderSurface* surface = texture->GetRenderSurface();
+    if (!surface || !surface->GetRenderBuffer())
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+
+    texture->SetResolveDirty(false);
+    surface->SetResolveDirty(false);
+
+    // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
+    if (!impl_->resolveSrcFBO_)
+        impl_->resolveSrcFBO_ = CreateFramebuffer();
+    if (!impl_->resolveDestFBO_)
+        impl_->resolveDestFBO_ = CreateFramebuffer();
+
+    if (!gl3Support)
+    {
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
+        glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+            surface->GetRenderBuffer());
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
+        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texture->GetGPUObjectName(),
+            0);
+        glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    }
+    else
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
+        glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetGPUObjectName(), 0);
+        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), 
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    // Restore previously bound FBO
+    BindFramebuffer(impl_->boundFBO_);
+    return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
+}
+
+bool Graphics::ResolveToTexture(TextureCube* texture)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (!texture)
+        return false;
+
+    URHO3D_PROFILE(ResolveToTexture);
+
+    texture->SetResolveDirty(false);
+
+    // Use separate FBOs for resolve to not disturb the currently set rendertarget(s)
+    if (!impl_->resolveSrcFBO_)
+        impl_->resolveSrcFBO_ = CreateFramebuffer();
+    if (!impl_->resolveDestFBO_)
+        impl_->resolveDestFBO_ = CreateFramebuffer();
+
+    if (!gl3Support)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            // Resolve only the surface(s) that were actually rendered to
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+
+            surface->SetResolveDirty(false);
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, impl_->resolveSrcFBO_);
+            glFramebufferRenderbufferEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT,
+                surface->GetRenderBuffer());
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, impl_->resolveDestFBO_);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebufferEXT(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+    }
+    else
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        {
+            RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
+            if (!surface->IsResolveDirty())
+                continue;
+            
+            surface->SetResolveDirty(false);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
+            glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                texture->GetGPUObjectName(), 0);
+            glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
+                GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    }
+
+    // Restore previously bound FBO
+    BindFramebuffer(impl_->boundFBO_);
+    return true;
+#else
+    // Not supported on GLES
+    return false;
+#endif
+}
+
 void Graphics::Draw(PrimitiveType type, unsigned vertexStart, unsigned vertexCount)
 {
     if (!vertexCount)
@@ -1123,10 +1249,30 @@ void Graphics::SetShaderParameter(StringHash param, float value)
     }
 }
 
+void Graphics::SetShaderParameter(StringHash param, int value)
+{
+    if (impl_->shaderProgram_)
+    {
+        const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
+        if (info)
+        {
+            if (info->bufferPtr_)
+            {
+                ConstantBuffer* buffer = info->bufferPtr_;
+                if (!buffer->IsDirty())
+                    impl_->dirtyConstantBuffers_.Push(buffer);
+                buffer->SetParameter(info->offset_, sizeof(int), &value);
+                return;
+            }
+
+            glUniform1i(info->location_, value);
+        }
+    }
+}
+
 void Graphics::SetShaderParameter(StringHash param, bool value)
 {
     // \todo Not tested
-
     if (impl_->shaderProgram_)
     {
         const ShaderParameter* info = impl_->shaderProgram_->GetParameter(param);
@@ -1340,60 +1486,6 @@ void Graphics::SetShaderParameter(StringHash param, const Matrix3x4& matrix)
     }
 }
 
-void Graphics::SetShaderParameter(StringHash param, const Variant& value)
-{
-    switch (value.GetType())
-    {
-    case VAR_BOOL:
-        SetShaderParameter(param, value.GetBool());
-        break;
-
-    case VAR_FLOAT:
-        SetShaderParameter(param, value.GetFloat());
-        break;
-
-    case VAR_VECTOR2:
-        SetShaderParameter(param, value.GetVector2());
-        break;
-
-    case VAR_VECTOR3:
-        SetShaderParameter(param, value.GetVector3());
-        break;
-
-    case VAR_VECTOR4:
-        SetShaderParameter(param, value.GetVector4());
-        break;
-
-    case VAR_COLOR:
-        SetShaderParameter(param, value.GetColor());
-        break;
-
-    case VAR_MATRIX3:
-        SetShaderParameter(param, value.GetMatrix3());
-        break;
-
-    case VAR_MATRIX3X4:
-        SetShaderParameter(param, value.GetMatrix3x4());
-        break;
-
-    case VAR_MATRIX4:
-        SetShaderParameter(param, value.GetMatrix4());
-        break;
-
-    case VAR_BUFFER:
-        {
-            const PODVector<unsigned char>& buffer = value.GetBuffer();
-            if (buffer.Size() >= sizeof(float))
-                SetShaderParameter(param, reinterpret_cast<const float*>(&buffer[0]), buffer.Size() / sizeof(float));
-        }
-        break;
-
-    default:
-        // Unsupported parameter type, do nothing
-        break;
-    }
-}
-
 bool Graphics::NeedParameterUpdate(ShaderParameterGroup group, const void* source)
 {
     return impl_->shaderProgram_ ? impl_->shaderProgram_->NeedParameterUpdate(group, source) : false;
@@ -1439,6 +1531,17 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     {
         if (renderTargets_[0] && renderTargets_[0]->GetParentTexture() == texture)
             texture = texture->GetBackupTexture();
+        else
+        {
+            // Resolve multisampled texture now as necessary
+            if (texture->GetMultiSample() > 1 && texture->GetAutoResolve() && texture->IsResolveDirty())
+            {
+                if (texture->GetType() == Texture2D::GetTypeStatic())
+                    ResolveToTexture(static_cast<Texture2D*>(texture));
+                if (texture->GetType() == TextureCube::GetTypeStatic())
+                    ResolveToTexture(static_cast<TextureCube*>(texture));
+            }
+        }
     }
 
     if (textures_[index] != texture)
@@ -1511,11 +1614,13 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
     }
 }
 
-void Graphics::SetTextureAnisotropy(unsigned level)
+void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
-    if (level != textureAnisotropy_)
+    level = Max(level, 1U);
+    
+    if (level != defaultTextureAnisotropy_)
     {
-        textureAnisotropy_ = level;
+        defaultTextureAnisotropy_ = level;
         SetTextureParametersDirty();
     }
 }
@@ -1569,6 +1674,13 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
+
+            // If multisampled, mark the texture & surface needing resolve
+            if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
+            {
+                parentTexture->SetResolveDirty(true);
+                renderTarget->SetResolveDirty(true);
+            }
         }
 
         impl_->fboDirty_ = true;
@@ -1588,7 +1700,9 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 {
     // If we are using a rendertarget texture, it is required in OpenGL to also have an own depth-stencil
     // Create a new depth-stencil texture as necessary to be able to provide similar behaviour as Direct3D9
-    if (renderTargets_[0] && !depthStencil)
+    // Only do this for non-multisampled rendertargets; when using multisampled target a similarly multisampled
+    // depth-stencil should also be provided (backbuffer depth isn't compatible)
+    if (renderTargets_[0] && renderTargets_[0]->GetMultiSample() == 1 && !depthStencil)
     {
         int width = renderTargets_[0]->GetWidth();
         int height = renderTargets_[0]->GetHeight();
@@ -1652,7 +1766,7 @@ void Graphics::SetViewport(const IntRect& rect)
     SetScissorTest(false);
 }
 
-void Graphics::SetBlendMode(BlendMode mode)
+void Graphics::SetBlendMode(BlendMode mode, bool alphaToCoverage)
 {
     if (mode != blendMode_)
     {
@@ -1666,6 +1780,16 @@ void Graphics::SetBlendMode(BlendMode mode)
         }
 
         blendMode_ = mode;
+    }
+
+    if (alphaToCoverage != alphaToCoverage_)
+    {
+        if (alphaToCoverage)
+            glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        else
+            glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+        alphaToCoverage_ = alphaToCoverage;
     }
 }
 
@@ -1707,9 +1831,8 @@ void Graphics::SetDepthBias(float constantBias, float slopeScaledBias)
         if (slopeScaledBias != 0.0f)
         {
             // OpenGL constant bias is unreliable and dependant on depth buffer bitdepth, apply in the projection matrix instead
-            float adjustedSlopeScaledBias = slopeScaledBias + 1.0f;
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(adjustedSlopeScaledBias, 0.0f);
+            glPolygonOffset(slopeScaledBias, 0.0f);
         }
         else
             glDisable(GL_POLYGON_OFFSET_FILL);
@@ -1747,6 +1870,20 @@ void Graphics::SetFillMode(FillMode mode)
     {
         glPolygonMode(GL_FRONT_AND_BACK, glFillMode[mode]);
         fillMode_ = mode;
+    }
+#endif
+}
+
+void Graphics::SetLineAntiAlias(bool enable)
+{
+#ifndef GL_ES_VERSION_2_0
+    if (enable != lineAntiAlias_)
+    {
+        if (enable)
+            glEnable(GL_LINE_SMOOTH);
+        else
+            glDisable(GL_LINE_SMOOTH);
+        lineAntiAlias_ = enable;
     }
 #endif
 }
@@ -1908,23 +2045,6 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
         }
     }
 #endif
-}
-
-void Graphics::BeginDumpShaders(const String& fileName)
-{
-    shaderPrecache_ = new ShaderPrecache(context_, fileName);
-}
-
-void Graphics::EndDumpShaders()
-{
-    shaderPrecache_.Reset();
-}
-
-void Graphics::PrecacheShaders(Deserializer& source)
-{
-    URHO3D_PROFILE(PrecacheShaders);
-
-    ShaderPrecache::LoadShaders(this, source);
 }
 
 bool Graphics::IsInitialized() const
@@ -2175,7 +2295,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
                     BindFramebuffer(i->second_.fbo_);
                     currentFBO = i->second_.fbo_;
                 }
-                BindColorAttachment(j, GL_TEXTURE_2D, 0);
+                BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
                 i->second_.colorAttachments_[j] = 0;
                 // Mark drawbuffer bits to need recalculation
                 i->second_.drawBuffers_ = M_MAX_UNSIGNED;
@@ -2831,25 +2951,38 @@ void Graphics::PrepareDraw()
             {
                 Texture* texture = renderTargets_[j]->GetParentTexture();
 
-                // If texture's parameters are dirty, update before attaching
-                if (texture->GetParametersDirty())
+                // Bind either a renderbuffer or texture, depending on what is available
+                unsigned renderBufferID = renderTargets_[j]->GetRenderBuffer();
+                if (!renderBufferID)
                 {
-                    SetTextureForUpdate(texture);
-                    texture->UpdateParameters();
-                    SetTexture(0, 0);
-                }
+                    // If texture's parameters are dirty, update before attaching
+                    if (texture->GetParametersDirty())
+                    {
+                        SetTextureForUpdate(texture);
+                        texture->UpdateParameters();
+                        SetTexture(0, 0);
+                    }
 
-                if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    {
+                        BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObjectName(), false);
+                        i->second_.colorAttachments_[j] = renderTargets_[j];
+                    }
+                }
+                else
                 {
-                    BindColorAttachment(j, renderTargets_[j]->GetTarget(), texture->GetGPUObjectName());
-                    i->second_.colorAttachments_[j] = renderTargets_[j];
+                    if (i->second_.colorAttachments_[j] != renderTargets_[j])
+                    {
+                        BindColorAttachment(j, renderTargets_[j]->GetTarget(), renderBufferID, true);
+                        i->second_.colorAttachments_[j] = renderTargets_[j];
+                    }
                 }
             }
             else
             {
                 if (i->second_.colorAttachments_[j])
                 {
-                    BindColorAttachment(j, GL_TEXTURE_2D, 0);
+                    BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
                     i->second_.colorAttachments_[j] = 0;
                 }
             }
@@ -3013,9 +3146,18 @@ void Graphics::CleanupFramebuffers()
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
              i != impl_->frameBuffers_.End(); ++i)
             DeleteFramebuffer(i->second_.fbo_);
+
+        if (impl_->resolveSrcFBO_)
+            DeleteFramebuffer(impl_->resolveSrcFBO_);
+        if (impl_->resolveDestFBO_)
+            DeleteFramebuffer(impl_->resolveDestFBO_);
     }
     else
+    {
         impl_->boundFBO_ = 0;
+        impl_->resolveSrcFBO_ = 0;
+        impl_->resolveDestFBO_ = 0;
+    }
 
     impl_->frameBuffers_.Clear();
 }
@@ -3040,13 +3182,14 @@ void Graphics::ResetCachedState()
     vertexShader_ = 0;
     pixelShader_ = 0;
     blendMode_ = BLEND_REPLACE;
-    textureAnisotropy_ = 1;
+    alphaToCoverage_ = false;
     colorWrite_ = true;
     cullMode_ = CULL_NONE;
     constantDepthBias_ = 0.0f;
     slopeScaledDepthBias_ = 0.0f;
     depthTestMode_ = CMP_ALWAYS;
     depthWrite_ = false;
+    lineAntiAlias_ = false;
     fillMode_ = FILL_SOLID;
     scissorTest_ = false;
     scissorRect_ = IntRect::ZERO;
@@ -3142,14 +3285,27 @@ void Graphics::BindFramebuffer(unsigned fbo)
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 }
 
-void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object)
+void Graphics::BindColorAttachment(unsigned index, unsigned target, unsigned object, bool isRenderBuffer)
 {
+    if (!object)
+        isRenderBuffer = false;
+
 #ifndef GL_ES_VERSION_2_0
     if (!gl3Support)
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, target, object, 0);
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, target, object, 0);
+        else
+            glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + index, GL_RENDERBUFFER_EXT, object);
+    }
     else
 #endif
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, object, 0);
+    {
+        if (!isRenderBuffer)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, target, object, 0);
+        else
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_RENDERBUFFER, object);
+    }
 }
 
 void Graphics::BindDepthAttachment(unsigned object, bool isRenderBuffer)

@@ -34,7 +34,7 @@ class Animation;
 struct Bone;
 
 /// Control data for an animation.
-struct AnimationControl
+struct URHO3D_API AnimationControl
 {
     /// Construct with defaults.
     AnimationControl() :
@@ -134,6 +134,8 @@ public:
 
     /// Return whether an animation is active. Note that non-looping animations that are being clamped at the end also return true.
     bool IsPlaying(const String& name) const;
+    /// Return whether any animation is active on a specific layer.
+    bool IsPlaying(unsigned char layer) const;
     /// Return whether an animation is fading in.
     bool IsFadingIn(const String& name) const;
     /// Return whether an animation is fading out.
@@ -168,8 +170,10 @@ public:
     bool GetRemoveOnCompletion(const String& name) const;
     /// Find an animation state by animation name.
     AnimationState* GetAnimationState(const String& name) const;
-    /// Find an animation state by animation name hash
+    /// Find an animation state by animation name hash.
     AnimationState* GetAnimationState(StringHash nameHash) const;
+    /// Return the animation control structures for inspection.
+    const Vector<AnimationControl>& GetAnimations() const { return animations_; }
 
     /// Set animation control structures attribute.
     void SetAnimationsAttr(const VariantVector& value);
