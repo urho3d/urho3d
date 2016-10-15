@@ -668,6 +668,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetTransform(const Matrix3x4&in)", asMETHODPR(T, SetTransform, (const Matrix3x4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float)", asMETHODPR(T, SetTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(T, SetTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float, float)", asMETHODPR(T, SetTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);

@@ -503,6 +503,11 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
     MarkNetworkUpdate();
 }
 
+void Node::SetTransform(const Matrix3x4& matrix)
+{
+    SetTransform(matrix.Translation(), matrix.Rotation(), matrix.Scale());
+}
+
 void Node::SetWorldPosition(const Vector3& position)
 {
     SetPosition((parent_ == scene_ || !parent_) ? position : parent_->GetWorldTransform().Inverse() * position);

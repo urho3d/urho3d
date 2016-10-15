@@ -161,6 +161,8 @@ public:
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// Set both position, rotation and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Set node transformation in parent space as an atomic operation.
+    void SetTransform(const Matrix3x4& matrix);
 
     /// Set both position and rotation in parent space as an atomic operation (for Urho2D).
     void SetTransform2D(const Vector2& position, float rotation) { SetTransform(Vector3(position), Quaternion(rotation)); }
