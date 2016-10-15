@@ -27,6 +27,10 @@
 #include <cassert>
 #include <cstddef>
 
+#if URHO3D_CXX11
+#include <type_traits>
+#endif
+
 namespace Urho3D
 {
 
@@ -515,5 +519,167 @@ template <class T, class U> WeakPtr<T> DynamicCast(const WeakPtr<U>& ptr)
     ret.DynamicCast(ptr);
     return ret;
 }
+
+/// Unique pointer template class.
+template <class T> class UniquePtr
+{
+public:
+    /// Construct empty.
+    UniquePtr() : ptr_(0) { }
+
+    /// Construct from pointer.
+    explicit UniquePtr(T* ptr) : ptr_(ptr) { }
+
+    /// Assign from pointer.
+    UniquePtr& operator = (T* ptr)
+    {
+        Reset(ptr);
+        return *this;
+    }
+
+#if URHO3D_CXX11
+    /// Construct empty.
+    UniquePtr(std::nullptr_t) { }
+
+    /// Move-construct from UniquePtr.
+    UniquePtr(UniquePtr && up) : ptr_(up.Detach()) { }
+
+    /// Move-assign from UniquePtr
+    UniquePtr& operator = (UniquePtr && up)
+    {
+        Reset(up.Detach());
+        return *this;
+    }
+#endif
+
+    /// Point to the object.
+    T* operator ->() const
+    {
+        assert(ptr_);
+        return ptr_;
+    }
+
+    /// Dereference the object.
+    T& operator *() const
+    {
+        assert(ptr_);
+        return *ptr_;
+    }
+
+    /// Test for less than with another unique pointer.
+    template <class U>
+    bool operator <(const UniquePtr<U>& rhs) const { return ptr_ < rhs.ptr_; }
+
+    /// Test for equality with another unique pointer.
+    template <class U>
+    bool operator ==(const UniquePtr<U>& rhs) const { return ptr_ == rhs.ptr_; }
+
+    /// Test for inequality with another unique pointer.
+    template <class U>
+    bool operator !=(const UniquePtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
+
+    /// Swap with another UniquePtr.
+    void Swap(UniquePtr& up) { Swap(ptr_, up.ptr_); }
+
+    /// Detach pointer from UniquePtr without destroying.
+    T* Detach()
+    {
+        T* ptr = ptr_;
+        ptr_ = 0;
+        return ptr;
+    }
+
+    /// Check if the pointer is null.
+    bool Null() const { return ptr_ == 0; }
+
+    /// Check if the pointer is not null.
+    bool NotNull() const { return ptr_ != 0; }
+
+    /// Return the raw pointer.
+    T* Get() const { return ptr_; }
+
+    /// Reset.
+    void Reset(T* ptr = 0)
+    {
+        if (ptr_)
+        {
+            delete ptr_;
+        }
+        ptr_ = ptr;
+    }
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return static_cast<unsigned>((static_cast<size_t>(ptr_) / sizeof(T))); }
+
+    /// Destruct.
+    ~UniquePtr()
+    {
+        Reset();
+    }
+
+private:
+    T* ptr_;
+
+};
+
+/// Swap two UniquePtr-s.
+template <class T> void Swap(UniquePtr<T>& first, UniquePtr<T>& second)
+{
+    first.Swap(second);
+}
+
+#if URHO3D_CXX11
+
+/// Construct UniquePtr.
+template <class T, class ... Args> UniquePtr<T> MakeUnique(Args && ... args)
+{
+    return UniquePtr<T>(new T(std::forward<Args>(args)...));
+}
+
+/// Construct SharedPtr.
+template <class T, class ... Args> SharedPtr<T> MakeShared(Args && ... args)
+{
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+
+#else
+
+/// Construct UniquePtr without arguments.
+template <class T> UniquePtr<T> MakeUnique()
+{
+    return UniquePtr<T>(new T());
+}
+
+/// Construct UniquePtr with one argument.
+template <class T, class U> UniquePtr<T> MakeUnique(U& arg)
+{
+    return UniquePtr<T>(new T(arg));
+}
+
+/// Construct UniquePtr with one argument.
+template <class T, class U> UniquePtr<T> MakeUnique(const U& arg)
+{
+    return UniquePtr<T>(new T(arg));
+}
+
+/// Construct SharedPtr without arguments.
+template <class T> SharedPtr<T> MakeShared()
+{
+    return SharedPtr<T>(new T());
+}
+
+/// Construct SharedPtr with one argument.
+template <class T, class U> SharedPtr<T> MakeShared(U& arg)
+{
+    return SharedPtr<T>(new T(arg));
+}
+
+/// Construct SharedPtr with one argument.
+template <class T, class U> SharedPtr<T> MakeShared(const U& arg)
+{
+    return SharedPtr<T>(new T(arg));
+}
+
+#endif
 
 }
