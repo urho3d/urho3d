@@ -206,6 +206,9 @@ public:
         return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_);
     }
 
+    /// Project vector onto axis.
+    float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(axis.Normalized()); }
+
     /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
     {

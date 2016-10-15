@@ -168,6 +168,9 @@ public:
     /// Calculate absolute dot product.
     float AbsDotProduct(const Vector2& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_); }
 
+    /// Project vector onto axis.
+    float ProjectOntoAxis(const Vector2& axis) const { return DotProduct(axis.Normalized()); }
+
     /// Returns the angle between this vector and another vector in degrees.
     float Angle(const Vector2& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length())); }
 

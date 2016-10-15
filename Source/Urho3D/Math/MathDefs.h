@@ -71,6 +71,10 @@ inline bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<T>::epsilon(
 template <class T, class U>
 inline T Lerp(T lhs, T rhs, U t) { return lhs * (1.0 - t) + rhs * t; }
 
+/// Inverse linear interpolation between two values.
+template <class T>
+inline T InverseLerp(T lhs, T rhs, T x) { return (x - lhs) / (rhs - lhs); }
+
 /// Return the smaller of two values.
 template <class T, class U>
 inline T Min(T lhs, U rhs) { return lhs < rhs ? lhs : rhs; }

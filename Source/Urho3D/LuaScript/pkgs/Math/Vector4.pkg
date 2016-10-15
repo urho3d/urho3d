@@ -20,6 +20,7 @@ class Vector4
 
     float DotProduct(const Vector4& rhs) const;
     float AbsDotProduct(const Vector4& rhs) const;
+    float ProjectOntoAxis(const Vector3& axis) const;
     Vector4 Abs() const;
     Vector4 Lerp(const Vector4& rhs, float t) const;
     bool Equals(const Vector4& rhs) const;
