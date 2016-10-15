@@ -316,7 +316,7 @@ void LoadChildUIElement(const String&in fileName)
 
     suppressUIElementChanges = true;
 
-    if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle))
+    if (editUIElement.LoadChildXML(xmlFile, uiElementDefaultStyle !is null ? uiElementDefaultStyle : uiStyle) !is null)
     {
         XMLElement rootElem = xmlFile.root;
         uint index = rootElem.HasAttribute("index") ? rootElem.GetUInt("index") : editUIElement.numChildren - 1;
@@ -559,7 +559,7 @@ bool UIElementPaste(bool duplication = false)
                 pasteElement = editUIElement;
         }
 
-        if (pasteElement.LoadChildXML(rootElem, null))
+        if (pasteElement.LoadChildXML(rootElem, null) !is null)
         {
             UIElement@ element = pasteElement.children[pasteElement.numChildren - 1];
 
