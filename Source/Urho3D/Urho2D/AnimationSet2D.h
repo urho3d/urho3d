@@ -76,7 +76,7 @@ public:
 #endif
 
     /// Return spriter data.
-    Spriter::SpriterData* GetSpriterData() const { return spriterData_; }
+    Spriter::SpriterData* GetSpriterData() const { return spriterData_.Get(); }
     /// Return spriter file sprite.
     Sprite2D* GetSpriterFileSprite(int folderId, int fileId) const;
 
@@ -109,7 +109,7 @@ private:
 #endif
     
     /// Spriter data.
-    Spriter::SpriterData* spriterData_;
+    UniquePtr<Spriter::SpriterData> spriterData_;
     /// Has sprite sheet.
     bool hasSpriteSheet_;
     /// Sprite sheet file path.

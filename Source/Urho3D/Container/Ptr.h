@@ -578,6 +578,9 @@ public:
     template <class U>
     bool operator !=(const UniquePtr<U>& rhs) const { return ptr_ != rhs.ptr_; }
 
+    /// Cast pointer to bool.
+    operator bool() const { return !!ptr_; }
+
     /// Swap with another UniquePtr.
     void Swap(UniquePtr& up) { Swap(ptr_, up.ptr_); }
 
@@ -640,44 +643,6 @@ template <class T, class ... Args> UniquePtr<T> MakeUnique(Args && ... args)
 template <class T, class ... Args> SharedPtr<T> MakeShared(Args && ... args)
 {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
-}
-
-#else
-
-/// Construct UniquePtr without arguments.
-template <class T> UniquePtr<T> MakeUnique()
-{
-    return UniquePtr<T>(new T());
-}
-
-/// Construct UniquePtr with one argument.
-template <class T, class U> UniquePtr<T> MakeUnique(U& arg)
-{
-    return UniquePtr<T>(new T(arg));
-}
-
-/// Construct UniquePtr with one argument.
-template <class T, class U> UniquePtr<T> MakeUnique(const U& arg)
-{
-    return UniquePtr<T>(new T(arg));
-}
-
-/// Construct SharedPtr without arguments.
-template <class T> SharedPtr<T> MakeShared()
-{
-    return SharedPtr<T>(new T());
-}
-
-/// Construct SharedPtr with one argument.
-template <class T, class U> SharedPtr<T> MakeShared(U& arg)
-{
-    return SharedPtr<T>(new T(arg));
-}
-
-/// Construct SharedPtr with one argument.
-template <class T, class U> SharedPtr<T> MakeShared(const U& arg)
-{
-    return SharedPtr<T>(new T(arg));
 }
 
 #endif

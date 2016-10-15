@@ -72,8 +72,6 @@ Node::~Node()
     // Remove from the scene
     if (scene_)
         scene_->NodeRemoved(this);
-
-    delete impl_;
 }
 
 void Node::RegisterObject(Context* context)

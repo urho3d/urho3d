@@ -370,18 +370,18 @@ public:
     String GetQuery() const { return queryString_; }
 
     /// Return pugixml xpath_query.
-    pugi::xpath_query* GetXPathQuery() const { return query_; }
+    pugi::xpath_query* GetXPathQuery() const { return query_.Get(); }
 
     /// Return pugixml xpath_variable_set.
-    pugi::xpath_variable_set* GetXPathVariableSet() const { return variables_; }
+    pugi::xpath_variable_set* GetXPathVariableSet() const { return variables_.Get(); }
 
 private:
     /// XPath query string.
     String queryString_;
     /// Pugixml xpath_query.
-    pugi::xpath_query* query_;
+    UniquePtr<pugi::xpath_query> query_;
     /// Pugixml xpath_variable_set.
-    pugi::xpath_variable_set* variables_;
+    UniquePtr<pugi::xpath_variable_set> variables_;
 };
 
 }

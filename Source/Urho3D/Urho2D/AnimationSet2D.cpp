@@ -110,7 +110,6 @@ AnimationSet2D::AnimationSet2D(Context* context) :
     skeletonData_(0),
     atlas_(0),
 #endif
-    spriterData_(0),
     hasSpriteSheet_(false)
 {
 }
@@ -525,11 +524,7 @@ void AnimationSet2D::Dispose()
     }
 #endif
 
-    if (spriterData_)
-    {
-        delete spriterData_;
-        spriterData_ = 0;
-    }
+    spriterData_.Reset();
 
     sprite_.Reset();
     spriteSheet_.Reset();

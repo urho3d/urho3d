@@ -366,10 +366,6 @@ Input::Input(Context* context) :
 
 Input::~Input()
 {
-#ifdef __EMSCRIPTEN__
-    delete emscriptenInput_;
-    emscriptenInput_ = 0;
-#endif
 }
 
 void Input::Update()

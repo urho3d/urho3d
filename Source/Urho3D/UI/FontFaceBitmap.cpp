@@ -355,15 +355,14 @@ unsigned FontFaceBitmap::ConvertFormatToNumComponents(unsigned format)
 
 SharedPtr<Image> FontFaceBitmap::SaveFaceTexture(Texture2D* texture)
 {
-    Image* image = new Image(font_->GetContext());
+    SharedPtr<Image> image(new Image(font_->GetContext()));
     image->SetSize(texture->GetWidth(), texture->GetHeight(), ConvertFormatToNumComponents(texture->GetFormat()));
     if (!texture->GetData(0, image->GetData()))
     {
-        delete image;
         URHO3D_LOGERROR("Could not save texture to image resource");
         return SharedPtr<Image>();
     }
-    return SharedPtr<Image>(image);
+    return image;
 }
 
 bool FontFaceBitmap::SaveFaceTexture(Texture2D* texture, const String& fileName)

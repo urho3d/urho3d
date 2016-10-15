@@ -432,7 +432,7 @@ private:
 
 #ifdef __EMSCRIPTEN__
     /// Emscripten Input glue instance.
-    EmscriptenInput* emscriptenInput_;
+    UniquePtr<EmscriptenInput> emscriptenInput_;
     /// Flag used to detect mouse jump when exiting pointer-lock.
     bool emscriptenExitingPointerLock_;
     /// Flag used to detect mouse jump on initial mouse click when entering pointer-lock.
