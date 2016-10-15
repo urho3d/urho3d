@@ -104,6 +104,8 @@ public:
     virtual bool BeginLoad(Deserializer& source);
     /// Save the image to a stream. Regardless of original format, the image is saved as png. Compressed image data is not supported. Return true if successful.
     virtual bool Save(Serializer& dest) const;
+    /// Save the image to a file. Format of the image is determined by file extension. JPG is saved with maximum quality.
+    virtual bool Save(const String& fileName) const;
 
     /// Set 2D size and number of color components. Old image data will be destroyed and new data is undefined. Return true if successful.
     bool SetSize(int width, int height, unsigned components);
@@ -139,6 +141,8 @@ public:
     bool SaveTGA(const String& fileName) const;
     /// Save in JPG format with compression quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality) const;
+    /// Save in DDS format. Only uncompressed RGBA images are supported. Return true if successful.
+    bool SaveDDS(const String& fileName) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.

@@ -777,24 +777,34 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
 }
 
-static bool ResourceLoad(File* file, XMLFile* ptr)
+static bool ResourceLoad(File* file, Resource* ptr)
 {
     return file && ptr->Load(*file);
 }
 
-static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 {
     return ptr->Load(buffer);
 }
 
-static bool ResourceSave(File* file, XMLFile* ptr)
+static bool ResourceLoadByName(const String& fileName, Resource* ptr)
+{
+    return ptr->Load(fileName);
+}
+
+static bool ResourceSave(File* file, Resource* ptr)
 {
     return file && ptr->Save(*file);
 }
 
-static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 {
     return ptr->Save(buffer);
+}
+
+static bool ResourceSaveByName(const String& fileName, Resource* ptr)
+{
+    return ptr->Save(fileName);
 }
 
 /// Template function for registering a class derived from Resource.
@@ -810,8 +820,10 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     }
     engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(ResourceLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&)", asFUNCTION(ResourceLoadVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(const String&in)", asFUNCTION(ResourceLoadByName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(ResourceSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(ResourceSaveVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(const String&in) const", asFUNCTION(ResourceSaveByName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_name(const String&in) const", asMETHODPR(T, SetName, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHODPR(T, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_memoryUse() const", asMETHODPR(T, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
