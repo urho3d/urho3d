@@ -330,7 +330,7 @@ public:
     unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
 
     /// Return length.
-    float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
+    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
 
     /// X coordinate.
     int x_;

@@ -60,7 +60,7 @@ class IntVector2
 
     String ToString() const;
     unsigned ToHash() const;
-	float Length() const;
+    float Length() const;
 
     int x_ @ x;
     int y_ @ y;
