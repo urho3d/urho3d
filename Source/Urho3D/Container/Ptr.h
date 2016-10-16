@@ -532,6 +532,10 @@ template<class T> inline void CheckedDelete(T* x)
 /// Unique pointer template class.
 template <class T> class UniquePtr
 {
+    // Make non-copyable
+    UniquePtr(const UniquePtr&);
+    UniquePtr& operator=(const UniquePtr&);
+
 public:
     /// Construct empty.
     UniquePtr() : ptr_(0) { }
