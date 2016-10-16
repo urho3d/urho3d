@@ -345,8 +345,6 @@ Input::Input(Context* context) :
     minimized_(false),
     focusedThisFrame_(false),
     suppressNextMouseMove_(false),
-    inResize_(false),
-    screenModeChanged_(false),
     initialized_(false)
 {
     for (int i = 0; i < TOUCHID_MAX; i++)
@@ -401,14 +399,11 @@ void Input::Update()
     {
 #ifdef REQUIRE_CLICK_TO_FOCUS
         // When using the "click to focus" mechanism, only focus automatically in fullscreen or non-hidden mouse mode
-        if (!inputFocus_ && ((mouseVisible_ || mouseMode_ == MM_FREE) || graphics_->GetFullscreen() || screenModeChanged_) && (flags & SDL_WINDOW_INPUT_FOCUS))
+        if (!inputFocus_ && ((mouseVisible_ || mouseMode_ == MM_FREE) || graphics_->GetFullscreen()) && (flags & SDL_WINDOW_INPUT_FOCUS))
 #else
         if (!inputFocus_ && (flags & SDL_WINDOW_INPUT_FOCUS))
 #endif
-        {
-            screenModeChanged_ = false;
             focusedThisFrame_ = true;
-        }
 
         if (focusedThisFrame_)
             GainFocus();
@@ -1840,7 +1835,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
     // Possibility for custom handling or suppression of default handling for the SDL event
     {
         using namespace SDLRawInput;
-    
+
         VariantMap eventData = GetEventDataMap();
         eventData[P_SDLEVENT] = &evt;
         eventData[P_CONSUMED] = false;
@@ -2303,9 +2298,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
                 break;
 
             case SDL_WINDOWEVENT_RESIZED:
-                inResize_ = true;
                 graphics_->OnWindowResized();
-                inResize_ = false;
                 break;
             case SDL_WINDOWEVENT_MOVED:
                 graphics_->OnWindowMoved();
@@ -2346,15 +2339,6 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
     SDL_Window* window = graphics_->GetWindow();
     windowID_ = SDL_GetWindowID(window);
 
-    // If screen mode happens due to mouse drag resize, do not recenter the mouse as that would lead to erratic window sizes
-    if (!mouseVisible_ && mouseMode_ != MM_FREE && !inResize_)
-    {
-        CenterMousePosition();
-        focusedThisFrame_ = true;
-    }
-    else
-        lastMousePosition_ = GetMousePosition();
-
     // Resize screen joysticks to new screen size
     for (HashMap<SDL_JoystickID, JoystickState>::Iterator i = joysticks_.Begin(); i != joysticks_.End(); ++i)
     {
@@ -2363,15 +2347,11 @@ void Input::HandleScreenMode(StringHash eventType, VariantMap& eventData)
             screenjoystick->SetSize(graphics_->GetWidth(), graphics_->GetHeight());
     }
 
-    if (graphics_->GetFullscreen())
+    if (graphics_->GetFullscreen() || !mouseVisible_)
         focusedThisFrame_ = true;
 
     // After setting a new screen mode we should not be minimized
     minimized_ = (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) != 0;
-
-    // Remember that screen mode changed in case we lose focus (needed on Linux)
-    if (!inResize_)
-        screenModeChanged_ = true;
 }
 
 void Input::HandleBeginFrame(StringHash eventType, VariantMap& eventData)
