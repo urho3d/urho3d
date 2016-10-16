@@ -732,7 +732,7 @@ class CreateUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadChildXML(elementData.root, styleFile))
+            if (parent.LoadChildXML(elementData.root, styleFile) !is null)
             {
                 UIElement@ element = parent.children[parent.numChildren - 1];
                 UpdateHierarchyItem(element);
@@ -773,7 +773,7 @@ class DeleteUIElementAction : EditAction
             // Have to update manually because the element ID var is not set yet when the E_ELEMENTADDED event is sent
             suppressUIElementChanges = true;
 
-            if (parent.LoadChildXML(elementData.root, styleFile))
+            if (parent.LoadChildXML(elementData.root, styleFile) !is null)
             {
                 XMLElement rootElem = elementData.root;
                 uint index = rootElem.GetUInt("index");
@@ -908,7 +908,7 @@ class ApplyUIElementStyleAction : EditAction
             suppressUIElementChanges = true;
 
             parent.RemoveChild(element);
-            if (parent.LoadChildXML(elementData.root, styleFile))
+            if (parent.LoadChildXML(elementData.root, styleFile) !is null)
             {
                 XMLElement rootElem = elementData.root;
                 uint index = rootElem.GetUInt("index");

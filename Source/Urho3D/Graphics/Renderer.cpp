@@ -1166,18 +1166,20 @@ View* Renderer::GetActualView(View* view)
         return view;
 }
 
-void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows)
+void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows, const BatchQueue& queue)
 {
-    // Check if shaders are unloaded or need reloading
     Pass* pass = batch.pass_;
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
-    if (!vertexShaders.Size() || !pixelShaders.Size() || pass->GetShadersLoadedFrameNumber() != shadersChangedFrameNumber_)
-    {
-        // First release all previous shaders, then load
+
+    // Check if need to release/reload all shaders
+    if (pass->GetShadersLoadedFrameNumber() != shadersChangedFrameNumber_)
         pass->ReleaseShaders();
-        LoadPassShaders(pass);
-    }
+
+    Vector<SharedPtr<ShaderVariation> >& vertexShaders = queue.hasExtraDefines_ ? pass->GetVertexShaders(queue.vsExtraDefinesHash_) : pass->GetVertexShaders();
+    Vector<SharedPtr<ShaderVariation> >& pixelShaders = queue.hasExtraDefines_ ? pass->GetPixelShaders(queue.psExtraDefinesHash_) : pass->GetPixelShaders();
+    
+    // Load shaders now if necessary
+    if (!vertexShaders.Size() || !pixelShaders.Size())
+        LoadPassShaders(pass, vertexShaders, pixelShaders, queue);
 
     // Make sure shaders are loaded now
     if (vertexShaders.Size() && pixelShaders.Size())
@@ -1653,26 +1655,42 @@ void Renderer::LoadShaders()
     shadersDirty_ = false;
 }
 
-void Renderer::LoadPassShaders(Pass* pass)
+void Renderer::LoadPassShaders(Pass* pass, Vector<SharedPtr<ShaderVariation> >& vertexShaders, Vector<SharedPtr<ShaderVariation> >& pixelShaders, const BatchQueue& queue)
 {
     URHO3D_PROFILE(LoadPassShaders);
-
-    Vector<SharedPtr<ShaderVariation> >& vertexShaders = pass->GetVertexShaders();
-    Vector<SharedPtr<ShaderVariation> >& pixelShaders = pass->GetPixelShaders();
 
     // Forget all the old shaders
     vertexShaders.Clear();
     pixelShaders.Clear();
 
-    String extraShaderDefines = " ";
+    String vsDefines = pass->GetEffectiveVertexShaderDefines();
+    String psDefines = pass->GetEffectivePixelShaderDefines();
+
+    // Make sure to end defines with space to allow appending engine's defines
+    if (vsDefines.Length() && !vsDefines.EndsWith(" "))
+        vsDefines += ' ';
+    if (psDefines.Length() && !psDefines.EndsWith(" "))
+        psDefines += ' ';
+
+    // Append defines from batch queue (renderpath command) if needed
+    if (queue.vsExtraDefines_.Length())
+    {
+        vsDefines += queue.vsExtraDefines_;
+        vsDefines += ' ';
+    }
+    if (queue.psExtraDefines_.Length())
+    {
+        psDefines += queue.psExtraDefines_;
+        psDefines += ' ';
+    }
+
+    // Add defines for VSM in the shadow pass if necessary
     if (pass->GetName() == "shadow"
         && (shadowQuality_ == SHADOWQUALITY_VSM || shadowQuality_ == SHADOWQUALITY_BLUR_VSM))
     {
-        extraShaderDefines = " VSM_SHADOW ";
+        vsDefines += "VSM_SHADOW ";
+        psDefines += "VSM_SHADOW ";
     }
-
-    String vsDefines = pass->GetEffectiveVertexShaderDefines();
-    String psDefines = pass->GetEffectivePixelShaderDefines();
 
     if (pass->GetLightingMode() == LIGHTING_PERPIXEL)
     {
@@ -1686,7 +1704,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             unsigned l = j % MAX_LIGHT_VS_VARIATIONS;
 
             vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                vsDefines + extraShaderDefines + lightVSVariations[l] + geometryVSVariations[g]);
+                vsDefines + lightVSVariations[l] + geometryVSVariations[g]);
         }
         for (unsigned j = 0; j < MAX_LIGHT_PS_VARIATIONS * 2; ++j)
         {
@@ -1696,12 +1714,12 @@ void Renderer::LoadPassShaders(Pass* pass)
             if (l & LPS_SHADOW)
             {
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    psDefines + extraShaderDefines + lightPSVariations[l] + GetShadowVariations() +
+                    psDefines + lightPSVariations[l] + GetShadowVariations() +
                     heightFogVariations[h]);
             }
             else
                 pixelShaders[j] = graphics_->GetShader(PS, pass->GetPixelShader(),
-                    psDefines + extraShaderDefines + lightPSVariations[l] + heightFogVariations[h]);
+                    psDefines + lightPSVariations[l] + heightFogVariations[h]);
         }
     }
     else
@@ -1715,7 +1733,7 @@ void Renderer::LoadPassShaders(Pass* pass)
                 unsigned g = j / MAX_VERTEXLIGHT_VS_VARIATIONS;
                 unsigned l = j % MAX_VERTEXLIGHT_VS_VARIATIONS;
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    vsDefines + extraShaderDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
+                    vsDefines + vertexLightVSVariations[l] + geometryVSVariations[g]);
             }
         }
         else
@@ -1724,7 +1742,7 @@ void Renderer::LoadPassShaders(Pass* pass)
             for (unsigned j = 0; j < MAX_GEOMETRYTYPES; ++j)
             {
                 vertexShaders[j] = graphics_->GetShader(VS, pass->GetVertexShader(),
-                    vsDefines + extraShaderDefines + geometryVSVariations[j]);
+                    vsDefines + geometryVSVariations[j]);
             }
         }
 
@@ -1732,7 +1750,7 @@ void Renderer::LoadPassShaders(Pass* pass)
         for (unsigned j = 0; j < 2; ++j)
         {
             pixelShaders[j] =
-                graphics_->GetShader(PS, pass->GetPixelShader(), psDefines + extraShaderDefines + heightFogVariations[j]);
+                graphics_->GetShader(PS, pass->GetPixelShader(), psDefines + heightFogVariations[j]);
         }
     }
 

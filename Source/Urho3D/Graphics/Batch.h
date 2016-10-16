@@ -271,6 +271,16 @@ public:
     PODVector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
     unsigned maxSortedInstances_;
+    /// Whether the pass command contains extra shader defines.
+    bool hasExtraDefines_;
+    /// Vertex shader extra defines.
+    String vsExtraDefines_;
+    /// Pixel shader extra defines.
+    String psExtraDefines_;
+    /// Hash for vertex shader extra defines.
+    StringHash vsExtraDefinesHash_;
+    /// Hash for pixel shader extra defines.
+    StringHash psExtraDefinesHash_;
 };
 
 /// Queue for shadow map draw calls
