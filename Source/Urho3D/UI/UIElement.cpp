@@ -310,7 +310,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     if (internalElem)
     {
         URHO3D_LOGERROR("Loading internal child element is not supported");
-        return NULL;
+        return 0;
     }
 
     String typeName = childElem.GetAttribute("type");
@@ -326,7 +326,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
         if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
         {
             RemoveChild(child, index);
-            return NULL;
+            return 0;
         }
     }
 

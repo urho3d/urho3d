@@ -214,7 +214,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         // are 29354 glyphs in msyh.ttf
         FT_ULong tagKern = FT_MAKE_TAG('k', 'e', 'r', 'n');
         FT_ULong kerningTableSize = 0;
-        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, NULL, &kerningTableSize);
+        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, 0, &kerningTableSize);
         if (error)
         {
             URHO3D_LOGERROR("Could not get kerning table length");

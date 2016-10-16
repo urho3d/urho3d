@@ -952,12 +952,14 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 
 static UIElement* UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 {
-    if (file == NULL)
-        return NULL;
+    if (!file)
+        return 0;
 
     XMLElement rootElem = file->GetRoot("element");
     if (rootElem)
         return ptr->LoadChildXML(rootElem, styleFile);
+    else
+        return 0;
 }
 
 static bool UIElementSaveXML(File* file, const String& indentation, UIElement* ptr)
