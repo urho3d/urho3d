@@ -520,6 +520,15 @@ template <class T, class U> WeakPtr<T> DynamicCast(const WeakPtr<U>& ptr)
     return ret;
 }
 
+/// Delete object of type T. T must be complete. See boost::checked_delete.
+template<class T> inline void CheckedDelete(T* x)
+{
+    // intentionally complex - simplification causes regressions
+    typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+    (void) sizeof(type_must_be_complete);
+    delete x;
+}
+
 /// Unique pointer template class.
 template <class T> class UniquePtr
 {
@@ -604,15 +613,12 @@ public:
     /// Reset.
     void Reset(T* ptr = 0)
     {
-        if (ptr_)
-        {
-            delete ptr_;
-        }
+        CheckedDelete(ptr_);
         ptr_ = ptr;
     }
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return static_cast<unsigned>((static_cast<size_t>(ptr_) / sizeof(T))); }
+    unsigned ToHash() const { return (unsigned)((size_t)ptr_ / sizeof(T)); }
 
     /// Destruct.
     ~UniquePtr()
