@@ -5553,6 +5553,8 @@ int width;
 class IntVector2
 {
 // Methods:
+float Length() const;
+uint ToHash() const;
 String ToString() const;
 
 // Properties:
@@ -7365,6 +7367,7 @@ void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
+void SetTransform(const Matrix3x4&);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetTransform(const Vector3&, const Quaternion&, float);
@@ -9221,6 +9224,7 @@ void SetInterceptNetworkUpdate(const String&, bool);
 void SetPosition2D(float, float);
 void SetScale(float);
 void SetScale2D(float, float);
+void SetTransform(const Matrix3x4&);
 void SetTransform(const Vector3&, const Quaternion&);
 void SetTransform(const Vector3&, const Quaternion&, const Vector3&);
 void SetTransform(const Vector3&, const Quaternion&, float);

@@ -7622,6 +7622,8 @@ Properties:
 
 Methods:
 
+- float Length() const
+- uint ToHash() const
 - String ToString() const
 
 Properties:
@@ -9244,6 +9246,7 @@ Methods:
 - void SetPosition2D(float, float)
 - void SetScale(float)
 - void SetScale2D(float, float)
+- void SetTransform(const Matrix3x4&)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
@@ -10933,6 +10936,7 @@ Methods:
 - void SetPosition2D(float, float)
 - void SetScale(float)
 - void SetScale2D(float, float)
+- void SetTransform(const Matrix3x4&)
 - void SetTransform(const Vector3&, const Quaternion&)
 - void SetTransform(const Vector3&, const Quaternion&, const Vector3&)
 - void SetTransform(const Vector3&, const Quaternion&, float)
