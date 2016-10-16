@@ -557,7 +557,7 @@ public:
     /// Move-construct from UniquePtr.
     UniquePtr(UniquePtr && up) : ptr_(up.Detach()) { }
 
-    /// Move-assign from UniquePtr
+    /// Move-assign from UniquePtr.
     UniquePtr& operator = (UniquePtr && up)
     {
         Reset(up.Detach());
