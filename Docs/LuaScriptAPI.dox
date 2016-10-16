@@ -2728,6 +2728,7 @@ Methods:
 - bool SavePNG(const String fileName) const
 - bool SaveTGA(const String fileName) const
 - bool SaveJPG(const String fileName, int quality) const
+- bool SaveDDS(const String fileName) const
 - Color GetPixel(int x, int y) const
 - Color GetPixel(int x, int y, int z) const
 - unsigned GetPixelInt(int x, int y) const
@@ -7178,6 +7179,7 @@ Methods:
 - float LengthSquared() const
 - float DotProduct(const Vector2& rhs) const
 - float AbsDotProduct(const Vector2& rhs) const
+- float ProjectOntoAxis(const Vector2& axis) const
 - float Angle(const Vector2& rhs) const
 - Vector2 Abs() const
 - Vector2 Lerp(const Vector2& rhs, float t) const
@@ -7229,6 +7231,7 @@ Methods:
 - float LengthSquared() const
 - float DotProduct(const Vector3& rhs) const
 - float AbsDotProduct(const Vector3& rhs) const
+- float ProjectOntoAxis(const Vector3& axis) const
 - Vector3 CrossProduct(const Vector3& rhs) const
 - Vector3 Abs() const
 - Vector3 Lerp(const Vector3& rhs, float t) const
@@ -7278,6 +7281,7 @@ Methods:
 - Vector4 operator/(const Vector4& rhs) const
 - float DotProduct(const Vector4& rhs) const
 - float AbsDotProduct(const Vector4& rhs) const
+- float ProjectOntoAxis(const Vector3& axis) const
 - Vector4 Abs() const
 - Vector4 Lerp(const Vector4& rhs, float t) const
 - bool Equals(const Vector4& rhs) const
@@ -8324,6 +8328,8 @@ Properties:
 - float Asin(float x)
 - float Atan(float x)
 - float Atan2(float y, float x)
+- float Ceil(float x)
+- int CeilToInt(float x)
 - float Clamp(float value, float min, float max)
 - int ClampInt(int value, int min, int max)
 - VectorBuffer CompressVectorBuffer(VectorBuffer& src)
@@ -8333,6 +8339,9 @@ Properties:
 - bool Equals(float lhs, float rhs)
 - void ErrorDialog(const String title, const String message)
 - void ErrorExit(const String message = String::EMPTY, int exitCode = EXIT_FAILURE)
+- float Floor(float x)
+- int FloorToInt(float x)
+- float Fract(float x)
 - const Vector<String>& GetArguments()
 - Audio* GetAudio()
 - ResourceCache* GetCache()
@@ -8372,6 +8381,7 @@ Properties:
 - UI* GetUI()
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
 - bool HasSubscribedToEvent(const String eventName)
+- float InverseLerp(float lhs, float rhs, float x)
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
 - bool IsDigit(unsigned ch)
@@ -8382,20 +8392,24 @@ Properties:
 - int MaxInt(int lhs, int rhs)
 - float Min(float lhs, float rhs)
 - int MinInt(int lhs, int rhs)
+- float Mod(float x, float y)
 - unsigned NextPowerOfTwo(unsigned value)
 - void OpenConsoleWindow()
+- float Pow(float x, float y)
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
 - float Random()
-- float Random(float range)
 - float Random(float min, float max)
+- float Random(float range)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
 - void RegisterEventName(const String eventName)
 - String RemoveTrailingSlash(const String pathName)
 - String ReplaceExtension(const String fullPath, const String newExtension)
+- float Round(float x)
+- int RoundToInt(float x)
 - unsigned SDBMHash(unsigned hash, char c)
 - void SendEvent(const String eventName, VariantMap& eventData)
 - void SetExecuteConsoleCommands(bool enable)
@@ -8405,6 +8419,10 @@ Properties:
 - float Sign(float value)
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
+- float Sqrt(float x)
+- float StableRandom(const Vector2& seed)
+- float StableRandom(const Vector3& seed)
+- float StableRandom(float seed)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
@@ -8432,6 +8450,29 @@ Properties:
 - void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
+- Vector3 VectorCeil(const Vector3& vec)
+- Vector4 VectorCeil(const Vector4& vec)
+- Vector2 VectorCeil(const Vector2& vec)
+- IntVector2 VectorCeilToInt(const Vector2& vec)
+- Vector4 VectorFloor(const Vector4& vec)
+- Vector2 VectorFloor(const Vector2& vec)
+- Vector3 VectorFloor(const Vector3& vec)
+- IntVector2 VectorFloorToInt(const Vector2& vec)
+- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
+- Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
+- Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
+- Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
+- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
+- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
+- Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
+- Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
+- IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
+- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
+- Vector2 VectorRound(const Vector2& vec)
+- Vector4 VectorRound(const Vector4& vec)
+- Vector3 VectorRound(const Vector3& vec)
+- IntVector2 VectorRoundToInt(const Vector2& vec)
 
 
 \section LuaScriptAPI_GlobalProperties Global properties
