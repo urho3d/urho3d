@@ -197,7 +197,7 @@ public:
     int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.
-    b2World* GetWorld() { return world_; }
+    b2World* GetWorld() { return world_.Get(); }
 
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
@@ -218,7 +218,7 @@ private:
     void SendEndContactEvents();
 
     /// Box2D physics world.
-    b2World* world_;
+    UniquePtr<b2World> world_;
     /// Gravity.
     Vector2 gravity_;
     /// Velocity iterations.

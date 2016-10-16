@@ -27,6 +27,7 @@ enum Intersection
 bool Equals(float lhs, float rhs);
 bool IsNaN(float value);
 float Lerp(float lhs, float rhs, float t);
+float InverseLerp(float lhs, float rhs, float x);
 float Min(float lhs, float rhs);
 float Max(float lhs, float rhs);
 float Abs(float value);
@@ -42,6 +43,16 @@ float Asin(float x);
 float Acos(float x);
 float Atan(float x);
 float Atan2(float y, float x);
+float Sqrt(float x);
+float Pow(float x, float y);
+float Mod(float x, float y);
+float Fract(float x);
+float Floor(float x);
+float Round(float x);
+float Ceil(float x);
+int FloorToInt(float x);
+int RoundToInt(float x);
+int CeilToInt(float x);
 
 int Min @ MinInt(int lhs, int rhs);
 int Max @ MaxInt(int lhs, int rhs);

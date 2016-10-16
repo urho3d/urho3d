@@ -66,7 +66,7 @@ public:
     XMLElement GetRoot(const String& name = String::EMPTY);
 
     /// Return the pugixml document.
-    pugi::xml_document* GetDocument() const { return document_; }
+    pugi::xml_document* GetDocument() const { return document_.Get(); }
 
     /// Serialize the XML content to a string.
     String ToString(const String& indentation = "\t") const;
@@ -92,7 +92,7 @@ private:
     bool CombineText(const pugi::xml_node& patch, const pugi::xml_node& original, bool prepend) const;
 
     /// Pugixml document.
-    pugi::xml_document* document_;
+    UniquePtr<pugi::xml_document> document_;
 };
 
 }

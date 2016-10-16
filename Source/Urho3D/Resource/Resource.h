@@ -64,6 +64,11 @@ public:
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
 
+    /// Load resource from file.
+    bool Load(const String& fileName);
+    /// Save resource to file.
+    virtual bool Save(const String& fileName) const;
+
     /// Set name.
     void SetName(const String& name);
     /// Set memory use in bytes, possibly approximate.

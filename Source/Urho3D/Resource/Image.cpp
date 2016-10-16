@@ -775,6 +775,19 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
+bool Image::Save(const String& fileName) const
+{
+    if (fileName.EndsWith(".dds", false))
+        return SaveDDS(fileName);
+    else if (fileName.EndsWith(".bmp", false))
+        return SaveBMP(fileName);
+    else if (fileName.EndsWith(".jpg", false) || fileName.EndsWith(".jpeg", false))
+        return SaveJPG(fileName, 100);
+    else if (fileName.EndsWith(".tga", false))
+        return SaveTGA(fileName);
+    else
+        return SavePNG(fileName);
+}
 
 bool Image::SetSize(int width, int height, unsigned components)
 {
@@ -1210,6 +1223,58 @@ bool Image::SaveJPG(const String& fileName, int quality) const
         return jo_write_jpg(GetNativePath(fileName).CString(), data_.Get(), width_, height_, components_, quality) != 0;
     else
         return false;
+}
+
+bool Image::SaveDDS(const String& fileName) const
+{
+    URHO3D_PROFILE(SaveImageDDS);
+
+    File outFile(context_, fileName, FILE_WRITE);
+    if (!outFile.IsOpen())
+    {
+        URHO3D_LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        URHO3D_LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (components_ != 4)
+    {
+        URHO3D_LOGERRORF("Can not save image with %u components to DDS", components_);
+        return false;
+    }
+
+    // Write image
+    PODVector<const Image*> levels;
+    GetLevels(levels);
+
+    outFile.WriteFileID("DDS ");
+
+    DDSurfaceDesc2 ddsd;
+    memset(&ddsd, 0, sizeof(ddsd));
+    ddsd.dwSize_ = sizeof(ddsd);
+    ddsd.dwFlags_ = 0x00000001l /*DDSD_CAPS*/
+        | 0x00000002l /*DDSD_HEIGHT*/ | 0x00000004l /*DDSD_WIDTH*/ | 0x00020000l /*DDSD_MIPMAPCOUNT*/ | 0x00001000l /*DDSD_PIXELFORMAT*/;
+    ddsd.dwWidth_ = width_;
+    ddsd.dwHeight_ = height_;
+    ddsd.dwMipMapCount_ = levels.Size();
+    ddsd.ddpfPixelFormat_.dwFlags_ = 0x00000040l /*DDPF_RGB*/ | 0x00000001l /*DDPF_ALPHAPIXELS*/;
+    ddsd.ddpfPixelFormat_.dwSize_ = sizeof(ddsd.ddpfPixelFormat_);
+    ddsd.ddpfPixelFormat_.dwRGBBitCount_ = 32;
+    ddsd.ddpfPixelFormat_.dwRBitMask_ = 0x000000ff;
+    ddsd.ddpfPixelFormat_.dwGBitMask_ = 0x0000ff00;
+    ddsd.ddpfPixelFormat_.dwBBitMask_ = 0x00ff0000;
+    ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_ = 0xff000000;
+
+    outFile.Write(&ddsd, sizeof(ddsd));
+    for (unsigned i = 0; i < levels.Size(); ++i)
+        outFile.Write(levels[i]->GetData(), levels[i]->GetWidth() * levels[i]->GetHeight() * 4);
+
+    return true;
 }
 
 Color Image::GetPixel(int x, int y) const

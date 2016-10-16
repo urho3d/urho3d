@@ -206,6 +206,9 @@ public:
         return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_);
     }
 
+    /// Project vector onto axis.
+    float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(axis.Normalized()); }
+
     /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
     {
@@ -280,5 +283,26 @@ public:
 
 /// Multiply Vector3 with a scalar.
 inline Vector3 operator *(float lhs, const Vector3& rhs) { return rhs * lhs; }
+
+/// Per-component linear interpolation between two 3-vectors.
+inline Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t) { return lhs + (rhs - lhs) * t; }
+
+/// Per-component min of two 3-vectors.
+inline Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs) { return Vector3(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_), Min(lhs.z_, rhs.z_)); }
+
+/// Per-component max of two 3-vectors.
+inline Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs) { return Vector3(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_), Max(lhs.z_, rhs.z_)); }
+
+/// Per-component floor of 3-vector.
+inline Vector3 VectorFloor(const Vector3& vec) { return Vector3(Floor(vec.x_), Floor(vec.y_), Floor(vec.z_)); }
+
+/// Per-component round of 3-vector.
+inline Vector3 VectorRound(const Vector3& vec) { return Vector3(Round(vec.x_), Round(vec.y_), Round(vec.z_)); }
+
+/// Per-component ceil of 3-vector.
+inline Vector3 VectorCeil(const Vector3& vec) { return Vector3(Ceil(vec.x_), Ceil(vec.y_), Ceil(vec.z_)); }
+
+/// Return a random value from [0, 1) from 3-vector seed.
+inline float StableRandom(const Vector3& seed) { return StableRandom(Vector2(StableRandom(Vector2(seed.x_, seed.y_)), seed.z_)); }
 
 }

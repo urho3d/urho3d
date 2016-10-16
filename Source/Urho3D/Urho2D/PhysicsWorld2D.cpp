@@ -47,7 +47,6 @@ static const int DEFAULT_POSITION_ITERATIONS = 3;
 
 PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     Component(context),
-    world_(0),
     gravity_(DEFAULT_GRAVITY),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
@@ -72,9 +71,6 @@ PhysicsWorld2D::~PhysicsWorld2D()
     for (unsigned i = 0; i < rigidBodies_.Size(); ++i)
         if (rigidBodies_[i])
             rigidBodies_[i]->ReleaseBody();
-
-    delete world_;
-    world_ = 0;
 }
 
 void PhysicsWorld2D::RegisterObject(Context* context)

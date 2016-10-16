@@ -59,7 +59,6 @@ AnimatedSprite2D::AnimatedSprite2D(Context* context) :
     animationStateData_(0),
     animationState_(0),
 #endif
-    spriterInstance_(0),
     speed_(1.0f),
     loopMode_(LM_DEFAULT)
 {
@@ -527,11 +526,7 @@ void AnimatedSprite2D::Dispose()
         skeleton_ = 0;
     }
 #endif
-    if (spriterInstance_)
-    {
-        delete spriterInstance_;
-        spriterInstance_ = 0;
-    }
+    spriterInstance_.Reset();
 }
 
 }
