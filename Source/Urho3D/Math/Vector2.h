@@ -329,6 +329,9 @@ public:
     /// Return hash value for HashSet & HashMap.
     unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
 
+    /// Return length.
+    float Length() const { return sqrtf(x_ * x_ + y_ * y_); }
+
     /// X coordinate.
     int x_;
     /// Y coordinate.
