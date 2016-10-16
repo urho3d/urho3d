@@ -596,6 +596,11 @@ void Input::SetMouseVisible(bool enable, bool suppressEvent)
 #endif
             }
         }
+        else
+        {
+            // Allow to set desired mouse visibility before initialization
+            mouseVisible_ = enable;
+        }
 
         if (mouseVisible_ != startMouseVisible)
         {
@@ -807,47 +812,55 @@ void Input::SetMouseMode(MouseMode mode, bool suppressEvent)
 #else
     if (mode != mouseMode_)
     {
-        SuppressNextMouseMove();
-
-        mouseMode_ = mode;
-        SDL_Window* const window = graphics_->GetWindow();
-
-        UI* const ui = GetSubsystem<UI>();
-        Cursor* const cursor = ui->GetCursor();
-
-        // Handle changing from previous mode
-        if (previousMode == MM_ABSOLUTE)
+        if (initialized_)
         {
-            if (!mouseVisible_)
-                SetMouseModeAbsolute(SDL_FALSE);
-        }
-        if (previousMode == MM_RELATIVE)
-        {
-            SetMouseModeRelative(SDL_FALSE);
-            ResetMouseVisible();
-        }
-        else if (previousMode == MM_WRAP)
-            SDL_SetWindowGrab(window, SDL_FALSE);
+            SuppressNextMouseMove();
 
-        // Handle changing to new mode
-        if (mode == MM_ABSOLUTE)
-        {
-            if (!mouseVisible_)
-                SetMouseModeAbsolute(SDL_TRUE);
-        }
-        else if (mode == MM_RELATIVE)
-        {
-            SetMouseVisible(false, true);
-            SetMouseModeRelative(SDL_TRUE);
-        }
-        else if (mode == MM_WRAP)
-        {
-            SetMouseGrabbed(true, suppressEvent);
-            SDL_SetWindowGrab(window, SDL_TRUE);
-        }
+            mouseMode_ = mode;
+            SDL_Window* const window = graphics_->GetWindow();
 
-        if (mode != MM_WRAP)
-            SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+            UI* const ui = GetSubsystem<UI>();
+            Cursor* const cursor = ui->GetCursor();
+
+            // Handle changing from previous mode
+            if (previousMode == MM_ABSOLUTE)
+            {
+                if (!mouseVisible_)
+                    SetMouseModeAbsolute(SDL_FALSE);
+            }
+            if (previousMode == MM_RELATIVE)
+            {
+                SetMouseModeRelative(SDL_FALSE);
+                ResetMouseVisible();
+            }
+            else if (previousMode == MM_WRAP)
+                SDL_SetWindowGrab(window, SDL_FALSE);
+
+            // Handle changing to new mode
+            if (mode == MM_ABSOLUTE)
+            {
+                if (!mouseVisible_)
+                    SetMouseModeAbsolute(SDL_TRUE);
+            }
+            else if (mode == MM_RELATIVE)
+            {
+                SetMouseVisible(false, true);
+                SetMouseModeRelative(SDL_TRUE);
+            }
+            else if (mode == MM_WRAP)
+            {
+                SetMouseGrabbed(true, suppressEvent);
+                SDL_SetWindowGrab(window, SDL_TRUE);
+            }
+
+            if (mode != MM_WRAP)
+                SetMouseGrabbed(!(mouseVisible_ || (cursor && cursor->IsVisible())), suppressEvent);
+        }
+        else
+        {
+            // Allow to set desired mouse mode before initialization
+            mouseMode_ = mode;
+        }
     }
 #endif
 
