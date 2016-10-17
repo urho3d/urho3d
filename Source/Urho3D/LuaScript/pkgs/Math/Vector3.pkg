@@ -23,6 +23,7 @@ class Vector3
     float LengthSquared() const;
     float DotProduct(const Vector3& rhs) const;
     float AbsDotProduct(const Vector3& rhs) const;
+    float ProjectOntoAxis(const Vector3& axis) const;
     Vector3 CrossProduct(const Vector3& rhs) const;
     Vector3 Abs() const;
     Vector3 Lerp(const Vector3& rhs, float t) const;
@@ -46,3 +47,11 @@ class Vector3
     static const Vector3 BACK;
     static const Vector3 ONE;
 };
+
+Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t);
+Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs);
+Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs);
+Vector3 VectorFloor(const Vector3& vec);
+Vector3 VectorRound(const Vector3& vec);
+Vector3 VectorCeil(const Vector3& vec);
+float StableRandom(const Vector3& seed);

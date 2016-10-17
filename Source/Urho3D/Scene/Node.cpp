@@ -72,8 +72,6 @@ Node::~Node()
     // Remove from the scene
     if (scene_)
         scene_->NodeRemoved(this);
-
-    delete impl_;
 }
 
 void Node::RegisterObject(Context* context)
@@ -503,6 +501,11 @@ void Node::SetTransform(const Vector3& position, const Quaternion& rotation, con
     MarkDirty();
 
     MarkNetworkUpdate();
+}
+
+void Node::SetTransform(const Matrix3x4& matrix)
+{
+    SetTransform(matrix.Translation(), matrix.Rotation(), matrix.Scale());
 }
 
 void Node::SetWorldPosition(const Vector3& position)
@@ -1227,6 +1230,13 @@ void Node::GetChildren(PODVector<Node*>& dest, bool recursive) const
         GetChildrenRecursive(dest);
 }
 
+PODVector<Node*> Node::GetChildren(bool recursive) const
+{
+    PODVector<Node*> dest;
+    GetChildren(dest, recursive);
+    return dest;
+}
+
 void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive) const
 {
     dest.Clear();
@@ -1243,6 +1253,13 @@ void Node::GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, boo
         GetChildrenWithComponentRecursive(dest, type);
 }
 
+PODVector<Node*> Node::GetChildrenWithComponent(StringHash type, bool recursive) const
+{
+    PODVector<Node*> dest;
+    GetChildrenWithComponent(dest, type, recursive);
+    return dest;
+}
+
 void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive /*= true*/) const
 {
     dest.Clear();
@@ -1257,6 +1274,13 @@ void Node::GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool re
     }
     else
         GetChildrenWithTagRecursive(dest, tag);
+}
+
+PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) const
+{
+    PODVector<Node*> dest;
+    GetChildrenWithTag(dest, tag, recursive);
+    return dest;
 }
 
 Node* Node::GetChild(unsigned index) const

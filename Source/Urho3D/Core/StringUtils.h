@@ -123,5 +123,30 @@ URHO3D_API unsigned ToUpper(unsigned ch);
 URHO3D_API unsigned ToLower(unsigned ch);
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb".
 URHO3D_API String GetFileSizeString(unsigned long long memorySize);
+/// Parse type from a C string.
+template <class T> T FromString(const char* source);
+
+template <> inline const char* FromString<const char*>(const char* source) { return source; }
+template <> inline String FromString<String>(const char* source) { return source; }
+template <> inline bool FromString<bool>(const char* source) { return ToBool(source); }
+template <> inline float FromString<float>(const char* source) { return ToFloat(source); }
+template <> inline double FromString<double>(const char* source) { return ToDouble(source); }
+template <> inline int FromString<int>(const char* source) { return ToInt(source); }
+template <> inline unsigned FromString<unsigned>(const char* source) { return ToUInt(source); }
+template <> inline Color FromString<Color>(const char* source) { return ToColor(source); }
+template <> inline IntRect FromString<IntRect>(const char* source) { return ToIntRect(source); }
+template <> inline IntVector2 FromString<IntVector2>(const char* source) { return ToIntVector2(source); }
+template <> inline Quaternion FromString<Quaternion>(const char* source) { return ToQuaternion(source); }
+template <> inline Rect FromString<Rect>(const char* source) { return ToRect(source); }
+template <> inline Vector2 FromString<Vector2>(const char* source) { return ToVector2(source); }
+template <> inline Vector3 FromString<Vector3>(const char* source) { return ToVector3(source); }
+template <> inline Vector4 FromString<Vector4>(const char* source) { return ToVector4(source); }
+template <> inline Variant FromString<Variant>(const char* source) { return ToVectorVariant(source); }
+template <> inline Matrix3 FromString<Matrix3>(const char* source) { return ToMatrix3(source); }
+template <> inline Matrix3x4 FromString<Matrix3x4>(const char* source) { return ToMatrix3x4(source); }
+template <> inline Matrix4 FromString<Matrix4>(const char* source) { return ToMatrix4(source); }
+
+/// Parse type from a string.
+template <class T> T FromString(const String& source) { return FromString<T>(source.CString()); }
 
 }

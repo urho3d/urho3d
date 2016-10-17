@@ -1171,7 +1171,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
 
             // Handle click
             element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
-            SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
+            SendClickEvent(E_UIMOUSECLICK, 0, element, cursorPos, button, buttons, qualifiers);
 
             // Fire double click event if element matches and is in time
             if (doubleClickElement_ && element == doubleClickElement_ &&
@@ -1179,7 +1179,7 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, 0, element, cursorPos, button, buttons, qualifiers);
             }
             else
             {
@@ -1217,10 +1217,10 @@ void UI::ProcessClickBegin(const IntVector2& cursorPos, int button, int buttons,
             // If clicked over no element, or a disabled element, lose focus (but not if there is a modal element)
             if (!HasModalElement())
                 SetFocusElement(0);
-            SendClickEvent(E_UIMOUSECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
+            SendClickEvent(E_UIMOUSECLICK, 0, element, cursorPos, button, buttons, qualifiers);
 
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, NULL, element, cursorPos, button, buttons, qualifiers);
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, 0, element, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;

@@ -226,12 +226,6 @@ DynamicNavigationMesh::DynamicNavigationMesh(Context* context) :
 DynamicNavigationMesh::~DynamicNavigationMesh()
 {
     ReleaseNavigationMesh();
-    delete allocator_;
-    allocator_ = 0;
-    delete compressor_;
-    compressor_ = 0;
-    delete meshProcessor_;
-    meshProcessor_ = 0;
 }
 
 void DynamicNavigationMesh::RegisterObject(Context* context)
@@ -336,7 +330,7 @@ bool DynamicNavigationMesh::Build()
             return false;
         }
 
-        if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_, compressor_, meshProcessor_)))
+        if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
         {
             URHO3D_LOGERROR("Could not initialize tile cache");
             ReleaseNavigationMesh();
@@ -595,7 +589,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
         ReleaseNavigationMesh();
         return;
     }
-    if (dtStatusFailed(tileCache_->init(&tcParams, allocator_, compressor_, meshProcessor_)))
+    if (dtStatusFailed(tileCache_->init(&tcParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
     {
         URHO3D_LOGERROR("Could not initialize tile cache");
         ReleaseNavigationMesh();
@@ -688,7 +682,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
             boundingBox_.max_.y_,
             boundingBox_.min_.z_ + tileEdgeLength * (float)(z + 1)));
 
-    DynamicNavBuildData build(allocator_);
+    DynamicNavBuildData build(allocator_.Get());
 
     rcConfig cfg;
     memset(&cfg, 0, sizeof cfg);
@@ -835,7 +829,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
         header.hmax = (unsigned short)layer->hmax;
 
         if (dtStatusFailed(
-            dtBuildTileCacheLayer(compressor_/*compressor*/, &header, layer->heights, layer->areas/*areas*/, layer->cons,
+            dtBuildTileCacheLayer(compressor_.Get()/*compressor*/, &header, layer->heights, layer->areas/*areas*/, layer->cons,
                 &(tiles[retCt].data), &tiles[retCt].dataSize)))
         {
             URHO3D_LOGERROR("Failed to build tile cache layers");

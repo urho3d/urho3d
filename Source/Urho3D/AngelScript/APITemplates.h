@@ -668,6 +668,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, const Vector3&in)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform(const Vector3&in, const Quaternion&in, float)", asMETHODPR(T, SetTransform, (const Vector3&, const Quaternion&, float), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void SetTransform(const Matrix3x4&in)", asMETHODPR(T, SetTransform, (const Matrix3x4&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float)", asMETHODPR(T, SetTransform2D, (const Vector2&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float, const Vector2&in)", asMETHODPR(T, SetTransform2D, (const Vector2&, float, const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetTransform2D(const Vector2&in, float, float)", asMETHODPR(T, SetTransform2D, (const Vector2&, float, float), void), asCALL_THISCALL);
@@ -777,24 +778,34 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "VariantMap& get_vars()", asFUNCTION(NodeGetVars), asCALL_CDECL_OBJLAST);
 }
 
-static bool ResourceLoad(File* file, XMLFile* ptr)
+static bool ResourceLoad(File* file, Resource* ptr)
 {
     return file && ptr->Load(*file);
 }
 
-static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 {
     return ptr->Load(buffer);
 }
 
-static bool ResourceSave(File* file, XMLFile* ptr)
+static bool ResourceLoadByName(const String& fileName, Resource* ptr)
+{
+    return ptr->Load(fileName);
+}
+
+static bool ResourceSave(File* file, Resource* ptr)
 {
     return file && ptr->Save(*file);
 }
 
-static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, XMLFile* ptr)
+static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 {
     return ptr->Save(buffer);
+}
+
+static bool ResourceSaveByName(const String& fileName, Resource* ptr)
+{
+    return ptr->Save(fileName);
 }
 
 /// Template function for registering a class derived from Resource.
@@ -810,8 +821,10 @@ template <class T> void RegisterResource(asIScriptEngine* engine, const char* cl
     }
     engine->RegisterObjectMethod(className, "bool Load(File@+)", asFUNCTION(ResourceLoad), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Load(VectorBuffer&)", asFUNCTION(ResourceLoadVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Load(const String&in)", asFUNCTION(ResourceLoadByName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(File@+) const", asFUNCTION(ResourceSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool Save(VectorBuffer&) const", asFUNCTION(ResourceSaveVectorBuffer), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool Save(const String&in) const", asFUNCTION(ResourceSaveByName), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_name(const String&in) const", asMETHODPR(T, SetName, (const String&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "const String& get_name() const", asMETHODPR(T, GetName, () const, const String&), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "uint get_memoryUse() const", asMETHODPR(T, GetMemoryUse, () const, unsigned), asCALL_THISCALL);
@@ -950,15 +963,16 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
         return false;
 }
 
-static bool UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
+static UIElement* UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 {
-    if (file)
-    {
-        XMLElement rootElem = file->GetRoot("element");
-        return rootElem && ptr->LoadChildXML(rootElem, styleFile);
-    }
+    if (!file)
+        return 0;
+
+    XMLElement rootElem = file->GetRoot("element");
+    if (rootElem)
+        return ptr->LoadChildXML(rootElem, styleFile);
     else
-        return false;
+        return 0;
 }
 
 static bool UIElementSaveXML(File* file, const String& indentation, UIElement* ptr)
@@ -1053,8 +1067,8 @@ template <class T> void RegisterUIElement(asIScriptEngine* engine, const char* c
     engine->RegisterObjectMethod(className, "bool LoadXML(File@+)", asFUNCTIONPR(UIElementLoadXML, (File*, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(VectorBuffer&)", asFUNCTIONPR(UIElementLoadXMLVectorBuffer, (VectorBuffer&, UIElement*), bool), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool LoadXML(XMLFile@+, XMLFile@+)", asFUNCTIONPR(UIElementLoadXML, (XMLFile*, XMLFile*, UIElement*), bool), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod(className, "bool LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "bool LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(const XMLElement&in, XMLFile@+ arg1 = null, bool arg2 = false)", asMETHOD(T, LoadChildXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "UIElement@+ LoadChildXML(XMLFile@+, XMLFile@+ arg1 = null)", asFUNCTION(UIElementLoadChildXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(File@+, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SaveXML(VectorBuffer&, const String&in indentation = \"\t\")", asFUNCTION(UIElementSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool SetStyle(const XMLElement&in)", asMETHODPR(T, SetStyle, (const XMLElement&), bool), asCALL_THISCALL);

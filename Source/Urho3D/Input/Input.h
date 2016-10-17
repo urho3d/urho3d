@@ -423,16 +423,12 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
-    /// Handling a window resize event flag.
-    bool inResize_;
-    /// Flag for automatic focus (without click inside window) after screen mode change, needed on Linux.
-    bool screenModeChanged_;
     /// Initialized flag.
     bool initialized_;
 
 #ifdef __EMSCRIPTEN__
     /// Emscripten Input glue instance.
-    EmscriptenInput* emscriptenInput_;
+    UniquePtr<EmscriptenInput> emscriptenInput_;
     /// Flag used to detect mouse jump when exiting pointer-lock.
     bool emscriptenExitingPointerLock_;
     /// Flag used to detect mouse jump on initial mouse click when entering pointer-lock.

@@ -261,7 +261,7 @@ public:
     void SetDebugDepthTest(bool enable);
 
     /// Return the Bullet physics world.
-    btDiscreteDynamicsWorld* GetWorld() { return world_; }
+    btDiscreteDynamicsWorld* GetWorld() { return world_.Get(); }
 
     /// Clean up the geometry cache.
     void CleanupGeometryCache();
@@ -301,13 +301,13 @@ private:
     /// Bullet collision configuration.
     btCollisionConfiguration* collisionConfiguration_;
     /// Bullet collision dispatcher.
-    btDispatcher* collisionDispatcher_;
+    UniquePtr<btDispatcher> collisionDispatcher_;
     /// Bullet collision broadphase.
-    btBroadphaseInterface* broadphase_;
+    UniquePtr<btBroadphaseInterface> broadphase_;
     /// Bullet constraint solver.
-    btConstraintSolver* solver_;
+    UniquePtr<btConstraintSolver> solver_;
     /// Bullet physics world.
-    btDiscreteDynamicsWorld* world_;
+    UniquePtr<btDiscreteDynamicsWorld> world_;
     /// Extra weak pointer to scene to allow for cleanup in case the world is destroyed before other components.
     WeakPtr<Scene> scene_;
     /// Rigid bodies in the world.

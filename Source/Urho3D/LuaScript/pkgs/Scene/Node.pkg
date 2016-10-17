@@ -44,6 +44,7 @@ class Node : public Animatable
     void SetTransform(const Vector3& position, const Quaternion& rotation);
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
+    void SetTransform(const Matrix3x4& transform);
     void SetTransform2D(const Vector2& position, float rotation);
     void SetTransform2D(const Vector2& position, float rotation, const Vector2& scale);
     void SetTransform2D(const Vector2& position, float rotation, float scale);

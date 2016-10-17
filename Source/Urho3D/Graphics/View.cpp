@@ -301,7 +301,8 @@ View::View(Context* context) :
     farClipZone_(0),
     occlusionBuffer_(0),
     renderTarget_(0),
-    substituteRenderTarget_(0)
+    substituteRenderTarget_(0),
+    passCommand_(0)
 {
     // Create octree query and scene results vector for each thread
     unsigned numThreads = GetSubsystem<WorkQueue>()->GetNumThreads() + 1; // Worker threads + main thread
@@ -369,6 +370,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             hasScenePasses_ = sourceView_->hasScenePasses_;
             noStencil_ = sourceView_->noStencil_;
             lightVolumeCommand_ = sourceView_->lightVolumeCommand_;
+            forwardLightsCommand_ = sourceView_->forwardLightsCommand_;
             octree_ = sourceView_->octree_;
             return true;
         }
@@ -393,6 +395,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
     hasScenePasses_ = false;
     noStencil_ = false;
     lightVolumeCommand_ = 0;
+    forwardLightsCommand_ = 0;
 
     scenePasses_.Clear();
     geometriesUpdated_ = false;
@@ -457,6 +460,7 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             if (j == batchQueues_.End())
                 j = batchQueues_.Insert(Pair<unsigned, BatchQueue>(info.passIndex_, BatchQueue()));
             info.batchQueue_ = &j->second_;
+            SetQueueShaderDefines(*info.batchQueue_, command);
 
             scenePasses_.Push(info);
         }
@@ -507,7 +511,10 @@ bool View::Define(RenderSurface* renderTarget, Viewport* viewport)
             deferred_ = true;
         }
         else if (command.type_ == CMD_FORWARDLIGHTS)
+        {
+            forwardLightsCommand_ = &command;
             useLitBase_ = command.useLitBase_;
+        }
     }
 
     drawShadows_ = renderer_->GetDrawShadows();
@@ -760,6 +767,17 @@ void View::SetCameraShaderParameters(Camera* camera)
 #endif
 
     graphics_->SetShaderParameter(VSP_VIEWPROJ, projection * camera->GetView());
+
+    // If in a scene pass and the command defines shader parameters, set them now
+    if (passCommand_)
+        SetCommandShaderParameters(*passCommand_);
+}
+
+void View::SetCommandShaderParameters(const RenderPathCommand& command)
+{
+    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
+    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
+        graphics_->SetShaderParameter(k->first_, k->second_);
 }
 
 void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
@@ -1039,6 +1057,16 @@ void View::GetLightBatches()
                 lightQueue.shadowMap_ = 0;
                 lightQueue.litBaseBatches_.Clear(maxSortedInstances);
                 lightQueue.litBatches_.Clear(maxSortedInstances);
+                if (forwardLightsCommand_)
+                {
+                    SetQueueShaderDefines(lightQueue.litBaseBatches_, *forwardLightsCommand_);
+                    SetQueueShaderDefines(lightQueue.litBatches_, *forwardLightsCommand_);
+                }
+                else
+                {
+                    lightQueue.litBaseBatches_.hasExtraDefines_ = false;
+                    lightQueue.litBatches_.hasExtraDefines_ = false;
+                }
                 lightQueue.volumeBatches_.Clear();
 
                 // Allocate shadow map now
@@ -1454,6 +1482,7 @@ void View::ExecuteRenderPathCommands()
         // Set for safety in case of empty renderpath
         currentRenderTarget_ = substituteRenderTarget_ ? substituteRenderTarget_ : renderTarget_;
         currentViewportTexture_ = 0;
+        passCommand_ = 0;
 
         bool viewportModified = false;
         bool isPingponging = false;
@@ -1571,7 +1600,18 @@ void View::ExecuteRenderPathCommands()
                         bool allowDepthWrite = SetTextures(command);
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
                             camera_->GetGPUProjection());
+
+                        if (command.shaderParameters_.Size())
+                        {
+                            // If pass defines shader parameters, reset parameter sources now to ensure they all will be set
+                            // (will be set after camera shader parameters)
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         queue.Draw(this, camera_, command.markToStencil_, false, allowDepthWrite);
+
+                        passCommand_ = 0;
                     }
                 }
                 break;
@@ -1607,6 +1647,12 @@ void View::ExecuteRenderPathCommands()
                         graphics_->SetClipPlane(camera_->GetUseClipping(), camera_->GetClipPlane(), camera_->GetView(),
                             camera_->GetGPUProjection());
 
+                        if (command.shaderParameters_.Size())
+                        {
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         // Draw base (replace blend) batches first
                         i->litBaseBatches_.Draw(this, camera_, false, false, allowDepthWrite);
 
@@ -1618,6 +1664,8 @@ void View::ExecuteRenderPathCommands()
                                 renderer_->OptimizeLightByStencil(i->light_, camera_);
                             i->litBatches_.Draw(this, camera_, false, true, allowDepthWrite);
                         }
+
+                        passCommand_ = 0;
                     }
 
                     graphics_->SetScissorTest(false);
@@ -1643,11 +1691,19 @@ void View::ExecuteRenderPathCommands()
 
                         SetTextures(command);
 
+                        if (command.shaderParameters_.Size())
+                        {
+                            graphics_->ClearParameterSources();
+                            passCommand_ = &command;
+                        }
+
                         for (unsigned j = 0; j < i->volumeBatches_.Size(); ++j)
                         {
                             SetupLightVolumeBatch(i->volumeBatches_[j]);
                             i->volumeBatches_[j].Draw(this, camera_, false);
                         }
+
+                        passCommand_ = 0;
                     }
 
                     graphics_->SetScissorTest(false);
@@ -1838,9 +1894,7 @@ void View::RenderQuad(RenderPathCommand& command)
     }
 
     // Set command's shader parameters last to allow them to override any of the above
-    const HashMap<StringHash, Variant>& parameters = command.shaderParameters_;
-    for (HashMap<StringHash, Variant>::ConstIterator k = parameters.Begin(); k != parameters.End(); ++k)
-        graphics_->SetShaderParameter(k->first_, k->second_);
+    SetCommandShaderParameters(command);
 
     graphics_->SetBlendMode(command.blendMode_);
     graphics_->SetDepthTest(CMP_ALWAYS);
@@ -2827,7 +2881,23 @@ void View::CheckMaterialForAuxView(Material* material)
     material->MarkForAuxView(frame_.frameNumber_);
 }
 
-void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
+void View::SetQueueShaderDefines(BatchQueue& queue, const RenderPathCommand& command)
+{
+    String vsDefines = command.vertexShaderDefines_.Trimmed();
+    String psDefines = command.pixelShaderDefines_.Trimmed();
+    if (vsDefines.Length() || psDefines.Length())
+    {
+        queue.hasExtraDefines_ = true;
+        queue.vsExtraDefines_ = vsDefines;
+        queue.psExtraDefines_ = psDefines;
+        queue.vsExtraDefinesHash_ = StringHash(vsDefines);
+        queue.psExtraDefinesHash_ = StringHash(psDefines);
+    }
+    else
+        queue.hasExtraDefines_ = false;
+}
+
+void View::AddBatchToQueue(BatchQueue& queue, Batch& batch, Technique* tech, bool allowInstancing, bool allowShadows)
 {
     if (!batch.material_)
         batch.material_ = renderer_->GetDefaultMaterial();
@@ -2840,16 +2910,16 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
     {
         BatchGroupKey key(batch);
 
-        HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchQueue.batchGroups_.Find(key);
-        if (i == batchQueue.batchGroups_.End())
+        HashMap<BatchGroupKey, BatchGroup>::Iterator i = queue.batchGroups_.Find(key);
+        if (i == queue.batchGroups_.End())
         {
             // Create a new group based on the batch
             // In case the group remains below the instancing limit, do not enable instancing shaders yet
             BatchGroup newGroup(batch);
             newGroup.geometryType_ = GEOM_STATIC;
-            renderer_->SetBatchShaders(newGroup, tech, allowShadows);
+            renderer_->SetBatchShaders(newGroup, tech, allowShadows, queue);
             newGroup.CalculateSortKey();
-            i = batchQueue.batchGroups_.Insert(MakePair(key, newGroup));
+            i = queue.batchGroups_.Insert(MakePair(key, newGroup));
         }
 
         int oldSize = i->second_.instances_.Size();
@@ -2858,13 +2928,13 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
         if (oldSize < minInstances_ && (int)i->second_.instances_.Size() >= minInstances_)
         {
             i->second_.geometryType_ = GEOM_INSTANCED;
-            renderer_->SetBatchShaders(i->second_, tech, allowShadows);
+            renderer_->SetBatchShaders(i->second_, tech, allowShadows, queue);
             i->second_.CalculateSortKey();
         }
     }
     else
     {
-        renderer_->SetBatchShaders(batch, tech, allowShadows);
+        renderer_->SetBatchShaders(batch, tech, allowShadows, queue);
         batch.CalculateSortKey();
 
         // If batch is static with multiple world transforms and cannot instance, we must push copies of the batch individually
@@ -2875,12 +2945,12 @@ void View::AddBatchToQueue(BatchQueue& batchQueue, Batch& batch, Technique* tech
             for (unsigned i = 0; i < numTransforms; ++i)
             {
                 // Move the transform pointer to generate copies of the batch which only refer to 1 world transform
-                batchQueue.batches_.Push(batch);
+                queue.batches_.Push(batch);
                 ++batch.worldTransform_;
             }
         }
         else
-            batchQueue.batches_.Push(batch);
+            queue.batches_.Push(batch);
     }
 }
 

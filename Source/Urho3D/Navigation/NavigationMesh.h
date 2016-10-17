@@ -278,9 +278,9 @@ protected:
     /// Detour navigation mesh query.
     dtNavMeshQuery* navMeshQuery_;
     /// Detour navigation mesh query filter.
-    dtQueryFilter* queryFilter_;
+    UniquePtr<dtQueryFilter> queryFilter_;
     /// Temporary data for finding a path.
-    FindPathData* pathData_;
+    UniquePtr<FindPathData> pathData_;
     /// Tile size.
     int tileSize_;
     /// Cell size.

@@ -1504,11 +1504,13 @@ The available commands are:
 
 - clear: Clear any of color, depth and stencil. Color clear can optionally use the fog color from the Zone visible at the far clip distance.
 - scenepass: Render scene objects whose \ref Materials "material technique" contains the specified pass. Will either be front-to-back ordered with state sorting, or back-to-front ordered with no state sorting. For deferred rendering, object lightmasks can be optionally marked to the stencil buffer. Vertex lights can optionally be handled during a pass, if it has the necessary shader combinations. Textures global to the pass can be bound to free texture units; these can either be the viewport, a named rendertarget, or a texture resource identified with its pathname.
-- quad: Render a viewport-sized quad using the specified shaders and compilation defines. Textures can be bound and additionally shader parameters and the blend mode (default=replace) can be specified.
+- quad: Render a viewport-sized quad using the specified shaders. The blend mode (default=replace) can be optionally specified.
 - forwardlights: Render per-pixel forward lighting for opaque objects with the specified pass name. Shadow maps are also rendered as necessary.
 - lightvolumes: Render deferred light volumes using the specified shaders. G-buffer textures can be bound as necessary.
 - renderui: Render the UI into the output rendertarget. Using this will cause the default %UI render to the backbuffer to be skipped.
 - sendevent: Send an event with a specified string parameter ("event name"). This can be used to call custom code,typically custom low-level rendering, in the middle of the renderpath execution.
+
+Scenepass, quad, forwardlights and lightvolumes commands all allow command-global shader compilation defines, shader parameters and textures to be defined. For example in deferred rendering, the lightvolumes command would bind the G-buffer textures to be able to calculate the lighting. Note that when binding command-global textures, these are (for optimization) bound only once in the beginning of the command. If the texture binding is overwritten by an object's material, it is "lost" until the end of the command. Therefore the command-global textures should be in units that are not used by materials.
 
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
@@ -1519,22 +1521,27 @@ The render path XML definition looks like this:
 \code
 <renderpath>
     <rendertarget name="RTName" tag="TagName" enabled="true|false" cubemap="true|false" size="x y"|sizedivisor="x y"|sizemultiplier="x y"
-        format="rgb|rgba|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth" filter="true|false" srgb="true|false" persistent="true|false"
+        format="rgb|rgba|l|a|r32f|rgba16|rgba16f|rgba32f|rg16|rg16f|rg32f|lineardepth|readabledepth|d24s8" filter="true|false" srgb="true|false" persistent="true|false"
         multisample="x" autoresolve="true|false" />
     <command type="clear" tag="TagName" enabled="true|false" color="r g b a|fog" depth="x" stencil="y" output="viewport|RTName" face="0|1|2|3|4|5" depthstencil="DSName" />
-    <command type="scenepass" pass="PassName" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
+    <command type="scenepass" pass="PassName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" sort="fronttoback|backtofront" marktostencil="true|false" vertexlights="true|false" metadata="base|alpha|gbuffer" depthstencil="DSName">
         <output index="0" name="RTName1" face="0|1|2|3|4|5" />
         <output index="1" name="RTName2" />
         <output index="2" name="RTName3" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
+        <parameter name="ParameterName" value="x y z w" />
     </command>
     <command type="quad" vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" blend="replace|add|multiply|alpha|addalpha|premulalpha|invdestalpha|subtract|subtractalpha" output="viewport|RTName" depthstencil="DSName" />
         <texture unit="unit" name="viewport|RTName|TextureName" />
         <parameter name="ParameterName" value="x y z w" />
     </command>
-    <command type="forwardlights" pass="PassName" uselitbase="true|false" output="viewport|RTName" depthstencil="DSName" />
-    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" output="viewport|RTName" depthstencil="DSName" />
+    <command type="forwardlights" pass="PassName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" uselitbase="true|false" output="viewport|RTName" depthstencil="DSName">
         <texture unit="unit" name="viewport|RTName|TextureName" />
+        <parameter name="ParameterName" value="x y z w" />
+    </command
+    <command type="lightvolumes"  vs="VertexShaderName" ps="PixelShaderName" vsdefines="DEFINE1 DEFINE2" psdefines="DEFINE3 DEFINE4" output="viewport|RTName" depthstencil="DSName" />
+        <texture unit="unit" name="viewport|RTName|TextureName" />
+        <parameter name="ParameterName" value="x y z w" />
     </command>
     <command type="renderui" output="viewport|RTName" depthstencil="DSName" />
     <command type="sendevent" name="EventName" />
@@ -3453,6 +3460,8 @@ byte[]     Bytecode, produced by AngelScript serializer
 - Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
 
 - Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
+
+- The macro NULL should not be used, 0 is used instead.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor

@@ -132,6 +132,10 @@ public:
     /// Return pixel shaders.
     Vector<SharedPtr<ShaderVariation> >& GetPixelShaders() { return pixelShaders_; }
 
+    /// Return vertex shaders with extra defines from the renderpath.
+    Vector<SharedPtr<ShaderVariation> >& GetVertexShaders(const StringHash& extraDefinesHash);
+    /// Return pixel shaders with extra defines from the renderpath.
+    Vector<SharedPtr<ShaderVariation> >& GetPixelShaders(const StringHash& extraDefinesHash);
     /// Return the effective vertex shader defines, accounting for excludes. Called internally by Renderer.
     String GetEffectiveVertexShaderDefines() const;
     /// Return the effective pixel shader defines, accounting for excludes. Called internally by Renderer.
@@ -172,6 +176,10 @@ private:
     Vector<SharedPtr<ShaderVariation> > vertexShaders_;
     /// Pixel shaders.
     Vector<SharedPtr<ShaderVariation> > pixelShaders_;
+    /// Vertex shaders with extra defines from the renderpath.
+    HashMap<StringHash, Vector<SharedPtr<ShaderVariation> > > extraVertexShaders_;
+    /// Pixel shaders with extra defines from the renderpath.
+    HashMap<StringHash, Vector<SharedPtr<ShaderVariation> > > extraPixelShaders_;
     /// Pass name.
     String name_;
 };
