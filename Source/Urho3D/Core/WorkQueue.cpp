@@ -147,14 +147,20 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
         queue_.Push(item);
     else
     {
+        bool inserted = false;
+
         for (List<WorkItem*>::Iterator i = queue_.Begin(); i != queue_.End(); ++i)
         {
             if ((*i)->priority_ <= item->priority_)
             {
                 queue_.Insert(i, item);
+                inserted = true;
                 break;
             }
         }
+
+        if (!inserted)
+            queue_.Push(item);
     }
 
     if (threads_.Size())
