@@ -749,6 +749,9 @@ void Text::UpdateCharLocations()
             y += rowHeight;
         }
 
+        if (lastFilled > printToText_[i])
+            lastFilled = printToText_[i];
+
         // Fill gaps in case characters were skipped from printing
         for (unsigned j = lastFilled; j <= printToText_[i]; ++j)
             charLocations_[j] = loc;
