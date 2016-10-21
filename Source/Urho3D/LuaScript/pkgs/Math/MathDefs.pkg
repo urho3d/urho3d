@@ -45,6 +45,7 @@ float Atan(float x);
 float Atan2(float y, float x);
 float Sqrt(float x);
 float Pow(float x, float y);
+float Ln(float x);
 float Mod(float x, float y);
 float Fract(float x);
 float Floor(float x);
