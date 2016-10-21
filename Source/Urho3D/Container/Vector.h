@@ -218,6 +218,7 @@ public:
     void Push(const Vector<T>& vector) { InsertElements(size_, vector.Begin(), vector.End()); }
 
 #if URHO3D_CXX11
+    /// Create another element at the end.
     template <typename... Args> T & EmplaceBack(Args&&... args)
     {
         if (size_ < capacity_)
@@ -761,6 +762,7 @@ public:
     }
 
 #if URHO3D_CXX11
+    /// Create another element at the end.
     template <typename... Args> T & EmplaceBack(Args&&... args)
     {
         if (size_ < capacity_)
