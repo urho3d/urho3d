@@ -74,7 +74,8 @@ Texture::Texture(Context* context) :
     sRGB_(false),
     parametersDirty_(true),
     autoResolve_(false),
-    resolveDirty_(false)
+    resolveDirty_(false),
+    levelsDirty_(false)
 {
     for (int i = 0; i < MAX_COORDS; ++i)
         addressMode_[i] = ADDRESS_WRAP;
@@ -254,6 +255,12 @@ void Texture::SetParameters(const XMLElement& element)
 void Texture::SetParametersDirty()
 {
     parametersDirty_ = true;
+}
+
+void Texture::SetLevelsDirty()
+{
+    if (usage_ == TEXTURE_RENDERTARGET && levels_ > 1)
+        levelsDirty_ = true;
 }
 
 unsigned Texture::CheckMaxLevels(int width, int height, unsigned requestedLevels)

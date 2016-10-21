@@ -441,6 +441,11 @@ bool Texture2DArray::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+
+    // Set mipmapping
+    if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1)
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
     textureDesc.MipLevels = levels_;

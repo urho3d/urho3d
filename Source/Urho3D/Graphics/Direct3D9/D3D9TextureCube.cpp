@@ -548,6 +548,8 @@ bool TextureCube::Create()
         return true;
     }
 
+    GraphicsImpl* impl = graphics_->GetImpl();
+
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
 
@@ -558,6 +560,17 @@ bool TextureCube::Create()
         break;
     case TEXTURE_RENDERTARGET:
         d3dUsage |= D3DUSAGE_RENDERTARGET;
+        if (requestedLevels_ != 1)
+        {
+            // Check mipmap autogeneration support
+            if (impl->CheckFormatSupport((D3DFORMAT)format_, D3DUSAGE_AUTOGENMIPMAP, D3DRTYPE_TEXTURE))
+            {
+                requestedLevels_ = 0;
+                d3dUsage |= D3DUSAGE_AUTOGENMIPMAP;
+            }
+            else
+                requestedLevels_ = 1;
+        }
         break;
     default:
         break;

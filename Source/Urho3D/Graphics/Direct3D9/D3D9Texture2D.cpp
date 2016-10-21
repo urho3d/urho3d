@@ -488,6 +488,8 @@ bool Texture2D::Create()
         autoResolve_ = true;
     }
 
+    GraphicsImpl* impl = graphics_->GetImpl();
+
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
 
@@ -498,9 +500,22 @@ bool Texture2D::Create()
         break;
     case TEXTURE_RENDERTARGET:
         d3dUsage |= D3DUSAGE_RENDERTARGET;
+        if (requestedLevels_ != 1)
+        {
+            // Check mipmap autogeneration support
+            if (impl->CheckFormatSupport((D3DFORMAT)format_, D3DUSAGE_AUTOGENMIPMAP, D3DRTYPE_TEXTURE))
+            {
+                requestedLevels_ = 0;
+                d3dUsage |= D3DUSAGE_AUTOGENMIPMAP;
+            }
+            else
+                requestedLevels_ = 1;
+        }
         break;
     case TEXTURE_DEPTHSTENCIL:
         d3dUsage |= D3DUSAGE_DEPTHSTENCIL;
+        // No mipmaps for depth-stencil textures
+        requestedLevels_ = 1;
         break;
     default:
         break;
@@ -509,7 +524,6 @@ bool Texture2D::Create()
     if (multiSample_ > 1)
     {
         // Fall back to non-multisampled if unsupported multisampling mode
-        GraphicsImpl* impl = graphics_->GetImpl();
         if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_,  multiSample_))
         {
             multiSample_ = 1;

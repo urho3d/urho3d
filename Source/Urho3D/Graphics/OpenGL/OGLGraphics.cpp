@@ -1563,6 +1563,8 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
 
             if (texture->GetParametersDirty())
                 texture->UpdateParameters();
+            if (texture->GetLevelsDirty())
+                texture->RegenerateLevels();
         }
         else if (impl_->textureTypes_[index])
         {
@@ -1574,7 +1576,7 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
     }
     else
     {
-        if (texture && texture->GetParametersDirty())
+        if (texture && (texture->GetParametersDirty() || texture->GetLevelsDirty()))
         {
             if (impl_->activeTexture_ != index)
             {
@@ -1583,7 +1585,10 @@ void Graphics::SetTexture(unsigned index, Texture* texture)
             }
 
             glBindTexture(texture->GetTarget(), texture->GetGPUObjectName());
-            texture->UpdateParameters();
+            if (texture->GetParametersDirty())
+                texture->UpdateParameters();
+            if (texture->GetLevelsDirty())
+                texture->RegenerateLevels();
         }
     }
 }
@@ -1681,6 +1686,10 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 parentTexture->SetResolveDirty(true);
                 renderTarget->SetResolveDirty(true);
             }
+
+            // If mipmapped, mark the levels needing regeneration
+            if (parentTexture->GetLevels() > 1)
+                parentTexture->SetLevelsDirty();
         }
 
         impl_->fboDirty_ = true;

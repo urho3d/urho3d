@@ -434,9 +434,15 @@ bool TextureCube::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+
+    // Set mipmapping
+    if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1 && multiSample_ == 1)
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
-    textureDesc.MipLevels = levels_;
+    // Disable mip levels from the multisample texture. Rather create them to the resolve texture
+    textureDesc.MipLevels = multiSample_ == 1 ? levels_ : 1;
     textureDesc.ArraySize = MAX_CUBEMAP_FACES;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = (UINT)multiSample_;
@@ -451,7 +457,7 @@ bool TextureCube::Create()
     // When multisample is specified, creating an actual cube texture will fail. Rather create as a 2D texture array
     // whose faces will be rendered to; only the resolve texture will be an actual cube texture
     if (multiSample_ < 2)
-        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_.ptr_);
     if (FAILED(hr))
@@ -466,7 +472,10 @@ bool TextureCube::Create()
     {
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
-        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
+        if (levels_ != 1)
+            textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
         HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&resolveTexture_);
         if (FAILED(hr))
         {
