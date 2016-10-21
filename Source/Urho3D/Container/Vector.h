@@ -217,6 +217,18 @@ public:
     /// Add another vector at the end.
     void Push(const Vector<T>& vector) { InsertElements(size_, vector.Begin(), vector.End()); }
 
+#if URHO3D_CXX11
+    template <typename... Args> T & EmplaceBack(Args&&... args)
+    {
+        if (size_ < capacity_)
+            ++size_;
+        else
+            Resize(size_ + 1);
+        T * ptr = new (&Back()) T(std::forward<Args>(args)...);
+        return *ptr;
+    }
+#endif
+
     /// Remove the last element.
     void Pop()
     {
@@ -747,6 +759,18 @@ public:
         Resize(size_ + vector.size_);
         CopyElements(Buffer() + oldSize, vector.Buffer(), vector.size_);
     }
+
+#if URHO3D_CXX11
+    template <typename... Args> T & EmplaceBack(Args&&... args)
+    {
+        if (size_ < capacity_)
+            ++size_;
+        else
+            Resize(size_ + 1);
+        T * ptr = new (&Back()) T(std::forward<Args>(args)...);
+        return *ptr;
+    }
+#endif
 
     /// Remove the last element.
     void Pop()
