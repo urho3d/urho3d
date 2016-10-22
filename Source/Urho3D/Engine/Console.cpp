@@ -351,8 +351,9 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             history_.Push(line);
             if (history_.Size() > historyRows_)
                 history_.Erase(history_.Begin());
-            historyPosition_ = history_.Size();
         }
+        
+        historyPosition_ = history_.Size();
 
         currentRow_.Clear();
         lineEdit_->SetText(currentRow_);
