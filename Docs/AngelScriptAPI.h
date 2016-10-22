@@ -12108,6 +12108,8 @@ Array<int> levelWidth;
 /* readonly */
 uint levels;
 /* readonly */
+bool levelsDirty;
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 /* readonly */
@@ -12176,6 +12178,8 @@ Array<int> levelHeight;
 Array<int> levelWidth;
 /* readonly */
 uint levels;
+/* readonly */
+bool levelsDirty;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
@@ -12248,6 +12252,8 @@ Array<int> levelWidth;
 /* readonly */
 uint levels;
 /* readonly */
+bool levelsDirty;
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 /* readonly */
@@ -12318,6 +12324,8 @@ Array<int> levelWidth;
 /* readonly */
 uint levels;
 /* readonly */
+bool levelsDirty;
+/* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
 /* readonly */
@@ -12386,6 +12394,8 @@ Array<int> levelHeight;
 Array<int> levelWidth;
 /* readonly */
 uint levels;
+/* readonly */
+bool levelsDirty;
 /* readonly */
 uint memoryUse;
 Array<int> mipsToSkip;
@@ -13750,7 +13760,7 @@ bool HasSubscribedToEvent(const String&);
 Vector3 ScreenToWorldPoint(int, int, float) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetRenderPath(XMLFile);
-Vector2 WorldToScreenPoint(const Vector3&) const;
+IntVector2 WorldToScreenPoint(const Vector3&) const;
 
 // Properties:
 Camera camera;

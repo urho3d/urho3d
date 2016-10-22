@@ -6470,6 +6470,7 @@ Methods:
 - int GetMultiSample() const
 - bool GetAutoResolve() const
 - bool IsResolveDirty() const
+- bool GetLevelsDirty() const
 - Texture* GetBackupTexture() const
 - int GetMipsToSkip(int quality) const
 - int GetLevelWidth(unsigned level) const
@@ -6494,6 +6495,7 @@ Properties:
 - int multiSample (readonly)
 - bool autoResolve (readonly)
 - bool resolveDirty (readonly)
+- bool levelsDirty (readonly)
 - Texture* backupTexture
 - TextureUsage usage (readonly)
 
