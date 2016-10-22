@@ -1117,6 +1117,8 @@ OpenGL ES 2.0 has further limitations:
 
 - Line antialiasing is not supported.
 
+- WebGL appears to not support rendertarget mipmap regeneration, so mipmaps for rendertargets are disabled on the Web platform for now.
+
 \page VertexBuffers Vertex buffers
 
 %Geometry data is defined by VertexBuffer objects, which hold a number of vertices of a certain vertex format. For rendering, the data is uploaded to the GPU, but optionally a shadow copy of
