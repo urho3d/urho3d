@@ -93,6 +93,8 @@ void Texture2DArray::Release()
 
         object_.name_ = 0;
     }
+
+    levelsDirty_ = false;
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)

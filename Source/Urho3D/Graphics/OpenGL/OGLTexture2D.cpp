@@ -94,6 +94,9 @@ void Texture2D::Release()
         if (renderSurface_)
             renderSurface_->Release();
     }
+
+    resolveDirty_ = false;
+    levelsDirty_ = false;
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
@@ -323,6 +326,15 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         URHO3D_LOGWARNING("Getting texture data while device is lost");
         return false;
     }
+
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGERROR("Can not get data from multisampled texture without autoresolve");
+        return false;
+    }
+    
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<Texture2D*>(this));
 
     graphics_->SetTextureForUpdate(const_cast<Texture2D*>(this));
 
