@@ -1,8 +1,8 @@
 #include "BRDF.hlsl"
 #ifdef COMPILEPS
 
-    #define LightRad 0.3
-    #define LightLengh 1
+    #define LightRad 0.1
+    #define LightLengh 4
 
     float3 SphereLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
     {
@@ -37,7 +37,7 @@
         float3 pos   = (cLightPosPS.xyz - worldPos);
         float3 reflectVec  = reflect(-toCamera, normal);
         
-        float3 L01 = lightVec * LightLengh;
+        float3 L01 = cLightDirPS * LightLengh;
         float3 L0 = pos - 0.5 * L01;
         float3 L1 = pos + 0.5 * L01;
         float3 ld = L1 - L0;
@@ -50,12 +50,9 @@
         ndl             = ( 2.0 * clamp( NoL0 + NoL1, 0.0, 1.0 ) ) 
                         / ( distL0 * distL1 + dot( L0, L1 ) + 2.0 );
     
-        float RoL0      = dot( reflectVec, L0 );
-        float RoLd      = dot( reflectVec, ld );
-        float L0oLd     = dot( L0, ld );
-        float distLd    = length( ld );
-        float t         = ( RoL0 * RoLd - L0oLd ) 
-                    / ( distLd * distLd - RoLd * RoLd );
+        float a = LightLengh * LightLengh;
+        float b = dot( reflectVec, L01 );
+        float t = saturate( dot( L0, b*reflectVec - L01 ) / (a - b*b) );
         
         float3 closestPoint   = L0 + ld * saturate( t);
         float3 centreToRay    = dot( closestPoint, reflectVec ) * reflectVec - closestPoint;
