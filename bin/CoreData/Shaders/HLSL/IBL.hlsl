@@ -229,21 +229,33 @@
 
     float GetMipFromRougness(float roughness)
     {
-        const float smoothness = 1.0 - roughness;
-        return (1.0 - smoothness * smoothness) * 10.0;
+        float Level = 3 - 1.15 * log2( roughness );
+        return 9.0 - 1 - Level;
     }
 
 
-    float3 EnvBRDFApprox (float3 SpecularColor, float Roughness, float NoV)
+    float3 EnvBRDFApprox (float3 specColor, float roughness, float ndv)
     {
         const float4 c0 = float4(-1, -0.0275, -0.572, 0.022 );
         const float4 c1 = float4(1, 0.0425, 1.0, -0.04 );
-        float4 r = Roughness * c0 + c1;
-        float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
+        float4 r = roughness * c0 + c1;
+        float a004 = min( r.x * r.x, exp2( -9.28 * ndv ) ) * r.x + r.y;
         float2 AB = float2( -1.04, 1.04 ) * a004 + r.zw;
-        return SpecularColor * AB.x + AB.y;
+        return specColor * AB.x + AB.y;
     }
 
+    float3 fix_cube_lookup(float3 v) 
+    {
+        float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+        float scale = (1024 - 1) / 1024;
+
+        if (abs(v.x) != M) v.x += scale;
+        if (abs(v.y) != M) v.y += scale;
+        if (abs(v.z) != M) v.z += scale; 
+
+        return v;
+    }
+    
     /// Calculate IBL contributation
     ///     reflectVec: reflection vector for cube sampling
     ///     wsNormal: surface normal in word space
@@ -255,13 +267,10 @@
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
 
-        // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
-        //const float GlossScale = 16.0;
-        //const float GlossBias = 5.0;
-        const float mipSelect = roughness * 9.0;// exp2(GlossScale * roughness + GlossBias) - exp2(GlossBias);
-
-        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, mipSelect)).rgb;
-        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.0)).rgb;
+        const float mipSelect = GetMipFromRougness(roughness);
+        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(fix_cube_lookup(reflectVec), mipSelect)).rgb;
+        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(fix_cube_lookup(wsNormal), 9.0)).rgb;
+        
         // Fake the HDR texture
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
         float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);
