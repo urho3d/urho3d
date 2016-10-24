@@ -126,6 +126,10 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         return false;
     }
 
+    // Disable mipmaps if multisample & custom resolve
+    if (multiSample > 1 && autoResolve == false)
+        requestedLevels_ = 1;
+
     // Delete the old rendersurface if any
     renderSurface_.Reset();
 
@@ -135,11 +139,10 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     {
         renderSurface_ = new RenderSurface(this);
 
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
+        // Clamp mode addressing by default and nearest filtering
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
     }
 
     if (usage == TEXTURE_RENDERTARGET)

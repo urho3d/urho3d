@@ -13452,6 +13452,7 @@ Properties:
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
+- bool levelsDirty // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
 - int multiSample // readonly
@@ -13504,6 +13505,7 @@ Properties:
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
+- bool levelsDirty // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
 - int multiSample // readonly
@@ -13557,6 +13559,7 @@ Properties:
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
+- bool levelsDirty // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
 - int multiSample // readonly
@@ -13609,6 +13612,7 @@ Properties:
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
+- bool levelsDirty // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
 - int multiSample // readonly
@@ -13661,6 +13665,7 @@ Properties:
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
+- bool levelsDirty // readonly
 - uint memoryUse // readonly
 - int[] mipsToSkip
 - int multiSample // readonly
@@ -14875,7 +14880,7 @@ Methods:
 - Vector3 ScreenToWorldPoint(int, int, float) const
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetRenderPath(XMLFile@)
-- Vector2 WorldToScreenPoint(const Vector3&) const
+- IntVector2 WorldToScreenPoint(const Vector3&) const
 
 Properties:
 

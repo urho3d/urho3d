@@ -22,8 +22,9 @@ class Texture : public Resource
     const Color& GetBorderColor() const;
     bool GetSRGB() const;
     int GetMultiSample() const;
-	bool GetAutoResolve() const;
-	bool IsResolveDirty() const;
+    bool GetAutoResolve() const;
+    bool IsResolveDirty() const;
+    bool GetLevelsDirty() const;
     Texture* GetBackupTexture() const;
     int GetMipsToSkip(int quality) const;
     int GetLevelWidth(unsigned level) const;
@@ -46,6 +47,7 @@ class Texture : public Resource
     tolua_readonly tolua_property__get_set int multiSample;
     tolua_readonly tolua_property__get_set bool autoResolve;
     tolua_readonly tolua_property__is_set bool resolveDirty;
+    tolua_readonly tolua_property__get_set bool levelsDirty;
     tolua_property__get_set Texture* backupTexture;
     tolua_readonly tolua_property__get_set TextureUsage usage;
 };

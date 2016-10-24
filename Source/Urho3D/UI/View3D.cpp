@@ -49,6 +49,10 @@ View3D::View3D(Context* context) :
     depthTexture_ = new Texture2D(context_);
     viewport_ = new Viewport(context_);
 
+    // Disable mipmaps since the texel ratio should be 1:1
+    renderTexture_->SetNumLevels(1);
+    depthTexture_->SetNumLevels(1);
+
     SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(View3D, HandleRenderSurfaceUpdate));
 }
 

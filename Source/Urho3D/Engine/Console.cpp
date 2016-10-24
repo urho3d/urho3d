@@ -344,10 +344,15 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         SendEvent(E_CONSOLECOMMAND, newEventData);
 #endif
 
-        // Store to history, then clear the lineedit
-        history_.Push(line);
-        if (history_.Size() > historyRows_)
-            history_.Erase(history_.Begin());
+        // Make sure the line isn't the same as the last one
+        if (history_.Empty() || line != history_.Back())
+        {
+            // Store to history, then clear the lineedit
+            history_.Push(line);
+            if (history_.Size() > historyRows_)
+                history_.Erase(history_.Begin());
+        }
+        
         historyPosition_ = history_.Size();
 
         currentRow_.Clear();

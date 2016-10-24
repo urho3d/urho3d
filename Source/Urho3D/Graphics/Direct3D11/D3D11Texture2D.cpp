@@ -299,6 +299,15 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGERROR("Can not get data from multisampled texture without autoresolve");
+        return false;
+    }
+
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<Texture2D*>(this));
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
 
@@ -323,7 +332,9 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
 
+    ID3D11Resource* srcResource = (ID3D11Resource*)(resolveTexture_ ? resolveTexture_ : object_.ptr_);
     unsigned srcSubResource = D3D11CalcSubresource(level, 0, levels_);
+
     D3D11_BOX srcBox;
     srcBox.left = 0;
     srcBox.right = (UINT)levelWidth;
@@ -331,7 +342,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     srcBox.bottom = (UINT)levelHeight;
     srcBox.front = 0;
     srcBox.back = 1;
-    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, (ID3D11Resource*)object_.ptr_,
+    graphics_->GetImpl()->GetDeviceContext()->CopySubresourceRegion(stagingTexture, 0, 0, 0, 0, srcResource,
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -367,9 +378,17 @@ bool Texture2D::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+
+    // Set mipmapping
+    if (usage_ == TEXTURE_DEPTHSTENCIL)
+        levels_ = 1;
+    else if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1 && multiSample_ == 1)
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
-    textureDesc.MipLevels = levels_;
+    // Disable mip levels from the multisample texture. Rather create them to the resolve texture
+    textureDesc.MipLevels = multiSample_ == 1 ? levels_ : 1;
     textureDesc.ArraySize = 1;
     textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = (UINT)multiSample_;
@@ -393,8 +412,12 @@ bool Texture2D::Create()
     // Create resolve texture for multisampling if necessary
     if (multiSample_ > 1 && autoResolve_)
     {
+        textureDesc.MipLevels = levels_;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.SampleDesc.Quality = 0;
+        if (levels_ != 1)
+            textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
         HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&resolveTexture_);
         if (FAILED(hr))
         {

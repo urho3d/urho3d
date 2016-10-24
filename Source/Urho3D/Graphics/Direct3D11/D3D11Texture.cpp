@@ -192,4 +192,13 @@ unsigned Texture::GetSRGBFormat(unsigned format)
         return format;
 }
 
+void Texture::RegenerateLevels()
+{
+    if (!shaderResourceView_)
+        return;
+
+    graphics_->GetImpl()->GetDeviceContext()->GenerateMips((ID3D11ShaderResourceView*)shaderResourceView_);
+    levelsDirty_ = false;
+}
+
 }

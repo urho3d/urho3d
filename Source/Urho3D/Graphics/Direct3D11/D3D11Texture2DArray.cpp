@@ -70,6 +70,8 @@ void Texture2DArray::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
+
+    levelsDirty_ = false;
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
@@ -441,6 +443,11 @@ bool Texture2DArray::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+
+    // Set mipmapping
+    if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1)
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
     textureDesc.MipLevels = levels_;

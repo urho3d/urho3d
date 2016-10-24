@@ -297,9 +297,8 @@ bool TextureCube::SetSize(int size, unsigned format, TextureUsage usage, int mul
 #endif
         }
 
-        // Nearest filtering and mipmaps disabled by default
+        // Nearest filtering by default
         filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
     }
 
     if (usage == TEXTURE_RENDERTARGET)

@@ -45,6 +45,10 @@ public:
     virtual ~Texture();
 
     /// Set number of requested mip levels. Needs to be called before setting size.
+    /** The default value (0) allocates as many mip levels as necessary to reach 1x1 size. Set value 1 to disable mipmapping.
+        Note that rendertargets need to regenerate mips dynamically after rendering, which may cost performance. Screen buffers
+        and shadow maps allocated by Renderer will have mipmaps disabled.
+     */
     void SetNumLevels(unsigned levels);
     /// Set filtering mode.
     void SetFilterMode(TextureFilterMode filter);
@@ -107,6 +111,9 @@ public:
 
     /// Return whether multisampled texture needs resolve.
     bool IsResolveDirty() const { return resolveDirty_; }
+
+    /// Return whether rendertarget mipmap levels need regenration.
+    bool GetLevelsDirty() const { return levelsDirty_; }
     
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
@@ -161,6 +168,11 @@ public:
 
     /// Set or clear the need resolve flag. Called internally by Graphics.
     void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
+
+    /// Set the mipmap levels dirty flag. Called internally by Graphics.
+    void SetLevelsDirty();
+    /// Regenerate mipmap levels for a rendertarget after rendering and before sampling. Called internally by Graphics. No-op on Direct3D9. On OpenGL the texture must have been bound to work properly.
+    void RegenerateLevels();
 
     /// Check maximum allowed mip levels for a specific texture size.
     static unsigned CheckMaxLevels(int width, int height, unsigned requestedLevels);
@@ -230,6 +242,8 @@ protected:
     bool autoResolve_;
     /// Multisampling resolve needed -flag.
     bool resolveDirty_;
+    /// Mipmap levels regeneration needed -flag.
+    bool levelsDirty_;
     /// Backup texture.
     SharedPtr<Texture> backupTexture_;
 };

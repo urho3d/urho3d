@@ -918,6 +918,7 @@ template <class T> void RegisterTexture(asIScriptEngine* engine, const char* cla
     engine->RegisterObjectMethod(className, "int get_multiSample() const", asMETHOD(T, GetMultiSample), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_autoResolve() const", asMETHOD(T, GetAutoResolve), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool get_resolveDirty() const", asMETHOD(T, IsResolveDirty), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_levelsDirty() const", asMETHOD(T, GetLevelsDirty), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_backupTexture(Texture@+)", asMETHOD(T, SetBackupTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Texture@+ get_backupTexture() const", asMETHOD(T, GetBackupTexture), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_mipsToSkip(int, int)", asMETHOD(T, SetMipsToSkip), asCALL_THISCALL);
