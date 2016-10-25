@@ -98,8 +98,19 @@ bool ValueAnimationInfo::SetTime(float time)
         PODVector<const VAnimEventFrame*> eventFrames;
         GetEventFrames(lastScaledTime_, scaledTime, eventFrames);
 
-        for (unsigned i = 0; i < eventFrames.Size(); ++i)
-            target_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+        if (eventFrames.Size())
+        {
+            // Make a copy of the target weakptr, since if it expires, the AnimationInfo is deleted as well, in which case the
+            // member variable cannot be accessed
+            WeakPtr<Object> targetWeak(target_);
+
+            for (unsigned i = 0; i < eventFrames.Size(); ++i)
+                target_->SendEvent(eventFrames[i]->eventType_, const_cast<VariantMap&>(eventFrames[i]->eventData_));
+
+            // Break immediately if target expired due to event
+            if (targetWeak.Expired())
+                return true;
+        }
     }
 
     lastScaledTime_ = scaledTime;
