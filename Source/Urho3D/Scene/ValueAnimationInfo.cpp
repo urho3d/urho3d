@@ -161,7 +161,8 @@ void ValueAnimationInfo::GetEventFrames(float beginTime, float endTime, PODVecto
     switch (wrapMode_)
     {
     case WM_LOOP:
-        if (beginTime < endTime)
+        /// \todo This can miss an event if the deltatime is exactly the animation's length
+        if (beginTime <= endTime)
             animation_->GetEventFrames(beginTime, endTime, eventFrames);
         else
         {
