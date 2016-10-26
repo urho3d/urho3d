@@ -7466,6 +7466,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
 - bool SaveBMP(const String&) const
+- bool SaveDDS(const String&) const
 - bool SaveJPG(const String&, int) const
 - bool SavePNG(const String&) const
 - bool SaveTGA(const String&) const
@@ -15998,6 +15999,7 @@ Properties:
 - bool IsPowerOfTwo(uint)
 - String Join(String[]&, const String&)
 - float Lerp(float, float, float)
+- float Ln(float)
 - void MarkNetworkUpdate()
 - float Max(float, float)
 - int Max(int, int)

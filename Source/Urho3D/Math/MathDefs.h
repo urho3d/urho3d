@@ -149,6 +149,9 @@ template <class T> inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
 /// Return X in power Y.
 template <class T> T Pow(T x, T y) { return pow(x, y); }
 
+/// Return natural logarithm of X.
+template <class T> T Ln(T x) { return log(x); }
+
 /// Return square root of X.
 template <class T> T Sqrt(T x) { return sqrt(x); }
 

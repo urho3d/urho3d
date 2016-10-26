@@ -1362,11 +1362,19 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
     // Timestep parameter is same no matter what event is being listened to
     float timeStep = eventData[Update::P_TIMESTEP].GetFloat();
 
+    // Keep weak pointer to self to check for destruction caused by event handling
+    WeakPtr<Object> self(this);
+
     Vector<String> finishedNames;
     for (HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Begin();
          i != shaderParameterAnimationInfos_.End(); ++i)
     {
-        if (i->second_->Update(timeStep))
+        bool finished = i->second_->Update(timeStep);
+        // If self deleted as a result of an event sent during animation playback, nothing more to do
+        if (self.Expired())
+            return;
+
+        if (finished)
             finishedNames.Push(i->second_->GetName());
     }
 
