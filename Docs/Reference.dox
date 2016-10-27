@@ -1589,6 +1589,8 @@ The render path starts by allocating a readable depth-stencil texture the same s
 
 The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will perform an additional full scene rendering pass.
 
+Renderpaths whose name ends with "SP" implement soft particles by comparing the scene depth to particles' depth.
+
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
 Otherwise fully customized scene render passes can be specified, but there are a few things to remember related to forward lighting:

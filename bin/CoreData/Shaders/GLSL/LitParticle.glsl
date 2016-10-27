@@ -1,6 +1,7 @@
 #include "Uniforms.glsl"
 #include "Samplers.glsl"
 #include "Transform.glsl"
+#include "ScreenPos.glsl"
 #include "Lighting.glsl"
 #include "Fog.glsl"
 
@@ -8,6 +9,10 @@ varying vec2 vTexCoord;
 varying vec4 vWorldPos;
 #ifdef VERTEXCOLOR
     varying vec4 vColor;
+#endif
+#ifdef SOFTPARTICLES
+    varying vec4 vScreenPos;
+    uniform float cSoftParticleFadeScale;
 #endif
 #ifdef PERPIXEL
     #ifdef SHADOW
@@ -34,6 +39,10 @@ void VS()
     gl_Position = GetClipPos(worldPos);
     vTexCoord = GetTexCoord(iTexCoord);
     vWorldPos = vec4(worldPos, GetDepth(gl_Position));
+
+    #ifdef SOFTPARTICLES
+        vScreenPos = GetScreenPos(gl_Position);
+    #endif
 
     #ifdef VERTEXCOLOR
         vColor = iColor;
@@ -91,6 +100,19 @@ void PS()
         float fogFactor = GetHeightFogFactor(vWorldPos.w, vWorldPos.y);
     #else
         float fogFactor = GetFogFactor(vWorldPos.w);
+    #endif
+
+    // Soft particle fade
+    #ifdef SOFTPARTICLES
+        float particleDepth = vWorldPos.w;
+        #ifdef HWDEPTH
+            float depth = ReconstructDepth(texture2DProj(sDepthBuffer, vScreenPos).r);
+        #else
+            float depth = DecodeDepth(texture2DProj(sDepthBuffer, vScreenPos).rgb);
+        #endif
+        float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
+        float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
+        diffColor.a -= fade;
     #endif
 
     #ifdef PERPIXEL
