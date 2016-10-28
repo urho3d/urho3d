@@ -9,6 +9,7 @@ static const int QUAL_CTRL;
 static const int QUAL_ALT;
 static const int QUAL_ANY;
 
+static const int KEY_UNKNOWN;
 static const int KEY_A;
 static const int KEY_B;
 static const int KEY_C;

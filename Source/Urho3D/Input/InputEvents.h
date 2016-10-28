@@ -249,6 +249,7 @@ static const int QUAL_CTRL = 2;
 static const int QUAL_ALT = 4;
 static const int QUAL_ANY = 8;
 
+static const int KEY_UNKNOWN = SDLK_UNKNOWN;
 static const int KEY_A = SDLK_a;
 static const int KEY_B = SDLK_b;
 static const int KEY_C = SDLK_c;
