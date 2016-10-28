@@ -15212,6 +15212,7 @@ int KEY_SPACE;
 int KEY_T;
 int KEY_TAB;
 int KEY_U;
+int KEY_UNKNOWN;
 int KEY_UP;
 int KEY_V;
 int KEY_W;
