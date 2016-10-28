@@ -122,9 +122,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
         float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
         #ifndef ADDITIVE
-            diffColor.a -= fade;
+            diffColor.a = max(diffColor.a - fade, 0.0);
         #else
-            diffColor.rgb -= fade;
+            diffColor.rgb = max(diffColor.rgb - fade, float3(0.0, 0.0, 0.0));
         #endif
     #endif
 

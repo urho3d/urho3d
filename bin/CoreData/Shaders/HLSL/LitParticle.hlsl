@@ -176,7 +176,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
         #endif
         float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
         float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
-        diffColor.a -= fade;
+        diffColor.a = max(diffColor.a - fade, 0.0);
     #endif
 
     #ifdef PERPIXEL
