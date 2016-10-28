@@ -57,15 +57,28 @@ void PS()
     #endif
 
     // Soft particle fade
+    // In expand mode depth test should be off. In that case do manual alpha discard test first to reduce fill rate
     #ifdef SOFTPARTICLES
+        #ifdef EXPAND
+            if (diffColor.a < 0.01)
+                discard;
+        #endif
+
         float particleDepth = vWorldPos.w;
         #ifdef HWDEPTH
             float depth = ReconstructDepth(texture2DProj(sDepthBuffer, vScreenPos).r);
         #else
             float depth = DecodeDepth(texture2DProj(sDepthBuffer, vScreenPos).rgb);
         #endif
-        float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
-        float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
+
+        #ifdef EXPAND
+            float diffZ = max(particleDepth - depth, 0.0) * (cFarClipPS - cNearClipPS);
+            float fade = clamp(diffZ * cSoftParticleFadeScale, 0.0, 1.0);
+        #else
+            float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
+            float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
+        #endif
+
         #ifndef ADDITIVE
             diffColor.a = max(diffColor.a - fade, 0.0);
         #else

@@ -168,14 +168,27 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 
     // Soft particle fade
+    // In expand mode depth test should be off. In that case do manual alpha discard test first to reduce fill rate
     #ifdef SOFTPARTICLES
+        #ifdef EXPAND
+            if (diffColor.a < 0.01)
+                discard;
+        #endif
+
         float particleDepth = iWorldPos.w;
         float depth = Sample2DProj(DepthBuffer, iScreenPos).r;
         #ifdef HWDEPTH
             depth = ReconstructDepth(depth);
         #endif
-        float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
-        float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
+
+        #ifdef EXPAND
+            float diffZ = max(particleDepth - depth, 0.0) * (cFarClipPS - cNearClipPS);
+            float fade = saturate(diffZ * cSoftParticleFadeScale);
+        #else
+            float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
+            float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
+        #endif
+
         diffColor.a = max(diffColor.a - fade, 0.0);
     #endif
 
