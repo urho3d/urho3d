@@ -140,7 +140,7 @@ void CreateDraggableFish()
 
 void HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
-    // Get UIElement relative position where input (touch or click) occured (top-left = IntVector2(0,0))
+    // Get UIElement relative position where input (touch or click) occurred (top-left = IntVector2(0,0))
     dragBeginPosition = IntVector2(eventData["ElementX"].GetInt(), eventData["ElementY"].GetInt());
 }
 

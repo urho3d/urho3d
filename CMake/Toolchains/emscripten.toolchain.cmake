@@ -53,7 +53,7 @@ endif ()
 if (NOT EMCC_VERSION)
     execute_process (COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc${TOOL_EXT} --version RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE EMCC_VERSION ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (EXIT_CODE EQUAL 0)
-        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMCC_VERSION "${EMCC_VERSION}")    # Stringify as it could be empty when an error has occured
+        string (REGEX MATCH "[^ .]+\\.[^.]+\\.[^ ]+" EMCC_VERSION "${EMCC_VERSION}")    # Stringify as it could be empty when an error has occurred
     else ()
         message (FATAL_ERROR "Could not determine the emcc version. Make sure you have installed and activated the Emscripten SDK correctly.")
     endif ()
@@ -118,7 +118,7 @@ foreach (LANG C CXX)
     # The ABI info could not be checked as per normal as CMake does not understand the test build output from Emscripten, so bypass it also
     set (CMAKE_${LANG}_ABI_COMPILED TRUE)
     set (CMAKE_${LANG}_SIZEOF_DATA_PTR 4)   # Assume it is always 32-bit for now (we could have used our CheckCompilerToolChains.cmake module here)
-    # There could be a bug in CMake itself where setting CMAKE_EXECUTABLE_SUFFIX variable outside of the scope, where it processes the platform configuration files, does not being honored by try_compile() command and as a result all the check macros that depend on try_compile() do not work properly when the CMAKE_EXECUTABLE_SUFFIX variable is only being set later futher down the road; At least one of the CMake devs has the opinion that this is the intended behavior but it is an unconvincing explanation because setting CMAKE_EXECUTABLE_SUFFIX variable later does have the desired effect everywhere else EXCEPT the try_compile() command
+    # There could be a bug in CMake itself where setting CMAKE_EXECUTABLE_SUFFIX variable outside of the scope, where it processes the platform configuration files, does not being honored by try_compile() command and as a result all the check macros that depend on try_compile() do not work properly when the CMAKE_EXECUTABLE_SUFFIX variable is only being set later further down the road; At least one of the CMake devs has the opinion that this is the intended behavior but it is an unconvincing explanation because setting CMAKE_EXECUTABLE_SUFFIX variable later does have the desired effect everywhere else EXCEPT the try_compile() command
     # We are forced to set CMAKE_EXECUTABLE_SUFFIX_C and CMAKE_EXECUTABLE_SUFFIX_CXX here as a workaround; we could not just set CMAKE_EXECUTABLE_SUFFIX directly because CMake processes platform configuration files after the toolchain file and since we tell CMake that we are cross-compiling for 'Linux' platform via CMAKE_SYSTEM_NAME variable, CMake initializes the CMAKE_EXECUTABLE_SUFFIX to empty string (as expected for Linux platform); the workaround avoids our setting from being overwritten by platform configuration files by using the C and CXX language variants of the variable
     # The executable suffix needs to be .js for the below Emscripten-specific compiler setting to be effective
     set (CMAKE_EXECUTABLE_SUFFIX_${LANG} .js)

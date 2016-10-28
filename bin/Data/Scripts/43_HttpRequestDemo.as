@@ -56,10 +56,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Initializing HTTP request
         if (httpRequest.state == HTTP_INITIALIZING)
             return;
-        // An error has occured
+        // An error has occurred
         else if (httpRequest.state == HTTP_ERROR)
         {
-            text.text = "An error has occured.";
+            text.text = "An error has occurred.";
             UnsubscribeFromEvent("Update");
         }
         // Get message data

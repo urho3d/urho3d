@@ -803,7 +803,7 @@ void Node::AddChild(Node* node, unsigned index)
         parent = parent->parent_;
     }
 
-    // Keep a shared ptr to the node while transfering
+    // Keep a shared ptr to the node while transferring
     SharedPtr<Node> nodeShared(node);
     Node* oldParent = node->parent_;
     if (oldParent)

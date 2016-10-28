@@ -47,7 +47,7 @@ public:
     /// Destruct.
     ~AttributeAnimationInfo();
 
-    /// Return attribute infomation.
+    /// Return attribute information.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
 
 protected:

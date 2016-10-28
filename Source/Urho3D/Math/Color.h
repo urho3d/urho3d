@@ -115,7 +115,7 @@ public:
     /// Return negation.
     Color operator -() const { return Color(-r_, -g_, -b_, -a_); }
 
-    /// Substract a color.
+    /// Subtract a color.
     Color operator -(const Color& rhs) const { return Color(r_ - rhs.r_, g_ - rhs.g_, b_ - rhs.b_, a_ - rhs.a_); }
 
     /// Add-assign a color.

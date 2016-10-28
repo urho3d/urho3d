@@ -687,7 +687,7 @@ void Renderer::Update(float timeStep)
         LoadShaders();
 
     // Queue update of the main viewports. Use reverse order, as rendering order is also reverse
-    // to render auxiliary views before dependant main views
+    // to render auxiliary views before dependent main views
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
         QueueViewport(0, viewports_[i]);
 

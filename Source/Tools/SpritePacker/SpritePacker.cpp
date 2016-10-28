@@ -168,7 +168,7 @@ void Run(Vector<String>& arguments)
         ErrorExit("An input and output file must be specified.");
 
     if (frameWidth ^ frameHeight)
-        ErrorExit("Both frameHeight and frameWidth must be ommited or specified.");
+        ErrorExit("Both frameHeight and frameWidth must be omitted or specified.");
 
     // take last input file as output
     if (inputFiles.Size() > 1)
@@ -362,7 +362,7 @@ void Run(Vector<String>& arguments)
             subTexture.SetInt("offsetY", packerInfo->offsetY);
         }
 
-        URHO3D_LOGINFO("Transfering " + packerInfo->path + " to sprite sheet.");
+        URHO3D_LOGINFO("Transferring " + packerInfo->path + " to sprite sheet.");
 
         File file(context, packerInfo->path);
         Image image(context);

@@ -116,7 +116,7 @@ private:
     UniquePtr<dtTileCacheAlloc> allocator_;
     /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes.
     UniquePtr<dtTileCacheCompressor> compressor_;
-    /// Mesh processer used by Detour, in this case a 'pass-through' processor.
+    /// Mesh processor used by Detour, in this case a 'pass-through' processor.
     UniquePtr<dtTileCacheMeshProcess> meshProcessor_;
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_;

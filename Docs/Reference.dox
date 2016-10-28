@@ -2462,7 +2462,7 @@ Box2D fixtures are implemented through the CollisionShape2D base class for 2D ph
 - Friction: \ref CollisionShape2D::SetFriction "SetFriction()" and \ref CollisionShape2D::GetFriction "GetFriction()"
 - Restitution (bounciness): \ref CollisionShape2D::SetRestitution "SetRestitution()" and \ref CollisionShape2D::GetRestitution "GetRestitution()"
 
-CollisionShape2D class also provides readonly acces to these properties:
+CollisionShape2D class also provides readonly access to these properties:
 - Mass: \ref CollisionShape2D::GetMass "GetMass()"
 - Inertia: \ref CollisionShape2D::GetInertia "GetInertia()"
 - Center of mass: \ref CollisionShape2D::GetMassCenter "GetMassCenter()"
@@ -2638,7 +2638,7 @@ Except Tile, objects are not visible (although you can display them for debuggin
 - to create a background from Tile sprites
 - etc.
 
-Additionaly Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
+Additionally Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
 
 If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 

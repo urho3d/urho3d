@@ -91,10 +91,10 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Initializing HTTP request
         if (httpRequest_->GetState() == HTTP_INITIALIZING)
             return;
-        // An error has occured
+        // An error has occurred
         else if (httpRequest_->GetState() == HTTP_ERROR)
         {
-            text_->SetText("An error has occured.");
+            text_->SetText("An error has occurred.");
             UnsubscribeFromEvent("Update");
         }
         // Get message data
