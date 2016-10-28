@@ -67,9 +67,9 @@ void PS()
         float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
         float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
         #ifndef ADDITIVE
-            diffColor.a -= fade;
+            diffColor.a = max(diffColor.a - fade, 0.0);
         #else
-            diffColor.rgb -= fade;
+            diffColor.rgb = max(diffColor.rgb - fade, vec3(0.0, 0.0, 0.0));
         #endif
     #endif
 

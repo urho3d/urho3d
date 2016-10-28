@@ -112,7 +112,7 @@ void PS()
         #endif
         float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
         float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
-        diffColor.a -= fade;
+        diffColor.a = max(diffColor.a - fade, 0.0);
     #endif
 
     #ifdef PERPIXEL
