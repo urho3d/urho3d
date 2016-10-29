@@ -161,6 +161,8 @@ public:
     void SetTransform(const Vector3& position, const Quaternion& rotation, float scale);
     /// Set both position, rotation and scale in parent space as an atomic operation.
     void SetTransform(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+    /// Set node transformation in parent space as an atomic operation.
+    void SetTransform(const Matrix3x4& matrix);
 
     /// Set both position and rotation in parent space as an atomic operation (for Urho2D).
     void SetTransform2D(const Vector2& position, float rotation) { SetTransform(Vector3(position), Quaternion(rotation)); }
@@ -497,10 +499,16 @@ public:
 
     /// Return child scene nodes, optionally recursive.
     void GetChildren(PODVector<Node*>& dest, bool recursive = false) const;
+    /// Return child scene nodes, optionally recursive.
+    PODVector<Node*> GetChildren(bool recursive) const;
     /// Return child scene nodes with a specific component.
     void GetChildrenWithComponent(PODVector<Node*>& dest, StringHash type, bool recursive = false) const;
+    /// Return child scene nodes with a specific component.
+    PODVector<Node*> GetChildrenWithComponent(StringHash type, bool recursive = false) const;
     /// Return child scene nodes with a specific tag.
     void GetChildrenWithTag(PODVector<Node*>& dest, const String& tag, bool recursive = false) const;
+    /// Return child scene nodes with a specific tag.
+    PODVector<Node*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
 
     /// Return child scene node by index.
     Node* GetChild(unsigned index) const;
@@ -678,7 +686,7 @@ private:
     /// Node listeners.
     Vector<WeakPtr<Component> > listeners_;
     /// Pointer to implementation.
-    NodeImpl* impl_;
+    UniquePtr<NodeImpl> impl_;
 
 protected:
     /// User variables.

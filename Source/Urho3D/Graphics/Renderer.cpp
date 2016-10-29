@@ -956,6 +956,9 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     int retries = 3;
     unsigned dummyColorFormat = graphics_->GetDummyColorFormat();
 
+    // Disable mipmaps from the shadow map
+    newShadowMap->SetNumLevels(1);
+
     while (retries)
     {
         if (!newShadowMap->SetSize(width, height, shadowMapFormat, shadowMapUsage, multiSample))
@@ -984,6 +987,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
                 if (!colorShadowMaps_.Contains(searchKey))
                 {
                     colorShadowMaps_[searchKey] = new Texture2D(context_);
+                    colorShadowMaps_[searchKey]->SetNumLevels(1);
                     colorShadowMaps_[searchKey]->SetSize(width, height, dummyColorFormat, TEXTURE_RENDERTARGET);
                 }
                 // Link the color rendertarget to the shadow map
@@ -1051,6 +1055,8 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
         if (!cubemap)
         {
             SharedPtr<Texture2D> newTex2D(new Texture2D(context_));
+            /// \todo Mipmaps disabled for now. Allow to request mipmapped buffer?
+            newTex2D->SetNumLevels(1);
             newTex2D->SetSize(width, height, format, depthStencil ? TEXTURE_DEPTHSTENCIL : TEXTURE_RENDERTARGET, multiSample, autoResolve);
 
 #ifdef URHO3D_OPENGL
@@ -1072,6 +1078,7 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
         else
         {
             SharedPtr<TextureCube> newTexCube(new TextureCube(context_));
+            newTexCube->SetNumLevels(1);
             newTexCube->SetSize(width, format, TEXTURE_RENDERTARGET, multiSample);
 
             newBuffer = newTexCube;

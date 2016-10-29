@@ -71,8 +71,6 @@ XMLFile::XMLFile(Context* context) :
 
 XMLFile::~XMLFile()
 {
-    delete document_;
-    document_ = 0;
 }
 
 void XMLFile::RegisterObject(Context* context)
@@ -116,11 +114,10 @@ bool XMLFile::BeginLoad(Deserializer& source)
         }
 
         // Patch this XMLFile and leave the original inherited XMLFile as it is
-        pugi::xml_document* patchDocument = document_;
+        UniquePtr<pugi::xml_document> patchDocument(document_.Detach());
         document_ = new pugi::xml_document();
         document_->reset(*inheritedXMLFile->document_);
         Patch(rootElem);
-        delete patchDocument;
 
         // Store resource dependencies so we know when to reload/repatch when the inherited resource changes
         cache->StoreResourceDependency(this, inherit);

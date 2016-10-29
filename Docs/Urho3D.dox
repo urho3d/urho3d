@@ -116,6 +116,7 @@ Urho3D development, contributions and bugfixes by:
 - AGreatFish
 - BlueMagnificent
 - Enhex
+- Fastran
 - Firegorilla
 - Gordon-F
 - Lumak
@@ -1051,6 +1052,7 @@ From 1.6 to master:
   Use the directory "Shaders/HLSL/Cache" to get the old behavior.
 - Signatures of UIElement virtual functions OnResize() and OnPositionSet() have changed.
 - UIElement::LoadChildXML() now returns the created element on success, instead of a boolean.
+- Rendertargets have gained the ability to have automatically regenerated mipmaps. Screen buffers received from the Renderer subsystem have mipmaps off, but for manually created rendertargets the default is mipmaps on, like for ordinary textures. Use SetNumLevels(1) to disable.
 */
 
 }

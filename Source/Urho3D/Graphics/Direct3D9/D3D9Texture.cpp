@@ -104,4 +104,10 @@ unsigned Texture::GetRowDataSize(int width) const
     }
 }
 
+void Texture::RegenerateLevels()
+{
+    // No-op on Direct3D9
+    levelsDirty_ = false;
+}
+
 }

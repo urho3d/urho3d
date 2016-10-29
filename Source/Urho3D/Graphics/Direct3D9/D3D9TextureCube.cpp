@@ -86,6 +86,9 @@ void TextureCube::Release()
     }
 
     URHO3D_SAFE_RELEASE(object_.ptr_);
+
+    resolveDirty_ = false;
+    levelsDirty_ = false;
 }
 
 bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
@@ -419,6 +422,9 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         return false;
     }
 
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<TextureCube*>(this));
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
 
@@ -439,15 +445,36 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
             return false;
         }
 
+        // If multisampled, must copy the surface of the resolve texture instead of the multisampled surface
+        IDirect3DSurface9* resolveSurface = 0;
+        if (multiSample_ > 1)
+        {
+            HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)face, 0,
+                (IDirect3DSurface9**)&resolveSurface);
+            if (FAILED(hr))
+            {
+                URHO3D_LOGD3DERROR("Could not get surface of the resolve texture", hr);
+                URHO3D_SAFE_RELEASE(resolveSurface);
+                return false;
+            }
+        }
+
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
             URHO3D_SAFE_RELEASE(offscreenSurface);
+            URHO3D_SAFE_RELEASE(resolveSurface);
             return false;
         }
-        hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurfaces_[face]->GetSurface(), offscreenSurface);
+
+        if (resolveSurface)
+            hr = device->GetRenderTargetData(resolveSurface, offscreenSurface);
+        else
+            hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurfaces_[face]->GetSurface(), offscreenSurface);
+        URHO3D_SAFE_RELEASE(resolveSurface);
+
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
@@ -525,13 +552,11 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     }
 
     if (offscreenSurface)
-    {
         offscreenSurface->UnlockRect();
-        URHO3D_SAFE_RELEASE(offscreenSurface);
-    }
     else
         ((IDirect3DCubeTexture9*)object_.ptr_)->UnlockRect((D3DCUBEMAP_FACES)face, level);
 
+    URHO3D_SAFE_RELEASE(offscreenSurface);
     return true;
 }
 
@@ -548,6 +573,8 @@ bool TextureCube::Create()
         return true;
     }
 
+    GraphicsImpl* impl = graphics_->GetImpl();
+
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
 
@@ -558,6 +585,17 @@ bool TextureCube::Create()
         break;
     case TEXTURE_RENDERTARGET:
         d3dUsage |= D3DUSAGE_RENDERTARGET;
+        if (requestedLevels_ != 1)
+        {
+            // Check mipmap autogeneration support
+            if (impl->CheckFormatSupport((D3DFORMAT)format_, D3DUSAGE_AUTOGENMIPMAP, D3DRTYPE_TEXTURE))
+            {
+                requestedLevels_ = 0;
+                d3dUsage |= D3DUSAGE_AUTOGENMIPMAP;
+            }
+            else
+                requestedLevels_ = 1;
+        }
         break;
     default:
         break;

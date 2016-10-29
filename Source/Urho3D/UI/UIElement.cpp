@@ -1743,6 +1743,13 @@ void UIElement::GetChildrenWithTag(PODVector<UIElement*>& dest, const String& ta
         GetChildrenWithTagRecursive(dest, tag);
 }
 
+PODVector<UIElement*> UIElement::GetChildrenWithTag(const String& tag, bool recursive) const
+{
+    PODVector<UIElement*> dest;
+    GetChildrenWithTag(dest, tag, recursive);
+    return dest;
+}
+
 void UIElement::GetChildrenWithTagRecursive(PODVector<UIElement*>& dest, const String& tag) const
 {
     for (Vector<SharedPtr<UIElement> >::ConstIterator i = children_.Begin(); i != children_.End(); ++i)

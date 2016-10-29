@@ -22,6 +22,7 @@ class Vector2
     float LengthSquared() const;
     float DotProduct(const Vector2& rhs) const;
     float AbsDotProduct(const Vector2& rhs) const;
+    float ProjectOntoAxis(const Vector2& axis) const;
     float Angle(const Vector2& rhs) const;
     Vector2 Abs() const;
     Vector2 Lerp(const Vector2& rhs, float t) const;
@@ -58,9 +59,25 @@ class IntVector2
     IntVector2 operator / (int rhs) const;
 
     String ToString() const;
+    unsigned ToHash() const;
+    float Length() const;
 
     int x_ @ x;
     int y_ @ y;
 
     static const IntVector2 ZERO;
 };
+
+Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t);
+Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs);
+Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs);
+Vector2 VectorFloor(const Vector2& vec);
+Vector2 VectorRound(const Vector2& vec);
+Vector2 VectorCeil(const Vector2& vec);
+IntVector2 VectorFloorToInt(const Vector2& vec);
+IntVector2 VectorRoundToInt(const Vector2& vec);
+IntVector2 VectorCeilToInt(const Vector2& vec);
+IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs);
+IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs);
+float StableRandom(const Vector2& seed);
+float StableRandom(float seed);

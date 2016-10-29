@@ -126,11 +126,11 @@ public:
     bool GetInterceptNetworkUpdate(const String& attributeName) const;
 
     /// Return the network attribute state, if allocated.
-    NetworkState* GetNetworkState() const { return networkState_; }
+    NetworkState* GetNetworkState() const { return networkState_.Get(); }
 
 protected:
     /// Network attribute state.
-    NetworkState* networkState_;
+    UniquePtr<NetworkState> networkState_;
 
 private:
     /// Set instance-level default value. Allocate the internal data structure as necessary.
@@ -139,7 +139,7 @@ private:
     Variant GetInstanceDefault(const String& name) const;
 
     /// Attribute default value at each instance level.
-    VariantMap* instanceDefaultValues_;
+    UniquePtr<VariantMap> instanceDefaultValues_;
     /// Temporary flag.
     bool temporary_;
 };

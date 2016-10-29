@@ -270,7 +270,7 @@ bool Image::BeginLoad(Deserializer& source)
         // DDS compressed format
         DDSurfaceDesc2 ddsd;
         source.Read(&ddsd, sizeof(ddsd));
-        
+
         // DDS DX10+
         const bool hasDXGI = ddsd.ddpfPixelFormat_.dwFourCC_ == FOURCC_DX10;
         DDSHeader10 dxgiHeader;
@@ -278,7 +278,7 @@ bool Image::BeginLoad(Deserializer& source)
             source.Read(&dxgiHeader, sizeof(dxgiHeader));
 
         unsigned fourCC = ddsd.ddpfPixelFormat_.dwFourCC_;
-        
+
         // If the DXGI header is available then remap formats and check sRGB
         if (hasDXGI)
         {
@@ -367,7 +367,7 @@ bool Image::BeginLoad(Deserializer& source)
             unsigned blocksWide = (ddsd.dwWidth_ + 3) / 4;
             unsigned blocksHeight = (ddsd.dwHeight_ + 3) / 4;
             dataSize = blocksWide * blocksHeight * blockSize;
-            
+
             // Calculate mip data size
             unsigned x = ddsd.dwWidth_ / 2;
             unsigned y = ddsd.dwHeight_ / 2;
@@ -408,7 +408,7 @@ bool Image::BeginLoad(Deserializer& source)
             currentImage->numCompressedLevels_ = ddsd.dwMipMapCount_;
             if (!currentImage->numCompressedLevels_)
                 currentImage->numCompressedLevels_ = 1;
-            
+
             // Memory use needs to be exact per image as it's used for verifying the data size in GetCompressedLevel()
             // even though it would be more proper for the first image to report the size of all siblings combined
             currentImage->SetMemoryUse(dataSize);
@@ -423,7 +423,7 @@ bool Image::BeginLoad(Deserializer& source)
                 currentImage = nextImage;
             }
         }
-        
+
         // If uncompressed DDS, convert the data to 8bit RGBA as the texture classes can not currently use eg. RGB565 format
         if (compressedFormat_ == CF_RGBA)
         {
@@ -458,7 +458,7 @@ bool Image::BeginLoad(Deserializer& source)
                 ADJUSTSHIFT(gMask, gShiftL, gShiftR)
                 ADJUSTSHIFT(bMask, bShiftL, bShiftR)
                 ADJUSTSHIFT(aMask, aShiftL, aShiftR)
-                
+
                 SharedArrayPtr<unsigned char> rgbaData(new unsigned char[numPixels * 4]);
 
                 switch (sourcePixelByteSize)
@@ -775,6 +775,19 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
+bool Image::Save(const String& fileName) const
+{
+    if (fileName.EndsWith(".dds", false))
+        return SaveDDS(fileName);
+    else if (fileName.EndsWith(".bmp", false))
+        return SaveBMP(fileName);
+    else if (fileName.EndsWith(".jpg", false) || fileName.EndsWith(".jpeg", false))
+        return SaveJPG(fileName, 100);
+    else if (fileName.EndsWith(".tga", false))
+        return SaveTGA(fileName);
+    else
+        return SavePNG(fileName);
+}
 
 bool Image::SetSize(int width, int height, unsigned components)
 {
@@ -1212,6 +1225,58 @@ bool Image::SaveJPG(const String& fileName, int quality) const
         return false;
 }
 
+bool Image::SaveDDS(const String& fileName) const
+{
+    URHO3D_PROFILE(SaveImageDDS);
+
+    File outFile(context_, fileName, FILE_WRITE);
+    if (!outFile.IsOpen())
+    {
+        URHO3D_LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        URHO3D_LOGERROR("Can not save compressed image to DDS");
+        return false;
+    }
+
+    if (components_ != 4)
+    {
+        URHO3D_LOGERRORF("Can not save image with %u components to DDS", components_);
+        return false;
+    }
+
+    // Write image
+    PODVector<const Image*> levels;
+    GetLevels(levels);
+
+    outFile.WriteFileID("DDS ");
+
+    DDSurfaceDesc2 ddsd;
+    memset(&ddsd, 0, sizeof(ddsd));
+    ddsd.dwSize_ = sizeof(ddsd);
+    ddsd.dwFlags_ = 0x00000001l /*DDSD_CAPS*/
+        | 0x00000002l /*DDSD_HEIGHT*/ | 0x00000004l /*DDSD_WIDTH*/ | 0x00020000l /*DDSD_MIPMAPCOUNT*/ | 0x00001000l /*DDSD_PIXELFORMAT*/;
+    ddsd.dwWidth_ = width_;
+    ddsd.dwHeight_ = height_;
+    ddsd.dwMipMapCount_ = levels.Size();
+    ddsd.ddpfPixelFormat_.dwFlags_ = 0x00000040l /*DDPF_RGB*/ | 0x00000001l /*DDPF_ALPHAPIXELS*/;
+    ddsd.ddpfPixelFormat_.dwSize_ = sizeof(ddsd.ddpfPixelFormat_);
+    ddsd.ddpfPixelFormat_.dwRGBBitCount_ = 32;
+    ddsd.ddpfPixelFormat_.dwRBitMask_ = 0x000000ff;
+    ddsd.ddpfPixelFormat_.dwGBitMask_ = 0x0000ff00;
+    ddsd.ddpfPixelFormat_.dwBBitMask_ = 0x00ff0000;
+    ddsd.ddpfPixelFormat_.dwRGBAlphaBitMask_ = 0xff000000;
+
+    outFile.Write(&ddsd, sizeof(ddsd));
+    for (unsigned i = 0; i < levels.Size(); ++i)
+        outFile.Write(levels[i]->GetData(), levels[i]->GetWidth() * levels[i]->GetHeight() * 4);
+
+    return true;
+}
+
 Color Image::GetPixel(int x, int y) const
 {
     return GetPixel(x, y, 0);
@@ -1293,8 +1358,8 @@ Color Image::GetPixelBilinear(float x, float y) const
 
     int xI = (int)x;
     int yI = (int)y;
-    float xF = x - floorf(x);
-    float yF = y - floorf(y);
+    float xF = Fract(x);
+    float yF = Fract(y);
 
     Color topColor = GetPixel(xI, yI).Lerp(GetPixel(xI + 1, yI), xF);
     Color bottomColor = GetPixel(xI, yI + 1).Lerp(GetPixel(xI + 1, yI + 1), xF);
@@ -1315,9 +1380,9 @@ Color Image::GetPixelTrilinear(float x, float y, float z) const
     int zI = (int)z;
     if (zI == depth_ - 1)
         return GetPixelBilinear(x, y);
-    float xF = x - floorf(x);
-    float yF = y - floorf(y);
-    float zF = z - floorf(z);
+    float xF = Fract(x);
+    float yF = Fract(y);
+    float zF = Fract(z);
 
     Color topColorNear = GetPixel(xI, yI, zI).Lerp(GetPixel(xI + 1, yI, zI), xF);
     Color bottomColorNear = GetPixel(xI, yI + 1, zI).Lerp(GetPixel(xI + 1, yI + 1, zI), xF);
@@ -2074,5 +2139,5 @@ void Image::FreeImageData(unsigned char* pixelData)
 
     stbi_image_free(pixelData);
 }
- 
+
 }

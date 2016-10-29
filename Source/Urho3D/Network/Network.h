@@ -147,7 +147,7 @@ private:
     void ConfigureNetworkSimulator();
 
     /// kNet instance.
-    kNet::Network* network_;
+    UniquePtr<kNet::Network> network_;
     /// Client's server connection.
     SharedPtr<Connection> serverConnection_;
     /// Server's client connections.

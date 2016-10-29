@@ -57,18 +57,12 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
 
 Serializable::Serializable(Context* context) :
     Object(context),
-    networkState_(0),
-    instanceDefaultValues_(0),
     temporary_(false)
 {
 }
 
 Serializable::~Serializable()
 {
-    delete networkState_;
-    networkState_ = 0;
-    delete instanceDefaultValues_;
-    instanceDefaultValues_ = 0;
 }
 
 void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
@@ -669,8 +663,7 @@ void Serializable::ResetToDefault()
 
 void Serializable::RemoveInstanceDefault()
 {
-    delete instanceDefaultValues_;
-    instanceDefaultValues_ = 0;
+    instanceDefaultValues_.Reset();
 }
 
 void Serializable::SetTemporary(bool enable)
