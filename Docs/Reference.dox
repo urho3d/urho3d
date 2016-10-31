@@ -1591,14 +1591,13 @@ The ForwardDepth.xml render path does the same, but using a linear depth rendert
 
 \section RenderPaths_SoftParticles Soft particles rendering
 
-Soft particles rendering is a practical example of utilizing scene depth reading. Renderpaths whose name ends with "SP" enable soft particles by adding the SOFTPARTICLES shader compile define for the alpha pass. This is recognized by the LitParticle & UnlitParticle shaders.
+Soft particles rendering is a practical example of utilizing scene depth reading. The default renderpaths that expose a readable depth bind the depth texture in the alpha pass. This is utilized by the UnlitParticle & LitParticle shaders when the SOFTPARTICLES shader compilation define is included. The particle techniques containing "Soft" in their name in Bin/CoreData/Techniques use this. Note that they expect a readable depth and will not work with the plain forward renderpath!
 
 Soft particles can be implemented in two contrasting approaches: "shrinking" and "expanding". In the shrinking approach (default) depth test can be left on and the soft particle shader starts to reduce particle opacity when the particle geometry approaches solid geometry. In the expanding approach the particles should have depth test off, and the shader instead starts to reduce the particle opacity when the particle geometry overshoots the solid geometry.
 
-For the expanding mode, see the "Expand" family of particle techniques in Bin/CoreData/Techniques. The downside is that performance can be lower due to not being able to use the hardware depth test, and the same technique can not be used when readable depth is not available, as otherwise the particles would clip through any solid geometry.
+For the expanding mode, see the "SoftExpand" family of particle techniques in Bin/CoreData/Techniques. The downside is that performance can be lower due to not being able to use the hardware depth test, and the same technique can not be used when readable depth is not available, as otherwise the particles would clip through any solid geometry.
 
-Note the SoftParticleFadeScale shader parameter which can be used to control the distance over which the fade
-will take effect. The renderpath sets the default value (1) but it can be adjusted by materials.
+Finally note the SoftParticleFadeScale shader parameter which is needed to control the distance over which the fade will take effect. This is defined in example materials using soft particles (SmokeSoft.xml & LitSmokeSoft.xml)
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 

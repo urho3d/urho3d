@@ -18,6 +18,8 @@
     <command type="scenepass" pass="refract" depthstencil="depth">
         <texture unit="environment" name="viewport" />
     </command>
-    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth" />
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth" psdefines="HWDEPTH">
+        <texture unit="depth" name="depth" />
+    </command>
     <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
 </renderpath>
