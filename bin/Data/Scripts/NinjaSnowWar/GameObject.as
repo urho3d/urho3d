@@ -118,7 +118,7 @@ class GameObject : ScriptObject
                     onGround = true;
                 else
                 {
-                    // If contact is somewhere inbetween vertical/horizontal, is sliding a slope
+                    // If contact is somewhere between vertical/horizontal, is sliding a slope
                     if (level > 0.1)
                         isSliding = true;
                 }

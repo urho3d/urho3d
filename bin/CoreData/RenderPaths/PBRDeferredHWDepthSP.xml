@@ -1,8 +1,0 @@
-<renderpath inherit="RenderPaths/PBRDeferredHWDepth.xml">
-    <replace sel="/renderpath/command[@type='scenepass' and @pass='alpha']">
-        <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth" vsdefines="SOFTPARTICLES" psdefines="SOFTPARTICLES HWDEPTH" >
-            <parameter name="SoftParticleFadeScale" value="1" />
-            <texture unit="depth" name="depth" />
-        </command>
-    </replace>
-</renderpath>

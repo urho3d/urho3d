@@ -1,8 +1,0 @@
-<renderpath inherit="RenderPaths/PBRDeferred.xml">
-    <replace sel="/renderpath/command[@type='scenepass' and @pass='alpha']">
-        <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" vsdefines="SOFTPARTICLES" psdefines="SOFTPARTICLES" >
-            <parameter name="SoftParticleFadeScale" value="1" />
-            <texture unit="depth" name="depth" />
-        </command>
-    </replace>
-</renderpath>

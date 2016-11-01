@@ -1562,7 +1562,7 @@ bool ColorWheelSetupBehaviorForColoring()
             }
             else if (coloringPropertyName == "menuSpecularIntensity")
             {
-               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we devide in and multiply out 
+               // ColorWheel have only 0-1 range output of V-value(BW), and for huge-range values we divide in and multiply out 
                float scaledSpecular = light.specularIntensity * 0.1f; 
                coloringOldScalar = scaledSpecular;
                ShowColorWheelWithColor(Color(scaledSpecular,scaledSpecular,scaledSpecular));

@@ -103,7 +103,7 @@ void Character::FixedUpdate(float timeStep)
         Vector3 brakeForce = -planeVelocity * BRAKE_FORCE;
         body->ApplyImpulse(brakeForce);
 
-        // Jump. Must release jump control inbetween jumps
+        // Jump. Must release jump control between jumps
         if (controls_.IsDown(CTRL_JUMP))
         {
             if (okToJump_)

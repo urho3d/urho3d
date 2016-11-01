@@ -354,7 +354,7 @@ void Node::AddTag(const String& tag)
     // Check if tag empty or already added
     if (tag.Empty() || HasTag(tag))
         return;
-    
+
     // Add tag
     impl_->tags_.Push(tag);
 
@@ -406,7 +406,7 @@ bool Node::RemoveTag(const String& tag)
         eventData[P_TAG] = tag;
         scene_->SendEvent(E_NODETAGREMOVED, eventData);
     }
-    
+
     // Sync
     MarkNetworkUpdate();
     return true;
@@ -782,11 +782,16 @@ void Node::MarkDirty()
     }
 }
 
-Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id)
+Node* Node::CreateChild(const String& name, CreateMode mode, unsigned id, bool temporary)
 {
-    Node* newNode = CreateChild(id, mode);
+    Node* newNode = CreateChild(id, mode, temporary);
     newNode->SetName(name);
     return newNode;
+}
+
+Node* Node::CreateTemporaryChild(const String& name, CreateMode mode, unsigned id)
+{
+    return CreateChild(name, mode, id, true);
 }
 
 void Node::AddChild(Node* node, unsigned index)
@@ -803,7 +808,7 @@ void Node::AddChild(Node* node, unsigned index)
         parent = parent->parent_;
     }
 
-    // Keep a shared ptr to the node while transfering
+    // Keep a shared ptr to the node while transferring
     SharedPtr<Node> nodeShared(node);
     Node* oldParent = node->parent_;
     if (oldParent)
@@ -1769,9 +1774,10 @@ void Node::MarkReplicationDirty()
     }
 }
 
-Node* Node::CreateChild(unsigned id, CreateMode mode)
+Node* Node::CreateChild(unsigned id, CreateMode mode, bool temporary)
 {
     SharedPtr<Node> newNode(new Node(context_));
+    newNode->SetTemporary(temporary);
 
     // If zero ID specified, or the ID is already taken, let the scene assign
     if (scene_)

@@ -833,7 +833,7 @@ macro (create_symlink SOURCE DESTINATION)
             # Fallback to copy only one time
             execute_process (${COMMAND})
             if (TARGET ${TARGET_NAME})
-                # Fallback to copy everytime the target is built
+                # Fallback to copy every time the target is built
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD ${COMMAND})
             endif ()
         else ()

@@ -416,7 +416,7 @@ function Character:FixedUpdate(timeStep)
         local brakeForce = planeVelocity * -BRAKE_FORCE
         body:ApplyImpulse(brakeForce)
 
-        -- Jump. Must release jump control inbetween jumps
+        -- Jump. Must release jump control between jumps
         if self.controls:IsDown(CTRL_JUMP) then
             if self.okToJump then
                 body:ApplyImpulse(Vector3(0.0, 1.0, 0.0) * JUMP_FORCE)
