@@ -1442,7 +1442,8 @@ void HandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetPtr();
-    UpdateHierarchyItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
+    if (showTemporaryObject || !node.temporary)
+        UpdateHierarchyItemText(GetListIndex(node), node.enabled, GetNodeTitle(node));
 }
 
 void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -1451,8 +1452,11 @@ void HandleNodeEnabledChanged(StringHash eventType, VariantMap& eventData)
         return;
 
     Node@ node = eventData["Node"].GetPtr();
-    UpdateHierarchyItemText(GetListIndex(node), node.enabled);
-    attributesDirty = true;
+    if (showTemporaryObject || !node.temporary)
+    {
+        UpdateHierarchyItemText(GetListIndex(node), node.enabled);
+        attributesDirty = true;
+    }
 }
 
 void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
@@ -1460,9 +1464,13 @@ void HandleComponentEnabledChanged(StringHash eventType, VariantMap& eventData)
     if (suppressSceneChanges)
         return;
 
+    Node@ node = eventData["Node"].GetPtr();
     Component@ component = eventData["Component"].GetPtr();
-    UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
-    attributesDirty = true;
+    if (showTemporaryObject || (!node.temporary && !component.temporary))
+    {
+        UpdateHierarchyItemText(GetComponentListIndex(component), component.enabledEffective);
+        attributesDirty = true;
+    }
 }
 
 void HandleUIElementAdded(StringHash eventType, VariantMap& eventData)
