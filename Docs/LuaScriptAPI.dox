@@ -3966,7 +3966,8 @@ Methods:
 - void SetEnabledRecursive(bool enable)
 - void SetOwner(Connection* owner)
 - void MarkDirty()
-- Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
+- Node* CreateChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0, bool temporary = false)
+- Node* CreateTemporaryChild(const String name = String::EMPTY, CreateMode mode = REPLICATED, unsigned id = 0)
 - void AddChild(Node* node, unsigned index = M_MAX_UNSIGNED)
 - void RemoveChild(Node* node)
 - void RemoveAllChildren()
@@ -4045,7 +4046,7 @@ Methods:
 - bool Load(Deserializer& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - bool LoadXML(const XMLElement& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
 - bool LoadJSON(const JSONValue& source, SceneResolver& resolver, bool loadChildren = true, bool rewriteIDs = false, CreateMode mode = REPLICATED)
-- Node* CreateChild(unsigned id, CreateMode mode)
+- Node* CreateChild(unsigned id, CreateMode mode, bool temporary = false)
 - void AddComponent(Component* component, unsigned id, CreateMode mode)
 - bool HasTag(const String tag) const
 - const StringVector& GetTags() const
