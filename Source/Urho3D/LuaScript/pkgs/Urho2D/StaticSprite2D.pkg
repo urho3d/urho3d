@@ -33,4 +33,6 @@ public:
     tolua_property__get_set bool useHotSpot;
     tolua_property__get_set Vector2 hotSpot;
     tolua_property__get_set Material* customMaterial;
+    tolua_property__get_set Rect drawRect;
+    tolua_property__get_set Rect textureRect;
 };
