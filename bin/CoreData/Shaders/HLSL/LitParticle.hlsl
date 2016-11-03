@@ -185,7 +185,7 @@ void PS(float2 iTexCoord : TEXCOORD0,
             float diffZ = max(particleDepth - depth, 0.0) * (cFarClipPS - cNearClipPS);
             float fade = saturate(diffZ * cSoftParticleFadeScale);
         #else
-            float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
+            float diffZ = (depth - particleDepth) * (cFarClipPS - cNearClipPS);
             float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
         #endif
 
