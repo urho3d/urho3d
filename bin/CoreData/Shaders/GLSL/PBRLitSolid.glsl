@@ -172,7 +172,7 @@ void PS()
         vec3 lightDir;
         vec3 finalColor;
 
-         float atten = 1;
+        float atten = 1;
 
         #if defined(DIRLIGHT)
             atten = GetAtten(normal, vWorldPos.xyz, lightDir);

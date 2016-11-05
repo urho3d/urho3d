@@ -263,9 +263,23 @@
     ///     roughness: surface roughness
     ///     ambientOcclusion: ambient occlusion
     float3 ImageBasedLighting(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
-    {
+    { 
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
+
+        /// Test: Parallax correction, currently not working
+
+        // float3 intersectMax = (cZoneMax - toCamera) / reflectVec;
+        // float3 intersectMin = (cZoneMin - toCamera) / reflectVec;
+        
+        // float3 furthestPlane = max(intersectMax, intersectMin);
+        
+        // float planeDistance = min(min(furthestPlane.x, furthestPlane.y), furthestPlane.z);
+
+        // // Get the intersection position
+        // float3 intersectionPos = toCamera + reflectVec * planeDistance;
+        // // Get corrected reflection
+        // reflectVec = intersectionPos - ((cZoneMin + cZoneMax )/ 2);
 
         const float mipSelect = GetMipFromRougness(roughness);
         float3 cube = SampleCubeLOD(ZoneCubeMap, float4(fix_cube_lookup(reflectVec), mipSelect)).rgb;
