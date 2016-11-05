@@ -1,5 +1,5 @@
 <technique vs="LitParticle" ps="LitParticle" vsdefines="SOFTPARTICLES" psdefines="DIFFMAP SOFTPARTICLES" >
-    <pass name="alpha" depthwrite="false" depthtest="false" blend="alpha" />
-    <pass name="litalpha" depthwrite="false" depthtest="false" blend="addalpha" />
+    <pass name="alpha" depthwrite="false" blend="alpha" />
+    <pass name="litalpha" depthwrite="false" blend="addalpha" />
     <pass name="shadow" vs="Shadow" ps="Shadow" />
 </technique>

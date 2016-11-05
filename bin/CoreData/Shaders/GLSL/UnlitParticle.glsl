@@ -75,7 +75,7 @@ void PS()
             float diffZ = max(particleDepth - depth, 0.0) * (cFarClipPS - cNearClipPS);
             float fade = clamp(diffZ * cSoftParticleFadeScale, 0.0, 1.0);
         #else
-            float diffZ = abs(depth - particleDepth) * (cFarClipPS - cNearClipPS);
+            float diffZ = (depth - particleDepth) * (cFarClipPS - cNearClipPS);
             float fade = clamp(1.0 - diffZ * cSoftParticleFadeScale, 0.0, 1.0);
         #endif
 
