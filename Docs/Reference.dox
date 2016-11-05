@@ -1514,6 +1514,8 @@ The available commands are:
 
 Scenepass, quad, forwardlights and lightvolumes commands all allow command-global shader compilation defines, shader parameters and textures to be defined. For example in deferred rendering, the lightvolumes command would bind the G-buffer textures to be able to calculate the lighting. Note that when binding command-global textures, these are (for optimization) bound only once in the beginning of the command. If the texture binding is overwritten by an object's material, it is "lost" until the end of the command. Therefore the command-global textures should be in units that are not used by materials.
 
+Note that it's legal for only one forwardlights or one lightvolumes command to exist in the renderpath.
+
 A render path can be loaded from a main XML file by calling \ref RenderPath::Load "Load()", after which other XML files (for example one for each post-processing effect) can be appended to it by calling \ref RenderPath::Append "Append()". Rendertargets and commands can be enabled or disabled by calling \ref RenderPath::SetEnabled "SetEnabled()" to switch eg. a post-processing effect on or off. To aid in this, both can be identified by tag names, for example the bloom effect uses the tag "Bloom" for all of its rendertargets and commands.
 
 It is legal to both write to the destination viewport and sample from it during the same command: pingpong copies of its contents will be made automatically. If the viewport has hardware multisampling on, the multisampled backbuffer will be resolved to a texture before sampling it.
@@ -1588,6 +1590,16 @@ An example render path for readable hardware depth exists in bin/CoreData/Render
 The render path starts by allocating a readable depth-stencil texture the same size as the destination viewport, clearing its depth, then rendering a depth-only pass to it. Next the destination color rendertarget is cleared normally, while the readable depth texture is used as the depth-stencil for that and all subsequent commands. Any command after the depth render pass could now bind the depth texture to an unit for sampling, for example for smooth particle or SSAO effects.
 
 The ForwardDepth.xml render path does the same, but using a linear depth rendertarget instead of a hardware depth texture. The advantage is better compatibility (guaranteed to work without checking \ref Graphics::GetReadableDepthSupport "GetReadableDepthSupport()") but it has worse performance as it will perform an additional full scene rendering pass.
+
+\section RenderPaths_SoftParticles Soft particles rendering
+
+Soft particles rendering is a practical example of utilizing scene depth reading. The default renderpaths that expose a readable depth bind the depth texture in the alpha pass. This is utilized by the UnlitParticle & LitParticle shaders when the SOFTPARTICLES shader compilation define is included. The particle techniques containing "Soft" in their name in Bin/CoreData/Techniques use this define. Note that they expect a readable depth and will not work with the plain forward renderpath!
+
+Soft particles can be implemented in two contrasting approaches: "shrinking" and "expanding". In the shrinking approach (default) depth test can be left on and the soft particle shader starts to reduce particle opacity when the particle geometry approaches solid geometry. In the expanding approach the particles should have depth test off, and the shader instead starts to reduce the particle opacity when the particle geometry overshoots the solid geometry.
+
+For the expanding mode, see the "SoftExpand" family of particle techniques. Their downside is that performance can be lower due to not being able to use hardware depth test.
+
+Finally note the SoftParticleFadeScale shader parameter which is needed to control the distance over which the fade will take effect. This is defined in example materials using soft particles (SmokeSoft.xml & LitSmokeSoft.xml)
 
 \section RenderPaths_ForwardLighting Forward lighting special considerations
 
@@ -2451,7 +2463,7 @@ Box2D fixtures are implemented through the CollisionShape2D base class for 2D ph
 - Friction: \ref CollisionShape2D::SetFriction "SetFriction()" and \ref CollisionShape2D::GetFriction "GetFriction()"
 - Restitution (bounciness): \ref CollisionShape2D::SetRestitution "SetRestitution()" and \ref CollisionShape2D::GetRestitution "GetRestitution()"
 
-CollisionShape2D class also provides readonly acces to these properties:
+CollisionShape2D class also provides readonly access to these properties:
 - Mass: \ref CollisionShape2D::GetMass "GetMass()"
 - Inertia: \ref CollisionShape2D::GetInertia "GetInertia()"
 - Center of mass: \ref CollisionShape2D::GetMassCenter "GetMassCenter()"
@@ -2627,7 +2639,7 @@ Except Tile, objects are not visible (although you can display them for debuggin
 - to create a background from Tile sprites
 - etc.
 
-Additionaly Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
+Additionally Sprite2D resource from a Tile object is retrieved using \ref TileMapObject2D::GetTileSprite "GetTileSprite()".
 
 If need be you can access the grid id (relative to the tilesets used) of a Tile object using \ref TileMapObject2D::GetTileGid "GetTileGid()".
 

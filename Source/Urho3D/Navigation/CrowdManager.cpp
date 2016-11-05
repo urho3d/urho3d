@@ -276,7 +276,7 @@ void CrowdManager::SetQueryFilterTypesAttr(const VariantVector& value)
             unsigned prevNumAreas = numAreas_[queryFilterType];
             numAreas_[queryFilterType] = Min(value[index++].GetUInt(), (unsigned)DT_MAX_AREAS);
 
-            // Must loop thru based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
+            // Must loop through based on previous number of areas, the new area cost (if any) can only be set in the next attribute get/set iteration
             if (index + prevNumAreas <= value.Size())
             {
                 for (unsigned i = 0; i < prevNumAreas; ++i)

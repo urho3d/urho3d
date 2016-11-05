@@ -533,7 +533,7 @@ function writeFunction(file, func)
       local declaration = func.declarations[i]
       if declaration.type ~= "void" then
         line = line .. declaration.type .. declaration.ptr .. " " .. declaration.name
-        -- add paramter default value
+        -- add parameter default value
         if declaration.def ~= "" then
           line = line .. " = " .. declaration.def
         end

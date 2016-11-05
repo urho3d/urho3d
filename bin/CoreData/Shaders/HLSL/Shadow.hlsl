@@ -3,6 +3,9 @@
 #include "Transform.hlsl"
 
 void VS(float4 iPos : POSITION,
+    #ifndef NOUV
+        float2 iTexCoord : TEXCOORD0,
+    #endif
     #ifdef SKINNED
         float4 iBlendWeights : BLENDWEIGHT,
         int4 iBlendIndices : BLENDINDICES,
@@ -10,8 +13,8 @@ void VS(float4 iPos : POSITION,
     #ifdef INSTANCED
         float4x3 iModelInstance : TEXCOORD4,
     #endif
-    #ifndef NOUV
-        float2 iTexCoord : TEXCOORD0,
+    #if defined(BILLBOARD) || defined(DIRBILLBOARD)
+        float2 iSize : TEXCOORD1,
     #endif
     #ifdef VSM_SHADOW
         out float3 oTexCoord : TEXCOORD0,

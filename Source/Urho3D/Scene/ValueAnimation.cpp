@@ -530,7 +530,7 @@ Variant ValueAnimation::SubstractAndMultiply(const Variant& value1, const Varian
         return (value1.GetDouble() - value2.GetDouble()) * t;
 
     default:
-        URHO3D_LOGERROR("Invalid value type for spline interpolation's substract and multiply operation");
+        URHO3D_LOGERROR("Invalid value type for spline interpolation's subtract and multiply operation");
         return Variant::EMPTY;
     }
 }

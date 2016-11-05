@@ -392,7 +392,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
 
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
-    // (ray doesnt hit either) by this conditional
+    // (ray doesn't hit either) by this conditional
     if (currentFrontFace != M_INFINITY || currentBackFace != M_INFINITY)
         return currentBackFace < currentFrontFace;
 

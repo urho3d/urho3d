@@ -160,7 +160,7 @@ void Billboards::CreateScene()
             bb->enabled_ = true;
         }
 
-        // After modifying the billboards, they need to be "commited" so that the BillboardSet updates its internals
+        // After modifying the billboards, they need to be "committed" so that the BillboardSet updates its internals
         billboardObject->Commit();
     }
 

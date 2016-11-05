@@ -95,15 +95,15 @@ function writeFunctionArgs(file, declarations)
   for i = 1, count do
     local declaration = declarations[i]
     if declaration.type ~= "void" then
-      -- add paramter type
+      -- add parameter type
       local param_str = declaration.type
       -- add pointer or reference
       if declaration.ptr ~= "" then
         param_str = param_str .. declaration.ptr
       end
-      -- add paramter name
+      -- add parameter name
       param_str = param_str .. " " .. declaration.name
-      -- add paramter default value
+      -- add parameter default value
       if declaration.def ~= "" then
         param_str = param_str .. " = " .. declaration.def
       end
