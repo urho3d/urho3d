@@ -180,8 +180,14 @@ public:
     void SetColor(const Color& color);
     /// Set temperature of the light in Kelvin. Modulates the light color when "use physical values" is enabled.
     void SetTemperature(float temperature);
+    /// Set radius of the light
+    void SetRadius(float radius);
+    /// Set length of the light
+    void SetLength(float length);
     /// Set use physical light values.
     void SetUsePhysicalValues(bool enable);
+    /// Set light to be an area light
+    void SetIsAreaLight(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
     void SetSpecularIntensity(float intensity);
     /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this. When "use physical values" is enabled, the value is specified in lumens.
@@ -227,8 +233,17 @@ public:
     /// Return the temperature of the light in Kelvin.
     float GetTemperature() const { return temperature_; }
 
+    /// Return the radius of the light
+    float GetRadius() const { return lightRad_; }
+
+    /// Return the length of the light
+    float GetLength() const { return lightLength_; }
+
     /// Return if light uses temperature and brightness in lumens.
     bool GetUsePhysicalValues() const { return usePhysicalValues_; }
+
+    /// Return if we are using area lighting
+    bool GetIsAreaLight() const { return isAreaLight_; }
 
     /// Return the color value of the temperature in Kelvin.
     Color GetColorFromTemperature() const;
@@ -339,6 +354,10 @@ private:
     Color color_;
     /// Light Temperature.
     float temperature_;
+    /// Radius of the light
+    float lightRad_;
+    /// Length of the light
+    float lightLength_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
     /// Directional light cascaded shadow parameters.
@@ -379,6 +398,8 @@ private:
     bool perVertex_;
     /// Use physical light values flag.
     bool usePhysicalValues_;
+    /// Use Area lighting flag
+    bool isAreaLight_;
 };
 
 inline bool CompareLights(Light* lhs, Light* rhs)

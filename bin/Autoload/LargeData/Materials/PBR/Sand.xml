@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <material>
 	<technique name="Techniques/PBR/PBRMetallicRoughDiffNormalSpec.xml" quality="0" loddistance="0" />
-	<texture unit="diffuse" name="Textures/PBR/Sand/Albedo.jpg" />
-	<texture unit="normal" name="Textures/PBR/Sand/Normal.jpg" />
-	<texture unit="specular" name="Textures/PBR/Sand/Properties.jpg" />
+	<texture unit="diffuse" name="Textures/PBR/Sand/Albedo.png" />
+	<texture unit="normal" name="Textures/PBR/Sand/Normal.png" />
+	<texture unit="specular" name="Textures/PBR/Sand/RGB.png" />
 	<parameter name="UOffset" value="1 0 0 0" />
 	<parameter name="VOffset" value="0 1 0 0" />
 	<parameter name="MatDiffColor" value="1 1 1 1" />
@@ -16,5 +16,7 @@
 	<shadowcull value="ccw" />
 	<fill value="solid" />
 	<depthbias constant="0" slopescaled="0" />
+	<alphatocoverage enable="true" />
 	<renderorder value="128" />
+	<occlusion enable="true" />
 </material>

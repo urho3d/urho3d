@@ -60,7 +60,11 @@ uniform float4 cMatSpecColor;
 #ifdef PBR
     uniform float cRoughness;
     uniform float cMetallic;
+    uniform float cLightRad;
+    uniform float cLightLength;
 #endif
+uniform float3 cZoneMin;
+uniform float3 cZoneMax;
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform float4 cShadowCubeAdjust;
@@ -163,6 +167,8 @@ cbuffer ZonePS : register(b2)
     float4 cAmbientColor;
     float4 cFogParams;
     float3 cFogColor;
+    float3 cZoneMin;
+    float3 cZoneMax;
 }
 
 cbuffer LightPS : register(b3)
@@ -178,6 +184,10 @@ cbuffer LightPS : register(b3)
     float4 cShadowSplits;
     float2 cVSMShadowParams;
     float4x4 cLightMatricesPS[4];
+    #ifdef PBR
+        float cLightRad;
+        float cLightLength;
+    #endif
 }
 
 #ifndef CUSTOM_MATERIAL_CBUFFER

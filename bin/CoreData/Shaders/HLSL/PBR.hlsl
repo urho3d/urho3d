@@ -1,16 +1,15 @@
 #include "BRDF.hlsl"
 #ifdef COMPILEPS
 
-    #define LightRad 0.1
-    #define LightLengh 4
+    
 
     float3 SphereLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
     {
         float3 pos   = (cLightPosPS.xyz - worldPos);
-        float radius = LightRad;
+        float radius = cLightRad;
 
-        float3 reflectVec  = reflect(-toCamera, normal);
-        float3 centreToRay = dot(pos, reflectVec) * reflectVec - pos;
+        float3 reflectVec   = reflect(-toCamera, normal);
+        float3 centreToRay  = dot(pos, reflectVec) * reflectVec - pos;
         float3 closestPoint = pos + centreToRay * saturate(radius / length(centreToRay));
 
         float3 l = normalize(closestPoint);
@@ -34,10 +33,12 @@
 
     float3 TubeLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
     {
-        float3 pos   = (cLightPosPS.xyz - worldPos);
+         float radius      = cLightRad;
+         float len         = cLightLength; 
+        float3 pos         = (cLightPosPS.xyz - worldPos);
         float3 reflectVec  = reflect(-toCamera, normal);
         
-        float3 L01 = cLightDirPS * LightLengh;
+        float3 L01 = cLightDirPS * len;
         float3 L0 = pos - 0.5 * L01;
         float3 L1 = pos + 0.5 * L01;
         float3 ld = L1 - L0;
@@ -50,25 +51,25 @@
         ndl             = ( 2.0 * clamp( NoL0 + NoL1, 0.0, 1.0 ) ) 
                         / ( distL0 * distL1 + dot( L0, L1 ) + 2.0 );
     
-        float a = LightLengh * LightLengh;
+        float a = len * len;
         float b = dot( reflectVec, L01 );
-        float t = saturate( dot( L0, b*reflectVec - L01 ) / (a - b*b) );
+        float t = saturate( dot( L0, b * reflectVec - L01 ) / (a - b*b) );
         
         float3 closestPoint   = L0 + ld * saturate( t);
         float3 centreToRay    = dot( closestPoint, reflectVec ) * reflectVec - closestPoint;
-        closestPoint = closestPoint + centreToRay * saturate(LightRad / length(centreToRay));
+        closestPoint          = closestPoint + centreToRay * saturate(radius / length(centreToRay));
 
         float3 l = normalize(closestPoint);
         float3 h = normalize(toCamera + l);
 
-        ndl       = saturate(dot(normal, l));
+        ndl       =  saturate(dot(normal, lightVec));
         float hdn = saturate(dot(h, normal));
         float hdv = dot(h, toCamera);
         float ndv = saturate(dot(normal, toCamera));
 
         float distL      = length(closestPoint);
         float alpha      = roughness * roughness;
-        float alphaPrime = saturate(LightRad / (distL * 2.0) + alpha);
+        float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
 
         const float3 fresnelTerm = Fresnel(specColor, hdv) ;
         const float distTerm     = Distribution(hdn, alphaPrime);
@@ -98,9 +99,9 @@
         float3 specularFactor = 0;
 
         #ifdef SPECULAR
-            if(LightRad > 0.0)
+            if(cLightRad > 0.0)
             {
-                if(LightLengh > 0.0)
+                if(cLightLength > 0.0)
                 {
                     specularFactor = TubeLight(worldPos, lightVec, normal, toCamera, roughness, specColor, ndl);
                     specularFactor *= ndl;
