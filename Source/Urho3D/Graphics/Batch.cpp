@@ -283,7 +283,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
         graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
         graphics->SetShaderParameter(PSP_ZONEMIN, zone_->GetBoundingBox().min_);
-		graphics->SetShaderParameter(PSP_ZONEMAX, zone_->GetBoundingBox().max_);
+        graphics->SetShaderParameter(PSP_ZONEMAX, zone_->GetBoundingBox().max_);
 
         float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);

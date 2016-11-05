@@ -98,7 +98,7 @@ Light::Light(Context* context) :
     lightQueue_(0),
     temperature_(DEFAULT_TEMPERATURE),
     lightRad_(DEFAULT_RADIUS),
-	lightLength_(DEFAULT_LENGTH),
+    lightLength_(DEFAULT_LENGTH),
     specularIntensity_(DEFAULT_SPECULARINTENSITY),
     brightness_(DEFAULT_BRIGHTNESS),
     range_(DEFAULT_RANGE),
