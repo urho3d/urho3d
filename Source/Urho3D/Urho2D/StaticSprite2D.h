@@ -62,6 +62,10 @@ public:
     void SetAlpha(float alpha);
     /// Set use hot spot.
     void SetUseHotSpot(bool useHotSpot);
+    /// Set use draw rectangle.
+    void SetUseDrawRect(bool useDrawRect);
+    /// Set use texture rectangle.
+    void SetUseTextureRect(bool useTextureRect);
     /// Set hot spot.
     void SetHotSpot(const Vector2& hotspot);
     /// Set custom material.
@@ -93,6 +97,12 @@ public:
 
     /// Return use hot spot.
     bool GetUseHotSpot() const { return useHotSpot_; }
+
+    /// Return use draw rect.
+    bool GetUseDrawRect() const { return useDrawRect_; }
+
+    /// Return use draw rect.
+    bool GetUseTextureRect() const { return useTextureRect_; }
 
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
