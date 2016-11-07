@@ -53,6 +53,7 @@ enum VariantType
     VAR_VARIANTVECTOR,
     VAR_VARIANTMAP,
     VAR_INTRECT,
+    VAR_RECT,
     VAR_INTVECTOR2,
     VAR_PTR,
     VAR_MATRIX3,
@@ -359,6 +360,13 @@ public:
         *this = value;
     }
 
+    /// Construct from a rect.
+    Variant(const Rect& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
     /// Construct from an IntVector2.
     Variant(const IntVector2& value) :
         type_(VAR_NONE)
@@ -615,6 +623,14 @@ public:
         return *this;
     }
 
+    /// Assign from a rect.
+    Variant& operator =(const Rect& rhs)
+    {
+        SetType(VAR_RECT);
+        *(reinterpret_cast<Rect*>(&value_)) = rhs;
+        return *this;
+    }
+
     /// Assign from an IntVector2.
     Variant& operator =(const IntVector2& rhs)
     {
@@ -761,6 +777,12 @@ public:
         return type_ == VAR_INTRECT ? *(reinterpret_cast<const IntRect*>(&value_)) == rhs : false;
     }
 
+    /// Test for equality with a rect. To return true, both the type and value must match.
+    bool operator ==(const Rect& rhs) const
+    {
+        return type_ == VAR_RECT ? *(reinterpret_cast<const Rect*>(&value_)) == rhs : false;
+    }
+
     /// Test for equality with an IntVector2. To return true, both the type and value must match.
     bool operator ==(const IntVector2& rhs) const
     {
@@ -858,6 +880,9 @@ public:
 
     /// Test for inequality with an integer rect.
     bool operator !=(const IntRect& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a rect.
+    bool operator !=(const Rect& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with an IntVector2.
     bool operator !=(const IntVector2& rhs) const { return !(*this == rhs); }
@@ -1020,6 +1045,9 @@ public:
     /// Return an integer rect or empty on type mismatch.
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? *reinterpret_cast<const IntRect*>(&value_) : IntRect::ZERO; }
 
+    /// Return an integer rect or empty on type mismatch.
+    const Rect& GetRect() const { return type_ == VAR_RECT ? *reinterpret_cast<const Rect*>(&value_) : Rect::ZERO; }
+
     /// Return an IntVector2 or empty on type mismatch.
     const IntVector2& GetIntVector2() const
     {
@@ -1155,6 +1183,8 @@ template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANT
 
 template <> inline VariantType GetVariantType<IntRect>() { return VAR_INTRECT; }
 
+template <> inline VariantType GetVariantType<Rect>() { return VAR_RECT; }
+
 template <> inline VariantType GetVariantType<IntVector2>() { return VAR_INTVECTOR2; }
 
 template <> inline VariantType GetVariantType<Matrix3>() { return VAR_MATRIX3; }
@@ -1189,6 +1219,8 @@ template <> URHO3D_API const Color& Variant::Get<const Color&>() const;
 template <> URHO3D_API const String& Variant::Get<const String&>() const;
 
 template <> URHO3D_API const IntRect& Variant::Get<const IntRect&>() const;
+
+template <> URHO3D_API const Rect& Variant::Get<const Rect&>() const;
 
 template <> URHO3D_API const IntVector2& Variant::Get<const IntVector2&>() const;
 
@@ -1227,6 +1259,8 @@ template <> URHO3D_API Color Variant::Get<Color>() const;
 template <> URHO3D_API String Variant::Get<String>() const;
 
 template <> URHO3D_API IntRect Variant::Get<IntRect>() const;
+
+template <> URHO3D_API Rect Variant::Get<Rect>() const;
 
 template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
 
