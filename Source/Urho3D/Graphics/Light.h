@@ -354,9 +354,9 @@ private:
     Color color_;
     /// Light Temperature.
     float temperature_;
-    /// Radius of the light
+    /// Radius of the light source. If above 0 it will turn the light into an area light.
     float lightRad_;
-    /// Length of the light
+    /// Length of the light source. If above 0 and radius is above 0 it will create a tube light.
     float lightLength_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
@@ -398,7 +398,7 @@ private:
     bool perVertex_;
     /// Use physical light values flag.
     bool usePhysicalValues_;
-    /// Use Area lighting flag
+    /// Use Area lighting flag. Currently not used.
     bool isAreaLight_;
 };
 
