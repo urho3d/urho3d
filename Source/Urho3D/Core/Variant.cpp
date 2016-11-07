@@ -57,6 +57,7 @@ static const char* typeNames[] =
     "VariantVector",
     "VariantMap",
     "IntRect",
+    "Rect",
     "IntVector2",
     "Ptr",
     "Matrix3",
@@ -186,6 +187,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_INTRECT:
         return *(reinterpret_cast<const IntRect*>(&value_)) == *(reinterpret_cast<const IntRect*>(&rhs.value_));
+
+    case VAR_RECT:
+        return *(reinterpret_cast<const Rect*>(&value_)) == *(reinterpret_cast<const Rect*>(&rhs.value_));
 
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
@@ -324,6 +328,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntRect(value);
         break;
 
+    case VAR_RECT:
+        *this = ToRect(value);
+        break;
+
     case VAR_INTVECTOR2:
         *this = ToIntVector2(value);
         break;
@@ -423,6 +431,9 @@ String Variant::ToString() const
     case VAR_INTRECT:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
 
+    case VAR_RECT:
+        return (reinterpret_cast<const Rect*>(&value_))->ToString();
+
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
 
@@ -509,6 +520,9 @@ bool Variant::IsZero() const
 
     case VAR_INTRECT:
         return *reinterpret_cast<const IntRect*>(&value_) == IntRect::ZERO;
+
+    case VAR_RECT:
+        return *reinterpret_cast<const Rect*>(&value_) == Rect::ZERO;
 
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
@@ -706,6 +720,11 @@ template <> const IntRect& Variant::Get<const IntRect&>() const
     return GetIntRect();
 }
 
+template <> const Rect& Variant::Get<const Rect&>() const
+{
+    return GetRect();
+}
+
 template <> const IntVector2& Variant::Get<const IntVector2&>() const
 {
     return GetIntVector2();
@@ -799,6 +818,11 @@ template <> String Variant::Get<String>() const
 template <> IntRect Variant::Get<IntRect>() const
 {
     return GetIntRect();
+}
+
+template <> Rect Variant::Get<Rect>() const
+{
+    return GetRect();
 }
 
 template <> IntVector2 Variant::Get<IntVector2>() const

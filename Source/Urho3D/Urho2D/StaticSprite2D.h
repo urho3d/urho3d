@@ -44,6 +44,10 @@ public:
 
     /// Set sprite.
     void SetSprite(Sprite2D* sprite);
+    /// Set draw rectangle.
+    void SetDrawRect(const Rect &rect);
+    /// Set texture rectangle.
+    void SetTextureRect(const Rect &rect);
     /// Set blend mode.
     void SetBlendMode(BlendMode blendMode);
     /// Set flip.
@@ -58,6 +62,10 @@ public:
     void SetAlpha(float alpha);
     /// Set use hot spot.
     void SetUseHotSpot(bool useHotSpot);
+    /// Set use draw rectangle.
+    void SetUseDrawRect(bool useDrawRect);
+    /// Set use texture rectangle.
+    void SetUseTextureRect(bool useTextureRect);
     /// Set hot spot.
     void SetHotSpot(const Vector2& hotspot);
     /// Set custom material.
@@ -65,6 +73,12 @@ public:
 
     /// Return sprite.
     Sprite2D* GetSprite() const;
+
+    /// Return draw rect.
+    const Rect& GetDrawRect() const { return drawRect_; }
+
+    /// Return texture rect.
+    const Rect& GetTextureRect() const { return textureRect_; }
 
     /// Return blend mode.
     BlendMode GetBlendMode() const { return blendMode_; }
@@ -83,6 +97,12 @@ public:
 
     /// Return use hot spot.
     bool GetUseHotSpot() const { return useHotSpot_; }
+
+    /// Return use draw rect.
+    bool GetUseDrawRect() const { return useDrawRect_; }
+
+    /// Return use draw rect.
+    bool GetUseTextureRect() const { return useTextureRect_; }
 
     /// Return hot spot.
     const Vector2& GetHotSpot() const { return hotSpot_; }
@@ -108,6 +128,8 @@ protected:
     virtual void UpdateSourceBatches();
     /// Update material.
     void UpdateMaterial();
+    /// Update drawRect.
+    void UpdateDrawRect();
 
     /// Sprite.
     SharedPtr<Sprite2D> sprite_;
@@ -125,6 +147,14 @@ protected:
     Vector2 hotSpot_;
     /// Custom material.
     SharedPtr<Material> customMaterial_;
+    /// Draw rectangle.
+    Rect drawRect_;
+    /// Use drawRect.
+    bool useDrawRect_;
+    /// Texture rectangle.
+    Rect textureRect_;
+    /// Use textureRect.
+    bool useTextureRect_;
 };
 
 }

@@ -127,6 +127,14 @@ template <class T> void RegisterStaticSprite2D(asIScriptEngine* engine, const ch
     engine->RegisterObjectMethod(className, "const Vector2& get_hotSpot() const", asMETHOD(T, GetHotSpot), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_customMaterial(Material@+)", asMETHOD(T, SetCustomMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Material@+ get_customMaterial() const", asMETHOD(T, GetCustomMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_useDrawRect(bool)", asMETHOD(T, SetUseDrawRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_useDrawRect() const", asMETHOD(T, GetUseDrawRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_useTextureRect(bool)", asMETHOD(T, SetUseTextureRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "bool get_useTextureRect() const", asMETHOD(T, GetUseTextureRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_drawRect(const Rect&)", asMETHOD(T, SetDrawRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Rect& get_drawRect() const", asMETHOD(T, GetDrawRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void set_textureRect(const Rect&)", asMETHOD(T, SetTextureRect), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "const Rect& get_textureRect() const", asMETHOD(T, GetTextureRect), asCALL_THISCALL);
 }
 
 static void RegisterStaticSprite2D(asIScriptEngine* engine)
