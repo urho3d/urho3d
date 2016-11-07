@@ -19,6 +19,7 @@ Urho3D development, contributions and bugfixes by:
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
+- Gauthier Billot
 - Loic Blot
 - Danny Boisvert
 - Sergey Bosko
