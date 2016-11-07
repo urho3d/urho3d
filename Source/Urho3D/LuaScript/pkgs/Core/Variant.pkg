@@ -27,6 +27,7 @@ enum VariantType
     VAR_MATRIX4,
     VAR_DOUBLE,
     VAR_STRINGVECTOR,
+    VAR_RECT,
     MAX_VAR_TYPES
 };
 
@@ -94,6 +95,7 @@ class Variant
     const Vector<Variant>& GetVariantVector() const;
     const VariantMap& GetVariantMap() const;
     const Vector<String>& GetStringVector() const;
+    const Rect& GetRect() const;
     const IntRect& GetIntRect() const;
     const IntVector2& GetIntVector2() const;
     RefCounted* GetPtr(const char* type) const;

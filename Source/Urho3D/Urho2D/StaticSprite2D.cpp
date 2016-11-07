@@ -46,9 +46,11 @@ StaticSprite2D::StaticSprite2D(Context* context) :
     flipY_(false),
     color_(Color::WHITE),
     useHotSpot_(false),
-    hotSpot_(0.5f, 0.5f),
     useDrawRect_(false),
-    useTextureRect_(false)
+    useTextureRect_(false),
+    hotSpot_(0.5f, 0.5f),
+    drawRect_(Rect::ZERO),
+    textureRect_(Rect::ZERO)
 {
     sourceBatches_.Resize(1);
     sourceBatches_[0].owner_ = this;
@@ -72,9 +74,11 @@ void StaticSprite2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColor, SetColor, Color, Color::WHITE, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Custom material", GetCustomMaterialAttr, SetCustomMaterialAttr, ResourceRef,
         ResourceRef(Material::GetTypeStatic()), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Draw Rectangle", GetDrawRect, SetDrawRect, Rect, Rect(), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Hot Spot", GetHotSpot, SetHotSpot, Vector2, Vector2(0.5f, 0.5f), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Use Hot Spot", GetUseHotSpot, SetUseHotSpot, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Rectangle", GetDrawRect, SetDrawRect, Rect, Rect::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Use Draw Rectangle", GetUseDrawRect, SetUseDrawRect, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Texture Rectangle", GetTextureRect, SetTextureRect, Rect, Rect(), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Texture Rectangle", GetTextureRect, SetTextureRect, Rect, Rect::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Use Texture Rectangle", GetUseTextureRect, SetUseTextureRect, bool, false, AM_DEFAULT);
 }
 
@@ -287,7 +291,7 @@ void StaticSprite2D::UpdateSourceBatches()
     if (!sprite_)
         return;
 
-    if(!useTextureRect_)
+    if (!useTextureRect_)
     {
         if (!sprite_->GetTextureRectangle(textureRect_, flipX_, flipY_))
             return;

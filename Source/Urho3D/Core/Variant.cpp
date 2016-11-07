@@ -57,7 +57,6 @@ static const char* typeNames[] =
     "VariantVector",
     "VariantMap",
     "IntRect",
-    "Rect",
     "IntVector2",
     "Ptr",
     "Matrix3",
@@ -65,6 +64,7 @@ static const char* typeNames[] =
     "Matrix4",
     "Double",
     "StringVector",
+    "Rect",
     0
 };
 
@@ -188,9 +188,6 @@ bool Variant::operator ==(const Variant& rhs) const
     case VAR_INTRECT:
         return *(reinterpret_cast<const IntRect*>(&value_)) == *(reinterpret_cast<const IntRect*>(&rhs.value_));
 
-    case VAR_RECT:
-        return *(reinterpret_cast<const Rect*>(&value_)) == *(reinterpret_cast<const Rect*>(&rhs.value_));
-
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
 
@@ -205,6 +202,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_DOUBLE:
         return *(reinterpret_cast<const double*>(&value_)) == *(reinterpret_cast<const double*>(&rhs.value_));
+
+    case VAR_RECT:
+        return *(reinterpret_cast<const Rect*>(&value_)) == *(reinterpret_cast<const Rect*>(&rhs.value_));
 
     default:
         return true;
@@ -328,10 +328,6 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntRect(value);
         break;
 
-    case VAR_RECT:
-        *this = ToRect(value);
-        break;
-
     case VAR_INTVECTOR2:
         *this = ToIntVector2(value);
         break;
@@ -355,6 +351,10 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_DOUBLE:
         *this = ToDouble(value);
+        break;
+
+    case VAR_RECT:
+        *this = ToRect(value);
         break;
 
     default:
@@ -431,9 +431,6 @@ String Variant::ToString() const
     case VAR_INTRECT:
         return (reinterpret_cast<const IntRect*>(&value_))->ToString();
 
-    case VAR_RECT:
-        return (reinterpret_cast<const Rect*>(&value_))->ToString();
-
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
 
@@ -448,6 +445,9 @@ String Variant::ToString() const
 
     case VAR_DOUBLE:
         return String(*reinterpret_cast<const double*>(&value_));
+
+    case VAR_RECT:
+        return (reinterpret_cast<const Rect*>(&value_))->ToString();
 
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_STRINGVECTOR, VAR_VARIANTMAP
@@ -521,9 +521,6 @@ bool Variant::IsZero() const
     case VAR_INTRECT:
         return *reinterpret_cast<const IntRect*>(&value_) == IntRect::ZERO;
 
-    case VAR_RECT:
-        return *reinterpret_cast<const Rect*>(&value_) == Rect::ZERO;
-
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
 
@@ -541,6 +538,9 @@ bool Variant::IsZero() const
 
     case VAR_DOUBLE:
         return *reinterpret_cast<const double*>(&value_) == 0.0;
+
+    case VAR_RECT:
+        return *reinterpret_cast<const Rect*>(&value_) == Rect::ZERO;
 
     default:
         return true;
@@ -715,14 +715,14 @@ template <> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
-template <> const IntRect& Variant::Get<const IntRect&>() const
-{
-    return GetIntRect();
-}
-
 template <> const Rect& Variant::Get<const Rect&>() const
 {
     return GetRect();
+}
+
+template <> const IntRect& Variant::Get<const IntRect&>() const
+{
+    return GetIntRect();
 }
 
 template <> const IntVector2& Variant::Get<const IntVector2&>() const
@@ -815,14 +815,14 @@ template <> String Variant::Get<String>() const
     return GetString();
 }
 
-template <> IntRect Variant::Get<IntRect>() const
-{
-    return GetIntRect();
-}
-
 template <> Rect Variant::Get<Rect>() const
 {
     return GetRect();
+}
+
+template <> IntRect Variant::Get<IntRect>() const
+{
+    return GetIntRect();
 }
 
 template <> IntVector2 Variant::Get<IntVector2>() const
