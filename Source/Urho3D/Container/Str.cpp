@@ -1014,10 +1014,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
     if (src == 0)
         return 0;
     
-    unsigned short word1 = *src;
+    unsigned short word1 = *src++;
     
     // Check if we are at a low surrogate
-    word1 = *src++;
     if (word1 >= 0xdc00 && word1 < 0xe000)
     {
         while (*src >= 0xdc00 && *src < 0xe000)
