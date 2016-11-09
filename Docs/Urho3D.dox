@@ -199,7 +199,7 @@ Urho3D uses the following third-party libraries:
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
-- SDL 2.0.4 (https://www.libsdl.org)
+- SDL 2.0.5 (https://www.libsdl.org)
 - SQLite 3.13.0 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (https://nothings.org)
@@ -1047,7 +1047,7 @@ From 1.6 to master:
 - SoundSource autoremove boolean was replaced with AutoRemoveMode enum, which allows removing either the component or owner node. Also used by ParticleEmitter.
 - Getting camera projection matrix has changed. Use GetProjection() to get the API-independent matrix, and GetGPUProjection() to get the matrix converted to be usable as a shader parameter. On D3D these are the same.
 - Alpha masking hint has been removed from Technique & Pass, due to materials also now being able to define additional shader compilation defines. You can use Material::SetRenderOrder() instead to ensure that partially opaque geometry will be drawn after fully opaque for GPU depth buffer optimization.
-  Due to this change you must also manually define that a material should not take part in occlusion rendering, see Material::SetOcclusion(). 
+  Due to this change you must also manually define that a material should not take part in occlusion rendering, see Material::SetOcclusion().
 - Techniques that existed just for shader defines like ALPHAMASK and PACKEDNORMAL have been removed. Replace by using techniques without those defines (e.g. DiffNormal instead of DiffNormalPacked), and adding the necessary defines to your materials instead.
 - The Light class has gained a max extrusion distance parameter for directional light shadows. In case you use a large far clip distance, you can experience different shadow depth resolution and effect of bias parameters, as the far clip distance no longer alone determines the extrusion. Adjust with Light::SetShadowMaxExtrusion() as necessary.
 - Direct3D binary shaders are now cached by default to the user preferences directory "urho3d/shadercache" to avoid writing into the application installation directory, to which the user may not have rights.
