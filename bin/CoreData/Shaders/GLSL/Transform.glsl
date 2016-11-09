@@ -182,9 +182,15 @@ vec3 GetWorldNormal(mat4 modelMatrix)
     #endif
 }
 
-vec3 GetWorldTangent(mat4 modelMatrix)
+vec4 GetWorldTangent(mat4 modelMatrix)
 {
-    return normalize(iTangent.xyz * GetNormalMatrix(modelMatrix));
+    #if defined(BILLBOARD)
+        return vec4(normalize(vec3(1.0, 0.0, 0.0) * cBillboardRot), 1.0);
+    #elif defined(DIRBILLBOARD)
+        return vec4(normalize(vec3(1.0, 0.0, 0.0) * GetNormalMatrix(modelMatrix)), 1.0);
+    #else
+        return vec4(normalize(iTangent.xyz * GetNormalMatrix(modelMatrix)), iTangent.w);
+    #endif
 }
 
 #else
