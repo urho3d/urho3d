@@ -21,12 +21,17 @@
 /* Called before SDL_main() to initialize JNI bindings in SDL library */
 extern void SDL_Android_Init(JNIEnv* env, jclass cls, jstring filesDir);
 
+/* This prototype is needed to prevent a warning about the missing prototype for global function below */
+JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir);
+
 /* Start up the SDL app */
 JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir)
 {
     int i;
     int argc;
     int status;
+    int len;
+    char** argv;
 
     /* This interface could expand with ABI negotiation, callbacks, etc. */
     SDL_Android_Init(env, cls, filesDir);
@@ -35,8 +40,8 @@ JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jc
 
     /* Prepare the arguments. */
 
-    int len = (*env)->GetArrayLength(env, array);
-    char* argv[len + 1];
+    len = (*env)->GetArrayLength(env, array);
+    argv = SDL_stack_alloc(char*, len + 1);
     argc = 0;
     // Urho3D: avoid hard-coding the "app_process" as the first argument
     for (i = 0; i < len; ++i) {
@@ -68,7 +73,7 @@ JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jc
     for (i = 0; i < argc; ++i) {
         SDL_free(argv[i]);
     }
-
+    SDL_stack_free(argv);
     /* Do not issue an exit or the whole application will terminate instead of just the SDL thread */
     /* exit(status); */
 

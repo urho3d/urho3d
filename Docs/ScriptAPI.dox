@@ -915,6 +915,12 @@ namespace Urho3D
 - %Flip Y : bool
 - %Color : Color
 - %Custom %material : ResourceRef
+- %Hot %Spot : Vector2
+- %Use %Hot %Spot : bool
+- %Draw %Rectangle : Rect
+- %Use %Draw %Rectangle : bool
+- %Texture %Rectangle : Rect
+- %Use %Texture %Rectangle : bool
 - %Speed : float
 - %Entity : String
 - %Animation %Set : ResourceRef
@@ -2201,6 +2207,12 @@ namespace Urho3D
 - %Flip Y : bool
 - %Color : Color
 - %Custom %material : ResourceRef
+- %Hot %Spot : Vector2
+- %Use %Hot %Spot : bool
+- %Draw %Rectangle : Rect
+- %Use %Draw %Rectangle : bool
+- %Texture %Rectangle : Rect
+- %Use %Texture %Rectangle : bool
 
 ### Terrain
 - %Is %Enabled : bool
@@ -2971,6 +2983,7 @@ Properties:
 - Color color
 - Material@ customMaterial
 - float drawDistance
+- Rect drawRect
 - bool enabled
 - bool enabledEffective // readonly
 - String entity
@@ -2996,9 +3009,12 @@ Properties:
 - float speed
 - Sprite2D@ sprite
 - bool temporary
+- Rect textureRect
 - StringHash type // readonly
 - String typeName // readonly
+- bool useDrawRect
 - bool useHotSpot
+- bool useTextureRect
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -12800,6 +12816,7 @@ Properties:
 - Color color
 - Material@ customMaterial
 - float drawDistance
+- Rect drawRect
 - bool enabled
 - bool enabledEffective // readonly
 - bool flipX
@@ -12822,9 +12839,12 @@ Properties:
 - uint shadowMask
 - Sprite2D@ sprite
 - bool temporary
+- Rect textureRect
 - StringHash type // readonly
 - String typeName // readonly
+- bool useDrawRect
 - bool useHotSpot
+- bool useTextureRect
 - uint viewMask
 - int weakRefs // readonly
 - BoundingBox worldBoundingBox // readonly
@@ -14424,6 +14444,7 @@ Methods:
 - const Matrix3x4& GetMatrix3x4() const
 - const Matrix4& GetMatrix4() const
 - const Quaternion& GetQuaternion() const
+- const Rect& GetRect() const
 - const ResourceRef& GetResourceRef() const
 - const ResourceRefList& GetResourceRefList() const
 - const String& GetString() const
@@ -15890,6 +15911,7 @@ Properties:
 - VAR_MATRIX4
 - VAR_DOUBLE
 - VAR_STRINGVECTOR
+- VAR_RECT
 
 
 ### VertexElementSemantic

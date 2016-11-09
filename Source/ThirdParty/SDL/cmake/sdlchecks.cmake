@@ -580,6 +580,27 @@ macro(CheckMir)
     endif()
 endmacro()
 
+macro(WaylandProtocolGen _SCANNER _XML _PROTL)
+    set(_WAYLAND_PROT_C_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+    set(_WAYLAND_PROT_H_CODE "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-client-protocol.h")
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_H_CODE}"
+        DEPENDS "${_XML}"
+        COMMAND "${_SCANNER}"
+        ARGS client-header "${_XML}" "${_WAYLAND_PROT_H_CODE}"
+    )
+
+    add_custom_command(
+        OUTPUT "${_WAYLAND_PROT_C_CODE}"
+        DEPENDS "${_WAYLAND_PROT_H_CODE}"
+        COMMAND "${_SCANNER}"
+        ARGS code "${_XML}" "${_WAYLAND_PROT_C_CODE}"
+    )
+
+    set(SOURCE_FILES ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols/${_PROTL}-protocol.c")
+endmacro()
+
 # Requires:
 # - EGL
 # Optional:
@@ -596,6 +617,17 @@ macro(CheckWayland)
 
       file(GLOB WAYLAND_SOURCES ${SDL2_SOURCE_DIR}/src/video/wayland/*.c)
       set(SOURCE_FILES ${SOURCE_FILES} ${WAYLAND_SOURCES})
+
+      # We have to generate some protocol interface code for some unstable Wayland features.
+      file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+      include_directories("${CMAKE_CURRENT_BINARY_DIR}/wayland-generated-protocols")
+
+      WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_CORE_PROTOCOL_DIR}/wayland.xml" "wayland")
+
+      foreach(_PROTL relative-pointer-unstable-v1 pointer-constraints-unstable-v1)
+        string(REGEX REPLACE "\\-unstable\\-.*$" "" PROTSUBDIR ${_PROTL})
+        WaylandProtocolGen("${WAYLAND_SCANNER}" "${WAYLAND_PROTOCOLS_DIR}/unstable/${PROTSUBDIR}/${_PROTL}.xml" "${_PROTL}")
+      endforeach()
 
       if(VIDEO_WAYLAND_QT_TOUCH)
           set(SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH 1)
@@ -729,7 +761,6 @@ macro(CheckOpenGL)
         set(SDL_VIDEO_OPENGL_GLX 1)
       endif ()
       set(SDL_VIDEO_RENDER_OGL 1)
-      list(APPEND EXTRA_LIBS GL)
     endif()
     set (CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
   endif()
