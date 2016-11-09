@@ -1247,7 +1247,13 @@ void ExecuteScript(const String&in fileName)
 void HandleRunScript(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiScriptFilter, uiScriptPath);
+
+    suppressSceneChanges = true;
     ExecuteScript(ExtractFileName(eventData));
+    suppressSceneChanges = false;
+
+    UpdateHierarchyItem(editorScene, true);
+    UpdateHierarchyItem(editorUIElement, true);
 }
 
 void HandleResourcePath(StringHash eventType, VariantMap& eventData)

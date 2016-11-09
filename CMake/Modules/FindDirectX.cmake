@@ -74,7 +74,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
             if (DEFINED ENV{MINGW_SYSROOT})
                 file (TO_CMAKE_PATH $ENV{MINGW_SYSROOT} MINGW_SYSROOT)
             else ()
-                execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE find_mingw_sysroot_output ERROR_QUIET)
+                execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output ERROR_QUIET)
                 file (STRINGS ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output MINGW_SYSROOT REGEX _mingw\\.h)
                 string (REGEX REPLACE "^[^ ]* *(.*)/include.*$" \\1 MINGW_SYSROOT "${MINGW_SYSROOT}")  # Stringify for string replacement
                 string (REPLACE "\\ " " " MINGW_SYSROOT "${MINGW_SYSROOT}")

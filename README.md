@@ -19,6 +19,7 @@ Urho3D development, contributions and bugfixes by:
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
+- Gauthier Billot
 - Loic Blot
 - Danny Boisvert
 - Sergey Bosko
@@ -59,6 +60,7 @@ Urho3D development, contributions and bugfixes by:
 - Nick Royer
 - Miika Santala
 - Anatoly Sennov
+- Matan Shukry
 - Bengt Soderstrom
 - Hualin Song
 - James Thomas

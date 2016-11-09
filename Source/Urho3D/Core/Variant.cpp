@@ -64,6 +64,7 @@ static const char* typeNames[] =
     "Matrix4",
     "Double",
     "StringVector",
+    "Rect",
     0
 };
 
@@ -201,6 +202,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_DOUBLE:
         return *(reinterpret_cast<const double*>(&value_)) == *(reinterpret_cast<const double*>(&rhs.value_));
+
+    case VAR_RECT:
+        return *(reinterpret_cast<const Rect*>(&value_)) == *(reinterpret_cast<const Rect*>(&rhs.value_));
 
     default:
         return true;
@@ -349,6 +353,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToDouble(value);
         break;
 
+    case VAR_RECT:
+        *this = ToRect(value);
+        break;
+
     default:
         SetType(VAR_NONE);
     }
@@ -437,6 +445,9 @@ String Variant::ToString() const
 
     case VAR_DOUBLE:
         return String(*reinterpret_cast<const double*>(&value_));
+
+    case VAR_RECT:
+        return (reinterpret_cast<const Rect*>(&value_))->ToString();
 
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_STRINGVECTOR, VAR_VARIANTMAP
@@ -527,6 +538,9 @@ bool Variant::IsZero() const
 
     case VAR_DOUBLE:
         return *reinterpret_cast<const double*>(&value_) == 0.0;
+
+    case VAR_RECT:
+        return *reinterpret_cast<const Rect*>(&value_) == Rect::ZERO;
 
     default:
         return true;
@@ -701,6 +715,11 @@ template <> const String& Variant::Get<const String&>() const
     return GetString();
 }
 
+template <> const Rect& Variant::Get<const Rect&>() const
+{
+    return GetRect();
+}
+
 template <> const IntRect& Variant::Get<const IntRect&>() const
 {
     return GetIntRect();
@@ -794,6 +813,11 @@ template <> Color Variant::Get<Color>() const
 template <> String Variant::Get<String>() const
 {
     return GetString();
+}
+
+template <> Rect Variant::Get<Rect>() const
+{
+    return GetRect();
 }
 
 template <> IntRect Variant::Get<IntRect>() const

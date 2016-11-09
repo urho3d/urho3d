@@ -281,7 +281,7 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
         numCoords = 2;
     if (type == VAR_VECTOR3 || type == VAR_QUATERNION)
         numCoords = 3;
-    else if (type == VAR_VECTOR4 || type == VAR_COLOR || type == VAR_INTRECT)
+    else if (type == VAR_VECTOR4 || type == VAR_COLOR || type == VAR_INTRECT || type == VAR_RECT)
         numCoords = 4;
 
     for (uint i = 0; i < numCoords; ++i)
@@ -435,7 +435,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         parent = CreateStringAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_BOOL)
         parent = CreateBoolAttributeEditor(list, serializables, info, index, subIndex);
-    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT || type == VAR_DOUBLE)
+    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT || type == VAR_DOUBLE || type == VAR_RECT)
         parent = CreateNumAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_INT)
         parent = CreateIntAttributeEditor(list, serializables, info, index, subIndex);
@@ -860,7 +860,7 @@ void FillValue(Array<Variant>& values, const Variant&in value)
 
 void SanitizeNumericalValue(VariantType type, String& value)
 {
-    if (type >= VAR_FLOAT && type <= VAR_COLOR)
+    if ((type >= VAR_FLOAT && type <= VAR_COLOR) || type == VAR_RECT)
         value = String(value.ToFloat());
     else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2)
         value = String(value.ToInt());

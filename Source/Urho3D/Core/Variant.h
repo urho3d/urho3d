@@ -60,6 +60,7 @@ enum VariantType
     VAR_MATRIX4,
     VAR_DOUBLE,
     VAR_STRINGVECTOR,
+    VAR_RECT,
     MAX_VAR_TYPES
 };
 
@@ -352,6 +353,13 @@ public:
         *this = value;
     }
 
+    /// Construct from a rect.
+    Variant(const Rect& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
     /// Construct from an integer rect.
     Variant(const IntRect& value) :
         type_(VAR_NONE)
@@ -607,6 +615,14 @@ public:
         return *this;
     }
 
+    /// Assign from a rect.
+    Variant& operator =(const Rect& rhs)
+    {
+        SetType(VAR_RECT);
+        *(reinterpret_cast<Rect*>(&value_)) = rhs;
+        return *this;
+    }
+
     /// Assign from an integer rect.
     Variant& operator =(const IntRect& rhs)
     {
@@ -755,6 +771,12 @@ public:
         return type_ == VAR_VARIANTMAP ? *(reinterpret_cast<const VariantMap*>(&value_)) == rhs : false;
     }
 
+    /// Test for equality with a rect. To return true, both the type and value must match.
+    bool operator ==(const Rect& rhs) const
+    {
+        return type_ == VAR_RECT ? *(reinterpret_cast<const Rect*>(&value_)) == rhs : false;
+    }
+
     /// Test for equality with an integer rect. To return true, both the type and value must match.
     bool operator ==(const IntRect& rhs) const
     {
@@ -855,6 +877,9 @@ public:
 
     /// Test for inequality with a variant map.
     bool operator !=(const VariantMap& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with a rect.
+    bool operator !=(const Rect& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with an integer rect.
     bool operator !=(const IntRect& rhs) const { return !(*this == rhs); }
@@ -1017,6 +1042,9 @@ public:
         return type_ == VAR_VARIANTMAP ? *reinterpret_cast<const VariantMap*>(&value_) : emptyVariantMap;
     }
 
+    /// Return a rect or empty on type mismatch.
+    const Rect& GetRect() const { return type_ == VAR_RECT ? *reinterpret_cast<const Rect*>(&value_) : Rect::ZERO; }
+
     /// Return an integer rect or empty on type mismatch.
     const IntRect& GetIntRect() const { return type_ == VAR_INTRECT ? *reinterpret_cast<const IntRect*>(&value_) : IntRect::ZERO; }
 
@@ -1153,6 +1181,8 @@ template <> inline VariantType GetVariantType<StringVector>() { return VAR_STRIN
 
 template <> inline VariantType GetVariantType<VariantMap>() { return VAR_VARIANTMAP; }
 
+template <> inline VariantType GetVariantType<Rect>() { return VAR_RECT; }
+
 template <> inline VariantType GetVariantType<IntRect>() { return VAR_INTRECT; }
 
 template <> inline VariantType GetVariantType<IntVector2>() { return VAR_INTVECTOR2; }
@@ -1187,6 +1217,8 @@ template <> URHO3D_API const Quaternion& Variant::Get<const Quaternion&>() const
 template <> URHO3D_API const Color& Variant::Get<const Color&>() const;
 
 template <> URHO3D_API const String& Variant::Get<const String&>() const;
+
+template <> URHO3D_API const Rect& Variant::Get<const Rect&>() const;
 
 template <> URHO3D_API const IntRect& Variant::Get<const IntRect&>() const;
 
@@ -1225,6 +1257,8 @@ template <> URHO3D_API Quaternion Variant::Get<Quaternion>() const;
 template <> URHO3D_API Color Variant::Get<Color>() const;
 
 template <> URHO3D_API String Variant::Get<String>() const;
+
+template <> URHO3D_API Rect Variant::Get<Rect>() const;
 
 template <> URHO3D_API IntRect Variant::Get<IntRect>() const;
 

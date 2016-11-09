@@ -1,7 +1,7 @@
 $#include "Urho2D/StaticSprite2D.h"
 
 class StaticSprite2D : public Drawable2D
-{    
+{
 public:
     void SetSprite(Sprite2D* sprite);
     void SetBlendMode(BlendMode mode);
@@ -12,6 +12,10 @@ public:
     void SetAlpha(float alpha);
     void SetUseHotSpot(bool useHotSpot);
     void SetHotSpot(const Vector2& hotspot);
+    void SetUseDrawRect(bool useDrawRect);
+    void SetDrawRect(const Rect &rect);
+    void SetUseTextureRect(bool useTextureRect);
+    void SetTextureRect(const Rect &rect);
     void SetCustomMaterial(Material* customMaterial);
 
     Sprite2D* GetSprite() const;
@@ -22,8 +26,12 @@ public:
     float GetAlpha() const;
     bool GetUseHotSpot() const;
     const Vector2& GetHotSpot() const;
+    bool GetUseDrawRect() const;
+    const Rect& GetDrawRect() const;
+    bool GetUseTextureRect() const;
+    const Rect& GetTextureRect() const;
     Material* GetCustomMaterial() const;
-    
+
     tolua_property__get_set Sprite2D* sprite;
     tolua_property__get_set BlendMode blendMode;
     tolua_property__get_set bool flipX;
@@ -33,4 +41,8 @@ public:
     tolua_property__get_set bool useHotSpot;
     tolua_property__get_set Vector2 hotSpot;
     tolua_property__get_set Material* customMaterial;
+    tolua_property__get_set Rect drawRect;
+    tolua_property__get_set bool useDrawRect;
+    tolua_property__get_set Rect textureRect;
+    tolua_property__get_set bool useTextureRect;
 };

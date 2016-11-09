@@ -6084,6 +6084,10 @@ Methods:
 - void SetAlpha(float alpha)
 - void SetUseHotSpot(bool useHotSpot)
 - void SetHotSpot(const Vector2& hotspot)
+- void SetUseDrawRect(bool useDrawRect)
+- void SetDrawRect(const Rect& rect)
+- void SetUseTextureRect(bool useTextureRect)
+- void SetTextureRect(const Rect& rect)
 - void SetCustomMaterial(Material* customMaterial)
 - Sprite2D* GetSprite() const
 - BlendMode GetBlendMode() const
@@ -6093,6 +6097,10 @@ Methods:
 - float GetAlpha() const
 - bool GetUseHotSpot() const
 - const Vector2& GetHotSpot() const
+- bool GetUseDrawRect() const
+- const Rect& GetDrawRect() const
+- bool GetUseTextureRect() const
+- const Rect& GetTextureRect() const
 - Material* GetCustomMaterial() const
 
 Properties:
@@ -6106,6 +6114,10 @@ Properties:
 - bool useHotSpot
 - Vector2 hotSpot
 - Material* customMaterial
+- Rect drawRect
+- bool useDrawRect
+- Rect textureRect
+- bool useTextureRect
 
 <a name="Class_StringHash"></a>
 ### StringHash
@@ -7129,6 +7141,7 @@ Methods:
 - const Vector<Variant>& GetVariantVector() const
 - const VariantMap& GetVariantMap() const
 - const Vector<String>& GetStringVector() const
+- const Rect& GetRect() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
 - RefCounted* GetPtr(const char* type) const
@@ -8263,6 +8276,7 @@ Properties:
 - int VAR_MATRIX4
 - int VAR_DOUBLE
 - int VAR_STRINGVECTOR
+- int VAR_RECT
 - int MAX_VAR_TYPES
 
 ### VertexElementSemantic
