@@ -132,6 +132,7 @@ WIN_CreateDevice(int devindex)
     device->VideoInit = WIN_VideoInit;
     device->VideoQuit = WIN_VideoQuit;
     device->GetDisplayBounds = WIN_GetDisplayBounds;
+    device->GetDisplayUsableBounds = WIN_GetDisplayUsableBounds;
     device->GetDisplayDPI = WIN_GetDisplayDPI;
     device->GetDisplayModes = WIN_GetDisplayModes;
     device->SetDisplayMode = WIN_SetDisplayMode;
@@ -144,6 +145,7 @@ WIN_CreateDevice(int devindex)
     device->SetWindowIcon = WIN_SetWindowIcon;
     device->SetWindowPosition = WIN_SetWindowPosition;
     device->SetWindowSize = WIN_SetWindowSize;
+    device->SetWindowOpacity = WIN_SetWindowOpacity;
     device->ShowWindow = WIN_ShowWindow;
     device->HideWindow = WIN_HideWindow;
     device->RaiseWindow = WIN_RaiseWindow;
@@ -151,6 +153,7 @@ WIN_CreateDevice(int devindex)
     device->MinimizeWindow = WIN_MinimizeWindow;
     device->RestoreWindow = WIN_RestoreWindow;
     device->SetWindowBordered = WIN_SetWindowBordered;
+    device->SetWindowResizable = WIN_SetWindowResizable;
     device->SetWindowFullscreen = WIN_SetWindowFullscreen;
     device->SetWindowGammaRamp = WIN_SetWindowGammaRamp;
     device->GetWindowGammaRamp = WIN_GetWindowGammaRamp;

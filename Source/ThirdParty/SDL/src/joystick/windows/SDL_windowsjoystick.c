@@ -38,15 +38,16 @@
 #include "SDL_error.h"
 #include "SDL_assert.h"
 #include "SDL_events.h"
-#include "SDL_thread.h"
 #include "SDL_timer.h"
 #include "SDL_mutex.h"
 #include "SDL_events.h"
 #include "SDL_hints.h"
 #include "SDL_joystick.h"
 #include "../SDL_sysjoystick.h"
-#if !SDL_EVENTS_DISABLED
-#include "../../events/SDL_events_c.h"
+#include "../../thread/SDL_systhread.h"
+// Urho3D: set WINVER if not defined
+#ifndef WINVER
+#define WINVER 0x0500
 #endif
 // Urho3D: set WINVER if not defined
 #ifndef WINVER
@@ -308,18 +309,9 @@ SDL_SYS_JoystickInit(void)
     SDL_SYS_JoystickDetect();
 
     if (!s_threadJoystick) {
-        s_bJoystickThreadQuit = SDL_FALSE;
         /* spin up the thread to detect hotplug of devices */
-#if defined(__WIN32__) && !defined(HAVE_LIBC)
-#undef SDL_CreateThread
-#if SDL_DYNAMIC_API
-        s_threadJoystick= SDL_CreateThread_REAL(SDL_JoystickThread, "SDL_joystick", NULL, NULL, NULL);
-#else
-        s_threadJoystick= SDL_CreateThread(SDL_JoystickThread, "SDL_joystick", NULL, NULL, NULL);
-#endif
-#else
-        s_threadJoystick = SDL_CreateThread(SDL_JoystickThread, "SDL_joystick", NULL);
-#endif
+        s_bJoystickThreadQuit = SDL_FALSE;
+        s_threadJoystick = SDL_CreateThreadInternal(SDL_JoystickThread, "SDL_joystick", 64 * 1024, NULL);
     }
     return SDL_SYS_NumJoysticks();
 }
@@ -343,9 +335,6 @@ void
 SDL_SYS_JoystickDetect()
 {
     JoyStick_DeviceData *pCurList = NULL;
-#if !SDL_EVENTS_DISABLED
-    SDL_Event event;
-#endif
 
     /* only enum the devices if the joystick thread told us something changed */
     if (!s_bDeviceAdded && !s_bDeviceRemoved) {
@@ -377,17 +366,7 @@ SDL_SYS_JoystickDetect()
             SDL_DINPUT_MaybeRemoveDevice(&pCurList->dxdevice);
         }
 
-#if !SDL_EVENTS_DISABLED
-        SDL_zero(event);
-        event.type = SDL_JOYDEVICEREMOVED;
-
-        if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-            event.jdevice.which = pCurList->nInstanceID;
-            if ((!SDL_EventOK) || (*SDL_EventOK) (SDL_EventOKParam, &event)) {
-                SDL_PushEvent(&event);
-            }
-        }
-#endif /* !SDL_EVENTS_DISABLED */
+        SDL_PrivateJoystickRemoved(pCurList->nInstanceID);
 
         pListNext = pCurList->pNext;
         SDL_free(pCurList->joystickname);
@@ -408,17 +387,8 @@ SDL_SYS_JoystickDetect()
                     SDL_DINPUT_MaybeAddDevice(&pNewJoystick->dxdevice);
                 }
 
-#if !SDL_EVENTS_DISABLED
-                SDL_zero(event);
-                event.type = SDL_JOYDEVICEADDED;
+                SDL_PrivateJoystickAdded(device_index);
 
-                if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-                    event.jdevice.which = device_index;
-                    if ((!SDL_EventOK) || (*SDL_EventOK) (SDL_EventOKParam, &event)) {
-                        SDL_PushEvent(&event);
-                    }
-                }
-#endif /* !SDL_EVENTS_DISABLED */
                 pNewJoystick->send_add_event = SDL_FALSE;
             }
             device_index++;
@@ -550,6 +520,9 @@ SDL_SYS_JoystickQuit(void)
 
     SDL_DINPUT_JoystickQuit();
     SDL_XINPUT_JoystickQuit();
+
+    s_bDeviceAdded = SDL_FALSE;
+    s_bDeviceRemoved = SDL_FALSE;
 }
 
 /* return the stable device guid for this device index */
