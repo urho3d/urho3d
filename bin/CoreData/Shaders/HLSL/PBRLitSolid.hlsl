@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP)|| defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if (defined(NORMALMAP)|| defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)) && !defined(BILLBOARD) && !defined(DIRBILLBOARD)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -90,10 +90,10 @@ void VS(float4 iPos : POSITION,
     #endif
 
     #if defined(NORMALMAP) || defined(IBL)
-        const float3 tangent = GetWorldTangent(modelMatrix);
-        const float3 bitangent = cross(tangent, oNormal) * iTangent.w;
+        const float4 tangent = GetWorldTangent(modelMatrix);
+        const float3 bitangent = cross(tangent.xyz, oNormal) * tangent.w;
         oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
-        oTangent = float4(tangent, bitangent.z);
+        oTangent = float4(tangent.xyz, bitangent.z);
     #else
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
@@ -226,7 +226,7 @@ void PS(
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
 
     // Get normal
-    #if defined(NORMALMAP) || defined(DIRBILLBOARD) || defined(IBL)
+    #if defined(NORMALMAP) || defined(IBL)
         const float3 tangent = normalize(iTangent.xyz);
         const float3 bitangent = normalize(float3(iTexCoord.zw, iTangent.w));
         const float3x3 tbn = float3x3(tangent, bitangent, iNormal);
