@@ -236,7 +236,7 @@
         return mix(normal, reflection, lerpFactor);
     }
 
-    float GetMipFromRougness(float roughness)
+    float GetMipFromRoughness(float roughness)
     {
         float Level = 3 - 1.15 * log2( roughness );
         return 9.0 - 1 - Level;
@@ -253,7 +253,7 @@
         return SpecularColor * AB.x + AB.y;
     }
 
-    vec3 fix_cube_lookup(vec3 v) 
+    vec3 FixCubeLookup(vec3 v) 
     {
         float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
         float scale = (1024 - 1) / 1024;
@@ -279,17 +279,17 @@
         // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
         //float GlossScale = 16.0;
         //float GlossBias = 5.0;
-        float mipSelect = GetMipFromRougness(roughness); //exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
+        float mipSelect = GetMipFromRoughness(roughness); //exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
 
         // OpenGL ES does not support textureLod without extensions and does not have the sZoneCubeMap sampler,
         // so for now, sample without explicit LOD, and from the environment sampler, where the zone texture will be put
         // on mobile hardware
         #ifndef GL_ES
-            vec3 cube = textureLod(sZoneCubeMap, fix_cube_lookup(reflectVec), mipSelect).rgb;
-            vec3 cubeD = textureLod(sZoneCubeMap, fix_cube_lookup(wsNormal), 9.0).rgb;
+            vec3 cube = textureLod(sZoneCubeMap, FixCubeLookup(reflectVec), mipSelect).rgb;
+            vec3 cubeD = textureLod(sZoneCubeMap, FixCubeLookup(wsNormal), 9.0).rgb;
         #else
-            vec3 cube = textureCube(sEnvCubeMap, fix_cube_lookup(reflectVec)).rgb;
-            vec3 cubeD = textureCube(sEnvCubeMap, fix_cube_lookup(wsNormal)).rgb;
+            vec3 cube = textureCube(sEnvCubeMap, FixCubeLookup(reflectVec)).rgb;
+            vec3 cubeD = textureCube(sEnvCubeMap, FixCubeLookup(wsNormal)).rgb;
         #endif
 
         // Fake the HDR texture
