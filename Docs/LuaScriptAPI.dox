@@ -2811,6 +2811,7 @@ Methods:
 - void RemoveAllGestures()
 - void SetMousePosition(const IntVector2& position)
 - void CenterMousePosition()
+- void SetProcessRepeatedKeyDown(bool enable)
 - int GetKeyFromName(const String name) const
 - int GetKeyFromScancode(int scancode) const
 - String GetKeyName(int key) const
@@ -2847,6 +2848,7 @@ Methods:
 - MouseMode GetMouseMode() const
 - bool HasFocus()
 - bool IsMinimized() const
+- bool GetProcessRepeatedKeyDown() const
 
 Properties:
 
