@@ -253,10 +253,13 @@ public:
     /// Destruct.
     ~HashMap()
     {
-        Clear();
-        FreeNode(Tail());
-        AllocatorUninitialize(allocator_);
-        delete[] ptrs_;
+        if (!ptrs_)
+        {
+            Clear();
+            FreeNode(Tail());
+            AllocatorUninitialize(allocator_);
+            delete[] ptrs_;
+        }
     }
 
     /// Assign a hash map.
