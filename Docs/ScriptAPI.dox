@@ -7574,6 +7574,7 @@ Methods:
 - void SetMouseGrabbed(bool, bool = false)
 - void SetMouseMode(MouseMode, bool = false)
 - void SetMouseVisible(bool, bool = false)
+- void SetProcessRepeatedKeyDown(bool)
 
 Properties:
 
@@ -7598,6 +7599,7 @@ Properties:
 - bool mouseVisible
 - uint numJoysticks // readonly
 - uint numTouches // readonly
+- bool processRepeatedKeyDown // readonly
 - bool[] qualifierDown // readonly
 - bool[] qualifierPress // readonly
 - int qualifiers // readonly

@@ -345,6 +345,7 @@ Input::Input(Context* context) :
     minimized_(false),
     focusedThisFrame_(false),
     suppressNextMouseMove_(false),
+    processRepeatedKeyDown_(false),
     initialized_(false)
 {
     for (int i = 0; i < TOUCHID_MAX; i++)
@@ -1857,19 +1858,12 @@ void Input::HandleSDLEvent(void* sdlEvent)
     switch (evt.type)
     {
         case SDL_KEYDOWN:
-#ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
-#else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
-#endif
+            if (processRepeatedKeyDown_ || !evt.key.repeat)
+                SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
             break;
 
         case SDL_KEYUP:
-#ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
-#else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
-#endif
+            SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
             break;
 
         case SDL_TEXTINPUT:

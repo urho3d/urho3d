@@ -66,6 +66,7 @@ class Input : public Object
     void RemoveAllGestures();
     void SetMousePosition(const IntVector2& position);
     void CenterMousePosition();
+    void SetProcessRepeatedKeyDown(bool enable);
 
     int GetKeyFromName(const String name) const;
     int GetKeyFromScancode(int scancode) const;
@@ -103,6 +104,7 @@ class Input : public Object
     MouseMode GetMouseMode() const;
     bool HasFocus();
     bool IsMinimized() const;
+    bool GetProcessRepeatedKeyDown() const;
 
     tolua_readonly tolua_property__get_set int qualifiers;
     tolua_property__get_set IntVector2 mousePosition;

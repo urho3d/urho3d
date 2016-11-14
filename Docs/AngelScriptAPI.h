@@ -5467,6 +5467,7 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetMouseGrabbed(bool, bool = false);
 void SetMouseMode(MouseMode, bool = false);
 void SetMouseVisible(bool, bool = false);
+void SetProcessRepeatedKeyDown(bool);
 
 // Properties:
 /* readonly */
@@ -5507,6 +5508,8 @@ bool mouseVisible;
 uint numJoysticks;
 /* readonly */
 uint numTouches;
+/* readonly */
+bool processRepeatedKeyDown;
 /* readonly */
 Array<bool> qualifierDown;
 /* readonly */

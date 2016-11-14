@@ -217,6 +217,9 @@ public:
     /// Center the mouse position.
     void CenterMousePosition();
 
+    /// Set whether the Input subsystem should process repeated keydown event.
+    void SetProcessRepeatedKeyDown(bool enable) { processRepeatedKeyDown_ = enable; }
+
     /// Return keycode from key name.
     int GetKeyFromName(const String& name) const;
     /// Return keycode from scancode.
@@ -300,6 +303,9 @@ public:
 
     /// Return whether application window is minimized.
     bool IsMinimized() const;
+
+    /// Return whether the Input subsystem should process repeated keydown event.
+    bool GetProcessRepeatedKeyDown() const { return processRepeatedKeyDown_; }
 
 private:
     /// Initialize when screen mode initially set.
@@ -423,6 +429,8 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Allow handling of repeated keydown event flag.
+    bool processRepeatedKeyDown_;
     /// Initialized flag.
     bool initialized_;
 

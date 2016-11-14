@@ -115,7 +115,7 @@ void Sample::InitTouchInput()
         if (patchFile->FromString(patchString))
             layout->Patch(patchFile);
     }
-    screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+    screenJoystickIndex_ = (unsigned)input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
     input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
 }
 
@@ -215,7 +215,7 @@ void Sample::CreateConsoleAndDebugHud()
 }
 
 
-void Sample::HandleKeyUp(StringHash eventType, VariantMap& eventData)
+void Sample::HandleKeyUp(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace KeyUp;
 
@@ -241,7 +241,7 @@ void Sample::HandleKeyUp(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace KeyDown;
 
@@ -270,7 +270,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             {
                 // Lazy initialization
                 ResourceCache* cache = GetSubsystem<ResourceCache>();
-                screenJoystickSettingsIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+                screenJoystickSettingsIndex_ = (unsigned)input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
             }
             else
                 input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, paused_);
@@ -349,7 +349,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
+void Sample::HandleSceneUpdate(StringHash /*eventType*/, VariantMap& eventData)
 {
     // Move the camera by touch, if the camera node is initialized by descendant sample class
     if (touchEnabled_ && cameraNode_)
@@ -385,7 +385,7 @@ void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Sample::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+void Sample::HandleTouchBegin(StringHash /*eventType*/, VariantMap& eventData)
 {
     // On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput();
@@ -393,7 +393,7 @@ void Sample::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 }
 
 // If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
-void Sample::HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
+void Sample::HandleMouseModeRequest(StringHash /*eventType*/, VariantMap& eventData)
 {
     Console* console = GetSubsystem<Console>();
     if (console && console->IsVisible())
@@ -406,7 +406,7 @@ void Sample::HandleMouseModeRequest(StringHash eventType, VariantMap& eventData)
     input->SetMouseMode(useMouseMode_);
 }
 
-void Sample::HandleMouseModeChange(StringHash eventType, VariantMap& eventData)
+void Sample::HandleMouseModeChange(StringHash /*eventType*/, VariantMap& eventData)
 {
     Input* input = GetSubsystem<Input>();
     bool mouseLocked = eventData[MouseModeChanged::P_MOUSELOCKED].GetBool();
