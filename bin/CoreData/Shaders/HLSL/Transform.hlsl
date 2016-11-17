@@ -137,7 +137,14 @@ float3 GetTrailNormal(float4 iPos, float3 iParentPos, float3 iForward)
     #define GetWorldNormal(modelMatrix) normalize(mul(iNormal, (float3x3)modelMatrix))
 #endif
 
-#define GetWorldTangent(modelMatrix) normalize(mul(iTangent.xyz, (float3x3)modelMatrix))
+#if defined(BILLBOARD)
+    #define GetWorldTangent(modelMatrix) float4(normalize(mul(float3(1.0, 0.0, 0.0), cBillboardRot)), 1.0)
+#elif defined(DIRBILLBOARD)
+    #define GetWorldTangent(modelMatrix) float4(normalize(mul(float3(1.0, 0.0, 0.0), (float3x3)modelMatrix)), 1.0)
+#else
+    #define GetWorldTangent(modelMatrix) float4(normalize(mul(iTangent.xyz, (float3x3)modelMatrix)), iTangent.w)
+#endif
+
 #endif
 
 #ifdef COMPILEPS
