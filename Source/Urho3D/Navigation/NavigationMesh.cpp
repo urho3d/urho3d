@@ -901,8 +901,8 @@ void NavigationMesh::CollectGeometries(Vector<NavigationGeometryInfo>& geometryL
     // Make sure nodes are not included twice
     if (processedNodes.Contains(node))
         return;
-    // Exclude obstacles from consideration
-    if (node->HasComponent<Obstacle>())
+    // Exclude obstacles and crowd agents from consideration
+    if (node->HasComponent<Obstacle>() || node->HasComponent<CrowdAgent>())
         return;
     processedNodes.Insert(node);
 
