@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <material>
 	<technique name="Techniques/PBR/PBRMetallicRoughDiffNormalSpecEmissive.xml" quality="0" loddistance="0" />
-	<texture unit="diffuse" name="Textures/PBR/Emissive Pannel/Albedo.jpg" />
-	<texture unit="normal" name="Textures/PBR/Emissive Pannel/Normal.jpg" />
-	<texture unit="specular" name="Textures/PBR/Emissive Pannel/PBR.jpg" />
-	<texture unit="emissive" name="Textures/PBR/Emissive Pannel/Emissive.jpg" />
+	<texture unit="diffuse" name="Textures/PBR/Emissive Pannel/Albedo.png" />
+	<texture unit="normal" name="Textures/PBR/Emissive Pannel/Normal.png" />
+	<texture unit="specular" name="Textures/PBR/Emissive Pannel/RGB.png" />
+	<texture unit="emissive" name="Textures/PBR/Emissive Pannel/Emissive.png" />
 	<parameter name="UOffset" value="1 0 0 0" />
 	<parameter name="VOffset" value="0 1 0 0" />
 	<parameter name="MatDiffColor" value="1 1 1 1" />
@@ -17,5 +17,7 @@
 	<shadowcull value="ccw" />
 	<fill value="solid" />
 	<depthbias constant="0" slopescaled="0" />
+	<alphatocoverage enable="false" />
 	<renderorder value="128" />
+	<occlusion enable="true" />
 </material>

@@ -283,6 +283,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
         graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
+        graphics->SetShaderParameter(PSP_ZONEMIN, zone_->GetBoundingBox().min_);
+        graphics->SetShaderParameter(PSP_ZONEMAX, zone_->GetBoundingBox().max_);
 
         float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
@@ -354,6 +356,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
 #else
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
+
 #endif
                     }
                     break;
@@ -373,6 +376,9 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 light->GetEffectiveSpecularIntensity()) * fade);
             graphics->SetShaderParameter(PSP_LIGHTDIR, lightDir);
             graphics->SetShaderParameter(PSP_LIGHTPOS, lightPos);
+            //graphics->define
+            graphics->SetShaderParameter(PSP_LIGHTRAD, light->GetRadius());
+            graphics->SetShaderParameter(PSP_LIGHTLENGTH, light->GetLength());
 
             if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
             {
