@@ -1,9 +1,9 @@
 #include "Uniforms.hlsl"
 #include "Samplers.hlsl"
+#include "Constants.hlsl"
 #include "Transform.hlsl"
 #include "ScreenPos.hlsl"
 #include "Lighting.hlsl"
-#include "Constants.hlsl"
 #include "Fog.hlsl"
 #include "PBR.hlsl"
 #include "IBL.hlsl"
@@ -252,8 +252,15 @@ void PS(
         float3 lightDir;
         float3 lightColor;
         float3 finalColor;
+        float atten = 1;
 
-        float atten = GetAtten(normal, iWorldPos.xyz, lightDir);
+        #if defined(DIRLIGHT)
+            atten = GetAtten(normal, iWorldPos.xyz, lightDir);
+        #elif defined(SPOTLIGHT)
+            atten = GetAttenSpot(normal, iWorldPos.xyz, lightDir);
+        #else
+            atten = GetAttenPoint(normal, iWorldPos.xyz, lightDir);
+        #endif
 
         float shadow = 1.0;
 
@@ -275,7 +282,7 @@ void PS(
         const float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
 
 
-        float3 BRDF = GetBRDF(lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
+        float3 BRDF = GetBRDF(iWorldPos.xyz, lightDir, lightVec, toCamera, normal, roughness, diffColor.rgb, specColor);
         finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
         #ifdef AMBIENT

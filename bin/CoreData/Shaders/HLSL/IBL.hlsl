@@ -227,23 +227,35 @@
         return lerp(normal, reflection, lerpFactor);
     }
 
-    float GetMipFromRougness(float roughness)
+    float GetMipFromRoughness(float roughness)
     {
-        const float smoothness = 1.0 - roughness;
-        return (1.0 - smoothness * smoothness) * 10.0;
+        float Level = 3 - 1.15 * log2( roughness );
+        return 9.0 - 1 - Level;
     }
 
 
-    float3 EnvBRDFApprox (float3 SpecularColor, float Roughness, float NoV)
+    float3 EnvBRDFApprox (float3 specColor, float roughness, float ndv)
     {
         const float4 c0 = float4(-1, -0.0275, -0.572, 0.022 );
         const float4 c1 = float4(1, 0.0425, 1.0, -0.04 );
-        float4 r = Roughness * c0 + c1;
-        float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
+        float4 r = roughness * c0 + c1;
+        float a004 = min( r.x * r.x, exp2( -9.28 * ndv ) ) * r.x + r.y;
         float2 AB = float2( -1.04, 1.04 ) * a004 + r.zw;
-        return SpecularColor * AB.x + AB.y;
+        return specColor * AB.x + AB.y;
     }
 
+    float3 FixCubeLookup(float3 v) 
+    {
+        float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+        float scale = (1024 - 1) / 1024;
+
+        if (abs(v.x) != M) v.x += scale;
+        if (abs(v.y) != M) v.y += scale;
+        if (abs(v.z) != M) v.z += scale; 
+
+        return v;
+    }
+    
     /// Calculate IBL contributation
     ///     reflectVec: reflection vector for cube sampling
     ///     wsNormal: surface normal in word space
@@ -251,17 +263,28 @@
     ///     roughness: surface roughness
     ///     ambientOcclusion: ambient occlusion
     float3 ImageBasedLighting(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
-    {
+    { 
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
 
-        // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
-        //const float GlossScale = 16.0;
-        //const float GlossBias = 5.0;
-        const float mipSelect = roughness * 9.0;// exp2(GlossScale * roughness + GlossBias) - exp2(GlossBias);
+        /// Test: Parallax correction, currently not working
 
-        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(reflectVec, mipSelect)).rgb;
-        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(wsNormal, 9.0)).rgb;
+        // float3 intersectMax = (cZoneMax - toCamera) / reflectVec;
+        // float3 intersectMin = (cZoneMin - toCamera) / reflectVec;
+        
+        // float3 furthestPlane = max(intersectMax, intersectMin);
+        
+        // float planeDistance = min(min(furthestPlane.x, furthestPlane.y), furthestPlane.z);
+
+        // // Get the intersection position
+        // float3 intersectionPos = toCamera + reflectVec * planeDistance;
+        // // Get corrected reflection
+        // reflectVec = intersectionPos - ((cZoneMin + cZoneMax )/ 2);
+
+        const float mipSelect = GetMipFromRoughness(roughness);
+        float3 cube = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(reflectVec), mipSelect)).rgb;
+        float3 cubeD = SampleCubeLOD(ZoneCubeMap, float4(FixCubeLookup(wsNormal), 9.0)).rgb;
+        
         // Fake the HDR texture
         float brightness = clamp(cAmbientColor.a, 0.0, 1.0);
         float darknessCutoff = clamp((cAmbientColor.a - 1.0) * 0.1, 0.0, 0.25);

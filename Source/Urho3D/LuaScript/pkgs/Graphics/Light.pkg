@@ -47,7 +47,10 @@ class Light : public Drawable
     void SetPerVertex(bool enable);
     void SetColor(const Color& color);
     void SetTemperature(float temperature);
+    void SetRadius(float redius);
+    void SetLength(float length);
     void SetUsePhysicalValues(bool enable);
+    void SetIsAreaLight(bool enable);
     void SetSpecularIntensity(float intensity);
     void SetBrightness(float brightness);
     void SetRange(float range);
@@ -69,11 +72,14 @@ class Light : public Drawable
     bool GetPerVertex() const;
     const Color& GetColor() const;
     float GetTemperature() const;
+    float GetRadius() const;
+    float GetLength() const;
     float GetSpecularIntensity() const;
     float GetBrightness() const;
     Color GetEffectiveColor() const;
     Color GetColorFromTemperature() const;
     bool GetUsePhysicalValues() const;
+    bool GetIsAreaLight() const;
     float GetEffectiveSpecularIntensity() const;
     float GetRange() const;
     float GetFov() const;
@@ -97,7 +103,10 @@ class Light : public Drawable
     tolua_property__get_set bool perVertex;
     tolua_property__get_set Color& color;
     tolua_property__get_set float temperature;
+    tolua_property__get_set float radius;
+    tolua_property__get_set float length;
     tolua_property__get_set bool usePhysicalValues;
+    tolua_property__get_set bool isAreaLight;
     tolua_property__get_set float specularIntensity;
     tolua_property__get_set float brightness;
     tolua_property__get_set float range;

@@ -13,5 +13,7 @@
 	<shadowcull value="ccw" />
 	<fill value="solid" />
 	<depthbias constant="0" slopescaled="0" />
+	<alphatocoverage enable="false" />
 	<renderorder value="128" />
+	<occlusion enable="true" />
 </material>
