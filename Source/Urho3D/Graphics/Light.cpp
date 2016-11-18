@@ -111,8 +111,7 @@ Light::Light(Context* context) :
     shadowNearFarRatio_(DEFAULT_SHADOWNEARFARRATIO),
     shadowMaxExtrusion_(DEFAULT_SHADOWMAXEXTRUSION),
     perVertex_(false),
-    usePhysicalValues_(false),
-    isAreaLight_(false)
+    usePhysicalValues_(false)
 {
 }
 
@@ -132,7 +131,6 @@ void Light::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Brightness Multiplier", GetBrightness, SetBrightness, float, DEFAULT_BRIGHTNESS, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Temperature", GetTemperature, SetTemperature, float, DEFAULT_TEMPERATURE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Use Physical Values", bool, usePhysicalValues_, false, AM_DEFAULT);
-    //URHO3D_ATTRIBUTE("Is Area Light", bool, isAreaLight_, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Radius", GetRadius, SetRadius, float, DEFAULT_RADIUS, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, DEFAULT_LENGTH, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Range", GetRange, SetRange, float, DEFAULT_RANGE, AM_DEFAULT);
@@ -327,12 +325,6 @@ void Light::SetLength(float length)
 void Light::SetUsePhysicalValues(bool enable)
 {
     usePhysicalValues_ = enable;
-    MarkNetworkUpdate();
-}
-
-void Light::SetIsAreaLight(bool enable)
-{
-    isAreaLight_ = enable;
     MarkNetworkUpdate();
 }
 

@@ -1220,8 +1220,6 @@ static void RegisterLight(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Light", "float get_length() const", asMETHOD(Light, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_usePhysicalValues(bool)", asMETHOD(Light, SetUsePhysicalValues), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "bool get_usePhysicalValues() const", asMETHOD(Light, GetUsePhysicalValues), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "void set_isAreaLight(bool)", asMETHOD(Light, SetIsAreaLight), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Light", "bool get_isAreaLight() const", asMETHOD(Light, GetIsAreaLight), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_specularIntensity(float)", asMETHOD(Light, SetSpecularIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "float get_specularIntensity() const", asMETHOD(Light, GetSpecularIntensity), asCALL_THISCALL);
     engine->RegisterObjectMethod("Light", "void set_brightness(float)", asMETHOD(Light, SetBrightness), asCALL_THISCALL);

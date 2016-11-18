@@ -117,9 +117,9 @@ void PS()
 
     float ndl = clamp(abs(dot(normal, lightVec)), M_EPSILON, 1.0);
 
-
     vec3 BRDF = GetBRDF(worldPos, lightDir, lightVec, toCamera, normal, roughness, albedoInput.rgb, specColor);
 
-    finalColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
+    gl_FragColor.a = 1.0;
+    gl_FragColor.rgb = BRDF * lightColor * (atten * shadow) / M_PI;
 
 }

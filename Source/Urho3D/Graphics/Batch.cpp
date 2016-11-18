@@ -356,7 +356,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 16);
 #else
                         graphics->SetShaderParameter(VSP_LIGHTMATRICES, lightVecRot.Data(), 12);
-
 #endif
                     }
                     break;
@@ -376,7 +375,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 light->GetEffectiveSpecularIntensity()) * fade);
             graphics->SetShaderParameter(PSP_LIGHTDIR, lightDir);
             graphics->SetShaderParameter(PSP_LIGHTPOS, lightPos);
-            //graphics->define
             graphics->SetShaderParameter(PSP_LIGHTRAD, light->GetRadius());
             graphics->SetShaderParameter(PSP_LIGHTLENGTH, light->GetLength());
 

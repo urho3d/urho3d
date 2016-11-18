@@ -180,14 +180,12 @@ public:
     void SetColor(const Color& color);
     /// Set temperature of the light in Kelvin. Modulates the light color when "use physical values" is enabled.
     void SetTemperature(float temperature);
-    /// Set radius of the light
+    /// Set area light radius. Greater than zero activates area light mode. Works only with PBR shaders.
     void SetRadius(float radius);
-    /// Set length of the light
+    /// Set tube area light length. Works only with PBR shaders.
     void SetLength(float length);
     /// Set use physical light values.
     void SetUsePhysicalValues(bool enable);
-    /// Set light to be an area light
-    void SetIsAreaLight(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
     void SetSpecularIntensity(float intensity);
     /// Set light brightness multiplier. Both the color and specular intensity are multiplied with this. When "use physical values" is enabled, the value is specified in lumens.
@@ -233,17 +231,14 @@ public:
     /// Return the temperature of the light in Kelvin.
     float GetTemperature() const { return temperature_; }
 
-    /// Return the radius of the light
+    /// Return area light mode radius. Works only with PBR shaders.
     float GetRadius() const { return lightRad_; }
 
-    /// Return the length of the light
+    /// Return area tube light length. Works only with PBR shaders.
     float GetLength() const { return lightLength_; }
 
     /// Return if light uses temperature and brightness in lumens.
     bool GetUsePhysicalValues() const { return usePhysicalValues_; }
-
-    /// Return if we are using area lighting
-    bool GetIsAreaLight() const { return isAreaLight_; }
 
     /// Return the color value of the temperature in Kelvin.
     Color GetColorFromTemperature() const;
@@ -354,9 +349,9 @@ private:
     Color color_;
     /// Light temperature.
     float temperature_;
-    /// Radius of the light source. If above 0 it will turn the light into an area light.
+    /// Radius of the light source. If above 0 it will turn the light into an area light.  Works only with PBR shaders.
     float lightRad_;
-    /// Length of the light source. If above 0 and radius is above 0 it will create a tube light.
+    /// Length of the light source. If above 0 and radius is above 0 it will create a tube light. Works only with PBR shaders.
     float lightLength_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
@@ -398,8 +393,6 @@ private:
     bool perVertex_;
     /// Use physical light values flag.
     bool usePhysicalValues_;
-    /// Use Area lighting flag. Currently not used.
-    bool isAreaLight_;
 };
 
 inline bool CompareLights(Light* lhs, Light* rhs)
