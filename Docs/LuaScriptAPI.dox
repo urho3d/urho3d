@@ -3044,6 +3044,8 @@ Methods:
 - void SetPerVertex(bool enable)
 - void SetColor(const Color& color)
 - void SetTemperature(float temperature)
+- void SetRadius(float redius)
+- void SetLength(float length)
 - void SetUsePhysicalValues(bool enable)
 - void SetSpecularIntensity(float intensity)
 - void SetBrightness(float brightness)
@@ -3065,6 +3067,8 @@ Methods:
 - bool GetPerVertex() const
 - const Color& GetColor() const
 - float GetTemperature() const
+- float GetRadius() const
+- float GetLength() const
 - float GetSpecularIntensity() const
 - float GetBrightness() const
 - Color GetEffectiveColor() const
@@ -3095,6 +3099,8 @@ Properties:
 - bool perVertex
 - Color& color
 - float temperature
+- float radius
+- float length
 - bool usePhysicalValues
 - float specularIntensity
 - float brightness

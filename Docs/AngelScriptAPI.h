@@ -5745,6 +5745,7 @@ Frustum frustum;
 uint id;
 /* readonly */
 bool inView;
+float length;
 uint lightMask;
 LightType lightType;
 float lodBias;
@@ -5761,6 +5762,7 @@ ObjectAnimation objectAnimation;
 bool occludee;
 bool occluder;
 bool perVertex;
+float radius;
 Texture rampTexture;
 float range;
 /* readonly */

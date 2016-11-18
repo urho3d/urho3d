@@ -1489,6 +1489,8 @@ namespace Urho3D
 - %Brightness %Multiplier : float
 - %Temperature : float
 - %Use %Physical %Values : bool
+- %Radius : float
+- %Length : float
 - %Range : float
 - %Spot %FOV : float
 - %Spot %Aspect %Ratio : float
@@ -7798,6 +7800,7 @@ Properties:
 - Frustum frustum // readonly
 - uint id // readonly
 - bool inView // readonly
+- float length
 - uint lightMask
 - LightType lightType
 - float lodBias
@@ -7810,6 +7813,7 @@ Properties:
 - bool occludee
 - bool occluder
 - bool perVertex
+- float radius
 - Texture@ rampTexture
 - float range
 - int refs // readonly
