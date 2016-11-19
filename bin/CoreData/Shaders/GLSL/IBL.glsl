@@ -236,10 +236,10 @@
         return mix(normal, reflection, lerpFactor);
     }
 
-    float GetMipFromRougness(float roughness)
+    float GetMipFromRoughness(float roughness)
     {
-        float smoothness = 1.0 - roughness;
-        return (1.0 - smoothness * smoothness) * 10.0;
+        float Level = 3 - 1.15 * log2( roughness );
+        return 9.0 - 1 - Level;
     }
 
 
@@ -251,6 +251,18 @@
         float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
         vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
         return SpecularColor * AB.x + AB.y;
+    }
+
+    vec3 FixCubeLookup(vec3 v) 
+    {
+        float M = max(max(abs(v.x), abs(v.y)), abs(v.z));
+        float scale = (1024 - 1) / 1024;
+
+        if (abs(v.x) != M) v.x += scale;
+        if (abs(v.y) != M) v.y += scale;
+        if (abs(v.z) != M) v.z += scale; 
+
+        return v;
     }
 
     /// Calculate IBL contributation
@@ -267,17 +279,17 @@
         // PMREM Mipmapmode https://seblagarde.wordpress.com/2012/06/10/amd-cubemapgen-for-physically-based-rendering/
         //float GlossScale = 16.0;
         //float GlossBias = 5.0;
-        float mipSelect = roughness * 9.0; //exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
+        float mipSelect = GetMipFromRoughness(roughness); //exp2(GlossScale * roughness * roughness + GlossBias) - exp2(GlossBias);
 
         // OpenGL ES does not support textureLod without extensions and does not have the sZoneCubeMap sampler,
         // so for now, sample without explicit LOD, and from the environment sampler, where the zone texture will be put
         // on mobile hardware
         #ifndef GL_ES
-            vec3 cube = textureLod(sZoneCubeMap, reflectVec, mipSelect).rgb;
-            vec3 cubeD = textureLod(sZoneCubeMap, wsNormal, 9.0).rgb;
+            vec3 cube = textureLod(sZoneCubeMap, FixCubeLookup(reflectVec), mipSelect).rgb;
+            vec3 cubeD = textureLod(sZoneCubeMap, FixCubeLookup(wsNormal), 9.0).rgb;
         #else
-            vec3 cube = textureCube(sEnvCubeMap, reflectVec).rgb;
-            vec3 cubeD = textureCube(sEnvCubeMap, wsNormal).rgb;
+            vec3 cube = textureCube(sEnvCubeMap, FixCubeLookup(reflectVec)).rgb;
+            vec3 cubeD = textureCube(sEnvCubeMap, FixCubeLookup(wsNormal)).rgb;
         #endif
 
         // Fake the HDR texture

@@ -180,6 +180,10 @@ public:
     void SetColor(const Color& color);
     /// Set temperature of the light in Kelvin. Modulates the light color when "use physical values" is enabled.
     void SetTemperature(float temperature);
+    /// Set area light radius. Greater than zero activates area light mode. Works only with PBR shaders.
+    void SetRadius(float radius);
+    /// Set tube area light length. Works only with PBR shaders.
+    void SetLength(float length);
     /// Set use physical light values.
     void SetUsePhysicalValues(bool enable);
     /// Set specular intensity. Zero disables specular calculations.
@@ -226,6 +230,12 @@ public:
 
     /// Return the temperature of the light in Kelvin.
     float GetTemperature() const { return temperature_; }
+
+    /// Return area light mode radius. Works only with PBR shaders.
+    float GetRadius() const { return lightRad_; }
+
+    /// Return area tube light length. Works only with PBR shaders.
+    float GetLength() const { return lightLength_; }
 
     /// Return if light uses temperature and brightness in lumens.
     bool GetUsePhysicalValues() const { return usePhysicalValues_; }
@@ -339,6 +349,10 @@ private:
     Color color_;
     /// Light temperature.
     float temperature_;
+    /// Radius of the light source. If above 0 it will turn the light into an area light.  Works only with PBR shaders.
+    float lightRad_;
+    /// Length of the light source. If above 0 and radius is above 0 it will create a tube light. Works only with PBR shaders.
+    float lightLength_;
     /// Shadow depth bias parameters.
     BiasParameters shadowBias_;
     /// Directional light cascaded shadow parameters.

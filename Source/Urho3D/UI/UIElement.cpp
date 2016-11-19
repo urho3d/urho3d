@@ -1792,16 +1792,16 @@ IntRect UIElement::GetCombinedScreenRect()
     {
         for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
-            IntVector2 childPos = (*i)->GetScreenPosition();
-            const IntVector2& childSize = (*i)->GetSize();
-            if (childPos.x_ < combined.left_)
-                combined.left_ = childPos.x_;
-            if (childPos.y_ < combined.top_)
-                combined.top_ = childPos.y_;
-            if (childPos.x_ + childSize.x_ > combined.right_)
-                combined.right_ = childPos.x_ + childSize.x_;
-            if (childPos.y_ + childSize.y_ > combined.bottom_)
-                combined.bottom_ = childPos.y_ + childSize.y_;
+            IntRect childCombined((*i)->GetCombinedScreenRect());
+
+            if (childCombined.left_ < combined.left_)
+                combined.left_ = childCombined.left_;
+            if (childCombined.right_ > combined.right_)
+                combined.right_ = childCombined.right_;
+            if (childCombined.top_ < combined.top_)
+                combined.top_ = childCombined.top_;
+            if (childCombined.bottom_ > combined.bottom_)
+                combined.bottom_ = childCombined.bottom_;
         }
     }
 
