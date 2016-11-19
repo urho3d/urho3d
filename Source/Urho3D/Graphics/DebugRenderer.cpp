@@ -541,7 +541,7 @@ void DebugRenderer::Render()
     graphics->SetBlendMode(lineAntiAlias_ ? BLEND_ALPHA : BLEND_REPLACE);
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
-    graphics->SetDepthWrite(false);
+    graphics->SetDepthWrite(true);
     graphics->SetLineAntiAlias(lineAntiAlias_);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
@@ -571,6 +571,7 @@ void DebugRenderer::Render()
     }
 
     graphics->SetBlendMode(BLEND_ALPHA);
+    graphics->SetDepthWrite(false);
 
     if (triangles_.Size())
     {
