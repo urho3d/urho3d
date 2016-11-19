@@ -116,12 +116,16 @@ public:
     void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest = true);
     /// Add a triangle with color already converted to unsigned.
     void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest = true);
+    /// Add a quadrangular polygon.
+    void AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, const Color& color, bool depthTest = true);
+    /// Add a quadrangular polygon with color already converted to unsigned.
+    void AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, unsigned color, bool depthTest = true);
     /// Add a scene node represented as its coordinate axes.
     void AddNode(Node* node, float scale = 1.0f, bool depthTest = true);
     /// Add a bounding box.
-    void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true, bool solid = false);
     /// Add a bounding box with transform.
-    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true, bool solid = false);
     /// Add a frustum.
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     /// Add a polyhedron.

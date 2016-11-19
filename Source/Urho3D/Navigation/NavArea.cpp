@@ -81,6 +81,7 @@ void NavArea::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         Matrix3x4 mat;
         mat.SetTranslation(node_->GetWorldPosition());
         debug->AddBoundingBox(boundingBox_, mat, Color::GREEN, depthTest);
+        debug->AddBoundingBox(boundingBox_, mat, Color(0.0f, 1.0f, 0.0f, 0.15f), true, true);
     }
 }
 
