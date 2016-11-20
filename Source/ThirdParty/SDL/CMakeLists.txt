@@ -347,7 +347,7 @@ foreach (_SUB AUDIO CPUINFO EVENTS FILE HAPTIC JOYSTICK POWER RENDER VIDEO)
   endif ()
 endforeach ()
 if (SDL_RENDER)
-  list (APPEND ${SDL2_SOURCE_DIR}/src/render/*/*.c)   # Recurse one more level
+  list (APPEND SOURCE_FILE_PATTERNS ${SDL2_SOURCE_DIR}/src/render/*/*.c)   # Recurse one more level
 endif ()
 file(GLOB SOURCE_FILES ${SOURCE_FILE_PATTERNS})
 

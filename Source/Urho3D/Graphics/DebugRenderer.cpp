@@ -118,6 +118,18 @@ void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vect
         noDepthTriangles_.Push(DebugTriangle(v1, v2, v3, color));
 }
 
+void DebugRenderer::AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, const Color& color, bool depthTest)
+{
+    AddTriangle(v1, v2, v3, color, depthTest);
+    AddTriangle(v3, v4, v1, color, depthTest);
+}
+
+void DebugRenderer::AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, unsigned color, bool depthTest)
+{
+    AddTriangle(v1, v2, v3, color, depthTest);
+    AddTriangle(v3, v4, v1, color, depthTest);
+}
+
 void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
 {
     if (!node)
@@ -131,7 +143,7 @@ void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
     AddLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt(), depthTest);
 }
 
-void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
+void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest, bool solid)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
@@ -145,21 +157,33 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
 
     unsigned uintColor = color.ToUInt();
 
-    AddLine(min, v1, uintColor, depthTest);
-    AddLine(v1, v2, uintColor, depthTest);
-    AddLine(v2, v3, uintColor, depthTest);
-    AddLine(v3, min, uintColor, depthTest);
-    AddLine(v4, v5, uintColor, depthTest);
-    AddLine(v5, max, uintColor, depthTest);
-    AddLine(max, v6, uintColor, depthTest);
-    AddLine(v6, v4, uintColor, depthTest);
-    AddLine(min, v4, uintColor, depthTest);
-    AddLine(v1, v5, uintColor, depthTest);
-    AddLine(v2, max, uintColor, depthTest);
-    AddLine(v3, v6, uintColor, depthTest);
+    if (!solid)
+    {
+        AddLine(min, v1, uintColor, depthTest);
+        AddLine(v1, v2, uintColor, depthTest);
+        AddLine(v2, v3, uintColor, depthTest);
+        AddLine(v3, min, uintColor, depthTest);
+        AddLine(v4, v5, uintColor, depthTest);
+        AddLine(v5, max, uintColor, depthTest);
+        AddLine(max, v6, uintColor, depthTest);
+        AddLine(v6, v4, uintColor, depthTest);
+        AddLine(min, v4, uintColor, depthTest);
+        AddLine(v1, v5, uintColor, depthTest);
+        AddLine(v2, max, uintColor, depthTest);
+        AddLine(v3, v6, uintColor, depthTest);
+    }
+    else
+    {
+        AddPolygon(min, v1, v2, v3, uintColor, depthTest);
+        AddPolygon(v4, v5, max, v6, uintColor, depthTest);
+        AddPolygon(min, v4, v6, v3, uintColor, depthTest);
+        AddPolygon(v1, v5, max, v2, uintColor, depthTest);
+        AddPolygon(v3, v2, max, v6, uintColor, depthTest);
+        AddPolygon(min, v1, v5, v4, uintColor, depthTest);
+    }
 }
 
-void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
+void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest, bool solid)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
@@ -175,18 +199,30 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
 
     unsigned uintColor = color.ToUInt();
 
-    AddLine(v0, v1, uintColor, depthTest);
-    AddLine(v1, v2, uintColor, depthTest);
-    AddLine(v2, v3, uintColor, depthTest);
-    AddLine(v3, v0, uintColor, depthTest);
-    AddLine(v4, v5, uintColor, depthTest);
-    AddLine(v5, v7, uintColor, depthTest);
-    AddLine(v7, v6, uintColor, depthTest);
-    AddLine(v6, v4, uintColor, depthTest);
-    AddLine(v0, v4, uintColor, depthTest);
-    AddLine(v1, v5, uintColor, depthTest);
-    AddLine(v2, v7, uintColor, depthTest);
-    AddLine(v3, v6, uintColor, depthTest);
+    if (!solid)
+    {
+        AddLine(v0, v1, uintColor, depthTest);
+        AddLine(v1, v2, uintColor, depthTest);
+        AddLine(v2, v3, uintColor, depthTest);
+        AddLine(v3, v0, uintColor, depthTest);
+        AddLine(v4, v5, uintColor, depthTest);
+        AddLine(v5, v7, uintColor, depthTest);
+        AddLine(v7, v6, uintColor, depthTest);
+        AddLine(v6, v4, uintColor, depthTest);
+        AddLine(v0, v4, uintColor, depthTest);
+        AddLine(v1, v5, uintColor, depthTest);
+        AddLine(v2, v7, uintColor, depthTest);
+        AddLine(v3, v6, uintColor, depthTest);
+    }
+    else
+    {
+        AddPolygon(v0, v1, v2, v3, uintColor, depthTest);
+        AddPolygon(v4, v5, v7, v6, uintColor, depthTest);
+        AddPolygon(v0, v4, v6, v3, uintColor, depthTest);
+        AddPolygon(v1, v5, v7, v2, uintColor, depthTest);
+        AddPolygon(v3, v2, v7, v6, uintColor, depthTest);
+        AddPolygon(v0, v1, v5, v4, uintColor, depthTest);
+    }
 }
 
 
@@ -535,6 +571,7 @@ void DebugRenderer::Render()
     }
 
     graphics->SetBlendMode(BLEND_ALPHA);
+    graphics->SetDepthWrite(false);
 
     if (triangles_.Size())
     {

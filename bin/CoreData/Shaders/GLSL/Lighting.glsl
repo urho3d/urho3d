@@ -129,14 +129,13 @@ float GetAtten(vec3 normal, vec3 worldPos, out vec3 lightDir)
 {
     lightDir = cLightDirPS;
     return clamp(dot(normal, lightDir), 0.0, 1.0);
-    
 }
 
 float GetAttenPoint(vec3 normal, vec3 worldPos, out vec3 lightDir)
 {
     vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
     float lightDist = length(lightVec);
-    float falloff = pow(clamp(1.0 - pow(lightDist / 1.0, 4.0), 0.0, 1.0), 2.0) * 3.14159265358979323846 / (4 * 3.14159265358979323846)*(pow(lightDist, 2.0) + 1.0);
+    float falloff = pow(clamp(1.0 - pow(lightDist / 1.0, 4.0), 0.0, 1.0), 2.0) * 3.14159265358979323846 / (4.0 * 3.14159265358979323846)*(pow(lightDist, 2.0) + 1.0);
     lightDir = lightVec / lightDist;
     return clamp(dot(normal, lightDir), 0.0, 1.0) * falloff;
 

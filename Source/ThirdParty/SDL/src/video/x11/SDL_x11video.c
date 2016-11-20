@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
@@ -395,7 +398,8 @@ X11_VideoInit(_THIS)
            Compose keys will work correctly. */
         char *prev_locale = setlocale(LC_ALL, NULL);
         char *prev_xmods  = X11_XSetLocaleModifiers(NULL);
-        const char *new_xmods = "";
+        // Urho3D - bug fix - the default XMODIFIERS should be null instead of empty string
+        const char *new_xmods = 0;
 #if defined(HAVE_IBUS_IBUS_H) || defined(HAVE_FCITX_FRONTEND_H)
         const char *env_xmods = SDL_getenv("XMODIFIERS");
 #endif

@@ -1857,19 +1857,11 @@ void Input::HandleSDLEvent(void* sdlEvent)
     switch (evt.type)
     {
         case SDL_KEYDOWN:
-#ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
-#else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
-#endif
+            SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
             break;
 
         case SDL_KEYUP:
-#ifdef __EMSCRIPTEN__
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
-#else
-        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
-#endif
+            SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
             break;
 
         case SDL_TEXTINPUT:
