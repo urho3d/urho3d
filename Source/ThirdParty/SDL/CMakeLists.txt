@@ -976,19 +976,13 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
       set(SDL_INPUT_LINUXKD 1)
     endif()
 
-    # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
-    set (CMAKE_REQUIRED_INCLUDES_UDEV_SAVED ${CMAKE_REQUIRED_INCLUDES})
-    if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES --sysroot)
-      find_path (UDEV_H_INCLUDE_DIRS libudev.h)
-      if (UDEV_H_INCLUDE_DIRS)
-        list (APPEND CMAKE_REQUIRED_INCLUDES ${UDEV_H_INCLUDE_DIRS} ${SYS_TYPES_H_INCLUDE_DIRS})
-      endif ()
-    endif ()
-    check_include_file("libudev.h" HAVE_LIBUDEV_H)
-    if (HAVE_LIBUDEV_H AND UDEV_H_INCLUDE_DIRS)
+    # Urho3D - bug fix - use find_path() to detect udev's header file instead of check_include_file() because the latter requires the path to header file to be known which is not the case when cross-compiling
+    find_path (UDEV_H_INCLUDE_DIRS libudev.h)
+    if (UDEV_H_INCLUDE_DIRS)
+      set (HAVE_LIBUDEV_H TRUE)
       include_directories (${UDEV_H_INCLUDE_DIRS})
     endif ()
-    set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_UDEV_SAVED})
+
     # Urho3D - bug fix - dbus/dbus.h is installed under path suffix 'dbus-1.0', so the following find_path() is needed even when not cross-compiling
     find_path (DBUS_H_INCLUDE_DIRS NAMES dbus/dbus.h PATH_SUFFIXES dbus-1.0)
     # Cater for both multilib and multiarch, native and cross-compiling build
@@ -1003,6 +997,7 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
       include_directories (${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
       list(APPEND EXTRA_LIBS dbus-1)
     endif ()
+
     # Urho3D - bug fix - ibus.h is installed under path suffix 'ibus-1.0', so the following find_path() is needed even when not cross-compiling
     find_path (IBUS_H_INCLUDE_DIRS NAMES ibus.h PATH_SUFFIXES ibus-1.0)
     find_path (GLIB_H_INCLUDE_DIRS NAMES glib.h PATH_SUFFIXES glib-2.0)
@@ -1018,7 +1013,12 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
       list(APPEND EXTRA_LIBS ibus-1.0)
     endif ()
 
-    # Urho3D - TODO - add fcitx support
+    # Urho3D - bug fix - use find_path() to detect fcitx's header file so it works for both native and cross-compiling builds
+    find_path (FCITX_H_INCLUDE_DIRS fcitx/frontend.h)
+    if (FCITX_H_INCLUDE_DIRS)
+      set (HAVE_FCITX_FRONTEND_H TRUE)
+      include_directories (${FCITX_H_INCLUDE_DIRS})
+    endif ()
 
     # Urho3D - bug fix - moved below logic from generic Unix block to Linux-specific block
     if(SDL_POWER)
