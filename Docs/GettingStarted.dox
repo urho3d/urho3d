@@ -30,8 +30,8 @@ Although all required third-party libraries are included as source code, there a
     - libpulse-dev (Debian-based) or pulseaudio-libs-devel (RedHat-based) for PulseAudio.
     - libroar-dev (Debian-based only) for RoarAudio (SNDIO).
   + %Input method editor (optional). One or both of these can be installed at the same time to enable the IME support in the game engine. When both frameworks are installed on user's host system, the application uses XMODIFIFIERS environment variable to determine which one is active.
-    - libibus-1.0-dev (Debian-based) or ibus-devel (RedHat-based) for Intelligent Input Bus (ibus).
-    - fcitx-libs-dev (Debian-based) or fcitx-devel (RedHat-based) for Flexible Input Method Framework (fcitx).
+    - libibus-1.0-dev (Debian-based) or ibus-devel (RedHat-based) for Intelligent %Input Bus (ibus).
+    - fcitx-libs-dev (Debian-based) or fcitx-devel (RedHat-based) for Flexible %Input Method Framework (fcitx).
   + Miscellaneous (optional).
     - libdbus-1-dev (Debian-based) or dbus-devel (Redhat-based) for system-wide messaging (e.g. inhibiting screen-saver).
     - libreadline6-dev (Debian-based) or readline-devel (Redhat-based) for easy editing of command lines in interactive standalone host tools, e.g. isql and lua interpreter.

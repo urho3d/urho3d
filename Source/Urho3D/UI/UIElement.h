@@ -178,7 +178,7 @@ public:
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers) { }
     /// React to text input event.
-    virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
+    virtual void OnTextInput(const String& text) { }
 
     /// React to resize.
     virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) { }
