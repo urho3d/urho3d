@@ -287,8 +287,6 @@ void ParticleEmitter::SetNumParticles(unsigned num)
     // Prevent negative value being assigned from the editor
     if (num > M_MAX_INT)
         num = 0;
-    if (num > MAX_BILLBOARDS)
-        num = MAX_BILLBOARDS;
 
     particles_.Resize(num);
     SetNumBillboards(num);

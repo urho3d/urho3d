@@ -57,8 +57,6 @@ struct URHO3D_API Billboard
     float screenScaleFactor_;
 };
 
-static const unsigned MAX_BILLBOARDS = 65536 / 4;
-
 /// %Billboard component.
 class URHO3D_API BillboardSet : public Drawable
 {
