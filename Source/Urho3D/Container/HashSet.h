@@ -439,8 +439,8 @@ public:
             return false;
 
         // Check for being power of two
-		if (numBuckets & (numBuckets - 1))
-			return false;
+	if (numBuckets & (numBuckets - 1))
+		return false;
 
         AllocateBuckets(Size(), numBuckets);
         Rehash();
