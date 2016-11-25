@@ -253,8 +253,6 @@ void BillboardSet::SetNumBillboards(unsigned num)
     // Prevent negative value being assigned from the editor
     if (num > M_MAX_INT)
         num = 0;
-    if (num > MAX_BILLBOARDS)
-        num = MAX_BILLBOARDS;
 
     unsigned oldNum = billboards_.Size();
     if (num == oldNum)
@@ -509,8 +507,11 @@ void BillboardSet::UpdateBufferSize()
         }
         geometryTypeUpdate_ = false;
     }
+    
+    bool largeIndices = (numBillboards * 4) >= 65536;
+
     if (indexBuffer_->GetIndexCount() != numBillboards * 6)
-        indexBuffer_->SetSize(numBillboards * 6, false);
+        indexBuffer_->SetSize(numBillboards * 6, largeIndices);
 
     bufferSizeDirty_ = false;
     bufferDirty_ = true;
@@ -520,22 +521,43 @@ void BillboardSet::UpdateBufferSize()
         return;
 
     // Indices do not change for a given billboard capacity
-    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, numBillboards * 6, true);
-    if (!dest)
+    void* destPtr = indexBuffer_->Lock(0, numBillboards * 6, true);
+    if (!destPtr)
         return;
 
-    unsigned vertexIndex = 0;
-    while (numBillboards--)
+    if (!largeIndices)
     {
-        dest[0] = (unsigned short)vertexIndex;
-        dest[1] = (unsigned short)(vertexIndex + 1);
-        dest[2] = (unsigned short)(vertexIndex + 2);
-        dest[3] = (unsigned short)(vertexIndex + 2);
-        dest[4] = (unsigned short)(vertexIndex + 3);
-        dest[5] = (unsigned short)vertexIndex;
+        unsigned short* dest = (unsigned short*)destPtr;
+        unsigned short vertexIndex = 0;
+        while (numBillboards--)
+        {
+            dest[0] = vertexIndex;
+            dest[1] = vertexIndex + 1;
+            dest[2] = vertexIndex + 2;
+            dest[3] = vertexIndex + 2;
+            dest[4] = vertexIndex + 3;
+            dest[5] = vertexIndex;
+            
+            dest += 6;
+            vertexIndex += 4;
+        }
+    }
+    else
+    {
+        unsigned* dest = (unsigned*)destPtr;
+        unsigned vertexIndex = 0;
+        while (numBillboards--)
+        {
+            dest[0] = vertexIndex;
+            dest[1] = vertexIndex + 1;
+            dest[2] = vertexIndex + 2;
+            dest[3] = vertexIndex + 2;
+            dest[4] = vertexIndex + 3;
+            dest[5] = vertexIndex;
 
-        dest += 6;
-        vertexIndex += 4;
+            dest += 6;
+            vertexIndex += 4;
+        }
     }
 
     indexBuffer_->Unlock();

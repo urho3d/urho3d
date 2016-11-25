@@ -1137,10 +1137,7 @@ void Input::SetScreenJoystickVisible(SDL_JoystickID id, bool enable)
 
 void Input::SetScreenKeyboardVisible(bool enable)
 {
-    if (!graphics_)
-        return;
-
-    if (enable != IsScreenKeyboardVisible())
+    if (enable != SDL_IsTextInputActive())
     {
         if (enable)
             SDL_StartTextInput();
@@ -1444,18 +1441,12 @@ bool Input::IsScreenJoystickVisible(SDL_JoystickID id) const
 
 bool Input::GetScreenKeyboardSupport() const
 {
-    return graphics_ ? SDL_HasScreenKeyboardSupport() != 0 : false;
+    return SDL_HasScreenKeyboardSupport();
 }
 
 bool Input::IsScreenKeyboardVisible() const
 {
-    if (graphics_)
-    {
-        SDL_Window* window = graphics_->GetWindow();
-        return SDL_IsScreenKeyboardShown(window) != SDL_FALSE;
-    }
-    else
-        return false;
+    return SDL_IsTextInputActive();
 }
 
 bool Input::IsMouseLocked() const
@@ -1856,29 +1847,33 @@ void Input::HandleSDLEvent(void* sdlEvent)
 
     switch (evt.type)
     {
-        case SDL_KEYDOWN:
-            SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
-            break;
+    case SDL_KEYDOWN:
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, true);
+        break;
 
-        case SDL_KEYUP:
-            SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
-            break;
+    case SDL_KEYUP:
+        SetKey(ConvertSDLKeyCode(evt.key.keysym.sym, evt.key.keysym.scancode), evt.key.keysym.scancode, false);
+        break;
 
-        case SDL_TEXTINPUT:
+    case SDL_TEXTINPUT:
         {
-            textInput_ = &evt.text.text[0];
-            unsigned unicode = textInput_.AtUTF8(0);
-            if (unicode)
-            {
-                using namespace TextInput;
+            using namespace TextInput;
 
-                VariantMap textInputEventData;
+            VariantMap textInputEventData;
+            textInputEventData[P_TEXT] = textInput_ = &evt.text.text[0];
+            SendEvent(E_TEXTINPUT, textInputEventData);
+        }
+        break;
 
-                textInputEventData[P_TEXT] = textInput_;
-                textInputEventData[P_BUTTONS] = mouseButtonDown_;
-                textInputEventData[P_QUALIFIERS] = GetQualifiers();
-                SendEvent(E_TEXTINPUT, textInputEventData);
-            }
+    case SDL_TEXTEDITING:
+        {
+            using namespace TextEditing;
+
+            VariantMap textEditingEventData;
+            textEditingEventData[P_COMPOSITION] = &evt.edit.text[0];
+            textEditingEventData[P_CURSOR] = evt.edit.start;
+            textEditingEventData[P_SELECTION_LENGTH] = evt.edit.length;
+            SendEvent(E_TEXTEDITING, textEditingEventData);
         }
         break;
 

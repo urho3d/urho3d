@@ -51,6 +51,7 @@ generated/
 
 # JetBrains IDE project settings
 /.idea/
+/cmake-build-*/
 
 # Code::Blocks project settings
 /*.cbp

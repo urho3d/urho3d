@@ -31,6 +31,8 @@
 
 #include "../DebugNew.h"
 
+#include <SDL/SDL.h>
+
 namespace Urho3D
 {
 
@@ -429,25 +431,19 @@ void LineEdit::OnKey(int key, int buttons, int qualifiers)
         UpdateCursor();
 }
 
-void LineEdit::OnTextInput(const String& text, int buttons, int qualifiers)
+void LineEdit::OnTextInput(const String& text)
 {
     if (!editable_)
         return;
 
     bool changed = false;
 
-    // If only CTRL is held down, do not edit
-    if ((qualifiers & (QUAL_CTRL | QUAL_ALT)) == QUAL_CTRL)
-        return;
-
-    // Send char as an event to allow changing it
-    using namespace CharEntry;
+    // Send text entry as an event to allow changing it
+    using namespace TextEntry;
 
     VariantMap& eventData = GetEventDataMap();
     eventData[P_ELEMENT] = this;
     eventData[P_TEXT] = text;
-    eventData[P_BUTTONS] = buttons;
-    eventData[P_QUALIFIERS] = qualifiers;
     SendEvent(E_TEXTENTRY, eventData);
 
     const String newText = eventData[P_TEXT].GetString().SubstringUTF8(0);
@@ -603,6 +599,10 @@ void LineEdit::UpdateCursor()
     cursor_->SetPosition(text_->GetPosition() + IntVector2(x, 0));
     cursor_->SetSize(cursor_->GetWidth(), text_->GetRowHeight());
 
+    IntVector2 screenPosition = ElementToScreen(cursor_->GetPosition());
+    SDL_Rect rect = {screenPosition.x_, screenPosition.y_, cursor_->GetSize().x_, cursor_->GetSize().y_};
+    SDL_SetTextInputRect(&rect);
+
     // Scroll if necessary
     int sx = -GetChildOffset().x_;
     int left = clipBorder_.left_;
@@ -636,7 +636,7 @@ unsigned LineEdit::GetCharIndex(const IntVector2& position)
     return M_MAX_UNSIGNED;
 }
 
-void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
+void LineEdit::HandleFocused(StringHash /*eventType*/, VariantMap& eventData)
 {
     if (eventData[Focused::P_BYKEY].GetBool())
     {
@@ -649,7 +649,7 @@ void LineEdit::HandleFocused(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Input>()->SetScreenKeyboardVisible(true);
 }
 
-void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
+void LineEdit::HandleDefocused(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     text_->ClearSelection();
 
@@ -657,7 +657,7 @@ void LineEdit::HandleDefocused(StringHash eventType, VariantMap& eventData)
         GetSubsystem<Input>()->SetScreenKeyboardVisible(false);
 }
 
-void LineEdit::HandleLayoutUpdated(StringHash eventType, VariantMap& eventData)
+void LineEdit::HandleLayoutUpdated(StringHash /*eventType*/, VariantMap& /*eventData*/)
 {
     UpdateCursor();
 }

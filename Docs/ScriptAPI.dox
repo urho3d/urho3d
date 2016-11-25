@@ -194,8 +194,11 @@ namespace Urho3D
 
 ### TextInput
 - %Text : String
-- %Buttons : int
-- %Qualifiers : int
+
+### TextEditing
+- %Composition : String
+- %Cursor : int
+- %SelectionLength : int
 
 ### JoystickConnected
 - %JoystickID : int
@@ -758,11 +761,9 @@ namespace Urho3D
 - %Element : UIElement pointer
 - %Modal : bool
 
-### CharEntry
+### TextEntry
 - %Element : UIElement pointer
-- %Text : String
-- %Buttons : int
-- %Qualifiers : int
+- %Text : String [in/out]
 
 ### TextChanged
 - %Element : UIElement pointer

@@ -220,7 +220,6 @@ public:
 
     float m00_;
     float m01_;
-    float m02_;
     float m10_;
     float m11_;
 
