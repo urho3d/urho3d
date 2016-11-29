@@ -274,7 +274,7 @@ int CrowdAgent::AddAgentToCrowd(bool force)
     {
         URHO3D_PROFILE(AddAgentToCrowd);
 
-        agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetPosition());
+        agentCrowdId_ = crowdManager_->AddAgent(this, node_->GetWorldPosition());
         if (agentCrowdId_ == -1)
             return -1;
 
@@ -471,7 +471,7 @@ void CrowdAgent::SetNavigationPushiness(NavigationPushiness val)
 Vector3 CrowdAgent::GetPosition() const
 {
     const dtCrowdAgent* agent = GetDetourCrowdAgent();
-    return agent ? Vector3(agent->npos) : node_->GetPosition();
+    return agent ? Vector3(agent->npos) : node_->GetWorldPosition();
 }
 
 Vector3 CrowdAgent::GetDesiredVelocity() const
@@ -531,7 +531,7 @@ void CrowdAgent::OnCrowdUpdate(dtCrowdAgent* ag, float dt)
             if (updateNodePosition_)
             {
                 ignoreTransformChanges_ = true;
-                node_->SetPosition(newPos);
+                node_->SetWorldPosition(newPos);
                 ignoreTransformChanges_ = false;
             }
 
@@ -625,12 +625,21 @@ void CrowdAgent::OnMarkedDirty(Node* node)
         if (agent)
         {
             Vector3& agentPos = reinterpret_cast<Vector3&>(agent->npos);
-            Vector3 nodeWorldPos = node->GetWorldPosition();
+            Vector3 nodePos = node->GetWorldPosition();
             
             // Only reset position / state if actually changed
-            if (nodeWorldPos != agentPos)
+            if (nodePos != agentPos)
             {
-                agentPos = nodeWorldPos;
+                // If position difference is significant, readd to crowd (issue 1695)
+                /// \todo Somewhat arbitrary
+                float diff = (agentPos - nodePos).LengthSquared();
+                if (diff >= 1.0f)
+                {
+                    RemoveAgentFromCrowd();
+                    AddAgentToCrowd();
+                }
+                else
+                    agentPos = nodePos;
 
                 // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
                 if (agent->state == CA_STATE_INVALID)
