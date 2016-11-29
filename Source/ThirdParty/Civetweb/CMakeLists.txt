@@ -34,6 +34,12 @@ if (WIN32)
             add_definitions (-D_TIMESPEC_DEFINED)
         endif ()
     endif ()
+elseif (APPLE)
+    include (CheckLibraryExists)
+    check_library_exists (c clock_gettime "" FOUND_CLOCK_GETTIME_IN_C)
+    if (FOUND_CLOCK_GETTIME_IN_C)
+        add_definitions (-DHAVE_CLOCK_GETTIME)
+    endif()
 endif ()
 
 # Define source files
