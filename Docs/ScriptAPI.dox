@@ -13411,6 +13411,7 @@ Properties:
 - bool fixedScreenSize
 - Font@ font // readonly
 - int fontSize
+- int height // readonly
 - HorizontalAlignment horizontalAlignment
 - uint id // readonly
 - bool inView // readonly
