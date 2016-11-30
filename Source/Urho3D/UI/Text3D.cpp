@@ -461,6 +461,11 @@ int Text3D::GetWidth() const
     return text_.GetWidth();
 }
 
+int Text3D::GetHeight() const
+{
+    return text_.GetHeight();
+}
+
 int Text3D::GetRowHeight() const
 {
     return text_.GetRowHeight();
