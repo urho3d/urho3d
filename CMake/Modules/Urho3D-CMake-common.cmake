@@ -454,6 +454,11 @@ if (URHO3D_URHO2D)
     add_definitions (-DURHO3D_URHO2D)
 endif ()
 
+# Add definition for SSE
+if (URHO3D_SSE)
+    add_definitions (-DURHO3D_SSE)
+endif ()
+
 # Add definition for Database
 if (URHO3D_DATABASE_ODBC)
     set (URHO3D_DATABASE_SQLITE 0)
