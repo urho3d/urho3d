@@ -204,7 +204,7 @@ endif ()
 
 # Generate platform specific export header file
 if (MSVC)
-    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n")
+    set (PRE_EXPORT_HEADER "\n#pragma warning(disable: 4251)\n#pragma warning(disable: 4275)\n\n#include \"Config.h\"\n")
 endif ()
 if (URHO3D_CLANG_TOOLS)
     set (ANNOTATE_NONSCRIPTABLE "__attribute__((annotate(\"nonscriptable\")))")
@@ -212,6 +212,8 @@ endif ()
 generate_export_header (${TARGET_NAME} ${URHO3D_LIB_TYPE} EXPORT_MACRO_NAME URHO3D_API EXPORT_FILE_NAME Urho3D.h.new)
 execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h)
 file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/Urho3D.h.new)
+
+include (GenerateConfigHeader)
 
 # Define generated object files
 # This is a hack as it relies on internal working of CMake
