@@ -382,6 +382,10 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         SetSkeleton(model->GetSkeleton(), createBones);
         ResetLodLevels();
 
+        // Reserve space for skinning matrices
+        skinMatrices_.Resize(skeleton_.GetNumBones());
+        SetGeometryBoneMappings();
+
         // Enable skinning in batches
         for (unsigned i = 0; i < batches_.Size(); ++i)
         {
@@ -778,10 +782,6 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
     }
-
-    // Reserve space for skinning matrices
-    skinMatrices_.Resize(skeleton_.GetNumBones());
-    SetGeometryBoneMappings();
 
     assignBonesPending_ = !createBones;
 }

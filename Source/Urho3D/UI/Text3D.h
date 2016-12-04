@@ -133,6 +133,8 @@ public:
     float GetEffectDepthBias() const;
     /// Return text width.
     int GetWidth() const;
+    /// Return text height.
+    int GetHeight() const;
     /// Return row height.
     int GetRowHeight() const;
     /// Return number of rows.

@@ -6428,6 +6428,7 @@ Methods:
 - const Color& GetEffectColor() const
 - float GetEffectDepthBias() const
 - int GetWidth() const
+- int GetHeight() const
 - int GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
@@ -6458,6 +6459,7 @@ Properties:
 - float effectDepthBias
 - int width
 - Color& color
+- int height (readonly)
 - int rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)

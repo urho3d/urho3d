@@ -461,6 +461,11 @@ int Text3D::GetWidth() const
     return text_.GetWidth();
 }
 
+int Text3D::GetHeight() const
+{
+    return text_.GetHeight();
+}
+
 int Text3D::GetRowHeight() const
 {
     return text_.GetRowHeight();
@@ -601,16 +606,21 @@ void Text3D::UpdateTextBatches()
         break;
     }
 
-    boundingBox_.Clear();
-
-    for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
+    if (uiVertexData_.Size())
     {
-        Vector3& position = *(reinterpret_cast<Vector3*>(&uiVertexData_[i]));
-        position += offset;
-        position *= TEXT_SCALING;
-        position.y_ = -position.y_;
-        boundingBox_.Merge(position);
+        boundingBox_.Clear();
+
+        for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
+        {
+            Vector3& position = *(reinterpret_cast<Vector3*>(&uiVertexData_[i]));
+            position += offset;
+            position *= TEXT_SCALING;
+            position.y_ = -position.y_;
+            boundingBox_.Merge(position);
+        }
     }
+    else
+        boundingBox_.Define(Vector3::ZERO, Vector3::ZERO);
 
     textDirty_ = false;
     geometryDirty_ = true;

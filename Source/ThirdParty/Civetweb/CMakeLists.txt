@@ -34,6 +34,12 @@ if (WIN32)
             add_definitions (-D_TIMESPEC_DEFINED)
         endif ()
     endif ()
+elseif (APPLE)
+    if (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.12 AND IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 10.0 AND APPLETVOS_DEPLOYMENT_TARGET VERSION_LESS 10.0)
+        add_definitions (-D_DARWIN_FEATURE_CLOCK_GETTIME=0)
+    else ()
+        add_definitions (-DHAVE_CLOCK_GETTIME)
+    endif ()
 endif ()
 
 # Define source files

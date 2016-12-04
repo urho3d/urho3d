@@ -123,9 +123,6 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 #ifdef __MACH__
 
-// Urho3D: prefer own implementation of clock_gettime regardless of XCode / SDK version
-#define _DARWIN_FEATURE_CLOCK_GETTIME 0
-
 #define CLOCK_MONOTONIC (1)
 #define CLOCK_REALTIME (2)
 
@@ -135,6 +132,8 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 #include <mach/mach_time.h>
 #include <assert.h>
 
+// Urho3D - On Apple platform, use its clock_gettime() when it is available
+#ifndef HAVE_CLOCK_GETTIME
 int clock_gettime(int clk_id, struct timespec *t)
 {
 	if (clk_id == CLOCK_REALTIME) {
@@ -174,6 +173,7 @@ int clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
+#endif  // HAVE_CLOCK_GETTIME
 #endif
 
 // Urho3D: Prevent inclusion of pthread_time.h on MinGW, instead prefer own implementation of clock_gettime()

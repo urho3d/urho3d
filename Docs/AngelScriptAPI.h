@@ -12031,6 +12031,8 @@ bool fixedScreenSize;
 /* readonly */
 Font font;
 int fontSize;
+/* readonly */
+int height;
 HorizontalAlignment horizontalAlignment;
 /* readonly */
 uint id;

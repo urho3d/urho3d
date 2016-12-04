@@ -60,6 +60,7 @@ class Text3D : public Drawable
     const Color& GetEffectColor() const;
     float GetEffectDepthBias() const;
     int GetWidth() const;
+    int GetHeight() const;
     int GetRowHeight() const;
     unsigned GetNumRows() const;
     unsigned GetNumChars() const;
@@ -88,6 +89,7 @@ class Text3D : public Drawable
     tolua_property__get_set float effectDepthBias;
     tolua_property__get_set int width;
     tolua_property__get_set Color& color; // Write only property.
+    tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set int rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
