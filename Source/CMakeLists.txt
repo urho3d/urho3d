@@ -101,6 +101,10 @@ if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()
 
+if (URHO3D_IMUI)
+    add_subdirectory (ThirdParty/imgui)
+endif ()
+
 if (NOT ANDROID AND NOT ARM AND NOT WEB)
     if (URHO3D_OPENGL)
         add_subdirectory (ThirdParty/GLEW)
