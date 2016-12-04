@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="152.788" />
 	<attribute name="Next Replicated Node ID" value="408" />
 	<attribute name="Next Replicated Component ID" value="428" />
-	<attribute name="Next Local Node ID" value="16777272" />
-	<attribute name="Next Local Component ID" value="16777865" />
+	<attribute name="Next Local Node ID" value="16777274" />
+	<attribute name="Next Local Component ID" value="16777889" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -1092,13 +1092,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="SphereWithDynamicMat" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-1.57986 2.84736 -3.50626" />
+		<attribute name="Position" value="-1.57986 3.32226 -3.50626" />
 		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="187">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/Dynamic.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/Dynamic.xml;Materials/PBR/DiamonPlate.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
@@ -1402,13 +1402,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sphere" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-4.90273 2.84736 -21.7491" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Position" value="-4.90273 3.4 -21.7491" />
+		<attribute name="Rotation" value="0.707107 0 -0.707107 0" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="219">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/Lead.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/Lead.xml;Materials/PBR/DiamonPlate.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
@@ -1416,13 +1416,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sphere" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-4.90273 2.84736 -17.2491" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Position" value="-4.90273 3.4 -17.2491" />
+		<attribute name="Rotation" value="0.707107 0 -0.707107 0" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="220">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/Sand.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/Sand.xml;Materials/PBR/DiamonPlate.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
@@ -1458,13 +1458,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sphere" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-4.90273 2.84736 -15.7491" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Position" value="-4.90273 3.4 -15.7491" />
+		<attribute name="Rotation" value="0.707107 0 -0.707107 0" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="223">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/Leather.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/Leather.xml;Materials/PBR/DiamonPlate.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
@@ -1504,13 +1504,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sphere" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-4.90273 2.84736 -18.7491" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Position" value="-4.90273 3.4 -18.7491" />
+		<attribute name="Rotation" value="0.707107 0 -0.707107 0" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="227">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/Mud.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/Mud.xml;Materials/PBR/DiamonPlate.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
@@ -1532,13 +1532,13 @@
 		<attribute name="Is Enabled" value="true" />
 		<attribute name="Name" value="Sphere" />
 		<attribute name="Tags" />
-		<attribute name="Position" value="-4.90273 2.84736 -20.2491" />
-		<attribute name="Rotation" value="1 0 0 0" />
-		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Position" value="-4.90273 3.4 -20.2491" />
+		<attribute name="Rotation" value="0.707107 0 -0.707107 0" />
+		<attribute name="Scale" value="2 2 2" />
 		<attribute name="Variables" />
 		<component type="StaticModel" id="229">
-			<attribute name="Model" value="Model;Models/Sphere.mdl" />
-			<attribute name="Material" value="Material;Materials/PBR/DiamonPlate.xml" />
+			<attribute name="Model" value="Model;Models/MaterialPreview.mdl" />
+			<attribute name="Material" value="Material;Materials/PBR/DiamonPlate.xml;Materials/PBR/Sand.xml" />
 			<attribute name="Cast Shadows" value="true" />
 		</component>
 	</node>
