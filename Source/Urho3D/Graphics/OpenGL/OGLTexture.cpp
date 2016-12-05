@@ -113,7 +113,10 @@ void Texture::UpdateParameters()
     switch (filterMode)
     {
     case FILTER_NEAREST:
-        glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        if (levels_ < 2)
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        else
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         break;
 
