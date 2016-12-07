@@ -36,7 +36,7 @@ float GatherAvgLum(Texture2D tex, SamplerState texSampler, float2 texCoord, floa
     #endif
     return lumAvg / 4.0;
 }
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oTexCoord : TEXCOORD0,
     out float2 oScreenPos : TEXCOORD1,
@@ -66,7 +66,8 @@ void VS(float4 iPos : POSITION,
 
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float2 iScreenPos : TEXCOORD1,
     out float4 oColor : OUTCOLOR0)
@@ -116,3 +117,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
     oColor = float4(color * (cAutoExposureMiddleGrey / adaptedLum), 1.0);
     #endif
 }
+#endif
