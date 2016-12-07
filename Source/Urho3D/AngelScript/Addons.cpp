@@ -2466,6 +2466,8 @@ void RegisterString(asIScriptEngine *engine)
     engine->RegisterObjectMethod("String", "String Substring(uint, uint) const", asMETHODPR(String, Substring, (unsigned, unsigned) const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String ToUpper() const", asMETHOD(String, ToUpper), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String ToLower() const", asMETHOD(String, ToLower), asCALL_THISCALL);
+	engine->RegisterObjectMethod("String", "String TrimLeft() const", asMETHOD(String, TrimLeft), asCALL_THISCALL);
+	engine->RegisterObjectMethod("String", "String TrimRight() const", asMETHOD(String, TrimRight), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "String Trimmed() const", asMETHOD(String, Trimmed), asCALL_THISCALL);
     engine->RegisterObjectMethod("String", "void SetUTF8FromLatin1(const String& in)", asFUNCTION(StringSetUTF8FromLatin1), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("String", "uint get_utf8Length() const", asMETHOD(String, LengthUTF8), asCALL_THISCALL);

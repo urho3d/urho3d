@@ -517,6 +517,36 @@ String String::Substring(unsigned pos, unsigned length) const
         return String();
 }
 
+String String::TrimLeft() const
+{
+	unsigned trimStart = 0;
+	unsigned trimEnd = length_;
+	while (trimStart < trimEnd)
+	{
+		char c = buffer_[trimStart];
+		if (c != ' ' && c != '\t')
+			break;
+		++trimStart;
+	}
+	
+	return Substring(trimStart);
+}
+
+String String::TrimRight() const
+{
+	unsigned trimEnd = length_;
+
+	while (trimEnd > 0)
+	{
+		char c = buffer_[trimEnd - 1];
+		if (c != ' ' && c != '\t')
+			break;
+		--trimEnd;
+	}
+
+	return Substring(0, trimEnd);
+}
+
 String String::Trimmed() const
 {
     unsigned trimStart = 0;
@@ -525,14 +555,14 @@ String String::Trimmed() const
     while (trimStart < trimEnd)
     {
         char c = buffer_[trimStart];
-        if (c != ' ' && c != 9)
+        if (c != ' ' && c != '\t')
             break;
         ++trimStart;
     }
     while (trimEnd > trimStart)
     {
         char c = buffer_[trimEnd - 1];
-        if (c != ' ' && c != 9)
+        if (c != ' ' && c != '\t')
             break;
         --trimEnd;
     }

@@ -694,7 +694,7 @@ float4 FxaaPixelShader(
                       Urho3D Vertex- and Pixelshader
                       
 ============================================================================*/
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     out float2 oScreenPos : TEXCOORD0,
     out float4 oPos : OUTPOSITION)
@@ -704,7 +704,8 @@ void VS(float4 iPos : POSITION,
     oPos = GetClipPos(worldPos);
     oScreenPos = GetScreenPosPreDiv(oPos);
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iScreenPos : TEXCOORD0,
     out float4 oColor : OUTCOLOR0)
 {
@@ -718,4 +719,4 @@ void PS(float2 iScreenPos : TEXCOORD0,
         0.0833f                             // float fxaaQualityEdgeThresholdMin
     );
 }
-
+#endif

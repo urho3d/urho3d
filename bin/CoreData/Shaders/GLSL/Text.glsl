@@ -13,8 +13,8 @@ uniform vec4 cShadowColor;
 #ifdef TEXT_EFFECT_STROKE
 uniform vec4 cStrokeColor;
 #endif
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -23,8 +23,9 @@ void VS()
     vTexCoord = iTexCoord;
     vColor = iColor;
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     gl_FragColor.rgb = vColor.rgb;
 
@@ -62,3 +63,4 @@ void PS()
     #endif
 #endif
 }
+#endif
