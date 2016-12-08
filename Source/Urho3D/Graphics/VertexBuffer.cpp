@@ -43,7 +43,8 @@ VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     lockCount_(0),
     lockScratchData_(0),
     shadowed_(false),
-    dynamic_(false)
+    dynamic_(false),
+    discardLock_(false)
 {
     UpdateOffsets();
 
