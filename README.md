@@ -9,7 +9,7 @@
 Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 
 ##License
-Licensed under the MIT license, see [License.txt](https://github.com/urho3d/Urho3D/blob/master/License.txt) for details.
+Licensed under the MIT license, see [LICENSE](https://github.com/urho3d/Urho3D/blob/master/LICENSE) for details.
 
 ##Credits
 Urho3D development, contributions and bugfixes by:

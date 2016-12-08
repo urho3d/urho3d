@@ -198,8 +198,13 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 
 bool AnimationController::PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime)
 {
-    FadeOthers(name, 0.0f, fadeTime);
-    return Play(name, layer, looped, fadeTime);
+    bool success = Play(name, layer, looped, fadeTime);
+    
+    // Fade other animations only if successfully started the new one
+    if (success)
+        FadeOthers(name, 0.0f, fadeTime);
+    
+    return success;
 }
 
 bool AnimationController::Stop(const String& name, float fadeOutTime)
