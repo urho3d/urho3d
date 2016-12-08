@@ -165,6 +165,8 @@ private:
     bool dynamic_;
     /// Shadowed flag.
     bool shadowed_;
+    /// Discard lock flag. Used by OpenGL only.
+    bool discardLock_;
 };
 
 }
