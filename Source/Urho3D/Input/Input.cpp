@@ -28,6 +28,7 @@
 #include "../Core/ProcessUtils.h"
 #include "../Core/Profiler.h"
 #include "../Core/StringUtils.h"
+#include "../Engine/Engine.h"
 #include "../Graphics/Graphics.h"
 #include "../Graphics/GraphicsEvents.h"
 #include "../Input/Input.h"
@@ -1490,6 +1491,13 @@ void Input::Initialize()
     else
         LoseFocus();
 #endif
+
+    Engine* engine = GetSubsystem<Engine>();
+    if (engine->HasParameter("MouseVisible"))
+        SetMouseVisible(engine->GetParameter("MouseVisible").GetBool());
+
+    if (engine->HasParameter("MouseMode"))
+        SetMouseMode((MouseMode)engine->GetParameter("MouseMode").GetInt());
 
     ResetJoysticks();
     ResetState();

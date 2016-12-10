@@ -224,6 +224,8 @@ The full list of supported parameters, their datatypes and default values:
 - TouchEmulation (bool) %Touch emulation on desktop platform. Default false.
 - ShaderCacheDir (string) Shader binary cache directory for Direct3D. Default "urho3d/shadercache" within the user's application preferences directory.
 - PackageCacheDir (string) Package cache directory for Network subsystem. Not specified by default.
+- MouseVisible (bool) Visible operating system mouse cursor. Default false.
+- MouseMode (MouseMode) Operating system mouse cursor mode. Default MM_ABSOLUTE.
 
 \section MainLoop_Frame Main loop iteration
 

@@ -160,8 +160,10 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     URHO3D_PROFILE(InitEngine);
 
+    engineParameters_ = parameters;
+
     // Set headless mode
-    headless_ = GetParameter(parameters, "Headless", false).GetBool();
+    headless_ = GetParameter("Headless", false).GetBool();
 
     // Register the rest of the subsystems
     if (!headless_)
@@ -184,23 +186,23 @@ bool Engine::Initialize(const VariantMap& parameters)
     Log* log = GetSubsystem<Log>();
     if (log)
     {
-        if (HasParameter(parameters, "LogLevel"))
-            log->SetLevel(GetParameter(parameters, "LogLevel").GetInt());
-        log->SetQuiet(GetParameter(parameters, "LogQuiet", false).GetBool());
-        log->Open(GetParameter(parameters, "LogName", "Urho3D.log").GetString());
+        if (HasParameter("LogLevel"))
+            log->SetLevel(GetParameter("LogLevel").GetInt());
+        log->SetQuiet(GetParameter("LogQuiet", false).GetBool());
+        log->Open(GetParameter("LogName", "Urho3D.log").GetString());
     }
 
     // Set maximally accurate low res timer
     GetSubsystem<Time>()->SetTimerPeriod(1);
 
     // Configure max FPS
-    if (GetParameter(parameters, "FrameLimiter", true) == false)
+    if (GetParameter("FrameLimiter", true) == false)
         SetMaxFps(0);
 
     // Set amount of worker threads according to the available physical CPU cores. Using also hyperthreaded cores results in
     // unpredictable extra synchronization overhead. Also reserve one core for the main thread
 #ifdef URHO3D_THREADING
-    unsigned numThreads = GetParameter(parameters, "WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
+    unsigned numThreads = GetParameter("WorkerThreads", true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
         GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
@@ -213,13 +215,13 @@ bool Engine::Initialize(const VariantMap& parameters)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     FileSystem* fileSystem = GetSubsystem<FileSystem>();
 
-    Vector<String> resourcePrefixPaths = GetParameter(parameters, "ResourcePrefixPaths", String::EMPTY).GetString().Split(';', true);
+    Vector<String> resourcePrefixPaths = GetParameter("ResourcePrefixPaths", String::EMPTY).GetString().Split(';', true);
     for (unsigned i = 0; i < resourcePrefixPaths.Size(); ++i)
         resourcePrefixPaths[i] = AddTrailingSlash(
             IsAbsolutePath(resourcePrefixPaths[i]) ? resourcePrefixPaths[i] : fileSystem->GetProgramDir() + resourcePrefixPaths[i]);
-    Vector<String> resourcePaths = GetParameter(parameters, "ResourcePaths", "Data;CoreData").GetString().Split(';');
-    Vector<String> resourcePackages = GetParameter(parameters, "ResourcePackages").GetString().Split(';');
-    Vector<String> autoLoadPaths = GetParameter(parameters, "AutoloadPaths", "Autoload").GetString().Split(';');
+    Vector<String> resourcePaths = GetParameter("ResourcePaths", "Data;CoreData").GetString().Split(';');
+    Vector<String> resourcePackages = GetParameter("ResourcePackages").GetString().Split(';');
+    Vector<String> autoLoadPaths = GetParameter("AutoloadPaths", "Autoload").GetString().Split(';');
 
     for (unsigned i = 0; i < resourcePaths.Size(); ++i)
     {
@@ -349,57 +351,57 @@ bool Engine::Initialize(const VariantMap& parameters)
         Graphics* graphics = GetSubsystem<Graphics>();
         Renderer* renderer = GetSubsystem<Renderer>();
 
-        if (HasParameter(parameters, "ExternalWindow"))
-            graphics->SetExternalWindow(GetParameter(parameters, "ExternalWindow").GetVoidPtr());
-        graphics->SetWindowTitle(GetParameter(parameters, "WindowTitle", "Urho3D").GetString());
-        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, "WindowIcon", String::EMPTY).GetString()));
-        graphics->SetFlushGPU(GetParameter(parameters, "FlushGPU", false).GetBool());
-        graphics->SetOrientations(GetParameter(parameters, "Orientations", "LandscapeLeft LandscapeRight").GetString());
+        if (HasParameter("ExternalWindow"))
+            graphics->SetExternalWindow(GetParameter("ExternalWindow").GetVoidPtr());
+        graphics->SetWindowTitle(GetParameter("WindowTitle", "Urho3D").GetString());
+        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter("WindowIcon", String::EMPTY).GetString()));
+        graphics->SetFlushGPU(GetParameter("FlushGPU", false).GetBool());
+        graphics->SetOrientations(GetParameter("Orientations", "LandscapeLeft LandscapeRight").GetString());
 
-        if (HasParameter(parameters, "WindowPositionX") && HasParameter(parameters, "WindowPositionY"))
-            graphics->SetWindowPosition(GetParameter(parameters, "WindowPositionX").GetInt(),
-                GetParameter(parameters, "WindowPositionY").GetInt());
+        if (HasParameter("WindowPositionX") && HasParameter("WindowPositionY"))
+            graphics->SetWindowPosition(GetParameter("WindowPositionX").GetInt(),
+                GetParameter("WindowPositionY").GetInt());
 
 #ifdef URHO3D_OPENGL
-        if (HasParameter(parameters, "ForceGL2"))
-            graphics->SetForceGL2(GetParameter(parameters, "ForceGL2").GetBool());
+        if (HasParameter("ForceGL2"))
+            graphics->SetForceGL2(GetParameter("ForceGL2").GetBool());
 #endif
 
         if (!graphics->SetMode(
-            GetParameter(parameters, "WindowWidth", 0).GetInt(),
-            GetParameter(parameters, "WindowHeight", 0).GetInt(),
-            GetParameter(parameters, "FullScreen", true).GetBool(),
-            GetParameter(parameters, "Borderless", false).GetBool(),
-            GetParameter(parameters, "WindowResizable", false).GetBool(),
-            GetParameter(parameters, "HighDPI", false).GetBool(),
-            GetParameter(parameters, "VSync", false).GetBool(),
-            GetParameter(parameters, "TripleBuffer", false).GetBool(),
-            GetParameter(parameters, "MultiSample", 1).GetInt()
+            GetParameter("WindowWidth", 0).GetInt(),
+            GetParameter("WindowHeight", 0).GetInt(),
+            GetParameter("FullScreen", true).GetBool(),
+            GetParameter("Borderless", false).GetBool(),
+            GetParameter("WindowResizable", false).GetBool(),
+            GetParameter("HighDPI", false).GetBool(),
+            GetParameter("VSync", false).GetBool(),
+            GetParameter("TripleBuffer", false).GetBool(),
+            GetParameter("MultiSample", 1).GetInt()
         ))
             return false;
 
-        graphics->SetShaderCacheDir(GetParameter(parameters, "ShaderCacheDir", fileSystem->GetAppPreferencesDir("urho3d", "shadercache")).GetString());
+        graphics->SetShaderCacheDir(GetParameter("ShaderCacheDir", fileSystem->GetAppPreferencesDir("urho3d", "shadercache")).GetString());
 
-        if (HasParameter(parameters, "DumpShaders"))
-            graphics->BeginDumpShaders(GetParameter(parameters, "DumpShaders", String::EMPTY).GetString());
-        if (HasParameter(parameters, "RenderPath"))
-            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter(parameters, "RenderPath").GetString()));
+        if (HasParameter("DumpShaders"))
+            graphics->BeginDumpShaders(GetParameter("DumpShaders", String::EMPTY).GetString());
+        if (HasParameter("RenderPath"))
+            renderer->SetDefaultRenderPath(cache->GetResource<XMLFile>(GetParameter("RenderPath").GetString()));
 
-        renderer->SetDrawShadows(GetParameter(parameters, "Shadows", true).GetBool());
-        if (renderer->GetDrawShadows() && GetParameter(parameters, "LowQualityShadows", false).GetBool())
+        renderer->SetDrawShadows(GetParameter("Shadows", true).GetBool());
+        if (renderer->GetDrawShadows() && GetParameter("LowQualityShadows", false).GetBool())
             renderer->SetShadowQuality(SHADOWQUALITY_SIMPLE_16BIT);
-        renderer->SetMaterialQuality(GetParameter(parameters, "MaterialQuality", QUALITY_HIGH).GetInt());
-        renderer->SetTextureQuality(GetParameter(parameters, "TextureQuality", QUALITY_HIGH).GetInt());
-        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter(parameters, "TextureFilterMode", FILTER_TRILINEAR).GetInt());
-        renderer->SetTextureAnisotropy(GetParameter(parameters, "TextureAnisotropy", 4).GetInt());
+        renderer->SetMaterialQuality(GetParameter("MaterialQuality", QUALITY_HIGH).GetInt());
+        renderer->SetTextureQuality(GetParameter("TextureQuality", QUALITY_HIGH).GetInt());
+        renderer->SetTextureFilterMode((TextureFilterMode)GetParameter("TextureFilterMode", FILTER_TRILINEAR).GetInt());
+        renderer->SetTextureAnisotropy(GetParameter("TextureAnisotropy", 4).GetInt());
 
-        if (GetParameter(parameters, "Sound", true).GetBool())
+        if (GetParameter("Sound", true).GetBool())
         {
             GetSubsystem<Audio>()->SetMode(
-                GetParameter(parameters, "SoundBuffer", 100).GetInt(),
-                GetParameter(parameters, "SoundMixRate", 44100).GetInt(),
-                GetParameter(parameters, "SoundStereo", true).GetBool(),
-                GetParameter(parameters, "SoundInterpolation", true).GetBool()
+                GetParameter("SoundBuffer", 100).GetInt(),
+                GetParameter("SoundMixRate", 44100).GetInt(),
+                GetParameter("SoundStereo", true).GetBool(),
+                GetParameter("SoundInterpolation", true).GetBool()
             );
         }
     }
@@ -408,22 +410,22 @@ bool Engine::Initialize(const VariantMap& parameters)
     InitFPU();
 
     // Initialize input
-    if (HasParameter(parameters, "TouchEmulation"))
-        GetSubsystem<Input>()->SetTouchEmulation(GetParameter(parameters, "TouchEmulation").GetBool());
+    if (HasParameter("TouchEmulation"))
+        GetSubsystem<Input>()->SetTouchEmulation(GetParameter("TouchEmulation").GetBool());
 
     // Initialize network
 #ifdef URHO3D_NETWORK
-    if (HasParameter(parameters, "PackageCacheDir"))
-        GetSubsystem<Network>()->SetPackageCacheDir(GetParameter(parameters, "PackageCacheDir").GetString());
+    if (HasParameter("PackageCacheDir"))
+        GetSubsystem<Network>()->SetPackageCacheDir(GetParameter("PackageCacheDir").GetString());
 #endif
 
 #ifdef URHO3D_TESTING
-    if (HasParameter(parameters, "TimeOut"))
-        timeOut_ = GetParameter(parameters, "TimeOut", 0).GetInt() * 1000000LL;
+    if (HasParameter("TimeOut"))
+        timeOut_ = GetParameter("TimeOut", 0).GetInt() * 1000000LL;
 #endif
 
 #ifdef URHO3D_PROFILING
-    if (GetParameter(parameters, "EventProfiler", true).GetBool())
+    if (GetParameter("EventProfiler", true).GetBool())
     {
         context_->RegisterSubsystem(new EventProfiler(context_));
         EventProfiler::SetActive(true);
@@ -919,17 +921,17 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
     return ret;
 }
 
-bool Engine::HasParameter(const VariantMap& parameters, const String& parameter)
+bool Engine::HasParameter(const String& parameter)
 {
     StringHash nameHash(parameter);
-    return parameters.Find(nameHash) != parameters.End();
+    return engineParameters_.Find(nameHash) != engineParameters_.End();
 }
 
-const Variant& Engine::GetParameter(const VariantMap& parameters, const String& parameter, const Variant& defaultValue)
+const Variant& Engine::GetParameter(const String& parameter, const Variant& defaultValue)
 {
     StringHash nameHash(parameter);
-    VariantMap::ConstIterator i = parameters.Find(nameHash);
-    return i != parameters.End() ? i->second_ : defaultValue;
+    VariantMap::ConstIterator i = engineParameters_.Find(nameHash);
+    return i != engineParameters_.End() ? i->second_ : defaultValue;
 }
 
 void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
