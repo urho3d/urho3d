@@ -32,7 +32,7 @@ class Audio;
 class Sound;
 class SoundStream;
 
-// Compressed audio decode buffer length in milliseconds
+/// Compressed audio decode buffer length in milliseconds.
 static const int STREAM_BUFFER_LENGTH = 100;
 
 /// %Sound source component with stereo position. A sound source needs to be created to a node to be considered "enabled" and be able to play, however that node does not need to belong to a scene.

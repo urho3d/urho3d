@@ -25,6 +25,7 @@
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/File.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
@@ -85,11 +86,11 @@ int main(int argc, char** argv)
     if (dumpApiMode)
     {
         VariantMap engineParameters;
-        engineParameters["Headless"] = true;
-        engineParameters["WorkerThreads"] = false;
-        engineParameters["LogName"] = String::EMPTY;
-        engineParameters["ResourcePaths"] = String::EMPTY;
-        engineParameters["AutoloadPaths"] = String::EMPTY;
+        engineParameters[EP_HEADLESS] = true;
+        engineParameters[EP_WORKER_THREADS] = false;
+        engineParameters[EP_LOG_NAME] = String::EMPTY;
+        engineParameters[EP_RESOURCE_PATHS] = String::EMPTY;
+        engineParameters[EP_AUTOLOAD_PATHS] = String::EMPTY;
         engine->Initialize(engineParameters);
     #ifdef URHO3D_LUA
         context->RegisterSubsystem(new LuaScript(context));

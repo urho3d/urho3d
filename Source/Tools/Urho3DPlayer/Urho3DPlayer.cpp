@@ -26,6 +26,7 @@
 #endif
 #include <Urho3D/Core/Main.h>
 #include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/IO/Log.h>
 #ifdef URHO3D_LUA
@@ -121,18 +122,18 @@ void Urho3DPlayer::Setup()
     else
     {
         // Use the script file name as the base name for the log file
-        engineParameters_["LogName"] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
+        engineParameters_[EP_LOG_NAME] = filesystem->GetAppPreferencesDir("urho3d", "logs") + GetFileNameAndExtension(scriptFileName_) + ".log";
     }
 #else
     // On Web platform setup a default windowed resolution similar to the executable samples
-    engineParameters_["FullScreen"]  = false;
+    engineParameters_[EP_FULL_SCREEN]  = false;
 #endif
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
     // The second and third entries are possible relative paths from the installed program/bin directory to the asset directory -- these entries are for binary when it is in the Urho3D SDK installation location
-    if (!engineParameters_.Contains("ResourcePrefixPaths"))
-        engineParameters_["ResourcePrefixPaths"] = ";../share/Resources;../share/Urho3D/Resources";
+    if (!engineParameters_.Contains(EP_RESOURCE_PREFIX_PATHS))
+        engineParameters_[EP_RESOURCE_PREFIX_PATHS] = ";../share/Resources;../share/Urho3D/Resources";
 }
 
 void Urho3DPlayer::Start()

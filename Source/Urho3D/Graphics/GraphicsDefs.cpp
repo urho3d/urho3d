@@ -107,7 +107,7 @@ extern URHO3D_API const VertexElement LEGACY_VERTEXELEMENTS[] =
     VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 4, true),      // Instancematrix1
     VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 5, true),      // Instancematrix2
     VertexElement(TYPE_VECTOR4, SEM_TEXCOORD, 6, true),      // Instancematrix3
-    VertexElement(TYPE_INT, SEM_OBJECTINDEX, 0, false)      // Objectindex
+    VertexElement(TYPE_INT, SEM_OBJECTINDEX, 0, false)       // Objectindex
 };
 
 extern URHO3D_API const unsigned ELEMENT_TYPESIZES[] =
