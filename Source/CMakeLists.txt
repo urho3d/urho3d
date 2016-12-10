@@ -108,6 +108,10 @@ if (URHO3D_URHO2D)
     endif ()
 endif ()
 
+if (URHO3D_NUKLEAR)
+    add_subdirectory (ThirdParty/Nuklear)
+endif ()
+
 if (URHO3D_PHYSICS)
     add_subdirectory (ThirdParty/Bullet)
 endif ()

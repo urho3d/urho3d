@@ -2356,6 +2356,12 @@ Lua:
 
 To zoom in/out, use \ref Camera::SetZoom "SetZoom()".
 
+\section Nuklear UI
+
+Nulkear is a minimal state immediate mode graphical user interface toolkit. Enable the build option CMAKE_NUKLEAR to use it.
+
+There is a Nuklear node editor sample and a Nuklear user interface sample.
+
 \section Urho2D_Sprites Sprites
 Urho2D provides a handful of classes for loading/drawing the kind of sprite required by your game. You can chose from animated sprites, 2D particle emitters and static sprites.
 
