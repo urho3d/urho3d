@@ -51,7 +51,7 @@ void SoundSynthesis::Setup()
 {
     // Modify engine startup parameters
     Sample::Setup();
-    engineParameters_["Sound"] = true;
+    engineParameters_[EP_SOUND] = true;
 }
 
 void SoundSynthesis::Start()

@@ -178,7 +178,7 @@ There is only one parameter pair in the above example, however, this overload me
 
 Before a Urho3D application can enter its main loop, the Engine subsystem object must be created and initialized by calling its \ref Engine::Initialize "Initialize()" function. Parameters sent in a VariantMap can be used to direct how the Engine initializes itself and the subsystems. One way to configure the parameters is to parse them from the command line like the Urho3DPlayer application does: this is accomplished by the helper function \ref Engine::ParseParameters "ParseParameters()".
 
-The full list of supported parameters, their datatypes and default values:
+The full list of supported parameters, their datatypes and default values: (also defined as constants in Engine/EngineDefs.h)
 
 - Headless (bool) Headless mode enable. Default false.
 - LogLevel (int) %Log verbosity level. Default LOG_INFO in release builds and LOG_DEBUG in debug builds.
@@ -186,7 +186,7 @@ The full list of supported parameters, their datatypes and default values:
 - LogName (string) %Log filename. Default "Urho3D.log".
 - FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
-- EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
+- %EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
 - ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
 - ResourcePaths (string) A semicolon-separated list of resource paths to use. If corresponding packages (ie. Data.pak for Data directory) exist they will be used instead. Default "Data;CoreData".
 - ResourcePackages (string) A semicolon-separated list of resource packages to use. Default empty.

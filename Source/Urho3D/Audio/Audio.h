@@ -115,7 +115,7 @@ public:
     /// Mix sound sources into the buffer.
     void MixOutput(void* dest, unsigned samples);
 
-    /// Final multiplier for for audio byte conversion
+    /// Final multiplier for audio byte conversion.
 #ifdef __EMSCRIPTEN__
     static const int SAMPLE_SIZE_MUL = 2;
 #else

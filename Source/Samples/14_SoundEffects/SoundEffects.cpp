@@ -67,7 +67,7 @@ void SoundEffects::Setup()
 {
     // Modify engine startup parameters
     Sample::Setup();
-    engineParameters_["Sound"] = true;
+    engineParameters_[EP_SOUND] = true;
 }
 
 void SoundEffects::Start()

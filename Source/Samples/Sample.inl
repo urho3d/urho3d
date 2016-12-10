@@ -26,6 +26,7 @@
 #include <Urho3D/UI/Cursor.h>
 #include <Urho3D/Engine/DebugHud.h>
 #include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Input/Input.h>
@@ -56,17 +57,17 @@ Sample::Sample(Context* context) :
 void Sample::Setup()
 {
     // Modify engine startup parameters
-    engineParameters_["WindowTitle"] = GetTypeName();
-    engineParameters_["LogName"]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
-    engineParameters_["FullScreen"]  = false;
-    engineParameters_["Headless"]    = false;
-    engineParameters_["Sound"]       = false;
+    engineParameters_[EP_WINDOW_TITLE] = GetTypeName();
+    engineParameters_[EP_LOG_NAME]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
+    engineParameters_[EP_FULL_SCREEN]  = false;
+    engineParameters_[EP_HEADLESS]     = false;
+    engineParameters_[EP_SOUND]        = false;
 
     // Construct a search path to find the resource prefix with two entries:
     // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
     // The second and third entries are possible relative paths from the installed program/bin directory to the asset directory -- these entries are for binary when it is in the Urho3D SDK installation location
-    if (!engineParameters_.Contains("ResourcePrefixPaths"))
-        engineParameters_["ResourcePrefixPaths"] = ";../share/Resources;../share/Urho3D/Resources";
+    if (!engineParameters_.Contains(EP_RESOURCE_PREFIX_PATHS))
+        engineParameters_[EP_RESOURCE_PREFIX_PATHS] = ";../share/Resources;../share/Urho3D/Resources";
 }
 
 void Sample::Start()
