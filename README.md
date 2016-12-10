@@ -96,6 +96,7 @@ Urho3D development, contributions and bugfixes by:
 - dragonCASTjosh
 - feltech
 - fredakilla
+- gleblebedev
 - hdunderscore
 - lvshiling
 - marynate
