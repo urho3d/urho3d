@@ -121,12 +121,12 @@ void SkeletalAnimation::CreateScene()
 
     for (unsigned i = 0; i < NUM_MODELS; ++i)
     {
-        Node* modelNode = scene_->CreateChild("Jack");
+        Node* modelNode = scene_->CreateChild("Jill");
         modelNode->SetPosition(Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f));
         modelNode->SetRotation(Quaternion(0.0f, Random(360.0f), 0.0f));
 
         Node* spinNode = modelNode->CreateChild();
-        spinNode->SetRotation( Quaternion(180, Vector3(0,1,0) ) );
+        spinNode->SetRotation( Quaternion(180.0f, Vector3(0.0f, 1.0f, 0.0f)));
 
         AnimatedModel* modelObject = spinNode->CreateComponent<AnimatedModel>();
 
