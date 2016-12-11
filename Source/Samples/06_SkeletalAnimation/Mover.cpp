@@ -55,7 +55,7 @@ void Mover::Update(float timeStep)
 
     // Get the model's first (only) animation state and advance its time. Note the convenience accessor to other components
     // in the same scene node
-    AnimatedModel* model = GetComponent<AnimatedModel>();
+    AnimatedModel* model = node_->GetComponent<AnimatedModel>(true);
     if (model->GetNumAnimationStates())
     {
         AnimationState* state = model->GetAnimationStates()[0];
