@@ -1389,8 +1389,27 @@ void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const In
 
     if (eventType == E_DRAGMOVE)
     {
-        eventData[P_DX] = deltaPos.x_;
-        eventData[P_DY] = deltaPos.y_;
+        // Figure out if we need to scale the positions
+        // Check ratio of window size to drawable size. These are not equal on e.g. Mac Retina displays
+        bool highDPI = SDL_WINDOW_ALLOW_HIGHDPI;
+        if (highDPI){
+            Graphics* g = GetSubsystem<Graphics>();
+            SDL_Window* curwindow = g->GetWindow();
+            int gl_w, gl_h;
+            SDL_GL_GetDrawableSize (curwindow, &gl_w, &gl_h);
+            
+            int sdl_w, sdl_h;
+            SDL_GetWindowSize (curwindow, &sdl_w, &sdl_h);
+            
+            float multiplier = gl_w/sdl_w;
+            eventData[P_DX] = multiplier*deltaPos.x_;
+            eventData[P_DY] = multiplier*deltaPos.y_;
+            
+        }
+        else{
+            eventData[P_DX] = deltaPos.x_;
+            eventData[P_DY] = deltaPos.y_;
+        }
     }
 
     if (dragData)

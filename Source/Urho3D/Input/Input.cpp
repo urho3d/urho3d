@@ -1364,6 +1364,24 @@ IntVector2 Input::GetMousePosition() const
         return ret;
 
     SDL_GetMouseState(&ret.x_, &ret.y_);
+    
+    // Figure out if we need the window size is the same as the drawable size
+    // They are not equal on Mac retina displays    
+    bool highDPI = SDL_WINDOW_ALLOW_HIGHDPI;
+    if (highDPI){
+        Graphics* g = GetSubsystem<Graphics>();
+        SDL_Window* curwindow = g->GetWindow();
+        int gl_w, gl_h;
+        SDL_GL_GetDrawableSize (curwindow, &gl_w, &gl_h);
+        
+        int sdl_w, sdl_h;
+        SDL_GetWindowSize (curwindow, &sdl_w, &sdl_h);
+        
+        float multiplier = gl_w/sdl_w;
+
+        ret.x_ *= multiplier;
+        ret.y_ *= multiplier;
+    }
 
     return ret;
 }
