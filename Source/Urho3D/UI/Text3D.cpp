@@ -653,8 +653,30 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Pass* pass = tech->CreatePass("alpha");
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
+                pass->SetBlendMode(BLEND_ALPHA);
+                pass->SetDepthWrite(false);
+                material->SetTechnique(0, tech);
+                material->SetCullMode(CULL_NONE);
+                batches_[i].material_ = material;
+            }
+            else
+                batches_[i].material_ = material_->Clone();
 
-                if (isSDFFont)
+            usingSDFShader_ = isSDFFont;
+        }
+
+        Material* material = batches_[i].material_;
+        Texture* texture = uiBatches_[i].texture_;
+        material->SetTexture(TU_DIFFUSE, texture);
+
+        if (isSDFFont)
+        {
+            // Note: custom defined material is assumed to have right shader defines; they aren't modified here
+            if (!material_)
+            {
+                Technique* tech = material->GetTechnique(0);
+                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                if (pass)
                 {
                     switch (GetTextEffect())
                     {
@@ -671,26 +693,8 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                         break;
                     }
                 }
-
-                pass->SetBlendMode(BLEND_ALPHA);
-                pass->SetDepthWrite(false);
-                material->SetTechnique(0, tech);
-                material->SetCullMode(CULL_NONE);
-                batches_[i].material_ = material;
             }
-            else
-                batches_[i].material_ = material_->Clone();
 
-            // Note: custom material is assumed to use the right kind of shader; it is not modified to define SIGNED_DISTANCE_FIELD
-            usingSDFShader_ = isSDFFont;
-        }
-
-        Material* material = batches_[i].material_;
-        Texture* texture = uiBatches_[i].texture_;
-        material->SetTexture(TU_DIFFUSE, texture);
-
-        if (isSDFFont)
-        {
             switch (GetTextEffect())
             {
             case TE_SHADOW:
