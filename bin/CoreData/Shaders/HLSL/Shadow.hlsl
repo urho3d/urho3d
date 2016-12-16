@@ -17,7 +17,7 @@ void VS(float4 iPos : POSITION,
         float2 iSize : TEXCOORD1,
     #endif
     #ifdef VSM_SHADOW
-        out float3 oTexCoord : TEXCOORD0,
+        out float4 oTexCoord : TEXCOORD0,
     #else
         out float2 oTexCoord : TEXCOORD0,
     #endif
@@ -32,7 +32,7 @@ void VS(float4 iPos : POSITION,
     float3 worldPos = GetWorldPos(modelMatrix);
     oPos = GetClipPos(worldPos);
     #ifdef VSM_SHADOW
-        oTexCoord = float3(GetTexCoord(iTexCoord), oPos.z/oPos.w);
+        oTexCoord = float4(GetTexCoord(iTexCoord), oPos.z, oPos.w);
     #else
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
@@ -40,7 +40,7 @@ void VS(float4 iPos : POSITION,
 
 void PS(
     #ifdef VSM_SHADOW
-        float3 iTexCoord : TEXCOORD0,
+        float4 iTexCoord : TEXCOORD0,
     #else
         float2 iTexCoord : TEXCOORD0,
     #endif
@@ -53,7 +53,7 @@ void PS(
     #endif
 
     #ifdef VSM_SHADOW
-        float depth = iTexCoord.z;
+        float depth = iTexCoord.z / iTexCoord.w;
         oColor = float4(depth, depth * depth, 1.0, 1.0);
     #else
         oColor = 1.0;
