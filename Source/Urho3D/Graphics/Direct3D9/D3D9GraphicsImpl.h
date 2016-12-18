@@ -83,8 +83,10 @@ private:
     D3DADAPTER_IDENTIFIER9 adapterIdentifier_;
     /// Direct3D presentation parameters.
     D3DPRESENT_PARAMETERS presentParams_;
-    /// Texture min/mag filter modes in use.
-    D3DTEXTUREFILTERTYPE minMagFilters_[MAX_TEXTURE_UNITS];
+    /// Texture min filter modes in use.
+    D3DTEXTUREFILTERTYPE minFilters_[MAX_TEXTURE_UNITS];
+    /// Texture mag filter modes in use.
+    D3DTEXTUREFILTERTYPE magFilters_[MAX_TEXTURE_UNITS];
     /// Texture mip filter modes in use.
     D3DTEXTUREFILTERTYPE mipFilters_[MAX_TEXTURE_UNITS];
     /// Texture U coordinate addressing modes in use.

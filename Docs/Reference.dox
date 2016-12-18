@@ -1233,7 +1233,7 @@ Textures can have an accompanying XML file which specifies load-time parameters,
 <texture>
     <address coord="u|v|w" mode="wrap|mirror|clamp|border" />
     <border color="r g b a" />
-    <filter mode="nearest|bilinear|trilinear|anisotropic|default" anisotropy="x" />
+    <filter mode="nearest|bilinear|trilinear|anisotropic|nearestanisotropic|default" anisotropy="x" />
     <mipmap enable="false|true" />
     <quality low="x" medium="y" high="z" />
     <srgb enable="false|true" />
