@@ -1,4 +1,4 @@
-![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/SourceAssets/FishBoneLogo.svg)
+![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
 
 #Urho3D
 
