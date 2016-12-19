@@ -16,12 +16,12 @@
 /** @file EventArray.h
 	@brief The class \ref kNet::EventArray EventArray. Allows listening to multiple events at once.*/
 
-// Urho3D: added include file
-#ifdef UNIX
+#include <vector>
+
+// Urho3D: removed the KNET_UNIX definition
+#ifndef _WIN32
 #include <sys/select.h>
 #endif
-
-#include <vector>
 
 #include "Event.h"
 
@@ -61,10 +61,11 @@ private:
 	static const int maxEvents = 64; ///< WSAWaitForMultipleEvents has a built-in limit of 64 items, hence this value.
 	int numAdded;
 
-#ifdef WIN32
+#ifdef _WIN32
 	WSAEVENT events[maxEvents]; 
 
-#elif defined(UNIX) || defined(ANDROID)
+// Urho3D: removed the KNET_UNIX definition
+#else
 	fd_set readfds;
 	fd_set writefds;
 	int nfds;

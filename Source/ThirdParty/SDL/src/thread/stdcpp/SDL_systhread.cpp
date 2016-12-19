@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -48,6 +48,7 @@ int
 SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 {
     try {
+        // !!! FIXME: no way to set a thread stack size here.
         std::thread cpp_thread(RunThread, args);
         thread->handle = (void *) new std::thread(std::move(cpp_thread));
         return 0;

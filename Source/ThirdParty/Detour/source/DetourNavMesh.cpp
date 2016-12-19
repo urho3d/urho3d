@@ -16,6 +16,8 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+// Modified by Lasse Oorni for Urho3D
+
 #include <float.h>
 #include <string.h>
 #include <stdio.h>
@@ -208,15 +210,20 @@ dtNavMesh::dtNavMesh() :
 
 dtNavMesh::~dtNavMesh()
 {
-	for (int i = 0; i < m_maxTiles; ++i)
+	// Urho3D: added null check for tile allocation
+	if (m_tiles)
 	{
-		if (m_tiles[i].flags & DT_TILE_FREE_DATA)
+		for (int i = 0; i < m_maxTiles; ++i)
 		{
-			dtFree(m_tiles[i].data);
-			m_tiles[i].data = 0;
-			m_tiles[i].dataSize = 0;
+			if (m_tiles[i].flags & DT_TILE_FREE_DATA)
+			{
+				dtFree(m_tiles[i].data);
+				m_tiles[i].data = 0;
+				m_tiles[i].dataSize = 0;
+			}
 		}
 	}
+	
 	dtFree(m_posLookup);
 	dtFree(m_tiles);
 }

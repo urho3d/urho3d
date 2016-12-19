@@ -1,0 +1,573 @@
+<element type="Window">
+    <attribute name="Name" value="EditorSettingsDialog" />
+    <attribute name="Min Size" value="440 0" />
+    <attribute name="Max Size" value="440 2147483647" />
+    <attribute name="Is Movable" value="true" />
+    <attribute name="Is Resizable" value="true" />
+    <attribute name="Resize Border" value="0 6 0 6" />
+    <attribute name="Layout Mode" value="Vertical" />
+    <attribute name="Layout Spacing" value="4" />
+    <attribute name="Layout Border" value="6 6 6 6" />
+    <element>
+        <attribute name="Min Size" value="0 16" />
+        <attribute name="Max Size" value="2147483647 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="Text">
+            <attribute name="Text" value="Editor settings" />
+            <attribute name="Auto Localizable" value="true" />
+        </element>
+        <element type="Button" style="CloseButton">
+            <attribute name="Name" value="CloseButton" />
+        </element>
+    </element>
+    <element type="BorderImage" style="EditorDivider" />
+    <element type="ListView" style="PanelView">
+        <attribute name="Min Size" value="0 60" />
+        <element type="BorderImage" internal="true">
+            <element internal="true">
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Near clip distance" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="NearClipEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Far clip distance" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="FarClipEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Field of view" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="FOVEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Movement speed" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="SpeedEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="LimitRotationToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Limit camera pitch" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="MouseWheelCameraPositionToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Mouse wheel camera position" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="MiddleMousePanToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Pan using middle mouse button" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Mouse orbit and drag behavior" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="MouseOrbitEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Relative" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Window Wrap" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Hot keys mode" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="HotKeysModeEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Standard" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Blender" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="New node mode" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="NewNodeModeEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Use distance" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="In center" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Raycast" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="New node distance" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DistanceEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Node move step" />
+                    </element>
+                    <element type="CheckBox">
+                        <attribute name="Name" value="MoveSnapToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Min Size" value="34 0" />
+                        <attribute name="Max Size" value="34 2147483647" />
+                        <attribute name="Text" value="Snap" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="MoveStepEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Node rotate step" />
+                    </element>
+                    <element type="CheckBox">
+                        <attribute name="Name" value="RotateSnapToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Min Size" value="34 0" />
+                        <attribute name="Max Size" value="34 2147483647" />
+                        <attribute name="Text" value="Snap" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="RotateStepEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Node scale step" />
+                    </element>
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ScaleSnapToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Min Size" value="34 0" />
+                        <attribute name="Max Size" value="34 2147483647" />
+                        <attribute name="Text" value="Snap" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ScaleStepEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Pick components of type" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="PickModeEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Geometries" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Lights" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Zones" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Rigidbodies" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="UI-elements" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="AssetImporter options" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="ImportOptionsEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="ApplyMaterialListToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Apply material list when model set" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="RememberResourcePathToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Remember resource path" />
+                    </element>
+                </element>
+                <element type="BorderImage" style="EditorDivider" />
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Render path" />
+                        <attribute name="Min Size" value="88 17" />
+                        <attribute name="Max Size" value="88 17" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="RenderPathNameEdit" />
+                     </element>
+                    <element type="Button">
+                        <attribute name="Name" value="PickRenderPathButton" />
+                        <attribute name="Min Size" value="36 17" />
+                        <attribute name="Max Size" value="36 17" />
+                        <attribute name="Layout Mode" value="Vertical" />
+                        <attribute name="Layout Border" value="1 1 1 1" />
+                        <element type="Text">
+                            <attribute name="Text" value="Pick" />
+                            <attribute name="Text Alignment" value="Center" />
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="GammaCorrectionToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Gamma correction" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="HDRToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="HDR rendering" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Texture quality" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="TextureQualityEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Low" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Medium" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="High" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Material quality" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="MaterialQualityEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Low" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Medium" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="High" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Shadow resolution" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="ShadowResolutionEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Off" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="512x512" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="1024x1024" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="2048x2048" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Shadow quality" />
+                    </element>
+                    <element type="DropDownList">
+                        <attribute name="Name" value="ShadowQualityEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                        <attribute name="Resize Popup" value="true" />
+                        <!-- Skip style processing as the purpose of below tags is to populate the content element -->
+                        <element type="Window" internal="true" popup="true" style="none">
+                            <element type="ListView" internal="true" style="none">
+                                <element type="BorderImage" internal="true" style="none">
+                                    <element internal="true" style="none">
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Simple 16bit" />
+                                        </element>
+                                        <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Simple 24bit" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="PCF 16bit" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="PCF 24bit" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="VSM" />
+                                        </element>
+                                       <element type="Text" style="FileSelectorFilterText">
+                                            <attribute name="Text" value="Blurred VSM" />
+                                        </element>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Max occluder triangles" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="MaxOccluderTrianglesEdit" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="SpecularLightingToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Specular lighting" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="DynamicInstancingToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Dynamic instancing" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="CheckBox">
+                        <attribute name="Name" value="FrameLimiterToggle" />
+                    </element>
+                    <element type="Text">
+                        <attribute name="Text" value="Frame limiter" />
+                    </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Gen Path" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenPath" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Key" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenKey" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="20" />
+                    <element type="Text">
+                        <attribute name="Text" value="Cubemap Size" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="CubeMapGenSize" />
+                        <attribute name="Min Size" value="100 0" />
+                        <attribute name="Max Size" value="100 2147483647" />
+                     </element>
+                </element>
+                <element style="ListRow">
+                    <attribute name="Layout Spacing" value="8" />
+                    <element type="Text">
+                        <attribute name="Text" value="Tags " />
+                        <attribute name="Min Size" value="88 17" />
+                        <attribute name="Max Size" value="88 17" />
+                    </element>
+                    <element type="LineEdit">
+                        <attribute name="Name" value="DefaultTagsEdit" />
+                     </element>
+                </element>
+            </element>
+        </element>
+    </element>
+</element>

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -21,24 +21,25 @@
 #ifndef _SDL_uikitvideo_h
 #define _SDL_uikitvideo_h
 
-#include <UIKit/UIKit.h>
-
 #include "../SDL_sysvideo.h"
 
-#ifndef __IPHONE_6_0
-/* This enum isn't available in older SDKs, but we use it for our own purposes on iOS 5.1 and for the system on iOS 6.0 */
-enum UIInterfaceOrientationMask
-{
-    UIInterfaceOrientationMaskPortrait = (1 << UIInterfaceOrientationPortrait),
-    UIInterfaceOrientationMaskLandscapeLeft = (1 << UIInterfaceOrientationLandscapeLeft),
-    UIInterfaceOrientationMaskLandscapeRight = (1 << UIInterfaceOrientationLandscapeRight),
-    UIInterfaceOrientationMaskPortraitUpsideDown = (1 << UIInterfaceOrientationPortraitUpsideDown),
-    UIInterfaceOrientationMaskLandscape = (UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
-    UIInterfaceOrientationMaskAll = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown),
-    UIInterfaceOrientationMaskAllButUpsideDown = (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskLandscapeRight),
-};
-#endif /* !__IPHONE_6_0 */
+#ifdef __OBJC__
 
+#include <UIKit/UIKit.h>
+
+@interface SDL_VideoData : NSObject
+
+@property (nonatomic) id pasteboardObserver;
+
+@end
+
+CGRect UIKit_ComputeViewFrame(SDL_Window *window, UIScreen *screen);
+
+#endif /* __OBJC__ */
+
+void UIKit_SuspendScreenSaver(_THIS);
+
+SDL_bool UIKit_IsSystemVersionAtLeast(double version);
 
 #endif /* _SDL_uikitvideo_h */
 

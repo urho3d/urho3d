@@ -1,0 +1,23 @@
+<element>
+    <attribute name="Name" value="TagContainer" />
+    <attribute name="Max Size" value="2147483647 17" />
+    <attribute name="Layout Mode" value="Horizontal" />
+    <attribute name="Layout Spacing" value="4" />
+    <element type="Button">
+        <attribute name="Name" value="TagsSelect" />
+        <attribute name="Min Size" value="16 16" />
+        <attribute name="Max Size" value="16 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="BorderImage">
+            <attribute name="Image Rect" value="190 0 208 15" />
+        </element>
+    </element>
+    <element type="Text" style="EditorAttributeText">
+        <attribute name="Name" value="TagsLabel" />
+        <attribute name="Text" value="Tags" />
+        <attribute name="Auto Localizable" value="true" />
+    </element>
+    <element type="LineEdit">
+        <attribute name="Name" value="TagsEdit" />
+    </element>
+</element>

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -59,6 +59,11 @@ extern SDL_TLSData *SDL_SYS_GetTLSData();
 
 /* Set the thread local storage for this thread */
 extern int SDL_SYS_SetTLSData(SDL_TLSData *data);
+
+/* This is for internal SDL use, so we don't need #ifdefs everywhere. */
+extern SDL_Thread *
+SDL_CreateThreadInternal(int (SDLCALL * fn) (void *), const char *name,
+                         const size_t stacksize, void *data);
 
 #endif /* _SDL_systhread_h */
 

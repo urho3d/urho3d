@@ -1,3 +1,0 @@
-<technique vs="Basic" ps="Basic">
-    <pass name="postalpha" depthtest="always" depthwrite="false" />
-</technique>

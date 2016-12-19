@@ -1,0 +1,255 @@
+<?xml version="1.0"?>
+<scene id="1">
+	<attribute name="Name" value="" />
+	<attribute name="Time Scale" value="1" />
+	<attribute name="Smoothing Constant" value="50" />
+	<attribute name="Snap Threshold" value="5" />
+	<attribute name="Elapsed Time" value="0" />
+	<attribute name="Next Replicated Node ID" value="10" />
+	<attribute name="Next Replicated Component ID" value="11" />
+	<attribute name="Next Local Node ID" value="16777229" />
+	<attribute name="Next Local Component ID" value="16777228" />
+	<attribute name="Variables" />
+	<attribute name="Variable Names" value="" />
+	<component type="Octree" id="1" />
+	<component type="DebugRenderer" id="2" />
+	<node id="2">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="-2.5 0 2.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="3">
+			<attribute name="Model" value="Model;Models/LinePrimitives/UnitX.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+		</component>
+	</node>
+	<node id="3">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="0 0 2.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="4">
+			<attribute name="Model" value="Model;Models/LinePrimitives/UnitY.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+		</component>
+	</node>
+	<node id="4">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="2.5 0 2.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="5">
+			<attribute name="Model" value="Model;Models/LinePrimitives/UnitZ.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+		</component>
+	</node>
+	<node id="5">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="-2.5 0 0.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="6">
+			<attribute name="Model" value="Model;Models/LinePrimitives/Basis.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+		</component>
+	</node>
+	<node id="6">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="2.5 0 0.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="StaticModel" id="7">
+			<attribute name="Model" value="Model;Models/LinePrimitives/Box1x1x1.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+		</component>
+	</node>
+	<node id="7">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="-2.5 0 -1.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="AnimatedModel" id="8">
+			<attribute name="Model" value="Model;Models/LinePrimitives/LinearBezier.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+			<attribute name="Bone Animation Enabled">
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+			</attribute>
+			<attribute name="Animation States">
+				<variant type="Int" value="0" />
+			</attribute>
+		</component>
+		<node id="16777217">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Root" />
+			<attribute name="Tags" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="0 0 0 1" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777218">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="A" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="0 0 0.806232" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777219">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="B" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="-0.910261 0 0" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+		</node>
+	</node>
+	<node id="8">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="0 0 -1.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="AnimatedModel" id="9">
+			<attribute name="Model" value="Model;Models/LinePrimitives/QuadraticBezier.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+			<attribute name="Bone Animation Enabled">
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+			</attribute>
+			<attribute name="Animation States">
+				<variant type="Int" value="0" />
+			</attribute>
+		</component>
+		<node id="16777220">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Root" />
+			<attribute name="Tags" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="0 0 0 1" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777221">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="A" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="0 0 0.906782" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777222">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="B" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="0 0 0" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777223">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="C" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="-0.855178 0 0" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+		</node>
+	</node>
+	<node id="9">
+		<attribute name="Is Enabled" value="true" />
+		<attribute name="Name" value="" />
+		<attribute name="Tags" />
+		<attribute name="Position" value="2.5 0 -1.5" />
+		<attribute name="Rotation" value="1 0 0 0" />
+		<attribute name="Scale" value="1 1 1" />
+		<attribute name="Variables" />
+		<component type="AnimatedModel" id="10">
+			<attribute name="Model" value="Model;Models/LinePrimitives/CubicBezier.mdl" />
+			<attribute name="Material" value="Material;Materials/VColUnlit.xml" />
+			<attribute name="Bone Animation Enabled">
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+				<variant type="Bool" value="true" />
+			</attribute>
+			<attribute name="Animation States">
+				<variant type="Int" value="0" />
+			</attribute>
+		</component>
+		<node id="16777224">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Root" />
+			<attribute name="Tags" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="0 0 0 1" />
+			<attribute name="Scale" value="1 1 1" />
+			<attribute name="Variables" />
+			<node id="16777225">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="A" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="0 0 0.725975" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777226">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="B" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="0.436331 0 0.231235" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777227">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="C" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="-0.429638 -0.300672 0.566838" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+			<node id="16777228">
+				<attribute name="Is Enabled" value="true" />
+				<attribute name="Name" value="D" />
+				<attribute name="Tags" />
+				<attribute name="Position" value="-0.558809 0 0" />
+				<attribute name="Rotation" value="0 0 0 1" />
+				<attribute name="Scale" value="1 1 1" />
+				<attribute name="Variables" />
+			</node>
+		</node>
+	</node>
+</scene>

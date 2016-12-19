@@ -15,6 +15,8 @@
  This source version has been altered.
  */
 
+ // Modified by Yao Wei Tjong & Lasse Oorni for Urho3D
+
 #if defined (_WIN32) || defined (__i386__)
 #define BT_USE_SSE_IN_API
 #endif
@@ -40,7 +42,7 @@ typedef  float float4 __attribute__ ((vector_size(16)));
 //typedef  uint32_t uint4 __attribute__ ((vector_size(16)));
 
 
-#if defined BT_USE_SSE || defined _WIN32
+#if defined BT_USE_SSE //|| defined _WIN32      // Urho3D - just use BT_USE_SSE as the main switch, Urho3D allow SSE to be disabled
 
 #define LOG2_ARRAY_SIZE     6
 #define STACK_ARRAY_COUNT   (1UL << LOG2_ARRAY_SIZE)
@@ -52,18 +54,19 @@ long _maxdot_large( const float *vv, const float *vec, unsigned long count, floa
 {
     const float4 *vertices = (const float4*) vv;
     static const unsigned char indexTable[16] = {(unsigned char)-1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
-    float4 dotMax = btAssign128( -BT_INFINITY,  -BT_INFINITY,  -BT_INFINITY,  -BT_INFINITY );
+    // Urho3D: cast to float in case BT_INFINITY is double on some MinGW derived compilers to prevent narrowing errors
+    float4 dotMax = btAssign128( static_cast<float>(-BT_INFINITY),  static_cast<float>(-BT_INFINITY), static_cast<float>(-BT_INFINITY), static_cast<float>(-BT_INFINITY) );
     float4 vvec = _mm_loadu_ps( vec );
     float4 vHi = btCastiTo128f(_mm_shuffle_epi32( btCastfTo128i( vvec), 0xaa ));          /// zzzz
     float4 vLo = _mm_movelh_ps( vvec, vvec );                               /// xyxy
-    
+
     long maxIndex = -1L;
     
     size_t segment = 0;
     float4 stack_array[ STACK_ARRAY_COUNT ];
     
 #if DEBUG
-    memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
+    //memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
 #endif
     
     size_t index;
@@ -437,7 +440,8 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 {
     const float4 *vertices = (const float4*) vv;
     static const unsigned char indexTable[16] = {(unsigned char)-1, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0 };
-    float4 dotmin = btAssign128( BT_INFINITY,  BT_INFINITY,  BT_INFINITY,  BT_INFINITY );
+    // Urho3D: cast to float in case BT_INFINITY is double on some MinGW derived compilers to prevent narrowing errors
+    float4 dotmin = btAssign128( static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY), static_cast<float>(BT_INFINITY) );
     float4 vvec = _mm_loadu_ps( vec );
     float4 vHi = btCastiTo128f(_mm_shuffle_epi32( btCastfTo128i( vvec), 0xaa ));          /// zzzz
     float4 vLo = _mm_movelh_ps( vvec, vvec );                               /// xyxy
@@ -448,7 +452,7 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
     float4 stack_array[ STACK_ARRAY_COUNT ];
     
 #if DEBUG
-    memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
+    //memset( stack_array, -1, STACK_ARRAY_COUNT * sizeof(stack_array[0]) );
 #endif
     
     size_t index;
@@ -825,7 +829,10 @@ long _mindot_large( const float *vv, const float *vec, unsigned long count, floa
 #define ARM_NEON_GCC_COMPATIBILITY  1
 #include <arm_neon.h>
 #include <sys/types.h>
+// Urho3D - enable NEON on generic ARM
+#ifdef __APPLE__
 #include <sys/sysctl.h> //for sysctlbyname
+#endif //__APPLE__
 
 static long _maxdot_large_v0( const float *vv, const float *vec, unsigned long count, float *dotResult );
 static long _maxdot_large_v1( const float *vv, const float *vec, unsigned long count, float *dotResult );
@@ -845,12 +852,15 @@ static inline uint32_t btGetCpuCapabilities( void )
 
     if( 0 == testedCapabilities)
     {
+// Urho3D - enable NEON on generic ARM
+#ifdef __APPLE__
         uint32_t hasFeature = 0;
         size_t featureSize = sizeof( hasFeature );
         int err = sysctlbyname( "hw.optional.neon_hpfp", &hasFeature, &featureSize, NULL, 0 );
 
         if( 0 == err && hasFeature)
             capabilities |= 0x2000;
+#endif //__APPLE__
 
 		testedCapabilities = true;
     }
@@ -884,11 +894,11 @@ static long _mindot_large_sel( const float *vv, const float *vec, unsigned long 
 }
 
 
-
-#if defined __arm__
+// Urho3D - enable NEON on generic ARM
+#if defined __arm__ && __APPLE__
 # define vld1q_f32_aligned_postincrement( _ptr ) ({ float32x4_t _r; asm( "vld1.f32 {%0}, [%1, :128]!\n" : "=w" (_r), "+r" (_ptr) ); /*return*/ _r; })
 #else
-//support 64bit arm
+//support 64bit (and generic) arm
 # define vld1q_f32_aligned_postincrement( _ptr) ({ float32x4_t _r = ((float32x4_t*)(_ptr))[0]; (_ptr) = (const float*) ((const char*)(_ptr) + 16L); /*return*/ _r; })
 #endif
 

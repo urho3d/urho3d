@@ -1,0 +1,3 @@
+<technique vs="Unlit" ps="Unlit" vsdefines="VERTEXCOLOR NOUV" psdefines="VERTEXCOLOR">
+    <pass name="alpha" depthwrite="false" blend="add" />
+</technique>

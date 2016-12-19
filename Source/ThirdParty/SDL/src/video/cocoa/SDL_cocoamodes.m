@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,6 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 #include "../../SDL_internal.h"
+#include "SDL_assert.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -26,6 +27,10 @@
 
 /* We need this for IODisplayCreateInfoDictionary and kIODisplayOnlyPreferredName */
 #include <IOKit/graphics/IOGraphicsLib.h>
+
+/* We need this for CVDisplayLinkGetNominalOutputVideoRefreshPeriod */
+#include <CoreVideo/CVBase.h>
+#include <CoreVideo/CVDisplayLink.h>
 
 /* we need this for ShowMenuBar() and HideMenuBar(). */
 #include <Carbon/Carbon.h>
@@ -43,29 +48,11 @@ Cocoa_ToggleMenuBar(const BOOL show)
      *  we can just simply do without it on newer OSes...
      */
 #if (MAC_OS_X_VERSION_MIN_REQUIRED < 1070) && !defined(__LP64__)
-    if (show)
+    if (show) {
         ShowMenuBar();
-    else
+    } else {
         HideMenuBar();
-#endif
-}
-
-
-/* !!! FIXME: clean out the pre-10.6 code when it makes sense to do so. */
-#define FORCE_OLD_API 0
-
-#if FORCE_OLD_API
-#undef MAC_OS_X_VERSION_MIN_REQUIRED
-#define MAC_OS_X_VERSION_MIN_REQUIRED 1050
-#endif
-
-static BOOL
-IS_SNOW_LEOPARD_OR_LATER(_THIS)
-{
-#if FORCE_OLD_API
-    return NO;
-#else
-    return ((((SDL_VideoData *) _this->driverdata))->osversion >= 0x1060);
+    }
 #endif
 }
 
@@ -113,65 +100,63 @@ CG_SetError(const char *prefix, CGDisplayErr result)
 }
 
 static SDL_bool
-GetDisplayMode(_THIS, const void *moderef, SDL_DisplayMode *mode)
+GetDisplayMode(_THIS, CGDisplayModeRef vidmode, CVDisplayLinkRef link, SDL_DisplayMode *mode)
 {
     SDL_DisplayModeData *data;
-    long width = 0;
-    long height = 0;
-    long bpp = 0;
-    long refreshRate = 0;
+    int width = 0;
+    int height = 0;
+    int bpp = 0;
+    int refreshRate = 0;
+    CFStringRef fmt;
 
     data = (SDL_DisplayModeData *) SDL_malloc(sizeof(*data));
     if (!data) {
         return SDL_FALSE;
     }
-    data->moderef = moderef;
+    data->moderef = vidmode;
 
-    if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        CGDisplayModeRef vidmode = (CGDisplayModeRef) moderef;
-        CFStringRef fmt = CGDisplayModeCopyPixelEncoding(vidmode);
-        width = (long) CGDisplayModeGetWidth(vidmode);
-        height = (long) CGDisplayModeGetHeight(vidmode);
-        refreshRate = (long) CGDisplayModeGetRefreshRate(vidmode);
+    fmt = CGDisplayModeCopyPixelEncoding(vidmode);
+    width = (int) CGDisplayModeGetWidth(vidmode);
+    height = (int) CGDisplayModeGetHeight(vidmode);
+    refreshRate = (int) (CGDisplayModeGetRefreshRate(vidmode) + 0.5);
 
-        if (CFStringCompare(fmt, CFSTR(IO32BitDirectPixels),
-                            kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
-            bpp = 32;
-        } else if (CFStringCompare(fmt, CFSTR(IO16BitDirectPixels),
-                            kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
-            bpp = 16;
-        } else {
-            bpp = 0;  /* ignore 8-bit and such for now. */
+    if (CFStringCompare(fmt, CFSTR(IO32BitDirectPixels),
+                        kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+        bpp = 32;
+    } else if (CFStringCompare(fmt, CFSTR(IO16BitDirectPixels),
+                        kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+        bpp = 16;
+    } else if (CFStringCompare(fmt, CFSTR(kIO30BitDirectPixels),
+                        kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
+        bpp = 30;
+    } else {
+        bpp = 0;  /* ignore 8-bit and such for now. */
+    }
+
+    CFRelease(fmt);
+
+    /* CGDisplayModeGetRefreshRate returns 0 for many non-CRT displays. */
+    if (refreshRate == 0 && link != NULL) {
+        CVTime time = CVDisplayLinkGetNominalOutputVideoRefreshPeriod(link);
+        if ((time.flags & kCVTimeIsIndefinite) == 0 && time.timeValue != 0) {
+            refreshRate = (int) ((time.timeScale / (double) time.timeValue) + 0.5);
         }
-
-        CFRelease(fmt);
     }
-
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
-    if (!IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        CFNumberRef number;
-        CFDictionaryRef vidmode = (CFDictionaryRef) moderef;
-        number = CFDictionaryGetValue(vidmode, kCGDisplayWidth);
-        CFNumberGetValue(number, kCFNumberLongType, &width);
-        number = CFDictionaryGetValue(vidmode, kCGDisplayHeight);
-        CFNumberGetValue(number, kCFNumberLongType, &height);
-        number = CFDictionaryGetValue(vidmode, kCGDisplayBitsPerPixel);
-        CFNumberGetValue(number, kCFNumberLongType, &bpp);
-        number = CFDictionaryGetValue(vidmode, kCGDisplayRefreshRate);
-        CFNumberGetValue(number, kCFNumberLongType, &refreshRate);
-    }
-    #endif
 
     mode->format = SDL_PIXELFORMAT_UNKNOWN;
     switch (bpp) {
     case 16:
         mode->format = SDL_PIXELFORMAT_ARGB1555;
         break;
+    case 30:
+        mode->format = SDL_PIXELFORMAT_ARGB2101010;
+        break;
     case 32:
         mode->format = SDL_PIXELFORMAT_ARGB8888;
         break;
     case 8: /* We don't support palettized modes now */
     default: /* Totally unrecognizable bit depth. */
+        SDL_free(data);
         return SDL_FALSE;
     }
     mode->w = width;
@@ -181,40 +166,24 @@ GetDisplayMode(_THIS, const void *moderef, SDL_DisplayMode *mode)
     return SDL_TRUE;
 }
 
-static void
-Cocoa_ReleaseDisplayMode(_THIS, const void *moderef)
-{
-    if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        CGDisplayModeRelease((CGDisplayModeRef) moderef);  /* NULL is ok */
-    }
-}
-
-static void
-Cocoa_ReleaseDisplayModeList(_THIS, CFArrayRef modelist)
-{
-    if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        CFRelease(modelist);  /* NULL is ok */
-    }
-}
-
 static const char *
 Cocoa_GetDisplayName(CGDirectDisplayID displayID)
 {
-    NSDictionary *deviceInfo = (NSDictionary *)IODisplayCreateInfoDictionary(CGDisplayIOServicePort(displayID), kIODisplayOnlyPreferredName);
-    NSDictionary *localizedNames = [deviceInfo objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
+    CFDictionaryRef deviceInfo = IODisplayCreateInfoDictionary(CGDisplayIOServicePort(displayID), kIODisplayOnlyPreferredName);
+    NSDictionary *localizedNames = [(NSDictionary *)deviceInfo objectForKey:[NSString stringWithUTF8String:kDisplayProductName]];
     const char* displayName = NULL;
 
     if ([localizedNames count] > 0) {
         displayName = SDL_strdup([[localizedNames objectForKey:[[localizedNames allKeys] objectAtIndex:0]] UTF8String]);
     }
-    [deviceInfo release];
+    CFRelease(deviceInfo);
     return displayName;
 }
 
 void
 Cocoa_InitModes(_THIS)
+{ @autoreleasepool
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     CGDisplayErr result;
     CGDirectDisplayID *displays;
     CGDisplayCount numDisplays;
@@ -223,7 +192,6 @@ Cocoa_InitModes(_THIS)
     result = CGGetOnlineDisplayList(0, NULL, &numDisplays);
     if (result != kCGErrorSuccess) {
         CG_SetError("CGGetOnlineDisplayList()", result);
-        [pool release];
         return;
     }
     displays = SDL_stack_alloc(CGDirectDisplayID, numDisplays);
@@ -231,7 +199,6 @@ Cocoa_InitModes(_THIS)
     if (result != kCGErrorSuccess) {
         CG_SetError("CGGetOnlineDisplayList()", result);
         SDL_stack_free(displays);
-        [pool release];
         return;
     }
 
@@ -241,7 +208,8 @@ Cocoa_InitModes(_THIS)
             SDL_VideoDisplay display;
             SDL_DisplayData *displaydata;
             SDL_DisplayMode mode;
-            const void *moderef = NULL;
+            CGDisplayModeRef moderef = NULL;
+            CVDisplayLinkRef link = NULL;
 
             if (pass == 0) {
                 if (!CGDisplayIsMain(displays[i])) {
@@ -257,15 +225,7 @@ Cocoa_InitModes(_THIS)
                 continue;
             }
 
-            if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-                moderef = CGDisplayCopyDisplayMode(displays[i]);
-            }
-
-            #if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
-            if (!IS_SNOW_LEOPARD_OR_LATER(_this)) {
-                moderef = CGDisplayCurrentMode(displays[i]);
-            }
-            #endif
+            moderef = CGDisplayCopyDisplayMode(displays[i]);
 
             if (!moderef) {
                 continue;
@@ -273,20 +233,25 @@ Cocoa_InitModes(_THIS)
 
             displaydata = (SDL_DisplayData *) SDL_malloc(sizeof(*displaydata));
             if (!displaydata) {
-                Cocoa_ReleaseDisplayMode(_this, moderef);
+                CGDisplayModeRelease(moderef);
                 continue;
             }
             displaydata->display = displays[i];
 
+            CVDisplayLinkCreateWithCGDisplay(displays[i], &link);
+
             SDL_zero(display);
             /* this returns a stddup'ed string */
             display.name = (char *)Cocoa_GetDisplayName(displays[i]);
-            if (!GetDisplayMode (_this, moderef, &mode)) {
-                Cocoa_ReleaseDisplayMode(_this, moderef);
+            if (!GetDisplayMode(_this, moderef, link, &mode)) {
+                CVDisplayLinkRelease(link);
+                CGDisplayModeRelease(moderef);
                 SDL_free(display.name);
                 SDL_free(displaydata);
                 continue;
             }
+
+            CVDisplayLinkRelease(link);
 
             display.desktop_mode = mode;
             display.current_mode = mode;
@@ -296,8 +261,7 @@ Cocoa_InitModes(_THIS)
         }
     }
     SDL_stack_free(displays);
-    [pool release];
-}
+}}
 
 int
 Cocoa_GetDisplayBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
@@ -313,55 +277,90 @@ Cocoa_GetDisplayBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
     return 0;
 }
 
+int
+Cocoa_GetDisplayUsableBounds(_THIS, SDL_VideoDisplay * display, SDL_Rect * rect)
+{
+    SDL_DisplayData *displaydata = (SDL_DisplayData *) display->driverdata;
+    const CGDirectDisplayID cgdisplay = displaydata->display;
+    NSArray *screens = [NSScreen screens];
+    NSScreen *screen = nil;
+
+    /* !!! FIXME: maybe track the NSScreen in SDL_DisplayData? */
+    for (NSScreen *i in screens) {
+        const CGDirectDisplayID thisDisplay = (CGDirectDisplayID) [[[i deviceDescription] objectForKey:@"NSScreenNumber"] unsignedIntValue];
+        if (thisDisplay == cgdisplay) {
+            screen = i;
+            break;
+        }
+    }
+
+    SDL_assert(screen != nil);  /* didn't find it?! */
+    if (screen == nil) {
+        return -1;
+    }
+
+    const CGRect cgrect = CGDisplayBounds(cgdisplay);
+    const NSRect frame = [screen visibleFrame];
+
+    // !!! FIXME: I assume -[NSScreen visibleFrame] is relative to the origin of the screen in question and not the whole desktop.
+    // !!! FIXME: The math vs CGDisplayBounds might be incorrect if that's not the case, though. Check this.
+    rect->x = (int)(cgrect.origin.x + frame.origin.x);
+    rect->y = (int)(cgrect.origin.y + frame.origin.y);
+    rect->w = (int)frame.size.width;
+    rect->h = (int)frame.size.height;
+
+    return 0;
+}
+
+int
+Cocoa_GetDisplayDPI(_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi)
+{
+    const float MM_IN_INCH = 25.4f;
+
+    SDL_DisplayData *data = (SDL_DisplayData *) display->driverdata;
+
+    CGSize displaySize = CGDisplayScreenSize(data->display);
+    int pixelWidth =  (int) CGDisplayPixelsWide(data->display);
+    int pixelHeight = (int) CGDisplayPixelsHigh(data->display);
+
+    if (ddpi) {
+        *ddpi = SDL_ComputeDiagonalDPI(pixelWidth, pixelHeight, displaySize.width / MM_IN_INCH, displaySize.height / MM_IN_INCH);
+    }
+    if (hdpi) {
+        *hdpi = pixelWidth * MM_IN_INCH / displaySize.width;
+    }
+    if (vdpi) {
+        *vdpi = pixelHeight * MM_IN_INCH / displaySize.height;
+    }
+
+    return 0;
+}
+
 void
 Cocoa_GetDisplayModes(_THIS, SDL_VideoDisplay * display)
 {
     SDL_DisplayData *data = (SDL_DisplayData *) display->driverdata;
-    CFArrayRef modes = NULL;
-
-    if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        modes = CGDisplayCopyAllDisplayModes(data->display, NULL);
-    }
-
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
-    if (!IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        modes = CGDisplayAvailableModes(data->display);
-    }
-    #endif
+    CFArrayRef modes = CGDisplayCopyAllDisplayModes(data->display, NULL);
 
     if (modes) {
+        CVDisplayLinkRef link = NULL;
         const CFIndex count = CFArrayGetCount(modes);
         CFIndex i;
 
+        CVDisplayLinkCreateWithCGDisplay(data->display, &link);
+
         for (i = 0; i < count; i++) {
-            const void *moderef = CFArrayGetValueAtIndex(modes, i);
+            CGDisplayModeRef moderef = (CGDisplayModeRef) CFArrayGetValueAtIndex(modes, i);
             SDL_DisplayMode mode;
-            if (GetDisplayMode(_this, moderef, &mode)) {
-                if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-                    CGDisplayModeRetain((CGDisplayModeRef) moderef);
-                }
+            if (GetDisplayMode(_this, moderef, link, &mode)) {
+                CGDisplayModeRetain(moderef);
                 SDL_AddDisplayMode(display, &mode);
             }
         }
 
-        Cocoa_ReleaseDisplayModeList(_this, modes);
+        CVDisplayLinkRelease(link);
+        CFRelease(modes);
     }
-}
-
-static CGError
-Cocoa_SwitchMode(_THIS, CGDirectDisplayID display, const void *mode)
-{
-    if (IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        return CGDisplaySetDisplayMode(display, (CGDisplayModeRef) mode, NULL);
-    }
- 
-    #if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
-    if (!IS_SNOW_LEOPARD_OR_LATER(_this)) {
-        return CGDisplaySwitchToMode(display, (CFDictionaryRef) mode);
-    }
-    #endif
-
-    return kCGErrorFailure;
 }
 
 int
@@ -379,7 +378,7 @@ Cocoa_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
 
     if (data == display->desktop_mode.driverdata) {
         /* Restoring desktop mode */
-        Cocoa_SwitchMode(_this, displaydata->display, data->moderef);
+        CGDisplaySetDisplayMode(displaydata->display, data->moderef, NULL);
 
         if (CGDisplayIsMain(displaydata->display)) {
             CGReleaseAllDisplays();
@@ -404,7 +403,7 @@ Cocoa_SetDisplayMode(_THIS, SDL_VideoDisplay * display, SDL_DisplayMode * mode)
         }
 
         /* Do the physical switch */
-        result = Cocoa_SwitchMode(_this, displaydata->display, data->moderef);
+        result = CGDisplaySetDisplayMode(displaydata->display, data->moderef, NULL);
         if (result != kCGErrorSuccess) {
             CG_SetError("CGDisplaySwitchToMode()", result);
             goto ERR_NO_SWITCH;
@@ -449,11 +448,11 @@ Cocoa_QuitModes(_THIS)
         }
 
         mode = (SDL_DisplayModeData *) display->desktop_mode.driverdata;
-        Cocoa_ReleaseDisplayMode(_this, mode->moderef);
+        CGDisplayModeRelease(mode->moderef);
 
         for (j = 0; j < display->num_display_modes; j++) {
             mode = (SDL_DisplayModeData*) display->display_modes[j].driverdata;
-            Cocoa_ReleaseDisplayMode(_this, mode->moderef);
+            CGDisplayModeRelease(mode->moderef);
         }
 
     }

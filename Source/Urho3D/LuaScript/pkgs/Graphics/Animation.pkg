@@ -1,0 +1,94 @@
+$#include "Graphics/Animation.h"
+
+static const unsigned char CHANNEL_POSITION;
+static const unsigned char CHANNEL_ROTATION;
+static const unsigned char CHANNEL_SCALE;
+
+struct AnimationKeyFrame
+{
+    float time_ @ time;
+    Vector3 position_ @ position;
+    Quaternion rotation_ @ rotation;
+    Vector3 scale_ @ scale;
+};
+
+struct AnimationTrack
+{
+    void SetKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void AddKeyFrame(const AnimationKeyFrame& keyFrame);
+    void InsertKeyFrame(unsigned index, const AnimationKeyFrame& keyFrame);
+    void RemoveKeyFrame(unsigned index);
+    void RemoveAllKeyFrames();
+
+    AnimationKeyFrame* GetKeyFrame(unsigned index);
+    unsigned GetNumKeyFrames() const { return keyFrames_.Size(); }
+
+    const String name_ @ name;
+    const StringHash nameHash_ @ nameHash;
+    unsigned char channelMask_ @ channelMask;
+    Vector<AnimationKeyFrame> keyFrames_ @ keyFrames;
+
+    tolua_readonly tolua_property__get_set unsigned numKeyFrames;
+};
+
+struct AnimationTriggerPoint
+{
+    AnimationTriggerPoint();
+    float time_ @ time;
+    Variant data_ @ data;
+};
+
+class Animation : public Resource
+{
+    Animation();
+    ~Animation();
+
+    void SetAnimationName(const String name);
+    void SetLength(float length);
+    AnimationTrack* CreateTrack(const String name);
+    bool RemoveTrack(const String name);
+    void RemoveAllTracks();
+    void SetTrigger(unsigned index, const AnimationTriggerPoint& trigger);
+    void AddTrigger(const AnimationTriggerPoint& trigger);
+    void AddTrigger(float time, bool timeIsNormalized, const Variant& data);
+    void RemoveTrigger(unsigned index);
+    void RemoveAllTriggers();
+    
+    // SharedPtr<Animation> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside Animation* AnimationClone @ Clone(const String cloneName = String::EMPTY) const;
+
+    const String GetAnimationName() const;
+    float GetLength() const;
+    unsigned GetNumTracks() const;
+    AnimationTrack* GetTrack(const String name);
+    AnimationTrack* GetTrack(StringHash nameHash);
+    unsigned GetNumTriggers() const;
+    AnimationTriggerPoint* GetTrigger(unsigned index);
+
+    tolua_property__get_set String animationName;
+    tolua_property__get_set float length;
+    tolua_readonly tolua_property__get_set unsigned numTracks;
+    tolua_readonly tolua_property__get_set unsigned numTriggers;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Animation_new00
+static int tolua_GraphicsLuaAPI_Animation_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Animation>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Animation_new00_local
+static int tolua_GraphicsLuaAPI_Animation_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Animation>(tolua_S);
+}
+
+static Animation* AnimationClone(const Animation* animation, const String& cloneName = String::EMPTY)
+{
+    if (!animation)
+        return 0;
+        
+    return animation->Clone(cloneName).Detach();
+}
+$}

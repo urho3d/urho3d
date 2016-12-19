@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -57,11 +57,13 @@
 
 #include "SDL_assert.h"
 
+#ifndef __NACL__
 /* List of signals to mask in the subthreads */
 static const int sig_list[] = {
     SIGHUP, SIGINT, SIGQUIT, SIGPIPE, SIGALRM, SIGTERM, SIGCHLD, SIGWINCH,
     SIGVTALRM, SIGPROF, 0
 };
+#endif
 
 static void *
 RunThread(void *data)
@@ -103,6 +105,11 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
         return SDL_SetError("Couldn't initialize pthread attributes");
     }
     pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
+    
+    /* Set caller-requested stack size. Otherwise: use the system default. */
+    if (thread->stacksize) {
+        pthread_attr_setstacksize(&type, (size_t) thread->stacksize);
+    }
 
     /* Create the thread and go! */
     if (pthread_create(&thread->handle, &type, RunThread, args) != 0) {
@@ -115,8 +122,10 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 void
 SDL_SYS_SetupThread(const char *name)
 {
+#if !defined(__NACL__)
     int i;
     sigset_t mask;
+#endif /* !__NACL__ */
 
     if (name != NULL) {
         #if defined(__MACOSX__) || defined(__IPHONEOS__) || defined(__LINUX__)
@@ -129,7 +138,11 @@ SDL_SYS_SetupThread(const char *name)
             #endif
         }
         #elif HAVE_PTHREAD_SETNAME_NP
+            #if defined(__NETBSD__)
+            pthread_setname_np(pthread_self(), "%s", name);
+            #else
             pthread_setname_np(pthread_self(), name);
+            #endif
         #elif HAVE_PTHREAD_SET_NAME_NP
             pthread_set_name_np(pthread_self(), name);
         #elif defined(__HAIKU__)
@@ -141,12 +154,16 @@ SDL_SYS_SetupThread(const char *name)
         #endif
     }
 
+   /* NativeClient does not yet support signals.*/
+#if !defined(__NACL__)
     /* Mask asynchronous signals for this thread */
     sigemptyset(&mask);
     for (i = 0; sig_list[i]; ++i) {
         sigaddset(&mask, sig_list[i]);
     }
     pthread_sigmask(SIG_BLOCK, &mask, 0);
+#endif /* !__NACL__ */
+
 
 #ifdef PTHREAD_CANCEL_ASYNCHRONOUS
     /* Allow ourselves to be asynchronously cancelled */
@@ -166,7 +183,10 @@ SDL_ThreadID(void)
 int
 SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
 {
-#ifdef __LINUX__
+#if __NACL__ 
+    /* FIXME: Setting thread priority does not seem to be supported in NACL */
+    return 0;
+#elif __LINUX__
     int value;
 
     if (priority == SDL_THREAD_PRIORITY_LOW) {
@@ -179,6 +199,10 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
     if (setpriority(PRIO_PROCESS, syscall(SYS_gettid), value) < 0) {
         /* Note that this fails if you're trying to set high priority
            and you don't have root permission. BUT DON'T RUN AS ROOT!
+
+           You can grant the ability to increase thread priority by
+           running the following command on your application binary:
+               sudo setcap 'cap_sys_nice=eip' <application>
          */
         return SDL_SetError("setpriority() failed");
     }

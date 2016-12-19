@@ -1,0 +1,31 @@
+<renderpath>
+    <rendertarget name="specular" sizedivisor="1 1" format="rgba16f" />
+    <rendertarget name="albedo" sizedivisor="1 1" format="rgba16f" />
+    <rendertarget name="normal" sizedivisor="1 1" format="rgba16f" />
+    <rendertarget name="depth" sizedivisor="1 1" format="readabledepth" />
+    <command type="clear" color="0 0 0 0" depth="1.0" stencil="0" depthstencil="depth" />
+    <command type="clear" color="0 0 0 0" output="albedo" depthstencil="depth"/>
+    <command type="clear" color="0 0 0 0" output="specular" depthstencil="depth" />
+    <command type="clear" color="0 0 0 0" output="normal" depthstencil="depth" />
+    <command type="clear" color="0 0 0 0" depth="1.0" output="depth" depthstencil="depth" />
+    <command type="scenepass" pass="base" vertexlights="true" metadata="base" depthstencil="depth" />
+    <command type="scenepass" pass="deferred" marktostencil="true" vertexlights="true" metadata="gbuffer" depthstencil="depth">
+        <output index="0" name="specular" />
+        <output index="1" name="albedo" />
+        <output index="2" name="normal" />
+    </command>
+    <command type="lightvolumes" vs="PBRDeferred" ps="PBRDeferred" psdefines="PBRDEFERRED PBR HWDEPTH" vsdefines="PBR" output="viewport" depthstencil="depth">
+        <texture unit="specular" name="specular" />
+        <texture unit="albedo" name="albedo" />
+        <texture unit="normal" name="normal" />
+        <texture unit="depth" name="depth" />
+    </command>
+    <command type="scenepass" pass="postopaque" depthstencil="depth"/>
+    <command type="scenepass" pass="refract" depthstencil="depth">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" depthstencil="depth" psdefines="HWDEPTH">
+        <texture unit="depth" name="depth" />
+    </command>
+    <command type="scenepass" pass="postalpha" sort="backtofront" depthstencil="depth" />
+</renderpath>

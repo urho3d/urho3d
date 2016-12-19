@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,9 +18,6 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 #include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_ANDROID
@@ -44,10 +41,13 @@ SDL_EGL_MakeCurrent_impl(Android)
 void
 Android_GLES_SwapWindow(_THIS, SDL_Window * window)
 {
-    /* FIXME: These two functions were in the Java code, do we really need them? */
-    // Urho3D: disabled
-    //_this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
-    //_this->egl_data->eglWaitGL();
+    /* The following two calls existed in the original Java code
+     * If you happen to have a device that's affected by their removal,
+     * please report to Bugzilla. -- Gabriel
+     */
+    
+    /*_this->egl_data->eglWaitNative(EGL_CORE_NATIVE_ENGINE);
+    _this->egl_data->eglWaitGL();*/
     SDL_EGL_SwapBuffers(_this, ((SDL_WindowData *) window->driverdata)->egl_surface);
 }
 

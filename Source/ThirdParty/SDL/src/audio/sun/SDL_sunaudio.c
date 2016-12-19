@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,7 +40,6 @@
 
 #include "SDL_timer.h"
 #include "SDL_audio.h"
-#include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "../SDL_audiodev_c.h"
 #include "SDL_sunaudio.h"
@@ -56,9 +55,9 @@ static Uint8 snd2au(int sample);
 
 /* Audio driver bootstrap functions */
 static void
-SUNAUDIO_DetectDevices(int iscapture, SDL_AddAudioDevice addfn)
+SUNAUDIO_DetectDevices(void)
 {
-    SDL_EnumUnixAudioDevices(iscapture, 1, (int (*)(int fd)) NULL, addfn);
+    SDL_EnumUnixAudioDevices(1, (int (*)(int)) NULL);
 }
 
 #ifdef DEBUG_AUDIO
@@ -158,7 +157,7 @@ SUNAUDIO_PlayDevice(_THIS)
         if (write(this->hidden->audio_fd, this->hidden->ulaw_buf,
             this->hidden->fragsize) < 0) {
             /* Assume fatal error, for now */
-            this->enabled = 0;
+            SDL_OpenedAudioDeviceDisconnected(this);
         }
         this->hidden->written += this->hidden->fragsize;
     } else {
@@ -168,7 +167,7 @@ SUNAUDIO_PlayDevice(_THIS)
         if (write(this->hidden->audio_fd, this->hidden->mixbuf,
             this->spec.size) < 0) {
             /* Assume fatal error, for now */
-            this->enabled = 0;
+            SDL_OpenedAudioDeviceDisconnected(this);
         }
         this->hidden->written += this->hidden->fragsize;
     }
@@ -183,22 +182,16 @@ SUNAUDIO_GetDeviceBuf(_THIS)
 static void
 SUNAUDIO_CloseDevice(_THIS)
 {
-    if (this->hidden != NULL) {
-        SDL_FreeAudioMem(this->hidden->mixbuf);
-        this->hidden->mixbuf = NULL;
-        SDL_free(this->hidden->ulaw_buf);
-        this->hidden->ulaw_buf = NULL;
-        if (this->hidden->audio_fd >= 0) {
-            close(this->hidden->audio_fd);
-            this->hidden->audio_fd = -1;
-        }
-        SDL_free(this->hidden);
-        this->hidden = NULL;
+    SDL_free(this->hidden->ulaw_buf);
+    if (this->hidden->audio_fd >= 0) {
+        close(this->hidden->audio_fd);
     }
+    SDL_free(this->hidden->mixbuf);
+    SDL_free(this->hidden);
 }
 
 static int
-SUNAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
+SUNAUDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 {
     const int flags = ((iscapture) ? OPEN_FLAGS_INPUT : OPEN_FLAGS_OUTPUT);
     SDL_AudioFormat format = 0;
@@ -219,7 +212,7 @@ SUNAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     if (this->hidden == NULL) {
         return SDL_OutOfMemory();
     }
-    SDL_memset(this->hidden, 0, (sizeof *this->hidden));
+    SDL_zerop(this->hidden);
 
     /* Open the audio device */
     this->hidden->audio_fd = open(devname, flags, 0);
@@ -340,7 +333,7 @@ SUNAUDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     SDL_CalculateAudioSpec(&this->spec);
 
     /* Allocate mixing buffer */
-    this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->spec.size);
+    this->hidden->mixbuf = (Uint8 *) SDL_malloc(this->spec.size);
     if (this->hidden->mixbuf == NULL) {
         return SDL_OutOfMemory();
     }
@@ -413,6 +406,8 @@ SUNAUDIO_Init(SDL_AudioDriverImpl * impl)
     impl->WaitDevice = SUNAUDIO_WaitDevice;
     impl->GetDeviceBuf = SUNAUDIO_GetDeviceBuf;
     impl->CloseDevice = SUNAUDIO_CloseDevice;
+
+    impl->AllowsArbitraryDeviceNames = 1;
 
     return 1; /* this audio target is available. */
 }

@@ -19,6 +19,8 @@
  * 	
  * */
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef JO_JPEG_HEADER_FILE_ONLY
 
 #if defined(_MSC_VER) && _MSC_VER >= 0x1400
@@ -28,6 +30,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+// Urho3D: for MultiByteToWideChar
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 static const unsigned char s_jo_ZigZag[] = { 0,1,5,6,14,15,27,28,2,4,7,13,16,26,29,42,3,8,12,17,25,30,41,43,9,11,18,24,31,40,44,53,10,19,23,32,39,45,52,54,20,22,33,38,46,51,55,60,21,34,37,47,50,56,59,61,35,36,48,49,57,58,62,63 };
 
@@ -231,7 +238,16 @@ bool jo_write_jpg(const char *filename, const void *data, int width, int height,
 		return false;
 	}
 
+	// Urho3D: proper UTF8 handling for Windows
+#ifndef _WIN32
 	FILE *fp = fopen(filename, "wb");
+#else
+	int wcharsize = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+	wchar_t* wstr = new wchar_t[wcharsize];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, wstr, wcharsize);
+	FILE *fp = _wfopen(wstr, L"wb");
+	delete[] wstr;
+#endif
 	if(!fp) {
 		return false;
 	}
@@ -262,7 +278,8 @@ bool jo_write_jpg(const char *filename, const void *data, int width, int height,
 	fwrite(YTable, sizeof(YTable), 1, fp);
 	putc(1, fp);
 	fwrite(UVTable, sizeof(UVTable), 1, fp);
-	const unsigned char head1[] = { 0xFF,0xC0,0,0x11,8,height>>8,height&0xFF,width>>8,width&0xFF,3,1,0x11,0,2,0x11,1,3,0x11,1,0xFF,0xC4,0x01,0xA2,0 };
+    // Urho3D: modified to avoid narrowing conversion
+	const unsigned char head1[] = { 0xFF,0xC0,0,0x11,8,static_cast<unsigned char>(height>>8),static_cast<unsigned char>(height&0xFF),static_cast<unsigned char>(width>>8),static_cast<unsigned char>(width&0xFF),3,1,0x11,0,2,0x11,1,3,0x11,1,0xFF,0xC4,0x01,0xA2,0 };
 	fwrite(head1, sizeof(head1), 1, fp);
 	fwrite(std_dc_luminance_nrcodes+1, sizeof(std_dc_luminance_nrcodes)-1, 1, fp);
 	fwrite(std_dc_luminance_values, sizeof(std_dc_luminance_values), 1, fp);

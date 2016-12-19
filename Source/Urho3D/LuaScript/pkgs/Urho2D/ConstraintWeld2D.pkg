@@ -1,0 +1,16 @@
+$#include "Urho2D/ConstraintWeld2D.h"
+
+class  ConstraintWeld2D : Constraint2D
+{
+    void SetAnchor(const Vector2& anchor);
+    void SetFrequencyHz(float frequencyHz);
+    void SetDampingRatio(float dampingRatio);
+
+    const Vector2& GetAnchor() const;
+    float GetFrequencyHz() const;
+    float GetDampingRatio() const;
+
+    tolua_property__get_set Vector2& anchor;
+    tolua_property__get_set float frequencyHz;
+    tolua_property__get_set float dampingRatio;
+};

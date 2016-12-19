@@ -1,0 +1,35 @@
+$#include "Resource/JSONFile.h"
+
+class JSONFile : Resource
+{
+    JSONFile();
+    ~JSONFile();
+
+    bool FromString(const String source);
+    const JSONValue& GetRoot() const;
+
+    tolua_outside bool JSONFileSave @ Save(const String fileName, const String indentation = "\t") const;
+};
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_JSONFile_new00
+static int tolua_ResourceLuaAPI_JSONFile_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<JSONFile>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_JSONFile_new00_local
+static int tolua_ResourceLuaAPI_JSONFile_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<JSONFile>(tolua_S);
+}
+
+static bool JSONFileSave(const JSONFile* resource, const String& fileName, const String& indentation)
+{
+    if (!resource)
+        return false;
+
+    File file(resource->GetContext());
+    return file.Open(fileName, FILE_WRITE) && resource->Save(file, indentation);
+}
+$}

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -86,6 +86,8 @@ struct SDL_Window
 
     SDL_DisplayMode fullscreen_mode;
 
+    float opacity;
+
     float brightness;
     Uint16 *gamma;
     Uint16 *saved_gamma;        /* (just offset into gamma) */
@@ -93,9 +95,14 @@ struct SDL_Window
     SDL_Surface *surface;
     SDL_bool surface_valid;
 
+    SDL_bool is_hiding;
     SDL_bool is_destroying;
+    SDL_bool is_dropping;       /* drag/drop in progress, expecting SDL_SendDropComplete(). */
 
     SDL_WindowShaper *shaper;
+
+    SDL_HitTest hit_test;
+    void *hit_test_data;
 
     SDL_WindowUserData *data;
 
@@ -167,6 +174,16 @@ struct SDL_VideoDevice
     int (*GetDisplayBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
 
     /*
+     * Get the dots/pixels-per-inch of a display
+     */
+    int (*GetDisplayDPI) (_THIS, SDL_VideoDisplay * display, float * ddpi, float * hdpi, float * vdpi);
+
+    /*
+     * Get the usable bounds of a display (bounds minus menubar or whatever)
+     */
+    int (*GetDisplayUsableBounds) (_THIS, SDL_VideoDisplay * display, SDL_Rect * rect);
+
+    /*
      * Get a list of the available display modes for a display.
      */
     void (*GetDisplayModes) (_THIS, SDL_VideoDisplay * display);
@@ -191,6 +208,10 @@ struct SDL_VideoDevice
     void (*SetWindowSize) (_THIS, SDL_Window * window);
     void (*SetWindowMinimumSize) (_THIS, SDL_Window * window);
     void (*SetWindowMaximumSize) (_THIS, SDL_Window * window);
+    int (*GetWindowBordersSize) (_THIS, SDL_Window * window, int *top, int *left, int *bottom, int *right);
+    int (*SetWindowOpacity) (_THIS, SDL_Window * window, float opacity);
+    int (*SetWindowModalFor) (_THIS, SDL_Window * modal_window, SDL_Window * parent_window);
+    int (*SetWindowInputFocus) (_THIS, SDL_Window * window);
     void (*ShowWindow) (_THIS, SDL_Window * window);
     void (*HideWindow) (_THIS, SDL_Window * window);
     void (*RaiseWindow) (_THIS, SDL_Window * window);
@@ -198,6 +219,7 @@ struct SDL_VideoDevice
     void (*MinimizeWindow) (_THIS, SDL_Window * window);
     void (*RestoreWindow) (_THIS, SDL_Window * window);
     void (*SetWindowBordered) (_THIS, SDL_Window * window, SDL_bool bordered);
+    void (*SetWindowResizable) (_THIS, SDL_Window * window, SDL_bool resizable);
     void (*SetWindowFullscreen) (_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
     int (*SetWindowGammaRamp) (_THIS, SDL_Window * window, const Uint16 * ramp);
     int (*GetWindowGammaRamp) (_THIS, SDL_Window * window, Uint16 * ramp);
@@ -215,8 +237,8 @@ struct SDL_VideoDevice
     SDL_ShapeDriver shape_driver;
 
     /* Get some platform dependent window information */
-      SDL_bool(*GetWindowWMInfo) (_THIS, SDL_Window * window,
-                                  struct SDL_SysWMinfo * info);
+    SDL_bool(*GetWindowWMInfo) (_THIS, SDL_Window * window,
+                                struct SDL_SysWMinfo * info);
 
     /* * * */
     /*
@@ -261,12 +283,16 @@ struct SDL_VideoDevice
     /* MessageBox */
     int (*ShowMessageBox) (_THIS, const SDL_MessageBoxData *messageboxdata, int *buttonid);
 
+    /* Hit-testing */
+    int (*SetWindowHitTest)(SDL_Window * window, SDL_bool enabled);
+
     /* * * */
     /* Data common to all drivers */
     SDL_bool suspend_screensaver;
     int num_displays;
     SDL_VideoDisplay *displays;
     SDL_Window *windows;
+    SDL_Window *grabbed_window;
     Uint8 window_magic;
     Uint32 next_object_id;
     char * clipboard_text;
@@ -296,6 +322,7 @@ struct SDL_VideoDevice
         int flags;
         int profile_mask;
         int share_with_current_context;
+        int release_behavior;
         int framebuffer_srgb_capable;
         int retained_backing;
         int driver_loaded;
@@ -381,6 +408,15 @@ extern VideoBootStrap DUMMY_bootstrap;
 #if SDL_VIDEO_DRIVER_WAYLAND
 extern VideoBootStrap Wayland_bootstrap;
 #endif
+#if SDL_VIDEO_DRIVER_NACL
+extern VideoBootStrap NACL_bootstrap;
+#endif
+#if SDL_VIDEO_DRIVER_VIVANTE
+extern VideoBootStrap VIVANTE_bootstrap;
+#endif
+#if SDL_VIDEO_DRIVER_EMSCRIPTEN
+extern VideoBootStrap Emscripten_bootstrap;
+#endif
 
 extern SDL_VideoDevice *SDL_GetVideoDevice(void);
 extern int SDL_AddBasicVideoDisplay(const SDL_DisplayMode * desktop_mode);
@@ -404,6 +440,8 @@ extern void SDL_UpdateWindowGrab(SDL_Window * window);
 extern SDL_Window * SDL_GetFocusWindow(void);
 
 extern SDL_bool SDL_ShouldAllowTopmost(void);
+
+extern float SDL_ComputeDiagonalDPI(int hpix, int vpix, float hinches, float vinches);
 
 #endif /* _SDL_sysvideo_h */
 

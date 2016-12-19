@@ -1,0 +1,18 @@
+{
+	"lang":{
+		"en":"Language: English",
+		"ru":"Язык: Русский"
+	},
+	"quit":{
+		"en":"Quit",
+		"ru":"Выйти"
+	},
+	"Press this button":{
+		"en":"Press this button",
+		"ru":"Нажмите эту кнопку"
+	},
+	"title":{
+		"en":"Title",
+		"ru":"Заголовок"
+	}
+}

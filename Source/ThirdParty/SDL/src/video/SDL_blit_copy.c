@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -109,10 +109,20 @@ SDL_BlitCopy(SDL_BlitInfo * info)
         overlap = (src < (dst + h*dstskip));
     }
     if (overlap) {
-        while (h--) {
-            SDL_memmove(dst, src, w);
-            src += srcskip;
-            dst += dstskip;
+        if ( dst < src ) {
+                while ( h-- ) {
+                        SDL_memmove(dst, src, w);
+                        src += srcskip;
+                        dst += dstskip;
+                }
+        } else {
+                src += ((h-1) * srcskip);
+                dst += ((h-1) * dstskip);
+                while ( h-- ) {
+                        SDL_memmove(dst, src, w);
+                        src -= srcskip;
+                        dst -= dstskip;
+                }
         }
         return;
     }

@@ -1,6 +1,6 @@
 /*
 ** Configuration header.
-** Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
 // Modified by Yao Wei Tjong for Urho3D
@@ -24,7 +24,7 @@
 #define LUA_LDIR	"!\\lua\\"
 #define LUA_CDIR	"!\\"
 #define LUA_PATH_DEFAULT \
-  ".\\?.lua;" "!\\" LUA_RDIR "?.lua;" LUA_IDIR "?.lua;" LUA_LDIR "?.lua;" LUA_LDIR "?\\init.lua;"
+  ".\\?.lua;" "!\\"LUA_RDIR"?.lua;" LUA_IDIR"?.lua;" LUA_LDIR"?.lua;" LUA_LDIR"?\\init.lua;"
 #define LUA_CPATH_DEFAULT \
   ".\\?.dll;" LUA_CDIR"?.dll;" LUA_CDIR"loadall.dll"
 #else
@@ -40,7 +40,7 @@
 #endif
 #define LUA_LROOT	"/usr/local"
 #define LUA_LUADIR	"/lua/5.1/"
-#define LUA_LJDIR	"/luajit-2.0.3/"
+#define LUA_LJDIR	"/luajit-2.1.0-beta2/"
 
 #ifdef LUA_ROOT
 #define LUA_JROOT	LUA_ROOT

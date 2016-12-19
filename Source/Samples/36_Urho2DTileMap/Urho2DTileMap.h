@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,15 @@
 
 #include "Sample.h"
 
-namespace Urho3D
-{
-    class Node;
-    class Scene;
-}
-
 /// Urho2D tile map example.
 /// This sample demonstrates:
 ///     - Creating a 2D scene with tile map
 ///     - Displaying the scene using the Renderer subsystem
 ///     - Handling keyboard to move and zoom 2D camera
+///     - Interacting with the tile map
 class Urho2DTileMap : public Sample
 {
-    OBJECT(Urho2DTileMap);
+    URHO3D_OBJECT(Urho2DTileMap, Sample);
 
 public:
     /// Construct.
@@ -82,4 +77,8 @@ private:
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Handle the mouse click event.
+    void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
+    /// Get mouse position in 2D world coordinates.
+    Vector2 GetMousePositionXY();
 };

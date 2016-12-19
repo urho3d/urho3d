@@ -1,0 +1,16 @@
+$#include "Urho2D/ConstraintFriction2D.h"
+
+class ConstraintFriction2D : Constraint2D
+{
+    void SetAnchor(const Vector2& anchor);
+    void SetMaxForce(float maxForce);
+    void SetMaxTorque(float maxTorque);
+
+    const Vector2& GetAnchor() const;
+    float GetMaxForce() const;
+    float GetMaxTorque() const;
+
+    tolua_property__get_set Vector2& anchor;
+    tolua_property__get_set float maxForce;
+    tolua_property__get_set float maxTorque;
+};

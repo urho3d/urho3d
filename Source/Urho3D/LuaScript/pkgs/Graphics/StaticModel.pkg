@@ -1,0 +1,22 @@
+$#include "Graphics/StaticModel.h"
+
+class StaticModel : public Drawable
+{
+    void SetModel(Model* model);
+    void SetMaterial(Material* material);
+    bool SetMaterial(unsigned index, Material* material);
+    void SetOcclusionLodLevel(unsigned level);
+    void ApplyMaterialList(const String fileName = String::EMPTY);
+    Model* GetModel() const;
+    unsigned GetNumGeometries() const;
+    Material* GetMaterial(unsigned index = 0) const;
+    unsigned GetOcclusionLodLevel() const;
+    bool IsInside(const Vector3& point) const;
+    bool IsInsideLocal(const Vector3& point) const;
+    
+    tolua_property__get_set Model* model;
+    tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set BoundingBox& boundingBox;
+    tolua_readonly tolua_property__get_set unsigned numGeometries;
+    tolua_property__get_set unsigned occlusionLodLevel;
+};

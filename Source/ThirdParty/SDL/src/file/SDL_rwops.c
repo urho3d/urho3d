@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,9 +38,13 @@
 #include "cocoa/SDL_rwopsbundlesupport.h"
 #endif /* __APPLE__ */
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 #include "../core/android/SDL_android.h"
 #include "SDL_system.h"
+#endif
+
+#if __NACL__
+#include "nacl_io/nacl_io.h"
 #endif
 
 #ifdef __WIN32__
@@ -466,7 +470,7 @@ SDL_RWFromFile(const char *file, const char *mode)
         SDL_SetError("SDL_RWFromFile(): No file or no mode specified");
         return NULL;
     }
-#if defined(ANDROID)
+#if defined(__ANDROID__)
 #ifdef HAVE_STDIO_H
     /* Try to open the file on the filesystem first */
     if (*file == '/') {

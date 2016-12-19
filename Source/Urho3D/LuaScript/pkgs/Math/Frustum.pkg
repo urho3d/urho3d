@@ -1,0 +1,42 @@
+$#include "Math/Frustum.h"
+
+enum FrustumPlane
+{
+    PLANE_NEAR = 0,
+    PLANE_LEFT,
+    PLANE_RIGHT,
+    PLANE_UP,
+    PLANE_DOWN,
+    PLANE_FAR,
+};
+
+static const unsigned NUM_FRUSTUM_PLANES;
+static const unsigned NUM_FRUSTUM_VERTICES;
+
+class Frustum
+{
+    Frustum();
+    Frustum(const Frustum& frustum);
+    ~Frustum();
+
+    void Define(float fov, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
+    void Define(const Vector3& near, const Vector3& far, const Matrix3x4& transform = Matrix3x4::IDENTITY);
+    void Define(const BoundingBox& box, const Matrix3x4& transform = Matrix3x4::IDENTITY);
+    void Define(const Matrix4& projection);
+    void DefineOrtho(float orthoSize, float aspectRatio, float zoom, float nearZ, float farZ, const Matrix3x4& transform = Matrix3x4::IDENTITY);
+    void DefineSplit(const Matrix4& projection, float near, float far);
+    void Transform(const Matrix3& transform);
+    void Transform(const Matrix3x4& transform);
+    
+    Intersection IsInside(const Vector3& point) const;
+    Intersection IsInside(const Sphere& sphere) const;
+    Intersection IsInsideFast(const Sphere& sphere) const;
+    Intersection IsInside(const BoundingBox& box) const;
+    Intersection IsInsideFast(const BoundingBox& box) const;
+    float Distance(const Vector3& point) const;
+    
+    Frustum Transformed(const Matrix3& transform) const;
+    Frustum Transformed(const Matrix3x4& transform) const;
+    Rect Projected(const Matrix4& transform) const;
+    void UpdatePlanes();
+};

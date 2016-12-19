@@ -1,0 +1,23 @@
+$#include "Urho2D/TileMap2D.h"
+
+class TileMap2D : Component
+{
+    void SetTmxFile(TmxFile2D* tmxFile);
+    TmxFile2D* GetTmxFile() const;
+    const TileMapInfo2D& GetInfo() const;
+    unsigned GetNumLayers() const;
+    TileMapLayer2D* GetLayer(unsigned index) const;
+    Vector2 TileIndexToPosition(int x, int y) const;
+    tolua_outside bool TileMap2DPositionToTileIndex @ PositionToTileIndex(const Vector2& position, int* x = 0, int* y = 0) const;
+
+    tolua_property__get_set TmxFile2D* tmxFile;
+    tolua_readonly tolua_property__get_set TileMapInfo2D& info;
+    tolua_readonly tolua_property__get_set unsigned numLayers;
+};
+
+${
+static bool TileMap2DPositionToTileIndex(const TileMap2D* tileMap, const Vector2& position, int* x, int* y)
+{
+    return tileMap->PositionToTileIndex(*x, *y, position);
+}
+$}

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,27 @@
 // THE SOFTWARE.
 //
 
-#include "Application.h"
-#include "Camera.h"
-#include "Console.h"
-#include "Cursor.h"
-#include "DebugHud.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "InputEvents.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite.h"
-#include "Texture2D.h"
-#include "Timer.h"
-#include "UI.h"
-#include "XMLFile.h"
+#include <Urho3D/Engine/Application.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Engine/Console.h>
+#include <Urho3D/UI/Cursor.h>
+#include <Urho3D/Engine/DebugHud.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Engine/EngineDefs.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Input/InputEvents.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Sprite.h>
+#include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Core/Timer.h>
+#include <Urho3D/UI/UI.h>
+#include <Urho3D/Resource/XMLFile.h>
+#include <Urho3D/IO/Log.h>
 
 Sample::Sample(Context* context) :
     Application(context),
@@ -47,17 +49,25 @@ Sample::Sample(Context* context) :
     touchEnabled_(false),
     screenJoystickIndex_(M_MAX_UNSIGNED),
     screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
-    paused_(false)
+    paused_(false),
+    useMouseMode_(MM_ABSOLUTE)
 {
 }
 
 void Sample::Setup()
 {
     // Modify engine startup parameters
-    engineParameters_["WindowTitle"] = GetTypeName();
-    engineParameters_["LogName"]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
-    engineParameters_["FullScreen"]  = false;
-    engineParameters_["Headless"]    = false;
+    engineParameters_[EP_WINDOW_TITLE] = GetTypeName();
+    engineParameters_[EP_LOG_NAME]     = GetSubsystem<FileSystem>()->GetAppPreferencesDir("urho3d", "logs") + GetTypeName() + ".log";
+    engineParameters_[EP_FULL_SCREEN]  = false;
+    engineParameters_[EP_HEADLESS]     = false;
+    engineParameters_[EP_SOUND]        = false;
+
+    // Construct a search path to find the resource prefix with two entries:
+    // The first entry is an empty path which will be substituted with program/bin directory -- this entry is for binary when it is still in build tree
+    // The second and third entries are possible relative paths from the installed program/bin directory to the asset directory -- these entries are for binary when it is in the Urho3D SDK installation location
+    if (!engineParameters_.Contains(EP_RESOURCE_PREFIX_PATHS))
+        engineParameters_[EP_RESOURCE_PREFIX_PATHS] = ";../share/Resources;../share/Urho3D/Resources";
 }
 
 void Sample::Start()
@@ -67,7 +77,7 @@ void Sample::Start()
         InitTouchInput();
     else if (GetSubsystem<Input>()->GetNumJoysticks() == 0)
         // On desktop platform, do not detect touch when we already got a joystick
-        SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Sample, HandleTouchBegin));
+        SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Sample, HandleTouchBegin));
 
     // Create logo
     CreateLogo();
@@ -79,9 +89,11 @@ void Sample::Start()
     CreateConsoleAndDebugHud();
 
     // Subscribe key down event
-    SubscribeToEvent(E_KEYDOWN, HANDLER(Sample, HandleKeyDown));
+    SubscribeToEvent(E_KEYDOWN, URHO3D_HANDLER(Sample, HandleKeyDown));
+    // Subscribe key up event
+    SubscribeToEvent(E_KEYUP, URHO3D_HANDLER(Sample, HandleKeyUp));
     // Subscribe scene update event
-    SubscribeToEvent(E_SCENEUPDATE, HANDLER(Sample, HandleSceneUpdate));
+    SubscribeToEvent(E_SCENEUPDATE, URHO3D_HANDLER(Sample, HandleSceneUpdate));
 }
 
 void Sample::Stop()
@@ -104,8 +116,35 @@ void Sample::InitTouchInput()
         if (patchFile->FromString(patchString))
             layout->Patch(patchFile);
     }
-    screenJoystickIndex_ = input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+    screenJoystickIndex_ = (unsigned)input->AddScreenJoystick(layout, cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
     input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, true);
+}
+
+void Sample::InitMouseMode(MouseMode mode)
+{
+    useMouseMode_ = mode;
+
+    Input* input = GetSubsystem<Input>();
+
+    if (GetPlatform() != "Web")
+    {
+        if (useMouseMode_ == MM_FREE)
+            input->SetMouseVisible(true);
+
+        Console* console = GetSubsystem<Console>();
+        if (useMouseMode_ != MM_ABSOLUTE)
+        {
+            input->SetMouseMode(useMouseMode_);
+            if (console && console->IsVisible())
+                input->SetMouseMode(MM_ABSOLUTE, true);
+        }
+    }
+    else
+    {
+        input->SetMouseVisible(true);
+        SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Sample, HandleMouseModeRequest));
+        SubscribeToEvent(E_MOUSEMODECHANGED, URHO3D_HANDLER(Sample, HandleMouseModeChange));
+    }
 }
 
 void Sample::SetLogoVisible(bool enable)
@@ -118,7 +157,7 @@ void Sample::CreateLogo()
 {
     // Get logo texture
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Texture2D* logoTexture = cache->GetResource<Texture2D>("Textures/LogoLarge.png");
+    Texture2D* logoTexture = cache->GetResource<Texture2D>("Textures/FishBoneLogo.png");
     if (!logoTexture)
         return;
 
@@ -139,14 +178,14 @@ void Sample::CreateLogo()
     logoSprite_->SetSize(textureWidth, textureHeight);
 
     // Set logo sprite hot spot
-    logoSprite_->SetHotSpot(0, textureHeight);
+    logoSprite_->SetHotSpot(textureWidth, textureHeight);
 
     // Set logo sprite alignment
-    logoSprite_->SetAlignment(HA_LEFT, VA_BOTTOM);
-    
+    logoSprite_->SetAlignment(HA_RIGHT, VA_BOTTOM);
+
     // Make logo not fully opaque to show the scene underneath
-    logoSprite_->SetOpacity(0.75f);
-    
+    logoSprite_->SetOpacity(0.9f);
+
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);
 }
@@ -176,35 +215,52 @@ void Sample::CreateConsoleAndDebugHud()
     debugHud->SetDefaultStyle(xmlFile);
 }
 
-void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+
+void Sample::HandleKeyUp(StringHash /*eventType*/, VariantMap& eventData)
 {
-    using namespace KeyDown;
+    using namespace KeyUp;
 
     int key = eventData[P_KEY].GetInt();
 
     // Close console (if open) or exit when ESC is pressed
-    if (key == KEY_ESC)
+    if (key == KEY_ESCAPE)
     {
         Console* console = GetSubsystem<Console>();
         if (console->IsVisible())
             console->SetVisible(false);
         else
-            engine_->Exit();
+        {
+            if (GetPlatform() == "Web")
+            {
+                GetSubsystem<Input>()->SetMouseVisible(true);
+                if (useMouseMode_ != MM_ABSOLUTE)
+                    GetSubsystem<Input>()->SetMouseMode(MM_FREE);
+            }
+            else
+                engine_->Exit();
+        }
     }
+}
+
+void Sample::HandleKeyDown(StringHash /*eventType*/, VariantMap& eventData)
+{
+    using namespace KeyDown;
+
+    int key = eventData[P_KEY].GetInt();
 
     // Toggle console with F1
-    else if (key == KEY_F1)
+    if (key == KEY_F1)
         GetSubsystem<Console>()->Toggle();
-    
+
     // Toggle debug HUD with F2
     else if (key == KEY_F2)
         GetSubsystem<DebugHud>()->ToggleAll();
-    
+
     // Common rendering quality controls, only when UI has no focused element
     else if (!GetSubsystem<UI>()->GetFocusElement())
     {
         Renderer* renderer = GetSubsystem<Renderer>();
-        
+
         // Preferences / Pause
         if (key == KEY_SELECT && touchEnabled_)
         {
@@ -215,7 +271,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             {
                 // Lazy initialization
                 ResourceCache* cache = GetSubsystem<ResourceCache>();
-                screenJoystickSettingsIndex_ = input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
+                screenJoystickSettingsIndex_ = (unsigned)input->AddScreenJoystick(cache->GetResource<XMLFile>("UI/ScreenJoystickSettings_Samples.xml"), cache->GetResource<XMLFile>("UI/DefaultStyle.xml"));
             }
             else
                 input->SetScreenJoystickVisible(screenJoystickSettingsIndex_, paused_);
@@ -230,7 +286,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetTextureQuality(quality);
         }
-        
+
         // Material quality
         else if (key == '2')
         {
@@ -240,15 +296,15 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 quality = QUALITY_LOW;
             renderer->SetMaterialQuality(quality);
         }
-        
+
         // Specular lighting
         else if (key == '3')
             renderer->SetSpecularLighting(!renderer->GetSpecularLighting());
-        
+
         // Shadow rendering
         else if (key == '4')
             renderer->SetDrawShadows(!renderer->GetDrawShadows());
-        
+
         // Shadow map resolution
         else if (key == '5')
         {
@@ -258,17 +314,17 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
                 shadowMapSize = 512;
             renderer->SetShadowMapSize(shadowMapSize);
         }
-        
+
         // Shadow depth and filtering quality
         else if (key == '6')
         {
-            int quality = renderer->GetShadowQuality();
-            ++quality;
-            if (quality > SHADOWQUALITY_HIGH_24BIT)
-                quality = SHADOWQUALITY_LOW_16BIT;
+            ShadowQuality quality = renderer->GetShadowQuality();
+            quality = (ShadowQuality)(quality + 1);
+            if (quality > SHADOWQUALITY_BLUR_VSM)
+                quality = SHADOWQUALITY_SIMPLE_16BIT;
             renderer->SetShadowQuality(quality);
         }
-        
+
         // Occlusion culling
         else if (key == '7')
         {
@@ -276,11 +332,11 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
             occlusion = !occlusion;
             renderer->SetMaxOccluderTriangles(occlusion ? 5000 : 0);
         }
-        
+
         // Instancing
         else if (key == '8')
             renderer->SetDynamicInstancing(!renderer->GetDynamicInstancing());
-        
+
         // Take screenshot
         else if (key == '9')
         {
@@ -294,7 +350,7 @@ void Sample::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
+void Sample::HandleSceneUpdate(StringHash /*eventType*/, VariantMap& eventData)
 {
     // Move the camera by touch, if the camera node is initialized by descendant sample class
     if (touchEnabled_ && cameraNode_)
@@ -330,9 +386,30 @@ void Sample::HandleSceneUpdate(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void Sample::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
+void Sample::HandleTouchBegin(StringHash /*eventType*/, VariantMap& eventData)
 {
     // On some platforms like Windows the presence of touch input can only be detected dynamically
     InitTouchInput();
     UnsubscribeFromEvent("TouchBegin");
+}
+
+// If the user clicks the canvas, attempt to switch to relative mouse mode on web platform
+void Sample::HandleMouseModeRequest(StringHash /*eventType*/, VariantMap& eventData)
+{
+    Console* console = GetSubsystem<Console>();
+    if (console && console->IsVisible())
+        return;
+    Input* input = GetSubsystem<Input>();
+    if (useMouseMode_ == MM_ABSOLUTE)
+        input->SetMouseVisible(false);
+    else if (useMouseMode_ == MM_FREE)
+        input->SetMouseVisible(true);
+    input->SetMouseMode(useMouseMode_);
+}
+
+void Sample::HandleMouseModeChange(StringHash /*eventType*/, VariantMap& eventData)
+{
+    Input* input = GetSubsystem<Input>();
+    bool mouseLocked = eventData[MouseModeChanged::P_MOUSELOCKED].GetBool();
+    input->SetMouseVisible(!mouseLocked);
 }

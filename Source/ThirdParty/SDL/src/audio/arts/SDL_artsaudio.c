@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,6 @@
 
 #include "SDL_timer.h"
 #include "SDL_audio.h"
-#include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "SDL_artsaudio.h"
 
@@ -151,7 +150,7 @@ ARTS_WaitDevice(_THIS)
         /* Check every 10 loops */
         if (this->hidden->parent && (((++cnt) % 10) == 0)) {
             if (kill(this->hidden->parent, 0) < 0 && errno == ESRCH) {
-                this->enabled = 0;
+                SDL_OpenedAudioDeviceDisconnected(this);
             }
         }
     }
@@ -179,19 +178,12 @@ ARTS_PlayDevice(_THIS)
 
     /* If we couldn't write, assume fatal error for now */
     if (written < 0) {
-        this->enabled = 0;
+        SDL_OpenedAudioDeviceDisconnected(this);
     }
 #ifdef DEBUG_AUDIO
     fprintf(stderr, "Wrote %d bytes of audio data\n", written);
 #endif
 }
-
-static void
-ARTS_WaitDone(_THIS)
-{
-    /* !!! FIXME: camp here until buffer drains... SDL_Delay(???); */
-}
-
 
 static Uint8 *
 ARTS_GetDeviceBuf(_THIS)
@@ -203,17 +195,12 @@ ARTS_GetDeviceBuf(_THIS)
 static void
 ARTS_CloseDevice(_THIS)
 {
-    if (this->hidden != NULL) {
-        SDL_FreeAudioMem(this->hidden->mixbuf);
-        this->hidden->mixbuf = NULL;
-        if (this->hidden->stream) {
-            SDL_NAME(arts_close_stream) (this->hidden->stream);
-            this->hidden->stream = 0;
-        }
-        SDL_NAME(arts_free) ();
-        SDL_free(this->hidden);
-        this->hidden = NULL;
+    if (this->hidden->stream) {
+        SDL_NAME(arts_close_stream) (this->hidden->stream);
     }
+    SDL_NAME(arts_free) ();
+    SDL_free(this->hidden->mixbuf);
+    SDL_free(this->hidden);
 }
 
 static int
@@ -229,7 +216,7 @@ ARTS_Suspend(void)
 }
 
 static int
-ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
+ARTS_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 {
     int rc = 0;
     int bits = 0, frag_spec = 0;
@@ -241,7 +228,7 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     if (this->hidden == NULL) {
         return SDL_OutOfMemory();
     }
-    SDL_memset(this->hidden, 0, (sizeof *this->hidden));
+    SDL_zerop(this->hidden);
 
     /* Try for a closest match on audio format */
     for (test_format = SDL_FirstAudioFormat(this->spec.format);
@@ -267,19 +254,16 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
         }
     }
     if (format == 0) {
-        ARTS_CloseDevice(this);
         return SDL_SetError("Couldn't find any hardware audio formats");
     }
     this->spec.format = test_format;
 
     if ((rc = SDL_NAME(arts_init) ()) != 0) {
-        ARTS_CloseDevice(this);
         return SDL_SetError("Unable to initialize ARTS: %s",
                             SDL_NAME(arts_error_text) (rc));
     }
 
     if (!ARTS_Suspend()) {
-        ARTS_CloseDevice(this);
         return SDL_SetError("ARTS can not open audio device");
     }
 
@@ -297,7 +281,6 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
     /* Determine the power of two of the fragment size */
     for (frag_spec = 0; (0x01 << frag_spec) < this->spec.size; ++frag_spec);
     if ((0x01 << frag_spec) != this->spec.size) {
-        ARTS_CloseDevice(this);
         return SDL_SetError("Fragment size must be a power of two");
     }
     frag_spec |= 0x00020000;    /* two fragments, for low latency */
@@ -316,9 +299,8 @@ ARTS_OpenDevice(_THIS, const char *devname, int iscapture)
 
     /* Allocate mixing buffer */
     this->hidden->mixlen = this->spec.size;
-    this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
+    this->hidden->mixbuf = (Uint8 *) SDL_malloc(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
-        ARTS_CloseDevice(this);
         return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->spec.size);
@@ -367,7 +349,6 @@ ARTS_Init(SDL_AudioDriverImpl * impl)
     impl->WaitDevice = ARTS_WaitDevice;
     impl->GetDeviceBuf = ARTS_GetDeviceBuf;
     impl->CloseDevice = ARTS_CloseDevice;
-    impl->WaitDone = ARTS_WaitDone;
     impl->Deinitialize = ARTS_Deinitialize;
     impl->OnlyHasDefaultOutputDevice = 1;
 

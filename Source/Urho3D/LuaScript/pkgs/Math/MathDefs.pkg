@@ -1,0 +1,75 @@
+$#include "Math/MathDefs.h"
+
+static const float M_PI;
+static const float M_HALF_PI;
+static const int M_MIN_INT;
+static const int M_MAX_INT;
+static const unsigned M_MIN_UNSIGNED;
+static const unsigned M_MAX_UNSIGNED;
+
+static const float M_EPSILON;
+static const float M_LARGE_EPSILON;
+static const float M_MIN_NEARCLIP;
+static const float M_MAX_FOV;
+static const float M_LARGE_VALUE;
+static const float M_INFINITY;
+static const float M_DEGTORAD;
+static const float M_DEGTORAD_2;
+static const float M_RADTODEG;
+
+enum Intersection
+{
+    OUTSIDE,
+    INTERSECTS,
+    INSIDE
+};
+
+bool Equals(float lhs, float rhs);
+bool IsNaN(float value);
+float Lerp(float lhs, float rhs, float t);
+float InverseLerp(float lhs, float rhs, float x);
+float Min(float lhs, float rhs);
+float Max(float lhs, float rhs);
+float Abs(float value);
+float Sign(float value);
+
+float Clamp(float value, float min, float max);
+float SmoothStep(float lhs, float rhs, float t);
+
+float Sin(float angle);
+float Cos(float angle);
+float Tan(float angle);
+float Asin(float x);
+float Acos(float x);
+float Atan(float x);
+float Atan2(float y, float x);
+float Sqrt(float x);
+float Pow(float x, float y);
+float Ln(float x);
+float Mod(float x, float y);
+float Fract(float x);
+float Floor(float x);
+float Round(float x);
+float Ceil(float x);
+int FloorToInt(float x);
+int RoundToInt(float x);
+int CeilToInt(float x);
+
+int Min @ MinInt(int lhs, int rhs);
+int Max @ MaxInt(int lhs, int rhs);
+int Abs @ AbsInt(int value);
+int Clamp @ ClampInt(int value, int min, int max);
+
+bool IsPowerOfTwo(unsigned value);
+
+unsigned NextPowerOfTwo(unsigned value);
+
+unsigned CountSetBits(unsigned value);
+
+unsigned SDBMHash(unsigned hash, unsigned char c);
+float Random();
+float Random(float range);
+float Random(float min, float max);
+int Random @ RandomInt(int range);
+int Random @ RandomInt(int min, int max);
+float RandomNormal(float meanValue, float variance);

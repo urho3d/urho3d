@@ -1,0 +1,26 @@
+$#include "Core/StringUtils.h"
+
+bool ToBool(const String source);
+float ToFloat(const String source);
+int ToInt(const String source, int base = 10);
+unsigned ToUInt(const String source, int base = 10);
+
+Color ToColor(const String source);
+IntRect ToIntRect(const String source);
+IntVector2 ToIntVector2(const String source);
+Quaternion ToQuaternion(const String source);
+Rect ToRect(const String source);
+Vector2 ToVector2(const String source);
+Vector3 ToVector3(const String source);
+Vector4 ToVector4(const String source, bool allowMissingCoords = false);
+Matrix3 ToMatrix3(const String source);
+Matrix3x4 ToMatrix3x4(const String source);
+Matrix4 ToMatrix4(const String source);
+
+String ToString(void* value);
+String ToStringHex(unsigned value);
+
+bool IsAlpha(unsigned ch);
+bool IsDigit(unsigned ch);
+unsigned ToUpper(unsigned ch);
+unsigned ToLower(unsigned ch);

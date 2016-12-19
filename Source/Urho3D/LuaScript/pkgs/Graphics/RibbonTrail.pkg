@@ -1,0 +1,57 @@
+$#include "Graphics/RibbonTrail.h"
+
+enum TrailType
+{
+    TT_FACE_CAMERA,
+    TT_BONE
+};
+
+class RibbonTrail : public Drawable
+{
+    void SetMaterial(Material* material);
+    void SetVertexDistance(float length);
+    void SetWidth(float width);
+    void SetStartColor(const Color& c);
+    void SetEndColor(const Color& c);
+    void SetStartScale(float startScale);
+    void SetEndScale(float endScale);
+    void SetTrailType(TrailType type);
+    void SetSorted(bool enable);
+    void SetLifetime(float time);
+    void SetEmitting(bool emitting);
+    void SetUpdateInvisible(bool updateInvisible);
+    void SetTailColumn(unsigned tailColumn);
+    void SetAnimationLodBias(float bias);
+
+    void Commit();
+
+    Material* GetMaterial() const;
+    float GetVertexDistance() const;
+    float GetWidth() const;
+    const Color& GetStartColor() const;
+    const Color& GetEndColor() const;
+    float GetStartScale() const;
+    float GetEndScale() const;
+    TrailType GetTrailType() const;
+    bool IsSorted() const;
+    float GetLifetime() const;
+    unsigned GetTailColumn() const;
+    bool IsEmitting() const;
+    bool GetUpdateInvisible() const;
+    float GetAnimationLodBias() const;
+
+    tolua_property__get_set Material* material;
+    tolua_property__get_set float vertexDistance;
+    tolua_property__get_set float width;
+    tolua_property__get_set Color& startColor;
+    tolua_property__get_set Color& endColor;
+    tolua_property__get_set float startScale;
+    tolua_property__get_set float endScale;
+    tolua_property__get_set TrailType trailType;
+    tolua_property__is_set bool sorted;
+    tolua_property__get_set float lifetime;
+    tolua_property__get_set unsigned tailColumn;
+    tolua_property__is_set bool emitting;
+    tolua_property__get_set bool updateInvisible;
+    tolua_property__get_set float animationLodBias;
+}

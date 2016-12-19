@@ -1,0 +1,136 @@
+$#include "IO/File.h"
+$#include "Graphics/Graphics.h"
+
+class Graphics : public Object
+{
+    void SetWindowTitle(const String windowTitle);
+    void SetWindowIcon(Image* windowIcon);
+    void SetWindowPosition(const IntVector2& position);
+    void SetWindowPosition(int x, int y);
+
+    bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample);
+    bool SetMode(int width, int height);
+
+    void SetSRGB(bool enable);
+    void SetDither(bool enable);
+    void SetFlushGPU(bool enable);
+    void SetOrientations(const String orientations);
+    bool ToggleFullscreen();
+    void Maximize();
+    void Minimize();
+    void Close();
+    bool TakeScreenShot(Image& destImage);
+    void BeginDumpShaders(const String fileName);
+    void EndDumpShaders();
+    void PrecacheShaders(Deserializer& source);
+    tolua_outside void GraphicsPrecacheShaders @ PrecacheShaders(const String fileName);
+    void SetShaderCacheDir(const String path);
+
+    bool IsInitialized() const;
+    void* GetExternalWindow() const;
+    const String GetWindowTitle() const;
+    const String GetApiName() const;
+    IntVector2 GetWindowPosition() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    int GetMultiSample() const;
+    bool GetFullscreen() const;
+    bool GetResizable() const;
+    bool GetBorderless() const;
+    bool GetVSync() const;
+    bool GetTripleBuffer() const;
+    bool GetSRGB() const;
+    bool GetDither() const;
+    bool GetFlushGPU() const;
+    const String GetOrientations() const;
+    bool IsDeviceLost() const;
+    unsigned GetNumPrimitives() const;
+    unsigned GetNumBatches() const;
+    unsigned GetDummyColorFormat() const;
+    unsigned GetShadowMapFormat() const;
+    unsigned GetHiresShadowMapFormat() const;
+    bool GetInstancingSupport() const;
+    bool GetLightPrepassSupport() const;
+    bool GetDeferredSupport() const;
+    bool GetHardwareShadowSupport() const;
+    bool GetReadableDepthSupport() const;
+    bool GetSRGBSupport() const;
+    bool GetSRGBWriteSupport() const;
+    IntVector2 GetDesktopResolution() const;
+    const String GetShaderCacheDir() const;
+
+    static unsigned GetAlphaFormat();
+    static unsigned GetLuminanceFormat();
+    static unsigned GetLuminanceAlphaFormat();
+    static unsigned GetRGBFormat();
+    static unsigned GetRGBAFormat();
+    static unsigned GetRGBA16Format();
+    static unsigned GetRGBAFloat16Format();
+    static unsigned GetRGBAFloat32Format();
+    static unsigned GetRG16Format();
+    static unsigned GetRGFloat16Format();
+    static unsigned GetRGFloat32Format();
+    static unsigned GetFloat16Format();
+    static unsigned GetFloat32Format();
+    static unsigned GetLinearDepthFormat();
+    static unsigned GetDepthStencilFormat();
+    static unsigned GetReadableDepthFormat();
+    static unsigned GetFormat(const String formatName);
+    static unsigned GetMaxBones();
+
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_property__get_set String windowTitle;
+    tolua_readonly tolua_property__get_set String apiName;
+    tolua_property__get_set IntVector2 windowPosition;
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set bool fullscreen;
+    tolua_readonly tolua_property__get_set bool resizable;
+    tolua_readonly tolua_property__get_set bool borderless;
+    tolua_readonly tolua_property__get_set bool vSync;
+    tolua_readonly tolua_property__get_set bool tripleBuffer;
+    tolua_property__get_set bool sRGB;
+    tolua_property__get_set bool dither;
+    tolua_property__get_set bool flushGPU;
+    tolua_property__get_set String orientations;
+    tolua_readonly tolua_property__is_set bool deviceLost;
+    tolua_readonly tolua_property__get_set unsigned numPrimitives;
+    tolua_readonly tolua_property__get_set unsigned numBatches;
+    tolua_readonly tolua_property__get_set unsigned dummyColorFormat;
+    tolua_readonly tolua_property__get_set unsigned shadowMapFormat;
+    tolua_readonly tolua_property__get_set unsigned hiresShadowMapFormat;
+    tolua_readonly tolua_property__get_set bool instancingSupport;
+    tolua_readonly tolua_property__get_set bool lightPrepassSupport;
+    tolua_readonly tolua_property__get_set bool deferredSupport;
+    tolua_readonly tolua_property__get_set bool hardwareShadowSupport;
+    tolua_readonly tolua_property__get_set bool readableDepthSupport;
+    tolua_readonly tolua_property__get_set bool sRGBSupport;
+    tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
+    tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
+    tolua_property__get_set String shaderCacheDir;
+};
+
+Graphics* GetGraphics();
+tolua_readonly tolua_property__get_set Graphics* graphics;
+
+${
+static void GraphicsPrecacheShaders(Graphics* graphics, const String& fileName)
+{
+    if (!graphics)
+        return;
+
+    File file(graphics->GetContext());
+    if (file.Open(fileName, FILE_READ))
+        graphics->PrecacheShaders(file);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_GetGraphics00
+static int tolua_GraphicsLuaAPI_GetGraphics00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Graphics>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_graphics_ptr
+#define tolua_get_graphics_ptr tolua_GraphicsLuaAPI_GetGraphics00
+$}

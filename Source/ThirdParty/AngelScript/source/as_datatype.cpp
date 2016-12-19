@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -159,7 +159,7 @@ bool asCDataType::IsNullHandle() const
 	return false;
 }
 
-asCString asCDataType::Format(bool includeNamespace) const
+asCString asCDataType::Format(asSNameSpace *currNs, bool includeNamespace) const
 {
 	if( IsNullHandle() )
 		return "<null handle>";
@@ -169,11 +169,13 @@ asCString asCDataType::Format(bool includeNamespace) const
 	if( isReadOnly )
 		str = "const ";
 
-	if( includeNamespace )
+	// If the type is not declared in the current namespace, then the namespace 
+	// must always be informed to guarantee that the correct type is informed
+	if( includeNamespace || (objectType && objectType->nameSpace != currNs) || (funcDef && funcDef->nameSpace != currNs) )
 	{
-		if( objectType )
+		if( objectType && objectType->nameSpace->name != "" )
 			str += objectType->nameSpace->name + "::";
-		else if( funcDef )
+		else if( funcDef && funcDef->nameSpace->name != "" )
 			str += funcDef->nameSpace->name + "::";
 	}
 
@@ -184,7 +186,7 @@ asCString asCDataType::Format(bool includeNamespace) const
 	else if( IsArrayType() && objectType && !objectType->engine->ep.expandDefaultArrayToTemplate )
 	{
 		asASSERT( objectType->templateSubTypes.GetLength() == 1 );
-		str += objectType->templateSubTypes[0].Format(includeNamespace);
+		str += objectType->templateSubTypes[0].Format(currNs, includeNamespace);
 		str += "[]";
 	}
 	else if( funcDef )
@@ -199,7 +201,7 @@ asCString asCDataType::Format(bool includeNamespace) const
 			str += "<";
 			for( asUINT subtypeIndex = 0; subtypeIndex < objectType->templateSubTypes.GetLength(); subtypeIndex++ )
 			{
-				str += objectType->templateSubTypes[subtypeIndex].Format(includeNamespace);
+				str += objectType->templateSubTypes[subtypeIndex].Format(currNs, includeNamespace);
 				if( subtypeIndex != objectType->templateSubTypes.GetLength()-1 )
 					str += ",";
 			}
@@ -225,7 +227,7 @@ asCString asCDataType::Format(bool includeNamespace) const
 			str += "const";
 	}
 
-    if( isReference )
+	if( isReference )
 		str += "&";
 
 	return str;
@@ -289,7 +291,7 @@ int asCDataType::MakeHandle(bool b, bool acceptHandleForScope)
 	return 0;
 }
 
-int asCDataType::MakeArray(asCScriptEngine *engine)
+int asCDataType::MakeArray(asCScriptEngine *engine, asCModule *module)
 {
 	if( engine->defaultArrayObjectType == 0 )
 		return asINVALID_TYPE;
@@ -298,7 +300,7 @@ int asCDataType::MakeArray(asCScriptEngine *engine)
 	isReadOnly = false;
 	asCArray<asCDataType> subTypes;
 	subTypes.PushLast(*this);
-	asCObjectType *at = engine->GetTemplateInstanceType(engine->defaultArrayObjectType, subTypes);
+	asCObjectType *at = engine->GetTemplateInstanceType(engine->defaultArrayObjectType, subTypes, module);
 	isReadOnly = tmpIsReadOnly;
 
 	isObjectHandle = false;
@@ -504,7 +506,7 @@ bool asCDataType::IsEqualExceptConst(const asCDataType &dt) const
 
 bool asCDataType::IsPrimitive() const
 {
-	//	Enumerations are primitives
+	// Enumerations are primitives
 	if( IsEnumType() )
 		return true;
 
@@ -517,6 +519,16 @@ bool asCDataType::IsPrimitive() const
 		return false;
 
 	return true;
+}
+
+bool asCDataType::IsMathType() const
+{
+	if( tokenType == ttInt || tokenType == ttInt8 || tokenType == ttInt16 || tokenType == ttInt64 ||
+		tokenType == ttUInt || tokenType == ttUInt8 || tokenType == ttUInt16 || tokenType == ttUInt64 ||
+		tokenType == ttFloat || tokenType == ttDouble )
+		return true;
+
+	return false;
 }
 
 bool asCDataType::IsIntegerType() const
@@ -633,6 +645,19 @@ int asCDataType::GetSizeOnStackDWords() const
 	return GetSizeInMemoryDWords() + size;
 }
 
+#ifdef WIP_16BYTE_ALIGN
+int  asCDataType::GetAlignment() const
+{
+	if( objectType == NULL )
+	{
+		// TODO: Small primitives should not be aligned to 4 byte boundaries
+		return 4; //Default alignment
+	}
+
+	return objectType->alignment;
+}
+#endif
+
 asSTypeBehaviour *asCDataType::GetBehaviour() const
 { 
 	return objectType ? &objectType->beh : 0; 
@@ -640,6 +665,9 @@ asSTypeBehaviour *asCDataType::GetBehaviour() const
 
 bool asCDataType::IsEnumType() const
 {
+	// Do a sanity check on the objectType, to verify that we aren't trying to access memory after it has been released
+	asASSERT( objectType == 0 || objectType->name.GetLength() < 100 );
+
 	if( objectType && (objectType->flags & asOBJ_ENUM) )
 		return true;
 

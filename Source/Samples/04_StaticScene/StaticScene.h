@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ class Scene;
 ///     - Handling keyboard and mouse input to move a freelook camera
 class StaticScene : public Sample
 {
-    OBJECT(StaticScene);
+    URHO3D_OBJECT(StaticScene, Sample);
 
 public:
     /// Construct.

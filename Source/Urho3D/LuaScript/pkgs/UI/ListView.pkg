@@ -1,0 +1,105 @@
+$#include "UI/ListView.h"
+
+enum HighlightMode
+{
+    HM_NEVER,
+    HM_FOCUS,
+    HM_ALWAYS
+};
+
+class HierarchyContainer : public UIElement
+{
+};
+
+class ListView : public ScrollView
+{
+    ListView();
+    virtual ~ListView();
+    
+    void AddItem(UIElement* item);
+    
+    void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
+    void RemoveItem(UIElement* item, unsigned index = 0);
+    
+    void RemoveItem(unsigned index);
+    void RemoveAllItems();
+    void SetSelection(unsigned index);
+    void SetSelections(const PODVector<unsigned>& indices);
+    void AddSelection(unsigned index);
+    void RemoveSelection(unsigned index);
+    void ToggleSelection(unsigned index);
+    
+    void ChangeSelection(int delta, bool additive = false);
+    void ClearSelection();
+    void SetHighlightMode(HighlightMode mode);
+    void SetMultiselect(bool enable);
+    void SetHierarchyMode(bool enable);
+    void SetBaseIndent(int baseIndent);
+    void SetClearSelectionOnDefocus(bool enable);
+    void SetSelectOnClickEnd(bool enable);
+
+    void Expand(unsigned index, bool enable, bool recursive = false);
+    void ToggleExpand(unsigned index, bool recursive = false);
+
+    unsigned GetNumItems() const;
+    UIElement* GetItem(unsigned index) const;
+
+    // PODVector<UIElement*> GetItems() const;
+    tolua_outside const PODVector<UIElement*>& ListViewGetItems @ GetItems() const;
+
+    unsigned FindItem(UIElement* item) const;
+    unsigned GetSelection() const;
+    const PODVector<unsigned>& GetSelections() const;
+    void CopySelectedItemsToClipboard() const;
+    UIElement* GetSelectedItem() const;
+
+    // PODVector<UIElement*> GetSelectedItems() const;
+    tolua_outside const PODVector<UIElement*>& ListViewGetSelectedItems @ GetSelectedItems() const;
+
+    bool IsSelected(unsigned index) const;
+    bool IsExpanded(unsigned index) const;
+    HighlightMode GetHighlightMode() const;
+    bool GetMultiselect() const;
+    bool GetClearSelectionOnDefocus() const;
+    bool GetSelectOnClickEnd() const;
+    bool GetHierarchyMode() const;
+    int GetBaseIndent() const;
+
+    tolua_readonly tolua_property__get_set unsigned numItems;
+    tolua_property__get_set unsigned selection;
+    tolua_readonly tolua_property__get_set UIElement* selectedItem;
+    tolua_property__get_set HighlightMode highlightMode;
+    tolua_property__get_set bool multiselect;
+    tolua_property__get_set bool clearSelectionOnDefocus;
+    tolua_property__get_set bool selectOnClickEnd;
+    tolua_property__get_set bool hierarchyMode;
+    tolua_property__get_set int baseIndent;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_ListView_new00
+static int tolua_UILuaAPI_ListView_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ListView>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_ListView_new00_local
+static int tolua_UILuaAPI_ListView_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ListView>(tolua_S);
+}
+
+static const PODVector<UIElement*>& ListViewGetItems(const ListView* listView)
+{
+    static PODVector<UIElement*> items;
+    items = listView->GetItems();
+    return items;
+}
+
+static const PODVector<UIElement*>& ListViewGetSelectedItems(const ListView* listView)
+{
+    static PODVector<UIElement*> items;
+    items = listView->GetSelectedItems();
+    return items;
+}
+$}

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -141,15 +141,15 @@ static const SDL_Scancode xfree86_scancode_table[] = {
     /*  112 */  SDL_SCANCODE_F15,
     /*  113 */  SDL_SCANCODE_F16,
     /*  114 */  SDL_SCANCODE_F17,
-    /*  115 */  SDL_SCANCODE_UNKNOWN,
+    /*  115 */  SDL_SCANCODE_INTERNATIONAL1, /* \_ */
     /*  116 */  SDL_SCANCODE_UNKNOWN, /* is translated to XK_ISO_Level3_Shift by my X server, but I have no keyboard that generates this code, so I don't know what the correct SDL_SCANCODE_* for it is */
     /*  117 */  SDL_SCANCODE_UNKNOWN,
     /*  118 */  SDL_SCANCODE_KP_EQUALS,
     /*  119 */  SDL_SCANCODE_UNKNOWN,
     /*  120 */  SDL_SCANCODE_UNKNOWN,
-    /*  121 */  SDL_SCANCODE_UNKNOWN,
+    /*  121 */  SDL_SCANCODE_INTERNATIONAL4, /* Henkan_Mode */
     /*  122 */  SDL_SCANCODE_UNKNOWN,
-    /*  123 */  SDL_SCANCODE_UNKNOWN,
+    /*  123 */  SDL_SCANCODE_INTERNATIONAL5, /* Muhenkan */
     /*  124 */  SDL_SCANCODE_UNKNOWN,
     /*  125 */  SDL_SCANCODE_INTERNATIONAL3, /* Yen */
     /*  126 */  SDL_SCANCODE_UNKNOWN,
@@ -266,12 +266,12 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /*  86 */   SDL_SCANCODE_NONUSBACKSLASH,
     /*  87 */   SDL_SCANCODE_F11,
     /*  88 */   SDL_SCANCODE_F12,
-    /*  89 */   SDL_SCANCODE_UNKNOWN,
+    /*  89 */   SDL_SCANCODE_INTERNATIONAL1, /* \_ */
     /*  90 */   SDL_SCANCODE_UNKNOWN,   /* Katakana */
     /*  91 */   SDL_SCANCODE_UNKNOWN,   /* Hiragana */
-    /*  92 */   SDL_SCANCODE_UNKNOWN,   /* Henkan_Mode */
-    /*  93 */   SDL_SCANCODE_UNKNOWN,   /* Hiragana_Katakana */
-    /*  94 */   SDL_SCANCODE_UNKNOWN,   /* Muhenkan */
+    /*  92 */   SDL_SCANCODE_INTERNATIONAL4, /* Henkan_Mode */
+    /*  93 */   SDL_SCANCODE_INTERNATIONAL2, /* Hiragana_Katakana */
+    /*  94 */   SDL_SCANCODE_INTERNATIONAL5, /* Muhenkan */
     /*  95 */   SDL_SCANCODE_UNKNOWN,
     /*  96 */   SDL_SCANCODE_KP_ENTER,
     /*  97 */   SDL_SCANCODE_RCTRL,
@@ -301,7 +301,7 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 121 */   SDL_SCANCODE_UNKNOWN,   /* KP_Decimal */
     /* 122 */   SDL_SCANCODE_UNKNOWN,   /* Hangul */
     /* 123 */   SDL_SCANCODE_UNKNOWN,   /* Hangul_Hanja */
-    /* 124 */   SDL_SCANCODE_UNKNOWN,
+    /* 124 */   SDL_SCANCODE_INTERNATIONAL3, /* Yen */
     /* 125 */   SDL_SCANCODE_LGUI,
     /* 126 */   SDL_SCANCODE_RGUI,
     /* 127 */   SDL_SCANCODE_APPLICATION,
@@ -416,6 +416,91 @@ static const SDL_Scancode xfree86_scancode_table2[] = {
     /* 236 */   SDL_SCANCODE_UNKNOWN,   /* XF86Battery */
     /* 237 */   SDL_SCANCODE_UNKNOWN,   /* XF86Bluetooth */
     /* 238 */   SDL_SCANCODE_UNKNOWN,   /* XF86WLAN */
+};
+
+/* Xvnc / Xtightvnc scancodes from xmodmap -pk */
+static const SDL_Scancode xvnc_scancode_table[] = {
+    /*  0 */    SDL_SCANCODE_LCTRL,
+    /*  1 */    SDL_SCANCODE_RCTRL,
+    /*  2 */    SDL_SCANCODE_LSHIFT,
+    /*  3 */    SDL_SCANCODE_RSHIFT,
+    /*  4 */    SDL_SCANCODE_UNKNOWN, /* Meta_L */
+    /*  5 */    SDL_SCANCODE_UNKNOWN, /* Meta_R */
+    /*  6 */    SDL_SCANCODE_LALT,
+    /*  7 */    SDL_SCANCODE_RALT,
+    /*  8 */    SDL_SCANCODE_SPACE,
+    /*  9 */    SDL_SCANCODE_0,
+    /*  10 */   SDL_SCANCODE_1,
+    /*  11 */   SDL_SCANCODE_2,
+    /*  12 */   SDL_SCANCODE_3,
+    /*  13 */   SDL_SCANCODE_4,
+    /*  14 */   SDL_SCANCODE_5,
+    /*  15 */   SDL_SCANCODE_6,
+    /*  16 */   SDL_SCANCODE_7,
+    /*  17 */   SDL_SCANCODE_8,
+    /*  18 */   SDL_SCANCODE_9,
+    /*  19 */   SDL_SCANCODE_MINUS,
+    /*  20 */   SDL_SCANCODE_EQUALS,
+    /*  21 */   SDL_SCANCODE_LEFTBRACKET,
+    /*  22 */   SDL_SCANCODE_RIGHTBRACKET,
+    /*  23 */   SDL_SCANCODE_SEMICOLON,
+    /*  24 */   SDL_SCANCODE_APOSTROPHE,
+    /*  25 */   SDL_SCANCODE_GRAVE,
+    /*  26 */   SDL_SCANCODE_COMMA,
+    /*  27 */   SDL_SCANCODE_PERIOD,
+    /*  28 */   SDL_SCANCODE_SLASH,
+    /*  29 */   SDL_SCANCODE_BACKSLASH,
+    /*  30 */   SDL_SCANCODE_A,
+    /*  31 */   SDL_SCANCODE_B,
+    /*  32 */   SDL_SCANCODE_C,
+    /*  33 */   SDL_SCANCODE_D,
+    /*  34 */   SDL_SCANCODE_E,
+    /*  35 */   SDL_SCANCODE_F,
+    /*  36 */   SDL_SCANCODE_G,
+    /*  37 */   SDL_SCANCODE_H,
+    /*  38 */   SDL_SCANCODE_I,
+    /*  39 */   SDL_SCANCODE_J,
+    /*  40 */   SDL_SCANCODE_K,
+    /*  41 */   SDL_SCANCODE_L,
+    /*  42 */   SDL_SCANCODE_M,
+    /*  43 */   SDL_SCANCODE_N,
+    /*  44 */   SDL_SCANCODE_O,
+    /*  45 */   SDL_SCANCODE_P,
+    /*  46 */   SDL_SCANCODE_Q,
+    /*  47 */   SDL_SCANCODE_R,
+    /*  48 */   SDL_SCANCODE_S,
+    /*  49 */   SDL_SCANCODE_T,
+    /*  50 */   SDL_SCANCODE_U,
+    /*  51 */   SDL_SCANCODE_V,
+    /*  52 */   SDL_SCANCODE_W,
+    /*  53 */   SDL_SCANCODE_X,
+    /*  54 */   SDL_SCANCODE_Y,
+    /*  55 */   SDL_SCANCODE_Z,
+    /*  56 */   SDL_SCANCODE_BACKSPACE,
+    /*  57 */   SDL_SCANCODE_RETURN,
+    /*  58 */   SDL_SCANCODE_TAB,
+    /*  59 */   SDL_SCANCODE_ESCAPE,
+    /*  60 */   SDL_SCANCODE_DELETE,
+    /*  61 */   SDL_SCANCODE_HOME,
+    /*  62 */   SDL_SCANCODE_END,
+    /*  63 */   SDL_SCANCODE_PAGEUP,
+    /*  64 */   SDL_SCANCODE_PAGEDOWN,
+    /*  65 */   SDL_SCANCODE_UP,
+    /*  66 */   SDL_SCANCODE_DOWN,
+    /*  67 */   SDL_SCANCODE_LEFT,
+    /*  68 */   SDL_SCANCODE_RIGHT,
+    /*  69 */   SDL_SCANCODE_F1,
+    /*  70 */   SDL_SCANCODE_F2,
+    /*  71 */   SDL_SCANCODE_F3,
+    /*  72 */   SDL_SCANCODE_F4,
+    /*  73 */   SDL_SCANCODE_F5,
+    /*  74 */   SDL_SCANCODE_F6,
+    /*  75 */   SDL_SCANCODE_F7,
+    /*  76 */   SDL_SCANCODE_F8,
+    /*  77 */   SDL_SCANCODE_F9,
+    /*  78 */   SDL_SCANCODE_F10,
+    /*  79 */   SDL_SCANCODE_F11,
+    /*  80 */   SDL_SCANCODE_F12,
 };
 
 /* *INDENT-ON* */

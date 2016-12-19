@@ -1,0 +1,54 @@
+$#include "Engine/Engine.h"
+
+class Engine : public Object
+{
+    void RunFrame();
+    
+    Console* CreateConsole();
+    DebugHud* CreateDebugHud();
+
+    void SetMinFps(int fps);
+    void SetMaxFps(int fps);
+    void SetMaxInactiveFps(int fps);
+    void SetTimeStepSmoothing(int frames);
+    void SetPauseMinimized(bool enable);
+    void SetAutoExit(bool enable);
+    void Exit();
+    void DumpProfiler();
+    void DumpResources(bool dumpFileName = false);
+    void DumpMemory();
+
+    int GetMinFps() const;
+    int GetMaxFps() const;
+    int GetMaxInactiveFps() const;
+    int GetTimeStepSmoothing() const;
+    bool GetPauseMinimized() const;
+    bool GetAutoExit() const;
+    bool IsInitialized() const;
+    bool IsExiting() const;
+    bool IsHeadless() const;
+
+    tolua_property__get_set int minFps;
+    tolua_property__get_set int maxFps;
+    tolua_property__get_set int maxInactiveFps;
+    tolua_property__get_set int timeStepSmoothing;
+    tolua_property__get_set bool pauseMinimized;
+    tolua_property__get_set bool autoExit;
+    tolua_readonly tolua_property__is_set bool initialized;
+    tolua_readonly tolua_property__is_set bool exiting;
+    tolua_readonly tolua_property__is_set bool headless;
+};
+
+Engine* GetEngine();
+tolua_readonly tolua_property__get_set Engine* engine;
+
+${
+#define TOLUA_DISABLE_tolua_EngineLuaAPI_GetEngine00
+static int tolua_EngineLuaAPI_GetEngine00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Engine>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_engine_ptr
+#define tolua_get_engine_ptr tolua_EngineLuaAPI_GetEngine00
+$}

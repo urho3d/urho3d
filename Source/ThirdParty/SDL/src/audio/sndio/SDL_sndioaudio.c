@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -36,7 +36,6 @@
 #include <unistd.h>
 
 #include "SDL_audio.h"
-#include "../SDL_audiomem.h"
 #include "../SDL_audio_c.h"
 #include "SDL_sndioaudio.h"
 
@@ -158,7 +157,7 @@ SNDIO_PlayDevice(_THIS)
 
     /* If we couldn't write, assume fatal error for now */
     if ( written == 0 ) {
-        this->enabled = 0;
+        SDL_OpenedAudioDeviceDisconnected(this);
     }
 #ifdef DEBUG_AUDIO
     fprintf(stderr, "Wrote %d bytes of audio data\n", written);
@@ -172,28 +171,18 @@ SNDIO_GetDeviceBuf(_THIS)
 }
 
 static void
-SNDIO_WaitDone(_THIS)
-{
-    SNDIO_sio_stop(this->hidden->dev);
-}
-
-static void
 SNDIO_CloseDevice(_THIS)
 {
-    if (this->hidden != NULL) {
-        SDL_FreeAudioMem(this->hidden->mixbuf);
-        this->hidden->mixbuf = NULL;
-        if ( this->hidden->dev != NULL ) {
-            SNDIO_sio_close(this->hidden->dev);
-            this->hidden->dev = NULL;
-        }
-        SDL_free(this->hidden);
-        this->hidden = NULL;
+    if ( this->hidden->dev != NULL ) {
+        SNDIO_sio_stop(this->hidden->dev);
+        SNDIO_sio_close(this->hidden->dev);
     }
+    SDL_free(this->hidden->mixbuf);
+    SDL_free(this->hidden);
 }
 
 static int
-SNDIO_OpenDevice(_THIS, const char *devname, int iscapture)
+SNDIO_OpenDevice(_THIS, void *handle, const char *devname, int iscapture)
 {
     SDL_AudioFormat test_format = SDL_FirstAudioFormat(this->spec.format);
     struct sio_par par;
@@ -204,13 +193,12 @@ SNDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     if (this->hidden == NULL) {
         return SDL_OutOfMemory();
     }
-    SDL_memset(this->hidden, 0, sizeof(*this->hidden));
+    SDL_zerop(this->hidden);
 
     this->hidden->mixlen = this->spec.size;
 
     /* !!! FIXME: SIO_DEVANY can be a specific device... */
-    if ((this->hidden->dev = SNDIO_sio_open(NULL, SIO_PLAY, 0)) == NULL) {
-        SNDIO_CloseDevice(this);
+    if ((this->hidden->dev = SNDIO_sio_open(SIO_DEVANY, SIO_PLAY, 0)) == NULL) {
         return SDL_SetError("sio_open() failed");
     }
 
@@ -229,7 +217,16 @@ SNDIO_OpenDevice(_THIS, const char *devname, int iscapture)
             par.sig = SDL_AUDIO_ISSIGNED(test_format) ? 1 : 0;
             par.bits = SDL_AUDIO_BITSIZE(test_format);
 
-            if (SNDIO_sio_setpar(this->hidden->dev, &par) == 1) {
+            if (SNDIO_sio_setpar(this->hidden->dev, &par) == 0) {
+                continue;
+            }
+            if (SNDIO_sio_getpar(this->hidden->dev, &par) == 0) {
+                return SDL_SetError("sio_getpar() failed");
+            }
+            if (par.bps != SIO_BPS(par.bits)) {
+                continue;
+            }
+            if ((par.bits == 8 * par.bps) || (par.msb)) {
                 status = 0;
                 break;
             }
@@ -238,33 +235,26 @@ SNDIO_OpenDevice(_THIS, const char *devname, int iscapture)
     }
 
     if (status < 0) {
-        SNDIO_CloseDevice(this);
         return SDL_SetError("sndio: Couldn't find any hardware audio formats");
     }
 
-    if (SNDIO_sio_getpar(this->hidden->dev, &par) == 0) {
-        SNDIO_CloseDevice(this);
-        return SDL_SetError("sio_getpar() failed");
-    }
-
-    if ((par.bits == 32) && (par.sig) && (par.le))
+    if ((par.bps == 4) && (par.sig) && (par.le))
         this->spec.format = AUDIO_S32LSB;
-    else if ((par.bits == 32) && (par.sig) && (!par.le))
+    else if ((par.bps == 4) && (par.sig) && (!par.le))
         this->spec.format = AUDIO_S32MSB;
-    else if ((par.bits == 16) && (par.sig) && (par.le))
+    else if ((par.bps == 2) && (par.sig) && (par.le))
         this->spec.format = AUDIO_S16LSB;
-    else if ((par.bits == 16) && (par.sig) && (!par.le))
+    else if ((par.bps == 2) && (par.sig) && (!par.le))
         this->spec.format = AUDIO_S16MSB;
-    else if ((par.bits == 16) && (!par.sig) && (par.le))
+    else if ((par.bps == 2) && (!par.sig) && (par.le))
         this->spec.format = AUDIO_U16LSB;
-    else if ((par.bits == 16) && (!par.sig) && (!par.le))
+    else if ((par.bps == 2) && (!par.sig) && (!par.le))
         this->spec.format = AUDIO_U16MSB;
-    else if ((par.bits == 8) && (par.sig))
+    else if ((par.bps == 1) && (par.sig))
         this->spec.format = AUDIO_S8;
-    else if ((par.bits == 8) && (!par.sig))
+    else if ((par.bps == 1) && (!par.sig))
         this->spec.format = AUDIO_U8;
     else {
-        SNDIO_CloseDevice(this);
         return SDL_SetError("sndio: Got unsupported hardware audio format.");
     }
 
@@ -277,9 +267,8 @@ SNDIO_OpenDevice(_THIS, const char *devname, int iscapture)
 
     /* Allocate mixing buffer */
     this->hidden->mixlen = this->spec.size;
-    this->hidden->mixbuf = (Uint8 *) SDL_AllocAudioMem(this->hidden->mixlen);
+    this->hidden->mixbuf = (Uint8 *) SDL_malloc(this->hidden->mixlen);
     if (this->hidden->mixbuf == NULL) {
-        SNDIO_CloseDevice(this);
         return SDL_OutOfMemory();
     }
     SDL_memset(this->hidden->mixbuf, this->spec.silence, this->hidden->mixlen);
@@ -310,7 +299,6 @@ SNDIO_Init(SDL_AudioDriverImpl * impl)
     impl->WaitDevice = SNDIO_WaitDevice;
     impl->PlayDevice = SNDIO_PlayDevice;
     impl->GetDeviceBuf = SNDIO_GetDeviceBuf;
-    impl->WaitDone = SNDIO_WaitDone;
     impl->CloseDevice = SNDIO_CloseDevice;
     impl->Deinitialize = SNDIO_Deinitialize;
     impl->OnlyHasDefaultOutputDevice = 1;  /* !!! FIXME: sndio can handle multiple devices. */

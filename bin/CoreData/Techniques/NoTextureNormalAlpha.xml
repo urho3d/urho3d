@@ -1,0 +1,5 @@
+<technique vs="LitSolid" ps="LitSolid">
+    <pass name="alpha"  depthwrite="false" blend="alpha" />
+    <pass name="litalpha" vsdefines="NORMALMAP" psdefines="NORMALMAP" depthwrite="false" blend="addalpha" />
+    <pass name="shadow" vs="Shadow" ps="Shadow" psexcludes="PACKEDNORMAL" />
+</technique>

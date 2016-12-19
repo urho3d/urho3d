@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,28 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "Text3D.h"
-#include "UI.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Text3D.h>
+#include <Urho3D/UI/UI.h>
 
 #include "SignedDistanceFieldText.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(SignedDistanceFieldText)
+URHO3D_DEFINE_APPLICATION_MAIN(SignedDistanceFieldText)
 
 SignedDistanceFieldText::SignedDistanceFieldText(Context* context) :
     Sample(context)
@@ -64,6 +64,9 @@ void SignedDistanceFieldText::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void SignedDistanceFieldText::CreateScene()
@@ -118,7 +121,7 @@ void SignedDistanceFieldText::CreateScene()
         mushroomTitleText->SetFont(cache->GetResource<Font>("Fonts/BlueHighway.sdf"), 24);
 
         mushroomTitleText->SetColor(Color::RED);
-        
+
         if (i % 3 == 1)
         {
             mushroomTitleText->SetColor(Color::GREEN);
@@ -195,20 +198,20 @@ void SignedDistanceFieldText::MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     // Use the Translate() function (default local space) to move relative to the node's orientation.
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::BACK * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
 void SignedDistanceFieldText::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(SignedDistanceFieldText, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(SignedDistanceFieldText, HandleUpdate));
 }
 
 void SignedDistanceFieldText::HandleUpdate(StringHash eventType, VariantMap& eventData)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,32 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionBox2D.h"
-#include "CollisionCircle2D.h"
-#include "CoreEvents.h"
-#include "DebugRenderer.h"
-#include "Drawable2D.h"
-#include "Engine.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "PhysicsWorld2D.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
-#include "Text.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/Urho2D/CollisionBox2D.h>
+#include <Urho3D/Urho2D/CollisionCircle2D.h>
+#include <Urho3D/Urho2D/Drawable2D.h>
+#include <Urho3D/Urho2D/PhysicsWorld2D.h>
+#include <Urho3D/Urho2D/RigidBody2D.h>
+#include <Urho3D/Urho2D/Sprite2D.h>
+#include <Urho3D/Urho2D/StaticSprite2D.h>
+
 #include "Urho2DPhysics.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DPhysics)
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DPhysics)
 
 static const unsigned NUM_OBJECTS = 100;
 
@@ -69,6 +70,9 @@ void Urho2DPhysics::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DPhysics::CreateScene()
@@ -86,9 +90,10 @@ void Urho2DPhysics::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
+    camera->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     // Create 2D physics world component
-    PhysicsWorld2D* physicsWorld = scene_->CreateComponent<PhysicsWorld2D>();
+    /*PhysicsWorld2D* physicsWorld = */scene_->CreateComponent<PhysicsWorld2D>();
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Sprite2D* boxSprite = cache->GetResource<Sprite2D>("Urho2D/Box.png");
@@ -100,7 +105,7 @@ void Urho2DPhysics::CreateScene()
     groundNode->SetScale(Vector3(200.0f, 1.0f, 0.0f));
 
     // Create 2D rigid body for gound
-    RigidBody2D* groundBody = groundNode->CreateComponent<RigidBody2D>();
+    /*RigidBody2D* groundBody = */groundNode->CreateComponent<RigidBody2D>();
 
     StaticSprite2D* groundSprite = groundNode->CreateComponent<StaticSprite2D>();
     groundSprite->SetSprite(boxSprite);
@@ -193,13 +198,13 @@ void Urho2DPhysics::MoveCamera(float timeStep)
     const float MOVE_SPEED = 4.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     if (input->GetKeyDown(KEY_PAGEUP))
@@ -218,7 +223,7 @@ void Urho2DPhysics::MoveCamera(float timeStep)
 void Urho2DPhysics::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DPhysics, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DPhysics, HandleUpdate));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);

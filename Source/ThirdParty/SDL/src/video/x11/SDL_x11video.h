@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -34,6 +34,9 @@
 #if SDL_VIDEO_DRIVER_X11_XCURSOR
 #include <X11/Xcursor/Xcursor.h>
 #endif
+#if SDL_VIDEO_DRIVER_X11_XDBE
+#include <X11/extensions/Xdbe.h>
+#endif
 #if SDL_VIDEO_DRIVER_X11_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -53,10 +56,8 @@
 #include <X11/extensions/xf86vmode.h>
 #endif
 
-#ifdef HAVE_DBUS_DBUS_H
-#define SDL_USE_LIBDBUS 1
-#include <dbus/dbus.h>
-#endif
+#include "../../core/linux/SDL_dbus.h"
+#include "../../core/linux/SDL_ime.h"
 
 #include "SDL_x11dyn.h"
 
@@ -80,6 +81,7 @@ typedef struct SDL_VideoData
     int numwindows;
     SDL_WindowData **windowlist;
     int windowlistlength;
+    XID window_group;
 
     /* This is true for ICCCM2.0-compliant window managers */
     SDL_bool net_wm;
@@ -87,19 +89,26 @@ typedef struct SDL_VideoData
     /* Useful atoms */
     Atom WM_PROTOCOLS;
     Atom WM_DELETE_WINDOW;
+    Atom WM_TAKE_FOCUS;
     Atom _NET_WM_STATE;
     Atom _NET_WM_STATE_HIDDEN;
     Atom _NET_WM_STATE_FOCUSED;
     Atom _NET_WM_STATE_MAXIMIZED_VERT;
     Atom _NET_WM_STATE_MAXIMIZED_HORZ;
     Atom _NET_WM_STATE_FULLSCREEN;
+    Atom _NET_WM_STATE_ABOVE;
+    Atom _NET_WM_STATE_SKIP_TASKBAR;
+    Atom _NET_WM_STATE_SKIP_PAGER;
     Atom _NET_WM_ALLOWED_ACTIONS;
     Atom _NET_WM_ACTION_FULLSCREEN;
     Atom _NET_WM_NAME;
     Atom _NET_WM_ICON_NAME;
     Atom _NET_WM_ICON;
     Atom _NET_WM_PING;
+    Atom _NET_WM_WINDOW_OPACITY;
+    Atom _NET_WM_USER_TIME;
     Atom _NET_ACTIVE_WINDOW;
+    Atom _NET_FRAME_EXTENTS;
     Atom UTF8_STRING;
     Atom PRIMARY;
     Atom XdndEnter;
@@ -110,19 +119,23 @@ typedef struct SDL_VideoData
     Atom XdndDrop;
     Atom XdndFinished;
     Atom XdndSelection;
+    Atom XKLAVIER_STATE;
 
     SDL_Scancode key_layout[256];
     SDL_bool selection_waiting;
 
-#if SDL_USE_LIBDBUS
-    DBusConnection *dbus;
+    Uint32 last_mode_change_deadline;
+
+    SDL_bool global_mouse_changed;
+    SDL_Point global_mouse_position;
+    Uint32 global_mouse_buttons;
+
+#if SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM
+    XkbDescPtr xkb;
 #endif
 } SDL_VideoData;
 
 extern SDL_bool X11_UseDirectColorVisuals(void);
-
-SDL_bool SDL_dbus_screensaver_inhibit(_THIS);
-void SDL_dbus_screensaver_tickle(_THIS);
 
 #endif /* _SDL_x11video_h */
 

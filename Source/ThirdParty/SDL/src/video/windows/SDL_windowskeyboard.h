@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,8 @@
 extern void WIN_InitKeyboard(_THIS);
 extern void WIN_UpdateKeymap(void);
 extern void WIN_QuitKeyboard(_THIS);
+
+extern void WIN_ResetDeadKeys(void);
 
 extern void WIN_StartTextInput(_THIS);
 extern void WIN_StopTextInput(_THIS);

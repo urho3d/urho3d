@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,11 +41,6 @@
 #include "../SDL_sysjoystick.h"
 #include "../SDL_joystick_c.h"
 #include "SDL_sysjoystick_c.h"
-
-/* !!! FIXME: move this somewhere else. */
-#if !SDL_EVENTS_DISABLED
-#include "../../events/SDL_events_c.h"
-#endif
 
 /* This isn't defined in older Linux kernel headers */
 #ifndef SYN_DROPPED
@@ -142,13 +137,15 @@ IsJoystick(int fd, char *namebuf, const size_t namebuflen, SDL_JoystickGUID *gui
 #if SDL_USE_LIBUDEV
 void joystick_udev_callback(SDL_UDEV_deviceevent udev_type, int udev_class, const char *devpath)
 {
-    if (devpath == NULL || !(udev_class & SDL_UDEV_DEVICE_JOYSTICK)) {
+    if (devpath == NULL) {
         return;
     }
-    
-    switch( udev_type )
-    {
+
+    switch (udev_type) {
         case SDL_UDEV_DEVICEADDED:
+            if (!(udev_class & SDL_UDEV_DEVICE_JOYSTICK)) {
+                return;
+            }
             MaybeAddDevice(devpath);
             break;
             
@@ -174,9 +171,6 @@ MaybeAddDevice(const char *path)
     char namebuf[128];
     SDL_JoystickGUID guid;
     SDL_joylist_item *item;
-#if !SDL_EVENTS_DISABLED
-    SDL_Event event;
-#endif
 
     if (path == NULL) {
         return -1;
@@ -237,18 +231,7 @@ MaybeAddDevice(const char *path)
     /* Need to increment the joystick count before we post the event */
     ++numjoysticks;
 
-    /* !!! FIXME: Move this to an SDL_PrivateJoyDeviceAdded() function? */
-#if !SDL_EVENTS_DISABLED
-    event.type = SDL_JOYDEVICEADDED;
-
-    if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-        event.jdevice.which = (numjoysticks - 1);
-        if ( (SDL_EventOK == NULL) ||
-             (*SDL_EventOK) (SDL_EventOKParam, &event) ) {
-            SDL_PushEvent(&event);
-        }
-    }
-#endif /* !SDL_EVENTS_DISABLED */
+    SDL_PrivateJoystickAdded(numjoysticks - 1);
 
     return numjoysticks;
 }
@@ -260,9 +243,6 @@ MaybeRemoveDevice(const char *path)
 {
     SDL_joylist_item *item;
     SDL_joylist_item *prev = NULL;
-#if !SDL_EVENTS_DISABLED
-    SDL_Event event;
-#endif
 
     if (path == NULL) {
         return -1;
@@ -288,18 +268,7 @@ MaybeRemoveDevice(const char *path)
             /* Need to decrement the joystick count before we post the event */
             --numjoysticks;
 
-            /* !!! FIXME: Move this to an SDL_PrivateJoyDeviceRemoved() function? */
-#if !SDL_EVENTS_DISABLED
-            event.type = SDL_JOYDEVICEREMOVED;
-
-            if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-                event.jdevice.which = item->device_instance;
-                if ( (SDL_EventOK == NULL) ||
-                     (*SDL_EventOK) (SDL_EventOKParam, &event) ) {
-                    SDL_PushEvent(&event);
-                }
-            }
-#endif /* !SDL_EVENTS_DISABLED */
+            SDL_PrivateJoystickRemoved(item->device_instance);
 
             SDL_free(item->path);
             SDL_free(item->name);
@@ -335,13 +304,12 @@ JoystickInitWithoutUdev(void)
 static int
 JoystickInitWithUdev(void)
 {
-
     if (SDL_UDEV_Init() < 0) {
         return SDL_SetError("Could not initialize UDEV");
     }
 
     /* Set up the udev callback */
-    if ( SDL_UDEV_AddCallback(joystick_udev_callback) < 0) {
+    if (SDL_UDEV_AddCallback(joystick_udev_callback) < 0) {
         SDL_UDEV_Quit();
         return SDL_SetError("Could not set up joystick <-> udev callback");
     }
@@ -390,15 +358,6 @@ void SDL_SYS_JoystickDetect()
     SDL_UDEV_Poll();
 #endif
     
-}
-
-SDL_bool SDL_SYS_JoystickNeedsPolling()
-{
-#if SDL_USE_LIBUDEV
-    return SDL_TRUE;
-#endif
-    
-    return SDL_FALSE;
 }
 
 static SDL_joylist_item *
@@ -500,7 +459,7 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
                 ++joystick->nbuttons;
             }
         }
-        for (i = 0; i < ABS_MISC; ++i) {
+        for (i = 0; i < ABS_MAX; ++i) {
             /* Skip hats */
             if (i == ABS_HAT0X) {
                 i = ABS_HAT3Y;
@@ -574,7 +533,7 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
 
 
 /* Function to open a joystick for use.
-   The joystick to open is specified by the index field of the joystick.
+   The joystick to open is specified by the device index.
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
@@ -629,10 +588,10 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
     return (0);
 }
 
-/* Function to determine is this joystick is attached to the system right now */
+/* Function to determine if this joystick is attached to the system right now */
 SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
 {
-    return !joystick->closed && (joystick->hwdata->item != NULL);
+    return joystick->hwdata->item != NULL;
 }
 
 static SDL_INLINE void
@@ -761,10 +720,6 @@ HandleInputEvents(SDL_Joystick * joystick)
                 }
                 break;
             case EV_ABS:
-                if (code >= ABS_MISC) {
-                    break;
-                }
-
                 switch (code) {
                 case ABS_HAT0X:
                 case ABS_HAT0Y:
@@ -849,9 +804,7 @@ SDL_SYS_JoystickClose(SDL_Joystick * joystick)
         SDL_free(joystick->hwdata->balls);
         SDL_free(joystick->hwdata->fname);
         SDL_free(joystick->hwdata);
-        joystick->hwdata = NULL;
     }
-    joystick->closed = 1;
 }
 
 /* Function to perform any system-specific joystick related cleanup */

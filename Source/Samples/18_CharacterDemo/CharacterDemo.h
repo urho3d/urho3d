@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ class Touch;
 ///     - Using touch inputs/gyroscope for iOS/Android (implemented through an external file)
 class CharacterDemo : public Sample
 {
-    OBJECT(CharacterDemo);
+    URHO3D_OBJECT(CharacterDemo, Sample);
 
 public:
     /// Construct.

@@ -44,12 +44,12 @@ void EventArray::AddEvent(const Event &e)
 {
 	if (e.IsNull())
 	{
-		LOG(LogError, "EventArray::AddEvent: Error! Tried to add a null event to event array at index %d!", numAdded);
+		KNET_LOG(LogError, "EventArray::AddEvent: Error! Tried to add a null event to event array at index %d!", numAdded);
 		return;
 	}
 	if (numAdded >= maxEvents)
 	{
-		LOG(LogError, "EventArray::AddEvent: Error! Tried to add too many events to event array! (max: %d)", numAdded);
+		KNET_LOG(LogError, "EventArray::AddEvent: Error! Tried to add too many events to event array! (max: %d)", numAdded);
 		return;
 	}
 	assert(numAdded < maxEvents);
@@ -68,10 +68,10 @@ int EventArray::Wait(int msecs)
 		return WaitTimedOut;
 	else
 	{
-		LOG(LogError, "EventArray::Wait: WSAWaitForMultipleEvents failed with error code %d (WSAGetLastError: %d)!", (int)ret, (int)WSAGetLastError());
+		KNET_LOG(LogError, "EventArray::Wait: WSAWaitForMultipleEvents failed with error code %d (WSAGetLastError: %d)!", (int)ret, (int)WSAGetLastError());
 		for(int i = 0; i < numAdded; ++i)
 			if (WSAWaitForMultipleEvents(1, events+i, FALSE, 0, FALSE) == WSA_WAIT_FAILED)
-				LOG(LogError, "EventArray::Wait: EventArray event at index %d is not valid!", i);
+				KNET_LOG(LogError, "EventArray::Wait: EventArray event at index %d is not valid!", i);
 
 		return WaitFailed;
 	}

@@ -1,0 +1,186 @@
+$#include "LuaScript/LuaScript.h"
+
+void LuaScriptAddEventHandler @ SubscribeToEvent(const String eventName, void* functionOrFunctionName);
+void LuaScriptAddEventHandler @ SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName);
+
+void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(const String eventName);
+void LuaScriptRemoveEventHandler @ UnsubscribeFromEvent(Object* sender, const String eventName);
+
+void LuaScriptRemoveEventHandlers @ UnsubscribeFromEvents(Object* sender);
+void LuaScriptRemoveAllEventHandlers @ UnsubscribeFromAllEvents();
+void LuaScriptRemoveEventHandlersExcept @ UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames);
+bool LuaScriptHasSubscribedToEvent @ HasSubscribedToEvent(const String eventName);
+bool LuaScriptHasSubscribedToEvent @ HasSubscribedToEvent(Object* sender, const String eventName);
+
+void LuaScriptSendEvent @ SendEvent(const String eventName, VariantMap& eventData);
+void LuaScriptSetExecuteConsoleCommands @ SetExecuteConsoleCommands(bool enable);
+bool LuaScriptGetExecuteConsoleCommands @ GetExecuteConsoleCommands();
+
+void LuaScriptSetGlobalVar @ SetGlobalVar(const String key, Variant value);
+Variant LuaScriptGetGlobalVar @ GetGlobalVar(const String key);
+VariantMap& LuaScriptGetGlobalVars @ GetGlobalVars();
+
+void RegisterEventName(const String eventName);
+
+${
+
+static void RegisterEventName(const String eventName)
+{
+    EventNameRegistrar::RegisterEventName(eventName.CString());
+}
+
+static LuaScript* GetLuaScript(lua_State* L)
+{
+    return GetContext(L)->GetSubsystem<LuaScript>();
+}
+
+#define LuaScriptAddEventHandler GetLuaScript(tolua_S)->AddEventHandler
+#define LuaScriptRemoveEventHandler GetLuaScript(tolua_S)->RemoveEventHandler
+#define LuaScriptRemoveEventHandlers GetLuaScript(tolua_S)->RemoveEventHandlers
+#define LuaScriptRemoveAllEventHandlers GetLuaScript(tolua_S)->RemoveAllEventHandlers
+#define LuaScriptRemoveEventHandlersExcept GetLuaScript(tolua_S)->RemoveEventHandlersExcept
+#define LuaScriptHasSubscribedToEvent GetLuaScript(tolua_S)->HasEventHandler
+
+#define LuaScriptSendEvent GetLuaScript(tolua_S)->SendEvent
+#define LuaScriptSetExecuteConsoleCommands GetLuaScript(tolua_S)->SetExecuteConsoleCommands
+#define LuaScriptGetExecuteConsoleCommands GetLuaScript(tolua_S)->GetExecuteConsoleCommands
+
+#define LuaScriptSetGlobalVar GetLuaScript(tolua_S)->SetGlobalVar
+#define LuaScriptGetGlobalVar GetLuaScript(tolua_S)->GetGlobalVar
+#define LuaScriptGetGlobalVars GetLuaScript(tolua_S)->GetGlobalVars
+
+static bool tolua_isfunctionorurho3dstring(lua_State* L, int lo, int def, tolua_Error* err)
+{
+    return lua_isfunction(L, lo) || tolua_isurho3dstring(L, lo, def, err);
+}
+static int tolua_LuaScriptLuaAPI_SubscribeToEvent(lua_State* tolua_S)
+{
+    int args = lua_gettop(tolua_S);
+    tolua_Error tolua_err;
+
+#ifndef TOLUA_RELEASE
+    if (args == 2)
+    {   
+        // SubscribeToEvent(const String eventName, void* functionOrFunctionName);
+        if (!tolua_isurho3dstring(tolua_S,1,0,&tolua_err) || 
+            !tolua_isfunctionorurho3dstring(tolua_S,2,0,&tolua_err))
+            goto tolua_lerror;
+    }
+    else if (args == 3)
+    {
+        // SubscribeToEvent(Object* sender, const String eventName, void* functionOrFunctionName);
+        if (!tolua_isuserdata(tolua_S,1,0,&tolua_err) ||
+            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err) ||
+            !tolua_isfunctionorurho3dstring(tolua_S,3,0,&tolua_err))
+            goto tolua_lerror;
+    }
+    else
+        goto tolua_lerror;
+#endif
+
+    if (args == 2)
+    {
+        // SubscribeToEvent(const String eventName, void* functionOrFunctionName);
+        const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,1,0));
+        if (lua_isfunction(tolua_S,2))
+            LuaScriptAddEventHandler(eventName,2);
+        else
+        {
+            const String functionName = (const String)tolua_tourho3dstring(tolua_S,2,0);
+            LuaScriptAddEventHandler(eventName,functionName);
+        }        
+    }
+    else if (args == 3)
+    {
+        // SubscribeToEvent(Object* sender, const String eventName, void* functionOrFunctionName);
+        Object* sender = ((Object*)  tolua_touserdata(tolua_S,1,0));
+        const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+        if (lua_isfunction(tolua_S,3))
+            LuaScriptAddEventHandler(sender,eventName,3);
+        else
+        {
+            const String functionName = (const String)tolua_tourho3dstring(tolua_S,3,0);
+            LuaScriptAddEventHandler(sender,eventName,functionName);
+        }
+    }
+
+    return 0;
+
+#ifndef TOLUA_RELEASE
+tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'SubscribeToEvent'.",&tolua_err);
+    return 0;
+#endif    
+}
+
+#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_SubscribeToEvent00
+static int tolua_LuaScriptLuaAPI_SubscribeToEvent00(lua_State* tolua_S)
+{
+    return tolua_LuaScriptLuaAPI_SubscribeToEvent(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_SubscribeToEvent01
+static int tolua_LuaScriptLuaAPI_SubscribeToEvent01(lua_State* tolua_S)
+{
+    return tolua_LuaScriptLuaAPI_SubscribeToEvent(tolua_S);
+}
+
+static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(lua_State* tolua_S)
+{
+    int args = lua_gettop(tolua_S);
+    tolua_Error tolua_err;
+    
+#ifndef TOLUA_RELEASE
+    if (args == 1)
+    {
+        // UnsubscribeFromEvent(const String eventName);
+        if (!tolua_isurho3dstring(tolua_S,1,0,&tolua_err))
+            goto tolua_lerror;
+    }
+    else if (args == 2)
+    {
+        // UnsubscribeFromEvent(Object* sender, const String eventName);
+        if (!tolua_isuserdata(tolua_S,1,0,&tolua_err) ||
+            !tolua_isurho3dstring(tolua_S,2,0,&tolua_err))
+                goto tolua_lerror;
+    }
+    else
+        goto tolua_lerror;
+#endif
+
+    if (args == 1)
+    {
+        // UnsubscribeFromEvent(const String eventName);
+        const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,1,0));
+        LuaScriptRemoveEventHandler(eventName);
+    }
+    else if (args == 2)
+    {
+        // UnsubscribeFromEvent(Object* sender, const String eventName);
+        Object* sender = ((Object*)  tolua_touserdata(tolua_S,1,0));
+        const String eventName = ((const String)  tolua_tourho3dstring(tolua_S,2,0));
+        LuaScriptRemoveEventHandler(sender, eventName);
+    }
+
+    return 0;
+
+#ifndef TOLUA_RELEASE
+tolua_lerror:
+    tolua_error(tolua_S,"#ferror in function 'UnsubscribeFromEvent'.",&tolua_err);
+    return 0;
+#endif
+}
+
+#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_UnsubscribeFromEvent00
+static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent00(lua_State* tolua_S)
+{
+    return tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_LuaScriptLuaAPI_UnsubscribeFromEvent01
+static int tolua_LuaScriptLuaAPI_UnsubscribeFromEvent01(lua_State* tolua_S)
+{
+    return tolua_LuaScriptLuaAPI_UnsubscribeFromEvent(tolua_S);
+}
+
+$}

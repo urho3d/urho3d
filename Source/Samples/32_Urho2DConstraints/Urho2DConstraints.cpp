@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,47 +20,49 @@
 // THE SOFTWARE.
 //
 
-#include "Camera.h"
-#include "CollisionBox2D.h"
-#include "CollisionCircle2D.h"
-#include "CollisionEdge2D.h"
-#include "CollisionPolygon2D.h"
-#include "ConstraintDistance2D.h"
-#include "ConstraintFriction2D.h"
-#include "ConstraintGear2D.h"
-#include "ConstraintMotor2D.h"
-#include "ConstraintMouse2D.h"
-#include "ConstraintPrismatic2D.h"
-#include "ConstraintPulley2D.h"
-#include "ConstraintRevolute2D.h"
-#include "ConstraintRope2D.h"
-#include "ConstraintWeld2D.h"
-#include "ConstraintWheel2D.h"
-#include "CoreEvents.h"
-#include "DebugNew.h"
-#include "DebugRenderer.h"
-#include "Drawable2D.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Graphics.h"
-#include "Input.h"
-#include "Octree.h"
-#include "PhysicsWorld2D.h"
-#include "Renderer.h"
-#include "ResourceCache.h"
-#include "RigidBody2D.h"
-#include "Scene.h"
-#include "SceneEvents.h"
-#include "Sprite2D.h"
-#include "StaticSprite2D.h"
-#include "Text.h"
-#include "Text3D.h"
-#include "Urho2DConstraints.h"
-#include "Vector.h"
-#include "Zone.h"
+#include <Urho3D/Container/Vector.h>
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/DebugRenderer.h>
+#include <Urho3D/Graphics/Graphics.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/Scene/SceneEvents.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/Text3D.h>
+#include <Urho3D/Urho2D/CollisionBox2D.h>
+#include <Urho3D/Urho2D/CollisionCircle2D.h>
+#include <Urho3D/Urho2D/CollisionEdge2D.h>
+#include <Urho3D/Urho2D/CollisionPolygon2D.h>
+#include <Urho3D/Urho2D/ConstraintDistance2D.h>
+#include <Urho3D/Urho2D/ConstraintFriction2D.h>
+#include <Urho3D/Urho2D/ConstraintGear2D.h>
+#include <Urho3D/Urho2D/ConstraintMotor2D.h>
+#include <Urho3D/Urho2D/ConstraintMouse2D.h>
+#include <Urho3D/Urho2D/ConstraintPrismatic2D.h>
+#include <Urho3D/Urho2D/ConstraintPulley2D.h>
+#include <Urho3D/Urho2D/ConstraintRevolute2D.h>
+#include <Urho3D/Urho2D/ConstraintRope2D.h>
+#include <Urho3D/Urho2D/ConstraintWeld2D.h>
+#include <Urho3D/Urho2D/ConstraintWheel2D.h>
+#include <Urho3D/Urho2D/Drawable2D.h>
+#include <Urho3D/Urho2D/PhysicsWorld2D.h>
+#include <Urho3D/Urho2D/RigidBody2D.h>
+#include <Urho3D/Urho2D/Sprite2D.h>
+#include <Urho3D/Urho2D/StaticSprite2D.h>
 
-DEFINE_APPLICATION_MAIN(Urho2DConstraints)
+#include "Urho2DConstraints.h"
+
+#include <Urho3D/DebugNew.h>
+
+URHO3D_DEFINE_APPLICATION_MAIN(Urho2DConstraints)
 
 Node* pickedNode;
 RigidBody2D* dummyBody;
@@ -86,6 +88,9 @@ void Urho2DConstraints::Start()
 
     // Hook up to the frame update events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_FREE);
 }
 
 void Urho2DConstraints::CreateScene()
@@ -107,7 +112,7 @@ void Urho2DConstraints::CreateScene()
 
     Graphics* graphics = GetSubsystem<Graphics>();
     camera_->SetOrthoSize((float)graphics->GetHeight() * PIXEL_SIZE);
-    camera_->SetZoom(1.2f);
+    camera_->SetZoom(1.2f * Min((float)graphics->GetWidth() / 1280.0f, (float)graphics->GetHeight() / 800.0f)); // Set zoom according to user's resolution to ensure full visibility (initial zoom (1.2) is set for full visibility at 1280x800 resolution)
 
     // Set up a viewport to the Renderer subsystem so that the 3D scene can be seen
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, camera_));
@@ -132,7 +137,7 @@ void Urho2DConstraints::CreateScene()
     for (unsigned j = 0; j<4; ++j)
     {
         Node* edgeNode = scene_->CreateChild("HorizontalEdge");
-        RigidBody2D* edgeBody = edgeNode->CreateComponent<RigidBody2D>();
+        /*RigidBody2D* edgeBody = */edgeNode->CreateComponent<RigidBody2D>();
         CollisionEdge2D* edgeShape = edgeNode->CreateComponent<CollisionEdge2D>();
         edgeShape->SetVertices(Vector2(-5.0f, j*2.0f -3.0f), Vector2(5.0f, j*2.0f -3.0f));
         edgeShape->SetFriction(0.5f); // Set friction
@@ -201,8 +206,8 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintDistance2D* constraintDistance = boxDistanceNode->CreateComponent<ConstraintDistance2D>(); // Apply ConstraintDistance2D to box
     constraintDistance->SetOtherBody(ballDistanceBody); // Constrain ball to box
-    constraintDistance->SetOwnerBodyAnchor(Vector2(boxDistanceNode->GetPosition().x_, boxDistanceNode->GetPosition().y_));
-    constraintDistance->SetOtherBodyAnchor(Vector2(ballDistanceNode->GetPosition().x_, ballDistanceNode->GetPosition().y_));
+    constraintDistance->SetOwnerBodyAnchor(boxDistanceNode->GetPosition2D());
+    constraintDistance->SetOtherBodyAnchor(ballDistanceNode->GetPosition2D());
     // Make the constraint soft (comment to make it rigid, which is its basic behavior)
     constraintDistance->SetFrequencyHz(4.0f);
     constraintDistance->SetDampingRatio(0.5f);
@@ -216,8 +221,8 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintFriction2D* constraintFriction = boxFrictionNode->CreateComponent<ConstraintFriction2D>(); // Apply ConstraintDistance2D to box
     constraintFriction->SetOtherBody(ballFrictionNode->GetComponent<RigidBody2D>()); // Constraint ball to box
-    //constraintFriction->SetOwnerBodyAnchor(Vector2(boxNode->GetPosition().x_, boxNode->GetPosition().y_);
-    //constraintFriction->SetOtherBodyAnchor(Vector2(ballNode->GetPosition().x_, ballNode->GetPosition().y_);
+    //constraintFriction->SetOwnerBodyAnchor(boxNode->GetPosition2D());
+    //constraintFriction->SetOtherBodyAnchor(ballNode->GetPosition2D());
     //constraintFriction->SetMaxForce(10.0f); // ballBody.mass * gravity
     //constraintDistance->SetMaxTorque(10.0f); // ballBody.mass * radius * gravity
 
@@ -236,10 +241,10 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintRevolute2D* gear1 = baseNode->CreateComponent<ConstraintRevolute2D>(); // Apply constraint to baseBox
     gear1->SetOtherBody(ball1Body); // Constrain ball1 to baseBox
-    gear1->SetAnchor(Vector2(ball1Node->GetPosition().x_, ball1Node->GetPosition().y_));
+    gear1->SetAnchor(ball1Node->GetPosition2D());
     ConstraintRevolute2D* gear2 = baseNode->CreateComponent<ConstraintRevolute2D>(); // Apply constraint to baseBox
     gear2->SetOtherBody(ball2Body); // Constrain ball2 to baseBox
-    gear2->SetAnchor(Vector2(ball2Node->GetPosition().x_, ball2Node->GetPosition().y_));
+    gear2->SetAnchor(ball2Node->GetPosition2D());
 
     ConstraintGear2D* constraintGear = ball1Node->CreateComponent<ConstraintGear2D>(); // Apply constraint to ball1
     constraintGear->SetOtherBody(ball2Body); // Constrain ball2 to ball1
@@ -263,7 +268,7 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintWheel2D* wheel1 = car->CreateComponent<ConstraintWheel2D>();
     wheel1->SetOtherBody(ball1WheelNode->GetComponent<RigidBody2D>());
-    wheel1->SetAnchor(Vector2(ball1WheelNode->GetPosition().x_, ball1WheelNode->GetPosition().y_));
+    wheel1->SetAnchor(ball1WheelNode->GetPosition2D());
     wheel1->SetAxis(Vector2(0.0f, 1.0f));
     wheel1->SetMaxMotorTorque(20.0f);
     wheel1->SetFrequencyHz(4.0f);
@@ -271,7 +276,7 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintWheel2D* wheel2 = car->CreateComponent<ConstraintWheel2D>();
     wheel2->SetOtherBody(ball2WheelNode->GetComponent<RigidBody2D>());
-    wheel2->SetAnchor(Vector2(ball2WheelNode->GetPosition().x_, ball2WheelNode->GetPosition().y_));
+    wheel2->SetAnchor(ball2WheelNode->GetPosition2D());
     wheel2->SetAxis(Vector2(0.0f, 1.0f));
     wheel2->SetMaxMotorTorque(10.0f);
     wheel2->SetFrequencyHz(4.0f);
@@ -326,10 +331,10 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintPulley2D* constraintPulley = boxPulleyNode->CreateComponent<ConstraintPulley2D>(); // Apply constraint to box
     constraintPulley->SetOtherBody(ballPulleyNode->GetComponent<RigidBody2D>()); // Constrain ball to box
-    constraintPulley->SetOwnerBodyAnchor(Vector2(boxPulleyNode->GetPosition().x_, boxPulleyNode->GetPosition().y_));
-    constraintPulley->SetOtherBodyAnchor(Vector2(ballPulleyNode->GetPosition().x_, ballPulleyNode->GetPosition().y_));
-    constraintPulley->SetOwnerBodyGroundAnchor(Vector2(boxPulleyNode->GetPosition().x_, boxPulleyNode->GetPosition().y_ + 1));
-    constraintPulley->SetOtherBodyGroundAnchor(Vector2(ballPulleyNode->GetPosition().x_, ballPulleyNode->GetPosition().y_ + 1));
+    constraintPulley->SetOwnerBodyAnchor(boxPulleyNode->GetPosition2D());
+    constraintPulley->SetOtherBodyAnchor(ballPulleyNode->GetPosition2D());
+    constraintPulley->SetOwnerBodyGroundAnchor(boxPulleyNode->GetPosition2D() + Vector2(0.0f, 1.0f));
+    constraintPulley->SetOtherBodyGroundAnchor(ballPulleyNode->GetPosition2D() + Vector2(0.0f, 1.0f));
     constraintPulley->SetRatio(1.0); // Weight ratio between ownerBody and otherBody
 
     // Create a ConstraintRevolute2D
@@ -375,7 +380,7 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintWeld2D* constraintWeld = boxWeldNode->CreateComponent<ConstraintWeld2D>();
     constraintWeld->SetOtherBody(ballWeldNode->GetComponent<RigidBody2D>()); // Constrain ball to box
-    constraintWeld->SetAnchor(Vector2(boxWeldNode->GetPosition().x_, boxWeldNode->GetPosition().y_));
+    constraintWeld->SetAnchor(boxWeldNode->GetPosition2D());
     constraintWeld->SetFrequencyHz(4.0f);
     constraintWeld->SetDampingRatio(0.5f);
 
@@ -388,7 +393,7 @@ void Urho2DConstraints::CreateScene()
 
     ConstraintWheel2D* constraintWheel = boxWheelNode->CreateComponent<ConstraintWheel2D>();
     constraintWheel->SetOtherBody(ballWheelNode->GetComponent<RigidBody2D>()); // Constrain ball to box
-    constraintWheel->SetAnchor(Vector2(ballWheelNode->GetPosition().x_, ballWheelNode->GetPosition().y_));
+    constraintWheel->SetAnchor(ballWheelNode->GetPosition2D());
     constraintWheel->SetAxis(Vector2(0.0f, 1.0f));
     constraintWheel->SetEnableMotor(true);
     constraintWheel->SetMaxMotorTorque(1.0f);
@@ -437,13 +442,13 @@ void Urho2DConstraints::MoveCamera(float timeStep)
     const float MOVE_SPEED = 4.0f;
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input->GetKeyDown('W'))
+    if (input->GetKeyDown(KEY_W))
         cameraNode_->Translate(Vector3::UP * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('S'))
+    if (input->GetKeyDown(KEY_S))
         cameraNode_->Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('A'))
+    if (input->GetKeyDown(KEY_A))
         cameraNode_->Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
-    if (input->GetKeyDown('D'))
+    if (input->GetKeyDown(KEY_D))
         cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     if (input->GetKeyDown(KEY_PAGEUP))
@@ -456,19 +461,19 @@ void Urho2DConstraints::MoveCamera(float timeStep)
 void Urho2DConstraints::SubscribeToEvents()
 {
     // Subscribe HandleUpdate() function for processing update events
-    SubscribeToEvent(E_UPDATE, HANDLER(Urho2DConstraints, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(Urho2DConstraints, HandleUpdate));
 
     // Subscribe HandlePostRenderUpdate() function for processing the post-render update event, during which we request debug geometry
-    SubscribeToEvent(E_POSTRENDERUPDATE, HANDLER(Urho2DConstraints, HandlePostRenderUpdate));
+    SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(Urho2DConstraints, HandlePostRenderUpdate));
 
     // Subscribe to mouse click
-    SubscribeToEvent(E_MOUSEBUTTONDOWN, HANDLER(Urho2DConstraints, HandleMouseButtonDown));
+    SubscribeToEvent(E_MOUSEBUTTONDOWN, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonDown));
 
     // Unsubscribe the SceneUpdate event from base class to prevent camera pitch and yaw in 2D sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
 
     if (touchEnabled_)
-        SubscribeToEvent(E_TOUCHBEGIN, HANDLER(Urho2DConstraints, HandleTouchBegin3));
+        SubscribeToEvent(E_TOUCHBEGIN, URHO3D_HANDLER(Urho2DConstraints, HandleTouchBegin3));
 }
 
 void Urho2DConstraints::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -521,8 +526,8 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
         constraintMouse->SetDampingRatio(0.0f);
     }
-    SubscribeToEvent(E_MOUSEMOVE, HANDLER(Urho2DConstraints, HandleMouseMove));
-    SubscribeToEvent(E_MOUSEBUTTONUP, HANDLER(Urho2DConstraints, HandleMouseButtonUp));
+    SubscribeToEvent(E_MOUSEMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleMouseMove));
+    SubscribeToEvent(E_MOUSEBUTTONUP, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonUp));
 }
 
 void Urho2DConstraints::HandleMouseButtonUp(StringHash eventType, VariantMap& eventData)
@@ -579,8 +584,8 @@ void Urho2DConstraints::HandleTouchBegin3(StringHash eventType, VariantMap& even
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
         constraintMouse->SetDampingRatio(0);
     }
-    SubscribeToEvent(E_TOUCHMOVE, HANDLER(Urho2DConstraints, HandleTouchMove3));
-    SubscribeToEvent(E_TOUCHEND, HANDLER(Urho2DConstraints, HandleTouchEnd3));
+    SubscribeToEvent(E_TOUCHMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleTouchMove3));
+    SubscribeToEvent(E_TOUCHEND, URHO3D_HANDLER(Urho2DConstraints, HandleTouchEnd3));
 }
 
 void Urho2DConstraints::HandleTouchMove3(StringHash eventType, VariantMap& eventData)

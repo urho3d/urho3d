@@ -1,0 +1,22 @@
+$#include "Urho2D/ConstraintPulley2D.h"
+
+class ConstraintPulley2D : Constraint2D
+{
+    void SetOwnerBodyGroundAnchor(const Vector2& groundAnchor);
+    void SetOtherBodyGroundAnchor(const Vector2& groundAnchor);
+    void SetOwnerBodyAnchor(const Vector2& anchor);
+    void SetOtherBodyAnchor(const Vector2& anchor);
+    void SetRatio(float ratio);
+
+    const Vector2& GetOwnerBodyGroundAnchor() const;
+    const Vector2& GetOtherBodyGroundAnchor() const;
+    const Vector2& GetOwnerBodyAnchor() const;
+    const Vector2& GetOtherBodyAnchor() const;
+    float GetRatio() const;
+
+    tolua_property__get_set Vector2& ownerBodyGroundAnchor;
+    tolua_property__get_set Vector2& otherBodyGroundAnchor;
+    tolua_property__get_set Vector2& ownerBodyAnchor;
+    tolua_property__get_set Vector2& otherBodyAnchor;
+    tolua_property__get_set float ratio;
+};

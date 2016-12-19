@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -445,6 +445,8 @@
 #define SDL_iconv_close SDL_iconv_close_REAL
 #define SDL_iconv SDL_iconv_REAL
 #define SDL_iconv_string SDL_iconv_string_REAL
+#define SDL_CreateRGBSurfaceWithFormat SDL_CreateRGBSurfaceWithFormat_REAL
+#define SDL_CreateRGBSurfaceWithFormatFrom SDL_CreateRGBSurfaceWithFormatFrom_REAL
 #define SDL_CreateRGBSurface SDL_CreateRGBSurface_REAL
 #define SDL_CreateRGBSurfaceFrom SDL_CreateRGBSurfaceFrom_REAL
 #define SDL_FreeSurface SDL_FreeSurface_REAL
@@ -505,6 +507,7 @@
 #define SDL_GetNumVideoDisplays SDL_GetNumVideoDisplays_REAL
 #define SDL_GetDisplayName SDL_GetDisplayName_REAL
 #define SDL_GetDisplayBounds SDL_GetDisplayBounds_REAL
+#define SDL_GetDisplayDPI SDL_GetDisplayDPI_REAL
 #define SDL_GetNumDisplayModes SDL_GetNumDisplayModes_REAL
 #define SDL_GetDisplayMode SDL_GetDisplayMode_REAL
 #define SDL_GetDesktopDisplayMode SDL_GetDesktopDisplayMode_REAL
@@ -575,3 +578,37 @@
 #define SDL_GetDefaultAssertionHandler SDL_GetDefaultAssertionHandler_REAL
 #define SDL_GetAssertionHandler SDL_GetAssertionHandler_REAL
 #define SDL_DXGIGetOutputInfo SDL_DXGIGetOutputInfo_REAL
+#define SDL_RenderIsClipEnabled SDL_RenderIsClipEnabled_REAL
+#define SDL_WinRTRunApp SDL_WinRTRunApp_REAL
+#define SDL_WarpMouseGlobal SDL_WarpMouseGlobal_REAL
+#define SDL_WinRTGetFSPathUNICODE SDL_WinRTGetFSPathUNICODE_REAL
+#define SDL_WinRTGetFSPathUTF8 SDL_WinRTGetFSPathUTF8_REAL
+#define SDL_WinRTRunApp SDL_WinRTRunApp_REAL
+#define SDL_sqrtf SDL_sqrtf_REAL
+#define SDL_tan SDL_tan_REAL
+#define SDL_tanf SDL_tanf_REAL
+#define SDL_CaptureMouse SDL_CaptureMouse_REAL
+#define SDL_SetWindowHitTest SDL_SetWindowHitTest_REAL
+#define SDL_GetGlobalMouseState SDL_GetGlobalMouseState_REAL
+#define SDL_HasAVX2 SDL_HasAVX2_REAL
+#define SDL_QueueAudio SDL_QueueAudio_REAL
+#define SDL_GetQueuedAudioSize SDL_GetQueuedAudioSize_REAL
+#define SDL_ClearQueuedAudio SDL_ClearQueuedAudio_REAL
+#define SDL_GetGrabbedWindow SDL_GetGrabbedWindow_REAL
+#define SDL_SetWindowsMessageHook SDL_SetWindowsMessageHook_REAL
+#define SDL_JoystickCurrentPowerLevel SDL_JoystickCurrentPowerLevel_REAL
+#define SDL_GameControllerFromInstanceID SDL_GameControllerFromInstanceID_REAL
+#define SDL_JoystickFromInstanceID SDL_JoystickFromInstanceID_REAL
+#define SDL_GetDisplayUsableBounds SDL_GetDisplayUsableBounds_REAL
+#define SDL_GetWindowBordersSize SDL_GetWindowBordersSize_REAL
+#define SDL_SetWindowOpacity SDL_SetWindowOpacity_REAL
+#define SDL_GetWindowOpacity SDL_GetWindowOpacity_REAL
+#define SDL_SetWindowInputFocus SDL_SetWindowInputFocus_REAL
+#define SDL_SetWindowModalFor SDL_SetWindowModalFor_REAL
+#define SDL_RenderSetIntegerScale SDL_RenderSetIntegerScale_REAL
+#define SDL_RenderGetIntegerScale SDL_RenderGetIntegerScale_REAL
+#define SDL_DequeueAudio SDL_DequeueAudio_REAL
+#define SDL_SetWindowResizable SDL_SetWindowResizable_REAL
+#define SDL_CreateRGBSurfaceWithFormat SDL_CreateRGBSurfaceWithFormat_REAL
+#define SDL_CreateRGBSurfaceWithFormatFrom SDL_CreateRGBSurfaceWithFormatFrom_REAL
+#define SDL_GetHintBoolean SDL_GetHintBoolean_REAL

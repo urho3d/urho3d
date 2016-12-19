@@ -1,0 +1,95 @@
+$#include "UI/Text.h"
+
+enum TextEffect
+{
+    TE_NONE = 0,
+    TE_SHADOW,
+    TE_STROKE
+};
+
+class Text : public UIElement
+{
+    Text();
+    virtual ~Text();
+
+    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFontSize(int size);
+
+    void SetText(const String text);
+
+    void SetTextAlignment(HorizontalAlignment align);
+    void SetRowSpacing(float spacing);
+    void SetWordwrap(bool enable);
+    void SetSelection(unsigned start, unsigned length = M_MAX_UNSIGNED);
+    void ClearSelection();
+    void SetSelectionColor(const Color& color);
+    void SetHoverColor(const Color& color);
+    void SetTextEffect(TextEffect textEffect);
+    void SetEffectShadowOffset(const IntVector2& offset);
+    void SetEffectStrokeThickness(int thickness);
+    void SetEffectRoundStroke(bool roundStroke);
+    void SetEffectColor(const Color& effectColor);
+
+    bool GetAutoLocalizable() const;
+    void SetAutoLocalizable(bool enable);
+
+    Font* GetFont() const;
+    int GetFontSize() const;
+    const String GetText() const;
+    HorizontalAlignment GetTextAlignment() const;
+    float GetRowSpacing() const;
+    bool GetWordwrap() const;
+    unsigned GetSelectionStart() const;
+    unsigned GetSelectionLength() const;
+    const Color& GetSelectionColor() const;
+    const Color& GetHoverColor() const;
+    TextEffect GetTextEffect() const;
+    const IntVector2& GetEffectShadowOffset() const;
+    int GetEffectStrokeThickness() const;
+    bool GetEffectRoundStroke() const;
+    const Color& GetEffectColor() const;
+    int GetRowHeight() const;
+    unsigned GetNumRows() const;
+    unsigned GetNumChars() const;
+    int GetRowWidth(unsigned index) const;
+    IntVector2 GetCharPosition(unsigned index);
+    IntVector2 GetCharSize(unsigned index);
+
+    void SetEffectDepthBias(float bias);
+    float GetEffectDepthBias() const;
+
+    tolua_property__get_set Font* font;
+    tolua_property__get_set int fontSize;
+    tolua_property__get_set String text;
+    tolua_property__get_set HorizontalAlignment textAlignment;
+    tolua_property__get_set float rowSpacing;
+    tolua_property__get_set bool wordwrap;
+    tolua_property__get_set bool autoLocalizable;
+    tolua_readonly tolua_property__get_set unsigned selectionStart;
+    tolua_readonly tolua_property__get_set unsigned selectionLength;
+    tolua_property__get_set Color& selectionColor;
+    tolua_property__get_set Color& hoverColor;
+    tolua_property__get_set TextEffect textEffect;
+    tolua_property__get_set IntVector2& effectShadowOffset;
+    tolua_property__get_set int effectStrokeThickness;
+    tolua_property__get_set bool effectRoundStroke;
+    tolua_property__get_set Color& effectColor;
+    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set unsigned numRows;
+    tolua_readonly tolua_property__get_set unsigned numChars;
+};
+
+${
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text_new00
+static int tolua_UILuaAPI_Text_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Text>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_UILuaAPI_Text_new00_local
+static int tolua_UILuaAPI_Text_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Text>(tolua_S);
+}
+$}

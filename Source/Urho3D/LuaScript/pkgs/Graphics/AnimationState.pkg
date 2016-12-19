@@ -1,0 +1,51 @@
+$#include "Graphics/AnimationState.h"
+
+enum AnimationBlendMode
+{
+    ABM_LERP = 0,
+    ABM_ADDITIVE
+};
+
+class AnimationState
+{
+    AnimationState(AnimatedModel* model, Animation* animation);
+    AnimationState(Node* node, Animation* animation);
+    ~AnimationState();
+
+    void SetStartBone(Bone* bone);
+    void SetLooped(bool looped);
+    void SetWeight(float weight);
+    void SetTime(float time);
+    void SetBoneWeight(const String name, float weight, bool recursive = false);
+    void SetBoneWeight(StringHash nameHash, float weight, bool recursive = false);
+    void SetBoneWeight(unsigned index, float weight, bool recursive = false);
+    void AddWeight(float delta);
+    void AddTime(float delta);
+    void SetLayer(unsigned char layer);
+    void SetBlendMode(AnimationBlendMode mode);
+
+    Animation* GetAnimation() const;
+    Bone* GetStartBone() const;
+    float GetBoneWeight(const String name) const;
+    float GetBoneWeight(StringHash nameHash) const;
+    float GetBoneWeight(unsigned index) const;
+    unsigned GetTrackIndex(const String name) const;
+    unsigned GetTrackIndex(StringHash nameHash) const;
+    bool IsEnabled() const;
+    bool IsLooped() const;
+    float GetWeight() const;
+    float GetTime() const;
+    float GetLength() const;
+    unsigned char GetLayer() const;
+    AnimationBlendMode GetBlendMode() const;
+
+    tolua_readonly tolua_property__get_set Animation* animation;
+    tolua_property__get_set Bone* startBone;
+    tolua_readonly tolua_property__is_set bool enabled;
+    tolua_property__is_set bool looped;
+    tolua_property__get_set float weight;
+    tolua_property__get_set float time;
+    tolua_readonly tolua_property__get_set float length;
+    tolua_property__get_set unsigned char layer;
+    tolua_property__get_set AnimationBlendMode blendMode;
+};

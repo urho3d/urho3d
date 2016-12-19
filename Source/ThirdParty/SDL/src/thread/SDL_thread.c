@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -26,6 +26,7 @@
 #include "SDL_thread.h"
 #include "SDL_thread_c.h"
 #include "SDL_systhread.h"
+#include "SDL_hints.h"
 #include "../SDL_error_c.h"
 
 
@@ -304,15 +305,15 @@ SDL_RunThread(void *data)
 #endif
 
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
-DECLSPEC SDL_Thread *SDLCALL
-SDL_CreateThread(int (SDLCALL * fn) (void *),
-                 const char *name, void *data,
+static SDL_Thread *
+SDL_CreateThreadWithStackSize(int (SDLCALL * fn) (void *),
+                 const char *name, const size_t stacksize, void *data,
                  pfnSDL_CurrentBeginThread pfnBeginThread,
                  pfnSDL_CurrentEndThread pfnEndThread)
 #else
-DECLSPEC SDL_Thread *SDLCALL
-SDL_CreateThread(int (SDLCALL * fn) (void *),
-                 const char *name, void *data)
+static SDL_Thread *
+SDL_CreateThreadWithStackSize(int (SDLCALL * fn) (void *),
+                const char *name, const size_t stacksize, void *data)
 #endif
 {
     SDL_Thread *thread;
@@ -362,6 +363,8 @@ SDL_CreateThread(int (SDLCALL * fn) (void *),
         return (NULL);
     }
 
+    thread->stacksize = stacksize;
+
     /* Create the thread and go! */
 #ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
     ret = SDL_SYS_CreateThread(thread, args, pfnBeginThread, pfnEndThread);
@@ -384,6 +387,50 @@ SDL_CreateThread(int (SDLCALL * fn) (void *),
 
     /* Everything is running now */
     return (thread);
+}
+
+#ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
+DECLSPEC SDL_Thread *SDLCALL
+SDL_CreateThread(int (SDLCALL * fn) (void *),
+                 const char *name, void *data,
+                 pfnSDL_CurrentBeginThread pfnBeginThread,
+                 pfnSDL_CurrentEndThread pfnEndThread)
+#else
+DECLSPEC SDL_Thread *SDLCALL
+SDL_CreateThread(int (SDLCALL * fn) (void *),
+                 const char *name, void *data)
+#endif
+{
+    /* !!! FIXME: in 2.1, just make stackhint part of the usual API. */
+    const char *stackhint = SDL_GetHint(SDL_HINT_THREAD_STACK_SIZE);
+    size_t stacksize = 0;
+
+    /* If the SDL_HINT_THREAD_STACK_SIZE exists, use it */
+    if (stackhint != NULL) {
+        char *endp = NULL;
+        const Sint64 hintval = SDL_strtoll(stackhint, &endp, 10);
+        if ((*stackhint != '\0') && (*endp == '\0')) {  /* a valid number? */
+            if (hintval > 0) {  /* reject bogus values. */
+                stacksize = (size_t) hintval;
+            }
+        }
+    }
+
+#ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
+    return SDL_CreateThreadWithStackSize(fn, name, stacksize, data, pfnBeginThread, pfnEndThread);
+#else
+    return SDL_CreateThreadWithStackSize(fn, name, stacksize, data);
+#endif
+}
+
+SDL_Thread *
+SDL_CreateThreadInternal(int (SDLCALL * fn) (void *), const char *name,
+                         const size_t stacksize, void *data) {
+#ifdef SDL_PASSED_BEGINTHREAD_ENDTHREAD
+    return SDL_CreateThreadWithStackSize(fn, name, stacksize, data, NULL, NULL);
+#else
+    return SDL_CreateThreadWithStackSize(fn, name, stacksize, data);
+#endif
 }
 
 SDL_threadID
@@ -442,10 +489,10 @@ SDL_DetachThread(SDL_Thread * thread)
         SDL_SYS_DetachThread(thread);
     } else {
         /* all other states are pretty final, see where we landed. */
-        const int state = SDL_AtomicGet(&thread->state);
-        if ((state == SDL_THREAD_STATE_DETACHED) || (state == SDL_THREAD_STATE_CLEANED)) {
+        const int thread_state = SDL_AtomicGet(&thread->state);
+        if ((thread_state == SDL_THREAD_STATE_DETACHED) || (thread_state == SDL_THREAD_STATE_CLEANED)) {
             return;  /* already detached (you shouldn't call this twice!) */
-        } else if (state == SDL_THREAD_STATE_ZOMBIE) {
+        } else if (thread_state == SDL_THREAD_STATE_ZOMBIE) {
             SDL_WaitThread(thread, NULL);  /* already done, clean it up. */
         } else {
             SDL_assert(0 && "Unexpected thread state");

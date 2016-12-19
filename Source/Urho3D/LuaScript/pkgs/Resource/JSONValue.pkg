@@ -1,0 +1,131 @@
+$#include "Resource/JSONValue.h"
+
+enum JSONValueType
+{
+    JSON_NULL = 0,
+    JSON_BOOL,
+    JSON_NUMBER,
+    JSON_STRING,
+    JSON_ARRAY,
+    JSON_OBJECT
+};
+
+enum JSONNumberType
+{
+    JSONNT_NAN = 0,
+    JSONNT_INT,
+    JSONNT_UINT,
+    JSONNT_FLOAT_DOUBLE
+};
+
+class JSONValue
+{
+    JSONValue();
+    JSONValue(bool value);
+    JSONValue(const char* value);           // This works for Lua string and Urho3D:String
+    JSONValue(double value);                // This works for all number types, must be declared after string overload
+    JSONValue(const JSONArray& value);
+    JSONValue(const JSONObject& value);
+    JSONValue(const JSONValue& value);
+    ~JSONValue();
+
+    tolua_outside void JSONValueSetBool @ SetBool(bool value);
+    tolua_outside void JSONValueSetInt @ SetInt(int value);
+    tolua_outside void JSONValueSetUint @ SetUint(unsigned value);
+    tolua_outside void JSONValueSetFloat @ SetFloat(float value);
+    tolua_outside void JSONValueSetDouble @ SetDouble(double value);
+    tolua_outside void JSONValueSetString @ SetString(const String value);
+    tolua_outside void JSONValueSetArray @ SetArray(const JSONArray& value);
+    tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
+
+    JSONValueType GetValueType() const;
+    JSONNumberType GetNumberType() const;
+    String GetValueTypeName() const;
+    String GetNumberTypeName() const;
+    bool IsNull() const;
+    bool IsBool() const;
+    bool IsNumber() const;
+    bool IsString() const;
+    bool IsArray() const;
+    bool IsObject() const;
+
+    bool GetBool() const;
+    int GetInt() const;
+    unsigned GetUInt() const;
+    float GetFloat() const;
+    double GetDouble() const;
+    const String GetString() const;
+    const JSONArray& GetArray() const;
+    const JSONObject& GetObject() const;
+
+    JSONValue& operator [](unsigned index);
+    const JSONValue& operator [](unsigned index) const;
+    void Push(const JSONValue& value);
+    void Pop();
+    void Insert(unsigned pos, const JSONValue& value);
+    void Erase(unsigned pos, unsigned length = 1);
+    void Resize(unsigned newSize);
+    unsigned Size() const;
+
+    // JSONValue& operator [](const String key);
+    // const JSONValue& operator [](const String key) const;
+    void Set(const String key, const JSONValue& value);
+    const JSONValue& Get(const String key) const;
+    bool Erase(const String key);
+    bool Contains(const String key) const;
+
+    void Clear();
+
+    static const JSONValue EMPTY;
+    static const JSONArray emptyArray;
+    static const JSONObject emptyObject;
+
+    tolua_readonly tolua_property__is_set bool null;
+    tolua_readonly tolua_property__get_set JSONValueType valueType;
+    tolua_readonly tolua_property__get_set JSONNumberType numberType;
+    tolua_readonly tolua_property__get_set String valueTypeName;
+    tolua_readonly tolua_property__get_set String numberTypeName;
+};
+
+${
+static void JSONValueSetBool(JSONValue* jsonValue, bool value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetInt(JSONValue* jsonValue, int value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetUint(JSONValue* jsonValue, unsigned value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetFloat(JSONValue* jsonValue, float value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetDouble(JSONValue* jsonValue, double value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetString(JSONValue* jsonValue, const String& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetArray(JSONValue* jsonValue, const JSONArray& value)
+{
+    (*jsonValue) = value;
+}
+
+static void JSONValueSetObject(JSONValue* jsonValue, const JSONObject& value)
+{
+    (*jsonValue) = value;
+}
+
+$}

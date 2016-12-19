@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -81,6 +81,7 @@ BE_CreateDevice(int devindex)
     device->MinimizeWindow = BE_MinimizeWindow;
     device->RestoreWindow = BE_RestoreWindow;
     device->SetWindowBordered = BE_SetWindowBordered;
+    device->SetWindowResizable = BE_SetWindowResizable;
     device->SetWindowFullscreen = BE_SetWindowFullscreen;
     device->SetWindowGammaRamp = BE_SetWindowGammaRamp;
     device->GetWindowGammaRamp = BE_GetWindowGammaRamp;

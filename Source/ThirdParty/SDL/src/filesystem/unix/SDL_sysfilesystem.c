@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#ifdef __FREEBSD__
+#if defined(__FREEBSD__) || defined(__OPENBSD__)
 #include <sys/sysctl.h>
 #endif
 
@@ -90,7 +90,26 @@ SDL_GetBasePath(void)
             return NULL;
         }
     }
-#elif defined(__SOLARIS__)
+#endif
+#if defined(__OPENBSD__)
+    char **retvalargs;
+    size_t len;
+    const int mib[] = { CTL_KERN, KERN_PROC_ARGS, getpid(), KERN_PROC_ARGV };
+    if (sysctl(mib, 4, NULL, &len, NULL, 0) != -1) {
+        retvalargs = SDL_malloc(len);
+        if (!retvalargs) {
+            SDL_OutOfMemory();
+            return NULL;
+        }
+        sysctl(mib, 4, retvalargs, &len, NULL, 0);
+        retval = SDL_malloc(PATH_MAX + 1);
+        if (retval)
+            realpath(retvalargs[0], retval);
+
+        SDL_free(retvalargs);
+    }
+#endif
+#if defined(__SOLARIS__)
     const char *path = getexecname();
     if ((path != NULL) && (path[0] == '/')) { /* must be absolute path... */
         retval = SDL_strdup(path);
@@ -197,7 +216,7 @@ SDL_GetPrefPath(const char *org, const char *app)
     }
     if (mkdir(retval, 0700) != 0 && errno != EEXIST) {
 error:
-        SDL_SetError("Couldn't create directory '%s': ", retval, strerror(errno));
+        SDL_SetError("Couldn't create directory '%s': '%s'", retval, strerror(errno));
         SDL_free(retval);
         return NULL;
     }

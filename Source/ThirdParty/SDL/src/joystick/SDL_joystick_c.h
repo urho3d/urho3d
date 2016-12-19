@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -33,6 +33,8 @@ extern void SDL_GameControllerQuit(void);
 
 
 /* Internal event queueing functions */
+extern void SDL_PrivateJoystickAdded(int device_index);
+extern void SDL_PrivateJoystickRemoved(SDL_JoystickID device_instance);
 extern int SDL_PrivateJoystickAxis(SDL_Joystick * joystick,
                                    Uint8 axis, Sint16 value);
 extern int SDL_PrivateJoystickBall(SDL_Joystick * joystick,
@@ -41,9 +43,8 @@ extern int SDL_PrivateJoystickHat(SDL_Joystick * joystick,
                                   Uint8 hat, Uint8 value);
 extern int SDL_PrivateJoystickButton(SDL_Joystick * joystick,
                                      Uint8 button, Uint8 state);
-
-/* Helper function to let lower sys layer tell the event system if the joystick code needs to think */
-extern SDL_bool SDL_PrivateJoystickNeedsPolling();
+extern void SDL_PrivateJoystickBatteryLevel(SDL_Joystick * joystick,
+                                            SDL_JoystickPowerLevel ePowerLevel);
 
 /* Internal sanity checking functions */
 extern int SDL_PrivateJoystickValid(SDL_Joystick * joystick);

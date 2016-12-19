@@ -1,0 +1,45 @@
+$#include "Math/Vector4.h"
+
+class Vector4
+{
+    Vector4();
+    Vector4(const Vector4& vector);
+    Vector4(const Vector3& vector, float w);
+    Vector4(float x, float y, float z, float w);
+    ~Vector4();
+
+    bool operator ==(const Vector4& rhs) const;
+    Vector4 operator + (const Vector4& rhs) const;
+    Vector4 operator - () const;
+    Vector4 operator - (const Vector4& rhs) const;
+    Vector4 operator * (float rhs) const;
+    Vector4 operator * (const Vector4& rhs) const;
+    Vector4 operator / (float rhs) const;
+    Vector4 operator / (const Vector4& rhs) const;
+    Vector4 operator / (const Vector4& rhs) const;
+
+    float DotProduct(const Vector4& rhs) const;
+    float AbsDotProduct(const Vector4& rhs) const;
+    float ProjectOntoAxis(const Vector3& axis) const;
+    Vector4 Abs() const;
+    Vector4 Lerp(const Vector4& rhs, float t) const;
+    bool Equals(const Vector4& rhs) const;
+    bool IsNaN() const;
+
+    String ToString() const;
+
+    float x_ @ x;
+    float y_ @ y;
+    float z_ @ z;
+    float w_ @ w;
+
+    static const Vector4 ZERO;
+    static const Vector4 ONE;
+};
+
+Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t);
+Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs);
+Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs);
+Vector4 VectorFloor(const Vector4& vec);
+Vector4 VectorRound(const Vector4& vec);
+Vector4 VectorCeil(const Vector4& vec);

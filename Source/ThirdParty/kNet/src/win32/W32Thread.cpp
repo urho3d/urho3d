@@ -18,11 +18,11 @@
 #include <cassert>
 #include <exception>
 
-#include "kNet/Network.h"
 #include "kNet/Thread.h"
 #include "kNet/NetworkLogging.h"
 #include "kNet/Clock.h"
 #include "kNet/NetException.h"
+#include "kNet/Network.h"
 
 #include "kNet/DebugMemoryLeakCheck.h"
 
@@ -55,7 +55,7 @@ bool Thread::IsRunning() const
 
 	if (result == 0)
 	{
-		LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::IsRunning!", GetLastError());
+		KNET_LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::IsRunning!", GetLastError());
 		return false;
 	}
 
@@ -89,7 +89,7 @@ void Thread::Stop()
 
 		if (result == 0)
 		{
-			LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::Stop()!", GetLastError());
+			KNET_LOG(LogError, "Warning: Received error %d from GetExitCodeThread in Thread::Stop()!", GetLastError());
 			break;
 		}
 		else if (exitCode != STILL_ACTIVE)
@@ -103,12 +103,12 @@ void Thread::Stop()
 
 	if (threadHandle != NULL)
 	{
-		TerminateThread(threadHandle, -1);
+		TerminateThread(threadHandle, (DWORD)-1);
 //		CloseHandle(threadHandle);
-		LOG(LogError, "Warning: Had to forcibly terminate thread!");
+		KNET_LOG(LogError, "Warning: Had to forcibly terminate thread!");
 	}
 
-	LOG(LogInfo, "Thread::Stop() called.");
+	KNET_LOG(LogInfo, "Thread::Stop() called.");
 
 	threadHandle = NULL;
 	threadId = 0;
@@ -123,13 +123,13 @@ void Thread::Stop()
 
 DWORD WINAPI ThreadEntryPoint(LPVOID lpParameter)
 {
-	LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%08X.", lpParameter);
+	KNET_LOG(LogInfo, "ThreadEntryPoint: Thread started with param 0x%08X.", lpParameter);
 
 	Thread *thread = reinterpret_cast<Thread*>(lpParameter);
 	if (!thread)
 	{
-		LOG(LogError, "Invalid thread start parameter 0!");
-		return -1;
+		KNET_LOG(LogError, "Invalid thread start parameter 0!");
+		return (DWORD)-1;
 	}
 	thread->_ThreadRun();
 
@@ -142,20 +142,20 @@ void Thread::_ThreadRun()
 	{
 		if (!threadEnabled)
 		{
-			LOG(LogError, "ThreadEntryPoint: Thread immediately requested to quit.");
+			KNET_LOG(LogError, "ThreadEntryPoint: Thread immediately requested to quit.");
 			return;
 		}
 
 		invoker->Invoke();
 	} catch(NetException &e)
 	{
-		LOG(LogError, "NetException thrown in thread: %s.", e.what());
+		KNET_LOG(LogError, "NetException thrown in thread: %s.", e.what());
 	} catch(std::exception &e)
 	{
-		LOG(LogError, "std::exception thrown in thread: %s.", e.what());
+		KNET_LOG(LogError, "std::exception thrown in thread: %s.", e.what());
 	} catch(...)
 	{
-		LOG(LogError, "Unknown exception thrown in thread.");
+		KNET_LOG(LogError, "Unknown exception thrown in thread.");
 	}
 }
 
@@ -173,7 +173,7 @@ void Thread::StartThread()
 	if (threadHandle == NULL)
 		throw NetException("Failed to create thread!");
 	else
-		LOG(LogInfo, "Thread::Run(): Thread created.");
+		KNET_LOG(LogInfo, "Thread::Run(): Thread created.");
 
 	SetName("kNet Thread");
 }

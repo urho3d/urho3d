@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<material>
+	<technique name="Techniques/Diff.xml" quality="0" loddistance="0" />
+	<texture unit="diffuse" name="Textures/UrhoDecalAlpha.dds" />
+	<shader psdefines="ALPHAMASK" />
+	<parameter name="UOffset" value="1 0 0 0" />
+	<parameter name="VOffset" value="0 1 0 0" />
+	<parameter name="MatDiffColor" value="1 1 1 1" />
+	<parameter name="MatEmissiveColor" value="0 0 0" />
+	<parameter name="MatEnvMapColor" value="1 1 1" />
+	<parameter name="MatSpecColor" value="0 0 0 1" />
+	<parameter name="Roughness" value="0.5" />
+	<parameter name="Metallic" value="0" />
+	<cull value="none" />
+	<shadowcull value="none" />
+	<fill value="solid" />
+	<depthbias constant="0" slopescaled="0" />
+	<renderorder value="129" />
+	<occlusion enable="false" />
+</material>

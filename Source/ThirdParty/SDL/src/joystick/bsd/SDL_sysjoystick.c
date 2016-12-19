@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -76,7 +76,7 @@
 #include "../SDL_sysjoystick.h"
 #include "../SDL_joystick_c.h"
 
-#define MAX_UHID_JOYS   16
+#define MAX_UHID_JOYS   64
 #define MAX_JOY_JOYS    2
 #define MAX_JOYS    (MAX_UHID_JOYS + MAX_JOY_JOYS)
 
@@ -179,7 +179,7 @@ SDL_SYS_JoystickInit(void)
 
         SDL_snprintf(s, SDL_arraysize(s), "/dev/uhid%d", i);
 
-        joynames[SDL_SYS_numjoysticks] = strdup(s);
+        joynames[SDL_SYS_numjoysticks] = SDL_strdup(s);
 
         if (SDL_SYS_JoystickOpen(&nj, SDL_SYS_numjoysticks) == 0) {
             SDL_SYS_JoystickClose(&nj);
@@ -193,7 +193,7 @@ SDL_SYS_JoystickInit(void)
         SDL_snprintf(s, SDL_arraysize(s), "/dev/joy%d", i);
         fd = open(s, O_RDONLY);
         if (fd != -1) {
-            joynames[SDL_SYS_numjoysticks++] = strdup(s);
+            joynames[SDL_SYS_numjoysticks++] = SDL_strdup(s);
             close(fd);
         }
     }
@@ -211,11 +211,6 @@ int SDL_SYS_NumJoysticks()
 
 void SDL_SYS_JoystickDetect()
 {
-}
-
-SDL_bool SDL_SYS_JoystickNeedsPolling()
-{
-    return SDL_FALSE;
 }
 
 const char *
@@ -291,7 +286,7 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joy, int device_index)
     struct joystick_hwdata *hw;
     struct hid_item hitem;
     struct hid_data *hdata;
-    struct report *rep;
+    struct report *rep = NULL;
     int fd;
     int i;
 
@@ -309,14 +304,14 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joy, int device_index)
     }
     joy->hwdata = hw;
     hw->fd = fd;
-    hw->path = strdup(path);
+    hw->path = SDL_strdup(path);
     if (!SDL_strncmp(path, "/dev/joy", 8)) {
         hw->type = BSDJOY_JOY;
         joy->naxes = 2;
         joy->nbuttons = 2;
         joy->nhats = 0;
         joy->nballs = 0;
-        joydevnames[device_index] = strdup("Gameport joystick");
+        joydevnames[device_index] = SDL_strdup("Gameport joystick");
         goto usbend;
     } else {
         hw->type = BSDJOY_UHID;
@@ -342,6 +337,38 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joy, int device_index)
 #endif
         rep->rid = -1;          /* XXX */
     }
+#if defined(__NetBSD__)
+    usb_device_descriptor_t udd;
+    struct usb_string_desc usd;
+    if (ioctl(fd, USB_GET_DEVICE_DESC, &udd) == -1)
+        goto desc_failed;
+
+    /* Get default language */
+    usd.usd_string_index = USB_LANGUAGE_TABLE;
+    usd.usd_language_id = 0;
+    if (ioctl(fd, USB_GET_STRING_DESC, &usd) == -1 || usd.usd_desc.bLength < 4) {
+        usd.usd_language_id = 0;
+    } else {
+        usd.usd_language_id = UGETW(usd.usd_desc.bString[0]);
+    }
+
+    usd.usd_string_index = udd.iProduct;
+    if (ioctl(fd, USB_GET_STRING_DESC, &usd) == 0) {
+        char str[128];
+        char *new_name = NULL;
+        int i;
+        for (i = 0; i < (usd.usd_desc.bLength >> 1) - 1 && i < sizeof(str) - 1; i++) {
+            str[i] = UGETW(usd.usd_desc.bString[i]);
+        }
+        str[i] = '\0';
+        asprintf(&new_name, "%s @ %s", str, path);
+        if (new_name != NULL) {
+            SDL_free(joydevnames[SDL_SYS_numjoysticks]);
+            joydevnames[SDL_SYS_numjoysticks] = new_name;
+        }
+    }
+desc_failed:
+#endif
     if (report_alloc(rep, hw->repdesc, REPORT_INPUT) < 0) {
         goto usberr;
     }
@@ -414,9 +441,21 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joy, int device_index)
         if (hw->axis_map[i] > 0)
             hw->axis_map[i] = joy->naxes++;
 
+    if (joy->naxes == 0 && joy->nbuttons == 0 && joy->nhats == 0 && joy->nballs == 0) {
+        SDL_SetError("%s: Not a joystick, ignoring", hw->path);
+        goto usberr;
+    }
+
   usbend:
     /* The poll blocks the event thread. */
     fcntl(fd, F_SETFL, O_NONBLOCK);
+#ifdef __NetBSD__
+    /* Flush pending events */
+    if (rep) {
+        while (read(joy->hwdata->fd, REP_BUF_DATA(rep), rep->size) == rep->size)
+            ;
+    }
+#endif
 
     return (0);
   usberr:
@@ -426,7 +465,7 @@ SDL_SYS_JoystickOpen(SDL_Joystick * joy, int device_index)
     return (-1);
 }
 
-/* Function to determine is this joystick is attached to the system right now */
+/* Function to determine if this joystick is attached to the system right now */
 SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
 {
     return SDL_TRUE;
@@ -563,8 +602,6 @@ SDL_SYS_JoystickClose(SDL_Joystick * joy)
     close(joy->hwdata->fd);
     SDL_free(joy->hwdata->path);
     SDL_free(joy->hwdata);
-
-    return;
 }
 
 void

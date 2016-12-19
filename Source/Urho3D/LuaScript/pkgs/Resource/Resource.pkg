@@ -1,0 +1,17 @@
+$#include "Resource/Resource.h"
+
+class Resource
+{
+    bool Load(Deserializer& source);
+    bool Save(Serializer& dest) const;
+    bool Load(const String& fileName);
+    bool Save(const String& fileName) const;
+    
+    const String GetName() const;
+    StringHash GetNameHash() const;
+    unsigned GetMemoryUse() const;
+    
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set StringHash nameHash;
+    tolua_readonly tolua_property__get_set unsigned memoryUse;
+};

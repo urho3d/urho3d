@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -50,6 +50,8 @@ static SDL_Renderer *PSP_CreateRenderer(SDL_Window * window, Uint32 flags);
 static void PSP_WindowEvent(SDL_Renderer * renderer,
                              const SDL_WindowEvent *event);
 static int PSP_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture);
+static int PSP_SetTextureColorMod(SDL_Renderer * renderer,
+                                   SDL_Texture * texture);
 static int PSP_UpdateTexture(SDL_Renderer * renderer, SDL_Texture * texture,
                               const SDL_Rect * rect, const void *pixels,
                               int pitch);
@@ -359,6 +361,7 @@ PSP_CreateRenderer(SDL_Window * window, Uint32 flags)
 
     renderer->WindowEvent = PSP_WindowEvent;
     renderer->CreateTexture = PSP_CreateTexture;
+    renderer->SetTextureColorMod = PSP_SetTextureColorMod;
     renderer->UpdateTexture = PSP_UpdateTexture;
     renderer->LockTexture = PSP_LockTexture;
     renderer->UnlockTexture = PSP_UnlockTexture;
@@ -459,7 +462,7 @@ static int
 PSP_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
 {
 /*      PSP_RenderData *renderdata = (PSP_RenderData *) renderer->driverdata; */
-    PSP_TextureData* psp_texture = (PSP_TextureData*) SDL_calloc(1, sizeof(*psp_texture));;
+    PSP_TextureData* psp_texture = (PSP_TextureData*) SDL_calloc(1, sizeof(*psp_texture));
 
     if(!psp_texture)
         return -1;
@@ -501,6 +504,11 @@ PSP_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
     return 0;
 }
 
+static int
+PSP_SetTextureColorMod(SDL_Renderer * renderer, SDL_Texture * texture)
+{
+    return SDL_Unsupported();
+}
 
 void
 TextureActivate(SDL_Texture * texture)
@@ -853,7 +861,7 @@ PSP_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
                     Uint32 pixel_format, void * pixels, int pitch)
 
 {
-        return 0;
+    return SDL_Unsupported();
 }
 
 

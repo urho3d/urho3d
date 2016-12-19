@@ -21,6 +21,8 @@
  */
 
 /* Author: Soren Sandmann <sandmann@redhat.com> */
+#include "../../SDL_internal.h"
+#include "SDL_stdinc.h"
 
 #include "edid.h"
 #include <stdlib.h>
@@ -247,7 +249,7 @@ decode_fraction (int high, int low)
     high = (high << 2) | low;
 
     for (i = 0; i < 10; ++i)
-	result += get_bit (high, i) * pow (2, i - 10);
+	result += get_bit (high, i) * SDL_pow (2, i - 10);
 
     return result;
 }
@@ -548,7 +550,6 @@ yesno (int v)
 void
 dump_monitor_info (MonitorInfo *info)
 {
-    char *s;
     int i;
     
     printf ("Checksum: %d (%s)\n",
@@ -601,6 +602,7 @@ dump_monitor_info (MonitorInfo *info)
     }
     else
     {
+       const char *s;
 	printf ("Video Signal Level: %f\n", info->analog.video_signal_level);
 	printf ("Sync Signal Level: %f\n", info->analog.sync_signal_level);
 	printf ("Total Signal Level: %f\n", info->analog.total_signal_level);

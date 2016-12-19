@@ -1,0 +1,57 @@
+$#include "Engine/Console.h"
+
+class Console : public Object
+{
+    void SetDefaultStyle(XMLFile* style);
+    void SetVisible(bool enable);
+    void Toggle();
+    void SetAutoVisibleOnError(bool enable);
+    void SetCommandInterpreter(const String interpreter);
+    void SetNumBufferedRows(unsigned rows);
+    void SetNumRows(unsigned rows);
+    void SetNumHistoryRows(unsigned rows);
+    void SetFocusOnShow(bool enable);
+    void UpdateElements();
+    
+    XMLFile* GetDefaultStyle() const;
+    BorderImage* GetBackground() const;
+    LineEdit* GetLineEdit() const;
+    Button* GetCloseButton() const;
+    bool IsVisible() const;
+    bool IsAutoVisibleOnError() const;
+    const String GetCommandInterpreter() const;
+    unsigned GetNumBufferedRows() const;
+    unsigned GetNumRows() const;
+    void CopySelectedRows() const;
+    unsigned GetNumHistoryRows() const;
+    unsigned GetHistoryPosition() const;
+    const String GetHistoryRow(unsigned index) const;
+    bool GetFocusOnShow() const;
+    
+    tolua_property__get_set XMLFile* defaultStyle;
+    tolua_readonly tolua_property__get_set BorderImage* background;
+    tolua_readonly tolua_property__get_set LineEdit* lineEdit;
+    tolua_readonly tolua_property__get_set Button* closeButton;
+    tolua_property__is_set bool visible;
+    tolua_property__is_set bool autoVisibleOnError;
+    tolua_property__get_set String commandInterpreter;
+    tolua_property__get_set unsigned numBufferedRows;
+    tolua_property__get_set unsigned numRows;
+    tolua_property__get_set unsigned numHistoryRows;
+    tolua_readonly tolua_property__get_set unsigned historyPosition;
+    tolua_property__get_set bool focusOnShow;
+};
+
+Console* GetConsole();
+tolua_readonly tolua_property__get_set Console* console;
+
+${
+#define TOLUA_DISABLE_tolua_EngineLuaAPI_GetConsole00
+static int tolua_EngineLuaAPI_GetConsole00(lua_State* tolua_S)
+{
+    return ToluaGetSubsystem<Console>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_get_console_ptr
+#define tolua_get_console_ptr tolua_EngineLuaAPI_GetConsole00
+$}

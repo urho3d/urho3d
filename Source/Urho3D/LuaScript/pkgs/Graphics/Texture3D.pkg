@@ -1,0 +1,26 @@
+$#include "Graphics/Texture3D.h"
+
+enum TextureUsage{};
+
+class Texture3D : public Texture
+{
+    Texture3D();
+    ~Texture3D();
+
+    bool SetSize(int width, int height, int depth, unsigned format, TextureUsage usage = TEXTURE_STATIC);
+    bool SetData(Image* image, bool useAlpha = false);
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Texture3D_new00
+static int tolua_GraphicsLuaAPI_Texture3D_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Texture3D>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_Texture3D_new00_local
+static int tolua_GraphicsLuaAPI_Texture3D_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Texture3D>(tolua_S);
+}
+$}

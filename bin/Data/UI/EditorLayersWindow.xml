@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<element type="Window">
+	<attribute name="Name" value="EditorLayers" />
+	<attribute name="Position" value="952 533" />
+	<attribute name="Size" value="220 45" />
+	
+  <element style="ListRow">
+        <attribute name="Layout Spacing" value="2" />
+        <attribute name="Position" value="5 4" />
+        <attribute name="Size" value="95 17" />
+        <element type="Text">
+            <attribute name="Text" value="Mask" />
+        </element>
+        <element type="DropDownList">
+            <attribute name="Name" value="LayerModeEdit" />
+            <attribute name="Position" value="5 4" />
+            <attribute name="Min Size" value="180 0" />
+            <attribute name="Max Size" value="180 2147483647" />
+            <attribute name="Resize Popup" value="true" />
+            
+            <element type="Window" internal="true" popup="true" style="none">
+                <element type="ListView" internal="true" style="none">
+                <attribute name="Name" value="ListView" />
+                    <element type="BorderImage" internal="true" style="none">
+                        <element internal="true" style="none">
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="View" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Light" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Shadow" />
+                            </element>
+                            <element type="Text" style="FileSelectorFilterText">
+                                <attribute name="Text" value="Zone" />
+                            </element>
+                        </element>
+                    </element>
+                </element>
+            </element>
+        </element>
+    </element>
+	
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit0" />
+		<attribute name="Position" value="55 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit1" />
+		<attribute name="Position" value="75 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit2" />
+		<attribute name="Position" value="95 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit3" />
+		<attribute name="Position" value="115 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit4" />
+		<attribute name="Position" value="135 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit5" />
+		<attribute name="Position" value="155 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit6" />
+		<attribute name="Position" value="175 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="CheckBox">
+		<attribute name="Name" value="Bit7" />
+		<attribute name="Position" value="195 24" />
+		<attribute name="Size" value="16 16" />
+		<attribute name="Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Top Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Left Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Bottom Right Color" value="0.5 0.5 0.5 1" />
+		<attribute name="Is Selected" value="true" />
+		<attribute name="Layout Mode" value="Horizontal" />
+	</element>
+	<element type="Text">
+		<attribute name="Position" value="6 24" />
+		<attribute name="Top Left Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Top Right Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Bottom Left Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Bottom Right Color" value="0.85 0.85 0.85 1" />
+		<attribute name="Text" value="Layer" />
+		<attribute name="Text Alignment" value="Center" />
+	</element>
+</element>

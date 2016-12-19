@@ -1,0 +1,26 @@
+$#include "Math/Polyhedron.h"
+
+class Polyhedron
+{
+    Polyhedron();
+    Polyhedron(const Polyhedron& polyhedron);
+    Polyhedron(const BoundingBox& box);
+    Polyhedron(const Frustum& frustum);
+    ~Polyhedron();
+
+    void Define(const BoundingBox& box);
+    void Define(const Frustum& frustum);
+    void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2);
+    void AddFace(const Vector3& v0, const Vector3& v1, const Vector3& v2, const Vector3& v3);
+    void Clip(const Plane& plane);
+    void Clip(const BoundingBox& box);
+    void Clip(const Frustum& box);
+    void Clear();
+    void Transform(const Matrix3& transform);
+    void Transform(const Matrix3x4& transform);
+    Polyhedron Transformed(const Matrix3& transform) const;
+    Polyhedron Transformed(const Matrix3x4& transform) const;
+    bool Empty() const;
+    
+    tolua_readonly tolua_property__no_prefix bool empty;
+};

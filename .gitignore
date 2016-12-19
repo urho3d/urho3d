@@ -1,25 +1,33 @@
-# Build directories
-Build/
-*-Build/
-
 # Output directories
-Bin/*
-!Bin/**/
-!Bin/*.bat
-!Bin/*.sh
-Bin/*.app/
-Bin/*.app.dSYM/
-Bin/Data/LuaScripts/jit/
-Bin/Screenshots
-*-Bin/
-Lib/
-*-Lib/
+/bin/*
+!/bin/**/
+!/bin/*.bat
+!/bin/*.sh
+/bin/*.app/
+/bin/*.app.dSYM/
+/bin/jit/
+/bin/Screenshots/
+/bin/tool/
+/include/
+/lib*/
+generated/
+/Source/Urho3D/tolua++-prefix/
+
+# Output files
+/Source/**/*.a
+/Source/ThirdParty/LuaJIT/src/host/buildvm
+/Source/ThirdParty/LuaJIT/src/host/buildvm_arch.h
+/Source/ThirdParty/LuaJIT/src/host/minilua
+/Source/Urho3D/Precompiled.cpp
+/Source/Urho3D/Urho3D.h
+/Source/Urho3D/Urho3D.pc
+/Source/Urho3D/Urho3D.pc.msvc
+/Source/Urho3D/Urho3DAll.h
+/Source/Urho3D/librevision.h
 
 # Compiled shaders
-*.vs2
-*.vs3
-*.ps2
-*.ps3
+*.vs?
+*.ps?
 
 # Compiled AngelScript
 *.asc
@@ -28,31 +36,60 @@ Lib/
 *.luc
 
 # Generated documentation
-Docs/html/
-Docs/Doxyfile
-Docs/minimal-*
+/Docs/html/
+/Docs/qch/
 
 # Eclipse project settings
-Source/.*project
-Source/.settings
+/.*project
+/.settings
 
-# Android in-the-source project settings
-Source/Android/project.properties
-Source/Android/local.properties
-Source/Android/proguard-project.txt
+# KDevelop project settings
+/*.kdev?
 
-# Android in-the-source build and output directories
-Source/Android/Engine
-Source/Android/ThirdParty
-Source/Android/libs
+# Qt Creator project settings
+/CMakeLists.txt.user
 
-# Android in-the-source CMake build files
+# JetBrains IDE project settings
+/.idea/
+/cmake-build-*/
+
+# Code::Blocks project settings
+/*.cbp
+
+# Codelite project settings
+/*.project
+/*.workspace
+
+# Android project settings
+/Android/local.properties
+
+# Android output directories
+/Android/Urho3D/
+/Android/ThirdParty/
+/Android/libs/
+
+# CMake generated build files
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
 Makefile
 cmake_install.cmake
 install_manifest.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+/Source/**/*.cmake
+!/Source/ThirdParty/SDL/cmake/*.cmake
+/Docs/**/*.cmake
+
+# Precompiled header files
+*.gch/
+*.pch/
+*.pch.*
+
+# Custom rake tasks
+/.rake/
+.rake_t_cache
 
 # Misc.
 configure*
@@ -62,3 +99,4 @@ configure*
 *.log
 *.bak
 Thumbs.db
+.directory

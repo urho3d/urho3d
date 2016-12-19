@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2014 the Urho3D project.
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,38 +20,36 @@
 // THE SOFTWARE.
 //
 
-#include "AnimatedModel.h"
-#include "AnimationController.h"
-#include "Camera.h"
-#include "CollisionShape.h"
-#include "Controls.h"
-#include "CoreEvents.h"
-#include "Engine.h"
-#include "FileSystem.h"
-#include "Font.h"
-#include "Input.h"
-#include "Light.h"
-#include "Material.h"
-#include "Model.h"
-#include "Octree.h"
-#include "PhysicsWorld.h"
-#include "ProcessUtils.h"
-#include "Renderer.h"
-#include "RigidBody.h"
-#include "ResourceCache.h"
-#include "Scene.h"
-#include "StaticModel.h"
-#include "Text.h"
-#include "UI.h"
-#include "Zone.h"
+#include <Urho3D/Core/CoreEvents.h>
+#include <Urho3D/Core/ProcessUtils.h>
+#include <Urho3D/Engine/Engine.h>
+#include <Urho3D/Graphics/AnimatedModel.h>
+#include <Urho3D/Graphics/AnimationController.h>
+#include <Urho3D/Graphics/Camera.h>
+#include <Urho3D/Graphics/Light.h>
+#include <Urho3D/Graphics/Material.h>
+#include <Urho3D/Graphics/Octree.h>
+#include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Input/Controls.h>
+#include <Urho3D/Input/Input.h>
+#include <Urho3D/IO/FileSystem.h>
+#include <Urho3D/Physics/CollisionShape.h>
+#include <Urho3D/Physics/PhysicsWorld.h>
+#include <Urho3D/Physics/RigidBody.h>
+#include <Urho3D/Resource/ResourceCache.h>
+#include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/Font.h>
+#include <Urho3D/UI/Text.h>
+#include <Urho3D/UI/UI.h>
 
 #include "Character.h"
 #include "CharacterDemo.h"
 #include "Touch.h"
 
-#include "DebugNew.h"
+#include <Urho3D/DebugNew.h>
 
-DEFINE_APPLICATION_MAIN(CharacterDemo)
+URHO3D_DEFINE_APPLICATION_MAIN(CharacterDemo)
 
 CharacterDemo::CharacterDemo(Context* context) :
     Sample(context),
@@ -83,6 +81,9 @@ void CharacterDemo::Start()
 
     // Subscribe to necessary events
     SubscribeToEvents();
+
+    // Set the mouse mode to use in the sample
+    Sample::InitMouseMode(MM_RELATIVE);
 }
 
 void CharacterDemo::CreateScene()
@@ -186,15 +187,19 @@ void CharacterDemo::CreateCharacter()
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
 
+    // spin node
+    Node* adjustNode = objectNode->CreateChild("AdjNode");
+    adjustNode->SetRotation( Quaternion(180, Vector3(0,1,0) ) );
+    
     // Create the rendering component + animation controller
-    AnimatedModel* object = objectNode->CreateComponent<AnimatedModel>();
-    object->SetModel(cache->GetResource<Model>("Models/Jack.mdl"));
-    object->SetMaterial(cache->GetResource<Material>("Materials/Jack.xml"));
+    AnimatedModel* object = adjustNode->CreateComponent<AnimatedModel>();
+    object->SetModel(cache->GetResource<Model>("Models/Mutant/Mutant.mdl"));
+    object->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/mutant_M.xml"));
     object->SetCastShadows(true);
-    objectNode->CreateComponent<AnimationController>();
+    adjustNode->CreateComponent<AnimationController>();
 
     // Set the head bone for manual control
-    object->GetSkeleton().GetBone("Bip01_Head")->animated_ = false;
+    object->GetSkeleton().GetBone("Mutant:Head")->animated_ = false;
 
     // Create rigidbody, and set non-zero mass so that the body becomes dynamic
     RigidBody* body = objectNode->CreateComponent<RigidBody>();
@@ -243,10 +248,10 @@ void CharacterDemo::CreateInstructions()
 void CharacterDemo::SubscribeToEvents()
 {
     // Subscribe to Update event for setting the character controls before physics simulation
-    SubscribeToEvent(E_UPDATE, HANDLER(CharacterDemo, HandleUpdate));
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(CharacterDemo, HandleUpdate));
 
     // Subscribe to PostUpdate event for updating the camera position after physics simulation
-    SubscribeToEvent(E_POSTUPDATE, HANDLER(CharacterDemo, HandlePostUpdate));
+    SubscribeToEvent(E_POSTUPDATE, URHO3D_HANDLER(CharacterDemo, HandlePostUpdate));
 
     // Unsubscribe the SceneUpdate event from base class as the camera node is being controlled in HandlePostUpdate() in this sample
     UnsubscribeFromEvent(E_SCENEUPDATE);
@@ -256,7 +261,6 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
 
-    float timeStep = eventData[P_TIMESTEP].GetFloat();
     Input* input = GetSubsystem<Input>();
 
     if (character_)
@@ -274,10 +278,10 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         {
             if (!touch_ || !touch_->useGyroscope_)
             {
-                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown('W'));
-                character_->controls_.Set(CTRL_BACK, input->GetKeyDown('S'));
-                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown('A'));
-                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown('D'));
+                character_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+                character_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+                character_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+                character_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
             }
             character_->controls_.Set(CTRL_JUMP, input->GetKeyDown(KEY_SPACE));
 
@@ -306,13 +310,15 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
             }
             // Limit pitch
             character_->controls_.pitch_ = Clamp(character_->controls_.pitch_, -80.0f, 80.0f);
+            // Set rotation already here so that it's updated every rendering frame instead of every physics frame
+            character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
 
             // Switch between 1st and 3rd person
-            if (input->GetKeyPress('F'))
+            if (input->GetKeyPress(KEY_F))
                 firstPerson_ = !firstPerson_;
 
             // Turn on/off gyroscope on mobile platform
-            if (touch_ && input->GetKeyPress('G'))
+            if (touch_ && input->GetKeyPress(KEY_G))
                 touch_->useGyroscope_ = !touch_->useGyroscope_;
 
             // Check for loading / saving the scene
@@ -332,9 +338,6 @@ void CharacterDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
                     character_ = characterNode->GetComponent<Character>();
             }
         }
-
-        // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-        character_->GetNode()->SetRotation(Quaternion(character_->controls_.yaw_, Vector3::UP));
     }
 }
 
@@ -350,14 +353,12 @@ void CharacterDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData
     Quaternion dir = rot * Quaternion(character_->controls_.pitch_, Vector3::RIGHT);
 
     // Turn head to camera pitch, but limit to avoid unnatural animation
-    Node* headNode = characterNode->GetChild("Bip01_Head", true);
+    Node* headNode = characterNode->GetChild("Mutant:Head", true);
     float limitPitch = Clamp(character_->controls_.pitch_, -45.0f, 45.0f);
     Quaternion headDir = rot * Quaternion(limitPitch, Vector3(1.0f, 0.0f, 0.0f));
     // This could be expanded to look at an arbitrary target, now just look at a point in front
-    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, 1.0f);
+    Vector3 headWorldTarget = headNode->GetWorldPosition() + headDir * Vector3(0.0f, 0.0f, -1.0f);
     headNode->LookAt(headWorldTarget, Vector3(0.0f, 1.0f, 0.0f));
-    // Correct head orientation because LookAt assumes Z = forward, but the bone has been authored differently (Y = forward)
-    headNode->Rotate(Quaternion(0.0f, 90.0f, 90.0f));
 
     if (firstPerson_)
     {

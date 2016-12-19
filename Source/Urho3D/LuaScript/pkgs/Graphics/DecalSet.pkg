@@ -1,0 +1,28 @@
+$#include "Graphics/DecalSet.h"
+
+class DecalSet : public Drawable
+{
+    void SetMaterial(Material* material);
+    void SetMaxVertices(unsigned num);
+    void SetMaxIndices(unsigned num);
+    void SetOptimizeBufferSize(bool enable);
+    bool AddDecal(Drawable* target, const Vector3& worldPosition, const Quaternion& worldRotation, float size, float aspectRatio, float depth, const Vector2& topLeftUV, const Vector2& bottomRightUV, float timeToLive = 0.0f, float normalCutoff = 0.1f, unsigned subGeometry = M_MAX_UNSIGNED);
+    void RemoveDecals(unsigned num);
+    void RemoveAllDecals();
+
+    Material* GetMaterial() const;
+    unsigned GetNumDecals() const;
+    unsigned GetNumVertices() const;
+    unsigned GetNumIndices() const;
+    unsigned GetMaxVertices() const;
+    unsigned GetMaxIndices() const;
+    bool GetOptimizeBufferSize() const;
+
+    tolua_property__get_set Material* material;
+    tolua_readonly tolua_property__get_set unsigned numDecals;
+    tolua_readonly tolua_property__get_set unsigned numVertices;
+    tolua_readonly tolua_property__get_set unsigned numIndices;
+    tolua_property__get_set unsigned maxVertices;
+    tolua_property__get_set unsigned maxIndices;
+    tolua_property__get_set bool optimizeBufferSize;
+};

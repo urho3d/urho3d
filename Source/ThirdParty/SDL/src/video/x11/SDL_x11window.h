@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -27,8 +27,7 @@
    video mode changes and we can respond to them by triggering more mode
    changes.
 */
-#define PENDING_FOCUS_IN_TIME   200
-#define PENDING_FOCUS_OUT_TIME  200
+#define PENDING_FOCUS_TIME   200
 
 #if SDL_VIDEO_OPENGL_EGL   
 #include <EGL/egl.h>
@@ -57,10 +56,16 @@ typedef struct
     GC gc;
     XIC ic;
     SDL_bool created;
+    int border_left;
+    int border_right;
+    int border_top;
+    int border_bottom;
+    Uint32 last_focus_event_time;
     PendingFocusEnum pending_focus;
     Uint32 pending_focus_time;
     XConfigureEvent last_xconfigure;
     struct SDL_VideoData *videodata;
+    unsigned long user_time;
     Atom xdnd_req;
     Window xdnd_source;
 #if SDL_VIDEO_OPENGL_EGL  
@@ -79,6 +84,10 @@ extern void X11_SetWindowIcon(_THIS, SDL_Window * window, SDL_Surface * icon);
 extern void X11_SetWindowPosition(_THIS, SDL_Window * window);
 extern void X11_SetWindowMinimumSize(_THIS, SDL_Window * window);
 extern void X11_SetWindowMaximumSize(_THIS, SDL_Window * window);
+extern int X11_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *bottom, int *right);
+extern int X11_SetWindowOpacity(_THIS, SDL_Window * window, float opacity);
+extern int X11_SetWindowModalFor(_THIS, SDL_Window * modal_window, SDL_Window * parent_window);
+extern int X11_SetWindowInputFocus(_THIS, SDL_Window * window);
 extern void X11_SetWindowSize(_THIS, SDL_Window * window);
 extern void X11_ShowWindow(_THIS, SDL_Window * window);
 extern void X11_HideWindow(_THIS, SDL_Window * window);
@@ -87,12 +96,14 @@ extern void X11_MaximizeWindow(_THIS, SDL_Window * window);
 extern void X11_MinimizeWindow(_THIS, SDL_Window * window);
 extern void X11_RestoreWindow(_THIS, SDL_Window * window);
 extern void X11_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered);
+extern void X11_SetWindowResizable(_THIS, SDL_Window * window, SDL_bool resizable);
 extern void X11_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display, SDL_bool fullscreen);
 extern int X11_SetWindowGammaRamp(_THIS, SDL_Window * window, const Uint16 * ramp);
 extern void X11_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed);
 extern void X11_DestroyWindow(_THIS, SDL_Window * window);
 extern SDL_bool X11_GetWindowWMInfo(_THIS, SDL_Window * window,
                                     struct SDL_SysWMinfo *info);
+extern int X11_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
 
 #endif /* _SDL_x11window_h */
 

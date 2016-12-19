@@ -1,4 +1,0 @@
-<material>
-    <technique name="Techniques/DiffVColAdd.xml" />
-    <texture unit="diffuse" name="Textures/Flare.dds" />
-</material>

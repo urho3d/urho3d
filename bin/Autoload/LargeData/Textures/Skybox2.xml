@@ -1,0 +1,12 @@
+<cubemap>
+    <srgb enable="true" />
+    <face name="output_pmrem_posx.dds" />
+    <face name="output_pmrem_negx.dds" />
+    <face name="output_pmrem_posy.dds" />
+    <face name="output_pmrem_negy.dds" />
+    <face name="output_pmrem_posz.dds" />
+    <face name="output_pmrem_negz.dds" />
+    <address coord="uv" mode="clamp" />
+    <mipmap enable="true" />
+    <filter mode="trilinear" />
+</cubemap>

@@ -1,0 +1,72 @@
+$#include "IO/Deserializer.h"
+
+class Deserializer
+{
+    // unsigned Read(void* dest, unsigned size);
+    tolua_outside VectorBuffer DeserializerRead @ Read(unsigned size);
+    unsigned Seek(unsigned position);
+    const String GetName() const;
+    unsigned GetChecksum();
+    unsigned GetPosition() const;
+    unsigned GetSize() const;
+    bool IsEof() const;
+    
+    int ReadInt();
+    long long ReadInt64();
+    short ReadShort();
+    signed char ReadByte();
+    unsigned ReadUInt();
+    unsigned long long ReadUInt64();
+    unsigned short ReadUShort();
+    unsigned char ReadUByte();
+    bool ReadBool();
+    float ReadFloat();
+    double ReadDouble();
+    IntRect ReadIntRect();
+    IntVector2 ReadIntVector2();
+    Rect ReadRect();
+    Vector2 ReadVector2();
+    Vector3 ReadVector3();
+    Vector3 ReadPackedVector3(float maxAbsCoord);
+    Vector4 ReadVector4();
+    Quaternion ReadQuaternion();
+    Quaternion ReadPackedQuaternion();
+    Matrix3 ReadMatrix3();
+    Matrix3x4 ReadMatrix3x4();
+    Matrix4 ReadMatrix4();
+    Color ReadColor();
+    BoundingBox ReadBoundingBox();
+    String ReadString();
+    String ReadFileID();
+    StringHash ReadStringHash();
+    
+    // PODVector<unsigned char> ReadBuffer();
+    VectorBuffer ReadBuffer();
+    
+    ResourceRef ReadResourceRef();
+    ResourceRefList ReadResourceRefList();
+    Variant ReadVariant();
+    Variant ReadVariant(VariantType type);
+    VariantVector ReadVariantVector();
+    VariantMap ReadVariantMap();
+    unsigned ReadVLE();
+    unsigned ReadNetID();
+    String ReadLine();
+    
+    tolua_readonly tolua_property__get_set String name;
+    tolua_readonly tolua_property__get_set unsigned checksum;
+    tolua_readonly tolua_property__get_set unsigned position;
+    tolua_readonly tolua_property__get_set unsigned size;
+    tolua_readonly tolua_property__is_set bool eof;
+};
+
+${
+static VectorBuffer DeserializerRead(Deserializer* deserializer, unsigned size)
+{
+    unsigned char* data = new unsigned char[size];
+    deserializer->Read(data, size);
+    VectorBuffer buffer(data, size);
+    delete [] data;
+    return buffer;
+}
+$}

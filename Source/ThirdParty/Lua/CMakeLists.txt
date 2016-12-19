@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2014 the Urho3D project.
+# Copyright (c) 2008-2016 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,27 @@
 set (TARGET_NAME Lua)
 
 # Define source files
-file (GLOB C_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.c)
-list (REMOVE_ITEM C_FILES src/lua.c src/luac.c)
-file (GLOB H_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.h)
-set (SOURCE_FILES ${C_FILES} ${H_FILES})
+define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_PATTERNS src/lua.c src/luac.c)
+
+# Define dependency libs
+if (READLINE_FOUND)
+    add_definitions (-DLUA_USE_READLINE)
+    # FIXME: temporary quick fix
+    if (RPI AND CMAKE_CROSSCOMPILING)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
+    endif ()
+    list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
+    list (APPEND LIBS ${READLINE_LIBRARIES})
+endif ()
 
 # Setup target
 setup_library ()
 
-# On Android platform, use 'adb push' to copy the tool(s) from android-Bin to Android (virtual) device; use 'adb shell' to login into a remote shell to execute the tool in the (virtual) device
-# The tools are not built on iOS platform as there is no (easy) way to execute them on the iOS device
-if (NOT IOS AND URHO3D_TOOLS)
+# Install headers for building and using the Urho3D library (no direct dependencies but library user may need them)
+install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/Lua FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
+
+# Setup additional Lua standalone targets (these targets can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
+if (NOT IOS AND NOT WEB)
     # Define target name for Lua interpreter
     set (TARGET_NAME lua_interpreter)   # Note: intended target name is 'lua' which clashes with 'Lua' library target above for case-insensitive platform
 
@@ -42,9 +52,9 @@ if (NOT IOS AND URHO3D_TOOLS)
     set (SOURCE_FILES src/lua.c)
 
     # Define dependency libs
-    set (LINK_LIBS_ONLY Lua)
+    set (LIBS Lua)
     if (NOT MSVC)
-        list (APPEND LINK_LIBS_ONLY m)
+        list (APPEND LIBS m)
     endif ()
 
     # Setup target

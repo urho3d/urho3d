@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -142,6 +142,12 @@ void BE_SetWindowSize(_THIS, SDL_Window * window) {
 void BE_SetWindowBordered(_THIS, SDL_Window * window, SDL_bool bordered) {
 	BMessage msg(BWIN_SET_BORDERED);
 	msg.AddBool("window-border", bordered != SDL_FALSE);
+	_ToBeWin(window)->PostMessage(&msg);
+}
+
+void BE_SetWindowResizable(_THIS, SDL_Window * window, SDL_bool resizable) {
+	BMessage msg(BWIN_SET_RESIZABLE);
+	msg.AddBool("window-resizable", resizable != SDL_FALSE);
 	_ToBeWin(window)->PostMessage(&msg);
 }
 

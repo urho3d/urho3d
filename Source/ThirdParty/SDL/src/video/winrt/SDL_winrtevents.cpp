@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -40,6 +40,7 @@ using Windows::UI::Core::CoreCursor;
 #include "SDL_system.h"
 
 extern "C" {
+#include "../../thread/SDL_systhread.h"
 #include "../SDL_sysvideo.h"
 #include "../../events/SDL_events_c.h"
 }
@@ -113,7 +114,7 @@ WINRT_CycleXAMLThread()
 
             _mutex = SDL_CreateMutex();
             _threadState = ThreadState_Running;
-            _XAMLThread = SDL_CreateThread(WINRT_XAMLThreadMain, "SDL/XAML App Thread", nullptr);
+            _XAMLThread = SDL_CreateThreadInternal(WINRT_XAMLThreadMain, "SDL/XAML App Thread", 0, nullptr);
 
             SDL_LockMutex(_mutex);
             while (_threadState != ThreadState_Yielding) {

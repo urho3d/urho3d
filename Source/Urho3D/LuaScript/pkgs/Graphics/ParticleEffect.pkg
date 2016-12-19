@@ -1,0 +1,170 @@
+$#include "Graphics/ParticleEffect.h"
+
+enum EmitterType
+{
+    EMITTER_SPHERE,
+    EMITTER_BOX
+};
+
+struct ColorFrame
+{
+    ColorFrame();
+    ColorFrame(const Color& color);
+    ColorFrame(const Color& color, float time);
+    ~ColorFrame();
+
+    Color Interpolate(const ColorFrame& next, float time);
+    Color color_ @ color;
+    float time_ @ time;
+};
+
+struct TextureFrame
+{
+    TextureFrame();
+    ~TextureFrame();
+
+    Rect uv_ @ uv;
+    float time_ @ time;
+};
+
+class ParticleEffect : public Resource
+{
+    ParticleEffect();
+    ~ParticleEffect();
+
+    void SetMaterial(Material* material);
+    void SetNumParticles(unsigned num);
+    void SetUpdateInvisible(bool enable);
+    void SetRelative(bool enable);
+    void SetScaled(bool enable);
+    void SetSorted(bool enable);
+    void SetFixedScreenSize(bool enable);
+    void SetAnimationLodBias(float lodBias);
+    void SetEmitterType(EmitterType type);
+    void SetEmitterSize(const Vector3& size);
+    void SetMinDirection(const Vector3& direction);
+    void SetMaxDirection(const Vector3& direction);
+    void SetConstantForce(const Vector3& force);
+    void SetDampingForce(float force);
+    void SetActiveTime(float time);
+    void SetInactiveTime(float time);
+    void SetMinEmissionRate(float rate);
+    void SetMaxEmissionRate(float rate);
+    void SetMinParticleSize(const Vector2& size);
+    void SetMaxParticleSize(const Vector2& size);
+    void SetMinTimeToLive(float time);
+    void SetMaxTimeToLive(float time);
+    void SetMinVelocity(float velocity);
+    void SetMaxVelocity(float velocity);
+    void SetMinRotation(float rotation);
+    void SetMaxRotation(float rotation);
+    void SetMinRotationSpeed(float speed);
+    void SetMaxRotationSpeed(float speed);
+    void SetSizeAdd(float sizeAdd);
+    void SetSizeMul(float sizeMul);
+    void AddColorTime(const Color& color, const float time);
+    void AddColorFrame(const ColorFrame& colorFrame);
+    void RemoveColorFrame(unsigned index);
+    void SetColorFrame(unsigned index, const ColorFrame& colorFrame);
+    void SetNumColorFrames(unsigned number);
+    void SortColorFrames();
+    void AddTextureTime(const Rect& uv, const float time);
+    void AddTextureFrame(const TextureFrame& textureFrame);
+    void RemoveTextureFrame(unsigned index);
+    void SetTextureFrame(unsigned index, const TextureFrame& textureFrame);
+    void SetNumTextureFrames(unsigned number);
+    void SortTextureFrames();
+    
+    // SharedPtr<ParticleEffect> Clone(const String cloneName = String::EMPTY) const;
+    tolua_outside ParticleEffect* ParticleEffectClone @ Clone(const String cloneName = String::EMPTY) const;
+
+    Material* GetMaterial() const;
+    unsigned GetNumParticles() const;
+    bool GetUpdateInvisible() const;
+    bool IsRelative() const;
+    bool IsScaled() const;
+    bool IsSorted() const;
+    bool IsFixedScreenSize() const;
+    float GetAnimationLodBias() const;
+    EmitterType GetEmitterType() const;
+    const Vector3& GetEmitterSize() const;
+    const Vector3& GetMinDirection() const;
+    const Vector3& GetMaxDirection() const;
+    const Vector3& GetConstantForce() const;
+    float GetDampingForce() const;
+    float GetActiveTime() const;
+    float GetInactiveTime() const;
+    float GetMinEmissionRate() const;
+    float GetMaxEmissionRate() const;
+    const Vector2& GetMinParticleSize() const;
+    const Vector2& GetMaxParticleSize() const;
+    float GetMinTimeToLive() const;
+    float GetMaxTimeToLive() const;
+    float GetMinVelocity() const;
+    float GetMaxVelocity() const;
+    float GetMinRotation() const;
+    float GetMaxRotation() const;
+    float GetMinRotationSpeed() const;
+    float GetMaxRotationSpeed() const;
+    float GetSizeAdd() const;
+    float GetSizeMul() const;
+    unsigned GetNumColorFrames() const;
+    const ColorFrame* GetColorFrame(unsigned index) const;
+    unsigned GetNumTextureFrames() const;
+    const TextureFrame* GetTextureFrame(unsigned index) const;
+
+    tolua_property__get_set Material* material;
+    tolua_property__get_set unsigned numParticles;
+    tolua_property__get_set bool updateInvisible;
+    tolua_property__is_set bool relative;
+    tolua_property__is_set bool scaled;
+    tolua_property__is_set bool sorted;
+    tolua_property__is_set bool fixedScreenSize;
+    tolua_property__get_set float animationLodBias;
+    tolua_property__get_set EmitterType emitterType;
+    tolua_property__get_set const Vector3& emitterSize;
+    tolua_property__get_set const Vector3& minDirection;
+    tolua_property__get_set const Vector3& maxDirection;
+    tolua_property__get_set const Vector3& constantForce;
+    tolua_property__get_set float dampingForce;
+    tolua_property__get_set float activeTime;
+    tolua_property__get_set float inactiveTime;
+    tolua_property__get_set float minEmissionRate;
+    tolua_property__get_set float maxEmissionRate;
+    tolua_property__get_set const Vector2& minParticleSize;
+    tolua_property__get_set const Vector2& maxParticleSize;
+    tolua_property__get_set float minTimeToLive;
+    tolua_property__get_set float maxTimeToLive;
+    tolua_property__get_set float minVelocity;
+    tolua_property__get_set float maxVelocity;
+    tolua_property__get_set float minRotation;
+    tolua_property__get_set float maxRotation;
+    tolua_property__get_set float minRotationSpeed;
+    tolua_property__get_set float maxRotationSpeed;
+    tolua_property__get_set float sizeAdd;
+    tolua_property__get_set float sizeMul;
+    tolua_property__get_set unsigned numColorFrames;
+    tolua_property__get_set unsigned numTextureFrames;
+};
+
+${
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_ParticleEffect_new00
+static int tolua_GraphicsLuaAPI_ParticleEffect_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<ParticleEffect>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_GraphicsLuaAPI_ParticleEffect_new00_local
+static int tolua_GraphicsLuaAPI_ParticleEffect_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<ParticleEffect>(tolua_S);
+}
+
+static ParticleEffect* ParticleEffectClone(const ParticleEffect* effect, const String& cloneName = String::EMPTY)
+{
+    if (!effect)
+        return 0;
+
+    return effect->Clone(cloneName).Detach();
+}
+$}

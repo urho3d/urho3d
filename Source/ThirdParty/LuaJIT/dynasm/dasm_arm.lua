@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- DynASM ARM module.
 --
--- Copyright (C) 2005-2014 Mike Pall. All rights reserved.
+-- Copyright (C) 2005-2016 Mike Pall. All rights reserved.
 -- See dynasm.lua for full copyright notice.
 ------------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 local _info = {
   arch =	"arm",
   description =	"DynASM ARM module",
-  version =	"1.3.0",
-  vernum =	 10300,
-  release =	"2011-05-05",
+  version =	"1.4.0",
+  vernum =	 10400,
+  release =	"2015-10-18",
   author =	"Mike Pall",
   license =	"MIT",
 }
@@ -923,19 +923,22 @@ local function parse_template(params, template, nparams, pos)
 end
 
 map_op[".template__"] = function(params, template, nparams)
-  if not params then return sub(template, 9) end
+  if not params then return template:gsub("%x%x%x%x%x%x%x%x", "") end
 
   -- Limit number of section buffer positions used by a single dasm_put().
   -- A single opcode needs a maximum of 3 positions.
   if secpos+3 > maxsecpos then wflush() end
   local pos = wpos()
-  local apos, spos = #actargs, secpos
+  local lpos, apos, spos = #actlist, #actargs, secpos
 
   local ok, err
   for t in gmatch(template, "[^|]+") do
     ok, err = pcall(parse_template, params, t, nparams, pos)
     if ok then return end
     secpos = spos
+    actlist[lpos+1] = nil
+    actlist[lpos+2] = nil
+    actlist[lpos+3] = nil
     actargs[apos+1] = nil
     actargs[apos+2] = nil
     actargs[apos+3] = nil

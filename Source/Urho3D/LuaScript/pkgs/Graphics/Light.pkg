@@ -1,0 +1,128 @@
+$#include "Graphics/Light.h"
+
+enum LightType
+{
+    LIGHT_DIRECTIONAL = 0,
+    LIGHT_SPOT,
+    LIGHT_POINT
+};
+
+struct BiasParameters
+{
+    BiasParameters();
+    BiasParameters(float constantBias, float slopeScaledBias, float normalOffset = 0.0f);
+    ~BiasParameters();
+    
+    float constantBias_ @ constantBias;
+    float slopeScaledBias_ @ slopeScaledBias;
+    float normalOffset_ @ normalOffset;
+};
+
+struct CascadeParameters
+{
+    CascadeParameters();
+    CascadeParameters(float split1, float split2, float split3, float split4, float fadeStart, float biasAutoAdjust = 1.0f);
+    ~CascadeParameters();
+    
+    float fadeStart_ @ fadeStart;
+    float biasAutoAdjust_ @ biasAutoAdjust;
+};
+
+struct FocusParameters
+{
+    FocusParameters();
+    FocusParameters(bool focus, bool nonUniform, bool autoSize, float quantize, float minView);
+    ~FocusParameters();
+    
+    bool focus_ @ focus;
+    bool nonUniform_ @ nonUniform;
+    bool autoSize_ @ autoSize;
+    float quantize_ @ quantize;
+    float minView_ @ minView;
+};
+
+class Light : public Drawable
+{
+    void SetLightType(LightType type);
+    void SetPerVertex(bool enable);
+    void SetColor(const Color& color);
+    void SetTemperature(float temperature);
+    void SetRadius(float redius);
+    void SetLength(float length);
+    void SetUsePhysicalValues(bool enable);
+    void SetSpecularIntensity(float intensity);
+    void SetBrightness(float brightness);
+    void SetRange(float range);
+    void SetFov(float fov);
+    void SetAspectRatio(float aspectRatio);
+    void SetFadeDistance(float distance);
+    void SetShadowFadeDistance(float distance);
+    void SetShadowBias(const BiasParameters& parameters);
+    void SetShadowCascade(const CascadeParameters& parameters);
+    void SetShadowFocus(const FocusParameters& parameters);
+    void SetShadowIntensity(float intensity);
+    void SetShadowResolution(float resolution);
+    void SetShadowNearFarRatio(float nearFarRatio);
+    void SetShadowMaxExtrusion(float extrusion);
+    void SetRampTexture(Texture* texture);
+    void SetShapeTexture(Texture* texture);
+
+    LightType GetLightType() const;
+    bool GetPerVertex() const;
+    const Color& GetColor() const;
+    float GetTemperature() const;
+    float GetRadius() const;
+    float GetLength() const;
+    float GetSpecularIntensity() const;
+    float GetBrightness() const;
+    Color GetEffectiveColor() const;
+    Color GetColorFromTemperature() const;
+    bool GetUsePhysicalValues() const;
+    float GetEffectiveSpecularIntensity() const;
+    float GetRange() const;
+    float GetFov() const;
+    float GetAspectRatio() const;
+    float GetFadeDistance() const;
+    float GetShadowFadeDistance() const;
+    const BiasParameters& GetShadowBias() const;
+    const CascadeParameters& GetShadowCascade() const;
+    const FocusParameters& GetShadowFocus() const;
+    float GetShadowIntensity() const;
+    float GetShadowResolution() const;
+    float GetShadowNearFarRatio() const;
+    float GetShadowMaxExtrusion() const;
+    Texture* GetRampTexture() const;
+    Texture* GetShapeTexture() const;
+    Frustum GetFrustum() const;
+    int GetNumShadowSplits() const;
+    bool IsNegative() const;
+    
+    tolua_property__get_set LightType lightType;
+    tolua_property__get_set bool perVertex;
+    tolua_property__get_set Color& color;
+    tolua_property__get_set float temperature;
+    tolua_property__get_set float radius;
+    tolua_property__get_set float length;
+    tolua_property__get_set bool usePhysicalValues;
+    tolua_property__get_set float specularIntensity;
+    tolua_property__get_set float brightness;
+    tolua_property__get_set float range;
+    tolua_property__get_set float fov;
+    tolua_property__get_set float aspectRatio;
+    tolua_property__get_set float fadeDistance;
+    tolua_property__get_set float shadowFadeDistance;
+    tolua_property__get_set BiasParameters& shadowBias;
+    tolua_property__get_set CascadeParameters& shadowCascade;
+    tolua_property__get_set FocusParameters& shadowFocus;
+    tolua_property__get_set float shadowIntensity;
+    tolua_property__get_set float shadowResolution;
+    tolua_property__get_set float shadowNearFarRatio;
+    tolua_property__get_set float shadowMaxExtrusion;
+    tolua_property__get_set Texture* rampTexture;
+    tolua_property__get_set Texture* shapeTexture;
+    tolua_readonly tolua_property__get_set Frustum frustum;
+    tolua_readonly tolua_property__get_set int numShadowSplits;
+    tolua_readonly tolua_property__is_set bool negative;
+    tolua_readonly tolua_property__get_set Color effectiveColor;
+    tolua_readonly tolua_property__get_set float effectiveSpecularIntensity;
+};

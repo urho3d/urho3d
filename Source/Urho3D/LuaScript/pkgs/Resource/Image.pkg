@@ -1,0 +1,95 @@
+$#include "Resource/Image.h"
+
+enum CompressedFormat
+{
+    CF_NONE = 0,
+    CF_RGBA,
+    CF_DXT1,
+    CF_DXT3,
+    CF_DXT5,
+    CF_ETC1,
+    CF_PVRTC_RGB_2BPP,
+    CF_PVRTC_RGBA_2BPP,
+    CF_PVRTC_RGB_4BPP,
+    CF_PVRTC_RGBA_4BPP,
+};
+
+class Image : public Resource
+{
+    Image();
+    ~Image();
+
+    bool SetSize(int width, int height, unsigned components);
+    bool SetSize(int width, int height, int depth, unsigned components);
+    void SetPixel(int x, int y, const Color& color);
+    void SetPixel(int x, int y, int z, const Color& color);
+    void SetPixelInt(int x, int y, unsigned uintColor);
+    void SetPixelInt(int x, int y, int z, unsigned uintColor);
+    bool LoadColorLUT(Deserializer& source);
+    tolua_outside bool ImageLoadColorLUT @ LoadColorLUT(const String fileName);
+    bool FlipHorizontal();
+    bool FlipVertical();
+    bool Resize(int width, int height);
+    void Clear(const Color& color);
+    void ClearInt(unsigned uintColor);
+    bool SaveBMP(const String fileName) const;
+    bool SavePNG(const String fileName) const;
+    bool SaveTGA(const String fileName) const;
+    bool SaveJPG(const String fileName, int quality) const;
+    bool SaveDDS(const String fileName) const;
+
+    Color GetPixel(int x, int y) const;
+    Color GetPixel(int x, int y, int z) const;
+    unsigned GetPixelInt(int x, int y) const;
+    unsigned GetPixelInt(int x, int y, int z) const;
+    Color GetPixelBilinear(float x, float y) const;
+    Color GetPixelTrilinear(float x, float y, float z) const;
+    int GetWidth() const;
+    int GetHeight() const;
+    int GetDepth() const;
+    unsigned GetComponents() const;
+    bool IsCompressed() const;
+    CompressedFormat GetCompressedFormat() const;
+    unsigned GetNumCompressedLevels() const;
+    Image* GetSubimage(const IntRect& rect) const;
+    bool IsCubemap() const;
+    bool IsArray() const;
+    bool IsSRGB() const;
+
+    tolua_readonly tolua_property__get_set int width;
+    tolua_readonly tolua_property__get_set int height;
+    tolua_readonly tolua_property__get_set int depth;
+    tolua_readonly tolua_property__get_set unsigned components;
+    tolua_readonly tolua_property__is_set bool compressed;
+    tolua_readonly tolua_property__get_set CompressedFormat compressedFormat;
+    tolua_readonly tolua_property__get_set unsigned numCompressedLevels;
+    tolua_readonly tolua_property__is_set bool cubemap;
+    tolua_readonly tolua_property__is_set bool array;
+    tolua_readonly tolua_property__is_set bool sRGB;
+};
+
+${
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_Image_new00
+static int tolua_ResourceLuaAPI_Image_new00(lua_State* tolua_S)
+{
+    return ToluaNewObject<Image>(tolua_S);
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_Image_new00_local
+static int tolua_ResourceLuaAPI_Image_new00_local(lua_State* tolua_S)
+{
+    return ToluaNewObjectGC<Image>(tolua_S);
+}
+
+static bool ImageLoadColorLUT(Image* image, const String& fileName)
+{
+    if (!image)
+        return false;
+
+    File file(image->GetContext());
+    if (!file.Open(fileName, FILE_READ))
+        return false;
+
+    return image->LoadColorLUT(file);
+}
+$}
