@@ -277,7 +277,7 @@ Renderer::Renderer(Context* context) :
     shadowMapSize_(1024),
     shadowQuality_(SHADOWQUALITY_PCF_16BIT),
     shadowSoftness_(1.0f),
-    vsmShadowParams_(0.0000001f, 0.2f),
+    vsmShadowParams_(0.0000001f, 0.9f),
     vsmMultiSample_(1),
     maxShadowMaps_(1),
     minInstances_(2),

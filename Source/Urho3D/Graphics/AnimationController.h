@@ -97,7 +97,7 @@ public:
     virtual void OnSetEnabled();
 
     /// Update the animations. Is called from HandleScenePostUpdate().
-    void Update(float timeStep);
+    virtual void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success.
     bool Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success.
