@@ -724,7 +724,7 @@ void Terrain::CreatePatchGeometry(TerrainPatch* patch)
                 *vertexData++ = normal.z_;
 
                 // Texture coordinate
-                Vector2 texCoord((float)xPos / (float)numVertices_.x_, 1.0f - (float)zPos / (float)numVertices_.y_);
+                Vector2 texCoord((float)xPos / (float)(numVertices_.x_ - 1), 1.0f - (float)zPos / (float)(numVertices_.y_ - 1));
                 *vertexData++ = texCoord.x_;
                 *vertexData++ = texCoord.y_;
 
