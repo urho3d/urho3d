@@ -14940,6 +14940,8 @@ uint GetRGFloat32Format();
 uint GetRandomSeed();
 uint GetReadableDepthFormat();
 String GetTextureUnitName(TextureUnit);
+VariantType GetVariantTypeFromName(const String&);
+String GetVariantTypeName(VariantType);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 float InverseLerp(float, float, float);
