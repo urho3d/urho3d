@@ -607,6 +607,8 @@ static void RegisterVariant(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Variant", "bool get_empty() const", asMETHOD(Variant, IsEmpty), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "VariantType get_type() const", asMETHOD(Variant, GetType), asCALL_THISCALL);
     engine->RegisterObjectMethod("Variant", "String get_typeName() const", asMETHODPR(Variant, GetTypeName, () const, String), asCALL_THISCALL);
+    engine->RegisterGlobalFunction("VariantType GetVariantTypeFromName(const String&in)", asFUNCTIONPR(Variant::GetTypeFromName, (const String&), VariantType), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetVariantTypeName(VariantType)", asFUNCTIONPR(Variant::GetTypeName, (VariantType), String), asCALL_CDECL);
 
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructVariantMap), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectBehaviour("VariantMap", asBEHAVE_CONSTRUCT, "void f(const VariantMap&in)", asFUNCTION(ConstructVariantMapCopy), asCALL_CDECL_OBJLAST);
