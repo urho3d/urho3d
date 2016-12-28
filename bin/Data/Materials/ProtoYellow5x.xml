@@ -1,0 +1,7 @@
+<material>
+    <technique name="Techniques/Diff.xml" />
+    <texture unit="diffuse" name="Textures/ProtoYellow256.jpg" />
+    <parameter name="MatSpecColor" value="0 0 0 16" />
+	<parameter name="UOffset" value="5 0 0 0" />
+	<parameter name="VOffset" value="0 5 0 0" />
+</material>

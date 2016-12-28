@@ -43,7 +43,7 @@ void CreateScene()
     planeNode.scale = Vector3(100.0f, 1.0f, 100.0f);
     StaticModel@ planeObject = planeNode.CreateComponent("StaticModel");
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
-    planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
+    planeObject.material = cache.GetResource("Material", "Materials/ProtoYellow5x.xml");
 
     // Create a Zone component for ambient lighting & fog control
     Node@ zoneNode = scene_.CreateChild("Zone");
@@ -66,24 +66,28 @@ void CreateScene()
 
     // Create animated models
     const uint NUM_MODELS = 100;
-    const float MODEL_MOVE_SPEED = 2.0f;
+    const float MODEL_MOVE_SPEED = 4.0f;
     const float MODEL_ROTATE_SPEED = 100.0f;
     const BoundingBox bounds(Vector3(-47.0f, 0.0f, -47.0f), Vector3(47.0f, 0.0f, 47.0f));
 
     for (uint i = 0; i < NUM_MODELS; ++i)
     {
-        Node@ modelNode = scene_.CreateChild("Jack");
+        Node@ modelNode = scene_.CreateChild("Jill");
         modelNode.position = Vector3(Random(90.0f) - 45.0f, 0.0f, Random(90.0f) - 45.0f);
         modelNode.rotation = Quaternion(0.0f, Random(360.0f), 0.0f);
-        AnimatedModel@ modelObject = modelNode.CreateComponent("AnimatedModel");
-        modelObject.model = cache.GetResource("Model", "Models/Jack.mdl");
-        modelObject.material = cache.GetResource("Material", "Materials/Jack.xml");
+
+        Node@ spinNode = modelNode.CreateChild();
+        spinNode.rotation = Quaternion(180.0f, Vector3(0.0f, 1.0f, 0.0f));
+
+        AnimatedModel@ modelObject = spinNode.CreateComponent("AnimatedModel");
+        modelObject.model = cache.GetResource("Model", "Models/Kachujin/Kachujin.mdl");
+        modelObject.material = cache.GetResource("Material", "Models/Kachujin/Materials/Kachujin.xml");
         modelObject.castShadows = true;
 
         // Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         // animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         // but we need to update the model's position manually in any case
-        Animation@ walkAnimation = cache.GetResource("Animation", "Models/Jack_Walk.ani");
+        Animation@ walkAnimation = cache.GetResource("Animation", "Models/Kachujin/Kachujin_Run.ani");
         AnimationState@ state = modelObject.AddAnimationState(walkAnimation);
         // Enable full blending weight and looping
         state.weight = 1.0f;
@@ -218,7 +222,7 @@ class Mover : ScriptObject
             node.Yaw(rotationSpeed * timeStep);
 
         // Get the model's first (only) animation state and advance its time
-        AnimatedModel@ model = node.GetComponent("AnimatedModel");
+        AnimatedModel@ model = node.GetComponent("AnimatedModel", true);
         AnimationState@ state = model.GetAnimationState(0);
         if (state !is null)
             state.AddTime(timeStep);
@@ -237,3 +241,4 @@ String patchInstructions =
     "        </element>"+
     "    </add>"+
     "</patch>";
+
