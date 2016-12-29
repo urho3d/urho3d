@@ -286,7 +286,7 @@ static void ConstructVariantScriptObject(asIScriptObject* value, Variant* ptr)
 {
     if (value)
     {
-        asIObjectType* scriptObjectInterface = value->GetEngine()->GetObjectTypeByName("ScriptObject");
+        asITypeInfo* scriptObjectInterface = value->GetEngine()->GetTypeInfoByName("ScriptObject");
         if (value->GetObjectType()->Implements(scriptObjectInterface))
             new(ptr) Variant(value);
         else
@@ -372,7 +372,7 @@ static asIScriptObject* VariantGetScriptObject(Variant* ptr)
     if (!object)
         return 0;
 
-    asIObjectType* scriptObjectInterface = object->GetEngine()->GetObjectTypeByName("ScriptObject");
+    asITypeInfo* scriptObjectInterface = object->GetEngine()->GetTypeInfoByName("ScriptObject");
     if (!object->GetObjectType()->Implements(scriptObjectInterface))
         return 0;
 

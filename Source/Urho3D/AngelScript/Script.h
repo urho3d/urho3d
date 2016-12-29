@@ -25,10 +25,10 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
-class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptModule;
+class asITypeInfo;
 
 struct asSMessageInfo;
 
@@ -97,7 +97,7 @@ public:
     /// Clear the inbuild object type cache.
     void ClearObjectTypeCache();
     /// Query for an inbuilt object type by constant declaration. Can not be used for script types.
-    asIObjectType* GetObjectType(const char* declaration);
+    asITypeInfo* GetObjectType(const char* declaration);
 
     /// Return the script module create/delete mutex.
     Mutex& GetModuleMutex() { return moduleMutex_; }
@@ -131,7 +131,7 @@ private:
     /// Script function/method execution contexts.
     Vector<asIScriptContext*> scriptFileContexts_;
     /// Search cache for inbuilt object types.
-    HashMap<const char*, asIObjectType*> objectTypes_;
+    HashMap<const char*, asITypeInfo*> objectTypes_;
     /// AngelScript resource router.
     SharedPtr<ResourceRouter> router_;
     /// Script module create/delete mutex.

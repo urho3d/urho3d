@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -324,15 +324,15 @@ const char &asCString::operator [](size_t index) const
 	return AddressOf()[index];
 }
 
-asCString asCString::SubString(size_t start, size_t length) const
+asCString asCString::SubString(size_t in_start, size_t in_length) const
 {
-	if( start >= GetLength() || length == 0 )
+	if( in_start >= GetLength() || in_length == 0 )
 		return asCString("");
 
-	if( length == (size_t)(-1) ) length = GetLength() - start;
+	if( in_length == (size_t)(-1) ) in_length = GetLength() - in_start;
 
 	asCString tmp;
-	tmp.Assign(AddressOf() + start, length);
+	tmp.Assign(AddressOf() + in_start, in_length);
 
 	return tmp;
 }

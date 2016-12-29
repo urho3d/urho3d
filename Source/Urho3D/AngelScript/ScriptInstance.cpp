@@ -388,7 +388,7 @@ bool ScriptInstance::IsA(const String& className) const
     if (scriptObject_)
     {
         // Start immediately at the first base class because we already checked the early out
-        asIObjectType* currentType = scriptObject_->GetObjectType()->GetBaseType();
+        asITypeInfo* currentType = scriptObject_->GetObjectType()->GetBaseType();
         while (currentType)
         {
             if (className == currentType->GetName())

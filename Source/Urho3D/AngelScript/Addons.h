@@ -49,19 +49,19 @@ public:
     static void SetMemoryFunctions(asALLOCFUNC_t allocFunc, asFREEFUNC_t freeFunc);
 
     // Factory functions
-    static CScriptArray *Create(asIObjectType *ot);
-    static CScriptArray *Create(asIObjectType *ot, asUINT length);
-    static CScriptArray *Create(asIObjectType *ot, asUINT length, void *defaultValue);
-    static CScriptArray *Create(asIObjectType *ot, void *listBuffer);
+    static CScriptArray *Create(asITypeInfo *ot);
+    static CScriptArray *Create(asITypeInfo *ot, asUINT length);
+    static CScriptArray *Create(asITypeInfo *ot, asUINT length, void *defaultValue);
+    static CScriptArray *Create(asITypeInfo *ot, void *listBuffer);
 
     // Memory management
     void AddRef() const;
     void Release() const;
 
     // Type information
-    asIObjectType *GetArrayObjectType() const;
-    int            GetArrayTypeId() const;
-    int            GetElementTypeId() const;
+    asITypeInfo *GetArrayObjectType() const;
+    int          GetArrayTypeId() const;
+    int          GetElementTypeId() const;
 
     // Get the current size
     asUINT GetSize() const;
@@ -117,15 +117,15 @@ public:
 protected:
     mutable int       refCount;
     mutable bool      gcFlag;
-    asIObjectType    *objType;
+    asITypeInfo      *objType;
     SArrayBuffer     *buffer;
     int               elementSize;
     int               subTypeId;
 
     // Constructors
-    CScriptArray(asIObjectType *ot, void *initBuf); // Called from script when initialized with list
-    CScriptArray(asUINT length, asIObjectType *ot);
-    CScriptArray(asUINT length, void *defVal, asIObjectType *ot);
+    CScriptArray(asITypeInfo *ot, void *initBuf); // Called from script when initialized with list
+    CScriptArray(asUINT length, asITypeInfo *ot);
+    CScriptArray(asUINT length, void *defVal, asITypeInfo *ot);
     CScriptArray(const CScriptArray &other);
     virtual ~CScriptArray();
 

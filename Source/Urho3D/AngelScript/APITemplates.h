@@ -68,7 +68,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -86,7 +86,7 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -104,7 +104,7 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, size);
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -122,7 +122,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -146,7 +146,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)
@@ -170,7 +170,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIObjectType* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
+        asITypeInfo* type = GetScriptContext()->GetSubsystem<Script>()->GetObjectType(arrayName);
         CScriptArray* arr = CScriptArray::Create(type, vector.Size());
 
         for (unsigned i = 0; i < arr->GetSize(); ++i)

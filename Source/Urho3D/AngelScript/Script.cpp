@@ -297,13 +297,13 @@ void Script::ClearObjectTypeCache()
     objectTypes_.Clear();
 }
 
-asIObjectType* Script::GetObjectType(const char* declaration)
+asITypeInfo* Script::GetObjectType(const char* declaration)
 {
-    HashMap<const char*, asIObjectType*>::ConstIterator i = objectTypes_.Find(declaration);
+    HashMap<const char*, asITypeInfo*>::ConstIterator i = objectTypes_.Find(declaration);
     if (i != objectTypes_.End())
         return i->second_;
 
-    asIObjectType* type = scriptEngine_->GetObjectTypeById(scriptEngine_->GetTypeIdByDecl(declaration));
+    asITypeInfo* type = scriptEngine_->GetTypeInfoById(scriptEngine_->GetTypeIdByDecl(declaration));
     objectTypes_[declaration] = type;
     return type;
 }
