@@ -41,7 +41,7 @@ function CreateScene()
     planeNode.scale = Vector3(100.0, 1.0, 100.0)
     local planeObject = planeNode:CreateComponent("StaticModel")
     planeObject.model = cache:GetResource("Model", "Models/Plane.mdl")
-    planeObject.material = cache:GetResource("Material", "Materials/ProtoYellow5x.xml")
+    planeObject.material = cache:GetResource("Material", "Materials/Stone.xml")
 
     -- Create a Zone component for ambient lighting & fog control
     local zoneNode = scene_:CreateChild("Zone")
