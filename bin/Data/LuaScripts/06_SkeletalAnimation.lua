@@ -64,23 +64,27 @@ function CreateScene()
 
     -- Create animated models
     local uint NUM_MODELS = 100
-    local MODEL_MOVE_SPEED = 2.0
+    local MODEL_MOVE_SPEED = 4.0
     local MODEL_ROTATE_SPEED = 100.0
     local bounds = BoundingBox(Vector3(-47.0, 0.0, -47.0), Vector3(47.0, 0.0, 47.0))
 
     for i = 1, NUM_MODELS do
-        local modelNode = scene_:CreateChild("Jack")
+        local modelNode = scene_:CreateChild("Jill")
         modelNode.position = Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0)
         modelNode.rotation = Quaternion(0.0, Random(360.0), 0.0)
-        local modelObject = modelNode:CreateComponent("AnimatedModel")
-        modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
-        modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+
+        localspinNode = modelNode:CreateChild();
+        localspinNode.rotation = Quaternion(180.0, Vector3(0.0, 1.0, 0.0));
+
+        local modelObject = localspinNode:CreateComponent("AnimatedModel")
+        modelObject.model = cache:GetResource("Model", "Models/Kachujin/Kachujin.mdl")
+        modelObject.material = cache:GetResource("Material", "Models/Kachujin/Materials/Kachujin.xml")
         modelObject.castShadows = true
 
         -- Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         -- animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         -- but we need to update the model's position manually in any case
-        local walkAnimation = cache:GetResource("Animation", "Models/Jack_Walk.ani")
+        local walkAnimation = cache:GetResource("Animation", "Models/Kachujin/Kachujin_Run.ani")
         local state = modelObject:AddAnimationState(walkAnimation)
         -- Enable full blending weight and looping
         state.weight = 1.0
@@ -216,7 +220,7 @@ function Mover:Update(timeStep)
     end
 
     -- Get the model's first (only) animation state and advance its time
-    local model = node:GetComponent("AnimatedModel")
+    local model = node:GetComponent("AnimatedModel", true)
     local state = model:GetAnimationState(0)
     if state ~= nil then
         state:AddTime(timeStep)
