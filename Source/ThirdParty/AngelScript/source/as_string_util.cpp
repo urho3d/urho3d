@@ -29,11 +29,16 @@
 
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include "as_config.h"
 
 #include <string.h>     // some compilers declare memcpy() here
 #include <math.h>       // pow()
-#include <stdint.h>     // UINT64_MAX
+
+// Urho3D: for compiler reliability, define ourselves
+//#include <stdint.h>     // UINT64_MAX
+#define UINT64_MAX 0xffffffffffffffffULL
 
 #if !defined(AS_NO_MEMORY_H)
 #include <memory.h>
