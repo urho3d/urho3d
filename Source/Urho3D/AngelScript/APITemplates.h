@@ -791,7 +791,7 @@ static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 
 static bool ResourceLoadByName(const String& fileName, Resource* ptr)
 {
-    return ptr->Load(fileName);
+    return ptr->LoadFile(fileName);
 }
 
 static bool ResourceSave(File* file, Resource* ptr)
@@ -806,7 +806,7 @@ static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 
 static bool ResourceSaveByName(const String& fileName, Resource* ptr)
 {
-    return ptr->Save(fileName);
+    return ptr->SaveFile(fileName);
 }
 
 /// Template function for registering a class derived from Resource.

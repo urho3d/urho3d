@@ -83,13 +83,13 @@ bool Resource::Save(Serializer& dest) const
     return false;
 }
 
-bool Resource::Load(const String& fileName)
+bool Resource::LoadFile(const String& fileName)
 {
     File file(context_);
     return file.Open(fileName, FILE_READ) && Load(file);
 }
 
-bool Resource::Save(const String& fileName) const
+bool Resource::SaveFile(const String& fileName) const
 {
     File file(context_);
     return file.Open(fileName, FILE_WRITE) && Save(file);
