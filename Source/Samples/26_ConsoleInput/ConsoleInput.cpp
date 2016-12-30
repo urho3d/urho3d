@@ -83,6 +83,12 @@ void ConsoleInput::Start()
     console->SetCommandInterpreter(GetTypeName());
     console->SetVisible(true);
     console->GetCloseButton()->SetVisible(false);
+    console->AddAutoComplete("help");
+    console->AddAutoComplete("eat");
+    console->AddAutoComplete("hide");
+    console->AddAutoComplete("wait");
+    console->AddAutoComplete("score");
+    console->AddAutoComplete("quit");
 
     // Show OS mouse cursor
     GetSubsystem<Input>()->SetMouseVisible(true);

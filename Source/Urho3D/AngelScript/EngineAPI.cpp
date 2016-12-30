@@ -62,6 +62,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "BorderImage@+ get_background() const", asMETHOD(Console, GetBackground), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "LineEdit@+ get_lineEdit() const", asMETHOD(Console, GetLineEdit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "Button@+ get_closeButton() const", asMETHOD(Console, GetCloseButton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void AddAutoComplete(const String&in)", asMETHOD(Console, AddAutoComplete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void RemoveAutoComplete(const String&in)", asMETHOD(Console, RemoveAutoComplete), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
 }
 
