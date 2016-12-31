@@ -775,7 +775,7 @@ bool Image::Save(Serializer& dest) const
     return success;
 }
 
-bool Image::Save(const String& fileName) const
+bool Image::SaveFile(const String& fileName) const
 {
     if (fileName.EndsWith(".dds", false))
         return SaveDDS(fileName);
