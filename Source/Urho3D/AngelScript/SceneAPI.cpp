@@ -288,21 +288,20 @@ static CScriptArray* GetObjectsByCategory(const String& category)
 
 static CScriptArray* GetObjectsAttriuteInfos(const String& objectType)
 {
-    const Vector<AttributeInfo> *attributes = GetScriptContext ()->GetAttributes (Urho3D::StringHash(objectType));
+    const Vector<AttributeInfo>* attributes = GetScriptContext()->GetAttributes(Urho3D::StringHash(objectType));
     Vector<AttributeInfo> copiedAttributes;
-    for (int index = 0; index < attributes->Size (); index++)
+    for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
     {
-        AttributeInfo attribute = attributes->At (index);
         AttributeInfo copy;
-        copy.type_ = attribute.type_;
-        copy.name_ = attribute.name_;
-        copy.offset_ = attribute.offset_;
-        copy.enumNames_ = attribute.enumNames_;
-        copy.variantStructureElementsNames_ = attribute.variantStructureElementsNames_;
-        copy.accessor_ = attribute.accessor_;
-        copy.defaultValue_ = attribute.defaultValue_;
-        copy.mode_ = attribute.mode_;
-        copy.ptr_ = attribute.ptr_;
+        copy.type_ = i.ptr_->type_;
+        copy.name_ = i.ptr_->name_;
+        copy.offset_ = i.ptr_->offset_;
+        copy.enumNames_ = i.ptr_->enumNames_;
+        copy.variantStructureElementsNames_ = i.ptr_->variantStructureElementsNames_;
+        copy.accessor_ = i.ptr_->accessor_;
+        copy.defaultValue_ = i.ptr_->defaultValue_;
+        copy.mode_ = i.ptr_->mode_;
+        copy.ptr_ = i.ptr_->ptr_;
         copiedAttributes.Push (copy);
     }
     return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
