@@ -286,6 +286,28 @@ static CScriptArray* GetObjectsByCategory(const String& category)
     return VectorToArray<String>(components, "Array<String>");
 }
 
+static CScriptArray* GetObjectsAttriuteInfos(const String& objectType)
+{
+    const Vector<AttributeInfo> *attributes = GetScriptContext ()->GetAttributes (Urho3D::StringHash(objectType));
+    Vector<AttributeInfo> copiedAttributes;
+    for (int index = 0; index < attributes->Size (); index++)
+    {
+        AttributeInfo attribute = attributes->At (index);
+        AttributeInfo copy;
+        copy.type_ = attribute.type_;
+        copy.name_ = attribute.name_;
+        copy.offset_ = attribute.offset_;
+        copy.enumNames_ = attribute.enumNames_;
+        copy.variantStructureElementsNames_ = attribute.variantStructureElementsNames_;
+        copy.accessor_ = attribute.accessor_;
+        copy.defaultValue_ = attribute.defaultValue_;
+        copy.mode_ = attribute.mode_;
+        copy.ptr_ = attribute.ptr_;
+        copiedAttributes.Push (copy);
+    }
+    return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
+}
+
 static void RegisterSmoothedTransform(asIScriptEngine* engine)
 {
     RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform");
@@ -398,6 +420,7 @@ static void RegisterScene(asIScriptEngine* engine)
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectsAttriuteInfos(const String&in)", asFUNCTION(GetObjectsAttriuteInfos), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
