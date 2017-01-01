@@ -53,7 +53,13 @@ void Start()
     console.numBufferedRows = 2 * console.numRows;
     console.commandInterpreter = "ScriptEventInvoker";
     console.visible = true;
-    console.closeButton.visible = false;
+	console.closeButton.visible = false;
+	console.AddAutoComplete("help");
+	console.AddAutoComplete("eat");
+	console.AddAutoComplete("hide");
+	console.AddAutoComplete("wait");
+	console.AddAutoComplete("score");
+	console.AddAutoComplete("quit");
 
     // Show OS mouse cursor
     input.mouseVisible = true;
