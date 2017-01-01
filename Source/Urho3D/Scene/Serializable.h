@@ -365,5 +365,7 @@ public:
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorFreeImpl<ClassName, typeName, Urho3D::MixedAttributeTrait<typeName > >(getFunction, setFunction), defaultValue, mode))
 /// Update the default value of an already registered attribute.
 #define URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE(name, defaultValue) context->UpdateAttributeDefaultValue<ClassName>(name, defaultValue)
+/// Define an variant structure attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
+#define URHO3D_VARIANT_STRUCTURE_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, variantStructureElementsNames, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, Urho3D::MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, variantStructureElementsNames, mode))
 
 }

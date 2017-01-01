@@ -824,6 +824,15 @@ static CScriptArray* AttributeInfoGetEnumNames(AttributeInfo* ptr)
     return VectorToArray<String>(enumNames, "Array<String>");
 }
 
+static CScriptArray* AttributeInfoGetVariantStructureElementsNames(AttributeInfo* ptr)
+{
+    Vector<String> variantStructureElementsNames;
+    const char** variantStructureElementsNamesPtrs = ptr->variantStructureElementsNames_;
+    while (variantStructureElementsNamesPtrs && *variantStructureElementsNamesPtrs)
+        variantStructureElementsNames.Push(*variantStructureElementsNamesPtrs++);
+    return VectorToArray<String>(variantStructureElementsNames, "Array<String>");
+}
+
 static void SendEvent(const String& eventType, VariantMap& eventData)
 {
     Object* sender = GetScriptContextEventListenerObject();
@@ -957,6 +966,7 @@ void RegisterObject(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("AttributeInfo", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructAttributeInfo), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("AttributeInfo", "AttributeInfo& opAssign(const AttributeInfo&in)", asMETHODPR(AttributeInfo, operator =, (const AttributeInfo&), AttributeInfo&), asCALL_THISCALL);
     engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_enumNames() const", asFUNCTION(AttributeInfoGetEnumNames), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("AttributeInfo", "Array<String>@ get_variantStructureElementsNames() const", asFUNCTION(AttributeInfoGetVariantStructureElementsNames), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectProperty("AttributeInfo", "VariantType type", offsetof(AttributeInfo, type_));
     engine->RegisterObjectProperty("AttributeInfo", "String name", offsetof(AttributeInfo, name_));
     engine->RegisterObjectProperty("AttributeInfo", "Variant defaultValue", offsetof(AttributeInfo, defaultValue_));
