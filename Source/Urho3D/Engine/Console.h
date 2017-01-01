@@ -70,6 +70,10 @@ public:
     void SetNumHistoryRows(unsigned rows);
     /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
     void SetFocusOnShow(bool enable);
+    /// Add auto complete option.
+    void AddAutoComplete(const String& option);
+    /// Remove auto complete option.
+    void RemoveAutoComplete(const String& option);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
 
@@ -111,12 +115,6 @@ public:
 
     /// Return history row at index.
     const String& GetHistoryRow(unsigned index) const;
-
-    /// Add auto complete option
-    void AddAutoComplete(const String& option);
-
-    /// Remove auto complete option
-    void RemoveAutoComplete(const String& option);
 
     /// Return whether automatically focuses the line edit when showing.
     bool GetFocusOnShow() const { return focusOnShow_; }
@@ -171,8 +169,6 @@ private:
     /// Command history current position.
     unsigned historyPosition_;
 
-    bool historyOrAutoCompleteChange;
-
     /**
     Command auto complete options.
 
@@ -185,7 +181,7 @@ private:
     */
     Vector<String> autoComplete_;
     /// Command auto complete current position.
-    Vector<String>::Iterator autoCompleteIter_;
+    unsigned autoCompletePosition_;
     /// Store the original line which is being auto-completed
     String autoCompleteLine_;
 
@@ -193,6 +189,8 @@ private:
     bool printing_;
     /// Flag for automatically focusing the line edit on showing the console.
     bool focusOnShow_;
+    /// Internal flag whether currently in an autocomplete or history change.
+    bool historyOrAutoCompleteChange_;
 };
 
 }

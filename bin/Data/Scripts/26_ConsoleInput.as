@@ -3,6 +3,7 @@
 //     - Implementing a crude text adventure game, which accepts input both through the engine console,
 //       and standard input.
 //     - Disabling default execution of console commands as immediate mode AngelScript.
+//     - Adding autocomplete options to the engine console.
 
 #include "Scripts/Utilities/Sample.as"
 

@@ -28,6 +28,7 @@
 /// This sample demonstrates:
 ///     - Implementing a crude text adventure game, which accepts input both through the engine console,
 ///       and standard input.
+///     - Adding autocomplete options to the engine console.
 class ConsoleInput : public Sample
 {
     URHO3D_OBJECT(ConsoleInput, Sample);
