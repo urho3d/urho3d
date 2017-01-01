@@ -641,10 +641,13 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
     const IntVector2& rootSize = rootElement_->GetSize();
 
     // If UI is smaller than the screen, wrap if necessary
-    if (positionCopy.x_ >= rootSize.x_)
-        positionCopy.x_ %= rootSize.x_;
-    if (positionCopy.y_ >= rootSize.y_)
-        positionCopy.y_ %= rootSize.y_;
+    if (rootSize.x_ > 0 && rootSize.y_ > 0)
+    {
+        if (positionCopy.x_ >= rootSize.x_)
+            positionCopy.x_ %= rootSize.x_;
+        if (positionCopy.y_ >= rootSize.y_)
+            positionCopy.y_ %= rootSize.y_;
+    }
 
     UIElement* result = 0;
     GetElementAt(result, HasModalElement() ? rootModalElement_ : rootElement_, positionCopy, enabledOnly);
