@@ -42,6 +42,9 @@
 
 #include "../DebugNew.h"
 
+#include <algorithm>
+#include <vector>
+
 namespace Urho3D
 {
 
@@ -53,7 +56,7 @@ Console::Console(Context* context) :
     autoVisibleOnError_(false),
     historyRows_(DEFAULT_HISTORY_SIZE),
     historyPosition_(0),
-    autoCompleteIter_(autoComplete_.begin()),
+    historyOrAutoCompleteChange(false),
     printing_(false)
 {
     UI* ui = GetSubsystem<UI>();
@@ -278,12 +281,19 @@ const String& Console::GetHistoryRow(unsigned index) const
 
 void Console::AddAutoComplete(const String & option)
 {
-    autoComplete_.insert(option);
+    // sorted insertion
+    Vector<String>::Iterator iter = UpperBound(autoComplete_.Begin(), autoComplete_.End(), option);
+    if(!iter.ptr_)
+        autoComplete_.Push(option);
+    // make sure it isn't a duplicate
+    else if(iter == autoComplete_.Begin() || *(iter-1) != option)
+        autoComplete_.Insert(iter, option);
 }
 
 void Console::RemoveAutoComplete(const String & option)
 {
-    autoComplete_.erase(option);
+    // erase and keep ordered
+    autoComplete_.Erase(LowerBound(autoComplete_.Begin(), autoComplete_.End(), option));
 }
 
 bool Console::PopulateInterpreter()
@@ -377,7 +387,7 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 
         historyPosition_ = history_.Size(); // reset
 
-        autoCompleteIter_ = autoComplete_.end(); // reset
+        autoCompleteIter_ = autoComplete_.End(); // reset
 
         currentRow_.Clear();
         lineEdit_->SetText(currentRow_);
@@ -393,17 +403,15 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 
     bool changed = false;
 
-    auto start_iter = autoCompleteIter_;
-
     switch (eventData[P_KEY].GetInt())
     {
     case KEY_UP:
-        if (autoCompleteIter_ == autoComplete_.begin())
-            autoCompleteIter_ = autoComplete_.end();
+        if (autoCompleteIter_ == autoComplete_.Begin())
+            autoCompleteIter_ = autoComplete_.End();
 
-        if (autoCompleteIter_ != autoComplete_.end())
+        if (autoCompleteIter_ != autoComplete_.End())
         {
-            auto before_begin = --autoComplete_.begin();
+            Vector<String>::Iterator before_begin = --autoComplete_.Begin();
 
             // Search for auto completion that contains the contents of the line
             for (--autoCompleteIter_; autoCompleteIter_ != before_begin; --autoCompleteIter_)
@@ -420,14 +428,14 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             if (autoCompleteIter_ == before_begin)
             {
                 // Reset the iterator
-                autoCompleteIter_ = autoComplete_.end();
+                autoCompleteIter_ = autoComplete_.End();
                 // Reset history position
                 historyPosition_ = history_.Size();
             }
         }
         
         // If no more auto complete options and history options left
-        if (autoCompleteIter_ == autoComplete_.end() &&
+        if (autoCompleteIter_ == autoComplete_.End() &&
             historyPosition_ > 0)
         {
             // If line text is not a history, save the current text value to be restored later
@@ -450,15 +458,15 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         else
         {
             // Loop over
-            if (autoCompleteIter_ == autoComplete_.end())
-                autoCompleteIter_ = autoComplete_.begin();
+            if (autoCompleteIter_ == autoComplete_.End() || !autoCompleteIter_.ptr_)
+                autoCompleteIter_ = autoComplete_.Begin();
             else
                 ++autoCompleteIter_; // If not starting over, skip checking the currently found completion
 
-            auto start_iter = autoCompleteIter_;
+            Vector<String>::Iterator start_iter = autoCompleteIter_;
 
             // Search for auto completion that contains the contents of the line
-            for (; autoCompleteIter_ != autoComplete_.end(); ++autoCompleteIter_)
+            for (; autoCompleteIter_ != autoComplete_.End(); ++autoCompleteIter_)
             {
                 if (autoCompleteIter_->StartsWith(autoCompleteLine_))
                 {
@@ -469,9 +477,9 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
             }
 
             // Continue to search the complete range
-            if (autoCompleteIter_ == autoComplete_.end())
+            if (autoCompleteIter_ == autoComplete_.End())
             {
-                for (autoCompleteIter_ = autoComplete_.begin(); autoCompleteIter_ != start_iter; ++autoCompleteIter_)
+                for (autoCompleteIter_ = autoComplete_.Begin(); autoCompleteIter_ != start_iter; ++autoCompleteIter_)
                 {
                     if (autoCompleteIter_->StartsWith(autoCompleteLine_))
                     {
@@ -497,7 +505,7 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
         {
             lineEdit_->SetText(currentRow_);
             // Set the auto complete iterator according to the currentRow
-            for (autoCompleteIter_ = autoComplete_.begin(); autoCompleteIter_ != autoComplete_.end(); ++autoCompleteIter_)
+            for (autoCompleteIter_ = autoComplete_.Begin(); autoCompleteIter_ != autoComplete_.End(); ++autoCompleteIter_)
                 if (autoCompleteIter_->StartsWith(currentRow_))
                     break;
         }
