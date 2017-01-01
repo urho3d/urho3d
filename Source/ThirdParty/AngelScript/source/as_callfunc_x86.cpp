@@ -28,6 +28,7 @@
    andreas@angelcode.com
 */
 
+// Modified by Lasse Oorni for Urho3D
 
 //
 // as_callfunc_x86.cpp
@@ -49,6 +50,11 @@
 #include "as_texts.h"
 #include "as_tokendef.h"
 #include "as_context.h"
+
+// Urho3D: work around Clang crash
+#ifdef __clang__
+#undef __OPTIMIZE__
+#endif
 
 BEGIN_AS_NAMESPACE
 
