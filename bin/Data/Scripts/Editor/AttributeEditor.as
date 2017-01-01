@@ -1491,70 +1491,26 @@ Array<VectorStruct@> vectorStructs;
 
 void InitVectorStructs()
 {
-    // Fill vector structure data
-    Array<String> billboardVariables = {
-        "Billboard Count",
-        "   Position",
-        "   Size",
-        "   UV Coordinates",
-        "   Color",
-        "   Rotation",
-        "   Direction",
-        "   Is Enabled"
-    };
-    vectorStructs.Push(VectorStruct("BillboardSet", "Billboards", billboardVariables, 1));
-
-    Array<String> animationStateVariables = {
-        "Anim State Count",
-        "   Animation",
-        "   Start Bone",
-        "   Is Looped",
-        "   Weight",
-        "   Time",
-        "   Layer"
-    };
-    vectorStructs.Push(VectorStruct("AnimatedModel", "Animation States", animationStateVariables, 1));
-
-    Array<String> staticModelGroupInstanceVariables = {
-        "Instance Count",
-        "   NodeID"
-    };
-    vectorStructs.Push(VectorStruct("StaticModelGroup", "Instance Nodes", staticModelGroupInstanceVariables, 1));
-
-    Array<String> splinePathInstanceVariables = {
-        "Control Point Count",
-        "   NodeID"
-    };
-    vectorStructs.Push(VectorStruct("SplinePath", "Control Points", splinePathInstanceVariables, 1));
-
-    Array<String> crowdManagerFilterTypeVariables = {
-        "Query Filter Type Count",
-        "   Include Flags",
-        "   Exclude Flags",
-        "   >AreaCost"
-    };
-    vectorStructs.Push(VectorStruct("CrowdManager", "Filter Types", crowdManagerFilterTypeVariables, 1));
-
-    Array<String> crowdManagerAreaCostVariables = {
-        "   Area Count",
-        "      Cost"
-    };
-    vectorStructs.Push(VectorStruct("CrowdManager", "   >AreaCost", crowdManagerAreaCostVariables, 1));
-
-    Array<String> crowdManagerObstacleAvoidanceTypeVariables = {
-        "Obstacle Avoid. Type Count",
-        "   Velocity Bias",
-        "   Desired Velocity Weight",
-        "   Current Velocity Weight",
-        "   Side Bias Weight",
-        "   Time of Impact Weight",
-        "   Time Horizon",
-        "   Grid Size",
-        "   Adaptive Divs",
-        "   Adaptive Rings",
-        "   Adaptive Depth"
-    };
-    vectorStructs.Push(VectorStruct("CrowdManager", "Obstacle Avoidance Types", crowdManagerObstacleAvoidanceTypeVariables, 1));
+    Array<String> categories = GetObjectCategories();
+    for (int categoryIndex = 0; categoryIndex < categories.length; categoryIndex++)
+    {
+        Array<String> objectsNames = GetObjectsByCategory(categories[categoryIndex]);
+        for (int objectIndex = 0; objectIndex < objectsNames.length; objectIndex++)
+        {
+            String objectName = objectsNames[objectIndex];
+            Array<AttributeInfo> attributes = GetObjectsAttriuteInfos(objectName);
+            
+            for (int attributeIndex = 0; attributeIndex < attributes.length; attributeIndex++)
+            {
+                AttributeInfo attribute = attributes[attributeIndex];
+                if (attribute.type == VAR_VARIANTVECTOR and attribute.variantStructureElementsNames.length > 0)
+                {
+                    Array<String> elementsNames = attribute.variantStructureElementsNames;
+                    vectorStructs.Push(VectorStruct(objectName, attribute.name, elementsNames, 1));
+                }
+            }
+        }
+    }
 }
 
 VectorStruct@ GetVectorStruct(Array<Serializable@>@ serializables, uint index)
