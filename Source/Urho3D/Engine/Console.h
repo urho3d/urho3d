@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../Core/Object.h"
-#include <set>
 
 namespace Urho3D
 {
@@ -172,21 +171,21 @@ private:
     /// Command history current position.
     unsigned historyPosition_;
 
-    bool historyOrAutoCompleteChange = false;
+    bool historyOrAutoCompleteChange;
 
     /**
-	Command auto complete options.
+    Command auto complete options.
 
-	down arrow key
-	Unless currently going through history options, will loop through next auto complete options.
+    down arrow key
+    Unless currently going through history options, will loop through next auto complete options.
 
-	up arrow key
-	Unless currently going through history options, will go through previous auto complete options.
-	When no previous options are left will start going through history options.
-	*/
-    std::set<String> autoComplete_;
+    up arrow key
+    Unless currently going through history options, will go through previous auto complete options.
+    When no previous options are left will start going through history options.
+    */
+    Vector<String> autoComplete_;
     /// Command auto complete current position.
-    std::set<String>::iterator autoCompleteIter_;
+    Vector<String>::Iterator autoCompleteIter_;
     /// Store the original line which is being auto-completed
     String autoCompleteLine_;
 
