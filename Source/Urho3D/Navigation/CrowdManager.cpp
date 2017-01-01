@@ -46,6 +46,31 @@ extern const char* NAVIGATION_CATEGORY;
 static const unsigned DEFAULT_MAX_AGENTS = 512;
 static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
+const char* filterTypesStructureElementsNames[] =
+{
+    "Query Filter Type Count",
+    "***Include Flags",
+    "   Exclude Flags",
+    "   >AreaCost",
+    0
+};
+
+const char* obstacleAvoidanceTypesStructureElementsNames[] =
+{
+    "Obstacle Avoid. Type Count",
+    "***Velocity Bias",
+    "   Desired Velocity Weight",
+    "   Current Velocity Weight",
+    "   Side Bias Weight",
+    "   Time of Impact Weight",
+    "   Time Horizon",
+    "   Grid Size",
+    "   Adaptive Divs",
+    "   Adaptive Rings",
+    "   Adaptive Depth",
+    0
+};
+
 void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
 {
     static_cast<CrowdAgent*>(ag->params.userData)->OnCrowdUpdate(ag, dt);
@@ -79,10 +104,12 @@ void CrowdManager::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr, VariantVector,
-        Variant::emptyVariantVector, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
-        VariantVector, Variant::emptyVariantVector, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
+                                                             VariantVector, Variant::emptyVariantVector,
+                                                             filterTypesStructureElementsNames, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
+                                                             VariantVector, Variant::emptyVariantVector,
+                                                             obstacleAvoidanceTypesStructureElementsNames, AM_DEFAULT);
 }
 
 void CrowdManager::ApplyAttributes()
