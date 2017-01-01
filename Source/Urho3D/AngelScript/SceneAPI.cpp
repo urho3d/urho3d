@@ -302,7 +302,7 @@ static CScriptArray* GetObjectsAttriuteInfos(const String& objectType)
         copy.defaultValue_ = i.ptr_->defaultValue_;
         copy.mode_ = i.ptr_->mode_;
         copy.ptr_ = i.ptr_->ptr_;
-        copiedAttributes.Push (copy);
+        copiedAttributes.Push(copy);
     }
     return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
 }

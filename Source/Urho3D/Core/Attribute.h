@@ -69,7 +69,7 @@ struct AttributeInfo
         type_(VAR_NONE),
         offset_(0),
         enumNames_(0),
-        variantStructureElementsNames_ (0),
+        variantStructureElementsNames_(0),
         mode_(AM_DEFAULT),
         ptr_(0)
     {
@@ -81,6 +81,7 @@ struct AttributeInfo
         name_(name),
         offset_((unsigned)offset),
         enumNames_(0),
+        variantStructureElementsNames_(0),
         defaultValue_(defaultValue),
         mode_(mode),
         ptr_(0)
@@ -93,7 +94,7 @@ struct AttributeInfo
         name_(name),
         offset_((unsigned)offset),
         enumNames_(enumNames),
-        variantStructureElementsNames_ (0),
+        variantStructureElementsNames_(0),
         defaultValue_(defaultValue),
         mode_(mode),
         ptr_(0)
@@ -106,7 +107,7 @@ struct AttributeInfo
         name_(name),
         offset_(0),
         enumNames_(0),
-        variantStructureElementsNames_ (0),
+        variantStructureElementsNames_(0),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
@@ -121,7 +122,7 @@ struct AttributeInfo
         name_(name),
         offset_(0),
         enumNames_(enumNames),
-        variantStructureElementsNames_ (0),
+        variantStructureElementsNames_(0),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
@@ -135,7 +136,7 @@ struct AttributeInfo
         name_(name),
         offset_(0),
         enumNames_(0),
-        variantStructureElementsNames_ (variantStructureElementsNames),
+        variantStructureElementsNames_(variantStructureElementsNames),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
