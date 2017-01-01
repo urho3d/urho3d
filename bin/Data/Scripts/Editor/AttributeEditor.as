@@ -1491,6 +1491,12 @@ Array<VectorStruct@> vectorStructs;
 
 void InitVectorStructs()
 {
+    Array<String> crowdManagerAreaCostVariables = {
+        "   Area Count",
+        "      Cost"
+    };
+    vectorStructs.Push(VectorStruct("CrowdManager", "   >AreaCost", crowdManagerAreaCostVariables, 1));
+    
     Array<String> categories = GetObjectCategories();
     for (int categoryIndex = 0; categoryIndex < categories.length; categoryIndex++)
     {
