@@ -46,7 +46,7 @@ extern const char* NAVIGATION_CATEGORY;
 static const unsigned DEFAULT_MAX_AGENTS = 512;
 static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
-const char* filterTypesStructureElementsNames[] =
+const char* filterTypesStructureElementNames[] =
 {
     "Query Filter Type Count",
     "***Include Flags",
@@ -55,7 +55,7 @@ const char* filterTypesStructureElementsNames[] =
     0
 };
 
-const char* obstacleAvoidanceTypesStructureElementsNames[] =
+const char* obstacleAvoidanceTypesStructureElementNames[] =
 {
     "Obstacle Avoid. Type Count",
     "***Velocity Bias",
@@ -106,10 +106,10 @@ void CrowdManager::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
     URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
                                                              VariantVector, Variant::emptyVariantVector,
-                                                             filterTypesStructureElementsNames, AM_DEFAULT);
+                                                             filterTypesStructureElementNames, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
                                                              VariantVector, Variant::emptyVariantVector,
-                                                             obstacleAvoidanceTypesStructureElementsNames, AM_DEFAULT);
+                                                             obstacleAvoidanceTypesStructureElementNames, AM_DEFAULT);
 }
 
 void CrowdManager::ApplyAttributes()

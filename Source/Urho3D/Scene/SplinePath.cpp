@@ -33,7 +33,7 @@ namespace Urho3D
 extern const char* interpolationModeNames[];
 extern const char* LOGIC_CATEGORY;
 
-const char* controlPointsStructureElementsNames[] =
+const char* controlPointsStructureElementNames[] =
 {
     "Control Point Count",
     "***NodeID",
@@ -64,7 +64,7 @@ void SplinePath::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Elapsed Time", float, elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
     URHO3D_ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
     URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr,
-                                                            VariantVector, Variant::emptyVariantVector, controlPointsStructureElementsNames,
+                                                            VariantVector, Variant::emptyVariantVector, controlPointsStructureElementNames,
                                                             AM_FILE | AM_NODEIDVECTOR);
 }
 

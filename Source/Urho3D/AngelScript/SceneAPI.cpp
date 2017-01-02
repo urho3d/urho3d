@@ -298,7 +298,7 @@ static CScriptArray* GetObjectAttributeInfos(const String& objectType)
             copy.name_ = i->name_;
             copy.offset_ = i->offset_;
             copy.enumNames_ = i->enumNames_;
-            copy.variantStructureElementsNames_ = i->variantStructureElementsNames_;
+            copy.variantStructureElementNames_ = i->variantStructureElementNames_;
             copy.accessor_ = i->accessor_;
             copy.defaultValue_ = i->defaultValue_;
             copy.mode_ = i->mode_;

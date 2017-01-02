@@ -57,7 +57,7 @@ const char* faceCameraModeNames[] =
     0
 };
 
-const char* billboardsStructureElementsNames[] =
+const char* billboardsStructureElementNames[] =
 {
     "Billboard Count",
     "***Position",
@@ -131,7 +131,7 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr,
                                                             VariantVector, Variant::emptyVariantVector,
-                                                            billboardsStructureElementsNames, AM_FILE);
+                                                            billboardsStructureElementNames, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }

@@ -40,7 +40,7 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-const char* instanceNodesStructureElementsNames[] =
+const char* instanceNodesStructureElementNames[] =
 {
     "Instance Count",
     "***NodeID",
@@ -66,7 +66,7 @@ void StaticModelGroup::RegisterObject(Context* context)
 
     URHO3D_COPY_BASE_ATTRIBUTES(StaticModel);
     URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Instance Nodes", GetNodeIDsAttr, SetNodeIDsAttr,
-                                                       VariantVector, Variant::emptyVariantVector, instanceNodesStructureElementsNames,
+                                                       VariantVector, Variant::emptyVariantVector, instanceNodesStructureElementNames,
                                                        AM_DEFAULT | AM_NODEIDVECTOR);
 }
 

@@ -49,7 +49,7 @@ namespace Urho3D
 
 extern const char* GEOMETRY_CATEGORY;
 
-const char* animationStatesStructureElementsNames[] =
+const char* animationStatesStructureElementNames[] =
 {
     "Anim State Count",
     "***Animation",
@@ -121,7 +121,7 @@ void AnimatedModel::RegisterObject(Context* context)
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
     URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
                                                             VariantVector, Variant::emptyVariantVector,
-                                                            animationStatesStructureElementsNames, AM_FILE);
+                                                            animationStatesStructureElementNames, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
