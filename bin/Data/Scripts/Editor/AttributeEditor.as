@@ -1504,8 +1504,8 @@ void InitVectorStructs()
         for (uint objectIndex = 0; objectIndex < objectsNames.length; objectIndex++)
         {
             String objectName = objectsNames[objectIndex];
-            Array<AttributeInfo> attributes = GetObjectsAttributeInfos(objectName);
-            
+            Array<AttributeInfo> attributes = GetObjectAttributeInfos(objectName);
+
             for (uint attributeIndex = 0; attributeIndex < attributes.length; attributeIndex++)
             {
                 AttributeInfo attribute = attributes[attributeIndex];

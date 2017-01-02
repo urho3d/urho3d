@@ -286,7 +286,7 @@ static CScriptArray* GetObjectsByCategory(const String& category)
     return VectorToArray<String>(components, "Array<String>");
 }
 
-static CScriptArray* GetObjectsAttributeInfos(const String& objectType)
+static CScriptArray* GetObjectAttributeInfos(const String& objectType)
 {
     const Vector<AttributeInfo>* attributes = GetScriptContext()->GetAttributes(Urho3D::StringHash(objectType));
     Vector<AttributeInfo> copiedAttributes;
@@ -294,15 +294,15 @@ static CScriptArray* GetObjectsAttributeInfos(const String& objectType)
         for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
         {
             AttributeInfo copy;
-            copy.type_ = i.ptr_->type_;
-            copy.name_ = i.ptr_->name_;
-            copy.offset_ = i.ptr_->offset_;
-            copy.enumNames_ = i.ptr_->enumNames_;
-            copy.variantStructureElementsNames_ = i.ptr_->variantStructureElementsNames_;
-            copy.accessor_ = i.ptr_->accessor_;
-            copy.defaultValue_ = i.ptr_->defaultValue_;
-            copy.mode_ = i.ptr_->mode_;
-            copy.ptr_ = i.ptr_->ptr_;
+            copy.type_ = i->type_;
+            copy.name_ = i->name_;
+            copy.offset_ = i->offset_;
+            copy.enumNames_ = i->enumNames_;
+            copy.variantStructureElementsNames_ = i->variantStructureElementsNames_;
+            copy.accessor_ = i->accessor_;
+            copy.defaultValue_ = i->defaultValue_;
+            copy.mode_ = i->mode_;
+            copy.ptr_ = i->ptr_;
             copiedAttributes.Push(copy);
         }
     return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
@@ -420,7 +420,7 @@ static void RegisterScene(asIScriptEngine* engine)
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectsAttributeInfos(const String&in)", asFUNCTION(GetObjectsAttributeInfos), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
