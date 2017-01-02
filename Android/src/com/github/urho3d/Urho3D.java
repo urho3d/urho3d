@@ -89,7 +89,7 @@ public class Urho3D extends SDLActivity {
                 try {
                     final AssetManager assetManager = getContext().getAssets();
                     HashMap<String, ArrayList<String>> scripts = new HashMap<String, ArrayList<String>>(2) {{
-                        put("AngleScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
+                        put("AngelScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
                         put("Lua", new ArrayList<String>(Arrays.asList(assetManager.list("Data/LuaScripts"))));
                     }};
                     startActivityForResult(new Intent(this, ScriptPicker.class).putExtra(SCRIPTS, scripts), OBTAINING_SCRIPT);
