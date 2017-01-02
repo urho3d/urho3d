@@ -419,7 +419,7 @@ static void RegisterScene(asIScriptEngine* engine)
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
-    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectsAttriuteInfos(const String&in)", asFUNCTION(GetObjectsAttributeInfos), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectsAttributeInfos(const String&in)", asFUNCTION(GetObjectsAttributeInfos), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)
