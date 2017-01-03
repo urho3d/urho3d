@@ -603,6 +603,8 @@ Array<String> enumNames;
 uint mode;
 String name;
 VariantType type;
+/* readonly */
+Array<String> variantStructureElementNames;
 };
 
 class Audio
@@ -14926,6 +14928,7 @@ uint GetMaxBones();
 String GetMiniDumpDir();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
+Array<AttributeInfo> GetObjectAttributeInfos(const String&);
 Array<String> GetObjectCategories();
 Array<String> GetObjectsByCategory(const String&);
 String GetParentPath(const String&);

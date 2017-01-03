@@ -3315,6 +3315,7 @@ Properties:
 - uint mode
 - String name
 - VariantType type
+- String[]@ variantStructureElementNames // readonly
 
 <a name="Class_Audio"></a>
 
@@ -16007,6 +16008,7 @@ Properties:
 - String GetMiniDumpDir()
 - uint GetNumLogicalCPUs()
 - uint GetNumPhysicalCPUs()
+- AttributeInfo[]@ GetObjectAttributeInfos(const String&)
 - String[]@ GetObjectCategories()
 - String[]@ GetObjectsByCategory(const String&)
 - String GetParentPath(const String&)
