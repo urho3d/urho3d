@@ -564,23 +564,16 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
         
-		//Highlight console messages based on their type
-		if (pendingRows_[i].first_ == LOG_ERROR)
-		{
-			text->SetStyle("ConsoleErrorText");
-		}
-		else if (pendingRows_[i].first_ == LOG_WARNING)
-		{
-			text->SetStyle("ConsoleWarningText");
-		}
-		else if (pendingRows_[i].first_ == LOG_INFO)
-		{
-			text->SetStyle("ConsoleInfoText");
-		}
-		else
-		{
-			text->SetStyle("ConsoleText");
-		}
+        //Highlight console messages based on their type
+        if (pendingRows_[i].first_ == LOG_ERROR)
+            text->SetStyle("ConsoleErrorText");
+        else if (pendingRows_[i].first_ == LOG_WARNING)
+            text->SetStyle("ConsoleWarningText");
+        else if (pendingRows_[i].first_ == LOG_INFO)
+            text->SetStyle("ConsoleInfoText");
+        else
+            text->SetStyle("ConsoleText");
+
         rowContainer_->AddItem(text);
     }
 
