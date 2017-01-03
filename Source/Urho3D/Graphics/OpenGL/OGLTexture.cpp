@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -137,6 +137,14 @@ void Texture::UpdateParameters()
         glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         break;
 
+    case FILTER_NEAREST_ANISOTROPIC:
+        if (levels_ < 2)
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        else
+            glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+        glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        break;
+
     default:
         break;
     }
@@ -147,7 +155,7 @@ void Texture::UpdateParameters()
     {
         unsigned maxAnisotropy = anisotropy_ ? anisotropy_ : graphics_->GetDefaultTextureAnisotropy();
         glTexParameterf(target_, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-            filterMode == FILTER_ANISOTROPIC ? (float)maxAnisotropy : 1.0f);
+            (filterMode == FILTER_ANISOTROPIC || filterMode == FILTER_NEAREST_ANISOTROPIC) ? (float)maxAnisotropy : 1.0f);
     }
 
     // Shadow compare

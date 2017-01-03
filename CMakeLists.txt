@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -115,8 +115,17 @@ elseif (WEB)
 elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
     if (RPI)
         set (CPACK_SYSTEM_NAME Raspberry-Pi)
+        set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE armhf)
     elseif (ARM)
         set (CPACK_SYSTEM_NAME ARM)     # Generic ARM
+        if (URHO3D_64BIT)
+            set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE arm64)
+        else ()
+            set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE armhf)
+        endif ()
+    elseif (NOT URHO3D_64BIT)
+        set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
+        set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # The 'package' target should be built with the help of 'setarch i686' command on a 64-bit host system
     endif ()
     if (NOT URHO3D_64BIT OR HAS_LIB64)
         list (APPEND CPACK_GENERATOR RPM)
@@ -136,9 +145,6 @@ elseif (CPACK_SYSTEM_NAME STREQUAL Linux)
 endif ()
 if (URHO3D_64BIT)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-64bit)
-else ()
-    set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)
-    set (CPACK_RPM_PACKAGE_ARCHITECTURE i686)       # The 'package' target should be built with the help of 'setarch i686' command on a 64-bit host system
 endif ()
 set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-${URHO3D_LIB_TYPE})
 if (WIN32 AND NOT URHO3D_OPENGL)
@@ -177,7 +183,7 @@ if (IOS OR URHO3D_MACOSX_BUNDLE)
         set (MACOSX_BUNDLE_SHORT_VERSION_STRING ${URHO3D_VERSION})
     endif ()
     if (NOT MACOSX_BUNDLE_COPYRIGHT)
-        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2016 the Urho3D project.")
+        set (MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2008-2017 the Urho3D project.")
     endif ()
 endif ()
 

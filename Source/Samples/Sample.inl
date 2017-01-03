@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -157,7 +157,7 @@ void Sample::CreateLogo()
 {
     // Get logo texture
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    Texture2D* logoTexture = cache->GetResource<Texture2D>("Textures/LogoLarge.png");
+    Texture2D* logoTexture = cache->GetResource<Texture2D>("Textures/FishBoneLogo.png");
     if (!logoTexture)
         return;
 
@@ -178,13 +178,13 @@ void Sample::CreateLogo()
     logoSprite_->SetSize(textureWidth, textureHeight);
 
     // Set logo sprite hot spot
-    logoSprite_->SetHotSpot(0, textureHeight);
+    logoSprite_->SetHotSpot(textureWidth, textureHeight);
 
     // Set logo sprite alignment
-    logoSprite_->SetAlignment(HA_LEFT, VA_BOTTOM);
+    logoSprite_->SetAlignment(HA_RIGHT, VA_BOTTOM);
 
     // Make logo not fully opaque to show the scene underneath
-    logoSprite_->SetOpacity(0.75f);
+    logoSprite_->SetOpacity(0.9f);
 
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite_->SetPriority(-100);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 /// This sample demonstrates:
 ///     - Implementing a crude text adventure game, which accepts input both through the engine console,
 ///       and standard input.
+///     - Adding autocomplete options to the engine console.
 class ConsoleInput : public Sample
 {
     URHO3D_OBJECT(ConsoleInput, Sample);

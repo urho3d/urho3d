@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,7 @@ public:
     virtual void OnSetEnabled();
 
     /// Update the animations. Is called from HandleScenePostUpdate().
-    void Update(float timeStep);
+    virtual void Update(float timeStep);
     /// Play an animation and set full target weight. Name must be the full resource name. Return true on success.
     bool Play(const String& name, unsigned char layer, bool looped, float fadeInTime = 0.0f);
     /// Play an animation, set full target weight and fade out all other animations on the same layer. Name must be the full resource name. Return true on success.

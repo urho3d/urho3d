@@ -97,7 +97,7 @@ void SetLogoVisible(bool enable)
 void CreateLogo()
 {
     // Get logo texture
-    Texture2D@ logoTexture = cache.GetResource("Texture2D", "Textures/LogoLarge.png");
+    Texture2D@ logoTexture = cache.GetResource("Texture2D", "Textures/FishBoneLogo.png");
     if (logoTexture is null)
         return;
 
@@ -117,13 +117,13 @@ void CreateLogo()
     logoSprite.SetSize(textureWidth, textureHeight);
 
     // Set logo sprite hot spot
-    logoSprite.SetHotSpot(0, textureHeight);
+    logoSprite.SetHotSpot(textureWidth, textureHeight);
 
     // Set logo sprite alignment
-    logoSprite.SetAlignment(HA_LEFT, VA_BOTTOM);
+    logoSprite.SetAlignment(HA_RIGHT, VA_BOTTOM);
 
     // Make logo not fully opaque to show the scene underneath
-    logoSprite.opacity = 0.75f;
+    logoSprite.opacity = 0.9f;
 
     // Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100;

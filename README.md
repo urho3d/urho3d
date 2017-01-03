@@ -65,6 +65,7 @@ Urho3D development, contributions and bugfixes by:
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
+- Konstantin Tomashevich
 - Yusuf Umar
 - Daniel Wiberg
 - Steven Zhang
@@ -180,7 +181,7 @@ NinjaSnowWar sounds by Veli-Pekka Tätilä.
 PBR textures from Substance Share. (https://share.allegorithmic.com)
 IBL textures from HDRLab's sIBL Archive.
 Dieselpunk Moto model by allexandr007.
-Mutant model from Mixamo.
+Mutant & Kachujin models from Mixamo.
 
 ##Documentation
 Urho3D classes have been sparsely documented using Doxygen notation. To

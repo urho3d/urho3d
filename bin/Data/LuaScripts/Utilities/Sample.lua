@@ -89,7 +89,7 @@ end
 
 function CreateLogo()
     -- Get logo texture
-    local logoTexture = cache:GetResource("Texture2D", "Textures/LogoLarge.png")
+    local logoTexture = cache:GetResource("Texture2D", "Textures/FishBoneLogo.png")
     if logoTexture == nil then
         return
     end
@@ -110,13 +110,13 @@ function CreateLogo()
     logoSprite:SetSize(textureWidth, textureHeight)
 
     -- Set logo sprite hot spot
-    logoSprite.hotSpot = IntVector2(0, textureHeight)
+    logoSprite.hotSpot = IntVector2(textureWidth, textureHeight)
 
     -- Set logo sprite alignment
-    logoSprite:SetAlignment(HA_LEFT, VA_BOTTOM);
+    logoSprite:SetAlignment(HA_RIGHT, VA_BOTTOM);
 
     -- Make logo not fully opaque to show the scene underneath
-    logoSprite.opacity = 0.75
+    logoSprite.opacity = 0.9
 
     -- Set a low priority for the logo so that other UI elements can be drawn on top
     logoSprite.priority = -100
