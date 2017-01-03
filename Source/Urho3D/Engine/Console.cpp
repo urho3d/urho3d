@@ -563,8 +563,24 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         rowContainer_->RemoveItem((unsigned)0);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
-        // Make error message highlight
-        text->SetStyle(pendingRows_[i].first_ == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
+        
+		//Highlight console messages based on their type
+		if (pendingRows_[i].first_ == LOG_ERROR)
+		{
+			text->SetStyle("ConsoleErrorText");
+		}
+		else if (pendingRows_[i].first_ == LOG_WARNING)
+		{
+			text->SetStyle("ConsoleWarningText");
+		}
+		else if (pendingRows_[i].first_ == LOG_INFO)
+		{
+			text->SetStyle("ConsoleInfoText");
+		}
+		else
+		{
+			text->SetStyle("ConsoleText");
+		}
         rowContainer_->AddItem(text);
     }
 

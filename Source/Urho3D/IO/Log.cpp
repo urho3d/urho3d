@@ -257,7 +257,7 @@ void Log::WriteRaw(const String& message, bool error)
 
     VariantMap& eventData = logInstance->GetEventDataMap();
     eventData[P_MESSAGE] = message;
-    eventData[P_LEVEL] = error ? LOG_ERROR : LOG_INFO;
+    eventData[P_LEVEL] = error ? LOG_ERROR : LOG_RAW;
     logInstance->SendEvent(E_LOGMESSAGE, eventData);
 
     logInstance->inWrite_ = false;
