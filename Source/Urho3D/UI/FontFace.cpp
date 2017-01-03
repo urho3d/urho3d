@@ -107,8 +107,8 @@ SharedPtr<Texture2D> FontFace::CreateFaceTexture()
     texture->SetMipsToSkip(QUALITY_LOW, 0); // No quality reduction
     texture->SetNumLevels(1); // No mipmaps
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
-    texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
-        texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+    texture->SetAddressMode(COORD_V, ADDRESS_BORDER);
+    texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
     return texture;
 }
 
