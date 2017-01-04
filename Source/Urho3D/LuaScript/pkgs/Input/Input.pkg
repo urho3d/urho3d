@@ -83,7 +83,7 @@ class Input : public Object
     bool GetQualifierPress(int qualifier) const;
     int GetQualifiers() const;
     IntVector2 GetMousePosition() const;
-    const IntVector2& GetMouseMove() const;
+    IntVector2 GetMouseMove() const;
     int GetMouseMoveX() const;
     int GetMouseMoveY() const;
     int GetMouseMoveWheel() const;
@@ -106,7 +106,7 @@ class Input : public Object
 
     tolua_readonly tolua_property__get_set int qualifiers;
     tolua_property__get_set IntVector2 mousePosition;
-    tolua_readonly tolua_property__get_set IntVector2& mouseMove;
+    tolua_readonly tolua_property__get_set IntVector2 mouseMove;
     tolua_readonly tolua_property__get_set int mouseMoveX;
     tolua_readonly tolua_property__get_set int mouseMoveY;
     tolua_readonly tolua_property__get_set int mouseMoveWheel;
