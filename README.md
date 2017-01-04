@@ -37,6 +37,7 @@ Urho3D development, contributions and bugfixes by:
 - Jukka Jylänki
 - Graham King
 - Jason Kinzer
+- Jan Korous
 - Eugene Kozlov
 - Gunnar Kriik
 - Aliaksandr Kryvashein
