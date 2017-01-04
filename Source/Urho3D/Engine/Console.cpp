@@ -48,6 +48,15 @@ namespace Urho3D
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
 
+const char* logStyles[] =
+{
+    "ConsoleDebugText",
+    "ConsoleInfoText",
+    "ConsoleWarningText",
+    "ConsoleErrorText",
+    "ConsoleText"
+};
+
 Console::Console(Context* context) :
     Object(context),
     autoVisibleOnError_(false),
@@ -565,14 +574,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         text->SetText(pendingRows_[i].second_);
         
         //Highlight console messages based on their type
-        if (pendingRows_[i].first_ == LOG_ERROR)
-            text->SetStyle("ConsoleErrorText");
-        else if (pendingRows_[i].first_ == LOG_WARNING)
-            text->SetStyle("ConsoleWarningText");
-        else if (pendingRows_[i].first_ == LOG_INFO)
-            text->SetStyle("ConsoleInfoText");
-        else
-            text->SetStyle("ConsoleText");
+        text->SetStyle(logStyles[pendingRows_[i].first_]);
 
         rowContainer_->AddItem(text);
     }
