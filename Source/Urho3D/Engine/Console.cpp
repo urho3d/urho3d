@@ -573,7 +573,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
         
-        //Highlight console messages based on their type
+        // Highlight console messages based on their type
         text->SetStyle(logStyles[pendingRows_[i].first_]);
 
         rowContainer_->AddItem(text);

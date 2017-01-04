@@ -44,6 +44,7 @@ Urho3D development, contributions and bugfixes by:
 - Rokas Kupstys
 - Ali Kämäräinen
 - Pete Leigh
+- Arnis Lielturks
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
