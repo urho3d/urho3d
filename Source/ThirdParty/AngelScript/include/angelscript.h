@@ -603,7 +603,8 @@ BEGIN_AS_NAMESPACE
 template<typename T>
 asUINT asGetTypeTraits()
 {
-#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5) || defined(__clang__)
+// Urho3D: restore earlier ifdefs due to some Android CI builds breaking
+#if defined(_MSC_VER) || defined(_LIBCPP_TYPE_TRAITS) || (__GNUC__ >= 5)
 	// MSVC, XCode/Clang, and gnuc 5+
 	// C++11 compliant code
 	bool hasConstructor        = std::is_default_constructible<T>::value && !std::is_trivially_default_constructible<T>::value;
