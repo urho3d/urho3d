@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
+#include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/VertexBuffer.h"
@@ -712,6 +713,22 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
 
             default:
                 break;
+            }
+        }
+        else
+        {
+            // If not SDF, set shader defines based on whether font texture is full RGB or just alpha
+            if (!material_)
+            {
+                Technique* tech = material->GetTechnique(0);
+                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                if (pass)
+                {
+                    if (texture && texture->GetFormat() == Graphics::GetAlphaFormat())
+                        pass->SetPixelShaderDefines("ALPHAMAP");
+                    else
+                        pass->SetPixelShaderDefines("");
+                }
             }
         }
     }

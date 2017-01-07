@@ -26,9 +26,9 @@ void VS()
 
 void PS()
 {
+#ifdef SIGNED_DISTANCE_FIELD
     gl_FragColor.rgb = vColor.rgb;
 
-#ifdef SIGNED_DISTANCE_FIELD
     float distance = texture2D(sDiffMap, vTexCoord).a;
     if (distance < 0.5)
     {
@@ -54,11 +54,15 @@ void PS()
         gl_FragColor.a = vColor.a * smoothstep(0.5, 0.505, distance);
     }
 #else
-    // Non-SDF font will likely be monochrome, in which case the alpha channel will be on the R channel on OpenGL 3
-    #ifdef GL3
-        gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).r;
+    #ifdef ALPHAMAP
+        gl_FragColor.rgb = vColor.rgb;
+        #ifdef GL3
+            gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).r;
+        #else
+            gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
+        #endif
     #else
-        gl_FragColor.a = vColor.a * texture2D(sDiffMap, vTexCoord).a;
+        gl_FragColor = vColor * texture2D(sDiffMap, vTexCoord);
     #endif
 #endif
 }

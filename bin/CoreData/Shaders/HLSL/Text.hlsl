@@ -41,9 +41,9 @@ void PS(float2 iTexCoord : TEXCOORD0,
     float4 iColor : COLOR0,
     out float4 oColor : OUTCOLOR0)
 {
-    oColor.rgb = iColor.rgb;
-
 #ifdef SIGNED_DISTANCE_FIELD
+    oColor.rgb = iColor.rgb;
+    
     float distance = Sample2D(DiffMap, iTexCoord).a;
     if (distance < 0.5f)
     {
@@ -69,6 +69,11 @@ void PS(float2 iTexCoord : TEXCOORD0,
         oColor.a = iColor.a * smoothstep(0.5f, 0.505f, distance);
     }
 #else
-    oColor.a = iColor.a * Sample2D(DiffMap, iTexCoord).a;
+    #ifdef ALPHAMAP
+        oColor.rgb = iColor.rgb;
+        oColor.a = iColor.a * Sample2D(DiffMap, iTexCoord).a;
+    #else
+        oColor = iColor* Sample2D(DiffMap, iTexCoord);
+    #endif
 #endif
 }
