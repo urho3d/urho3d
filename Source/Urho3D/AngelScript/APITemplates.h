@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -791,7 +791,7 @@ static bool ResourceLoadVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 
 static bool ResourceLoadByName(const String& fileName, Resource* ptr)
 {
-    return ptr->Load(fileName);
+    return ptr->LoadFile(fileName);
 }
 
 static bool ResourceSave(File* file, Resource* ptr)
@@ -806,7 +806,7 @@ static bool ResourceSaveVectorBuffer(VectorBuffer& buffer, Resource* ptr)
 
 static bool ResourceSaveByName(const String& fileName, Resource* ptr)
 {
-    return ptr->Save(fileName);
+    return ptr->SaveFile(fileName);
 }
 
 /// Template function for registering a class derived from Resource.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,11 +48,22 @@ namespace Urho3D
 static const int DEFAULT_CONSOLE_ROWS = 16;
 static const int DEFAULT_HISTORY_SIZE = 16;
 
+const char* logStyles[] =
+{
+    "ConsoleDebugText",
+    "ConsoleInfoText",
+    "ConsoleWarningText",
+    "ConsoleErrorText",
+    "ConsoleText"
+};
+
 Console::Console(Context* context) :
     Object(context),
     autoVisibleOnError_(false),
     historyRows_(DEFAULT_HISTORY_SIZE),
     historyPosition_(0),
+    autoCompletePosition_(0),
+    historyOrAutoCompleteChange_(false),
     printing_(false)
 {
     UI* ui = GetSubsystem<UI>();
@@ -89,6 +100,7 @@ Console::Console(Context* context) :
     SetNumRows(DEFAULT_CONSOLE_ROWS);
 
     SubscribeToEvent(interpreters_, E_ITEMSELECTED, URHO3D_HANDLER(Console, HandleInterpreterSelected));
+    SubscribeToEvent(lineEdit_, E_TEXTCHANGED, URHO3D_HANDLER(Console, HandleTextChanged));
     SubscribeToEvent(lineEdit_, E_TEXTFINISHED, URHO3D_HANDLER(Console, HandleTextFinished));
     SubscribeToEvent(lineEdit_, E_UNHANDLEDKEY, URHO3D_HANDLER(Console, HandleLineEditKey));
     SubscribeToEvent(closeButton_, E_RELEASED, URHO3D_HANDLER(Console, HandleCloseButtonPressed));
@@ -236,6 +248,25 @@ void Console::SetFocusOnShow(bool enable)
     focusOnShow_ = enable;
 }
 
+void Console::AddAutoComplete(const String& option)
+{
+    // Sorted insertion
+    Vector<String>::Iterator iter = UpperBound(autoComplete_.Begin(), autoComplete_.End(), option);
+    if (!iter.ptr_)
+        autoComplete_.Push(option);
+    // Make sure it isn't a duplicate
+    else if (iter == autoComplete_.Begin() || *(iter - 1) != option)
+        autoComplete_.Insert(iter, option);
+}
+
+void Console::RemoveAutoComplete(const String& option)
+{
+    // Erase and keep ordered
+    autoComplete_.Erase(LowerBound(autoComplete_.Begin(), autoComplete_.End(), option));
+    if (autoCompletePosition_ > autoComplete_.Size())
+        autoCompletePosition_ = autoComplete_.Size();
+}
+
 void Console::UpdateElements()
 {
     int width = GetSubsystem<UI>()->GetRoot()->GetWidth();
@@ -325,6 +356,16 @@ void Console::HandleInterpreterSelected(StringHash eventType, VariantMap& eventD
     lineEdit_->SetFocus(true);
 }
 
+void Console::HandleTextChanged(StringHash eventType, VariantMap & eventData)
+{
+    // Save the original line
+    // Make sure the change isn't caused by auto complete or history
+    if (!historyOrAutoCompleteChange_)
+        autoCompleteLine_ = eventData[TextEntry::P_TEXT].GetString();
+
+    historyOrAutoCompleteChange_ = false;
+}
+
 void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
 {
     using namespace TextFinished;
@@ -352,8 +393,9 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
             if (history_.Size() > historyRows_)
                 history_.Erase(history_.Begin());
         }
-        
-        historyPosition_ = history_.Size();
+
+        historyPosition_ = history_.Size(); // Reset
+        autoCompletePosition_ = autoComplete_.Size(); // Reset
 
         currentRow_.Clear();
         lineEdit_->SetText(currentRow_);
@@ -372,20 +414,89 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
     switch (eventData[P_KEY].GetInt())
     {
     case KEY_UP:
-        if (historyPosition_ > 0)
+        if (autoCompletePosition_ == 0)
+            autoCompletePosition_ = autoComplete_.Size();
+
+        if (autoCompletePosition_ < autoComplete_.Size())
         {
+            // Search for auto completion that contains the contents of the line
+            for (--autoCompletePosition_; autoCompletePosition_ != M_MAX_UNSIGNED; --autoCompletePosition_)
+            {
+                const String& current = autoComplete_[autoCompletePosition_];
+                if (current.StartsWith(autoCompleteLine_))
+                {
+                    historyOrAutoCompleteChange_ = true;
+                    lineEdit_->SetText(current);
+                    break;
+                }
+            }
+
+            // If not found
+            if (autoCompletePosition_ == M_MAX_UNSIGNED)
+            {
+                // Reset the position
+                autoCompletePosition_ = autoComplete_.Size();
+                // Reset history position
+                historyPosition_ = history_.Size();
+            }
+        }
+        
+        // If no more auto complete options and history options left
+        if (autoCompletePosition_ == autoComplete_.Size() && historyPosition_ > 0)
+        {
+            // If line text is not a history, save the current text value to be restored later
             if (historyPosition_ == history_.Size())
                 currentRow_ = lineEdit_->GetText();
+            // Use the previous option
             --historyPosition_;
             changed = true;
         }
         break;
 
     case KEY_DOWN:
+        // If history options left
         if (historyPosition_ < history_.Size())
         {
+            // Use the next option
             ++historyPosition_;
             changed = true;
+        }
+        else
+        {
+            // Loop over
+            if (autoCompletePosition_ >= autoComplete_.Size())
+                autoCompletePosition_ = 0;
+            else
+                ++autoCompletePosition_; // If not starting over, skip checking the currently found completion
+
+            unsigned startPosition = autoCompletePosition_;
+
+            // Search for auto completion that contains the contents of the line
+            for (; autoCompletePosition_ < autoComplete_.Size(); ++autoCompletePosition_)
+            {
+                const String& current = autoComplete_[autoCompletePosition_];
+                if (current.StartsWith(autoCompleteLine_))
+                {
+                    historyOrAutoCompleteChange_ = true;
+                    lineEdit_->SetText(current);
+                    break;
+                }
+            }
+
+            // Continue to search the complete range
+            if (autoCompletePosition_ == autoComplete_.Size())
+            {
+                for (autoCompletePosition_ = 0; autoCompletePosition_ != startPosition; ++autoCompletePosition_)
+                {
+                    const String& current = autoComplete_[autoCompletePosition_];
+                    if (current.StartsWith(autoCompleteLine_))
+                    {
+                        historyOrAutoCompleteChange_ = true;
+                        lineEdit_->SetText(current);
+                        break;
+                    }
+                }
+            }
         }
         break;
 
@@ -394,10 +505,18 @@ void Console::HandleLineEditKey(StringHash eventType, VariantMap& eventData)
 
     if (changed)
     {
+        historyOrAutoCompleteChange_ = true;
+        // Set text to history option
         if (historyPosition_ < history_.Size())
             lineEdit_->SetText(history_[historyPosition_]);
-        else
+        else // restore the original line value before it was set to history values
+        {
             lineEdit_->SetText(currentRow_);
+            // Set the auto complete position according to the currentRow
+            for (autoCompletePosition_ = 0; autoCompletePosition_ < autoComplete_.Size(); ++autoCompletePosition_)
+                if (autoComplete_[autoCompletePosition_].StartsWith(currentRow_))
+                    break;
+        }
     }
 }
 
@@ -453,8 +572,10 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         rowContainer_->RemoveItem((unsigned)0);
         text = new Text(context_);
         text->SetText(pendingRows_[i].second_);
-        // Make error message highlight
-        text->SetStyle(pendingRows_[i].first_ == LOG_ERROR ? "ConsoleHighlightedText" : "ConsoleText");
+        
+        // Highlight console messages based on their type
+        text->SetStyle(logStyles[pendingRows_[i].first_]);
+
         rowContainer_->AddItem(text);
     }
 

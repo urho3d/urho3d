@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -286,6 +286,28 @@ static CScriptArray* GetObjectsByCategory(const String& category)
     return VectorToArray<String>(components, "Array<String>");
 }
 
+static CScriptArray* GetObjectAttributeInfos(const String& objectType)
+{
+    const Vector<AttributeInfo>* attributes = GetScriptContext()->GetAttributes(Urho3D::StringHash(objectType));
+    Vector<AttributeInfo> copiedAttributes;
+    if (attributes)
+        for (Vector<AttributeInfo>::ConstIterator i = attributes->Begin(); i != attributes->End(); ++i)
+        {
+            AttributeInfo copy;
+            copy.type_ = i->type_;
+            copy.name_ = i->name_;
+            copy.offset_ = i->offset_;
+            copy.enumNames_ = i->enumNames_;
+            copy.variantStructureElementNames_ = i->variantStructureElementNames_;
+            copy.accessor_ = i->accessor_;
+            copy.defaultValue_ = i->defaultValue_;
+            copy.mode_ = i->mode_;
+            copy.ptr_ = i->ptr_;
+            copiedAttributes.Push(copy);
+        }
+    return VectorToArray<AttributeInfo>(copiedAttributes, "Array<AttributeInfo>");
+}
+
 static void RegisterSmoothedTransform(asIScriptEngine* engine)
 {
     RegisterComponent<SmoothedTransform>(engine, "SmoothedTransform");
@@ -398,6 +420,7 @@ static void RegisterScene(asIScriptEngine* engine)
 
     engine->RegisterGlobalFunction("Array<String>@ GetObjectCategories()", asFUNCTION(GetObjectCategories), asCALL_CDECL);
     engine->RegisterGlobalFunction("Array<String>@ GetObjectsByCategory(const String&in)", asFUNCTION(GetObjectsByCategory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("Array<AttributeInfo>@ GetObjectAttributeInfos(const String&in)", asFUNCTION(GetObjectAttributeInfos), asCALL_CDECL);
 }
 
 void RegisterSceneAPI(asIScriptEngine* engine)

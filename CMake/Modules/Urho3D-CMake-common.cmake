@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -1825,7 +1825,7 @@ elseif (WEB)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
             file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
             string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
-            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
+            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
             file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
         endif ()
     endif ()

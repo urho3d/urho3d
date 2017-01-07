@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,19 @@ const char* faceCameraModeNames[] =
     "LookAt Y",
     "LookAt Mixed",
     "Direction",
+    0
+};
+
+const char* billboardsStructureElementNames[] =
+{
+    "Billboard Count",
+    "   Position",
+    "   Size",
+    "   UV Coordinates",
+    "   Color",
+    "   Rotation",
+    "   Direction",
+    "   Is Enabled",
     0
 };
 
@@ -116,8 +129,9 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
-        AM_FILE);
+    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr,
+                                                            VariantVector, Variant::emptyVariantVector,
+                                                            billboardsStructureElementNames, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
