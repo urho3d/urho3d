@@ -60,7 +60,7 @@ const char* faceCameraModeNames[] =
 const char* billboardsStructureElementNames[] =
 {
     "Billboard Count",
-    "***Position",
+    "   Position",
     "   Size",
     "   UV Coordinates",
     "   Color",

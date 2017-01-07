@@ -49,7 +49,7 @@ static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 const char* filterTypesStructureElementNames[] =
 {
     "Query Filter Type Count",
-    "***Include Flags",
+    "   Include Flags",
     "   Exclude Flags",
     "   >AreaCost",
     0
@@ -58,7 +58,7 @@ const char* filterTypesStructureElementNames[] =
 const char* obstacleAvoidanceTypesStructureElementNames[] =
 {
     "Obstacle Avoid. Type Count",
-    "***Velocity Bias",
+    "   Velocity Bias",
     "   Desired Velocity Weight",
     "   Current Velocity Weight",
     "   Side Bias Weight",

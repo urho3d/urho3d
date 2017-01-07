@@ -483,16 +483,6 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             AttributeInfo vectorInfo;
             vectorInfo.name = vectorStruct.variableNames[nameIndex++];
             bool nested = vectorInfo.name.Contains('>');
-
-            // Create small divider for repeated instances
-            if (vectorInfo.name.Contains("***"))
-            {
-                vectorInfo.name.Replace("***", "   ");
-                UIElement@ divider = UIElement();
-                divider.SetFixedHeight(8);
-                list.AddItem(divider);
-            }
-
             if (nested)
             {
                 vectorInfo.type = VAR_VARIANTVECTOR;
@@ -519,6 +509,11 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
                     break;
                 }
                 nameIndex = vectorStruct.restartIndex;
+
+                // Create small divider for repeated instances
+                UIElement@ divider = UIElement();
+                divider.SetFixedHeight(8);
+                list.AddItem(divider);
             }
         }
     }

@@ -43,7 +43,7 @@ extern const char* GEOMETRY_CATEGORY;
 const char* instanceNodesStructureElementNames[] =
 {
     "Instance Count",
-    "***NodeID",
+    "   NodeID",
     0
 };
 

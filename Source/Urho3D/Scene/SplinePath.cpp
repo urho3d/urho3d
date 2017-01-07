@@ -36,7 +36,7 @@ extern const char* LOGIC_CATEGORY;
 const char* controlPointsStructureElementNames[] =
 {
     "Control Point Count",
-    "***NodeID",
+    "   NodeID",
     0
 };
 

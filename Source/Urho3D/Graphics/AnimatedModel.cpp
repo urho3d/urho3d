@@ -52,7 +52,7 @@ extern const char* GEOMETRY_CATEGORY;
 const char* animationStatesStructureElementNames[] =
 {
     "Anim State Count",
-    "***Animation",
+    "   Animation",
     "   Start Bone",
     "   Is Looped",
     "   Weight",
