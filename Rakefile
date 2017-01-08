@@ -869,8 +869,17 @@ end
 
 def update_web_samples_data dir = '../urho3d.github.io/samples', filename = '../urho3d.github.io/_data/web.json'
   begin
-    web = JSON.parse File.read filename
-    Dir.chdir(dir) { web['samples'] = Dir['*.html'].sort }
+    web = { 'samples' => {} }
+    Dir.chdir(dir) { web['samples']['Native'] = Dir['*.html'].sort }
+    web['player'] = web['samples']['Native'].pop     # Assume the last sample after sorting is the Urho3DPlayer.html
+    {'AngelScript' => 'Scripts', 'Lua' => 'LuaScripts'}.each { |lang, subdir|
+      Dir.chdir("bin/Data/#{subdir}") {
+        script_samples = Dir['[0-9]*'].sort
+        deleted_samples = []    # Delete samples that do not have their native counterpart
+        script_samples.each { |sample| deleted_samples.push sample unless web['samples']['Native'].include? "#{sample.split('.').first}.html" }
+        web['samples'][lang] = (script_samples - deleted_samples).map { |sample| "#{subdir}/#{sample}" }
+      }
+    }
     File.open(filename, 'w') { |file| file.puts web.to_json }
     return 0
   rescue
