@@ -11461,6 +11461,8 @@ Vector2 ToVector2() const;
 Vector3 ToVector3() const;
 Vector4 ToVector4(bool = false) const;
 Variant ToVectorVariant() const;
+String TrimLeft() const;
+String TrimRight() const;
 String Trimmed() const;
 
 // Properties:

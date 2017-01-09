@@ -4,8 +4,8 @@
 
 varying vec2 vTexCoord;
 varying vec4 vColor;
-
-void VS()
+#ifdef COMPILEVS
+void main()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
@@ -14,10 +14,12 @@ void VS()
     vTexCoord = iTexCoord;
     vColor = iColor;
 }
-
-void PS()
+#endif
+#ifdef COMPILEPS
+void main()
 {
     vec4 diffColor = cMatDiffColor * vColor;
     vec4 diffInput = texture2D(sDiffMap, vTexCoord);
     gl_FragColor = diffColor * diffInput;
 }
+#endif

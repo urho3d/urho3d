@@ -32,6 +32,7 @@
 #include "../Urho2D/StaticSprite2D.h"
 
 #include "../DebugNew.h"
+#include "../IO/Log.h"
 
 namespace Urho3D
 {
@@ -84,6 +85,11 @@ void StaticSprite2D::RegisterObject(Context* context)
 
 void StaticSprite2D::SetSprite(Sprite2D* sprite)
 {
+	if (!sprite)
+	{
+		URHO3D_LOGERROR("Sprite must not be null!");
+		return;
+	}
     if (sprite == sprite_)
         return;
 

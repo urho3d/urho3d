@@ -7,7 +7,7 @@
 #include "Fog.hlsl"
 #include "PBR.hlsl"
 #include "IBL.hlsl"
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
         float3 iNormal : NORMAL,
@@ -138,7 +138,8 @@ void VS(float4 iPos : POSITION,
         #endif
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(
     #if defined(NORMALMAP) || defined(IBL)
         float4 iTexCoord : TEXCOORD0,
@@ -342,3 +343,4 @@ void PS(
         oColor = float4(GetFog(finalColor, fogFactor), diffColor.a);
     #endif
 }
+#endif

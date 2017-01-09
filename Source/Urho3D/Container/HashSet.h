@@ -439,11 +439,8 @@ public:
             return false;
 
         // Check for being power of two
-        unsigned check = numBuckets;
-        while (!(check & 1))
-            check >>= 1;
-        if (check != 1)
-            return false;
+	if (numBuckets & (numBuckets - 1))
+		return false;
 
         AllocateBuckets(Size(), numBuckets);
         Rehash();

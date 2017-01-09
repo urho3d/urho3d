@@ -16,7 +16,7 @@ cbuffer CustomPS : register(b6)
 }
 #endif
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     #ifndef NOUV
         float2 iTexCoord : TEXCOORD0,
@@ -76,7 +76,8 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     #ifdef SOFTPARTICLES
         float4 iScreenPos: TEXCOORD1,
@@ -143,3 +144,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
 
     oColor = float4(GetFog(diffColor.rgb, fogFactor), diffColor.a);
 }
+#endif

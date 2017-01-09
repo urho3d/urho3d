@@ -22,7 +22,7 @@ cbuffer CustomPS : register(b6)
 #endif
 
 #endif
-
+#ifdef COMPILEVS
 void VS(float4 iPos : POSITION,
     float2 iTexCoord : TEXCOORD0,
     out float2 oTexCoord : TEXCOORD0,
@@ -36,7 +36,8 @@ void VS(float4 iPos : POSITION,
     oColor = iColor;
     oTexCoord = iTexCoord;
 }
-
+#endif
+#ifdef COMPILEPS
 void PS(float2 iTexCoord : TEXCOORD0,
     float4 iColor : COLOR0,
     out float4 oColor : OUTCOLOR0)
@@ -77,3 +78,4 @@ void PS(float2 iTexCoord : TEXCOORD0,
     #endif
 #endif
 }
+#endif
