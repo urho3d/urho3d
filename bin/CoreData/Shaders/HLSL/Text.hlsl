@@ -44,7 +44,7 @@ void VS(float4 iPos : POSITION,
         return smoothstep(0.5 - width, 0.5 + width, distance);
     }
 
-    // Comment for turn off supersampling
+    // Comment this define to turn off supersampling
     #define SUPERSAMPLING
 #endif
 
@@ -58,20 +58,29 @@ void PS(float2 iTexCoord : TEXCOORD0,
     float distance = Sample2D(DiffMap, iTexCoord).a;
 
     #ifdef TEXT_EFFECT_STROKE
-        float outlineFactor = smoothstep(0.5, 0.52, distance); // Border of glyph
-        oColor.rgb = lerp(cStrokeColor.rgb, iColor.rgb, outlineFactor);
+        #ifdef SUPERSAMPLING
+            float outlineFactor = smoothstep(0.5, 0.525, distance); // Border of glyph
+            oColor.rgb = lerp(cStrokeColor.rgb, iColor.rgb, outlineFactor);
+        #else
+            if (distance < 0.525)
+                oColor.rgb = cStrokeColor.rgb;
+        #endif
     #endif
 
     #ifdef TEXT_EFFECT_SHADOW
         if (Sample2D(DiffMap, iTexCoord - cShadowOffset).a > 0.5 && distance <= 0.5)
             oColor = cShadowColor;
+        #ifndef SUPERSAMPLING
+        else if (distance <= 0.5)
+            oColor.a = 0.0;
+        #endif
         else
     #endif
         {
             float width = fwidth(distance);
             float alpha = GetAlpha(distance, width);
 
-            #ifdef SUPERSAMPLING  
+            #ifdef SUPERSAMPLING
                 float2 deltaUV = 0.354 * fwidth(iTexCoord); // (1.0 / sqrt(2.0)) / 2.0 = 0.354
                 float4 square = float4(iTexCoord - deltaUV, iTexCoord + deltaUV);
 

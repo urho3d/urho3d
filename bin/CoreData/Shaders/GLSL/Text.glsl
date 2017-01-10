@@ -53,7 +53,7 @@ void VS()
         return smoothstep(0.5 - width, 0.5 + width, distance);
     }
 
-    // Comment for turn off supersampling
+    // Comment this define to turn off supersampling
     #define SUPERSAMPLING
 #endif
 
@@ -64,13 +64,22 @@ void PS()
     float distance = texture2D(sDiffMap, vTexCoord).a;
 
     #ifdef TEXT_EFFECT_STROKE
-        float outlineFactor = smoothstep(0.5, 0.52, distance); // Border of glyph
-        gl_FragColor.rgb = mix(cStrokeColor.rgb, vColor.rgb, outlineFactor);
+        #ifdef SUPERSAMPLING
+            float outlineFactor = smoothstep(0.5, 0.525, distance); // Border of glyph
+            gl_FragColor.rgb = mix(cStrokeColor.rgb, vColor.rgb, outlineFactor);
+        #else
+            if (distance < 0.525)
+               gl_FragColor.rgb = cStrokeColor.rgb;
+        #endif
     #endif
 
     #ifdef TEXT_EFFECT_SHADOW
         if (texture2D(sDiffMap, vTexCoord - cShadowOffset).a > 0.5 && distance <= 0.5)
             gl_FragColor = cShadowColor;
+        #ifndef SUPERSAMPLING
+        else if (distance <= 0.5)
+            gl_FragColor.a = 0;
+        #endif
         else
     #endif
         {
