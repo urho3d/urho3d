@@ -42,7 +42,8 @@
 URHO3D_DEFINE_APPLICATION_MAIN(Urho3DPlayer);
 
 Urho3DPlayer::Urho3DPlayer(Context* context) :
-    Application(context)
+    Application(context),
+    commandLineRead_(false)
 {
 }
 
@@ -59,18 +60,22 @@ void Urho3DPlayer::Setup()
     if (GetArguments().Empty() && filesystem->FileExists(commandFileName))
     {
         SharedPtr<File> commandFile(new File(context_, commandFileName));
-        String commandLine = commandFile->ReadLine();
-        commandFile->Close();
-        ParseArguments(commandLine, false);
-        // Reparse engine startup parameters now
-        engineParameters_ = Engine::ParseParameters(GetArguments());
+        if (commandFile->IsOpen())
+        {
+            commandLineRead_ = true;
+            String commandLine = commandFile->ReadLine();
+            commandFile->Close();
+            ParseArguments(commandLine, false);
+            // Reparse engine startup parameters now
+            engineParameters_ = Engine::ParseParameters(GetArguments());
+        }
     }
 
     // Check for script file name from the arguments
     GetScriptFileName();
 
     // Show usage if not found
-    if (scriptFileName_.Empty())
+    if ((GetArguments().Size() || commandLineRead_) && scriptFileName_.Empty())
     {
         ErrorExit("Usage: Urho3DPlayer <scriptfile> [options]\n\n"
             "The script file should implement the function void Start() for initializing the "
@@ -137,9 +142,9 @@ void Urho3DPlayer::Setup()
 
 void Urho3DPlayer::Start()
 {
-    // Reattempt reading the command line now on Web platform
-#ifdef __EMSCRIPTEN__
-    if (GetArguments().Empty())
+    // Reattempt reading the command line from the resource system now if not read before
+    // Note that the engine can not be reconfigured at this point; only the script name can be specified
+    if (GetArguments().Empty() && !commandLineRead_)
     {
         SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);
         if (commandFile)
@@ -148,16 +153,15 @@ void Urho3DPlayer::Start()
             commandFile->Close();
             ParseArguments(commandLine, false);
         }
-    }
 
-    GetScriptFileName();
+        GetScriptFileName();
 
-    if (scriptFileName_.Empty())
-    {
-        ErrorExit("Script file name not specified; cannot proceed");
-        return;
+        if (scriptFileName_.Empty())
+        {
+            ErrorExit("Script file name not specified; cannot proceed");
+            return;
+        }
     }
-#endif
 
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
