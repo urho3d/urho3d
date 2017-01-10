@@ -2831,7 +2831,7 @@ Methods:
 - bool GetQualifierPress(int qualifier) const
 - int GetQualifiers() const
 - IntVector2 GetMousePosition() const
-- const IntVector2& GetMouseMove() const
+- IntVector2 GetMouseMove() const
 - int GetMouseMoveX() const
 - int GetMouseMoveY() const
 - int GetMouseMoveWheel() const
@@ -2856,7 +2856,7 @@ Properties:
 
 - int qualifiers (readonly)
 - IntVector2 mousePosition
-- IntVector2& mouseMove (readonly)
+- IntVector2 mouseMove (readonly)
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
