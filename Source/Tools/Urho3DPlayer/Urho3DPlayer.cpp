@@ -144,7 +144,11 @@ void Urho3DPlayer::Start()
 {
     // Reattempt reading the command line from the resource system now if not read before
     // Note that the engine can not be reconfigured at this point; only the script name can be specified
-    if (GetArguments().Empty() && !commandLineRead_)
+    if (GetArguments().Empty()
+#ifndef __EMSCRIPTEN__
+        && !commandLineRead_
+#endif
+        )
     {
         SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);
         if (commandFile)
@@ -162,6 +166,18 @@ void Urho3DPlayer::Start()
             return;
         }
     }
+#ifdef __EMSCRIPTEN__
+    else
+    {
+        GetScriptFileName();
+
+        if (scriptFileName_.Empty())
+        {
+            ErrorExit("Script file name not specified; cannot proceed");
+            return;
+        }
+    }
+#endif
 
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
