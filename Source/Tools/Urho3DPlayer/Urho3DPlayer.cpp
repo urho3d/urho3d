@@ -144,11 +144,7 @@ void Urho3DPlayer::Start()
 {
     // Reattempt reading the command line from the resource system now if not read before
     // Note that the engine can not be reconfigured at this point; only the script name can be specified
-    if (GetArguments().Empty()
-#ifndef __EMSCRIPTEN__
-        && !commandLineRead_
-#endif
-        )
+    if (GetArguments().Empty() && !commandLineRead_)
     {
         SharedPtr<File> commandFile = GetSubsystem<ResourceCache>()->GetFile("CommandLine.txt", false);
         if (commandFile)
