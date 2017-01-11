@@ -70,10 +70,12 @@ void Urho3DPlayer::Setup()
             engineParameters_ = Engine::ParseParameters(GetArguments());
         }
     }
+#endif
 
     // Check for script file name from the arguments
     GetScriptFileName();
 
+#ifndef __EMSCRIPTEN__
     // Show usage if not found
     if ((GetArguments().Size() || commandLineRead_) && scriptFileName_.Empty())
     {
@@ -155,12 +157,12 @@ void Urho3DPlayer::Start()
         }
 
         GetScriptFileName();
+    }
 
-        if (scriptFileName_.Empty())
-        {
-            ErrorExit("Script file name not specified; cannot proceed");
-            return;
-        }
+    if (scriptFileName_.Empty())
+    {
+        ErrorExit("Script file name not specified; cannot proceed");
+        return;
     }
 #ifdef __EMSCRIPTEN__
     else
