@@ -106,6 +106,24 @@ XMLElement XMLElement::CreateChild(const char* name)
     return XMLElement(file_, child.internal_object());
 }
 
+XMLElement XMLElement::GetOrCreateChild(const String& name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
+}
+
+XMLElement XMLElement::GetOrCreateChild(const char* name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
+}
+
 bool XMLElement::RemoveChild(const XMLElement& element)
 {
     if (!element.file_ || (!element.node_ && !element.xpathNode_) || !file_ || (!node_ && !xpathNode_))

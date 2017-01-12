@@ -3,6 +3,7 @@ $#include "Resource/XMLElement.h"
 class XMLElement
 {
     XMLElement CreateChild(const String name);
+    XMLElement GetOrCreateChild(const String name);
     bool RemoveChild(const XMLElement& element);
     bool RemoveChild(const String name);
     bool RemoveChildren(const String name = String::EMPTY);

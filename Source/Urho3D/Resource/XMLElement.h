@@ -66,6 +66,10 @@ public:
     XMLElement CreateChild(const String& name);
     /// Create a child element.
     XMLElement CreateChild(const char* name);
+    /// Return the first child element with name or create if does not exist.
+    XMLElement GetOrCreateChild(const String& name);
+    /// Return the first child element with name or create if does not exist.
+    XMLElement GetOrCreateChild(const char* name);
     /// Remove a child element. Return true if successful.
     bool RemoveChild(const XMLElement& element);
     /// Remove a child element by name. Return true if successful.

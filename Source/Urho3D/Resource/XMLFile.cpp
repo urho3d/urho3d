@@ -150,6 +150,17 @@ XMLElement XMLFile::CreateRoot(const String& name)
     return XMLElement(this, root.internal_object());
 }
 
+XMLElement XMLFile::GetOrCreateRoot(const String& name)
+{
+    XMLElement root = GetRoot(name);
+    if (root.NotNull())
+        return root;
+    root = GetRoot();
+    if (root.NotNull())
+        URHO3D_LOGWARNING("XMLFile already has root " + root.GetName() + ", deleting it and creating root " + name);
+    return CreateRoot(name);
+}
+
 bool XMLFile::FromString(const String& source)
 {
     if (source.Empty())
