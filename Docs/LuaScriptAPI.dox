@@ -7602,6 +7602,7 @@ Properties:
 Methods:
 
 - XMLElement CreateChild(const String name)
+- XMLElement GetOrCreateChild(const String name)
 - bool RemoveChild(const XMLElement& element)
 - bool RemoveChild(const String name)
 - bool RemoveChildren(const String name = String::EMPTY)
@@ -7692,6 +7693,7 @@ Methods:
 - void delete()
 - bool FromString(const String source)
 - XMLElement CreateRoot(const String name = String::EMPTY)
+- XMLElement GetOrCreateRoot(const String name = String::EMPTY)
 - XMLElement GetRoot(const String name = String::EMPTY)
 - String ToString(const String indentation = "\t") const
 - void Patch(XMLFile* patchFile)
