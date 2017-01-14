@@ -494,7 +494,7 @@ task :ci_emscripten_samples_update do
   next if timeup
   puts 'Updating Web samples in main website...'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
-  system "rsync -a --delete --exclude tool --exclude *.pak ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
   update_web_samples_data or abort 'Failed to update Web json data file'
   root_commit, _ = get_root_commit_and_recipients
   system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
