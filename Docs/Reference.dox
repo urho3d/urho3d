@@ -151,7 +151,7 @@ void MyObject::OnUpdate(StringHash type, VariantMap& args)
 
 }
 
-SubscribeToEvent(E_UPDATE, std::bind(&MyObject::OnUpdate, this)));
+SubscribeToEvent(E_UPDATE, std::bind(&MyObject::OnUpdate, this, std::placeholders::_1, std::placeholders::_2)));
 \endcode
 
 std::bind() discarding unneeded parameters:
@@ -161,6 +161,8 @@ void Class::OnUpdate(VariantMap& args)
 {
 
 }
+
+using namespace std::placeholders;
 
 SubscribeToEvent(E_UPDATE, std::bind(&Class::OnUpdate, this, _2)));
 \endcode
