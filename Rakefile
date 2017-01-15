@@ -495,6 +495,16 @@ task :ci_emscripten_samples_update do
   puts 'Updating Web samples in main website...'
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
+  Dir.chdir('../urho3d.github.io/samples') {
+    uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
+    system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
+    if system 'git diff --quiet Urho3D.js'
+      File.unlink 'Urho3D.js.bak'
+      Dir['*.js'].grep_v('Urho3D.js').each { |file| system %Q(ruby -i -pe "gsub '#{uuid.last}', '#{uuid.first}'" #{file}) }
+    else
+      File.rename 'Urho3D.js.bak', 'Urho3D.js'
+    end
+  }
   update_web_samples_data or abort 'Failed to update Web json data file'
   root_commit, _ = get_root_commit_and_recipients
   system "cd ../urho3d.github.io && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/urho3d.github.io.git && git add -A . && ( git commit -qm \"Travis CI: Web samples update at #{Time.now.utc}.\n\nCommit: https://github.com/$TRAVIS_REPO_SLUG/commit/#{root_commit}\n\nMessage: #{`git log --format=%B -n 1 #{root_commit}`}\" || true) && git push -q >/dev/null 2>&1" or abort 'Failed to update Web samples'
