@@ -500,7 +500,7 @@ task :ci_emscripten_samples_update do
     system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
     if system 'git diff --quiet Urho3D.js'
       File.unlink 'Urho3D.js.bak'
-      Dir['*.js'].grep_v('Urho3D.js').each { |file| system %Q(ruby -i -pe "gsub '#{uuid.last}', '#{uuid.first}'" #{file}) }
+      Dir['*.js'].each { |file| system %Q(ruby -i -pe "gsub '#{uuid.last}', '#{uuid.first}'" #{file}) }
     else
       File.rename 'Urho3D.js.bak', 'Urho3D.js'
     end
