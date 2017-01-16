@@ -435,4 +435,8 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="176 16 190 30" />
     </element>
+    <element type="ShowOrigin">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="192 160 222 190" />
+    </element>
 </elements>

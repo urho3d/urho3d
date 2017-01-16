@@ -22,6 +22,8 @@
 #include "Scripts/Editor/EditorColorWheel.as"
 #include "Scripts/Editor/EditorEventsHandlers.as"
 #include "Scripts/Editor/EditorViewDebugIcons.as"
+#include "Scripts/Editor/EditorViewSelectableOrigins.as"
+#include "Scripts/Editor/EditorViewPaintSelection.as"
 
 String configFileName;
 
@@ -127,7 +129,9 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     UpdateGizmo();
     UpdateDirtyUI();
     UpdateViewDebugIcons();
-
+    UpdateOrigins();
+    UpdatePaintSelection();
+    
     // Handle Particle Editor looping.
     if (particleEffectWindow !is null and particleEffectWindow.visible)
     {

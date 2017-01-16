@@ -67,6 +67,12 @@ void CreateToolBar()
     fillModeGroup.AddChild(CreateToolBarToggle("FillSolid"));
     FinalizeGroupHorizontal(fillModeGroup, "ToolBarToggle");
     toolBar.AddChild(fillModeGroup);
+    
+    toolBar.AddChild(CreateToolBarSpacer(4));
+    UIElement@ originGroup = CreateGroup("OriginGroup", LM_HORIZONTAL);
+    originGroup.AddChild(CreateToolBarToggle("ShowOrigin"));
+    FinalizeGroupHorizontal(originGroup, "ToolBarToggle");
+    toolBar.AddChild(originGroup);
 
     toolBar.AddChild(CreateToolBarSpacer(4));
     DropDownList@ viewportModeList = DropDownList();
@@ -381,6 +387,15 @@ void ToolBarSetViewportMode(StringHash eventType, VariantMap& eventData)
     SetViewportMode(mode);
 }
 
+void ToolBarShowOrigin(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    
+    ShowOrigins (edit.checked);
+        
+    toolBarDirty = true;
+}
+
 void UpdateDirtyToolBar()
 {
     if (toolBar is null || !toolBarDirty)
@@ -473,6 +488,10 @@ void UpdateDirtyToolBar()
     CheckBox@ fillSolidToggle = toolBar.GetChild("FillSolid", true);
     if (fillSolidToggle.checked != (fillMode == FILL_SOLID))
         fillSolidToggle.checked = fillMode == FILL_SOLID;
+        
+    CheckBox@ showOriginToggle = toolBar.GetChild("ShowOrigin", true);
+    if (showOriginToggle.checked != (EditorOriginShow == true))
+        showOriginToggle.checked = EditorOriginShow == true;
 
     if (!subscribedToEditorToolBar)
     {
@@ -498,6 +517,7 @@ void UpdateDirtyToolBar()
         SubscribeToEvent(fillPointToggle, "Toggled", "ToolBarFillModePoint");
         SubscribeToEvent(fillWireFrameToggle, "Toggled", "ToolBarFillModeWireFrame");
         SubscribeToEvent(fillSolidToggle, "Toggled", "ToolBarFillModeSolid");
+        SubscribeToEvent(showOriginToggle, "Toggled", "ToolBarShowOrigin");
         subscribedToEditorToolBar = true;
     }
 
