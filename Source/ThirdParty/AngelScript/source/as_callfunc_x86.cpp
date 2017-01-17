@@ -51,8 +51,8 @@
 #include "as_tokendef.h"
 #include "as_context.h"
 
-// Urho3D: work around Clang crash
-#ifdef __clang__
+// Urho3D: work around Clang crash and error on old GCC
+#if defined(__clang__) || (__GNUC__ == 4 && __GNUC_MINOR__ < 7) || __GNUC__ < 4
 #undef __OPTIMIZE__
 #endif
 
