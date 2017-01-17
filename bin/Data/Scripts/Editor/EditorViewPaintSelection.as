@@ -158,13 +158,14 @@ void HandlePaintSelectionMouseMove(StringHash eventType, VariantMap& eventData)
     float r = (paintSelectionBrushCurrentSize.x * 0.5);
 
     IntVector2 mousePos(x,y);
+
     // Select by mouse
-    if (input.mouseButtonDown[MOUSEB_LEFT] && input.qualifierDown[QUAL_ALT] != true)
+    if (input.mouseButtonDown[MOUSEB_LEFT] && input.qualifierDown[QUAL_CTRL] != true)
     {
         SelectOriginsByPaintSelection(mousePos, r, true);
     }
     // Deselect by mouse
-    else if (input.mouseButtonDown[MOUSEB_LEFT] && input.qualifierDown[QUAL_ALT] == true)
+    else if (input.mouseButtonDown[MOUSEB_LEFT] && input.qualifierDown[QUAL_CTRL] == true)
     {
         SelectOriginsByPaintSelection(mousePos, r, false);
     }
