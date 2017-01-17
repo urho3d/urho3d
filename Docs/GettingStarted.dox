@@ -849,7 +849,7 @@ Shift+Middle mouse - Hold down orbits the camera around selected objects
 The PaintSelect-tool usage:
 
 \verbatim
-Key C              - Enable/Disable PaintSelection-tool (circle) for selecting origins in viewport, Hold Alt to deselect operation
+Key C              - Enable/Disable PaintSelection-tool (circle) for selecting origins in viewport, Hold Ctrl during painting with circle to enable deselection operation
 Key Space          - Show/Hide name for nearly placed orinigs in viewport while ShowOrigins are enabled in toolbar
 \endverbatim
 
