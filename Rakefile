@@ -496,6 +496,7 @@ task :ci_emscripten_samples_update do
   system 'git clone --depth 1 -q https://github.com/urho3d/urho3d.github.io.git ../urho3d.github.io' or abort 'Failed to clone urho3d/urho3d.github.io'
   system "rsync -a --delete --exclude tool --exclude *.pak --exclude index.md ../Build/bin/ ../urho3d.github.io/samples" or abort 'Failed to rsync Web samples'
   Dir.chdir('../urho3d.github.io/samples') {
+    next unless system 'git diff --quiet Urho3D.js.data'
     uuid = `git diff --color=never --word-diff-regex='\\w+' --word-diff=porcelain Urho3D.js`.split.grep(/^[+-]\w+-/).map { |it| it[0] = ''; it }
     system %Q(ruby -i.bak -pe "gsub '#{uuid.last}', '#{uuid.first}'" Urho3D.js)
     if system 'git diff --quiet Urho3D.js'
