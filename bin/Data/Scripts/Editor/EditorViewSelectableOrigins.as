@@ -1,16 +1,17 @@
 const bool DEFAULT_SHOW_NAMES_FOR_ALL = false;
 const int ORIGIN_STEP_UPDATE = 10;
-const int NAMES_SIZE = 10;
+const int NAMES_SIZE = 11;
 const StringHash ORIGIN_NODEID_VAR("OriginNodeID");
 const Color ORIGIN_COLOR(1.0f,1.0f,1.0f,1.0f);
 const Color ORIGIN_COLOR_SELECTED(0.0f,1.0f,1.0f,1.0f);
 const Color ORIGIN_COLOR_DISABLED(1.0f,0.0f,0.0f,1.0f);
 const Color ORIGIN_COLOR_TEXT(1.0f,1.0f,1.0f,0.3f);
 const Color ORIGIN_COLOR_SELECTED_TEXT(1.0f,1.0f,1.0f,1.0f);
-const IntVector2 ORIGIN_ICON_SIZE(12,12);
-const IntVector2 ORIGIN_ICON_SIZE_SELECTED(15,15);
+const IntVector2 ORIGIN_ICON_SIZE(14,14);
+const IntVector2 ORIGIN_ICON_SIZE_SELECTED(18,18);
 const float ORIGINS_VISIBLITY_RANGE = 32.0f;
-const IntVector2 ORIGINOFFSETICON(7,7);
+const IntVector2 ORIGINOFFSETICON(8,8);
+const IntVector2 ORIGINOFFSETICONSELECTED(10,8);
 
 bool showNamesForAll = DEFAULT_SHOW_NAMES_FOR_ALL;
 bool EditorOriginShow = false;
@@ -53,11 +54,6 @@ void HandleOriginToggled(StringHash eventType, VariantMap& eventData)
     if (origin is null) return;
 
     if (EditorPaintSelectionShow) return;
-
-    //if (hotKeyMode == HOTKEYS_MODE_BLENDER)
-    //    if (!input.mouseButtonDown[MOUSEB_RIGHT]) return;
-    //else
-    //    if (!input.mouseButtonDown[MOUSEB_LEFT]) return;
 
     if (IsSceneOrigin(origin))
     {
@@ -175,7 +171,7 @@ void UpdateOrigins()
                         // turn on origin and move
                         MoveOrigin(i, true);
 
-                        if (isThisNodeOneOfSelected(originsNodes[i])) 
+                        if (isThisNodeOneOfSelected(originsNodes[i]))
                         {
                             ShowSelectedNodeOrigin(originsNodes[i], i);
                             originsNames[i].visible = true;
@@ -226,7 +222,7 @@ void ShowSelectedNodeOrigin(Node@ node, int index)
         Viewport@ vp = activeViewport.viewport;
         Vector2 sp = activeViewport.camera.WorldToScreenPoint(node.worldPosition);
         //originsIcons[index].position = IntVector2(10+int(vp.rect.left + sp.x * vp.rect.right), -5 + int(vp.rect.top + sp.y* vp.rect.bottom));
-        originsIcons[index].position = IntVector2(int(vp.rect.left + sp.x * vp.rect.right) - ORIGINOFFSETICON.x, int(vp.rect.top + sp.y* vp.rect.bottom) - ORIGINOFFSETICON.y);
+        originsIcons[index].position = IntVector2(int(vp.rect.left + sp.x * vp.rect.right) - ORIGINOFFSETICONSELECTED.x, int(vp.rect.top + sp.y* vp.rect.bottom) - ORIGINOFFSETICONSELECTED.y);
         originsNames[index].color = ORIGIN_COLOR_SELECTED_TEXT;
 
         if (originsNodes[index].enabled)
@@ -244,7 +240,7 @@ void ShowSelectedNodeOrigin(Node@ node, int index)
             originsIcons[index].vars[ORIGIN_NODEID_VAR] = node.id;
         }
 
-        // We always update to keep and feed alt-info with actual info about node components 
+        // We always update to keep and feed alt-info with actual info about node components
         Array<Component@> components = node.GetComponents();
         Array<String> componentsShortInfo;
         Array<String> componentsDetailInfo;
@@ -274,7 +270,7 @@ void CreateOrigin(int index, bool isVisible = false)
 
     originsNames[index] = Text();
     originsNames[index].visible = false;
-    originsNames[index].SetFont(cache.GetResource("Font", "Fonts/BlueHighway.ttf"), NAMES_SIZE);
+    originsNames[index].SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), NAMES_SIZE);
     originsNames[index].color = ORIGIN_COLOR_TEXT;
     //originsNames[index].textEffect = TE_STROKE;
     originsNames[index].temporary = true;
@@ -317,20 +313,20 @@ void MoveOrigin(int index, bool isVisible = false)
         originsNames[index].visible = true;
         originsNames[index].color = ORIGIN_COLOR_SELECTED_TEXT;
     }
-    else 
+    else
     {
         originsNames[index].visible = showNamesForAll ? isVisible : false;
         originsNames[index].color = ORIGIN_COLOR_TEXT;
     }
 }
 
-void VisibilityOrigin(int index, bool isVisible = false) 
+void VisibilityOrigin(int index, bool isVisible = false)
 {
     originsIcons[index].visible = isVisible;
     originsNames[index].visible = isVisible;
 }
 
-bool IsSceneOrigin(UIElement@ element) 
+bool IsSceneOrigin(UIElement@ element)
 {
     if (originsIcons.length < 1) return false;
 
@@ -347,8 +343,8 @@ bool IsSceneOrigin(UIElement@ element)
     return false;
 }
 
-void CheckKeyboardQualifers() 
-{ 
+void CheckKeyboardQualifers()
+{
     // if pressed alt we inc state for info
     bool showAltInfo = input.keyPress[KEY_ALT];
     if (showAltInfo)
@@ -359,7 +355,14 @@ void CheckKeyboardQualifers()
     if (hideAltInfo)
         selectedNodeInfoState = 0;
 
-    bool showNameForOther = (input.keyPress[KEY_SPACE] && ui.focusElement is null);
+    bool showNameForOther = false;
+
+    // In-B.mode Key_Space are busy by quick menu, so we use other key for B.mode
+    if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+      showNameForOther = (input.keyPress[KEY_TAB] && ui.focusElement is null);
+    else
+      showNameForOther = (input.keyPress[KEY_SPACE] && ui.focusElement is null);
+
     if (showNameForOther)
         showNamesForAll =!showNamesForAll;
 
@@ -379,7 +382,7 @@ String NodeInfo(Node& node, int st)
         if (st > 0 && node.tags.length > 0)
         {
             result = result + "\n[";
-            for (int i=0;i<node.tags.length; i++) 
+            for (int i=0;i<node.tags.length; i++)
             {
                 result = result + " " + node.tags[i];
             }
@@ -392,7 +395,7 @@ String NodeInfo(Node& node, int st)
     return result;
 }
 
-void HandleSceneLoadedForOrigins() 
+void HandleSceneLoadedForOrigins()
 {
     rebuildSceneOrigins = true;
 }
@@ -402,7 +405,7 @@ void HandleOriginsHoverBegin(StringHash eventType, VariantMap& eventData)
     UIElement@ origin = eventData["Element"].GetPtr();
     if (origin is null)
         return;
-    
+
     if (IsSceneOrigin(origin))
     {
         VariantMap data;
@@ -419,7 +422,7 @@ void HandleOriginsHoverEnd(StringHash eventType, VariantMap& eventData)
     UIElement@ origin = eventData["Element"].GetPtr();
     if (origin is null)
         return;
-    
+
     if (IsSceneOrigin(origin))
     {
         VariantMap data;
@@ -428,5 +431,5 @@ void HandleOriginsHoverEnd(StringHash eventType, VariantMap& eventData)
         data["NodeId"] = originsIcons[originHoveredIndex].vars[ORIGIN_NODEID_VAR].GetInt();
         SendEvent(EDITOR_EVENT_ORIGIN_END_HOVER, data);
         isOriginsHovered = false;
-    }    
+    }
 }
