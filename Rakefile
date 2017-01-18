@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -76,7 +76,12 @@ task :cmake do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  unless ENV['OS']
+  if ENV['OS']
+    # CMake claims mingw32-make does not build correctly with MSYS shell in the PATH env-var and prevents build tree generation if so
+    # Our CI on Windows host requires MSYS shell, so we cannot just simply remove it from the PATH globally
+    # Instead, we modify the PATH env-var locally here just before invoking the CMake generator
+    ENV['PATH'] = ENV['PATH'].gsub /Git\\usr\\bin/, 'GoAway'
+  else
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   end
@@ -127,7 +132,11 @@ task :make do
     end
   }
   build_tree = ENV["#{platform}_build_tree"] || ENV['build_tree'] || "../#{platform}-Build"
-  unless ENV['OS']
+  if ENV['OS']
+    # While calling mingw-32-make itself does not require the PATH to be altered (as long as it is not inside an MSYS shell),
+    # we have to do it again here because our build system invokes CMake internally to generate things on-the-fly as part of the build process
+    ENV['PATH'] = ENV['PATH'].gsub /Git\\usr\\bin/, 'GoAway'
+  else
     ccache_envvar = ENV['CCACHE_SLOPPINESS'] ? '' : 'CCACHE_SLOPPINESS=pch_defines,time_macros'   # Only attempt to do the right thing when user hasn't done it
     ccache_envvar = "#{ccache_envvar} CCACHE_COMPRESS=1" unless ENV['CCACHE_COMPRESS']
   end
@@ -323,22 +332,23 @@ task :ci do
   end
   # Unshallow the clone's history when necessary
   if ENV['CI'] && ENV['PACKAGE_UPLOAD'] && !ENV['RELEASE_TAG']
-    system "bash -c 'git fetch --unshallow'" or abort 'Failed to unshallow cloned repository'
+    system 'git fetch --unshallow' or abort 'Failed to unshallow cloned repository'
   end
   # Show CMake version
-  system "bash -c 'cmake --version && echo'" or abort 'Failed to find CMake'
+  system 'cmake --version' or abort 'Failed to find CMake'
+  puts
   # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
   ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
   ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
-  # Only able to test run when targeting 64-bit native Linux platform, 64-bit native OSX platform, and Web platform; and when not packaging due to time constraint
+  # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
   ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['WEB'] || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
-  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] ? 'vs2015' : '')
+  generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
-  system "bash -c 'rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1'" or abort 'Failed to configure Urho3D library build'
+  system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -350,16 +360,16 @@ task :ci do
     system 'rake ci_push_bindings' or abort
     next
   end
-  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "bash -c 'rake make'" }
+  if !wait_for_block { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system 'rake make' }
     abort 'Failed to build Urho3D library' unless File.exists?('already_timeup.log')
     $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
     next
   end
   if ENV['URHO3D_TESTING'] && !timeup
     # Multi-config CMake generators use different test target name than single-config ones for no good reason
-    test = "rake make target=#{ENV['OS'] || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
-    system "bash -c '#{test}'" or abort 'Failed to test Urho3D library'
-    test = "&& echo && #{test}"
+    test = "rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
+    system "#{test}" or abort 'Failed to test Urho3D library'
+    test = "&& echo#{ENV['OS'] ? '.' : ''} && #{test}"
   else
     test = ''
   end
@@ -367,7 +377,7 @@ task :ci do
   unless ENV['CI'] && (ENV['IOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
     ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
-    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "bash -c 'rake make target=install >/dev/null'" }
+    if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
       abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
       $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
       next
@@ -384,13 +394,13 @@ task :ci do
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? "C:/projects/#{org}/" : (ENV['TRAVIS'] ? "#{ENV['HOME']}/build/#{org}/Build/" : '../Build/')}UsingSDK" do   # The last rel path is for non-CI users, just in case
       puts "\nConfiguring downstream project using Urho3D SDK...\n\n"; $stdout.flush
       # SDK installation to a system-wide location does not need URHO3D_HOME to be defined, staged-installation does
-      system "bash -c '#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      system "#{ENV['DESTDIR'] ? 'URHO3D_HOME=~/usr/local' : ''} rake cmake #{generator} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
     next if timeup
     # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
       puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
-      system "bash -c 'rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? '../../Build' : '..'} URHO3D_LUA=1 && rake make #{test}'" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? '../../Build' : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
   end
   # Make, deploy, and test run Android APK in an Android (virtual) device
@@ -582,7 +592,7 @@ task :ci_package_upload do
   elsif !File.exists?("#{ENV['build_tree']}/Docs/html/index.html")
     puts "Generating documentation...\n"; $stdout.flush
     # Ignore the exit status from 'make doc' on Windows host system because Doxygen may not return exit status correctly on Windows
-    system "bash -c 'rake make target=doc >/dev/null'" or ENV['OS'] or abort 'Failed to generate documentation'
+    system "rake make target=doc >#{ENV['OS'] ? 'nul' : '/dev/null'}" or ENV['OS'] or abort 'Failed to generate documentation'
     next if timeup
   end
   # Make the package
@@ -601,7 +611,7 @@ task :ci_package_upload do
       system 'rake cmake' or abort 'Failed to reconfigure to generate 64-bit RPM package'
       system "rm #{ENV['build_tree']}/Urho3D-*" or abort 'Failed to remove previously generated artifacts'  # This task can be invoked more than one time
      end
-    system "bash -c '#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package'" or abort 'Failed to make binary package'
+    system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
   next if timeup
   # Determine the upload location

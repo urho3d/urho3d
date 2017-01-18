@@ -60,8 +60,8 @@ install:
 build_script:
   - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
+# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build
+  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0"
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
   - rake ci_timer
 test: off
