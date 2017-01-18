@@ -850,7 +850,7 @@ The PaintSelect-tool usage:
 
 \verbatim
 Key C              - Enable/Disable PaintSelection-tool (circle) for selecting origins in viewport, Hold Ctrl during painting with circle to enable deselection operation
-Key Space          - Show/Hide name for nearly placed orinigs in viewport while ShowOrigins are enabled in toolbar
+Key Space          - Show/Hide name for nearly placed origins in viewport while ShowOrigins are enabled in toolbar
 \endverbatim
 
 \section EditorInstructions_Controls2 Controls (Blender style hotkeys)
