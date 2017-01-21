@@ -149,7 +149,7 @@ Urho3D uses the following third-party libraries:
 - Box2D 2.3.0 (http://box2d.org)
 - Bullet 2.83.6 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.5.0 (https://www.freetype.org)
+- FreeType 2.7.1 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
