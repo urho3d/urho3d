@@ -22,14 +22,13 @@
 
 #pragma once
 
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 namespace Urho3D
 {
 
 /// Memory area that can be read and written to as a stream.
-class URHO3D_API MemoryBuffer : public Deserializer, public Serializer
+class URHO3D_API MemoryBuffer : public AbstractFile
 {
 public:
     /// Construct with a pointer and size.
