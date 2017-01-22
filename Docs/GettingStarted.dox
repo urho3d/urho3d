@@ -2,7 +2,7 @@ namespace Urho3D
 {
 
 /**
-\page Building Building Urho3D
+\page Building Building Urho3D library
 
 \tableofcontents
 
@@ -318,7 +318,7 @@ DESTDIR=$(grep SYSROOT CMakeCache.txt |cut -d'=' -f2) make install
 
 Note that SYSROOT variable is empty when the build tree is not setup for cross-compiling.
 
-Refer to \ref UsingLibrary on how to setup your own project to use Urho3D as external library.
+Refer to \ref UsingLibrary on how to setup your own project to use Urho3D library.
 
 Urho3D should be built as a shared library if your application consists of multiple modules (main executable + other shared libraries) that all link to Urho3D. The reason for this is that Urho3D contains a few sensitive static data values, such as the main thread's ID, which will not work properly if they are duplicated due to multiple static linkage.
 
@@ -344,43 +344,12 @@ When building for Direct3D9 with the Windows 8 SDK (Visual Studio 2012+), copy d
 
 OpenGL does not depend on a separate shader compiler DLL.
 
-\section Using_ccache Using ccache
-
-ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. As such, this is optional in the build process. In order to enable ccache support and make it work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variables must be set:
-\verbatim
-USE_CCACHE=1
-CCACHE_SLOPPINESS=pch_defines,time_macros
-\endverbatim
-
-Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
-
-You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
-
-Ensure the ccache symlinks directory is being added as the first entry in the 'PATH' environment variable so the symlinks of the compiler toolchain is being found first by CMake rather than the actual compiler toolchain. This is especially important for native build. Usually the 'PATH' environment variable has been set correctly for ccache in RedHat-based host system such as Fedora, but it is not the case in Debian-based host system such as Ubuntu nor in Mac OS X host system with homebrew's ccache installation. For the latter case, use "whereis -b ccache" or "brew info ccache" to find out where your ccache symlinks directory is and adjust the 'PATH' environment variable accordingly.
-
-Note that these environment variables are used by ccache itself and not by our CMake build rules, so they must remain set in the host system not only while generating the initial project file using CMake but also while building the project later.
-
-Xcode IDE and its CLI version, xcodebuild, do not work with ccache out of the box. They probably don't need it because internally they already cache the derived build data. However, if you are performing a lot of switching between different checked out versions of the project source tree or performing a lot of clean build similar to continuous integration build then probably it is more beneficial to hack Xcode/xcodebuild to use ccache. As it is a hack, do the following at your own risk.
-
-On Xcode 5:
-\verbatim
-cd $(dirname $(xcodebuild -find-executable clang))
-for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
-\endverbatim
-
-On Xcode 6 or above:
-\verbatim
-cd $(dirname $(xcodebuild -find-executable clang))
-sudo cp -p $(which ccache) .
-for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done
-\endverbatim
-
-Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
 
 \page Running Running Urho3D player application
 
 \tableofcontents
 
+\section Running_Description Description
 The Urho3D player application in the bin directory contains all the engine runtime functionality. However, it does not contain any inbuilt logic, and therefore must be supplied with the name of the application script file it should run:
 
 \verbatim
@@ -438,7 +407,45 @@ The engine can be configured using the following command line options.
 -touch       Touch emulation on desktop platform
 \endverbatim
 
-\section Running_Xcode_AngelScript_Info Mac OS X specific - How to view/edit AngelScript within Xcode
+
+\page Misc_HowTos Miscellaneous how-to's
+
+\tableofcontents
+
+\section Using_ccache Linux and macOS specific - How to use ccache to speed up build
+
+ccache is a compiler cache software available on Linux and Mac OS X host systems. It speeds up the build by bypassing the actual compilation and reusing the result from previous compilation when the cache is hit. As such, this is optional in the build process. In order to enable ccache support and make it work correctly when building/using Urho3D library with GCC/Clang precompiled header enabled, the following environment variables must be set:
+\verbatim
+USE_CCACHE=1
+CCACHE_SLOPPINESS=pch_defines,time_macros
+\endverbatim
+
+Failure to do so would cause the precompiled header cannot be used by ccache. When ccache is setup correctly and with more hits than misses then even clean build can be done as fast as incremental build. The ccache support is available for native compiler toolchains as well as all cross-compiler toolchains supported by Urho3D.
+
+You may also want to set 'CCACHE_COMPRESS' environment variable to 1 to enable the compression of the cached objects. It is a trade-off between cache size and build time.
+
+Ensure the ccache symlinks directory is being added as the first entry in the 'PATH' environment variable so the symlinks of the compiler toolchain is being found first by CMake rather than the actual compiler toolchain. This is especially important for native build. Usually the 'PATH' environment variable has been set correctly for ccache in RedHat-based host system such as Fedora, but it is not the case in Debian-based host system such as Ubuntu nor in Mac OS X host system with homebrew's ccache installation. For the latter case, use "whereis -b ccache" or "brew info ccache" to find out where your ccache symlinks directory is and adjust the 'PATH' environment variable accordingly.
+
+Note that these environment variables are used by ccache itself and not by our CMake build rules, so they must remain set in the host system not only while generating the initial project file using CMake but also while building the project later.
+
+Xcode IDE and its CLI version, xcodebuild, do not work with ccache out of the box. They probably don't need it because internally they already cache the derived build data. However, if you are performing a lot of switching between different checked out versions of the project source tree or performing a lot of clean build similar to continuous integration build then probably it is more beneficial to hack Xcode/xcodebuild to use ccache. As it is a hack, do the following at your own risk.
+
+On Xcode 5:
+\verbatim
+cd $(dirname $(xcodebuild -find-executable clang))
+for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
+\endverbatim
+
+On Xcode 6 or above:
+\verbatim
+cd $(dirname $(xcodebuild -find-executable clang))
+sudo cp -p $(which ccache) .
+for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done
+\endverbatim
+
+Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
+
+\section Running_Xcode_AngelScript_Info macOS specific - How to view/edit AngelScript within Xcode
 
 By default Mac OS X recognizes file having extension .as as 'AppleSingle Archive'. So, even after associating this file type to always open with Xcode, Xcode is still not able to view/edit the content of the file correctly. In order to view/edit the scripts, after launching the Urho3D project in Xcode, select the .as file(s) in the Project Navigator and then in the %File Inspector (right panel) change the file type from 'Default - AppleSingle archive' to 'C++ Source' in the %File Type drop down list. The current editor view usually does not refresh its content after this change. Selecting another file in the Project Navigator then reselecting the .as file should force the editor to reload and show the .as file correctly afterwards.
 
@@ -456,6 +463,16 @@ $ find /System/Library/Frameworks -type f -name lsregister -exec {} -kill -r -do
 \endcode
 
 The last command resets the launch service database and rebuilds it, so the changes should take effect immediately when Xcode restarts.
+
+\section symlinking_on_windows Windows specific - How to grant non-Administrator user to create symbolic links
+
+If you are building Urho3D library or project under Windows host system then you may have seen the build system complaining about the insufficient user privilege to create symbolic links and falling back to hard-copy setup in the build tree. You should inform your Windows Administrator to grant the “Create symbolic links” (SeCreateSymbolicLinkPrivilege) to your user account to avoid this. However, if you are the Administrator of your own Home or Professional Windows host system then you could perform the following to fix the problem. Login using your Administrator account to create a new non-Administrator user account then grant the "Create symbolic links” privilege to that new account as follows:
+
+-# Launch "secpol.msc" via Start → Run.
+-# Navigate to Security Settings → Local Policies → User Rights Assignment → Create symbolic links.
+-# Add the account into the security setting.
+
+To build Urho3D you have to use the newly created account instead of your original Administrator account because for some reason Windows OS does not honor the “Create symbolic links” privilege if the account having the privilege is also a member of the Administrator group. If you must use your own original account then you have to remove your account from the Administrator group, which means you need another account to become the Administrator. Either way your host OS will have two accounts and only the non-Administrator account works!
 
 
 \page Examples Examples
@@ -516,9 +533,11 @@ F2          Toggle debug HUD
 \endverbatim
 
 
-\page UsingLibrary Using Urho3D as external library
+\page UsingLibrary Using Urho3D library
 
 \tableofcontents
+
+\section Scaffolding Project scaffolding
 
 This page shows how to create a new downstream C++ project linking against Urho3D library as external library. There are two approaches to do this. The first approach uses Urho3D library directly from the Urho3D project build tree. The second approach uses Urho3D SDK installation. It is imperative to clean the CMake cache when changing from one approach to the other, or simply delete and recreate your project build tree from scratch.
 
@@ -603,7 +622,7 @@ The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variabl
 
 If you have prepared your new project as outlined above then you can use the \ref Build_Scripts "build instructions of Urho3D project" to build your own project.
 
-\section FromSDKWithPkgConfig Using pkg-config instead of CMake
+\section Using_pkg_config Using pkg-config instead of CMake
 
 If for some reason you could not use CMake in your project, you could configure your project to compile and link against Urho3D library from SDK installation using 'pkg-config' tool with the help of 'Urho3D.pc' configuration file (which is installed as part of the SDK installation). If the Urho3D SDK is being installed into a local location (such as /usr/local) or a non-default location, then most likely you would need to specify PKG_CONFIG_PATH environment variable to point to the location of the configuration file for this to work. The 'Urho3D.pc' file contains important information on how to configure your compiler and linker correctly. You can use that information as a reference to configure your own project even when you do not use 'pkg-config' tool.
 
@@ -634,7 +653,7 @@ export PKG_CONFIG_PATH=${MINGW_SYSROOT}/usr/local/lib/pkgconfig
 $CC -o Urho3DPlayer_d.exe Urho3DPlayer.cpp `pkg-config --variable CFLAGS_DEBUG Urho3D` `pkg-config --cflags --libs Urho3D`
 \endcode
 
-\section Scaffolding Project scaffolding
+\section Using_Rake_Tasks Using rake tasks for project scaffolding and building
 
 With [Rake](https://rubygems.org/gems/rake) ruby gem installed, you can quickly setup all the above by simply using the 'scaffolding' rake task.
 
