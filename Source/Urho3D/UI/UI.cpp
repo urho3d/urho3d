@@ -56,6 +56,7 @@
 #include "../UI/UIEvents.h"
 #include "../UI/Window.h"
 #include "../UI/View3D.h"
+#include "../UI/MultiLineEdit.h"
 
 #include <SDL/SDL.h>
 
@@ -1268,7 +1269,6 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                 {
                     bool dragTarget = element && (element->GetDragDropMode() & DD_TARGET) != 0;
                     bool dragDropFinish = dragSource && dragTarget && element != dragElement;
-
                     if (dragDropFinish)
                     {
                         bool accept = element->OnDragDropFinish(dragElement);
@@ -1276,7 +1276,8 @@ void UI::ProcessClickEnd(const IntVector2& cursorPos, int button, int buttons, i
                         // OnDragDropFinish() may have caused destruction of the elements, so check the pointers again
                         if (accept && dragElement && element)
                         {
-                            using namespace DragDropFinish;
+							
+							using namespace DragDropFinish;
 
                             VariantMap& eventData = GetEventDataMap();
                             eventData[P_SOURCE] = dragElement.Get();
@@ -1923,6 +1924,7 @@ void RegisterUILibrary(Context* context)
     MessageBox::RegisterObject(context);
     ProgressBar::RegisterObject(context);
     ToolTip::RegisterObject(context);
+	MultiLineEdit::RegisterObject(context);
 }
 
 }

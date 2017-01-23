@@ -10,6 +10,8 @@
 /bin/tool/
 /include/
 /lib*/
+[Bb]uild/
+[Bb]uild_*/
 generated/
 /Source/Urho3D/tolua++-prefix/
 
