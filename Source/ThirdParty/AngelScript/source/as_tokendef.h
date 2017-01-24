@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -302,16 +302,17 @@ const char * const whiteSpace = " \t\r\n";
 // Some keywords that are not considered tokens by the parser
 // These only have meaning in specific situations. Outside these
 // situations they are treated as normal identifiers.
-const char * const THIS_TOKEN     = "this";
-const char * const FROM_TOKEN     = "from";
-const char * const SUPER_TOKEN    = "super";
-const char * const SHARED_TOKEN   = "shared";
-const char * const FINAL_TOKEN    = "final";
-const char * const OVERRIDE_TOKEN = "override";
-const char * const GET_TOKEN      = "get";
-const char * const SET_TOKEN      = "set";
-const char * const ABSTRACT_TOKEN = "abstract";
-const char * const FUNCTION_TOKEN = "function";
+const char * const THIS_TOKEN      = "this";
+const char * const FROM_TOKEN      = "from";
+const char * const SUPER_TOKEN     = "super";
+const char * const SHARED_TOKEN    = "shared";
+const char * const FINAL_TOKEN     = "final";
+const char * const OVERRIDE_TOKEN  = "override";
+const char * const GET_TOKEN       = "get";
+const char * const SET_TOKEN       = "set";
+const char * const ABSTRACT_TOKEN  = "abstract";
+const char * const FUNCTION_TOKEN  = "function";
+const char * const IF_HANDLE_TOKEN = "if_handle_then_const";
 
 END_AS_NAMESPACE
 
