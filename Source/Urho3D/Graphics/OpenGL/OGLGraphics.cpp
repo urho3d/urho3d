@@ -267,8 +267,7 @@ Graphics::Graphics(Context* context_) :
     SetTextureUnitMappings();
     ResetCachedState();
 
-    // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
+    context_->RequireSDL(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -281,8 +280,7 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
 
-    // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
-    SDL_Quit();
+    context_->ReleaseSDL();
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
@@ -788,7 +786,7 @@ bool Graphics::ResolveToTexture(Texture2D* texture)
         glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, impl_->resolveDestFBO_);
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->GetGPUObjectName(), 0);
-        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(), 
+        glBlitFramebuffer(0, 0, texture->GetWidth(), texture->GetHeight(), 0, 0, texture->GetWidth(), texture->GetHeight(),
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -849,7 +847,7 @@ bool Graphics::ResolveToTexture(TextureCube* texture)
             RenderSurface* surface = texture->GetRenderSurface((CubeMapFace)i);
             if (!surface->IsResolveDirty())
                 continue;
-            
+
             surface->SetResolveDirty(false);
             glBindFramebuffer(GL_READ_FRAMEBUFFER, impl_->resolveSrcFBO_);
             glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, surface->GetRenderBuffer());
@@ -1622,7 +1620,7 @@ void Graphics::SetDefaultTextureFilterMode(TextureFilterMode mode)
 void Graphics::SetDefaultTextureAnisotropy(unsigned level)
 {
     level = Max(level, 1U);
-    
+
     if (level != defaultTextureAnisotropy_)
     {
         defaultTextureAnisotropy_ = level;

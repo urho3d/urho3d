@@ -237,8 +237,7 @@ Graphics::Graphics(Context* context) :
     SetTextureUnitMappings();
     ResetCachedState();
 
-    // Initialize SDL now. Graphics should be the first SDL-using subsystem to be created
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_NOPARACHUTE);
+    context_->RequireSDL(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -295,8 +294,7 @@ Graphics::~Graphics()
     delete impl_;
     impl_ = 0;
 
-    // Shut down SDL now. Graphics should be the last SDL-using subsystem to be destroyed
-    SDL_Quit();
+    context_->ReleaseSDL();
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
@@ -1406,7 +1404,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
                 if (textures_[i] == parentTexture)
                     SetTexture(i, textures_[i]->GetBackupTexture());
             }
-            
+
             // If multisampled, mark the texture & surface needing resolve
             if (parentTexture->GetMultiSample() > 1 && parentTexture->GetAutoResolve())
             {
@@ -2560,7 +2558,7 @@ void Graphics::PrepareDraw()
         int scaledDepthBias = (int)(constantDepthBias_ * (1 << depthBits));
 
         unsigned newRasterizerStateHash =
-            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) | 
+            (scissorTest_ ? 1 : 0) | (lineAntiAlias_ ? 2 : 0) | (fillMode_ << 2) | (cullMode_ << 4) |
             ((scaledDepthBias & 0x1fff) << 6) | (((int)(slopeScaledDepthBias_ * 100.0f) & 0x1fff) << 19);
         if (newRasterizerStateHash != impl_->rasterizerStateHash_)
         {

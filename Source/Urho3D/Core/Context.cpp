@@ -28,8 +28,13 @@
 
 #include "../DebugNew.h"
 
+#include <SDL/SDL.h>
+
 namespace Urho3D
 {
+
+// Keeps track of how many times SDL was initialised so we know when to call SDL_Quit().
+static int g_sdlInitCounter = 0;
 
 void EventReceiverGroup::BeginSendEvent()
 {
@@ -210,6 +215,50 @@ VariantMap& Context::GetEventDataMap()
     return ret;
 }
 
+bool Context::RequireSDL(unsigned int sdlFlags)
+{
+    // Always increment, the caller must match with ReleaseSDL(), regardless of
+    // what happens.
+    g_sdlInitCounter++;
+
+    // Need to call SDL_Init() at least once before SDL_InitSubsystem()
+    if(g_sdlInitCounter == 0)
+    {
+        URHO3D_LOGDEBUG("Initialising SDL");
+        if(SDL_Init(0) != 0)
+        {
+            URHO3D_LOGERRORF("Failed to initialise SDL: %s", SDL_GetError());
+            return false;
+        }
+    }
+
+    Uint32 remainingFlags = sdlFlags & ~SDL_WasInit(0);
+    if(remainingFlags != 0)
+    {
+        if(SDL_InitSubSystem(remainingFlags) != 0)
+        {
+            URHO3D_LOGERRORF("Failed to initialise SDL subsystem: %s", SDL_GetError());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void Context::ReleaseSDL()
+{
+    g_sdlInitCounter--;
+    if(g_sdlInitCounter == 0)
+    {
+        URHO3D_LOGDEBUG("Quitting SDL");
+        SDL_QuitSubSystem(SDL_INIT_EVERYTHING);
+        SDL_Quit();
+    }
+    if(g_sdlInitCounter < 0)
+    {
+        URHO3D_LOGERRORF("Too many calls to Context::ReleaseSDL()!");
+    }
+}
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {

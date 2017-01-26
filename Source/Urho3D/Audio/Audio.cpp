@@ -58,6 +58,8 @@ Audio::Audio(Context* context) :
     sampleSize_(0),
     playing_(false)
 {
+    context_->RequireSDL(SDL_INIT_AUDIO);
+
     // Set the master to the default value
     masterGain_[SOUND_MASTER_HASH] = 1.0f;
 
@@ -70,6 +72,7 @@ Audio::Audio(Context* context) :
 Audio::~Audio()
 {
     Release();
+    context_->ReleaseSDL();
 }
 
 bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation)
