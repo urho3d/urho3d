@@ -258,6 +258,14 @@ public:
         y_(rhs.y_)
     {
     }
+    
+    /// Assign from another vector.
+    IntVector2& operator =(const IntVector2& rhs)
+    {
+        x_ = rhs.x_;
+        y_ = rhs.y_;
+        return *this;
+    }    
 
     /// Assign from another vector.
     IntVector2& operator =(const IntVector2& rhs)
