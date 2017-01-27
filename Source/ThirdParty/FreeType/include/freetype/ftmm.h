@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType Multiple Master font interface (specification).             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2003, 2004, 2006, 2009, 2013 by                   */
+/*  Copyright 1996-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,8 +16,8 @@
 /***************************************************************************/
 
 
-#ifndef __FTMM_H__
-#define __FTMM_H__
+#ifndef FTMM_H_
+#define FTMM_H_
 
 
 #include <ft2build.h>
@@ -95,8 +95,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    num_designs :: Number of designs; should be normally 2^num_axis    */
   /*                   even though the Type~1 specification strangely      */
-  /*                   allows for intermediate designs to be present. This */
-  /*                   number cannot exceed~16.                            */
+  /*                   allows for intermediate designs to be present.      */
+  /*                   This number cannot exceed~16.                       */
   /*                                                                       */
   /*    axis        :: A table of axis descriptors.                        */
   /*                                                                       */
@@ -171,6 +171,7 @@ FT_BEGIN_HEADER
   {
     FT_Fixed*  coords;
     FT_UInt    strid;
+    FT_UInt    psid;   /* since 2.7.1 */
 
   } FT_Var_Named_Style;
 
@@ -195,17 +196,25 @@ FT_BEGIN_HEADER
   /*                       (where every glyph could have a different       */
   /*                       number of designs).                             */
   /*                                                                       */
-  /*    num_namedstyles :: The number of named styles; only meaningful for */
-  /*                       GX that allows certain design coordinates to    */
-  /*                       have a string ID (in the `name' table)          */
-  /*                       associated with them.  The font can tell the    */
-  /*                       user that, for example, Weight=1.5 is `Bold'.   */
+  /*    num_namedstyles :: The number of named styles; a `named style' is  */
+  /*                       a tuple of design coordinates that has a string */
+  /*                       ID (in the `name' table) associated with it.    */
+  /*                       The font can tell the user that, for example,   */
+  /*                       [Weight=1.5,Width=1.1] is `Bold'.               */
   /*                                                                       */
-  /*    axis            :: A table of axis descriptors.                    */
+  /*                       For Type 1 Multiple Masters fonts, this value   */
+  /*                       is always zero because the format does not      */
+  /*                       support named styles.                           */
+  /*                                                                       */
+  /*    axis            :: An axis descriptor table.                       */
   /*                       GX fonts contain slightly more data than MM.    */
+  /*                       Memory management of this pointer is done       */
+  /*                       internally by FreeType.                         */
   /*                                                                       */
-  /*    namedstyles     :: A table of named styles.                        */
+  /*    namedstyle      :: A named style table.                            */
   /*                       Only meaningful with GX.                        */
+  /*                       Memory management of this pointer is done       */
+  /*                       internally by FreeType.                         */
   /*                                                                       */
   typedef struct  FT_MM_Var_
   {
@@ -216,9 +225,6 @@ FT_BEGIN_HEADER
     FT_Var_Named_Style*  namedstyle;
 
   } FT_MM_Var;
-
-
-  /* */
 
 
   /*************************************************************************/
@@ -258,7 +264,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Output>                                                              */
   /*    amaster :: The Multiple Masters/GX var descriptor.                 */
-  /*               Allocates a data structure, which the user must free.   */
+  /*               Allocates a data structure, which the user must         */
+  /*               deallocate with `free' after use.                       */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
@@ -283,8 +290,10 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: An array of design coordinates.                      */
   /*                                                                       */
@@ -310,8 +319,10 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: An array of design coordinates.                      */
   /*                                                                       */
@@ -320,6 +331,34 @@ FT_BEGIN_HEADER
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_Var_Design_Coordinates( FT_Face    face,
+                                 FT_UInt    num_coords,
+                                 FT_Fixed*  coords );
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    FT_Get_Var_Design_Coordinates                                      */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    For Multiple Master and GX Var fonts, get the design coordinates   */
+  /*    of the currently selected interpolated font.                       */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    face       :: A handle to the source face.                         */
+  /*                                                                       */
+  /*    num_coords :: The number of design coordinates to retrieve.  If it */
+  /*                  is larger than the number of axes, set the excess    */
+  /*                  values to~0.                                         */
+  /*                                                                       */
+  /* <Output>                                                              */
+  /*    coords     :: The design coordinates array.                        */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    FreeType error code.  0~means success.                             */
+  /*                                                                       */
+  FT_EXPORT( FT_Error )
+  FT_Get_Var_Design_Coordinates( FT_Face    face,
                                  FT_UInt    num_coords,
                                  FT_Fixed*  coords );
 
@@ -337,17 +376,49 @@ FT_BEGIN_HEADER
   /*    face       :: A handle to the source face.                         */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    num_coords :: The number of design coordinates (must be equal to   */
-  /*                  the number of axes in the font).                     */
+  /*    num_coords :: The number of available design coordinates.  If it   */
+  /*                  is larger than the number of axes, ignore the excess */
+  /*                  values.  If it is smaller than the number of axes,   */
+  /*                  use default values for the remaining axes.           */
   /*                                                                       */
   /*    coords     :: The design coordinates array (each element must be   */
-  /*                  between 0 and 1.0).                                  */
+  /*                  between 0 and 1.0 for MM fonts, and between -1.0 and */
+  /*                  1.0 for GX var fonts).                               */
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Set_MM_Blend_Coordinates( FT_Face    face,
+                               FT_UInt    num_coords,
+                               FT_Fixed*  coords );
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    FT_Get_MM_Blend_Coordinates                                        */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    For Multiple Masters and GX var fonts, get the normalized blend    */
+  /*    coordinates of the currently selected interpolated font.           */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    face       :: A handle to the source face.                         */
+  /*                                                                       */
+  /*    num_coords :: The number of normalized blend coordinates to        */
+  /*                  retrieve.  If it is larger than the number of axes,  */
+  /*                  set the excess values to~0.5 for MM fonts, and to~0  */
+  /*                  for GX var fonts.                                    */
+  /*                                                                       */
+  /* <Output>                                                              */
+  /*    coords     :: The normalized blend coordinates array.              */
+  /*                                                                       */
+  /* <Return>                                                              */
+  /*    FreeType error code.  0~means success.                             */
+  /*                                                                       */
+  FT_EXPORT( FT_Error )
+  FT_Get_MM_Blend_Coordinates( FT_Face    face,
                                FT_UInt    num_coords,
                                FT_Fixed*  coords );
 
@@ -366,12 +437,25 @@ FT_BEGIN_HEADER
                                 FT_Fixed*  coords );
 
 
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Function>                                                            */
+  /*    FT_Get_Var_Blend_Coordinates                                       */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    This is another name of @FT_Get_MM_Blend_Coordinates.              */
+  /*                                                                       */
+  FT_EXPORT( FT_Error )
+  FT_Get_Var_Blend_Coordinates( FT_Face    face,
+                                FT_UInt    num_coords,
+                                FT_Fixed*  coords );
+
   /* */
 
 
 FT_END_HEADER
 
-#endif /* __FTMM_H__ */
+#endif /* FTMM_H_ */
 
 
 /* END */

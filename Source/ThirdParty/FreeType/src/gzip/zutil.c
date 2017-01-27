@@ -5,29 +5,12 @@
 
 /* @(#) $Id$ */
 
-// Modified by Yao Wei Tjong for Urho3D
-
 #include "zutil.h"
 
 #ifndef STDC
 extern void exit OF((int));
 #endif
 
-// Urho3D: quick fix for debug build
-#ifdef DEBUG
-
-#  ifndef verbose
-#    define verbose 0
-#  endif
-int z_verbose = verbose;
-
-void z_error (m)
-char *m;
-{
-    fprintf(stderr, "%s\n", m);
-    exit(1);
-}
-#endif
 
 #ifndef HAVE_MEMCPY
 

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType position independent code services for autofit module.  */
 /*                                                                         */
-/*  Copyright 2009, 2011-2013 by                                           */
+/*  Copyright 2009-2016 by                                                 */
 /*  Oran Agra and Mickey Gabel.                                            */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,11 +16,9 @@
 /***************************************************************************/
 
 
-#ifndef __AFPIC_H__
-#define __AFPIC_H__
+#ifndef AFPIC_H_
+#define AFPIC_H_
 
-
-FT_BEGIN_HEADER
 
 #include FT_INTERNAL_PIC_H
 
@@ -32,6 +30,7 @@ FT_BEGIN_HEADER
 
 #define AF_WRITING_SYSTEM_CLASSES_GET  af_writing_system_classes
 #define AF_SCRIPT_CLASSES_GET          af_script_classes
+#define AF_STYLE_CLASSES_GET           af_style_classes
 #define AF_INTERFACE_GET               af_autofitter_interface
 
 #else /* FT_CONFIG_OPTION_PIC */
@@ -42,20 +41,27 @@ FT_BEGIN_HEADER
 #include "aftypes.h"
 
 
+FT_BEGIN_HEADER
+
   typedef struct  AFModulePIC_
   {
     FT_ServiceDescRec*          af_services;
     FT_Service_PropertiesRec    af_service_properties;
 
     AF_WritingSystemClass       af_writing_system_classes
-                                  [AF_WRITING_SYSTEM_MAX];
+                                  [AF_WRITING_SYSTEM_MAX + 1];
     AF_WritingSystemClassRec    af_writing_system_classes_rec
-                                  [AF_WRITING_SYSTEM_MAX - 1];
+                                  [AF_WRITING_SYSTEM_MAX];
 
     AF_ScriptClass              af_script_classes
-                                  [AF_SCRIPT_MAX];
+                                  [AF_SCRIPT_MAX + 1];
     AF_ScriptClassRec           af_script_classes_rec
-                                  [AF_SCRIPT_MAX - 1];
+                                  [AF_SCRIPT_MAX];
+
+    AF_StyleClass               af_style_classes
+                                  [AF_STYLE_MAX + 1];
+    AF_StyleClassRec            af_style_classes_rec
+                                  [AF_STYLE_MAX];
 
     FT_AutoHinter_InterfaceRec  af_autofitter_interface;
 
@@ -74,6 +80,8 @@ FT_BEGIN_HEADER
           ( GET_PIC( FT_FACE_LIBRARY( globals->face ) )->af_writing_system_classes )
 #define AF_SCRIPT_CLASSES_GET  \
           ( GET_PIC( FT_FACE_LIBRARY( globals->face ) )->af_script_classes )
+#define AF_STYLE_CLASSES_GET  \
+          ( GET_PIC( FT_FACE_LIBRARY( globals->face ) )->af_style_classes )
 #define AF_INTERFACE_GET  \
           ( GET_PIC( library )->af_autofitter_interface )
 
@@ -85,13 +93,13 @@ FT_BEGIN_HEADER
   FT_Error
   autofit_module_class_pic_init( FT_Library  library );
 
+FT_END_HEADER
+
 #endif /* FT_CONFIG_OPTION_PIC */
 
  /* */
 
-FT_END_HEADER
-
-#endif /* __AFPIC_H__ */
+#endif /* AFPIC_H_ */
 
 
 /* END */

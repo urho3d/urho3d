@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter writing systems (specification only).                    */
 /*                                                                         */
-/*  Copyright 2013 by                                                      */
+/*  Copyright 2013-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,8 +16,8 @@
 /***************************************************************************/
 
 
-#ifndef __AFWRTSYS_H__
-#define __AFWRTSYS_H__
+#ifndef AFWRTSYS_H_
+#define AFWRTSYS_H_
 
   /* Since preprocessor directives can't create other preprocessor */
   /* directives, we have to include the header files manually.     */
@@ -30,14 +30,15 @@
 #include "aflatin2.h"
 #endif
 
-#endif /* __AFWRTSYS_H__ */
+#endif /* AFWRTSYS_H_ */
 
 
   /* The following part can be included multiple times. */
   /* Define `WRITING_SYSTEM' as needed.                 */
 
 
-  /* Add new writing systems here. */
+  /* Add new writing systems here.  The arguments are the writing system */
+  /* name in lowercase and uppercase, respectively.                      */
 
   WRITING_SYSTEM( dummy,  DUMMY  )
   WRITING_SYSTEM( latin,  LATIN  )

@@ -5,7 +5,7 @@
 /*    Support for the FT_Outline type used to store glyph shapes of        */
 /*    most scalable font formats (specification).                          */
 /*                                                                         */
-/*  Copyright 1996-2003, 2005-2013 by                                      */
+/*  Copyright 1996-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -17,8 +17,8 @@
 /***************************************************************************/
 
 
-#ifndef __FTOUTLN_H__
-#define __FTOUTLN_H__
+#ifndef FTOUTLN_H_
+#define FTOUTLN_H_
 
 
 #include <ft2build.h>
@@ -52,7 +52,6 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Order>                                                               */
   /*    FT_Outline                                                         */
-  /*    FT_OUTLINE_FLAGS                                                   */
   /*    FT_Outline_New                                                     */
   /*    FT_Outline_Done                                                    */
   /*    FT_Outline_Copy                                                    */
@@ -68,13 +67,17 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    FT_Outline_Get_Bitmap                                              */
   /*    FT_Outline_Render                                                  */
-  /*                                                                       */
   /*    FT_Outline_Decompose                                               */
   /*    FT_Outline_Funcs                                                   */
-  /*    FT_Outline_MoveTo_Func                                             */
-  /*    FT_Outline_LineTo_Func                                             */
-  /*    FT_Outline_ConicTo_Func                                            */
-  /*    FT_Outline_CubicTo_Func                                            */
+  /*    FT_Outline_MoveToFunc                                              */
+  /*    FT_Outline_LineToFunc                                              */
+  /*    FT_Outline_ConicToFunc                                             */
+  /*    FT_Outline_CubicToFunc                                             */
+  /*                                                                       */
+  /*    FT_Orientation                                                     */
+  /*    FT_Outline_Get_Orientation                                         */
+  /*                                                                       */
+  /*    FT_OUTLINE_XXX                                                     */
   /*                                                                       */
   /*************************************************************************/
 
@@ -111,6 +114,10 @@ FT_BEGIN_HEADER
   /*    most cases, it is best to filter this out before using the         */
   /*    outline for stroking purposes (otherwise it would result in a      */
   /*    visible dot when round caps are used).                             */
+  /*                                                                       */
+  /*    Similarly, the function returns success for an empty outline also  */
+  /*    (doing nothing, this is, not calling any emitter); if necessary,   */
+  /*    you should filter this out, too.                                   */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Outline_Decompose( FT_Outline*              outline,
@@ -209,6 +216,10 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Return>                                                              */
   /*    FreeType error code.  0~means success.                             */
+  /*                                                                       */
+  /* <Note>                                                                */
+  /*    An empty outline, or an outline with a single point only is also   */
+  /*    valid.                                                             */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Outline_Check( FT_Outline*  outline );
@@ -351,9 +362,12 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /*    {                                                                  */
   /*      FT_Load_Glyph( face, index, FT_LOAD_DEFAULT );                   */
-  /*      if ( face->slot->format == FT_GLYPH_FORMAT_OUTLINE )             */
-  /*        FT_Outline_Embolden( &face->slot->outline, strength );         */
+  /*      if ( face->glyph->format == FT_GLYPH_FORMAT_OUTLINE )            */
+  /*        FT_Outline_Embolden( &face->glyph->outline, strength );        */
   /*    }                                                                  */
+  /*                                                                       */
+  /*    To get meaningful results, font scaling values must be set with    */
+  /*    functions like @FT_Set_Char_Size before calling FT_Render_Glyph.   */
   /*                                                                       */
   FT_EXPORT( FT_Error )
   FT_Outline_Embolden( FT_Outline*  outline,
@@ -532,7 +546,7 @@ FT_BEGIN_HEADER
   *
   * @description:
   *   This function analyzes a glyph outline and tries to compute its
-  *   fill orientation (see @FT_Orientation).  This is done by integrating 
+  *   fill orientation (see @FT_Orientation).  This is done by integrating
   *   the total area covered by the outline. The positive integral
   *   corresponds to the clockwise orientation and @FT_ORIENTATION_POSTSCRIPT
   *   is returned. The negative integral corresponds to the counter-clockwise
@@ -552,13 +566,12 @@ FT_BEGIN_HEADER
   FT_EXPORT( FT_Orientation )
   FT_Outline_Get_Orientation( FT_Outline*  outline );
 
-
   /* */
 
 
 FT_END_HEADER
 
-#endif /* __FTOUTLN_H__ */
+#endif /* FTOUTLN_H_ */
 
 
 /* END */

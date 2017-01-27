@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for controlling the CFF driver (specification only).    */
 /*                                                                         */
-/*  Copyright 2013 by                                                      */
+/*  Copyright 2013-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,8 +16,8 @@
 /***************************************************************************/
 
 
-#ifndef __FTCFFDRV_H__
-#define __FTCFFDRV_H__
+#ifndef FTCFFDRV_H_
+#define FTCFFDRV_H_
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -89,7 +89,7 @@ FT_BEGIN_HEADER
    *   features preserve the design's weight and spacing much better than
    *   aliased type would.
    *
-   *   2) Aligment in the vertical direction: Weights and spacing along the
+   *   2) Alignment in the vertical direction: Weights and spacing along the
    *   y~axis are less critical; what is much more important is the visual
    *   alignment of related features (like cap-height and x-height).  The
    *   sense of alignment for these is enhanced by the sharpness of grid-fit
@@ -108,13 +108,19 @@ FT_BEGIN_HEADER
    *   in one of four ways, top edge up or down, bottom edge up or down.
    *   Unless there are conflicting hstems, the smallest movement is taken
    *   to minimize distortion.
+   *
+   * @order:
+   *   hinting-engine[cff]
+   *   no-stem-darkening[cff]
+   *   darkening-parameters[cff]
+   *
    */
 
 
   /**************************************************************************
    *
    * @property:
-   *   hinting-engine
+   *   hinting-engine[cff]
    *
    * @description:
    *   Thanks to Adobe, which contributed a new hinting (and parsing)
@@ -142,6 +148,8 @@ FT_BEGIN_HEADER
    * @note:
    *   This property can be used with @FT_Property_Get also.
    *
+   *   This property can be set via the `FREETYPE_PROPERTIES' environment
+   *   variable (using values `adobe' or `freetype').
    */
 
 
@@ -151,8 +159,8 @@ FT_BEGIN_HEADER
    *   FT_CFF_HINTING_XXX
    *
    * @description:
-   *   A list of constants used for the @hinting-engine property to select
-   *   the hinting engine for CFF fonts.
+   *   A list of constants used for the @hinting-engine[cff] property to
+   *   select the hinting engine for CFF fonts.
    *
    * @values:
    *   FT_CFF_HINTING_FREETYPE ::
@@ -169,12 +177,13 @@ FT_BEGIN_HEADER
   /**************************************************************************
    *
    * @property:
-   *   no-stem-darkening
+   *   no-stem-darkening[cff]
    *
    * @description:
    *   By default, the Adobe CFF engine darkens stems at smaller sizes,
-   *   regardless of hinting, to enhance contrast.  Setting this property,
-   *   stem darkening gets switched off.
+   *   regardless of hinting, to enhance contrast.  This feature requires
+   *   a rendering system with proper gamma correction.  Setting this
+   *   property, stem darkening gets switched off.
    *
    *   Note that stem darkening is never applied if @FT_LOAD_NO_SCALE is set.
    *
@@ -192,13 +201,16 @@ FT_BEGIN_HEADER
    * @note:
    *   This property can be used with @FT_Property_Get also.
    *
+   *   This property can be set via the `FREETYPE_PROPERTIES' environment
+   *   variable (using values 1 and 0 for `on' and `off', respectively).
+   *
    */
 
 
   /**************************************************************************
    *
    * @property:
-   *   darkening-parameters
+   *   darkening-parameters[cff]
    *
    * @description:
    *   By default, the Adobe CFF engine darkens stems as follows (if the
@@ -211,9 +223,11 @@ FT_BEGIN_HEADER
    *     stem width >= 2.333px: darkening amount = 0px
    *   }
    *
-   *   and piecewise linear in-between.  Using the `darkening-parameters'
-   *   property, these four control points can be changed, as the following
-   *   example demonstrates.
+   *   and piecewise linear in-between.  At configuration time, these four
+   *   control points can be set with the macro
+   *   `CFF_CONFIG_OPTION_DARKENING_PARAMETERS'.  At runtime, the control
+   *   points can be changed using the `darkening-parameters' property, as
+   *   the following example demonstrates.
    *
    *   {
    *     FT_Library  library;
@@ -231,22 +245,31 @@ FT_BEGIN_HEADER
    *
    *   The x~values give the stem width, and the y~values the darkening
    *   amount.  The unit is 1000th of pixels.  All coordinate values must be
-   *   positive; the x~values must be monotonically increasing, and the
-   *   y~values smaller than or equal to 500 (corresponding to half a
-   *   pixel).
+   *   positive; the x~values must be monotonically increasing; the
+   *   y~values must be monotonically decreasing and smaller than or
+   *   equal to 500 (corresponding to half a pixel); the slope of each
+   *   linear piece must be shallower than -1 (e.g., -.4).
    *
    * @note:
    *   This property can be used with @FT_Property_Get also.
    *
+   *   This property can be set via the `FREETYPE_PROPERTIES' environment
+   *   variable, using eight comma-separated integers without spaces.  Here
+   *   the above example, using `\' to break the line for readability.
+   *
+   *   {
+   *     FREETYPE_PROPERTIES=\
+   *     cff:darkening-parameters=500,300,1000,200,1500,100,2000,0
+   *   }
    */
 
+  /* */
 
- /* */
 
 FT_END_HEADER
 
 
-#endif /* __FTCFFDRV_H__ */
+#endif /* FTCFFDRV_H_ */
 
 
 /* END */
