@@ -2082,8 +2082,14 @@ PODVector<int> Graphics::GetMultiSampleLevels() const
     PODVector<int> ret;
     // No multisampling always supported
     ret.Push(1);
-    /// \todo Implement properly, if possible
 
+#ifndef GL_ES
+    int maxSamples = 0;
+    glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
+    for (int i = 2; i <= maxSamples && i <= 16; i *= 2)
+        ret.Push(i);
+#endif
+    
     return ret;
 }
 
