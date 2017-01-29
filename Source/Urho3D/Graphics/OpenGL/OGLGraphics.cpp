@@ -267,7 +267,7 @@ Graphics::Graphics(Context* context_) :
     SetTextureUnitMappings();
     ResetCachedState();
 
-    context_->RequireSDL(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
+    context_->RequireSDL(SDL_INIT_VIDEO);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);

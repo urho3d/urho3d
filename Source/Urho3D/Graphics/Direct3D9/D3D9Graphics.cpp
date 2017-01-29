@@ -289,7 +289,7 @@ Graphics::Graphics(Context* context) :
 {
     SetTextureUnitMappings();
 
-    context_->RequireSDL(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
+    context_->RequireSDL(SDL_INIT_VIDEO);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
