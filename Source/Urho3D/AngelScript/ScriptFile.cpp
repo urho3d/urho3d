@@ -781,6 +781,10 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
                     context->SetArgObject(i, (void*)&parameters[i].GetIntVector2());
                     break;
 
+                case VAR_INTVECTOR3:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntVector3());
+                    break;
+
                 case VAR_COLOR:
                     context->SetArgObject(i, (void*)&parameters[i].GetColor());
                     break;
