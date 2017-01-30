@@ -2456,12 +2456,14 @@ Methods:
 - const IntVector2& GetAbsoluteGlyphOffset() const
 - const Vector2& GetScaledGlyphOffset() const
 - IntVector2 GetTotalGlyphOffset(int pointSize) const
+- FontType GetFontType() const
 - bool IsSDFFont() const
 
 Properties:
 
 - IntVector2 absoluteGlyphOffset
 - Vector2 scaledGlyphOffset
+- FontType fontType (readonly)
 
 <a name="Class_Frustum"></a>
 ### Frustum
@@ -7941,6 +7943,13 @@ Properties:
 - int FM_RESETFOCUS
 - int FM_FOCUSABLE
 - int FM_FOCUSABLE_DEFOCUSABLE
+
+### FontType
+
+- int FONT_NONE
+- int FONT_FREETYPE
+- int FONT_BITMAP
+- int MAX_FONT_TYPES
 
 ### FrustumPlane
 

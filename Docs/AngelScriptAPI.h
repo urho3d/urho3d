@@ -5099,6 +5099,8 @@ IntVector2 absoluteGlyphOffset;
 /* readonly */
 String category;
 /* readonly */
+FontType fontType;
+/* readonly */
 uint memoryUse;
 String name;
 /* readonly */
@@ -14500,6 +14502,13 @@ FM_NOTFOCUSABLE,
 FM_RESETFOCUS,
 FM_FOCUSABLE,
 FM_FOCUSABLE_DEFOCUSABLE,
+};
+
+enum FontType
+{
+FONT_NONE,
+FONT_FREETYPE,
+FONT_BITMAP,
 };
 
 enum HighlightMode

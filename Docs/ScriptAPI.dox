@@ -7273,6 +7273,7 @@ Properties:
 
 - IntVector2 absoluteGlyphOffset
 - String category // readonly
+- FontType fontType // readonly
 - uint memoryUse // readonly
 - String name
 - int refs // readonly
@@ -15581,6 +15582,13 @@ Properties:
 - FM_RESETFOCUS
 - FM_FOCUSABLE
 - FM_FOCUSABLE_DEFOCUSABLE
+
+
+### FontType
+
+- FONT_NONE
+- FONT_FREETYPE
+- FONT_BITMAP
 
 
 ### HighlightMode
