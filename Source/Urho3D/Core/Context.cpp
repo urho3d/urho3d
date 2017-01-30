@@ -28,7 +28,9 @@
 
 #include "../DebugNew.h"
 
+#ifndef MINI_URHO
 #include <SDL/SDL.h>
+#endif
 
 namespace Urho3D
 {
@@ -217,9 +219,10 @@ VariantMap& Context::GetEventDataMap()
 
 bool Context::RequireSDL(unsigned int sdlFlags)
 {
+#ifndef MINI_URHO
     // Always increment, the caller must match with ReleaseSDL(), regardless of
     // what happens.
-    sdlInitCounter++;
+    ++sdlInitCounter;
 
     // Need to call SDL_Init() at least once before SDL_InitSubsystem()
     if (sdlInitCounter == 0)
@@ -241,13 +244,15 @@ bool Context::RequireSDL(unsigned int sdlFlags)
             return false;
         }
     }
+#endif
 
     return true;
 }
 
 void Context::ReleaseSDL()
 {
-    sdlInitCounter--;
+#ifndef MINI_URHO
+    --sdlInitCounter;
 
     if (sdlInitCounter == 0)
     {
@@ -257,9 +262,8 @@ void Context::ReleaseSDL()
     }
 
     if (sdlInitCounter < 0)
-    {
-        URHO3D_LOGERRORF("Too many calls to Context::ReleaseSDL()!");
-    }
+        URHO3D_LOGERROR("Too many calls to Context::ReleaseSDL()!");
+#endif
 }
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
