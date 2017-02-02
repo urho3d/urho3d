@@ -98,6 +98,7 @@ namespace Urho3D
 <a href="#Class_Input"><b>Input</b></a>
 <a href="#Class_IntRect"><b>IntRect</b></a>
 <a href="#Class_IntVector2"><b>IntVector2</b></a>
+<a href="#Class_IntVector3"><b>IntVector3</b></a>
 <a href="#Class_JSONFile"><b>JSONFile</b></a>
 <a href="#Class_JSONValue"><b>JSONValue</b></a>
 <a href="#Class_JoystickState"><b>JoystickState</b></a>
@@ -1402,10 +1403,12 @@ Methods:
 - void SetOtherBodyAnchor(const Vector2& anchor)
 - void SetFrequencyHz(float frequencyHz)
 - void SetDampingRatio(float dampingRatio)
+- void SetLength(float length)
 - const Vector2& GetOwnerBodyAnchor() const
 - const Vector2& GetOtherBodyAnchor() const
 - float GetFrequencyHz() const
 - float GetDampingRatio() const
+- float GetLength() const
 
 Properties:
 
@@ -1413,6 +1416,7 @@ Properties:
 - Vector2& otherBodyAnchor
 - float frequencyHz
 - float dampingRatio
+- float length
 
 <a name="Class_ConstraintFriction2D"></a>
 ### ConstraintFriction2D : Constraint2D
@@ -2023,6 +2027,7 @@ Methods:
 - double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
+- IntVector3 ReadIntVector3()
 - Rect ReadRect()
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
@@ -2260,6 +2265,7 @@ Methods:
 - double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
+- IntVector3 ReadIntVector3()
 - Rect ReadRect()
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
@@ -2299,6 +2305,7 @@ Methods:
 - bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
+- bool WriteIntVector3(const IntVector3& value)
 - bool WriteRect(const Rect& value)
 - bool WriteVector2(const Vector2& value)
 - bool WriteVector3(const Vector3& value)
@@ -2674,6 +2681,7 @@ Methods:
 - double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
+- IntVector3 ReadIntVector3()
 - Rect ReadRect()
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
@@ -2931,6 +2939,43 @@ Properties:
 - int x
 - int y
 - const IntVector2 ZERO
+
+<a name="Class_IntVector3"></a>
+### IntVector3
+
+
+Methods:
+
+- IntVector3() (GC)
+- IntVector3* new()
+- IntVector3(int x, int y, int z) (GC)
+- IntVector3* new(int x, int y, int z)
+- IntVector3(const IntVector3& rhs) (GC)
+- IntVector3* new(const IntVector3& rhs)
+- void delete()
+- bool operator==(const IntVector3& rhs) const
+- IntVector3 operator+(const IntVector3& rhs) const
+- IntVector3 operator-() const
+- IntVector3 operator-(const IntVector3& rhs) const
+- IntVector3 operator*(int rhs) const
+- IntVector3 operator/(int rhs) const
+- String ToString() const
+- unsigned ToHash() const
+- float Length() const
+
+Properties:
+
+- int x
+- int y
+- int z
+- const IntVector3 ZERO
+- const IntVector3 LEFT
+- const IntVector3 RIGHT
+- const IntVector3 UP
+- const IntVector3 DOWN
+- const IntVector3 FORWARD
+- const IntVector3 BACK
+- const IntVector3 ONE
 
 <a name="Class_JSONFile"></a>
 ### JSONFile : Resource
@@ -3640,6 +3685,7 @@ Methods:
 - double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
+- IntVector3 ReadIntVector3()
 - Rect ReadRect()
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
@@ -3677,6 +3723,7 @@ Methods:
 - bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
+- bool WriteIntVector3(const IntVector3& value)
 - bool WriteRect(const Rect& value)
 - bool WriteVector2(const Vector2& value)
 - bool WriteVector3(const Vector3& value)
@@ -5678,6 +5725,7 @@ Methods:
 - bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
+- bool WriteIntVector3(const IntVector3& value)
 - bool WriteRect(const Rect& value)
 - bool WriteVector2(const Vector2& value)
 - bool WriteVector3(const Vector3& value)
@@ -7158,6 +7206,7 @@ Methods:
 - const Rect& GetRect() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
+- const IntVector3& GetIntVector3() const
 - RefCounted* GetPtr(const char* type) const
 - const Matrix3& GetMatrix3() const
 - const Matrix3x4& GetMatrix3x4() const
@@ -7366,6 +7415,7 @@ Methods:
 - double ReadDouble()
 - IntRect ReadIntRect()
 - IntVector2 ReadIntVector2()
+- IntVector3 ReadIntVector3()
 - Rect ReadRect()
 - Vector2 ReadVector2()
 - Vector3 ReadVector3()
@@ -7405,6 +7455,7 @@ Methods:
 - bool WriteDouble(double value)
 - bool WriteIntRect(const IntRect& value)
 - bool WriteIntVector2(const IntVector2& value)
+- bool WriteIntVector3(const IntVector3& value)
 - bool WriteRect(const Rect& value)
 - bool WriteVector2(const Vector2& value)
 - bool WriteVector3(const Vector3& value)
@@ -7621,6 +7672,7 @@ Methods:
 - bool SetInt(const String name, int value)
 - bool SetIntRect(const String name, const IntRect& value)
 - bool SetIntVector2(const String name, const IntVector2& value)
+- bool SetIntVector3(const String name, const IntVector3& value)
 - bool SetRect(const String name, const Rect& value)
 - bool SetQuaternion(const String name, const Quaternion& value)
 - bool SetString(const String name, const String value)
@@ -7659,6 +7711,7 @@ Methods:
 - int GetInt(const String name) const
 - IntRect GetIntRect(const String name) const
 - IntVector2 GetIntVector2(const String name) const
+- IntVector3 GetIntVector3(const String name) const
 - Rect GetRect(const String name) const
 - Quaternion GetQuaternion(const String name) const
 - Variant GetVariant() const
@@ -8301,6 +8354,7 @@ Properties:
 - int VAR_DOUBLE
 - int VAR_STRINGVECTOR
 - int VAR_RECT
+- int VAR_INTVECTOR3
 - int MAX_VAR_TYPES
 
 ### VertexElementSemantic
@@ -8423,8 +8477,8 @@ Properties:
 - Renderer* GetRenderer()
 - Time* GetTime()
 - UI* GetUI()
-- bool HasSubscribedToEvent(const String eventName)
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
+- bool HasSubscribedToEvent(const String eventName)
 - float InverseLerp(float lhs, float rhs, float x)
 - bool IsAbsolutePath(const String pathName)
 - bool IsAlpha(unsigned ch)
@@ -8444,8 +8498,8 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random(float range)
 - float Random()
+- float Random(float range)
 - float Random(float min, float max)
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
@@ -8468,8 +8522,8 @@ Properties:
 - float StableRandom(float seed)
 - float StableRandom(const Vector3& seed)
 - float StableRandom(const Vector2& seed)
-- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -8477,6 +8531,7 @@ Properties:
 - int ToInt(const String source, int base = 10)
 - IntRect ToIntRect(const String source)
 - IntVector2 ToIntVector2(const String source)
+- IntVector3 ToIntVector3(const String source)
 - unsigned ToLower(unsigned ch)
 - Matrix3 ToMatrix3(const String source)
 - Matrix3x4 ToMatrix3x4(const String source)
@@ -8492,31 +8547,36 @@ Properties:
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
+- void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
-- Vector3 VectorCeil(const Vector3& vec)
 - Vector2 VectorCeil(const Vector2& vec)
 - Vector4 VectorCeil(const Vector4& vec)
+- Vector3 VectorCeil(const Vector3& vec)
 - IntVector2 VectorCeilToInt(const Vector2& vec)
+- IntVector3 VectorCeilToInt(const Vector3& vec)
 - Vector4 VectorFloor(const Vector4& vec)
-- Vector2 VectorFloor(const Vector2& vec)
 - Vector3 VectorFloor(const Vector3& vec)
+- Vector2 VectorFloor(const Vector2& vec)
+- IntVector3 VectorFloorToInt(const Vector3& vec)
 - IntVector2 VectorFloorToInt(const Vector2& vec)
 - Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
-- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
-- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
-- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
-- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
+- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
+- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
 - Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
+- IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
 - Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
-- Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
 - IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
-- Vector3 VectorRound(const Vector3& vec)
+- Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
 - Vector2 VectorRound(const Vector2& vec)
+- Vector3 VectorRound(const Vector3& vec)
 - Vector4 VectorRound(const Vector4& vec)
+- IntVector3 VectorRoundToInt(const Vector3& vec)
 - IntVector2 VectorRoundToInt(const Vector2& vec)
 
 

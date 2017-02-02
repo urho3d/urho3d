@@ -1213,6 +1213,7 @@ namespace Urho3D
 - %Other %Body %Anchor : Vector2
 - %Frequency %Hz : float
 - %Damping %Ratio : float
+- %Length : float
 - %Collide %Connected : bool
 
 ### ConstraintFriction2D
@@ -2643,6 +2644,7 @@ namespace Urho3D
 <a href="#Class_Input"><b>Input</b></a>
 <a href="#Class_IntRect"><b>IntRect</b></a>
 <a href="#Class_IntVector2"><b>IntVector2</b></a>
+<a href="#Class_IntVector3"><b>IntVector3</b></a>
 <a href="#Class_JSONFile"><b>JSONFile</b></a>
 <a href="#Class_JSONValue"><b>JSONValue</b></a>
 <a href="#Class_JoystickState"><b>JoystickState</b></a>
@@ -5080,6 +5082,7 @@ Properties:
 - bool enabledEffective // readonly
 - float frequencyHz
 - uint id // readonly
+- float length
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -7656,6 +7659,23 @@ Properties:
 - int[] data // readonly
 - int x
 - int y
+
+<a name="Class_IntVector3"></a>
+
+### IntVector3
+
+Methods:
+
+- float Length() const
+- uint ToHash() const
+- String ToString() const
+
+Properties:
+
+- int[] data // readonly
+- int x
+- int y
+- int z
 
 <a name="Class_JSONFile"></a>
 
@@ -12900,6 +12920,7 @@ Methods:
 - int ToInt(int = 10) const
 - IntRect ToIntRect() const
 - IntVector2 ToIntVector2() const
+- IntVector3 ToIntVector3() const
 - String ToLower() const
 - Matrix3 ToMatrix3() const
 - Matrix3x4 ToMatrix3x4() const
@@ -14451,6 +14472,7 @@ Methods:
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
+- const IntVector3& GetIntVector3() const
 - const Matrix3& GetMatrix3() const
 - const Matrix3x4& GetMatrix3x4() const
 - const Matrix4& GetMatrix4() const
@@ -15160,6 +15182,7 @@ Methods:
 - int GetInt(const String&) const
 - IntRect GetIntRect(const String&) const
 - IntVector2 GetIntVector2(const String&) const
+- IntVector3 GetIntVector3(const String&) const
 - Matrix3 GetMatrix3(const String&) const
 - Matrix3x4 GetMatrix3x4(const String&) const
 - Matrix4 GetMatrix4(const String&) const
@@ -15197,6 +15220,7 @@ Methods:
 - bool SetInt(const String&, int)
 - bool SetIntRect(const String&, const IntRect&)
 - bool SetIntVector2(const String&, const IntVector2&)
+- bool SetIntVector3(const String&, const IntVector3&)
 - bool SetMatrix3(const String&, const Matrix3&)
 - bool SetMatrix3x4(const String&, const Matrix3x4&)
 - bool SetMatrix4(const String&, const Matrix4&)
@@ -15926,6 +15950,7 @@ Properties:
 - VAR_VARIANTMAP
 - VAR_INTRECT
 - VAR_INTVECTOR2
+- VAR_INTVECTOR3
 - VAR_PTR
 - VAR_MATRIX3
 - VAR_MATRIX3X4
@@ -16105,18 +16130,22 @@ Properties:
 - Vector3 VectorCeil(const Vector3&)
 - Vector4 VectorCeil(const Vector4&)
 - IntVector2 VectorCeilToInt(const Vector2&)
+- IntVector3 VectorCeilToInt(const Vector3&)
 - Vector2 VectorFloor(const Vector2&)
 - Vector3 VectorFloor(const Vector3&)
 - Vector4 VectorFloor(const Vector4&)
 - IntVector2 VectorFloorToInt(const Vector2&)
+- IntVector3 VectorFloorToInt(const Vector3&)
 - Vector2 VectorLerp(const Vector2&, const Vector2&, const Vector2&)
 - Vector3 VectorLerp(const Vector3&, const Vector3&, const Vector3&)
 - Vector4 VectorLerp(const Vector4&, const Vector4&, const Vector4&)
 - IntVector2 VectorMax(const IntVector2&, const IntVector2&)
+- IntVector3 VectorMax(const IntVector3&, const IntVector3&)
 - Vector2 VectorMax(const Vector2&, const Vector2&)
 - Vector3 VectorMax(const Vector3&, const Vector3&)
 - Vector4 VectorMax(const Vector4&, const Vector4&)
 - IntVector2 VectorMin(const IntVector2&, const IntVector2&)
+- IntVector3 VectorMin(const IntVector3&, const IntVector3&)
 - Vector2 VectorMin(const Vector2&, const Vector2&)
 - Vector3 VectorMin(const Vector3&, const Vector3&)
 - Vector4 VectorMin(const Vector4&, const Vector4&)
@@ -16124,6 +16153,7 @@ Properties:
 - Vector3 VectorRound(const Vector3&)
 - Vector4 VectorRound(const Vector4&)
 - IntVector2 VectorRoundToInt(const Vector2&)
+- IntVector3 VectorRoundToInt(const Vector3&)
 - bool WriteDrawablesToOBJ(Drawable@[]@, File@, bool, bool, bool = false)
 \section ScriptAPI_GlobalProperties Global properties
 - DBAPI DBAPI
