@@ -28,6 +28,7 @@ enum VariantType
     VAR_DOUBLE,
     VAR_STRINGVECTOR,
     VAR_RECT,
+    VAR_INTVECTOR3,
     MAX_VAR_TYPES
 };
 
@@ -98,6 +99,7 @@ class Variant
     const Rect& GetRect() const;
     const IntRect& GetIntRect() const;
     const IntVector2& GetIntVector2() const;
+    const IntVector3& GetIntVector3() const;
     RefCounted* GetPtr(const char* type) const;
     const Matrix3& GetMatrix3() const;
     const Matrix3x4& GetMatrix3x4() const;

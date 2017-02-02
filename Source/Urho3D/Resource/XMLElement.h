@@ -128,6 +128,8 @@ public:
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.
     bool SetIntVector2(const String& name, const IntVector2& value);
+    /// Set an IntVector3 attribute.
+    bool SetIntVector3(const String& name, const IntVector3& value);
     /// Set a Rect attribute.
     bool SetRect(const String& name, const Rect& value);
     /// Set a quaternion attribute.
@@ -231,6 +233,8 @@ public:
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.
     IntVector2 GetIntVector2(const String& name) const;
+    /// Return an IntVector3 attribute, or default if missing.
+    IntVector3 GetIntVector3(const String& name) const;
     /// Return a Rect attribute, or default if missing.
     Rect GetRect(const String& name) const;
     /// Return a quaternion attribute, or default if missing.

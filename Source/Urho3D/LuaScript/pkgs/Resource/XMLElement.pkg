@@ -21,6 +21,7 @@ class XMLElement
     bool SetInt(const String name, int value);
     bool SetIntRect(const String name, const IntRect& value);
     bool SetIntVector2(const String name, const IntVector2& value);
+    bool SetIntVector3(const String name, const IntVector3& value);
     bool SetRect(const String name, const Rect& value);
     bool SetQuaternion(const String name, const Quaternion& value);
     bool SetString(const String name, const String value);
@@ -62,6 +63,7 @@ class XMLElement
     int GetInt(const String name) const;
     IntRect GetIntRect(const String name) const;
     IntVector2 GetIntVector2(const String name) const;
+    IntVector3 GetIntVector3(const String name) const;
     Rect GetRect(const String name) const;
     Quaternion GetQuaternion(const String name) const;
     Variant GetVariant() const;

@@ -271,6 +271,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                     variant = *static_cast<IntVector2*>(value);
                     break;
 
+                case VAR_INTVECTOR3:
+                    variant = *static_cast<IntVector3*>(value);
+                    break;
+
                 case VAR_MATRIX3:
                     variant = *static_cast<Matrix3*>(value);
                     break;
@@ -357,6 +361,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
     case VAR_VARIANTMAP:
     case VAR_INTRECT:
     case VAR_INTVECTOR2:
+    case VAR_INTVECTOR3:
         tolua_pushusertype(L, (void*)variant->Get<const VariantValue*>(), variant->GetTypeName().CString());
         break;
 
