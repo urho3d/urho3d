@@ -81,6 +81,7 @@ void CreateToolBar()
     viewportModeList.SetAlignment(HA_LEFT, VA_CENTER);
     toolBar.AddChild(viewportModeList);
     viewportModeList.AddItem(CreateViewPortModeText("Single", VIEWPORT_SINGLE));
+    viewportModeList.AddItem(CreateViewPortModeText("Compact", VIEWPORT_COMPACT));
     viewportModeList.AddItem(CreateViewPortModeText("Vertical Split", VIEWPORT_LEFT|VIEWPORT_RIGHT));
     viewportModeList.AddItem(CreateViewPortModeText("Horizontal Split", VIEWPORT_TOP|VIEWPORT_BOTTOM));
     viewportModeList.AddItem(CreateViewPortModeText("Quad", VIEWPORT_TOP_LEFT|VIEWPORT_TOP_RIGHT|VIEWPORT_BOTTOM_LEFT|VIEWPORT_BOTTOM_RIGHT));
