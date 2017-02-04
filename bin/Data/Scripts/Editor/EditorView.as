@@ -43,6 +43,7 @@ const uint VIEWPORT_BORDER_V1    = 0x00000020;
 const uint VIEWPORT_BORDER_V2    = 0x00000040;
 
 const uint VIEWPORT_SINGLE       = 0x00000000;
+const uint VIEWPORT_COMPACT 	 = 0x00009000;
 const uint VIEWPORT_TOP          = 0x00000100;
 const uint VIEWPORT_BOTTOM       = 0x00000200;
 const uint VIEWPORT_LEFT         = 0x00000400;
@@ -624,10 +625,86 @@ void SetFillMode(FillMode fillMode_)
         viewports[i].camera.fillMode = fillMode_;
 }
 
+void SortWindows(){
+	hierarchyWindow.position = IntVector2(secondaryToolBar.width,toolBar.height + uiMenuBar.height);
+	hierarchyWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
+	attributeInspectorWindow.position = IntVector2(viewportArea.width-attributeInspectorWindow.width,toolBar.height + uiMenuBar.height);
+	attributeInspectorWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
+}
+
+void SetCompactMode(uint mode = VIEWPORT_SINGLE){
+	SortWindows();
+	attributeInspectorWindow.GetChild("CloseButton",true).visible = false;
+	attributeInspectorWindow.resizable = false;
+	attributeInspectorWindow.movable = false;
+	hierarchyWindow.GetChild("CloseButton",true).visible = false;
+	hierarchyWindow.resizable = false;
+	hierarchyWindow.movable = false;
+
+	browserWindow.visible = false;
+
+    Array<Vector3> cameraPositions;
+    Array<Quaternion> cameraRotations;
+    for (uint i = 0; i < viewports.length; ++i)
+    {
+        cameraPositions.Push(viewports[i].cameraNode.position);
+        cameraRotations.Push(viewports[i].cameraNode.rotation);
+    }
+
+    viewports.Clear();
+    viewportMode = mode;
+
+    {
+        uint viewport = 0;
+        ViewportContext@ vc = ViewportContext(
+            IntRect(
+                secondaryToolBar.width + hierarchyWindow.width,
+                toolBar.height + uiMenuBar.height,
+                viewportArea.width-attributeInspectorWindow.width,
+                viewportArea.height),
+            viewports.length + 1,
+            viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
+        );
+        viewports.Push(vc);
+    }
+
+    renderer.numViewports = viewports.length;
+    for (uint i = 0; i < viewports.length; ++i)
+        renderer.viewports[i] = viewports[i].viewport;
+
+    if (cameraPositions.length > 0)
+    {
+        for (uint i = 0; i < viewports.length; ++i)
+        {
+            uint src = i;
+            if (src >= cameraPositions.length)
+                src = cameraPositions.length - 1;
+            viewports[i].cameraNode.position = cameraPositions[src];
+            viewports[i].cameraNode.rotation = cameraRotations[src];
+        }
+    }
+
+    ReacquireCameraYawPitch();
+    UpdateViewParameters();
+    UpdateCameraPreview();
+    CreateViewportUI();
+}
 
 // Sets the viewport mode
 void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 {
+    if(mode == VIEWPORT_COMPACT){
+		SetCompactMode(mode);
+		return;
+	}else if(viewportMode == VIEWPORT_COMPACT){
+		attributeInspectorWindow.GetChild("CloseButton",true).visible = true;
+		attributeInspectorWindow.resizable = true;
+		attributeInspectorWindow.movable = true;
+		hierarchyWindow.GetChild("CloseButton",true).visible = true;
+		hierarchyWindow.resizable = true;
+		hierarchyWindow.movable = true;
+	}
+
     // Remember old viewport positions
     Array<Vector3> cameraPositions;
     Array<Quaternion> cameraRotations;
