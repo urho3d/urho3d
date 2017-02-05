@@ -71,7 +71,7 @@ void L10n::InitLocalizationSystem()
 {
     Localization* l10n = GetSubsystem<Localization>();
     // JSON files must be in UTF8 encoding without BOM
-    // The first founded language will be set as current
+    // The first found language will be set as current
     l10n->LoadJSONFile("StringsEnRu.json");
     // You can load multiple files
     l10n->LoadJSONFile("StringsDe.json");
