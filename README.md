@@ -11,6 +11,9 @@ Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 ##License
 Licensed under the MIT license, see [LICENSE](https://github.com/urho3d/Urho3D/blob/master/LICENSE) for details.
 
+##Contributing
+Before making pull requests, please read the [Contribution checklist](https://urho3d.github.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.github.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
+
 ##Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
