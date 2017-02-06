@@ -30,7 +30,7 @@ void Start()
 void InitLocalizationSystem()
 {
     // JSON files must be in UTF8 encoding without BOM
-    // The first founded language will be set as current
+    // The first found language will be set as current
     localization.LoadJSONFile("StringsEnRu.json");
     // You can load multiple files
     localization.LoadJSONFile("StringsDe.json");
