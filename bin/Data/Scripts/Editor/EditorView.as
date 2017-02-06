@@ -642,12 +642,12 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 	if(mode == VIEWPORT_COMPACT)
 	{
 		//Move and scale hierarchy window to left of screen
-		hierarchyWindow.visible = true;
+		ShowHierarchyWindow();
 		hierarchyWindow.position = IntVector2(secondaryToolBar.width,toolBar.height + uiMenuBar.height);
 		hierarchyWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
 		
 		//Move and scale inspector window to left of screen
-		attributeInspectorWindow.visible = true;
+		ShowAttributeInspectorWindow();
 		attributeInspectorWindow.position = IntVector2(viewportArea.width-attributeInspectorWindow.width,toolBar.height + uiMenuBar.height);
 		attributeInspectorWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
 
