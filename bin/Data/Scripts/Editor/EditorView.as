@@ -1233,22 +1233,22 @@ void UpdateStats(float timeStep)
     
     if(viewportMode != VIEWPORT_COMPACT)
     {
-	    if (graphics.width >= editorModeText.size.x + renderStatsText.size.x + 45)
-	    {
-			SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
-			SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
-			SetupStatsBarText(modelInfoText, font, 35, 88, HA_LEFT, VA_TOP);
-	    }
-	    else
-	    {
-			SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
-			SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
-			SetupStatsBarText(modelInfoText, font, 35, 102, HA_LEFT, VA_TOP);
-	    }
+	if (graphics.width >= editorModeText.size.x + renderStatsText.size.x + 45)
+	{
+            SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+            SetupStatsBarText(renderStatsText, font, -4, 64, HA_RIGHT, VA_TOP);
+            SetupStatsBarText(modelInfoText, font, 35, 88, HA_LEFT, VA_TOP);
+	}
+	else
+	{
+            SetupStatsBarText(editorModeText, font, 35, 64, HA_LEFT, VA_TOP);
+            SetupStatsBarText(renderStatsText, font, 35, 78, HA_LEFT, VA_TOP);
+            SetupStatsBarText(modelInfoText, font, 35, 102, HA_LEFT, VA_TOP);
+	}
     }
     else
     {
-		SetupStatsBarText(editorModeText, font, secondaryToolBar.width + hierarchyWindow.width + 10 , 64, HA_LEFT, VA_TOP);
+        SetupStatsBarText(editorModeText, font, secondaryToolBar.width + hierarchyWindow.width + 10 , 64, HA_LEFT, VA_TOP);
         SetupStatsBarText(renderStatsText, font, secondaryToolBar.width + hierarchyWindow.width + 10 , 84, HA_LEFT, VA_TOP);
         SetupStatsBarText(modelInfoText, font, secondaryToolBar.width + hierarchyWindow.width + 10, 104, HA_LEFT, VA_TOP);	
     }
