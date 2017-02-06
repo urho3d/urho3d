@@ -70,6 +70,7 @@ Urho3D development, contributions and bugfixes by:
 - Joshua Tippetts
 - Konstantin Tomashevich
 - Yusuf Umar
+- Mateus Vendramini
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish
