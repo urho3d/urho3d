@@ -524,11 +524,13 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         for (uint i = 0; i < keys.length; ++i)
         {
             String varName = GetVarName(keys[i]);
+            bool shouldHide = false;
+
             if (varName.empty)
             {
-                // UIElements will contain internal vars, which do not have known mappings. Skip these
+                // UIElements will contain internal vars, which do not have known mappings. Hide these
                 if (cast<UIElement>(serializables[0]) !is null)
-                    continue;
+                    shouldHide = true;
                 // Else, for scene nodes, show as hexadecimal hashes if nothing else is available
                 varName = keys[i].ToString();
             }
@@ -544,7 +546,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             {
                 parent.vars["Key"] = keys[i].value;
                 // If variable name is not registered (i.e. it is an editor internal variable) then hide it
-                if (varName.empty)
+                if (varName.empty || shouldHide)
                     parent.visible = false;
             }
         }
