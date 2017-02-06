@@ -190,7 +190,7 @@ void ShowAttributeInspectorWindow()
 void HideAttributeInspectorWindow()
 {
     if(viewportMode == VIEWPORT_COMPACT)
-		return;
+        return;
     attributeInspectorWindow.visible = false;
 }
 
