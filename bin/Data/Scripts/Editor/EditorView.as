@@ -625,88 +625,11 @@ void SetFillMode(FillMode fillMode_)
         viewports[i].camera.fillMode = fillMode_;
 }
 
-void SortWindows(){
-	hierarchyWindow.position = IntVector2(secondaryToolBar.width,toolBar.height + uiMenuBar.height);
-	hierarchyWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
-	attributeInspectorWindow.position = IntVector2(viewportArea.width-attributeInspectorWindow.width,toolBar.height + uiMenuBar.height);
-	attributeInspectorWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
-}
-
-void SetCompactMode(uint mode = VIEWPORT_SINGLE){
-	SortWindows();
-	attributeInspectorWindow.GetChild("CloseButton",true).visible = false;
-	attributeInspectorWindow.resizable = false;
-	attributeInspectorWindow.movable = false;
-	hierarchyWindow.GetChild("CloseButton",true).visible = false;
-	hierarchyWindow.resizable = false;
-	hierarchyWindow.movable = false;
-
-	browserWindow.visible = false;
-
-    Array<Vector3> cameraPositions;
-    Array<Quaternion> cameraRotations;
-    for (uint i = 0; i < viewports.length; ++i)
-    {
-        cameraPositions.Push(viewports[i].cameraNode.position);
-        cameraRotations.Push(viewports[i].cameraNode.rotation);
-    }
-
-    viewports.Clear();
-    viewportMode = mode;
-
-    {
-        uint viewport = 0;
-        ViewportContext@ vc = ViewportContext(
-            IntRect(
-                secondaryToolBar.width + hierarchyWindow.width,
-                toolBar.height + uiMenuBar.height,
-                viewportArea.width-attributeInspectorWindow.width,
-                viewportArea.height),
-            viewports.length + 1,
-            viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
-        );
-        viewports.Push(vc);
-    }
-
-    renderer.numViewports = viewports.length;
-    for (uint i = 0; i < viewports.length; ++i)
-        renderer.viewports[i] = viewports[i].viewport;
-
-    if (cameraPositions.length > 0)
-    {
-        for (uint i = 0; i < viewports.length; ++i)
-        {
-            uint src = i;
-            if (src >= cameraPositions.length)
-                src = cameraPositions.length - 1;
-            viewports[i].cameraNode.position = cameraPositions[src];
-            viewports[i].cameraNode.rotation = cameraRotations[src];
-        }
-    }
-
-    ReacquireCameraYawPitch();
-    UpdateViewParameters();
-    UpdateCameraPreview();
-    CreateViewportUI();
-}
-
 // Sets the viewport mode
 void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 {
-    if(mode == VIEWPORT_COMPACT){
-		SetCompactMode(mode);
-		return;
-	}else if(viewportMode == VIEWPORT_COMPACT){
-		attributeInspectorWindow.GetChild("CloseButton",true).visible = true;
-		attributeInspectorWindow.resizable = true;
-		attributeInspectorWindow.movable = true;
-		hierarchyWindow.GetChild("CloseButton",true).visible = true;
-		hierarchyWindow.resizable = true;
-		hierarchyWindow.movable = true;
-	}
-
-    // Remember old viewport positions
-    Array<Vector3> cameraPositions;
+	// Remember old viewport positions
+	Array<Vector3> cameraPositions;
     Array<Quaternion> cameraRotations;
     for (uint i = 0; i < viewports.length; ++i)
     {
@@ -715,73 +638,121 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
     }
 
     viewports.Clear();
-    viewportMode = mode;
 
-    // Always have quad a
-    {
-        uint viewport = 0;
-        ViewportContext@ vc = ViewportContext(
-            IntRect(
-                0,
-                0,
-                mode & (VIEWPORT_LEFT|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.width / 2 : viewportArea.width,
-                mode & (VIEWPORT_TOP|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.height / 2 : viewportArea.height),
-            viewports.length + 1,
-            viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
-        );
-        viewports.Push(vc);
-    }
+	if(mode == VIEWPORT_COMPACT)
+	{
+		hierarchyWindow.position = IntVector2(secondaryToolBar.width,toolBar.height + uiMenuBar.height);
+		hierarchyWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
+		attributeInspectorWindow.position = IntVector2(viewportArea.width-attributeInspectorWindow.width,toolBar.height + uiMenuBar.height);
+		attributeInspectorWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
 
-    uint topRight = viewportMode & (VIEWPORT_RIGHT|VIEWPORT_TOP_RIGHT);
-    if (topRight > 0)
-    {
-        ViewportContext@ vc = ViewportContext(
-            IntRect(
-                viewportArea.width/2,
-                0,
-                viewportArea.width,
-                mode & VIEWPORT_TOP_RIGHT > 0 ? viewportArea.height / 2 : viewportArea.height),
-            viewports.length + 1,
-            topRight
-        );
-        viewports.Push(vc);
-    }
+		//Hide close button and disable resize/movement inspector/hierarchy of windows.
+		attributeInspectorWindow.GetChild("CloseButton",true).visible = false;
+		attributeInspectorWindow.resizable = false;
+		attributeInspectorWindow.movable = false;
+		hierarchyWindow.GetChild("CloseButton",true).visible = false;
+		hierarchyWindow.resizable = false;
+		hierarchyWindow.movable = false;
 
-    uint bottomLeft = viewportMode & (VIEWPORT_BOTTOM|VIEWPORT_BOTTOM_LEFT);
-    if (bottomLeft > 0)
-    {
-        ViewportContext@ vc = ViewportContext(
-            IntRect(
-                0,
-                viewportArea.height / 2,
-                mode & (VIEWPORT_BOTTOM_LEFT) > 0 ? viewportArea.width / 2 : viewportArea.width,
-                viewportArea.height),
-            viewports.length + 1,
-            bottomLeft
-        );
-        viewports.Push(vc);
-    }
+		//Create viewport on center of window.
+		{
+		    uint viewport = 0;
+		    ViewportContext@ vc = ViewportContext(
+		        IntRect(
+		            secondaryToolBar.width + hierarchyWindow.width,
+		            toolBar.height + uiMenuBar.height,
+		            viewportArea.width-attributeInspectorWindow.width,
+		            viewportArea.height),
+		        viewports.length + 1,
+		        viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
+		    );
+		    viewports.Push(vc);
+		}
+		viewportMode = mode;
 
-    uint bottomRight = viewportMode & (VIEWPORT_BOTTOM_RIGHT);
-    if (bottomRight > 0)
-    {
-        ViewportContext@ vc = ViewportContext(
-            IntRect(
-                viewportArea.width / 2,
-                viewportArea.height / 2,
-                viewportArea.width,
-                viewportArea.height),
-            viewports.length + 1,
-            bottomRight
-        );
-        viewports.Push(vc);
-    }
+	}
+	else
+	{
+		//Show close button and enable resize/movement of inspector/hierarchy windows.
+		if(viewportMode == VIEWPORT_COMPACT)
+		{
+			attributeInspectorWindow.GetChild("CloseButton",true).visible = true;
+			attributeInspectorWindow.resizable = true;
+			attributeInspectorWindow.movable = true;
+			hierarchyWindow.GetChild("CloseButton",true).visible = true;
+			hierarchyWindow.resizable = true;
+			hierarchyWindow.movable = true;
+		}
+
+		viewportMode = mode;
+		
+		// Always have quad a
+		{
+		    uint viewport = 0;
+		    ViewportContext@ vc = ViewportContext(
+		        IntRect(
+		            0,
+		            0,
+		            mode & (VIEWPORT_LEFT|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.width / 2 : viewportArea.width,
+		            mode & (VIEWPORT_TOP|VIEWPORT_TOP_LEFT) > 0 ? viewportArea.height / 2 : viewportArea.height),
+		        viewports.length + 1,
+		        viewportMode & (VIEWPORT_TOP|VIEWPORT_LEFT|VIEWPORT_TOP_LEFT)
+		    );
+		    viewports.Push(vc);
+		}
+
+		uint topRight = viewportMode & (VIEWPORT_RIGHT|VIEWPORT_TOP_RIGHT);
+		if (topRight > 0)
+		{
+		    ViewportContext@ vc = ViewportContext(
+		        IntRect(
+		            viewportArea.width/2,
+		            0,
+		            viewportArea.width,
+		            mode & VIEWPORT_TOP_RIGHT > 0 ? viewportArea.height / 2 : viewportArea.height),
+		        viewports.length + 1,
+		        topRight
+		    );
+		    viewports.Push(vc);
+		}
+
+		uint bottomLeft = viewportMode & (VIEWPORT_BOTTOM|VIEWPORT_BOTTOM_LEFT);
+		if (bottomLeft > 0)
+		{
+		    ViewportContext@ vc = ViewportContext(
+		        IntRect(
+		            0,
+		            viewportArea.height / 2,
+		            mode & (VIEWPORT_BOTTOM_LEFT) > 0 ? viewportArea.width / 2 : viewportArea.width,
+		            viewportArea.height),
+		        viewports.length + 1,
+		        bottomLeft
+		    );
+		    viewports.Push(vc);
+		}
+
+		uint bottomRight = viewportMode & (VIEWPORT_BOTTOM_RIGHT);
+		if (bottomRight > 0)
+		{
+		    ViewportContext@ vc = ViewportContext(
+		        IntRect(
+		            viewportArea.width / 2,
+		            viewportArea.height / 2,
+		            viewportArea.width,
+		            viewportArea.height),
+		        viewports.length + 1,
+		        bottomRight
+		    );
+		    viewports.Push(vc);
+		}
+
+	}
 
     renderer.numViewports = viewports.length;
     for (uint i = 0; i < viewports.length; ++i)
         renderer.viewports[i] = viewports[i].viewport;
 
-    // Restore camera positions as applicable. Default new viewports to the last camera position
+	// Restore camera positions as applicable. Default new viewports to the last camera position
     if (cameraPositions.length > 0)
     {
         for (uint i = 0; i < viewports.length; ++i)
