@@ -34,6 +34,11 @@ String coloringPropertyName;
 Color coloringOldColor;
 float coloringOldScalar;
 bool debugRenderDisabled = false;
+bool restoreViewport = false;
+IntVector2 oldHierarchyWindowPosition; // used for restore hierarchy position when switch between viewport modes
+int oldHierarchyWindowHeight;
+IntVector2 oldInspectorWindowPosition; // used for restore inspector position when switch between viewport modes
+int oldInspectorWindowHeight;
 
 const uint VIEWPORT_BORDER_H     = 0x00000001;
 const uint VIEWPORT_BORDER_H1    = 0x00000002;
@@ -500,7 +505,17 @@ void CreateCamera()
     // Set the initial viewport rect
     viewportArea = IntRect(0, 0, graphics.width, graphics.height);
 
-    SetViewportMode(viewportMode);
+    // Set viewport single to store default hierarchy/inspector height/positions
+    if(viewportMode == VIEWPORT_COMPACT)
+    {
+        SetViewportMode(VIEWPORT_SINGLE);
+        SetViewportMode(VIEWPORT_COMPACT);
+    }
+    else
+    {
+        SetViewportMode(viewportMode);
+    }
+    
     SetActiveViewport(viewports[0]);
 
     // Note: the camera is not inside the scene, so that it is not listed, and does not get deleted
@@ -641,17 +656,26 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
 
     if(mode == VIEWPORT_COMPACT)
     {
-        //Move and scale hierarchy window to left of screen
+        // Remember old hierarchy/inspector height/positions
+        if(viewportMode != VIEWPORT_COMPACT){
+            restoreViewport = true;
+            oldHierarchyWindowPosition = hierarchyWindow.position;
+            oldHierarchyWindowHeight = hierarchyWindow.height;
+            oldInspectorWindowPosition = attributeInspectorWindow.position;
+            oldInspectorWindowHeight = attributeInspectorWindow.height;
+        }    
+    
+        // Move and scale hierarchy window to left of screen
         ShowHierarchyWindow();
         hierarchyWindow.position = IntVector2(secondaryToolBar.width,toolBar.height + uiMenuBar.height);
         hierarchyWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
         
-        //Move and scale inspector window to left of screen
+        // Move and scale inspector window to left of screen
         ShowAttributeInspectorWindow();
         attributeInspectorWindow.position = IntVector2(viewportArea.width-attributeInspectorWindow.width,toolBar.height + uiMenuBar.height);
         attributeInspectorWindow.height = viewportArea.height-(toolBar.height + uiMenuBar.height);
 
-        //Hide close button and disable resize/movement inspector/hierarchy of windows.
+        // Hide close button and disable resize/movement inspector/hierarchy of windows
         attributeInspectorWindow.GetChild("CloseButton",true).visible = false;
         attributeInspectorWindow.resizable = false;
         attributeInspectorWindow.movable = false;
@@ -659,7 +683,7 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
         hierarchyWindow.resizable = false;
         hierarchyWindow.movable = false;
 
-        //Create viewport on center of window.
+        // Create viewport on center of window
         {
             uint viewport = 0;
             ViewportContext@ vc = ViewportContext(
@@ -678,9 +702,18 @@ void SetViewportMode(uint mode = VIEWPORT_SINGLE)
     }
     else
     {
-        //Show close button and enable resize/movement of inspector/hierarchy windows.
         if(viewportMode == VIEWPORT_COMPACT)
         {
+            // Restore hierarchy/inspector windows height/positions
+            if(restoreViewport)
+            {
+                hierarchyWindow.position = oldHierarchyWindowPosition;
+                hierarchyWindow.height = oldHierarchyWindowHeight;
+                attributeInspectorWindow.position = oldInspectorWindowPosition;
+                attributeInspectorWindow.height = oldInspectorWindowHeight;
+            }
+	    
+            // Show close button and enable resize/movement of inspector/hierarchy windows
             attributeInspectorWindow.GetChild("CloseButton",true).visible = true;
             attributeInspectorWindow.resizable = true;
             attributeInspectorWindow.movable = true;
