@@ -701,7 +701,9 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -fno-keep-inline-dllexport")
             if (NOT URHO3D_64BIT)
-                # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
+                set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+                set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+                # Prevent auto-vectorize optimization when using -O2, unless stack realign is being enforced globally
                 if (URHO3D_SSE)
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
