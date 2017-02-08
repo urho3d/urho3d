@@ -355,10 +355,13 @@ public:
     /// Return scene.
     Scene* GetScene() const { return scene_; }
 
+    /// Return whether is a direct or indirect child of specified node.
+    bool IsChildOf(Node* node) const;
+
     /// Return whether is enabled. Disables nodes effectively disable all their components.
     bool IsEnabled() const { return enabled_; }
 
-    /// Returns the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
+    /// Return the node's last own enabled state. May be different than the value returned by IsEnabled when SetDeepEnabled has been used.
     bool IsEnabledSelf() const { return enabledPrev_; }
 
     /// Return owner connection in networking.

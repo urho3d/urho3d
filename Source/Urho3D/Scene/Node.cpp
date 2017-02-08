@@ -800,13 +800,8 @@ void Node::AddChild(Node* node, unsigned index)
     if (!node || node == this || node->parent_ == this)
         return;
     // Check for possible cyclic parent assignment
-    Node* parent = parent_;
-    while (parent)
-    {
-        if (parent == node)
-            return;
-        parent = parent->parent_;
-    }
+    if (IsChildOf(node))
+        return;
 
     // Keep a shared ptr to the node while transferring
     SharedPtr<Node> nodeShared(node);
@@ -1362,6 +1357,18 @@ bool Node::HasComponent(StringHash type) const
 bool Node::HasTag(const String& tag) const
 {
     return impl_->tags_.Contains(tag);
+}
+
+bool Node::IsChildOf(Node* node) const
+{
+    Node* parent = parent_;
+    while (parent)
+    {
+        if (parent == node)
+            return true;
+        parent = parent->parent_;
+    }
+    return false;
 }
 
 const Variant& Node::GetVar(StringHash key) const
