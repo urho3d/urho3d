@@ -64,6 +64,7 @@ before_build:
   - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - rake ci_setup_cache
 build_script:
+  - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:URHO3D_TOOLS = "0" }
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move Build\*.zip . && rd /S /Q Build\_CPack_Packages
   - rake ci_timer
 after_build: rake ci_teardown_cache
