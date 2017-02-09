@@ -421,9 +421,13 @@ end
 # Usage: NOT intended to be used manually
 desc 'Setup build cache'
 task :ci_setup_cache do
-  clear = /\[ccache clear\]/ =~ ENV['COMMIT_MESSAGE']
+  clear = /\[cache clear\]/ =~ ENV['COMMIT_MESSAGE']
+  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
+  if ENV['APPVEYOR']
+    system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
+    next
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
-  if ENV['USE_CCACHE'].to_i == 2
+  elsif ENV['USE_CCACHE'].to_i == 2
     puts 'Setting up build cache'
     job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
     repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
@@ -443,8 +447,12 @@ end
 # Usage: NOT intended to be used manually
 desc 'Teardown build cache'
 task :ci_teardown_cache do
+  # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
+  if ENV['APPVEYOR']
+    # No-op for now
+    next
   # Upload cache to internal cache store if it is our own
-  if ENV['USE_CCACHE'].to_i == 2
+  elsif ENV['USE_CCACHE'].to_i == 2
     puts 'Storing build cache'
     job_number = ".#{ENV['TRAVIS_JOB_NUMBER'].split('.').last}"
     repo_slug = "#{ENV['TRAVIS_REPO_SLUG'].split('/').first}/cache-store.git"
@@ -486,7 +494,7 @@ task :ci_site_update do
     system "git add Source && git commit -qm 'Travis CI: source tree update at #{Time.now.utc}.' >/dev/null 2>&1"   # Use extra quiet mode as there could be no changes at all
     if /2008-([0-9]{4}) the Urho3D project/.match(File.read('Rakefile'))[1].to_i != Time.now.year
       # Automatically bump copyright when crossing a new year and give instruction to clear the cache if so since the cache is of no use anyway because of massive changes
-      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ccache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
+      system "git add #{bump_copyright_year.join ' '} && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[cache clear]'; then git push origin HEAD:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1 && echo Bumped copyright - Happy New Year!; fi" or abort "Failed to push copyright update for #{ENV['TRAVIS_BRANCH']}"
       ['urho3d.github.io master', 'android-ndk ndk-update-trigger', 'armhf-sysroot sysroot-update-trigger', 'arm64-sysroot sysroot-update-trigger', 'rpi-sysroot sysroot-update-trigger', 'emscripten-sdk sdk-update-trigger'].each { |var| pair = var.split; system "if [ ! -d ../#{pair.first} ]; then git clone -q --depth 1 --branch #{pair.last} https://github.com/urho3d/#{pair.first} ../#{pair.first}; fi" or abort "Failed to clone urho3d/#{pair.first}"; system "cd ../#{pair.first} && git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/urho3d/#{pair.first} && git add #{bump_copyright_year("../#{pair.first}").join ' '} 2>/dev/null && git add #{bump_copyright_year("../#{pair.first}", '2014-[0-9]{4} Yao').join ' '} 2>/dev/null && if git commit -qm 'Travis CI: bump copyright to #{Time.now.year}.\n[ci skip]'; then git push -q >/dev/null 2>&1; fi" or abort "Failed to push copyright update for urho3d/#{pair.first}"; }
     elsif system("git add Docs/*API* && git commit -qm 'Test commit to detect API documentation changes'")
       # Automatically give instruction to do packaging when API has changed, unless the instruction is already given in this commit
@@ -533,7 +541,7 @@ task :ci_create_mirrors do
   system 'git checkout -qf $TRAVIS_COMMIT' if head_moved
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git' or abort 'Failed to re-checkout commit'
   # Limit the scanning to only master branch and limit the frequency of scanning
-  scan = ENV['TRAVIS_BRANCH'] == 'master' && ((/\[ccache clear\]/ !~ ENV['COMMIT_MESSAGE'] && `ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i) || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
+  scan = ENV['TRAVIS_BRANCH'] == 'master' && ((/\[cache clear\]/ !~ ENV['COMMIT_MESSAGE'] && `ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i) || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
   # Check if it is time to generate annotation
   annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
   # Determine which CI mirror branches to be auto created
