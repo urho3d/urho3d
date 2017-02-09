@@ -37,7 +37,7 @@
 using namespace Urho3D;
 
 // Kernel used for blurring IES lights
-static const float Sigma3Kernel9x9[9 * 9] = {
+static const float sigma3Kernel9x9[9 * 9] = {
     0.00401f, 0.005895f, 0.007763f, 0.009157f, 0.009675f, 0.009157f, 0.007763f, 0.005895f, 0.00401f,
     0.005895f, 0.008667f, 0.011412f, 0.013461f, 0.014223f, 0.013461f, 0.011412f, 0.008667f, 0.005895f,
     0.007763f, 0.011412f, 0.015028f, 0.017726f, 0.018729f, 0.017726f, 0.015028f, 0.011412f, 0.007763f,
@@ -103,7 +103,7 @@ void Run(const Vector<String>& arguments)
         WriteIES(data, width, height, vertical, horizontal, luminance);
 
         // Apply a blur, simpler than interpolating through the 2 dimensions of coarse samples
-        Blur(data, width, height, Sigma3Kernel9x9, 9);
+        Blur(data, width, height, sigma3Kernel9x9, 9);
 
         stbi_write_png(arguments[1].CString(), width, height, 1, data.Get(), 0);
     }
