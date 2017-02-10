@@ -1393,31 +1393,31 @@ void UI::SendDragOrHoverEvent(StringHash eventType, UIElement* element, const In
 
     if (eventType == E_DRAGMOVE)
     {
-        // Figure out if we need to scale the positions
-        // Check ratio of window size to drawable size. These are not equal on e.g. Mac Retina displays
-        bool highDPI = SDL_WINDOW_ALLOW_HIGHDPI;
-        if (highDPI)
-        {
-            Graphics* g = GetSubsystem<Graphics>();
-            SDL_Window* curwindow = g->GetWindow();
-            int gl_w = g->GetWidth();
-            
-            int sdl_w, sdl_h;
-            SDL_GetWindowSize (curwindow, &sdl_w, &sdl_h);
-            
-            float multiplier = 1.0f;
-            if (sdl_w != 0)
-                multiplier = gl_w/sdl_w;
-            
-            eventData[P_DX] = multiplier*deltaPos.x_;
-            eventData[P_DY] = multiplier*deltaPos.y_;
-            
-        }
-        else
-        {
+//        // Figure out if we need to scale the positions
+//        // Check ratio of window size to drawable size. These are not equal on e.g. Mac Retina displays
+//        bool highDPI = SDL_WINDOW_ALLOW_HIGHDPI;
+//        if (highDPI)
+//        {
+//            Graphics* g = GetSubsystem<Graphics>();
+//            SDL_Window* curwindow = g->GetWindow();
+//            int gl_w = g->GetWidth();
+//            
+//            int sdl_w, sdl_h;
+//            SDL_GetWindowSize (curwindow, &sdl_w, &sdl_h);
+//            
+//            float multiplier = 1.0f;
+//            if (sdl_w != 0)
+//                multiplier = gl_w/sdl_w;
+//            
+//            eventData[P_DX] = multiplier*deltaPos.x_;
+//            eventData[P_DY] = multiplier*deltaPos.y_;
+//            
+//        }
+//        else
+//        {
             eventData[P_DX] = deltaPos.x_;
             eventData[P_DY] = deltaPos.y_;
-        }
+//        }
     }
 
     if (dragData)
