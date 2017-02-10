@@ -5253,6 +5253,8 @@ bool sRGBSupport;
 bool sRGBWriteSupport;
 String shaderCacheDir;
 /* readonly */
+IntVector2 size;
+/* readonly */
 bool tripleBuffer;
 /* readonly */
 StringHash type;
