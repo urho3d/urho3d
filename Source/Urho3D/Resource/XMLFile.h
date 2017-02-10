@@ -61,6 +61,8 @@ public:
     bool FromString(const String& source);
     /// Clear the document and create a root element.
     XMLElement CreateRoot(const String& name);
+    /// Get the root element if it has matching name, otherwise create it and clear the document.
+    XMLElement GetOrCreateRoot(const String& name);
 
     /// Return the root element, with optionally specified name. Return null element if not found.
     XMLElement GetRoot(const String& name = String::EMPTY);

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2013 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -29,10 +29,16 @@
 
 */
 
+// Modified by Lasse Oorni for Urho3D
+
 #include "as_config.h"
 
 #include <string.h>     // some compilers declare memcpy() here
 #include <math.h>       // pow()
+
+// Urho3D: for compiler reliability, define ourselves
+//#include <stdint.h>     // UINT64_MAX
+#define UINT64_MAX 0xffffffffffffffffULL
 
 #if !defined(AS_NO_MEMORY_H)
 #include <memory.h>
@@ -171,9 +177,12 @@ static int asCharToNbr(char ch, int radix)
 }
 
 // If base is 0 the string should be prefixed by 0x, 0d, 0o, or 0b to allow the function to automatically determine the radix
-asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
+asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned, bool *overflow)
 {
 	asASSERT(base == 10 || base == 16 || base == 0);
+
+	if (overflow)
+		*overflow = false;
 
 	const char *end = string;
 
@@ -182,6 +191,8 @@ asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
 	{
 		while( *end >= '0' && *end <= '9' )
 		{
+			if( overflow && ((res > UINT64_MAX / 10) || ((asUINT(*end - '0') > (UINT64_MAX - (UINT64_MAX / 10) * 10)) && res == UINT64_MAX / 10)) )
+				*overflow = true;
 			res *= 10;
 			res += *end++ - '0';
 		}
@@ -205,8 +216,13 @@ asQWORD asStringScanUInt64(const char *string, int base, size_t *numScanned)
 
 		if( base )
 		{
-			for( int nbr; (nbr = asCharToNbr(*end, base)) >= 0; end++ )
+			for (int nbr; (nbr = asCharToNbr(*end, base)) >= 0; end++)
+			{
+				if (overflow && ((res > UINT64_MAX / base) || ((asUINT(nbr) > (UINT64_MAX - (UINT64_MAX / base) * base)) && res == UINT64_MAX / base)) )
+					*overflow = true;
+
 				res = res * base + nbr;
+			}
 		}
 	}
 

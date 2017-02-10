@@ -227,6 +227,27 @@ IntVector2 ToIntVector2(const char* source)
     return ret;
 }
 
+IntVector3 ToIntVector3(const String& source)
+{
+    return ToIntVector3(source.CString());
+}
+
+IntVector3 ToIntVector3(const char* source)
+{
+    IntVector3 ret(IntVector3::ZERO);
+
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 3)
+        return ret;
+
+    char* ptr = (char*)source;
+    ret.x_ = (int)strtol(ptr, &ptr, 10);
+    ret.y_ = (int)strtol(ptr, &ptr, 10);
+    ret.z_ = (int)strtol(ptr, &ptr, 10);
+
+    return ret;
+}
+
 Rect ToRect(const String& source)
 {
     return ToRect(source.CString());

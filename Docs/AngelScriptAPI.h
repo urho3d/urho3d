@@ -603,6 +603,8 @@ Array<String> enumNames;
 uint mode;
 String name;
 VariantType type;
+/* readonly */
+Array<String> variantStructureElementNames;
 };
 
 class Audio
@@ -2605,6 +2607,7 @@ bool enabledEffective;
 float frequencyHz;
 /* readonly */
 uint id;
+float length;
 /* readonly */
 Node node;
 /* readonly */
@@ -5097,6 +5100,8 @@ IntVector2 absoluteGlyphOffset;
 /* readonly */
 String category;
 /* readonly */
+FontType fontType;
+/* readonly */
 uint memoryUse;
 String name;
 /* readonly */
@@ -5247,6 +5252,8 @@ bool sRGBSupport;
 /* readonly */
 bool sRGBWriteSupport;
 String shaderCacheDir;
+/* readonly */
+IntVector2 size;
 /* readonly */
 bool tripleBuffer;
 /* readonly */
@@ -5570,6 +5577,21 @@ String ToString() const;
 Array<int> data;
 int x;
 int y;
+};
+
+class IntVector3
+{
+// Methods:
+float Length() const;
+uint ToHash() const;
+String ToString() const;
+
+// Properties:
+/* readonly */
+Array<int> data;
+int x;
+int y;
+int z;
 };
 
 class JSONFile
@@ -11448,6 +11470,7 @@ float ToFloat() const;
 int ToInt(int = 10) const;
 IntRect ToIntRect() const;
 IntVector2 ToIntVector2() const;
+IntVector3 ToIntVector3() const;
 String ToLower() const;
 Matrix3 ToMatrix3() const;
 Matrix3x4 ToMatrix3x4() const;
@@ -13277,6 +13300,7 @@ uint GetUInt() const;
 Array<Variant> GetVariantVector() const;
 const IntRect& GetIntRect() const;
 const IntVector2& GetIntVector2() const;
+const IntVector3& GetIntVector3() const;
 const Matrix3& GetMatrix3() const;
 const Matrix3x4& GetMatrix3x4() const;
 const Matrix4& GetMatrix4() const;
@@ -14052,10 +14076,12 @@ float GetFloat(const String&) const;
 int GetInt(const String&) const;
 IntRect GetIntRect(const String&) const;
 IntVector2 GetIntVector2(const String&) const;
+IntVector3 GetIntVector3(const String&) const;
 Matrix3 GetMatrix3(const String&) const;
 Matrix3x4 GetMatrix3x4(const String&) const;
 Matrix4 GetMatrix4(const String&) const;
 XMLElement GetNext(const String& = String ( )) const;
+XMLElement GetOrCreateChild(const String&);
 Quaternion GetQuaternion(const String&) const;
 ResourceRef GetResourceRef() const;
 ResourceRefList GetResourceRefList() const;
@@ -14088,6 +14114,7 @@ bool SetFloat(const String&, float);
 bool SetInt(const String&, int);
 bool SetIntRect(const String&, const IntRect&);
 bool SetIntVector2(const String&, const IntVector2&);
+bool SetIntVector3(const String&, const IntVector3&);
 bool SetMatrix3(const String&, const Matrix3&);
 bool SetMatrix3x4(const String&, const Matrix3x4&);
 bool SetMatrix4(const String&, const Matrix4&);
@@ -14127,6 +14154,7 @@ class XMLFile
 // Methods:
 XMLElement CreateRoot(const String&);
 bool FromString(const String&);
+XMLElement GetOrCreateRoot(const String&);
 XMLElement GetRoot(const String& = String ( ));
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
@@ -14498,6 +14526,13 @@ FM_FOCUSABLE,
 FM_FOCUSABLE_DEFOCUSABLE,
 };
 
+enum FontType
+{
+FONT_NONE,
+FONT_FREETYPE,
+FONT_BITMAP,
+};
+
 enum HighlightMode
 {
 HM_NEVER,
@@ -14833,6 +14868,7 @@ VAR_VARIANTVECTOR,
 VAR_VARIANTMAP,
 VAR_INTRECT,
 VAR_INTVECTOR2,
+VAR_INTVECTOR3,
 VAR_PTR,
 VAR_MATRIX3,
 VAR_MATRIX3X4,
@@ -14926,6 +14962,7 @@ uint GetMaxBones();
 String GetMiniDumpDir();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
+Array<AttributeInfo> GetObjectAttributeInfos(const String&);
 Array<String> GetObjectCategories();
 Array<String> GetObjectsByCategory(const String&);
 String GetParentPath(const String&);
@@ -15012,18 +15049,22 @@ Vector2 VectorCeil(const Vector2&);
 Vector3 VectorCeil(const Vector3&);
 Vector4 VectorCeil(const Vector4&);
 IntVector2 VectorCeilToInt(const Vector2&);
+IntVector3 VectorCeilToInt(const Vector3&);
 Vector2 VectorFloor(const Vector2&);
 Vector3 VectorFloor(const Vector3&);
 Vector4 VectorFloor(const Vector4&);
 IntVector2 VectorFloorToInt(const Vector2&);
+IntVector3 VectorFloorToInt(const Vector3&);
 Vector2 VectorLerp(const Vector2&, const Vector2&, const Vector2&);
 Vector3 VectorLerp(const Vector3&, const Vector3&, const Vector3&);
 Vector4 VectorLerp(const Vector4&, const Vector4&, const Vector4&);
 IntVector2 VectorMax(const IntVector2&, const IntVector2&);
+IntVector3 VectorMax(const IntVector3&, const IntVector3&);
 Vector2 VectorMax(const Vector2&, const Vector2&);
 Vector3 VectorMax(const Vector3&, const Vector3&);
 Vector4 VectorMax(const Vector4&, const Vector4&);
 IntVector2 VectorMin(const IntVector2&, const IntVector2&);
+IntVector3 VectorMin(const IntVector3&, const IntVector3&);
 Vector2 VectorMin(const Vector2&, const Vector2&);
 Vector3 VectorMin(const Vector3&, const Vector3&);
 Vector4 VectorMin(const Vector4&, const Vector4&);
@@ -15031,6 +15072,7 @@ Vector2 VectorRound(const Vector2&);
 Vector3 VectorRound(const Vector3&);
 Vector4 VectorRound(const Vector4&);
 IntVector2 VectorRoundToInt(const Vector2&);
+IntVector3 VectorRoundToInt(const Vector3&);
 bool WriteDrawablesToOBJ(Array<Drawable>, File, bool, bool, bool = false);
 
 // Global properties

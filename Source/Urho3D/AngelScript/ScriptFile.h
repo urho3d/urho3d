@@ -27,12 +27,12 @@
 #include "../Container/HashSet.h"
 #include "../Resource/Resource.h"
 
-class asIObjectType;
 class asIScriptContext;
 class asIScriptEngine;
 class asIScriptFunction;
 class asIScriptModule;
 class asIScriptObject;
+class asITypeInfo;
 
 namespace Urho3D
 {
@@ -136,11 +136,11 @@ private:
     /// Encountered include files during script file loading.
     HashSet<String> includeFiles_;
     /// Search cache for checking whether script classes implement "ScriptObject" interface.
-    HashMap<asIObjectType*, bool> validClasses_;
+    HashMap<asITypeInfo*, bool> validClasses_;
     /// Search cache for functions.
     HashMap<String, asIScriptFunction*> functions_;
     /// Search cache for methods.
-    HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> > methods_;
+    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> > methods_;
     /// Delayed function calls.
     Vector<DelayedCall> delayedCalls_;
     /// Event helper objects for handling procedural or non-ScriptInstance script events

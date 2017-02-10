@@ -701,7 +701,9 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -fno-keep-inline-dllexport")
             if (NOT URHO3D_64BIT)
-                # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
+                set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+                set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+                # Prevent auto-vectorize optimization when using -O2, unless stack realign is being enforced globally
                 if (URHO3D_SSE)
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
@@ -1825,16 +1827,16 @@ elseif (WEB)
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
             file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
             string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
-            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"320\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
+            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
             file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
         endif ()
     endif ()
 else ()
-    # Ensure the output directory exist before creating the symlinks
-    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
     foreach (I Autoload CoreData Data)
-        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I} AND EXISTS ${CMAKE_SOURCE_DIR}/bin/${I})
+            # Ensure the output directory exist before creating the symlinks
+            file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()

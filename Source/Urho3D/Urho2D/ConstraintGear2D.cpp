@@ -94,7 +94,11 @@ void ConstraintGear2D::SetRatio(float ratio)
 
     jointDef_.ratio = ratio;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2GearJoint*>(joint_)->SetRatio(ratio);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 

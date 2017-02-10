@@ -60,10 +60,20 @@ static bool FontSaveXML(const String& fileName, int pointSize, bool usedGlyphs, 
     return ptr->SaveXML(file, pointSize, usedGlyphs, indentation);
 }
 
+static bool FontSaveXMLFile(File* file, int pointSize, bool usedGlyphs, const String& indentation, Font* ptr)
+{
+    return ptr->SaveXML(*file, pointSize, usedGlyphs, indentation);
+}
+
 static void RegisterFont(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("FontType");
+    engine->RegisterEnumValue("FontType", "FONT_NONE", FONT_NONE);
+    engine->RegisterEnumValue("FontType", "FONT_FREETYPE", FONT_FREETYPE);
+    engine->RegisterEnumValue("FontType", "FONT_BITMAP", FONT_BITMAP);
+
     RegisterResource<Font>(engine, "Font");
-    engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asMETHOD(Font, SaveXML), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(int) const", asMETHOD(Font, GetTotalGlyphOffset), asCALL_THISCALL);
@@ -71,6 +81,7 @@ static void RegisterFont(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "const IntVector2& get_absoluteGlyphOffset() const", asMETHOD(Font, GetAbsoluteGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "void set_scaledGlyphOffset(const Vector2&)", asMETHOD(Font, SetScaledGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "const Vector2& get_scaledGlyphOffset() const", asMETHOD(Font, GetScaledGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "FontType get_fontType() const", asMETHOD(Font, GetFontType), asCALL_THISCALL);
 }
 
 static void RegisterUIElement(asIScriptEngine* engine)

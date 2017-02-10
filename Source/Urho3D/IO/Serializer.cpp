@@ -100,6 +100,11 @@ bool Serializer::WriteIntVector2(const IntVector2& value)
     return Write(value.Data(), sizeof value) == sizeof value;
 }
 
+bool Serializer::WriteIntVector3(const IntVector3& value)
+{
+    return Write(value.Data(), sizeof value) == sizeof value;
+}
+
 bool Serializer::WriteRect(const Rect& value)
 {
     return Write(value.Data(), sizeof value) == sizeof value;
@@ -303,6 +308,9 @@ bool Serializer::WriteVariantData(const Variant& value)
 
     case VAR_INTVECTOR2:
         return WriteIntVector2(value.GetIntVector2());
+
+    case VAR_INTVECTOR3:
+        return WriteIntVector3(value.GetIntVector3());
 
     case VAR_MATRIX3:
         return WriteMatrix3(value.GetMatrix3());

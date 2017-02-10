@@ -119,7 +119,11 @@ public:
     /// Return custom material attribute.
     ResourceRef GetCustomMaterialAttr() const;
 
+
 protected:
+
+    /// Handle scene being assigned.
+    virtual void OnSceneSet(Scene* scene);
     /// Recalculate the world-space bounding box.
     virtual void OnWorldBoundingBoxUpdate();
     /// Handle draw order changed.

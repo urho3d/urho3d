@@ -263,6 +263,13 @@ ResourceRef StaticSprite2D::GetCustomMaterialAttr() const
     return GetResourceRef(customMaterial_, Material::GetTypeStatic());
 }
 
+void StaticSprite2D::OnSceneSet(Scene* scene)
+{
+    Drawable2D::OnSceneSet(scene);
+
+    UpdateMaterial();
+}
+
 void StaticSprite2D::OnWorldBoundingBoxUpdate()
 {
     boundingBox_.Clear();
@@ -339,7 +346,7 @@ void StaticSprite2D::UpdateMaterial()
         sourceBatches_[0].material_ = customMaterial_;
     else
     {
-        if (sprite_)
+        if (sprite_ && renderer_)
             sourceBatches_[0].material_ = renderer_->GetMaterial(sprite_->GetTexture(), blendMode_);
         else
             sourceBatches_[0].material_ = 0;

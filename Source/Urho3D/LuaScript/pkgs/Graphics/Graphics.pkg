@@ -34,6 +34,7 @@ class Graphics : public Object
     int GetWidth() const;
     int GetHeight() const;
     int GetMultiSample() const;
+    IntVector2 GetSize() const;
     bool GetFullscreen() const;
     bool GetResizable() const;
     bool GetBorderless() const;
@@ -85,6 +86,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set int width;
     tolua_readonly tolua_property__get_set int height;
     tolua_readonly tolua_property__get_set int multiSample;
+    tolua_readonly tolua_property__get_set IntVector2 size;
     tolua_readonly tolua_property__get_set bool fullscreen;
     tolua_readonly tolua_property__get_set bool resizable;
     tolua_readonly tolua_property__get_set bool borderless;

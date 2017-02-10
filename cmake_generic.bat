@@ -47,6 +47,7 @@ set "arch="
 if not "%~1" == "" (
     if "%~1" == "-DANDROID" if "%~2" == "1" set "OPTS=-G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\android.toolchain.cmake""
     if "%~1" == "-DWEB" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE="%TOOLCHAINS%\emscripten.toolchain.cmake""
+    if "%~1" == "-DMINGW" if "%~2" == "1" set "OPTS=-G "MinGW Makefiles""
     if "%~1" == "-DURHO3D_64BIT" if "%~2" == "1" set "arch= Win64"
     if "%~1" == "-DURHO3D_64BIT" if "%~2" == "0" set "arch="
     if "%~1" == "-VS" set "OPTS=-G "Visual Studio %~2%arch%""

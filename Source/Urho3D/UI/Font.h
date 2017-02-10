@@ -34,7 +34,7 @@ static const int FONT_TEXTURE_MIN_SIZE = 128;
 static const int FONT_DPI = 96;
 
 /// %Font file type.
-enum FONT_TYPE
+enum FontType
 {
     FONT_NONE = 0,
     FONT_FREETYPE,
@@ -66,6 +66,9 @@ public:
 
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
     FontFace* GetFace(int pointSize);
+
+    /// Return font type.
+    FontType GetFontType() const { return fontType_; }
 
     /// Is signed distance field font.
     bool IsSDFFont() const { return sdfFont_; }
@@ -101,7 +104,7 @@ private:
     /// Point size scaled position adjustment for glyphs.
     Vector2 scaledOffset_;
     /// Font type.
-    FONT_TYPE fontType_;
+    FontType fontType_;
     /// Signed distance field font flag.
     bool sdfFont_;
 };

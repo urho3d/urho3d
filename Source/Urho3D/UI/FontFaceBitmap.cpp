@@ -236,7 +236,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
         image->SetSize(width, height, components);
         memset(image->GetData(), 0, width * height * components);
 
-        newImages.Push(image);
+        newImages[i] = image;
     }
 
     for (HashMap<unsigned, FontGlyph>::Iterator i = glyphMapping_.Begin(); i != glyphMapping_.End(); ++i)

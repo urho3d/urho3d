@@ -96,6 +96,10 @@ public:
     void UpdateAttributeDefaultValue(StringHash objectType, const char* name, const Variant& defaultValue);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap();
+    /// Initialises the specified SDL systems, if not already. Returns true if successful. This call must be matched with ReleaseSDL() when SDL functions are no longer required, even if this call fails.
+    bool RequireSDL(unsigned int sdlFlags);
+    /// Indicate that you are done with using SDL. Must be called after using RequireSDL().
+    void ReleaseSDL();
 
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(StringHash baseType, StringHash derivedType);

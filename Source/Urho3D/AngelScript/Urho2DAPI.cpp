@@ -585,6 +585,8 @@ static void RegisterConstraintDistance2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ConstraintDistance2D", "float get_frequencyHz() const", asMETHOD(ConstraintDistance2D, GetFrequencyHz), asCALL_THISCALL);
     engine->RegisterObjectMethod("ConstraintDistance2D", "void set_dampingRatio(float)", asMETHOD(ConstraintDistance2D, SetDampingRatio), asCALL_THISCALL);
     engine->RegisterObjectMethod("ConstraintDistance2D", "float get_dampingRatio() const", asMETHOD(ConstraintDistance2D, GetDampingRatio), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "void set_length(float)", asMETHOD(ConstraintDistance2D, SetLength), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ConstraintDistance2D", "float get_length() const", asMETHOD(ConstraintDistance2D, GetLength), asCALL_THISCALL);
 }
 
 static void RegisterConstraintFriction2D(asIScriptEngine* engine)

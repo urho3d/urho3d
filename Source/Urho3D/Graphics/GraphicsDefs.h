@@ -48,7 +48,7 @@ enum PrimitiveType
     TRIANGLE_FAN
 };
 
-/// %Geometry type.
+/// %Geometry type for vertex shader geometry variations.
 enum GeometryType
 {
     GEOM_STATIC = 0,
@@ -58,8 +58,9 @@ enum GeometryType
     GEOM_DIRBILLBOARD = 4,
     GEOM_TRAIL_FACE_CAMERA = 5,
     GEOM_TRAIL_BONE = 6,
-    GEOM_STATIC_NOINSTANCING = 7,
     MAX_GEOMETRYTYPES = 7,
+    // This is not a real geometry type for VS, but used to mark objects that do not desire to be instanced
+    GEOM_STATIC_NOINSTANCING = 7,
 };
 
 /// Blending mode.

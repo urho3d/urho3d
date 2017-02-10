@@ -5,7 +5,7 @@
 /*    Auto-fitter routines to compute global hinting values                */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 2003-2005, 2007, 2009, 2011-2013 by                          */
+/*  Copyright 2003-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -17,12 +17,13 @@
 /***************************************************************************/
 
 
-#ifndef __AFGLOBAL_H__
-#define __AFGLOBAL_H__
+#ifndef AFGLOBAL_H_
+#define AFGLOBAL_H_
 
 
 #include "aftypes.h"
 #include "afmodule.h"
+#include "afshaper.h"
 
 
 FT_BEGIN_HEADER
@@ -31,29 +32,56 @@ FT_BEGIN_HEADER
   FT_LOCAL_ARRAY( AF_WritingSystemClass )
   af_writing_system_classes[];
 
+
+#undef  SCRIPT
+#define SCRIPT( s, S, d, h, H, ss )                            \
+          AF_DECLARE_SCRIPT_CLASS( af_ ## s ## _script_class )
+
+#include "afscript.h"
+
   FT_LOCAL_ARRAY( AF_ScriptClass )
   af_script_classes[];
 
+
+#undef  STYLE
+#define STYLE( s, S, d, ws, sc, ss, c )                      \
+          AF_DECLARE_STYLE_CLASS( af_ ## s ## _style_class )
+
+#include "afstyles.h"
+
+  FT_LOCAL_ARRAY( AF_StyleClass )
+  af_style_classes[];
+
+
 #ifdef FT_DEBUG_LEVEL_TRACE
   FT_LOCAL_ARRAY( char* )
-  af_script_names[];
+  af_style_names[];
 #endif
+
 
   /*
    *  Default values and flags for both autofitter globals (found in
    *  AF_ModuleRec) and face globals (in AF_FaceGlobalsRec).
    */
 
-  /* index of fallback script in `af_script_classes' */
+  /* index of fallback style in `af_style_classes' */
 #ifdef AF_CONFIG_OPTION_CJK
-#define AF_SCRIPT_FALLBACK  AF_SCRIPT_HANI
+#define AF_STYLE_FALLBACK    AF_STYLE_HANI_DFLT
 #else
-#define AF_SCRIPT_FALLBACK  AF_SCRIPT_DFLT
+#define AF_STYLE_FALLBACK    AF_STYLE_NONE_DFLT
 #endif
-  /* a bit mask indicating an uncovered glyph        */
-#define AF_SCRIPT_NONE      0x7F
-  /* if this flag is set, we have an ASCII digit     */
-#define AF_DIGIT            0x80
+  /* default script for OpenType; ignored if HarfBuzz isn't used */
+#define AF_SCRIPT_DEFAULT    AF_SCRIPT_LATN
+
+  /* a bit mask for AF_DIGIT and AF_NONBASE */
+#define AF_STYLE_MASK        0x3FFF
+  /* an uncovered glyph      */
+#define AF_STYLE_UNASSIGNED  AF_STYLE_MASK
+
+  /* if this flag is set, we have an ASCII digit   */
+#define AF_DIGIT             0x8000U
+  /* if this flag is set, we have a non-base character */
+#define AF_NONBASE           0x4000U
 
   /* `increase-x-height' property */
 #define AF_PROP_INCREASE_X_HEIGHT_MIN  6
@@ -70,29 +98,50 @@ FT_BEGIN_HEADER
 
 
   /*
-   *  Note that glyph_scripts[] maps each glyph to an index into the
-   *  `af_script_classes' array.
+   *  Note that glyph_styles[] maps each glyph to an index into the
+   *  `af_style_classes' array.
    *
    */
   typedef struct  AF_FaceGlobalsRec_
   {
-    FT_Face           face;
-    FT_Long           glyph_count;    /* same as face->num_glyphs */
-    FT_Byte*          glyph_scripts;
+    FT_Face          face;
+    FT_Long          glyph_count;    /* same as face->num_glyphs */
+    FT_UShort*       glyph_styles;
+
+#ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
+    hb_font_t*       hb_font;
+    hb_buffer_t*     hb_buf;           /* for feature comparison */
+#endif
 
     /* per-face auto-hinter properties */
-    FT_UInt           increase_x_height;
+    FT_UInt          increase_x_height;
 
-    AF_ScriptMetrics  metrics[AF_SCRIPT_MAX];
+    AF_StyleMetrics  metrics[AF_STYLE_MAX];
 
-    AF_Module         module;         /* to access global properties */
+    /* Compute darkening amount once per size.  Use this to check whether */
+    /* darken_{x,y} needs to be recomputed.                               */
+    FT_UShort        stem_darkening_for_ppem;
+    /* Copy from e.g. AF_LatinMetrics.axis[AF_DIMENSION_HORZ] */
+    /* to compute the darkening amount.                       */
+    FT_Pos           standard_vertical_width;
+    /* Copy from e.g. AF_LatinMetrics.axis[AF_DIMENSION_VERT] */
+    /* to compute the darkening amount.                       */
+    FT_Pos           standard_horizontal_width;
+    /* The actual amount to darken a glyph along the X axis. */
+    FT_Pos           darken_x;
+    /* The actual amount to darken a glyph along the Y axis. */
+    FT_Pos           darken_y;
+    /* Amount to scale down by to keep emboldened points */
+    /* on the Y-axis in pre-computed blue zones.         */
+    FT_Fixed         scale_down_factor;
+    AF_Module        module;         /* to access global properties */
 
   } AF_FaceGlobalsRec;
 
 
   /*
    *  model the global hints data for a given face, decomposed into
-   *  script-specific items
+   *  style-specific items
    */
 
   FT_LOCAL( FT_Error )
@@ -101,10 +150,10 @@ FT_BEGIN_HEADER
                        AF_Module        module );
 
   FT_LOCAL( FT_Error )
-  af_face_globals_get_metrics( AF_FaceGlobals     globals,
-                               FT_UInt            gindex,
-                               FT_UInt            options,
-                               AF_ScriptMetrics  *ametrics );
+  af_face_globals_get_metrics( AF_FaceGlobals    globals,
+                               FT_UInt           gindex,
+                               FT_UInt           options,
+                               AF_StyleMetrics  *ametrics );
 
   FT_LOCAL( void )
   af_face_globals_free( AF_FaceGlobals  globals );
@@ -118,7 +167,7 @@ FT_BEGIN_HEADER
 
 FT_END_HEADER
 
-#endif /* __AFGLOBAL_H__ */
+#endif /* AFGLOBAL_H_ */
 
 
 /* END */

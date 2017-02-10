@@ -33,6 +33,7 @@ namespace Urho3D
 class Color;
 class IntRect;
 class IntVector2;
+class IntVector3;
 class Quaternion;
 class Rect;
 class Vector2;
@@ -75,6 +76,8 @@ public:
     bool WriteIntRect(const IntRect& value);
     /// Write an IntVector2.
     bool WriteIntVector2(const IntVector2& value);
+    /// Write an IntVector3.
+    bool WriteIntVector3(const IntVector3& value);
     /// Write a Rect.
     bool WriteRect(const Rect& value);
     /// Write a Vector2.

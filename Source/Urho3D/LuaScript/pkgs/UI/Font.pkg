@@ -1,5 +1,13 @@
 $#include "UI/Font.h"
 
+enum FontType
+{
+    FONT_NONE = 0,
+    FONT_FREETYPE,
+    FONT_BITMAP,
+    MAX_FONT_TYPES
+};
+
 class Font : public Resource
 {
     void SetAbsoluteGlyphOffset(const IntVector2& offset);
@@ -8,8 +16,10 @@ class Font : public Resource
     const IntVector2& GetAbsoluteGlyphOffset() const;
     const Vector2& GetScaledGlyphOffset() const;
     IntVector2 GetTotalGlyphOffset(int pointSize) const;
+    FontType GetFontType() const;
     bool IsSDFFont() const;
     
     tolua_property__get_set IntVector2 absoluteGlyphOffset;
     tolua_property__get_set Vector2 scaledGlyphOffset;
+    tolua_readonly tolua_property__get_set FontType fontType;
 };

@@ -33,6 +33,7 @@ class HttpRequest
     double ReadDouble();
     IntRect ReadIntRect();
     IntVector2 ReadIntVector2();
+    IntVector3 ReadIntVector3();
     Rect ReadRect();
     Vector2 ReadVector2();
     Vector3 ReadVector3();

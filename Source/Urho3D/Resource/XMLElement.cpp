@@ -106,6 +106,24 @@ XMLElement XMLElement::CreateChild(const char* name)
     return XMLElement(file_, child.internal_object());
 }
 
+XMLElement XMLElement::GetOrCreateChild(const String& name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
+}
+
+XMLElement XMLElement::GetOrCreateChild(const char* name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
+}
+
 bool XMLElement::RemoveChild(const XMLElement& element)
 {
     if (!element.file_ || (!element.node_ && !element.xpathNode_) || !file_ || (!node_ && !xpathNode_))
@@ -337,6 +355,11 @@ bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 }
 
 bool XMLElement::SetIntVector2(const String& name, const IntVector2& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
+bool XMLElement::SetIntVector3(const String& name, const IntVector3& value)
 {
     return SetAttribute(name, value.ToString());
 }
@@ -764,6 +787,11 @@ IntRect XMLElement::GetIntRect(const String& name) const
 IntVector2 XMLElement::GetIntVector2(const String& name) const
 {
     return ToIntVector2(GetAttribute(name));
+}
+
+IntVector3 XMLElement::GetIntVector3(const String& name) const
+{
+    return ToIntVector3(GetAttribute(name));
 }
 
 Quaternion XMLElement::GetQuaternion(const String& name) const
