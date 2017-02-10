@@ -135,7 +135,7 @@ clone_depth: 50
 cache:
   - C:\tools\mingw32 -> .appveyor.yml
   - C:\tools\mingw64 -> .appveyor.yml
-  - Build
+  - mingw-Build
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -148,7 +148,7 @@ environment:
   SF_API:
     secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
 # Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
-  build_tree: Build
+  build_tree: mingw-Build
   config: Release
 # We cannot afford to have a large matrix on AppVeyor at the moment
   URHO3D_D3D11: 1
@@ -179,7 +179,7 @@ before_build:
   - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - rake ci_setup_cache
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move Build\*.zip . && rd /S /Q Build\_CPack_Packages
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
   - rake ci_timer
 after_build: rake ci_teardown_cache
 test: off

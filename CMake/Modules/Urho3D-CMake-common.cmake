@@ -1832,11 +1832,11 @@ elseif (WEB)
         endif ()
     endif ()
 else ()
-    # Ensure the output directory exist before creating the symlinks
-    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
     foreach (I Autoload CoreData Data)
-        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I} AND EXISTS ${CMAKE_SOURCE_DIR}/bin/${I})
+            # Ensure the output directory exist before creating the symlinks
+            file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()
