@@ -449,7 +449,7 @@ desc 'Teardown build cache'
 task :ci_teardown_cache do
   # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
   if ENV['APPVEYOR']
-    system "bash -c 'rm -rf #{ENV['build_tree']}/{bin,Source/Urho3D/tolua++-prefix/src/tolua++-build/bin}'"
+    # No-op for now
     next
   # Upload cache to internal cache store if it is our own
   elsif ENV['USE_CCACHE'].to_i == 2
