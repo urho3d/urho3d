@@ -27,6 +27,145 @@
 namespace Urho3D
 {
 
+/// Three-dimensional vector with integer values.
+class URHO3D_API IntVector3
+{
+public:
+    /// Construct a zero vector.
+    IntVector3() :
+        x_(0),
+        y_(0),
+        z_(0)
+    {
+    }
+
+    /// Construct from coordinates.
+    IntVector3(int x, int y, int z) :
+        x_(x),
+        y_(y),
+        z_(z)
+    {
+    }
+
+    /// Construct from an int array.
+    IntVector3(const int* data) :
+        x_(data[0]),
+        y_(data[1]),
+        z_(data[2])
+    {
+    }
+
+    /// Copy-construct from another vector.
+    IntVector3(const IntVector3& rhs) :
+        x_(rhs.x_),
+        y_(rhs.y_),
+        z_(rhs.z_)
+    {
+    }
+
+    /// Assign from another vector.
+    IntVector3& operator =(const IntVector3& rhs)
+    {
+        x_ = rhs.x_;
+        y_ = rhs.y_;
+        z_ = rhs.z_;
+        return *this;
+    }
+
+    /// Test for equality with another vector.
+    bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
+
+    /// Test for inequality with another vector.
+    bool operator !=(const IntVector3& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_; }
+
+    /// Add a vector.
+    IntVector3 operator +(const IntVector3& rhs) const { return IntVector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
+
+    /// Return negation.
+    IntVector3 operator -() const { return IntVector3(-x_, -y_, -z_); }
+
+    /// Subtract a vector.
+    IntVector3 operator -(const IntVector3& rhs) const { return IntVector3(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_); }
+
+    /// Multiply with a scalar.
+    IntVector3 operator *(int rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
+
+    /// Divide by a scalar.
+    IntVector3 operator /(int rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
+
+    /// Add-assign a vector.
+    IntVector3& operator +=(const IntVector3& rhs)
+    {
+        x_ += rhs.x_;
+        y_ += rhs.y_;
+        z_ += rhs.z_;
+        return *this;
+    }
+
+    /// Subtract-assign a vector.
+    IntVector3& operator -=(const IntVector3& rhs)
+    {
+        x_ -= rhs.x_;
+        y_ -= rhs.y_;
+        z_ -= rhs.z_;
+        return *this;
+    }
+
+    /// Multiply-assign a scalar.
+    IntVector3& operator *=(int rhs)
+    {
+        x_ *= rhs;
+        y_ *= rhs;
+        z_ *= rhs;
+        return *this;
+    }
+
+    /// Divide-assign a scalar.
+    IntVector3& operator /=(int rhs)
+    {
+        x_ /= rhs;
+        y_ /= rhs;
+        z_ /= rhs;
+        return *this;
+    }
+
+    /// Return integer data.
+    const int* Data() const { return &x_; }
+
+    /// Return as string.
+    String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return (unsigned)x_ * 31 * 31 + (unsigned)y_ * 31 + (unsigned)z_; }
+
+    /// Return length.
+    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_ + z_ * z_)); }
+
+    /// X coordinate.
+    int x_;
+    /// Y coordinate.
+    int y_;
+    /// Z coordinate.
+    int z_;
+
+    /// Zero vector.
+    static const IntVector3 ZERO;
+    /// (-1,0,0) vector.
+    static const IntVector3 LEFT;
+    /// (1,0,0) vector.
+    static const IntVector3 RIGHT;
+    /// (0,1,0) vector.
+    static const IntVector3 UP;
+    /// (0,-1,0) vector.
+    static const IntVector3 DOWN;
+    /// (0,0,1) vector.
+    static const IntVector3 FORWARD;
+    /// (0,0,-1) vector.
+    static const IntVector3 BACK;
+    /// (1,1,1) vector.
+    static const IntVector3 ONE;
+};
+
 /// Three-dimensional vector.
 class URHO3D_API Vector3
 {
@@ -60,6 +199,14 @@ public:
         x_(vector.x_),
         y_(vector.y_),
         z_(0.0f)
+    {
+    }
+
+    /// Construct from an IntVector3.
+    explicit Vector3(const IntVector3& vector) :
+        x_((float)vector.x_),
+        y_((float)vector.y_),
+        z_((float)vector.z_)
     {
     }
 
@@ -283,145 +430,6 @@ public:
 
 /// Multiply Vector3 with a scalar.
 inline Vector3 operator *(float lhs, const Vector3& rhs) { return rhs * lhs; }
-
-/// Three-dimensional vector with integer values.
-class URHO3D_API IntVector3
-{
-public:
-    /// Construct a zero vector.
-    IntVector3() :
-        x_(0),
-        y_(0),
-        z_(0)
-    {
-    }
-
-    /// Construct from coordinates.
-    IntVector3(int x, int y, int z) :
-        x_(x),
-        y_(y),
-        z_(z)
-    {
-    }
-
-    /// Construct from an int array.
-    IntVector3(const int* data) :
-        x_(data[0]),
-        y_(data[1]),
-        z_(data[2])
-    {
-    }
-
-    /// Copy-construct from another vector.
-    IntVector3(const IntVector3& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_),
-        z_(rhs.z_)
-    {
-    }
-
-    /// Assign from another vector.
-    IntVector3& operator =(const IntVector3& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        z_ = rhs.z_;
-        return *this;
-    }
-
-    /// Test for equality with another vector.
-    bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
-
-    /// Test for inequality with another vector.
-    bool operator !=(const IntVector3& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_; }
-
-    /// Add a vector.
-    IntVector3 operator +(const IntVector3& rhs) const { return IntVector3(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_); }
-
-    /// Return negation.
-    IntVector3 operator -() const { return IntVector3(-x_, -y_, -z_); }
-
-    /// Subtract a vector.
-    IntVector3 operator -(const IntVector3& rhs) const { return IntVector3(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_); }
-
-    /// Multiply with a scalar.
-    IntVector3 operator *(int rhs) const { return IntVector3(x_ * rhs, y_ * rhs, z_ * rhs); }
-
-    /// Divide by a scalar.
-    IntVector3 operator /(int rhs) const { return IntVector3(x_ / rhs, y_ / rhs, z_ / rhs); }
-
-    /// Add-assign a vector.
-    IntVector3& operator +=(const IntVector3& rhs)
-    {
-        x_ += rhs.x_;
-        y_ += rhs.y_;
-        z_ += rhs.z_;
-        return *this;
-    }
-
-    /// Subtract-assign a vector.
-    IntVector3& operator -=(const IntVector3& rhs)
-    {
-        x_ -= rhs.x_;
-        y_ -= rhs.y_;
-        z_ -= rhs.z_;
-        return *this;
-    }
-
-    /// Multiply-assign a scalar.
-    IntVector3& operator *=(int rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        z_ *= rhs;
-        return *this;
-    }
-
-    /// Divide-assign a scalar.
-    IntVector3& operator /=(int rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        z_ /= rhs;
-        return *this;
-    }
-
-    /// Return integer data.
-    const int* Data() const { return &x_; }
-
-    /// Return as string.
-    String ToString() const;
-
-    /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)x_ * 31 * 31 + (unsigned)y_ * 31 + (unsigned)z_; }
-
-    /// Return length.
-    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_ + z_ * z_)); }
-
-    /// X coordinate.
-    int x_;
-    /// Y coordinate.
-    int y_;
-    /// Z coordinate.
-    int z_;
-
-    /// Zero vector.
-    static const IntVector3 ZERO;
-    /// (-1,0,0) vector.
-    static const IntVector3 LEFT;
-    /// (1,0,0) vector.
-    static const IntVector3 RIGHT;
-    /// (0,1,0) vector.
-    static const IntVector3 UP;
-    /// (0,-1,0) vector.
-    static const IntVector3 DOWN;
-    /// (0,0,1) vector.
-    static const IntVector3 FORWARD;
-    /// (0,0,-1) vector.
-    static const IntVector3 BACK;
-    /// (1,1,1) vector.
-    static const IntVector3 ONE;
-};
 
 /// Multiply IntVector3 with a scalar.
 inline IntVector3 operator *(int lhs, const IntVector3& rhs) { return rhs * lhs; }

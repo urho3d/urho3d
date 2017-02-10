@@ -28,6 +28,120 @@
 namespace Urho3D
 {
 
+/// Two-dimensional vector with integer values.
+class URHO3D_API IntVector2
+{
+public:
+    /// Construct a zero vector.
+    IntVector2() :
+        x_(0),
+        y_(0)
+    {
+    }
+
+    /// Construct from coordinates.
+    IntVector2(int x, int y) :
+        x_(x),
+        y_(y)
+    {
+    }
+
+    /// Construct from an int array.
+    IntVector2(const int* data) :
+        x_(data[0]),
+        y_(data[1])
+    {
+    }
+
+    /// Copy-construct from another vector.
+    IntVector2(const IntVector2& rhs) :
+        x_(rhs.x_),
+        y_(rhs.y_)
+    {
+    }
+
+    /// Assign from another vector.
+    IntVector2& operator =(const IntVector2& rhs)
+    {
+        x_ = rhs.x_;
+        y_ = rhs.y_;
+        return *this;
+    }
+
+    /// Test for equality with another vector.
+    bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
+
+    /// Test for inequality with another vector.
+    bool operator !=(const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
+
+    /// Add a vector.
+    IntVector2 operator +(const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
+
+    /// Return negation.
+    IntVector2 operator -() const { return IntVector2(-x_, -y_); }
+
+    /// Subtract a vector.
+    IntVector2 operator -(const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
+
+    /// Multiply with a scalar.
+    IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
+
+    /// Divide by a scalar.
+    IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
+
+    /// Add-assign a vector.
+    IntVector2& operator +=(const IntVector2& rhs)
+    {
+        x_ += rhs.x_;
+        y_ += rhs.y_;
+        return *this;
+    }
+
+    /// Subtract-assign a vector.
+    IntVector2& operator -=(const IntVector2& rhs)
+    {
+        x_ -= rhs.x_;
+        y_ -= rhs.y_;
+        return *this;
+    }
+
+    /// Multiply-assign a scalar.
+    IntVector2& operator *=(int rhs)
+    {
+        x_ *= rhs;
+        y_ *= rhs;
+        return *this;
+    }
+
+    /// Divide-assign a scalar.
+    IntVector2& operator /=(int rhs)
+    {
+        x_ /= rhs;
+        y_ /= rhs;
+        return *this;
+    }
+
+    /// Return integer data.
+    const int* Data() const { return &x_; }
+
+    /// Return as string.
+    String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+
+    /// Return length.
+    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
+
+    /// X coordinate.
+    int x_;
+    /// Y coordinate.
+    int y_;
+
+    /// Zero vector.
+    static const IntVector2 ZERO;
+};
+
 /// Two-dimensional vector.
 class URHO3D_API Vector2
 {
@@ -43,6 +157,13 @@ public:
     Vector2(const Vector2& vector) :
         x_(vector.x_),
         y_(vector.y_)
+    {
+    }
+
+    /// Construct from an IntVector2.
+    explicit Vector2(const IntVector2& vector) :
+        x_((float)vector.x_),
+        y_((float)vector.y_)
     {
     }
 
@@ -226,120 +347,6 @@ public:
 
 /// Multiply Vector2 with a scalar
 inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }
-
-/// Two-dimensional vector with integer values.
-class URHO3D_API IntVector2
-{
-public:
-    /// Construct a zero vector.
-    IntVector2() :
-        x_(0),
-        y_(0)
-    {
-    }
-
-    /// Construct from coordinates.
-    IntVector2(int x, int y) :
-        x_(x),
-        y_(y)
-    {
-    }
-
-    /// Construct from an int array.
-    IntVector2(const int* data) :
-        x_(data[0]),
-        y_(data[1])
-    {
-    }
-
-    /// Copy-construct from another vector.
-    IntVector2(const IntVector2& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_)
-    {
-    }
-
-    /// Assign from another vector.
-    IntVector2& operator =(const IntVector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
-
-    /// Test for equality with another vector.
-    bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
-
-    /// Test for inequality with another vector.
-    bool operator !=(const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
-
-    /// Add a vector.
-    IntVector2 operator +(const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
-
-    /// Return negation.
-    IntVector2 operator -() const { return IntVector2(-x_, -y_); }
-
-    /// Subtract a vector.
-    IntVector2 operator -(const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
-
-    /// Multiply with a scalar.
-    IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
-
-    /// Divide by a scalar.
-    IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
-
-    /// Add-assign a vector.
-    IntVector2& operator +=(const IntVector2& rhs)
-    {
-        x_ += rhs.x_;
-        y_ += rhs.y_;
-        return *this;
-    }
-
-    /// Subtract-assign a vector.
-    IntVector2& operator -=(const IntVector2& rhs)
-    {
-        x_ -= rhs.x_;
-        y_ -= rhs.y_;
-        return *this;
-    }
-
-    /// Multiply-assign a scalar.
-    IntVector2& operator *=(int rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        return *this;
-    }
-
-    /// Divide-assign a scalar.
-    IntVector2& operator /=(int rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        return *this;
-    }
-
-    /// Return integer data.
-    const int* Data() const { return &x_; }
-
-    /// Return as string.
-    String ToString() const;
-
-    /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
-
-    /// Return length.
-    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
-
-    /// X coordinate.
-    int x_;
-    /// Y coordinate.
-    int y_;
-
-    /// Zero vector.
-    static const IntVector2 ZERO;
-};
 
 /// Multiply IntVector2 with a scalar.
 inline IntVector2 operator *(int lhs, const IntVector2& rhs) { return rhs * lhs; }
