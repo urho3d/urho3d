@@ -133,8 +133,7 @@ platform:
   - x64
 clone_depth: 50
 cache:
-  - C:\tools\mingw32 -> .appveyor.yml
-  - C:\tools\mingw64 -> .appveyor.yml
+  - Build
   - mingw-Build
 environment:
   GIT_NAME:
@@ -172,7 +171,7 @@ install:
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
-  - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
+  - curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
 before_build:
   - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"

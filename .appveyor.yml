@@ -27,6 +27,7 @@ platform:
 clone_depth: 50
 cache:
   - Build
+  - mingw-Build
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -64,7 +65,7 @@ before_build:
   - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - rake ci_setup_cache
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move Build\*.zip . && rd /S /Q Build\_CPack_Packages
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
   - rake ci_timer
 after_build: rake ci_teardown_cache
 test: off

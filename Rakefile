@@ -400,7 +400,7 @@ task :ci do
     # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
       puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
-      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? '../../Build' : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? "../../#{ENV['build_tree']}" : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
   end
   # Make, deploy, and test run Android APK in an Android (virtual) device
@@ -425,6 +425,10 @@ task :ci_setup_cache do
   # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
   if ENV['APPVEYOR']
     system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
+    if File.exists?("#{ENV['build_tree']}/.commit")
+      last_commit = File.read "#{ENV['build_tree']}/.commit"
+      system "bash -c 'find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt' && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})"
+    end
     next
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   elsif ENV['USE_CCACHE'].to_i == 2
@@ -449,7 +453,9 @@ desc 'Teardown build cache'
 task :ci_teardown_cache do
   # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
   if ENV['APPVEYOR']
-    # No-op for now
+    File.write("#{ENV['build_tree']}/.commit", ENV['APPVEYOR_REPO_COMMIT']) if Dir.exist?(ENV['build_tree'])
+    # Temporarily exclude build artifacts from being cached due to cache size limitation
+    system "bash -c 'rm #{ENV['build_tree']}/bin/*.{exe,dll}'"
     next
   # Upload cache to internal cache store if it is our own
   elsif ENV['USE_CCACHE'].to_i == 2
