@@ -427,7 +427,7 @@ task :ci_setup_cache do
     system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
     if File.exists?("#{ENV['build_tree']}/.commit")
       last_commit = File.read "#{ENV['build_tree']}/.commit"
-      system "bash -c 'find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt' && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})"
+      system "bash -c 'find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})'"
     end
     next
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
