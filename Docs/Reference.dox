@@ -3211,11 +3211,13 @@ The -c option enables LZ4 compression on the files. The -q option enables the op
 \section Tools_RampGenerator RampGenerator
 
 Creates 1D and 2D ramp textures for use in light attenuation and spotlight spot shapes.
+Alternatively bakes the image from .ies input file.
 
 Usage:
 
 \verbatim
 RampGenerator <output file> <width> <power> [dimensions]
+RampGenerator <input file> <output png file> <width> [dimensions]
 \endverbatim
 
 The output is saved in PNG format. The power parameter is fed into the pow() function to determine ramp shape; higher value gives more brightness and more abrupt fade at the edge.
