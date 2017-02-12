@@ -25,8 +25,8 @@ class TerrainEditor
     // Create the Terrain Editor window and initialize it
     void Create()
     {
-
-        if (window !is null) return;
+        if (window !is null)
+            return;
 
         window = LoadEditorUI("UI/EditorTerrainWindow.xml");
         ui.root.AddChild(window);
@@ -104,10 +104,10 @@ class TerrainEditor
     // Save all the terrains we have edited
     void Save()
     {
-        for(uint i = 0; i < terrainsEdited.length; ++i)
+        for (uint i = 0; i < terrainsEdited.length; ++i)
         {
             // Make sure its not null (it may have been deleted since last save)
-            if(terrainsEdited[i] !is null)
+            if (terrainsEdited[i] !is null)
             {
                 String fileLocation = fileSystem.programDir + "Data/" + terrainsEdited[i].GetAttribute("Height Map").GetResourceRef().name;
 
@@ -115,20 +115,20 @@ class TerrainEditor
                 Array<String> parts = chunks[chunks.length - 1].Split('.');
                 String fileType = parts[1];
 
-                if(fileType == "png")
+                if (fileType == "png")
                 {
                     terrainsEdited[i].heightMap.SavePNG(fileLocation);
                 }
-                else if(fileType == "jpg")
+                else if (fileType == "jpg")
                 {
                     // Save with the highest quality
                     terrainsEdited[i].heightMap.SaveJPG(fileLocation, 100);
                 }
-                else if(fileType == "bmp")
+                else if (fileType == "bmp")
                 {
                     terrainsEdited[i].heightMap.SaveBMP(fileLocation);
                 }
-                else if(fileType == "tga")
+                else if (fileType == "tga")
                 {
                     terrainsEdited[i].heightMap.SaveTGA(fileLocation);
                 }
@@ -142,9 +142,9 @@ class TerrainEditor
     // Returns a brush based on its name (its filename minus the extension)
     Image@ GetBrushImage(String brushName)
     {
-        for(uint i = 0; i < brushes.length; ++i)
+        for (uint i = 0; i < brushes.length; ++i)
         {
-            if(brushes[i].name == brushName)
+            if (brushes[i].name == brushName)
             {
                 return brushes[i];
             }
@@ -161,7 +161,7 @@ class TerrainEditor
         String brushesFileLocation = fileSystem.programDir + "Data/Textures/Editor/TerrainBrushes";
         Array<String> files = fileSystem.ScanDir(brushesFileLocation, "*.*", SCAN_FILES, false);
 
-        for(uint i = 0; i < files.length; ++i)
+        for (uint i = 0; i < files.length; ++i)
         {
             terrainBrushes.AddItem(CreateBrush(brushesFileLocation + "/" + files[i]));
         }
@@ -217,21 +217,21 @@ class TerrainEditor
         SetSceneModified();
 
         // Add that terrain to the terrainsEdited if its not already in there
-        if(terrainsEdited.FindByRef(terrainComponent) == -1)
+        if (terrainsEdited.FindByRef(terrainComponent) == -1)
             terrainsEdited.Push(terrainComponent);
 
         // Only work if a brush is selected
-        if(selectedBrushImage !is null){
+        if (selectedBrushImage !is null){
             uint brushImageWidth = selectedBrushImage.width;
             uint brushImageHeight = selectedBrushImage.height;
 
-            switch(editMode)
+            switch (editMode)
             {
                 case TERRAIN_EDITMODE_RAISELOWERHEIGHT: {
                     // Iterate over the entire brush image
-                    for(int y = 0; y < brushImageHeight; ++y)
+                    for (int y = 0; y < brushImageHeight; ++y)
                     {
-                        for(int x = 0; x < brushImageWidth; ++x)
+                        for (int x = 0; x < brushImageWidth; ++x)
                         {
                             // Get the current terrain height at that position (centred to the brush's size)
                             IntVector2 pos = IntVector2(position.x + x - (brushImageWidth / 2), position.y + y - (brushImageHeight / 2));
@@ -253,16 +253,16 @@ class TerrainEditor
 
                 case TERRAIN_EDITMODE_SETHEIGHT: {
                     // The color we want to set the height to (this stays the same until targetColorSelected is false again)
-                    if(targetColorSelected == false)
+                    if (targetColorSelected == false)
                     {
                         targetColor = terrainImage.GetPixel(position.x, position.y);
                         targetColorSelected = true;
                     }
 
                     // Iterate over the entire brush image
-                    for(int y = 0; y < brushImageHeight; ++y)
+                    for (int y = 0; y < brushImageHeight; ++y)
                     {
-                        for(int x = 0; x < brushImageWidth; ++x)
+                        for (int x = 0; x < brushImageWidth; ++x)
                         {
                             // Get the current terrain height at that position (centred to the brush's size)
                             IntVector2 pos = IntVector2(position.x + x - (brushImageWidth / 2), position.y + y - (brushImageHeight / 2));
@@ -275,9 +275,9 @@ class TerrainEditor
                             newColor.b += (targetColor.b - newColor.b) * brushColor.a;
 
                             // Set it to target if its close enough
-                            if(Difference(targetColor.r, newColor.r) < 0.01f) newColor.r = targetColor.r;
-                            if(Difference(targetColor.g, newColor.g) < 0.01f) newColor.g = targetColor.g;
-                            if(Difference(targetColor.b, newColor.b) < 0.01f) newColor.b = targetColor.b;
+                            if (Difference(targetColor.r, newColor.r) < 0.01f) newColor.r = targetColor.r;
+                            if (Difference(targetColor.g, newColor.g) < 0.01f) newColor.g = targetColor.g;
+                            if (Difference(targetColor.b, newColor.b) < 0.01f) newColor.b = targetColor.b;
 
                             terrainImage.SetPixel(pos.x, pos.y, newColor);
                         }
@@ -291,16 +291,16 @@ class TerrainEditor
                     //Image@ subImage = terrainImage.GetSubimage(rect);
 
                     // Iterate over the entire brush image
-                    for(int y = 0; y < brushImageHeight; ++y)
+                    for (int y = 0; y < brushImageHeight; ++y)
                     {
-                        for(int x = 0; x < brushImageWidth; ++x)
+                        for (int x = 0; x < brushImageWidth; ++x)
                         {
                             // Get the current terrain height at that position (centred to the brush's size)
                             IntVector2 pos = IntVector2(position.x + x - (brushImageWidth / 2), position.y + y - (brushImageHeight / 2));
 
                             // Make sure the pixel we're working on is atleast one pixel inside the terrainImage
                             // as we need an adjacent pixel on all sides for the smoothing algorithm to work
-                            if(pos.x > 0 && pos.y > 0 && pos.x < terrainImage.width - 1 && pos.y < terrainImage.height - 1)
+                            if (pos.x > 0 && pos.y > 0 && pos.x < terrainImage.width - 1 && pos.y < terrainImage.height - 1)
                             {
                                 Color newColor = terrainImage.GetPixel(pos.x, pos.y);
                                 Color brushColor = selectedBrushImage.GetPixel(x, y);
@@ -322,7 +322,7 @@ class TerrainEditor
                                 float avgB = 0.0f;
 
                                 // Get the average of those pixels
-                                for(uint i = 0; i < adjacentColors.length; ++i)
+                                for (uint i = 0; i < adjacentColors.length; ++i)
                                 {
                                     avgR += adjacentColors[i].r;
                                     avgG += adjacentColors[i].g;
@@ -345,9 +345,9 @@ class TerrainEditor
                     }
 
                     // Apply our changes to that actual terrain
-                    //for(int y = 0; y < subImage.height; ++y)
+                    //for (int y = 0; y < subImage.height; ++y)
                     //{
-                    //    for(int x = 0; x < subImage.width; ++x)
+                    //    for (int x = 0; x < subImage.width; ++x)
                     //    {
                     //        terrainImage.SetPixel(position.x + x - (brushImageWidth / 2), position.y + y - (brushImageHeight / 2), subImage.GetPixel(x, y));
                     //    }
@@ -376,7 +376,7 @@ class TerrainEditor
     // Update the UI
     void UpdateDirty()
     {
-        if(!dirty)
+        if (!dirty)
             return;
 
         CheckBox@ raiseLowerHeight = window.GetChild("RaiseLowerHeight", true);
@@ -395,9 +395,9 @@ class TerrainEditor
 
         ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
 
-        for(uint i = 0; i < terrainBrushes.numItems; ++i)
+        for (uint i = 0; i < terrainBrushes.numItems; ++i)
         {
-            if(terrainBrushes.items[i] !is selectedBrush)
+            if (terrainBrushes.items[i] !is selectedBrush)
             {
                 CheckBox@ checkbox = cast<CheckBox>(terrainBrushes.items[i]);
                 checkbox.checked = false;
@@ -472,7 +472,7 @@ class TerrainEditor
     void BrushSelected(StringHash eventType, VariantMap& eventData)
     {
         CheckBox@ checkbox = cast<CheckBox>(eventData["Element"].GetPtr());
-        if(checkbox.checked == false)
+        if (checkbox.checked == false)
             return;
         selectedBrush = checkbox;
         selectedBrushImage = GetBrushImage(selectedBrush.name);
