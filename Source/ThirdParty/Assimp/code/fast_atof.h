@@ -26,7 +26,6 @@
 #else
 #include "../include/assimp/Compiler/pstdint.h"
 #endif
-
 #include <stdexcept>
 
 #include "StringComparison.h"

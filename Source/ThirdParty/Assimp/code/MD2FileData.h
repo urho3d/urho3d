@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file  MD2FileData.h
  *  @brief Defines helper data structures for importing MD2 files
  *  http://linux.ucla.edu/~phaethon/q3/formats/md2-schoenblum.html

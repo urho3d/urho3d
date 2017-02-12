@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file  Q3DLoader.h
  *  @brief Declaration of the Q3D importer class.
  */
@@ -110,7 +108,7 @@ private:
 
     struct Face
     {
-        Face(unsigned int s)
+        explicit Face(unsigned int s)
             :   indices   (s)
             ,   uvindices (s)
             ,   mat       (0)
