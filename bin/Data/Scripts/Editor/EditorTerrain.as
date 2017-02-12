@@ -1,6 +1,6 @@
 // Urho3D terrain editor
 
-const uint TERRAIN_EDITMODE_RAISELOWERHEIGHT = 0, TERRAIN_EDITMODE_SETHEIGHT = 1, TERRAIN_EDITMODE_SMOOTHHEIGHT = 3, 
+const uint TERRAIN_EDITMODE_RAISELOWERHEIGHT = 0, TERRAIN_EDITMODE_SETHEIGHT = 1, TERRAIN_EDITMODE_SMOOTHHEIGHT = 3,
 	  TERRAIN_EDITMODE_PAINTBRUSH = 4, TERRAIN_EDITMODE_PAINTTREES = 5, TERRAIN_EDITMODE_PAINTFOLIAGE = 6;
 
 funcdef bool TerrainEditorShowCallback();
@@ -25,31 +25,19 @@ class TerrainEditor
 	// Create the Terrain Editor window and initialize it
 	void Create()
 	{
-		if (window !is null)
-			return;
 
-		window = ui.LoadLayout(cache.GetResource("XMLFile", "UI/EditorTerrainWindow.xml"));
+		if (window !is null) return;
+
+		window = LoadEditorUI("UI/EditorTerrainWindow.xml");
 		ui.root.AddChild(window);
 		window.opacity = uiMaxOpacity;
-		
-		UIElement@ terrainToolsGroup = CreateGroup("TerrainToolsGroup", LM_HORIZONTAL);
-		terrainToolsGroup.horizontalAlignment = HA_CENTER;
-		terrainToolsGroup.AddChild(CreateToolBarToggle("RaiseLowerHeight"));
-		terrainToolsGroup.AddChild(CreateToolBarToggle("SetHeight"));
-		terrainToolsGroup.AddChild(CreateToolBarToggle("SmoothHeight"));
-		terrainToolsGroup.AddChild(CreateToolBarToggle("PaintBrush"));
-		terrainToolsGroup.AddChild(CreateToolBarToggle("PaintTrees"));
-		terrainToolsGroup.AddChild(CreateToolBarToggle("PaintFoliage"));
-		FinalizeGroupHorizontal(terrainToolsGroup, "ToolBarToggle");
-		window.AddChild(terrainToolsGroup);
 
 		BorderImage@ currentToolDesc = BorderImage("CurrentToolDesc");
 		currentToolDesc.style = "EditorToolBar";
 		currentToolDesc.SetLayout(LM_HORIZONTAL);
 		currentToolDesc.layoutSpacing = 4;
 		currentToolDesc.layoutBorder = IntRect(8, 4, 4, 8);
-		currentToolDesc.minHeight = 64;
-		currentToolDesc.maxHeight = 64;
+		currentToolDesc.minHeight = 32;
 		currentToolDesc.horizontalAlignment = HA_CENTER;
 		currentToolDesc.opacity = uiMaxOpacity;
 		currentToolDesc.SetPosition(0, 0);
@@ -58,7 +46,6 @@ class TerrainEditor
 		currentToolDescText = Text("CurrentToolDescText");
 		currentToolDescText.text = "Raise or lower terrain using the current brush";
 		currentToolDescText.SetStyleAuto(uiStyle);
-		currentToolDescText.wordwrap = true;
 		currentToolDescText.color = Color(1.0f, 1.0, 1.0f, 1.0f);
 		currentToolDescText.position = IntVector2(16, 16);
 		currentToolDescText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.ttf"), 10);
@@ -90,7 +77,6 @@ class TerrainEditor
 		settingsText.SetFont(cache.GetResource("Font", "Fonts/BlueHighway.ttf"), 10);
 		window.AddChild(settingsText);
 		
-		window.SetFixedWidth(300);
 		window.height = 300;
 		window.SetPosition(ui.root.width - 10 - window.width, attributeInspectorWindow.position.y + attributeInspectorWindow.height + 10);
 		
@@ -101,9 +87,18 @@ class TerrainEditor
 		SubscribeToEvent(window.GetChild("PaintTrees", true), "Toggled", "EditModePaintTrees");
 		SubscribeToEvent(window.GetChild("PaintFoliage", true), "Toggled", "EditModePaintFoliage");
 		SubscribeToEvent(window.GetChild("CloseButton", true), "Released", "Hide");
+		SubscribeToEvent(window.GetChild("CreateTerrainButton", true), "Released", "CreateTerrain");
 		
 		LoadBrushes();
 		Show();
+	}
+	
+	void CreateTerrain()
+	{
+		Node@ node = CreateNode(LOCAL);
+		node.position = Vector3(0, 0, 0);
+		Component@ comp = node.CreateComponent("Terrain");
+		SelectComponent(comp, false);
 	}
 	
 	// Save all the terrains we have edited
