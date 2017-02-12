@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CFF character mapping table (cmap) support (body).                   */
 /*                                                                         */
-/*  Copyright 2002-2007, 2010, 2013 by                                     */
+/*  Copyright 2002-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -33,11 +33,14 @@
   /*************************************************************************/
 
   FT_CALLBACK_DEF( FT_Error )
-  cff_cmap_encoding_init( CFF_CMapStd  cmap )
+  cff_cmap_encoding_init( CFF_CMapStd  cmap,
+                          FT_Pointer   pointer )
   {
     TT_Face       face     = (TT_Face)FT_CMAP_FACE( cmap );
     CFF_Font      cff      = (CFF_Font)face->extra.data;
     CFF_Encoding  encoding = &cff->encoding;
+
+    FT_UNUSED( pointer );
 
 
     cmap->gids  = encoding->codes;
@@ -101,15 +104,21 @@
   }
 
 
-  FT_DEFINE_CMAP_CLASS(cff_cmap_encoding_class_rec,
+  FT_DEFINE_CMAP_CLASS(
+    cff_cmap_encoding_class_rec,
+
     sizeof ( CFF_CMapStdRec ),
 
-    (FT_CMap_InitFunc)     cff_cmap_encoding_init,
-    (FT_CMap_DoneFunc)     cff_cmap_encoding_done,
-    (FT_CMap_CharIndexFunc)cff_cmap_encoding_char_index,
-    (FT_CMap_CharNextFunc) cff_cmap_encoding_char_next,
+    (FT_CMap_InitFunc)     cff_cmap_encoding_init,        /* init       */
+    (FT_CMap_DoneFunc)     cff_cmap_encoding_done,        /* done       */
+    (FT_CMap_CharIndexFunc)cff_cmap_encoding_char_index,  /* char_index */
+    (FT_CMap_CharNextFunc) cff_cmap_encoding_char_next,   /* char_next  */
 
-    NULL, NULL, NULL, NULL, NULL
+    (FT_CMap_CharVarIndexFunc)    NULL,  /* char_var_index   */
+    (FT_CMap_CharVarIsDefaultFunc)NULL,  /* char_var_default */
+    (FT_CMap_VariantListFunc)     NULL,  /* variant_list     */
+    (FT_CMap_CharVariantListFunc) NULL,  /* charvariant_list */
+    (FT_CMap_VariantCharListFunc) NULL   /* variantchar_list */
   )
 
 
@@ -135,13 +144,16 @@
 
 
   FT_CALLBACK_DEF( FT_Error )
-  cff_cmap_unicode_init( PS_Unicodes  unicodes )
+  cff_cmap_unicode_init( PS_Unicodes  unicodes,
+                         FT_Pointer   pointer )
   {
     TT_Face             face    = (TT_Face)FT_CMAP_FACE( unicodes );
     FT_Memory           memory  = FT_FACE_MEMORY( face );
     CFF_Font            cff     = (CFF_Font)face->extra.data;
     CFF_Charset         charset = &cff->charset;
     FT_Service_PsCMaps  psnames = (FT_Service_PsCMaps)cff->psnames;
+
+    FT_UNUSED( pointer );
 
 
     /* can't build Unicode map for CID-keyed font */
@@ -196,15 +208,22 @@
   }
 
 
-  FT_DEFINE_CMAP_CLASS(cff_cmap_unicode_class_rec,
+  FT_DEFINE_CMAP_CLASS(
+    cff_cmap_unicode_class_rec,
+
     sizeof ( PS_UnicodesRec ),
 
-    (FT_CMap_InitFunc)     cff_cmap_unicode_init,
-    (FT_CMap_DoneFunc)     cff_cmap_unicode_done,
-    (FT_CMap_CharIndexFunc)cff_cmap_unicode_char_index,
-    (FT_CMap_CharNextFunc) cff_cmap_unicode_char_next,
+    (FT_CMap_InitFunc)     cff_cmap_unicode_init,        /* init       */
+    (FT_CMap_DoneFunc)     cff_cmap_unicode_done,        /* done       */
+    (FT_CMap_CharIndexFunc)cff_cmap_unicode_char_index,  /* char_index */
+    (FT_CMap_CharNextFunc) cff_cmap_unicode_char_next,   /* char_next  */
 
-    NULL, NULL, NULL, NULL, NULL
+    (FT_CMap_CharVarIndexFunc)    NULL,  /* char_var_index   */
+    (FT_CMap_CharVarIsDefaultFunc)NULL,  /* char_var_default */
+    (FT_CMap_VariantListFunc)     NULL,  /* variant_list     */
+    (FT_CMap_CharVariantListFunc) NULL,  /* charvariant_list */
+    (FT_CMap_VariantCharListFunc) NULL   /* variantchar_list */
   )
+
 
 /* END */

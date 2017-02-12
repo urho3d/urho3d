@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -148,6 +148,17 @@ XMLElement XMLFile::CreateRoot(const String& name)
     document_->reset();
     pugi::xml_node root = document_->append_child(name.CString());
     return XMLElement(this, root.internal_object());
+}
+
+XMLElement XMLFile::GetOrCreateRoot(const String& name)
+{
+    XMLElement root = GetRoot(name);
+    if (root.NotNull())
+        return root;
+    root = GetRoot();
+    if (root.NotNull())
+        URHO3D_LOGWARNING("XMLFile already has root " + root.GetName() + ", deleting it and creating root " + name);
+    return CreateRoot(name);
 }
 
 bool XMLFile::FromString(const String& source)

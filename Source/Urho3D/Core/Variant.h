@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@ enum VariantType
     VAR_DOUBLE,
     VAR_STRINGVECTOR,
     VAR_RECT,
+    VAR_INTVECTOR3,
     MAX_VAR_TYPES
 };
 
@@ -374,6 +375,13 @@ public:
         *this = value;
     }
 
+    /// Construct from an IntVector3.
+    Variant(const IntVector3& value) :
+        type_(VAR_NONE)
+    {
+        *this = value;
+    }
+
     /// Construct from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
     Variant(RefCounted* value) :
         type_(VAR_NONE)
@@ -639,6 +647,14 @@ public:
         return *this;
     }
 
+    /// Assign from an IntVector3.
+    Variant& operator =(const IntVector3& rhs)
+    {
+        SetType(VAR_INTVECTOR3);
+        *(reinterpret_cast<IntVector3*>(&value_)) = rhs;
+        return *this;
+    }
+
     /// Assign from a RefCounted pointer. The object will be stored internally in a WeakPtr so that its expiration can be detected safely.
     Variant& operator =(RefCounted* rhs)
     {
@@ -789,6 +805,12 @@ public:
         return type_ == VAR_INTVECTOR2 ? *(reinterpret_cast<const IntVector2*>(&value_)) == rhs : false;
     }
 
+    /// Test for equality with an IntVector3. To return true, both the type and value must match.
+    bool operator ==(const IntVector3& rhs) const
+    {
+        return type_ == VAR_INTVECTOR3 ? *(reinterpret_cast<const IntVector3*>(&value_)) == rhs : false;
+    }
+
     /// Test for equality with a StringHash. To return true, both the type and value must match.
     bool operator ==(const StringHash& rhs) const { return type_ == VAR_INT ? (unsigned)value_.int_ == rhs.Value() : false; }
 
@@ -886,6 +908,9 @@ public:
 
     /// Test for inequality with an IntVector2.
     bool operator !=(const IntVector2& rhs) const { return !(*this == rhs); }
+
+    /// Test for inequality with an IntVector3.
+    bool operator !=(const IntVector3& rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a StringHash.
     bool operator !=(const StringHash& rhs) const { return !(*this == rhs); }
@@ -1054,6 +1079,12 @@ public:
         return type_ == VAR_INTVECTOR2 ? *reinterpret_cast<const IntVector2*>(&value_) : IntVector2::ZERO;
     }
 
+    /// Return an IntVector3 or empty on type mismatch.
+    const IntVector3& GetIntVector3() const
+    {
+        return type_ == VAR_INTVECTOR3 ? *reinterpret_cast<const IntVector3*>(&value_) : IntVector3::ZERO;
+    }
+
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
     RefCounted* GetPtr() const
     {
@@ -1187,6 +1218,8 @@ template <> inline VariantType GetVariantType<IntRect>() { return VAR_INTRECT; }
 
 template <> inline VariantType GetVariantType<IntVector2>() { return VAR_INTVECTOR2; }
 
+template <> inline VariantType GetVariantType<IntVector3>() { return VAR_INTVECTOR3; }
+
 template <> inline VariantType GetVariantType<Matrix3>() { return VAR_MATRIX3; }
 
 template <> inline VariantType GetVariantType<Matrix3x4>() { return VAR_MATRIX3X4; }
@@ -1223,6 +1256,8 @@ template <> URHO3D_API const Rect& Variant::Get<const Rect&>() const;
 template <> URHO3D_API const IntRect& Variant::Get<const IntRect&>() const;
 
 template <> URHO3D_API const IntVector2& Variant::Get<const IntVector2&>() const;
+
+template <> URHO3D_API const IntVector3& Variant::Get<const IntVector3&>() const;
 
 template <> URHO3D_API const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const;
 
@@ -1263,6 +1298,8 @@ template <> URHO3D_API Rect Variant::Get<Rect>() const;
 template <> URHO3D_API IntRect Variant::Get<IntRect>() const;
 
 template <> URHO3D_API IntVector2 Variant::Get<IntVector2>() const;
+
+template <> URHO3D_API IntVector3 Variant::Get<IntVector3>() const;
 
 template <> URHO3D_API PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const;
 

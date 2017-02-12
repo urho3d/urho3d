@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -271,6 +271,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                     variant = *static_cast<IntVector2*>(value);
                     break;
 
+                case VAR_INTVECTOR3:
+                    variant = *static_cast<IntVector3*>(value);
+                    break;
+
                 case VAR_MATRIX3:
                     variant = *static_cast<Matrix3*>(value);
                     break;
@@ -357,6 +361,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
     case VAR_VARIANTMAP:
     case VAR_INTRECT:
     case VAR_INTVECTOR2:
+    case VAR_INTVECTOR3:
         tolua_pushusertype(L, (void*)variant->Get<const VariantValue*>(), variant->GetTypeName().CString());
         break;
 

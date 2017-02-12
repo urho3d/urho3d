@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1260,9 +1260,12 @@ void BuildAndSaveAnimations(OutModel* model)
         String animName = FromAIString(anim->mName);
         String animOutName;
 
+        float thisImportEndTime = importEndTime_;
+        float thisImportStartTime = importStartTime_;
+
         // If no animation split specified, set the end time to duration
-        if (importEndTime_ == 0.0f)
-            importEndTime_ = duration;
+        if (thisImportEndTime == 0.0f)
+            thisImportEndTime = duration;
 
         if (animName.Empty())
             animName = "Anim" + String(i + 1);
@@ -1290,9 +1293,9 @@ void BuildAndSaveAnimations(OutModel* model)
             if (channel->mScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
-        if (startTime > importStartTime_)
-            importStartTime_ = startTime;
-        duration = importEndTime_ - importStartTime_;
+        if (startTime > thisImportStartTime)
+            thisImportStartTime = startTime;
+        duration = thisImportEndTime - thisImportStartTime;
 
         SharedPtr<Animation> outAnim(new Animation(context_));
         outAnim->SetAnimationName(animName);
@@ -1473,9 +1476,9 @@ void BuildAndSaveAnimations(OutModel* model)
                     kf.rotation_ = ToQuaternion(rot);
                 if (track->channelMask_ & CHANNEL_SCALE)
                     kf.scale_ = ToVector3(scale);
-                if (kf.time_ >= importStartTime_ && kf.time_ <= importEndTime_)
+                if (kf.time_ >= thisImportStartTime && kf.time_ <= thisImportEndTime)
                 {
-                    kf.time_ = (kf.time_ - importStartTime_) * tickConversion;
+                    kf.time_ = (kf.time_ - thisImportStartTime) * tickConversion;
                     track->keyFrames_.Push(kf);
                 }
             }

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for validating OpenType tables (specification).         */
 /*                                                                         */
-/*  Copyright 2004-2007, 2013 by                                           */
+/*  Copyright 2004-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -27,8 +27,8 @@
 /***************************************************************************/
 
 
-#ifndef __FTOTVAL_H__
-#define __FTOTVAL_H__
+#ifndef FTOTVAL_H_
+#define FTOTVAL_H_
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -57,6 +57,12 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    This section contains the declaration of functions to validate     */
   /*    some OpenType tables (BASE, GDEF, GPOS, GSUB, JSTF, MATH).         */
+  /*                                                                       */
+  /* <Order>                                                               */
+  /*    FT_OpenType_Validate                                               */
+  /*    FT_OpenType_Free                                                   */
+  /*                                                                       */
+  /*    FT_VALIDATE_OTXXX                                                  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -100,14 +106,12 @@ FT_BEGIN_HEADER
 #define FT_VALIDATE_JSTF  0x1000
 #define FT_VALIDATE_MATH  0x2000
 
-#define FT_VALIDATE_OT  FT_VALIDATE_BASE | \
-                        FT_VALIDATE_GDEF | \
-                        FT_VALIDATE_GPOS | \
-                        FT_VALIDATE_GSUB | \
-                        FT_VALIDATE_JSTF | \
-                        FT_VALIDATE_MATH
-
-  /* */
+#define FT_VALIDATE_OT  ( FT_VALIDATE_BASE | \
+                          FT_VALIDATE_GDEF | \
+                          FT_VALIDATE_GPOS | \
+                          FT_VALIDATE_GSUB | \
+                          FT_VALIDATE_JSTF | \
+                          FT_VALIDATE_MATH )
 
  /**********************************************************************
   *
@@ -165,8 +169,6 @@ FT_BEGIN_HEADER
                         FT_Bytes  *GSUB_table,
                         FT_Bytes  *JSTF_table );
 
-  /* */
-
  /**********************************************************************
   *
   * @function:
@@ -191,13 +193,12 @@ FT_BEGIN_HEADER
   FT_OpenType_Free( FT_Face   face,
                     FT_Bytes  table );
 
-
- /* */
+  /* */
 
 
 FT_END_HEADER
 
-#endif /* __FTOTVAL_H__ */
+#endif /* FTOTVAL_H_ */
 
 
 /* END */

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1045,7 +1045,7 @@ void asCByteCode::OptimizeLocally(const asCArray<int> &tempVariableOffsets)
 		short tempVar = last->wArg[0];
 		asCArray<short> freedVars;
 
-		asCByteInstruction *instr = last->prev;
+		instr = last->prev;
 		asASSERT( instr && instr->op == asBC_Block );
 		instr = instr->prev;
 		while( instr && instr->op == asBC_FREE )
@@ -1536,7 +1536,7 @@ void asCByteCode::ExtractObjectVariableInfo(asCScriptFunction *outFunc)
 			asSObjectVariableInfo info;
 			info.programPos     = pos;
 			info.variableOffset = (short)instr->wArg[0];
-			info.option         = *(int*)ARG_DW(instr->arg);
+			info.option         = (asEObjVarInfoOption)*(int*)ARG_DW(instr->arg);
 			outFunc->scriptData->objVariableInfo.PushLast(info);
 		}
 		else if( instr->op == asBC_VarDecl )
@@ -2064,18 +2064,23 @@ void asCByteCode::PostProcess()
 }
 
 #ifdef AS_DEBUG
-void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScriptFunction *func)
+void asCByteCode::DebugOutput(const char *name, asCScriptFunction *func)
 {
 	_mkdir("AS_DEBUG");
 
-	asCString str = "AS_DEBUG/";
-	str += name;
+	asCString path = "AS_DEBUG/";
+	path += name;
+
+	// Anonymous functions created from within class methods will contain :: as part of the name
+	// Replace :: with __ to avoid error when creating the file for debug output
+	for (asUINT n = 0; n < path.GetLength(); n++)
+		if (path[n] == ':') path[n] = '_';
 
 #if _MSC_VER >= 1500 && !defined(AS_MARMALADE)
 	FILE *file;
-	fopen_s(&file, str.AddressOf(), "w");
+	fopen_s(&file, path.AddressOf(), "w");
 #else
-	FILE *file = fopen(str.AddressOf(), "w");
+	FILE *file = fopen(path.AddressOf(), "w");
 #endif
 
 #if !defined(AS_XENON) // XBox 360: When running in DVD Emu, no write is allowed
@@ -2237,8 +2242,8 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 
 			case asBC_FuncPtr:
 				{
-					asCScriptFunction *func = *(asCScriptFunction**)ARG_DW(instr->arg);
-					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_DW(instr->arg), func->GetDeclaration());
+					asCScriptFunction *f = *(asCScriptFunction**)ARG_DW(instr->arg);
+					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_DW(instr->arg), f->GetDeclaration());
 				}
 				break;
 
@@ -2298,8 +2303,8 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 
 			case asBC_FuncPtr:
 				{
-					asCScriptFunction *func = *(asCScriptFunction**)ARG_QW(instr->arg);
-					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), func->GetDeclaration());
+					asCScriptFunction *f = *(asCScriptFunction**)ARG_QW(instr->arg);
+					fprintf(file, "   %-8s 0x%x          (func:%s)\n", asBCInfo[instr->op].name, (asUINT)*ARG_QW(instr->arg), f->GetDeclaration());
 				}
 				break;
 	
@@ -2345,8 +2350,8 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			if( instr->op == asBC_ALLOC )
 			{
 				asCObjectType *ot = *(asCObjectType**)ARG_DW(instr->arg);
-				asCScriptFunction *func = engine->scriptFunctions[instr->wArg[0]];
-				fprintf(file, "   %-8s 0x%x, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(int*)ARG_DW(instr->arg), *(int*)(ARG_DW(instr->arg)+1), ot->GetName(), func ? func->GetDeclaration() : "{no func}");
+				asCScriptFunction *f = engine->scriptFunctions[instr->wArg[0]];
+				fprintf(file, "   %-8s 0x%x, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(int*)ARG_DW(instr->arg), *(int*)(ARG_DW(instr->arg)+1), ot->GetName(), f ? f->GetDeclaration() : "{no func}");
 			}
 			else
 				fprintf(file, "   %-8s %u, %d\n", asBCInfo[instr->op].name, *(int*)ARG_DW(instr->arg), *(int*)(ARG_DW(instr->arg)+1));
@@ -2360,19 +2365,19 @@ void asCByteCode::DebugOutput(const char *name, asCScriptEngine *engine, asCScri
 			if( instr->op == asBC_ALLOC )
 			{
 				asCObjectType *ot = *(asCObjectType**)ARG_QW(instr->arg);
-				asCScriptFunction *func = engine->scriptFunctions[instr->wArg[0]];
-#ifdef __GNUC__
+				asCScriptFunction *f = engine->scriptFunctions[instr->wArg[0]];
+#if defined(__GNUC__) && !defined(_MSC_VER)
 #ifdef AS_64BIT_PTR
-				fprintf(file, "   %-8s 0x%lx, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), func ? func->GetDeclaration() : "{no func}");
+				fprintf(file, "   %-8s 0x%lx, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), f ? f->GetDeclaration() : "{no func}");
 #else
-				fprintf(file, "   %-8s 0x%llx, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), func ? func->GetDeclaration() : "{no func}");
+				fprintf(file, "   %-8s 0x%llx, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), f ? f->GetDeclaration() : "{no func}");
 #endif
 #else
-				fprintf(file, "   %-8s 0x%I64x, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), func ? func->GetDeclaration() : "{no func}");
+				fprintf(file, "   %-8s 0x%I64x, %d             (type:%s, %s)\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2), ot->GetName(), f ? f->GetDeclaration() : "{no func}");
 #endif
 			}
 			else
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(_MSC_VER)
 #ifdef AS_64BIT_PTR
 				fprintf(file, "   %-8s %lu, %d\n", asBCInfo[instr->op].name, *(asINT64*)ARG_QW(instr->arg), *(int*)(ARG_DW(instr->arg)+2));
 #else

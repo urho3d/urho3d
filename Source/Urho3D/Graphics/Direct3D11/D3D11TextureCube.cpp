@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -445,6 +445,14 @@ bool TextureCube::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
+
+    // Disable multisampling if not supported
+    if (multiSample_ > 1 && !graphics_->GetImpl()->CheckMultiSampleSupport(textureDesc.Format, multiSample_))
+    {
+        multiSample_ = 1;
+        autoResolve_ = false;
+    }
 
     // Set mipmapping
     if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1 && multiSample_ == 1)
@@ -455,9 +463,8 @@ bool TextureCube::Create()
     // Disable mip levels from the multisample texture. Rather create them to the resolve texture
     textureDesc.MipLevels = multiSample_ == 1 ? levels_ : 1;
     textureDesc.ArraySize = MAX_CUBEMAP_FACES;
-    textureDesc.Format = (DXGI_FORMAT)(sRGB_ ? GetSRGBFormat(format_) : format_);
     textureDesc.SampleDesc.Count = (UINT)multiSample_;
-    textureDesc.SampleDesc.Quality = multiSample_ > 1 ? 0xffffffff : 0;
+    textureDesc.SampleDesc.Quality = graphics_->GetImpl()->GetMultiSampleQuality(textureDesc.Format, multiSample_);
     textureDesc.Usage = usage_ == TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     if (usage_ == TEXTURE_RENDERTARGET)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -212,7 +212,7 @@ public:
     bool RemoveGesture(unsigned gestureID);
     /// Remove all in-memory gestures.
     void RemoveAllGestures();
-    /// Set the mouse cursor position.
+    /// Set the mouse cursor position. Uses the backbuffer (Graphics width/height) coordinates.
     void SetMousePosition(const IntVector2& position);
     /// Center the mouse position.
     void CenterMousePosition();
@@ -247,10 +247,10 @@ public:
     bool GetQualifierPress(int qualifier) const;
     /// Return the currently held down qualifiers.
     int GetQualifiers() const;
-    /// Return mouse position within window. Should only be used with a visible mouse cursor.
+    /// Return mouse position within window. Should only be used with a visible mouse cursor. Uses the backbuffer (Graphics width/height) coordinates.
     IntVector2 GetMousePosition() const;
     /// Return mouse movement since last frame.
-    const IntVector2& GetMouseMove() const;
+    IntVector2 GetMouseMove() const;
     /// Return horizontal mouse movement since last frame.
     int GetMouseMoveX() const;
     /// Return vertical mouse movement since last frame.
@@ -393,6 +393,8 @@ private:
     IntVector2 mouseMove_;
     /// Mouse wheel movement since last frame.
     int mouseMoveWheel_;
+    /// Input coordinate scaling. Non-unity when window and backbuffer have different sizes (e.g. Retina display.)
+    Vector2 inputScale_;
     /// SDL window ID.
     unsigned windowID_;
     /// Fullscreen toggle flag.
@@ -423,6 +425,8 @@ private:
     bool focusedThisFrame_;
     /// Next mouse move suppress flag.
     bool suppressNextMouseMove_;
+    /// Whether mouse move is accumulated in backbuffer scale or not (when using events directly).
+    bool mouseMoveScaled_;
     /// Initialized flag.
     bool initialized_;
 

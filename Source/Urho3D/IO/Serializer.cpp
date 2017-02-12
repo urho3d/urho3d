@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,11 @@ bool Serializer::WriteIntRect(const IntRect& value)
 }
 
 bool Serializer::WriteIntVector2(const IntVector2& value)
+{
+    return Write(value.Data(), sizeof value) == sizeof value;
+}
+
+bool Serializer::WriteIntVector3(const IntVector3& value)
 {
     return Write(value.Data(), sizeof value) == sizeof value;
 }
@@ -303,6 +308,9 @@ bool Serializer::WriteVariantData(const Variant& value)
 
     case VAR_INTVECTOR2:
         return WriteIntVector2(value.GetIntVector2());
+
+    case VAR_INTVECTOR3:
+        return WriteIntVector3(value.GetIntVector3());
 
     case VAR_MATRIX3:
         return WriteMatrix3(value.GetMatrix3());

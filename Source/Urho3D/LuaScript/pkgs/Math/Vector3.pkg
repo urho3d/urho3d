@@ -6,6 +6,7 @@ class Vector3
     Vector3(const Vector3& vector);
     Vector3(const Vector2& vector, float z);
     Vector3(const Vector2& vector);
+    Vector3(const IntVector3& vector);
     Vector3(float x, float y, float z);
     Vector3(float x, float y);
     ~Vector3();
@@ -48,10 +49,47 @@ class Vector3
     static const Vector3 ONE;
 };
 
+class IntVector3
+{
+    IntVector3();
+    IntVector3(int x, int y, int z);
+    IntVector3(const IntVector3& rhs);
+    ~IntVector3();
+
+    bool operator ==(const IntVector3& rhs) const;
+    IntVector3 operator + (const IntVector3& rhs) const;
+    IntVector3 operator - () const;
+    IntVector3 operator - (const IntVector3& rhs) const;
+    IntVector3 operator * (int rhs) const;
+    IntVector3 operator / (int rhs) const;
+
+    String ToString() const;
+    unsigned ToHash() const;
+    float Length() const;
+
+    int x_ @ x;
+    int y_ @ y;
+    int z_ @ z;
+
+    static const IntVector3 ZERO;
+    static const IntVector3 LEFT;
+    static const IntVector3 RIGHT;
+    static const IntVector3 UP;
+    static const IntVector3 DOWN;
+    static const IntVector3 FORWARD;
+    static const IntVector3 BACK;
+    static const IntVector3 ONE;
+};
+
 Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t);
 Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs);
 Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs);
 Vector3 VectorFloor(const Vector3& vec);
 Vector3 VectorRound(const Vector3& vec);
 Vector3 VectorCeil(const Vector3& vec);
+IntVector3 VectorFloorToInt(const Vector3& vec);
+IntVector3 VectorRoundToInt(const Vector3& vec);
+IntVector3 VectorCeilToInt(const Vector3& vec);
+IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs);
+IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs);
 float StableRandom(const Vector3& seed);

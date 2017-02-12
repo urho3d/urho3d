@@ -11,6 +11,9 @@ Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 ##License
 Licensed under the MIT license, see [LICENSE](https://github.com/urho3d/Urho3D/blob/master/LICENSE) for details.
 
+##Contributing
+Before making pull requests, please read the [Contribution checklist](https://urho3d.github.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.github.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
+
 ##Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
@@ -23,6 +26,7 @@ Urho3D development, contributions and bugfixes by:
 - Loic Blot
 - Danny Boisvert
 - Sergey Bosko
+- Lisandro Bruzzo
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
@@ -37,6 +41,7 @@ Urho3D development, contributions and bugfixes by:
 - Jukka Jylänki
 - Graham King
 - Jason Kinzer
+- Jan Korous
 - Eugene Kozlov
 - Gunnar Kriik
 - Aliaksandr Kryvashein
@@ -44,6 +49,7 @@ Urho3D development, contributions and bugfixes by:
 - Rokas Kupstys
 - Ali Kämäräinen
 - Pete Leigh
+- Arnis Lielturks
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
@@ -57,7 +63,9 @@ Urho3D development, contributions and bugfixes by:
 - Vladimir Pobedinsky
 - Franck Poulain
 - Pranjal Raihan
+- Mariusz Richtscheid
 - Nick Royer
+- Jonathan Sandusky
 - Miika Santala
 - Anatoly Sennov
 - Matan Shukry
@@ -65,7 +73,9 @@ Urho3D development, contributions and bugfixes by:
 - Hualin Song
 - James Thomas
 - Joshua Tippetts
+- Konstantin Tomashevich
 - Yusuf Umar
+- Mateus Vendramini
 - Daniel Wiberg
 - Steven Zhang
 - AGreatFish
@@ -141,12 +151,12 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.30.2 (http://www.angelcode.com/angelscript)
+- AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
 - Boost 1.61.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.0 (http://box2d.org)
 - Bullet 2.83.6 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.5.0 (https://www.freetype.org)
+- FreeType 2.7.1 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
@@ -162,7 +172,7 @@ Urho3D uses the following third-party libraries:
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.5 (https://www.libsdl.org)
-- SQLite 3.13.0 (https://www.sqlite.org)
+- SQLite 3.16.2 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (https://nothings.org)
 - stb_image_write 1.02 (https://nothings.org)
@@ -180,7 +190,7 @@ NinjaSnowWar sounds by Veli-Pekka Tätilä.
 PBR textures from Substance Share. (https://share.allegorithmic.com)
 IBL textures from HDRLab's sIBL Archive.
 Dieselpunk Moto model by allexandr007.
-Mutant model from Mixamo.
+Mutant & Kachujin models from Mixamo.
 
 ##Documentation
 Urho3D classes have been sparsely documented using Doxygen notation. To

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,13 @@ namespace Urho3D
 extern const char* interpolationModeNames[];
 extern const char* LOGIC_CATEGORY;
 
+const char* controlPointsStructureElementNames[] =
+{
+    "Control Point Count",
+    "   NodeID",
+    0
+};
+
 SplinePath::SplinePath(Context* context) :
     Component(context),
     spline_(BEZIER_CURVE),
@@ -56,8 +63,9 @@ void SplinePath::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Traveled", float, traveled_, 0.f, AM_FILE | AM_NOEDIT);
     URHO3D_ATTRIBUTE("Elapsed Time", float, elapsedTime_, 0.f, AM_FILE | AM_NOEDIT);
     URHO3D_ACCESSOR_ATTRIBUTE("Controlled", GetControlledIdAttr, SetControlledIdAttr, unsigned, 0, AM_FILE | AM_NODEID);
-    URHO3D_ACCESSOR_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr, VariantVector, Variant::emptyVariantVector,
-        AM_FILE | AM_NODEIDVECTOR);
+    URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Control Points", GetControlPointIdsAttr, SetControlPointIdsAttr,
+                                                            VariantVector, Variant::emptyVariantVector, controlPointsStructureElementNames,
+                                                            AM_FILE | AM_NODEIDVECTOR);
 }
 
 void SplinePath::ApplyAttributes()

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -223,6 +223,27 @@ IntVector2 ToIntVector2(const char* source)
     char* ptr = (char*)source;
     ret.x_ = (int)strtol(ptr, &ptr, 10);
     ret.y_ = (int)strtol(ptr, &ptr, 10);
+
+    return ret;
+}
+
+IntVector3 ToIntVector3(const String& source)
+{
+    return ToIntVector3(source.CString());
+}
+
+IntVector3 ToIntVector3(const char* source)
+{
+    IntVector3 ret(IntVector3::ZERO);
+
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 3)
+        return ret;
+
+    char* ptr = (char*)source;
+    ret.x_ = (int)strtol(ptr, &ptr, 10);
+    ret.y_ = (int)strtol(ptr, &ptr, 10);
+    ret.z_ = (int)strtol(ptr, &ptr, 10);
 
     return ret;
 }

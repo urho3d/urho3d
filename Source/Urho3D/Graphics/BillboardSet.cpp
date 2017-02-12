@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,19 @@ const char* faceCameraModeNames[] =
     "LookAt Y",
     "LookAt Mixed",
     "Direction",
+    0
+};
+
+const char* billboardsStructureElementNames[] =
+{
+    "Billboard Count",
+    "   Position",
+    "   Size",
+    "   UV Coordinates",
+    "   Color",
+    "   Rotation",
+    "   Direction",
+    "   Is Enabled",
     0
 };
 
@@ -116,8 +129,9 @@ void BillboardSet::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Distance", GetShadowDistance, SetShadowDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Animation LOD Bias", GetAnimationLodBias, SetAnimationLodBias, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr, VariantVector, Variant::emptyVariantVector,
-        AM_FILE);
+    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Billboards", GetBillboardsAttr, SetBillboardsAttr,
+                                                            VariantVector, Variant::emptyVariantVector,
+                                                            billboardsStructureElementNames, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Network Billboards", GetNetBillboardsAttr, SetNetBillboardsAttr, PODVector<unsigned char>,
         Variant::emptyBuffer, AM_NET | AM_NOEDIT);
 }
@@ -187,11 +201,11 @@ void BillboardSet::UpdateBatches(const FrameInfo& frame)
             bufferDirty_ = true;
 
         hasOrthoCamera_ = frame.camera_->IsOrthographic();
-
-        // Calculate fixed screen size scale factor for billboards if needed
-        if (fixedScreenSize_)
-            CalculateFixedScreenSize(frame);
     }
+
+    // Calculate fixed screen size scale factor for billboards. Will not dirty the buffer unless actually changed
+    if (fixedScreenSize_)
+        CalculateFixedScreenSize(frame);
 
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
@@ -764,6 +778,7 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
 {
     float invViewHeight = 1.0f / frame.viewSize_.y_;
     float halfViewWorldSize = frame.camera_->GetHalfViewSize();
+    bool scaleFactorChanged = false;
 
     if (!frame.camera_->IsOrthographic())
     {
@@ -774,18 +789,33 @@ void BillboardSet::CalculateFixedScreenSize(const FrameInfo& frame)
         for (unsigned i = 0; i < billboards_.Size(); ++i)
         {
             Vector4 projPos(viewProj * Vector4(billboardTransform * billboards_[i].position_, 1.0f));
-            billboards_[i].screenScaleFactor_ = invViewHeight * halfViewWorldSize * projPos.w_;
+            float newScaleFactor = invViewHeight * halfViewWorldSize * projPos.w_;
+            if (newScaleFactor != billboards_[i].screenScaleFactor_)
+            {
+                billboards_[i].screenScaleFactor_ = newScaleFactor;
+                scaleFactorChanged = true;
+            }
         }
     }
     else
     {
         for (unsigned i = 0; i < billboards_.Size(); ++i)
-            billboards_[i].screenScaleFactor_ = invViewHeight * halfViewWorldSize;
+        {
+            float newScaleFactor = invViewHeight * halfViewWorldSize;
+            if (newScaleFactor != billboards_[i].screenScaleFactor_)
+            {
+                billboards_[i].screenScaleFactor_ = newScaleFactor;
+                scaleFactorChanged = true;
+            }
+        }
     }
 
-    bufferDirty_ = true;
-    forceUpdate_ = true;
-    worldBoundingBoxDirty_ = true;
+    if (scaleFactorChanged)
+    {
+        bufferDirty_ = true;
+        forceUpdate_ = true;
+        worldBoundingBoxDirty_ = true;
+    }
 }
 
 }

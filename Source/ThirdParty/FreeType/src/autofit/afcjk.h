@@ -2,9 +2,9 @@
 /*                                                                         */
 /*  afcjk.h                                                                */
 /*                                                                         */
-/*    Auto-fitter hinting routines for CJK script (specification).         */
+/*    Auto-fitter hinting routines for CJK writing system (specification). */
 /*                                                                         */
-/*  Copyright 2006, 2007, 2011-2013 by                                     */
+/*  Copyright 2006-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,8 +16,8 @@
 /***************************************************************************/
 
 
-#ifndef __AFCJK_H__
-#define __AFCJK_H__
+#ifndef AFCJK_H_
+#define AFCJK_H_
 
 #include "afhints.h"
 #include "aflatin.h"
@@ -29,11 +29,6 @@ FT_BEGIN_HEADER
   /* the CJK-specific writing system */
 
   AF_DECLARE_WRITING_SYSTEM_CLASS( af_cjk_writing_system_class )
-
-
-  /* the CJK-specific script classes */
-
-  AF_DECLARE_SCRIPT_CLASS( af_hani_script_class )
 
 
   /*************************************************************************/
@@ -55,21 +50,15 @@ FT_BEGIN_HEADER
           ( (b)->properties & AF_BLUE_PROPERTY_CJK_TOP )
 #define AF_CJK_IS_HORIZ_BLUE( b ) \
           ( (b)->properties & AF_BLUE_PROPERTY_CJK_HORIZ )
-#define AF_CJK_IS_FILLED_BLUE( b ) \
-          ( (b)->properties & AF_BLUE_PROPERTY_CJK_FILL )
 #define AF_CJK_IS_RIGHT_BLUE  AF_CJK_IS_TOP_BLUE
 
 #define AF_CJK_MAX_WIDTHS  16
 
 
-  enum
-  {
-    AF_CJK_BLUE_ACTIVE     = 1 << 0,  /* set if zone height is <= 3/4px */
-    AF_CJK_BLUE_TOP        = 1 << 1,  /* result of AF_CJK_IS_TOP_BLUE   */
-    AF_CJK_BLUE_ADJUSTMENT = 1 << 2,  /* used for scale adjustment      */
-                                      /* optimization                   */
-    AF_CJK_BLUE_FLAG_MAX
-  };
+#define AF_CJK_BLUE_ACTIVE      ( 1U << 0 ) /* zone height is <= 3/4px      */
+#define AF_CJK_BLUE_TOP         ( 1U << 1 ) /* result of AF_CJK_IS_TOP_BLUE */
+#define AF_CJK_BLUE_ADJUSTMENT  ( 1U << 2 ) /* used for scale adjustment    */
+                                            /* optimization                 */
 
 
   typedef struct  AF_CJKBlueRec_
@@ -105,9 +94,9 @@ FT_BEGIN_HEADER
 
   typedef struct  AF_CJKMetricsRec_
   {
-    AF_ScriptMetricsRec  root;
-    FT_UInt              units_per_em;
-    AF_CJKAxisRec        axis[AF_DIMENSION_MAX];
+    AF_StyleMetricsRec  root;
+    FT_UInt             units_per_em;
+    AF_CJKAxisRec       axis[AF_DIMENSION_MAX];
 
   } AF_CJKMetricsRec, *AF_CJKMetrics;
 
@@ -126,7 +115,8 @@ FT_BEGIN_HEADER
                      AF_CJKMetrics  metrics );
 
   FT_LOCAL( FT_Error )
-  af_cjk_hints_apply( AF_GlyphHints  hints,
+  af_cjk_hints_apply( FT_UInt        glyph_index,
+                      AF_GlyphHints  hints,
                       FT_Outline*    outline,
                       AF_CJKMetrics  metrics );
 
@@ -145,7 +135,7 @@ FT_BEGIN_HEADER
 
 FT_END_HEADER
 
-#endif /* __AFCJK_H__ */
+#endif /* AFCJK_H_ */
 
 
 /* END */

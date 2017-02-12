@@ -1,0 +1,36 @@
+--------------------------
+note:
+--------------------------
+There is no requirement in the Mixamo License to provide any license information with any content.  
+However, for the purpose of learning, I have provided some pertinent information below.
+
+--------------------------
+info:
+--------------------------
+website: https://www.mixamo.com/
+model: Kachujin_G_Rosales
+license: http://www.adobe.com/legal/terms.html
+
+--------------------------
+license short explanation (from the forum):
+--------------------------
+Jeanette Mathews
+May 31, 2016 07:24
+
+Thanks for the feedback, and glad to hear the tutorial was useful getting you started.  :)
+
+Yes, all Fuse and Mixamo content is available for commercial and non commercial use, royalty free.  
+You can edit them to your hearts content!
+
+The only requirement we have is that the final product you are creating must have our content in an 'embedded', non-editable format.  
+So you can't edit the characters and sell them directly, because then other people have access to the character 3d data files.  
+Games, movies, 3d prints, 2D illustrations, or any other file format where the character/animation files are not-editable is fine.  
+Selling characters/animations directly is against the TOS/EULA.
+
+Hope that helps clarify!
+
+reference: https://community.mixamo.com/hc/en-us/community/posts/211496987-Mixamo-Store-Characters-Licence
+
+--------------------------
+
+

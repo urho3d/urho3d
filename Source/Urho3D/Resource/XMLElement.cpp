@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,6 +104,24 @@ XMLElement XMLElement::CreateChild(const char* name)
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
     pugi::xml_node child = const_cast<pugi::xml_node&>(node).append_child(name);
     return XMLElement(file_, child.internal_object());
+}
+
+XMLElement XMLElement::GetOrCreateChild(const String& name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
+}
+
+XMLElement XMLElement::GetOrCreateChild(const char* name)
+{
+    XMLElement child = GetChild(name);
+    if (child.NotNull())
+        return child;
+    else
+        return CreateChild(name);
 }
 
 bool XMLElement::RemoveChild(const XMLElement& element)
@@ -337,6 +355,11 @@ bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 }
 
 bool XMLElement::SetIntVector2(const String& name, const IntVector2& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
+bool XMLElement::SetIntVector3(const String& name, const IntVector3& value)
 {
     return SetAttribute(name, value.ToString());
 }
@@ -764,6 +787,11 @@ IntRect XMLElement::GetIntRect(const String& name) const
 IntVector2 XMLElement::GetIntVector2(const String& name) const
 {
     return ToIntVector2(GetAttribute(name));
+}
+
+IntVector3 XMLElement::GetIntVector3(const String& name) const
+{
+    return ToIntVector3(GetAttribute(name));
 }
 
 Quaternion XMLElement::GetQuaternion(const String& name) const

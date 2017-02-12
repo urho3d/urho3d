@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,7 @@ static const char* typeNames[] =
     "Double",
     "StringVector",
     "Rect",
+    "IntVector3",
     0
 };
 
@@ -190,6 +191,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
+
+    case VAR_INTVECTOR3:
+        return *(reinterpret_cast<const IntVector3*>(&value_)) == *(reinterpret_cast<const IntVector3*>(&rhs.value_));
 
     case VAR_MATRIX3:
         return *(reinterpret_cast<const Matrix3*>(value_.ptr_)) == *(reinterpret_cast<const Matrix3*>(rhs.value_.ptr_));
@@ -332,6 +336,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntVector2(value);
         break;
 
+    case VAR_INTVECTOR3:
+        *this = ToIntVector3(value);
+        break;
+
     case VAR_PTR:
         // From string to RefCounted pointer not supported, set to null
         *this = (RefCounted*)0;
@@ -434,6 +442,9 @@ String Variant::ToString() const
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
 
+    case VAR_INTVECTOR3:
+        return (reinterpret_cast<const IntVector3*>(&value_))->ToString();
+
     case VAR_MATRIX3:
         return (reinterpret_cast<const Matrix3*>(value_.ptr_))->ToString();
 
@@ -523,6 +534,9 @@ bool Variant::IsZero() const
 
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
+
+    case VAR_INTVECTOR3:
+        return *reinterpret_cast<const IntVector3*>(&value_) == IntVector3::ZERO;
 
     case VAR_PTR:
         return *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) == (RefCounted*)0;
@@ -730,6 +744,11 @@ template <> const IntVector2& Variant::Get<const IntVector2&>() const
     return GetIntVector2();
 }
 
+template <> const IntVector3& Variant::Get<const IntVector3&>() const
+{
+    return GetIntVector3();
+}
+
 template <> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const
 {
     return GetBuffer();
@@ -828,6 +847,11 @@ template <> IntRect Variant::Get<IntRect>() const
 template <> IntVector2 Variant::Get<IntVector2>() const
 {
     return GetIntVector2();
+}
+
+template <> IntVector3 Variant::Get<IntVector3>() const
+{
+    return GetIntVector3();
 }
 
 template <> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const

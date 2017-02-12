@@ -85,11 +85,8 @@ void CreateHierarchyWindow()
     SubscribeToEvent(hierarchyList, "ItemClicked", "HandleHierarchyItemClick");
     SubscribeToEvent("DragDropTest", "HandleDragDropTest");
     SubscribeToEvent("DragDropFinish", "HandleDragDropFinish");
-    SubscribeToEvent(editorScene, "NodeAdded", "HandleNodeAdded");
-    SubscribeToEvent(editorScene, "NodeRemoved", "HandleNodeRemoved");
     SubscribeToEvent(editorScene, "ComponentAdded", "HandleComponentAdded");
     SubscribeToEvent(editorScene, "ComponentRemoved", "HandleComponentRemoved");
-    SubscribeToEvent(editorScene, "NodeNameChanged", "HandleNodeNameChanged");
     SubscribeToEvent(editorScene, "NodeEnabledChanged", "HandleNodeEnabledChanged");
     SubscribeToEvent(editorScene, "ComponentEnabledChanged", "HandleComponentEnabledChanged");
     SubscribeToEvent("TemporaryChanged", "HandleTemporaryChanged");
@@ -112,6 +109,8 @@ void ShowHierarchyWindow()
 
 void HideHierarchyWindow()
 {
+    if(viewportMode == VIEWPORT_COMPACT)
+        return;
     hierarchyWindow.visible = false;
 }
 
@@ -539,6 +538,23 @@ void SelectNode(Node@ node, bool multiselect)
     }
     else if (!multiselect)
         hierarchyList.ClearSelection();
+}
+
+void DeselectNode(Node@ node)
+{
+    if (node is null)
+    {
+        hierarchyList.ClearSelection();
+        return;
+    }
+
+    uint index = GetListIndex(node);
+    uint numItems = hierarchyList.numItems;
+
+    if (index < numItems)
+    {
+        hierarchyList.ToggleSelection(index);
+    }
 }
 
 void SelectComponent(Component@ component, bool multiselect)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
+#include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/VertexBuffer.h"
@@ -155,7 +156,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
         for (unsigned i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
         {
             Geometry* geometry = geometries_[i];
-            geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_,
+            geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_ / UI_VERTEX_SIZE,
                 (uiBatches_[i].vertexEnd_ - uiBatches_[i].vertexStart_) / UI_VERTEX_SIZE);
         }
     }
@@ -712,6 +713,22 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
 
             default:
                 break;
+            }
+        }
+        else
+        {
+            // If not SDF, set shader defines based on whether font texture is full RGB or just alpha
+            if (!material_)
+            {
+                Technique* tech = material->GetTechnique(0);
+                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                if (pass)
+                {
+                    if (texture && texture->GetFormat() == Graphics::GetAlphaFormat())
+                        pass->SetPixelShaderDefines("ALPHAMAP");
+                    else
+                        pass->SetPixelShaderDefines("");
+                }
             }
         }
     }

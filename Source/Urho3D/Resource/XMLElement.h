@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,6 +66,10 @@ public:
     XMLElement CreateChild(const String& name);
     /// Create a child element.
     XMLElement CreateChild(const char* name);
+    /// Return the first child element with name or create if does not exist.
+    XMLElement GetOrCreateChild(const String& name);
+    /// Return the first child element with name or create if does not exist.
+    XMLElement GetOrCreateChild(const char* name);
     /// Remove a child element. Return true if successful.
     bool RemoveChild(const XMLElement& element);
     /// Remove a child element by name. Return true if successful.
@@ -124,6 +128,8 @@ public:
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.
     bool SetIntVector2(const String& name, const IntVector2& value);
+    /// Set an IntVector3 attribute.
+    bool SetIntVector3(const String& name, const IntVector3& value);
     /// Set a Rect attribute.
     bool SetRect(const String& name, const Rect& value);
     /// Set a quaternion attribute.
@@ -227,6 +233,8 @@ public:
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.
     IntVector2 GetIntVector2(const String& name) const;
+    /// Return an IntVector3 attribute, or default if missing.
+    IntVector3 GetIntVector3(const String& name) const;
     /// Return a Rect attribute, or default if missing.
     Rect GetRect(const String& name) const;
     /// Return a quaternion attribute, or default if missing.

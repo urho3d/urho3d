@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -412,17 +412,17 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
         return 0;
 
     asIScriptContext* context = script_->GetScriptFileContext();
-    asIObjectType* type = 0;
+    asITypeInfo* type = 0;
     if (useInterface)
     {
-        asIObjectType* interfaceType = scriptModule_->GetObjectTypeByDecl(className.CString());
+        asITypeInfo* interfaceType = scriptModule_->GetTypeInfoByDecl(className.CString());
 
         if (!interfaceType)
             return 0;
 
         for (unsigned i = 0; i < scriptModule_->GetObjectTypeCount(); ++i)
         {
-            asIObjectType* t = scriptModule_->GetObjectTypeByIndex(i);
+            asITypeInfo* t = scriptModule_->GetObjectTypeByIndex(i);
             if (t->Implements(interfaceType))
             {
                 type = t;
@@ -432,7 +432,7 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     }
     else
     {
-        type = scriptModule_->GetObjectTypeByDecl(className.CString());
+        type = scriptModule_->GetTypeInfoByDecl(className.CString());
     }
 
     if (!type)
@@ -440,12 +440,12 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
 
     // Ensure that the type implements the "ScriptObject" interface, so it can be returned to script properly
     bool found;
-    HashMap<asIObjectType*, bool>::ConstIterator i = validClasses_.Find(type);
+    HashMap<asITypeInfo*, bool>::ConstIterator i = validClasses_.Find(type);
     if (i != validClasses_.End())
         found = i->second_;
     else
     {
-        asIObjectType* scriptObjectType = scriptModule_->GetObjectTypeByDecl("ScriptObject");
+        asITypeInfo* scriptObjectType = scriptModule_->GetTypeInfoByDecl("ScriptObject");
 
         found = type->Implements(scriptObjectType);
         validClasses_[type] = found;
@@ -511,11 +511,11 @@ asIScriptFunction* ScriptFile::GetMethod(asIScriptObject* object, const String& 
     if (declaration.Find('(') == String::NPOS)
         declaration = "void " + declaration + "()";
 
-    asIObjectType* type = object->GetObjectType();
+    asITypeInfo* type = object->GetObjectType();
     if (!type)
         return 0;
 
-    HashMap<asIObjectType*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
+    HashMap<asITypeInfo*, HashMap<String, asIScriptFunction*> >::ConstIterator i = methods_.Find(type);
     if (i != methods_.End())
     {
         HashMap<String, asIScriptFunction*>::ConstIterator j = i->second_.Find(declaration);
@@ -779,6 +779,10 @@ void ScriptFile::SetParameters(asIScriptContext* context, asIScriptFunction* fun
 
                 case VAR_INTVECTOR2:
                     context->SetArgObject(i, (void*)&parameters[i].GetIntVector2());
+                    break;
+
+                case VAR_INTVECTOR3:
+                    context->SetArgObject(i, (void*)&parameters[i].GetIntVector3());
                     break;
 
                 case VAR_COLOR:

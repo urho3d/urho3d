@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ set (SOURCE_FILES
     src/base/ftbase.c
     src/base/ftbbox.c
     src/base/ftbitmap.c
+    src/base/ftfntfmt.c
     src/base/ftfstype.c
     src/base/ftgasp.c
     src/base/ftglyph.c

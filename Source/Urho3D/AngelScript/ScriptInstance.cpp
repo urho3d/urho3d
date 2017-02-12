@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -388,7 +388,7 @@ bool ScriptInstance::IsA(const String& className) const
     if (scriptObject_)
     {
         // Start immediately at the first base class because we already checked the early out
-        asIObjectType* currentType = scriptObject_->GetObjectType()->GetBaseType();
+        asITypeInfo* currentType = scriptObject_->GetObjectType()->GetBaseType();
         while (currentType)
         {
             if (className == currentType->GetName())

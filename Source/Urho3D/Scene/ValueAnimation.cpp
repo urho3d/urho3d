@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -235,10 +235,10 @@ void ValueAnimation::SetValueType(VariantType valueType)
         (valueType_ == VAR_FLOAT) || (valueType_ == VAR_VECTOR2) || (valueType_ == VAR_VECTOR3) || (valueType_ == VAR_VECTOR4) ||
         (valueType_ == VAR_QUATERNION) || (valueType_ == VAR_COLOR);
 
-    if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2))
+    if ((valueType_ == VAR_INTRECT) || (valueType_ == VAR_INTVECTOR2) || (valueType_ == VAR_INTVECTOR3))
     {
         interpolatable_ = true;
-        // Force linear interpolation for IntRect and IntVector2
+        // Force linear interpolation for IntRect, IntVector2 and IntVector3
         if (interpolationMethod_ == IM_SPLINE)
             interpolationMethod_ = IM_LINEAR;
     }
@@ -259,8 +259,8 @@ void ValueAnimation::SetInterpolationMethod(InterpMethod method)
     if (method == interpolationMethod_)
         return;
 
-    // Force linear interpolation for IntRect and IntVector2
-    if (method == IM_SPLINE && (valueType_ == VAR_INTRECT || valueType_ == VAR_INTVECTOR2))
+    // Force linear interpolation for IntRect, IntVector2 and IntVector3
+    if (method == IM_SPLINE && (valueType_ == VAR_INTRECT || valueType_ == VAR_INTVECTOR2 || valueType_ == VAR_INTVECTOR3))
         method = IM_LINEAR;
 
     interpolationMethod_ = method;
@@ -417,6 +417,14 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
             const IntVector2& v1 = value1.GetIntVector2();
             const IntVector2& v2 = value2.GetIntVector2();
             return IntVector2((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t));
+        }
+
+    case VAR_INTVECTOR3:
+        {
+            float s = 1.0f - t;
+            const IntVector3& v1 = value1.GetIntVector3();
+            const IntVector3& v2 = value2.GetIntVector3();
+            return IntVector3((int)(v1.x_ * s + v2.x_ * t), (int)(v1.y_ * s + v2.y_ * t), (int)(v1.z_ * s + v2.z_ * t));
         }
 
     case VAR_DOUBLE:

@@ -8,6 +8,7 @@ unsigned ToUInt(const String source, int base = 10);
 Color ToColor(const String source);
 IntRect ToIntRect(const String source);
 IntVector2 ToIntVector2(const String source);
+IntVector3 ToIntVector3(const String source);
 Quaternion ToQuaternion(const String source);
 Rect ToRect(const String source);
 Vector2 ToVector2(const String source);

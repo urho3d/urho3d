@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -334,7 +334,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     Vector<Pair<String, unsigned> > sortedTypes;
     for (unsigned i = 0; i < types; ++i)
     {
-        asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(i);
+        asITypeInfo* type = scriptEngine_->GetObjectTypeByIndex(i);
         if (type)
         {
             String typeName(type->GetName());
@@ -357,7 +357,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
         for (unsigned i = 0; i < sortedTypes.Size(); ++i)
         {
-            asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
+            asITypeInfo* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
             if (type)
             {
                 String typeName(type->GetName());
@@ -372,7 +372,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
 
     for (unsigned i = 0; i < sortedTypes.Size(); ++i)
     {
-        asIObjectType* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
+        asITypeInfo* type = scriptEngine_->GetObjectTypeByIndex(sortedTypes[i].second_);
         if (type)
         {
             String typeName(type->GetName());
@@ -534,19 +534,18 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     unsigned enums = scriptEngine_->GetEnumCount();
     Vector<Pair<String, unsigned> > sortedEnums;
     for (unsigned i = 0; i < enums; ++i)
-    {
-        int typeId;
-        sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i, &typeId)), i));
-    }
+        sortedEnums.Push(MakePair(String(scriptEngine_->GetEnumByIndex(i)->GetName()), i));
     Sort(sortedEnums.Begin(), sortedEnums.End());
 
     for (unsigned i = 0; i < sortedEnums.Size(); ++i)
     {
-        int typeId = 0;
+        asITypeInfo* enumType = scriptEngine_->GetEnumByIndex(sortedEnums[i].second_);
+        int typeId = enumType->GetTypeId();
+
         if (mode == DOXYGEN)
-            Log::WriteRaw("\n### " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n\n");
+            Log::WriteRaw("\n### " + String(enumType->GetName()) + "\n\n");
         else if (mode == C_HEADER)
-            Log::WriteRaw("\nenum " + String(scriptEngine_->GetEnumByIndex(sortedEnums[i].second_, &typeId)) + "\n{\n");
+            Log::WriteRaw("\nenum " + String(enumType->GetName()) + "\n{\n");
 
         for (unsigned j = 0; j < (unsigned)scriptEngine_->GetEnumValueCount(typeId); ++j)
         {

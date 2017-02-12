@@ -543,11 +543,6 @@ void CreateMenuBar()
     BorderImage@ spacer = BorderImage("MenuBarSpacer");
     uiMenuBar.AddChild(spacer);
     spacer.style = "EditorMenuBar";
-
-    BorderImage@ logo = BorderImage("Logo");
-    logo.texture = cache.GetResource("Texture2D", "Textures/Logo.png");
-    logo.SetFixedWidth(64);
-    uiMenuBar.AddChild(logo);
 }
 
 bool Exit()
@@ -1181,6 +1176,7 @@ void HandleOpenSceneFile(StringHash eventType, VariantMap& eventData)
 {
     CloseFileSelector(uiSceneFilter, uiScenePath);
     LoadScene(ExtractFileName(eventData));
+    SendEvent(EDITOR_EVENT_SCENE_LOADED);
 }
 
 void HandleSaveSceneFile(StringHash eventType, VariantMap& eventData)

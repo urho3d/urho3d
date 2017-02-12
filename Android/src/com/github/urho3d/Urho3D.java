@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,7 @@ public class Urho3D extends SDLActivity {
                 try {
                     final AssetManager assetManager = getContext().getAssets();
                     HashMap<String, ArrayList<String>> scripts = new HashMap<String, ArrayList<String>>(2) {{
-                        put("AngleScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
+                        put("AngelScript", new ArrayList<String>(Arrays.asList(assetManager.list("Data/Scripts"))));
                         put("Lua", new ArrayList<String>(Arrays.asList(assetManager.list("Data/LuaScripts"))));
                     }};
                     startActivityForResult(new Intent(this, ScriptPicker.class).putExtra(SCRIPTS, scripts), OBTAINING_SCRIPT);
