@@ -104,7 +104,7 @@ matrix:
     # env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 before_script:
   - rake ci_timer
-  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
   - if [ $RELEASE_TAG ] || ([ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]); then if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then export SITE_UPDATE=1; fi; if [ "$CC" == "gcc" ] && ([ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
@@ -133,8 +133,13 @@ platform:
   - x64
 clone_depth: 50
 cache:
+  # AppVeyor seems to restore caches based on the job ordering alone, it does not use the env-vars as the key like Travis
+  # Therefore, we are forced to list out all the cache items for our master CI and MinGW CI builds here
   - Build
   - mingw-Build
+  # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
+  - C:\tools\mingw32 -> .appveyor.yml
+  - C:\tools\mingw64 -> .appveyor.yml
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -171,7 +176,7 @@ install:
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
-  - curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
+  - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
 before_build:
   - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"

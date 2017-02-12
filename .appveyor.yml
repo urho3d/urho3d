@@ -26,8 +26,13 @@ platform:
   - x64
 clone_depth: 50
 cache:
+  # AppVeyor seems to restore caches based on the job ordering alone, it does not use the env-vars as the key like Travis
+  # Therefore, we are forced to list out all the cache items for our master CI and MinGW CI builds here
   - Build
   - mingw-Build
+  # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
+  - C:\tools\mingw32 -> .appveyor.yml
+  - C:\tools\mingw64 -> .appveyor.yml
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -62,7 +67,7 @@ install:
         }
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
 before_build:
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
+  - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) }
   - rake ci_setup_cache
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
