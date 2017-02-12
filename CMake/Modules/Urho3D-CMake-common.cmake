@@ -701,7 +701,9 @@ else ()
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -static-libgcc -fno-keep-inline-dllexport")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++ -fno-keep-inline-dllexport")
             if (NOT URHO3D_64BIT)
-                # Prevent auto-vectorize optimization when using -O3, unless stack realign is being enforced globally
+                set (CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+                set (CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+                # Prevent auto-vectorize optimization when using -O2, unless stack realign is being enforced globally
                 if (URHO3D_SSE)
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
@@ -1830,11 +1832,11 @@ elseif (WEB)
         endif ()
     endif ()
 else ()
-    # Ensure the output directory exist before creating the symlinks
-    file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # Create symbolic links in the build tree
     foreach (I Autoload CoreData Data)
-        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I})
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I} AND EXISTS ${CMAKE_SOURCE_DIR}/bin/${I})
+            # Ensure the output directory exist before creating the symlinks
+            file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
             create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
         endif ()
     endforeach ()

@@ -282,6 +282,9 @@ public:
     /// Return multisample mode (1 = no multisampling.)
     int GetMultiSample() const { return multiSample_; }
 
+    /// Return window size in pixels.
+    IntVector2 GetSize() const { return IntVector2(width_, height_); }
+
     /// Return whether window is fullscreen.
     bool GetFullscreen() const { return fullscreen_; }
 

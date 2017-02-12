@@ -2576,6 +2576,7 @@ Methods:
 - int GetWidth() const
 - int GetHeight() const
 - int GetMultiSample() const
+- IntVector2 GetSize() const
 - bool GetFullscreen() const
 - bool GetResizable() const
 - bool GetBorderless() const
@@ -2628,6 +2629,7 @@ Properties:
 - int width (readonly)
 - int height (readonly)
 - int multiSample (readonly)
+- IntVector2 size (readonly)
 - bool fullscreen (readonly)
 - bool resizable (readonly)
 - bool borderless (readonly)
@@ -7244,6 +7246,8 @@ Methods:
 - Vector2* new()
 - Vector2(const Vector2& vector) (GC)
 - Vector2* new(const Vector2& vector)
+- Vector2(const IntVector2& vector) (GC)
+- Vector2* new(const IntVector2& vector)
 - Vector2(float x, float y) (GC)
 - Vector2* new(float x, float y)
 - void delete()
@@ -7295,6 +7299,8 @@ Methods:
 - Vector3* new(const Vector2& vector, float z)
 - Vector3(const Vector2& vector) (GC)
 - Vector3* new(const Vector2& vector)
+- Vector3(const IntVector3& vector) (GC)
+- Vector3* new(const IntVector3& vector)
 - Vector3(float x, float y, float z) (GC)
 - Vector3* new(float x, float y, float z)
 - Vector3(float x, float y) (GC)

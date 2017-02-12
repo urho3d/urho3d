@@ -25,6 +25,9 @@ platform:
   - x86
   - x64
 clone_depth: 50
+cache:
+  - Build
+  - mingw-Build
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -57,16 +60,17 @@ install:
         {
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
-build_script:
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0"
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
+before_build:
+  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
+  - rake ci_setup_cache
+build_script:
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
   - rake ci_timer
+after_build: rake ci_teardown_cache
 test: off
 artifacts:
-  - path: Build\*.zip
+  - path: .\*.zip
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:

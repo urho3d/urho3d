@@ -26,6 +26,7 @@ Urho3D development, contributions and bugfixes by:
 - Loic Blot
 - Danny Boisvert
 - Sergey Bosko
+- Lisandro Bruzzo
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
@@ -64,6 +65,7 @@ Urho3D development, contributions and bugfixes by:
 - Pranjal Raihan
 - Mariusz Richtscheid
 - Nick Royer
+- Jonathan Sandusky
 - Miika Santala
 - Anatoly Sennov
 - Matan Shukry
