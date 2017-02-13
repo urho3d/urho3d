@@ -160,7 +160,7 @@ Urho3D uses the following third-party libraries:
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
-- libcpuid 0.2.2 (https://github.com/anrieff/libcpuid)
+- libcpuid 0.4.0 (https://github.com/anrieff/libcpuid)
 - Lua 5.1 (https://www.lua.org)
 - LuaJIT 2.1.0+ (http://www.luajit.org)
 - LZ4 r131 (https://github.com/Cyan4973/lz4)
