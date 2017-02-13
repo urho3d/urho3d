@@ -209,7 +209,6 @@ protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
 
-private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
     /// Send begin contact events.
