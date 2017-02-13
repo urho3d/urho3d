@@ -561,7 +561,9 @@ void RigidBody2D::OnSceneSet(Scene* scene)
 {
     if (scene)
     {
-        physicsWorld_ = scene->GetOrCreateComponent<PhysicsWorld2D>();
+        physicsWorld_ = scene->GetDerivedComponent<PhysicsWorld2D>();
+        if (!physicsWorld_)
+            physicsWorld_ = scene->CreateComponent<PhysicsWorld2D>();
 
         CreateBody();
         physicsWorld_->AddRigidBody(this);
