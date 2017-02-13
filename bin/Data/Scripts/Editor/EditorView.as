@@ -1747,8 +1747,26 @@ void HandlePostRenderUpdate()
 
     if (renderingDebug)
         renderer.DrawDebugGeometry(false);
+
     if (physicsDebug && editorScene.physicsWorld !is null)
         editorScene.physicsWorld.DrawDebugGeometry(true);
+
+    if (physicsDebug && editorScene.physicsWorld2D !is null)
+    {
+        bool needDraw = true;
+        for (uint i = 0; i < selectedComponents.length; ++i)
+        {
+            if (cast<PhysicsWorld2D>(selectedComponents[i]) !is null)
+            {
+                needDraw = false; // Already drawed
+                break;
+            }
+        }
+
+        if (needDraw)
+            physicsWorld2D.DrawDebugGeometry();
+    }
+
     if (octreeDebug && editorScene.octree !is null)
         editorScene.octree.DrawDebugGeometry(true);
 
