@@ -23,6 +23,8 @@
 # Define target name
 set (TARGET_NAME LibCpuId)
 
+add_definitions (-DVERSION="0.4.0")
+
 # Define generated source files
 if (MSVC AND URHO3D_64BIT)
     enable_language (ASM_MASM)
