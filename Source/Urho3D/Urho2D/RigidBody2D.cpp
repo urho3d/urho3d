@@ -175,7 +175,6 @@ void RigidBody2D::SetUseFixtureMass(bool useFixtureMass)
 
     if (body_)
     {
-        body_->m_useFixtureMass = useFixtureMass;
         if (useFixtureMass_)
             body_->ResetMassData();
         else
@@ -349,6 +348,12 @@ void RigidBody2D::ApplyLinearImpulse(const Vector2& impulse, const Vector2& poin
 {
     if (body_ && impulse != Vector2::ZERO)
         body_->ApplyLinearImpulse(ToB2Vec2(impulse), ToB2Vec2(point), wake);
+}
+
+void RigidBody2D::ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake)
+{
+    if (body_ && impulse != Vector2::ZERO)
+        body_->ApplyLinearImpulseToCenter(ToB2Vec2(impulse), wake);
 }
 
 void RigidBody2D::ApplyAngularImpulse(float impulse, bool wake)

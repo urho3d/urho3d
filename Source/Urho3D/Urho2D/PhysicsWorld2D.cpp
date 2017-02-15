@@ -176,6 +176,13 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
     }
 }
 
+extern URHO3D_API const float PIXEL_SIZE;
+
+void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
+{
+    DrawSolidCircle(p, size * 0.5f * PIXEL_SIZE, b2Vec2(), color);
+}
+
 void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 {
     if (!debugRenderer_)

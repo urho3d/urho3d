@@ -16,12 +16,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
-#include <Box2D/Collision/b2DynamicTree.h>
-// Urho3D: replaced with cstring include for memcpy to work on Android
-// #include <memory.h>
-#include <cstring>
+#include "Box2D/Collision/b2DynamicTree.h"
+#include <string.h>
 
 b2DynamicTree::b2DynamicTree()
 {
@@ -656,6 +652,7 @@ void b2DynamicTree::ValidateMetrics(int32 index) const
 
 void b2DynamicTree::Validate() const
 {
+#if defined(b2DEBUG)
 	ValidateStructure(m_root);
 	ValidateMetrics(m_root);
 
@@ -671,6 +668,7 @@ void b2DynamicTree::Validate() const
 	b2Assert(GetHeight() == ComputeHeight());
 
 	b2Assert(m_nodeCount + freeCount == m_nodeCapacity);
+#endif
 }
 
 int32 b2DynamicTree::GetMaxBalance() const
