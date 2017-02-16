@@ -399,7 +399,13 @@ class TerrainEditor
         uint brushImageHeight = scaledSelectedBrushImage.height;
 
         updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
-        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
+        if (updateChanges.offset.x < 0) updateChanges.offset.x = 0;
+        if (updateChanges.offset.y < 0) updateChanges.offset.y = 0;
+
+        IntRect boundsRect = IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight);
+        boundsRect = ClipIntRectToHeightmapBounds(terrainImage, boundsRect);
+
+        updateChanges.oldImage = terrainImage.GetSubimage(boundsRect);
 
         // lower or raise (respectively), multiply this by the brush opacity
         float opacity = brushOpacitySlider.value / 25;
@@ -435,7 +441,13 @@ class TerrainEditor
         uint brushImageHeight = scaledSelectedBrushImage.height;
 
         updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
-        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
+        if (updateChanges.offset.x < 0) updateChanges.offset.x = 0;
+        if (updateChanges.offset.y < 0) updateChanges.offset.y = 0;
+
+        IntRect boundsRect = IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight);
+        boundsRect = ClipIntRectToHeightmapBounds(terrainImage, boundsRect);
+
+        updateChanges.oldImage = terrainImage.GetSubimage(boundsRect);
 
         // Iterate over the entire brush image
         for (int y = 0; y < brushImageHeight; ++y)
@@ -482,7 +494,7 @@ class TerrainEditor
             }
         }
 
-        updateChanges.newImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
+        updateChanges.newImage = terrainImage.GetSubimage(boundsRect);
     }
 
     private void UpdateTerrainSetHeight(Image@ terrainImage, IntVector2 position, TerrainEditorUpdateChanges@ updateChanges)
@@ -491,7 +503,13 @@ class TerrainEditor
         uint brushImageHeight = scaledSelectedBrushImage.height;
 
         updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
-        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
+        if (updateChanges.offset.x < 0) updateChanges.offset.x = 0;
+        if (updateChanges.offset.y < 0) updateChanges.offset.y = 0;
+
+        IntRect boundsRect = IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight);
+        boundsRect = ClipIntRectToHeightmapBounds(terrainImage, boundsRect);
+
+        updateChanges.oldImage = terrainImage.GetSubimage(boundsRect);
 
         float targetHeight = brushHeightSlider.value / 25;
 
@@ -516,7 +534,7 @@ class TerrainEditor
             }
         }
 
-        updateChanges.newImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
+        updateChanges.newImage = terrainImage.GetSubimage(boundsRect);
     }
 
     private void UpdateTerrainSetConstantHeight(Image@ terrainImage, float height)
@@ -531,5 +549,21 @@ class TerrainEditor
                 terrainImage.SetPixel(x, y, newColor);
             }
         }
+    }
+
+    private IntRect ClipIntRectToHeightmapBounds(Image@ terrainImage, IntRect intRect) {
+        if (intRect.left > terrainImage.width)
+            intRect.left = terrainImage.width;
+
+        if (intRect.right > terrainImage.width)
+            intRect.right = terrainImage.width;
+
+        if (intRect.top > terrainImage.height)
+            intRect.top = terrainImage.height;
+
+        if (intRect.bottom > terrainImage.height)
+            intRect.bottom = terrainImage.height;
+
+        return intRect;
     }
 }
