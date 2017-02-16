@@ -105,6 +105,8 @@ public:
     virtual void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
     /// Draw a transform. Choose your own length scale.
     virtual void DrawTransform(const b2Transform& xf);
+    /// Draw a point.
+    virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
 
     /// Step the simulation forward.
     void Update(float timeStep);

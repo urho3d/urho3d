@@ -346,6 +346,7 @@ static void RegisterRigidBody2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyForceToCenter(const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyForceToCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyTorque(float torque, bool)", asMETHOD(RigidBody2D, ApplyTorque), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyLinearImpulse(const Vector2&in, const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyLinearImpulse), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RigidBody2D", "void ApplyLinearImpulseToCenter(const Vector2&in, bool)", asMETHOD(RigidBody2D, ApplyLinearImpulseToCenter), asCALL_THISCALL);
     engine->RegisterObjectMethod("RigidBody2D", "void ApplyAngularImpulse(float, bool)", asMETHOD(RigidBody2D, ApplyAngularImpulse), asCALL_THISCALL);
 }
 

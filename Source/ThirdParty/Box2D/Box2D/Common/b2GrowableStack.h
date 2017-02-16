@@ -16,15 +16,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
-
-#include <cstring>
 #ifndef B2_GROWABLE_STACK_H
 #define B2_GROWABLE_STACK_H
-#include <Box2D/Common/b2Settings.h>
-// Urho3D: replaced with cstring include for memcpy to work on Android
-// #include <memory.h>
-#include <cstring>
+#include "Box2D/Common/b2Settings.h"
+#include <string.h>
 
 /// This is a growable LIFO stack with an initial capacity of N.
 /// If the stack size exceeds the initial capacity, the heap is used

@@ -19,15 +19,23 @@
 #ifndef B2_DRAW_H
 #define B2_DRAW_H
 
-#include <Box2D/Common/b2Math.h>
+#include "Box2D/Common/b2Math.h"
 
 /// Color for debug drawing. Each value has the range [0,1].
 struct b2Color
 {
 	b2Color() {}
-	b2Color(float32 r, float32 g, float32 b) : r(r), g(g), b(b) {}
-	void Set(float32 ri, float32 gi, float32 bi) { r = ri; g = gi; b = bi; }
-	float32 r, g, b;
+	b2Color(float32 rIn, float32 gIn, float32 bIn, float32 aIn = 1.0f)
+	{
+		r = rIn; g = gIn; b = bIn; a = aIn;
+	}
+
+	void Set(float32 rIn, float32 gIn, float32 bIn, float32 aIn = 1.0f)
+	{
+		r = rIn; g = gIn; b = bIn; a = aIn;
+	}
+
+	float32 r, g, b, a;
 };
 
 /// Implement and register this class with a b2World to provide debug drawing of physics
@@ -78,6 +86,9 @@ public:
 	/// Draw a transform. Choose your own length scale.
 	/// @param xf a transform.
 	virtual void DrawTransform(const b2Transform& xf) = 0;
+
+	/// Draw a point.
+	virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color) = 0;
 
 protected:
 	uint32 m_drawFlags;

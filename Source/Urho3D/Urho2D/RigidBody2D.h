@@ -93,6 +93,8 @@ public:
     void ApplyTorque(float torque, bool wake);
     /// Apply linear impulse.
     void ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake);
+    /// Apply linear impulse to center.
+    void ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake);
     /// Apply angular impulse.
     void ApplyAngularImpulse(float impulse, bool wake);
 
