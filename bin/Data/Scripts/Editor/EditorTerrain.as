@@ -6,6 +6,12 @@ const uint TERRAIN_EDITMODE_RAISELOWERHEIGHT = 0, TERRAIN_EDITMODE_SETHEIGHT = 1
 
 funcdef bool TerrainEditorShowCallback();
 
+class TerrainEditorUpdateChanges {
+    IntVector2 offset;
+    Image@ oldImage;
+    Image@ newImage;
+}
+
 class TerrainEditor
 {
     private bool dirty = true;
@@ -175,21 +181,26 @@ class TerrainEditor
         if (selectedBrushImage is null || scaledSelectedBrushImage is null)
             return;
 
+        TerrainEditorUpdateChanges@ updateChanges = TerrainEditorUpdateChanges();
+
         switch (editMode)
         {
         case TERRAIN_EDITMODE_RAISELOWERHEIGHT:
-            UpdateTerrainRaiseLower(terrainImage, position);
+            UpdateTerrainRaiseLower(terrainImage, position, updateChanges);
             break;
         case TERRAIN_EDITMODE_SETHEIGHT:
-            UpdateTerrainSetHeight(terrainImage, position);
+            UpdateTerrainSetHeight(terrainImage, position, updateChanges);
             break;
         case TERRAIN_EDITMODE_SMOOTHHEIGHT:
-            UpdateTerrainSmooth(terrainImage, position);
+            UpdateTerrainSmooth(terrainImage, position, updateChanges);
             break;
         }
 
-        // Apply our changes
         terrainComponent.ApplyHeightMap();
+
+        ModifyTerrainAction action;
+        action.Define(terrainComponent, updateChanges.offset, updateChanges.oldImage, updateChanges.newImage);
+        SaveEditAction(action);
     }
 
     private uint NearestPowerOf2(uint value) {
@@ -382,10 +393,13 @@ class TerrainEditor
         scaledSelectedBrushImage.Resize(int(selectedBrushImage.width * size), int(selectedBrushImage.height * size));
     }
 
-    private void UpdateTerrainRaiseLower(Image@ terrainImage, IntVector2 position)
+    private void UpdateTerrainRaiseLower(Image@ terrainImage, IntVector2 position, TerrainEditorUpdateChanges@ updateChanges)
     {
         uint brushImageWidth = scaledSelectedBrushImage.width;
         uint brushImageHeight = scaledSelectedBrushImage.height;
+
+        updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
+        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
 
         // lower or raise (respectively), multiply this by the brush opacity
         float opacity = brushOpacitySlider.value / 25;
@@ -409,13 +423,19 @@ class TerrainEditor
         }
 
         // Smooth the terrain a bit
-        UpdateTerrainSmooth(terrainImage, position);
+        TerrainEditorUpdateChanges@ smoothUpdateChanges = TerrainEditorUpdateChanges();
+        UpdateTerrainSmooth(terrainImage, position, smoothUpdateChanges);
+
+        updateChanges.newImage = smoothUpdateChanges.newImage;
     }
 
-    private void UpdateTerrainSmooth(Image@ terrainImage, IntVector2 position)
+    private void UpdateTerrainSmooth(Image@ terrainImage, IntVector2 position, TerrainEditorUpdateChanges@ updateChanges)
     {
         uint brushImageWidth = scaledSelectedBrushImage.width;
         uint brushImageHeight = scaledSelectedBrushImage.height;
+
+        updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
+        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
 
         // Iterate over the entire brush image
         for (int y = 0; y < brushImageHeight; ++y)
@@ -461,12 +481,17 @@ class TerrainEditor
                 terrainImage.SetPixel(position.x + x - (brushImageWidth / 2), position.y + y - (brushImageHeight / 2), avgColor);
             }
         }
+
+        updateChanges.newImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
     }
 
-    private void UpdateTerrainSetHeight(Image@ terrainImage, IntVector2 position)
+    private void UpdateTerrainSetHeight(Image@ terrainImage, IntVector2 position, TerrainEditorUpdateChanges@ updateChanges)
     {
         uint brushImageWidth = scaledSelectedBrushImage.width;
         uint brushImageHeight = scaledSelectedBrushImage.height;
+
+        updateChanges.offset = IntVector2(position.x - (brushImageWidth / 2), position.y - (brushImageHeight / 2));
+        updateChanges.oldImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
 
         float targetHeight = brushHeightSlider.value / 25;
 
@@ -490,6 +515,8 @@ class TerrainEditor
                 terrainImage.SetPixel(pos.x, pos.y, newColor);
             }
         }
+
+        updateChanges.newImage = terrainImage.GetSubimage(IntRect(updateChanges.offset.x, updateChanges.offset.y, updateChanges.offset.x + brushImageWidth, updateChanges.offset.y + brushImageHeight));
     }
 
     private void UpdateTerrainSetConstantHeight(Image@ terrainImage, float height)

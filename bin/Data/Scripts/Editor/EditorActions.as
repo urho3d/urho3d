@@ -1088,3 +1088,65 @@ class AssignModelAction : EditAction
     }
 
 }
+
+class ModifyTerrainAction : EditAction
+{
+    WeakHandle terrain;
+    IntVector2 offset;
+    VectorBuffer compressedOldBuffer;
+    VectorBuffer compressedNewBuffer;
+
+    void Define(Terrain@ terrain_, IntVector2 offset_, Image@ oldImage_, Image@ newImage_)
+    {
+        terrain = terrain_;
+        offset = offset_;
+        VectorBuffer uncompressedOldBuffer;
+        VectorBuffer uncompressedNewBuffer;
+        oldImage_.Save(uncompressedOldBuffer);
+        newImage_.Save(uncompressedNewBuffer);
+        compressedOldBuffer = CompressVectorBuffer(uncompressedOldBuffer);
+        compressedNewBuffer = CompressVectorBuffer(uncompressedNewBuffer);
+    }
+
+    void Undo()
+    {
+        Terrain@ terrain_ = terrain.Get();
+        if (terrain_ is null)
+            return;
+
+        VectorBuffer uncompressedOldBuffer = DecompressVectorBuffer(compressedOldBuffer);
+        Image oldImage;
+        oldImage.Load(uncompressedOldBuffer);
+
+        for (int y = 0; y < oldImage.height; ++y)
+        {
+            for (int x = 0; x < oldImage.width; ++x)
+            {
+                terrain_.heightMap.SetPixel(offset.x + x, offset.y + y, oldImage.GetPixel(x, y));
+            }
+        }
+
+        terrain_.ApplyHeightMap();
+    }
+
+    void Redo()
+    {
+        Terrain@ terrain_ = terrain.Get();
+        if (terrain_ is null)
+            return;
+
+        VectorBuffer uncompressedNewBuffer = DecompressVectorBuffer(compressedNewBuffer);
+        Image newImage;
+        newImage.Load(uncompressedNewBuffer);
+
+        for (int y = 0; y < newImage.height; ++y)
+        {
+            for (int x = 0; x < newImage.width; ++x)
+            {
+                terrain_.heightMap.SetPixel(offset.x + x, offset.y + y, newImage.GetPixel(x, y));
+            }
+        }
+
+        terrain_.ApplyHeightMap();
+    }
+}
