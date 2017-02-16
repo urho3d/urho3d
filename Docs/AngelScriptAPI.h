@@ -9067,6 +9067,7 @@ void ApplyAttributes();
 void ApplyForce(const Vector2&, const Vector2&, bool);
 void ApplyForceToCenter(const Vector2&, bool);
 void ApplyLinearImpulse(const Vector2&, const Vector2&, bool);
+void ApplyLinearImpulseToCenter(const Vector2&, bool);
 void ApplyTorque(float, bool);
 void DrawDebugGeometry(DebugRenderer, bool);
 Variant GetAttribute(const String&) const;
