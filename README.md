@@ -153,7 +153,7 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 Urho3D uses the following third-party libraries:
 - AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
 - Boost 1.61.0 (http://www.boost.org) - only used for AngelScript generic bindings
-- Box2D 2.3.0 (http://box2d.org)
+- Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.83.6 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
 - FreeType 2.7.1 (https://www.freetype.org)
