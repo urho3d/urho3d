@@ -675,6 +675,8 @@ SET( zlib_SRCS
 SOURCE_GROUP( zlib FILES ${zlib_SRCS})
 
 SET ( openddl_parser_SRCS
+  contrib/openddlparser/code/OpenDDLExport.cpp 
+  contrib/openddlparser/code/OpenDDLCommon.cpp
   contrib/openddlparser/code/OpenDDLParser.cpp
   contrib/openddlparser/code/DDLNode.cpp
   contrib/openddlparser/code/Value.cpp
@@ -683,6 +685,7 @@ SET ( openddl_parser_SRCS
   contrib/openddlparser/include/openddlparser/OpenDDLCommon.h
   contrib/openddlparser/include/openddlparser/DDLNode.h
   contrib/openddlparser/include/openddlparser/Value.h
+  contrib/openddlparser/include/openddlparser/OpenDDLExport.h
 )
 SOURCE_GROUP( openddl_parser FILES ${openddl_parser_SRCS})
 

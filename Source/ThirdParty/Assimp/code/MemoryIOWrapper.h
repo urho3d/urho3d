@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file MemoryIOWrapper.h
  *  Handy IOStream/IOSystem implemetation to read directly from a memory buffer */
 #ifndef AI_MEMORYIOSTREAM_H_INC

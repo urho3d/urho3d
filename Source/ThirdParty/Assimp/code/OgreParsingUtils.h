@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef AI_OGREPARSINGUTILS_H_INC
 #define AI_OGREPARSINGUTILS_H_INC
 

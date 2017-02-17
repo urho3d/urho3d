@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /**  @file  qnan.h
  *   @brief Some utilities for our dealings with qnans.
  *
