@@ -55,6 +55,7 @@ Urho3D development, contributions and bugfixes by:
 - Nathanial Lydick
 - Xavier Maupeu
 - Jonne Nauha
+- Huy Nguyen
 - Paul Noome
 - David Palacios
 - Alex Parlett
@@ -167,7 +168,7 @@ Urho3D uses the following third-party libraries:
 - MojoShader (https://icculus.org/mojoshader)
 - Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
 - nanodbc 2.12.4 (https://lexicalunit.github.io/nanodbc)
-- Open Asset Import Library (http://assimp.sourceforge.net)
+- Open Asset Import Library 3.2 (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
 - rapidjson 0.11 (https://code.google.com/p/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
