@@ -12,6 +12,54 @@ class TerrainEditorUpdateChanges {
     Image@ newImage;
 }
 
+class TerrainEditorBrushVisualizer
+{
+    Node@ node;
+    CustomGeometry@ customGeometry;
+    private bool addedToOctree = false;
+
+    void Create()
+    {
+        node = Node();
+        customGeometry = node.CreateComponent("CustomGeometry");
+        customGeometry.numGeometries = 1;
+        customGeometry.material = cache.GetResource("Material", "Materials/VColUnlit.xml");
+        customGeometry.occludee = false;
+        customGeometry.enabled = true;
+    }
+
+    void Hide()
+    {
+        node.enabled = false;
+        addedToOctree = false;
+    }
+
+    void Update(Terrain@ terrainComponent, Vector3 position, float radius)
+    {
+        node.enabled = true;
+        node.position = Vector3(position.x, 0, position.z);
+
+        // Generate the circle
+        customGeometry.BeginGeometry(0, LINE_STRIP);
+        for (uint i = 0; i < 364; i += 4)
+        {
+            float angle = i * M_PI / 180;
+            float x = radius * Cos(angle / 0.0174532925);
+            float z = radius * Sin(angle / 0.0174532925);
+            float y = terrainComponent.GetHeight(Vector3(position.x + x, 0, position.z + z));
+            customGeometry.DefineVertex(Vector3(x, y + 0.25, z));
+            customGeometry.DefineColor(Color(0, 1, 0));
+        }
+        customGeometry.Commit();
+
+        if (editorScene.octree !is null && addedToOctree == false)
+        {
+            editorScene.octree.AddManualDrawable(customGeometry);
+            addedToOctree = true;
+        }
+    }
+}
+
 class TerrainEditor
 {
     private bool dirty = true;
@@ -27,6 +75,7 @@ class TerrainEditor
     private Slider@ brushSizeSlider;
     private Slider@ brushOpacitySlider;
     private Slider@ brushHeightSlider;
+    private TerrainEditorBrushVisualizer brushVisualizer;
 
     private Array<Terrain@> terrainsEdited;
 
@@ -78,12 +127,29 @@ class TerrainEditor
 
         LoadBrushes();
         Show();
+
+        brushVisualizer.Create();
     }
 
     // Hide the window
     void Hide()
     {
         window.visible = false;
+    }
+
+    void HideBrushVisualizer()
+    {
+        brushVisualizer.Hide();
+    }
+
+    void UpdateBrushVisualizer(Terrain@ terrainComponent, Vector3 position)
+    {
+        if (scaledSelectedBrushImage is null)
+        {
+            brushVisualizer.Hide();
+            return;
+        }
+        brushVisualizer.Update(terrainComponent, position, scaledSelectedBrushImage.width / 2);
     }
 
     // Save all the terrains we have edited
@@ -169,34 +235,38 @@ class TerrainEditor
     }
 
     // This gets called when we want to do something to a terrain
-    void Work(Terrain@ terrainComponent, Image@ terrainImage, IntVector2 position)
+    void Work(Terrain@ terrainComponent, Vector3 position)
     {
+        // Only work if a brush is selected
+        if (selectedBrushImage is null || scaledSelectedBrushImage is null)
+            return;
+
         SetSceneModified();
 
         // Add that terrain to the terrainsEdited if its not already in there
         if (terrainsEdited.FindByRef(terrainComponent) == -1)
             terrainsEdited.Push(terrainComponent);
 
-        // Only work if a brush is selected
-        if (selectedBrushImage is null || scaledSelectedBrushImage is null)
-            return;
-
         TerrainEditorUpdateChanges@ updateChanges = TerrainEditorUpdateChanges();
+
+        IntVector2 pos = terrainComponent.WorldToHeightMap(position);
 
         switch (editMode)
         {
         case TERRAIN_EDITMODE_RAISELOWERHEIGHT:
-            UpdateTerrainRaiseLower(terrainImage, position, updateChanges);
+            UpdateTerrainRaiseLower(terrainComponent.heightMap, pos, updateChanges);
             break;
         case TERRAIN_EDITMODE_SETHEIGHT:
-            UpdateTerrainSetHeight(terrainImage, position, updateChanges);
+            UpdateTerrainSetHeight(terrainComponent.heightMap, pos, updateChanges);
             break;
         case TERRAIN_EDITMODE_SMOOTHHEIGHT:
-            UpdateTerrainSmooth(terrainImage, position, updateChanges);
+            UpdateTerrainSmooth(terrainComponent.heightMap, pos, updateChanges);
             break;
         }
 
         terrainComponent.ApplyHeightMap();
+
+        UpdateBrushVisualizer(terrainComponent, position);
 
         ModifyTerrainAction action;
         action.Define(terrainComponent, updateChanges.offset, updateChanges.oldImage, updateChanges.newImage);
@@ -387,8 +457,6 @@ class TerrainEditor
         if (selectedBrushImage is null)
             return;
         float size = (brushSizeSlider.value / 25) + 0.5;
-        Print(brushSizeSlider.value);
-        Print(size);
         scaledSelectedBrushImage = selectedBrushImage.GetSubimage(IntRect(0, 0, selectedBrushImage.width, selectedBrushImage.height));
         scaledSelectedBrushImage.Resize(int(selectedBrushImage.width * size), int(selectedBrushImage.height * size));
     }
