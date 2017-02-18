@@ -134,7 +134,7 @@
         <attribute name="Name" value="CurrentToolDesc" />
         <attribute name="Layout Mode" value="Horizontal" />
         <attribute name="Layout Spacing" value="4" />
-        <attribute name="Horizontal Alignment" value="Center" />
+        <attribute name="Horiz Alignment" value="Center" />
         <attribute name="Min Size" value="0 30" />
         <attribute name="Max Size" value="999999 30" />
         <element type="Text">
@@ -167,7 +167,7 @@
         <attribute name="Name" value="SettingsArea" />
         <attribute name="Layout Mode" value="Vertical" />
         <attribute name="Layout Spacing" value="4" />
-        <attribute name="Horizontal Alignment" value="Center" />
+        <attribute name="Horiz Alignment" value="Center" />
         <element type="Text">
             <attribute name="Name" value="BrushSizeLabel" />
             <attribute name="Text" value="Brush Size" />
@@ -193,7 +193,7 @@
             <attribute name="Max Size" value="999999 10" />
             <attribute name="Range" value="25" />
             <attribute name="Value" value="12.5" />
-            <attribute name="Visible" value="false" />
+            <attribute name="Is Visible" value="false" />
         </element>
         <element type="Text">
             <attribute name="Name" value="BrushHeightLabel" />
@@ -207,7 +207,7 @@
             <attribute name="Max Size" value="999999 10" />
             <attribute name="Range" value="25" />
             <attribute name="Value" value="12.5" />
-            <attribute name="Visible" value="false" />
+            <attribute name="Is Visible" value="false" />
         </element>
     </element>
 </element>
