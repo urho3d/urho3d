@@ -23,6 +23,7 @@
 #include <Urho3D/Container/ArrayPtr.h>
 #include <Urho3D/Core/Context.h>
 #include <Urho3D/IO/File.h>
+#include <Urho3D/IO/FileSystem.h>
 #include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Core/StringUtils.h>
 
@@ -76,7 +77,7 @@ void Run(const Vector<String>& arguments)
         ErrorExit("Usage: RampGenerator <output png file> <width> <power> [dimensions]\n"
                   "IES Usage: RampGenerator <input file> <output png file> <width> [dimensions]");
 
-    if (arguments[0].EndsWith(".ies")) // Generate an IES light derived ramp
+    if (GetExtension(arguments[0]) == ".ies") // Generate an IES light derived ramp
     {
         String inputFile = arguments[0];
         String ouputFile = arguments[1];
