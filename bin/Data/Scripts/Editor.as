@@ -18,6 +18,7 @@
 #include "Scripts/Editor/EditorResourceBrowser.as"
 #include "Scripts/Editor/EditorSpawn.as"
 #include "Scripts/Editor/EditorSoundType.as"
+#include "Scripts/Editor/EditorTerrain.as"
 #include "Scripts/Editor/EditorLayers.as"
 #include "Scripts/Editor/EditorColorWheel.as"
 #include "Scripts/Editor/EditorEventsHandlers.as"

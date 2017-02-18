@@ -267,6 +267,9 @@ bool SaveScene(const String&in fileName)
         success = editorScene.Save(file);
     RemoveBackup(success, fileName);
 
+	// Save all the terrains we've modified
+	terrainEditor.Save();
+
     editorScene.updateEnabled = false;
 
     if (success)
