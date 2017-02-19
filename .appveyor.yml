@@ -52,10 +52,11 @@ environment:
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-install:
+before_build:
   - rake ci_timer
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+  - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
+        if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE))))
         {
           $env:PACKAGE_UPLOAD = "1";
           if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
@@ -63,15 +64,13 @@ install:
         }
         else
         {
+          $env:URHO3D_TOOLS = "0";
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-before_build:
-  - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) }
   # rake ci_setup_cache
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0"
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
 #after_build: rake ci_teardown_cache
 test: off

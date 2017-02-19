@@ -162,29 +162,27 @@ environment:
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-install:
+before_build:
   - rake ci_timer
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
+  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT);
+        if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -notmatch "[^-]+-[^-]+-CI" -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE)))
         {
           $env:PACKAGE_UPLOAD = "1";
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
           do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
         }
         else
         {
+          $env:URHO3D_TOOLS = "0";
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
   - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
-before_build:
-  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   # rake ci_setup_cache
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0"
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
 #after_build: rake ci_teardown_cache
 test: off
