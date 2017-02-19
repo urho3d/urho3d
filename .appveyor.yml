@@ -31,8 +31,8 @@ cache:
   # Build
   # mingw-Build
   # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
-  - C:\tools\mingw32 -> .travis.yml
-  - C:\tools\mingw64 -> .travis.yml
+  - C:\tools\mingw32
+  - C:\tools\mingw64
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
