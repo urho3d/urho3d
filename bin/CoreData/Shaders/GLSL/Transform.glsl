@@ -147,7 +147,7 @@ vec3 GetTrailNormal(vec4 iPos, vec3 iParentPos, vec3 iForward)
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
-    #define iModelMatrix GetInstanceMatrix();
+    #define iModelMatrix GetInstanceMatrix()
 #else
     #define iModelMatrix cModel
 #endif

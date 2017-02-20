@@ -106,7 +106,7 @@ float3 GetTrailNormal(float4 iPos, float3 iParentPos, float3 iForward)
 #endif
 
 #if defined(SKINNED)
-    #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices);
+    #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
     #define iModelMatrix iModelInstance
 #else
