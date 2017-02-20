@@ -120,6 +120,11 @@ URHO3D_EVENT(E_ENDVIEWRENDER, EndViewRender)
     URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
 }
 
+/// Render of all views is finished for the frame.
+URHO3D_EVENT(E_ENDALLVIEWSRENDER, EndAllViewsRender)
+{
+}
+
 /// A render path event has occurred.
 URHO3D_EVENT(E_RENDERPATHEVENT, RenderPathEvent)
 {
