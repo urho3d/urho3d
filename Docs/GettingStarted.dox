@@ -164,6 +164,7 @@ A number of build options can be defined when invoking the build scripts or when
 |EMSCRIPTEN_ALLOW_MEMORY_GROWTH|0|Enable memory growing based on application demand (Emscripten cross-compiling build only)|
 |EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten cross-compiling build only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten cross-compiling build only)|
+|EMSCRIPTEN_SHARE_JS  |0|Share the same JS file responsible to load the shared data file (Emscripten cross-compiling build only and when enabling sharing data file support only)|
 |EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten cross-compiling build only), use 'emrun --list_browsers' command to get the list of possible values|
 |EMSCRIPTEN_SYSTEM_LIBS|-|Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten cross-compiling build only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries|
 
