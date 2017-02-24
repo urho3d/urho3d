@@ -44,6 +44,8 @@ public:
 
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);
+    /// Reinitialize resource cache subsystem using parameters given. Implicitly called by Initialize. Return true if successful.
+    bool InitializeResourceCache(const VariantMap& parameters, bool removeOld = true);
     /// Run one frame.
     void RunFrame();
     /// Create the console and return it. May return null if engine configuration does not allow creation (headless mode.)
