@@ -45,6 +45,10 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
     /// Create joint.
@@ -94,8 +98,12 @@ protected:
     WeakPtr<RigidBody2D> ownerBody_;
     /// Other body.
     WeakPtr<RigidBody2D> otherBody_;
-    /// Collide connected.
+    /// Other body node ID for serialization.
+    unsigned otherBodyNodeID_;
+    /// Collide connected flag.
     bool collideConnected_;
+    /// Other body node ID dirty flag.
+    bool otherBodyNodeIDDirty_;
     /// Attached constraint.
     WeakPtr<Constraint2D> attachedConstraint_;
 };
