@@ -1217,6 +1217,7 @@ namespace Urho3D
 - %Damping %Ratio : float
 - %Length : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintFriction2D
 - %Is %Enabled : bool
@@ -1224,11 +1225,13 @@ namespace Urho3D
 - %Max %Force : float
 - %Max %Torque : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintGear2D
 - %Is %Enabled : bool
 - %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintMotor2D
 - %Is %Enabled : bool
@@ -1238,6 +1241,7 @@ namespace Urho3D
 - %Max %Torque : float
 - %Correction %Factor : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintMouse2D
 - %Is %Enabled : bool
@@ -1246,6 +1250,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintPrismatic2D
 - %Is %Enabled : bool
@@ -1258,6 +1263,7 @@ namespace Urho3D
 - %Max %Motor %Force : float
 - %Motor %Speed : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintPulley2D
 - %Is %Enabled : bool
@@ -1267,6 +1273,7 @@ namespace Urho3D
 - %Other %Body %Anchor : Vector2
 - %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintRevolute2D
 - %Is %Enabled : bool
@@ -1278,6 +1285,7 @@ namespace Urho3D
 - %Motor %Speed : float
 - %Max %Motor %Torque : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintRope2D
 - %Is %Enabled : bool
@@ -1285,6 +1293,7 @@ namespace Urho3D
 - %Other %Body %Anchor : Vector2
 - %Max %Length : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintWeld2D
 - %Is %Enabled : bool
@@ -1292,6 +1301,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### ConstraintWheel2D
 - %Is %Enabled : bool
@@ -1303,6 +1313,7 @@ namespace Urho3D
 - %Frequency %Hz : float
 - %Damping %Ratio : float
 - %Collide %Connected : bool
+- %Other %Body %NodeID : int
 
 ### CrowdAgent
 - %Target %Position : Vector3
