@@ -149,22 +149,12 @@ if (TARGET LuaJIT_universal)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
     list (APPEND SYMBOLIC_SOURCES ${LuaJIT_universal_symbolic})
 endif ()
+set_source_files_properties (${SYMBOLIC_SOURCES} PROPERTIES SYMBOLIC TRUE)
 add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/librevision.h
     COMMAND ${CMAKE_COMMAND} -DFILENAME=${CMAKE_CURRENT_BINARY_DIR}/librevision.h -P CMake/Modules/GetUrho3DRevision.cmake
     DEPENDS ${URHO3D_DEPS} ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating GIT revision number (tag + last commit SHA-1)")
-if (EMSCRIPTEN)
-    # Emscripten will attempt to generate system libraries in LLVM bitcode (libcxxabi, gl, libc, and dlmalloc) when linking for the very first time
-    # However, currently it does so without any locking resulting in potentially multiple same generation with build system that supports concurrent build processes such as ours
-    # Workaround that by calling Emscripten builder to generate all the required system libraries (in case it is the very first time) ahead of time in an orderly fashion
-    set (EMBUILDER_SYSTEM_LIBS_symbolic EMBUILDER_SYSTEM_LIBS_symbolic)
-    list (APPEND EMSCRIPTEN_SYSTEM_LIBS dlmalloc libc libcxxabi gl)
-    add_custom_command (OUTPUT ${EMBUILDER_SYSTEM_LIBS_symbolic}
-        COMMAND ${EMBUILDER} build ${EMSCRIPTEN_SYSTEM_LIBS})
-    list (APPEND SYMBOLIC_SOURCES ${EMBUILDER_SYSTEM_LIBS_symbolic})
-endif ()
-set_source_files_properties (${SYMBOLIC_SOURCES} PROPERTIES SYMBOLIC TRUE)
 
 # Use the AutoBinder tool to generate source files for binding script subsystems
 if (URHO3D_BINDINGS)

@@ -166,8 +166,8 @@ A number of build options can be defined when invoking the build scripts or when
 |EMSCRIPTEN_TOTAL_MEMORY|*|Specify the total size of memory to be used (Emscripten only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1|
 |EMSCRIPTEN_SHARE_DATA|0|Enable sharing data file support (Emscripten only)|
 |EMSCRIPTEN_SHARE_JS  |0|Share the same JS file responsible to load the shared data file (Emscripten only and when enabling sharing data file support only)|
+|EMSCRIPTEN_WASM      |0|Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)|
 |EMSCRIPTEN_EMRUN_BROWSER|firefox|Specify the particular browser to be spawned by emrun during testing (Emscripten only), use 'emrun --list_browsers' command to get the list of possible values|
-|EMSCRIPTEN_SYSTEM_LIBS|-|Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries|
 
 Note that the specified build option values are cached by CMake after the initial configuration step. The cached values will be used by CMake in the subsequent configuration. The same build options are not required to be specified again and again. But once a non-default build option value is being cached, it can only be reverted back to its default value by explicitly resetting it. That is, simply by not passing the corresponding build option would not revert it back to its default. One way to revert all the build options to their default values is by clearing the CMake cache by executing cmake_clean.bat or cmake_clean.sh with the location of the build tree as the first argument or by executing it in the build tree itself.
 

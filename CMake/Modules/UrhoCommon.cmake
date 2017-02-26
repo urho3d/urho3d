@@ -297,7 +297,7 @@ if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     set (EMSCRIPTEN_TOTAL_MEMORY ${EMSCRIPTEN_TOTAL_MEMORY} CACHE STRING "Specify the total size of memory to be used (Emscripten only); default to 128 MB, this option is ignored when EMSCRIPTEN_ALLOW_MEMORY_GROWTH=1")
     option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten only)")
     cmake_dependent_option (EMSCRIPTEN_SHARE_JS "Share the same JS file responsible to load the shared data file (Emscripten only and when enabling sharing data file support only)" FALSE EMSCRIPTEN_SHARE_DATA FALSE)
-    set (EMSCRIPTEN_SYSTEM_LIBS "" CACHE STRING "Specify a semicolon-separated list of additional system libraries that should be pre-built using embuilder.py, by default 'dlmalloc', 'libc', 'libcxxabi', and 'gl' will be pre-built, so they should not be listed again (Emscripten only); when using CMake CLI on Unix-like host systems, the semicolon may need to be properly escaped; see usage of embuilder.py to get the full list of supported system libraries")
+    cmake_dependent_option (EMSCRIPTEN_WASM "Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)" FALSE "NOT EMSCRIPTEN_EMCC_VERSION VERSION_LESS 1.37.3" FALSE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
 set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED)
@@ -634,7 +634,10 @@ else ()
                 else ()
                     set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
                 endif ()
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MEMORY_LINKER_FLAGS} -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+                if (EMSCRIPTEN_WASM)
+                    set (WASM "-s WASM=1")
+                endif ()
+                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MEMORY_LINKER_FLAGS} -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 ${WASM}")
                 set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
                 set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
                 if (URHO3D_TESTING)
