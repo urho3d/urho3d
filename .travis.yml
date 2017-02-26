@@ -421,7 +421,7 @@ before_script:
   - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
-script: rake ci && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]]; then rake ci_emscripten_samples_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 ---
