@@ -198,6 +198,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                 variant = (int)value;
                 break;
 
+            case VAR_INT64:
+                variant = (long long int)value;
+                break;
+
             case VAR_BOOL:
                 variant = value != 0.0f;
                 break;
@@ -337,6 +341,13 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
         }
         else
             tolua_pushnumber(L, (lua_Number)variant->GetInt());
+        break;
+
+    case VAR_INT64:
+        if (typeName == "unsigned" || typeName == "unsigned int" || typeName == "UInt" || typeName == "uint")
+            tolua_pushnumber(L, (lua_Number)variant->GetUInt64());
+        else
+            tolua_pushnumber(L, (lua_Number)variant->GetInt64());
         break;
 
     case VAR_BOOL:
