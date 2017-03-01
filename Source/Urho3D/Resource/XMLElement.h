@@ -125,9 +125,9 @@ public:
     /// Set an integer attribute.
     bool SetInt(const String& name, int value);
     /// Set an unsigned integer attribute.
-    bool SetUInt64(const String& name, unsigned long long int value);
+    bool SetUInt64(const String& name, unsigned long long value);
     /// Set an integer attribute.
-    bool SetInt64(const String& name, long long int value);
+    bool SetInt64(const String& name, long long value);
     /// Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.

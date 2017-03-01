@@ -48,13 +48,13 @@ URHO3D_API unsigned ToUInt(const String& source, int base = 10);
 /// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
 URHO3D_API unsigned ToUInt(const char* source, int base = 10);
 /// Parse an 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API long long int ToInt64(const String& source, int base = 10);
+URHO3D_API long long ToInt64(const String& source, int base = 10);
 /// Parse an 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API long long int ToInt64(const char* source, int base = 10);
+URHO3D_API long long ToInt64(const char* source, int base = 10);
 /// Parse an unsigned 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned long long int ToUInt64(const String& source, int base = 10);
+URHO3D_API unsigned long long ToUInt64(const String& source, int base = 10);
 /// Parse an unsigned 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
-URHO3D_API unsigned long long int ToUInt64(const char* source, int base = 10);
+URHO3D_API unsigned long long ToUInt64(const char* source, int base = 10);
 /// Parse a Color from a string.
 URHO3D_API Color ToColor(const String& source);
 /// Parse a Color from a C string.

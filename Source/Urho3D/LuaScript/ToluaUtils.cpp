@@ -199,7 +199,7 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                 break;
 
             case VAR_INT64:
-                variant = (long long int)value;
+                variant = (long long)value;
                 break;
 
             case VAR_BOOL:

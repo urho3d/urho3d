@@ -216,7 +216,7 @@ public:
     }
 
     /// Construct from 64 bit integer.
-    Variant(long long int value) :
+    Variant(long long value) :
         type_(VAR_NONE)
     {
         *this = value;
@@ -230,10 +230,10 @@ public:
     }
 
     /// Construct from unsigned integer.
-    Variant(unsigned long long int value) :
+    Variant(unsigned long long value) :
         type_(VAR_NONE)
     {
-        *this = (long long int)value;
+        *this = (long long)value;
     }
 
     /// Construct from a string hash (convert to integer).
@@ -484,18 +484,18 @@ public:
     }
 
     /// Assign from 64 bit integer.
-    Variant& operator =(long long int rhs)
+    Variant& operator =(long long rhs)
     {
         SetType(VAR_INT64);
-        *reinterpret_cast<long long int*>(&value_) = rhs;
+        *reinterpret_cast<long long*>(&value_) = rhs;
         return *this;
     }
 
     /// Assign from unsigned 64 bit integer.
-    Variant& operator =(unsigned long long int rhs)
+    Variant& operator =(unsigned long long rhs)
     {
         SetType(VAR_INT64);
-        *reinterpret_cast<long long int*>(&value_) = (long long int)rhs;
+        *reinterpret_cast<long long*>(&value_) = (long long)rhs;
         return *this;
     }
 
@@ -728,10 +728,10 @@ public:
     bool operator ==(unsigned rhs) const { return type_ == VAR_INT ? value_.int_ == (int)rhs : false; }
 
     /// Test for equality with an 64 bit integer. To return true, both the type and value must match.
-    bool operator ==(long long int rhs) const { return type_ == VAR_INT64 ? *reinterpret_cast<const long long int*>(&value_.int_) == rhs : false; }
+    bool operator ==(long long rhs) const { return type_ == VAR_INT64 ? *reinterpret_cast<const long long*>(&value_.int_) == rhs : false; }
 
     /// Test for equality with an unsigned integer. To return true, both the type and value must match.
-    bool operator ==(unsigned long long int rhs) const { return type_ == VAR_INT64 ? *reinterpret_cast<const unsigned long long int*>(&value_.int_) == (int)rhs : false; }
+    bool operator ==(unsigned long long rhs) const { return type_ == VAR_INT64 ? *reinterpret_cast<const unsigned long long*>(&value_.int_) == (int)rhs : false; }
 
     /// Test for equality with a bool. To return true, both the type and value must match.
     bool operator ==(bool rhs) const { return type_ == VAR_BOOL ? value_.bool_ == rhs : false; }
@@ -890,10 +890,10 @@ public:
     bool operator !=(unsigned rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with an 64 bit integer.
-    bool operator !=(long long int rhs) const { return !(*this == rhs); }
+    bool operator !=(long long rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with an unsigned 64 bit integer.
-    bool operator !=(unsigned long long int rhs) const { return !(*this == rhs); }
+    bool operator !=(unsigned long long rhs) const { return !(*this == rhs); }
 
     /// Test for inequality with a bool.
     bool operator !=(bool rhs) const { return !(*this == rhs); }
@@ -995,31 +995,31 @@ public:
     }
 
     /// Return 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    long long int GetInt64() const
+    long long GetInt64() const
     {
         if (type_ == VAR_INT64)
-            return *(reinterpret_cast<const long long int*>(&value_));
+            return *(reinterpret_cast<const long long*>(&value_));
         else if (type_ == VAR_INT)
             return value_.int_;
         else if (type_ == VAR_FLOAT)
-            return (long long int)value_.float_;
+            return (long long)value_.float_;
         else if (type_ == VAR_DOUBLE)
-            return (long long int)*reinterpret_cast<const double*>(&value_);
+            return (long long)*reinterpret_cast<const double*>(&value_);
         else
             return 0;
     }
 
     /// Return unsigned 64 bit int or zero on type mismatch. Floats and doubles are converted.
-    unsigned long long int GetUInt64() const
+    unsigned long long GetUInt64() const
     {
         if (type_ == VAR_INT64)
-            return *(reinterpret_cast<const unsigned long long int*>(&value_));
+            return *(reinterpret_cast<const unsigned long long*>(&value_));
         else if (type_ == VAR_INT)
-            return static_cast<unsigned long long int>(value_.int_);
+            return static_cast<unsigned long long>(value_.int_);
         else if (type_ == VAR_FLOAT)
-            return (unsigned long long int)value_.float_;
+            return (unsigned long long)value_.float_;
         else if (type_ == VAR_DOUBLE)
-            return (unsigned long long int)*reinterpret_cast<const double*>(&value_);
+            return (unsigned long long)*reinterpret_cast<const double*>(&value_);
         else
             return 0;
     }
@@ -1253,9 +1253,9 @@ template <> inline VariantType GetVariantType<int>() { return VAR_INT; }
 
 template <> inline VariantType GetVariantType<unsigned>() { return VAR_INT; }
 
-template <> inline VariantType GetVariantType<long long int>() { return VAR_INT64; }
+template <> inline VariantType GetVariantType<long long>() { return VAR_INT64; }
 
-template <> inline VariantType GetVariantType<unsigned long long int>() { return VAR_INT64; }
+template <> inline VariantType GetVariantType<unsigned long long>() { return VAR_INT64; }
 
 template <> inline VariantType GetVariantType<bool>() { return VAR_BOOL; }
 
@@ -1308,9 +1308,9 @@ template <> URHO3D_API int Variant::Get<int>() const;
 
 template <> URHO3D_API unsigned Variant::Get<unsigned>() const;
 
-template <> URHO3D_API long long int Variant::Get<long long int>() const;
+template <> URHO3D_API long long Variant::Get<long long>() const;
 
-template <> URHO3D_API unsigned long long int Variant::Get<unsigned long long int>() const;
+template <> URHO3D_API unsigned long long Variant::Get<unsigned long long>() const;
 
 template <> URHO3D_API StringHash Variant::Get<StringHash>() const;
 

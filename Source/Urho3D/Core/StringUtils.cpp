@@ -120,7 +120,7 @@ int ToInt(const char* source, int base)
     return (int)strtol(source, 0, base);
 }
 
-long long int ToInt64(const char* source, int base)
+long long ToInt64(const char* source, int base)
 {
     if (!source)
         return 0;
@@ -132,7 +132,7 @@ long long int ToInt64(const char* source, int base)
     return strtoll(source, 0, base);
 }
 
-long long int ToInt64(const String& source, int base)
+long long ToInt64(const String& source, int base)
 {
     return ToInt64(source.CString(), base);
 }
@@ -142,7 +142,7 @@ unsigned ToUInt(const String& source, int base)
     return ToUInt(source.CString(), base);
 }
 
-unsigned long long int ToUInt64(const char* source, int base)
+unsigned long long ToUInt64(const char* source, int base)
 {
     if (!source)
         return 0;
@@ -154,7 +154,7 @@ unsigned long long int ToUInt64(const char* source, int base)
     return strtoull(source, 0, base);
 }
 
-unsigned long long int ToUInt64(const String& source, int base)
+unsigned long long ToUInt64(const String& source, int base)
 {
     return ToUInt64(source.CString(), base);
 }
