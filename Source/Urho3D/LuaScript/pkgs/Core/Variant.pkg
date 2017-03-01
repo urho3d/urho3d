@@ -29,6 +29,7 @@ enum VariantType
     VAR_STRINGVECTOR,
     VAR_RECT,
     VAR_INTVECTOR3,
+    VAR_INT64,
     MAX_VAR_TYPES
 };
 
@@ -78,6 +79,8 @@ class Variant
     // All below getters are preserved for backward compatibility and for compatibility with C++ and AngelScript API
     int GetInt() const;
     unsigned GetUInt() const;
+    long long int GetInt64() const;
+    unsigned long long int GetUInt64() const;
     StringHash GetStringHash() const;
     bool GetBool() const;
     float GetFloat() const;

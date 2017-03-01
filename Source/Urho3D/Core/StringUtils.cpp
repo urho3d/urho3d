@@ -120,9 +120,43 @@ int ToInt(const char* source, int base)
     return (int)strtol(source, 0, base);
 }
 
+long long int ToInt64(const char* source, int base)
+{
+    if (!source)
+        return 0;
+
+    // Shield against runtime library assert by converting illegal base values to 0 (autodetect)
+    if (base < 2 || base > 36)
+        base = 0;
+
+    return strtoll(source, 0, base);
+}
+
+long long int ToInt64(const String& source, int base)
+{
+    return ToInt64(source.CString(), base);
+}
+
 unsigned ToUInt(const String& source, int base)
 {
     return ToUInt(source.CString(), base);
+}
+
+unsigned long long int ToUInt64(const char* source, int base)
+{
+    if (!source)
+        return 0;
+
+    // Shield against runtime library assert by converting illegal base values to 0 (autodetect)
+    if (base < 2 || base > 36)
+        base = 0;
+
+    return strtoull(source, 0, base);
+}
+
+unsigned long long int ToUInt64(const String& source, int base)
+{
+    return ToUInt64(source.CString(), base);
 }
 
 unsigned ToUInt(const char* source, int base)

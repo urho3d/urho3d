@@ -349,6 +349,16 @@ bool XMLElement::SetInt(const String& name, int value)
     return SetAttribute(name, String(value));
 }
 
+bool XMLElement::SetUInt64(const String& name, unsigned long long int value)
+{
+    return SetAttribute(name, String(value));
+}
+
+bool XMLElement::SetInt64(const String& name, long long int value)
+{
+    return SetAttribute(name, String(value));
+}
+
 bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 {
     return SetAttribute(name, value.ToString());
