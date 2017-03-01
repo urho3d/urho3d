@@ -7188,6 +7188,8 @@ Methods:
 - void* Get(const char* type = 0) const
 - int GetInt() const
 - unsigned GetUInt() const
+- int GetInt64() const
+- int GetUInt64() const
 - StringHash GetStringHash() const
 - bool GetBool() const
 - float GetFloat() const
@@ -7677,6 +7679,8 @@ Methods:
 - bool SetDouble(const String name, double value)
 - bool SetUInt(const String name, unsigned value)
 - bool SetInt(const String name, int value)
+- bool SetUInt64(const String name, long value)
+- bool SetInt64(const String name, long value)
 - bool SetIntRect(const String name, const IntRect& value)
 - bool SetIntVector2(const String name, const IntVector2& value)
 - bool SetIntVector3(const String name, const IntVector3& value)
@@ -7716,6 +7720,8 @@ Methods:
 - double GetDouble(const String name) const
 - unsigned GetUInt(const String name) const
 - int GetInt(const String name) const
+- long GetUInt64(const String name) const
+- long GetInt64(const String name) const
 - IntRect GetIntRect(const String name) const
 - IntVector2 GetIntVector2(const String name) const
 - IntVector3 GetIntVector3(const String name) const
@@ -8362,6 +8368,7 @@ Properties:
 - int VAR_STRINGVECTOR
 - int VAR_RECT
 - int VAR_INTVECTOR3
+- int VAR_INT64
 - int MAX_VAR_TYPES
 
 ### VertexElementSemantic
@@ -8505,9 +8512,9 @@ Properties:
 - void PrintLine(const String str, bool error = false)
 - int Rand()
 - float RandStandardNormal()
-- float Random()
-- float Random(float range)
 - float Random(float min, float max)
+- float Random(float range)
+- float Random()
 - int RandomInt(int range)
 - int RandomInt(int min, int max)
 - float RandomNormal(float meanValue, float variance)
@@ -8526,16 +8533,17 @@ Properties:
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - float Sqrt(float x)
-- float StableRandom(float seed)
 - float StableRandom(const Vector3& seed)
+- float StableRandom(float seed)
 - float StableRandom(const Vector2& seed)
-- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
 - float ToFloat(const String source)
 - int ToInt(const String source, int base = 10)
+- int ToInt64(const String source, int base = 10)
 - IntRect ToIntRect(const String source)
 - IntVector2 ToIntVector2(const String source)
 - IntVector3 ToIntVector3(const String source)
@@ -8548,41 +8556,42 @@ Properties:
 - String ToString(void* value)
 - String ToStringHex(unsigned value)
 - unsigned ToUInt(const String source, int base = 10)
+- int ToUInt64(const String source, int base = 10)
 - unsigned ToUpper(unsigned ch)
 - Vector2 ToVector2(const String source)
 - Vector3 ToVector3(const String source)
 - Vector4 ToVector4(const String source, bool allowMissingCoords = false)
 - void UnsubscribeFromAllEvents()
 - void UnsubscribeFromAllEventsExcept(const Vector<String>& exceptionNames)
-- void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvent(Object* sender, const String eventName)
+- void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
 - Vector2 VectorCeil(const Vector2& vec)
 - Vector4 VectorCeil(const Vector4& vec)
 - Vector3 VectorCeil(const Vector3& vec)
-- IntVector2 VectorCeilToInt(const Vector2& vec)
 - IntVector3 VectorCeilToInt(const Vector3& vec)
-- Vector4 VectorFloor(const Vector4& vec)
-- Vector3 VectorFloor(const Vector3& vec)
+- IntVector2 VectorCeilToInt(const Vector2& vec)
 - Vector2 VectorFloor(const Vector2& vec)
-- IntVector3 VectorFloorToInt(const Vector3& vec)
+- Vector3 VectorFloor(const Vector3& vec)
+- Vector4 VectorFloor(const Vector4& vec)
 - IntVector2 VectorFloorToInt(const Vector2& vec)
+- IntVector3 VectorFloorToInt(const Vector3& vec)
 - Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
-- Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
 - Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
+- Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
 - Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
-- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
 - Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
-- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
 - IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
+- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
 - Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
 - IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
 - Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
-- IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
 - Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
+- IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
+- Vector4 VectorRound(const Vector4& vec)
 - Vector2 VectorRound(const Vector2& vec)
 - Vector3 VectorRound(const Vector3& vec)
-- Vector4 VectorRound(const Vector4& vec)
 - IntVector3 VectorRoundToInt(const Vector3& vec)
 - IntVector2 VectorRoundToInt(const Vector2& vec)
 

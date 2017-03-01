@@ -12933,6 +12933,7 @@ Methods:
 - double ToDouble() const
 - float ToFloat() const
 - int ToInt(int = 10) const
+- int64 ToInt64(int = 10) const
 - IntRect ToIntRect() const
 - IntVector2 ToIntVector2() const
 - IntVector3 ToIntVector3() const
@@ -12942,6 +12943,7 @@ Methods:
 - Matrix4 ToMatrix4() const
 - Quaternion ToQuaternion() const
 - uint ToUInt(int = 10) const
+- uint64 ToUInt64(int = 10) const
 - String ToUpper() const
 - Vector2 ToVector2() const
 - Vector3 ToVector3() const
@@ -14479,11 +14481,13 @@ Methods:
 - double GetDouble() const
 - float GetFloat() const
 - int GetInt() const
+- int GetInt64() const
 - RefCounted@ GetPtr() const
 - ScriptObject@ GetScriptObject() const
 - StringHash GetStringHash() const
 - String[]@ GetStringVector() const
 - uint GetUInt() const
+- uint64 GetUInt64() const
 - Variant[]@ GetVariantVector() const
 - const IntRect& GetIntRect() const
 - const IntVector2& GetIntVector2() const
@@ -15195,6 +15199,7 @@ Methods:
 - double GetDouble(const String&) const
 - float GetFloat(const String&) const
 - int GetInt(const String&) const
+- int64 GetInt64(const String&) const
 - IntRect GetIntRect(const String&) const
 - IntVector2 GetIntVector2(const String&) const
 - IntVector3 GetIntVector3(const String&) const
@@ -15207,6 +15212,7 @@ Methods:
 - ResourceRef GetResourceRef() const
 - ResourceRefList GetResourceRefList() const
 - uint GetUInt(const String&) const
+- uint64 GetUInt64(const String&) const
 - String GetValue() const
 - Variant GetVariant() const
 - VariantMap GetVariantMap() const
@@ -15233,6 +15239,7 @@ Methods:
 - bool SetDouble(const String&, double)
 - bool SetFloat(const String&, float)
 - bool SetInt(const String&, int)
+- bool SetInt64(const String&, int64)
 - bool SetIntRect(const String&, const IntRect&)
 - bool SetIntVector2(const String&, const IntVector2&)
 - bool SetIntVector3(const String&, const IntVector3&)
@@ -15243,6 +15250,7 @@ Methods:
 - bool SetResourceRef(const String&, const ResourceRef&)
 - bool SetResourceRefList(const String&, const ResourceRefList&)
 - bool SetUInt(const String&, uint)
+- bool SetUInt64(const String&, uint64)
 - bool SetValue(const String&)
 - bool SetVariant(const Variant&)
 - bool SetVariantMap(const VariantMap&)
