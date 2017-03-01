@@ -19,8 +19,8 @@ class XMLElement
     bool SetDouble(const String name, double value);
     bool SetUInt(const String name, unsigned value);
     bool SetInt(const String name, int value);
-    bool SetUInt64(const String name, unsigned long long int value);
-    bool SetInt64(const String name, long long int value);
+    bool SetUInt64(const String name, unsigned long long value);
+    bool SetInt64(const String name, long long value);
     bool SetIntRect(const String name, const IntRect& value);
     bool SetIntVector2(const String name, const IntVector2& value);
     bool SetIntVector3(const String name, const IntVector3& value);
@@ -63,6 +63,8 @@ class XMLElement
     double GetDouble(const String name) const;
     unsigned GetUInt(const String name) const;
     int GetInt(const String name) const;
+    unsigned long long GetUInt64(const String name) const;
+    long long GetInt64(const String name) const;
     IntRect GetIntRect(const String name) const;
     IntVector2 GetIntVector2(const String name) const;
     IntVector3 GetIntVector3(const String name) const;

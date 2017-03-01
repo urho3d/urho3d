@@ -124,9 +124,9 @@ public:
     bool SetUInt(const String& name, unsigned value);
     /// Set an integer attribute.
     bool SetInt(const String& name, int value);
-    /// Set an unsigned integer attribute.
+    /// Set an unsigned long long integer attribute.
     bool SetUInt64(const String& name, unsigned long long value);
-    /// Set an integer attribute.
+    /// Set a long long integer attribute.
     bool SetInt64(const String& name, long long value);
     /// Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
@@ -233,6 +233,10 @@ public:
     unsigned GetUInt(const String& name) const;
     /// Return an integer attribute, or zero if missing.
     int GetInt(const String& name) const;
+    /// Return an unsigned long long integer attribute, or zero if missing.
+    unsigned long long GetUInt64(const String& name) const;
+    /// Return a long long integer attribute, or zero if missing.
+    long long GetInt64(const String& name) const;
     /// Return an IntRect attribute, or default if missing.
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.
