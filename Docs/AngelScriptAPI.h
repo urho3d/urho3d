@@ -8450,10 +8450,10 @@ void FromRotationTo(const Vector3&, const Vector3&);
 Quaternion Inverse() const;
 bool IsNaN() const;
 float LengthSquared() const;
-Quaternion Nlerp(Quaternion, float, bool) const;
+Quaternion Nlerp(const Quaternion&, float, bool) const;
 void Normalize();
 Quaternion Normalized() const;
-Quaternion Slerp(Quaternion, float) const;
+Quaternion Slerp(const Quaternion&, float) const;
 String ToString() const;
 
 // Properties:
