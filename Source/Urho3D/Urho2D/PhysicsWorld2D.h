@@ -30,6 +30,7 @@ namespace Urho3D
 {
 
 class Camera;
+class CollisionShape2D;
 class RigidBody2D;
 
 /// 2D Physics raycast hit.
@@ -265,6 +266,10 @@ protected:
         SharedPtr<Node> nodeB_;
         /// Box2D contact.
         b2Contact* contact_;
+        /// Shape A.
+        SharedPtr<CollisionShape2D> shapeA_;
+        /// Shape B.
+        SharedPtr<CollisionShape2D> shapeB_;
     };
     /// Begin contact infos.
     Vector<ContactInfo> beginContactInfos_;
