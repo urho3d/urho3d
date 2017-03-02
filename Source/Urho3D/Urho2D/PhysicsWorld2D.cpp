@@ -30,6 +30,7 @@
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Urho2D/CollisionShape2D.h"
 #include "../Urho2D/PhysicsEvents2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/PhysicsWorld2D.h"
@@ -686,6 +687,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
 
@@ -696,6 +699,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -705,6 +710,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -731,6 +738,8 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
 
@@ -741,6 +750,8 @@ void PhysicsWorld2D::SendEndContactEvents()
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -750,6 +761,8 @@ void PhysicsWorld2D::SendEndContactEvents()
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -771,6 +784,8 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     nodeA_ = bodyA_->GetNode();
     nodeB_ = bodyB_->GetNode();
     contact_ = contact;
+    shapeA_ = (CollisionShape2D*)fixtureA->GetUserData();
+    shapeB_ = (CollisionShape2D*)fixtureB->GetUserData();
 }
 
 PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
@@ -778,7 +793,9 @@ PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
     bodyB_(other.bodyB_),
     nodeA_(other.nodeA_),
     nodeB_(other.nodeB_),
-    contact_(other.contact_)
+    contact_(other.contact_),
+    shapeA_(other.shapeA_),
+    shapeB_(other.shapeB_)
 {
 }
 
