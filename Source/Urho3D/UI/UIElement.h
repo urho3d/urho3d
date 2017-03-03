@@ -391,9 +391,6 @@ public:
     /// Template version of returning child element by variable. If only key is provided, return the first child having the matching variable key. If value is also provided then the actual variable value would also be checked against using dynamic cast. May return 0 when casting failed.
     template <class T> T* GetChildDynamicCast(const StringHash& key, const Variant& value = Variant::EMPTY, bool recursive = false) const;
 
-    /// Return name.
-    const String& GetName() const { return name_; }
-
     /// Return position.
     const IntVector2& GetPosition() const { return position_; }
 
@@ -654,8 +651,6 @@ protected:
     /// Update anchored size & position. Only called when anchoring is enabled.
     void UpdateAnchoring();
 
-    /// Name.
-    String name_;
     /// Child elements.
     Vector<SharedPtr<UIElement> > children_;
     /// Parent element.

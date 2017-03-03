@@ -121,6 +121,11 @@ public:
     /// Return object animation attribute.
     ResourceRef GetObjectAnimationAttr() const;
 
+    /// Set name.
+    virtual void SetName(const String& name);
+    /// Return name.
+    const String& GetName() const { return name_; }
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded() = 0;
@@ -153,6 +158,8 @@ protected:
     HashSet<const AttributeInfo*> animatedNetworkAttributes_;
     /// Attribute animation infos.
     HashMap<String, SharedPtr<AttributeAnimationInfo> > attributeAnimationInfos_;
+    /// Name.
+    String name_;
 };
 
 }
