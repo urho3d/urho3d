@@ -421,7 +421,6 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
   - if [[ $EMSCRIPTEN_WASM ]]; then export BINARYEN=binaryen-master-64bit; fi
   - git clone --depth 1 --branch $EMSCRIPTEN_BRANCH https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-${EMSCRIPTEN_BRANCH}-64bit $BINARYEN && source emscripten-sdk/emsdk_env.sh
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done

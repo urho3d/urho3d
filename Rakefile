@@ -342,7 +342,7 @@ task :ci do
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
   ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['WEB'] || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
+  ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
