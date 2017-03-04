@@ -419,6 +419,8 @@ namespace Urho3D
 - %NodeA : Node pointer
 - %NodeB : Node pointer
 - %Contact : b2Contact pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
 
 ### PhysicsEndContact2D
 - %World : PhysicsWorld2D pointer
@@ -427,18 +429,24 @@ namespace Urho3D
 - %NodeA : Node pointer
 - %NodeB : Node pointer
 - %Contact : b2Contact pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
 
 ### NodeBeginContact2D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
 - %Contact : b2Contact pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
 
 ### NodeEndContact2D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
 - %Contact : b2Contact pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
 
 ## %Physics events
 
