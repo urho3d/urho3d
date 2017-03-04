@@ -722,6 +722,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Array<Component@>@ GetComponents(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentsWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetComponent(const String&in, bool recursive = false) const", asFUNCTION(NodeGetComponentWithType), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Component@+ GetParentComponent(const String&in, bool fullTraversal = false) const", asFUNCTION(NodeGetParentComponentWithType), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool IsChildOf(Node@+) const", asMETHOD(T, IsChildOf), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "bool HasComponent(const String&in) const", asFUNCTION(NodeHasComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasTag(const String&in)", asMETHOD(T, HasTag), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Array<String>@ get_tags()", asFUNCTION(NodeGetTags), asCALL_CDECL_OBJLAST);
