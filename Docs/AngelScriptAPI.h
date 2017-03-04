@@ -7343,6 +7343,7 @@ bool HasComponent(const String&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool HasTag(const String&);
+bool IsChildOf(Node) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -9199,6 +9200,7 @@ Node InstantiateXML(File, const Vector3&, const Quaternion&, CreateMode = REPLIC
 Node InstantiateXML(VectorBuffer&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateXML(XMLFile, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
 Node InstantiateXML(const XMLElement&, const Vector3&, const Quaternion&, CreateMode = REPLICATED);
+bool IsChildOf(Node) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadAsync(File, LoadMode = LOAD_SCENE_AND_RESOURCES);
