@@ -22,14 +22,13 @@
 
 #pragma once
 
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 namespace Urho3D
 {
 
 /// Dynamically sized buffer that can be read and written to as a stream.
-class URHO3D_API VectorBuffer : public Deserializer, public Serializer
+class URHO3D_API VectorBuffer : public AbstractFile
 {
 public:
     /// Construct an empty buffer.
