@@ -132,6 +132,7 @@ class Node : public Animatable
     StringHash GetNameHash() const;
     Node* GetParent() const;
     Scene* GetScene() const;
+    bool IsChildOf(Node* node) const;
     bool IsEnabled() const;
     bool IsEnabledSelf() const;
     Connection* GetOwner() const;
