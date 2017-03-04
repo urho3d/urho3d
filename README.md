@@ -193,6 +193,7 @@ PBR textures from Substance Share. (https://share.allegorithmic.com)
 IBL textures from HDRLab's sIBL Archive.
 Dieselpunk Moto model by allexandr007.
 Mutant & Kachujin models from Mixamo.
+License / copyright information included with the assets as necessary. All other assets (including shaders) by Urho3D authors and licensed similarly as the engine itself.
 
 ##Documentation
 Urho3D classes have been sparsely documented using Doxygen notation. To
