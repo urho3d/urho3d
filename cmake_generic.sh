@@ -60,7 +60,7 @@ for a in $@; do
             OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake"
             ;;
         -DWEB=1)
-            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/emscripten.toolchain.cmake"
+            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Emscripten.cmake"
             ;;
     esac
 done
