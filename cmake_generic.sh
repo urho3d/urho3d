@@ -51,13 +51,13 @@ for a in $@; do
             ANDROID=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Android.cmake"
             ;;
         -DRPI=1)
-            if [[ ! $(uname -m) =~ ^arm ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/raspberrypi.toolchain.cmake"; fi
+            if [[ ! $(uname -m) =~ ^arm ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/RaspberryPi.cmake"; fi
             ;;
         -DARM=1)
-            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/arm-linux.toolchain.cmake"; fi
+            if [[ ! $(uname -m) =~ ^(arm|aarch64) ]]; then OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Arm.cmake"; fi
             ;;
         -DWIN32=1)
-            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/mingw.toolchain.cmake"
+            OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/MinGW.cmake"
             ;;
         -DWEB=1)
             OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Emscripten.cmake"
