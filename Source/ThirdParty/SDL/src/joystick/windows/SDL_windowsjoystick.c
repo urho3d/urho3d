@@ -49,10 +49,6 @@
 #ifndef WINVER
 #define WINVER 0x0500
 #endif
-// Urho3D: set WINVER if not defined
-#ifndef WINVER
-#define WINVER 0x0500
-#endif
 #include "../../core/windows/SDL_windows.h"
 #if !defined(__WINRT__)
 #include <dbt.h>
