@@ -125,7 +125,7 @@ if (RPI)
     link_directories (${VIDEOCORE_LIBRARY_DIRS})
 endif ()
 if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
+    set (URHO3D_LIB_TYPE STATIC CACHE STRING "Specify Urho3D library type, possible values are STATIC (default), SHARED, and MODULE; the last value is available for Emscripten only")
     # Non-Windows platforms always use OpenGL, the URHO3D_OPENGL variable will always be forced to TRUE, i.e. it is not an option at all
     # Windows platform has URHO3D_OPENGL as an option, MSVC compiler default to FALSE (i.e. prefers Direct3D) while MinGW compiler default to TRUE
     if (MINGW)
@@ -187,7 +187,7 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
         set_property (GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ${URHO3D_64BIT})
     endif ()
 else ()
-    set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC (default) and SHARED")
+    set (URHO3D_LIB_TYPE "" CACHE STRING "Specify Urho3D library type, possible values are STATIC (default), SHARED, and MODULE; the last value is available for Emscripten only")
     set (URHO3D_HOME "" CACHE PATH "Path to Urho3D build tree or SDK installation location (downstream project only)")
     if (URHO3D_PCH OR URHO3D_UPDATE_SOURCE_TREE OR URHO3D_TOOLS)
         # Just reference it to suppress "unused variable" CMake warning on downstream projects using this CMake module
@@ -200,7 +200,7 @@ else ()
         include_directories (${URHO3D_INCLUDE_DIRS})
     endif ()
 endif ()
-option (URHO3D_PACKAGING "Enable resources packaging support, on Web platform default to 1, on other platforms default to 0" ${WEB})
+cmake_dependent_option (URHO3D_PACKAGING "Enable resources packaging support" FALSE "NOT WEB" TRUE)
 # Enable profiling by default. If disabled, autoprofileblocks become no-ops and the Profiler subsystem is not instantiated.
 option (URHO3D_PROFILING "Enable profiling support" TRUE)
 # Enable logging by default. If disabled, LOGXXXX macros become no-ops and the Log subsystem is not instantiated.
@@ -290,17 +290,24 @@ if (RPI)
     set (RPI_ABI ${RPI_ABI} CACHE STRING "Specify target ABI (RPI platform only), possible values are armeabi-v6 (default for RPI 1), armeabi-v7a (default for RPI 2), armeabi-v7a with NEON, and armeabi-v7a with VFPV4" FORCE)
 endif ()
 if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
+    set (MODULE MODULE)
     set (EMSCRIPTEN_ROOT_PATH "" CACHE PATH "Root path to Emscripten cross-compiler tools (Emscripten only)")
     set (EMSCRIPTEN_SYSROOT "" CACHE PATH "Path to Emscripten system root (Emscripten only)")
     cmake_dependent_option (EMSCRIPTEN_WASM "Enable Binaryen support to generate output to WASM (WebAssembly) format (Emscripten only)" FALSE "NOT EMSCRIPTEN_EMCC_VERSION VERSION_LESS 1.37.3" FALSE)
-    cmake_dependent_option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand when targeting asm.js, it is not set by default due to performance penalty (Emscripten only)" FALSE "NOT EMSCRIPTEN_WASM" TRUE)   # Allo memory growth by default when targeting WebAssembly since there is no performance penalty as in asm.js mode
+    # Currently Emscripten does not support memory growth with MODULE library type
+    if (URHO3D_LIB_TYPE STREQUAL MODULE)
+        set (DEFAULT_MEMORY_GROWTH FALSE)
+    else ()
+        set (DEFAULT_MEMORY_GROWTH TRUE)
+    endif ()
+    cmake_dependent_option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand when targeting asm.js, it is not set by default due to performance penalty (Emscripten with STATIC or SHARED library type only)" FALSE "NOT EMSCRIPTEN_WASM AND NOT URHO3D_LIB_TYPE STREQUAL MODULE" ${DEFAULT_MEMORY_GROWTH})   # Allow memory growth by default when targeting WebAssembly since there is no performance penalty as in asm.js mode
     math (EXPR EMSCRIPTEN_TOTAL_MEMORY "128 * 1024 * 1024")
     set (EMSCRIPTEN_TOTAL_MEMORY ${EMSCRIPTEN_TOTAL_MEMORY} CACHE STRING "Specify the total size of memory to be used (Emscripten only); default to 128 MB, must be in multiple of 64 KB when targeting WebAssembly and in multiple of 16 MB when targeting asm.js")
     option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten only)")
     cmake_dependent_option (EMSCRIPTEN_SHARE_JS "Share the same JS file responsible to load the shared data file (Emscripten only and when enabling sharing data file support only)" FALSE EMSCRIPTEN_SHARE_DATA FALSE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
-set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED)
+set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED ${MODULE})
 if (NOT CMAKE_CONFIGURATION_TYPES)
     set_property (CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${URHO3D_BUILD_CONFIGURATIONS})
 endif ()
@@ -368,7 +375,7 @@ endif ()
 if (URHO3D_LIB_TYPE)
     string (TOUPPER ${URHO3D_LIB_TYPE} URHO3D_LIB_TYPE)
 endif ()
-if (NOT URHO3D_LIB_TYPE STREQUAL SHARED)
+if (NOT URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_LIB_TYPE STREQUAL MODULE)
     set (URHO3D_LIB_TYPE STATIC)
     if (MSVC)
         # This define will be baked into the export header for MSVC compiler
@@ -628,21 +635,8 @@ else ()
                 endif ()
                 set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
                 set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
-                # Linker flags
-                if (EMSCRIPTEN_WASM)
-                    # Allow emitting of code that might trap (for higher performance)
-                    set (WASM_LINKER_FLAGS "-s WASM=1 -s BINARYEN_IMPRECISE=1")  # TODO: BINARYEN_IMPRECISE could be renamed to BINARYEN_EMIT_POTENTIAL_TRAPS or something like that in the coming release)
-                endif ()
-                set (MEMORY_LINKER_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
-                if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
-                    set (MEMORY_LINKER_FLAGS "${MEMORY_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1")
-                endif ()
-                set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${WASM_LINKER_FLAGS} ${MEMORY_LINKER_FLAGS} -s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
                 set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
                 set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
-                if (URHO3D_TESTING)
-                    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --emrun")  # Inject code into the generated Module object to enable capture of stdout, stderr and exit()
-                endif ()
             endif ()
         elseif (MINGW)
             # MinGW-specific setup
@@ -872,7 +866,13 @@ macro (define_dependency_libs TARGET)
                 if (TARGET ${TARGET}_universal)
                     add_dependencies (${TARGET_NAME} ${TARGET}_universal)
                 endif ()
-                list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
+                if (URHO3D_LIB_TYPE STREQUAL MODULE)
+                    if (TARGET ${TARGET})
+                        add_dependencies (${TARGET_NAME} ${TARGET})
+                    endif ()
+                else ()
+                    list (APPEND ABSOLUTE_PATH_LIBS ${URHO3D_LIBRARIES})
+                endif ()
             endif ()
         endif ()
     endif ()
@@ -947,6 +947,110 @@ macro (define_source_files)
             endif ()
         endforeach ()
     endif ()
+endmacro ()
+
+# Macro for defining resource files, should be called after the define_source_files() macro
+macro (define_resource_files)
+    check_source_files ()
+    if (NOT RESOURCE_DIRS)
+        # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
+        foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
+            # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
+            if (IS_DIRECTORY ${DIR})
+                list (APPEND RESOURCE_DIRS ${DIR})
+            endif ()
+        endforeach ()
+    endif ()
+    if (URHO3D_PACKAGING AND RESOURCE_DIRS)
+        # Populate all the variables required by resource packaging
+        foreach (DIR ${RESOURCE_DIRS})
+            get_filename_component (NAME ${DIR} NAME)
+            if (ANDROID)
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_BINARY_DIR}/assets/${NAME}.pak)
+            else ()
+                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
+            endif ()
+            list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
+            if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
+                # Set the custom EMCC_OPTION property to preload the *.pak individually
+                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
+            endif ()
+        endforeach ()
+        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
+        if (WEB)
+            if (EMSCRIPTEN)
+                # Set the custom EMCC_OPTION property to peload the generated shared data file
+                if (EMSCRIPTEN_SHARE_DATA)
+                    set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
+                    if (EMSCRIPTEN_SHARE_JS)
+                        set (PREFIX_JS ${CMAKE_BINARY_DIR}/Source/prefix.js)
+                        set (SHARED_JS ${SHARED_RESOURCE_JS})
+                    else ()
+                        set (PREFIX_JS ${SHARED_RESOURCE_JS})
+                    endif ()
+                    list (APPEND SOURCE_FILES ${PREFIX_JS} ${SHARED_RESOURCE_JS}.data)
+                    set_source_files_properties (${PREFIX_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
+                    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
+                    if (DEST_BUNDLE_DIR)
+                        install (FILES ${SHARED_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
+                    endif ()
+                    # Define a custom command for generating a shared data file
+                    if (RESOURCE_PAKS)
+                        # When sharing a single data file, all main targets are assumed to use a same set of resource paks
+                        foreach (FILE ${RESOURCE_PAKS})
+                            get_filename_component (NAME ${FILE} NAME)
+                            list (APPEND PAK_NAMES ${NAME})
+                        endforeach ()
+                        if (CMAKE_BUILD_TYPE STREQUAL Debug AND EMSCRIPTEN_EMCC_VERSION VERSION_GREATER 1.32.2)
+                            set (SEPARATE_METADATA --separate-metadata)
+                        endif ()
+                        add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
+                            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${SEPARATE_METADATA}
+                            DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
+                            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                            COMMENT "Generating shared data file")
+                    endif ()
+                endif ()
+            endif ()
+        endif ()
+    endif ()
+    if (XCODE)
+        if (NOT RESOURCE_FILES)
+            # Default app bundle icon
+            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
+            if (IOS)
+                # Default app icon on the iOS home screen
+                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
+            endif ()
+        endif ()
+        # Group them together under 'Resources' in Xcode IDE
+        source_group (Resources FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
+        # But only use either paks or dirs
+        if (RESOURCE_PAKS)
+            set_source_files_properties (${RESOURCE_PAKS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        else ()
+            set_source_files_properties (${RESOURCE_DIRS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        endif ()
+    endif ()
+    list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
+endmacro()
+
+# Macro fo adding a HTML shell-file when targeting Web platform
+macro (add_html_shell)
+    if (NOT ${ARGN} STREQUAL "")
+        set (SHELL_HTML ${ARGN})
+    else ()
+        # Create Urho3D custom HTML shell that also embeds our own project logo
+        if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
+            file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
+            string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
+            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
+            file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
+        endif ()
+        set (SHELL_HTML ${CMAKE_BINARY_DIR}/Source/shell.html)
+    endif ()
+    list (APPEND SOURCE_FILES ${SHELL_HTML})
+    set_source_files_properties (${SHELL_HTML} PROPERTIES EMCC_OPTION shell-file)
 endmacro ()
 
 include (GenerateExportHeader)
@@ -1273,6 +1377,7 @@ endmacro ()
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 #  LINK_DEPENDS - list of additional files on which a target binary depends for linking (Makefile-based generator only)
+#  LINK_FLAGS - list of additional link flags
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_executable)
     cmake_parse_arguments (ARG "PRIVATE;TOOL;NODEPS" "" "" ${ARGN})
@@ -1293,10 +1398,24 @@ macro (setup_executable)
     if (NOT ARG_NODEPS)
         define_dependency_libs (Urho3D)
     endif ()
+    if (EMSCRIPTEN)
+        list (APPEND LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
+        if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
+            list (APPEND LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
+        endif ()
+        if (EMSCRIPTEN_WASM)
+            # Allow emitting of code that might trap (for higher performance)
+            list (APPEND LINK_FLAGS "-s WASM=1 -s BINARYEN_IMPRECISE=1")  # TODO: BINARYEN_IMPRECISE could be renamed to BINARYEN_EMIT_POTENTIAL_TRAPS or something like that in the coming release)
+        endif ()
+        if (URHO3D_TESTING)
+            # Inject code into the generated Module object to enable capture of stdout, stderr and exit(); and also to enable processing of request parameters as app's arguments
+            list (APPEND LINK_FLAGS "--emrun")
+        endif ()
+    endif ()
     if (XCODE AND LUAJIT_EXE_LINKER_FLAGS_APPLE)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_LDFLAGS[arch=x86_64] "${LUAJIT_EXE_LINKER_FLAGS_APPLE} $(OTHER_LDFLAGS)")    # Xcode universal build linker flags when targeting 64-bit OSX with LuaJIT enabled
     endif ()
-    setup_target ()
+    _setup_target ()
 
     if (URHO3D_SCP_TO_TARGET)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND scp $<TARGET_FILE:${TARGET_NAME}> ${URHO3D_SCP_TO_TARGET} || exit 0
@@ -1316,12 +1435,24 @@ macro (setup_executable)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${RUNTIME_DIR})
     endif ()
+    if (EMSCRIPTEN AND NOT ARG_NODEPS AND URHO3D_LIB_TYPE STREQUAL MODULE AND RUNTIME_DIR)
+        # Make a copy of the Urho3D module to the runtime directory in the build tree
+        if (TARGET Urho3D)
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${RUNTIME_DIR}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D>.mem ${RUNTIME_DIR})
+        else ()
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${URHO3D_LIBRARIES} ${RUNTIME_DIR}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${URHO3D_LIBRARIES}.mem ${RUNTIME_DIR})
+        endif ()
+    endif ()
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (NOT ARG_PRIVATE)
         if (WEB AND DEST_BUNDLE_DIR)
             set (LOCATION $<TARGET_FILE_DIR:${TARGET_NAME}>)
             unset (FILES)
-            foreach (EXT data html html.map html.mem js)
+            foreach (EXT data html html.map html.mem js wasm)
                 list (APPEND FILES ${LOCATION}/${TARGET_NAME}.${EXT})
             endforeach ()
             install (FILES ${FILES} DESTINATION ${DEST_BUNDLE_DIR} OPTIONAL)    # We get html.map or html.mem depend on the build configuration
@@ -1354,6 +1485,7 @@ endmacro ()
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 #  LINK_DEPENDS - list of additional files on which a target binary depends for linking (Makefile-based generator only)
+#  LINK_FLAGS - list of additional link flags
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_library)
     cmake_parse_arguments (ARG NODEPS "" "" ${ARGN})
@@ -1366,7 +1498,7 @@ macro (setup_library)
     if (XCODE AND LUAJIT_SHARED_LINKER_FLAGS_APPLE AND LIB_TYPE STREQUAL SHARED_LIBRARY)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_LDFLAGS[arch=x86_64] "${LUAJIT_SHARED_LINKER_FLAGS_APPLE} $(OTHER_LDFLAGS)")    # Xcode universal build linker flags when targeting 64-bit OSX with LuaJIT enabled
     endif ()
-    setup_target ()
+    _setup_target ()
 
     # Setup the compiler flags for building shared library
     if (LIB_TYPE STREQUAL SHARED_LIBRARY)
@@ -1403,109 +1535,11 @@ endmacro ()
 #  LIBS - list of dependent libraries that are built internally in the project
 #  ABSOLUTE_PATH_LIBS - list of dependent libraries that are external to the project
 #  LINK_DEPENDS - list of additional files on which a target binary depends for linking (Makefile-based generator only)
+#  LINK_FLAGS - list of additional link flags
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_main_executable)
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})
-
-    # Define resources
-    if (NOT RESOURCE_DIRS)
-        # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
-        foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
-            # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
-            if (IS_DIRECTORY ${DIR})
-                list (APPEND RESOURCE_DIRS ${DIR})
-            endif ()
-        endforeach ()
-    endif ()
-    if (URHO3D_PACKAGING AND RESOURCE_DIRS)
-        # Populate all the variables required by resource packaging
-        foreach (DIR ${RESOURCE_DIRS})
-            get_filename_component (NAME ${DIR} NAME)
-            if (ANDROID)
-                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_BINARY_DIR}/assets/${NAME}.pak)
-            else ()
-                set (RESOURCE_${DIR}_PATHNAME ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${NAME}.pak)
-            endif ()
-            list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
-            if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
-                # Set the custom EMCC_OPTION property to preload the *.pak individually
-                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
-            endif ()
-        endforeach ()
-        # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
-        find_Urho3d_tool (PACKAGE_TOOL PackageTool
-            HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
-            DOC "Path to PackageTool" MSG_MODE WARNING)
-        if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-            set (PACKAGING_DEP DEPENDS PackageTool)
-        endif ()
-        set (PACKAGING_COMMENT " and packaging")
-        set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
-        if (WEB)
-            if (EMSCRIPTEN)
-                # When generating html as output, check if shell-file is already added in source files list by downstream project
-                if (CMAKE_EXECUTABLE_SUFFIX_CXX STREQUAL .html)
-                    if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-                        foreach (FILE ${SOURCE_FILES})
-                            get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
-                            if (EMCC_OPTION STREQUAL shell-file)
-                                set (SHELL_HTML_FOUND TRUE)
-                                break ()
-                            endif ()
-                        endforeach ()
-                    endif ()
-                    if (NOT SHELL_HTML_FOUND)
-                        # Use custom Urho3D shell.html
-                        set (SHELL_HTML ${CMAKE_BINARY_DIR}/Source/shell.html)
-                        list (APPEND SOURCE_FILES ${SHELL_HTML})
-                        set_source_files_properties (${SHELL_HTML} PROPERTIES EMCC_OPTION shell-file)
-                    endif ()
-                endif ()
-                # Set the custom EMCC_OPTION property to peload the generated shared data file
-                if (EMSCRIPTEN_SHARE_DATA)
-                    set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
-                    if (EMSCRIPTEN_SHARE_JS)
-                        set (PREFIX_JS ${CMAKE_BINARY_DIR}/Source/prefix.js)
-                        set (SHARED_JS ${SHARED_RESOURCE_JS})
-                    else ()
-                        set (PREFIX_JS ${SHARED_RESOURCE_JS})
-                    endif ()
-                    list (APPEND SOURCE_FILES ${PREFIX_JS} ${SHARED_RESOURCE_JS}.data)
-                    set_source_files_properties (${PREFIX_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
-                    # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
-                    if (DEST_BUNDLE_DIR)
-                        install (FILES ${SHARED_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
-                    endif ()
-                endif ()
-                # If not using EMRUN then we need to include the emrun_prejs.js manually in order to process the request parameters as arguments correctly
-                if (NOT URHO3D_TESTING)
-                    set (EMRUN_PREJS ${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js)
-                    list (APPEND SOURCE_FILES ${EMRUN_PREJS})
-                    set_source_files_properties (${EMRUN_PREJS} PROPERTIES EMCC_OPTION pre-js)
-                endif ()
-            endif ()
-        endif ()
-    endif ()
-    if (XCODE)
-        if (NOT RESOURCE_FILES)
-            # Default app bundle icon
-            set (RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.icns)
-            if (IOS)
-                # Default app icon on the iOS home screen
-                list (APPEND RESOURCE_FILES ${CMAKE_SOURCE_DIR}/bin/Data/Textures/UrhoIcon.png)
-            endif ()
-        endif ()
-        # Group them together under 'Resources' in Xcode IDE
-        source_group (Resources FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
-        # But only use either paks or dirs
-        if (RESOURCE_PAKS)
-            set_source_files_properties (${RESOURCE_PAKS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        else ()
-            set_source_files_properties (${RESOURCE_DIRS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        endif ()
-    endif ()
-    list (APPEND SOURCE_FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
-
+    define_resource_files ()
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
@@ -1557,30 +1591,121 @@ macro (setup_main_executable)
             endif ()
         elseif (WEB)
             if (EMSCRIPTEN)
-                # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file
+                # Output to HTML when a HTML shell-file is being added in source files list
                 foreach (FILE ${SOURCE_FILES})
                     get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
-                    if (EMCC_OPTION)
-                        list (APPEND LINK_DEPENDS ${FILE})
-                        unset (EMCC_FILE_ALIAS)
-                        unset (EMCC_EXCLUDE_FILE)
-                        if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
-                            get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
-                            get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
-                            if (EMCC_EXCLUDE_FILE)
-                                set (EMCC_EXCLUDE_FILE " --exclude-file ${EMCC_EXCLUDE_FILE}")
-                            endif ()
-                        endif ()
-                        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
+                    if (EMCC_OPTION STREQUAL shell-file)
+                        list (APPEND TARGET_PROPERTIES SUFFIX .html)
+                        break ()
                     endif ()
                 endforeach ()
+                if (URHO3D_TESTING)
+                    # Auto adding the HTML shell-file during testing with emrun, if it has not been added yet
+                    if (NOT EMCC_OPTION STREQUAL shell-file)
+                        add_html_shell ()
+                        list (APPEND TARGET_PROPERTIES SUFFIX .html)
+                    endif ()
+                else ()
+                    # If not using EMRUN then we need to include the emrun_prejs.js manually in order to process the request parameters as app's arguments correctly
+                    set (EMRUN_PREJS ${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js)
+                    list (APPEND SOURCE_FILES ${EMRUN_PREJS})
+                    set_source_files_properties (${EMRUN_PREJS} PROPERTIES EMCC_OPTION pre-js)
+                endif ()
             endif ()
         endif ()
         setup_executable (${EXE_TYPE} ${ARG_UNPARSED_ARGUMENTS})
     endif ()
 
-    # Define a custom target for resource modification checking and resource packaging (if enabled)
+    # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
+    # Exclude multi-config generators, plus MSVC explicitly since it could also be used through NMake which is not multi-config,
+    # but MSVC does not have a strip command
+    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB AND NOT MSVC)
+        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
+    endif ()
+endmacro ()
+
+# Macro for setting up dependency lib for compilation and linking of a target (to be used internally)
+macro (_setup_target)
+    # Include directories
+    include_directories (${INCLUDE_DIRS})
+    # Link libraries
+    define_dependency_libs (${TARGET_NAME})
+    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
+    # Enable PCH if requested
+    if (${TARGET_NAME}_HEADER_PATHNAME)
+        enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
+    endif ()
+    # Extra compiler flags for Xcode which are dynamically changed based on active arch in order to support Mach-O universal binary targets
+    # We don't add the ABI flag for Xcode because it automatically passes '-arch i386' compiler flag when targeting 32 bit which does the same thing as '-m32'
+    if (XCODE)
+        # Speed up build when in Debug configuration by building active arch only
+        list (FIND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH ATTRIBUTE_ALREADY_SET)
+        if (ATTRIBUTE_ALREADY_SET EQUAL -1)
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+        endif ()
+        if (NOT URHO3D_SSE)
+            # Nullify the Clang default so that it is consistent with GCC
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse $(OTHER_CFLAGS)")
+            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-mno-sse $(OTHER_CPLUSPLUSFLAGS)")
+        endif ()
+    endif ()
+    # Extra linker flags for Emscripten
+    if (EMSCRIPTEN)
+        # Pass EMCC-specifc setting to differentiate between main and side modules
+        if (URHO3D_LIB_TYPE STREQUAL MODULE)
+            if (${TARGET_NAME} STREQUAL Urho3D)
+                list (APPEND LINK_FLAGS "-s MAIN_MODULE=2")      # Main module has standard libs statically linked with dead code elimination
+            else ()
+                list (APPEND LINK_FLAGS "-s SIDE_MODULE=1")
+            endif ()
+        endif ()
+        # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file
+        foreach (FILE ${SOURCE_FILES})
+            get_property (EMCC_OPTION SOURCE ${FILE} PROPERTY EMCC_OPTION)
+            if (EMCC_OPTION)
+                unset (EMCC_FILE_ALIAS)
+                unset (EMCC_EXCLUDE_FILE)
+                if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
+                    get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
+                    get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
+                    if (EMCC_EXCLUDE_FILE)
+                        set (EMCC_EXCLUDE_FILE " --exclude-file ${EMCC_EXCLUDE_FILE}")
+                    else ()
+                        list (APPEND LINK_DEPENDS ${FILE})
+                    endif ()
+                endif ()
+                list (APPEND LINK_FLAGS "--${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
+            endif ()
+        endforeach ()
+    endif ()
+    # Set additional linker dependencies (only work for Makefile-based generator according to CMake documentation)
+    if (LINK_DEPENDS)
+        string (REPLACE ";" "\;" LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
+        list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
+        unset (LINK_DEPENDS)
+    endif ()
+    # Set additional linker flags
+    if (LINK_FLAGS)
+        string (REPLACE ";" " " LINK_FLAGS "${LINK_FLAGS}")
+        list (APPEND TARGET_PROPERTIES LINK_FLAGS ${LINK_FLAGS})
+        unset (LINK_FLAGS)
+    endif ()
+    if (TARGET_PROPERTIES)
+        set_target_properties (${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
+        unset (TARGET_PROPERTIES)
+    endif ()
+    # Setup custom resource checker target
     if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
+        if (URHO3D_PACKAGING)
+            # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
+            find_Urho3d_tool (PACKAGE_TOOL PackageTool
+                HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
+                DOC "Path to PackageTool" MSG_MODE WARNING)
+            if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+                set (PACKAGING_DEP DEPENDS PackageTool)
+            endif ()
+            set (PACKAGING_COMMENT " and packaging")
+        endif ()
         # Share a same custom target that checks for a same resource dirs list
         foreach (DIR ${RESOURCE_DIRS})
             string (MD5 MD5 ${DIR})
@@ -1618,68 +1743,7 @@ macro (setup_main_executable)
         add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
 
-    # Define a custom command for generating a shared data file (if enabled)
-    if (EMSCRIPTEN_SHARE_DATA AND RESOURCE_PAKS)
-        # When sharing a single data file, all main targets are assumed to use a same set of resource paks
-        foreach (FILE ${RESOURCE_PAKS})
-            get_filename_component (NAME ${FILE} NAME)
-            list (APPEND PAK_NAMES ${NAME})
-        endforeach ()
-        if (CMAKE_BUILD_TYPE STREQUAL Debug AND EMSCRIPTEN_EMCC_VERSION VERSION_GREATER 1.32.2)
-            set (SEPARATE_METADATA --separate-metadata)
-        endif ()
-        add_custom_command (OUTPUT ${SHARED_RESOURCE_JS}.data
-            COMMAND ${EMPACKAGER} ${SHARED_RESOURCE_JS}.data --preload ${PAK_NAMES} --js-output=${SHARED_RESOURCE_JS} --use-preload-cache ${SEPARATE_METADATA}
-            DEPENDS RESOURCE_CHECK ${RESOURCE_PAKS}
-            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-            COMMENT "Generating shared data file")
-    endif ()
-
-    # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
-    # Exclude multi-config generators, plus MSVC explicitly since it could also be used through NMake which is not multi-config,
-    # but MSVC does not have a strip command
-    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB AND NOT MSVC)
-        add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
-    endif ()
-endmacro ()
-
-# Macro for setting up dependency lib for compilation and linking of a target
-macro (setup_target)
-    # Include directories
-    include_directories (${INCLUDE_DIRS})
-    # Link libraries
-    define_dependency_libs (${TARGET_NAME})
-    target_link_libraries (${TARGET_NAME} ${ABSOLUTE_PATH_LIBS} ${LIBS})
-    # Enable PCH if requested
-    if (${TARGET_NAME}_HEADER_PATHNAME)
-        enable_pch (${${TARGET_NAME}_HEADER_PATHNAME})
-    endif ()
-    # Set additional linker dependencies (only work for Makefile-based generator according to CMake documentation)
-    if (LINK_DEPENDS)
-        string (REPLACE ";" "\;" LINK_DEPENDS "${LINK_DEPENDS}")        # Stringify for string replacement
-        list (APPEND TARGET_PROPERTIES LINK_DEPENDS "${LINK_DEPENDS}")  # Stringify with semicolons already escaped
-        unset (LINK_DEPENDS)
-    endif ()
-    # Extra compiler flags for Xcode which are dynamically changed based on active arch in order to support Mach-O universal binary targets
-    # We don't add the ABI flag for Xcode because it automatically passes '-arch i386' compiler flag when targeting 32 bit which does the same thing as '-m32'
-    if (XCODE)
-        # Speed up build when in Debug configuration by building active arch only
-        list (FIND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH ATTRIBUTE_ALREADY_SET)
-        if (ATTRIBUTE_ALREADY_SET EQUAL -1)
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
-        endif ()
-        if (NOT URHO3D_SSE)
-            # Nullify the Clang default so that it is consistent with GCC
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386] "-mno-sse $(OTHER_CFLAGS)")
-            list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386] "-mno-sse $(OTHER_CPLUSPLUSFLAGS)")
-        endif ()
-    endif ()
-    if (TARGET_PROPERTIES)
-        set_target_properties (${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
-        unset (TARGET_PROPERTIES)
-    endif ()
-
-    # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red in the Xcode IDE as if they are not yet built
+    # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red in the Xcode as if they are not yet built
     if (NOT DEFINED ENV{TRAVIS})
         if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
             file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/build)
@@ -1691,7 +1755,7 @@ macro (setup_target)
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/build)
         endif ()
     endif ()
-endmacro ()
+endmacro()
 
 # Macro for setting up a test case
 macro (setup_test)
@@ -1752,17 +1816,8 @@ if (ANDROID)
         endif ()
     endforeach ()
 elseif (WEB)
-    # Create Urho3D custom HTML shell that also embeds our own project logo
-    if (EMSCRIPTEN)
-        if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
-            file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
-            string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
-            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
-            file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
-        endif ()
-        if (EMSCRIPTEN_SHARE_JS AND NOT EXISTS ${CMAKE_BINARY_DIR}/Source/prefix.js)
-            file (WRITE ${CMAKE_BINARY_DIR}/Source/prefix.js "var Module;if(typeof Module==='undefined')Module=eval('(function(){try{return Module||{}}catch(e){return{}}})()');var s=document.createElement('script');s.src='${CMAKE_PROJECT_NAME}.js';document.body.appendChild(s);Module['preRun'].push(function(){Module['addRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')});s.onload=function(){Module['removeRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')};")
-        endif ()
+    if (EMSCRIPTEN_SHARE_JS AND NOT EXISTS ${CMAKE_BINARY_DIR}/Source/prefix.js)
+        file (WRITE ${CMAKE_BINARY_DIR}/Source/prefix.js "var Module;if(typeof Module==='undefined')Module=eval('(function(){try{return Module||{}}catch(e){return{}}})()');var s=document.createElement('script');s.src='${CMAKE_PROJECT_NAME}.js';document.body.appendChild(s);Module['preRun'].push(function(){Module['addRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')});s.onload=function(){Module['removeRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')};")
     endif ()
 else ()
     # Create symbolic links in the build tree

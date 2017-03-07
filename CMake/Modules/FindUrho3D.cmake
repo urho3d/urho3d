@@ -99,6 +99,10 @@ else ()
         if (NOT CMAKE_FIND_LIBRARY_SUFFIXES MATCHES ^\\.\(a|lib\))
             list (REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
         endif ()
+        # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so", and also cater for the module library extension
+        if (EMSCRIPTEN)
+            string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES};.js")   # Stringify for string replacement
+        endif ()
         # If library type is specified then only search for the requested library type
         if (NOT MSVC AND URHO3D_LIB_TYPE)      # MSVC static lib and import lib have a same extension, so cannot use it for searches
             if (URHO3D_LIB_TYPE STREQUAL STATIC)
@@ -108,16 +112,16 @@ else ()
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .dll.a)
                 elseif (APPLE)
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .dylib)
+                elseif (EMSCRIPTEN)
+                    set (CMAKE_FIND_LIBRARY_SUFFIXES .bc)
                 else ()
                     set (CMAKE_FIND_LIBRARY_SUFFIXES .so)
                 endif ()
+            elseif (URHO3D_LIB_TYPE STREQUAL MODULE AND EMSCRIPTEN)
+                set (CMAKE_FIND_LIBRARY_SUFFIXES .js)
             else ()
                 message (FATAL_ERROR "Library type: '${URHO3D_LIB_TYPE}' is not supported")
             endif ()
-        endif ()
-        # Cater for the shared library extension in Emscripten build which is ".bc" instead of ".so"
-        if (EMSCRIPTEN)
-            string (REPLACE .so .bc CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_FIND_LIBRARY_SUFFIXES}")   # Stringify for string replacement
         endif ()
         # The PATH_SUFFIX does not work for CMake on Windows host system, it actually needs a prefix instead
         if (CMAKE_HOST_WIN32)
@@ -200,7 +204,11 @@ else ()
                 # For Non-MSVC compiler the static define is not baked into the export header file so we need to define it for the try_compile below
                 set (COMPILER_STATIC_DEFINE COMPILE_DEFINITIONS -DURHO3D_STATIC_DEFINE)
             else ()
-                set (URHO3D_LIB_TYPE SHARED)
+                if (EXT STREQUAL .js)
+                    set (URHO3D_LIB_TYPE MODULE)
+                else ()
+                    set (URHO3D_LIB_TYPE SHARED)
+                endif ()
                 unset (COMPILER_STATIC_DEFINE)
             endif ()
         endif ()
@@ -232,22 +240,26 @@ else ()
                 endif ()
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
-            string (REPLACE .js ";" COMPILER_FLAGS "${COMPILER_FLAGS}")     # Emscripten-specific - revise SmileyHack to inject empty suffix to keep try_compile() happy
-            while (NOT URHO3D_COMPILE_RESULT)
-                try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrhoLibrary.cpp
-                    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
-                    OUTPUT_VARIABLE TRY_COMPILE_OUT)
-                if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
-                    # Give a second chance for MSVC to use static runtime flag
-                    if (URHO3D_LIBRARIES_REL)
-                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MT)
+            if (URHO3D_LIB_TYPE STREQUAL MODULE)
+                # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
+                set (URHO3D_COMPILE_RESULT 1)
+            else ()
+                while (NOT URHO3D_COMPILE_RESULT)
+                    try_compile (URHO3D_COMPILE_RESULT ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_LIST_DIR}/CheckUrhoLibrary.cpp
+                        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${COMPILER_FLAGS} -DLINK_LIBRARIES:STRING=${URHO3D_LIBRARIES} -DINCLUDE_DIRECTORIES:STRING=${URHO3D_INCLUDE_DIRS} ${COMPILER_STATIC_DEFINE} ${COMPILER_STATIC_RUNTIME_FLAGS}
+                        OUTPUT_VARIABLE TRY_COMPILE_OUT)
+                    if (MSVC AND NOT URHO3D_COMPILE_RESULT AND NOT COMPILER_STATIC_RUNTIME_FLAGS)
+                        # Give a second chance for MSVC to use static runtime flag
+                        if (URHO3D_LIBRARIES_REL)
+                            set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MT)
+                        else ()
+                            set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MTd)
+                        endif ()
                     else ()
-                        set (COMPILER_STATIC_RUNTIME_FLAGS COMPILE_DEFINITIONS /MTd)
+                        break ()    # Other compilers break immediately rendering the while-loop a no-ops
                     endif ()
-                else ()
-                    break ()    # Other compilers break immediately rendering the while-loop a no-ops
-                endif ()
-            endwhile ()
+                endwhile ()
+            endif ()
             set (URHO3D_COMPILE_RESULT ${URHO3D_COMPILE_RESULT} CACHE INTERNAL "FindUrho3D module's compile result")
             if (URHO3D_COMPILE_RESULT)
                 # Auto-discover build options used by the found library and export header

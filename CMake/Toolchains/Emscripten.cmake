@@ -154,14 +154,13 @@ foreach (LANG C CXX)
     set (CMAKE_${LANG}_ABI_COMPILED TRUE)
     set (CMAKE_${LANG}_SIZEOF_DATA_PTR 4)   # Assume it is always 32-bit for now (we could have used our CheckCompilerToolChains.cmake module here)
     # We could not set CMAKE_EXECUTABLE_SUFFIX directly because CMake processes platform configuration files after the toolchain file and since we tell CMake that we are cross-compiling for 'Linux' platform (Emscripten is not a valid platform yet in CMake) via CMAKE_SYSTEM_NAME variable, as such CMake force initializes the CMAKE_EXECUTABLE_SUFFIX to empty string (as expected for Linux platform); To workaround it we have to use CMAKE_EXECUTABLE_SUFFIX_C and CMAKE_EXECUTABLE_SUFFIX_CXX instead, which are fortunately not being touched by platform configuration files
-    if (NOT DEFINED CMAKE_EXECUTABLE_SUFFIX_${LANG})
-        set (CMAKE_EXECUTABLE_SUFFIX_${LANG} .html)
-    endif ()
+    set (CMAKE_EXECUTABLE_SUFFIX_${LANG} .js)
+    set (CMAKE_SHARED_LIBRARY_SUFFIX_${LANG} .bc)   # "linked" LLVM bitcode
+    set (CMAKE_SHARED_MODULE_SUFFIX_${LANG} .js)    # side module
 endforeach ()
 
 # Set required compiler flags for various internal CMake checks which rely on the compiler/linker error to be occured for the check to be performed correctly
-# The executable suffix needs to be .js for the below Emscripten-specific compiler setting to be effective
-set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1;-DSmileyHack=byYaoWT;-DCMAKE_EXECUTABLE_SUFFIX_C=.js;-DCMAKE_EXECUTABLE_SUFFIX_CXX=.js")
+set (CMAKE_REQUIRED_FLAGS "-s ERROR_ON_UNDEFINED_SYMBOLS=1")
 
 # Use response files on Windows host
 if (CMAKE_HOST_WIN32)
