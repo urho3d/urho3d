@@ -1059,8 +1059,8 @@ class AssignModelAction : EditAction
     void Define(StaticModel@ staticModel_, Model@ oldModel_, Model@ newModel_)
     {
         staticModel = staticModel_;
-        oldModel = oldModel_.name;
-        newModel = newModel_.name;
+        oldModel = (oldModel_ !is null) ? oldModel_.name : "";
+        newModel = (newModel_ !is null) ? newModel_.name : "";
     }
 
     void Undo()
