@@ -152,18 +152,27 @@ void EditorMainHandleHoverEnd(StringHash eventType, VariantMap& eventData)
 
 void EditorMainHandleNodeAdded(StringHash eventType, VariantMap& eventData)
 {
+    if (GetEventSender() !is editorScene)
+        return;
+
     HandleNodeAdded(eventType, eventData);
     rebuildSceneOrigins = true;
 }
 
 void EditorMainHandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
+    if (GetEventSender() !is editorScene)
+        return;
+
     HandleNodeRemoved(eventType, eventData);
     rebuildSceneOrigins = true;
 }
 
 void EditorMainHandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
 {
+    if (GetEventSender() !is editorScene)
+        return;
+
     HandleNodeNameChanged(eventType, eventData);
 }
 
