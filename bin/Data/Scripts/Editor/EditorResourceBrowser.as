@@ -838,7 +838,7 @@ void HandleResourceBrowserFileListSelectionChange(StringHash eventType, VariantM
                 if (boxes[i].size.length > biggestBox.size.length)
                     biggestBox = boxes[i];
             }
-            resourcePreviewCameraNode.position = camPosition * biggestBox.size.length + biggestBox.center;
+            resourcePreviewCameraNode.position = biggestBox.center + camPosition * biggestBox.size.length;
         }
 
         resourcePreviewScene.AddChild(resourcePreviewNode);
