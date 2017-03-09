@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
+#include "../IO/VectorBuffer.h"
 
 #include <Box2D/Box2D.h>
 
@@ -275,6 +276,8 @@ protected:
     Vector<ContactInfo> beginContactInfos_;
     /// End contact infos.
     Vector<ContactInfo> endContactInfos_;
+    /// Temporary buffer with contact data.
+    VectorBuffer contacts_;
 };
 
 }

@@ -46,6 +46,21 @@ static const Vector2 DEFAULT_GRAVITY(0.0f, -9.81f);
 static const int DEFAULT_VELOCITY_ITERATIONS = 8;
 static const int DEFAULT_POSITION_ITERATIONS = 3;
 
+// Helper function to write contact info into buffer.
+const PODVector<unsigned char>& WriteContactInfo(VectorBuffer& buffer, b2Contact* contact)
+{
+    buffer.Clear();
+    b2WorldManifold worldManifold;
+    contact->GetWorldManifold(&worldManifold);
+    for (int i = 0; i < contact->GetManifold()->pointCount; ++i)
+    {
+        buffer.WriteVector2(Vector2(worldManifold.points[i].x, worldManifold.points[i].y));
+        buffer.WriteVector2(Vector2(worldManifold.normal.x, worldManifold.normal.y));
+        buffer.WriteFloat(worldManifold.separations[i]);
+    }
+    return buffer.GetBuffer();
+}
+
 PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     Component(context),
     gravity_(DEFAULT_GRAVITY),
@@ -687,12 +702,14 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
         eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
         eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
 
         nodeEventData[NodeBeginContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeBeginContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
 
         if (contactInfo.nodeA_)
         {
@@ -738,20 +755,22 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
         eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
         eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
 
         nodeEventData[NodeEndContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeEndContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
 
         if (contactInfo.nodeA_)
         {
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
-            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
-            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -761,8 +780,8 @@ void PhysicsWorld2D::SendEndContactEvents()
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
-            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
-            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
