@@ -148,6 +148,70 @@ void PhysicsWorld2D::EndContact(b2Contact* contact)
         return;
 
     endContactInfos_.Push(ContactInfo(contact));
+    disabledContacts_.Erase(contact);
+}
+
+void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+    b2Fixture* fixtureA = contact->GetFixtureA();
+    b2Fixture* fixtureB = contact->GetFixtureB();
+    if (!fixtureA || !fixtureB)
+        return;
+
+    if (disabledContacts_.Contains(contact))
+        contact->SetEnabled(false);
+    ContactInfo contactInfo(contact);
+
+    // Send global event
+    VariantMap& eventData = GetEventDataMap();
+    eventData[PhysicsUpdateContact2D::P_WORLD] = this;
+    eventData[PhysicsUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+
+    eventData[PhysicsUpdateContact2D::P_BODYA] = contactInfo.bodyA_.Get();
+    eventData[PhysicsUpdateContact2D::P_BODYB] = contactInfo.bodyB_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEA] = contactInfo.nodeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEB] = contactInfo.nodeB_.Get();
+    eventData[PhysicsUpdateContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+    eventData[PhysicsUpdateContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+    eventData[PhysicsUpdateContact2D::P_SHAPEA] = contactInfo.shapeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_SHAPEB] = contactInfo.shapeB_.Get();
+
+    SendEvent(E_PHYSICSUPDATECONTACT2D, eventData);
+    contact->SetEnabled(eventData[PhysicsUpdateContact2D::P_ENABLED].GetBool());
+    eventData.Clear();
+
+    // Send node event
+    eventData[NodeUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+    eventData[NodeUpdateContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+    eventData[NodeUpdateContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+
+    if (contactInfo.nodeA_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
+
+        contactInfo.nodeA_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    if (contactInfo.nodeB_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
+
+        contactInfo.nodeB_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    contact->SetEnabled(eventData[NodeUpdateContact2D::P_ENABLED].GetBool());
+    if (contact->IsEnabled())
+        disabledContacts_.Erase(contact);
+    else
+        disabledContacts_.Insert(contact);
 }
 
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
