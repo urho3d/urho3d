@@ -1630,7 +1630,9 @@ macro (setup_main_executable)
     endif ()
 
     # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
-    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB)  # This condition excludes Xcode and VS as they are multi-config, which is exactly what we want too
+    # Exclude multi-config generators, plus MSVC explicitly since it could also be used through NMake which is not multi-config,
+    # but MSVC does not have a strip command
+    if (CMAKE_BUILD_TYPE STREQUAL Release AND NOT WEB AND NOT MSVC)
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${TARGET_NAME}>)
     endif ()
 endmacro ()
