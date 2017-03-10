@@ -140,6 +140,16 @@ public:
 
     /// Zero vector.
     static const IntVector2 ZERO;
+    /// (-1,0) vector.
+    static const IntVector2 LEFT;
+    /// (1,0) vector.
+    static const IntVector2 RIGHT;
+    /// (0,1) vector.
+    static const IntVector2 UP;
+    /// (0,-1) vector.
+    static const IntVector2 DOWN;
+    /// (1,1) vector.
+    static const IntVector2 ONE;
 };
 
 /// Two-dimensional vector.
