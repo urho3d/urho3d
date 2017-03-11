@@ -16,7 +16,7 @@ Before making pull requests, please read the [Contribution checklist](https://ur
 
 ##Credits
 Urho3D development, contributions and bugfixes by:
-- Lasse Öörni (loorni@gmail.com, AgentC at GameDev.net)
+- Lasse Öörni
 - Wei Tjong Yao
 - Aster Jian
 - Vivienne Anthony
