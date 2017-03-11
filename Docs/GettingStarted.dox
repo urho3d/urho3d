@@ -299,6 +299,10 @@ On Windows building with Emscripten requires a MinGW toolchain. The one that can
 
 If CMake complains that emcc is not able to compile a test program, try reactivating your current Emscripten cross-compiler tools with 'emsdk activate <sdk-version>', clear all generated *.cmake files as well as the CMake cache, and retry running CMake.
 
+\subsection Emscripten_experimental_build_options Experimental build options
+
+- EMSCRIPTEN_WASM=1. Enabling this build option to target WebAssembly. Currently the WASM output requires Firefox Nightly or Chrome Canary to run.
+
 \section Building_64bit Native 64bit build
 
 When using MSVC compiler, Urho3D common CMake module configures the build tree to target a 32-bit platform by default. When using other non-MSVC compilers (like GCC or Clang), the module sets the default to 32-bit or 64-bit based on the chosen toolchain in the build tree. You can, however, use the "URHO3D_64BIT" build option to override the default, i.e. by setting the option to '0' (for 32-bit) and '1' (for 64-bit) explicitly.
