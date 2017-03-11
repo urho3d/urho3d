@@ -297,7 +297,9 @@ void ParticleEmitter::SetEmitting(bool enable)
     if (enable != emitting_)
     {
         emitting_ = enable;
-        sendFinishedEvent_ = enable;
+
+        // If stopping emission now, and there are active particles, send finish event once they are gone
+        sendFinishedEvent_ = enable || CheckActiveParticles();
         periodTimer_ = 0.0f;
         // Note: network update does not need to be marked as this is a file only attribute
     }
@@ -531,6 +533,20 @@ unsigned ParticleEmitter::GetFreeParticle() const
     return M_MAX_UNSIGNED;
 }
 
+bool ParticleEmitter::CheckActiveParticles() const
+{
+    for (unsigned i = 0; i < billboards_.Size(); ++i)
+    {
+        if (billboards_[i].enabled_)
+        {
+            return true;
+            break;
+        }
+    }
+
+    return false;
+}
+
 void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Store scene's timestep and use it instead of global timestep, as time scale may be other than 1
@@ -546,40 +562,26 @@ void ParticleEmitter::HandleScenePostUpdate(StringHash eventType, VariantMap& ev
         MarkForUpdate();
     }
 
-    if (node_ && !emitting_ && sendFinishedEvent_)
+    // Send finished event only once all particles are gone
+    if (node_ && !emitting_ && sendFinishedEvent_ && !CheckActiveParticles())
     {
-        // Send finished event only once all billboards are gone
-        bool hasEnabledBillboards = false;
+        sendFinishedEvent_ = false;
 
-        for (unsigned i = 0; i < billboards_.Size(); ++i)
-        {
-            if (billboards_[i].enabled_)
-            {
-                hasEnabledBillboards = true;
-                break;
-            }
-        }
+        // Make a weak pointer to self to check for destruction during event handling
+        WeakPtr<ParticleEmitter> self(this);
 
-        if (!hasEnabledBillboards)
-        {
-            sendFinishedEvent_ = false;
+        using namespace ParticleEffectFinished;
 
-            // Make a weak pointer to self to check for destruction during event handling
-            WeakPtr<ParticleEmitter> self(this);
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
 
-            using namespace ParticleEffectFinished;
+        node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
 
-            VariantMap& eventData = GetEventDataMap();
-            eventData[P_NODE] = node_;
-            eventData[P_EFFECT] = effect_;
+        if (self.Expired())
+            return;
 
-            node_->SendEvent(E_PARTICLEEFFECTFINISHED, eventData);
-
-            if (self.Expired())
-                return;
-
-            DoAutoRemove(autoRemove_);
-        }
+        DoAutoRemove(autoRemove_);
     }
 }
 
