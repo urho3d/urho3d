@@ -32,11 +32,20 @@
 #include <SDL/SDL.h>
 #endif
 
+#ifdef URHO3D_IK
+#include <ik/memory.h>
+#include <ik/log.h>
+#endif
+
 namespace Urho3D
 {
 
 // Keeps track of how many times SDL was initialised so we know when to call SDL_Quit().
 static int sdlInitCounter = 0;
+// Keeps track of how many times IK was initialised
+#ifdef URHO3D_IK
+static int ikInitCounter = 0;
+#endif
 
 void EventReceiverGroup::BeginSendEvent()
 {
@@ -225,7 +234,7 @@ bool Context::RequireSDL(unsigned int sdlFlags)
     ++sdlInitCounter;
 
     // Need to call SDL_Init() at least once before SDL_InitSubsystem()
-    if (sdlInitCounter == 0)
+    if (sdlInitCounter == 1)
     {
         URHO3D_LOGDEBUG("Initialising SDL");
         if (SDL_Init(0) != 0)
@@ -265,6 +274,37 @@ void Context::ReleaseSDL()
         URHO3D_LOGERROR("Too many calls to Context::ReleaseSDL()!");
 #endif
 }
+
+#ifdef URHO3D_IK
+void Context::RequireIK()
+{
+    // Always increment, the caller must match with ReleaseSDL(), regardless of
+    // what happens.
+    ++ikInitCounter;
+
+    if (ikInitCounter == 1)
+    {
+        URHO3D_LOGDEBUG("Initialising Inverse Kinematics library");
+        ik_memory_init();
+        ik_log_init(IK_LOG_NONE);
+    }
+}
+
+void Context::ReleaseIK()
+{
+    --ikInitCounter;
+
+    if (ikInitCounter == 0)
+    {
+        URHO3D_LOGDEBUG("De-initialising Inverse Kinematics library");
+        ik_log_deinit();
+        ik_memory_deinit();
+    }
+
+    if (ikInitCounter < 0)
+        URHO3D_LOGERROR("Too many calls to Context::ReleaseIK()");
+}
+#endif
 
 void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
 {
