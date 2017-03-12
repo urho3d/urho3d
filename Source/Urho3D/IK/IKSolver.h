@@ -46,9 +46,10 @@ public:
 
     enum Algorithm
     {
-        FABRIK,
+        FABRIK
+        /* not implemented yet
         JACOBIAN_INVERSE,
-        JACOBIAN_TRANSPOSE
+        JACOBIAN_TRANSPOSE*/
     };
 
     /// Construct an IK root component.
@@ -128,6 +129,7 @@ private:
 
     PODVector<IKEffector*> effectorList_;
     ik_solver_t* solver_;
+    Algorithm algorithm_;
     bool solverTreeNeedsRebuild_;
 };
 

@@ -55,8 +55,9 @@ void IKEffector::RegisterObject(Context* context)
 {
     context->RegisterFactory<IKEffector>(IK_CATEGORY);
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Chain Length", GetChainLength, SetChainLength, unsigned, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Target Position", GetTargetPosition, SetTargetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Target Node", GetTargetName, SetTargetName, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Chain Length", GetChainLength, SetChainLength, unsigned, true, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -91,6 +92,12 @@ void IKEffector::SetTargetName(const String& nodeName)
 {
     targetName_ = nodeName;
     targetNode_ = NULL;
+}
+
+// ----------------------------------------------------------------------------
+const Vector3& IKEffector::GetTargetPosition() const
+{
+    return targetPosition_;
 }
 
 // ----------------------------------------------------------------------------

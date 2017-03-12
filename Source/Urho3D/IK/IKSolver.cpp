@@ -60,10 +60,24 @@ static Vector3 Vec3IK2Urho(const vec3_t* ik)
 {
     return Vector3(ik->v.x, ik->v.y, ik->v.z);
 }
+static quat_t QuatUrho2IK(const Quaternion& urho)
+{
+    quat_t ret;
+    ret.q.x = urho.x_;
+    ret.q.y = urho.y_;
+    ret.q.z = urho.z_;
+    ret.q.w = urho.w_;
+    return ret;
+}
+static Quaternion QuatIK2Urho(const quat_t* ik)
+{
+    return Quaternion(ik->q.w, ik->q.x, ik->q.y, ik->q.z);
+}
 static ik_node_t* CreateIKNode(const Node* node)
 {
     ik_node_t* ikNode = ik_node_create(node->GetID());
     ikNode->position = Vec3Urho2IK(node->GetWorldPosition());
+    ikNode->rotation = QuatUrho2IK(node->GetWorldRotation());
     ikNode->user_data = (void*)node;
     return ikNode;
 }
@@ -82,13 +96,8 @@ static bool ChildrenHaveEffector(const Node* node)
 static void ApplyResultCallback(ik_node_t* ikNode, vec3_t position, quat_t rotation)
 {
     Node* node = (Node*)ikNode->user_data;
-    node->SetWorldPosition(Vec3IK2Urho(&ikNode->solved_position));
-    node->SetWorldRotation(Quaternion(
-        rotation.q.w,
-        rotation.q.x,
-        rotation.q.y,
-        rotation.q.z
-    ));
+    node->SetWorldRotation(QuatIK2Urho(&rotation));
+    //node->SetWorldPosition(Vec3IK2Urho(&position));
 }
 
 // ----------------------------------------------------------------------------
@@ -98,10 +107,8 @@ IKSolver::IKSolver(Context* context) :
     solverTreeNeedsRebuild_(false)
 {
     context_->RequireIK();
-    solver_ = ik_solver_create(SOLVER_FABRIK);
-    solver_->apply_result = ApplyResultCallback;
-    solver_->build_mode = SOLVER_EXCLUDE_ROOT;
-    ik_log_register_listener(HandleIKLog);
+
+    SetAlgorithm(FABRIK);
 
     SubscribeToEvent(E_COMPONENTADDED,              URHO3D_HANDLER(IKSolver, HandleComponentAdded));
     SubscribeToEvent(E_COMPONENTREMOVED,            URHO3D_HANDLER(IKSolver, HandleComponentRemoved));
@@ -136,22 +143,33 @@ void IKSolver::RegisterObject(Context* context)
         NULL
     };
 
-    URHO3D_ACCESSOR_ATTRIBUTE("Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 1000, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.1f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
 void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
 {
-    URHO3D_LOGERROR("Failed to set algorithm: Not implemented");
+    algorithm_ = algorithm;
+
+    if (solver_ != NULL)
+        ik_solver_destroy(solver_);
+
+    switch (algorithm_)
+    {
+        case FABRIK: solver_ = ik_solver_create(SOLVER_FABRIK); break;
+    }
+
+    solver_->apply_result = ApplyResultCallback;
+    solver_->build_mode = SOLVER_EXCLUDE_ROOT;
+    ik_log_register_listener(HandleIKLog);
 }
 
 // ----------------------------------------------------------------------------
 IKSolver::Algorithm IKSolver::GetAlgorithm() const
 {
-    return FABRIK;
+    return algorithm_;
 }
 
 // ----------------------------------------------------------------------------

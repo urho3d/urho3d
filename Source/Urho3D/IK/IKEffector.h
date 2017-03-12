@@ -80,6 +80,7 @@ public:
      */
     void SetTargetName(const String& nodeName);
 
+    const Vector3& GetTargetPosition() const;
     void SetTargetPosition(const Vector3& targetPosition);
 
     void UpdateTargetNodePosition();
