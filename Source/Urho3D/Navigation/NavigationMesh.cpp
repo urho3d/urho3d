@@ -224,6 +224,46 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
+void NavigationMesh::GetNavMeshGeometry(Vector<Vector<Vector3>>& polygons)
+{
+	if (!navMesh_ || !node_)
+		return;
+
+	const Matrix3x4& worldTransform = node_->GetWorldTransform();
+
+	const dtNavMesh* navMesh = navMesh_;
+
+	for (int z = 0; z < numTilesZ_; ++z)
+	{
+		for (int x = 0; x < numTilesX_; ++x)
+		{
+			for (int i = 0; i < 128; ++i)
+			{
+				const dtMeshTile* tile = navMesh->getTileAt(x, z, i);
+				if (!tile)
+					continue;
+				
+
+				for (int i = 0; i < tile->header->polyCount; ++i)
+				{
+					dtPoly* poly = tile->polys + i;
+
+					//new poly
+					Vector<Vector3> newPoly;
+					newPoly.Resize(poly->vertCount);
+					
+					for (unsigned j = 0; j < poly->vertCount; ++j)
+					{						
+						newPoly[j] = worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]);
+					}
+
+					polygons.Push(newPoly);
+				}
+			}
+		}
+	}
+}
+
 void NavigationMesh::SetMeshName(const String& newName)
 {
     meshName_ = newName;

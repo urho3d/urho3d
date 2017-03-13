@@ -254,6 +254,9 @@ public:
     /// Return whether to draw NavArea components.
     bool GetDrawNavAreas() const { return drawNavAreas_; }
 
+	/// Get nav mesh geometry data
+	void GetNavMeshGeometry(Vector<Vector<Vector3>>& polygons);
+
 protected:
     /// Collect geometry from under Navigable components.
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
