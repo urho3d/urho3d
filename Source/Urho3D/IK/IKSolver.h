@@ -114,6 +114,8 @@ public:
 
     void MarkSolverTreeDirty();
 
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+
 private:
     virtual void OnSceneSet(Scene* scene);
     /// Causes the entire tree to be rebuilt

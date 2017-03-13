@@ -32,6 +32,7 @@
 #include "../Scene/SceneEvents.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationState.h"
+#include "../Graphics/DebugRenderer.h"
 
 #include <ik/solver.h>
 #include <ik/node.h>
@@ -388,6 +389,78 @@ void IKSolver::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMa
     }
 
     ik_solver_solve(solver_);
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
+{
+    // Draws all scene segments
+    for (PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
+        (*it)->DrawDebugGeometry(debug, depthTest);
+
+    ORDERED_VECTOR_FOR_EACH(&solver_->effector_nodes_list, ik_node_t*, pnode)
+        ik_effector_t* effector = (*pnode)->effector;
+
+        // Calculate average length of all segments so we can determine the radius
+        // of the debug spheres to draw
+        int chainLength = effector->chain_length == 0 ? -1 : effector->chain_length;
+        ik_node_t* a = *pnode;
+        ik_node_t* b = a->parent;
+        float averageLength = 0.0f;
+        unsigned numberOfSegments = 0;
+        while (b && b != solver_->tree && chainLength-- != 0)
+        {
+            vec3_t v = a->position;
+            vec3_sub_vec3(v.f, b->position.f);
+            averageLength += vec3_length(v.f);
+            ++numberOfSegments;
+            a = b;
+            b = b->parent;
+        }
+        averageLength /= numberOfSegments;
+
+        // connect all chained nodes together with lines
+        chainLength = effector->chain_length == 0 ? -1 : effector->chain_length;
+        a = *pnode;;
+        b = a->parent;;
+        debug->AddSphere(
+            Sphere(Vec3IK2Urho(&a->position), averageLength * 0.1),
+            Color(0, 0, 255),
+            depthTest
+        );
+        debug->AddSphere(
+            Sphere(Vec3IK2Urho(&a->solved_position), averageLength * 0.1),
+            Color(255, 128, 0),
+            depthTest
+        );
+        while (b && b != solver_->tree && chainLength-- != 0)
+        {
+            debug->AddLine(
+                Vec3IK2Urho(&a->position),
+                Vec3IK2Urho(&b->position),
+                Color(0, 255, 255),
+                depthTest
+            );
+            debug->AddSphere(
+                Sphere(Vec3IK2Urho(&b->position), averageLength * 0.1),
+                Color(0, 0, 255),
+                depthTest
+            );
+            debug->AddLine(
+                Vec3IK2Urho(&a->solved_position),
+                Vec3IK2Urho(&b->solved_position),
+                Color(255, 0, 0),
+                depthTest
+            );
+            debug->AddSphere(
+                Sphere(Vec3IK2Urho(&b->solved_position), averageLength * 0.1),
+                Color(255, 128, 0),
+                depthTest
+            );
+            a = b;
+            b = b->parent;
+        }
+    ORDERED_VECTOR_END_EACH
 }
 
 } // namespace Urho3D
