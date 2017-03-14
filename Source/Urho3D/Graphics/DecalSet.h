@@ -204,8 +204,6 @@ private:
     void MarkDecalsDirty();
     /// Recalculate the local-space bounding box.
     void CalculateBoundingBox();
-    /// Resize decal vertex and index buffers.
-    void UpdateBufferSize();
     /// Rewrite decal vertex and index buffers.
     void UpdateBuffers();
     /// Recalculate skinning.
