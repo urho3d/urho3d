@@ -94,11 +94,11 @@ static bool ChildrenHaveEffector(const Node* node)
             return true;
     }
 }
-static void ApplyResultCallback(ik_node_t* ikNode, vec3_t position, quat_t rotation)
+static void ApplyResultCallback(ik_node_t* ikNode)
 {
     Node* node = (Node*)ikNode->user_data;
-    node->SetWorldRotation(QuatIK2Urho(&rotation));
-    node->SetWorldPosition(Vec3IK2Urho(&position));
+    node->SetWorldRotation(QuatIK2Urho(&ikNode->solved_rotation));
+    node->SetWorldPosition(Vec3IK2Urho(&ikNode->solved_position));
 }
 
 // ----------------------------------------------------------------------------
