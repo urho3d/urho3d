@@ -228,7 +228,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     Node* a = node_;
     float averageLength = 0.0f;
     unsigned numberOfSegments = 0;
-    while (a && a != terminationNode && chainLength-- != 0)
+    while (a && a != terminationNode->GetParent() && chainLength-- != 0)
     {
         averageLength += a->GetPosition().Length();
         ++numberOfSegments;
@@ -245,7 +245,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         Color::YELLOW,
         depthTest
     );
-    while (b && b != terminationNode && chainLength-- != 0)
+    while (b && b != terminationNode->GetParent() && chainLength-- != 0)
     {
         debug->AddLine(
             a->GetWorldPosition(),

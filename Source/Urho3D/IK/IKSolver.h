@@ -119,6 +119,9 @@ public:
     /// Causes the solver tree to be rebuilt before solving the next time.
     void MarkSolverTreeDirty();
 
+    void Solve();
+    void ResetToInitialPose();
+
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:

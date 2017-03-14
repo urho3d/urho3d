@@ -68,12 +68,6 @@ static bool ChildrenHaveEffector(const Node* node)
             return true;
     }
 }
-static void ApplyResultCallback(ik_node_t* ikNode)
-{
-    Node* node = (Node*)ikNode->user_data;
-    node->SetWorldRotation(QuatIK2Urho(&ikNode->solved_rotation));
-    node->SetWorldPosition(Vec3IK2Urho(&ikNode->solved_position));
-}
 
 // ----------------------------------------------------------------------------
 IKSolver::IKSolver(Context* context) :
@@ -142,7 +136,6 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
         case FABRIK: solver_ = ik_solver_create(SOLVER_FABRIK); break;
     }
 
-    solver_->apply_result = ApplyResultCallback;
     solver_->flags = SOLVER_CALCULATE_FINAL_ANGLES;
 
     ik_log_register_listener(HandleIKLog);
@@ -181,6 +174,45 @@ void IKSolver::MarkSolverTreeDirty()
 }
 
 // ----------------------------------------------------------------------------
+static void ApplySolvedDataCallback(ik_node_t* ikNode)
+{
+    Node* node = (Node*)ikNode->user_data;
+    node->SetWorldRotation(QuatIK2Urho(&ikNode->solved_rotation));
+    node->SetWorldPosition(Vec3IK2Urho(&ikNode->solved_position));
+}
+void IKSolver::Solve()
+{
+    URHO3D_PROFILE(Solve);
+
+    if (solverTreeNeedsRebuild_)
+    {
+        ik_solver_rebuild_data(solver_);
+        solverTreeNeedsRebuild_ = false;
+    }
+
+    for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
+    {
+        (*it)->UpdateTargetNodePosition();
+    }
+
+    solver_->apply_result = ApplySolvedDataCallback;
+    ik_solver_solve(solver_);
+}
+
+// ----------------------------------------------------------------------------
+static void ApplyInitialDataCallback(ik_node_t* ikNode)
+{
+    Node* node = (Node*)ikNode->user_data;
+    node->SetWorldRotation(QuatIK2Urho(&ikNode->rotation));
+    node->SetWorldPosition(Vec3IK2Urho(&ikNode->position));
+}
+void IKSolver::ResetToInitialPose()
+{
+    solver_->apply_result = ApplyInitialDataCallback;
+    ik_solver_iterate_tree(solver_);
+}
+
+// ----------------------------------------------------------------------------
 /*
  * This next section maintains the internal list of effector nodes. Whenever
  * nodes are deleted or added to the scene, or whenever components are added
@@ -195,6 +227,7 @@ void IKSolver::MarkSolverTreeDirty()
 // ----------------------------------------------------------------------------
 void IKSolver::OnNodeSet(Node* node)
 {
+    ResetToInitialPose();
     if (node == NULL)
         ik_solver_destroy_tree(solver_);
     else
@@ -206,7 +239,7 @@ void IKSolver::RebuildTree()
 {
     assert(node_ != NULL);
 
-    ik_node_t* ikRoot = ik_node_create(node_->GetID());
+    ik_node_t* ikRoot = CreateIKNode(node_);
     ik_solver_set_tree(solver_, ikRoot);
 
     PODVector<Node*> effectorNodes;
@@ -292,8 +325,9 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
     ik_node_destroy_effector(ikNode);
     effector->SetEffector(NULL);
-    effectorList_.Remove(effector); // TODO RemoveSwap()
+    effectorList_.RemoveSwap(effector);
 
+    ResetToInitialPose();
     MarkSolverTreeDirty();
 }
 
@@ -344,26 +378,14 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
             ik_node_destroy(ikNode);
     }
 
+    ResetToInitialPose();
     MarkSolverTreeDirty();
 }
 
 // ----------------------------------------------------------------------------
 void IKSolver::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
 {
-    URHO3D_PROFILE(SolveIK);
-
-    if (solverTreeNeedsRebuild_)
-    {
-        ik_solver_rebuild_data(solver_);
-        solverTreeNeedsRebuild_ = false;
-    }
-
-    for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
-    {
-        (*it)->UpdateTargetNodePosition();
-    }
-
-    ik_solver_solve(solver_);
+    Solve();
 }
 
 // ----------------------------------------------------------------------------
