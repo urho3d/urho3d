@@ -115,6 +115,8 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Calculate Angles", DoCalculateFinalAngles, SetCalculateFinalAngles, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", DoSkipReset, SetSkipReset, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -165,6 +167,34 @@ void IKSolver::SetTolerance(float tolerance)
     if(tolerance < M_EPSILON)
         tolerance = M_EPSILON;
     solver_->tolerance = tolerance;
+}
+
+// ----------------------------------------------------------------------------
+bool IKSolver::DoCalculateFinalAngles() const
+{
+    return solver_->flags & SOLVER_CALCULATE_FINAL_ANGLES;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::SetCalculateFinalAngles(bool enable)
+{
+    solver_->flags &= ~SOLVER_CALCULATE_FINAL_ANGLES;
+    if (enable)
+        solver_->flags |= SOLVER_CALCULATE_FINAL_ANGLES;
+}
+
+// ----------------------------------------------------------------------------
+bool IKSolver::DoSkipReset() const
+{
+    return solver_->flags & SOLVER_SKIP_RESET;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::SetSkipReset(bool enable)
+{
+    solver_->flags &= ~SOLVER_SKIP_RESET;
+    if (enable)
+        solver_->flags |= SOLVER_SKIP_RESET;
 }
 
 // ----------------------------------------------------------------------------
