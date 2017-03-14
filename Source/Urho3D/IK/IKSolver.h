@@ -59,6 +59,9 @@ public:
     /// Registers this class to the context.
     static void RegisterObject(Context* context);
 
+    /// Returns the active algorithm
+    Algorithm GetAlgorithm() const;
+
     /*!
      * @brief Selects the solver algorithm. Default is FABRIK.
      *
@@ -69,7 +72,9 @@ public:
      *     violent snapping about), and it always converges.
      */
     void SetAlgorithm(Algorithm algorithm);
-    Algorithm GetAlgorithm() const;
+
+    /// Returns the configured maximum number of iterations.
+    unsigned GetMaximumIterations() const;
 
     /*!
      * @brief Sets the maximum number of iterations the solver is allowed to
@@ -90,10 +95,8 @@ public:
      */
     void SetMaximumIterations(unsigned iterations);
 
-    /*!
-     * @brief Returns the configured maximum number of iterations.
-     */
-    unsigned GetMaximumIterations() const;
+    /// Returns the configured tolerance.
+    float GetTolerance() const;
 
     /*!
      * @brief Sets the distance at which the effector is "close enough" to the
@@ -107,17 +110,19 @@ public:
      */
     void SetTolerance(float tolerance);
 
-    /*!
-     * @brief Returns the configured tolerance.
-     */
-    float GetTolerance() const;
+    bool DoCalculateFinalAngles() const;
+    void SetCalculateFinalAngles(bool enable);
 
+    bool DoSkipReset() const;
+    void SetSkipReset(bool enable);
+
+    /// Causes the solver tree to be rebuilt before solving the next time.
     void MarkSolverTreeDirty();
 
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnNodeSet(Node* scene);
     /// Causes the entire tree to be rebuilt
     void RebuildTree();
     void BuildTreeToEffector(const Node* node);

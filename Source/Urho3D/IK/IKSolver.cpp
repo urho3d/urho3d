@@ -21,8 +21,8 @@
 //
 
 #include "../IK/IKSolver.h"
-#include "../IK/IK.h"
 #include "../IK/IKEvents.h"
+#include "../IK/IKConverters.h"
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
@@ -42,37 +42,11 @@
 namespace Urho3D
 {
 
-extern const char* IK_CATEGORY;;
-extern const char* SUBSYSTEM_CATEGORY;
+extern const char* IK_CATEGORY;
 
 static void HandleIKLog(const char* msg)
 {
     URHO3D_LOGINFOF("[IK] %s", msg);
-}
-static vec3_t Vec3Urho2IK(const Vector3& urho)
-{
-    vec3_t ret;
-    ret.v.x = urho.x_;
-    ret.v.y = urho.y_;
-    ret.v.z = urho.z_;
-    return ret;
-}
-static Vector3 Vec3IK2Urho(const vec3_t* ik)
-{
-    return Vector3(ik->v.x, ik->v.y, ik->v.z);
-}
-static quat_t QuatUrho2IK(const Quaternion& urho)
-{
-    quat_t ret;
-    ret.q.x = urho.x_;
-    ret.q.y = urho.y_;
-    ret.q.z = urho.z_;
-    ret.q.w = urho.w_;
-    return ret;
-}
-static Quaternion QuatIK2Urho(const quat_t* ik)
-{
-    return Quaternion(ik->q.w, ik->q.x, ik->q.y, ik->q.z);
 }
 static ik_node_t* CreateIKNode(const Node* node)
 {
@@ -134,7 +108,7 @@ IKSolver::~IKSolver()
 // ----------------------------------------------------------------------------
 void IKSolver::RegisterObject(Context* context)
 {
-    context->RegisterFactory<IKSolver>(SUBSYSTEM_CATEGORY);
+    context->RegisterFactory<IKSolver>(IK_CATEGORY);
 
     static const char* algorithmNames[] = {
         "FABRIK",
@@ -147,6 +121,12 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
+}
+
+// ----------------------------------------------------------------------------
+IKSolver::Algorithm IKSolver::GetAlgorithm() const
+{
+    return algorithm_;
 }
 
 // ----------------------------------------------------------------------------
@@ -163,20 +143,9 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
     }
 
     solver_->apply_result = ApplyResultCallback;
-    solver_->build_mode = SOLVER_EXCLUDE_ROOT;
+    solver_->flags = SOLVER_CALCULATE_FINAL_ANGLES;
+
     ik_log_register_listener(HandleIKLog);
-}
-
-// ----------------------------------------------------------------------------
-IKSolver::Algorithm IKSolver::GetAlgorithm() const
-{
-    return algorithm_;
-}
-
-// ----------------------------------------------------------------------------
-void IKSolver::SetMaximumIterations(unsigned iterations)
-{
-    solver_->max_iterations = iterations;
 }
 
 // ----------------------------------------------------------------------------
@@ -186,17 +155,23 @@ unsigned IKSolver::GetMaximumIterations() const
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetTolerance(float tolerance)
+void IKSolver::SetMaximumIterations(unsigned iterations)
 {
-    if(tolerance < M_EPSILON)
-        tolerance = M_EPSILON;
-    solver_->tolerance = tolerance;
+    solver_->max_iterations = iterations;
 }
 
 // ----------------------------------------------------------------------------
 float IKSolver::GetTolerance() const
 {
     return solver_->tolerance;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::SetTolerance(float tolerance)
+{
+    if(tolerance < M_EPSILON)
+        tolerance = M_EPSILON;
+    solver_->tolerance = tolerance;
 }
 
 // ----------------------------------------------------------------------------
@@ -218,29 +193,24 @@ void IKSolver::MarkSolverTreeDirty()
  */
 
 // ----------------------------------------------------------------------------
-void IKSolver::OnSceneSet(Scene* scene)
+void IKSolver::OnNodeSet(Node* node)
 {
-    if (scene == NULL)
-    {
+    if (node == NULL)
         ik_solver_destroy_tree(solver_);
-    }
     else
-    {
         RebuildTree();
-    }
 }
 
 // ----------------------------------------------------------------------------
 void IKSolver::RebuildTree()
 {
-    Node* scene = GetScene();
-    assert(scene != NULL);
+    assert(node_ != NULL);
 
-    ik_node_t* ikRoot = ik_node_create(scene->GetID());
+    ik_node_t* ikRoot = ik_node_create(node_->GetID());
     ik_solver_set_tree(solver_, ikRoot);
 
     PODVector<Node*> effectorNodes;
-    scene->GetChildrenWithComponent<IKEffector>(effectorNodes, true);
+    node_->GetChildrenWithComponent<IKEffector>(effectorNodes, true);
     for(PODVector<Node*>::ConstIterator it = effectorNodes.Begin(); it != effectorNodes.End(); ++it)
     {
         BuildTreeToEffector(*it);
@@ -367,7 +337,12 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 
     ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
     if(ikNode != NULL)
-        ik_node_destroy(ikNode);
+    {
+        if(ikNode == solver_->tree)
+            ik_solver_destroy_tree(solver_);
+        else
+            ik_node_destroy(ikNode);
+    }
 
     MarkSolverTreeDirty();
 }
@@ -408,7 +383,7 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         ik_node_t* b = a->parent;
         float averageLength = 0.0f;
         unsigned numberOfSegments = 0;
-        while (b && b != solver_->tree && chainLength-- != 0)
+        while (b && chainLength-- != 0)
         {
             vec3_t v = a->position;
             vec3_sub_vec3(v.f, b->position.f);
@@ -421,8 +396,8 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
         // connect all chained nodes together with lines
         chainLength = effector->chain_length == 0 ? -1 : effector->chain_length;
-        a = *pnode;;
-        b = a->parent;;
+        a = *pnode;
+        b = a->parent;
         debug->AddSphere(
             Sphere(Vec3IK2Urho(&a->position), averageLength * 0.1),
             Color(0, 0, 255),
@@ -433,7 +408,7 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             Color(255, 128, 0),
             depthTest
         );
-        while (b && b != solver_->tree && chainLength-- != 0)
+        while (b && chainLength-- != 0)
         {
             debug->AddLine(
                 Vec3IK2Urho(&a->position),

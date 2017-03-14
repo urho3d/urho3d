@@ -83,10 +83,25 @@ public:
     const Vector3& GetTargetPosition() const;
     void SetTargetPosition(const Vector3& targetPosition);
 
-    void UpdateTargetNodePosition();
+    const Quaternion& GetTargetRotation() const;
+    void SetTargetRotation(const Quaternion& targetRotation);
+
+    Vector3 GetTargetRotationEuler() const;
+    void SetTargetRotationEuler(const Vector3& targetRotation);
 
     unsigned GetChainLength() const;
     void SetChainLength(unsigned chainLength);
+
+    float GetWeight() const;
+    void SetWeight(float weight);
+
+    bool DoInheritParentRotation() const;
+    void SetInheritParentRotation(bool enable);
+
+    bool DoWeightedChildRotations() const;
+    void SetWeightedChildRotations(bool enable);
+
+    void UpdateTargetNodePosition();
 
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
@@ -94,12 +109,17 @@ public:
     void SetEffector(ik_effector_t* effector);
 
 private:
-    String targetName_;
-    Vector3 targetPosition_;
     WeakPtr<Node> targetNode_;
     WeakPtr<IKSolver> solver_;
     ik_effector_t* ikEffector_;
+
+    String targetName_;
+    Vector3 targetPosition_;
+    Quaternion targetRotation_;
     unsigned chainLength_;
+    float weight_;
+    bool inheritParentRotation_;
+    bool weightedChildrotations_;
 };
 
 } // namespace Urho3D

@@ -20,34 +20,22 @@
 // THE SOFTWARE.
 //
 
-/*
- * TODO IK todo
- *  - Initial pose is not saved when saving scene in editor. Instead, the
- *    solved state of the chain(s) are saved.
- *  - Target angle in addition to target position -> use weighted angles
- *    approach
- *  - Add an IKEffector weight parameter, so the user can specify
- *    (between [0..1]) how much influence the solved chains have.
- *  - Add support for enabling/disabling initial pose to support animated
- *    models as well as scene nodes.
- *  - Pole targets?
- *  - Add support for manually updating initial pose.
- *  - Add support for having the initial pose update every time it's solved
- *    -> incremental solving so to speak.
- *  - Apply bullet constraints to joints.
- *  - Script bindings.
- *  - Optimise.
- *  - Profile.
- */
+#pragma once
 
-namespace Urho3D
-{
+#include "../Math/Vector3.h"
+#include "../Math/Quaternion.h"
+#include <ik/vec3.h>
+#include <ik/quat.h>
 
-class Context;
+namespace Urho3D {
 
-/*!
- * Registers all IK systems to the specified context.
- */
-void RegisterIKLibrary(Context* context);
+/// Converts from an Urho3D Vector3 to an IK vec3_t
+vec3_t Vec3Urho2IK(const Vector3& urho);
+/// Converts from an IK vec3_t to an Urho3D Vector3
+Vector3 Vec3IK2Urho(const vec3_t* ik);
+/// Converts from an Urho3D quaternion to an IK quat_t
+quat_t QuatUrho2IK(const Quaternion& urho);
+/// Converts from an IK quat_t to an Urho3D quaternion
+Quaternion QuatIK2Urho(const quat_t* ik);
 
-} // namespace Urho3D
+}
