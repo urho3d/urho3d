@@ -3,4 +3,5 @@
     <texture unit="diffuse" name="Textures/UrhoDecal.dds" />
     <parameter name="MatDiffColor" value="1 1 0 1" />
     <depthbias constant="-0.00001" slopescaled="0" />
+    <renderorder value="0" />
 </material>
