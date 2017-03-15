@@ -167,9 +167,9 @@ float IKEffector::GetWeight() const
 // ----------------------------------------------------------------------------
 void IKEffector::SetWeight(float weight)
 {
-    weight_ = weight;
+    weight_ = Clamp(weight, 0.0f, 1.0f);
     if (ikEffector_ != NULL)
-        /*ikEffector_->weight = weight*/;
+        ikEffector_->weight = weight_;
 }
 
 // ----------------------------------------------------------------------------
@@ -269,9 +269,10 @@ void IKEffector::SetEffector(ik_effector_t* effector)
     ikEffector_ = effector;
     if (effector)
     {
-        effector->chain_length = chainLength_;
         effector->target_position = Vec3Urho2IK(targetPosition_);
         effector->target_rotation = QuatUrho2IK(targetRotation_);
+        effector->weight = weight_;
+        effector->chain_length = chainLength_;
     }
 }
 
