@@ -25,8 +25,6 @@
  *  - Actually implement tolerance.
  *  - Target angle in addition to target position -> use weighted angles
  *    approach
- *  - Nlerp weighted effectors using total chain length + root node as axis
- *    of rotation (so arm moves in a circle, for example)
  *  - Fix rotation issue with shared sub-base nodes -> rotations need to be
  *    averaged.
  *  - Add support for manually updating initial pose.

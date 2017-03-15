@@ -43,6 +43,7 @@ IKEffector::IKEffector(Context* context) :
     ikEffector_(NULL),
     chainLength_(0),
     weight_(1.0f),
+    weightedNlerp_(false),
     inheritParentRotation_(false),
     weightedChildrotations_(false)
 {
@@ -63,6 +64,7 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Target Position", GetTargetPosition, SetTargetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Target Rotation", GetTargetRotationEuler, SetTargetRotationEuler, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", DoWeightedNlerp, SetWeightedNlerp, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", DoInheritParentRotation, SetInheritParentRotation, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Weighted Child Rotations", DoWeightedChildRotations, SetWeightedChildRotations, bool, false, AM_DEFAULT);
 }
@@ -173,6 +175,24 @@ void IKEffector::SetWeight(float weight)
 }
 
 // ----------------------------------------------------------------------------
+bool IKEffector::DoWeightedNlerp() const
+{
+    return weightedNlerp_;
+}
+
+// ----------------------------------------------------------------------------
+void IKEffector::SetWeightedNlerp(bool enable)
+{
+    weightedNlerp_ = enable;
+    if (ikEffector_ != NULL)
+    {
+        ikEffector_->flags &= ~EFFECTOR_WEIGHT_NLERP;
+        if (enable)
+            ikEffector_->flags |= EFFECTOR_WEIGHT_NLERP;
+    }
+}
+
+// ----------------------------------------------------------------------------
 bool IKEffector::DoInheritParentRotation() const
 {
     return inheritParentRotation_;
@@ -273,6 +293,7 @@ void IKEffector::SetEffector(ik_effector_t* effector)
         effector->target_rotation = QuatUrho2IK(targetRotation_);
         effector->weight = weight_;
         effector->chain_length = chainLength_;
+        SetWeightedNlerp(weightedNlerp_);
     }
 }
 

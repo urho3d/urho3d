@@ -95,6 +95,9 @@ public:
     float GetWeight() const;
     void SetWeight(float weight);
 
+    bool DoWeightedNlerp() const;
+    void SetWeightedNlerp(bool enable);
+
     bool DoInheritParentRotation() const;
     void SetInheritParentRotation(bool enable);
 
@@ -118,6 +121,7 @@ private:
     Quaternion targetRotation_;
     unsigned chainLength_;
     float weight_;
+    bool weightedNlerp_;
     bool inheritParentRotation_;
     bool weightedChildrotations_;
 };
