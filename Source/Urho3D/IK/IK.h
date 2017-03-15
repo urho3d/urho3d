@@ -22,10 +22,17 @@
 
 /*
  * TODO IK todo
+ *  - Actually implement tolerance.
  *  - Target angle in addition to target position -> use weighted angles
  *    approach
- *  - Pole targets?
+ *  - Nlerp weighted effectors using total chain length + root node as axis
+ *    of rotation (so arm moves in a circle, for example)
+ *  - Fix rotation issue with shared sub-base nodes -> rotations need to be
+ *    averaged.
  *  - Add support for manually updating initial pose.
+ *  - Pole targets?
+ *  - Support for "stretchiness" with min/max lengths.
+ *  - Support for "stiffness" factor, describes how well a bone rotates.
  *  - Apply bullet constraints to joints.
  *  - Script bindings.
  *  - Optimise.

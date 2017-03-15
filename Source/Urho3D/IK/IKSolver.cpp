@@ -140,7 +140,7 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
         case FABRIK: solver_ = ik_solver_create(SOLVER_FABRIK); break;
     }
 
-    solver_->flags = SOLVER_CALCULATE_FINAL_ANGLES;
+    solver_->flags = SOLVER_CALCULATE_FINAL_ROTATIONS;
 
     ik_log_register_listener(HandleIKLog);
 }
@@ -174,15 +174,15 @@ void IKSolver::SetTolerance(float tolerance)
 // ----------------------------------------------------------------------------
 bool IKSolver::DoCalculateFinalAngles() const
 {
-    return solver_->flags & SOLVER_CALCULATE_FINAL_ANGLES;
+    return solver_->flags & SOLVER_CALCULATE_FINAL_ROTATIONS;
 }
 
 // ----------------------------------------------------------------------------
 void IKSolver::SetCalculateFinalAngles(bool enable)
 {
-    solver_->flags &= ~SOLVER_CALCULATE_FINAL_ANGLES;
+    solver_->flags &= ~SOLVER_CALCULATE_FINAL_ROTATIONS;
     if (enable)
-        solver_->flags |= SOLVER_CALCULATE_FINAL_ANGLES;
+        solver_->flags |= SOLVER_CALCULATE_FINAL_ROTATIONS;
 }
 
 // ----------------------------------------------------------------------------
