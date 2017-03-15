@@ -22,18 +22,10 @@
 
 /*
  * TODO IK todo
- *  - Initial pose is not saved when saving scene in editor. Instead, the
- *    solved state of the chain(s) are saved.
  *  - Target angle in addition to target position -> use weighted angles
  *    approach
- *  - Add an IKEffector weight parameter, so the user can specify
- *    (between [0..1]) how much influence the solved chains have.
- *  - Add support for enabling/disabling initial pose to support animated
- *    models as well as scene nodes.
  *  - Pole targets?
  *  - Add support for manually updating initial pose.
- *  - Add support for having the initial pose update every time it's solved
- *    -> incremental solving so to speak.
  *  - Apply bullet constraints to joints.
  *  - Script bindings.
  *  - Optimise.

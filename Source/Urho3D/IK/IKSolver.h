@@ -116,11 +116,15 @@ public:
     bool DoSkipReset() const;
     void SetSkipReset(bool enable);
 
+    bool DoUpdateInitialPose() const;
+    void SetUpdateInitialPose(bool enable);
+
     /// Causes the solver tree to be rebuilt before solving the next time.
     void MarkSolverTreeDirty();
 
     void Solve();
     void ResetToInitialPose();
+    void UpdateInitialPose();
 
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
@@ -141,6 +145,7 @@ private:
     ik_solver_t* solver_;
     Algorithm algorithm_;
     bool solverTreeNeedsRebuild_;
+    bool updateInitialPose_;
 };
 
 } // namespace Urho3D

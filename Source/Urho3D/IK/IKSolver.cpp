@@ -73,7 +73,8 @@ static bool ChildrenHaveEffector(const Node* node)
 IKSolver::IKSolver(Context* context) :
     Component(context),
     solver_(NULL),
-    solverTreeNeedsRebuild_(false)
+    solverTreeNeedsRebuild_(false),
+    updateInitialPose_(false)
 {
     context_->RequireIK();
 
@@ -117,6 +118,7 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Calculate Angles", DoCalculateFinalAngles, SetCalculateFinalAngles, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", DoSkipReset, SetSkipReset, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Initial Pose", DoUpdateInitialPose, SetUpdateInitialPose, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -198,6 +200,18 @@ void IKSolver::SetSkipReset(bool enable)
 }
 
 // ----------------------------------------------------------------------------
+bool IKSolver::DoUpdateInitialPose() const
+{
+    return updateInitialPose_;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::SetUpdateInitialPose(bool enable)
+{
+    updateInitialPose_ = enable;
+}
+
+// ----------------------------------------------------------------------------
 void IKSolver::MarkSolverTreeDirty()
 {
     solverTreeNeedsRebuild_ = true;
@@ -220,6 +234,9 @@ void IKSolver::Solve()
         solverTreeNeedsRebuild_ = false;
     }
 
+    if (updateInitialPose_)
+        UpdateInitialPose();
+
     for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
     {
         (*it)->UpdateTargetNodePosition();
@@ -239,6 +256,19 @@ static void ApplyInitialDataCallback(ik_node_t* ikNode)
 void IKSolver::ResetToInitialPose()
 {
     solver_->apply_result = ApplyInitialDataCallback;
+    ik_solver_iterate_tree(solver_);
+}
+
+// ----------------------------------------------------------------------------
+static void UpdateInitialPoseCallback(ik_node_t* ikNode)
+{
+    Node* node = (Node*)ikNode->user_data;
+    ikNode->rotation = QuatUrho2IK(node->GetWorldRotation());
+    ikNode->position = Vec3Urho2IK(node->GetWorldPosition());
+}
+void IKSolver::UpdateInitialPose()
+{
+    solver_->apply_result = UpdateInitialPoseCallback;
     ik_solver_iterate_tree(solver_);
 }
 
