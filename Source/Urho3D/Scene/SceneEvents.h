@@ -118,7 +118,7 @@ URHO3D_EVENT(E_NODEADDED, NodeAdded)
     URHO3D_PARAM(P_NODE, Node);                    // Node pointer
 }
 
-/// A child node is about to be removed from a parent node.
+/// A child node is about to be removed from a parent node. Note that individual component removal events will not be sent.
 URHO3D_EVENT(E_NODEREMOVED, NodeRemoved)
 {
     URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
