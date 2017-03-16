@@ -70,7 +70,7 @@ public:
     void SetAttenuation(float attenuation);
     /// Set stereo panning. -1.0 is full left and 1.0 is full right.
     void SetPanning(float panning);
-    //// Set to remove either the sound source component or its owner node from the scene automatically on sound playback completion. Disabled by default.
+    /// Set to remove either the sound source component or its owner node from the scene automatically on sound playback completion. Disabled by default.
     void SetAutoRemoveMode(AutoRemoveMode mode);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
