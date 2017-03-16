@@ -20,6 +20,11 @@
 # THE SOFTWARE.
 #
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define target name
 set (TARGET_NAME Box2D)
 

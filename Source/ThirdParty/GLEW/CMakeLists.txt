@@ -23,6 +23,11 @@
 # Define target name
 set (TARGET_NAME GLEW)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define preprocessor macros
 add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
 

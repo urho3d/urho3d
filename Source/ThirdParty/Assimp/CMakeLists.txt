@@ -15,6 +15,11 @@ if (MINGW)
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
 endif ()
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 INCLUDE_DIRECTORIES( code )
 INCLUDE_DIRECTORIES( include )
 INCLUDE_DIRECTORIES( code/BoostWorkaround )

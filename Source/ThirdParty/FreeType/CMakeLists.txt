@@ -30,6 +30,11 @@ if (XCODE OR CMAKE_BUILD_TYPE STREQUAL Debug)
     add_definitions (-Dz_verbose=ft2_z_verbose -Dz_error=ft2_z_error)
 endif ()
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define source files
 set (SOURCE_FILES
     src/autofit/autofit.c
