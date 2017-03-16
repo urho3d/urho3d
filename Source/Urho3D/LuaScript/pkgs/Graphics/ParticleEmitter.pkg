@@ -1,5 +1,12 @@
 $#include "Graphics/ParticleEmitter.h"
 
+enum AutoRemoveMode
+{
+    REMOVE_DISABLED = 0,
+    REMOVE_COMPONENT,
+    REMOVE_NODE
+};
+
 class ParticleEmitter : public BillboardSet
 {
     void SetEffect(ParticleEffect* effect);
