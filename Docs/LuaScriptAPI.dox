@@ -7833,6 +7833,18 @@ Properties:
 - int REMOVE_COMPONENT
 - int REMOVE_NODE
 
+### AutoRemoveMode
+
+- int REMOVE_DISABLED
+- int REMOVE_COMPONENT
+- int REMOVE_NODE
+
+### AutoRemoveMode
+
+- int REMOVE_DISABLED
+- int REMOVE_COMPONENT
+- int REMOVE_NODE
+
 ### BlendMode
 
 - int BLEND_REPLACE
