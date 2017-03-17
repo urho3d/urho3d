@@ -264,6 +264,8 @@ Graphics::Graphics(Context* context) :
     resizable_(false),
     highDPI_(false),
     vsync_(false),
+    monitor_(0),
+    refreshRate_(0),
     tripleBuffer_(false),
     flushGPU_(false),
     sRGB_(false),
@@ -328,7 +330,7 @@ Graphics::~Graphics()
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
-    bool tripleBuffer, int multiSample)
+    bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
 
@@ -336,9 +338,14 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     bool maximize = false;
 
+    // make sure monitor index is not bigger than the currently detected monitors
+    int monitors = SDL_GetNumVideoDisplays();
+    if (monitor >= monitors)
+        monitor = 0; // this monitor is not present, use first monitor
+
     // Find out the full screen mode display format (match desktop color depth)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
+    SDL_GetDesktopDisplayMode(monitor, &mode);
     D3DFORMAT fullscreenFormat = SDL_BITSPERPIXEL(mode.format) == 16 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
 
     // If zero dimensions in windowed mode, set windowed mode to maximize and set a predefined default restored window size. If zero in fullscreen, use desktop mode
@@ -394,7 +401,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // Check fullscreen mode validity. Use a closest match if not found
     if (fullscreen)
     {
-        PODVector<IntVector2> resolutions = GetResolutions();
+        PODVector<IntVector3> resolutions = GetResolutions(monitor);
         if (resolutions.Size())
         {
             unsigned best = 0;
@@ -412,6 +419,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             width = resolutions[best].x_;
             height = resolutions[best].y_;
+            refreshRate = resolutions[best].z_;
         }
     }
 
@@ -422,7 +430,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             multiSample = 1;
     }
 
-    AdjustWindow(width, height, fullscreen, borderless);
+    AdjustWindow(width, height, fullscreen, borderless, monitor);
 
     if (maximize)
     {
@@ -451,7 +459,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     impl_->presentParams_.EnableAutoDepthStencil = TRUE;
     impl_->presentParams_.AutoDepthStencilFormat = D3DFMT_D24S8;
     impl_->presentParams_.Flags = D3DPRESENT_LINEAR_CONTENT;
-    impl_->presentParams_.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    impl_->presentParams_.FullScreen_RefreshRateInHz = fullscreen ? refreshRate : D3DPRESENT_RATE_DEFAULT;
 
     if (vsync)
         impl_->presentParams_.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
@@ -466,10 +474,12 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     highDPI_ = highDPI;
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
+    monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     if (!impl_->device_)
     {
-        unsigned adapter = D3DADAPTER_DEFAULT;
+        unsigned adapter = monitor;
         unsigned deviceType = D3DDEVTYPE_HAL;
 
         // Check for PerfHUD adapter
@@ -526,7 +536,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
@@ -2330,7 +2340,7 @@ bool Graphics::OpenWindow(int width, int height, bool resizable, bool borderless
     return true;
 }
 
-void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless)
+void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, bool& newBorderless, int& monitor)
 {
     if (!externalWindow_)
     {
@@ -2339,8 +2349,17 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_MaximizeWindow(window_);
             SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
-        else
+        else {
+            if (newFullscreen || newBorderless) 
+            {
+                // reposition the window on the specified monitor
+                SDL_Rect display_rect;
+                SDL_GetDisplayBounds(monitor, &display_rect);
+                SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
+            }
+
             SDL_SetWindowSize(window_, newWidth, newHeight);
+        }
 
         // Hack fix: on SDL 2.0.4 a fullscreen->windowed transition results in a maximized window when the D3D device is reset, so hide before
         SDL_HideWindow(window_);

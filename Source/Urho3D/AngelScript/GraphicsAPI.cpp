@@ -1840,7 +1840,7 @@ static void RegisterTerrain(asIScriptEngine* engine)
 
 static CScriptArray* GraphicsGetResolutions(Graphics* ptr)
 {
-    return VectorToArray<IntVector2>(ptr->GetResolutions(), "Array<IntVector2>");
+    return VectorToArray<IntVector3>(ptr->GetResolutions(), "Array<IntVector3>");
 }
 
 static CScriptArray* GraphicsGetMultiSampleLevels(Graphics* ptr)
@@ -1867,7 +1867,7 @@ static Graphics* GetGraphics()
 static void RegisterGraphics(asIScriptEngine* engine)
 {
     RegisterObject<Graphics>(engine, "Graphics");
-    engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int)", asMETHODPR(Graphics, SetMode, (int, int, bool, bool, bool, bool, bool, bool, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)", asMETHODPR(Graphics, SetMode, (int, int, bool, bool, bool, bool, bool, bool, int, int, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int)", asMETHODPR(Graphics, SetMode, (int, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void SetWindowPosition(int, int)", asMETHODPR(Graphics, SetWindowPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool ToggleFullscreen()", asMETHOD(Graphics, ToggleFullscreen), asCALL_THISCALL);

@@ -248,7 +248,9 @@ bool Engine::Initialize(const VariantMap& parameters)
             GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
             GetParameter(parameters, EP_VSYNC, false).GetBool(),
             GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
-            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt()
+            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
+            GetParameter(parameters, EP_MONITOR, 0).GetInt(),
+            GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
         ))
             return false;
 
@@ -863,6 +865,14 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
             else if (argument == "y" && !value.Empty())
             {
                 ret[EP_WINDOW_HEIGHT] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "monitor" && !value.Empty()) {
+                ret[EP_MONITOR] = ToInt(value);
+                ++i;
+            }
+            else if (argument == "hz" && !value.Empty()) {
+                ret[EP_REFRESH_RATE] = ToInt(value);
                 ++i;
             }
             else if (argument == "m" && !value.Empty())
