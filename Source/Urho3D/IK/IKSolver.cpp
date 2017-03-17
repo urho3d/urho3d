@@ -226,7 +226,7 @@ static void ApplySolvedDataCallback(ik_node_t* ikNode)
 }
 void IKSolver::Solve()
 {
-    URHO3D_PROFILE(Solve);
+    URHO3D_PROFILE(IKSolve);
 
     if (solverTreeNeedsRebuild_)
     {

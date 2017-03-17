@@ -45,7 +45,7 @@ IKEffector::IKEffector(Context* context) :
     weight_(1.0f),
     weightedNlerp_(false),
     inheritParentRotation_(false),
-    weightedChildrotations_(false)
+    targetRotationEnabled_(false)
 {
 }
 
@@ -66,7 +66,7 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", DoWeightedNlerp, SetWeightedNlerp, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", DoInheritParentRotation, SetInheritParentRotation, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Weighted Child Rotations", DoWeightedChildRotations, SetWeightedChildRotations, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Weighted Child Rotations", TargetRotationEnabled_, SetTargetRotationEnabled, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -203,21 +203,29 @@ void IKEffector::SetInheritParentRotation(bool enable)
 {
     inheritParentRotation_ = enable;
     if(ikEffector_ != NULL)
-        /*TODO*/;
+    {
+        ikEffector_->flags &= ~EFFECTOR_INHERIT_PARENT_ROTATION;
+        if (enable)
+            ikEffector_->flags |= EFFECTOR_INHERIT_PARENT_ROTATION;
+    }
 }
 
 // ----------------------------------------------------------------------------
-bool IKEffector::DoWeightedChildRotations() const
+bool IKEffector::TargetRotationEnabled_() const
 {
-    return weightedChildrotations_;
+    return targetRotationEnabled_;
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetWeightedChildRotations(bool enable)
+void IKEffector::SetTargetRotationEnabled(bool enable)
 {
-    weightedChildrotations_ = enable;
+    targetRotationEnabled_ = enable;
     if(ikEffector_ != NULL)
-        /*TODO*/;
+    {
+        ikEffector_->flags &= ~EFFECTOR_ENABLE_TARGET_ROTATION;
+        if (enable)
+            ikEffector_->flags |= EFFECTOR_ENABLE_TARGET_ROTATION;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -231,6 +239,7 @@ void IKEffector::UpdateTargetNodePosition()
     }
 
     SetTargetPosition(targetNode_->GetWorldPosition());
+    SetTargetRotation(targetNode_->GetWorldRotation());
 }
 
 // ----------------------------------------------------------------------------

@@ -101,8 +101,8 @@ public:
     bool DoInheritParentRotation() const;
     void SetInheritParentRotation(bool enable);
 
-    bool DoWeightedChildRotations() const;
-    void SetWeightedChildRotations(bool enable);
+    bool TargetRotationEnabled_() const;
+    void SetTargetRotationEnabled(bool enable);
 
     void UpdateTargetNodePosition();
 
@@ -123,7 +123,7 @@ private:
     float weight_;
     bool weightedNlerp_;
     bool inheritParentRotation_;
-    bool weightedChildrotations_;
+    bool targetRotationEnabled_;
 };
 
 } // namespace Urho3D
