@@ -522,7 +522,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef URHO3D_LOGGING
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
@@ -541,6 +541,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_BORDERLESS] = borderless_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_MONITOR] = monitor_;
+    eventData[P_REFRESHRATE] = refreshRate_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
