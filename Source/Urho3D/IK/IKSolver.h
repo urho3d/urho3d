@@ -110,14 +110,17 @@ public:
      */
     void SetTolerance(float tolerance);
 
-    bool DoCalculateFinalAngles() const;
-    void SetCalculateFinalAngles(bool enable);
+    bool BoneRotationsEnabled() const;
+    void SetBoneRotations(bool enable);
 
-    bool DoSkipReset() const;
-    void SetSkipReset(bool enable);
+    bool TargetRotationEnabled() const;
+    void SetTargetRotation(bool enable);
 
-    bool DoUpdateInitialPose() const;
-    void SetUpdateInitialPose(bool enable);
+    bool ContinuousSolvingEnabled() const;
+    void SetContinuousSolving(bool enable);
+
+    bool UpdatePoseEnabled() const;
+    void SetUpdatePose(bool enable);
 
     /// Causes the solver tree to be rebuilt before solving the next time.
     void MarkSolverTreeDirty();

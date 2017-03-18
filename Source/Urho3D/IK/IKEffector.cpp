@@ -43,9 +43,10 @@ IKEffector::IKEffector(Context* context) :
     ikEffector_(NULL),
     chainLength_(0),
     weight_(1.0f),
+    rotationWeight_(1.0),
+    rotationDecay_(0.25),
     weightedNlerp_(false),
-    inheritParentRotation_(false),
-    targetRotationEnabled_(false)
+    inheritParentRotation_(false)
 {
 }
 
@@ -64,9 +65,10 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Target Position", GetTargetPosition, SetTargetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Target Rotation", GetTargetRotationEuler, SetTargetRotationEuler, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Rotation Weight", GetRotationWeight, SetRotationWeight, float, 1.0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Rotation Decay", GetRotationDecay, SetRotationDecay, float, 0.25, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", DoWeightedNlerp, SetWeightedNlerp, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", DoInheritParentRotation, SetInheritParentRotation, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Weighted Child Rotations", TargetRotationEnabled_, SetTargetRotationEnabled, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -175,6 +177,34 @@ void IKEffector::SetWeight(float weight)
 }
 
 // ----------------------------------------------------------------------------
+float IKEffector::GetRotationWeight() const
+{
+    return rotationWeight_;
+}
+
+// ----------------------------------------------------------------------------
+void IKEffector::SetRotationWeight(float weight)
+{
+    rotationWeight_ = Clamp(weight, 0.0f, 1.0f);
+    if (ikEffector_ != NULL)
+        ikEffector_->rotation_weight = rotationWeight_;
+}
+
+// ----------------------------------------------------------------------------
+float IKEffector::GetRotationDecay() const
+{
+    return rotationDecay_;
+}
+
+// ----------------------------------------------------------------------------
+void IKEffector::SetRotationDecay(float decay)
+{
+    rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
+    if (ikEffector_ != NULL)
+        ikEffector_->rotation_decay = rotationDecay_;
+}
+
+// ----------------------------------------------------------------------------
 bool IKEffector::DoWeightedNlerp() const
 {
     return weightedNlerp_;
@@ -207,24 +237,6 @@ void IKEffector::SetInheritParentRotation(bool enable)
         ikEffector_->flags &= ~EFFECTOR_INHERIT_PARENT_ROTATION;
         if (enable)
             ikEffector_->flags |= EFFECTOR_INHERIT_PARENT_ROTATION;
-    }
-}
-
-// ----------------------------------------------------------------------------
-bool IKEffector::TargetRotationEnabled_() const
-{
-    return targetRotationEnabled_;
-}
-
-// ----------------------------------------------------------------------------
-void IKEffector::SetTargetRotationEnabled(bool enable)
-{
-    targetRotationEnabled_ = enable;
-    if(ikEffector_ != NULL)
-    {
-        ikEffector_->flags &= ~EFFECTOR_ENABLE_TARGET_ROTATION;
-        if (enable)
-            ikEffector_->flags |= EFFECTOR_ENABLE_TARGET_ROTATION;
     }
 }
 
@@ -301,6 +313,8 @@ void IKEffector::SetEffector(ik_effector_t* effector)
         effector->target_position = Vec3Urho2IK(targetPosition_);
         effector->target_rotation = QuatUrho2IK(targetRotation_);
         effector->weight = weight_;
+        effector->rotation_weight = rotationWeight_;
+        effector->rotation_decay = rotationDecay_;
         effector->chain_length = chainLength_;
         SetWeightedNlerp(weightedNlerp_);
     }

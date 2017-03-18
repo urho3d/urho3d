@@ -116,9 +116,10 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Calculate Angles", DoCalculateFinalAngles, SetCalculateFinalAngles, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", DoSkipReset, SetSkipReset, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Initial Pose", DoUpdateInitialPose, SetUpdateInitialPose, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bone Rotations", BoneRotationsEnabled, SetBoneRotations, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Target Rotation", TargetRotationEnabled, SetTargetRotation, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", ContinuousSolvingEnabled, SetContinuousSolving, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Pose", UpdatePoseEnabled, SetUpdatePose, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -172,13 +173,13 @@ void IKSolver::SetTolerance(float tolerance)
 }
 
 // ----------------------------------------------------------------------------
-bool IKSolver::DoCalculateFinalAngles() const
+bool IKSolver::BoneRotationsEnabled() const
 {
     return solver_->flags & SOLVER_CALCULATE_FINAL_ROTATIONS;
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetCalculateFinalAngles(bool enable)
+void IKSolver::SetBoneRotations(bool enable)
 {
     solver_->flags &= ~SOLVER_CALCULATE_FINAL_ROTATIONS;
     if (enable)
@@ -186,13 +187,27 @@ void IKSolver::SetCalculateFinalAngles(bool enable)
 }
 
 // ----------------------------------------------------------------------------
-bool IKSolver::DoSkipReset() const
+bool IKSolver::TargetRotationEnabled() const
+{
+    return solver_->flags & SOLVER_CALCULATE_TARGET_ROTATIONS;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::SetTargetRotation(bool enable)
+{
+    solver_->flags &= ~SOLVER_CALCULATE_TARGET_ROTATIONS;
+    if (enable)
+        solver_->flags |= SOLVER_CALCULATE_TARGET_ROTATIONS;
+}
+
+// ----------------------------------------------------------------------------
+bool IKSolver::ContinuousSolvingEnabled() const
 {
     return solver_->flags & SOLVER_SKIP_RESET;
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetSkipReset(bool enable)
+void IKSolver::SetContinuousSolving(bool enable)
 {
     solver_->flags &= ~SOLVER_SKIP_RESET;
     if (enable)
@@ -200,13 +215,13 @@ void IKSolver::SetSkipReset(bool enable)
 }
 
 // ----------------------------------------------------------------------------
-bool IKSolver::DoUpdateInitialPose() const
+bool IKSolver::UpdatePoseEnabled() const
 {
     return updateInitialPose_;
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetUpdateInitialPose(bool enable)
+void IKSolver::SetUpdatePose(bool enable)
 {
     updateInitialPose_ = enable;
 }

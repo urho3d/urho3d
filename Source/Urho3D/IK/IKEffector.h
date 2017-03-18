@@ -95,14 +95,17 @@ public:
     float GetWeight() const;
     void SetWeight(float weight);
 
+    float GetRotationWeight() const;
+    void SetRotationWeight(float weight);
+
+    float GetRotationDecay() const;
+    void SetRotationDecay(float decay);
+
     bool DoWeightedNlerp() const;
     void SetWeightedNlerp(bool enable);
 
     bool DoInheritParentRotation() const;
     void SetInheritParentRotation(bool enable);
-
-    bool TargetRotationEnabled_() const;
-    void SetTargetRotationEnabled(bool enable);
 
     void UpdateTargetNodePosition();
 
@@ -121,9 +124,10 @@ private:
     Quaternion targetRotation_;
     unsigned chainLength_;
     float weight_;
+    float rotationWeight_;
+    float rotationDecay_;
     bool weightedNlerp_;
     bool inheritParentRotation_;
-    bool targetRotationEnabled_;
 };
 
 } // namespace Urho3D
