@@ -367,11 +367,13 @@ public:
     bool GetSRGBWriteSupport() const { return sRGBWriteSupport_; }
 
     /// Return supported fullscreen resolutions (third component is refreshRate). Will be empty if listing the resolutions is not supported on the platform (e.g. Web).
-    PODVector<IntVector3> GetResolutions(int monitor = 0) const;
+    PODVector<IntVector3> GetResolutions(int monitor) const;
     /// Return supported multisampling levels.
     PODVector<int> GetMultiSampleLevels() const;
     /// Return the desktop resolution.
-    IntVector2 GetDesktopResolution() const;
+    IntVector2 GetDesktopResolution(int monitor) const;
+    /// Return the number of currently connected monitors
+    int GetMonitorCount() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;
     /// Return a shader variation by name and defines.

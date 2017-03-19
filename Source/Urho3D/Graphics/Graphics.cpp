@@ -177,12 +177,12 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
     PODVector<IntVector3> ret;
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
+    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
 
     for (unsigned i = 0; i < numModes; ++i)
     {
         SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
+        SDL_GetDisplayMode(monitor, i, &mode);
         int width = mode.w;
         int height = mode.h;
         int rate = mode.refresh_rate;
@@ -206,16 +206,21 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
     return ret;
 }
 
-IntVector2 Graphics::GetDesktopResolution() const
+IntVector2 Graphics::GetDesktopResolution(int monitor) const
 {
 #if !defined(__ANDROID__) && !defined(IOS)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
+    SDL_GetDesktopDisplayMode(monitor, &mode);
     return IntVector2(mode.w, mode.h);
 #else
     // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
     return IntVector2(width_, height_);
 #endif
+}
+
+int Graphics::GetMonitorCount() const
+{
+    return SDL_GetNumVideoDisplays();
 }
 
 void Graphics::Maximize()
