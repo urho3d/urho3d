@@ -59,7 +59,8 @@ class Graphics : public Object
     bool GetReadableDepthSupport() const;
     bool GetSRGBSupport() const;
     bool GetSRGBWriteSupport() const;
-    IntVector2 GetDesktopResolution() const;
+    IntVector2 GetDesktopResolution(int monitor) const;
+    int GetMonitorCount() const;
     const String GetShaderCacheDir() const;
 
     static unsigned GetAlphaFormat();
@@ -113,7 +114,7 @@ class Graphics : public Object
     tolua_readonly tolua_property__get_set bool readableDepthSupport;
     tolua_readonly tolua_property__get_set bool sRGBSupport;
     tolua_readonly tolua_property__get_set bool sRGBWriteSupport;
-    tolua_readonly tolua_property__get_set IntVector2 desktopResolution;
+    tolua_readonly tolua_property__get_set int monitorCount;
     tolua_property__get_set String shaderCacheDir;
 };
 

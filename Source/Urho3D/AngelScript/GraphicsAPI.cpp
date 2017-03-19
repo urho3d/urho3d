@@ -1838,9 +1838,14 @@ static void RegisterTerrain(asIScriptEngine* engine)
 }
 
 
-static CScriptArray* GraphicsGetResolutions(Graphics* ptr)
+static CScriptArray* GraphicsGetResolutions(int monitor, Graphics* ptr)
 {
-    return VectorToArray<IntVector3>(ptr->GetResolutions(), "Array<IntVector3>");
+    return VectorToArray<IntVector3>(ptr->GetResolutions(monitor), "Array<IntVector3>");
+}
+
+static int GraphicsGetMonitorCount(Graphics* ptr)
+{
+    return ptr->GetMonitorCount();
 }
 
 static CScriptArray* GraphicsGetMultiSampleLevels(Graphics* ptr)
@@ -1915,9 +1920,10 @@ static void RegisterGraphics(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Graphics", "bool get_readableDepthSupport() const", asMETHOD(Graphics, GetReadableDepthSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sRGBSupport() const", asMETHOD(Graphics, GetSRGBSupport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool get_sRGBWriteSupport() const", asMETHOD(Graphics, GetSRGBWriteSupport), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Graphics", "Array<IntVector2>@ get_resolutions() const", asFUNCTION(GraphicsGetResolutions), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("Graphics", "Array<IntVector3>@ get_resolutions(int) const", asFUNCTION(GraphicsGetResolutions), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Graphics", "Array<int>@ get_multiSampleLevels() const", asFUNCTION(GraphicsGetMultiSampleLevels), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Graphics", "IntVector2 get_desktopResolution() const", asMETHOD(Graphics, GetDesktopResolution), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "IntVector2 get_desktopResolution(int) const", asMETHOD(Graphics, GetDesktopResolution), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "int get_monitorCount() const", asFUNCTION(GraphicsGetMonitorCount), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Graphics@+ get_graphics()", asFUNCTION(GetGraphics), asCALL_CDECL);
 }
 
