@@ -160,7 +160,7 @@ class TerrainEditor
             // Make sure its not null (it may have been deleted since last save)
             if (terrainsEdited[i] !is null)
             {
-                String fileLocation = fileSystem.programDir + "Data/" + terrainsEdited[i].GetAttribute("Height Map").GetResourceRef().name;
+                String fileLocation = sceneResourcePath + terrainsEdited[i].GetAttribute("Height Map").GetResourceRef().name;
 
                 Array<String> chunks = fileLocation.Split('/');
                 Array<String> parts = chunks[chunks.length - 1].Split('.');
@@ -286,7 +286,7 @@ class TerrainEditor
                 continue;
 
             return value < (i + (i / 2)) ? i : i * 2;
-    	}
+        }
 
         return 2048;
     }
@@ -294,7 +294,7 @@ class TerrainEditor
     private void CreateTerrain()
     {
         String fileName = "Textures/heightmap-" + time.timeSinceEpoch  + ".png";
-        String fileLocation = fileSystem.programDir + "Data/" + fileName;
+        String fileLocation = sceneResourcePath + fileName;
 
         Node@ node = CreateNode(LOCAL);
         node.position = Vector3(0, 0, 0);
@@ -313,6 +313,8 @@ class TerrainEditor
 
         UpdateTerrainSetConstantHeight(image, 0);
 
+        if (!fileSystem.DirExists(GetPath(fileLocation)))
+            fileSystem.CreateDir(GetPath(fileLocation));
         image.SavePNG(fileLocation);
 
         Terrain@ terrain = node.CreateComponent("Terrain");
@@ -384,7 +386,15 @@ class TerrainEditor
     {
         ListView@ terrainBrushes = window.GetChild("BrushesContainer", true);
 
-        String brushesFileLocation = fileSystem.programDir + "Data/Textures/Editor/TerrainBrushes";
+        Array<String>@ resourceDirs = cache.resourceDirs;
+        String brushesFileLocation;
+        for (uint i = 0; i < resourceDirs.length; ++i)
+        {
+            brushesFileLocation = resourceDirs[i] + "Textures/Editor/TerrainBrushes";
+            if (fileSystem.DirExists(brushesFileLocation))
+                break;
+        }
+
         Array<String> files = fileSystem.ScanDir(brushesFileLocation, "*.*", SCAN_FILES, false);
 
         for (uint i = 0; i < files.length; ++i)
