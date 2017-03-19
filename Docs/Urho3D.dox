@@ -1032,6 +1032,12 @@ Related projects:
 
 - Consolidated Urho3D extra samples (https://github.com/Lumak/Urho3D-Extra-Samples)
 
+Projects using Urho3D:
+
+- heXon - a twin-stick-shooter for up to four players (https://github.com/LucKeyProductions/heXon)
+
+- Quatter - a board game for two players (https://github.com/LucKeyProductions/Quatter)
+
 \page PortingNotes Porting notes
 
 From 1.4 to 1.5:
