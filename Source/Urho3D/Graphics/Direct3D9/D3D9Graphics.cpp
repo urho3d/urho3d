@@ -340,7 +340,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     // make sure monitor index is not bigger than the currently detected monitors
     int monitors = SDL_GetNumVideoDisplays();
-    if (monitor >= monitors)
+    if (monitor >= monitors || monitor < 0)
         monitor = 0; // this monitor is not present, use first monitor
 
     // Find out the full screen mode display format (match desktop color depth)
@@ -598,7 +598,7 @@ bool Graphics::TakeScreenShot(Image& destImage)
         // If windowed and multisampled, must still capture the whole screen
         if (!fullscreen_)
         {
-            IntVector2 desktopSize = GetDesktopResolution();
+            IntVector2 desktopSize = GetDesktopResolution(monitor_);
             surfaceWidth = (unsigned)desktopSize.x_;
             surfaceHeight = (unsigned)desktopSize.y_;
         }
