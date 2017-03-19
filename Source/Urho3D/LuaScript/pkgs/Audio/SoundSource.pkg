@@ -1,11 +1,7 @@
 $#include "Audio/SoundSource.h"
 
-enum AutoRemoveMode
-{
-    REMOVE_DISABLED = 0,
-    REMOVE_COMPONENT,
-    REMOVE_NODE
-};
+// The actual enum is defined in Scene/Component.pkg
+enum AutoRemoveMode {};
 
 class SoundSource : public Component
 {
