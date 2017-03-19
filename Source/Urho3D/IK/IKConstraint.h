@@ -30,7 +30,7 @@ namespace Urho3D
 class Context;
 class Node;
 
-class IKConstraint : public Component
+class URHO3D_API IKConstraint : public Component
 {
     URHO3D_OBJECT(IKConstraint, Component)
 

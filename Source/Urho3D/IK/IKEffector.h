@@ -33,7 +33,7 @@ namespace Urho3D
 class Context;
 class IKSolver;
 
-class IKEffector : public Component
+class URHO3D_API IKEffector : public Component
 {
     URHO3D_OBJECT(IKEffector, Component)
 

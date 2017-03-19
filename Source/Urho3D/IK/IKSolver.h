@@ -38,7 +38,7 @@ class AnimationState;
  * The IK problem is solved starting from the node this component is attached
  * to and ending at all nodes that have an IKEffector component attached.
  */
-class IKSolver : public Component
+class URHO3D_API IKSolver : public Component
 {
     URHO3D_OBJECT(IKSolver, Component)
 
