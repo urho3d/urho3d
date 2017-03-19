@@ -55,6 +55,10 @@ void RegisterNetworkAPI(asIScriptEngine* engine);
 /// Register the Database library to script.
 void RegisterDatabaseAPI(asIScriptEngine* engine);
 #endif
+#ifdef URHO3D_IK
+/// Register the inverse kinematics library to script
+void RegisterIKAPI(asIScriptEngine* engine);
+#endif
 #ifdef URHO3D_PHYSICS
 /// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);

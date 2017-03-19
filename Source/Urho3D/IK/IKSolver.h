@@ -111,27 +111,32 @@ public:
     void SetTolerance(float tolerance);
 
     bool BoneRotationsEnabled() const;
-    void SetBoneRotations(bool enable);
+    void EnableBoneRotations(bool enable);
 
     bool TargetRotationEnabled() const;
-    void SetTargetRotation(bool enable);
+    void EnableTargetRotation(bool enable);
 
     bool ContinuousSolvingEnabled() const;
-    void SetContinuousSolving(bool enable);
+    void EnableContinuousSolving(bool enable);
 
     bool UpdatePoseEnabled() const;
-    void SetUpdatePose(bool enable);
+    void EnableUpdatePose(bool enable);
 
-    /// Causes the solver tree to be rebuilt before solving the next time.
-    void MarkSolverTreeDirty();
+    bool AutoSolveEnabled() const;
+    void EnableAutoSolve(bool enable);
 
     void Solve();
     void ResetToInitialPose();
     void UpdateInitialPose();
 
+    /// Causes the solver tree to be rebuilt before solving the next time.
+    void MarkSolverTreeDirty();
+
+    void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
+    virtual void OnSceneSet(Scene* scene);
     virtual void OnNodeSet(Node* scene);
     /// Causes the entire tree to be rebuilt
     void RebuildTree();
@@ -149,6 +154,7 @@ private:
     Algorithm algorithm_;
     bool solverTreeNeedsRebuild_;
     bool updateInitialPose_;
+    bool autoSolveEnabled_;
 };
 
 } // namespace Urho3D

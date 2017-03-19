@@ -74,17 +74,17 @@ IKSolver::IKSolver(Context* context) :
     Component(context),
     solver_(NULL),
     solverTreeNeedsRebuild_(false),
-    updateInitialPose_(false)
+    updateInitialPose_(false),
+    autoSolveEnabled_(true)
 {
     context_->RequireIK();
 
     SetAlgorithm(FABRIK);
 
-    SubscribeToEvent(E_COMPONENTADDED,              URHO3D_HANDLER(IKSolver, HandleComponentAdded));
-    SubscribeToEvent(E_COMPONENTREMOVED,            URHO3D_HANDLER(IKSolver, HandleComponentRemoved));
-    SubscribeToEvent(E_NODEADDED,                   URHO3D_HANDLER(IKSolver, HandleNodeAdded));
-    SubscribeToEvent(E_NODEREMOVED,                 URHO3D_HANDLER(IKSolver, HandleNodeRemoved));
-    SubscribeToEvent(E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(IKSolver, HandleSceneDrawableUpdateFinished));
+    SubscribeToEvent(GetScene(), E_COMPONENTADDED,              URHO3D_HANDLER(IKSolver, HandleComponentAdded));
+    SubscribeToEvent(GetScene(), E_COMPONENTREMOVED,            URHO3D_HANDLER(IKSolver, HandleComponentRemoved));
+    SubscribeToEvent(GetScene(), E_NODEADDED,                   URHO3D_HANDLER(IKSolver, HandleNodeAdded));
+    SubscribeToEvent(GetScene(), E_NODEREMOVED,                 URHO3D_HANDLER(IKSolver, HandleNodeRemoved));
 }
 
 // ----------------------------------------------------------------------------
@@ -116,10 +116,10 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Bone Rotations", BoneRotationsEnabled, SetBoneRotations, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Target Rotation", TargetRotationEnabled, SetTargetRotation, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", ContinuousSolvingEnabled, SetContinuousSolving, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Pose", UpdatePoseEnabled, SetUpdatePose, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bone Rotations", BoneRotationsEnabled, EnableBoneRotations, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Target Rotation", TargetRotationEnabled, EnableTargetRotation, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", ContinuousSolvingEnabled, EnableContinuousSolving, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Pose", UpdatePoseEnabled, EnableUpdatePose, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -179,7 +179,7 @@ bool IKSolver::BoneRotationsEnabled() const
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetBoneRotations(bool enable)
+void IKSolver::EnableBoneRotations(bool enable)
 {
     solver_->flags &= ~SOLVER_CALCULATE_FINAL_ROTATIONS;
     if (enable)
@@ -193,7 +193,7 @@ bool IKSolver::TargetRotationEnabled() const
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetTargetRotation(bool enable)
+void IKSolver::EnableTargetRotation(bool enable)
 {
     solver_->flags &= ~SOLVER_CALCULATE_TARGET_ROTATIONS;
     if (enable)
@@ -207,7 +207,7 @@ bool IKSolver::ContinuousSolvingEnabled() const
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetContinuousSolving(bool enable)
+void IKSolver::EnableContinuousSolving(bool enable)
 {
     solver_->flags &= ~SOLVER_SKIP_RESET;
     if (enable)
@@ -221,7 +221,7 @@ bool IKSolver::UpdatePoseEnabled() const
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::SetUpdatePose(bool enable)
+void IKSolver::EnableUpdatePose(bool enable)
 {
     updateInitialPose_ = enable;
 }
@@ -230,6 +230,26 @@ void IKSolver::SetUpdatePose(bool enable)
 void IKSolver::MarkSolverTreeDirty()
 {
     solverTreeNeedsRebuild_ = true;
+}
+
+// ----------------------------------------------------------------------------
+bool IKSolver::AutoSolveEnabled() const
+{
+    return autoSolveEnabled_;
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::EnableAutoSolve(bool enable)
+{
+    if (autoSolveEnabled_ == enable)
+        return;
+
+    if (enable)
+        SubscribeToEvent(GetScene(), E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(IKSolver, HandleSceneDrawableUpdateFinished));
+    else
+        UnsubscribeFromEvent(GetScene(), E_SCENEDRAWABLEUPDATEFINISHED);
+
+    autoSolveEnabled_ = enable;
 }
 
 // ----------------------------------------------------------------------------
@@ -300,9 +320,15 @@ void IKSolver::UpdateInitialPose()
  */
 
 // ----------------------------------------------------------------------------
+void IKSolver::OnSceneSet(Scene* scene)
+{
+    if (autoSolveEnabled_)
+        SubscribeToEvent(scene, E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(IKSolver, HandleSceneDrawableUpdateFinished));
+}
+
+// ----------------------------------------------------------------------------
 void IKSolver::OnNodeSet(Node* node)
 {
-    ResetToInitialPose();
     if (node == NULL)
         ik_solver_destroy_tree(solver_);
     else
@@ -461,6 +487,14 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 void IKSolver::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
 {
     Solve();
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::DrawDebugGeometry(bool depthTest)
+{
+    DebugRenderer* debug = GetScene()->GetComponent<DebugRenderer>();
+    if (debug)
+        DrawDebugGeometry(debug, depthTest);
 }
 
 // ----------------------------------------------------------------------------

@@ -101,14 +101,15 @@ public:
     float GetRotationDecay() const;
     void SetRotationDecay(float decay);
 
-    bool DoWeightedNlerp() const;
-    void SetWeightedNlerp(bool enable);
+    bool WeightedNlerpEnabled() const;
+    void EnableWeightedNlerp(bool enable);
 
-    bool DoInheritParentRotation() const;
-    void SetInheritParentRotation(bool enable);
+    bool InheritParentRotationEnabled() const;
+    void EnableInheritParentRotation(bool enable);
 
     void UpdateTargetNodePosition();
 
+    void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     void SetSolver(IKSolver* solver);

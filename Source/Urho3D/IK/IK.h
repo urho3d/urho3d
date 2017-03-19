@@ -21,20 +21,17 @@
 //
 
 /*
- * TODO IK todo
- *  - Actually implement tolerance.
- *  - Target angle in addition to target position -> use weighted angles
- *    approach
- *  - Fix rotation issue with shared sub-base nodes -> rotations need to be
- *    averaged.
+ * TODO
  *  - Add support for manually updating initial pose.
- *  - Pole targets?
- *  - Support for "stretchiness" with min/max lengths.
- *  - Support for "stiffness" factor, describes how well a bone rotates.
- *  - Apply bullet constraints to joints.
  *  - Script bindings.
  *  - Optimise.
  *  - Profile.
+ *  - Documentation.
+ *
+ * FUTURE
+ *  - Support for "stretchiness" with min/max lengths.
+ *  - Support for "stiffness" factor, describes how well a bone rotates.
+ *  - Apply bullet constraints to joints.
  */
 
 namespace Urho3D

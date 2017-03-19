@@ -210,7 +210,7 @@ if (URHO3D_LUA)
     # Use the host tool to generate source files for tolua++ API binding
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/LuaScript/generated)
     file (GLOB API_PKG_FILES LuaScript/pkgs/*.pkg)
-    foreach (DIR Navigation Network Database Physics Urho2D)
+    foreach (DIR IK Navigation Network Database Physics Urho2D)
         string (TOUPPER URHO3D_${DIR} OPT)
         if (NOT ${OPT})
             list (REMOVE_ITEM API_PKG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/LuaScript/pkgs/${DIR}LuaAPI.pkg)

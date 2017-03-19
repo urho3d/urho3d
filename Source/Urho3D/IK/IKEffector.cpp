@@ -67,8 +67,8 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Weight", GetRotationWeight, SetRotationWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Decay", GetRotationDecay, SetRotationDecay, float, 0.25, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", DoWeightedNlerp, SetWeightedNlerp, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", DoInheritParentRotation, SetInheritParentRotation, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", WeightedNlerpEnabled, EnableWeightedNlerp, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", InheritParentRotationEnabled, EnableInheritParentRotation, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -205,13 +205,13 @@ void IKEffector::SetRotationDecay(float decay)
 }
 
 // ----------------------------------------------------------------------------
-bool IKEffector::DoWeightedNlerp() const
+bool IKEffector::WeightedNlerpEnabled() const
 {
     return weightedNlerp_;
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetWeightedNlerp(bool enable)
+void IKEffector::EnableWeightedNlerp(bool enable)
 {
     weightedNlerp_ = enable;
     if (ikEffector_ != NULL)
@@ -223,13 +223,13 @@ void IKEffector::SetWeightedNlerp(bool enable)
 }
 
 // ----------------------------------------------------------------------------
-bool IKEffector::DoInheritParentRotation() const
+bool IKEffector::InheritParentRotationEnabled() const
 {
     return inheritParentRotation_;
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetInheritParentRotation(bool enable)
+void IKEffector::EnableInheritParentRotation(bool enable)
 {
     inheritParentRotation_ = enable;
     if(ikEffector_ != NULL)
@@ -252,6 +252,14 @@ void IKEffector::UpdateTargetNodePosition()
 
     SetTargetPosition(targetNode_->GetWorldPosition());
     SetTargetRotation(targetNode_->GetWorldRotation());
+}
+
+// ----------------------------------------------------------------------------
+void IKEffector::DrawDebugGeometry(bool depthTest)
+{
+    DebugRenderer* debug = GetScene()->GetComponent<DebugRenderer>();
+    if (debug)
+        DrawDebugGeometry(debug, depthTest);
 }
 
 // ----------------------------------------------------------------------------
@@ -302,6 +310,11 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         a = b;
         b = b->GetParent();
     }
+
+    Vector3 direction = targetRotation_ * Vector3::FORWARD;
+    direction = direction * averageLength + targetPosition_;
+    debug->AddSphere(Sphere(targetPosition_, averageLength * 0.2), Color(255, 128, 0), depthTest);
+    debug->AddLine(targetPosition_, direction, Color(255, 128, 0), depthTest);
 }
 
 // ----------------------------------------------------------------------------
@@ -316,7 +329,7 @@ void IKEffector::SetEffector(ik_effector_t* effector)
         effector->rotation_weight = rotationWeight_;
         effector->rotation_decay = rotationDecay_;
         effector->chain_length = chainLength_;
-        SetWeightedNlerp(weightedNlerp_);
+        EnableWeightedNlerp(weightedNlerp_);
     }
 }
 
