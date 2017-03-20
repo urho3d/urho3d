@@ -284,7 +284,7 @@ Graphics::~Graphics()
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
-    bool tripleBuffer, int multiSample)
+    bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 {
     URHO3D_PROFILE(SetScreenMode);
 
@@ -294,6 +294,11 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     // iOS and tvOS app always take the fullscreen (and with status bar hidden)
     fullscreen = true;
 #endif
+
+    // make sure monitor index is not bigger than the currently detected monitors
+    int monitors = SDL_GetNumVideoDisplays();
+    if (monitor >= monitors || monitor < 0)
+        monitor = 0; // this monitor is not present, use first monitor
 
     // Fullscreen or Borderless can not be resizable
     if (fullscreen || borderless)
@@ -325,7 +330,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         if (fullscreen || borderless)
         {
             SDL_DisplayMode mode;
-            SDL_GetDesktopDisplayMode(0, &mode);
+            SDL_GetDesktopDisplayMode(monitor, &mode);
             width = mode.w;
             height = mode.h;
         }
@@ -341,7 +346,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 #ifdef DESKTOP_GRAPHICS
     if (fullscreen)
     {
-        PODVector<IntVector2> resolutions = GetResolutions();
+        PODVector<IntVector3> resolutions = GetResolutions(monitor);
         if (resolutions.Size())
         {
             unsigned best = 0;
@@ -359,6 +364,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
             width = resolutions[best].x_;
             height = resolutions[best].y_;
+            refreshRate = resolutions[best].z_;
         }
     }
 #endif
@@ -417,8 +423,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
 
-        int x = fullscreen ? 0 : position_.x_;
-        int y = fullscreen ? 0 : position_.y_;
+        // reposition the window on the specified monitor
+        SDL_Rect display_rect;
+        SDL_GetDisplayBounds(monitor, &display_rect);
+        SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
+
+        int x = fullscreen || borderless ? display_rect.x : position_.x_;
+        int y = fullscreen || borderless ? display_rect.y : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
@@ -511,7 +522,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 #ifdef URHO3D_LOGGING
     String msg;
-    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    msg.AppendWithFormat("Set screen mode %dx%d %s monitor %d", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"), monitor_);
     if (borderless_)
         msg.Append(" borderless");
     if (resizable_)
@@ -530,6 +541,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     eventData[P_BORDERLESS] = borderless_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_MONITOR] = monitor_;
+    eventData[P_REFRESHRATE] = refreshRate_;
     SendEvent(E_SCREENMODE, eventData);
 
     return true;
@@ -537,7 +550,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
 bool Graphics::SetMode(int width, int height)
 {
-    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width, height, fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetSRGB(bool enable)
