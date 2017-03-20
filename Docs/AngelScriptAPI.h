@@ -5197,7 +5197,7 @@ void PrecacheShaders(File);
 void PrecacheShaders(VectorBuffer&);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 bool SetMode(int, int);
-bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int);
+bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int);
 void SetWindowPosition(int, int);
 bool TakeScreenShot(Image);
 bool ToggleFullscreen();
@@ -5212,7 +5212,7 @@ String category;
 /* readonly */
 bool deferredSupport;
 /* readonly */
-IntVector2 desktopResolution;
+Array<IntVector2> desktopResolution;
 /* readonly */
 bool deviceLost;
 bool dither;
@@ -5230,6 +5230,8 @@ bool instancingSupport;
 /* readonly */
 bool lightPrepassSupport;
 /* readonly */
+int monitorCount;
+/* readonly */
 int multiSample;
 /* readonly */
 Array<int> multiSampleLevels;
@@ -5245,7 +5247,7 @@ int refs;
 /* readonly */
 bool resizable;
 /* readonly */
-Array<IntVector2> resolutions;
+Array<Array<IntVector3>> resolutions;
 bool sRGB;
 /* readonly */
 bool sRGBSupport;

@@ -2552,7 +2552,7 @@ Methods:
 - void SetWindowIcon(Image* windowIcon)
 - void SetWindowPosition(const IntVector2& position)
 - void SetWindowPosition(int x, int y)
-- bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample)
+- bool SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer, int multiSample, int monitor, int refreshRate)
 - bool SetMode(int width, int height)
 - void SetSRGB(bool enable)
 - void SetDither(bool enable)
@@ -2581,6 +2581,8 @@ Methods:
 - bool GetResizable() const
 - bool GetBorderless() const
 - bool GetVSync() const
+- int GetMonitor() const
+- int GetRefreshRate() const
 - bool GetTripleBuffer() const
 - bool GetSRGB() const
 - bool GetDither() const
@@ -2599,7 +2601,8 @@ Methods:
 - bool GetReadableDepthSupport() const
 - bool GetSRGBSupport() const
 - bool GetSRGBWriteSupport() const
-- IntVector2 GetDesktopResolution() const
+- IntVector2 GetDesktopResolution(int monitor) const
+- int GetMonitorCount() const
 - const String GetShaderCacheDir() const
 - unsigned GetAlphaFormat()
 - unsigned GetLuminanceFormat()
@@ -2634,6 +2637,8 @@ Properties:
 - bool resizable (readonly)
 - bool borderless (readonly)
 - bool vSync (readonly)
+- int refreshRate (readonly)
+- int monitor (readonly)
 - bool tripleBuffer (readonly)
 - bool sRGB
 - bool dither
@@ -2652,7 +2657,7 @@ Properties:
 - bool readableDepthSupport (readonly)
 - bool sRGBSupport (readonly)
 - bool sRGBWriteSupport (readonly)
-- IntVector2 desktopResolution (readonly)
+- int monitorCount (readonly)
 - String shaderCacheDir
 
 <a name="Class_HierarchyContainer"></a>

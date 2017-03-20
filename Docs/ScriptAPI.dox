@@ -84,6 +84,8 @@ namespace Urho3D
 - %Borderless : bool
 - %Resizable : bool
 - %HighDPI : bool
+- %Monitor : int
+- %RefreshRate : int
 
 ### WindowPos
 - %X : int
@@ -7383,7 +7385,7 @@ Methods:
 - void PrecacheShaders(VectorBuffer&)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - bool SetMode(int, int)
-- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int)
+- bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)
 - void SetWindowPosition(int, int)
 - bool TakeScreenShot(Image@)
 - bool ToggleFullscreen()
@@ -7394,7 +7396,7 @@ Properties:
 - bool borderless // readonly
 - String category // readonly
 - bool deferredSupport // readonly
-- IntVector2 desktopResolution // readonly
+- IntVector2[] desktopResolution // readonly
 - bool deviceLost // readonly
 - bool dither
 - bool flushGPU
@@ -7404,6 +7406,7 @@ Properties:
 - bool initialized // readonly
 - bool instancingSupport // readonly
 - bool lightPrepassSupport // readonly
+- int monitorCount // readonly
 - int multiSample // readonly
 - int[]@ multiSampleLevels // readonly
 - uint numBatches // readonly
@@ -7412,7 +7415,7 @@ Properties:
 - bool readableDepthSupport // readonly
 - int refs // readonly
 - bool resizable // readonly
-- IntVector2[]@ resolutions // readonly
+- IntVector3[]@[] resolutions // readonly
 - bool sRGB
 - bool sRGBSupport // readonly
 - bool sRGBWriteSupport // readonly
