@@ -372,7 +372,7 @@ public:
     PODVector<int> GetMultiSampleLevels() const;
     /// Return the desktop resolution.
     IntVector2 GetDesktopResolution(int monitor) const;
-    /// Return the number of currently connected monitors
+    /// Return the number of currently connected monitors.
     int GetMonitorCount() const;
     /// Return hardware format for a compressed image format, or 0 if unsupported.
     unsigned GetFormat(CompressedFormat format) const;

@@ -295,7 +295,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     fullscreen = true;
 #endif
 
-    // make sure monitor index is not bigger than the currently detected monitors
+    // Make sure monitor index is not bigger than the currently detected monitors
     int monitors = SDL_GetNumVideoDisplays();
     if (monitor >= monitors || monitor < 0)
         monitor = 0; // this monitor is not present, use first monitor
@@ -423,7 +423,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
         }
 
-        // reposition the window on the specified monitor
+        // Reposition the window on the specified monitor
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(monitor, &display_rect);
         SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);

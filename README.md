@@ -93,6 +93,7 @@ Urho3D development, contributions and bugfixes by:
 - Ner'zhul
 - Newb I the Newbd
 - OvermindDL1
+- PredatorMF
 - Scellow
 - Skrylar
 - TheComet93

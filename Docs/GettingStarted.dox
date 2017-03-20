@@ -401,6 +401,8 @@ The engine can be configured using the following command line options.
 -headless    Headless mode. No application window will be created
 -landscape   Use landscape orientations (iOS only, default)
 -portrait    Use portrait orientations (iOS only)
+-monitor <num> Monitor number to use
+-hz <freq>   Monitor refresh rate to use
 -prepass     Use light pre-pass rendering
 -deferred    Use deferred rendering
 -renderpath <name> Use the named renderpath (must enter full resource name)
