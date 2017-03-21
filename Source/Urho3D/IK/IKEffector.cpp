@@ -129,7 +129,7 @@ const Quaternion& IKEffector::GetTargetRotation() const
 void IKEffector::SetTargetRotation(const Quaternion& targetRotation)
 {
     targetRotation_ = targetRotation;
-    if(ikEffector_)
+    if (ikEffector_)
         ikEffector_->target_rotation = QuatUrho2IK(targetRotation);
 }
 

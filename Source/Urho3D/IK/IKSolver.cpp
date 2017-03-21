@@ -81,7 +81,7 @@ IKSolver::~IKSolver()
 {
     // Destroying the solver tree will destroy the effector objects, so remove
     // any references any of the IKEffector objects could be holding
-    for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
+    for (PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
         (*it)->SetIKEffector(NULL);
 
     ik_solver_destroy(solver_);
@@ -153,7 +153,7 @@ float IKSolver::GetTolerance() const
 // ----------------------------------------------------------------------------
 void IKSolver::SetTolerance(float tolerance)
 {
-    if(tolerance < M_EPSILON)
+    if (tolerance < M_EPSILON)
         tolerance = M_EPSILON;
     solver_->tolerance = tolerance;
 }
@@ -258,7 +258,7 @@ void IKSolver::Solve()
     if (updateInitialPose_)
         UpdateInitialPose();
 
-    for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
+    for (PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
     {
         (*it)->UpdateTargetNodePosition();
     }
@@ -357,7 +357,7 @@ void IKSolver::BuildTree()
 
     PODVector<Node*> effectorNodes;
     node_->GetChildrenWithComponent<IKEffector>(effectorNodes, true);
-    for(PODVector<Node*>::ConstIterator it = effectorNodes.Begin(); it != effectorNodes.End(); ++it)
+    for (PODVector<Node*>::ConstIterator it = effectorNodes.Begin(); it != effectorNodes.End(); ++it)
     {
         BuildTreeToEffector(*it);
     }
@@ -369,7 +369,7 @@ void IKSolver::BuildTreeToEffector(const Node* node)
     // Check if the component that was added is an IK effector. If not, then it
     // does not concern us.
     IKEffector* effector = static_cast<IKEffector*>(node->GetComponent<IKEffector>());
-    if(effector == NULL || effector->GetType() != IKEffector::GetTypeStatic())
+    if (effector == NULL || effector->GetType() != IKEffector::GetTypeStatic())
         return;
 
     // May need to build tree up to the node where this effector was added. Do
@@ -412,7 +412,7 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
     using namespace ComponentAdded;
     (void)eventType;
 
-    if(solver_->tree == NULL)
+    if (solver_->tree == NULL)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
@@ -423,9 +423,8 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
 void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventData)
 {
     using namespace ComponentRemoved;
-    (void)eventType;
 
-    if(solver_->tree == NULL)
+    if (solver_->tree == NULL)
         return;
 
     // If an effector was removed, the tree will have to be rebuilt.
@@ -455,7 +454,6 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
 void IKSolver::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeAdded;
-    (void)eventType;
 
     if (solver_->tree == NULL)
         return;
@@ -475,9 +473,8 @@ void IKSolver::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
 {
     using namespace NodeRemoved;
-    (void)eventType;
 
-    if(solver_->tree == NULL)
+    if (solver_->tree == NULL)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
@@ -485,7 +482,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     // Remove cached IKEffectors from our list
     PODVector<Node*> nodes;
     node->GetChildrenWithComponent<IKEffector>(nodes, true);
-    for(PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
+    for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
     {
         effectorList_.Remove((*it)->GetComponent<IKEffector>());
     }
@@ -494,7 +491,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     // solver's tree instead of destroying the single node. Calling
     // ik_node_destroy() on the solver's root node will cause segfaults.
     ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-    if(ikNode != NULL)
+    if (ikNode != NULL)
     {
         if(ikNode == solver_->tree)
             ik_solver_destroy_tree(solver_);

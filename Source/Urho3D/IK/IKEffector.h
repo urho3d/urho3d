@@ -45,9 +45,7 @@ public:
     /// Destructs he IK effector.
     virtual ~IKEffector();
 
-    /*!
-     * Registers this class as an object factory.
-     */
+    /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
 
     /// Retrieves the node that is being used as a target. Can be NULL.
@@ -102,11 +100,13 @@ public:
 
     /// How strongly the effector affects the solution.
     float GetWeight() const;
+
     /*!
-     * @brief Sets how much influence the effector has on the solution. You can
-     * use this value to smoothly transition between a solved pose and an
-     * initial pose  For instance, lifting a foot off of the ground or letting
-     * go of an object.
+     * @brief Sets how much influence the effector has on the solution.
+     *
+     * You can use this value to smoothly transition between a solved pose and
+     * an initial pose  For instance, lifting a foot off of the ground or
+     * letting go of an object.
      */
     void SetWeight(float weight);
 
@@ -126,11 +126,13 @@ public:
 
     /*!
      * @brief A factor with which to control the target rotation influence of
-     * the next segments down the chain. For example, if this is set to 0.5
-     * and the rotation weight is set to 1.0, then the first segment will
-     * match the target rotation exactly, the next segment will match it only
-     * 50%, the next segment 25%, the next 12.5%, etc. This parameter makes
-     * long chains look more natural when matching a target rotation.
+     * the next segments down the chain.
+     *
+     * For example, if this is set to 0.5 and the rotation weight is set to
+     * 1.0, then the first segment will match the target rotation exactly, the
+     * next segment will match it only 50%, the next segment 25%, the next
+     * 12.5%, etc. This parameter makes long chains look more natural when
+     * matching a target rotation.
      */
     void SetRotationDecay(float decay);
 

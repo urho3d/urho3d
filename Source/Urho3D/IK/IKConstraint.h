@@ -38,19 +38,13 @@ class URHO3D_API IKConstraint : public Component
 
 public:
 
-    /*!
-     * Constructs a new IK constraint.
-     */
+    /// Constructs a new IK constraint.
     IKConstraint(Context* context);
 
-    /*!
-     * Destructs he IK constraint.
-     */
+    /// Destructs he IK constraint.
     virtual ~IKConstraint();
 
-    /*!
-     * Registers this class as an object factory.
-     */
+    /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
 
     float GetStiffness() const;
