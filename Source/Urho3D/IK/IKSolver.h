@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "../IK/IKEffector.h"
 #include "../Scene/Component.h"
 
 struct ik_solver_t;
@@ -31,6 +30,8 @@ struct ik_node_t;
 namespace Urho3D
 {
 class AnimationState;
+class IKConstraint;
+class IKEffector;
 
 /*!
  * @brief Marks the root or "beginning" of an IK chain or multiple IK chains.
@@ -138,8 +139,11 @@ public:
 private:
     virtual void OnSceneSet(Scene* scene);
     virtual void OnNodeSet(Node* scene);
-    /// Causes the entire tree to be rebuilt
-    void RebuildTree();
+
+    ik_node_t* CreateIKNode(const Node* node);
+
+    void DestroyTree();
+    void BuildTree();
     void BuildTreeToEffector(const Node* node);
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);

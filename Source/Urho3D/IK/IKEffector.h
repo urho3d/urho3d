@@ -112,10 +112,14 @@ public:
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
-    void SetSolver(IKSolver* solver);
-    void SetEffector(ik_effector_t* effector);
-
 private:
+    friend class IKSolver;
+
+    /// Intended to be used only by IKSolver
+    void SetIKSolver(IKSolver* solver);
+    /// Intended to be used only by IKSolver
+    void SetIKEffector(ik_effector_t* effector);
+
     WeakPtr<Node> targetNode_;
     WeakPtr<IKSolver> solver_;
     ik_effector_t* ikEffector_;

@@ -318,7 +318,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetEffector(ik_effector_t* effector)
+void IKEffector::SetIKEffector(ik_effector_t* effector)
 {
     ikEffector_ = effector;
     if (effector)
@@ -334,7 +334,7 @@ void IKEffector::SetEffector(ik_effector_t* effector)
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetSolver(IKSolver* solver)
+void IKEffector::SetIKSolver(IKSolver* solver)
 {
     solver_ = solver;
 }

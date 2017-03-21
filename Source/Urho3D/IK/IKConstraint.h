@@ -24,6 +24,8 @@
 
 #include "../Scene/Component.h"
 
+struct ik_node_t;
+
 namespace Urho3D
 {
 
@@ -51,7 +53,26 @@ public:
      */
     static void RegisterObject(Context* context);
 
+    float GetStiffness() const;
+    void SetStiffness(float stiffness);
+
+    float GetStretchiness() const;
+    void SetStretchiness(float stretchiness);
+
+    const Vector2& GetLengthConstraints() const;
+    void SetLengthConstraints(const Vector2& lengthConstraints);
+
 private:
+    friend class IKSolver;
+
+    /// Intended to be used only by IKSolver
+    void SetIKNode(ik_node_t* effector);
+
+    ik_node_t* ikNode_;
+
+    float stiffness_;
+    float stretchiness_;
+    Vector2 lengthConstraints_;
 };
 
 } // namespace Urho3D

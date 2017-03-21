@@ -27,6 +27,9 @@
  *  - Optimise.
  *  - Profile.
  *  - Documentation.
+ *  - Move log callback into context init function.
+ *  - Bug when enabling continuous mode and IKSolver is placed somewhere
+ *    on part of the model's bones.
  *
  * FUTURE
  *  - Support for "stretchiness" with min/max lengths.
