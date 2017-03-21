@@ -34,6 +34,4 @@ class IKEffector : public Component
 
     bool InheritParentRotationEnabled() const;
     void EnableInheritParentRotation(bool enable);
-
-    void UpdateTargetNodePosition();
 };
