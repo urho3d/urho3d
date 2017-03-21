@@ -42,10 +42,18 @@ namespace Urho3D
 
 // Keeps track of how many times SDL was initialised so we know when to call SDL_Quit().
 static int sdlInitCounter = 0;
-// Keeps track of how many times IK was initialised
+
 #ifdef URHO3D_IK
+// Keeps track of how many times IK was initialised
 static int ikInitCounter = 0;
+
+// Reroute all messages from the ik library to the Urho3D log
+static void HandleIKLog(const char* msg)
+{
+    URHO3D_LOGINFOF("[IK] %s", msg);
+}
 #endif
+
 
 void EventReceiverGroup::BeginSendEvent()
 {
@@ -287,6 +295,7 @@ void Context::RequireIK()
         URHO3D_LOGDEBUG("Initialising Inverse Kinematics library");
         ik_memory_init();
         ik_log_init(IK_LOG_NONE);
+        ik_log_register_listener(HandleIKLog);
     }
 }
 
@@ -297,6 +306,7 @@ void Context::ReleaseIK()
     if (ikInitCounter == 0)
     {
         URHO3D_LOGDEBUG("De-initialising Inverse Kinematics library");
+        ik_log_unregister_listener(HandleIKLog);
         ik_log_deinit();
         ik_memory_deinit();
     }

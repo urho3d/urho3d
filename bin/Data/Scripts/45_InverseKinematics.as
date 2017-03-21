@@ -50,7 +50,7 @@ void CreateScene()
 
     // Create scene node & StaticModel component for showing a static plane
     floorNode_ = scene_.CreateChild("Plane");
-    floorNode_.scale = Vector3(100.0f, 1.0f, 100.0f);
+    floorNode_.scale = Vector3(50.0f, 1.0f, 50.0f);
     StaticModel@ planeObject = floorNode_.CreateComponent("StaticModel");
     planeObject.model = cache.GetResource("Model", "Models/Plane.mdl");
     planeObject.material = cache.GetResource("Material", "Materials/StoneTiled.xml");
@@ -71,7 +71,7 @@ void CreateScene()
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
 
     // Load Jack animated model
-    jackNode_ = scene_.CreateChild("Ninja");
+    jackNode_ = scene_.CreateChild("Jack");
     jackNode_.rotation = Quaternion(0.0f, 270.0f, 0.0f);
     AnimatedModel@ jack = jackNode_.CreateComponent("AnimatedModel");
     jack.model = cache.GetResource("Model", "Models/Jack.mdl");
@@ -103,9 +103,9 @@ void CreateScene()
     solver_.autoSolve = false;
 
     // When this is enabled, the solver will use the current positions of the
-    // nodes in the skeleton as its basis. If you disable this, then the solver
-    // will store the initial positions of the nodes once and always use those
-    // positions.
+    // nodes in the skeleton as its basis every frame. If you disable this, then
+    // the solver will store the initial positions of the nodes once and always
+    // use those positions for calculating solutions.
     // With animated characters you generally want to continuously update the
     // initial positions.
     solver_.updatePose = true;
@@ -218,30 +218,32 @@ void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
 
 void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
 {
-    Vector3 leftTarget = leftFoot_.worldPosition;
-    Vector3 rightTarget = rightFoot_.worldPosition;
+    Vector3 leftFootPosition = leftFoot_.worldPosition;
+    Vector3 rightFootPosition = rightFoot_.worldPosition;
 
-    PhysicsRaycastResult result = scene_.physicsWorld.RaycastSingle(Ray(leftTarget + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2);
+    // Cast ray down to get the normal of the underlying surface
+    PhysicsRaycastResult result = scene_.physicsWorld.RaycastSingle(Ray(leftFootPosition + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2);
     if (result.body !is null)
     {
-        result = scene_.physicsWorld.RaycastSingle(Ray(leftTarget + result.normal, -result.normal), 2);
-        leftTarget = result.position;
+        // Cast again, but this time along the normal. Set the target position
+        // to the ray intersection
+        result = scene_.physicsWorld.RaycastSingle(Ray(leftFootPosition + result.normal, -result.normal), 2);
+        // The foot node has an offset relative to the root node
+        float footOffset = jackNode_.worldPosition.y + leftFoot_.worldPosition.y;
+        leftEffector_.targetPosition = result.position + result.normal * footOffset;
+        // Rotate foot according to normal
         leftFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
     }
 
-    result = scene_.physicsWorld.RaycastSingle(Ray(rightTarget + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2);
+    // Same deal with the right foot
+    result = scene_.physicsWorld.RaycastSingle(Ray(rightFootPosition + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2);
     if (result.body !is null)
     {
-        result = scene_.physicsWorld.RaycastSingle(Ray(rightTarget + result.normal, -result.normal), 2);
-        rightTarget = result.position;
+        result = scene_.physicsWorld.RaycastSingle(Ray(rightFootPosition + result.normal, -result.normal), 2);
+        float footOffset = jackNode_.worldPosition.y + rightFoot_.worldPosition.y;
+        rightEffector_.targetPosition = result.position + result.normal * footOffset;
         rightFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
     }
-
-    Vector3 leftFootOffset = Vector3(0, jackNode_.worldPosition.y + leftFoot_.worldPosition.y, 0);
-    Vector3 rightFootOffset = Vector3(0, jackNode_.worldPosition.y + rightFoot_.worldPosition.y, 0);
-
-    leftEffector_.targetPosition = leftTarget + leftFootOffset;
-    rightEffector_.targetPosition = rightTarget + rightFootOffset;
 
     solver_.Solve();
 }

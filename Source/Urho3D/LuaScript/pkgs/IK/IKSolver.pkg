@@ -1,5 +1,4 @@
-#include "IK/IKEffector.h"
-#include "Scene/Component.h"
+$#include "IK/IKSolver.h"
 
 class IKSolver : public Component
 {
@@ -14,18 +13,24 @@ class IKSolver : public Component
     void SetMaximumIterations(unsigned iterations);
     float GetTolerance() const;
     void SetTolerance(float tolerance);
+
     bool BoneRotationsEnabled() const;
     void EnableBoneRotations(bool enable);
+
     bool TargetRotationEnabled() const;
     void EnableTargetRotation(bool enable);
+
     bool ContinuousSolvingEnabled() const;
     void EnableContinuousSolving(bool enable);
+
     bool UpdatePoseEnabled() const;
     void EnableUpdatePose(bool enable);
+
+    bool AutoSolveEnabled() const;
+    void EnableAutoSolve(bool enable);
 
     void Solve();
     void ResetToInitialPose();
     void UpdateInitialPose();
 };
 
-} // namespace Urho3D

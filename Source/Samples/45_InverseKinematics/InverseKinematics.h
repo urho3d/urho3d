@@ -30,6 +30,7 @@ namespace Urho3D
 class AnimationController;
 class Node;
 class IKEffector;
+class IKSolver;
 class Scene;
 class RibbonTrail;
 
@@ -49,13 +50,22 @@ public:
     virtual void Start();
 
 protected:
-    /// Animation controller of the ninja.
-    SharedPtr<Urho3D::AnimationController> jackAnimController_;
-    /// Inverse kinematic effectors
+    /// Animation controller of Jack.
+    SharedPtr<Urho3D::AnimationController> jackAnimCtrl_;
+    /// Inverse kinematic effectors and solver
     SharedPtr<Urho3D::IKEffector> leftEffector_;
     SharedPtr<Urho3D::IKEffector> rightEffector_;
-    /// Sum of timestep.
-    float timeStepSum_;
+    SharedPtr<Urho3D::IKSolver> solver_;
+    /// Need references to these nodes to calculate foot angles and offsets
+    SharedPtr<Urho3D::Node> leftFoot_;
+    SharedPtr<Urho3D::Node> rightFoot_;
+    SharedPtr<Urho3D::Node> jackNode_;
+    /// So we can rotate the floor
+    SharedPtr<Urho3D::Node> floorNode_;
+    float floorPitch_;
+    float floorRoll_;
+    /// Whether or not to draw debug geometry
+    bool drawDebug_;
 
 private:
     /// Construct the scene content.
@@ -65,11 +75,15 @@ private:
     /// Set up a viewport for displaying the scene.
     void SetupViewport();
     /// Read input and moves the camera.
-    void MoveCamera(float timeStep);
+    void UpdateCameraAndFloor(float timeStep);
     /// Subscribe to application-wide logic update events.
     void SubscribeToEvents();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Draw debug geometry
+    void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+    /// Process IK logic
+    void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
     SharedPtr<Node> cameraRotateNode_;
 };

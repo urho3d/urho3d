@@ -39,17 +39,12 @@
 #include <ik/solver.h>
 #include <ik/node.h>
 #include <ik/effector.h>
-#include <ik/log.h>
 
 namespace Urho3D
 {
 
 extern const char* IK_CATEGORY;
 
-static void HandleIKLog(const char* msg)
-{
-    URHO3D_LOGINFOF("[IK] %s", msg);
-}
 static bool ChildrenHaveEffector(const Node* node)
 {
     if (node->HasComponent<IKEffector>())
@@ -89,7 +84,6 @@ IKSolver::~IKSolver()
     for(PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
         (*it)->SetIKEffector(NULL);
 
-    ik_log_unregister_listener(HandleIKLog);
     ik_solver_destroy(solver_);
     context_->ReleaseIK();
 }
@@ -136,8 +130,6 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
     }
 
     solver_->flags = SOLVER_CALCULATE_FINAL_ROTATIONS;
-
-    ik_log_register_listener(HandleIKLog);
 }
 
 // ----------------------------------------------------------------------------
