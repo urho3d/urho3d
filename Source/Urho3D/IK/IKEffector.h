@@ -80,34 +80,76 @@ public:
      */
     void SetTargetName(const String& nodeName);
 
+    /// Returns the current target position in world space.
     const Vector3& GetTargetPosition() const;
+    /// Sets the current target position. If the effector has a target node then this will have no effect.
     void SetTargetPosition(const Vector3& targetPosition);
 
+    /// Gets the current target rotation in world space.
     const Quaternion& GetTargetRotation() const;
+    /// Sets the current target rotation. If the effector has a target node then this will have no effect.
     void SetTargetRotation(const Quaternion& targetRotation);
 
+    /// Required for the editor, get the target rotation in euler angles
     Vector3 GetTargetRotationEuler() const;
+    /// Required for the editor, sets the target rotation in euler angles
     void SetTargetRotationEuler(const Vector3& targetRotation);
 
+    /// Returns the number of segments that will be affected by this effector. 0 Means all nodes between this effector and the next IKSolver.
     unsigned GetChainLength() const;
+    /// Sets the number of segments that will be affected. 0 Means all nodes between this effector and the next IKSolver.
     void SetChainLength(unsigned chainLength);
 
+    /// How strongly the effector affects the solution.
     float GetWeight() const;
+    /*!
+     * @brief Sets how much influence the effector has on the solution. You can
+     * use this value to smoothly transition between a solved pose and an
+     * initial pose  For instance, lifting a foot off of the ground or letting
+     * go of an object.
+     */
     void SetWeight(float weight);
 
+    /// How strongly the target node's rotation influences the solution
     float GetRotationWeight() const;
+    /*!
+     * @brief Sets how much influence the target rotation should have on the
+     * solution. A value of 1 means to match the target rotation exactly, if
+     * possible. A value of 0 means to not match it at all.
+     * @note The solver must have target rotation enabled for this to have
+     * any effect. See IKSolver::EnableTargetRotation().
+     */
     void SetRotationWeight(float weight);
 
+    /// Retrieves the rotation decay factor. See SetRotationDecay() for info.
     float GetRotationDecay() const;
+
+    /*!
+     * @brief A factor with which to control the target rotation influence of
+     * the next segments down the chain. For example, if this is set to 0.5
+     * and the rotation weight is set to 1.0, then the first segment will
+     * match the target rotation exactly, the next segment will match it only
+     * 50%, the next segment 25%, the next 12.5%, etc. This parameter makes
+     * long chains look more natural when matching a target rotation.
+     */
     void SetRotationDecay(float decay);
 
+    /// Whether or not to nlerp instead of lerp when transitioning with the weight parameter
     bool WeightedNlerpEnabled() const;
+
+    /*!
+     * @brief If you set the effector weight (see SetWeight()) to a value in
+     * between 0 and 1, the default behaviour is to linearly interpolate the
+     * effector's target position. If the solved tree and the initial tree
+     * are far apart, this can look very strange, especially if you are
+     * controlling limbs on a character that are designed to rotation. Enabling
+     * this causes a rotational based interpolation (nlerp) around the chain's
+     * base node and makes transitions look much more natural.
+     */
     void EnableWeightedNlerp(bool enable);
 
     bool InheritParentRotationEnabled() const;
     void EnableInheritParentRotation(bool enable);
-
-    void UpdateTargetNodePosition();
 
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
@@ -119,6 +161,8 @@ private:
     void SetIKSolver(IKSolver* solver);
     /// Intended to be used only by IKSolver
     void SetIKEffector(ik_effector_t* effector);
+    /// Intended to be used by IKSolver. Copies the positions/rotations of the target node into the effector
+    void UpdateTargetNodePosition();
 
     WeakPtr<Node> targetNode_;
     WeakPtr<IKSolver> solver_;

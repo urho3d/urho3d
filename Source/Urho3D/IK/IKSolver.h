@@ -85,13 +85,13 @@ public:
      * FABRIK looks decent after only 10 iterations, whereas Jacobian based
      * methods often require more than a 100.
      *
-     * The default value is 50.
+     * The default value is 20.
      *
      * @note Most algorithms have a convergence criteria at which the solver
      * will stop iterating, so most of the time the maximum number of
      * iterations isn't even reached.
      *
-     * @param iterations Number of iterations. Must be greater than 0. Higher
+     * @param[in] iterations Number of iterations. Must be greater than 0. Higher
      * values yield more accurate results, but at the cost of performance.
      */
     void SetMaximumIterations(unsigned iterations);
@@ -111,23 +111,107 @@ public:
      */
     void SetTolerance(float tolerance);
 
+    /// Whether or not rotations should be calculated.
     bool BoneRotationsEnabled() const;
+
+    /*!
+     * @brief When enabled, final joint rotations are calculated as a post
+     * processing step. If you are using IK on a model with skinning, you will
+     * want to enable this or it will look wrong. If you disable this, then
+     * you will get a slight performance boost (less calculations are required)
+     * but only the node positions are updated. This can be useful for scene
+     * IK (perhaps a chain of platforms, where each platform should retain its
+     * initial world rotation?)
+     */
     void EnableBoneRotations(bool enable);
 
+    /// Whether or not target rotation is enabled
     bool TargetRotationEnabled() const;
+
+    /*!
+     * @brief When enabled, the effector will try to match the target's
+     * rotation as well as the effectors position. When disabled, the target
+     * node will reach the effector with any rotation necessary.
+     *
+     * If the target position goes out of range of the effector then the
+     * rotation will no longer be matched. The chain will try to reach out to
+     * reach the target position, even if it means rotating towards it.
+     */
     void EnableTargetRotation(bool enable);
 
+    /// Whether or not continuous solving is enabled or not.
     bool ContinuousSolvingEnabled() const;
+
+    /*!
+     * @brief When enabled, the solver will refrain from applying the initial
+     * pose before solving. The result is that it will use the previously
+     * solved tree as a basis for the new calculation instead of using the
+     * initial tree. This can be useful if you want to simulate chains or
+     * something similar. When disabled, the solver will use the initial
+     * positions/rotations which where set when the solver was first created.
+     *
+     * If you call UpdateInitialPose() then the initial tree will be matched to
+     * the current nodes in the scene graph.
+     *
+     * If you call ResetToInitialPose() then you will do the opposite of
+     * UpdateInitialPose() -- the initial pose is applied back to the scene
+     * graph.
+     *
+     * If you enable pose updating with EnableUpdatePose(), then the initial
+     * tree will automatically be matched to the current nodes in the scene
+     * graph.
+     */
     void EnableContinuousSolving(bool enable);
 
+    /// Whether or not the initial pose is updated for every solution
     bool UpdatePoseEnabled() const;
+
+    /*!
+     * @brief When enabled, the current Urho3D node positions and rotations in
+     * the scene graph will be copied into the solver's initial tree right
+     * before solving. This should generally be enabled for animated models
+     * so the solver refers to the current frame of animation rather than to
+     * the animation's initial pose.
+     *
+     * When disabled, the initial pose will remain unmodified. The initial pose
+     * is set when the solver is first created. You can manually update the
+     * initial pose at any time by calling UpdateInitialPose().
+     */
     void EnableUpdatePose(bool enable);
 
+    /// Whether or not the solver should be invoked automatically
     bool AutoSolveEnabled() const;
+
+    /*!
+     * @brief Mostly exists because of the editor. When enabled, the solver
+     * will be invoked automatically for you. If you need to do additional
+     * calculations before being able to set the effector target data, you will
+     * want to disable this and call Solve() manually.
+     */
     void EnableAutoSolve(bool enable);
 
+    /*!
+     * @brief Invokes the solver. The solution is applied back to the scene
+     * graph automatically.
+     * @note You will want to register to E_SCENEDRAWABLEUPDATEFINISHED and
+     * call this method there. This is right after the animations have been
+     * applied.
+     */
     void Solve();
+
+    /*!
+     * @brief Causes the initial tree to be applied back to Urho3D's scene
+     * graph. This is what gets called when continuous solving is disabled.
+     */
     void ResetToInitialPose();
+
+    /*!
+     * @brief Causes the current scene graph data to be copied into the solvers
+     * initial pose. This should generally be called before solving if you
+     * are using IK on an animated model. If you don't update the initial pose,
+     * then the result will be a "continuous solution", where the solver will
+     * use the previously calculated tree as a basis for the new solution.
+     */
     void UpdateInitialPose();
 
     /// Causes the solver tree to be rebuilt before solving the next time.
@@ -137,13 +221,19 @@ public:
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
+    /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
+    /// Destroys and creates the tree
     virtual void OnNodeSet(Node* scene);
 
+    /// Creates the ik library node and sets the current rotation/position and user data correctly.
     ik_node_t* CreateIKNode(const Node* node);
 
+    /// Destroys the solver's tree
     void DestroyTree();
+    /// Builds the solver's tree to match the scene graph's tree
     void BuildTree();
+    /// Builds a chain of nodes up to the specified node and adds an effector. Thus, the specified node must have an IKEffector attached.
     void BuildTreeToEffector(const Node* node);
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
