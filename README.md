@@ -1,6 +1,6 @@
 ![Urho3D logo](https://raw.githubusercontent.com/urho3d/Urho3D/master/bin/Data/Textures/LogoLarge.png)
 
-#Urho3D
+# Urho3D
 
 [![Join the chat at https://gitter.im/urho3d/Urho3D](https://badges.gitter.im/urho3d/Urho3D.svg)](https://gitter.im/urho3d/Urho3D?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -8,13 +8,13 @@
 
 Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 
-##License
+## License
 Licensed under the MIT license, see [LICENSE](https://github.com/urho3d/Urho3D/blob/master/LICENSE) for details.
 
-##Contributing
+## Contributing
 Before making pull requests, please read the [Contribution checklist](https://urho3d.github.io/documentation/HEAD/_contribution_checklist.html) and [Coding conventions](https://urho3d.github.io/documentation/HEAD/_coding_conventions.html) pages from the documentation.
 
-##Credits
+## Credits
 Urho3D development, contributions and bugfixes by:
 - Lasse Öörni
 - Wei Tjong Yao
@@ -196,7 +196,7 @@ Dieselpunk Moto model by allexandr007.
 Mutant & Kachujin models from Mixamo.
 License / copyright information included with the assets as necessary. All other assets (including shaders) by Urho3D authors and licensed similarly as the engine itself.
 
-##Documentation
+## Documentation
 Urho3D classes have been sparsely documented using Doxygen notation. To
 generate documentation into the "Docs" subdirectory, open the Doxyfile in the
 "Docs" subdirectory with doxywizard and click "Run doxygen" from the "Run" tab.
@@ -216,6 +216,6 @@ Replace HEAD with a specific release version in the above links to obtain the
 documentation pertinent to the specified release. Alternatively, use the
 document-switcher in the documentation website to do so.
 
-##History
+## History
 The change history is available online at
   https://urho3d.github.io/documentation/HEAD/_history.html
