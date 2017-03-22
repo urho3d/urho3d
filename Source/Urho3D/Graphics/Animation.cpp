@@ -379,8 +379,9 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
 } 
 
 AnimationTrack* Animation::GetTrack(unsigned index) 
-{
-    index = (index < 0) || (index > tracks_.Size() - 1) ? 0 : index; 
+{ 
+    if (index >= GetNumTracks()) 
+        return (AnimationTrack*) 0;
 
     int j = 0; 
     for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i) 
@@ -391,7 +392,7 @@ AnimationTrack* Animation::GetTrack(unsigned index)
         ++j;
     }
     
-    return (AnimationTrack*)0;
+    return (AnimationTrack*) 0;
 }
 
 
