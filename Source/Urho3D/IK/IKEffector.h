@@ -75,6 +75,7 @@ public:
      * @brief Sets the name of the target node. The node doesn't necessarily
      * have to exist in the scene graph. When a node is created that matches
      * this name, it is selected as the target.
+     * @note This clears the existing target node.
      */
     void SetTargetName(const String& nodeName);
 

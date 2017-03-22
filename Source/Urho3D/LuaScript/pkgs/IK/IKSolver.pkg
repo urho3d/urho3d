@@ -32,5 +32,9 @@ class IKSolver : public Component
     void Solve();
     void ResetToInitialPose();
     void UpdateInitialPose();
+
+    tolua_property__get_set Algorithm algorithm;
+    tolua_property__get_set unsigned maximumIterations;
+    tolua_property__get_set float tolerance;
 };
 

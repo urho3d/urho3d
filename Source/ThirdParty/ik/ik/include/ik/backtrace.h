@@ -4,7 +4,6 @@
 #define BACKTRACE_SIZE 64
 
 #include "ik/gen/config.h"
-#include "ik/pstdint.h"
 
 C_HEADER_BEGIN
 

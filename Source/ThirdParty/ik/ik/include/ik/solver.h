@@ -2,7 +2,6 @@
 #define IK_SOLVER_H
 
 #include "ik/gen/config.h"
-#include "ik/pstdint.h"
 #include "ik/ordered_vector.h"
 #include "ik/vec3.h"
 #include "ik/quat.h"

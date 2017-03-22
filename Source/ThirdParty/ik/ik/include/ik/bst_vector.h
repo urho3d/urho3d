@@ -8,7 +8,6 @@
 #ifndef IK_BST_VECTOR_H
 #define IK_BST_VECTOR_H
 
-#include "ik/pstdint.h"
 #include "ik/gen/config.h"
 #include "ik/ordered_vector.h"
 

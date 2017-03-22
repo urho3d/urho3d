@@ -138,7 +138,7 @@ void InverseKinematics::CreateScene()
     // possible to the effectors for optimal performance. Since in this case
     // we're solving the legs only, we can place the solver at the spine.
     Node* spine = jackNode_->GetChild("Bip01_Spine", true);
-    solver_ = spine->CreateComponent<IKSolver>();
+    solver_ = jackNode_->CreateComponent<IKSolver>();
 
     // Disable auto-solving, which means we need to call Solve() manually
     solver_->EnableAutoSolve(false);

@@ -1,5 +1,7 @@
-set (PROJECT_NAME "IK")
-set (BUILD_TYPE "STATIC")
+include (CheckIncludeFiles)
+
+set (IK_BUILD_TYPE "STATIC")
+check_include_files ("stdint.h" HAVE_STDINT_H)
 
 # memory debugging
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -65,7 +67,7 @@ list (APPEND IK_SOURCES ${IK_PLATFORM_SOURCES})
 
 include_directories ("include")
 
-add_library (ik ${BUILD_TYPE}
+add_library (ik ${IK_BUILD_TYPE}
     ${IK_HEADERS}
     ${IK_SOURCES}
 )
@@ -77,14 +79,13 @@ add_definitions (-DIK_BUILDING)
 # install targets
 ###############################################################################
 
-# only install if shared library
-if (${BUILD_TYPE} STREQUAL "SHARED")
-    install (
-        TARGETS
-            ik
-        LIBRARY DESTINATION
-            "lib"
-        RUNTIME DESTINATION
-            "bin"
-    )
-endif ()
+install (
+    TARGETS
+        ik
+    LIBRARY DESTINATION
+        "lib"
+    RUNTIME DESTINATION
+        "bin"
+    ARCHIVE DESTINATION
+        "lib"
+)

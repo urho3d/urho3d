@@ -39,6 +39,7 @@
 #include <ik/solver.h>
 #include <ik/node.h>
 #include <ik/effector.h>
+#include <ik/log.h>
 
 namespace Urho3D
 {
@@ -319,7 +320,7 @@ void IKSolver::OnNodeSet(Node* node)
     DestroyTree();
 
     if (node != NULL)
-        BuildTree();
+        RebuildTree();
 }
 
 // ----------------------------------------------------------------------------
@@ -348,7 +349,7 @@ void IKSolver::DestroyTree()
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::BuildTree()
+void IKSolver::RebuildTree()
 {
     assert(node_ != NULL);
 
@@ -434,6 +435,7 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
         IKEffector* effector = static_cast<IKEffector*>(component);
         Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
+        assert(ikNode != NULL);
         ik_node_destroy_effector(ikNode);
         effector->SetIKEffector(NULL);
         effectorList_.RemoveSwap(effector);
@@ -484,7 +486,9 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     node->GetChildrenWithComponent<IKEffector>(nodes, true);
     for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
     {
-        effectorList_.Remove((*it)->GetComponent<IKEffector>());
+        IKEffector* effector = (*it)->GetComponent<IKEffector>();
+        effector->SetIKEffector(NULL);
+        effectorList_.RemoveSwap(effector);
     }
 
     // Special case, if the node being destroyed is the root node, destroy the
@@ -493,14 +497,13 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
     if (ikNode != NULL)
     {
-        if(ikNode == solver_->tree)
+        if (ikNode == solver_->tree)
             ik_solver_destroy_tree(solver_);
         else
             ik_node_destroy(ikNode);
-    }
 
-    ResetToInitialPose();
-    MarkSolverTreeDirty();
+        MarkSolverTreeDirty();
+    }
 }
 
 // ----------------------------------------------------------------------------

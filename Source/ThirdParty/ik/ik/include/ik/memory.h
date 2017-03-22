@@ -2,7 +2,6 @@
 #define MEMORY_H
 
 #include "ik/gen/config.h"
-#include "ik/pstdint.h"
 
 #if IK_MEMORY_DEBUGGING == ON
 #   define MALLOC malloc_wrapper

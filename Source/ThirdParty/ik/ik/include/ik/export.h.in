@@ -14,7 +14,7 @@
 #   define IK_EXPORT_H
 
     /* set @BUILD_TYPE@ to SHARED or STATIC */
-#   define IK_STATIC
+#   define IK_@IK_BUILD_TYPE@
 
     /* --------------------------------------------------------------
      * define visibility macros

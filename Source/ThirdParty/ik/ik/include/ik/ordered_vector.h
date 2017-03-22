@@ -12,7 +12,6 @@
 #define ORDERED_VECTOR_H
 
 #include "ik/gen/config.h"
-#include "ik/pstdint.h"
 
 C_HEADER_BEGIN
 

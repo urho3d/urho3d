@@ -2,7 +2,6 @@
 #define IK_NODE_H
 
 #include "ik/gen/config.h"
-#include "ik/pstdint.h"
 #include "ik/bst_vector.h"
 #include "ik/vec3.h"
 #include "ik/quat.h"

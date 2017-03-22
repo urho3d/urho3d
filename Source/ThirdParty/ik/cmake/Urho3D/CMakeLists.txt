@@ -19,6 +19,11 @@
 # THE SOFTWARE.
 #
 
+include (CheckIncludeFiles)
+
+set (IK_BUILD_TYPE "STATIC")
+check_include_files ("stdint.h" HAVE_STDINT_H)
+
 # memory debugging
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     option (IK_MEMORY_DEBUGGING "Global switch for memory options. Keeps track of the number of allocations and de-allocations and prints a report when the program shuts down" ON)
@@ -37,8 +42,6 @@ endif ()
 
 set (IK_REAL "float" CACHE STRING "Type to use for real numbers")
 option (IK_DOT_OUTPUT "When enabled, the generated chains are dumped to DOT for debug purposes" OFF)
-
-set (EXPORT_H_TEMPLATE )
 
 configure_file ("../../ik/include/ik/export.h.in"
                 "../../include/ik/gen/export.h")

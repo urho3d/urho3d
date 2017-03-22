@@ -167,11 +167,10 @@ void UpdateCameraAndFloor(float timeStep)
     if (input.mouseButtonDown[MOUSEB_RIGHT])
     {
         IntVector2 mouseMoveInt = input.mouseMove;
-        Vector3 mouseMove = Matrix3(
-            -Cos(yaw), Sin(yaw), 0,
-            Sin(yaw),  Cos(yaw), 0,
-            0,         0,        1
-        ) * Vector3(mouseMoveInt.y, -mouseMoveInt.x, 0);
+        Vector2 mouseMove = Matrix2(
+            -Cos(yaw), Sin(yaw),
+            Sin(yaw),  Cos(yaw)
+        ) * Vector2(mouseMoveInt.y, -mouseMoveInt.x);
         floorPitch_ += MOUSE_SENSITIVITY * mouseMove.x;
         floorPitch_ = Clamp(floorPitch_, -90.0f, 90.0f);
         floorRoll_ += MOUSE_SENSITIVITY * mouseMove.y;

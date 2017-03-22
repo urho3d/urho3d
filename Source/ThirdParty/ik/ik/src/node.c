@@ -87,7 +87,7 @@ ik_node_unlink(struct ik_node_t* node)
     if(node->parent == NULL)
         return;
 
-    assert(node == bstv_erase(&node->parent->children, node->guid));
+    bstv_erase(&node->parent->children, node->guid);
     node->parent = NULL;
 }
 

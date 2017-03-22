@@ -63,6 +63,9 @@ extern int tolua_NetworkLuaAPI_open(lua_State*);
 #ifdef URHO3D_DATABASE
 extern int tolua_DatabaseLuaAPI_open(lua_State*);
 #endif
+#ifdef URHO3D_IK
+extern int tolua_IKLuaAPI_open(lua_State*);
+#endif
 #ifdef URHO3D_PHYSICS
 extern int tolua_PhysicsLuaAPI_open(lua_State*);
 #endif
@@ -114,6 +117,9 @@ LuaScript::LuaScript(Context* context) :
 #endif
 #ifdef URHO3D_DATABASE
     tolua_DatabaseLuaAPI_open(luaState_);
+#endif
+#ifdef URHO3D_IK
+    tolua_IKLuaAPI_open(luaState_);
 #endif
 #ifdef URHO3D_PHYSICS
     tolua_PhysicsLuaAPI_open(luaState_);

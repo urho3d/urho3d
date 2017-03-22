@@ -231,8 +231,8 @@ private:
 
     /// Destroys the solver's tree
     void DestroyTree();
-    /// Builds the solver's tree to match the scene graph's tree
-    void BuildTree();
+    /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed
+    void RebuildTree();
     /// Builds a chain of nodes up to the specified node and adds an effector. Thus, the specified node must have an IKEffector attached.
     void BuildTreeToEffector(const Node* node);
 

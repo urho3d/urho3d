@@ -83,24 +83,21 @@ function CreateScene()
     -- control the grounding.
     leftFoot_  = jackNode_:GetChild("Bip01_L_Foot", true);
     rightFoot_ = jackNode_:GetChild("Bip01_R_Foot", true);
-
-    -- NOTE: Crashes here for some reason
     leftEffector_  = leftFoot_:CreateComponent("IKEffector")
-
-    --rightEffector_ = rightFoot_:CreateComponent("IKEffector")
+    rightEffector_ = rightFoot_:CreateComponent("IKEffector")
     -- Control 2 segments up to the hips
-    --leftEffector_.chainLength = 2;
-    --rightEffector_.chainLength = 2;
+    leftEffector_.chainLength = 2;
+    rightEffector_.chainLength = 2;
 
     -- For the effectors to work, an IKSolver needs to be attached to one of
     -- the parent nodes. Typically, you want to place the solver as close as
     -- possible to the effectors for optimal performance. Since in this case
     -- we're solving the legs only, we can place the solver at the spine.
-    --local spine = jackNode_:GetChild("Bip01_Spine", true);
-    --solver_ = spine:CreateComponent("IKSolver");
+    local spine = jackNode_:GetChild("Bip01_Spine", true);
+    solver_ = spine:CreateComponent("IKSolver");
 
     -- Disable auto-solving, which means we can call Solve() manually.
-    --solver_.autoSolve = false;
+    solver_:EnableAutoSolve(false);
 
     -- When this is enabled, the solver will use the current positions of the
     -- nodes in the skeleton as its basis every frame. If you disable this, then
@@ -108,20 +105,24 @@ function CreateScene()
     -- use those positions for calculating solutions.
     -- With animated characters you generally want to continuously update the
     -- initial positions.
-    --solver_.updatePose = true;
+    solver_:EnableUpdatePose(true);
 
     -- Create the camera.
-    cameraNode = scene_:CreateChild("Camera")
+    cameraRotateNode_ = scene_:CreateChild("CameraRotate")
+    cameraNode = cameraRotateNode_:CreateChild("Camera")
     cameraNode:CreateComponent("Camera")
 
     -- Set an initial position for the camera scene node above the plane
-    cameraNode.position = Vector3(0.0, 2.0, -14.0)
+    cameraNode.position = Vector3(0.0, 0.0, -4.0)
+    cameraRotateNode_.position = Vector3(0.0, 0.4, 0.0)
+    pitch = 20.0
+    yaw = 50.0
 end
 
 function CreateInstructions()
     -- Construct new Text object, set string to display and font to use
     local instructionText = ui.root:CreateChild("Text")
-    instructionText:SetText("Use WASD keys and mouse to move")
+    instructionText:SetText("Left-Click and drag to look around\nRight-Click and drag to change incline\nPress space to reset floor\nPress D to draw debug geometry")
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
 
     -- Position the text relative to the screen center
@@ -150,33 +151,43 @@ function UpdateCameraAndFloor(timeStep)
     local MOUSE_SENSITIVITY = 0.1
 
     -- Use this frame's mouse motion to adjust camera node yaw and pitch. Clamp the pitch between -90 and 90 degrees
-    local mouseMove = input.mouseMove
-    yaw = yaw +MOUSE_SENSITIVITY * mouseMove.x
-    pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
-    pitch = Clamp(pitch, -90.0, 90.0)
+    if input:GetMouseButtonDown(MOUSEB_LEFT) then
+        local mouseMove = input.mouseMove
+        yaw = yaw +MOUSE_SENSITIVITY * mouseMove.x
+        pitch = pitch + MOUSE_SENSITIVITY * mouseMove.y
+        pitch = Clamp(pitch, -90.0, 90.0)
+    end
+
+    if input:GetMouseButtonDown(MOUSEB_RIGHT) then
+        local mouseMoveInt = input.mouseMove
+        local mouseMove = Vector2()
+        mouseMove.x = -Cos(yaw) * mouseMoveInt.y - Sin(yaw) * mouseMoveInt.x
+        mouseMove.y = Sin(yaw) * mouseMoveInt.y - Cos(yaw) * mouseMoveInt.x
+
+        floorPitch_ = floorPitch_ + MOUSE_SENSITIVITY * mouseMove.x
+        floorPitch_ = Clamp(floorPitch_, -90.0, 90.0)
+        floorRoll_ = floorRoll_ + MOUSE_SENSITIVITY * mouseMove.y
+    end
+
+    if input:GetKeyPress(KEY_SPACE) then
+        floorPitch_ = 0.0
+        floorRoll_ = 0.0
+    end
+
+    if input:GetKeyPress(KEY_D) then
+        drawDebug_ = not drawDebug_
+    end
 
     -- Construct new orientation for the camera scene node from yaw and pitch. Roll is fixed to zero
-    cameraNode.rotation = Quaternion(pitch, yaw, 0.0)
-
-    -- Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    -- Use the Translate() function (default local space) to move relative to the node's orientation.
-    if input:GetKeyDown(KEY_W) then
-        cameraNode:Translate(Vector3(0.0, 0.0, 1.0) * MOVE_SPEED * timeStep)
-    end
-    if input:GetKeyDown(KEY_S) then
-        cameraNode:Translate(Vector3(0.0, 0.0, -1.0) * MOVE_SPEED * timeStep)
-    end
-    if input:GetKeyDown(KEY_A) then
-        cameraNode:Translate(Vector3(-1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
-    end
-    if input:GetKeyDown(KEY_D) then
-        cameraNode:Translate(Vector3(1.0, 0.0, 0.0) * MOVE_SPEED * timeStep)
-    end
+    cameraRotateNode_.rotation = Quaternion(pitch, yaw, 0.0)
+    floorNode_.rotation = Quaternion(floorPitch_, 0.0, floorRoll_)
 end
 
 function SubscribeToEvents()
     -- Subscribe HandleUpdate() function for processing update events
     SubscribeToEvent("Update", "HandleUpdate")
+    SubscribeToEvent("PostRenderUpdate", "HandlePostRenderUpdate")
+    SubscribeToEvent("SceneDrawableUpdateFinished", "HandleSceneDrawableUpdateFinished")
 end
 
 function HandleUpdate(eventType, eventData)
@@ -185,4 +196,42 @@ function HandleUpdate(eventType, eventData)
 
     -- Move the camera, scale movement with time step
     UpdateCameraAndFloor(timeStep)
+end
+
+function HandlePostRenderUpdate(eventType, eventData)
+    if drawDebug_ then
+        solver_:DrawDebugGeometry(false)
+    end
+end
+
+function HandleSceneDrawableUpdateFinished(eventType, eventData)
+    local physicsWorld = scene_:GetComponent("PhysicsWorld")
+    local leftFootPosition = leftFoot_.worldPosition
+    local rightFootPosition = rightFoot_.worldPosition
+
+    -- Cast ray down to get the normal of the underlying surface
+    local result = physicsWorld:RaycastSingle(Ray(leftFootPosition + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2)
+    if result.body then
+        -- Cast again, but this time along the normal. Set the target position
+        -- to the ray intersection
+        local oppositeNormal = result.normal * -1
+        result = physicsWorld:RaycastSingle(Ray(leftFootPosition + result.normal, oppositeNormal), 2)
+        -- The foot node has an offset relative to the root node
+        footOffset = jackNode_.worldPosition.y + leftFoot_.worldPosition.y
+        leftEffector_.targetPosition = result.position + result.normal * footOffset
+        -- Rotate foot according to normal
+        leftFoot_:Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD)
+    end
+
+    -- Same deal with the right foot
+    result = physicsWorld:RaycastSingle(Ray(rightFootPosition + Vector3(0, 1, 0), Vector3(0, -1, 0)), 2)
+    if result.body then
+        local oppositeNormal = result.normal * -1
+        result = physicsWorld:RaycastSingle(Ray(rightFootPosition + result.normal, oppositeNormal), 2)
+        footOffset = jackNode_.worldPosition.y + rightFoot_.worldPosition.y
+        rightEffector_.targetPosition = result.position + result.normal * footOffset
+        rightFoot_:Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD)
+    end
+
+    solver_:Solve()
 end

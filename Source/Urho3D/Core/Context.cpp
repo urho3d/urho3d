@@ -33,10 +33,6 @@
 #endif
 
 #ifdef URHO3D_IK
-// Hopefully fixes issue on windows where ik/pstdint.h redefines int32_t
-#if defined(HAVE_STDINT_H)
-#define _PSTDINT_H_INCLUDED
-#endif
 #include <ik/memory.h>
 #include <ik/log.h>
 #endif
