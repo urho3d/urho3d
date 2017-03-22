@@ -376,7 +376,25 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
     ret->SetMemoryUse(GetMemoryUse());
     
     return ret;
+} 
+
+AnimationTrack* Animation::GetTrack(unsigned index) 
+{ 
+    if (index >= GetNumTracks()) 
+        return (AnimationTrack*) 0;
+
+    int j = 0; 
+    for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i) 
+    {
+        if (j == index) 
+            return &i->second_; 
+        
+        ++j;
+    }
+    
+    return (AnimationTrack*) 0;
 }
+
 
 AnimationTrack* Animation::GetTrack(const String& name)
 {
