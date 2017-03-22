@@ -31,7 +31,7 @@ struct ordered_vector_t
  * @return Returns the newly created vector object.
  */
 IK_PUBLIC_API struct ordered_vector_t*
-ordered_vector_create(uint32_t element_size);
+ordered_vector_create(const uint32_t element_size);
 
 /*!
  * @brief Initialises an existing vector object.
@@ -43,7 +43,7 @@ ordered_vector_create(uint32_t element_size);
  */
 IK_PUBLIC_API void
 ordered_vector_construct(struct ordered_vector_t* vector,
-                           uint32_t element_size);
+                           const uint32_t element_size);
 
 /*!
  * @brief Destroys an existing vector object and frees all memory allocated by

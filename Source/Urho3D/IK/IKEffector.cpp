@@ -61,7 +61,7 @@ void IKEffector::RegisterObject(Context* context)
     context->RegisterFactory<IKEffector>(IK_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Target Node", GetTargetName, SetTargetName, String, String::EMPTY, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Chain Length", GetChainLength, SetChainLength, unsigned, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Chain Length", GetChainLength, SetChainLength, unsigned, 0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Target Position", GetTargetPosition, SetTargetPosition, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Target Rotation", GetTargetRotationEuler, SetTargetRotationEuler, Vector3, Vector3::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
@@ -290,7 +290,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     a = node_;
     Node* b = a->GetParent();
     debug->AddSphere(
-        Sphere(a->GetWorldPosition(), averageLength * 0.1),
+        Sphere(a->GetWorldPosition(), averageLength * 0.1f),
         Color::YELLOW,
         depthTest
     );
@@ -303,7 +303,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             depthTest
         );
         debug->AddSphere(
-            Sphere(b->GetWorldPosition(), averageLength * 0.1),
+            Sphere(b->GetWorldPosition(), averageLength * 0.1f),
             Color::YELLOW,
             depthTest
         );
@@ -313,7 +313,7 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
     Vector3 direction = targetRotation_ * Vector3::FORWARD;
     direction = direction * averageLength + targetPosition_;
-    debug->AddSphere(Sphere(targetPosition_, averageLength * 0.2), Color(255, 128, 0), depthTest);
+    debug->AddSphere(Sphere(targetPosition_, averageLength * 0.2f), Color(255, 128, 0), depthTest);
     debug->AddLine(targetPosition_, direction, Color(255, 128, 0), depthTest);
 }
 

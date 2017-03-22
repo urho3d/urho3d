@@ -228,7 +228,7 @@ void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventDa
         // to the ray intersection
         result = scene_.physicsWorld.RaycastSingle(Ray(leftFootPosition + result.normal, -result.normal), 2);
         // The foot node has an offset relative to the root node
-        float footOffset = jackNode_.worldPosition.y + leftFoot_.worldPosition.y;
+        float footOffset = leftFoot_.worldPosition.y - jackNode_.worldPosition.y;
         leftEffector_.targetPosition = result.position + result.normal * footOffset;
         // Rotate foot according to normal
         leftFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
@@ -239,7 +239,7 @@ void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventDa
     if (result.body !is null)
     {
         result = scene_.physicsWorld.RaycastSingle(Ray(rightFootPosition + result.normal, -result.normal), 2);
-        float footOffset = jackNode_.worldPosition.y + rightFoot_.worldPosition.y;
+        float footOffset = rightFoot_.worldPosition.y - jackNode_.worldPosition.y;
         rightEffector_.targetPosition = result.position + result.normal * footOffset;
         rightFoot_.Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD);
     }

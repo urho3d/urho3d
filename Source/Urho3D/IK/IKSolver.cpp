@@ -109,6 +109,7 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Target Rotation", TargetRotationEnabled, EnableTargetRotation, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Continuous Solving", ContinuousSolvingEnabled, EnableContinuousSolving, bool, false, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Update Pose", UpdatePoseEnabled, EnableUpdatePose, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Solve", AutoSolveEnabled, EnableAutoSolve, bool, true, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -162,7 +163,7 @@ void IKSolver::SetTolerance(float tolerance)
 // ----------------------------------------------------------------------------
 bool IKSolver::BoneRotationsEnabled() const
 {
-    return solver_->flags & SOLVER_CALCULATE_FINAL_ROTATIONS;
+    return (solver_->flags & SOLVER_CALCULATE_FINAL_ROTATIONS) != 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -176,7 +177,7 @@ void IKSolver::EnableBoneRotations(bool enable)
 // ----------------------------------------------------------------------------
 bool IKSolver::TargetRotationEnabled() const
 {
-    return solver_->flags & SOLVER_CALCULATE_TARGET_ROTATIONS;
+    return (solver_->flags & SOLVER_CALCULATE_TARGET_ROTATIONS) != 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -190,7 +191,7 @@ void IKSolver::EnableTargetRotation(bool enable)
 // ----------------------------------------------------------------------------
 bool IKSolver::ContinuousSolvingEnabled() const
 {
-    return solver_->flags & SOLVER_SKIP_RESET;
+    return (solver_->flags & SOLVER_SKIP_RESET) != 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -553,12 +554,12 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         a = *pnode;
         b = a->parent;
         debug->AddSphere(
-            Sphere(Vec3IK2Urho(&a->position), averageLength * 0.1),
+            Sphere(Vec3IK2Urho(&a->position), averageLength * 0.1f),
             Color(0, 0, 255),
             depthTest
         );
         debug->AddSphere(
-            Sphere(Vec3IK2Urho(&a->solved_position), averageLength * 0.1),
+            Sphere(Vec3IK2Urho(&a->solved_position), averageLength * 0.1f),
             Color(255, 128, 0),
             depthTest
         );
@@ -571,7 +572,7 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 depthTest
             );
             debug->AddSphere(
-                Sphere(Vec3IK2Urho(&b->position), averageLength * 0.1),
+                Sphere(Vec3IK2Urho(&b->position), averageLength * 0.1f),
                 Color(0, 0, 255),
                 depthTest
             );
@@ -582,7 +583,7 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                 depthTest
             );
             debug->AddSphere(
-                Sphere(Vec3IK2Urho(&b->solved_position), averageLength * 0.1),
+                Sphere(Vec3IK2Urho(&b->solved_position), averageLength * 0.1f),
                 Color(255, 128, 0),
                 depthTest
             );

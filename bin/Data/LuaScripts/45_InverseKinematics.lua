@@ -217,7 +217,7 @@ function HandleSceneDrawableUpdateFinished(eventType, eventData)
         local oppositeNormal = result.normal * -1
         result = physicsWorld:RaycastSingle(Ray(leftFootPosition + result.normal, oppositeNormal), 2)
         -- The foot node has an offset relative to the root node
-        footOffset = jackNode_.worldPosition.y + leftFoot_.worldPosition.y
+        footOffset = leftFoot_.worldPosition.y - jackNode_.worldPosition.y
         leftEffector_.targetPosition = result.position + result.normal * footOffset
         -- Rotate foot according to normal
         leftFoot_:Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD)
@@ -228,7 +228,7 @@ function HandleSceneDrawableUpdateFinished(eventType, eventData)
     if result.body then
         local oppositeNormal = result.normal * -1
         result = physicsWorld:RaycastSingle(Ray(rightFootPosition + result.normal, oppositeNormal), 2)
-        footOffset = jackNode_.worldPosition.y + rightFoot_.worldPosition.y
+        footOffset = rightFoot_.worldPosition.y - jackNode_.worldPosition.y
         rightEffector_.targetPosition = result.position + result.normal * footOffset
         rightFoot_:Rotate(Quaternion(Vector3(0, 1, 0), result.normal), TS_WORLD)
     end

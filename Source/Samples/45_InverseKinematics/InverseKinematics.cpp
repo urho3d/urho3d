@@ -280,7 +280,7 @@ void InverseKinematics::HandleSceneDrawableUpdateFinished(StringHash eventType, 
         // to the ray intersection
         phyWorld->RaycastSingle(result, Ray(leftFootPosition + result.normal_, -result.normal_), 2);
         // The foot node has an offset relative to the root node
-        float footOffset = jackNode_->GetWorldPosition().y_ + leftFoot_->GetWorldPosition().y_;
+        float footOffset = leftFoot_->GetWorldPosition().y_ - jackNode_->GetWorldPosition().y_;
         leftEffector_->SetTargetPosition(result.position_ + result.normal_ * footOffset);
         // Rotate foot according to normal
         leftFoot_->Rotate(Quaternion(Vector3(0, 1, 0), result.normal_), TS_WORLD);
@@ -291,7 +291,7 @@ void InverseKinematics::HandleSceneDrawableUpdateFinished(StringHash eventType, 
     if (result.body_)
     {
         phyWorld->RaycastSingle(result, Ray(rightFootPosition + result.normal_, -result.normal_), 2);
-        float footOffset = jackNode_->GetWorldPosition().y_ + rightFoot_->GetWorldPosition().y_;
+        float footOffset = rightFoot_->GetWorldPosition().y_ - jackNode_->GetWorldPosition().y_;
         rightEffector_->SetTargetPosition(result.position_ + result.normal_ * footOffset);
         rightFoot_->Rotate(Quaternion(Vector3(0, 1, 0), result.normal_), TS_WORLD);
     }

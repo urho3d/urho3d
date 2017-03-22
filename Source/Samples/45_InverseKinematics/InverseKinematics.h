@@ -26,18 +26,15 @@
 
 namespace Urho3D
 {
-
 class AnimationController;
 class Node;
 class IKEffector;
 class IKSolver;
 class Scene;
-class RibbonTrail;
-
 }
 
-/// Ribbon trail demo.
-/// This sample demonstrates how to use both trail types of RibbonTrail component.
+/// Inverse Kinematics demo.
+/// This sample demonstrates how to adjust the position of animated feet so they match the ground's angle using IK
 class InverseKinematics : public Sample
 {
     URHO3D_OBJECT(InverseKinematics, Sample);
