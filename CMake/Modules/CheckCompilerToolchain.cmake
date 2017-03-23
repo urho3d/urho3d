@@ -156,7 +156,7 @@ else ()
             # Use the same target flag as configured by Android/CMake toolchain file
             string (REGEX REPLACE "^.*-target ([^ ]+).*$" "-target;\\1" ARCH_FLAGS "${CMAKE_CXX_FLAGS}")
         endif ()
-        execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
+        execute_process (COMMAND ${CMAKE_C_COMPILER} ${ARCH_FLAGS} -E -dM -xc ${NULL_DEVICE${EMCC_FIX}} RESULT_VARIABLE CC_EXIT_STATUS OUTPUT_VARIABLE NATIVE_PREDEFINED_MACROS ERROR_QUIET)
         if (NOT CC_EXIT_STATUS EQUAL 0)
             message (FATAL_ERROR "Could not check compiler toolchain as it does not handle '-E -dM' compiler flags correctly")
         endif ()
