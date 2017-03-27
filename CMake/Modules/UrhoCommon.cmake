@@ -635,8 +635,10 @@ else ()
                 endif ()
                 set (CMAKE_C_FLAGS_RELEASE "-Oz -DNDEBUG")
                 set (CMAKE_CXX_FLAGS_RELEASE "-Oz -DNDEBUG")
-                set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")     # Remove variables to make the -O3 regalloc easier
-                set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g4")     # Preserve LLVM debug information, show line number debug comments, and generate source maps
+                # Remove variables to make the -O3 regalloc easier
+                set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -O3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1")
+                # Preserve LLVM debug information, show line number debug comments, and generate source maps; always disable exception handling codegen
+                set (CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g4 -s DISABLE_EXCEPTION_CATCHING=1")
             endif ()
         elseif (MINGW)
             # MinGW-specific setup
