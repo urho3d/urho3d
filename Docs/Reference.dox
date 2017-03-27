@@ -2728,6 +2728,8 @@ There are some things to watch out for:
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
+- If you want to run the same server logic for both the locally connecting client as well as remote clients, you can use both the server & client functionality in Network subsystem simultaneously. However in this case you need 2 copies of the scene: server and client. Only the client scene should be rendered on the local client, while the server scene is used for simulation only.
+
 \section Network_InterestManagement Interest management
 
 %Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use. To use, create the NetworkPriority component to a Node you wish to apply interest management to. The component can be created as local, as it is not important to the clients.
