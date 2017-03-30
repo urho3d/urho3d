@@ -59,6 +59,18 @@ static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
     return file.Get();
 }
 
+static CScriptArray* ResourceCacheGetResources(StringHash type, ResourceCache* ptr)
+{
+    PODVector<Resource*> resources;
+    ptr->GetResources(resources, type);
+    return VectorToHandleArray(resources, "Array<Resource@>");
+}
+
+static CScriptArray* ResourceCacheGetResources_TypeStr(const String& type, ResourceCache* ptr)
+{
+    return ResourceCacheGetResources(StringHash(type), ptr);
+}
+
 static void ResourceCacheReleaseResource(const String& type, const String& name, bool force, ResourceCache* ptr)
 {
     ptr->ReleaseResource(type, name, force);
@@ -154,6 +166,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetExistingResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetExistingResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetExistingResource(StringHash, const String&in)", asMETHODPR(ResourceCache, GetExistingResource, (StringHash, const String&), Resource*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool BackgroundLoadResource(const String&in, const String&in, bool sendEventOnFailure = true)", asFUNCTION(ResourceCacheBackgroundLoadResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Array<Resource@>@ GetResources(const String&in)", asFUNCTION(ResourceCacheGetResources_TypeStr), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Array<Resource@>@ GetResources(StringHash)", asFUNCTION(ResourceCacheGetResources), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint64)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint64 get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint64 get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
