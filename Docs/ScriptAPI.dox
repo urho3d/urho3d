@@ -10568,6 +10568,8 @@ Methods:
 - Resource@ GetResource(StringHash, const String&, bool = true)
 - Resource@ GetResource(const String&, const String&, bool = true)
 - String GetResourceFileName(const String&) const
+- Resource@[]@ GetResources(StringHash)
+- Resource@[]@ GetResources(const String&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - void ReleaseAllResources(bool = false)

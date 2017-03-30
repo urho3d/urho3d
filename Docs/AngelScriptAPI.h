@@ -8780,6 +8780,8 @@ String GetPreferredResourceDir(const String&) const;
 Resource GetResource(StringHash, const String&, bool = true);
 Resource GetResource(const String&, const String&, bool = true);
 String GetResourceFileName(const String&) const;
+Array<Resource> GetResources(StringHash);
+Array<Resource> GetResources(const String&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 void ReleaseAllResources(bool = false);
