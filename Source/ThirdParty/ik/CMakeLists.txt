@@ -30,14 +30,14 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
     set (DEFAULT_MEMORY_DEBUGGING 1)
 endif ()
 option (IK_MEMORY_DEBUGGING "Global switch for memory options. Keep track of the number of allocations and de-allocations and prints a report when the program shuts down" ${DEFAULT_MEMORY_DEBUGGING})
-cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" IK_MEMORY_DEBUGGING FALSE)
+cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" "IK_MEMORY_DEBUGGING AND NOT WEB" FALSE)
 
 set (IK_REAL float CACHE STRING "Type to use for real numbers")
 option (IK_DOT_OUTPUT "When enabled, the generated chains are dumped to DOT for debug purposes")
 
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS include/ik/*.h)
-if (CMAKE_SYSTEM_NAME STREQUAL Linux)
+if (IK_MEMORY_BACKTRACE)
     list (APPEND SOURCE_FILES src/platform/linux/backtrace_linux.c)
 endif ()
 
