@@ -1,7 +1,7 @@
 #ifndef IK_SOLVER_FABRIK_H
 #define IK_SOLVER_FABRIK_H
 
-#include "ik/gen/config.h"
+#include "ik/config.h"
 #include "ik/ordered_vector.h"
 #include "ik/solver.h"
 

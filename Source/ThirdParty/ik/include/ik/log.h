@@ -1,7 +1,7 @@
 #ifndef IK_LOG_H
 #define IK_LOG_H
 
-#include "ik/gen/config.h"
+#include "ik/config.h"
 
 C_HEADER_BEGIN
 

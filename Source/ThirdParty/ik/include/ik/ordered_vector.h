@@ -11,7 +11,7 @@
 #ifndef ORDERED_VECTOR_H
 #define ORDERED_VECTOR_H
 
-#include "ik/gen/config.h"
+#include "ik/config.h"
 
 C_HEADER_BEGIN
 

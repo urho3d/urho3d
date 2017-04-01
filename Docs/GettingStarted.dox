@@ -107,6 +107,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_LUAJIT_AMALG  |0|Enable LuaJIT amalgamated build (LuaJIT only)|
 |URHO3D_SAFE_LUA      |0|Enable Lua C++ wrapper safety checks (Lua/LuaJIT only)|
 |URHO3D_LUA_RAW_SCRIPT_LOADER  |0|Prefer loading raw script files from the file system before falling back on Urho3D resource cache. Useful for debugging (e.g. breakpoints), but less performant (Lua/LuaJIT only)|
+|URHO3D_IK            |1|Enable inverse kinematics support|
 |URHO3D_NETWORK       |1|Enable Networking support|
 |URHO3D_PHYSICS       |1|Enable Physics support|
 |URHO3D_NAVIGATION    |1|Enable Navigation support|

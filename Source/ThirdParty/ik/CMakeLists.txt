@@ -1,59 +1,57 @@
-cmake_minimum_required (VERSION 2.6)
+# Copyright (c) 2008-2017 the Urho3D project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 
-# If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their
-# definition and dump it in the cache along with proper documentation, otherwise
-# set MAKE_BUILD_TYPE to Debug prior to calling PROJECT()
-if (DEFINED CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-else()
-    set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
-endif()
-message (STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+# Define target name
+set (TARGET_NAME ik)
 
-###############################################################################
-# Project name
-###############################################################################
+include (CheckIncludeFiles)
+check_include_files (stdint.h HAVE_STDINT_H)
 
-project ("ik" C)
+# Memory debugging options, non-DEBUG and multi-config generator will set the default to FALSE
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    set (DEFAULT_MEMORY_DEBUGGING 1)
+endif ()
+option (IK_MEMORY_DEBUGGING "Global switch for memory options. Keep track of the number of allocations and de-allocations and prints a report when the program shuts down" ${DEFAULT_MEMORY_DEBUGGING})
+cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" IK_MEMORY_DEBUGGING FALSE)
 
-# Make macs happy
-set (CMAKE_MACOSX_RPATH OFF)
+set (IK_REAL float CACHE STRING "Type to use for real numbers")
+option (IK_DOT_OUTPUT "When enabled, the generated chains are dumped to DOT for debug purposes")
 
-###############################################################################
-# compiler definitions and flags
-###############################################################################
-
-if (${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
-    add_definitions (-W -Wall -fno-omit-frame-pointer)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
-    add_definitions (-W -Wall -fno-omit-frame-pointer)
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "Intel")
-elseif (${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
-    add_definitions (-D_CRT_SECURE_NO_WARNINGS)
-    if (CMAKE_BUILD_TYPE MATCHES Debug)
-        STRING(REGEX REPLACE "/MDd" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-        add_definitions (-MTd)
-    elseif (CMAKE_BUILD_TYPE MATCHES Release)
-        STRING(REGEX REPLACE "/MD" "" CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-        add_definitions (-MT)
-    endif ()
+# Define source files
+define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS include/ik/*.h)
+if (CMAKE_SYSTEM_NAME STREQUAL Linux)
+    list (APPEND SOURCE_FILES src/platform/linux/backtrace_linux.c)
 endif ()
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-DDEBUG)
-endif ()
+# Define generated source files
+set (IK_BUILD_TYPE STATIC)      # Urho always builds its 3rd-party as STATIC lib
+configure_file (include/ik/export.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/export.h)
+configure_file (include/ik/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/config.h)
 
-###############################################################################
-# Dependency settings
-###############################################################################
+# Define dependency libs
+set (INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/include/generated include)
 
-message (STATUS "------------------------------------------------------------")
-message (STATUS "Global settings")
-message (STATUS "------------------------------------------------------------")
+# Setup target
+setup_library ()
 
-add_subdirectory ("ik")
-
-option (IK_TESTS "Whether to build unit tests or not (requires C++)" OFF)
-if (IK_TESTS)
-    add_subdirectory ("tests")
-endif ()
+# Install headers for building the Urho3D library
+install_header_files (DIRECTORY include/ik/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/ik FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK BUILD_TREE_ONLY)  # Note: the trailing slash is significant
+install_header_files (FILES ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/export.h ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/config.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/ik)

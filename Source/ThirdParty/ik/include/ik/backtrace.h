@@ -3,7 +3,7 @@
 
 #define BACKTRACE_SIZE 64
 
-#include "ik/gen/config.h"
+#include "ik/config.h"
 
 C_HEADER_BEGIN
 

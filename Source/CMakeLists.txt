@@ -89,8 +89,7 @@ if (URHO3D_DATABASE_SQLITE)
 endif ()
 
 if (URHO3D_IK)
-    # IK lib provides its own Urho3D specific CMakeLists.txt
-    add_subdirectory (ThirdParty/ik/cmake/Urho3D)
+    add_subdirectory (ThirdParty/ik)
 endif ()
 
 if (URHO3D_NAVIGATION)
