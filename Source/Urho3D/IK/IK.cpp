@@ -20,11 +20,10 @@
 // THE SOFTWARE.
 //
 
-#include "IK.h"
-#include "IKConstraint.h"
-#include "IKEffector.h"
-#include "IKSolver.h"
-
+#include "../IK/IK.h"
+#include "../IK/IKConstraint.h"
+#include "../IK/IKEffector.h"
+#include "../IK/IKSolver.h"
 
 namespace Urho3D
 {

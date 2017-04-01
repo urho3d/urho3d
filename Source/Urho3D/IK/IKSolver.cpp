@@ -28,18 +28,15 @@
 
 #include "../Core/Context.h"
 #include "../Core/Profiler.h"
-#include "../IO/Log.h"
-#include "../Scene/Node.h"
-#include "../Scene/Scene.h"
-#include "../Scene/SceneEvents.h"
 #include "../Graphics/Animation.h"
 #include "../Graphics/AnimationState.h"
 #include "../Graphics/DebugRenderer.h"
+#include "../IO/Log.h"
+#include "../Scene/SceneEvents.h"
 
-#include <ik/solver.h>
-#include <ik/node.h>
 #include <ik/effector.h>
-#include <ik/log.h>
+#include <ik/node.h>
+#include <ik/solver.h>
 
 namespace Urho3D
 {

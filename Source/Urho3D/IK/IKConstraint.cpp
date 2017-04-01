@@ -20,11 +20,12 @@
 // THE SOFTWARE.
 //
 
+#include "../Core/Context.h"
 #include "../IK/IK.h"
 #include "../IK/IKConstraint.h"
-#include "../Core/Context.h"
 #include "../Scene/Node.h"
 #include "../Scene/SceneEvents.h"
+
 #include <ik/node.h>
 
 namespace Urho3D

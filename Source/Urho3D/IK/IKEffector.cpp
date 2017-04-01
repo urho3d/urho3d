@@ -20,17 +20,15 @@
 // THE SOFTWARE.
 //
 
-#include "../IK/IKEffector.h"
-#include "../IK/IKSolver.h"
-#include "../IK/IKConverters.h"
-#include "../IK/IKEvents.h"
 #include "../Core/Context.h"
 #include "../Graphics/DebugRenderer.h"
-#include "../Scene/Node.h"
-#include "../Scene/Scene.h"
+#include "../IK/IKConverters.h"
+#include "../IK/IKEffector.h"
+#include "../IK/IKEvents.h"
+#include "../IK/IKSolver.h"
 #include "../Scene/SceneEvents.h"
+
 #include <ik/effector.h>
-#include <ik/log.h>
 
 namespace Urho3D
 {

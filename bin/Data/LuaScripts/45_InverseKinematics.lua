@@ -145,8 +145,6 @@ function UpdateCameraAndFloor(timeStep)
         return
     end
 
-    -- Movement speed as world units per second
-    local MOVE_SPEED = 20.0
     -- Mouse sensitivity as degrees per pixel
     local MOUSE_SENSITIVITY = 0.1
 

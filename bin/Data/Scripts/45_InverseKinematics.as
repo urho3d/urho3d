@@ -150,8 +150,6 @@ void UpdateCameraAndFloor(float timeStep)
     if (ui.focusElement !is null)
         return;
 
-    // Movement speed as world units per second
-    const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 

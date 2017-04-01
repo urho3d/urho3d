@@ -38,7 +38,6 @@
 #include <Urho3D/Physics/CollisionShape.h>
 #include <Urho3D/Physics/RigidBody.h>
 #include <Urho3D/Resource/ResourceCache.h>
-#include <Urho3D/Scene/Scene.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
@@ -138,7 +137,7 @@ void InverseKinematics::CreateScene()
     // possible to the effectors for optimal performance. Since in this case
     // we're solving the legs only, we can place the solver at the spine.
     Node* spine = jackNode_->GetChild("Bip01_Spine", true);
-    solver_ = jackNode_->CreateComponent<IKSolver>();
+    solver_ = spine->CreateComponent<IKSolver>();
 
     // Disable auto-solving, which means we need to call Solve() manually
     solver_->EnableAutoSolve(false);
@@ -190,7 +189,7 @@ void InverseKinematics::SetupViewport()
     renderer->SetViewport(0, viewport);
 }
 
-void InverseKinematics::UpdateCameraAndFloor(float timeStep)
+void InverseKinematics::UpdateCameraAndFloor(float /*timeStep*/)
 {
     // Do not move if the UI has a focused element (the console)
     if (GetSubsystem<UI>()->GetFocusElement())
@@ -198,8 +197,6 @@ void InverseKinematics::UpdateCameraAndFloor(float timeStep)
 
     Input* input = GetSubsystem<Input>();
 
-    // Movement speed as world units per second
-    const float MOVE_SPEED = 20.0f;
     // Mouse sensitivity as degrees per pixel
     const float MOUSE_SENSITIVITY = 0.1f;
 
@@ -248,7 +245,7 @@ void InverseKinematics::SubscribeToEvents()
     SubscribeToEvent(E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(InverseKinematics, HandleSceneDrawableUpdateFinished));
 }
 
-void InverseKinematics::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void InverseKinematics::HandleUpdate(StringHash /*eventType*/, VariantMap& eventData)
 {
     using namespace Update;
 
@@ -259,13 +256,13 @@ void InverseKinematics::HandleUpdate(StringHash eventType, VariantMap& eventData
     UpdateCameraAndFloor(timeStep);
 }
 
-void InverseKinematics::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+void InverseKinematics::HandlePostRenderUpdate(StringHash /*eventType*/, VariantMap& eventData)
 {
     if (drawDebug_)
         solver_->DrawDebugGeometry(false);
 }
 
-void InverseKinematics::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
+void InverseKinematics::HandleSceneDrawableUpdateFinished(StringHash /*eventType*/, VariantMap& eventData)
 {
     PhysicsWorld* phyWorld = scene_->GetComponent<PhysicsWorld>();
     Vector3 leftFootPosition = leftFoot_->GetWorldPosition();
