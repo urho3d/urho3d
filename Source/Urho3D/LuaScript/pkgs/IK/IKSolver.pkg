@@ -33,6 +33,9 @@ class IKSolver : public Component
     void ResetToInitialPose();
     void UpdateInitialPose();
 
+    void MarkSolverTreeDirty();
+    void DrawDebugGeometry(bool depthTest);
+
     tolua_property__get_set Algorithm algorithm;
     tolua_property__get_set unsigned maximumIterations;
     tolua_property__get_set float tolerance;
