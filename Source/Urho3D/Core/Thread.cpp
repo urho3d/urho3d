@@ -38,8 +38,7 @@ namespace Urho3D
 #ifdef URHO3D_THREADING
 #ifdef _WIN32
 
-static
-DWORD WINAPI ThreadFunctionStatic(void* data)
+static DWORD WINAPI ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
@@ -48,8 +47,7 @@ DWORD WINAPI ThreadFunctionStatic(void* data)
 
 #else
 
-static
-void* ThreadFunctionStatic(void* data)
+static void* ThreadFunctionStatic(void* data)
 {
     Thread* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
