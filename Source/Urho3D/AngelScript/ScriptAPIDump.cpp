@@ -405,9 +405,6 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     Log::WriteRaw(str);
                 }
                 Log::WriteRaw("\nclass " + typeName + "\n{\npublic:\n");
-            }
-            if (mode == C_HEADER)
-            {
                 for (asUINT m = 0, mc = type->GetBehaviourCount(); m < mc; m++) {
                     asEBehaviours bh;
                     asIScriptFunction* pM = type->GetBehaviourByIndex(m, &bh);

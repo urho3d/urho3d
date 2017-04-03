@@ -270,12 +270,13 @@ URHO3D_EVENT(E_PARTICLESDURATION, ParticlesDuration) {
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
-    unsigned tests = (numParticles_ > 0 ? 1 : 0) | (emissionTime_ > 0.0f ? 2 : 0);
+    bool hasParticles = numParticles_ > 0;
+    bool emitting = emissionTime_ > 0.0f;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Update(timeStep);
-    if ((tests & 2) && emissionTime_ == 0.0f)
+    if (emitting && emissionTime_ == 0.0f)
         SendEvent(E_PARTICLESDURATION); // emitting particles stoped
-    if ((tests & 1) && !numParticles_)
+    if (hasParticles && 0 == numParticles_)
         SendEvent(E_PARTICLESEND);      // all particles over
 }
 
