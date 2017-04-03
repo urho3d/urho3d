@@ -328,7 +328,17 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 "#define uint8 unsigned char\n"
                 "#define uint16 unsigned short\n"
                 "#define uint64 unsigned long\n"
-                "#define null 0\n");
+                "#define null 0\n"
+				"#define in\n"
+				"#define out\n"
+				"#define inout\n"
+				"#define is ==\n"
+				"#define interface struct\n"
+				"#define class struct\n"
+				"#define cast reinterpret_cast\n"
+				"#define mixin\n"
+				"#define funcdef\n"
+			);
 
     unsigned types = scriptEngine_->GetObjectTypeCount();
     Vector<Pair<String, unsigned> > sortedTypes;
@@ -387,11 +397,26 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
             else if (mode == C_HEADER)
             {
                 ///\todo Find a cleaner way to do this instead of hardcoding
-                if (typeName == "Array")
-                    Log::WriteRaw("\ntemplate <class T> class " + typeName + "\n{\n");
-                else
-                    Log::WriteRaw("\nclass " + typeName + "\n{\n");
-            }
+				if (type->GetFlags() & asOBJ_TEMPLATE) {
+					String str = "\ntemplate <";
+					for (asUINT tt = 0, ttm = type->GetSubTypeCount(); tt < ttm; tt++) {
+						asITypeInfo* pSubType = type->GetSubType(tt);
+						str += String("class ") + pSubType->GetName() + (tt < ttm - 1 ? ", " : ">");
+					}
+					Log::WriteRaw(str);
+				}
+				Log::WriteRaw("\nclass " + typeName + "\n{\npublic:\n");
+			}
+			if (mode == C_HEADER) {
+				for (asUINT m = 0, mc = type->GetBehaviourCount(); m < mc; m++) {
+					asEBehaviours bh;
+					asIScriptFunction* pM = type->GetBehaviourByIndex(m, &bh);
+					if (bh == asBEHAVE_CONSTRUCT || bh == asBEHAVE_DESTRUCT || bh == asBEHAVE_FACTORY)
+						Log::WriteRaw(String(pM->GetDeclaration(false, false, true)) + ";\n");
+				}
+				if (typeName == "String")
+					Log::WriteRaw("String(const char*);\n");
+			}
 
             unsigned methods = type->GetMethodCount();
             for (unsigned j = 0; j < methods; ++j)
@@ -407,8 +432,17 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                     ExtractPropertyInfo(methodName, declaration, propertyInfos);
                 else
                 {
-                    // Sanitate the method name. \todo For now, skip the operators
-                    if (!declaration.Contains("::op"))
+                    // Sanitate the method name. For some operators fix name
+					if (declaration.Contains("::op")) {
+						declaration.Replace("::opEquals(", "::operator==(");
+						declaration.Replace("::opAssign(", "::operator=(");
+						declaration.Replace("::opAddAssign(", "::operator+=(");
+						declaration.Replace("::opAdd(", "::operator+(");
+						declaration.Replace("::opCmp(", "::operator<(");
+						declaration.Replace("::opPreInc(", "::operator++(");
+						declaration.Replace("::opPostInc()", "::operator++(int)");
+					}
+					if (!declaration.Contains("::op"))
                     {
                         String prefix(typeName + "::");
                         declaration.Replace(prefix, "");
