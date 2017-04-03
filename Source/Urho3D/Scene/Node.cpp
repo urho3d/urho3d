@@ -1907,10 +1907,17 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         {
             if (names[i].Front() != '#')
                 break;
-
-            unsigned index = ToUInt(names[i].Substring(1, names[i].Length() - 1));
-            node = node->GetChild(index);
-            if (!node)
+			
+			String name = names[i].Substring(1, names[i].Length() - 1);
+			char s = name.Front();
+			if (s >= '0' && s <= '9') {
+				unsigned index = ToUInt(name);
+				node = node->GetChild(index);
+			} else {
+				node = node->GetChild(name, true);
+			}
+			
+			if (!node)
             {
                 URHO3D_LOGERROR("Could not find node by name " + name);
                 return 0;
