@@ -107,6 +107,18 @@
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="48 16 62 30" />
     </element>
+    <element type="IKSolver">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 0 174 14" />
+    </element>
+    <element type="IKConstraint">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="160 0 174 14" />
+    </element>
+    <element type="IKEffector">
+        <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
+        <attribute name="Image Rect" value="192 16 206 30" />
+    </element>
     <element type="Light">
         <attribute name="Texture" value="Texture2D;Textures/Editor/EditorIcons.png" />
         <attribute name="Image Rect" value="48 0 62 14" />

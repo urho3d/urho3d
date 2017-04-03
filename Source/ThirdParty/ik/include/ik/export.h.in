@@ -1,0 +1,120 @@
+/* ----------------------------------------------------------------
+ * Export and visibility amcros
+ * ----------------------------------------------------------------
+ * Substitution variables:
+ *  - PROJECT_NAME          : All-caps variable identifying the
+ *                            name of the project being built.
+ *  - BUILD_TYPE            : Set to either SHARED or STATIC.
+ * Global definitions (non substitution)
+ *  - PROJECT_NAME_BUILDING : Define this if the library is being
+ *                            built.
+ * ------------------------------------------------------------- */
+
+#ifndef IK_EXPORT_H
+#   define IK_EXPORT_H
+
+    /* set @BUILD_TYPE@ to SHARED or STATIC */
+#   define IK_@IK_BUILD_TYPE@
+
+    /* --------------------------------------------------------------
+     * define visibility macros
+     * --------------------------------------------------------------*/
+
+    /* define platform dependent and build dependent visibility macro helpers */
+#   if defined(IK_SHARED)
+#       if defined(IK_PLATFORM_WINDOWS)
+#           if defined(__GNUC__)
+                /* cygwin visbibility */
+#               define IK_HELPER_API_EXPORT __attribute__ ((dllexport))
+#               define IK_HELPER_API_IMPORT __attribute__ ((dllimport))
+#           else
+                /* msvc visibility */
+#               define IK_HELPER_API_EXPORT __declspec(dllexport)
+#               define IK_HELPER_API_IMPORT __declspec(dllimport)
+                /* disable warnings */
+#               pragma warning(disable: 4996) /* 'strcpy': This function or variable may be unsafe */
+#           endif
+#           define IK_HELPER_API_LOCAL
+#       else
+#           if __GNUC__ >= 4
+                /* gcc 4+ visibility */
+#               define IK_HELPER_API_EXPORT __attribute__ ((visibility ("default")))
+#               define IK_HELPER_API_IMPORT __attribute__ ((visibility ("default")))
+#               define IK_HELPER_API_LOCAL  __attribute__ ((visibility ("hidden")))
+#           else
+                /* gcc lower than 4 doesn't have any explicit visibility, everything is exported */
+#               define IK_HELPER_API_EXPORT
+#               define IK_HELPER_API_IMPORT
+#               define IK_HELPER_API_LOCAL
+#           endif
+#       endif
+#   elif defined(IK_STATIC)
+        /* static build */
+#       define IK_HELPER_API_EXPORT
+#       define IK_HELPER_API_IMPORT
+#       define IK_HELPER_API_LOCAL
+#   else
+#       error Please define IK_SHARED or IK_STATIC
+#   endif
+
+    /*
+     * define public API macro, depending on whether the library is being
+     * built or being linked against.
+     */
+#   if defined(IK_BUILDING) /* defined by CMake when library is being compiled */
+#       define IK_PUBLIC_API IK_HELPER_API_EXPORT
+#   else
+#       define IK_PUBLIC_API IK_HELPER_API_IMPORT
+#   endif
+
+    /*
+     * define local visibility macro. If we're testing, everything
+     * is visible
+     */
+#   if defined(TESTING)
+#       define IK_LOCAL_API IK_PUBLIC_API
+#   else
+#       define IK_LOCAL_API IK_HELPER_API_LOCAL
+#   endif
+
+    /*
+     * define class member visibility macros. If we're testing, everything
+     * is public
+     */
+#   if defined(TESTING)
+#       define PUBLIC public
+#       define PROTECTED public
+#       define PRIVATE public
+#   else
+#       define PUBLIC public
+#       define PROTECTED protected
+#       define PRIVATE private
+#   endif
+
+    /* --------------------------------------------------------------
+     * typeof support
+     * --------------------------------------------------------------*/
+
+#   if defined(__GNUC__)
+#       define TYPEOF(x) __typeof__(x)
+#   else
+#       undef TYPEOF
+#   endif
+
+    /* --------------------------------------------------------------
+     * C linkage
+     * --------------------------------------------------------------*/
+
+#   ifdef __cplusplus
+#       define C_HEADER_BEGIN extern "C" {
+#   else
+#       define C_HEADER_BEGIN
+#   endif
+
+#   ifdef __cplusplus
+#       define C_HEADER_END }
+#   else
+#       define C_HEADER_END
+#   endif
+
+#endif /* IK_EXPORT_H */

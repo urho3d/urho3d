@@ -1,0 +1,43 @@
+$#include "IK/IKSolver.h"
+
+class IKSolver : public Component
+{
+    enum Algorithm
+    {
+        FABRIK
+    };
+
+    Algorithm GetAlgorithm() const;
+    void SetAlgorithm(Algorithm algorithm);
+    unsigned GetMaximumIterations() const;
+    void SetMaximumIterations(unsigned iterations);
+    float GetTolerance() const;
+    void SetTolerance(float tolerance);
+
+    bool BoneRotationsEnabled() const;
+    void EnableBoneRotations(bool enable);
+
+    bool TargetRotationEnabled() const;
+    void EnableTargetRotation(bool enable);
+
+    bool ContinuousSolvingEnabled() const;
+    void EnableContinuousSolving(bool enable);
+
+    bool UpdatePoseEnabled() const;
+    void EnableUpdatePose(bool enable);
+
+    bool AutoSolveEnabled() const;
+    void EnableAutoSolve(bool enable);
+
+    void Solve();
+    void ResetToInitialPose();
+    void UpdateInitialPose();
+
+    void MarkSolverTreeDirty();
+    void DrawDebugGeometry(bool depthTest);
+
+    tolua_property__get_set Algorithm algorithm;
+    tolua_property__get_set unsigned maximumIterations;
+    tolua_property__get_set float tolerance;
+};
+

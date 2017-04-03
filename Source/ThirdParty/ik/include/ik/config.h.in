@@ -1,0 +1,36 @@
+/* --------------------------------------------------------------
+ * Configures prerequisite for this library
+ * --------------------------------------------------------------*/
+
+#ifndef IK_CONFIG_HPP
+#   define IK_CONFIG_HPP
+
+    /* --------------------------------------------------------------
+     * build settings
+     * --------------------------------------------------------------*/
+
+#   define OFF    0
+#   define ON     1
+
+#   define HAVE_STDINT_H @HAVE_STDINT_H@
+#   define ik_real @IK_REAL@
+#   define IK_MEMORY_DEBUGGING @IK_MEMORY_DEBUGGING@
+#   if IK_MEMORY_DEBUGGING == ON
+#       define IK_MEMORY_BACKTRACE @IK_MEMORY_BACKTRACE@
+#   endif
+#   define IK_DOT_OUTPUT @IK_DOT_OUTPUT@
+
+    /* --------------------------------------------------------------
+     * common include files
+     * --------------------------------------------------------------*/
+
+#   include "ik/export.h"
+#   include <stddef.h>
+
+#   if HAVE_STDINT_H == ON
+#       include <stdint.h>
+#   else
+#       include "ik/pstdint.h"
+#   endif
+
+#endif /* IK_CONFIG_HPP */

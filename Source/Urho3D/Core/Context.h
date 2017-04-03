@@ -100,6 +100,12 @@ public:
     bool RequireSDL(unsigned int sdlFlags);
     /// Indicate that you are done with using SDL. Must be called after using RequireSDL().
     void ReleaseSDL();
+#ifdef URHO3D_IK
+    /// Initialises the IK library, if not already. This call must be matched with ReleaseIK() when the IK library is no longer required.
+    void RequireIK();
+    /// Indicate that you are done with using the IK library.
+    void ReleaseIK();
+#endif
 
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(StringHash baseType, StringHash derivedType);
