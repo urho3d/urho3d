@@ -408,8 +408,15 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 for (asUINT m = 0, mc = type->GetBehaviourCount(); m < mc; m++) {
                     asEBehaviours bh;
                     asIScriptFunction* pM = type->GetBehaviourByIndex(m, &bh);
-                    if (bh == asBEHAVE_CONSTRUCT || bh == asBEHAVE_DESTRUCT || bh == asBEHAVE_FACTORY)
+                    if (bh == asBEHAVE_CONSTRUCT || bh == asBEHAVE_DESTRUCT)
                         Log::WriteRaw(String(pM->GetDeclaration(false, false, true)) + ";\n");
+                }
+                for (asUINT m = 0, mc = type->GetFactoryCount(); m < mc; m++) {
+                    asIScriptFunction* pM = type->GetFactoryByIndex(m);
+                    String declaration(pM->GetDeclaration(false, false, true));
+                    declaration = declaration.Substring(declaration.Find(' ') + 1);
+                    declaration.Replace("@", "&");
+                    Log::WriteRaw(declaration + ";\n");
                 }
                 if (typeName == "String")
                     Log::WriteRaw("String(const char*);\n");
