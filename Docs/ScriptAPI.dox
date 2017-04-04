@@ -148,6 +148,12 @@ namespace Urho3D
 
 ### DeviceReset
 
+## %IK events
+
+### IKEffectorTargetChanged
+- %EffectorNode : (Node*) The effector node that has changed targets
+- %TargetNode : (Node*) The new target node. NOTE: Can be NULL (means no target)
+
 ## %IO events
 
 ### LogMessage
@@ -414,6 +420,17 @@ namespace Urho3D
 
 ## %Physics2D events
 
+### PhysicsUpdateContact2D
+- %World : PhysicsWorld2D pointer
+- %BodyA : RigidBody2D pointer
+- %BodyB : RigidBody2D pointer
+- %NodeA : Node pointer
+- %NodeB : Node pointer
+- %Contact : b2Contact pointer
+- %ShapeA : CollisionShape2D pointer
+- %ShapeB : CollisionShape2D pointer
+- %Enabled : bool [in/out]
+
 ### PhysicsBeginContact2D
 - %World : PhysicsWorld2D pointer
 - %BodyA : RigidBody2D pointer
@@ -433,6 +450,15 @@ namespace Urho3D
 - %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
+
+### NodeUpdateContact2D
+- %Body : RigidBody2D pointer
+- %OtherNode : Node pointer
+- %OtherBody : RigidBody2D pointer
+- %Contact : b2Contact pointer
+- %Shape : CollisionShape2D pointer
+- %OtherShape : CollisionShape2D pointer
+- %Enabled : bool [in/out]
 
 ### NodeBeginContact2D
 - %Body : RigidBody2D pointer
@@ -1505,6 +1531,32 @@ namespace Urho3D
 - %Max %Obstacles : int
 - %Max %Layers : int
 - %Draw %Obstacles : bool
+
+### IKConstraint
+- %Stiffness : float
+- %Stretchiness : float
+- %Length %Constraints : Vector2
+
+### IKEffector
+- %Target %Node : String
+- %Chain %Length : int
+- %Target %Position : Vector3
+- %Target %Rotation : Vector3
+- %Weight : float
+- %Rotation %Weight : float
+- %Rotation %Decay : float
+- %Nlerp %Weight : bool
+- %Inherit %Parent %Rotation : bool
+
+### IKSolver
+- %Algorithm : int
+- %Max %Iterations : int
+- %Convergence %Tolerance : float
+- %Bone %Rotations : bool
+- %Target %Rotation : bool
+- %Continuous %Solving : bool
+- %Update %Pose : bool
+- %Auto %Solve : bool
 
 ### Light
 - %Is %Enabled : bool
@@ -2662,6 +2714,9 @@ namespace Urho3D
 <a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
+<a href="#Class_IKConstraint"><b>IKConstraint</b></a>
+<a href="#Class_IKEffector"><b>IKEffector</b></a>
+<a href="#Class_IKSolver"><b>IKSolver</b></a>
 <a href="#Class_Image"><b>Image</b></a>
 <a href="#Class_IndexBuffer"><b>IndexBuffer</b></a>
 <a href="#Class_Input"><b>Input</b></a>
@@ -7488,6 +7543,206 @@ Properties:
 - HttpRequestState state // readonly
 - String url // readonly
 - String verb // readonly
+- int weakRefs // readonly
+
+<a name="Class_IKConstraint"></a>
+
+### IKConstraint
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+
+<a name="Class_IKEffector"></a>
+
+### IKEffector
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+
+Properties:
+
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- String category // readonly
+- uint chainLength
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- bool inheritParentRotation
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- float rotationDecay
+- float rotationWeight
+- String targetName
+- Node@ targetNode
+- Vector3 targetPosition
+- Quaternion targetRotation
+- bool temporary
+- StringHash type // readonly
+- String typeName // readonly
+- int weakRefs // readonly
+- float weight
+- bool weightedNlerp
+
+<a name="Class_IKSolver"></a>
+
+### IKSolver
+
+Methods:
+
+- void ApplyAttributes()
+- void DrawDebugGeometry(DebugRenderer@, bool)
+- void DrawDebugGeometry(bool)
+- Variant GetAttribute(const String&) const
+- ValueAnimation@ GetAttributeAnimation(const String&) const
+- float GetAttributeAnimationSpeed(const String&) const
+- float GetAttributeAnimationTime(const String&) const
+- WrapMode GetAttributeAnimationWrapMode(const String&) const
+- Variant GetAttributeDefault(const String&) const
+- bool GetInterceptNetworkUpdate(const String&) const
+- bool HasSubscribedToEvent(Object@, const String&)
+- bool HasSubscribedToEvent(const String&)
+- bool Load(File@, bool = false)
+- bool Load(VectorBuffer&, bool = false)
+- bool LoadJSON(const JSONValue&, bool = false)
+- bool LoadXML(const XMLElement&, bool = false)
+- void MarkNetworkUpdate() const
+- void Remove()
+- void RemoveAttributeAnimation(const String&)
+- void RemoveInstanceDefault()
+- void RemoveObjectAnimation()
+- void ResetToDefault()
+- void ResetToInitialPose()
+- bool Save(File@) const
+- bool Save(VectorBuffer&) const
+- bool SaveJSON(JSONValue&) const
+- bool SaveXML(XMLElement&) const
+- void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- void SetAnimationTime(float)
+- bool SetAttribute(const String&, const Variant&)
+- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
+- void SetAttributeAnimationSpeed(const String&, float)
+- void SetAttributeAnimationTime(const String&, float)
+- void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetInterceptNetworkUpdate(const String&, bool)
+- void Solve()
+- void UpdateInitialPose()
+
+Properties:
+
+- IKAlgorithm algorithm
+- bool animationEnabled
+- Variant[] attributeDefaults // readonly
+- AttributeInfo[] attributeInfos // readonly
+- Variant[] attributes
+- bool autoSolve
+- bool boneRotations
+- String category // readonly
+- bool continuousSolving
+- bool enabled
+- bool enabledEffective // readonly
+- uint id // readonly
+- uint maximumIterations
+- Node@ node // readonly
+- uint numAttributes // readonly
+- ObjectAnimation@ objectAnimation
+- int refs // readonly
+- bool targetRotation
+- bool temporary
+- float tolerance
+- StringHash type // readonly
+- String typeName // readonly
+- bool updatePose
 - int weakRefs // readonly
 
 <a name="Class_Image"></a>
@@ -15675,6 +15930,11 @@ Properties:
 - HTTP_ERROR
 - HTTP_OPEN
 - HTTP_CLOSED
+
+
+### IKAlgorithm
+
+- FABRIK
 
 
 ### InterpMethod

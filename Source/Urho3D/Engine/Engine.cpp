@@ -38,6 +38,9 @@
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../IO/PackageFile.h"
+#ifdef URHO3D_IK
+#include "../IK/IK.h"
+#endif
 #ifdef URHO3D_NAVIGATION
 #include "../Navigation/NavigationMesh.h"
 #endif
@@ -138,6 +141,10 @@ Engine::Engine(Context* context) :
 
     // Register object factories for libraries which are not automatically registered along with subsystem creation
     RegisterSceneLibrary(context_);
+
+#ifdef URHO3D_IK
+    RegisterIKLibrary(context_);
+#endif
 
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
