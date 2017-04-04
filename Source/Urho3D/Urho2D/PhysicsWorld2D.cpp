@@ -148,7 +148,6 @@ void PhysicsWorld2D::EndContact(b2Contact* contact)
         return;
 
     endContactInfos_.Push(ContactInfo(contact));
-    disabledContacts_.Erase(contact);
 }
 
 void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
@@ -158,8 +157,6 @@ void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
     if (!fixtureA || !fixtureB)
         return;
 
-    if (disabledContacts_.Contains(contact))
-        contact->SetEnabled(false);
     ContactInfo contactInfo(contact);
 
     // Send global event
@@ -208,10 +205,6 @@ void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
     }
 
     contact->SetEnabled(eventData[NodeUpdateContact2D::P_ENABLED].GetBool());
-    if (contact->IsEnabled())
-        disabledContacts_.Erase(contact);
-    else
-        disabledContacts_.Insert(contact);
 }
 
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)

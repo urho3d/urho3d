@@ -280,8 +280,6 @@ protected:
     Vector<ContactInfo> endContactInfos_;
     /// Temporary buffer with contact data.
     VectorBuffer contacts_;
-    /// Disabled contacts.
-    HashSet<b2Contact*> disabledContacts_;
 };
 
 }
