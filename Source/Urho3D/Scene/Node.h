@@ -59,8 +59,6 @@ struct URHO3D_API NodeImpl
     PODVector<Node*> dependencyNodes_;
     /// Network owner connection.
     Connection* owner_;
-    /// Name.
-    String name_;
     /// Tag strings.
     StringVector tags_;
     /// Name hash.
@@ -336,9 +334,6 @@ public:
 
     /// Return ID.
     unsigned GetID() const { return id_; }
-
-    /// Return name.
-    const String& GetName() const { return impl_->name_; }
 
     /// Return name hash.
     StringHash GetNameHash() const { return impl_->nameHash_; }

@@ -80,6 +80,7 @@ void Animatable::RegisterObject(Context* context)
 {
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_FILE);
 }
 
 bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
@@ -184,6 +185,11 @@ bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
     }
 
     return true;
+}
+
+void Animatable::SetName(const String& name)
+{
+    name_ = name;
 }
 
 bool Animatable::SaveXML(XMLElement& dest) const

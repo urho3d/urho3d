@@ -321,9 +321,9 @@ bool Node::SaveJSON(Serializer& dest, const String& indentation) const
 
 void Node::SetName(const String& name)
 {
-    if (name != impl_->name_)
+    if (name != name_)
     {
-        impl_->name_ = name;
+        name_ = name;
         impl_->nameHash_ = name;
 
         MarkNetworkUpdate();
