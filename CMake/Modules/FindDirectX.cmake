@@ -183,7 +183,7 @@ if (MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below to fi
     endif ()
     foreach (VERSION 10.0 8.1 8.0)
         list (APPEND DIRECT3D_DLL_REDIST_SEARCH_PATHS "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v${VERSION};InstallationFolder]/Redist/D3D/${PATH_SUFFIX}")
-    endforeach()
+    endforeach ()
     find_file (DIRECT3D_DLL NAMES ${DIRECT3D_DLL_NAMES} PATHS ${DIRECT3D_DLL_REDIST_SEARCH_PATHS} DOC "Direct3D DLL"
         NO_DEFAULT_PATH)    # Do not use default paths such as the PATH variable, to potentially avoid using a wrong architecture DLL
     if (DIRECT3D_DLL AND NOT MINGW)
