@@ -22,9 +22,11 @@
 
 # Get Urho3D library revision number
 
+# Use the same commit-ish used by CI server to describe the repository
 if (DEFINED ENV{TRAVIS_COMMIT})
-    # Use the same commit-ish used by CI server to describe the repository
     set (ARG $ENV{TRAVIS_COMMIT})
+elseif (DEFINED ENV{APPVEYOR})
+    set (ARG $ENV{APPVEYOR_REPO_COMMIT})
 else ()
     set (ARG --dirty)
 endif ()
