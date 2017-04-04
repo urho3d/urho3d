@@ -95,7 +95,7 @@ public:
     bool DirExists(const String& pathName) const;
     /// Scan a directory for specified files.
     void ScanDir(Vector<String>& result, const String& pathName, const String& filter, unsigned flags, bool recursive) const;
-    /// Return the program's directory. If it does not contain the Urho3D default CoreData and Data directories, and the current working directory does, return the working directory instead.
+    /// Return the program's directory.
     String GetProgramDir() const;
     /// Return the user documents directory.
     String GetUserDocumentsDir() const;
@@ -113,8 +113,6 @@ private:
 
     /// Allowed directories.
     HashSet<String> allowedPaths_;
-    /// Cached program directory.
-    mutable String programDir_;
     /// Async execution queue.
     List<AsyncExecRequest*> asyncExecQueue_;
     /// Next async execution ID.
