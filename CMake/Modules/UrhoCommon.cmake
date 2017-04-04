@@ -730,13 +730,17 @@ endmacro ()
 # Macro for checking the SOURCE_FILES variable is properly initialized
 macro (check_source_files)
     if (NOT SOURCE_FILES)
-        message (FATAL_ERROR "Could not configure and generate the project file because no source files have been defined yet. "
-            "You can define the source files explicitly by setting the SOURCE_FILES variable in your CMakeLists.txt; or "
-            "by calling the define_source_files() macro which would by default glob all the C++ source files found in the same scope of "
-            "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
-            "If your source files are not located in the same directory as the CMakeLists.txt or your source files are "
-            "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
-            "See the define_source_files() macro definition in the CMake/Modules/UrhoCommon.cmake for more detail.")
+        if (NOT ${ARGN} STREQUAL "")
+            message (FATAL_ERROR ${ARGN})
+        else ()
+            message (FATAL_ERROR "Could not configure and generate the project file because no source files have been defined yet. "
+                "You can define the source files explicitly by setting the SOURCE_FILES variable in your CMakeLists.txt; or "
+                "by calling the define_source_files() macro which would by default glob all the C++ source files found in the same scope of "
+                "CMakeLists.txt where the macro is being called and the macro would set the SOURCE_FILES variable automatically. "
+                "If your source files are not located in the same directory as the CMakeLists.txt or your source files are "
+                "more than just C++ language then you probably have to pass in extra arguments when calling the macro in order to make it works. "
+                "See the define_source_files() macro definition in the CMake/Modules/UrhoCommon.cmake for more detail.")
+        endif ()
     endif ()
 endmacro ()
 
@@ -886,7 +890,7 @@ endmacro ()
 # Macro for defining source files with optional arguments as follows:
 #  GLOB_CPP_PATTERNS <list> - Use the provided globbing patterns for CPP_FILES instead of the default *.cpp
 #  GLOB_H_PATTERNS <list> - Use the provided globbing patterns for H_FILES instead of the default *.h
-#  EXCLUDE_PATTERNS <list> - Use the provided patterns for excluding matched source files
+#  EXCLUDE_PATTERNS <list> - Use the provided regex patterns for excluding the unwanted matched source files
 #  EXTRA_CPP_FILES <list> - Include the provided list of files into CPP_FILES result
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
 #  PCH <list> - Enable precompiled header support on the defined source files using the specified header file, the list is "<path/to/header> [C++|C]"
@@ -954,20 +958,42 @@ macro (define_source_files)
     endif ()
 endmacro ()
 
-# Macro for defining resource files, should be called after the define_source_files() macro
-macro (define_resource_files)
-    check_source_files ()
-    if (NOT RESOURCE_DIRS)
-        # If the macro caller has not defined the resource dirs then set them based on Urho3D project convention
-        foreach (DIR ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data)
-            # Do not assume downstream project always follows Urho3D project convention, so double check if this directory exists before using it
-            if (IS_DIRECTORY ${DIR})
-                list (APPEND RESOURCE_DIRS ${DIR})
-            endif ()
-        endforeach ()
+# Macro for defining resource directories with optional arguments as follows:
+#  GLOB_PATTERNS <list> - Use the provided globbing patterns for resource directories, default to "${CMAKE_SOURCE_DIR}/bin/*Data"
+#  EXCLUDE_PATTERNS <list> - Use the provided regex patterns for excluding the unwanted matched directories
+#  EXTRA_DIRS <list> - Include the provided list of directories into globbing result
+#  HTML_SHELL <value> - An absolute path to the HTML shell file (only applicable for Web platform)
+macro (define_resource_dirs)
+    check_source_files ("Could not call define_resource_dirs() macro before define_source_files() macro.")
+    cmake_parse_arguments (ARG "" "HTML_SHELL" "GLOB_PATTERNS;EXCLUDE_PATTERNS;EXTRA_DIRS" ${ARGN})
+    if (WEB)
+        if (ARG_HTML_SHELL)
+            add_html_shell (${ARG_HTML_SHELL})
+        endif ()
     endif ()
+    # If not explicitly specified then use the Urho3D project structure convention
+    if (NOT ARG_GLOB_PATTERNS)
+        set (ARG_GLOB_PATTERNS ${CMAKE_SOURCE_DIR}/bin/*Data)
+    endif ()
+    file (GLOB GLOB_RESULTS ${ARG_GLOB_PATTERNS})
+    unset (GLOB_DIRS)
+    foreach (DIR ${GLOB_RESULTS})
+        if (IS_DIRECTORY ${DIR})
+            list (APPEND GLOB_DIRS ${DIR})
+        endif ()
+    endforeach ()
+    if (ARG_EXCLUDE_PATTERNS)
+        set (GLOB_DIRS_WITH_SENTINEL ";${GLOB_DIRS};")  # Stringify the lists
+        foreach (PATTERN ${ARG_EXCLUDE_PATTERNS})
+            foreach (LOOP RANGE 1)
+                string (REGEX REPLACE ";${PATTERN};" ";;" GLOB_DIRS_WITH_SENTINEL "${GLOB_DIRS_WITH_SENTINEL}")
+            endforeach ()
+        endforeach ()
+        set (GLOB_DIRS ${GLOB_DIRS_WITH_SENTINEL})      # Convert strings back to lists, extra sentinels are harmless
+    endif ()
+    list (APPEND RESOURCE_DIRS ${GLOB_DIRS} ${ARG_EXTRA_DIRS})
+    # Populate all the variables required by resource packaging, if the build option is enabled
     if (URHO3D_PACKAGING AND RESOURCE_DIRS)
-        # Populate all the variables required by resource packaging
         foreach (DIR ${RESOURCE_DIRS})
             get_filename_component (NAME ${DIR} NAME)
             if (ANDROID)
@@ -1042,20 +1068,21 @@ endmacro()
 
 # Macro fo adding a HTML shell-file when targeting Web platform
 macro (add_html_shell)
+    check_source_files ("Could not call add_html_shell() macro before define_source_files() macro.")
     if (NOT ${ARGN} STREQUAL "")
-        set (SHELL_HTML ${ARGN})
+        set (HTML_SHELL ${ARGN})
     else ()
         # Create Urho3D custom HTML shell that also embeds our own project logo
         if (NOT EXISTS ${CMAKE_BINARY_DIR}/Source/shell.html)
-            file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html SHELL_HTML)
-            string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" SHELL_HTML "${SHELL_HTML}")     # Stringify to preserve semicolons
-            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" SHELL_HTML "${SHELL_HTML}")
-            file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${SHELL_HTML}")
+            file (READ ${EMSCRIPTEN_ROOT_PATH}/src/shell.html HTML_SHELL)
+            string (REPLACE "<!doctype html>" "<!-- This is a generated file. DO NOT EDIT!-->\n\n<!doctype html>" HTML_SHELL "${HTML_SHELL}")     # Stringify to preserve semicolons
+            string (REPLACE "<body>" "<body>\n\n<a href=\"https://urho3d.github.io\" title=\"Urho3D Homepage\"><img src=\"https://urho3d.github.io/assets/images/logo.png\" alt=\"link to https://urho3d.github.io\" height=\"80\" width=\"160\" /></a>\n" HTML_SHELL "${HTML_SHELL}")
+            file (WRITE ${CMAKE_BINARY_DIR}/Source/shell.html "${HTML_SHELL}")
         endif ()
-        set (SHELL_HTML ${CMAKE_BINARY_DIR}/Source/shell.html)
+        set (HTML_SHELL ${CMAKE_BINARY_DIR}/Source/shell.html)
     endif ()
-    list (APPEND SOURCE_FILES ${SHELL_HTML})
-    set_source_files_properties (${SHELL_HTML} PROPERTIES EMCC_OPTION shell-file)
+    list (APPEND SOURCE_FILES ${HTML_SHELL})
+    set_source_files_properties (${HTML_SHELL} PROPERTIES EMCC_OPTION shell-file)
 endmacro ()
 
 include (GenerateExportHeader)
@@ -1544,7 +1571,9 @@ endmacro ()
 #  TARGET_PROPERTIES - list of target properties
 macro (setup_main_executable)
     cmake_parse_arguments (ARG "NOBUNDLE;MACOSX_BUNDLE;WIN32" "" "" ${ARGN})
-    define_resource_files ()
+    if (NOT RESOURCE_DIRS)
+        define_resource_dirs ()
+    endif ()
     if (ANDROID)
         # Add SDL native init function, SDL_Main() entry point must be defined by one of the source files in ${SOURCE_FILES}
         find_Urho3D_file (ANDROID_MAIN_C_PATH SDL_android_main.c
@@ -1619,6 +1648,17 @@ macro (setup_main_executable)
             endif ()
         endif ()
         setup_executable (${EXE_TYPE} ${ARG_UNPARSED_ARGUMENTS})
+    endif ()
+    # Only need to install the resource directories once in case  they are referenced by multiple targets
+    if (RESOURCE_DIRS AND DEST_SHARE_DIR)
+        foreach (DIR ${RESOURCE_DIRS})
+            list (FIND INSTALLED_RESOURCE_DIRS ${DIR} FOUND_INDEX)
+            if (FOUND_INDEX EQUAL -1)
+                install (DIRECTORY ${DIR} DESTINATION ${DEST_SHARE_DIR}/Resources)
+                list (APPEND INSTALLED_RESOURCE_DIRS ${DIR})
+            endif ()
+            set (INSTALLED_RESOURCE_DIRS ${INSTALLED_RESOURCE_DIRS} PARENT_SCOPE)
+        endforeach ()
     endif ()
 
     # Define a custom command for stripping the main target executable (or shared library for Android) for Release build configuration
@@ -1747,7 +1787,32 @@ macro (_setup_target)
         endif ()
         add_dependencies (${TARGET_NAME} ${RESOURCE_CHECK_${MD5ALL}})
     endif ()
-
+    # Create symbolic links in the build tree
+    if (ANDROID)
+        file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
+        if (NOT URHO3D_PACKAGING)
+            foreach (I ${RESOURCE_DIRS})
+                get_filename_component (NAME ${I} NAME)
+                if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${NAME})
+                    create_symlink (${I} ${CMAKE_SOURCE_DIR}/Android/assets/${NAME} FALLBACK_TO_COPY)
+                endif ()
+            endforeach ()
+        endif ()
+        foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
+            if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
+                create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
+            endif ()
+        endforeach ()
+    else ()
+        foreach (I ${RESOURCE_DIRS})
+            get_filename_component (NAME ${I} NAME)
+            if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${NAME} AND EXISTS ${I})
+                # Ensure the output directory exist before creating the symlinks
+                file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+                create_symlink (${I} ${CMAKE_BINARY_DIR}/bin/${NAME} FALLBACK_TO_COPY)
+            endif ()
+        endforeach ()
+    endif ()
     # Workaround CMake/Xcode generator bug where it always appends '/build' path element to SYMROOT attribute and as such the items in Products are always rendered as red in the Xcode as if they are not yet built
     if (NOT DEFINED ENV{TRAVIS})
         if (XCODE AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
@@ -1781,13 +1846,14 @@ macro (setup_test)
     endif ()
 endmacro ()
 
-# Set common project structure for all platforms
+# Set common binary output directory if not already set (note that this module can be included in an external project which may already have DEST_RUNTIME_DIR preset)
 if (NOT DEST_RUNTIME_DIR)
-    # Set common binary output directory if not already set (note that this module can be included in an external project which may already have DEST_RUNTIME_DIR preset)
     set_output_directories (${CMAKE_BINARY_DIR}/bin RUNTIME PDB)
 endif ()
+
 if (ANDROID)
-    # Enable Android ndk-gdb
+    # TODO: Verify if this setup still works with Android NDK 13 and above
+    # Enable Android ndk-gdb, if the build option is enabled
     if (ANDROID_NDK_GDB)
         set (NDK_GDB_SOLIB_PATH ${CMAKE_BINARY_DIR}/obj/local/${ANDROID_NDK_ABI_NAME}/)
         file (MAKE_DIRECTORY ${NDK_GDB_SOLIB_PATH})
@@ -1806,46 +1872,24 @@ if (ANDROID)
     else ()
         file (REMOVE ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/gdbserver)
     endif ()
-    # Create symbolic links in the build tree
-    file (MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/Android/assets)
-    if (NOT URHO3D_PACKAGING)
-        foreach (I CoreData Data)
-            if (NOT EXISTS ${CMAKE_SOURCE_DIR}/Android/assets/${I})
-                create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_SOURCE_DIR}/Android/assets/${I} FALLBACK_TO_COPY)
-            endif ()
-        endforeach ()
-    endif ()
-    foreach (I AndroidManifest.xml build.xml custom_rules.xml project.properties src res assets jni)
-        if (EXISTS ${CMAKE_SOURCE_DIR}/Android/${I} AND NOT EXISTS ${CMAKE_BINARY_DIR}/${I})    # No-ops when 'Android' is used as build tree
-            create_symlink (${CMAKE_SOURCE_DIR}/Android/${I} ${CMAKE_BINARY_DIR}/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
 elseif (WEB)
     if (EMSCRIPTEN_SHARE_JS AND NOT EXISTS ${CMAKE_BINARY_DIR}/Source/prefix.js)
         file (WRITE ${CMAKE_BINARY_DIR}/Source/prefix.js "var Module;if(typeof Module==='undefined')Module=eval('(function(){try{return Module||{}}catch(e){return{}}})()');var s=document.createElement('script');s.src='${CMAKE_PROJECT_NAME}.js';document.body.appendChild(s);Module['preRun'].push(function(){Module['addRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')});s.onload=function(){Module['removeRunDependency']('${CMAKE_PROJECT_NAME}.js.loader')};")
     endif ()
-else ()
-    # Create symbolic links in the build tree
-    foreach (I Autoload CoreData Data)
-        if (NOT EXISTS ${CMAKE_BINARY_DIR}/bin/${I} AND EXISTS ${CMAKE_SOURCE_DIR}/bin/${I})
-            # Ensure the output directory exist before creating the symlinks
-            file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-            create_symlink (${CMAKE_SOURCE_DIR}/bin/${I} ${CMAKE_BINARY_DIR}/bin/${I} FALLBACK_TO_COPY)
-        endif ()
-    endforeach ()
-    # Warn user if PATH environment variable has not been correctly set for using ccache
-    if (NOT CMAKE_CROSSCOMPILING AND NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
-        if (APPLE)
-            set (WHEREIS brew info ccache)
-        else ()
-            set (WHEREIS whereis -b ccache)
-        endif ()
-        execute_process (COMMAND ${WHEREIS} COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        if (EXIT_CODE EQUAL 0 AND NOT $ENV{PATH} MATCHES "${CCACHE_SYMLINK}")  # Need to stringify because CCACHE_SYMLINK variable could be empty when the command failed
-            message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
+endif ()
+
+# Warn user if PATH environment variable has not been correctly set for using ccache
+if (NOT CMAKE_HOST_WIN32 AND "$ENV{USE_CCACHE}")
+    if (APPLE)
+        set (WHEREIS brew info ccache)
+    else ()
+        set (WHEREIS whereis -b ccache)
+    endif ()
+    execute_process (COMMAND ${WHEREIS} COMMAND grep -o \\S*lib\\S* RESULT_VARIABLE EXIT_CODE OUTPUT_VARIABLE CCACHE_SYMLINK ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (EXIT_CODE EQUAL 0 AND NOT $ENV{PATH} MATCHES "${CCACHE_SYMLINK}")  # Need to stringify because CCACHE_SYMLINK variable could be empty when the command failed
+        message (WARNING "The lib directory containing the ccache symlinks (${CCACHE_SYMLINK}) has not been added in the PATH environment variable. "
                 "This is required to enable ccache support for native compiler toolchain. CMake has been configured to use the actual compiler toolchain instead of ccache. "
                 "In order to rectify this, the build tree must be regenerated after the PATH environment variable has been adjusted accordingly.")
-        endif ()
     endif ()
 endif ()
 

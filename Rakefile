@@ -342,7 +342,7 @@ task :ci do
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
   ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB'] 
+  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
@@ -824,7 +824,7 @@ def android_wait_for_device retries = -1, retry_interval = 10, package = 'androi
   return retries == 0 ? nil : 0
 end
 
-def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'sleep 30'
+def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/', payload = 'sleep 30'
   # The device should have been found at this point
   return nil unless $specific_device
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error
