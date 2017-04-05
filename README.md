@@ -119,6 +119,7 @@ Urho3D development, contributions and bugfixes by:
 - neat3d
 - nemerle
 - ninjastone
+- orefkov
 - proller
 - raould
 - rasteron
