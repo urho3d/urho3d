@@ -566,7 +566,7 @@ First of all, structure your project similar to Urho3D project as below. Althoug
  └ *.bat or *.sh
 \endcode
 
-The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets (if you do not follow this convention then in order to run the Urho3D executables successfully, you must use the '-pp' and/or '-p' \ref Running_Commandline "command line option" or use the URHO3D_PREFIX_PATH environment variable to point to your resource directories). You must copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory, unless you just want to use cmake-gui for your own project configuration and generation. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everywhere. The build scripts work together with the Urho3D CMake modules and toolchains to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can only pass the \ref Build_Options that are applicable to downstream projects. Be mindful that conflicting build options would be ignored.
+The physical project root directory is also the logical project source tree in CMake terminology where your project main CMakeLists.txt should reside. The 'bin' directory should contain the 'Data' and 'CoreData' resource subdirs for your own assets. You must copy (or symlink) the 'CMake' subdir from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/CMake') to your project root directory. You may also want to copy (or symlink) the build scripts from Urho3D project root directory (or from Urho3D SDK installation, which can be found in the 'share/Urho3D/Scripts') to your project root directory, unless you just want to use cmake-gui for your own project configuration and generation. Alternatively, you can add the Urho3D project root directory into the PATH environment variable in your host system in order to make the build scripts available everywhere. The build scripts work together with the Urho3D CMake modules and toolchains to configure and generate your initial project build tree. Both out-of-source build tree (recommended) and non out-of-source build tree are supported. Note that when you configure your project (either via one of the build script or via cmake-gui), you can only pass the \ref Build_Options that are applicable to downstream projects. Be mindful that conflicting build options would be ignored.
 
 In your own project root directory, create a main CMakeLists.txt file and add the following lines: (replace MyProjectName and MyExecutableName with the actual names you want)
 
@@ -620,6 +620,33 @@ set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
 The setup_main_executable() macro then uses SOURCE_FILES and TARGET_NAME variables to setup a new CMake target that would work on ALL platforms supported by Urho3D. Make sure both your project name and target name are not called 'Urho3D', as this name is reserved for Urho3D project only.
 
 If you have prepared your new project as outlined above then you can use the \ref Build_Scripts "build instructions of Urho3D project" to build your own project.
+
+Sometimes you may want to have different resource directories to contain your assets than the one used by Urho3D project by convention. For example, you may have them arranged by scenes as follows:
+
+\code
+<PROJECT_ROOT>/
+ ├ bin/
+ │  ├ Scene1/
+ │  ├ Scene2/
+ │  └ Core/
+ ├ ...
+\endcode
+
+If that is the case then you have to tell both the build system and the Urho3D library (more specifically the Engine class) where the resource paths are. Using the above example, you have to tell the build system by calling the define_resource_dirs() macro explicitly and passing it the option to glob your resource directories. The define_resource_dirs() macro is actually being called internally with the default option which glob directory names based on Urho3D project convention, but your project can override that by making the call explicitly in your CMakeLists.txt.
+
+\code
+...
+
+# Define source files
+define_source_files ()
+define_resource_dirs (GLOB_PATTERNS ${CMAKE_SOURCE_DIR}/bin/Scene* ${CMAKE_SOURCE_DIR}/bin/Core)
+
+...
+\endcode
+
+You also need to inform the Urho3D library that you have non-conventional resource directory paths. You do that by setting the EP_RESOURCE_PATHS engine parameter, either programmatically during compile time or via '-p' \ref Running_Commandline "command line option" during runtime. In this case you would set it to "Scene1;Scene2;Core" instead of the default "Data;CoreData".
+
+Your project may also want to store the resource directories in other location instead of the 'bin' directory where the executable binary resides. For example when creating macOS bundle or iOS bundle, all the assets are automatically bundled into another directory outside where the executable binary resides. In fact, you can have them in a few separate parent directories and not just one. That is where the EP_RESOURCE_PREFIX_PATHS engine parameter and '-pp' command line option come into picture. With this you can define an alternate resource prefix path where your resource path would be prepended before locating your assets.
 
 \section Using_pkg_config Using pkg-config instead of CMake
 

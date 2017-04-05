@@ -1083,7 +1083,7 @@ From 1.6 to master:
 - StaticModel::SetModel() will no longer warn and redirect to AnimatedModel::SetModel() if the wrong function is called from C++ code. The AngelScript API will instead redirect properly without producing a warning.
 - Graphics::SetMode(), Graphics::GetDesktopResolution() and Graphics::GetResolutions() have gained an extra parameter to specify the monitor to use. Use Graphics::GetMonitorCount() to get the number of attached monitors. Monitor number 0 means the default primary monitor.
 - Build system - the "Urho3D-CMake-common.cmake" file is now renamed to "UrhoCommon.cmake".
-- Build system - downstream project is now responsible to add the HTML shell-file by calling the add_html_shell() macro in order to generate the HTML output when targeting Web platform, i.e. the build system defaults to JS output now, except when URHO3D_TESTING build option is set. When URHO3D_TESTING is set then it is assumed the output should be test runnable by using emrun, therefore the build system will automatically add the default HTML shell-file if none has been added yet.
+- Build system - downstream project is now responsible to add the HTML shell-file by calling the add_html_shell() macro or by passing "HTML_SHELL" option when calling the define_resource_dirs() in order to generate the HTML output when targeting Web platform, i.e. the build system defaults to JS output now, except when URHO3D_TESTING build option is set. When URHO3D_TESTING is set then it is assumed the output should be test runnable by using emrun, therefore the build system will automatically add the default HTML shell-file if none has been added yet.
 */
 
 }
