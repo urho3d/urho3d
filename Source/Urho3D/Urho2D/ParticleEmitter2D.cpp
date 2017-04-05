@@ -262,11 +262,22 @@ void ParticleEmitter2D::UpdateMaterial()
         sourceBatches_[0].material_ = 0;
 }
 
+URHO3D_EVENT(E_PARTICLESEND, ParticlesEnd) {
+}
+URHO3D_EVENT(E_PARTICLESDURATION, ParticlesDuration) {
+}
+
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
+    bool hasParticles = numParticles_ > 0;
+    bool emitting = emissionTime_ > 0.0f;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Update(timeStep);
+    if (emitting && emissionTime_ == 0.0f)
+        SendEvent(E_PARTICLESDURATION); // emitting particles stoped
+    if (hasParticles && 0 == numParticles_)
+        SendEvent(E_PARTICLESEND);      // all particles over
 }
 
 void ParticleEmitter2D::Update(float timeStep)
@@ -297,7 +308,7 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emissionTime_ >= 0.0f)
+    if (emissionTime_ > 0.0f)
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
 
