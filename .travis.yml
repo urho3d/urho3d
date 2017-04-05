@@ -435,7 +435,7 @@ after_script: rake ci_teardown_cache
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}
-osx_image: xcode8
+osx_image: xcode8.3
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -447,10 +447,11 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
-    # MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    # XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1 sdk=iphonesimulator
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=10.3 sdk=iphonesimulator
 matrix:
   fast_finish: true
 before_script:
