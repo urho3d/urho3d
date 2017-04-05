@@ -210,6 +210,8 @@ Graphics::Graphics(Context* context) :
     resizable_(false),
     highDPI_(false),
     vsync_(false),
+    monitor_(0),
+    refreshRate_(0),
     tripleBuffer_(false),
     flushGPU_(false),
     forceGL2_(false),
@@ -380,6 +382,7 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
 
     AdjustWindow(width, height, fullscreen, borderless, monitor);
     monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     if (maximize)
     {
