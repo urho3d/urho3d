@@ -922,6 +922,16 @@ namespace Urho3D
 - %ElementX : int (only if element is non-null)
 - %ElementY : int (only if element is non-null)
 
+## %Urho2D events
+
+### ParticlesEnd
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
+### ParticlesDuration
+- %Node : Node pointer
+- %Effect : ParticleEffect2D pointer
+
 
 \page AttributeList Attribute list
 
