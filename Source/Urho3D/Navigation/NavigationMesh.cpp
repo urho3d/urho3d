@@ -224,7 +224,7 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     }
 }
 
-void NavigationMesh::GetNavMeshGeometry(Vector<Vector<Vector3>>& polygons)
+void NavigationMesh::GetNavMeshGeometry(Vector<Vector<Vector3> >& polygons)
 {
 	if (!navMesh_ || !node_)
 		return;
