@@ -2103,24 +2103,24 @@ void HandleWheelChangeColor(StringHash eventType, VariantMap& eventData)
                 attributesDirty = true;
             }
         }
-		else if (coloringComponent.typeName == "Text3D") 
-		{
-			Text3D@ txt = cast<Text3D>(coloringComponent);
-			if (txt !is null) 
-			{
-				if (coloringPropertyName == "c")
-					txt.color = c;
-				else if (coloringPropertyName == "tl") 
-					txt.colors[C_TOPLEFT] = c;
-				else if (coloringPropertyName == "tr") 
-					txt.colors[C_TOPRIGHT] = c;
-				else if (coloringPropertyName == "bl") 
-					txt.colors[C_BOTTOMLEFT] = c;
-				else if (coloringPropertyName == "br") 
-					txt.colors[C_BOTTOMRIGHT] = c;
+        else if (coloringComponent.typeName == "Text3D") 
+        {
+            Text3D@ txt = cast<Text3D>(coloringComponent);
+            if (txt !is null) 
+            {
+                if (coloringPropertyName == "c")
+                    txt.color = c;
+                else if (coloringPropertyName == "tl") 
+                    txt.colors[C_TOPLEFT] = c;
+                else if (coloringPropertyName == "tr") 
+                    txt.colors[C_TOPRIGHT] = c;
+                else if (coloringPropertyName == "bl") 
+                    txt.colors[C_BOTTOMLEFT] = c;
+                else if (coloringPropertyName == "br") 
+                    txt.colors[C_BOTTOMRIGHT] = c;
                 attributesDirty = true;
-			}
-		}
+            }
+        }
     }
 
     timeToNextColoringGroupUpdate = time.systemTime + stepColoringGroupUpdate;
