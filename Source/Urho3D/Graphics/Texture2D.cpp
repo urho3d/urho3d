@@ -153,6 +153,7 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     width_ = width;
     height_ = height;
     format_ = format;
+    depth_ = 1;
     multiSample_ = multiSample;
     autoResolve_ = autoResolve;
 
