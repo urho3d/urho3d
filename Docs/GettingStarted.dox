@@ -440,20 +440,13 @@ Note that these environment variables are used by ccache itself and not by our C
 
 Xcode IDE and its CLI version, xcodebuild, do not work with ccache out of the box. They probably don't need it because internally they already cache the derived build data. However, if you are performing a lot of switching between different checked out versions of the project source tree or performing a lot of clean build similar to continuous integration build then probably it is more beneficial to hack Xcode/xcodebuild to use ccache. As it is a hack, do the following at your own risk.
 
-On Xcode 5:
-\verbatim
-cd $(dirname $(xcodebuild -find-executable clang))
-for compiler in clang clang++; do mv $compiler{,.orig} && ln -sf $(which ccache) $compiler; done
-\endverbatim
-
-On Xcode 6 or above:
 \verbatim
 cd $(dirname $(xcodebuild -find-executable clang))
 sudo cp -p $(which ccache) .
 for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done
 \endverbatim
 
-Starting since version 6, Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
+Xcode has done something funky internally. It won't build unless the symlink resolves to an executable within its own rooted-'/usr/bin' in Xcode.app package. The 'ccache' executable is physically copied to this location for this reason. But as the result, you have to manually keep this copy up to date when upgrading ccache and also repeat the whole process again as necessary when upgrading Xcode.
 
 \section Running_Xcode_AngelScript_Info macOS specific - How to view/edit AngelScript within Xcode
 
