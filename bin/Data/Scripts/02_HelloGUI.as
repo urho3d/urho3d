@@ -11,7 +11,7 @@
 #include "Scripts/Utilities/Sample.as"
 
 Window@ window;
-IntVector2 dragBeginPosition = IntVector2(0, 0);
+IntVector2 dragBeginPosition = IntVector2::ZERO;
 
 void Start()
 {

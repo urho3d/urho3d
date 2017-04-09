@@ -194,6 +194,15 @@ static void RegisterIntVector2(asIScriptEngine* engine)
     engine->RegisterObjectProperty("IntVector2", "int y", offsetof(IntVector2, y_));
     engine->RegisterGlobalFunction("IntVector2 VectorMin(const IntVector2&in, const IntVector2&in)", asFUNCTIONPR(VectorMin, (const IntVector2&, const IntVector2&), IntVector2), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector2 VectorMax(const IntVector2&in, const IntVector2&in)", asFUNCTIONPR(VectorMax, (const IntVector2&, const IntVector2&), IntVector2), asCALL_CDECL);
+
+    engine->SetDefaultNamespace("IntVector2");
+    engine->RegisterGlobalProperty("const IntVector2 ZERO", (void*)&IntVector2::ZERO);
+    engine->RegisterGlobalProperty("const IntVector2 LEFT", (void*)&IntVector2::LEFT);
+    engine->RegisterGlobalProperty("const IntVector2 RIGHT", (void*)&IntVector2::RIGHT);
+    engine->RegisterGlobalProperty("const IntVector2 UP", (void*)&IntVector2::UP);
+    engine->RegisterGlobalProperty("const IntVector2 DOWN", (void*)&IntVector2::DOWN);
+    engine->RegisterGlobalProperty("const IntVector2 ONE", (void*)&IntVector2::ONE);
+    engine->SetDefaultNamespace("");
 }
 
 static void ConstructIntVector3(IntVector3* ptr)
@@ -248,6 +257,17 @@ static void RegisterIntVector3(asIScriptEngine* engine)
     engine->RegisterObjectProperty("IntVector3", "int z", offsetof(IntVector3, z_));
     engine->RegisterGlobalFunction("IntVector3 VectorMin(const IntVector3&in, const IntVector3&in)", asFUNCTIONPR(VectorMin, (const IntVector3&, const IntVector3&), IntVector3), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector3 VectorMax(const IntVector3&in, const IntVector3&in)", asFUNCTIONPR(VectorMax, (const IntVector3&, const IntVector3&), IntVector3), asCALL_CDECL);
+
+    engine->SetDefaultNamespace("IntVector3");
+    engine->RegisterGlobalProperty("const IntVector3 ZERO", (void*)&IntVector3::ZERO);
+    engine->RegisterGlobalProperty("const IntVector3 LEFT", (void*)&IntVector3::LEFT);
+    engine->RegisterGlobalProperty("const IntVector3 RIGHT", (void*)&IntVector3::RIGHT);
+    engine->RegisterGlobalProperty("const IntVector3 UP", (void*)&IntVector3::UP);
+    engine->RegisterGlobalProperty("const IntVector3 DOWN", (void*)&IntVector3::DOWN);
+    engine->RegisterGlobalProperty("const IntVector3 FORWARD", (void*)&IntVector3::FORWARD);
+    engine->RegisterGlobalProperty("const IntVector3 BACK", (void*)&IntVector3::BACK);
+    engine->RegisterGlobalProperty("const IntVector3 ONE", (void*)&IntVector3::ONE);
+    engine->SetDefaultNamespace("");
 }
 
 static void ConstructVector2(Vector2* ptr)
@@ -331,6 +351,15 @@ static void RegisterVector2(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("IntVector2 VectorFloorToInt(const Vector2&in)", asFUNCTIONPR(VectorFloorToInt, (const Vector2&), IntVector2), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector2 VectorRoundToInt(const Vector2&in)", asFUNCTIONPR(VectorRoundToInt, (const Vector2&), IntVector2), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector2 VectorCeilToInt(const Vector2&in)", asFUNCTIONPR(VectorCeilToInt, (const Vector2&), IntVector2), asCALL_CDECL);
+
+    engine->SetDefaultNamespace("Vector2");
+    engine->RegisterGlobalProperty("const Vector2 ZERO", (void*)&Vector2::ZERO);
+    engine->RegisterGlobalProperty("const Vector2 LEFT", (void*)&Vector2::LEFT);
+    engine->RegisterGlobalProperty("const Vector2 RIGHT", (void*)&Vector2::RIGHT);
+    engine->RegisterGlobalProperty("const Vector2 UP", (void*)&Vector2::UP);
+    engine->RegisterGlobalProperty("const Vector2 DOWN", (void*)&Vector2::DOWN);
+    engine->RegisterGlobalProperty("const Vector2 ONE", (void*)&Vector2::ONE);
+    engine->SetDefaultNamespace("");
 }
 
 static void ConstructVector3(Vector3* ptr)
@@ -433,6 +462,17 @@ static void RegisterVector3(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("IntVector3 VectorFloorToInt(const Vector3&in)", asFUNCTIONPR(VectorFloorToInt, (const Vector3&), IntVector3), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector3 VectorRoundToInt(const Vector3&in)", asFUNCTIONPR(VectorRoundToInt, (const Vector3&), IntVector3), asCALL_CDECL);
     engine->RegisterGlobalFunction("IntVector3 VectorCeilToInt(const Vector3&in)", asFUNCTIONPR(VectorCeilToInt, (const Vector3&), IntVector3), asCALL_CDECL);
+
+    engine->SetDefaultNamespace("Vector3");
+    engine->RegisterGlobalProperty("const Vector3 ZERO", (void*)&Vector3::ZERO);
+    engine->RegisterGlobalProperty("const Vector3 LEFT", (void*)&Vector3::LEFT);
+    engine->RegisterGlobalProperty("const Vector3 RIGHT", (void*)&Vector3::RIGHT);
+    engine->RegisterGlobalProperty("const Vector3 UP", (void*)&Vector3::UP);
+    engine->RegisterGlobalProperty("const Vector3 DOWN", (void*)&Vector3::DOWN);
+    engine->RegisterGlobalProperty("const Vector3 FORWARD", (void*)&Vector3::FORWARD);
+    engine->RegisterGlobalProperty("const Vector3 BACK", (void*)&Vector3::BACK);
+    engine->RegisterGlobalProperty("const Vector3 ONE", (void*)&Vector3::ONE);
+    engine->SetDefaultNamespace("");
 }
 
 static void ConstructVector4(Vector4* ptr)
