@@ -929,21 +929,6 @@ macro (define_source_files)
     list (APPEND CPP_FILES ${ARG_EXTRA_CPP_FILES})
     list (APPEND H_FILES ${ARG_EXTRA_H_FILES})
     set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-    # Group the source files accordingly on IDE that supports it
-    foreach (CPP_FILE ${CPP_FILES})
-        get_filename_component (PATH ${CPP_FILE} PATH)
-        if (PATH)
-            string (REPLACE / \\ PATH ${PATH})
-            source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
-        endif ()
-    endforeach ()
-    foreach (H_FILE ${H_FILES})
-        get_filename_component (PATH ${H_FILE} PATH)
-        if (PATH)
-            string (REPLACE / \\ PATH ${PATH})
-            source_group ("Header Files\\${PATH}" FILES ${H_FILE})
-        endif ()
-    endforeach ()
     # Optionally enable PCH
     if (ARG_PCH)
         enable_pch (${ARG_PCH})
@@ -982,6 +967,7 @@ macro (define_resource_dirs)
         set (GLOB_DIRS ${GLOB_DIRS_WITH_SENTINEL})      # Convert strings back to lists, extra sentinels are harmless
     endif ()
     list (APPEND RESOURCE_DIRS ${GLOB_DIRS} ${ARG_EXTRA_DIRS})
+    source_group ("Resource Dirs" FILES ${RESOURCE_DIRS})
     # Populate all the variables required by resource packaging, if the build option is enabled
     if (URHO3D_PACKAGING AND RESOURCE_DIRS)
         foreach (DIR ${RESOURCE_DIRS})
@@ -1045,7 +1031,7 @@ macro (define_resource_dirs)
             endif ()
         endif ()
         # Group them together under 'Resources' in Xcode IDE
-        source_group (Resources FILES ${RESOURCE_DIRS} ${RESOURCE_PAKS} ${RESOURCE_FILES})
+        source_group (Resources FILES ${RESOURCE_PAKS} ${RESOURCE_FILES})     # RESOURCE_PAKS could be empty if packaging is not requested
         # But only use either paks or dirs
         if (RESOURCE_PAKS)
             set_source_files_properties (${RESOURCE_PAKS} ${RESOURCE_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
