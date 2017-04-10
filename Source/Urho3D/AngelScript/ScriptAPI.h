@@ -59,6 +59,10 @@ void RegisterDatabaseAPI(asIScriptEngine* engine);
 /// Register the inverse kinematics library to script
 void RegisterIKAPI(asIScriptEngine* engine);
 #endif
+#ifdef URHO3D_RAYCASTVEHICLE
+/// Register RaycastVehicle component to script.
+void RegisterRaycastVehicleAPI(asIScriptEngine* engine);
+#endif
 #ifdef URHO3D_PHYSICS
 /// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);

@@ -41,6 +41,9 @@
 #ifdef URHO3D_IK
 #include "../IK/IK.h"
 #endif
+#ifdef URHO3D_RAYCASTVEHICLE
+#include "../RaycastVehicle/RaycastVehicle.h"
+#endif
 #ifdef URHO3D_NAVIGATION
 #include "../Navigation/NavigationMesh.h"
 #endif
@@ -144,6 +147,10 @@ Engine::Engine(Context* context) :
 
 #ifdef URHO3D_IK
     RegisterIKLibrary(context_);
+#endif
+    
+#ifdef URHO3D_RAYCASTVEHICLE
+    RegisterRaycastVehicleLibrary(context_);
 #endif
 
 #ifdef URHO3D_PHYSICS
