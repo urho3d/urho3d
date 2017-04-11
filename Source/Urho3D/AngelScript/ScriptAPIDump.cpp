@@ -353,6 +353,24 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     }
     Sort(sortedTypes.Begin(), sortedTypes.End());
 
+    // Get global constants by namespace
+    HashMap<String, Vector<String> > globalConstants;
+    unsigned properties = scriptEngine_->GetGlobalPropertyCount();
+    for (unsigned i = 0; i < properties; ++i)
+    {
+        const char* propertyName;
+        const char* propertyDeclaration;
+        const char* propertyNameSpace;
+        int typeId;
+        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, &propertyNameSpace, &typeId);
+        propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
+
+        String type(propertyDeclaration);
+        globalConstants[String(propertyNameSpace)].Push(type + " " + String(propertyName));
+    }
+    for (HashMap<String, Vector<String> >::Iterator i = globalConstants.Begin(); i != globalConstants.End(); ++i)
+        Sort(i->second_.Begin(), i->second_.End(), ComparePropertyStrings);
+
     if (mode == DOXYGEN)
     {
         Log::WriteRaw("\\section ScriptAPI_TableOfContents Table of contents\n"
@@ -535,6 +553,27 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
                 }
             }
 
+            // Check for namespaced constants to be included in the class documentation
+            HashMap<String, Vector<String> >::ConstIterator gcIt = globalConstants.Find(typeName);
+            if (gcIt != globalConstants.End())
+            {
+                String prefix;
+                if (mode == DOXYGEN)
+                {
+                    Log::WriteRaw("\nConstants:\n\n");
+                }
+                else if (mode == C_HEADER)
+                {
+                    Log::WriteRaw("\n// Constants:\n");
+                    prefix = "static const ";
+                }
+
+                const Vector<String>& constants = gcIt->second_;
+                for (unsigned j = 0; j < constants.Size(); ++j)
+                    OutputAPIRow(mode, prefix + constants[j]);
+            }
+
+
             if (mode == DOXYGEN)
                 Log::WriteRaw("\n");
             else if (mode == C_HEADER)
@@ -619,24 +658,9 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     else if (mode == C_HEADER)
         Log::WriteRaw("\n// Global constants\n");
 
-    Vector<String> globalConstants;
-    unsigned properties = scriptEngine_->GetGlobalPropertyCount();
-    for (unsigned i = 0; i < properties; ++i)
-    {
-        const char* propertyName;
-        const char* propertyDeclaration;
-        int typeId;
-        scriptEngine_->GetGlobalPropertyByIndex(i, &propertyName, 0, &typeId);
-        propertyDeclaration = scriptEngine_->GetTypeDeclaration(typeId);
-
-        String type(propertyDeclaration);
-        globalConstants.Push(type + " " + String(propertyName));
-    }
-
-    Sort(globalConstants.Begin(), globalConstants.End(), ComparePropertyStrings);
-
-    for (unsigned i = 0; i < globalConstants.Size(); ++i)
-        OutputAPIRow(mode, globalConstants[i], true);
+    const Vector<String>& noNameSpaceConstants = globalConstants[String()];
+    for (unsigned i = 0; i < noNameSpaceConstants.Size(); ++i)
+        OutputAPIRow(mode, noNameSpaceConstants[i], true);
 
     if (mode == DOXYGEN)
         Log::WriteRaw("*/\n\n}\n");
