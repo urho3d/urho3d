@@ -5979,6 +5979,14 @@ String ToString() const;
 Array<int> data;
 int x;
 int y;
+
+// Constants:
+static const IntVector2 DOWN;
+static const IntVector2 LEFT;
+static const IntVector2 ONE;
+static const IntVector2 RIGHT;
+static const IntVector2 UP;
+static const IntVector2 ZERO;
 };
 
 class IntVector3
@@ -5999,6 +6007,16 @@ Array<int> data;
 int x;
 int y;
 int z;
+
+// Constants:
+static const IntVector3 BACK;
+static const IntVector3 DOWN;
+static const IntVector3 FORWARD;
+static const IntVector3 LEFT;
+static const IntVector3 ONE;
+static const IntVector3 RIGHT;
+static const IntVector3 UP;
+static const IntVector3 ZERO;
 };
 
 class JSONFile
@@ -14107,6 +14125,14 @@ float length;
 float lengthSquared;
 float x;
 float y;
+
+// Constants:
+static const Vector2 DOWN;
+static const Vector2 LEFT;
+static const Vector2 ONE;
+static const Vector2 RIGHT;
+static const Vector2 UP;
+static const Vector2 ZERO;
 };
 
 class Vector3
@@ -14144,6 +14170,16 @@ float lengthSquared;
 float x;
 float y;
 float z;
+
+// Constants:
+static const Vector3 BACK;
+static const Vector3 DOWN;
+static const Vector3 FORWARD;
+static const Vector3 LEFT;
+static const Vector3 ONE;
+static const Vector3 RIGHT;
+static const Vector3 UP;
+static const Vector3 ZERO;
 };
 
 class Vector4
@@ -15920,8 +15956,6 @@ uint AM_NET;
 uint AM_NODEID;
 uint AM_NODEIDVECTOR;
 uint AM_NOEDIT;
-Vector3 BACK;
-IntVector3 BACK;
 Color BLACK;
 Color BLUE;
 uint8 CHANNEL_POSITION;
@@ -15965,10 +15999,6 @@ uint DEBUGHUD_SHOW_PROFILER;
 uint DEBUGHUD_SHOW_STATS;
 uint DEFAULT_LIGHTMASK;
 uint DEFAULT_VIEWMASK;
-Vector2 DOWN;
-IntVector3 DOWN;
-Vector3 DOWN;
-IntVector2 DOWN;
 uint DRAWABLE_ANY;
 uint DRAWABLE_GEOMETRY;
 uint DRAWABLE_GEOMETRY2D;
@@ -15976,8 +16006,6 @@ uint DRAWABLE_LIGHT;
 uint DRAWABLE_ZONE;
 uint FIRST_LOCAL_ID;
 uint FIRST_REPLICATED_ID;
-Vector3 FORWARD;
-IntVector3 FORWARD;
 Color GRAY;
 Color GREEN;
 int HAT_CENTER;
@@ -16099,10 +16127,6 @@ int KEY_Y;
 int KEY_Z;
 uint LAST_LOCAL_ID;
 uint LAST_REPLICATED_ID;
-Vector2 LEFT;
-IntVector2 LEFT;
-IntVector3 LEFT;
-Vector3 LEFT;
 int LOG_DEBUG;
 int LOG_ERROR;
 int LOG_INFO;
@@ -16141,10 +16165,6 @@ uint M_MIN_UNSIGNED;
 float M_PI;
 float M_RADTODEG;
 uint NPOS;
-Vector3 ONE;
-Vector2 ONE;
-IntVector3 ONE;
-IntVector2 ONE;
 float PIXEL_SIZE;
 int QUALITY_HIGH;
 int QUALITY_LOW;
@@ -16155,10 +16175,6 @@ int QUAL_ANY;
 int QUAL_CTRL;
 int QUAL_SHIFT;
 Color RED;
-IntVector2 RIGHT;
-Vector3 RIGHT;
-Vector2 RIGHT;
-IntVector3 RIGHT;
 int SCANCODE_0;
 int SCANCODE_1;
 int SCANCODE_2;
@@ -16413,17 +16429,9 @@ String SOUND_MASTER;
 String SOUND_MUSIC;
 String SOUND_VOICE;
 Color TRANSPARENT;
-Vector2 UP;
-Vector3 UP;
-IntVector2 UP;
-IntVector3 UP;
 uint VO_DISABLE_OCCLUSION;
 uint VO_DISABLE_SHADOWS;
 uint VO_LOW_MATERIAL_QUALITY;
 uint VO_NONE;
 Color WHITE;
 Color YELLOW;
-IntVector3 ZERO;
-Vector2 ZERO;
-Vector3 ZERO;
-IntVector2 ZERO;
