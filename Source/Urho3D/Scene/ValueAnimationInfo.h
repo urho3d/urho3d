@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
+#include "../Core/Variant.h"
 #include "../Scene/AnimationDefs.h"
 
 namespace Urho3D
