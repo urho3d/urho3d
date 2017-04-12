@@ -20,7 +20,7 @@
 // THE SOFTWARE.
 //
 
-#ifdef URHO3D_PHYSICS
+#ifdef URHO3D_IK
 
 #include "../Precompiled.h"
 
