@@ -2084,9 +2084,12 @@ void Node::UpdateWorldTransform() const
 
 void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
-    // Send change event. Do not send when already being destroyed
+    // Keep a shared pointer to the child about to be removed, to make sure the erase from container completes first. Otherwise
+    // it would be possible that other child nodes get removed as part of the node's components' cleanup, causing a re-entrant
+    // erase and a crash
     SharedPtr<Node> child(*i);
 
+    // Send change event. Do not send when this node is already being destroyed
     if (Refs() > 0 && scene_)
     {
         using namespace NodeRemoved;
