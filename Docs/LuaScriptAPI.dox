@@ -2938,6 +2938,7 @@ Methods:
 - int GetMouseMoveX() const
 - int GetMouseMoveY() const
 - int GetMouseMoveWheel() const
+- Vector2 GetInputScale() const
 - unsigned GetNumTouches() const
 - TouchState* GetTouch(unsigned index) const
 - unsigned GetNumJoysticks() const
@@ -2963,6 +2964,7 @@ Properties:
 - int mouseMoveX (readonly)
 - int mouseMoveY (readonly)
 - int mouseMoveWheel (readonly)
+- Vector2 inputScale (readonly)
 - unsigned numTouches (readonly)
 - unsigned numJoysticks (readonly)
 - bool toggleFullscreen (readonly)

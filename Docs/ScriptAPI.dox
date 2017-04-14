@@ -7881,6 +7881,7 @@ Properties:
 
 - String category // readonly
 - bool focus // readonly
+- Vector2 inputScale // readonly
 - JoystickState@[] joysticks // readonly
 - JoystickState@[] joysticksByIndex // readonly
 - JoystickState@[] joysticksByName // readonly

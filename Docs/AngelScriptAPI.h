@@ -5876,6 +5876,8 @@ String category;
 /* readonly */
 bool focus;
 /* readonly */
+Vector2 inputScale;
+/* readonly */
 Array<JoystickState> joysticks;
 /* readonly */
 Array<JoystickState> joysticksByIndex;
