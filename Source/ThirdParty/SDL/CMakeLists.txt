@@ -1111,6 +1111,14 @@ elseif(WINDOWS)
   if(DIRECTX)
     # Urho3D - bug fix - use our own FindDirectX.cmake module which does not rely on DXSDK_DIR environment variable directly when DirectX SDK is being used
     # Urho3D - TODO - move the find_package(DirectX) call from Urho3D common module to here later after we have refactored the library dependency handling
+
+    check_struct_has_member (XINPUT_GAMEPAD_EX wButtons xinput.h HAVE_XINPUT_GAMEPAD_EX)
+    check_struct_has_member (XINPUT_STATE_EX dwPacketNumber xinput.h HAVE_XINPUT_STATE_EX)
+    foreach (VAR HAVE_XINPUT_GAMEPAD_EX HAVE_XINPUT_STATE_EX)
+      if (${VAR})
+        add_definitions (-D${VAR})
+      endif ()
+    endforeach ()
   endif()
 
   if(SDL_AUDIO)
