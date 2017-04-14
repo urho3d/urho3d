@@ -5979,6 +5979,14 @@ String ToString() const;
 Array<int> data;
 int x;
 int y;
+
+// Constants:
+static const IntVector2 DOWN;
+static const IntVector2 LEFT;
+static const IntVector2 ONE;
+static const IntVector2 RIGHT;
+static const IntVector2 UP;
+static const IntVector2 ZERO;
 };
 
 class IntVector3
@@ -5999,6 +6007,16 @@ Array<int> data;
 int x;
 int y;
 int z;
+
+// Constants:
+static const IntVector3 BACK;
+static const IntVector3 DOWN;
+static const IntVector3 FORWARD;
+static const IntVector3 LEFT;
+static const IntVector3 ONE;
+static const IntVector3 RIGHT;
+static const IntVector3 UP;
+static const IntVector3 ZERO;
 };
 
 class JSONFile
@@ -14107,6 +14125,14 @@ float length;
 float lengthSquared;
 float x;
 float y;
+
+// Constants:
+static const Vector2 DOWN;
+static const Vector2 LEFT;
+static const Vector2 ONE;
+static const Vector2 RIGHT;
+static const Vector2 UP;
+static const Vector2 ZERO;
 };
 
 class Vector3
@@ -14144,6 +14170,16 @@ float lengthSquared;
 float x;
 float y;
 float z;
+
+// Constants:
+static const Vector3 BACK;
+static const Vector3 DOWN;
+static const Vector3 FORWARD;
+static const Vector3 LEFT;
+static const Vector3 ONE;
+static const Vector3 RIGHT;
+static const Vector3 UP;
+static const Vector3 ZERO;
 };
 
 class Vector4

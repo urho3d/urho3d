@@ -93,7 +93,7 @@ void CreateScene()
     // inside geometry
     body.collisionLayer = 2;
     CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
-    shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+    shape.SetBox(Vector3::ONE);
 
     // Create mushrooms of varying sizes
     const uint NUM_MUSHROOMS = 60;
@@ -134,7 +134,7 @@ void CreateScene()
         // Bigger boxes will be heavier and harder to move
         body.mass = scale * 2.0f;
         CollisionShape@ shape = objectNode.CreateComponent("CollisionShape");
-        shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+        shape.SetBox(Vector3::ONE);
     }
 }
 
@@ -144,7 +144,7 @@ void CreateCharacter()
     characterNode.position = Vector3(0.0f, 1.0f, 0.0f);
 
     Node@ adjNode = characterNode.CreateChild("AdjNode");
-    adjNode.rotation = Quaternion(180, Vector3(0,1,0) );
+    adjNode.rotation = Quaternion(180.0f, Vector3::UP);
 
     // Create the rendering component + animation controller
     AnimatedModel@ object = adjNode.CreateComponent("AnimatedModel");
@@ -163,7 +163,7 @@ void CreateCharacter()
 
     // Set zero angular factor so that physics doesn't turn the character on its own.
     // Instead we will control the character yaw manually
-    body.angularFactor = Vector3(0.0f, 0.0f, 0.0f);
+    body.angularFactor = Vector3::ZERO;
 
     // Set the rigidbody to signal collision also when in rest, so that we get ground collisions properly
     body.collisionEventMode = COLLISION_ALWAYS;
@@ -259,7 +259,7 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Limit pitch
         character.controls.pitch = Clamp(character.controls.pitch, -80.0f, 80.0f);
         // Set rotation already here so that it's updated every rendering frame instead of every physics frame
-        characterNode.rotation = Quaternion(character.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
+        characterNode.rotation = Quaternion(character.controls.yaw, Vector3::UP);
 
         // Switch between 1st and 3rd person
         if (input.keyPress[KEY_F])
@@ -299,7 +299,7 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 
     // Get camera lookat dir from character yaw + pitch
     Quaternion rot = characterNode.rotation;
-    Quaternion dir = rot * Quaternion(character.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
+    Quaternion dir = rot * Quaternion(character.controls.pitch, Vector3::RIGHT);
 
     // Turn head to camera pitch, but limit to avoid unnatural animation
     Node@ headNode = characterNode.GetChild("Mutant:Head", true);
@@ -321,7 +321,7 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         Vector3 aimPoint = characterNode.position + rot * Vector3(0.0f, 1.7f, 0.0f); // You can modify x Vector3 value to translate the fixed character position (indicative range[-2;2])
 
         // Collide camera ray with static physics objects (layer bitmask 2) to ensure we see the character properly
-        Vector3 rayDir = dir * Vector3(0.0f, 0.0f, -1.0f); // For indoor scenes you can use dir * Vector3(0.0, 0.0, -0.5) to prevent camera from crossing the walls
+        Vector3 rayDir = dir * Vector3::BACK; // For indoor scenes you can use dir * Vector3(0.0, 0.0, -0.5) to prevent camera from crossing the walls
         float rayDistance = cameraDistance;
         PhysicsRaycastResult result = scene_.physicsWorld.RaycastSingle(Ray(aimPoint, rayDir), rayDistance, 2);
         if (result.body !is null)
@@ -410,13 +410,13 @@ class Character : ScriptObject
         Vector3 planeVelocity(velocity.x, 0.0f, velocity.z);
 
         if (controls.IsDown(CTRL_FORWARD))
-            moveDir += Vector3(0.0f, 0.0f, 1.0f);
+            moveDir += Vector3::FORWARD;
         if (controls.IsDown(CTRL_BACK))
-            moveDir += Vector3(0.0f, 0.0f, -1.0f);
+            moveDir += Vector3::BACK;
         if (controls.IsDown(CTRL_LEFT))
-            moveDir += Vector3(-1.0f, 0.0f, 0.0f);
+            moveDir += Vector3::LEFT;
         if (controls.IsDown(CTRL_RIGHT))
-            moveDir += Vector3(1.0f, 0.0f, 0.0f);
+            moveDir += Vector3::RIGHT;
 
         // Normalize move vector so that diagonal strafing is not faster
         if (moveDir.lengthSquared > 0.0f)
@@ -436,7 +436,7 @@ class Character : ScriptObject
             {
                 if (okToJump)
                 {
-                    body.ApplyImpulse(Vector3(0.0f, 1.0f, 0.0f) * JUMP_FORCE);
+                    body.ApplyImpulse(Vector3::UP * JUMP_FORCE);
                     okToJump = false;
                     animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
                 }
@@ -452,7 +452,7 @@ class Character : ScriptObject
         else
         {
             // Play walk animation if moving on ground, otherwise fade it out
-            if (softGrounded && !moveDir.Equals(Vector3(0.0f, 0.0f, 0.0f)))
+            if (softGrounded && !moveDir.Equals(Vector3::ZERO))
             {
                 animCtrl.PlayExclusive("Models/Mutant/Mutant_Run.ani", 0, true, 0.2f);
                 // Set walk animation speed proportional to velocity

@@ -238,9 +238,12 @@ else ()
                 else ()
                     set (CMAKE_TRY_COMPILE_CONFIGURATION Debug)
                 endif ()
+            elseif (IOS)
+                # Debug build does not produce universal binary library, so we could not test compile against the library
+                execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq armv7 RESULT_VARIABLE SKIP_COMPILE_TEST OUTPUT_QUIET ERROR_QUIET)
             endif ()
             set (COMPILER_FLAGS "${COMPILER_32BIT_FLAG} ${CMAKE_REQUIRED_FLAGS}")
-            if (URHO3D_LIB_TYPE STREQUAL MODULE)
+            if (SKIP_COMPILE_TEST OR URHO3D_LIB_TYPE STREQUAL MODULE)
                 # Module library type cannot be test linked so just assume it is a valid Urho3D module for now
                 set (URHO3D_COMPILE_RESULT 1)
             else ()
@@ -265,9 +268,8 @@ else ()
                 # Auto-discover build options used by the found library and export header
                 file (READ ${URHO3D_BASE_INCLUDE_DIR}/Urho3D.h EXPORT_HEADER)
                 if (IOS)
-                    # Since Urho3D library for iOS is a universal binary, we need another way to find out the compiler ABI when the library was built
-                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -cq 'x86_64' RESULT_VARIABLE GREP_RESULT OUTPUT_QUIET ERROR_QUIET)
-                    math (EXPR ABI_64BIT "1 - ${GREP_RESULT}")
+                    # Since Urho3D library for iOS is a universal binary (except when it was a Debug build), we need another way to find out the compiler ABI when the library was built
+                    execute_process (COMMAND lipo -info ${URHO3D_LIBRARIES} COMMAND grep -c x86_64 OUTPUT_VARIABLE ABI_64BIT ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
                 elseif (MSVC)
                     if (COMPILER_STATIC_RUNTIME_FLAGS)
                         set (EXPORT_HEADER "${EXPORT_HEADER}#define URHO3D_STATIC_RUNTIME\n")

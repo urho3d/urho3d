@@ -203,13 +203,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     // Set destination or teleport with left mouse button
     if (input.mouseButtonPress[MOUSEB_LEFT])
@@ -237,7 +237,7 @@ void SetPathPoint()
         {
             // Teleport
             currentPath.Clear();
-            jackNode.LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3(0.0f, 1.0f, 0.0f));
+            jackNode.LookAt(Vector3(pathPos.x, jackNode.position.y, pathPos.z), Vector3::UP);
             jackNode.position = pathPos;
         }
         else
@@ -332,8 +332,8 @@ void FollowPath(float timeStep)
         if (move > distance)
             move = distance;
 
-        jackNode.LookAt(nextWaypoint, Vector3(0.0f, 1.0f, 0.0f));
-        jackNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * move);
+        jackNode.LookAt(nextWaypoint, Vector3::UP);
+        jackNode.Translate(Vector3::FORWARD * move);
 
         // Remove waypoint if reached it
         if (distance < 0.1)

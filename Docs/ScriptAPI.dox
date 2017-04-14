@@ -7951,6 +7951,15 @@ Properties:
 - int x
 - int y
 
+Constants:
+
+- IntVector2 DOWN
+- IntVector2 LEFT
+- IntVector2 ONE
+- IntVector2 RIGHT
+- IntVector2 UP
+- IntVector2 ZERO
+
 <a name="Class_IntVector3"></a>
 
 ### IntVector3
@@ -7967,6 +7976,17 @@ Properties:
 - int x
 - int y
 - int z
+
+Constants:
+
+- IntVector3 BACK
+- IntVector3 DOWN
+- IntVector3 FORWARD
+- IntVector3 LEFT
+- IntVector3 ONE
+- IntVector3 RIGHT
+- IntVector3 UP
+- IntVector3 ZERO
 
 <a name="Class_JSONFile"></a>
 
@@ -14838,6 +14858,15 @@ Properties:
 - float x
 - float y
 
+Constants:
+
+- Vector2 DOWN
+- Vector2 LEFT
+- Vector2 ONE
+- Vector2 RIGHT
+- Vector2 UP
+- Vector2 ZERO
+
 <a name="Class_Vector3"></a>
 
 ### Vector3
@@ -14865,6 +14894,17 @@ Properties:
 - float x
 - float y
 - float z
+
+Constants:
+
+- Vector3 BACK
+- Vector3 DOWN
+- Vector3 FORWARD
+- Vector3 LEFT
+- Vector3 ONE
+- Vector3 RIGHT
+- Vector3 UP
+- Vector3 ZERO
 
 <a name="Class_Vector4"></a>
 

@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
+#include "../Container/Vector.h"
 #include "../Scene/AnimationDefs.h"
 
 namespace Urho3D
@@ -30,6 +32,7 @@ namespace Urho3D
 
 class Object;
 class ValueAnimation;
+class Variant;
 struct VAnimEventFrame;
 
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.
