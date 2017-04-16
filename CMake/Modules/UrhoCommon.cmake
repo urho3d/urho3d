@@ -1428,7 +1428,7 @@ macro (setup_executable)
         endif ()
         if (EMSCRIPTEN_WASM)
             # Allow emitting of code that might trap (for higher performance)
-            list (APPEND LINK_FLAGS "-s WASM=1 -s BINARYEN_IMPRECISE=1")  # TODO: BINARYEN_IMPRECISE could be renamed to BINARYEN_EMIT_POTENTIAL_TRAPS or something like that in the coming release)
+            list (APPEND LINK_FLAGS "-s WASM=1 -s \"BINARYEN_TRAP_MODE='allow'\"")
         endif ()
         if (URHO3D_TESTING)
             # Inject code into the generated Module object to enable capture of stdout, stderr and exit(); and also to enable processing of request parameters as app's arguments
