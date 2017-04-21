@@ -257,7 +257,6 @@ namespace Urho3D
 		case KEY_C:
 			if (textCopyable_ && qualifiers & QUAL_CTRL)
 			{
-				URHO3D_LOGINFO("attempting copy");
 				unsigned start = text_->GetSelectionStart();
 				unsigned length = text_->GetSelectionLength();
 
@@ -280,7 +279,6 @@ namespace Urho3D
 		case KEY_V:
 			if (editable_ && textCopyable_ && qualifiers & QUAL_CTRL)
 			{
-				URHO3D_LOGINFO("attempting paste");
 				const String& clipBoard = GetSubsystem<UI>()->GetClipboardText();
 				if (!clipBoard.Empty())
 				{
@@ -373,7 +371,6 @@ namespace Urho3D
 		case KEY_DELETE:
 			if (editable_)
 			{
-				URHO3D_LOGINFO("Deleting multi line text");
 				if (!text_->GetSelectionLength())
 				{
 					if (cursorPosition_ < line_.LengthUTF8())
@@ -495,7 +492,6 @@ namespace Urho3D
 		case KEY_BACKSPACE:
 			if (editable_)
 			{
-				URHO3D_LOGINFO("Deleting multi line text");
 				if (!text_->GetSelectionLength())
 				{
 					if (line_.LengthUTF8() && cursorPosition_)

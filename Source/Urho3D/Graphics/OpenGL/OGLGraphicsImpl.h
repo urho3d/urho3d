@@ -33,8 +33,12 @@
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(__ANDROID__) || defined (__arm__) || defined(__aarch64__) || defined (__EMSCRIPTEN__)
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include <GLES3/gl3.h>
+#include <GLES3/gl2ext.h>
+#ifndef GL_OES_standard_derivatives
+#define GL_OES_standard_derivatives 1
+#define GL_FRAGMENT_SHADER_DERIVATIVE_HINT_OES 0x8B8B
+#endif /* GL_OES_standard_derivatives */
 #else
 #include <GLEW/glew.h>
 #endif
