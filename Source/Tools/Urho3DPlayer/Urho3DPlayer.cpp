@@ -109,6 +109,7 @@ void Urho3DPlayer::Setup()
             "-gl2         Force OpenGL 2 use even if OpenGL 3 is available\n"
             "-flushgpu    Flush GPU command queue each frame. Effective only on Direct3D\n"
             "-borderless  Borderless window mode\n"
+            "-lowdpi      Force low DPI mode on Retina display\n"
             "-headless    Headless mode. No application window will be created\n"
             "-landscape   Use landscape orientations (iOS only, default)\n"
             "-portrait    Use portrait orientations (iOS only)\n"

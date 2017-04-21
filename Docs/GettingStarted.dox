@@ -400,6 +400,7 @@ The engine can be configured using the following command line options.
 -gl2         Force OpenGL 2 use even if OpenGL 3 is available
 -flushgpu    Flush GPU command queue each frame. Effective only on Direct3D
 -borderless  Borderless window mode
+-lowdpi      Force low DPI mode on Retina display
 -headless    Headless mode. No application window will be created
 -landscape   Use landscape orientations (iOS only, default)
 -portrait    Use portrait orientations (iOS only)

@@ -851,6 +851,8 @@ VariantMap Engine::ParseParameters(const Vector<String>& arguments)
                 ret[EP_FULL_SCREEN] = false;
             else if (argument == "borderless")
                 ret[EP_BORDERLESS] = true;
+            else if (argument == "lowdpi")
+                ret[EP_HIGH_DPI] = false;
             else if (argument == "s")
                 ret[EP_WINDOW_RESIZABLE] = true;
             else if (argument == "q")
