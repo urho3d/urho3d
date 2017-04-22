@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<particleeffect>
+	<material name="Materials/Smoke.xml" />
+	<numparticles value="200" />
+	<updateinvisible enable="true" />
+	<relative enable="false" />
+	<scaled enable="true" />
+	<sorted enable="true" />
+	<animlodbias value="0" />
+	<emittertype value="Sphere" />
+	<emittersize value="0 0 0" />
+	<direction min="-0.2 0.8 -0.2" max="0.2 1.1 0.2" />
+	<constantforce value="0 -0.4 0" />
+	<dampingforce value="0.1" />
+	<activetime value="0" />
+	<inactivetime value="0" />
+	<emissionrate min="12" max="14" />
+	<particlesize min="0.6 0.6" max="0.6 0.6" />
+	<timetolive min="4" max="4" />
+	<velocity min="0.2" max="0.7" />
+	<rotation min="0" max="0" />
+	<rotationspeed min="-10" max="10" />
+	<sizedelta add="0" mul="1.6" />
+	<colorfade color="0.2 0.2 0.2 0" time="0" />
+	<colorfade color="0.97 0.78 0.5 0.4" time="0" />
+	<colorfade color="0.95 0.82 0.6 0" time="4" />
+</particleeffect>
