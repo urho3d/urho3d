@@ -1,0 +1,64 @@
+$#include "Physics/RaycastVehicle.h"
+
+class RaycastVehicle : public LogicComponent
+{
+        RaycastVehicle(Urho3D::Context* context);
+        ~RaycastVehicle();
+        static void RegisterObject(Context* context);
+        virtual void ApplyAttributes();
+        void AddWheel(Node *wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
+        void ResetSuspension(void);
+        void UpdateWheelTransform(int wheel, bool interpolated);
+        Vector3 GetWheelPosition(int wheel);
+        Quaternion GetWheelRotation(int wheel);
+        Vector3 GetWheelConnectionPoint(int wheel);
+        int GetNumWheels();
+        Node *GetWheelNode(int wheel);
+        void SetSteeringValue(int wheel, float steeringValue);
+        float GetSteeringValue(int wheel) const;
+        void SetWheelSuspensionStiffness(int wheel, float stiffness);
+        float GetWheelSuspensionStiffness(int wheel) const;
+        void SetWheelDampingRelaxation(int wheel, float damping);
+        float GetWheelDampingRelaxation(int wheel) const;
+        void SetWheelDampingCompression(int wheel, float compression);
+        float GetWheelDampingCompression(int wheel) const;
+        void SetWheelFrictionSlip(int wheel, float slip);
+        float GetWheelFrictionSlip(int wheel) const;
+        void SetWheelRollInfluence(int wheel, float rollInfluence);
+        float GetWheelRollInfluence(int wheel) const;
+        void SetEngineForce(int wheel, float force);
+        float GetEngineForce(int wheel) const;
+        void SetBrake(int wheel, float force);
+        float GetBrake(int wheel) const;
+        void SetWheelRadius(int wheel, float wheelRadius);
+        float GetWheelRadius(int wheel) const;
+        void ResetWheels();
+        void SetWheelRestLength(int wheel, float length);
+        float GetWheelRestLength(int wheel) const;
+        void SetWheelSkidInfo(int wheel, float factor);
+        float GetWheelSkidInfo(int wheel) const;
+        bool WheelIsGrounded(int wheel) const;
+        void SetMaxSuspensionTravel(int wheel, float maxSuspensionTravel);
+        float GetMaxSuspensionTravel(int wheel);
+        void SetWheelDirection(int wheel, Vector3 direction);
+        Vector3 GetWheelDirection(int wheel) const;
+        void SetWheelAxle(int wheel, Vector3 axle);
+        Vector3 GetWheelAxle(int wheel) const;
+        float GetWheelSideSlipSpeed(int wheel) const;
+        float GetMaxSideSlipSpeed() const;
+        void SetMaxSideSlipSpeed(float speed);
+        void SetWheelSkidInfoCumulative(int wheel, float skid);
+        float GetWheelSkidInfoCumulative(int wheel) const;
+        bool IsFrontWheel(int wheel) const;
+        Vector3 GetContactPosition(int wheel) const;
+        Vector3 GetContactNormal(int wheel) const;
+        void SetInAirRPM(float rpm);
+        float GetInAirRPM() const;
+        void Init();
+        void FixedUpdate(float timeStep);
+        void FixedPostUpdate(float timeStep);
+        void PostUpdate(float timeStep);
+        VariantVector GetWheelDataForSave() const;
+        void SetLoadedWheelData(const VariantVector& value);
+};
+
