@@ -1114,7 +1114,7 @@ void CreateDebugHud()
 void CenterDialog(UIElement@ element)
 {
     IntVector2 size = element.size;
-    element.SetPosition((graphics.width - size.x) / 2, (graphics.height - size.y) / 2);
+    element.SetPosition((ui.root.width - size.x) / 2, (ui.root.height - size.y) / 2);
 }
 
 void CreateContextMenu()
