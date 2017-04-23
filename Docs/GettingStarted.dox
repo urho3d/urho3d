@@ -303,7 +303,7 @@ If CMake complains that emcc is not able to compile a test program, try reactiva
 \subsection Emscripten_experimental_build_options Experimental build options
 
 - EMSCRIPTEN_WASM=1. Enabling this build option to target WebAssembly. Currently the WASM output requires Firefox Nightly or Chrome Canary to run.
-- URHO3D_LIB_TYPE=MODULE. For fast iteration during development time. This build option should be avoided for for production due to reduce throughput.
+- URHO3D_LIB_TYPE=MODULE. For fast iteration during development time. This build option should be avoided for production due to reduce throughput.
 
 \section Building_64bit Native 64bit build
 
