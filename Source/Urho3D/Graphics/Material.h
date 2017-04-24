@@ -72,6 +72,9 @@ struct TechniqueEntry
     float lodDistance_;
 };
 
+///Get Texture unit from name
+//static TextureUnit ParseTextureUnitName(String name);
+
 /// Material's shader parameter animation instance.
 class ShaderParameterAnimationInfo : public ValueAnimationInfo
 {
