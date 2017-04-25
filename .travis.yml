@@ -199,7 +199,7 @@ cache: ccache
 sudo: false
 addons:
   apt:
-    sources: kubuntu-backports
+    sources: [george-edison55-precise-backports, kubuntu-backports]
     packages: [cmake, libpulse-dev]
   coverity_scan:
     project:
