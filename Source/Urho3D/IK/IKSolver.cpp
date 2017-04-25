@@ -54,6 +54,8 @@ static bool ChildrenHaveEffector(const Node* node)
         if (ChildrenHaveEffector(it->Get()))
             return true;
     }
+
+    return false;
 }
 
 // ----------------------------------------------------------------------------
