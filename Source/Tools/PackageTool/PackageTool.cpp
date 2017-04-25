@@ -145,7 +145,7 @@ void Run(const Vector<String>& arguments)
         for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
         {
             String extension = GetExtension(fileNames[i]);
-            for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
+            for (unsigned j = 0; j < ignoreExtensions_[j].Length(); ++j)
             {
                 if (extension == ignoreExtensions_[j])
                 {
