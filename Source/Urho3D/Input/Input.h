@@ -257,6 +257,8 @@ public:
     int GetMouseMoveY() const;
     /// Return mouse wheel movement since last frame.
     int GetMouseMoveWheel() const { return mouseMoveWheel_; }
+    /// Return input coordinate scaling. Should return non-unity on High DPI display.
+    Vector2 GetInputScale() const { return inputScale_; }
 
     /// Return number of active finger touches.
     unsigned GetNumTouches() const { return touches_.Size(); }

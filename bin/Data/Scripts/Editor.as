@@ -59,6 +59,12 @@ void Start()
     cache.returnFailedResources = true;
     // Use OS mouse without grabbing it
     input.mouseVisible = true;
+    // If input is scaled the double the UI size (High DPI display)
+    if (input.inputScale != Vector2::ONE)
+    {
+        // Should we use the inputScale itself to scale UI?
+        ui.scale = 2;
+    }
     // Use system clipboard to allow transport of text in & out from the editor
     ui.useSystemClipboard = true;
 }
