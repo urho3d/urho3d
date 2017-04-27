@@ -1367,7 +1367,7 @@ void AnimatedModel::UpdateMorphs()
 
                     for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
-                        if (morphs_[j].weight_ > 0.0f)
+                        if (morphs_[j].weight_ != 0.0f)
                         {
                             HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())
