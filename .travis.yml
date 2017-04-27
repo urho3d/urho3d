@@ -192,7 +192,7 @@ deploy: off
 
 ---
 
-branch: {name: Coverity-Scan, active: yes, mandatory: yes}
+branch: {name: Coverity-Scan, active: no, mandatory: yes}
 language: cpp
 compiler: gcc
 cache: ccache

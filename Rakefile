@@ -559,10 +559,6 @@ task :ci_create_mirrors do
     skip_travis = /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
     ci_only = matched ? matched[1].split(/[ ,]/).reject!(&:empty?) : nil
-    if ci_only
-      ci_only.push('Coverity-Scan') if scan
-      ci_only.push('Annotate') if annotate
-    end
   else
     ci_only = nil
   end
