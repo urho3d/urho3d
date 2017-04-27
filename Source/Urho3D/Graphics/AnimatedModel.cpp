@@ -556,10 +556,8 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         return;
 
     // If morph vertex buffers have not been created yet, create now
-    if (weight > 0.0f && morphVertexBuffers_.Empty())
+    if (weight != 0.0f && morphVertexBuffers_.Empty())
         CloneGeometries();
-
-    weight = Clamp(weight, 0.0f, 1.0f);
 
     if (weight != morphs_[index].weight_)
     {
