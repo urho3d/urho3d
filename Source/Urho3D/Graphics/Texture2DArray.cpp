@@ -187,6 +187,7 @@ bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned fo
     width_ = width;
     height_ = height;
     format_ = format;
+    depth_ = 1;
     if (layers)
         layers_ = layers;
 

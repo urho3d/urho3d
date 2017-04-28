@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file  UnrealLoader.h
  *  @brief Declaration of the .3d (UNREAL) importer class.
  */
@@ -94,7 +92,7 @@ struct TempMat  {
         ,   numFaces    (0)
     {}
 
-    TempMat(const Triangle& in)
+    explicit TempMat(const Triangle& in)
         :   type        ((Unreal::MeshFlags)in.mType)
         ,   tex         (in.mTextureNum)
         ,   numFaces    (0)

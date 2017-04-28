@@ -20,12 +20,21 @@
 # THE SOFTWARE.
 #
 
-# Check existence of stdint.h for LibCpuId
-include (CheckIncludeFiles)
-check_include_files (stdint.h HAVE_STDINT_H)
-if (HAVE_STDINT_H)
-    add_definitions (-DHAVE_STDINT_H)
-endif ()
+# Check existence of various header files and their functions required by some of the third-party libraries and Urho3D library
+# Set the CMake variables in this scope but only add the compiler defines in the respective library's scope
+include (CheckIncludeFile)
+foreach (HEADER stdint.h inttypes.h malloc.h)
+    string (TOUPPER HAVE_${HEADER} HAVE_HEADER)
+    string (REPLACE . _ HAVE_HEADER ${HAVE_HEADER})
+    check_include_file (${HEADER} ${HAVE_HEADER})
+endforeach ()
+include (CheckFunctionExists)
+foreach (FUNCT __sincosf malloc_usable_size)
+    string (TOUPPER HAVE_${FUNCT} HAVE_FUNCT)
+    check_function_exists (${FUNCT} ${HAVE_FUNCT})
+endforeach ()
+include (CheckLibraryExists)
+check_library_exists (m sincosf "" HAVE_SINCOSF)
 
 # Setup RPATH settings
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT WEB)
@@ -34,9 +43,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
     # But don't set them yet in the build tree
     set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
     if (APPLE)
-        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-            set (CMAKE_MACOSX_RPATH TRUE)
-        endif ()
+        set (CMAKE_MACOSX_RPATH TRUE)
         set (ORIGIN @loader_path)
     else ()
         set (ORIGIN $ORIGIN)
@@ -59,7 +66,7 @@ endforeach ()
 
 if (URHO3D_ANGELSCRIPT)
     add_subdirectory (ThirdParty/AngelScript)
-    if (EMSCRIPTEN OR (ARM AND NATIVE_64BIT))
+    if (WEB OR (ARM AND URHO3D_64BIT))
         add_subdirectory (ThirdParty/boost)
     endif ()
 endif ()
@@ -79,6 +86,10 @@ if (URHO3D_DATABASE_ODBC)
 endif ()
 if (URHO3D_DATABASE_SQLITE)
     add_subdirectory (ThirdParty/SQLite)
+endif ()
+
+if (URHO3D_IK)
+    add_subdirectory (ThirdParty/ik)
 endif ()
 
 if (URHO3D_NAVIGATION)

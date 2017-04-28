@@ -1,5 +1,8 @@
 $#include "Audio/SoundSource.h"
 
+// The actual enum is defined in Scene/Component.pkg
+enum AutoRemoveMode {};
+
 class SoundSource : public Component
 {
     void Play(Sound* sound);

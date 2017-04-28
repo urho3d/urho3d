@@ -36,6 +36,8 @@ URHO3D_EVENT(E_SCREENMODE, ScreenMode)
     URHO3D_PARAM(P_BORDERLESS, Borderless);        // bool
     URHO3D_PARAM(P_RESIZABLE, Resizable);          // bool
     URHO3D_PARAM(P_HIGHDPI, HighDPI);              // bool
+    URHO3D_PARAM(P_MONITOR, Monitor);              // int
+    URHO3D_PARAM(P_REFRESHRATE, RefreshRate);      // int
 }
 
 /// Window position changed.
@@ -118,6 +120,11 @@ URHO3D_EVENT(E_ENDVIEWRENDER, EndViewRender)
     URHO3D_PARAM(P_SURFACE, Surface);              // RenderSurface pointer
     URHO3D_PARAM(P_SCENE, Scene);                  // Scene pointer
     URHO3D_PARAM(P_CAMERA, Camera);                // Camera pointer
+}
+
+/// Render of all views is finished for the frame.
+URHO3D_EVENT(E_ENDALLVIEWSRENDER, EndAllViewsRender)
+{
 }
 
 /// A render path event has occurred.

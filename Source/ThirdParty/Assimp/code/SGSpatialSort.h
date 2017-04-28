@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** Small helper classes to optimise finding vertizes close to a given location
  */
 #ifndef AI_D3DSSPATIALSORT_H_INC
@@ -73,7 +71,7 @@ public:
     /** Construction from a given face array, handling smoothing groups
      *  properly
      */
-    SGSpatialSort(const std::vector<aiVector3D>& vPositions);
+    explicit SGSpatialSort(const std::vector<aiVector3D>& vPositions);
 
     // -------------------------------------------------------------------
     /** Add a vertex to the spatial sort

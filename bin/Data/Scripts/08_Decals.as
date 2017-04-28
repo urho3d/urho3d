@@ -183,13 +183,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     // Toggle debug geometry with space
     if (input.keyPress[KEY_SPACE])
@@ -219,7 +219,7 @@ void PaintDecal()
         // use full texture UV's (0,0) to (1,1). Note that if we create several decals to a large object (such as the ground
         // plane) over a large area using just one DecalSet component, the decals will all be culled as one unit. If that is
         // undesirable, it may be necessary to create more than one DecalSet based on the distance
-        decal.AddDecal(hitDrawable, hitPos, cameraNode.rotation, 0.5f, 1.0f, 1.0f, Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f));
+        decal.AddDecal(hitDrawable, hitPos, cameraNode.rotation, 0.5f, 1.0f, 1.0f, Vector2::ZERO, Vector2::ONE);
     }
 }
 

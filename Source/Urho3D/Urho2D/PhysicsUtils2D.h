@@ -56,16 +56,4 @@ inline Vector3 ToVector3(const b2Vec2& vec2)
     return Vector3(vec2.x, vec2.y, 0.0f);
 }
 
-/*
-inline bool operator == (const b2Vec2& left, const b2Vec2& right)
-{
-    return left.x == right.x && left.y == right.y;
-}
-*/
-
-inline bool operator !=(const b2Vec2& left, const b2Vec2& right)
-{
-    return left.x != right.x || left.y != right.y;
-}
-
 }

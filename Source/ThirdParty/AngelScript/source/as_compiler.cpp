@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -1959,7 +1959,7 @@ void asCCompiler::MoveArgsToStack(int funcId, asCByteCode *bc, asCArray<asCExprC
 					// If the variable is really an argument of @& type, then it is necessary
 					// to use asBC_GETOBJREF so the pointer is correctly dereferenced.
 					sVariable *var = variables->GetVariableByOffset(args[n]->type.stackOffset);
-					if (var == 0 || !var->type.IsReference())
+					if (var == 0 || !var->type.IsReference() || !var->type.IsObjectHandle())
 						bc->InstrWORD(asBC_GETREF, (asWORD)offset);
 					else
 						bc->InstrWORD(asBC_GETOBJREF, (asWORD)offset);
@@ -11197,6 +11197,8 @@ int asCCompiler::FindPropertyAccessor(const asCString &name, asCExprContext *ctx
 		ctx->property_get = getId;
 		ctx->property_set = setId;
 
+		bool isHandleSafe = ctx->type.isHandleSafe;
+
 		if( ctx->type.dataType.IsObject() )
 		{
 			// If the object is read-only then we need to remember that
@@ -11227,6 +11229,10 @@ int asCCompiler::FindPropertyAccessor(const asCString &name, asCExprContext *ctx
 		ctx->type.stackOffset = (short)offset;
 		ctx->type.isTemporary = isTemp;
 		ctx->exprNode = node;
+
+		// Remember if the object is safe, so the invocation of the property
+		// accessor doesn't needlessly make a safe copy of the handle
+		ctx->type.isHandleSafe = isHandleSafe;
 
 		// Store the argument for later use
 		if( arg )
@@ -12534,8 +12540,15 @@ int asCCompiler::CompileOverloadedDualOperator2(asCScriptNode *node, const char 
 		// Did we find an operator?
 		if( ops.GetLength() == 1 )
 		{
+			// Reserve the variables used in the right expression so the new temporary
+			// variable allocated for the left operand isn't accidentally overwritten.
+			int l = int(reservedVariables.GetLength());
+			rctx->bc.GetVarsUsed(reservedVariables);
+
 			// Process the lctx expression as get accessor
 			ProcessPropertyGetAccessor(lctx, node);
+
+			reservedVariables.SetLength(l);
 
 			asCExprContext tmpCtx(engine);
 			if (leftToRight)
@@ -12546,7 +12559,7 @@ int asCCompiler::CompileOverloadedDualOperator2(asCScriptNode *node, const char 
 				{
 					// Reserve the variables used in the right expression so the new temporary
 					// variable allocated for the left operand isn't accidentally overwritten.
-					int l = int(reservedVariables.GetLength());
+					l = int(reservedVariables.GetLength());
 					rctx->bc.GetVarsUsed(reservedVariables);
 
 					if (lctx->type.dataType.SupportHandles())

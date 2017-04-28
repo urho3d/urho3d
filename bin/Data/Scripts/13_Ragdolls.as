@@ -75,7 +75,7 @@ void CreateScene()
         CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
         // Set a box shape of size 1 x 1 x 1 for collision. The shape will be scaled with the scene node scale, so the
         // rendering and physics representation sizes should match (the box model is also 1 x 1 x 1.)
-        shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+        shape.SetBox(Vector3::ONE);
     }
 
     // Create animated models
@@ -178,13 +178,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     // "Shoot" a physics object with left mousebutton
     if (input.mouseButtonPress[MOUSEB_LEFT])
@@ -292,26 +292,26 @@ class CreateRagdoll : ScriptObject
                 Quaternion(0.0f, 0.0f, 90.0f));
 
             // Create Constraints between bones
-            CreateRagdollConstraint("Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, 1.0f),
-                Vector3(0.0f, 0.0f, 1.0f), Vector2(45.0f, 0.0f), Vector2(-10.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(-1.0f, 0.0f, 0.0f),
-                Vector3(-1.0f, 0.0f, 0.0f), Vector2(0.0f, 30.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0.0f, -1.0f, 0.0f),
-                Vector3(0.0f, 1.0f, 0.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f), false);
-            CreateRagdollConstraint("Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3(0.0f, -1.0f, 0.0f),
-                Vector3(0.0f, 1.0f, 0.0f), Vector2(45.0f, 45.0f), Vector2(0.0f, 0.0f), false);
-            CreateRagdollConstraint("Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
-            CreateRagdollConstraint("Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3(0.0f, 0.0f, -1.0f),
-                Vector3(0.0f, 0.0f, -1.0f), Vector2(90.0f, 0.0f), Vector2(0.0f, 0.0f));
+            CreateRagdollConstraint("Bip01_L_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3::BACK,
+                Vector3::FORWARD, Vector2(45.0f, 45.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_R_Thigh", "Bip01_Pelvis", CONSTRAINT_CONETWIST, Vector3::BACK,
+                Vector3::FORWARD, Vector2(45.0f, 45.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_L_Calf", "Bip01_L_Thigh", CONSTRAINT_HINGE, Vector3::BACK,
+                Vector3::BACK, Vector2(90.0f, 0.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_R_Calf", "Bip01_R_Thigh", CONSTRAINT_HINGE, Vector3::BACK,
+                Vector3::BACK, Vector2(90.0f, 0.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_Spine1", "Bip01_Pelvis", CONSTRAINT_HINGE, Vector3::FORWARD,
+                Vector3::FORWARD, Vector2(45.0f, 0.0f), Vector2(-10.0f, 0.0f));
+            CreateRagdollConstraint("Bip01_Head", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3::LEFT,
+                Vector3::LEFT, Vector2(0.0f, 30.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_L_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3::DOWN,
+                Vector3::UP, Vector2(45.0f, 45.0f), Vector2::ZERO, false);
+            CreateRagdollConstraint("Bip01_R_UpperArm", "Bip01_Spine1", CONSTRAINT_CONETWIST, Vector3::DOWN,
+                Vector3::UP, Vector2(45.0f, 45.0f), Vector2::ZERO, false);
+            CreateRagdollConstraint("Bip01_L_Forearm", "Bip01_L_UpperArm", CONSTRAINT_HINGE, Vector3::BACK,
+                Vector3::BACK, Vector2(90.0f, 0.0f), Vector2::ZERO);
+            CreateRagdollConstraint("Bip01_R_Forearm", "Bip01_R_UpperArm", CONSTRAINT_HINGE, Vector3::BACK,
+                Vector3::BACK, Vector2(90.0f, 0.0f), Vector2::ZERO);
 
             // Disable keyframe animation from all bones so that they will not interfere with the ragdoll
             AnimatedModel@ model = node.GetComponent("AnimatedModel");

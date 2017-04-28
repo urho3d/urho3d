@@ -20,24 +20,17 @@
 # THE SOFTWARE.
 #
 
-# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-if (WIN32)
-    cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
-else ()
-    cmake_minimum_required (VERSION 2.8.6)
-endif ()
+# Set CMake minimum version and CMake policy required by UrhoCommon module
+cmake_minimum_required (VERSION 3.2.3)
 if (COMMAND cmake_policy)
+    # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)
-    if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        # INTERFACE_LINK_LIBRARIES defines the link interface
-        cmake_policy (SET CMP0022 NEW)
-    endif ()
-    if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-        cmake_policy (SET CMP0026 OLD)
-        # MACOSX_RPATH is enabled by default
-        cmake_policy (SET CMP0042 NEW)
-    endif ()
+    # INTERFACE_LINK_LIBRARIES defines the link interface
+    cmake_policy (SET CMP0022 NEW)
+    # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+    cmake_policy (SET CMP0026 OLD)
+    # MACOSX_RPATH is enabled by default
+    cmake_policy (SET CMP0042 NEW)
 endif ()
 
 # Set project name
@@ -46,8 +39,8 @@ project (Urho3D)
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D Cmake common module
-include (Urho3D-CMake-common)
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
 
 # Setup SDK install destinations
 set (PATH_SUFFIX Urho3D)
@@ -60,7 +53,7 @@ else ()
     set (SCRIPT_EXT .sh)
 endif ()
 if (ANDROID)
-    # For Android platform, install to a path similar to ANDROID_LIBRARY_OUTPUT_PATH variable, e.g. libs/armeabi-v7a
+    # For Android platform, install to a path based on the chosen Android ABI, e.g. libs/armeabi-v7a
     set (LIB_SUFFIX s/${ANDROID_NDK_ABI_NAME})
 elseif (URHO3D_64BIT)
     # Install to 'lib64' when one of these conditions is true
@@ -76,9 +69,7 @@ set (DEST_LIBRARY_DIR lib${LIB_SUFFIX}/${PATH_SUFFIX})
 set (DEST_PKGCONFIG_DIR lib${LIB_SUFFIX}/pkgconfig)
 # Install application launcher scripts
 file (GLOB APP_SCRIPTS ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
-install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the Urho3D-CMake-common module
-# Install resource directories required by applications built with Urho3D library
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Autoload ${CMAKE_SOURCE_DIR}/bin/CoreData ${CMAKE_SOURCE_DIR}/bin/Data DESTINATION ${DEST_SHARE_DIR}/Resources)
+install (PROGRAMS ${APP_SCRIPTS} DESTINATION ${DEST_RUNTIME_DIR})   # DEST_RUNTIME_DIR variable is set by the set_output_directories() macro call in the UrhoCommon module
 # Install CMake modules and toolchains provided by and for Urho3D
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/CMake/ DESTINATION ${DEST_SHARE_DIR}/CMake)    # Note: the trailing slash is significant
 # Install CMake build scripts
@@ -91,7 +82,7 @@ set (CPACK_PACKAGE_DESCRIPTION_SUMMARY ${URHO3D_DESCRIPTION})
 set (URHO3D_URL "https://github.com/urho3d/Urho3D")
 set (CPACK_PACKAGE_VENDOR ${URHO3D_URL})
 set (CPACK_PACKAGE_CONTACT ${URHO3D_URL})
-execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrho3DRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process (COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/CMake/Modules/GetUrhoRevision.cmake WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE URHO3D_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set (CPACK_PACKAGE_VERSION ${URHO3D_VERSION})
 string (REGEX MATCH "([^.]+)\\.([^.]+)\\.(.+)" MATCHED ${URHO3D_VERSION})
 if (MATCHED)
@@ -109,6 +100,9 @@ elseif (IOS)
 elseif (APPLE)
     set (CPACK_SYSTEM_NAME OSX)
 elseif (WIN32)
+    if (MINGW)
+        set (CPACK_SYSTEM_NAME MinGW)   # MinGW implies Windows platform
+    endif ()
     set (CPACK_GENERATOR ZIP)
 elseif (WEB)
     set (CPACK_SYSTEM_NAME Web)
@@ -162,6 +156,8 @@ elseif (ARM_ABI_FLAGS)
     string (REGEX REPLACE .*- - CPU_NAME "${CPU_NAME}")
     string (TOUPPER "${CPU_NAME}" CPU_NAME)
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}${CPU_NAME})
+elseif (EMSCRIPTEN_WASM)
+    set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-WASM)
 endif ()
 if (NOT DEFINED ENV{RELEASE_TAG})
     set (CPACK_SYSTEM_NAME ${CPACK_SYSTEM_NAME}-snapshot)

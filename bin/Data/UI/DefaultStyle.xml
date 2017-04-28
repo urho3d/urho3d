@@ -387,4 +387,11 @@
         <attribute name="Image Rect" value="50 5 51 6" />
         <attribute name="Border" value="0 0 0 0" />
     </element>
+    <element type="TerrainEditorCheckbox" style="BorderImage">
+        <attribute name="Image Rect" value="240 0 256 16" />
+        <attribute name="Border" value="4 4 4 4" />
+        <attribute name="Checked Image Offset" value="-112 48" />
+        <attribute name="Min Size" value="34 34" />
+        <attribute name="Max Size" value="34 34" />
+    </element>
 </elements>

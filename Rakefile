@@ -54,7 +54,7 @@ task :cmake do
   platform = 'native'
   build_options = ''
   # TODO: Need to find a way to automatically populate the array with all the Urho3D supported build options, at the moment it only contains those being used in CI
-  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
+  ['URHO3D_64BIT', 'URHO3D_LIB_TYPE', 'URHO3D_STATIC_RUNTIME', 'URHO3D_PCH', 'URHO3D_BINDINGS', 'URHO3D_OPENGL', 'URHO3D_D3D11', 'URHO3D_TESTING', 'URHO3D_TEST_TIMEOUT', 'URHO3D_UPDATE_SOURCE_TREE', 'URHO3D_TOOLS', 'URHO3D_DEPLOYMENT_TARGET', 'URHO3D_USE_LIB64_RPM', 'CMAKE_BUILD_TYPE', 'CMAKE_OSX_DEPLOYMENT_TARGET', 'IOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'WIN32', 'MINGW', 'ANDROID', 'ANDROID_ABI', 'ANDROID_NATIVE_API_LEVEL', 'ANDROID_TOOLCHAIN_NAME', 'RPI', 'RPI_ABI', 'ARM', 'ARM_ABI_FLAGS', 'WEB', 'EMSCRIPTEN_SHARE_DATA', 'EMSCRIPTEN_SHARE_JS', 'EMSCRIPTEN_WASM', 'EMSCRIPTEN_EMRUN_BROWSER'].each { |var|
     ARGV << "#{var}=\"#{ENV[var]}\"" if ENV[var] && !ARGV.find { |arg| /#{var}=/ =~ arg }
   }
   ARGV.each { |option|
@@ -293,7 +293,7 @@ end
 desc 'Build and run the Annotate tool (temporary)'
 task :ci_annotate do
   system 'rake cmake URHO3D_CLANG_TOOLS=1 && rake make annotate' or abort 'Failed to annotate'
-  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/COVERITY_SCAN_THRESHOLD/URHO3D_PCH=0 URHO3D_BINDINGS=1 COVERITY_SCAN_THRESHOLD/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [skip appveyor] [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
+  system "git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git && if git fetch origin clang-tools:clang-tools 2>/dev/null; then git push -qf origin --delete clang-tools; fi && git checkout -B clang-tools && git stash -q && git reset --hard HEAD~ && git stash pop -q && sed -i \"s/SF_DEFAULT/URHO3D_PCH=0 URHO3D_BINDINGS=1 SF_DEFAULT/g\" .travis.yml && git add -A .travis.yml Source/Urho3D && if git commit -qm 'Result of Annotator tool. [skip appveyor] [ci only: clang-tools]'; then git push -q -u origin clang-tools >/dev/null 2>&1; fi" or abort 'Failed to push clang-tools branch'
 end
 
 # Usage: NOT intended to be used manually
@@ -342,7 +342,7 @@ task :ci do
   # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
   ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
-  ENV['URHO3D_TESTING'] = '1' if ((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['WEB'] || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']
+  ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
   # When not explicitly specified then use generic generator
   generator = ENV['XCODE'] ? 'xcode' : (ENV['APPVEYOR'] && !ENV['MINGW'] ? 'vs2015' : '')
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu LTS 12.04 as its GCC cross-compiler version is too old, wait until we have Ubuntu LTS 14.04
@@ -365,7 +365,7 @@ task :ci do
     $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
     next
   end
-  if ENV['URHO3D_TESTING'] && !timeup
+  if ENV['URHO3D_TESTING'] && !ENV['WEB'] && !timeup
     # Multi-config CMake generators use different test target name than single-config ones for no good reason
     test = "rake make target=#{(ENV['OS'] && !ENV['MINGW']) || ENV['XCODE'] ? 'RUN_TESTS' : 'test'}"
     system "#{test}" or abort 'Failed to test Urho3D library'
@@ -400,7 +400,7 @@ task :ci do
     # Second test - create a new project on the fly that uses newly built Urho3D library in the build tree
     Dir.chdir scaffolding "#{ENV['APPVEYOR'] ? '' : '../Build/'}UsingBuildTree" do
       puts "Configuring downstream project using Urho3D library in its build tree...\n\n"; $stdout.flush
-      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? '../../Build' : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
+      system "rake cmake #{generator} URHO3D_HOME=#{ENV['APPVEYOR'] ? "../../#{ENV['build_tree']}" : '..'} URHO3D_LUA=1 && rake make #{test}" or abort 'Failed to configure/build/test temporary downstream project using Urho3D as external library'
     end
   end
   # Make, deploy, and test run Android APK in an Android (virtual) device
@@ -425,6 +425,12 @@ task :ci_setup_cache do
   # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
   if ENV['APPVEYOR']
     system "bash -c 'rm -rf #{ENV['build_tree']}'" if clear
+    if File.exists?("#{ENV['build_tree']}/.commits")
+      # Find the last valid commit SHA because the recorded commit SHAs may no longer be valid due to git reset/forced push
+      last_commit = File.read("#{ENV['build_tree']}/.commits").split.find { |sha| system "git cat-file -e #{sha}" }
+      # AppVeyor prefers CMD's FIND over MSYS's find, so we have to use fully qualified path to the MSYS's find
+      system "bash -c '/c/Program\\ Files/Git/usr/bin/find CMakeLists.txt CMake Docs Source |xargs touch -r #{ENV['build_tree']}/CMakeCache.txt && touch $(git diff --name-only #{last_commit} #{ENV['APPVEYOR_REPO_COMMIT']})'"
+    end
     next
   # Use internal cache store instead of using Travis CI one (this is a workaround for using ccache on Travis CI legacy build infra)
   elsif ENV['USE_CCACHE'].to_i == 2
@@ -449,7 +455,11 @@ desc 'Teardown build cache'
 task :ci_teardown_cache do
   # AppVeyor on Windows host has different kind of cache mechanism, not based on ccache
   if ENV['APPVEYOR']
-    # No-op for now
+    # Keep the last 10 commit SHAs
+    commits = (File.exists?("#{ENV['build_tree']}/.commits") ? File.read("#{ENV['build_tree']}/.commits").split : []).unshift(`git rev-parse #{ENV['APPVEYOR_REPO_COMMIT']}`.chomp).take 10
+    File.open("#{ENV['build_tree']}/.commits", 'w') { |file| file.puts commits } if Dir.exist?(ENV['build_tree'])
+    # Exclude build artifacts from being cached due to cache size limitation
+    system "bash -c 'rm -f #{ENV['build_tree']}/bin/*.{exe,dll}'"
     next
   # Upload cache to internal cache store if it is our own
   elsif ENV['USE_CCACHE'].to_i == 2
@@ -540,8 +550,8 @@ task :ci_create_mirrors do
   # Reset the head to the original commit position for mirror creation
   system 'git checkout -qf $TRAVIS_COMMIT' if head_moved
   system 'git config user.name $GIT_NAME && git config user.email $GIT_EMAIL && git remote set-url --push origin https://$GH_TOKEN@github.com/$TRAVIS_REPO_SLUG.git' or abort 'Failed to re-checkout commit'
-  # Limit the scanning to only master branch and limit the frequency of scanning
-  scan = ENV['TRAVIS_BRANCH'] == 'master' && ((/\[cache clear\]/ !~ ENV['COMMIT_MESSAGE'] && `ccache -s |grep 'cache miss'`.split.last.to_i >= ENV['COVERITY_SCAN_THRESHOLD'].to_i) || /\[ci scan\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
+  # Limit the scanning to only master branch
+  scan = ENV['TRAVIS_BRANCH'] == 'master'
   # Check if it is time to generate annotation
   annotate = ENV['TRAVIS_BRANCH'] == 'master' && (ENV['PACKAGE_UPLOAD'] || /\[ci annotate\]/ =~ ENV['COMMIT_MESSAGE']) && /\[ci only:.*?\]/ !~ ENV['COMMIT_MESSAGE']
   # Determine which CI mirror branches to be auto created
@@ -549,10 +559,6 @@ task :ci_create_mirrors do
     skip_travis = /\[skip travis\]/ =~ ENV['COMMIT_MESSAGE']   # For feature parity with AppVeyor's [skip appveyor]
     matched = /\[ci only:(.*?)\]/.match(ENV['COMMIT_MESSAGE'])
     ci_only = matched ? matched[1].split(/[ ,]/).reject!(&:empty?) : nil
-    if ci_only
-      ci_only.push('Coverity-Scan') if scan
-      ci_only.push('Annotate') if annotate
-    end
   else
     ci_only = nil
   end
@@ -702,24 +708,17 @@ def scaffolding dir, project = 'Scaffolding', target = 'Main'
   end
   dir.gsub!(/\//, '\\') if ENV['OS']
   build_script = <<EOF
-# Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-if (WIN32)
-    cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
-else ()
-    cmake_minimum_required (VERSION 2.8.6)
-endif ()
+# Set CMake minimum version and CMake policy required by UrhoCommon module
+cmake_minimum_required (VERSION 3.2.3)
 if (COMMAND cmake_policy)
+    # Libraries linked via full path no longer produce linker search paths
     cmake_policy (SET CMP0003 NEW)
-    if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-        # INTERFACE_LINK_LIBRARIES defines the link interface
-        cmake_policy (SET CMP0022 NEW)
-    endif ()
-    if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-        cmake_policy (SET CMP0026 OLD)
-        # MACOSX_RPATH is enabled by default
-        cmake_policy (SET CMP0042 NEW)
-    endif ()
+    # INTERFACE_LINK_LIBRARIES defines the link interface
+    cmake_policy (SET CMP0022 NEW)
+    # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+    cmake_policy (SET CMP0026 OLD)
+    # MACOSX_RPATH is enabled by default
+    cmake_policy (SET CMP0042 NEW)
 endif ()
 
 # Set project name
@@ -728,8 +727,8 @@ project (#{project})
 # Set CMake modules search path
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
 
-# Include Urho3D CMake common module
-include (Urho3D-CMake-common)
+# Include UrhoCommon.cmake module after setting project name
+include (UrhoCommon)
 
 # Define target name
 set (TARGET_NAME #{target})
@@ -821,7 +820,7 @@ def android_wait_for_device retries = -1, retry_interval = 10, package = 'androi
   return retries == 0 ? nil : 0
 end
 
-def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/CoreData/', payload = 'sleep 30'
+def android_test_run parameter = '--es pickedLibrary Urho3DPlayer:Scripts/NinjaSnowWar.as', intent = '.SampleLauncher', package = 'com.github.urho3d', success_indicator = 'Added resource path /apk/', payload = 'sleep 30'
   # The device should have been found at this point
   return nil unless $specific_device
   # Capture adb's stdout and interpret it because adb neither uses stderr nor returns proper exit code on error

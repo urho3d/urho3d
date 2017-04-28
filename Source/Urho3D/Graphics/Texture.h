@@ -82,7 +82,7 @@ public:
     /// Return height.
     int GetHeight() const { return height_; }
 
-    /// Return height.
+    /// Return depth.
     int GetDepth() const { return depth_; }
 
     /// Return filtering mode.

@@ -103,7 +103,7 @@ void Graphics::SetOrientations(const String& orientations)
 
 bool Graphics::ToggleFullscreen()
 {
-    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_);
+    return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
 }
 
 void Graphics::SetShaderParameter(StringHash param, const Variant& value)
@@ -172,25 +172,26 @@ IntVector2 Graphics::GetWindowPosition() const
     return IntVector2::ZERO;
 }
 
-PODVector<IntVector2> Graphics::GetResolutions() const
+PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
 {
-    PODVector<IntVector2> ret;
+    PODVector<IntVector3> ret;
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(0);
+    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
 
     for (unsigned i = 0; i < numModes; ++i)
     {
         SDL_DisplayMode mode;
-        SDL_GetDisplayMode(0, i, &mode);
+        SDL_GetDisplayMode(monitor, i, &mode);
         int width = mode.w;
         int height = mode.h;
+        int rate = mode.refresh_rate;
 
         // Store mode if unique
         bool unique = true;
         for (unsigned j = 0; j < ret.Size(); ++j)
         {
-            if (ret[j].x_ == width && ret[j].y_ == height)
+            if (ret[j].x_ == width && ret[j].y_ == height && ret[j].z_ == rate)
             {
                 unique = false;
                 break;
@@ -198,23 +199,28 @@ PODVector<IntVector2> Graphics::GetResolutions() const
         }
 
         if (unique)
-            ret.Push(IntVector2(width, height));
+            ret.Push(IntVector3(width, height, rate));
     }
 #endif
 
     return ret;
 }
 
-IntVector2 Graphics::GetDesktopResolution() const
+IntVector2 Graphics::GetDesktopResolution(int monitor) const
 {
 #if !defined(__ANDROID__) && !defined(IOS)
     SDL_DisplayMode mode;
-    SDL_GetDesktopDisplayMode(0, &mode);
+    SDL_GetDesktopDisplayMode(monitor, &mode);
     return IntVector2(mode.w, mode.h);
 #else
     // SDL_GetDesktopDisplayMode() may not work correctly on mobile platforms. Rather return the window size
     return IntVector2(width_, height_);
 #endif
+}
+
+int Graphics::GetMonitorCount() const
+{
+    return SDL_GetNumVideoDisplays();
 }
 
 void Graphics::Maximize()

@@ -155,8 +155,9 @@ void UI::SetCursor(Cursor* cursor)
 
         IntVector2 pos = cursor_->GetPosition();
         const IntVector2& rootSize = rootElement_->GetSize();
-        pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
-        pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
+        const IntVector2& rootPos = rootElement_->GetPosition();
+        pos.x_ = Clamp(pos.x_, rootPos.x_, rootPos.x_ + rootSize.x_ - 1);
+        pos.y_ = Clamp(pos.y_, rootPos.y_, rootPos.y_ + rootSize.y_ - 1);
         cursor_->SetPosition(pos);
     }
 }
@@ -411,8 +412,9 @@ void UI::RenderUpdate()
     batches_.Clear();
     vertexData_.Clear();
     const IntVector2& rootSize = rootElement_->GetSize();
+    const IntVector2& rootPos = rootElement_->GetPosition();
     // Note: the scissors operate on unscaled coordinates. Scissor scaling is only performed during render
-    IntRect currentScissor = IntRect(0, 0, rootSize.x_, rootSize.y_);
+    IntRect currentScissor = IntRect(rootPos.x_, rootPos.y_, rootPos.x_ + rootSize.x_, rootPos.y_ + rootSize.y_);
     if (rootElement_->IsVisible())
         GetBatches(rootElement_, currentScissor);
 
@@ -466,7 +468,10 @@ void UI::DebugDraw(UIElement* element)
     if (element)
     {
         const IntVector2& rootSize = rootElement_->GetSize();
-        element->GetDebugDrawBatches(debugDrawBatches_, debugVertexData_, IntRect(0, 0, rootSize.x_, rootSize.y_));
+        const IntVector2& rootPos = rootElement_->GetPosition();
+        element->GetDebugDrawBatches(debugDrawBatches_, debugVertexData_, IntRect(rootPos.x_, rootPos.y_,
+                                                                                  rootPos.x_ + rootSize.x_,
+                                                                                  rootPos.y_ + rootSize.y_));
     }
 }
 
@@ -640,14 +645,22 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
     IntVector2 positionCopy(position);
     const IntVector2& rootSize = rootElement_->GetSize();
+    const IntVector2& rootPos = rootElement_->GetPosition();
+
+    // If position is out of bounds of root element return null.
+    if (position.x_ < rootPos.x_ || position.x_ > rootPos.x_ + rootSize.x_)
+        return 0;
+
+    if (position.y_ < rootPos.y_ || position.y_ > rootPos.y_ + rootSize.y_)
+        return 0;
 
     // If UI is smaller than the screen, wrap if necessary
     if (rootSize.x_ > 0 && rootSize.y_ > 0)
     {
-        if (positionCopy.x_ >= rootSize.x_)
-            positionCopy.x_ %= rootSize.x_;
-        if (positionCopy.y_ >= rootSize.y_)
-            positionCopy.y_ %= rootSize.y_;
+        if (positionCopy.x_ >= rootPos.x_ + rootSize.x_)
+            positionCopy.x_ = rootPos.x_ + ((positionCopy.x_ - rootPos.x_) % rootSize.x_);
+        if (positionCopy.y_ >= rootPos.y_ + rootSize.y_)
+            positionCopy.y_ = rootPos.y_ + ((positionCopy.y_ - rootPos.y_) % rootSize.y_);
     }
 
     UIElement* result = 0;
@@ -995,14 +1008,17 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                                 i += (toSkip - 1);
                         }
                     }
+                    // Note: we cannot check for the up / left limits of positioning, since the element may be off the visible
+                    // screen but some of its layouted children will yet be visible. In down & right directions we can terminate
+                    // the loop, since all further children will be further down or right.
                     else if (parentLayoutMode == LM_HORIZONTAL)
                     {
-                        if (element->GetScreenPosition().x_ >= rootElement_->GetSize().x_)
+                        if (element->GetScreenPosition().x_ >= rootElement_->GetPosition().x_ + rootElement_->GetSize().x_)
                             break;
                     }
                     else if (parentLayoutMode == LM_VERTICAL)
                     {
-                        if (element->GetScreenPosition().y_ >= rootElement_->GetSize().y_)
+                        if (element->GetScreenPosition().y_ >= rootElement_->GetPosition().y_ + rootElement_->GetSize().y_)
                             break;
                     }
                 }
@@ -1491,6 +1507,7 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
 
     Input* input = GetSubsystem<Input>();
     const IntVector2& rootSize = rootElement_->GetSize();
+    const IntVector2& rootPos = rootElement_->GetPosition();
 
     IntVector2 DeltaP = IntVector2(eventData[P_DX].GetInt(), eventData[P_DY].GetInt());
 
@@ -1506,8 +1523,8 @@ void UI::HandleMouseMove(StringHash eventType, VariantMap& eventData)
                 IntVector2 pos = cursor_->GetPosition();
                 pos.x_ += eventData[P_DX].GetInt();
                 pos.y_ += eventData[P_DY].GetInt();
-                pos.x_ = Clamp(pos.x_, 0, rootSize.x_ - 1);
-                pos.y_ = Clamp(pos.y_, 0, rootSize.y_ - 1);
+                pos.x_ = Clamp(pos.x_, rootPos.x_, rootPos.x_ + rootSize.x_ - 1);
+                pos.y_ = Clamp(pos.y_, rootPos.y_, rootPos.y_ + rootSize.y_ - 1);
                 cursor_->SetPosition(pos);
             }
         }

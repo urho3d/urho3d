@@ -151,7 +151,7 @@ void MyObject::OnUpdate(StringHash type, VariantMap& args)
 
 }
 
-SubscribeToEvent(E_UPDATE, std::bind(&MyObject::OnUpdate, this)));
+SubscribeToEvent(E_UPDATE, std::bind(&MyObject::OnUpdate, this, std::placeholders::_1, std::placeholders::_2)));
 \endcode
 
 std::bind() discarding unneeded parameters:
@@ -161,6 +161,8 @@ void Class::OnUpdate(VariantMap& args)
 {
 
 }
+
+using namespace std::placeholders;
 
 SubscribeToEvent(E_UPDATE, std::bind(&Class::OnUpdate, this, _2)));
 \endcode
@@ -208,6 +210,8 @@ The full list of supported parameters, their datatypes and default values: (also
 - ForceGL2 (bool) When true, forces OpenGL 2 use even if OpenGL 3 is available. No effect on Direct3D or mobile builds. Default false.
 - Multisample (int) Hardware multisampling level. Default 1 (no multisampling.)
 - Orientations (string) Space-separated list of allowed orientations. Effective only on iOS. All possible values are "LandscapeLeft", "LandscapeRight", "Portrait" and "PortraitUpsideDown". Default "LandscapeLeft LandscapeRight".
+- Monitor (int) Monitor number to use. 0 is the default (primary) monitor.
+- RefreshRate (int) Monitor refresh rate in Hz to use.
 - DumpShaders (string) Filename to dump used shader variations to for precaching.
 - %RenderPath (string) Default renderpath resource name. Default empty, which causes forward rendering (bin/CoreData/RenderPaths/Forward.xml) to be used.
 - Shadows (bool) Shadow rendering enable. Default true.
@@ -395,6 +399,12 @@ Just loading or saving whole scenes is not flexible enough for eg. games where n
 - Using the "node" command in AssetImporter, which will save the scene node hierarchy and any models contained in the input asset (eg. a Collada file)
 
 To instantiate the saved node into a scene, call \ref Scene::Instantiate "Instantiate()", \ref Scene::InstantiateJSON() or \ref Scene::InstantiateXML "InstantiateXML()" depending on the format. The node will be created as a child of the Scene but can be freely reparented after that. Position and rotation for placing the node need to be specified. The NinjaSnowWar example uses XML format for its object prefabs; these exist in the bin/Data/Objects directory.
+
+\section SceneModel_Events Scene graph events
+
+The Scene object sends events on scene graph modification, such as nodes or components being added or removed, the enabled status of a node or component being 
+changed, or name or tags being changed. These are used in the Editor to implement keeping the scene hierarchy window up to date. See the include file
+SceneEvents.h. Note that when a node is removed from the scene, individual component removals are not signaled.
 
 \section SceneModel_FurtherInformation Further information
 
@@ -2718,6 +2728,8 @@ There are some things to watch out for:
 
 - Nodes have the concept of the \ref Node::SetOwner "owner connection" (for example the player that is controlling a specific game object), which can be set in server code. This property is not replicated to the client. Messages or remote events can be used instead to tell the players what object they control.
 
+- If you want to run the same server logic for both the locally connecting client as well as remote clients, you can use both the server & client functionality in Network subsystem simultaneously. However in this case you need 2 copies of the scene: server and client. Only the client scene should be rendered on the local client, while the server scene is used for simulation only.
+
 \section Network_InterestManagement Interest management
 
 %Scene replication includes a simple, distance-based interest management mechanism for reducing bandwidth use. To use, create the NetworkPriority component to a Node you wish to apply interest management to. The component can be created as local, as it is not important to the clients.
@@ -3211,11 +3223,13 @@ The -c option enables LZ4 compression on the files. The -q option enables the op
 \section Tools_RampGenerator RampGenerator
 
 Creates 1D and 2D ramp textures for use in light attenuation and spotlight spot shapes.
+Alternatively bakes the image from .ies input file.
 
 Usage:
 
 \verbatim
 RampGenerator <output file> <width> <power> [dimensions]
+RampGenerator <input file> <output png file> <width> [dimensions]
 \endverbatim
 
 The output is saved in PNG format. The power parameter is fed into the pow() function to determine ramp shape; higher value gives more brightness and more abrupt fade at the edge.

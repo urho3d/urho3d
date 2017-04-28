@@ -29,10 +29,6 @@ define_source_files (GLOB_CPP_PATTERNS src/*.c GLOB_H_PATTERNS src/*.h EXCLUDE_P
 # Define dependency libs
 if (READLINE_FOUND)
     add_definitions (-DLUA_USE_READLINE)
-    # FIXME: temporary quick fix
-    if (RPI AND CMAKE_CROSSCOMPILING)
-        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
-    endif ()
     list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
     list (APPEND LIBS ${READLINE_LIBRARIES})
 endif ()

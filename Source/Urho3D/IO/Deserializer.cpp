@@ -309,6 +309,9 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_INT:
         return Variant(ReadInt());
 
+    case VAR_INT64:
+        return Variant(ReadInt64());
+
     case VAR_BOOL:
         return Variant(ReadBool());
 

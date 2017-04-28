@@ -223,7 +223,11 @@ void CollisionShape2D::CreateFixture()
     // Chain shape must have atleast two vertices before creating fixture
     if (fixtureDef_.shape->m_type != b2Shape::e_chain || static_cast<const b2ChainShape*>(fixtureDef_.shape)->m_count >= 2)
     {
+        b2MassData massData;
+        body->GetMassData(&massData);
         fixture_ = body->CreateFixture(&fixtureDef_);
+        if (!rigidBody_->GetUseFixtureMass()) // Workaround for resetting mass in CreateFixture().
+            body->SetMassData(&massData);
         fixture_->SetUserData(this);
     }
 }
@@ -240,7 +244,11 @@ void CollisionShape2D::ReleaseFixture()
     if (!body)
         return;
 
+    b2MassData massData;
+    body->GetMassData(&massData);
     body->DestroyFixture(fixture_);
+    if (!rigidBody_->GetUseFixtureMass()) // Workaround for resetting mass in DestroyFixture().
+        body->SetMassData(&massData);
     fixture_ = 0;
 }
 

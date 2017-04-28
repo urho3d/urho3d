@@ -43,8 +43,8 @@ matrix:
     - compiler: gcc
   include:
     - &Linux-64bit
-      addons: {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [g++-4.9, &linux_packages [*default_packages, libasound2-dev, libpulse-dev, rpm]]}}
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 COVERITY_SCAN_THRESHOLD=100 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
+      addons: {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [g++-4.9, &linux_packages [*default_packages, libpulse-dev, rpm]]}}
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC URHO3D_UPDATE_SOURCE_TREE=1 SF_DEFAULT=linux:Linux-64bit-STATIC.tar.gz
     - &Linux-64bit-shared
       addons: {apt: {sources: *default_sources, packages: *linux_packages}}
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -104,24 +104,24 @@ matrix:
     # env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_D3D11=1
 before_script:
   - rake ci_timer
-  - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
   # Travis-CI has a special case handling for release tag where it checks out directly from the tag branch instead of the default 'master' branch
-  - if [ $RELEASE_TAG ] || ([ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]); then if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ]; then export SITE_UPDATE=1; fi; if [ "$CC" == "gcc" ] && ([ $RELEASE_TAG ] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
-  - if [ $LINUX ]; then if [ "$URHO3D_64BIT" == "0" ]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
-  - if [ $WIN32 ]; then if [ "$URHO3D_64BIT" == "0" ]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
+  - if [[ $RELEASE_TAG ]] || ([[ "$TRAVIS_BRANCH" == "master" ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]); then if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]]; then export SITE_UPDATE=1; fi; if [[ "$CC" == "gcc" ]] && ([[ $RELEASE_TAG ]] || echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi; fi
+  - if [[ $LINUX ]]; then if [[ "$URHO3D_64BIT" == "0" ]]; then export CMAKE_PREFIX_PATH=/usr/lib/i386-linux-gnu; else export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start; fi; fi
+  - if [[ $WIN32 ]]; then if [[ "$URHO3D_64BIT" == "0" ]]; then export ARCH=i686; else export ARCH=x86_64; fi && export MINGW_PREFIX=/usr/bin/${ARCH}-w64-mingw32; fi
   # MinGW package on Ubuntu 12.04 LTS does not come with d3dcompiler.h file which is required by our CI build with URHO3D_OPENGL=0.
   # Temporarily workaround the problem by downloading the missing header from Ubuntu 14.04 LTS source package.
-  - if [ $URHO3D_OPENGL ]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty https://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
+  - if [[ $URHO3D_OPENGL ]]; then mkdir -p ../Build/{,generated/{UsingBuildTree,UsingSDK}/}include/Urho3D/ThirdParty && wget -P ../Build/include/Urho3D/ThirdParty https://bazaar.launchpad.net/~ubuntu-branches/ubuntu/trusty/mingw-w64/trusty/download/package-import%40ubuntu.com-20130624192537-vzn12bb7qd5w3iy8/d3dcompiler.h-20120402093420-bk10a737hzitlkgj-65/d3dcompiler.h && for d in UsingBuildTree UsingSDK; do bash -c "cd ../Build/generated/$d/include/Urho3D/ThirdParty && ln -s ../../../../../include/Urho3D/ThirdParty/d3dcompiler.h ."; done; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $URHO3D_BINDINGS ]; then git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang && export CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH; fi
+  - if [[ $URHO3D_BINDINGS ]]; then git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang && export CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done && export PATH=$HOME:$PATH; fi
   # For some reason clang compiler toolchain installation in Travis CI VM does not have symlink in the ccache symlinks directory, so workaround it
-  - if [ "$CC"  == "clang" ]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
+  - if [[ "$CC"  == "clang" ]]; then ln -s $(which ccache) $HOME/clang && ln -s $(which ccache) $HOME/clang++ && export PATH=$HOME:$PATH; fi
   - rake ci_setup_cache
-script: rake ci && if [ $SITE_UPDATE ]; then rake ci_site_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload && if [ $LINUX ] && [ ! "$URHO3D_64BIT" == "0" ]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
+script: rake ci && if [[ $SITE_UPDATE ]]; then rake ci_site_update; fi && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload && if [[ $LINUX ]] && [[ ! "$URHO3D_64BIT" == "0" ]]; then rake ci_package_upload URHO3D_USE_LIB64_RPM=1; fi; fi && rake ci_timer
 after_script:
   - rake ci_teardown_cache
-  - if [ ${TRAVIS_JOB_NUMBER##*.} == 1 ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then rake ci_create_mirrors; fi
+  - if [[ ${TRAVIS_JOB_NUMBER##*.} == 1 ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then rake ci_create_mirrors; fi
 notifications: {email: {on_success: never, on_failure: change}}
 
 ---
@@ -133,9 +133,13 @@ platform:
   - x64
 clone_depth: 50
 cache:
-  - C:\tools\mingw32 -> .appveyor.yml
-  - C:\tools\mingw64 -> .appveyor.yml
-  - mingw-Build
+  # AppVeyor seems to restore caches based on the job ordering alone, it does not use the env-vars as the key like Travis
+  # Therefore, we are forced to list out all the cache items for our master CI and MinGW CI builds here
+  # Build
+  # mingw-Build
+  # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
+  - C:\tools\mingw32
+  - C:\tools\mingw64
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -158,30 +162,29 @@ environment:
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-install:
+before_build:
   - rake ci_timer
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
+  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT);
+        if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -notmatch "[^-]+-[^-]+-CI" -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE)))
         {
           $env:PACKAGE_UPLOAD = "1";
-          if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
           do { "Installing doxygen and graphviz..."; choco install doxygen.portable graphviz.portable >$null } until ($?);
         }
         else
         {
+          $env:URHO3D_TOOLS = "0";
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
   - if "%PLATFORM%" == "x64" (set "URHO3D_64BIT=1" && set "MINGW_URL=%x86_64-posix-seh%" && set "ARCH=64") else (set "MINGW_URL=%i686-posix-dwarf%" && set "ARCH=32")
   - if not exist "C:\tools\mingw%ARCH%" curl -fsSL -o "mingw.7z" -O "%MINGW_URL%" && 7z x -y -o"C:\tools" "mingw.7z" >nul && echo "Installed MinGW compiler toolchain to C:\tools"
   - set "PATH=C:\tools\mingw%ARCH%\bin;%PATH%"
-before_build:
-  - set "APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%~"
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
-  - rake ci_setup_cache
+  # rake ci_setup_cache
 build_script:
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
-after_build: rake ci_teardown_cache
+#after_build: rake ci_teardown_cache
 test: off
 artifacts:
   - path: .\*.zip
@@ -196,7 +199,8 @@ cache: ccache
 sudo: false
 addons:
   apt:
-    packages: [libasound2-dev, libpulse-dev]
+    sources: [george-edison55-precise-backports, kubuntu-backports]
+    packages: [cmake, libpulse-dev]
   coverity_scan:
     project:
       name: urho3d/Urho3D
@@ -229,7 +233,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libasound2-dev, libpulse-dev]}}
+addons: {apt: {sources: [kubuntu-backports, ubuntu-toolchain-r-test], packages: [cmake, g++-4.9, libpulse-dev]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -257,7 +261,7 @@ cache: {directories: $HOME/.ccache}
 android: {components: [build-tools-22.0.1]}
 jdk: oraclejdk8
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz, g++-multilib]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -271,18 +275,18 @@ env:
     - CCACHE_MAXSIZE=100M
   matrix:
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
-    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level 21
+    - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level android-21
     - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
-    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21  # 9 is the default but at least 12 is needed when LuaJIT is enabled
-    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=21
-    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC          # Using default native API Level 9
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21  # android-9 is the default but at least android-12 is needed when LuaJIT is enabled
+    - ANDROID_ABI=x86    ANDROID_TOOLCHAIN_NAME=x86-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86-android-21 ANDROID_NATIVE_API_LEVEL=android-21
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC          # Using default native API Level android-9
     - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
 matrix:
   fast_finish: true
   include:
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
     - addons: &newer_gcc {apt: {sources: [*default_sources, ubuntu-toolchain-r-test], packages: [*default_packages, g++-4.9]}}
-      env: ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level 21
+      env: ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level android-21
     - addons: {<<: *newer_gcc}
       env: ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
 before_script:
@@ -290,13 +294,13 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([ $AVD ] || [ $PACKAGE_UPLOAD ]) && [ $INSTALL ]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
-  - if [ "$ANDROID_ABI" == "arm64-v8a" ]; then export PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
+  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - git clone --depth 1 --branch strip https://github.com/urho3d/android-ndk.git && export ANDROID_NDK=$(pwd)/android-ndk && if ([[ $AVD ]] || [[ $PACKAGE_UPLOAD ]]) && [[ $INSTALL ]]; then (while :; do echo 'y'; sleep 1; done) |android update sdk --no-ui --all --filter $INSTALL; fi
+  - if [[ "$ANDROID_ABI" == "arm64-v8a" ]]; then export PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
   - export C_PATH=$(pwd)/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$C_PATH:$PATH; for f in $C_PATH/{clang,clang++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 ---
@@ -306,7 +310,7 @@ language: cpp
 compiler: gcc
 cache: ccache
 sudo: false
-addons: {apt: {sources: &default_sources george-edison55-precise-backports, packages: &default_packages [doxygen, graphviz, g++-multilib, rpm]}}
+addons: {apt: {sources: &default_sources [george-edison55-precise-backports, kubuntu-backports], packages: &default_packages [cmake, doxygen, graphviz, g++-multilib, rpm]}}
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -335,7 +339,7 @@ before_script:
   - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):${RPI_PREFIX%/*}:$PATH
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 ---
@@ -370,8 +374,8 @@ matrix:
       env: SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
 before_script:
   - rake ci_timer
-  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.3.1-2016.05-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
-  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.3.1-2016.05-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
+  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.4.1-2017.01-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu PATH=$HOME:$PATH CXX=g++-4.9 CC=gcc-4.9 && for compiler in gcc g++; do ln -s $(which ccache) $HOME/$compiler-4.9; done; fi
+  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
   - for f in $ARM_PREFIX-{gcc,g++}; do touch -d "2015-01-01 00:00:00 +0800" $f; done
   - git clone --depth 1 https://github.com/urho3d/$SYSROOT.git && export ARM_SYSROOT=$(pwd)/$SYSROOT
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
@@ -395,16 +399,21 @@ env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
     - secure: ecj/PwpbHkH9AYFsc2TMeRuNm5E3xMM8A0x4AcGhzpwDuZWdFx3R1T4G9u45Z5aUyTJWGqOeX1JPaEVVFZuYnNBKRy0kmiUrM9EE0j7WsT57K48tP1ysn2ynyvHgbYkKOfYR0t8XAMWTBbulT9DVVk3DS69//2WgiXGDVUEJTyI=
-    - numjobs=2
+    - numjobs=1
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
+    - EMSCRIPTEN_SHARE_JS=1
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
   matrix:
-    - URHO3D_LIB_TYPE=STATIC
-    - URHO3D_LIB_TYPE=SHARED
+    - URHO3D_LIB_TYPE=MODULE BRANCH=master numjobs=4
+    - URHO3D_LIB_TYPE=STATIC BRANCH=master
+    - URHO3D_LIB_TYPE=SHARED BRANCH=master
+    # URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=1 BRANCH=incoming numjobs=4
+    - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=1 BRANCH=incoming
+    - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=1 BRANCH=incoming
 matrix:
   fast_finish: true
 before_script:
@@ -412,12 +421,12 @@ before_script:
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
-  - if [ $RELEASE_TAG ] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
-  - export DISPLAY=:99.0; bash -e /etc/init.d/xvfb start
-  - git clone --depth 1 https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-master-64bit && source emscripten-sdk/emsdk_env.sh
+  - if [[ $RELEASE_TAG ]] || (! [[ $TRAVIS_BRANCH =~ [^-]+-[^-]+-CI ]] && echo $COMMIT_MESSAGE |grep -cq '\[ci package\]'); then export PACKAGE_UPLOAD=1; fi
+  - if [[ $EMSCRIPTEN_WASM ]]; then export BINARYEN=binaryen-master-64bit; fi
+  - git clone --depth 1 --branch $BRANCH https://github.com/urho3d/emscripten-sdk.git && emscripten-sdk/emsdk activate --build=Release sdk-${BRANCH}-64bit $BINARYEN && source emscripten-sdk/emsdk_env.sh
   - export PATH=$(whereis -b ccache |grep -o '\S*lib\S*'):$PATH; for f in $EMSCRIPTEN/{emcc,em++}; do touch -d "2015-09-01 00:00:00 +0800" $f; done
   - rake ci_setup_cache
-script: rake ci && if [ "$URHO3D_LIB_TYPE" == "SHARED" ]; then rake ci_emscripten_samples_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ "$TRAVIS_BRANCH" == "Web-CI" ]] && [[ ! $EMSCRIPTEN_WASM ]] && [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$URHO3D_LIB_TYPE" == "SHARED" ]]; then rake ci_emscripten_samples_update; fi && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 ---
@@ -425,7 +434,7 @@ after_script: rake ci_teardown_cache
 branch: {name: OSX-CI, active: yes, mandatory: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}
-osx_image: xcode8
+osx_image: xcode8.3
 env:
   global:
     - secure: SLJCjkjDsTMbCIV9Wecz5JATnhk0fuzlnLMeZdvvFDv+8NL8cXyutkU0VfyRSLf3HSD1Js79a6fRMROyVGWj/w/BRrjqGnZzsB6+ZeJNnadiVIF5Gh+w90We5ccvSp2G4DyYgwkNnkKlJK7zNEWGu/K+bHL1EOCA+EIVrFMyA44=
@@ -437,10 +446,11 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
-    # MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.11 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    # XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.11
-    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=9.1 sdk=iphonesimulator
+    - MAKEFILE=1    URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
+    - MAKEFILE=1    URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
+    - XCODE=1       URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1       URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
+    - XCODE=1 IOS=1 URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=10.3 sdk=iphonesimulator
 matrix:
   fast_finish: true
 before_script:
@@ -458,9 +468,9 @@ before_script:
     fi
   - travis_retry brew install ccache $cmake $doxygen
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
-  - if [ $XCODE ]; then pushd $(dirname $(xcodebuild -find-executable clang)) && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd && if [ $IOS ]; then redundant=AppleTV,Watch; elif [ $TVOS ]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
+  - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
   - rake ci_setup_cache
-script: rake ci && if [ $PACKAGE_UPLOAD ]; then rake ci_package_upload; fi && rake ci_timer
+script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
 after_script: rake ci_teardown_cache
 
 # Below samples are excluded from Xcode/OSX build due to build time constraint

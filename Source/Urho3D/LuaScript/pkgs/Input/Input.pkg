@@ -87,6 +87,7 @@ class Input : public Object
     int GetMouseMoveX() const;
     int GetMouseMoveY() const;
     int GetMouseMoveWheel() const;
+    Vector2 GetInputScale() const;
     unsigned GetNumTouches() const;
     TouchState* GetTouch(unsigned index) const;
     unsigned GetNumJoysticks() const;
@@ -110,6 +111,7 @@ class Input : public Object
     tolua_readonly tolua_property__get_set int mouseMoveX;
     tolua_readonly tolua_property__get_set int mouseMoveY;
     tolua_readonly tolua_property__get_set int mouseMoveWheel;
+    tolua_readonly tolua_property__get_set Vector2 inputScale;
     tolua_readonly tolua_property__get_set unsigned numTouches;
     tolua_readonly tolua_property__get_set unsigned numJoysticks;
     tolua_readonly tolua_property__get_set bool toggleFullscreen;

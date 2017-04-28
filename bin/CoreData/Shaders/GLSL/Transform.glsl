@@ -147,7 +147,7 @@ vec3 GetTrailNormal(vec4 iPos, vec3 iParentPos, vec3 iForward)
 #if defined(SKINNED)
     #define iModelMatrix GetSkinMatrix(iBlendWeights, iBlendIndices)
 #elif defined(INSTANCED)
-    #define iModelMatrix GetInstanceMatrix();
+    #define iModelMatrix GetInstanceMatrix()
 #else
     #define iModelMatrix cModel
 #endif
@@ -199,14 +199,20 @@ vec4 GetWorldTangent(mat4 modelMatrix)
 #ifdef GL3
 #define varying in
 
-// \todo: should not hardcode the number of MRT outputs according to defines
+#ifndef MRT_COUNT
+
 #if defined(DEFERRED)
-out vec4 fragData[4];
+#define MRT_COUNT 4
 #elif defined(PREPASS)
-out vec4 fragData[2];
+#define MRT_COUNT 2
 #else
-out vec4 fragData[1];
+#define MRT_COUNT 1
 #endif
+
+#endif
+
+out vec4 fragData[MRT_COUNT];
+
 
 #define gl_FragColor fragData[0]
 #define gl_FragData fragData

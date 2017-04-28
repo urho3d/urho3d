@@ -61,7 +61,8 @@ class Animation : public Resource
     float GetLength() const;
     unsigned GetNumTracks() const;
     AnimationTrack* GetTrack(const String name);
-    AnimationTrack* GetTrack(StringHash nameHash);
+    AnimationTrack* GetTrack(StringHash nameHash); 
+    AnimationTrack* GetTrack(unsigned index); 
     unsigned GetNumTriggers() const;
     AnimationTriggerPoint* GetTrigger(unsigned index);
 

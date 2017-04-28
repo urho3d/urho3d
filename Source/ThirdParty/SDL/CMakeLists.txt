@@ -285,7 +285,7 @@ dep_option(NAS_SHARED          "Dynamically load NAS audio API" ON NAS OFF)
 dep_option(SNDIO               "Support the Roar audio API" ON UNIX_SYS OFF)
 # Urho3D - commented out RPATH as an option because Urho3D is configured to always use RPATH, so init the variable to always TRUE
 set (RPATH TRUE)
-# Urho3D - prefer clock_gettime() when it is available (hide the option for Windows)
+# Urho3D - prefer clock_gettime() when it is available
 dep_option(CLOCK_GETTIME       "Use clock_gettime() instead of gettimeofday()" ON "NOT WINDOWS" OFF)
 set_option(INPUT_TSLIB         "Use the Touchscreen library for input" ${UNIX_SYS})
 dep_option(VIDEO_WAYLAND       "Use Wayland video driver" ON UNIX_SYS OFF)
@@ -459,7 +459,7 @@ if(ASSEMBLY)
 endif()
 
 # Urho3D - move from Unix platform-specific section below to here
-if(CLOCK_GETTIME)
+if(CLOCK_GETTIME AND (NOT IOS OR IPHONEOS_DEPLOYMENT_TARGET STREQUAL "" OR NOT IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 10.0))   # We cheat a little bit here with a hard-coded check because iOS 10.3 SDK when targeting 9.3 has strong symbol for iPhoneOS archs but weak symbol for iPhoneSimulator archs
   # Urho3D - bug fix - use different variables for different checks because of CMake caches the result variable; this fix the detection on Android platform
   check_library_exists(rt clock_gettime "" FOUND_CLOCK_GETTIME_IN_RT)
   if(FOUND_CLOCK_GETTIME_IN_RT)
@@ -501,10 +501,6 @@ if(LIBC)
     set(STDC_HEADERS 1)
   else()
     set(HAVE_LIBC TRUE)
-    # Urho3D - temporary bug fix - starting since Raspbian Jessie some of the headers are installed in the arch-specific directory and it seems that older CMake (prior to release 3.2.3) does not include this directory by default yet, so we have to do that manually
-    if (RPI AND CMAKE_LIBRARY_ARCHITECTURE)
-      include_directories (${SYSROOT}/usr/include/${CMAKE_LIBRARY_ARCHITECTURE})    # SYSROOT is empty when we are not cross-compiling
-    endif ()
     # Urho3D - bug fix - when cross-compiling the headers are rooted, either use "--sysroot" compiler flag or use CMAKE_REQUIRED_INCLUDES (e.g. on RPI) to cater for it
     set (CMAKE_REQUIRED_INCLUDES_SYS_TYPES_SAVED ${CMAKE_REQUIRED_INCLUDES})
     if (CMAKE_CROSSCOMPILING AND NOT "${CMAKE_C_FLAGS} ${CMAKE_REQUIRED_FLAGS}" MATCHES --sysroot)
@@ -981,7 +977,8 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     find_path (UDEV_H_INCLUDE_DIRS libudev.h)
     if (UDEV_H_INCLUDE_DIRS)
       set (HAVE_LIBUDEV_H TRUE)
-      include_directories (${UDEV_H_INCLUDE_DIRS})
+      include_directories (SYSTEM ${UDEV_H_INCLUDE_DIRS})
+      # TODO: find the shared library and store the result in the SDL_UDEV_DYNAMIC variable
     endif ()
 
     # Urho3D - bug fix - dbus/dbus.h is installed under path suffix 'dbus-1.0', so the following find_path() is needed even when not cross-compiling
@@ -995,7 +992,7 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     find_path (DBUS_ARCH_DEPS_H_INCLUDE_DIRS NAMES dbus/dbus-arch-deps.h PATHS ${DBUS_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/dbus-1.0/include)
     if (DBUS_H_INCLUDE_DIRS AND DBUS_H_INCLUDE_DIRS AND DBUS_ARCH_DEPS_H_INCLUDE_DIRS)
       set(HAVE_DBUS_DBUS_H TRUE)
-      include_directories (${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
+      include_directories (SYSTEM ${DBUS_H_INCLUDE_DIRS} ${DBUS_ARCH_DEPS_H_INCLUDE_DIRS})
       list(APPEND EXTRA_LIBS dbus-1)
     endif ()
 
@@ -1010,17 +1007,17 @@ elseif(UNIX)    # Urho3D - at this point both UNIX and UNIX_SYS should be equiva
     find_path (GLIB_CONFIG_H_INCLUDE_DIRS NAMES glibconfig.h PATHS ${GLIB_INC_SEARCH_PATH} /usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}/glib-2.0/include)
     if (IBUS_H_INCLUDE_DIRS AND GLIB_H_INCLUDE_DIRS AND GLIB_CONFIG_H_INCLUDE_DIRS)
       set(HAVE_IBUS_IBUS_H TRUE)
-      include_directories(${IBUS_H_INCLUDE_DIRS} ${GLIB_H_INCLUDE_DIRS} ${GLIB_CONFIG_H_INCLUDE_DIRS})
+      include_directories(SYSTEM ${IBUS_H_INCLUDE_DIRS} ${GLIB_H_INCLUDE_DIRS} ${GLIB_CONFIG_H_INCLUDE_DIRS})
       list(APPEND EXTRA_LIBS ibus-1.0)
-      add_definitions (-DSDL_USE_IME)
+      set (SDL_USE_IME 1)
     endif ()
 
     # Urho3D - bug fix - use find_path() to detect fcitx's header file so it works for both native and cross-compiling builds
     find_path (FCITX_H_INCLUDE_DIRS fcitx/frontend.h)
     if (FCITX_H_INCLUDE_DIRS)
       set (HAVE_FCITX_FRONTEND_H TRUE)
-      include_directories (${FCITX_H_INCLUDE_DIRS})
-      add_definitions (-DSDL_USE_IME)
+      include_directories (SYSTEM ${FCITX_H_INCLUDE_DIRS})
+      set (SDL_USE_IME 1)
     endif ()
 
     # Urho3D - bug fix - moved below logic from generic Unix block to Linux-specific block
@@ -1114,6 +1111,14 @@ elseif(WINDOWS)
   if(DIRECTX)
     # Urho3D - bug fix - use our own FindDirectX.cmake module which does not rely on DXSDK_DIR environment variable directly when DirectX SDK is being used
     # Urho3D - TODO - move the find_package(DirectX) call from Urho3D common module to here later after we have refactored the library dependency handling
+
+    check_struct_has_member (XINPUT_GAMEPAD_EX wButtons xinput.h HAVE_XINPUT_GAMEPAD_EX)
+    check_struct_has_member (XINPUT_STATE_EX dwPacketNumber xinput.h HAVE_XINPUT_STATE_EX)
+    foreach (VAR HAVE_XINPUT_GAMEPAD_EX HAVE_XINPUT_STATE_EX)
+      if (${VAR})
+        add_definitions (-D${VAR})
+      endif ()
+    endforeach ()
   endif()
 
   if(SDL_AUDIO)

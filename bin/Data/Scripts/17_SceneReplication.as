@@ -94,7 +94,7 @@ void CreateScene()
             RigidBody@ body = floorNode.CreateComponent("RigidBody");
             body.friction = 1.0f;
             CollisionShape@ shape = floorNode.CreateComponent("CollisionShape");
-            shape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+            shape.SetBox(Vector3::ONE);
         }
     }
 
@@ -278,7 +278,7 @@ void MoveCamera()
             const float CAMERA_DISTANCE = 5.0f;
 
             // Move camera some distance away from the ball
-            cameraNode.position = ballNode.position + cameraNode.rotation * Vector3(0.0f, 0.0f, -1.0f) * CAMERA_DISTANCE;
+            cameraNode.position = ballNode.position + cameraNode.rotation * Vector3::BACK * CAMERA_DISTANCE;
             showInstructions = true;
         }
     }
@@ -341,13 +341,13 @@ void HandlePhysicsPreStep(StringHash eventType, VariantMap& eventData)
             // independent from rendering framerate. We could also apply forces (which would enable in-air control),
             // but want to emphasize that it's a ball which should only control its motion by rolling along the ground
             if (connection.controls.IsDown(CTRL_FORWARD))
-                body.ApplyTorque(rotation * Vector3(1.0f, 0.0f, 0.0f) * MOVE_TORQUE);
+                body.ApplyTorque(rotation * Vector3::RIGHT * MOVE_TORQUE);
             if (connection.controls.IsDown(CTRL_BACK))
-                body.ApplyTorque(rotation * Vector3(-1.0f, 0.0f, 0.0f) * MOVE_TORQUE);
+                body.ApplyTorque(rotation * Vector3::LEFT * MOVE_TORQUE);
             if (connection.controls.IsDown(CTRL_LEFT))
-                body.ApplyTorque(rotation * Vector3(0.0f, 0.0f, 1.0f) * MOVE_TORQUE);
+                body.ApplyTorque(rotation * Vector3::FORWARD * MOVE_TORQUE);
             if (connection.controls.IsDown(CTRL_RIGHT))
-                body.ApplyTorque(rotation * Vector3(0.0f, 0.0f, -1.0f) * MOVE_TORQUE);
+                body.ApplyTorque(rotation * Vector3::BACK * MOVE_TORQUE);
         }
     }
 }

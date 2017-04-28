@@ -267,6 +267,9 @@ bool SaveScene(const String&in fileName)
         success = editorScene.Save(file);
     RemoveBackup(success, fileName);
 
+	// Save all the terrains we've modified
+	terrainEditor.Save();
+
     editorScene.updateEnabled = false;
 
     if (success)
@@ -1636,7 +1639,23 @@ bool ColorWheelSetupBehaviorForColoring()
             ShowColorWheelWithColor(coloringOldColor);
         }
     }
-          
+    else if (coloringComponent.typeName == "Text3D") 
+    {
+        Text3D@ txt = cast<Text3D>(coloringComponent);
+        if (txt !is null) 
+        {
+            if (coloringPropertyName == "c" || coloringPropertyName == "tl")
+                coloringOldColor = txt.colors[C_TOPLEFT];
+            else if (coloringPropertyName == "tr") 
+                coloringOldColor = txt.colors[C_TOPRIGHT];
+            else if (coloringPropertyName == "bl") 
+                coloringOldColor = txt.colors[C_BOTTOMLEFT];
+            else if (coloringPropertyName == "br") 
+                coloringOldColor = txt.colors[C_BOTTOMRIGHT];
+            
+            ShowColorWheelWithColor(coloringOldColor);
+        }
+    }          
     return true;
 }
 

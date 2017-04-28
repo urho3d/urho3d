@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
-    Deserializer(size),
+    AbstractFile(size),
     buffer_((unsigned char*)data),
     readOnly_(false)
 {
@@ -37,7 +37,7 @@ MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
 }
 
 MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
-    Deserializer(size),
+    AbstractFile(size),
     buffer_((unsigned char*)data),
     readOnly_(true)
 {
@@ -46,14 +46,14 @@ MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
 }
 
 MemoryBuffer::MemoryBuffer(PODVector<unsigned char>& data) :
-    Deserializer(data.Size()),
+    AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(false)
 {
 }
 
 MemoryBuffer::MemoryBuffer(const PODVector<unsigned char>& data) :
-    Deserializer(data.Size()),
+    AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(true)
 {

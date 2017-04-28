@@ -84,7 +84,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
                 message (FATAL_ERROR "Could not find MinGW system root. "
                     "Use MINGW_SYSROOT environment variable or build option to specify the location of system root.")
             endif ()
-            set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected" FORCE)
+            set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected" FORCE)
         endif ()
         # MinGW Cross-compiling uses CMAKE_FIND_ROOT_PATH while MinGW on Windows host uses CMAKE_PREFIX_PATH
         if (CMAKE_HOST_WIN32)
@@ -183,7 +183,7 @@ if (MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below to fi
     endif ()
     foreach (VERSION 10.0 8.1 8.0)
         list (APPEND DIRECT3D_DLL_REDIST_SEARCH_PATHS "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v${VERSION};InstallationFolder]/Redist/D3D/${PATH_SUFFIX}")
-    endforeach()
+    endforeach ()
     find_file (DIRECT3D_DLL NAMES ${DIRECT3D_DLL_NAMES} PATHS ${DIRECT3D_DLL_REDIST_SEARCH_PATHS} DOC "Direct3D DLL"
         NO_DEFAULT_PATH)    # Do not use default paths such as the PATH variable, to potentially avoid using a wrong architecture DLL
     if (DIRECT3D_DLL AND NOT MINGW)

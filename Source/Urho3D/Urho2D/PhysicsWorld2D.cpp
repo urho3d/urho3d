@@ -30,6 +30,7 @@
 #include "../IO/Log.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
+#include "../Urho2D/CollisionShape2D.h"
 #include "../Urho2D/PhysicsEvents2D.h"
 #include "../Urho2D/PhysicsUtils2D.h"
 #include "../Urho2D/PhysicsWorld2D.h"
@@ -44,6 +45,21 @@ extern const char* SUBSYSTEM_CATEGORY;
 static const Vector2 DEFAULT_GRAVITY(0.0f, -9.81f);
 static const int DEFAULT_VELOCITY_ITERATIONS = 8;
 static const int DEFAULT_POSITION_ITERATIONS = 3;
+
+// Helper function to write contact info into buffer.
+const PODVector<unsigned char>& WriteContactInfo(VectorBuffer& buffer, b2Contact* contact)
+{
+    buffer.Clear();
+    b2WorldManifold worldManifold;
+    contact->GetWorldManifold(&worldManifold);
+    for (int i = 0; i < contact->GetManifold()->pointCount; ++i)
+    {
+        buffer.WriteVector2(Vector2(worldManifold.points[i].x, worldManifold.points[i].y));
+        buffer.WriteVector2(Vector2(worldManifold.normal.x, worldManifold.normal.y));
+        buffer.WriteFloat(worldManifold.separations[i]);
+    }
+    return buffer.GetBuffer();
+}
 
 PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     Component(context),
@@ -134,6 +150,63 @@ void PhysicsWorld2D::EndContact(b2Contact* contact)
     endContactInfos_.Push(ContactInfo(contact));
 }
 
+void PhysicsWorld2D::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+{
+    b2Fixture* fixtureA = contact->GetFixtureA();
+    b2Fixture* fixtureB = contact->GetFixtureB();
+    if (!fixtureA || !fixtureB)
+        return;
+
+    ContactInfo contactInfo(contact);
+
+    // Send global event
+    VariantMap& eventData = GetEventDataMap();
+    eventData[PhysicsUpdateContact2D::P_WORLD] = this;
+    eventData[PhysicsUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+
+    eventData[PhysicsUpdateContact2D::P_BODYA] = contactInfo.bodyA_.Get();
+    eventData[PhysicsUpdateContact2D::P_BODYB] = contactInfo.bodyB_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEA] = contactInfo.nodeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_NODEB] = contactInfo.nodeB_.Get();
+    eventData[PhysicsUpdateContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+    eventData[PhysicsUpdateContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+    eventData[PhysicsUpdateContact2D::P_SHAPEA] = contactInfo.shapeA_.Get();
+    eventData[PhysicsUpdateContact2D::P_SHAPEB] = contactInfo.shapeB_.Get();
+
+    SendEvent(E_PHYSICSUPDATECONTACT2D, eventData);
+    contact->SetEnabled(eventData[PhysicsUpdateContact2D::P_ENABLED].GetBool());
+    eventData.Clear();
+
+    // Send node event
+    eventData[NodeUpdateContact2D::P_ENABLED] = contact->IsEnabled();
+    eventData[NodeUpdateContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+    eventData[NodeUpdateContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+
+    if (contactInfo.nodeA_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
+
+        contactInfo.nodeA_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    if (contactInfo.nodeB_)
+    {
+        eventData[NodeUpdateContact2D::P_BODY] = contactInfo.bodyB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+        eventData[NodeUpdateContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+        eventData[NodeUpdateContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
+
+        contactInfo.nodeB_->SendEvent(E_NODEUPDATECONTACT2D, eventData);
+    }
+
+    contact->SetEnabled(eventData[NodeUpdateContact2D::P_ENABLED].GetBool());
+}
+
 void PhysicsWorld2D::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 {
     if (!debugRenderer_)
@@ -174,6 +247,13 @@ void PhysicsWorld2D::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
         debugRenderer_->AddLine(p + Vector3(x1, y1, 0.0f), p + Vector3(x2, y2, 0.0f), c, debugDepthTest_);
     }
+}
+
+extern URHO3D_API const float PIXEL_SIZE;
+
+void PhysicsWorld2D::DrawPoint(const b2Vec2& p, float32 size, const b2Color& color)
+{
+    DrawSolidCircle(p, size * 0.5f * PIXEL_SIZE, b2Vec2(), color);
 }
 
 void PhysicsWorld2D::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
@@ -679,16 +759,22 @@ void PhysicsWorld2D::SendBeginContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSBEGINCONTACT2D, eventData);
 
         nodeEventData[NodeBeginContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeBeginContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
 
         if (contactInfo.nodeA_)
         {
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -698,6 +784,8 @@ void PhysicsWorld2D::SendBeginContactEvents()
             nodeEventData[NodeBeginContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeBeginContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeBeginContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeBeginContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEBEGINCONTACT2D, nodeEventData);
         }
@@ -724,16 +812,22 @@ void PhysicsWorld2D::SendEndContactEvents()
         eventData[P_NODEA] = contactInfo.nodeA_.Get();
         eventData[P_NODEB] = contactInfo.nodeB_.Get();
         eventData[P_CONTACT] = (void*)contactInfo.contact_;
+        eventData[P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
+        eventData[P_SHAPEA] = contactInfo.shapeA_.Get();
+        eventData[P_SHAPEB] = contactInfo.shapeB_.Get();
 
         SendEvent(E_PHYSICSENDCONTACT2D, eventData);
 
         nodeEventData[NodeEndContact2D::P_CONTACT] = (void*)contactInfo.contact_;
+        nodeEventData[NodeEndContact2D::P_CONTACTPOINTS] = WriteContactInfo(contacts_, contactInfo.contact_);
 
         if (contactInfo.nodeA_)
         {
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyB_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeA_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeB_.Get();
 
             contactInfo.nodeA_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -743,6 +837,8 @@ void PhysicsWorld2D::SendEndContactEvents()
             nodeEventData[NodeEndContact2D::P_BODY] = contactInfo.bodyB_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERNODE] = contactInfo.nodeA_.Get();
             nodeEventData[NodeEndContact2D::P_OTHERBODY] = contactInfo.bodyA_.Get();
+            nodeEventData[NodeEndContact2D::P_SHAPE] = contactInfo.shapeB_.Get();
+            nodeEventData[NodeEndContact2D::P_OTHERSHAPE] = contactInfo.shapeA_.Get();
 
             contactInfo.nodeB_->SendEvent(E_NODEENDCONTACT2D, nodeEventData);
         }
@@ -764,6 +860,8 @@ PhysicsWorld2D::ContactInfo::ContactInfo(b2Contact* contact)
     nodeA_ = bodyA_->GetNode();
     nodeB_ = bodyB_->GetNode();
     contact_ = contact;
+    shapeA_ = (CollisionShape2D*)fixtureA->GetUserData();
+    shapeB_ = (CollisionShape2D*)fixtureB->GetUserData();
 }
 
 PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
@@ -771,7 +869,9 @@ PhysicsWorld2D::ContactInfo::ContactInfo(const ContactInfo& other) :
     bodyB_(other.bodyB_),
     nodeA_(other.nodeA_),
     nodeB_(other.nodeB_),
-    contact_(other.contact_)
+    contact_(other.contact_),
+    shapeA_(other.shapeA_),
+    shapeB_(other.shapeB_)
 {
 }
 

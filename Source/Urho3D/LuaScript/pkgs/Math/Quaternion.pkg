@@ -48,8 +48,8 @@ class Quaternion
     float PitchAngle() const;
     float RollAngle() const;
     Matrix3 RotationMatrix() const;
-    Quaternion Slerp(Quaternion rhs, float t) const;
-    Quaternion Nlerp(Quaternion rhs, float t, bool shortestPath) const;
+    Quaternion Slerp(const Quaternion& rhs, float t) const;
+    Quaternion Nlerp(const Quaternion& rhs, float t, bool shortestPath) const;
     String ToString() const;
 
     float w_ @ w;

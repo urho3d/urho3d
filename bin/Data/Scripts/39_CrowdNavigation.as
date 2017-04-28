@@ -375,13 +375,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0f, 0.0f, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     // Set destination or spawn a jack with left mouse button
     if (input.mouseButtonPress[MOUSEB_LEFT])
@@ -467,7 +467,6 @@ void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData)
 void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
 {
     const String WALKING_ANI = "Models/Jack_Walk.ani";
-    const Vector3 FORWARD(0.0f, 0.0f, 1.0f);
 
     Node@ node = eventData["Node"].GetPtr();
     CrowdAgent@ agent = eventData["CrowdAgent"].GetPtr();
@@ -483,7 +482,7 @@ void HandleCrowdAgentReposition(StringHash eventType, VariantMap& eventData)
         {
             float speedRatio = speed / agent.maxSpeed;
             // Face the direction of its velocity but moderate the turning speed based on the speed ratio and timeStep
-            node.rotation = node.rotation.Slerp(Quaternion(FORWARD, velocity), 10.f * timeStep * speedRatio);
+            node.rotation = node.rotation.Slerp(Quaternion(Vector3::FORWARD, velocity), 10.f * timeStep * speedRatio);
             // Throttle the animation speed based on agent speed ratio (ratio = 1 is full throttle)
             animCtrl.SetSpeed(WALKING_ANI, speedRatio * 1.5f);
         }

@@ -20,6 +20,11 @@
 // THE SOFTWARE.
 //
 
+// This file overrides global new to provide file and line information to allocations for easier memory leak detection on MSVC
+// compilers. Do not include this file in a compilation unit that uses placement new. Include this file last after other
+// includes; e.g. Bullet's include files will cause a compile error if this file is included before them. Also note that
+// using DebugNew.h is by no means mandatory, but just a debugging convenience.
+
 #pragma once
 
 #if defined(_MSC_VER) && defined(_DEBUG)
