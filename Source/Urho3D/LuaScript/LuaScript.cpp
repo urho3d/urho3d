@@ -66,6 +66,9 @@ extern int tolua_DatabaseLuaAPI_open(lua_State*);
 #ifdef URHO3D_IK
 extern int tolua_IKLuaAPI_open(lua_State*);
 #endif
+#ifdef URHO3D_RAYCASTVEHICLE
+extern int tolua_RaycastVehicleLuaAPI_open(lua_State*);
+#endif
 #ifdef URHO3D_PHYSICS
 extern int tolua_PhysicsLuaAPI_open(lua_State*);
 #endif
@@ -120,6 +123,9 @@ LuaScript::LuaScript(Context* context) :
 #endif
 #ifdef URHO3D_IK
     tolua_IKLuaAPI_open(luaState_);
+#endif
+#ifdef URHO3D_RAYCASTVEHICLE
+    tolua_RaycastVehicleLuaAPI_open(luaState_);
 #endif
 #ifdef URHO3D_PHYSICS
     tolua_PhysicsLuaAPI_open(luaState_);

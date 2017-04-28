@@ -129,6 +129,9 @@ Script::Script(Context* context) :
 #ifdef URHO3D_IK
     RegisterIKAPI(scriptEngine_);
 #endif
+#ifdef URHO3D_RAYCASTVEHICLE
+    RegisterRaycastVehicleAPI(scriptEngine_);
+#endif
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsAPI(scriptEngine_);
 #endif

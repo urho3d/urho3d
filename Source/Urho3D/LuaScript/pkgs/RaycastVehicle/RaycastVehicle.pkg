@@ -1,0 +1,33 @@
+$#include "RaycastVehicle/RaycastVehicle.h"
+
+class RaycastVehicle : public LogicComponent
+{
+        RaycastVehicle(Urho3D::Context* context);
+        ~RaycastVehicle();
+        static void RegisterObject(Context* context);
+        virtual void ApplyAttributes();
+        void AddWheel(Node *wheelNode, Vector3 connectionPoint, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
+        void ResetSuspension(void);
+        void UpdateWheelTransform(int wheel, bool interpolated);
+        Vector3 GetWheelPosition(int wheel);
+        Quaternion GetWheelRotation(int wheel);
+        Vector3 GetWheelConnectionPoint(int wheel);
+        int GetNumWheels();
+        Node *GetWheelNode(int wheel);
+        void SetSteeringValue(int wheel, float steeringValue);
+        void SetWheelSuspensionStiffness(int wheel, float stiffness);
+        float GetWheelSuspensionStiffness(int wheel);
+        void SetWheelDampingRelaxation(int wheel, float damping);
+        float GetWheelDampingRelaxation(int wheel);
+        void SetWheelDampingCompression(int wheel, float compression);
+        float GetWheelDampingCompression(int wheel);
+        void SetWheelFrictionSlip(int wheel, float slip);
+        float GetWheelFrictionSlip(int wheel);
+        void SetWheelRollInfluence(int wheel, float rollInfluence);
+        float GetWheelRollInfluence(int wheel);
+        void SetEngineForce(int wheel, float force);
+        void Init();
+        void FixedUpdate(float timeStep);
+        void PostUpdate(float timeStep);
+};
+
