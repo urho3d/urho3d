@@ -188,6 +188,9 @@ public:
     /// Return linear interpolation of this color with another color.
     Color Lerp(const Color& rhs, float t) const;
 
+	/// Multiply with a color.
+	Color MultiplyComponents(const Color& rhs) { return Color(r_ * rhs.r_, g_ * rhs.g_, b_ * rhs.b_, a_ * rhs.a_); }
+
     /// Return color with absolute components.
     Color Abs() const { return Color(Urho3D::Abs(r_), Urho3D::Abs(g_), Urho3D::Abs(b_), Urho3D::Abs(a_)); }
 
