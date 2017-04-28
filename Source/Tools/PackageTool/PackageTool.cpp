@@ -286,7 +286,7 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (pos + unpackedSize > dataSize)
                     unpackedSize = dataSize - pos;
 
-                unsigned packedSize = (unsigned)LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
+                unsigned packedSize = (unsigned)LZ4_compress_HC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize, LZ4_compressBound(unpackedSize), 0);
                 if (!packedSize)
                     ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + String(pos));
 
