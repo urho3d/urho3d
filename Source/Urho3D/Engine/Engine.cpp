@@ -149,7 +149,6 @@ Engine::Engine(Context* context) :
     
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
-    RegisterRaycastVehicleLibrary(context_);
 #endif
 
 #ifdef URHO3D_NAVIGATION

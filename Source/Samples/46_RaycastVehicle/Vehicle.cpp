@@ -19,14 +19,10 @@
 #include <Urho3D/Scene/Scene.h>
 #include <Urho3D/Urho3D.h>
 
+using namespace Urho3D;
+
 const float CHASSIS_WIDTH = 2.6f;
 const float WHEEL_WIDTH = 0.4f;
-#define DELETE_NULL(x) \
-    {                  \
-        if (x)         \
-            delete x;  \
-        x = NULL;      \
-    }
 
 void Vehicle::RegisterObject(Context* context)
 {

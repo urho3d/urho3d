@@ -270,7 +270,7 @@ HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     float cameraRayLength = (cameraTargetPos - cameraStartPos).length;
     PhysicsRaycastResult result =
         scene_.physicsWorld.RaycastSingle(cameraRay, cameraRayLength, 2);
-    if (result.body ! is null)
+    if (result.body !is null)
         cameraTargetPos =
             cameraStartPos + cameraRay.direction * (result.distance - 0.5f);
     cameraNode.position = cameraTargetPos;

@@ -26,10 +26,8 @@
 
 namespace Urho3D
 {
-
-class Node;
-
-class Scene;
+    class Node;
+    class Scene;
 }
 
 class Vehicle;
@@ -43,7 +41,6 @@ class Vehicle;
 
 class RaycastVehicleDemo : public Sample
 {
-
     URHO3D_OBJECT(RaycastVehicleDemo, Sample);
 
 public:
@@ -73,5 +70,5 @@ private:
     void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
 
     /// The controllable vehicle component.
-    WeakPtr< Vehicle > vehicle_;
+    WeakPtr<Vehicle> vehicle_;
 };
