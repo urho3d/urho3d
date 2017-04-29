@@ -316,9 +316,9 @@ function Vehicle:Init()
 	-- Setting rotation according to wheel position
 	local isFrontWheel = connectionPoint.z > 0.0
 	if connectionPoint.x >= 0.0 then
-            wheelNode.rotation = Quaternion(0.0, 0.0, -90.0)
-        else
-            wheelNode.rotation = Quaternion(0.0, 0.0, 90.0)
+        wheelNode.rotation = Quaternion(0.0, 0.0, -90.0)
+    else
+        wheelNode.rotation = Quaternion(0.0, 0.0, 90.0)
 	end
 	wheelNode.worldPosition = node.worldPosition + node.worldRotation * connectionPoint
 	wheelNode.scale = Vector3(1.0, 0.65, 1.0)

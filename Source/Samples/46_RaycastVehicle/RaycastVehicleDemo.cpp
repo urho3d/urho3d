@@ -89,10 +89,7 @@ void RaycastVehicleDemo::CreateScene()
     cameraNode_ = new Node(context_);
     Camera* camera = cameraNode_->CreateComponent<Camera>();
     camera->SetFarClip(500.0f);
-    GetSubsystem<Renderer>()->SetViewport(0,
-                                            new Viewport(context_,
-                                                         scene_,
-                                                         camera));
+    GetSubsystem<Renderer>()->SetViewport(0, new Viewport(context_, scene_, camera));
     // Create static scene content. First create a zone for ambient lighting and fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
@@ -132,23 +129,19 @@ void RaycastVehicleDemo::CreateScene()
     for (unsigned i = 0; i < NUM_MUSHROOMS; ++i)
     {
         Node* objectNode = scene_->CreateChild("Mushroom");
-        Vector3 position(Random(2000.0f) - 1000.0f, 0.0f,
-                         Random(2000.0f) - 1000.0f);
+        Vector3 position(Random(2000.0f) - 1000.0f, 0.0f, Random(2000.0f) - 1000.0f);
         position.y_ = terrain->GetHeight(position) - 0.1f;
         objectNode->SetPosition(position);
         // Create a rotation quaternion from up vector to terrain normal
-        objectNode->SetRotation(Quaternion(Vector3::UP,
-                                           terrain->GetNormal(position)));
+        objectNode->SetRotation(Quaternion(Vector3::UP, terrain->GetNormal(position)));
         objectNode->SetScale(3.0f);
-        StaticModel* object =
-            objectNode->CreateComponent<StaticModel>();
+        StaticModel* object = objectNode->CreateComponent<StaticModel>();
         object->SetModel(cache->GetResource<Model>("Models/Mushroom.mdl"));
         object->SetMaterial(cache->GetResource<Material>("Materials/Mushroom.xml"));
         object->SetCastShadows(true);
         RigidBody* body = objectNode->CreateComponent<RigidBody>();
         body->SetCollisionLayer(2);
-        CollisionShape* shape =
-            objectNode->CreateComponent<CollisionShape>();
+        CollisionShape* shape = objectNode->CreateComponent<CollisionShape>();
         shape->SetTriangleMesh(object->GetModel(), 0);
     }
 }
@@ -205,16 +198,11 @@ void RaycastVehicleDemo::HandleUpdate(StringHash eventType,
         // Get movement controls and assign them to the vehicle component. If UI has a focused element, clear controls
         if (!ui->GetFocusElement())
         {
-            vehicle_->controls_.Set(CTRL_FORWARD,
-                                    input->GetKeyDown(KEY_W));
-            vehicle_->controls_.Set(CTRL_BACK,
-                                    input->GetKeyDown(KEY_S));
-            vehicle_->controls_.Set(CTRL_LEFT,
-                                    input->GetKeyDown(KEY_A));
-            vehicle_->controls_.Set(CTRL_RIGHT,
-                                    input->GetKeyDown(KEY_D));
-            vehicle_->controls_.Set(CTRL_BRAKE,
-                                    input->GetKeyDown(KEY_F));
+            vehicle_->controls_.Set(CTRL_FORWARD, input->GetKeyDown(KEY_W));
+            vehicle_->controls_.Set(CTRL_BACK, input->GetKeyDown(KEY_S));
+            vehicle_->controls_.Set(CTRL_LEFT, input->GetKeyDown(KEY_A));
+            vehicle_->controls_.Set(CTRL_RIGHT, input->GetKeyDown(KEY_D));
+            vehicle_->controls_.Set(CTRL_BRAKE, input->GetKeyDown(KEY_F));
             // Add yaw & pitch from the mouse motion or touch input. Used only for the camera, does not affect motion
             if (touchEnabled_)
             {
@@ -223,73 +211,53 @@ void RaycastVehicleDemo::HandleUpdate(StringHash eventType,
                     TouchState* state = input->GetTouch(i);
                     if (!state->touchedElement_) // Touch on empty space
                     {
-                        Camera* camera =
-                            cameraNode_->GetComponent<Camera>();
+                        Camera* camera = cameraNode_->GetComponent<Camera>();
                         if (!camera)
                         {
                             return;
                         }
-                        Graphics* graphics =
-                            GetSubsystem<Graphics>();
-                        vehicle_->controls_.yaw_ +=
-                            TOUCH_SENSITIVITY * camera->GetFov() /
-                            graphics->GetHeight() *
-                            state->delta_.x_;
-                        vehicle_->controls_.pitch_ +=
-                            TOUCH_SENSITIVITY * camera->GetFov() /
-                            graphics->GetHeight() *
-                            state->delta_.y_;
+                        Graphics* graphics = GetSubsystem<Graphics>();
+                        vehicle_->controls_.yaw_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.x_;
+                        vehicle_->controls_.pitch_ += TOUCH_SENSITIVITY * camera->GetFov() / graphics->GetHeight() * state->delta_.y_;
                     }
                 }
             }
             else
             {
-                vehicle_->controls_.yaw_ +=
-                    (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
-                vehicle_->controls_.pitch_ +=
-                    (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
+                vehicle_->controls_.yaw_ += (float)input->GetMouseMoveX() * YAW_SENSITIVITY;
+                vehicle_->controls_.pitch_ += (float)input->GetMouseMoveY() * YAW_SENSITIVITY;
             }
             // Limit pitch
-            vehicle_->controls_.pitch_ =
-                Clamp(vehicle_->controls_.pitch_, 0.0f, 80.0f);
+            vehicle_->controls_.pitch_ = Clamp(vehicle_->controls_.pitch_, 0.0f, 80.0f);
             // Check for loading / saving the scene
             if (input->GetKeyPress(KEY_F5))
             {
-                File saveFile(context_,
-                              GetSubsystem<FileSystem>()->GetProgramDir() +
-                                  "Data/Scenes/RaycastVehicleDemo.xml",
+                File saveFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/RaycastVehicleDemo.xml", 
                               FILE_WRITE);
                 scene_->SaveXML(saveFile);
             }
             if (input->GetKeyPress(KEY_F7))
             {
-                File loadFile(context_,
-                              GetSubsystem<FileSystem>()->GetProgramDir() +
-                                  "Data/Scenes/RaycastVehicleDemo.xml",
+                File loadFile(context_, GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Scenes/RaycastVehicleDemo.xml",
                               FILE_READ);
                 scene_->LoadXML(loadFile);
                 // After loading we have to reacquire the weak pointer to the Vehicle component, as it has been recreated
                 // Simply find the vehicle's scene node by name as there's only one of them
-                Node* vehicleNode =
-                    scene_->GetChild("Vehicle", true);
+                Node* vehicleNode = scene_->GetChild("Vehicle", true);
                 if (vehicleNode)
                 {
-                    vehicle_ =
-                        vehicleNode->GetComponent<Vehicle>();
+                    vehicle_ = vehicleNode->GetComponent<Vehicle>();
                 }
             }
         }
         else
         {
-            vehicle_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT |
-                                        CTRL_RIGHT | CTRL_BRAKE,
-                                    false);
+            vehicle_->controls_.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_BRAKE, false);
         }
     }
 }
 
-void RaycastVehicleDemo::HandlePostUpdate(StringHash eventType,
-                                          VariantMap& eventData)
+void RaycastVehicleDemo::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (!vehicle_)
     {
@@ -308,14 +276,10 @@ void RaycastVehicleDemo::HandlePostUpdate(StringHash eventType,
     Ray cameraRay(cameraStartPos, cameraTargetPos - cameraStartPos);
     float cameraRayLength = (cameraTargetPos - cameraStartPos).Length();
     PhysicsRaycastResult result;
-    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result,
-                                                          cameraRay,
-                                                          cameraRayLength,
-                                                          2);
+    scene_->GetComponent<PhysicsWorld>()->RaycastSingle(result, cameraRay, cameraRayLength, 2);
     if (result.body_)
     {
-        cameraTargetPos =
-            cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
+        cameraTargetPos = cameraStartPos + cameraRay.direction_ * (result.distance_ - 0.5f);
     }
     cameraNode_->SetPosition(cameraTargetPos);
     cameraNode_->SetRotation(dir);

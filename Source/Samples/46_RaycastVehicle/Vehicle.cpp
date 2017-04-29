@@ -28,10 +28,8 @@ void Vehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<Vehicle>();
     URHO3D_ATTRIBUTE("Steering", float, steering_, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f,
-                     AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f,
-                     AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Yaw", float, controls_.yaw_, 0.0f, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Controls Pitch", float, controls_.pitch_, 0.0f, AM_DEFAULT);
 }
 
 Vehicle::Vehicle(Urho3D::Context* context)
@@ -71,8 +69,7 @@ void Vehicle::Init()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     StaticModel* hullObject = node_->CreateComponent<StaticModel>();
     // Setting-up collision shape
-    CollisionShape* hullColShape =
-        node_->CreateComponent<CollisionShape>();
+    CollisionShape* hullColShape = node_->CreateComponent<CollisionShape>();
     Vector3 v3BoxExtents = Vector3::ONE;
     hullColShape->SetBox(v3BoxExtents);
     node_->SetScale(Vector3(2.3f, 1.0f, 4.0f));
@@ -88,21 +85,15 @@ void Vehicle::Init()
     // Note we don't set wheel nodes as children of hull (while we could) to avoid scaling to affect them.
     float wheelX = CHASSIS_WIDTH / 2.0f - wheelWidth_;
     // Front left
-    connectionPoints_[0] =
-        Vector3(-wheelX, connectionHeight, 2.5f - GetWheelRadius() * 2.0f);
+    connectionPoints_[0] = Vector3(-wheelX, connectionHeight, 2.5f - GetWheelRadius() * 2.0f);
     // Front right
-    connectionPoints_[1] =
-        Vector3(wheelX, connectionHeight, 2.5f - GetWheelRadius() * 2.0f);
+    connectionPoints_[1] = Vector3(wheelX, connectionHeight, 2.5f - GetWheelRadius() * 2.0f);
     // Back left
-    connectionPoints_[2] =
-        Vector3(-wheelX, connectionHeight, -2.5f + GetWheelRadius() * 2.0f);
+    connectionPoints_[2] = Vector3(-wheelX, connectionHeight, -2.5f + GetWheelRadius() * 2.0f);
     // Back right
-    connectionPoints_[3] =
-        Vector3(wheelX, connectionHeight, -2.5f + GetWheelRadius() * 2.0f);
+    connectionPoints_[3] = Vector3(wheelX, connectionHeight, -2.5f + GetWheelRadius() * 2.0f);
     const Color LtBrown(0.972f, 0.780f, 0.412f);
-    for (int id = 0;
-         id < sizeof(connectionPoints_) / sizeof(connectionPoints_[0]);
-         id++)
+    for (int id = 0; id < sizeof(connectionPoints_) / sizeof(connectionPoints_[0]); id++)
     {
         Node* wheelNode = GetScene()->CreateChild();
         Vector3 connectionPoint = connectionPoints_[id];
@@ -110,17 +101,9 @@ void Vehicle::Init()
         // back wheels are at z < 0
         // Setting rotation according to wheel position
         bool isFrontWheel = connectionPoints_[id].z_ > 0.0f;
-        wheelNode->SetRotation(connectionPoint.x_ >=
-                                       0.0
-                                   ? Quaternion(0.0f, 0.0f,
-                                                -90.0f)
-                                   : Quaternion(0.0f, 0.0f, 90.0f));
-        wheelNode->SetWorldPosition(node_->GetWorldPosition() +
-                                    node_->GetWorldRotation() *
-                                        connectionPoints_[id]);
-        vehicle->AddWheel(wheelNode, wheelDirection, wheelAxle,
-                          suspensionRestLength_, wheelRadius_,
-                          isFrontWheel);
+        wheelNode->SetRotation(connectionPoint.x_ >= 0.0 ? Quaternion(0.0f, 0.0f, -90.0f) : Quaternion(0.0f, 0.0f, 90.0f));
+        wheelNode->SetWorldPosition(node_->GetWorldPosition() + node_->GetWorldRotation() * connectionPoints_[id]);
+        vehicle->AddWheel(wheelNode, wheelDirection, wheelAxle, suspensionRestLength_, wheelRadius_, isFrontWheel);
         vehicle->SetWheelSuspensionStiffness(id, suspensionStiffness_);
         vehicle->SetWheelDampingRelaxation(id, suspensionDamping_);
         vehicle->SetWheelDampingCompression(id, suspensionCompression_);
@@ -141,11 +124,8 @@ void Vehicle::CreateEmitter(Vector3 place)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Node* emitter = GetScene()->CreateChild();
-    emitter->SetWorldPosition(node_->GetWorldPosition() +
-                              node_->GetWorldRotation() * place +
-                              Vector3(0, -wheelRadius_, 0));
-    ParticleEmitter* particleEmitter =
-        emitter->CreateComponent<ParticleEmitter>();
+    emitter->SetWorldPosition(node_->GetWorldPosition() + node_->GetWorldRotation() * place + Vector3(0, -wheelRadius_, 0));
+    ParticleEmitter* particleEmitter = emitter->CreateComponent<ParticleEmitter>();
     particleEmitter->SetEffect(cache->GetResource<ParticleEffect>("Particle/Dust.xml"));
     particleEmitter->SetEmitting(false);
     particleEmitterNodeList_.Push(emitter);
@@ -155,8 +135,7 @@ void Vehicle::CreateEmitter(Vector3 place)
 /// Applying attributes
 void Vehicle::ApplyAttributes()
 {
-    RaycastVehicle* vehicle =
-        node_->GetOrCreateComponent<RaycastVehicle>();
+    RaycastVehicle* vehicle = node_->GetOrCreateComponent<RaycastVehicle>();
     if (emittersCreated)
         return;
     for (int i = 0; i < 4; i++)
@@ -214,6 +193,7 @@ void Vehicle::FixedUpdate(float timeStep)
     vehicle->SetEngineForce(2, engineForce_);
     vehicle->SetEngineForce(3, engineForce_);
     for (int i = 0; i < vehicle->GetNumWheels(); i++)
+    {
         if (brake)
         {
             vehicle->SetBrake(i, brakingForce_);
@@ -222,6 +202,7 @@ void Vehicle::FixedUpdate(float timeStep)
         {
             vehicle->SetBrake(i, 0.0f);
         }
+    }
 }
 
 void Vehicle::PostUpdate(float timeStep)
@@ -234,9 +215,9 @@ void Vehicle::PostUpdate(float timeStep)
     for (int i = 0; i < vehicle->GetNumWheels(); i++)
     {
         Node* emitter = particleEmitterNodeList_[i];
-        ParticleEmitter* particleEmitter =
-            emitter->GetComponent<ParticleEmitter>();
-        if (vehicle->WheelIsGrounded(i) && (vehicle->GetWheelSkidInfoCumulative(i) < 0.9f || vehicle->GetBrake(i) > 2.0f || planeAccel > 15.0f))
+        ParticleEmitter* particleEmitter = emitter->GetComponent<ParticleEmitter>();
+        if (vehicle->WheelIsGrounded(i) && (vehicle->GetWheelSkidInfoCumulative(i) < 0.9f || vehicle->GetBrake(i) > 2.0f || 
+            planeAccel > 15.0f))
         {
             particleEmitterNodeList_[i]->SetWorldPosition(vehicle->GetContactPosition(i));
             if (!particleEmitter->IsEmitting())
