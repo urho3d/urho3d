@@ -9059,6 +9059,122 @@ uint subObject;
 Vector2 textureUV;
 };
 
+class RaycastVehicle
+{
+public:
+// Methods:
+void AddWheel(Node, Vector3, Vector3, float, float, bool);
+void ApplyAttributes();
+void DrawDebugGeometry(DebugRenderer, bool);
+Variant GetAttribute(const String&) const;
+ValueAnimation GetAttributeAnimation(const String&) const;
+float GetAttributeAnimationSpeed(const String&) const;
+float GetAttributeAnimationTime(const String&) const;
+WrapMode GetAttributeAnimationWrapMode(const String&) const;
+Variant GetAttributeDefault(const String&) const;
+float GetBrake(int);
+Vector3 GetContactNormal(int);
+Vector3 GetContactPosition(int);
+float GetEngineForce(int);
+bool GetInterceptNetworkUpdate(const String&) const;
+float GetMaxSuspensionTravel(int);
+float GetSteeringValue(int);
+Vector3 GetWheelAxle(int);
+Vector3 GetWheelConnectionPoint(int);
+float GetWheelDampingCompression(int);
+float GetWheelDampingRelaxation(int);
+Vector3 GetWheelDirection(int);
+float GetWheelFrictionSlip(int);
+Node GetWheelNode(int);
+Vector3 GetWheelPosition(int);
+float GetWheelRadius(int);
+float GetWheelRestLength(int);
+float GetWheelRollInfluence(int);
+Vector3 GetWheelRotation(int);
+float GetWheelSideSlipSpeed(int);
+float GetWheelSkidInfo(int);
+float GetWheelSkidInfoCumulative(int);
+float GetWheelSuspensionStiffness(int);
+bool HasSubscribedToEvent(Object, const String&);
+bool HasSubscribedToEvent(const String&);
+void Init();
+bool IsFrontWheel(int);
+bool Load(File, bool = false);
+bool Load(VectorBuffer&, bool = false);
+bool LoadJSON(const JSONValue&, bool = false);
+bool LoadXML(const XMLElement&, bool = false);
+void MarkNetworkUpdate() const;
+void Remove();
+void RemoveAttributeAnimation(const String&);
+void RemoveInstanceDefault();
+void RemoveObjectAnimation();
+void ResetSuspension();
+void ResetToDefault();
+void ResetWheels();
+bool Save(File) const;
+bool Save(VectorBuffer&) const;
+bool SaveJSON(JSONValue&) const;
+bool SaveXML(XMLElement&) const;
+void SendEvent(const String&, VariantMap& = VariantMap ( ));
+void SetAnimationTime(float);
+bool SetAttribute(const String&, const Variant&);
+void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
+void SetAttributeAnimationSpeed(const String&, float);
+void SetAttributeAnimationTime(const String&, float);
+void SetAttributeAnimationWrapMode(const String&, WrapMode);
+void SetBrake(int, float);
+void SetEngineForce(int, float);
+void SetInterceptNetworkUpdate(const String&, bool);
+void SetMaxSuspensionTravel(int, float);
+void SetSteeringValue(int, float);
+void SetWheelAxle(int, Vector3);
+void SetWheelDampingCompression(int, float);
+void SetWheelDampingRelaxation(int, float);
+void SetWheelDirection(int, Vector3);
+void SetWheelFrictionSlip(int, float);
+void SetWheelRadius(int, float);
+void SetWheelRestLength(int, float);
+void SetWheelRollInfluence(int, float);
+void SetWheelSkidInfo(int, float);
+void SetWheelSkidInfoCumulative(int, float);
+void SetWheelSuspensionStiffness(int, float);
+void UpdateWheelTransform(int, bool);
+bool WheelIsGrounded(int);
+
+// Properties:
+bool animationEnabled;
+/* readonly */
+Array<Variant> attributeDefaults;
+/* readonly */
+Array<AttributeInfo> attributeInfos;
+Array<Variant> attributes;
+/* readonly */
+String category;
+bool enabled;
+/* readonly */
+bool enabledEffective;
+/* readonly */
+uint id;
+float inAirRPM;
+float maxSideSlipSpeed;
+/* readonly */
+Node node;
+/* readonly */
+uint numAttributes;
+/* readonly */
+int numWheels;
+ObjectAnimation objectAnimation;
+/* readonly */
+int refs;
+bool temporary;
+/* readonly */
+StringHash type;
+/* readonly */
+String typeName;
+/* readonly */
+int weakRefs;
+};
+
 class Rect
 {
 public:
