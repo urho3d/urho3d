@@ -6104,6 +6104,8 @@ bool isObject;
 /* readonly */
 bool isString;
 /* readonly */
+Array<String> keys;
+/* readonly */
 JSONNumberType numberType;
 /* readonly */
 String numberTypeName;
@@ -6113,6 +6115,8 @@ uint size;
 JSONValueType valueType;
 /* readonly */
 String valueTypeName;
+/* readonly */
+Array<JSONValue> values;
 };
 
 class JoystickState
