@@ -304,6 +304,36 @@ static JSONValue& JSONValueAtKey(const String& key, JSONValue& jsonValue)
     return jsonValue[key];
 }
 
+static CScriptArray* JSONValueGetKeys(const JSONValue& jsonValue)
+{
+    Vector<String> keys;
+    if (jsonValue.IsObject())
+    {
+        for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+            keys.Push(i->first_);
+    }
+
+    return VectorToArray<String>(keys, "Array<String>");
+}
+
+static CScriptArray* JSONValueGetValues(const JSONValue& jsonValue)
+{
+    if (jsonValue.IsArray())
+        return VectorToArray<JSONValue>(jsonValue.GetArray(), "Array<JSONValue>");
+    else
+    {
+        Vector<JSONValue> values;
+
+        if (jsonValue.IsObject())
+        {
+            for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+                values.Push(i->second_);
+        }
+
+        return VectorToArray<JSONValue>(values, "Array<JSONValue>");
+    }
+}
+
 static void RegisterJSONValue(asIScriptEngine* engine)
 {
     engine->RegisterEnum("JSONValueType");
@@ -374,6 +404,9 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "bool Contains(const String&in) const", asMETHOD(JSONValue, Contains), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "void Clear()", asMETHOD(JSONValue, Clear), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ get_keys() const", asFUNCTION(JSONValueGetKeys), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "Array<JSONValue>@ get_values() const", asFUNCTION(JSONValueGetValues), asCALL_CDECL_OBJLAST);
 }
 
 static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
