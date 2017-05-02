@@ -322,7 +322,7 @@ JSONObjectIterator JSONValue::End()
     // Convert to object type.
     SetType(JSON_OBJECT);
 
-    return objectValue_->Begin();
+    return objectValue_->End();
 }
 
 ConstJSONObjectIterator JSONValue::End() const
