@@ -640,6 +640,8 @@ static void RegisterQuaternion(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Quaternion", "float get_yaw() const", asMETHOD(Quaternion, YawAngle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_pitch() const", asMETHOD(Quaternion, PitchAngle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "float get_roll() const", asMETHOD(Quaternion, RollAngle), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "Vector3 get_axis() const", asMETHOD(Quaternion, Axis), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Quaternion", "float get_angle() const", asMETHOD(Quaternion, Angle), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Matrix3 get_rotationMatrix() const", asMETHOD(Quaternion, RotationMatrix), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Slerp(const Quaternion&in, float) const", asMETHOD(Quaternion, Slerp), asCALL_THISCALL);
     engine->RegisterObjectMethod("Quaternion", "Quaternion Nlerp(const Quaternion&in, float, bool) const", asMETHOD(Quaternion, Nlerp), asCALL_THISCALL);
