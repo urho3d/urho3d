@@ -47,6 +47,8 @@ class Quaternion
     float YawAngle() const;
     float PitchAngle() const;
     float RollAngle() const;
+    Vector3 Axis() const;
+    float Angle() const;
     Matrix3 RotationMatrix() const;
     Quaternion Slerp(const Quaternion& rhs, float t) const;
     Quaternion Nlerp(const Quaternion& rhs, float t, bool shortestPath) const;
