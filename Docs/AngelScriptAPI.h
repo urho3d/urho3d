@@ -9008,6 +9008,10 @@ String ToString() const;
 
 // Properties:
 /* readonly */
+float angle;
+/* readonly */
+Vector3 axis;
+/* readonly */
 Vector3 eulerAngles;
 /* readonly */
 float pitch;
