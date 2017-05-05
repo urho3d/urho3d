@@ -139,6 +139,7 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterNode<Node>(engine, "Node");
 
     engine->RegisterObjectMethod("Node", "void SetDeepEnabled(bool)", asMETHOD(Node, SetDeepEnabled), asCALL_THISCALL);
+	engine->RegisterObjectMethod("Node", "int GetID()", asMETHOD(Node, GetID), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void ResetDeepEnabled()", asMETHOD(Node, ResetDeepEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void SetEnabledRecursive(bool)", asMETHOD(Node, SetEnabledRecursive), asCALL_THISCALL);
     engine->RegisterObjectMethod("Node", "void MarkDirty()", asMETHOD(Node, MarkDirty), asCALL_THISCALL);
@@ -156,6 +157,8 @@ static void RegisterNode(asIScriptEngine* engine)
 
     // Now GetNode can be registered
     engine->RegisterObjectMethod("Component", "Node@+ get_node() const", asMETHOD(Component, GetNode), asCALL_THISCALL);
+
+	engine->RegisterObjectMethod("Component", "int GetID()", asMETHOD(Component, GetID), asCALL_THISCALL);
 
     // Calling DebugRenderer is part of the Component API, so register it as early as possible
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
