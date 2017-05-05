@@ -850,7 +850,7 @@ String ResourceCache::SanitateResourceName(const String& nameIn) const
     if (resourceDirs_.Size())
     {
         String namePath = GetPath(name);
-        String exePath = fileSystem->GetProgramDir();
+        String exePath = fileSystem->GetProgramDir().Replaced("/./", "/");
         for (unsigned i = 0; i < resourceDirs_.Size(); ++i)
         {
             String relativeResourcePath = resourceDirs_[i];

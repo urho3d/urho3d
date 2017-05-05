@@ -556,10 +556,8 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         return;
 
     // If morph vertex buffers have not been created yet, create now
-    if (weight > 0.0f && morphVertexBuffers_.Empty())
+    if (weight != 0.0f && morphVertexBuffers_.Empty())
         CloneGeometries();
-
-    weight = Clamp(weight, 0.0f, 1.0f);
 
     if (weight != morphs_[index].weight_)
     {
@@ -1369,7 +1367,7 @@ void AnimatedModel::UpdateMorphs()
 
                     for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
-                        if (morphs_[j].weight_ > 0.0f)
+                        if (morphs_[j].weight_ != 0.0f)
                         {
                             HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())

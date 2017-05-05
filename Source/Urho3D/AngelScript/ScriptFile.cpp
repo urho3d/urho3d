@@ -463,7 +463,11 @@ asIScriptObject* ScriptFile::CreateObject(const String& className, bool useInter
     if (!factory || context->Prepare(factory) < 0 || context->Execute() < 0)
         return 0;
 
-    asIScriptObject* obj = *(static_cast<asIScriptObject**>(context->GetAddressOfReturnValue()));
+    void* objAddress = context->GetAddressOfReturnValue();
+    if (!objAddress)
+        return 0;
+
+    asIScriptObject* obj = *(static_cast<asIScriptObject**>(objAddress));
     if (obj)
         obj->AddRef();
 

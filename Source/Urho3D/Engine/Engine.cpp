@@ -52,6 +52,7 @@
 #endif
 #ifdef URHO3D_PHYSICS
 #include "../Physics/PhysicsWorld.h"
+#include "../Physics/RaycastVehicle.h"
 #endif
 #include "../Resource/ResourceCache.h"
 #include "../Resource/Localization.h"
@@ -145,7 +146,7 @@ Engine::Engine(Context* context) :
 #ifdef URHO3D_IK
     RegisterIKLibrary(context_);
 #endif
-
+    
 #ifdef URHO3D_PHYSICS
     RegisterPhysicsLibrary(context_);
 #endif
