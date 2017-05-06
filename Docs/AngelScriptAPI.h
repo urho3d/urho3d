@@ -7963,6 +7963,8 @@ Scene scene;
 /* readonly */
 ScriptObject scriptObject;
 /* readonly */
+Vector3 signedWorldScale;
+/* readonly */
 Array<String> tags;
 bool temporary;
 /* readonly */
@@ -10059,6 +10061,8 @@ Vector3 scale;
 Vector2 scale2D;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Vector3 signedWorldScale;
 float smoothingConstant;
 float snapThreshold;
 /* readonly */
