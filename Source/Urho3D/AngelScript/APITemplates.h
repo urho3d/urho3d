@@ -762,7 +762,7 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "Vector3 get_worldRight()", asMETHOD(T, GetWorldRight), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldScale(const Vector3&in)", asMETHODPR(T, SetWorldScale, (const Vector3&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector3 get_worldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
-    engine->RegisterObjectMethod(className, "Vector3 get_signedWorldScale()", asMETHOD(T, GetWorldScale), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "Vector3 get_signedWorldScale()", asMETHOD(T, GetSignedWorldScale), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void set_worldScale2D(const Vector2&in)", asMETHODPR(T, SetWorldScale2D, (const Vector2&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Vector2 get_worldScale2D()", asMETHOD(T, GetWorldScale2D), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Matrix3x4 get_transform() const", asMETHOD(T, GetTransform), asCALL_THISCALL);
