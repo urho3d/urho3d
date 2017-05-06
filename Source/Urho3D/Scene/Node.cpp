@@ -1171,6 +1171,21 @@ void Node::RemoveListener(Component* component)
     }
 }
 
+Vector3 Node::GetSignedWorldScale() const
+{
+    if (dirty_)
+        UpdateWorldTransform();
+    
+    Vector3 scale = worldTransform_.Scale();
+    Matrix3 rot = worldRotation_.RotationMatrix();
+    
+    scale.x_ *= Sign(rot.m00_) * Sign(worldTransform_.m00_);
+    scale.y_ *= Sign(rot.m11_) * Sign(worldTransform_.m11_);
+    scale.z_ *= Sign(rot.m22_) * Sign(worldTransform_.m22_);
+    
+    return scale;
+}
+
 Vector3 Node::LocalToWorld(const Vector3& position) const
 {
     return GetWorldTransform() * position;

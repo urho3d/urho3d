@@ -20,6 +20,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse Öörni
 - Wei Tjong Yao
 - Aster Jian
+- Ricardo Abreu
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
