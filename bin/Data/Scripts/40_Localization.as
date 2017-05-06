@@ -11,8 +11,9 @@ void Start()
     // Execute the common startup for samples
     SampleStart();
 
-    // Enable OS cursor
+    // Enable and center OS cursor
     input.mouseVisible = true;
+    input.CenterMousePosition();
 
     // Load strings from JSON files and subscribe to the change language event
     InitLocalizationSystem();

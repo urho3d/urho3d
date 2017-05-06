@@ -128,7 +128,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     buffer[dataSize] = '\0';
 
     rapidjson::Document document;
-    if (document.Parse<kParseCommentsFlag>(buffer).HasParseError())
+    if (document.Parse<kParseCommentsFlag | kParseTrailingCommasFlag>(buffer).HasParseError())
     {
         URHO3D_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
