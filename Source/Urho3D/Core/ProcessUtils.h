@@ -70,4 +70,6 @@ URHO3D_API void SetMiniDumpDir(const String& pathName);
 /// Return minidump write location.
 URHO3D_API String GetMiniDumpDir();
 
+URHO3D_API unsigned long long GetTotalMemory(); 
+
 }
