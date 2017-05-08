@@ -251,12 +251,23 @@ void Script::MessageCallback(const asSMessageInfo* msg)
         URHO3D_LOGINFO(message);
         break;
     }
+
+	if (msg->type == asMSGTYPE_ERROR) {
+		//also send error event
+		VariantMap& eventData = GetEventDataMap();
+		eventData[ScriptError::P_SCRIPTPATH] = msg->section;
+		eventData[ScriptError::P_ROW] = msg->row;
+		eventData[ScriptError::P_COL] = msg->col;
+		eventData[ScriptError::P_MSG] = msg->message;
+		SendEvent(E_SCRIPTERROR, eventData);
+	}
+
 }
 
 void Script::ExceptionCallback(asIScriptContext* context)
 {
     String message;
-    message.AppendWithFormat("- Exception '%s' in '%s'\n%s", context->GetExceptionString(),
+    message.AppendWithFormat("Exception '%s' in '%s'\n%s", context->GetExceptionString(),
         context->GetExceptionFunction()->GetDeclaration(), GetCallStack(context).CString());
 
     asSMessageInfo msg;

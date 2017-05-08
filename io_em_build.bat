@@ -1,0 +1,4 @@
+cmake -BBuild/WebGL -H. ^
+-DURHO3D_PACKAGING=1 -DURHO3D_SAMPLES=1 -DEMSCRIPTEN=1 -DWEB=1 -DEMSCRIPTEN_ALLOW_MEMORY_GROWTH=1 ^
+-G "MinGW Makefiles" ^
+-DCMAKE_TOOLCHAIN_FILE="CMake/Toolchains/emscripten.toolchain.cmake"
