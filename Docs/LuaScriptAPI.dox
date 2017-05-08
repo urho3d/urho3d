@@ -3114,6 +3114,8 @@ Methods:
 - void SetString(const String value)
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
+- void SetVariant(const Variant& value)
+- void SetVariantMap(const VariantMap& value)
 - JSONValueType GetValueType() const
 - JSONNumberType GetNumberType() const
 - String GetValueTypeName() const
@@ -3132,6 +3134,8 @@ Methods:
 - const String GetString() const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - JSONValue operator&[](unsigned index, JSONValue tolua_value)
 - JSONValue operator[](unsigned index)
 - const JSONValue operator[](unsigned index) const

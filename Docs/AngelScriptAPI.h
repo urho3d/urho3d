@@ -6082,12 +6082,16 @@ double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
 uint GetUInt() const;
+Variant GetVariant() const;
+VariantMap GetVariantMap() const;
 void Insert(uint, const JSONValue&);
 const JSONValue& Get(const String&) const;
 void Pop();
 void Push(const JSONValue&);
 void Resize(uint);
 void Set(const String&, const JSONValue&);
+void SetVariant(const Variant&);
+void SetVariantMap(const VariantMap&);
 const String& GetString() const;
 
 // Properties:
