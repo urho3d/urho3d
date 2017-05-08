@@ -496,9 +496,10 @@ unsigned long long GetTotalMemory()
     if(sysinfo(&s) != -1)
         return s.totalram; 
 #elif defined(_WIN32)
-    unsigned long long l; 
-    if(GetPhysicallyInstalledSystemMemory(&l))
-        return l;
+    MEMORYSTATUSEX state; 
+    state.dwLength = sizeof(state); 
+    if(GlobalMemoryStatusEx(&state)) 
+        return state.ullTotalPhys; 
 #else 
 #endif 
     return 0ull;
