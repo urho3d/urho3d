@@ -19,3 +19,4 @@ String GetMiniDumpDir();
 unsigned long long GetTotalMemory(); 
 String GetLoginName(); 
 String GetHostName();
+String GetOSVersion(); 

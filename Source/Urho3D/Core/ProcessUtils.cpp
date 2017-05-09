@@ -539,4 +539,53 @@ String GetHostName()
     return String::EMPTY; 
 }
 
+#if defined(_WIN32)
+#define STATUS_SUCCESS (0x00000000)
+typedef NTSTATUS       (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+static void GetOS(RTL_OSVERSIONINFOW *r)
+{
+    HMODULE m = GetModuleHandle("ntdll.dll");
+    if (m)
+    {
+        RtlGetVersionPtr fPtr = (RtlGetVersionPtr) GetProcAddress(m, "RtlGetVersion");
+        if (r && fPtr && fPtr(r) == STATUS_SUCCESS)
+            r->dwOSVersionInfoSize = sizeof *r; 
+    }
+}
+#endif 
+
+String GetOSVersion() 
+{
+#if defined(__linux__)
+    struct utsname u; 
+    if(uname(&u) == 0)
+        return String(u.sysname) + " " + u.release; 
+#elif defined(_WIN32)
+    RTL_OSVERSIONINFOW r;
+    GetOS(&r); 
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
+    if(r.dwMajorVersion == 5 && r.dwMinorVersion == 0) 
+        return "Windows 2000"; 
+    else if(r.dwMajorVersion == 5 && r.dwMinorVersion == 1) 
+        return "Windows XP"; 
+    else if(r.dwMajorVersion == 5 && r.dwMinorVersion == 2) 
+        return "Windows XP 64-Bit Edition/Windows Server 2003/Windows Server 2003 R2"; 
+    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 0) 
+        return "Windows Vista/Windows Server 2008"; 
+    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 1) 
+        return "Windows 7/Windows Server 2008 R2"; 
+    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 2) 
+        return "Windows 8/Windows Server 2012";
+    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 3) 
+        return "Windows 8.1/Windows Server 2012 R2"; 
+    else if(r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
+        return "Windows 10/Windows Server 2016"; 
+    else 
+        return "Windows Unidentified"; 
+#else 
+#endif 
+    return String::EMPTY; 
+}
+
 }

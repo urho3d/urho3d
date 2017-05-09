@@ -15947,6 +15947,7 @@ String GetPlatform();
 uint64 GetTotalMemory();
 String GetLoginName(); 
 String GetHostName();
+String GetOSVersion(); 
 uint GetRG16Format();
 uint GetRGBA16Format();
 uint GetRGBAFloat16Format();
