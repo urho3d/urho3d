@@ -15944,6 +15944,7 @@ Array<String> GetObjectsByCategory(const String&);
 String GetParentPath(const String&);
 String GetPath(const String&);
 String GetPlatform();
+uint64 GetTotalMemory();
 uint GetRG16Format();
 uint GetRGBA16Format();
 uint GetRGBAFloat16Format();

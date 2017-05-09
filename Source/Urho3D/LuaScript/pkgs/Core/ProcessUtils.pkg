@@ -15,3 +15,5 @@ unsigned GetNumLogicalCPUs();
 
 void SetMiniDumpDir(const String pathName);
 String GetMiniDumpDir();
+
+unsigned long long GetTotalMemory(); 

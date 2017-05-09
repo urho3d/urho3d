@@ -69,5 +69,6 @@ URHO3D_API unsigned GetNumLogicalCPUs();
 URHO3D_API void SetMiniDumpDir(const String& pathName);
 /// Return minidump write location.
 URHO3D_API String GetMiniDumpDir();
-
+/// Return the total amount of useable memory. 
+URHO3D_API unsigned long long GetTotalMemory(); 
 }
