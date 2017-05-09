@@ -73,4 +73,6 @@ URHO3D_API String GetMiniDumpDir();
 URHO3D_API unsigned long long GetTotalMemory(); 
 /// Return the name of the currently logged in user. 
 URHO3D_API String GetLoginName(); 
+/// Return the name of the running machine. 
+URHO3D_API String GetHostName();
 }

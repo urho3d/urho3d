@@ -50,6 +50,7 @@
 #include <pwd.h> 
 #include <unistd.h>
 #include <sys/sysinfo.h>
+#include <limits.h> // For HOST_NAME_MAX. 
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
@@ -520,6 +521,22 @@ String GetLoginName()
 #else 
 #endif 
     return String::EMPTY;
+}
+
+String GetHostName() 
+{
+#if defined(__linux__)
+    char buffer[HOST_NAME_MAX + 1]; 
+    if(gethostname(buffer, HOST_NAME_MAX + 1) == 0) 
+        return buffer; 
+#elif defined(_WIN32)
+    char buffer[MAX_COMPUTERNAME_LENGTH + 1]; 
+    DWORD len = MAX_COMPUTERNAME_LENGTH + 1; 
+    if(GetComputerName(buffer, &len))
+        return buffer; 
+#else 
+#endif 
+    return String::EMPTY; 
 }
 
 }

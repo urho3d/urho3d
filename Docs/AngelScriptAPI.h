@@ -15946,6 +15946,7 @@ String GetPath(const String&);
 String GetPlatform();
 uint64 GetTotalMemory();
 String GetLoginName(); 
+String GetHostName();
 uint GetRG16Format();
 uint GetRGBA16Format();
 uint GetRGBAFloat16Format();

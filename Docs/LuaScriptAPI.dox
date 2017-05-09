@@ -8656,6 +8656,7 @@ Properties:
 - String GetPlatform()
 - unsigned long long GetTotalMemory()
 - String GetLoginName()
+- String GetHostName() 
 - unsigned GetRandomSeed()
 - Renderer* GetRenderer()
 - Time* GetTime()
