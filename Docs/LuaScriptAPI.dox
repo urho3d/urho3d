@@ -8655,6 +8655,7 @@ Properties:
 - String GetPath(const String fullPath)
 - String GetPlatform()
 - unsigned long long GetTotalMemory()
+- String GetLoginName()
 - unsigned GetRandomSeed()
 - Renderer* GetRenderer()
 - Time* GetTime()

@@ -42,10 +42,12 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <io.h>
+#include <Lmcons.h> // For UNLEN. 
 #if defined(_MSC_VER)
 #include <float.h>
 #endif
 #else
+#include <pwd.h> 
 #include <unistd.h>
 #include <sys/sysinfo.h>
 #endif
@@ -500,6 +502,24 @@ unsigned long long GetTotalMemory()
 #else 
 #endif 
     return 0ull;
+}
+
+String GetLoginName() 
+{
+#if defined(__linux__)
+    struct passwd *p = getpwuid(getuid());
+    if (p) 
+        return p->pw_name;
+    else 
+        return "(?)"; 
+#elif defined(_WIN32)
+    char name[UNLEN + 1];
+    DWORD len = UNLEN + 1; 
+    if(GetUserName(name, &len)) 
+        return name; 
+#else 
+#endif 
+    return String::EMPTY;
 }
 
 }

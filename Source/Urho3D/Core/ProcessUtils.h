@@ -71,4 +71,6 @@ URHO3D_API void SetMiniDumpDir(const String& pathName);
 URHO3D_API String GetMiniDumpDir();
 /// Return the total amount of useable memory. 
 URHO3D_API unsigned long long GetTotalMemory(); 
+/// Return the name of the currently logged in user. 
+URHO3D_API String GetLoginName(); 
 }
