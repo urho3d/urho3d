@@ -42,14 +42,19 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <io.h>
-#include <Lmcons.h> // For UNLEN. 
 #if defined(_MSC_VER)
 #include <float.h>
-#endif
+#include <Lmcons.h> // For UNLEN. 
+#elif defined(__MINGW32__)
+#include <lmcons.h> // For UNLEN. Apparently MSVC defines "<Lmcons.h>" (with an upperscore 'L' but MinGW uses an underscore 'l'). 
+#include <ntdef.h> 
+#else 
+#endif 
 #else
 #include <pwd.h> 
 #include <unistd.h>
 #include <sys/sysinfo.h>
+#include <sys/utsname.h>
 #include <limits.h> // For HOST_NAME_MAX. 
 #endif
 
@@ -540,8 +545,7 @@ String GetHostName()
 }
 
 #if defined(_WIN32)
-#define STATUS_SUCCESS (0x00000000)
-typedef NTSTATUS       (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+typedef NTSTATUS (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
 static void GetOS(RTL_OSVERSIONINFOW *r)
 {
