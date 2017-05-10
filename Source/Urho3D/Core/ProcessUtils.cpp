@@ -553,7 +553,7 @@ static void GetOS(RTL_OSVERSIONINFOW *r)
     if (m)
     {
         RtlGetVersionPtr fPtr = (RtlGetVersionPtr) GetProcAddress(m, "RtlGetVersion");
-        if (r && fPtr && fPtr(r) == STATUS_SUCCESS)
+        if (r && fPtr && fPtr(r) == 0)
             r->dwOSVersionInfoSize = sizeof *r; 
     }
 }
