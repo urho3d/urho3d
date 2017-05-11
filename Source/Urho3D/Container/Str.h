@@ -64,17 +64,17 @@ template <typename T> struct IsNotCharPtr<char*, T>
 {
 };
 
-/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of characters.
 template < unsigned N > inline unsigned LiteralStrLen(const char(&a)[N])
 {
-    return a[N-1] == '\0' ? N-1 : N;
+    return a[N-1] == '\0' ? N-1 : strlen(a);
 }
-/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of characters.
 inline unsigned LiteralStrLen(const char(&a)[1])
 {
     return a[0] == '\0' ? 0 : 1;
 }
-/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of characters.
 inline unsigned LiteralStrLen(const char(&)[0])
 {
     return 0;
@@ -632,7 +632,7 @@ private:
 #endif
     }
 
-    /// Append with a C string of known length.
+    /// Append a C string of known length.
     void Add(const char* str, unsigned length)
     {
         unsigned oldLength = length_;
@@ -640,7 +640,7 @@ private:
         CopyChars(&buffer_[oldLength], str, length);
     }
 
-    /// Assign with a C string of known length.
+    /// Assign a C string of known length.
     void Set(const char* str, unsigned length)
     {
         Resize(length);
