@@ -27,7 +27,6 @@
 #include "../Audio/Sound.h"
 #include "../Audio/SoundSource.h"
 #include "../Audio/SoundStream.h"
-#include "../Audio/OggVorbisSoundStream.h"
 #include "../Core/Context.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
@@ -154,12 +153,15 @@ void SoundSource::Seek(float seekTime)
     // set to valid range
     seekTime = Clamp(seekTime, 0.0f, sound_->GetLength());
 
-    if (!soundStream_) {
+    if (!soundStream_)
+    {
         // raw or wav format
         SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
-    } else {
+    } else
+    {
         // ogg format
-        if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency()))) {
+        if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency())))
+        {
             timePosition_ = seekTime;
         }
     }
