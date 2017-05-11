@@ -38,12 +38,6 @@ BufferedSoundStream::~BufferedSoundStream()
 {
 }
 
-int BufferedSoundStream::Seek(unsigned int sample_number)
-{
-    // Do not support yet
-    return 0;
-}
-    
 unsigned BufferedSoundStream::GetData(signed char* dest, unsigned numBytes)
 {
     MutexLock lock(bufferMutex_);
