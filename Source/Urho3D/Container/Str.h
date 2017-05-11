@@ -36,6 +36,50 @@ static const int MATRIX_CONVERSION_BUFFER_LENGTH = 256;
 
 class WString;
 
+/// Helper structure used as a type trait to differentiate between character arrays and a character pointers.
+template <typename T, typename U> struct IsCharPtr
+{
+};
+/// Specialization for constant character pointers.
+template <typename T> struct IsCharPtr<const char*, T>
+{
+    typedef T type;
+};
+/// Specialization for character pointers.
+template <typename T> struct IsCharPtr<char*, T>
+{
+    typedef T type;
+};
+/// Helper structure used as a type trait to make a distinction between other types and character pointers.
+template <typename T, typename U> struct IsNotCharPtr
+{
+    typedef U type;
+};
+/// Specialization for constant character pointers.
+template <typename T> struct IsNotCharPtr<const char*, T>
+{
+};
+/// Specialization for character pointers.
+template <typename T> struct IsNotCharPtr<char*, T>
+{
+};
+
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+template < unsigned N > inline unsigned LiteralStrLen(const char(&a)[N])
+{
+    return a[N-1] == '\0' ? N-1 : N;
+}
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+inline unsigned LiteralStrLen(const char(&a)[1])
+{
+    return a[0] == '\0' ? 0 : 1;
+}
+/// Exclude (at compile-time, if possible) the null character from the actual size of string literals and/or array of caharacters.
+inline unsigned LiteralStrLen(const char(&)[0])
+{
+    return 0;
+}
+
 /// %String class.
 class URHO3D_API String
 {
@@ -60,22 +104,34 @@ public:
         *this = str;
     }
 
+    /// Construct from a constant character array.
+    template <unsigned N>
+    String(const char(&str)[N]) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Set(str, LiteralStrLen(str));
+    }
+
+    /// Construct from a character array.
+    template <unsigned N>
+    String(char(&str)[N]) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        *this = (const char *)str;
+    }
+
     /// Construct from a C string.
-    String(const char* str) :
+    template <typename T>
+    String(T str, typename IsCharPtr<T, void>::type* = 0) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
     {
         *this = str;
-    }
-
-    /// Construct from a C string.
-    String(char* str) :
-        length_(0),
-        capacity_(0),
-        buffer_(&endZero)
-    {
-        *this = (const char*)str;
     }
 
     /// Construct from a char array and length.
@@ -109,6 +165,17 @@ public:
     /// Construct from a wide character string.
     String(const WString& str);
 
+    /// Construct by concatenating an existing string with a C string of known length.
+    String(const String & left, const char* right, unsigned length) :
+        length_(0),
+        capacity_(0),
+        buffer_(&endZero)
+    {
+        Resize(left.length_ + length);
+        CopyChars(buffer_, left.buffer_, left.length_);
+        CopyChars(buffer_ + left.length_, right, length);
+    }
+
     /// Construct from an integer.
     explicit String(int value);
     /// Construct from a short integer.
@@ -137,7 +204,7 @@ public:
     explicit String(char value, unsigned length);
 
     /// Construct from a convertable value.
-    template <class T> explicit String(const T& value) :
+    template <class T> explicit String(const T& value, typename IsNotCharPtr<T, void>::type* = 0) :
         length_(0),
         capacity_(0),
         buffer_(&endZero)
@@ -161,8 +228,27 @@ public:
         return *this;
     }
 
+    /// Assign a constant character array.
+    template <unsigned N>
+    String& operator =(const char(&rhs)[N])
+    {
+        Set(rhs, LiteralStrLen(rhs));
+
+        return *this;
+    }
+
+    /// Assign a character array.
+    template <unsigned N>
+    String& operator =(char(&rhs)[N])
+    {
+        *this = (const char *)rhs;
+
+        return *this;
+    }
+
     /// Assign a C string.
-    String& operator =(const char* rhs)
+    template <typename T>
+    typename IsCharPtr<T, String&>::type operator =(T rhs)
     {
         unsigned rhsLength = CStringLength(rhs);
         Resize(rhsLength);
@@ -181,8 +267,27 @@ public:
         return *this;
     }
 
+    /// Add-assign a constant character array.
+    template <unsigned N>
+    String& operator +=(const char(&rhs)[N])
+    {
+        Add(rhs, LiteralStrLen(rhs));
+
+        return *this;
+    }
+
+    /// Add-assign a character array.
+    template <unsigned N>
+    String& operator +=(char(&rhs)[N])
+    {
+        *this += (const char *)rhs;
+
+        return *this;
+    }
+
     /// Add-assign a C string.
-    String& operator +=(const char* rhs)
+    template <typename T>
+    typename IsCharPtr<T, String&>::type operator +=(T rhs)
     {
         unsigned rhsLength = CStringLength(rhs);
         unsigned oldLength = length_;
@@ -224,7 +329,8 @@ public:
     String& operator +=(bool rhs);
 
     /// Add-assign (concatenate as string) an arbitrary type.
-    template <class T> String operator +=(const T& rhs) { return *this += rhs.ToString(); }
+    template <class T>
+    typename IsNotCharPtr<T, String&>::type operator +=(const T& rhs) { return *this += rhs.ToString(); }
 
     /// Add a string.
     String operator +(const String& rhs) const
@@ -237,8 +343,23 @@ public:
         return ret;
     }
 
+    /// Add a constant character array.
+    template <unsigned N>
+    String operator +(const char(&rhs)[N])
+    {
+        return String(*this, rhs, LiteralStrLen(rhs));
+    }
+
+    /// Add a character array.
+    template <unsigned N>
+    String operator +(char(&rhs)[N])
+    {
+        return String(*this, rhs, CStringLength(rhs));
+    }
+
     /// Add a C string.
-    String operator +(const char* rhs) const
+    template <typename T>
+    typename IsCharPtr<T, String>::type operator +(T rhs)
     {
         unsigned rhsLength = CStringLength(rhs);
         String ret;
@@ -509,6 +630,21 @@ private:
             ++src;
         }
 #endif
+    }
+
+    /// Append with a C string of known length.
+    void Add(const char* str, unsigned length)
+    {
+        unsigned oldLength = length_;
+        Resize(oldLength + length);
+        CopyChars(&buffer_[oldLength], str, length);
+    }
+
+    /// Assign with a C string of known length.
+    void Set(const char* str, unsigned length)
+    {
+        Resize(length);
+        CopyChars(buffer_, str, length);
     }
 
     /// Replace a substring with another substring.
