@@ -50,7 +50,7 @@
 #include <ntdef.h> 
 #else 
 #endif 
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__APPLE__) && !defined(__ANDROID__) 
 #include <pwd.h> 
 #include <unistd.h>
 #include <sys/sysinfo.h>
