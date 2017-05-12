@@ -39,7 +39,7 @@
 #include <LibCpuId/libcpuid.h>
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <windows.h>
 #include <io.h>
 #if defined(_MSC_VER)
