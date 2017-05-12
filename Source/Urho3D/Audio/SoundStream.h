@@ -36,6 +36,9 @@ public:
     /// Destruct.
     ~SoundStream();
 
+    /// Seek to sample number
+    virtual bool Seek(unsigned int sample_number);
+    
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
     virtual unsigned GetData(signed char* dest, unsigned numBytes) = 0;
 

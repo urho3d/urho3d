@@ -144,6 +144,30 @@ void SoundSource::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
 }
 
+void SoundSource::Seek(float seekTime)
+{
+    // ignore buffered sound stream
+    if (!audio_ || !sound_ || (soundStream_ && !sound_->IsCompressed()))
+        return;
+
+    // set to valid range
+    seekTime = Clamp(seekTime, 0.0f, sound_->GetLength());
+
+    if (!soundStream_)
+    {
+        // raw or wav format
+        SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
+    }
+    else
+    {
+        // ogg format
+        if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency())))
+        {
+            timePosition_ = seekTime;
+        }
+    }
+}
+
 void SoundSource::Play(Sound* sound)
 {
     if (!audio_)
