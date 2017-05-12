@@ -157,7 +157,8 @@ void SoundSource::Seek(float seekTime)
     {
         // raw or wav format
         SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
-    } else
+    }
+    else
     {
         // ogg format
         if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency())))
