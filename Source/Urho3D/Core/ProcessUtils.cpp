@@ -50,12 +50,13 @@
 #include <ntdef.h> 
 #else 
 #endif 
-#else
+#elif defined(__linux__)
 #include <pwd.h> 
 #include <unistd.h>
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
 #include <limits.h> // For HOST_NAME_MAX. 
+#else
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
