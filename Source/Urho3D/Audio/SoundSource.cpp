@@ -161,7 +161,7 @@ void SoundSource::Seek(float seekTime)
     else
     {
         // Ogg format
-        if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency())))
+        if (soundStream_->Seek((unsigned)(seekTime * soundStream_->GetFrequency())))
         {
             timePosition_ = seekTime;
         }
