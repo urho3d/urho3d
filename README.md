@@ -120,6 +120,7 @@ Urho3D development, contributions and bugfixes by:
 - lhinuz
 - lvshiling
 - marynate
+- meshonline
 - mightyCelu
 - neat3d
 - nemerle

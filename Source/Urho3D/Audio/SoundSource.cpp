@@ -146,21 +146,21 @@ void SoundSource::RegisterObject(Context* context)
 
 void SoundSource::Seek(float seekTime)
 {
-    // ignore buffered sound stream
+    // Ignore buffered sound stream
     if (!audio_ || !sound_ || (soundStream_ && !sound_->IsCompressed()))
         return;
 
-    // set to valid range
+    // Set to valid range
     seekTime = Clamp(seekTime, 0.0f, sound_->GetLength());
 
     if (!soundStream_)
     {
-        // raw or wav format
+        // Raw or wav format
         SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
     }
     else
     {
-        // ogg format
+        // Ogg format
         if (soundStream_->Seek((unsigned int)(seekTime * soundStream_->GetFrequency())))
         {
             timePosition_ = seekTime;
