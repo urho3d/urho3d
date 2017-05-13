@@ -56,6 +56,7 @@ void RegisterSoundSources(asIScriptEngine* engine)
     RegisterSoundSource<SoundSource3D>(engine, "SoundSource3D");
     // Allow creation of sound sources also outside scene
     RegisterObjectConstructor<SoundSource>(engine, "SoundSource");
+    engine->RegisterObjectMethod("SoundSource", "void Seek(float)", asMETHOD(SoundSource, Seek), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void SetDistanceAttenuation(float, float, float)", asMETHOD(SoundSource3D, SetDistanceAttenuation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void SetAngleAttenuation(float, float)", asMETHOD(SoundSource3D, SetAngleAttenuation), asCALL_THISCALL);
     engine->RegisterObjectMethod("SoundSource3D", "void set_nearDistance(float)", asMETHOD(SoundSource3D, SetNearDistance), asCALL_THISCALL);
