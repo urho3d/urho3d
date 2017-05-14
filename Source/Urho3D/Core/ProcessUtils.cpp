@@ -610,8 +610,82 @@ String GetOSVersion()
         return "Windows 10/Windows Server 2016"; 
     else 
         return "Windows Unidentified";
+#elif defined(__APPLE__)
+    char kernel_r[256]; 
+    size_t size = sizeof(kernel_r); 
+
+    if(sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
+    {
+        Vector<String> kernel_version = String(kernel_r).Split('.'); 
+        String version = "macOS/Mac OS X "; 
+        int major = atoi(kernel_version[0].CString());
+        int minor = atoi(kernel_version[1].CString());
+        int patch = atoi(kernel_version[2].CString()); 
+
+        // https://en.wikipedia.org/wiki/Darwin_(operating_system)
+        if(major == 16) // macOS Sierra 
+        {
+            version += "Sierra "; 
+            switch(minor)
+            {
+                case 0: version += "10.12.0 "; break; 
+                case 1: version += "10.12.1 "; break; 
+                case 3: version += "10.12.2 "; break; 
+            }
+        }
+        else if(major == 15) // OS X El Capitan
+        {
+            version += "El Capitan ";
+            switch(minor)
+            {
+                case 0: version += "10.11.0 "; break; 
+                case 6: version += "10.11.6 "; break; 
+            }
+        }
+        else if(major == 14) // OS X Yosemite 
+        {
+            version += "Yosemite "; 
+            switch(minor) 
+            {
+                case 0: version += "10.10.0 "; break; 
+                case 5: version += "10.10.5 "; break; 
+            }
+        }
+        else if(major == 13) // OS X Mavericks
+        {
+            version += "Mavericks ";
+            switch(minor)
+            {
+                case 0: version += "10.9.0 "; break; 
+                case 4: version += "10.9.5 "; break; 
+            }
+        }
+        else if(major == 12) // OS X Mountain Lion
+        {
+            version += "Mountain Lion "; 
+            switch(minor) 
+            {
+                case 0: version += "10.8.0 "; break; 
+                case 6: version += "10.8.5 "; break; 
+            }
+        }
+        else if(major == 11) // Mac OS X Lion
+        {
+            version += "Lion ";
+            switch(minor)
+            {
+                case 0: version += "10.7.0 "; break; 
+                case 4: version += "10.7.5 "; break; 
+            }
+        }
+        else 
+        {
+            version += "Unknown ";
+        }
+
+        return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")"; 
+    }
 #endif
-    /// \todo Implement on OSX
     return String::EMPTY; 
 }
 
