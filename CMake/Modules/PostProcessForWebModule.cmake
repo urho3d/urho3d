@@ -22,7 +22,7 @@
 
 # Post process to glue the main module and side module(s) together
 
-string (REPLACE " " .js',' SIDE_MODULES "'${SIDE_MODULES}.js'")                     # Stringify for string replacement
+string (REPLACE " " .js',' SIDE_MODULES "'${SIDE_MODULES}.js'")              # Stringify for string replacement
 if (HAS_SHELL_FILE)
     file (READ ${TARGET_FILE} CONTENT)
     string (REPLACE ${TARGET_NAME}.js libUrho3D.js CONTENT "${CONTENT}")     # Stringify to preserve semicolons

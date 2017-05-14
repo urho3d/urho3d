@@ -425,7 +425,6 @@ env:
     - numjobs=2
     - WEB=1
     - EMSCRIPTEN_SHARE_DATA=1
-    - EMSCRIPTEN_SHARE_JS=1
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
