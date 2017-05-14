@@ -55,6 +55,7 @@
 #include <sys/utsname.h>
 #elif defined(__APPLE__)
 #include <sys/sysctl.h>
+#include <SystemConfiguration/SystemConfiguration.h> // For the detection functions inside GetLoginName(). 
 #endif
 #ifndef _WIN32
 #include <unistd.h>
@@ -525,17 +526,30 @@ String GetLoginName()
     struct passwd *p = getpwuid(getuid());
     if (p) 
         return p->pw_name;
-    else 
-        return "(?)"; 
 #elif defined(_WIN32)
     char name[UNLEN + 1];
     DWORD len = UNLEN + 1;
     if(GetUserName(name, &len))
         return name;
 #elif defined(__APPLE__)
-    return getenv("USER");
+    SCDynamicStoreRef s = SCDynamicStoreCreate(NULL, CFSTR("GetConsoleUser"), NULL, NULL);
+    if(s != NULL)
+    {
+        uid_t u; 
+        CFStringRef n = SCDynamicStoreCopyConsoleUser(s, &u, NULL);
+        CFRelease(s); 
+        if(n != NULL)
+        {
+            char name[256]; 
+            Boolean b = CFStringGetCString(n, name, 256, kCFStringEncodingUTF8);
+            CFRelease(n); 
+
+            if(b == true)
+                return name; 
+        }
+    }
 #endif
-    return String::EMPTY;
+    return "(?)"; 
 }
 
 String GetHostName() 
