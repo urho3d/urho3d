@@ -234,6 +234,8 @@ Graphics::Graphics(Context* context_) :
     resizable_(false),
     highDPI_(false),
     vsync_(false),
+    monitor_(0),
+    refreshRate_(0),
     tripleBuffer_(false),
     sRGB_(false),
     forceGL2_(false),
@@ -506,6 +508,8 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
     vsync_ = vsync;
     tripleBuffer_ = tripleBuffer;
     multiSample_ = multiSample;
+    monitor_ = monitor;
+    refreshRate_ = refreshRate;
 
     SDL_GL_GetDrawableSize(window_, &width_, &height_);
     if (!fullscreen)

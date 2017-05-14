@@ -3114,6 +3114,8 @@ Methods:
 - void SetString(const String value)
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
+- void SetVariant(const Variant& value)
+- void SetVariantMap(const VariantMap& value)
 - JSONValueType GetValueType() const
 - JSONNumberType GetNumberType() const
 - String GetValueTypeName() const
@@ -3132,6 +3134,8 @@ Methods:
 - const String GetString() const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - JSONValue operator&[](unsigned index, JSONValue tolua_value)
 - JSONValue operator[](unsigned index)
 - const JSONValue operator[](unsigned index) const
@@ -4175,6 +4179,7 @@ Methods:
 - Vector3 GetWorldUp() const
 - Vector3 GetWorldRight() const
 - Vector3 GetWorldScale() const
+- Vector3 GetSignedWorldScale() const
 - Vector2 GetWorldScale2D() const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
@@ -4237,6 +4242,7 @@ Properties:
 - Vector3 worldUp (readonly)
 - Vector3 worldRight (readonly)
 - Vector3 worldScale
+- Vector3 signedWorldScale (readonly)
 - Vector2 worldScale2D
 - Matrix3x4& worldTransform (readonly)
 - bool dirty (readonly)
@@ -6008,6 +6014,7 @@ Properties:
 
 Methods:
 
+- void Seek(float seekTime)
 - void Play(Sound* sound)
 - void Play(Sound* sound, float frequency)
 - void Play(Sound* sound, float frequency, float gain)

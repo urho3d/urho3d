@@ -59,6 +59,16 @@ OggVorbisSoundStream::~OggVorbisSoundStream()
     }
 }
 
+bool OggVorbisSoundStream::Seek(unsigned sample_number)
+{
+    if (!decoder_)
+        return false;
+    
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+    
+    return stb_vorbis_seek(vorbis, sample_number) == 1;
+}
+
 unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
 {
     if (!decoder_)

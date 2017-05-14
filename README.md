@@ -20,6 +20,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse Öörni
 - Wei Tjong Yao
 - Aster Jian
+- Ricardo Abreu
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
@@ -116,8 +117,10 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- lhinuz
 - lvshiling
 - marynate
+- meshonline
 - mightyCelu
 - neat3d
 - nemerle

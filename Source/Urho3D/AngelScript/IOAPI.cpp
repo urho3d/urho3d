@@ -56,7 +56,17 @@ static void Print(int value, bool error)
     Log::WriteRaw(String(value) + "\n", error);
 }
 
+static void Print(long long value, bool error)
+{
+    Log::WriteRaw(String(value) + "\n", error);
+}
+
 static void Print(unsigned value, bool error)
+{
+    Log::WriteRaw(String(value) + "\n", error);
+}
+
+static void Print(unsigned long long value, bool error)
 {
     Log::WriteRaw(String(value) + "\n", error);
 }
@@ -112,7 +122,9 @@ static void LogError(const String& str, Log* ptr)
 
 static void Print(const String& value, bool error) { }
 static void Print(int value, bool error) { }
+static void Print(long long value, bool error) { }
 static void Print(unsigned value, bool error) { }
+static void Print(unsigned long long value, bool error) { }
 static void Print(float value, bool error) { }
 static void Print(bool value, bool error) { }
 static void Print(const Variant& value, bool error) { }
@@ -153,7 +165,9 @@ static void RegisterLog(asIScriptEngine* engine)
     // Register also Print() functions for convenience
     engine->RegisterGlobalFunction("void Print(const String&in, bool error = false)", asFUNCTIONPR(Print, (const String&, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(int, bool error = false)", asFUNCTIONPR(Print, (int, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(int64, bool error = false)", asFUNCTIONPR(Print, (long long, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(uint, bool error = false)", asFUNCTIONPR(Print, (unsigned, bool), void), asCALL_CDECL);
+    engine->RegisterGlobalFunction("void Print(uint64, bool error = false)", asFUNCTIONPR(Print, (unsigned long long, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(float, bool error = false)", asFUNCTIONPR(Print, (float, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(bool, bool error = false)", asFUNCTIONPR(Print, (bool, bool), void), asCALL_CDECL);
     engine->RegisterGlobalFunction("void Print(const Variant&in, bool error = false)", asFUNCTIONPR(Print, (const Variant&, bool), void), asCALL_CDECL);

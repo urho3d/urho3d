@@ -5,6 +5,7 @@ enum AutoRemoveMode {};
 
 class SoundSource : public Component
 {
+    void Seek(float seekTime);
     void Play(Sound* sound);
     void Play(Sound* sound, float frequency);
     void Play(Sound* sound, float frequency, float gain);

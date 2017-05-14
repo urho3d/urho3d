@@ -6082,12 +6082,16 @@ double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
 uint GetUInt() const;
+Variant GetVariant() const;
+VariantMap GetVariantMap() const;
 void Insert(uint, const JSONValue&);
 const JSONValue& Get(const String&) const;
 void Pop();
 void Push(const JSONValue&);
 void Resize(uint);
 void Set(const String&, const JSONValue&);
+void SetVariant(const Variant&);
+void SetVariantMap(const VariantMap&);
 const String& GetString() const;
 
 // Properties:
@@ -7962,6 +7966,8 @@ Vector2 scale2D;
 Scene scene;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Vector3 signedWorldScale;
 /* readonly */
 Array<String> tags;
 bool temporary;
@@ -10059,6 +10065,8 @@ Vector3 scale;
 Vector2 scale2D;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Vector3 signedWorldScale;
 float smoothingConstant;
 float snapThreshold;
 /* readonly */
@@ -11326,6 +11334,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
+void Seek(float);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
@@ -11412,6 +11421,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
+void Seek(float);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAngleAttenuation(float, float);
 void SetAnimationTime(float);

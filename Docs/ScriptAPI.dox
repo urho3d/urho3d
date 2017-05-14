@@ -8041,12 +8041,16 @@ Methods:
 - float GetFloat() const
 - int GetInt() const
 - uint GetUInt() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - void Insert(uint, const JSONValue&)
 - const JSONValue& Get(const String&) const
 - void Pop()
 - void Push(const JSONValue&)
 - void Resize(uint)
 - void Set(const String&, const JSONValue&)
+- void SetVariant(const Variant&)
+- void SetVariantMap(const VariantMap&)
 - const String& GetString() const
 
 Properties:
@@ -9666,6 +9670,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
@@ -11482,6 +11487,7 @@ Properties:
 - Vector3 scale
 - Vector2 scale2D
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - float smoothingConstant
 - float snapThreshold
 - String[]@ tags // readonly
@@ -12569,6 +12575,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
@@ -12642,6 +12649,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
 - void SetAnimationTime(float)

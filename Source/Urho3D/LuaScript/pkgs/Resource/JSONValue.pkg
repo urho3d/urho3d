@@ -37,6 +37,8 @@ class JSONValue
     tolua_outside void JSONValueSetString @ SetString(const String value);
     tolua_outside void JSONValueSetArray @ SetArray(const JSONArray& value);
     tolua_outside void JSONValueSetObject @ SetObject(const JSONObject& value);
+    void SetVariant(const Variant& value);
+    void SetVariantMap(const VariantMap& value);
 
     JSONValueType GetValueType() const;
     JSONNumberType GetNumberType() const;
@@ -57,6 +59,8 @@ class JSONValue
     const String GetString() const;
     const JSONArray& GetArray() const;
     const JSONObject& GetObject() const;
+    Variant GetVariant() const;
+    VariantMap GetVariantMap() const;
 
     JSONValue& operator [](unsigned index);
     const JSONValue& operator [](unsigned index) const;
@@ -126,6 +130,68 @@ static void JSONValueSetArray(JSONValue* jsonValue, const JSONArray& value)
 static void JSONValueSetObject(JSONValue* jsonValue, const JSONObject& value)
 {
     (*jsonValue) = value;
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_JSONValue_SetVariant00
+static int tolua_ResourceLuaAPI_JSONValue_SetVariant00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"JSONValue",0,&tolua_err) ||
+ (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Variant",0,&tolua_err)) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  JSONValue* self = (JSONValue*)  tolua_tousertype(tolua_S,1,0);
+  const Variant* value = ((const Variant*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetVariant'", NULL);
+#endif
+ {
+  self->SetVariant(*value, GetContext(tolua_S));
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetVariant'.",&tolua_err);
+ return 0;
+#endif
+}
+
+#define TOLUA_DISABLE_tolua_ResourceLuaAPI_JSONValue_SetVariantMap00
+static int tolua_ResourceLuaAPI_JSONValue_SetVariantMap00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+ !tolua_isusertype(tolua_S,1,"JSONValue",0,&tolua_err) ||
+ (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const VariantMap",0,&tolua_err)) ||
+ !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+ goto tolua_lerror;
+ else
+#endif
+ {
+  JSONValue* self = (JSONValue*)  tolua_tousertype(tolua_S,1,0);
+  const VariantMap* value = ((const VariantMap*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+ if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetVariantMap'", NULL);
+#endif
+ {
+  self->SetVariantMap(*value, GetContext(tolua_S));
+ }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetVariantMap'.",&tolua_err);
+ return 0;
+#endif
 }
 
 $}
