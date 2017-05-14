@@ -48,15 +48,16 @@
 #elif defined(__MINGW32__)
 #include <lmcons.h> // For UNLEN. Apparently MSVC defines "<Lmcons.h>" (with an upperscore 'L' but MinGW uses an underscore 'l'). 
 #include <ntdef.h> 
-#else 
-#endif 
-#elif defined(__linux__) && !defined(__APPLE__) && !defined(__ANDROID__) 
+#endif
+#elif defined(__linux__) && !defined(__ANDROID__) 
 #include <pwd.h> 
-#include <unistd.h>
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
-#include <limits.h> // For HOST_NAME_MAX. 
-#else
+#elif defined(__APPLE__)
+#include <sys/sysctl.h>
+#endif
+#ifndef _WIN32
+#include <unistd.h>
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
@@ -497,23 +498,30 @@ String GetMiniDumpDir()
 
 unsigned long long GetTotalMemory()
 {
-#if defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__)
     struct sysinfo s;
     if(sysinfo(&s) != -1)
         return s.totalram; 
 #elif defined(_WIN32)
-    MEMORYSTATUSEX state; 
+    MEMORYSTATUSEX state;
     state.dwLength = sizeof(state); 
     if(GlobalMemoryStatusEx(&state)) 
         return state.ullTotalPhys; 
-#else 
-#endif 
+#elif defined(__APPLE__)
+    unsigned long long memSize;
+    size_t len = sizeof(memSize);
+    int mib[2]; 
+    mib[0] = CTL_HW;
+    mib[1] = HW_MEMSIZE;
+    sysctl(mib, 2, &memSize, &len, NULL, 0);
+    return memSize;
+#endif
     return 0ull;
 }
 
 String GetLoginName() 
 {
-#if defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__)
     struct passwd *p = getpwuid(getuid());
     if (p) 
         return p->pw_name;
@@ -521,27 +529,27 @@ String GetLoginName()
         return "(?)"; 
 #elif defined(_WIN32)
     char name[UNLEN + 1];
-    DWORD len = UNLEN + 1; 
-    if(GetUserName(name, &len)) 
-        return name; 
-#else 
-#endif 
+    DWORD len = UNLEN + 1;
+    if(GetUserName(name, &len))
+        return name;
+#elif defined(__APPLE__)
+    return getenv("USER");
+#endif
     return String::EMPTY;
 }
 
 String GetHostName() 
 {
-#if defined(__linux__)
-    char buffer[HOST_NAME_MAX + 1]; 
-    if(gethostname(buffer, HOST_NAME_MAX + 1) == 0) 
+#if (defined(__linux__) || defined(__APPLE__)) && !defined(__ANDROID__)
+    char buffer[256]; 
+    if (gethostname(buffer, 256) == 0) 
         return buffer; 
 #elif defined(_WIN32)
     char buffer[MAX_COMPUTERNAME_LENGTH + 1]; 
     DWORD len = MAX_COMPUTERNAME_LENGTH + 1; 
     if(GetComputerName(buffer, &len))
-        return buffer; 
-#else 
-#endif 
+        return buffer;
+#endif
     return String::EMPTY; 
 }
 
@@ -562,8 +570,8 @@ static void GetOS(RTL_OSVERSIONINFOW *r)
 
 String GetOSVersion() 
 {
-#if defined(__linux__)
-    struct utsname u; 
+#if defined(__linux__) && !defined(__ANDROID__)
+    struct utsname u;
     if(uname(&u) == 0)
         return String(u.sysname) + " " + u.release; 
 #elif defined(_WIN32)
@@ -587,9 +595,9 @@ String GetOSVersion()
     else if(r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
         return "Windows 10/Windows Server 2016"; 
     else 
-        return "Windows Unidentified"; 
-#else 
-#endif 
+        return "Windows Unidentified";
+#endif
+    /// \todo Implement on OSX
     return String::EMPTY; 
 }
 
