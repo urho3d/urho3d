@@ -23,10 +23,10 @@
 #include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
+#include "../Core/StringUtils.h"
 #include "../IO/FileSystem.h"
 
 #include <cstdio>
-#include <cstdlib>
 #include <fcntl.h>
 
 #ifdef __APPLE__
@@ -502,12 +502,12 @@ unsigned long long GetTotalMemory()
 {
 #if defined(__linux__) && !defined(__ANDROID__)
     struct sysinfo s;
-    if(sysinfo(&s) != -1)
+    if (sysinfo(&s) != -1)
         return s.totalram; 
 #elif defined(_WIN32)
     MEMORYSTATUSEX state;
     state.dwLength = sizeof(state); 
-    if(GlobalMemoryStatusEx(&state)) 
+    if (GlobalMemoryStatusEx(&state)) 
         return state.ullTotalPhys; 
 #elif defined(__APPLE__)
     unsigned long long memSize;
@@ -530,22 +530,22 @@ String GetLoginName()
 #elif defined(_WIN32)
     char name[UNLEN + 1];
     DWORD len = UNLEN + 1;
-    if(GetUserName(name, &len))
+    if (GetUserName(name, &len))
         return name;
 #elif defined(__APPLE__)
     SCDynamicStoreRef s = SCDynamicStoreCreate(NULL, CFSTR("GetConsoleUser"), NULL, NULL);
-    if(s != NULL)
+    if (s != NULL)
     {
         uid_t u; 
         CFStringRef n = SCDynamicStoreCopyConsoleUser(s, &u, NULL);
         CFRelease(s); 
-        if(n != NULL)
+        if (n != NULL)
         {
             char name[256]; 
             Boolean b = CFStringGetCString(n, name, 256, kCFStringEncodingUTF8);
             CFRelease(n); 
 
-            if(b == true)
+            if (b == true)
                 return name; 
         }
     }
@@ -562,7 +562,7 @@ String GetHostName()
 #elif defined(_WIN32)
     char buffer[MAX_COMPUTERNAME_LENGTH + 1]; 
     DWORD len = MAX_COMPUTERNAME_LENGTH + 1; 
-    if(GetComputerName(buffer, &len))
+    if (GetComputerName(buffer, &len))
         return buffer;
 #endif
     return String::EMPTY; 
@@ -587,27 +587,27 @@ String GetOSVersion()
 {
 #if defined(__linux__) && !defined(__ANDROID__)
     struct utsname u;
-    if(uname(&u) == 0)
+    if (uname(&u) == 0)
         return String(u.sysname) + " " + u.release; 
 #elif defined(_WIN32)
     RTL_OSVERSIONINFOW r;
     GetOS(&r); 
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
-    if(r.dwMajorVersion == 5 && r.dwMinorVersion == 0) 
+    if (r.dwMajorVersion == 5 && r.dwMinorVersion == 0) 
         return "Windows 2000"; 
-    else if(r.dwMajorVersion == 5 && r.dwMinorVersion == 1) 
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 1) 
         return "Windows XP"; 
-    else if(r.dwMajorVersion == 5 && r.dwMinorVersion == 2) 
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 2) 
         return "Windows XP 64-Bit Edition/Windows Server 2003/Windows Server 2003 R2"; 
-    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 0) 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 0) 
         return "Windows Vista/Windows Server 2008"; 
-    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 1) 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 1) 
         return "Windows 7/Windows Server 2008 R2"; 
-    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 2) 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 2) 
         return "Windows 8/Windows Server 2012";
-    else if(r.dwMajorVersion == 6 && r.dwMinorVersion == 3) 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 3) 
         return "Windows 8.1/Windows Server 2012 R2"; 
-    else if(r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
+    else if (r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
         return "Windows 10/Windows Server 2016"; 
     else 
         return "Windows Unidentified";
@@ -615,16 +615,15 @@ String GetOSVersion()
     char kernel_r[256]; 
     size_t size = sizeof(kernel_r); 
 
-    if(sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
+    if (sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
     {
         Vector<String> kernel_version = String(kernel_r).Split('.'); 
         String version = "macOS/Mac OS X "; 
-        int major = atoi(kernel_version[0].CString());
-        int minor = atoi(kernel_version[1].CString());
-        int patch = atoi(kernel_version[2].CString()); 
+        int major = ToInt(kernel_version[0]);
+        int minor = ToInt(kernel_version[1]);
 
         // https://en.wikipedia.org/wiki/Darwin_(operating_system)
-        if(major == 16) // macOS Sierra 
+        if (major == 16) // macOS Sierra 
         {
             version += "Sierra "; 
             switch(minor)
@@ -634,7 +633,7 @@ String GetOSVersion()
                 case 3: version += "10.12.2 "; break; 
             }
         }
-        else if(major == 15) // OS X El Capitan
+        else if (major == 15) // OS X El Capitan
         {
             version += "El Capitan ";
             switch(minor)
@@ -643,7 +642,7 @@ String GetOSVersion()
                 case 6: version += "10.11.6 "; break; 
             }
         }
-        else if(major == 14) // OS X Yosemite 
+        else if (major == 14) // OS X Yosemite 
         {
             version += "Yosemite "; 
             switch(minor) 
@@ -652,7 +651,7 @@ String GetOSVersion()
                 case 5: version += "10.10.5 "; break; 
             }
         }
-        else if(major == 13) // OS X Mavericks
+        else if (major == 13) // OS X Mavericks
         {
             version += "Mavericks ";
             switch(minor)
@@ -661,7 +660,7 @@ String GetOSVersion()
                 case 4: version += "10.9.5 "; break; 
             }
         }
-        else if(major == 12) // OS X Mountain Lion
+        else if (major == 12) // OS X Mountain Lion
         {
             version += "Mountain Lion "; 
             switch(minor) 
@@ -670,7 +669,7 @@ String GetOSVersion()
                 case 6: version += "10.8.5 "; break; 
             }
         }
-        else if(major == 11) // Mac OS X Lion
+        else if (major == 11) // Mac OS X Lion
         {
             version += "Lion ";
             switch(minor)
