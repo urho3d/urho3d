@@ -13,5 +13,7 @@ String GetPlatform();
 unsigned GetNumPhysicalCPUs();
 unsigned GetNumLogicalCPUs();
 
+unsigned long long GetTotalMemory(); 
+
 void SetMiniDumpDir(const String pathName);
 String GetMiniDumpDir();

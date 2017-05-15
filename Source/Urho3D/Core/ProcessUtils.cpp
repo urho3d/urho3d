@@ -44,9 +44,13 @@
 #include <io.h>
 #if defined(_MSC_VER)
 #include <float.h>
-#endif
+#elif defined(__MINGW32__)
+extern "C"
+WINBASEAPI BOOL WINAPI GetPhysicallyInstalledSystemMemory(PULONGLONG);
+#endif 
 #else
 #include <unistd.h>
+#include <sys/sysinfo.h>
 #endif
 
 #if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
@@ -483,6 +487,22 @@ String GetMiniDumpDir()
 #endif
 
     return miniDumpDir;
+} 
+
+unsigned long long GetTotalMemory()
+{
+#if defined(__linux__)
+    struct sysinfo s;
+    if(sysinfo(&s) != -1)
+        return s.totalram; 
+#elif defined(_WIN32)
+    MEMORYSTATUSEX state; 
+    state.dwLength = sizeof(state); 
+    if(GlobalMemoryStatusEx(&state)) 
+        return state.ullTotalPhys; 
+#else 
+#endif 
+    return 0ull;
 }
 
 }
