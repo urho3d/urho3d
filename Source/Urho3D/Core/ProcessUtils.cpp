@@ -532,7 +532,7 @@ String GetLoginName()
     DWORD len = UNLEN + 1;
     if (GetUserName(name, &len))
         return name;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) && !defined(IOS)
     SCDynamicStoreRef s = SCDynamicStoreCreate(NULL, CFSTR("GetConsoleUser"), NULL, NULL);
     if (s != NULL)
     {
