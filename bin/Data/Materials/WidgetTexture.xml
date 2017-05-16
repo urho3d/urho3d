@@ -1,0 +1,3 @@
+<material>
+    <technique name="Techniques/DiffUnlitAlpha.xml" />
+</material>
