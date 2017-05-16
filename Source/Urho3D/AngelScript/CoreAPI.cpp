@@ -829,6 +829,10 @@ static void RegisterProcessUtils(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("uint GetNumLogicalCPUs()", asFUNCTION(GetNumLogicalCPUs), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SetMiniDumpDir(const String&in)", asFUNCTION(SetMiniDumpDir), asCALL_CDECL);
     engine->RegisterGlobalFunction("String GetMiniDumpDir()", asFUNCTION(GetMiniDumpDir), asCALL_CDECL);
+    engine->RegisterGlobalFunction("uint64 GetTotalMemory()", asFUNCTION(GetTotalMemory), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetLoginName()", asFUNCTION(GetLoginName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetHostName()", asFUNCTION(GetHostName), asCALL_CDECL);
+    engine->RegisterGlobalFunction("String GetOSVersion()", asFUNCTION(GetOSVersion), asCALL_CDECL);
 }
 
 static void ConstructAttributeInfo(AttributeInfo* ptr)
