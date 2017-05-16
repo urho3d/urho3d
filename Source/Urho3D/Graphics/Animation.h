@@ -162,9 +162,9 @@ public:
     const HashMap<StringHash, AnimationTrack>& GetTracks() const { return tracks_; }
 
     /// Return number of animation tracks.
-    unsigned GetNumTracks() const { return tracks_.Size(); } 
+    unsigned GetNumTracks() const { return tracks_.Size(); }
 
-    /// Return animation track by index. 
+    /// Return animation track by index.
     AnimationTrack *GetTrack(unsigned index);
 
     /// Return animation track by name.
