@@ -342,8 +342,8 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
 
 struct SpriteInfo
 {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
     Spriter::File* file_;
     SharedPtr<Image> image_;
 };
