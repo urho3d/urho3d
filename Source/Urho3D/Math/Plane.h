@@ -62,6 +62,15 @@ public:
     {
         Define(plane);
     }
+    
+    /// Assign from another plane.
+    Plane& operator =(const Plane& rhs)
+    {
+        normal_ = rhs.normal_;
+        absNormal_ = rhs.absNormal_;
+        d_ = rhs.d_;
+        return *this;
+    }
 
     /// Assign from another plane.
     Plane& operator =(const Plane& rhs)
