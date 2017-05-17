@@ -90,7 +90,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
         if (CMAKE_HOST_WIN32)
             set (CMAKE_PREFIX_PATH ${MINGW_SYSROOT})
         endif ()
-        # MinGW does not need search paths as DirectX headers and libraries (when installed) are in its default search path
+        # MinGW does not usually need search paths as DirectX headers and libraries (when installed) are in its default search path
         # However, we do not explicitly unset the DIRECTX_INC_SEARCH_PATHS and DIRECTX_LIB_SEARCH_PATHS variables here, so module user could set these two variables externally when for some reasons the DirectX headers and libraries are not installed in MinGW default search path
     else ()
         set (D3DCOMPILER_NAMES d3dcompiler)
@@ -113,12 +113,12 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
                 $ENV{DXSDK_DIR}/Lib)
         endif ()
     endif ()
-    find_path (DIRECTX_INCLUDE_DIRS NAMES ${DIRECTX_HEADERS} PATHS ${DIRECTX_INC_SEARCH_PATHS} DOC "DirectX include directory")
+    find_path (DIRECTX_INCLUDE_DIRS NAMES ${DIRECTX_HEADERS} PATHS ${DIRECTX_INC_SEARCH_PATHS} DOC "DirectX include directory" CMAKE_FIND_ROOT_PATH_BOTH)
     if (DIRECTX_INCLUDE_DIRS)
         set (CMAKE_REQUIRED_INCLUDES ${DIRECTX_INCLUDE_DIRS})
         set (DIRECTX_LIBRARY_DIRS)
         set (DIRECT3D_LIBRARIES)
-        find_library (DIRECTX_D3DCOMPILER NAMES ${D3DCOMPILER_NAMES} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX d3dcompiler library")
+        find_library (DIRECTX_D3DCOMPILER NAMES ${D3DCOMPILER_NAMES} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX d3dcompiler library" CMAKE_FIND_ROOT_PATH_BOTH)
         if (DIRECTX_D3DCOMPILER)
             get_filename_component (NAME ${DIRECTX_D3DCOMPILER} NAME)
             string (REGEX REPLACE "^.*(d3dcompiler[_0-9]*).*$" \\1 D3DCOMPILER_LIB_NAME ${NAME})
@@ -134,7 +134,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
             foreach (NAME ${D3DCOMPILER_LIB_NAME} ${DIRECT3D_LIB_NAMES})
                 string (REGEX REPLACE _[0-9]+$ "" BASE_NAME ${NAME})
                 string (TOUPPER ${BASE_NAME} UPCASE_NAME)
-                find_library (DIRECTX_${UPCASE_NAME} NAMES ${NAME} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX ${BASE_NAME} library")
+                find_library (DIRECTX_${UPCASE_NAME} NAMES ${NAME} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX ${BASE_NAME} library" CMAKE_FIND_ROOT_PATH_BOTH)
                 if (DIRECTX_${UPCASE_NAME})
                     get_filename_component (PATH ${DIRECTX_${UPCASE_NAME}} PATH)
                     list (APPEND DIRECTX_LIBRARY_DIRS ${PATH})      # All the libs should be found in a same place, but just in case
