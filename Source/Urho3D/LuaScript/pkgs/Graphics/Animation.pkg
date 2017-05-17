@@ -38,7 +38,7 @@ struct AnimationTriggerPoint
     Variant data_ @ data;
 };
 
-class Animation : public Resource
+class Animation : public ResourceWithMetadata
 {
     Animation();
     ~Animation();

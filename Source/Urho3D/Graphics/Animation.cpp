@@ -107,7 +107,7 @@ void AnimationTrack::GetKeyFrameIndex(float time, unsigned& index) const
 }
 
 Animation::Animation(Context* context) :
-    Resource(context),
+    ResourceWithMetadata(context),
     length_(0.f)
 {
 }
@@ -173,16 +173,15 @@ bool Animation::BeginLoad(Deserializer& source)
     if (file)
     {
         XMLElement rootElem = file->GetRoot();
-        XMLElement triggerElem = rootElem.GetChild("trigger");
-        while (triggerElem)
+        for (XMLElement triggerElem = rootElem.GetChild("trigger"); triggerElem; triggerElem = triggerElem.GetNext("trigger"))
         {
             if (triggerElem.HasAttribute("normalizedtime"))
                 AddTrigger(triggerElem.GetFloat("normalizedtime"), true, triggerElem.GetVariant());
             else if (triggerElem.HasAttribute("time"))
                 AddTrigger(triggerElem.GetFloat("time"), false, triggerElem.GetVariant());
-
-            triggerElem = triggerElem.GetNext("trigger");
         }
+
+        LoadMetadataFromXML(rootElem);
 
         memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
         SetMemoryUse(memoryUse);
@@ -196,7 +195,7 @@ bool Animation::BeginLoad(Deserializer& source)
     if (jsonFile)
     {
         const JSONValue& rootVal = jsonFile->GetRoot();
-        JSONArray triggerArray = rootVal.Get("triggers").GetArray();
+        const JSONArray& triggerArray = rootVal.Get("triggers").GetArray();
 
         for (unsigned i = 0; i < triggerArray.Size(); i++)
         {
@@ -211,6 +210,9 @@ bool Animation::BeginLoad(Deserializer& source)
                     AddTrigger(timeVal.GetFloat(), false, triggerValue.GetVariant());
             }
         }
+
+        const JSONArray& metadataArray = rootVal.Get("metadata").GetArray();
+        LoadMetadataFromJSON(metadataArray);
 
         memoryUse += triggers_.Size() * sizeof(AnimationTriggerPoint);
         SetMemoryUse(memoryUse);
@@ -252,7 +254,7 @@ bool Animation::Save(Serializer& dest) const
     }
 
     // If triggers have been defined, write an XML file for them
-    if (triggers_.Size())
+    if (!triggers_.Empty() || HasMetadata())
     {
         File* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
@@ -268,6 +270,8 @@ bool Animation::Save(Serializer& dest) const
                 triggerElem.SetFloat("time", triggers_[i].time_);
                 triggerElem.SetVariant(triggers_[i].data_);
             }
+
+            SaveMetadataToXML(rootElem);
 
             File xmlFile(context_, xmlName, FILE_WRITE);
             xml->Save(xmlFile);
@@ -373,28 +377,28 @@ SharedPtr<Animation> Animation::Clone(const String& cloneName) const
     ret->length_ = length_;
     ret->tracks_ = tracks_;
     ret->triggers_ = triggers_;
+    ret->CopyMetadata(*this);
     ret->SetMemoryUse(GetMemoryUse());
-    
+
     return ret;
-} 
-
-AnimationTrack* Animation::GetTrack(unsigned index) 
-{ 
-    if (index >= GetNumTracks()) 
-        return (AnimationTrack*) 0;
-
-    int j = 0; 
-    for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i) 
-    {
-        if (j == index) 
-            return &i->second_; 
-        
-        ++j;
-    }
-    
-    return (AnimationTrack*) 0;
 }
 
+AnimationTrack* Animation::GetTrack(unsigned index)
+{
+    if (index >= GetNumTracks())
+        return (AnimationTrack*) 0;
+
+    int j = 0;
+    for(HashMap<StringHash, AnimationTrack>::Iterator i = tracks_.Begin(); i != tracks_.End(); ++i)
+    {
+        if (j == index)
+            return &i->second_;
+
+        ++j;
+    }
+
+    return (AnimationTrack*) 0;
+}
 
 AnimationTrack* Animation::GetTrack(const String& name)
 {
