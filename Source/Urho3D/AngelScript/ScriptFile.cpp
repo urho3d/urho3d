@@ -660,7 +660,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
             // Skip until ; or { whichever comes first
             while (pos < dataSize && buffer[pos] != ';' && buffer[pos] != '{')
             {
-                engine->ParseToken(&buffer[pos], 0, &len);
+                engine->ParseToken(&buffer[pos], dataSize - pos, &len);
                 pos += len;
             }
             // Skip entire statement block
@@ -671,7 +671,7 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                 int level = 1;
                 while (level > 0 && pos < dataSize)
                 {
-                    asETokenClass t = engine->ParseToken(&buffer[pos], 0, &len);
+                    asETokenClass t = engine->ParseToken(&buffer[pos], dataSize - pos, &len);
                     if (t == asTC_KEYWORD)
                     {
                         if (buffer[pos] == '{')
