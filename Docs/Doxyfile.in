@@ -756,7 +756,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "@CMAKE_SOURCE_DIR@/Source/Urho3D" \
-                         "@CMAKE_SOURCE_DIR@/Source/ThirdParty/rapidjson/include/rapidjson" \
                          "@CMAKE_CURRENT_SOURCE_DIR@" \
                          "@CMAKE_CURRENT_BINARY_DIR@/generated"
 
