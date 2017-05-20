@@ -56,7 +56,7 @@ public:
             if (physWorld_) {
                 btDynamicsWorld *pbtDynWorld = (btDynamicsWorld*) physWorld_->GetWorld();
                 pbtDynWorld->removeAction(vehicle_);
-	    }
+            }
             delete vehicle_;
         }
         vehicle_ = 0;
@@ -74,6 +74,15 @@ public:
         int forwardIndex = 2;
         PhysicsWorld *pPhysWorld = scene->GetComponent<PhysicsWorld>();
         btDynamicsWorld *pbtDynWorld = (btDynamicsWorld*) pPhysWorld->GetWorld();
+	if (!pbtDynWorld)
+		return;
+        if (vehicleRayCaster_)
+                delete vehicleRayCaster_;
+        if (vehicle_)
+        {
+		pbtDynWorld->removeAction(vehicle_);
+		delete vehicle_;
+        }
 
         vehicleRayCaster_ = new btDefaultVehicleRaycaster(pbtDynWorld);
         btRigidBody *bthullBody = body->GetBody();
