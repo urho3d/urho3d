@@ -317,7 +317,7 @@ if (EMSCRIPTEN)     # CMAKE_CROSSCOMPILING is always true for Emscripten
     cmake_dependent_option (EMSCRIPTEN_ALLOW_MEMORY_GROWTH "Enable memory growing based on application demand when targeting asm.js, it is not set by default due to performance penalty (Emscripten with STATIC or SHARED library type only)" FALSE "NOT EMSCRIPTEN_WASM AND NOT URHO3D_LIB_TYPE STREQUAL MODULE" ${DEFAULT_MEMORY_GROWTH})   # Allow memory growth by default when targeting WebAssembly since there is no performance penalty as in asm.js mode
     math (EXPR EMSCRIPTEN_TOTAL_MEMORY "128 * 1024 * 1024")
     set (EMSCRIPTEN_TOTAL_MEMORY ${EMSCRIPTEN_TOTAL_MEMORY} CACHE STRING "Specify the total size of memory to be used (Emscripten only); default to 128 MB, must be in multiple of 64 KB when targeting WebAssembly and in multiple of 16 MB when targeting asm.js")
-    option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten only)")
+    cmake_dependent_option (EMSCRIPTEN_SHARE_DATA "Enable sharing data file support (Emscripten only)" FALSE "NOT URHO3D_LIB_TYPE STREQUAL MODULE" TRUE)
 endif ()
 # Constrain the build option values in cmake-gui, if applicable
 set_property (CACHE URHO3D_LIB_TYPE PROPERTY STRINGS STATIC SHARED ${MODULE})
@@ -1003,9 +1003,7 @@ macro (define_resource_dirs)
                 # Set the custom EMCC_OPTION property to peload the generated shared data file
                 if (EMSCRIPTEN_SHARE_DATA)
                     set (SHARED_RESOURCE_JS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.js)
-                    set (PREFIX_JS ${CMAKE_BINARY_DIR}/Source/pak-loader.js)
-                    list (APPEND SOURCE_FILES ${PREFIX_JS} ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
-                    set_source_files_properties (${PREFIX_JS} PROPERTIES GENERATED TRUE EMCC_OPTION pre-js)
+                    list (APPEND SOURCE_FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data)
                     # DEST_BUNDLE_DIR may be empty when macro caller does not wish to install anything
                     if (DEST_BUNDLE_DIR)
                         install (FILES ${SHARED_RESOURCE_JS} ${SHARED_RESOURCE_JS}.data DESTINATION ${DEST_BUNDLE_DIR})
@@ -1614,11 +1612,6 @@ macro (setup_main_executable)
                         set (SELF_EXECUTABLE_SHELL 1)
                         set (HAS_SHELL_FILE 1)
                     endif ()
-                else ()
-                    # If not using EMRUN then we need to include the emrun_prejs.js manually in order to process the request parameters as app's arguments correctly
-                    set (EMRUN_PREJS ${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js)
-                    list (APPEND SOURCE_FILES ${EMRUN_PREJS})
-                    set_source_files_properties (${EMRUN_PREJS} PROPERTIES EMCC_OPTION pre-js)
                 endif ()
             endif ()
         endif ()
@@ -1722,23 +1715,35 @@ macro (_setup_target)
     endif ()
     # Extra linker flags for Emscripten
     if (EMSCRIPTEN)
-        if (NOT LIB_TYPE)   # LIB_TYPE is empty for executable target
-            list (APPEND LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
+        # These flags are set only once either in the main module or main executable
+        if ((URHO3D_LIB_TYPE STREQUAL MODULE AND ${TARGET_NAME} STREQUAL Urho3D) OR (NOT URHO3D_LIB_TYPE STREQUAL MODULE AND NOT LIB_TYPE))
+            list (APPEND LINK_FLAGS "-s TOTAL_MEMORY=${EMSCRIPTEN_TOTAL_MEMORY}")
             if (EMSCRIPTEN_ALLOW_MEMORY_GROWTH)
                 list (APPEND LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
             endif ()
-            if (EMSCRIPTEN_WASM)
-                list (APPEND LINK_FLAGS "-s WASM=1")
+            if (EMSCRIPTEN_SHARE_DATA)      # MODULE lib type always have this variable enabled
+                list (APPEND LINK_FLAGS "--pre-js ${CMAKE_BINARY_DIR}/Source/pak-loader.js")
             endif ()
             if (URHO3D_TESTING)
-                list (APPEND LINK_FLAGS "--emrun")
+                list (APPEND LINK_FLAGS --emrun)
+            else ()
+                # If not using EMRUN then we need to include the emrun_prejs.js manually in order to process the request parameters as app's arguments correctly
+                list (APPEND LINK_FLAGS "--pre-js ${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js")
+            endif ()
+        endif ()
+        # These flags are here instead of in the CMAKE_(EXE|MODULE)_LINKER_FLAGS so that they do not interfere with the auto-detection logic during initial configuration
+        if (NOT LIB_TYPE OR LIB_TYPE STREQUAL MODULE)
+            list (APPEND LINK_FLAGS "-s NO_EXIT_RUNTIME=1 -s ERROR_ON_UNDEFINED_SYMBOLS=1")
+            if (EMSCRIPTEN_WASM)
+                list (APPEND LINK_FLAGS "-s WASM=1")
             endif ()
         endif ()
         # Pass EMCC-specifc setting to differentiate between main and side modules
         if (URHO3D_LIB_TYPE STREQUAL MODULE)
             if (${TARGET_NAME} STREQUAL Urho3D)
-                # Main module has standard libs statically linked with dead code elimination
-                list (APPEND LINK_FLAGS "-s MAIN_MODULE=2")
+                # Main module has standard libs statically linked
+                # TODO: with dead code elimination
+                list (APPEND LINK_FLAGS "-s MAIN_MODULE=1")
             elseif ((NOT ARG_NODEPS AND NOT LIB_TYPE) OR LIB_TYPE STREQUAL MODULE)
                 if (LIB_TYPE)
                     set (SIDE_MODULES ${SIDE_MODULES} ${TARGET_NAME} PARENT_SCOPE)
