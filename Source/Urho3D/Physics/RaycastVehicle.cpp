@@ -35,6 +35,9 @@ namespace Urho3D
 
 struct RaycastVehicleData
 {
+private:
+    WeakPtr<PhysicsWorld> physWorld_;
+public:
     RaycastVehicleData()
     {
         vehicleRayCaster_ = 0;
@@ -50,6 +53,10 @@ struct RaycastVehicleData
         vehicleRayCaster_ = 0;
         if (vehicle_)
         {
+            if (physWorld_) {
+                btDynamicsWorld *pbtDynWorld = (btDynamicsWorld*) physWorld_->GetWorld();
+                pbtDynWorld->removeAction(vehicle_);
+            }
             delete vehicle_;
         }
         vehicle_ = 0;
@@ -67,6 +74,15 @@ struct RaycastVehicleData
         int forwardIndex = 2;
         PhysicsWorld *pPhysWorld = scene->GetComponent<PhysicsWorld>();
         btDynamicsWorld *pbtDynWorld = (btDynamicsWorld*) pPhysWorld->GetWorld();
+	if (!pbtDynWorld)
+		return;
+        if (vehicleRayCaster_)
+                delete vehicleRayCaster_;
+        if (vehicle_)
+        {
+		pbtDynWorld->removeAction(vehicle_);
+		delete vehicle_;
+        }
 
         vehicleRayCaster_ = new btDefaultVehicleRaycaster(pbtDynWorld);
         btRigidBody *bthullBody = body->GetBody();
@@ -75,6 +91,7 @@ struct RaycastVehicleData
         pbtDynWorld->addVehicle(vehicle_);
 
         vehicle_->setCoordinateSystem(rightIndex, upIndex, forwardIndex);
+        physWorld_ = pPhysWorld;
     }
 
     btVehicleRaycaster *vehicleRayCaster_;
