@@ -1904,8 +1904,9 @@ void RegisterUILibrary(Context* context)
     CheckBox::RegisterObject(context);
     Cursor::RegisterObject(context);
     Text::RegisterObject(context);
+    RichWidget::RegisterObject(context);
     Text3D::RegisterObject(context);
-    RichTextView3D::RegisterObject(context);
+    RichText3D::RegisterObject(context);
     Window::RegisterObject(context);
     View3D::RegisterObject(context);
     LineEdit::RegisterObject(context);

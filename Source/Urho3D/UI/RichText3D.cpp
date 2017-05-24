@@ -4,10 +4,13 @@
 #include "../Core/StringUtils.h"
 #include "../UI/RichMarkupParser.h"
 #include "../Engine/Engine.h"
+#include "../Core/CoreEvents.h"
 
-namespace Urho3D {
+namespace Urho3D
+{
 
-namespace {
+namespace
+{
 
 inline unsigned find_first_of(const String& str, const String& delimiters, unsigned offset = 0) {
   if (offset >= str.Length())
@@ -21,29 +24,29 @@ inline unsigned find_first_of(const String& str, const String& delimiters, unsig
   return -1;
 }
 
-// Old code kept for 1:1 compatibility with previous version
+// Old code kept for 1:1 compatibility
 template <typename T>
 inline void splitwords(const String& str, T& tokens, const String& delimiters = " ", bool trimEmpty = false) {
-	unsigned pos, lastPos = 0;
-	while(true) {
-		pos = find_first_of(str, delimiters, lastPos);
-		if(pos == String::NPOS) {
-			pos = str.Length();
-			if(pos != lastPos || !trimEmpty)
-				tokens.Push(typename T::ValueType(str.CString()+lastPos, 
-				  pos-lastPos));
+  unsigned pos, lastPos = 0;
+  while(true) {
+    pos = find_first_of(str, delimiters, lastPos);
+    if(pos == String::NPOS) {
+      pos = str.Length();
+      if(pos != lastPos || !trimEmpty)
+        tokens.Push(typename T::ValueType(str.CString() + lastPos, 
+          pos - lastPos));
 
-			break;
-		} else {
-			if(pos != lastPos) {
-			  tokens.Push(typename T::ValueType(str.CString()+lastPos, pos-lastPos ));
-			}
-			if (!trimEmpty)
-			  tokens.Push(typename T::ValueType(str.CString()+pos, 1 ));
-		}
+      break;
+    } else {
+      if(pos != lastPos) {
+        tokens.Push(typename T::ValueType(str.CString() + lastPos, pos - lastPos));
+      }
+      if (!trimEmpty)
+        tokens.Push(typename T::ValueType(str.CString() + pos, 1 ));
+    }
 
-		lastPos = pos + 1;
-	}
+    lastPos = pos + 1;
+  }
 }
 
 } // namespace
@@ -81,12 +84,12 @@ static const char* ticker_directions[] =
 };
 
 extern const char* GEOMETRY_CATEGORY;
-/// Register object factory. Drawable must be registered first.
-void RichTextView3D::RegisterObject(Context* context) {
-  context->RegisterFactory<RichTextView3D>(GEOMETRY_CATEGORY);
-  context->RegisterFactory<RichWidgetText>(GEOMETRY_CATEGORY);
-  context->RegisterFactory<RichWidgetImage>(GEOMETRY_CATEGORY);
 
+/// Register object factory. Drawable must be registered first.
+void RichText3D::RegisterObject(Context* context) {
+  context->RegisterFactory<RichText3D>(GEOMETRY_CATEGORY);
+
+  //URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Draw Origin", GetDrawOrigin, SetDrawOrigin, Vector3, Vector3::ZERO, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
   URHO3D_ACCESSOR_ATTRIBUTE("Text", GetText, SetText, String, String::EMPTY, AM_DEFAULT);
   URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
@@ -94,6 +97,7 @@ void RichTextView3D::RegisterObject(Context* context) {
   URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Color", GetTextColor, SetTextColor, Color, Color::WHITE, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Word Wrap", GetWrapping, SetWrapping, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Single Line", GetSingleLine, SetSingleLine, bool, true, AM_DEFAULT);
+  URHO3D_ACCESSOR_ATTRIBUTE("Auto Clip", GetClipToContent, SetClipToContent, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Line Spacing", GetLineSpacing, SetLineSpacing, int, 0, AM_DEFAULT);
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Text Alignment", GetAlignment, SetAlignment, TextAlign,
     horizontal_alignments, ALIGN_LEFT, AM_DEFAULT);
@@ -112,7 +116,7 @@ void RichTextView3D::RegisterObject(Context* context) {
   URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }
 
-RichTextView3D::RichTextView3D(Context* context)
+RichText3D::RichText3D(Context* context)
  : ticker_type_(TickerType_None)
  , ticker_direction_(TickerDirection_Negative)
  , ticker_speed_(60)
@@ -120,152 +124,173 @@ RichTextView3D::RichTextView3D(Context* context)
  , single_line_(false)
  , wrapping_(WRAP_WORD)
  , ticker_position_(0.0f)
- , parse_script_(true)
  , last_update_time_(-1)
  , last_script_update_(-1)
  , refresh_count_(0)
  , alignment_(ALIGN_LEFT)
  , line_spacing_(0)
- , RichWidget(context) {
+ , RichWidget(context)
+{
+    default_font_state_.color = Color::WHITE;
+    SetDefaultFont("Fonts/Anonymous Pro.ttf", 32, false, false, false);
 
-	 default_font_state_.color = Color::WHITE;
-   SetDefaultFont("Fonts/Anonymous Pro.ttf", 32, false, false, false);
+    // TODO: disable this handler when the component is disabled
+    SubscribeToEvent(Urho3D::E_UPDATE, URHO3D_HANDLER(RichText3D, UpdateTickerAnimation));
 }
 
-RichTextView3D::~RichTextView3D() {
+RichText3D::~RichText3D()
+{
 
 }
 
-void RichTextView3D::SetText(const String& text/*, const String& context_name*/) {
-	text_ = text;
-	//context_name_ = context_name;
-	SetFlags(WidgetFlags_All);
-	ResetTicker();
+void RichText3D::SetText(const String& text)
+{
+    text_ = text;
+    SetFlags(WidgetFlags_All);
+    ResetTicker();
 }
 
-const String& RichTextView3D::GetText() const {
-	return text_;
+const String& RichText3D::GetText() const
+{
+    return text_;
 }
 
-void RichTextView3D::SetTextColor(const Color& color) {
-  default_font_state_.color = color;
-  SetFlags(WidgetFlags_All);
+void RichText3D::SetTextColor(const Color& color)
+{
+    default_font_state_.color = color;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetAlignment(TextAlign align) {
-  alignment_ = align;
-  SetFlags(WidgetFlags_All);
+void RichText3D::SetAlignment(TextAlign align)
+{
+    alignment_ = align;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetLineSpacing(int line_spacing) {
-  line_spacing_ = line_spacing;
-  SetFlags(WidgetFlags_All);
+void RichText3D::SetLineSpacing(int line_spacing) {
+    line_spacing_ = line_spacing;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetParserEnabled(bool parse_script) {
-	parse_script_ = parse_script;
-	SetFlags(WidgetFlags_All);
+void RichText3D::SetTickerType(TickerType type)
+{
+    ticker_type_ = type;
+    ResetTicker();
 }
 
-void RichTextView3D::SetTickerType(TickerType type) {
-	ticker_type_ = type;
-	ResetTicker();
+void RichText3D::SetWrapping(bool wrapping) {
+    wrapping_ = wrapping ? WRAP_WORD : WRAP_NONE;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetWrapping(bool wrapping) {
-  wrapping_ = wrapping ? WRAP_WORD : WRAP_NONE;
-  SetFlags(WidgetFlags_All);
+TickerType RichText3D::GetTickerType() const
+{
+    return ticker_type_;
 }
 
-TickerType RichTextView3D::GetTickerType() const {
-	return ticker_type_;
+void RichText3D::SetTickerDirection(TickerDirection direction)
+{
+    ticker_direction_ = direction;
+    ResetTicker();
 }
 
-void RichTextView3D::SetTickerDirection(TickerDirection direction) {
-	ticker_direction_ = direction;
-	ResetTicker();
+TickerDirection RichText3D::GetTickerDirection() const
+{
+    return ticker_direction_;
 }
 
-TickerDirection RichTextView3D::GetTickerDirection() const {
-	return ticker_direction_;
+void RichText3D::SetTickerSpeed(float pixelspersecond)
+{
+    ticker_speed_ = pixelspersecond;
 }
 
-void RichTextView3D::SetTickerSpeed(float pixelspersecond) {
-	ticker_speed_ = pixelspersecond;
+float RichText3D::GetTickerSpeed() const
+{
+    return ticker_speed_;
 }
 
-float RichTextView3D::GetTickerSpeed() const {
-	return ticker_speed_;
+void RichText3D::SetSingleLine(bool single_line)
+{
+    single_line_ = single_line;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetSingleLine(bool single_line) {
-	single_line_ = single_line;
-	SetFlags(WidgetFlags_All); // inform the widget that it needs total update
+void RichText3D::ResetTicker()
+{
+    scroll_origin_ = Vector3::ZERO;
+
+    if (ticker_type_ == TickerType_Horizontal)
+    {
+        if (ticker_direction_ == TickerDirection_Negative)
+            scroll_origin_ = Vector3(content_size_.x_, 0.0f, 0.0f);
+        else
+            scroll_origin_ = Vector3(-content_size_.x_, 0.0f, 0.0f);
+    }
+    else if (ticker_type_ == TickerType_Vertical)
+    {
+        if (ticker_direction_ == TickerDirection_Negative)
+            scroll_origin_ = Vector3(0.0f, content_size_.y_, 0.0f);
+        else
+            scroll_origin_ = Vector3(0.0f, -content_size_.y_, 0.0f);
+    }
+    else
+    {
+        scroll_origin_ = Vector3::ZERO;
+        SetDrawOrigin(scroll_origin_);
+    }
+
+    ticker_position_ = 0.0f;
 }
 
-void RichTextView3D::ResetTicker() {
-	scroll_origin_ = Vector3::ZERO;
-
-	if (ticker_type_ == TickerType_Horizontal) {
-		if (ticker_direction_ == TickerDirection_Negative)
-			scroll_origin_ = Vector3((float)GetClipRegion().Width(), 0.0f, 0.0f);
-		else
-			scroll_origin_ = Vector3(0.0f - (float)content_size_.x_, 0.0f, 0.0f);
-	} else if (ticker_type_ == TickerType_Vertical) {
-    if (ticker_direction_ == TickerDirection_Negative)
-      scroll_origin_ = Vector3(0.0f, (float)GetClipRegion().Height(), 0.0f);
-		else
-			scroll_origin_ = Vector3(0.0f, 0.0f - (float)content_size_.y_, 0.0f);
-	} else {
-		scroll_origin_ = Vector3::ZERO;
-		SetDrawOrigin(scroll_origin_);
-	}
-
-	ticker_position_ = 0.0f;
+float RichText3D::GetTickerPosition() const
+{
+    return ticker_position_;
 }
 
-float RichTextView3D::GetTickerPosition() const {
-	return ticker_position_;
+void RichText3D::SetTickerPosition(float tickerPosition)
+{
+    // TODO: implement
 }
 
-void RichTextView3D::SetTickerPosition(float tickerPosition) {
-	/*if (ticker_type_ == TickerType_Horizontal) {
-		if (ticker_direction_ == TickerDir_ScrollFromRight)
-	}
-	*/
+void RichText3D::SetDefaultFont(const String& face, unsigned size, bool bold, bool italic, bool underlined)
+{
+    default_font_state_.face = face;
+    default_font_state_.size = size;
+    default_font_state_.bold = bold;
+    default_font_state_.italic = italic;
+    default_font_state_.underlined = underlined;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetDefaultFont(const String& face, unsigned char size, bool bold, bool italic, bool underlined) {
-	default_font_state_.face = face;
-	default_font_state_.size = size;
-	default_font_state_.bold = bold;
-	default_font_state_.italic = italic;
-	default_font_state_.underlined = underlined;
+ResourceRef RichText3D::GetFontAttr() const
+{
+    return ResourceRef(Font::GetTypeStatic(), default_font_state_.face);
 }
 
-ResourceRef RichTextView3D::GetFontAttr() const {
-  return ResourceRef(Font::GetTypeStatic(), default_font_state_.face);
+void RichText3D::SetFontAttr(const ResourceRef& value)
+{
+    default_font_state_.face = value.name_;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetFontAttr(const ResourceRef& value) {
-  default_font_state_.face = value.name_;
+int RichText3D::GetFontSizeAttr() const
+{
+    return default_font_state_.size;
 }
 
-int RichTextView3D::GetFontSizeAttr() const {
-  return default_font_state_.size;
+void RichText3D::SetFontSizeAttr(int size)
+{
+    default_font_state_.size = size;
+    SetFlags(WidgetFlags_All);
 }
 
-void RichTextView3D::SetFontSizeAttr(int size) {
-  default_font_state_.size = size;
-  SetFlags(WidgetFlags_All);
-}
-
-void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
+void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
+{
   TextLine line;
   if (!single_line_) {
-    LineVector markupLines;
+    Vector<TextLine> markupLines;
     // for every new line in a block, create a new TextLine
-    for (BlockVector::ConstIterator i = markup_blocks.Begin(); i != markup_blocks.End(); ++i) {
+    for (Vector<TextBlock>::ConstIterator i = markup_blocks.Begin(); i != markup_blocks.End(); ++i) {
       size_t posNewLine = 0;
       size_t posLast = 0;
       if ((posNewLine = i->text.Find("\n", posLast)) != String::NPOS) {
@@ -309,20 +334,22 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
       int draw_offset_x = layout_x;
       int draw_offset_y = layout_y;
 
-      for (LineVector::Iterator it = markupLines.Begin(); it != markupLines.End(); ++it) {
+      FontState fontstate;
+
+      for (Vector<TextLine>::Iterator it = markupLines.Begin(); it != markupLines.End(); ++it) {
         TextLine* line = &*it;
 
         TextLine new_line;
-        new_line.Height = 0;
-        new_line.Width = 0;
-        new_line.offsetX = layout_x;
-        new_line.offsetY = 0;
+        new_line.height = 0;
+        new_line.width = 0;
+        new_line.offset_x = layout_x;
+        new_line.offset_y = 0;
         new_line.align = alignment_;
 
         // reset the x offset of the current line
         draw_offset_x = layout_x;
 
-        for (BlockVector::Iterator bit = line->blocks.Begin(); bit != line->blocks.End(); ++bit) {
+        for (Vector<TextBlock>::Iterator bit = line->blocks.Begin(); bit != line->blocks.End(); ++bit) {
           TextBlock new_block;
           new_block.font = (*bit).font;
 
@@ -345,9 +372,15 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
 
             // this block's text renderer
             String id;
-            id.AppendWithFormat("%s.%d%s", bit->font.face.CString(), bit->font.size, bi.CString());
+            fontstate.face = bit->font.face;
+            fontstate.size = bit->font.size;
+            if (fontstate.face.Empty())
+              fontstate.face = default_font_state_.face;
+            if (fontstate.size <= 0)
+              fontstate.size = default_font_state_.size;
+            id.AppendWithFormat("%s.%d%s", fontstate.face.CString(), fontstate.size, bi.CString());
             RichWidgetText* text_renderer = CacheWidgetBatch<RichWidgetText>(id);
-            text_renderer->SetFont(bit->font.face, bit->font.size);
+            text_renderer->SetFont(fontstate.face, fontstate.size);
 
             // for every word in this block do a check if there's enough space on the current line
             // Simple word wrap logic: if the space is enough, put the word on the current line, else go to the next line
@@ -356,7 +389,7 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
               the_word = *wit;
               IntVector2 wordsize = text_renderer->CalculateTextExtents(the_word);
 
-              new_line.Height = Max(wordsize.y_, new_line.Height);
+              new_line.height = Max(wordsize.y_, new_line.height);
 
               bool needs_new_line = (draw_offset_x + wordsize.x_) > layout_width;
               bool is_wider_than_line = wordsize.x_ > layout_width;
@@ -383,14 +416,14 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
                 new_block.text.Append(fit_word);
                 new_line.blocks.Push(new_block);
                 draw_offset_x += newwordsize.x_;
-                new_line.Width = draw_offset_x;
-                new_line.offsetY = draw_offset_y;
+                new_line.width = draw_offset_x;
+                new_line.offset_y = draw_offset_y;
                 lines_.Push(new_line);
                 // create a new empty line
                 new_line.blocks.Clear();
                 new_block.text.Clear();
                 draw_offset_x = layout_x;
-                draw_offset_y += new_line.Height;
+                draw_offset_y += new_line.height;
 
                 the_word = the_word.Substring(fit_word.Length());
 
@@ -407,8 +440,8 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
 
               // carry the whole word on a new line
               if (needs_new_line) {
-                new_line.Width = draw_offset_x;
-                new_line.offsetY = draw_offset_y;
+                new_line.width = draw_offset_x;
+                new_line.offset_y = draw_offset_y;
                 new_line.blocks.Push(new_block);
                 lines_.Push(new_line);
                 // create next empty line
@@ -416,7 +449,7 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
                 // add current text to a block
                 new_block.text.Clear();
                 draw_offset_x = layout_x;
-                draw_offset_y += new_line.Height;
+                draw_offset_y += new_line.height;
                 if (the_word == " " || the_word == "\t") {
                   // mark as space
                   new_line_space = true;
@@ -435,7 +468,6 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
             }
 
             new_line.blocks.Push(new_block);
-
           } else {
             // if the block is iconic (image, video, etc)
             new_block = (*bit); // copy the block
@@ -460,13 +492,13 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
               new_line.blocks.Push(new_block);
 
               draw_offset_x += new_block.image_width;
-              new_line.Height = Max(new_block.image_height, new_line.Height);
+              new_line.height = Max(new_block.image_height, new_line.height);
             }
           }
 
-          new_line.Width = draw_offset_x;
-          new_line.offsetY = draw_offset_y;
-          draw_offset_y += new_line.Height;//  + metrics.leading();
+          new_line.width = draw_offset_x;
+          new_line.offset_y = draw_offset_y;
+          draw_offset_y += new_line.height;
         }
 
         lines_.Push(new_line);
@@ -484,7 +516,6 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
     for (auto i = markup_blocks.Begin(); i != markup_blocks.End(); i++) {
       size_t crpos;
       while ((crpos = find_first_of(i->text, "\n\r")) != String::NPOS) {
-        //i->text.erase(crpos, 1);
         i->text.Replace(crpos, 1, " ");
       }
       // TODO: single line doesn't get images when width or height = 0
@@ -494,7 +525,7 @@ void RichTextView3D::ArrangeTextBlocks(BlockVector& markup_blocks) {
   }
 }
 
-void RichTextView3D::DrawTextLines() {
+void RichText3D::DrawTextLines() {
   // clear all quads
   Clear();
 
@@ -510,13 +541,13 @@ void RichTextView3D::DrawTextLines() {
     switch (l->align) {
     default:
     case ALIGN_LEFT:
-      xoffset = l->offsetX;
+      xoffset = l->offset_x;
       break;
     case ALIGN_CENTER:
-      xoffset = (clip_region_.Width() - l->Width) / 2;
+      xoffset = (clip_region_.Width() - l->width) / 2;
       break;
     case ALIGN_RIGHT:
-      xoffset = clip_region_.Width() - l->Width;
+      xoffset = clip_region_.Width() - l->width;
     }
 
     FontState fontstate;
@@ -570,11 +601,11 @@ void RichTextView3D::DrawTextLines() {
   }
 }
 
-void RichTextView3D::CompileTextLayout() {
+void RichText3D::CompileTextLayout() {
 	lines_.Clear();
 	content_size_ = Vector2::ZERO;
 
-	BlockVector markup_blocks;
+  Vector<TextBlock> markup_blocks;
   markup_blocks.Reserve(10);
 
   HTMLParser::Parse(text_, markup_blocks, default_font_state_);  
@@ -582,68 +613,81 @@ void RichTextView3D::CompileTextLayout() {
   DrawTextLines();
 }
 
-void RichTextView3D::OnUpdate() {
-  float fElapsed = GetSubsystem<Engine>()->GetNextTimeStep();
-		
-	if (IsFlagged(WidgetFlags_ContentChanged)) {
-		try {
-			CompileTextLayout();
-		} catch (...) {}
-		ClearFlags(WidgetFlags_ContentChanged);
-	}
+void RichText3D::UpdateTickerAnimation(Urho3D::StringHash eventType, Urho3D::VariantMap& eventData)
+{
+  using namespace RenderUpdate;
+  float elapsed = eventData[P_TIMESTEP].GetFloat();
 
-	// Update ticker state
-	if (ticker_type_ != TickerType_None) {
-		// ticker direction sign
-		int vertical_dir = 0, horizontal_dir = 0;
+  if (!IsEnabled())
+    return;
 
-		if (ticker_type_ == TickerType_Horizontal) {
-			if (ticker_direction_ == TickerDirection_Negative)
-				horizontal_dir = -1;
-			else
-				horizontal_dir = 1;
-		} else if (ticker_type_ == TickerType_Vertical) {
+  if (IsFlagged(WidgetFlags_ContentChanged))
+  {
+    CompileTextLayout();
+    ClearFlags(WidgetFlags_ContentChanged);
+  }
+
+  // Update ticker state
+  if (ticker_type_ != TickerType_None)
+  {
+    // ticker direction sign
+    int vertical_dir = 0, horizontal_dir = 0;
+
+    if (ticker_type_ == TickerType_Horizontal)
+    {
       if (ticker_direction_ == TickerDirection_Negative)
-				vertical_dir = -1;
-			else
-				vertical_dir = 1;
-		}
+        horizontal_dir = -1;
+      else
+        horizontal_dir = 1;
+    } 
+    else if (ticker_type_ == TickerType_Vertical)
+    {
+      if (ticker_direction_ == TickerDirection_Negative)
+        vertical_dir = -1;
+      else
+        vertical_dir = 1;
+    }
 
-		// move the ticker, cap the time elapsed to 100ms to prevent long jumps
-		float move_factor = ticker_speed_ * (fElapsed < 0.1f ? fElapsed : 0.1f);
-		scroll_origin_.x_ += horizontal_dir * move_factor;
-		scroll_origin_.y_ += vertical_dir * move_factor;
+    // move the ticker, cap the time elapsed to 100ms to prevent long jumps
+    float move_factor = ticker_speed_ * (elapsed < 0.1f ? elapsed : 0.1f);
+    scroll_origin_.x_ += horizontal_dir * move_factor;
+    scroll_origin_.y_ += vertical_dir * move_factor;
 
-		// All the magic done by moving the draw origin of the Widget
-		SetDrawOrigin(scroll_origin_);
+    // move the content
+    SetDrawOrigin(scroll_origin_);
 
-		// check if the text has scrolled out
-		bool scrolled_out = false;
-		float ticker_max;
+    // check if the text has scrolled out
+    bool scrolled_out = false;
+    float ticker_max;
 
-		IntRect actual_clip_region = GetClipRegion();
-		// detect ticker scrolling out of the clip region and update the ticker position
-		if (ticker_type_ == TickerType_Horizontal) {
-			ticker_max = (horizontal_dir == -1 ? content_size_.x_ : content_size_.x_ + actual_clip_region.Width());
-			scrolled_out = horizontal_dir * scroll_origin_.x_ > ticker_max;
-			ticker_position_ = ticker_max != 0 ? ((float)horizontal_dir * scroll_origin_.x_ / ticker_max) : 0;
-		} else if (ticker_type_ == TickerType_Vertical) {
-			ticker_max = (vertical_dir == -1 ? content_size_.y_ : content_size_.y_ + actual_clip_region.Height());
-			scrolled_out = vertical_dir * scroll_origin_.y_ > ticker_max;
-			ticker_position_ = ticker_max != 0 ? ((float)vertical_dir * scroll_origin_.y_ / ticker_max) : 0;
-		}
-			
-		if (scrolled_out) {
-			if (parse_script_) {
-				if (content_size_ != Vector2::ZERO)
-					refresh_count_ ++;
-				try {
-					CompileTextLayout();
-				} catch (...) {}
-			}
-			ResetTicker();
-		}
-	}
+    IntRect actual_clip_region = GetClipRegion();
+    // detect ticker scrolling out of the clip region and update the ticker position
+    if (ticker_type_ == TickerType_Horizontal)
+    {
+      ticker_max = (horizontal_dir == -1 ? content_size_.x_ : content_size_.x_ + actual_clip_region.Width());
+      scrolled_out = horizontal_dir * scroll_origin_.x_ > ticker_max;
+      ticker_position_ = ticker_max != 0 ? ((float)horizontal_dir * scroll_origin_.x_ / ticker_max) : 0;
+    }
+    else if (ticker_type_ == TickerType_Vertical)
+    {
+      ticker_max = (vertical_dir == -1 ? content_size_.y_ : content_size_.y_ + actual_clip_region.Height());
+      scrolled_out = vertical_dir * scroll_origin_.y_ > ticker_max;
+      ticker_position_ = ticker_max != 0 ? ((float)vertical_dir * scroll_origin_.y_ / ticker_max) : 0;
+    }
+
+    if (scrolled_out)
+    {
+      if (content_size_ != Vector2::ZERO)
+        refresh_count_++;
+      // TODO: send an event
+
+      //CompileTextLayout();
+      ResetTicker();
+    }
+  }
+
+  //if (IsFlagged(WidgetFlags_GeometryDirty))
+  //  Draw();
 }
 
 } // namespace Urho3D
