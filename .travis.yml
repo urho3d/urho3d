@@ -392,8 +392,8 @@ before_script:
   - rake ci_timer
   - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
-  - if [[ $SYSROOT =~ arm64 ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/aarch64-linux-gnu/gcc-linaro-5.4.1-2017.01-x86_64_aarch64-linux-gnu.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/aarch64-linux-gnu; fi
-  - if [[ $SYSROOT =~ armhf ]]; then wget https://releases.linaro.org/components/toolchain/binaries/latest-5/arm-linux-gnueabihf/gcc-linaro-5.4.1-2017.01-x86_64_arm-linux-gnueabihf.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/arm-linux-gnueabihf; fi
+  - if [[ $SYSROOT =~ arm64 ]]; then export triplet=aarch64-linux-gnu; else export triplet=arm-linux-gnueabihf; fi
+  - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/$triplet/gcc-linaro-5.4.1-2017.05-x86_64_$triplet.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/$triplet
   - for compiler in $ARM_PREFIX-{gcc,g++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
   - git clone --depth 1 https://github.com/urho3d/$SYSROOT.git && export ARM_SYSROOT=$(pwd)/$SYSROOT
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
