@@ -108,6 +108,14 @@ public:
     VerticalAlignment GetVerticalAlignment() const { return align_v_; }
     /// Get content size.
     Vector2 GetContentSize() const { return content_size_; }
+    /// Set whether text has fixed size on screen (pixel-perfect) regardless of distance to camera. Works best when combined with face camera rotation. Default false.
+    void SetFixedScreenSize(bool enable);
+    /// Return whether text has fixed screen size.
+    bool IsFixedScreenSize() const { return fixedScreenSize_; }
+    /// Set how the text should rotate in relation to the camera. Default is to not rotate (FC_NONE.)
+    void SetFaceCameraMode(FaceCameraMode mode);
+    /// Return how the text rotates in relation to the camera.
+    FaceCameraMode GetFaceCameraMode() const { return faceCameraMode_; }
     /// A cache of the used render items, all unused render items (those with no quads) will be freed.
     Vector<SharedPtr<RichWidgetBatch>> items_;
 protected:
@@ -122,7 +130,6 @@ protected:
     Vector2 internal_scale_;
     /// Content size. Updated from subclasses.
     Vector2 content_size_;
-protected:
     /// WidgetFlags_XXX combination.
     unsigned flags_;
     /// Specifies if anything would be drawn inside.
@@ -154,6 +161,15 @@ protected:
     /// Clip content to its size (default true)
     bool clip_to_content_;
 
+    /// Custom world transform for facing the camera automatically.
+    Matrix3x4 customWorldTransform_;
+    /// Text rotation mode in relation to the camera.
+    FaceCameraMode faceCameraMode_;
+    /// Minimal angle between text normal and look-at direction.
+    float minAngle_;
+    /// Fixed screen size flag.
+    bool fixedScreenSize_;
+
     /// The clip region after scaling. TODO: remove
     Rect GetActualDrawArea(bool withPadding = true) const;
     /// Draw all render items.
@@ -162,6 +178,8 @@ protected:
     void UpdateTextBatches();
     /// Update the geometry_ materials and SourceBatch from the UIBatch list.
     void UpdateTextMaterials();
+    /// Recalculate camera facing and fixed screen size.
+    void CalculateFixedScreenSize(const FrameInfo& frame);
 
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
     virtual void UpdateBatches(const FrameInfo& frame);

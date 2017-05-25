@@ -113,6 +113,7 @@ void RichText3D::RegisterObject(Context* context) {
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Node Align V", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment,
     vertical_alignments, VA_TOP, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
+  URHO3D_COPY_BASE_ATTRIBUTES(RichWidget);
   URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
 }
 

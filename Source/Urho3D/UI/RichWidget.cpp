@@ -3,10 +3,12 @@
 #include "../UI/RichBatchImage.h"
 #include "../Core/Context.h"
 #include "../Scene/Node.h"
+#include "../Graphics/Camera.h"
 
 namespace Urho3D {
 
 extern const char* GEOMETRY_CATEGORY;
+extern const char* faceCameraModeNames[];
 
 /// Register object factory. Drawable must be registered first.
 void RichWidget::RegisterObject(Context* context)
@@ -14,6 +16,11 @@ void RichWidget::RegisterObject(Context* context)
     context->RegisterFactory<RichWidget>(GEOMETRY_CATEGORY);
     RichWidgetImage::RegisterObject(context);
     RichWidgetText::RegisterObject(context);
+
+    URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
+    URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Min Angle", float, minAngle_, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
 }
 
 RichWidget::RichWidget(Context* context)
@@ -31,6 +38,10 @@ RichWidget::RichWidget(Context* context)
  , align_h_(HA_LEFT)
  , align_v_(VA_TOP)
  , clip_to_content_(true)
+ , customWorldTransform_(Matrix3x4::IDENTITY)
+ , faceCameraMode_(FC_NONE)
+ , minAngle_(0.0f)
+ , fixedScreenSize_(false)
 {
  
 }
@@ -154,8 +165,8 @@ Rect RichWidget::GetActualDrawArea(bool withPadding) const
 
     if (!withPadding)
     {
-        cliprect.min_.x_ = clip_region_.left_;
-        cliprect.min_.y_ = clip_region_.top_;
+        cliprect.min_.x_ = (float)clip_region_.left_;
+        cliprect.min_.y_ = (float)clip_region_.top_;
         cliprect.max_.x_ = (float)clip_region_.right_ * internal_scale_.x_;
         cliprect.max_.y_ = (float)clip_region_.bottom_ * internal_scale_.y_;
     }
@@ -221,6 +232,30 @@ void RichWidget::SetVerticalAlignment(VerticalAlignment align)
   SetFlags(WidgetFlags_GeometryDirty);
 }
 
+void RichWidget::SetFixedScreenSize(bool enable)
+{
+    if (enable != fixedScreenSize_)
+    {
+        fixedScreenSize_ = enable;
+
+        // Bounding box must be recalculated
+        OnMarkedDirty(node_);
+        MarkNetworkUpdate();
+    }
+}
+
+void RichWidget::SetFaceCameraMode(FaceCameraMode mode)
+{
+    if (mode != faceCameraMode_)
+    {
+        faceCameraMode_ = mode;
+
+        // Bounding box must be recalculated
+        OnMarkedDirty(node_);
+        MarkNetworkUpdate();
+    }
+}
+
 void RichWidget::SetFlags(unsigned flags) 
 { 
     flags_ |= flags;
@@ -230,33 +265,6 @@ void RichWidget::SetFlags(unsigned flags)
         MarkNetworkUpdate();
     }
 }
-
-#if 0
-/// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-void Widget::UpdateBatches(const FrameInfo& frame) {
-  if (IsFlagged(WidgetFlags_Dirty)) {
-    Draw();
-    //ClearFlags(WidgetFlags_Dirty);
-  }
-
-  distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
-
-  //if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
-  //  CalculateFixedScreenSize(frame);
-
-  for (unsigned i = 0; i < batches_.Size(); ++i) {
-    batches_[i].distance_ = distance_;
-    batches_[i].worldTransform_ = &node_->GetWorldTransform();
-  }
-
-  for (unsigned i = 0; i < ui_batches_.Size(); ++i) {
-    if (ui_batches_[i].texture_ && ui_batches_[i].texture_->IsDataLost()) {
-      //fontDataLost_ = true;
-      break;
-    }
-  }
-}
-#endif
 
 void RichWidget::Draw()
 {
@@ -276,24 +284,21 @@ void RichWidget::Draw()
             UpdateTextMaterials();
         }
     }
-    //ClearFlags(WidgetFlags_Dirty);
     RemoveUnusedWidgetBatches();
 }
 
 void RichWidget::UpdateBatches(const FrameInfo& frame)
 {
-#if 0
     distance_ = frame.camera_->GetDistance(GetWorldBoundingBox().Center());
 
-    //if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
-    //  CalculateFixedScreenSize(frame);
+    if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
+        CalculateFixedScreenSize(frame);
 
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
-        batches_[i].worldTransform_ = /*faceCameraMode_ != FC_NONE ? &customWorldTransform_ : */&node_->GetWorldTransform();
+        batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
-#endif
 }
 
 void RichWidget::UpdateTextBatches()
@@ -371,6 +376,7 @@ void RichWidget::UpdateTextBatches()
 
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
+    worldBoundingBoxDirty_ = true;
 }
 
 void RichWidget::UpdateTextMaterials()
@@ -382,7 +388,7 @@ void RichWidget::UpdateTextMaterials()
     {
         auto& batch = batches_[i];
 
-        batch.worldTransform_ = &node_->GetWorldTransform();
+        //batch.worldTransform_ = &node_->GetWorldTransform();
 
         if (!geometries_[i])
         {
@@ -402,6 +408,10 @@ void RichWidget::UpdateTextMaterials()
 /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
 void RichWidget::UpdateGeometry(const FrameInfo& frame)
 {
+    // In case is being rendered from multiple views, recalculate camera facing & fixed size
+    if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
+        CalculateFixedScreenSize(frame);
+
     if (IsFlagged(WidgetFlags_GeometryDirty))
     {
         for (unsigned i = 0; i < batches_.Size() && i < ui_batches_.Size(); ++i)
@@ -435,8 +445,39 @@ UpdateGeometryType RichWidget::GetUpdateGeometryType()
 // Recalculate the world-space bounding box.
 void RichWidget::OnWorldBoundingBoxUpdate()
 {
-    worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
+    // In face camera mode, use the last camera rotation to build the world bounding box
+    if (faceCameraMode_ != FC_NONE || fixedScreenSize_)
+    {
+        worldBoundingBox_ = boundingBox_.Transformed(Matrix3x4(node_->GetWorldPosition(),
+            customWorldTransform_.Rotation(), customWorldTransform_.Scale()));
+    }
+    else
+        worldBoundingBox_ = boundingBox_.Transformed(node_->GetWorldTransform());
 }
 
+void RichWidget::CalculateFixedScreenSize(const FrameInfo& frame)
+{
+    Vector3 worldPosition = node_->GetWorldPosition();
+    Vector3 worldScale = node_->GetWorldScale();
+
+    if (fixedScreenSize_)
+    {
+        float textScaling = 2.0f / (1.0f / 128.0f) / frame.viewSize_.y_;
+        float halfViewWorldSize = frame.camera_->GetHalfViewSize();
+
+        if (!frame.camera_->IsOrthographic())
+        {
+            Matrix4 viewProj(frame.camera_->GetProjection() * frame.camera_->GetView());
+            Vector4 projPos(viewProj * Vector4(worldPosition, 1.0f));
+            worldScale *= textScaling * halfViewWorldSize * projPos.w_;
+        }
+        else
+            worldScale *= textScaling * halfViewWorldSize;
+    }
+
+    customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
+        worldPosition, node_->GetWorldRotation(), faceCameraMode_, minAngle_), worldScale);
+    worldBoundingBoxDirty_ = true;
+}
 
 } // namespace Urho3D
