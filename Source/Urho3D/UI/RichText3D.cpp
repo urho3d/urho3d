@@ -96,7 +96,7 @@ void RichText3D::RegisterObject(Context* context) {
   URHO3D_ACCESSOR_ATTRIBUTE("Font Size", GetFontSizeAttr, SetFontSizeAttr, int, 14, AM_DEFAULT);
   URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Color", GetTextColor, SetTextColor, Color, Color::WHITE, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Word Wrap", GetWrapping, SetWrapping, bool, true, AM_DEFAULT);
-  URHO3D_ACCESSOR_ATTRIBUTE("Single Line", GetSingleLine, SetSingleLine, bool, true, AM_DEFAULT);
+  URHO3D_ACCESSOR_ATTRIBUTE("Single Line", GetSingleLine, SetSingleLine, bool, false, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Auto Clip", GetClipToContent, SetClipToContent, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Line Spacing", GetLineSpacing, SetLineSpacing, int, 0, AM_DEFAULT);
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Text Alignment", GetAlignment, SetAlignment, TextAlign,
@@ -482,17 +482,17 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
                 //new_block.image_width = new_block.image_height * aspect;
 
                 // fit by width
-                new_block.image_width = clip_region_.Width();
+                new_block.image_width = (float)clip_region_.Width();
                 new_block.image_height = new_block.image_width / aspect;
               }
 
               if (new_block.image_width == 0) {
-                new_block.image_width = clip_region_.Width();
+                new_block.image_width = (float)clip_region_.Width();
               }
               new_line.blocks.Push(new_block);
 
-              draw_offset_x += new_block.image_width;
-              new_line.height = Max(new_block.image_height, new_line.height);
+              draw_offset_x += (int)new_block.image_width;
+              new_line.height = Max((int)new_block.image_height, new_line.height);
             }
           }
 
@@ -561,18 +561,18 @@ void RichText3D::DrawTextLines() {
           image_renderer->SetImageSource(bit->text);
 
         if (bit->image_width == 0)
-          bit->image_width = clip_region_.Width();
+          bit->image_width = (float)clip_region_.Width();
         if (bit->image_height == 0) {
           // height should be the line max height
-          bit->image_height = line_max_height;
+          bit->image_height = (float)line_max_height;
           // width should be auto calculated based on the texture size
           float aspect = image_renderer->GetImageAspect();
           bit->image_width = bit->image_height * aspect;
         }
 
-        image_renderer->AddImage(Vector3(xoffset, yoffset, 0), bit->image_width, bit->image_height);
-        line_max_height = Max(bit->image_height, line_max_height);
-        xoffset += bit->image_width;
+        image_renderer->AddImage(Vector3((float)xoffset, (float)yoffset, 0.0f), bit->image_width, bit->image_height);
+        line_max_height = Max((int)bit->image_height, line_max_height);
+        xoffset += (int)bit->image_width;
       } else {
         // bold-italic flags are passed as third asset name parameter
         fontstate.face = bit->font.face;
@@ -588,7 +588,7 @@ void RichText3D::DrawTextLines() {
         id.AppendWithFormat("%s.%d%s", fontstate.face.CString(), fontstate.size, bi.CString());
         text_renderer = CacheWidgetBatch<RichWidgetText>(id);
         text_renderer->SetFont(fontstate.face, fontstate.size);
-        text_renderer->AddText(bit->text, Vector3(xoffset, yoffset, 0), bit->font.color);
+        text_renderer->AddText(bit->text, Vector3((float)xoffset, (float)yoffset, 0.0f), bit->font.color);
         if (text_renderer->GetFontFace()) {
           line_max_height = Max(text_renderer->GetRowHeight(), line_max_height);
           xoffset += text_renderer->CalculateTextExtents(bit->text).x_;
@@ -597,7 +597,7 @@ void RichText3D::DrawTextLines() {
     }
     yoffset += line_max_height + line_spacing_;
     content_size_.x_ = Max<float>(content_size_.x_, xoffset);
-    content_size_.y_ = yoffset;
+    content_size_.y_ = (float)yoffset;
   }
 }
 
@@ -685,9 +685,6 @@ void RichText3D::UpdateTickerAnimation(Urho3D::StringHash eventType, Urho3D::Var
       ResetTicker();
     }
   }
-
-  //if (IsFlagged(WidgetFlags_GeometryDirty))
-  //  Draw();
 }
 
 } // namespace Urho3D

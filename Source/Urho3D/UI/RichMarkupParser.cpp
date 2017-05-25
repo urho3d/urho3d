@@ -53,7 +53,7 @@ inline Color ParseHTMLColor(const String& str)
         }
     }
 
-    return Color(R / 255.0, G / 255.0, B / 255.0, A / 255.0);
+    return Color(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
 }
 
 } // namespace
