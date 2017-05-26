@@ -1,3 +1,4 @@
 <material>
+    <cull value="none" />
     <technique name="Techniques/DiffUnlitAlpha.xml" />
 </material>

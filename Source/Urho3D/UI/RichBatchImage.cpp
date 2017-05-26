@@ -6,19 +6,17 @@
 
 namespace Urho3D {
 
-extern const char* GEOMETRY_CATEGORY;
-
 /// Register object factory. Drawable must be registered first.
 void RichWidgetImage::RegisterObject(Context* context)
 {
-    context->RegisterFactory<RichWidgetImage>(GEOMETRY_CATEGORY);
+    context->RegisterFactory<RichWidgetImage>();
 }
 
 RichWidgetImage::RichWidgetImage(Context* context) 
  : RichWidgetBatch(context)
 {
      ResourceCache* cache = GetSubsystem<ResourceCache>();
-     Material* material = cache->GetResource<Material>("Materials/WidgetTexture.xml");
+     Material* material = cache->GetResource<Material>("Materials/RichImage.xml");
      material_ = material;
 }
 

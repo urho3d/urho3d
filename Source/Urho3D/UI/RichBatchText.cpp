@@ -8,12 +8,10 @@
 namespace Urho3D
 {
 
-extern const char* GEOMETRY_CATEGORY;
-
 /// Register object factory. Drawable must be registered first.
 void RichWidgetText::RegisterObject(Context* context)
 {
-    context->RegisterFactory<RichWidgetText>(GEOMETRY_CATEGORY);
+    context->RegisterFactory<RichWidgetText>();
 }
 
 RichWidgetText::RichWidgetText(Context* context)
@@ -137,7 +135,7 @@ void RichWidgetText::AddText(const String& text, const Vector3& pos, const Color
               uv, // UV rect
               p.x_ + (bitmap_font_rescale_.x_ * glyph->offsetX_) + parent_widget_->GetShadowOffset().x_,
               p.y_ + (bitmap_font_rescale_.y_ * glyph->offsetY_) + parent_widget_->GetShadowOffset().y_,
-              p.z_ + parent_widget_->GetShadowOffset().z_ + 0.01,
+              p.z_ + parent_widget_->GetShadowOffset().z_ + 0.01f,
               bitmap_font_rescale_.x_ * glyph->width_,
               bitmap_font_rescale_.y_ * glyph->height_,
               parent_widget_->GetShadowColor());
@@ -171,9 +169,9 @@ void RichWidgetText::AddText(const String& text, const Vector3& pos, const Color
     }
 }
 
-IntVector2 RichWidgetText::CalculateTextExtents(const String& text)
+Vector2 RichWidgetText::CalculateTextExtents(const String& text)
 {
-    IntVector2 res;
+    Vector2 res;
     if (!font_face_)
         return res;
 
@@ -182,16 +180,16 @@ IntVector2 RichWidgetText::CalculateTextExtents(const String& text)
         const FontGlyph* glyph = font_face_->GetGlyph(*it);
         if (!glyph)
             continue;
-        res.x_ += (glyph->advanceX_) * bitmap_font_rescale_.x_;
+        res.x_ += (float)glyph->advanceX_ * bitmap_font_rescale_.x_;
         res.y_ = Max(res.y_, glyph->height_ * bitmap_font_rescale_.y_);
     }
     return res;
 }
 
-int RichWidgetText::GetRowHeight() const
+float RichWidgetText::GetRowHeight() const
 {
     if (font_face_)
-      return bitmap_font_rescale_.y_ * font_face_->GetRowHeight();
+        return bitmap_font_rescale_.y_ * font_face_->GetRowHeight();
     return 0;
 }
 

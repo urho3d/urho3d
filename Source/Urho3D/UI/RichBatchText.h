@@ -33,9 +33,9 @@ public:
     /// Get the font face (only valid after SetFont).
     FontFace* GetFontFace() const { return font_face_; }
     /// Calculate text extents with the current font
-    IntVector2 CalculateTextExtents(const String& text);
+    Vector2 CalculateTextExtents(const String& text);
     /// Row height
-    int GetRowHeight() const;
+    float GetRowHeight() const;
 private:
     Font* font_;
     FontFace* font_face_;

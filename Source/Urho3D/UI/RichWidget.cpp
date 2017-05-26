@@ -7,16 +7,40 @@
 
 namespace Urho3D {
 
-extern const char* GEOMETRY_CATEGORY;
 extern const char* faceCameraModeNames[];
+
+static const char* horizontal_alignments[] =
+{
+  "Left",
+  "Center",
+  "Right",
+  0
+};
+
+static const char* vertical_alignments[] =
+{
+  "Top",
+  "Center",
+  "Bottom",
+  0
+};
+
+const float RichWidget::unitsPerPixel = 1.0f / 128;
 
 /// Register object factory. Drawable must be registered first.
 void RichWidget::RegisterObject(Context* context)
 {
-    context->RegisterFactory<RichWidget>(GEOMETRY_CATEGORY);
+    context->RegisterFactory<RichWidget>();
     RichWidgetImage::RegisterObject(context);
     RichWidgetText::RegisterObject(context);
 
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Clip", GetClipToContent, SetClipToContent, bool, true, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Clip Region", GetClipRegion, SetClipRegion, IntRect, IntRect::ZERO, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Padding", GetPadding, SetPadding, IntRect, IntRect::ZERO, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Node Align H", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
+      horizontal_alignments, HA_LEFT, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Node Align V", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment,
+      vertical_alignments, VA_TOP, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Min Angle", float, minAngle_, 0.0f, AM_DEFAULT);
@@ -297,7 +321,7 @@ void RichWidget::UpdateBatches(const FrameInfo& frame)
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         batches_[i].distance_ = distance_;
-        batches_[i].worldTransform_ = faceCameraMode_ != FC_NONE ? &customWorldTransform_ : &node_->GetWorldTransform();
+        batches_[i].worldTransform_ = (faceCameraMode_ != FC_NONE || fixedScreenSize_) ? &customWorldTransform_ : &node_->GetWorldTransform();
     }
 }
 
@@ -321,17 +345,21 @@ void RichWidget::UpdateTextBatches()
     Vector3 offset(Vector3::ZERO);
     offset.z_ = GetDrawOrigin().z_;
 
+    Vector2 align_size = content_size_;
+    if (!clip_to_content_ && clip_region_ != IntRect::ZERO)
+      align_size = Vector2((float)clip_region_.Width(), (float)clip_region_.Height());
+
     switch (align_h_)
     {
     case HA_LEFT:
         break;
 
     case HA_CENTER:
-        offset.x_ -= (float)content_size_.x_ * 0.5f;
+        offset.x_ -= (float)align_size.x_ * 0.5f;
         break;
 
     case HA_RIGHT:
-        offset.x_ -= content_size_.x_;
+        offset.x_ -= align_size.x_;
         break;
     }
 
@@ -341,18 +369,16 @@ void RichWidget::UpdateTextBatches()
         break;
 
     case VA_CENTER:
-      offset.y_ -= content_size_.y_ * 0.5f;
+        offset.y_ -= align_size.y_ * 0.5f;
         break;
 
     case VA_BOTTOM:
-        offset.y_ -= content_size_.y_;
+        offset.y_ -= align_size.y_;
         break;
     }
 
-    static const float unitPerPixel = 1.0f / 128.0f;
-
     boundingBox_.Clear();
-    boundingBox_.Define(Vector3(offset.x_, offset.y_) * unitPerPixel, Vector3(content_size_ + Vector2(offset.x_, offset.y_)) * unitPerPixel);
+    boundingBox_.Define(Vector3(offset.x_, offset.y_) * unitsPerPixel, Vector3(align_size + Vector2(offset.x_, offset.y_)) * unitsPerPixel);
     boundingBox_.min_.y_ = -boundingBox_.min_.y_;
     boundingBox_.max_.y_ = -boundingBox_.max_.y_;
 
@@ -362,7 +388,7 @@ void RichWidget::UpdateTextBatches()
         {
             Vector3& position = *(reinterpret_cast<Vector3*>(&ui_vertex_data_[i]));
             position += offset;
-            position *= unitPerPixel;
+            position *= unitsPerPixel;
             position.y_ = -position.y_;
         }
     }
@@ -370,8 +396,8 @@ void RichWidget::UpdateTextBatches()
     if (!clip_to_content_ && clip_region_ != IntRect::ZERO)
     {
         boundingBox_.Define(
-          Vector3(((float)clip_region_.left_ + offset.x_) * unitPerPixel, -((float)clip_region_.top_ + offset.y_) * unitPerPixel),
-          Vector3(((float)clip_region_.right_ + offset.x_) * unitPerPixel, -((float)clip_region_.bottom_ + offset.y_) * unitPerPixel));
+          Vector3(((float)clip_region_.left_ + offset.x_) * unitsPerPixel, -((float)clip_region_.top_ + offset.y_) * unitsPerPixel),
+          Vector3(((float)clip_region_.right_ + offset.x_) * unitsPerPixel, -((float)clip_region_.bottom_ + offset.y_) * unitsPerPixel));
     }
 
     OnMarkedDirty(node_);
@@ -387,8 +413,6 @@ void RichWidget::UpdateTextMaterials()
     for (unsigned i = 0; i < batches_.Size(); ++i)
     {
         auto& batch = batches_[i];
-
-        //batch.worldTransform_ = &node_->GetWorldTransform();
 
         if (!geometries_[i])
         {
@@ -462,7 +486,7 @@ void RichWidget::CalculateFixedScreenSize(const FrameInfo& frame)
 
     if (fixedScreenSize_)
     {
-        float textScaling = 2.0f / (1.0f / 128.0f) / frame.viewSize_.y_;
+        float textScaling = 2.0f / unitsPerPixel / frame.viewSize_.y_;
         float halfViewWorldSize = frame.camera_->GetHalfViewSize();
 
         if (!frame.camera_->IsOrthographic())

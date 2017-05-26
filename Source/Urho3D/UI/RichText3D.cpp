@@ -24,6 +24,10 @@ inline unsigned find_first_of(const String& str, const String& delimiters, unsig
   return -1;
 }
 
+
+// Characters that split words
+static const char splitter_chars[] = " \t,.:;";
+
 // Old code kept for 1:1 compatibility
 template <typename T>
 inline void splitwords(const String& str, T& tokens, const String& delimiters = " ", bool trimEmpty = false) {
@@ -51,22 +55,6 @@ inline void splitwords(const String& str, T& tokens, const String& delimiters = 
 
 } // namespace
 
-static const char* horizontal_alignments[] =
-{
-  "Left",
-  "Center",
-  "Right",
-  0
-};
-
-static const char* vertical_alignments[] =
-{
-  "Top",
-  "Center",
-  "Bottom",
-  0
-};
-
 static const char* ticker_types[] =
 {
   "None",
@@ -80,6 +68,14 @@ static const char* ticker_directions[] =
 {
   "Negative",
   "Positive",
+  0
+};
+
+static const char* horizontal_alignments[] =
+{
+  "Left",
+  "Center",
+  "Right",
   0
 };
 
@@ -97,7 +93,6 @@ void RichText3D::RegisterObject(Context* context) {
   URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Color", GetTextColor, SetTextColor, Color, Color::WHITE, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Word Wrap", GetWrapping, SetWrapping, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Single Line", GetSingleLine, SetSingleLine, bool, false, AM_DEFAULT);
-  URHO3D_ACCESSOR_ATTRIBUTE("Auto Clip", GetClipToContent, SetClipToContent, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Line Spacing", GetLineSpacing, SetLineSpacing, int, 0, AM_DEFAULT);
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Text Alignment", GetAlignment, SetAlignment, TextAlign,
     horizontal_alignments, ALIGN_LEFT, AM_DEFAULT);
@@ -106,12 +101,6 @@ void RichText3D::RegisterObject(Context* context) {
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Ticker Direction", GetTickerDirection, SetTickerDirection, TickerDirection,
     ticker_directions, TickerDirection_Negative, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Ticker Speed", GetTickerSpeed, SetTickerSpeed, float, 120, AM_DEFAULT);
-  URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Clip Region", GetClipRegion, SetClipRegion, IntRect, IntRect::ZERO, AM_DEFAULT);
-  URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Padding", GetPadding, SetPadding, IntRect, IntRect::ZERO, AM_DEFAULT);
-  URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Node Align H", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
-    horizontal_alignments, HA_LEFT, AM_DEFAULT);
-  URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Node Align V", GetVerticalAlignment, SetVerticalAlignment, VerticalAlignment,
-    vertical_alignments, VA_TOP, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
   URHO3D_COPY_BASE_ATTRIBUTES(RichWidget);
   URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
@@ -125,8 +114,6 @@ RichText3D::RichText3D(Context* context)
  , single_line_(false)
  , wrapping_(WRAP_WORD)
  , ticker_position_(0.0f)
- , last_update_time_(-1)
- , last_script_update_(-1)
  , refresh_count_(0)
  , alignment_(ALIGN_LEFT)
  , line_spacing_(0)
@@ -360,7 +347,7 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
               bit->text.Erase(crpos, 1);
 
             Vector<String> words;
-            splitwords(bit->text, words, " \t,.:;", false);
+            splitwords(bit->text, words, splitter_chars, false);
             if (words.Empty())
               words.Push(bit->text);
 
@@ -388,9 +375,9 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
             String the_word;
             for (Vector<String>::ConstIterator wit = words.Begin(); wit != words.End(); ++wit) {
               the_word = *wit;
-              IntVector2 wordsize = text_renderer->CalculateTextExtents(the_word);
+              Vector2 wordsize = text_renderer->CalculateTextExtents(the_word);
 
-              new_line.height = Max(wordsize.y_, new_line.height);
+              new_line.height = Max<int>((int)wordsize.y_, new_line.height);
 
               bool needs_new_line = (draw_offset_x + wordsize.x_) > layout_width;
               bool is_wider_than_line = wordsize.x_ > layout_width;
@@ -398,14 +385,14 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
               // Handle cases where this word can't be fit in a line
               while (is_wider_than_line && needs_new_line) {
                 String fit_word = the_word;
-                int width_remain = wordsize.x_ - layout_width;
+                int width_remain = (int)wordsize.x_ - layout_width;
                 assert(width_remain >= 0);
                 // remove a char from this word until it can be fit in the current line
-                IntVector2 newwordsize;
+                Vector2 newwordsize;
                 while (width_remain > 0 && !the_word.Empty()) {
                   fit_word.Erase(fit_word.Length() - 1);
                   newwordsize = text_renderer->CalculateTextExtents(fit_word);
-                  width_remain = newwordsize.x_ - layout_width;
+                  width_remain = (int)newwordsize.x_ - layout_width;
                 }
 
                 // prevent endless loops
@@ -416,7 +403,7 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
                 // and create a new line
                 new_block.text.Append(fit_word);
                 new_line.blocks.Push(new_block);
-                draw_offset_x += newwordsize.x_;
+                draw_offset_x += (int)newwordsize.x_;
                 new_line.width = draw_offset_x;
                 new_line.offset_y = draw_offset_y;
                 lines_.Push(new_line);
@@ -429,7 +416,7 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
                 the_word = the_word.Substring(fit_word.Length());
 
                 wordsize = text_renderer->CalculateTextExtents(the_word);
-                draw_offset_x += wordsize.x_;
+                draw_offset_x += (int)wordsize.x_;
                 is_wider_than_line = wordsize.x_ > layout_width;
 
                 if (!is_wider_than_line) {
@@ -465,7 +452,7 @@ void RichText3D::ArrangeTextBlocks(Vector<TextBlock>& markup_blocks)
                   continue;
               }
               new_block.text.Append(the_word);
-              draw_offset_x += wordsize.x_;
+              draw_offset_x += (int)wordsize.x_;
             }
 
             new_line.blocks.Push(new_block);
@@ -591,8 +578,8 @@ void RichText3D::DrawTextLines() {
         text_renderer->SetFont(fontstate.face, fontstate.size);
         text_renderer->AddText(bit->text, Vector3((float)xoffset, (float)yoffset, 0.0f), bit->font.color);
         if (text_renderer->GetFontFace()) {
-          line_max_height = Max(text_renderer->GetRowHeight(), line_max_height);
-          xoffset += text_renderer->CalculateTextExtents(bit->text).x_;
+          line_max_height = Max<int>((int)text_renderer->GetRowHeight(), line_max_height);
+          xoffset += (int)text_renderer->CalculateTextExtents(bit->text).x_;
         }
       }
     }
@@ -680,9 +667,8 @@ void RichText3D::UpdateTickerAnimation(Urho3D::StringHash eventType, Urho3D::Var
     {
       if (content_size_ != Vector2::ZERO)
         refresh_count_++;
-      // TODO: send an event
 
-      //CompileTextLayout();
+      // TODO: send an event
       ResetTicker();
     }
   }

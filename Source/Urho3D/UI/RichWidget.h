@@ -27,7 +27,8 @@ enum WidgetFlags
 class RichWidget: public Drawable
 {
     URHO3D_OBJECT(RichWidget, Drawable)
-public:  
+public:
+    static const float unitsPerPixel;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 

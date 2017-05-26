@@ -179,10 +179,6 @@ protected:
     String text_;
     /// Additional line spacing (can be negative).
     int line_spacing_;
-    /// Last recompile time.
-    long long	last_update_time_;
-    /// Last script recompile.
-    long long	last_script_update_;
     /// Ticker type.
     TickerType ticker_type_;
     /// Ticker direction.
