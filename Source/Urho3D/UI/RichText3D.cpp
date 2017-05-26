@@ -94,8 +94,8 @@ void RichText3D::RegisterObject(Context* context) {
   URHO3D_ACCESSOR_ATTRIBUTE("Word Wrap", GetWrapping, SetWrapping, bool, true, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Single Line", GetSingleLine, SetSingleLine, bool, false, AM_DEFAULT);
   URHO3D_ACCESSOR_ATTRIBUTE("Line Spacing", GetLineSpacing, SetLineSpacing, int, 0, AM_DEFAULT);
-  URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Text Alignment", GetAlignment, SetAlignment, TextAlign,
-    horizontal_alignments, ALIGN_LEFT, AM_DEFAULT);
+  URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Text Alignment", GetAlignment, SetAlignment, HorizontalAlignment,
+    horizontal_alignments, HA_LEFT, AM_DEFAULT);
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Ticker Type", GetTickerType, SetTickerType, TickerType,
     ticker_types, TickerType_None, AM_DEFAULT);
   URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Ticker Direction", GetTickerDirection, SetTickerDirection, TickerDirection,
@@ -115,12 +115,12 @@ RichText3D::RichText3D(Context* context)
  , wrapping_(WRAP_WORD)
  , ticker_position_(0.0f)
  , refresh_count_(0)
- , alignment_(ALIGN_LEFT)
+ , alignment_(HA_LEFT)
  , line_spacing_(0)
  , RichWidget(context)
 {
     default_font_state_.color = Color::WHITE;
-    SetDefaultFont("Fonts/Anonymous Pro.ttf", 32, false, false, false);
+    SetDefaultFont("Fonts/Anonymous Pro.ttf", 32);
 
     // TODO: disable this handler when the component is disabled
     SubscribeToEvent(Urho3D::E_UPDATE, URHO3D_HANDLER(RichText3D, UpdateTickerAnimation));
@@ -149,7 +149,7 @@ void RichText3D::SetTextColor(const Color& color)
     SetFlags(WidgetFlags_All);
 }
 
-void RichText3D::SetAlignment(TextAlign align)
+void RichText3D::SetAlignment(HorizontalAlignment align)
 {
     alignment_ = align;
     SetFlags(WidgetFlags_All);
@@ -240,13 +240,13 @@ void RichText3D::SetTickerPosition(float tickerPosition)
     // TODO: implement
 }
 
-void RichText3D::SetDefaultFont(const String& face, unsigned size, bool bold, bool italic, bool underlined)
+void RichText3D::SetDefaultFont(const String& face, unsigned size)
 {
     default_font_state_.face = face;
     default_font_state_.size = size;
-    default_font_state_.bold = bold;
-    default_font_state_.italic = italic;
-    default_font_state_.underlined = underlined;
+    default_font_state_.bold = false;
+    default_font_state_.italic = false;
+    default_font_state_.underlined = false;
     SetFlags(WidgetFlags_All);
 }
 
@@ -528,13 +528,13 @@ void RichText3D::DrawTextLines() {
 
     switch (l->align) {
     default:
-    case ALIGN_LEFT:
+    case HA_LEFT:
       xoffset = l->offset_x;
       break;
-    case ALIGN_CENTER:
+    case HA_CENTER:
       xoffset = (clip_region_.Width() - l->width) / 2;
       break;
-    case ALIGN_RIGHT:
+    case HA_RIGHT:
       xoffset = clip_region_.Width() - l->width;
     }
 

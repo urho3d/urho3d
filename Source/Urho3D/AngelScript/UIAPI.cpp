@@ -37,6 +37,7 @@
 #include "../UI/Sprite.h"
 #include "../UI/Text.h"
 #include "../UI/Text3D.h"
+#include "../UI/RichText3D.h"
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/View3D.h"
@@ -472,6 +473,64 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHOD(Text3D, GetRowHeight), asCALL_THISCALL);
 }
 
+static void RegisterRichWidget(asIScriptEngine* engine)
+{
+    RegisterDrawable<RichWidget>(engine, "RichWidget");
+    engine->RegisterObjectMethod("RichWidget", "void set_clipRegion(const IntRect&in)", asMETHODPR(RichWidget, SetClipRegion, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "IntRect get_clipRegion() const", asMETHOD(RichWidget, GetClipRegion), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_clipToContent()", asMETHOD(RichWidget, SetClipToContent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "bool get_clipToContent() const", asMETHOD(RichWidget, GetClipToContent), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_drawOrigin(const Vector3&in)", asMETHODPR(RichWidget, SetDrawOrigin, (const Vector3&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "Vector3 get_drawOrigin() const", asMETHOD(RichWidget, GetDrawOrigin), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_padding(const IntRect&in)", asMETHODPR(RichWidget, SetPadding, (const IntRect&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "IntRect get_padding() const", asMETHOD(RichWidget, GetPadding), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "Vector2 get_contentSize() const", asMETHOD(RichWidget, GetContentSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_fixedScreenSize(bool)", asMETHOD(Text3D, SetFixedScreenSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "bool get_fixedScreenSize() const", asMETHOD(Text3D, IsFixedScreenSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_faceCameraMode(FaceCameraMode)", asMETHOD(Text3D, SetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "FaceCameraMode get_faceCameraMode() const", asMETHOD(Text3D, GetFaceCameraMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_horizontalAlignment(HorizontalAlignment)", asMETHOD(Text3D, SetHorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "HorizontalAlignment get_horizontalAlignment() const", asMETHOD(Text3D, GetHorizontalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "void set_verticalAlignment(VerticalAlignment)", asMETHOD(Text3D, SetVerticalAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichWidget", "VerticalAlignment get_verticalAlignment() const", asMETHOD(Text3D, GetVerticalAlignment), asCALL_THISCALL);
+}
+
+static void RegisterRichText3D(asIScriptEngine* engine)
+{
+    engine->RegisterEnum("TickerType");
+    engine->RegisterEnumValue("TickerType", "TickerType_None", TickerType_None);
+    engine->RegisterEnumValue("TickerType", "TickerType_Horizontal", TickerType_Horizontal);
+    engine->RegisterEnumValue("TickerType", "TickerType_Vertical", TickerType_Vertical);
+
+    engine->RegisterEnum("TickerDirection");
+    engine->RegisterEnumValue("TickerDirection", "TickerDirection_Negative", TickerDirection_Negative);
+    engine->RegisterEnumValue("TickerDirection", "TickerDirection_Positive", TickerDirection_Positive);
+
+    RegisterDrawable<RichText3D>(engine, "RichText3D");
+    engine->RegisterObjectMethod("RichText3D", "void set_text(const String&in)", asMETHOD(RichText3D, SetText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "const String& get_text() const", asMETHOD(RichText3D, GetText), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_defaultFont(const String&in, uint)", asMETHODPR(RichText3D, SetDefaultFont, (const String&, unsigned), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "String get_defaultFontName() const", asMETHOD(RichText3D, GetDefaultFontName), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "uint get_defaultFontSize() const", asMETHOD(RichText3D, GetDefaultFontSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_textColor(const Color&in)", asMETHOD(RichText3D, SetTextColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "Color get_textColor() const", asMETHOD(RichText3D, GetTextColor), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_textAlignment(HorizontalAlignment)", asMETHOD(RichText3D, SetAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "HorizontalAlignment get_textAlignment() const", asMETHOD(RichText3D, GetAlignment), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_lineSpacing(uint)", asMETHOD(RichText3D, SetLineSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "uint get_lineSpacing() const", asMETHOD(RichText3D, GetLineSpacing), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_wrapping(bool)", asMETHOD(RichText3D, SetWrapping), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "bool get_wrapping() const", asMETHOD(RichText3D, GetWrapping), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_tickerType(TickerType)", asMETHOD(RichText3D, SetTickerType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "TickerType get_tickerType() const", asMETHOD(RichText3D, GetTickerType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_tickerDirection(TickerDirection)", asMETHOD(RichText3D, SetTickerDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "TickerDirection get_tickerDirection() const", asMETHOD(RichText3D, GetTickerDirection), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_tickerSpeed(float)", asMETHOD(RichText3D, SetTickerSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "float get_tickerSpeed() const", asMETHOD(RichText3D, GetTickerSpeed), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void set_singleLine(bool)", asMETHOD(RichText3D, SetSingleLine), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "bool get_singleLine() const", asMETHOD(RichText3D, GetSingleLine), asCALL_THISCALL);
+    engine->RegisterObjectMethod("RichText3D", "void ResetTicker()", asMETHOD(RichText3D, ResetTicker), asCALL_THISCALL);
+}
+
 static void RegisterLineEdit(asIScriptEngine* engine)
 {
     RegisterBorderImage<LineEdit>(engine, "LineEdit");
@@ -804,6 +863,8 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterListView(engine);
     RegisterText(engine);
     RegisterText3D(engine);
+    RegisterRichWidget(engine);
+    RegisterRichText3D(engine);
     RegisterLineEdit(engine);
     RegisterMenu(engine);
     RegisterMessageBox(engine);

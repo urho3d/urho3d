@@ -72,7 +72,7 @@ RichWidget::RichWidget(Context* context)
 
 RichWidget::~RichWidget()
 {
-    RemoveWidgetBatchs();
+    RemoveWidgetBatches();
 }
 
 void RichWidget::SetClipRegion(const IntRect& rect)
@@ -148,7 +148,7 @@ RichWidgetBatch* RichWidget::CacheWidgetBatchT(StringHash type, StringHash id) {
     return new_batch;
 }
 
-void RichWidget::RemoveWidgetBatchs()
+void RichWidget::RemoveWidgetBatches()
 {
     items_.Clear();
 }

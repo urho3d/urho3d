@@ -65,7 +65,7 @@ public:
     /// Creates a WidgetBatch with the specified texture and type. If it already exists, returns the existing instance.
     RichWidgetBatch* CacheWidgetBatchT(StringHash type, StringHash id);
     /// Remove all batches.
-    void RemoveWidgetBatchs();
+    void RemoveWidgetBatches();
     /// Remove unused batches (cached but not referenced).
     void RemoveUnusedWidgetBatches();
     /// Get a list of cached batches.

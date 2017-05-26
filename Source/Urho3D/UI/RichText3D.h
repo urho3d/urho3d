@@ -19,14 +19,6 @@ enum TickerDirection
     TickerDirection_Positive,
 };
 
-/// Text align
-enum TextAlign
-{
-    ALIGN_LEFT,
-    ALIGN_CENTER,
-    ALIGN_RIGHT
-};
-
 /// Text wrapping
 enum TextWrapping
 {
@@ -95,7 +87,7 @@ struct TextLine
      , height(0)
       , offset_x(0)
       , offset_y(0)
-      , align(ALIGN_LEFT) {}
+      , align(HA_LEFT) {}
 
     int width;
     int height;
@@ -103,7 +95,7 @@ struct TextLine
     int offset_x;
     int offset_y;
 
-    TextAlign	align;
+    HorizontalAlignment	align;
     Vector<TextBlock> blocks;
 };
 
@@ -125,15 +117,19 @@ public:
     /// Get currently displayed text (as markup).
     const String& GetText() const;
     /// Set the default font for blocks without formatting.
-    void SetDefaultFont(const String& face, unsigned size, bool bold, bool italic, bool underlined);
+    void SetDefaultFont(const String& face, unsigned size);
+    /// Get default font name
+    String GetDefaultFontName() const { return default_font_state_.face; }
+    /// Get default font size
+    unsigned GetDefaultFontSize() const { return default_font_state_.size; }
     /// Set text color.
     void SetTextColor(const Color& color);
     /// Get text color.
     Color GetTextColor() const { return default_font_state_.color; }
     /// Set text alignment.
-    void SetAlignment(TextAlign align);
+    void SetAlignment(HorizontalAlignment align);
     /// Get text alignment.
-    TextAlign GetAlignment() const { return alignment_; }
+    HorizontalAlignment GetAlignment() const { return alignment_; }
     /// Set additional line spacing (can be negative).
     void SetLineSpacing(int line_spacing);
     /// Get additional line spacing.
@@ -198,7 +194,7 @@ protected:
     /// Wrapping
     TextWrapping wrapping_;
     /// Alignment
-    TextAlign alignment_;
+    HorizontalAlignment alignment_;
     /// How many times this text has recompiled itself
     unsigned refresh_count_;
 
@@ -209,6 +205,7 @@ protected:
     /// Draw text lines to the widget.
     void DrawTextLines();
 
+    /// Per-frame text animation.
     void UpdateTickerAnimation(Urho3D::StringHash eventType, Urho3D::VariantMap& eventData);
 };
 
