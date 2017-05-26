@@ -132,7 +132,7 @@ RichWidgetBatch::RichWidgetBatch(Context* context)
  : is_dirty_(false)
  , use_count_(0)
  , parent_widget_(0)
- , UIElement(context)
+ , Object(context)
  , texture_(0)
  , num_batches_(0)
 {
@@ -164,7 +164,7 @@ void RichWidgetBatch::ClearQuads()
 void RichWidgetBatch::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     // Draw all the quads to the UIBatch list
-    UIBatch batch(this, BLEND_ALPHA, currentScissor, texture_ ? texture_ : 0, &vertexData);
+    UIBatch batch(0, BLEND_ALPHA, currentScissor, texture_ ? texture_ : 0, &vertexData);
 
     float scalex = parent_widget_ ? parent_widget_->GetInternalScale().x_ : 1.0f;
     float scaley = parent_widget_ ? parent_widget_->GetInternalScale().y_ : 1.0f;

@@ -50,7 +50,7 @@ void RichWidgetImage::AddImage(const Vector3 pos, float width, float height)
               pos.y_ + parent_widget_->GetShadowOffset().y_, 
               pos.x_ + parent_widget_->GetShadowOffset().x_ + width,
               pos.y_ + parent_widget_->GetShadowOffset().y_ + height), 
-            pos.z_ + 0.01,
+            pos.z_ + 0.01f,
             Rect(0, 0, 0, 0), // NOTE: UV is empty
             parent_widget_->GetShadowColor());
     }

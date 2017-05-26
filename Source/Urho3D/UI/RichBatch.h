@@ -34,9 +34,9 @@ struct Quad
 void AddQuadToUIBatch(UIBatch* batch, const Quad& q);
 
 /// A batch for rendering inside a widget.
-class RichWidgetBatch: public UIElement
+class RichWidgetBatch: public Object
 {
-    URHO3D_OBJECT(RichWidgetBatch, UIElement)
+    URHO3D_OBJECT(RichWidgetBatch, Object)
 public:
     explicit RichWidgetBatch(Context* context);
     virtual ~RichWidgetBatch();
