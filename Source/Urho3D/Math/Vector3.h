@@ -23,7 +23,7 @@
 #pragma once
 
 #include "../Math/Vector2.h"
-#incluide "../Math/MathDefs.h"
+#include "../Math/MathDefs.h"
 
 namespace Urho3D
 {
