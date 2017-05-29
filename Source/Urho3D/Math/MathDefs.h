@@ -272,6 +272,15 @@ inline float HalfToFloat(unsigned short value)
     return out;
 }
 
+// Returns a representation of the specified floating-point value as a single format bit layout.
+inline unsigned FloatToRawIntBits(float x)
+{
+    unsigned y;
+	memcpy(&y, &x, 4);
+	
+    return y;
+}
+
 /// Calculate both sine and cosine, with angle in degrees.
 URHO3D_API void SinCos(float angle, float& sin, float& cos);
 
