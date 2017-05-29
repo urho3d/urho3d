@@ -276,7 +276,7 @@ inline float HalfToFloat(unsigned short value)
 inline unsigned FloatToRawIntBits(float x)
 {
     unsigned y;
-	memcpy(&y, &x, 4);
+    memcpy(&y, &x, 4);
 	
     return y;
 }
