@@ -40,17 +40,17 @@ Although all required third-party libraries are included as source code, there a
 
 - For Raspberry Pi, follow the building prerequisite for Linux above, with the exception for display server. Raspberry Pi operating system usually already comes with Broadcom Video Core display server preinstalled. On top of that, you must also install this package: libevdev2 (Raspbian) or libevdev (Pidora).
 
-- For Mac OS X, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
+- For macOS, iOS, and tvOS, the Xcode developer tools package should include everything necessary. Make sure that the Xcode command line tools are also installed.
 
 - For Android, the Android SDK (version 12 or later) and Android NDK (r7 or later) need to be installed.
 
-- For Emscripten, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
+- For Web, the Emscripten SDK need to be installed (on Windows also MinGW-W64 compiler toolchain is required).
 
 To run Urho3D, the minimum system requirements are:
 
 - Windows: CPU with SSE2 instructions support, Windows XP or newer, DirectX 9.0c, GPU with %Shader %Model 3 support.
 
-- Mac OS X: CPU with SSE2 instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
+- macOS: CPU with SSE2 instructions support, GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions, OS version 10.5 or newer.
 
 - Linux: any CPU (MMX, 3DNow!, and SSE/SSE2 instructions will be used if supported), GPU with OpenGL 2.0 support, EXT_framebuffer_object and EXT_packed_depth_stencil extensions.
 
@@ -58,15 +58,17 @@ To run Urho3D, the minimum system requirements are:
 
 - Android: OS version 2.3 or newer, OpenGL ES 2.0 capable GPU.
 
-- iOS: OpenGL ES 2.0 capable GPU.
+- iOS: armv7, iPhone 3GS or newer including iPad, OS version 3 or newer.
 
-- Web: modern browsers with fast JavaScript engine and HTML5 and WebGL support.
+- tvOS: arm64, OS version 9 or newer.
+
+- Web: modern HTML5 browsers with fast JavaScript engine and WebGL support. Nightly built browsers are required for running WebAssembly target.
 
 SSE2 requirement can be eliminated by disabling the use of SSE2 instruction set, see URHO3D_SSE build option below. For Linux platform using GCC/Clang compiler toolchain, the MMX and 3DNow! extensions can be enabled for older CPUs by using URHO3D_MMX and URHO3D_3DNOW build options when the option is available. The MMX and SSE/SSE2 extensions on x86_64 ABI are always enabled, so the URHO3D_MMX and URHO3D_SSE build option do not exist on x86_64 ABI. Also note that MMX extension is effectively enabled when 3DNow! or SSE/SSE2 extension is enabled, so disabling URHO3D_MMX build option in this case has no effect. The URHO3D_MMX and URHO3D_3DNOW build options are disabled by default. They should only be enabled when targeting older CPU with MMX and 3DNow! support, respectively.
 
 The NEON instruction set will be used by default whenever it is available. See the ANDROID_ABI and RPI_ABI build options for more detail for Android and Raspberry-Pi platforms, respectively. The NEON instruction set is always used on iOS and tVOS platforms.
 
-CMake (https://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 3.2.3 (or 3.4.1 on Apple platforms when LuaJIT is enabled). However, it is recommended to use the latest CMake version available out there, especially when targeting Mac OS X and iOS platforms using the latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
+CMake (https://www.cmake.org) is required to configure and generate the Urho3D project build tree. The minimum required version is 3.2.3 (or 3.4.1 on Apple platforms when LuaJIT is enabled). However, it is recommended to use the latest CMake version available, especially when targeting Apple platforms using its latest Xcode version available. This is because Apple is known to change the internal working of Xcode with little regards to other third party build tools, such as CMake.
 
 \section Build_Scripts Build scripts
 
@@ -139,7 +141,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_WIN32_CONSOLE |0|Use console main() instead of WinMain() as entry point when setting up Windows executable targets (Windows platform only)|
 |URHO3D_MACOSX_BUNDLE |0|Use MACOSX_BUNDLE when setting up macOS executable targets (macOS platform only)|
 |URHO3D_LIB_TYPE      |STATIC|Specify Urho3D library type, possible values are STATIC (default), SHARED, and MODULE; the last value is available for Emscripten only|
-|URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (non-Android cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
+|URHO3D_SCP_TO_TARGET |-|Use scp to transfer executables to target system (RPI and generic ARM cross-compiling build only), SSH digital key must be setup first for this to work, typical value has a pattern of usr@tgt:remote-loc|
 |URHO3D_UPDATE_SOURCE_TREE|0|Enable commands to copy back some of the generated build artifacts from build tree to source tree to facilitate devs to push them as part of a commit (for library devs with push right only)|
 |URHO3D_USE_LIB64_RPM |0|Enable 64-bit RPM CPack generator using /usr/lib64 and disable all other generators (Debian-based host only, which uses /usr/lib by default)|
 |URHO3D_USE_LIB_DEB   |0|Enable 64-bit DEB CPack generator using /usr/lib and disable all other generators (Redhat-based host only, which uses /usr/lib64 by default)|
@@ -179,7 +181,7 @@ A native build of Urho3D has two steps:
 
 -# Run CMake in the root directory (which is also CMake's source tree) with your preferred generator and toolchain specified to generate the build tree. You can use cmake-gui or the provided batch files or shell scripts on the respective host system. All the batch files and shell scripts expect the build tree location to be passed as the first argument, or to execute them in the build tree itself when reconfiguring the existing build tree.\n
     - Windows: cmake_vs20xx.bat, cmake_mingw.bat, cmake_codeblock.bat, cmake_codelite.bat cmake_ninja.bat, or cmake_generic.bat\n
-    - Mac OS X: cmake_xcode.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
+    - macOS: cmake_xcode.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
     - Linux: cmake_eclipse.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
     - Raspberry Pi: cmake_rpi.sh, cmake_eclipse.sh, cmake_codeblocks.sh, cmake_codelite.sh, cmake_ninja.sh, or cmake_generic.sh\n
 -# Use the IDE of your choice to open the CMake's generated project file or solution file in the build tree. Change the build configuration (Debug/Release) and change the built-in target to ALL_BUILD to build all the targets.\n
@@ -197,7 +199,7 @@ If using MinGW to compile, DirectX headers may need to be acquired separately. T
 
 After the build is complete, the programs can be run from the bin subdirectory in the build tree. These include the Urho3D player application, which can run application scripts, the tools, and C++ sample applications if they have been enabled.
 
-The Mac OS X executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the Mac OS X platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph. Note that the Mach-O universal binary targets can only be built when Xcode generator is used. All the other generators only build single-arch binary targets.
+The macOS executables can be built with all the resources bundled into a single app directory. In order to enable this, set the URHO3D_MACOSX_BUNDLE build option when configuring the build tree for the macOS platform. The bundled app can be launched just by double-clicking from the Finder without worrying about setting the 'resource prefix path'. This is because the URHO3D_PREFIX_PATH environment variable has been set internally to point to the resources directory that is already bundled in the app. Note, however, if you do not launch the app via the Apple "Launch Services" (such as when you are debugging or by calling the executable directly inside the bundled app directory via CLI) then you still need to set the 'resource prefix path' manually as described in the previous paragraph. Note that the Mach-O universal binary targets can only be built when Xcode generator is used. All the other generators only build single-arch binary targets.
 
 The Windows executables are by default built as Windows application instead of console application. You can set the URHO3D_WIN32_CONSOLE build option to override this. As console application, the standard output and standard error streams of the executable are redirected to console.
 
@@ -217,11 +219,11 @@ First, if you are building under Windows host without MKLINK support then copy b
 
 Set the ANDROID_NDK environment variable to point to your Android NDK. On Windows, ensure that make.exe from the Android NDK is included in the path and is executable from the command line.
 
-On Windows host, execute cmake_android.bat. On OS X or Linux host, execute cmake_android.sh. Then go to the build tree and execute the below commands to start the build.
+On Windows host, execute cmake_android.bat. On Mac or Linux host, execute cmake_android.sh. Then go to the build tree and execute the below commands to start the build.
 
 \verbatim
-- android update project -p . -t <target-id>
 - make -j <num_jobs>
+- android update project -p . -t <target-id>
 - ant debug
 \endverbatim
 
@@ -237,15 +239,13 @@ Note that the native code is built by default for armeabi-v7a ABI. To make your 
 
 You can also build and deploy using Eclipse IDE with ADT plugin. To do that, execute cmake_eclipse.sh with "-DANDROID=1" build option set. Import "Existing Android Code into Workspace" from the CMake generated Eclipse project file in the build tree. Switch Eclipse IDE to use Java Perspective. Update project properties to choose the desired Android API target. Choose "Run" to let ADT automatically build and deploy the application to Android (virtual) device.
 
-\section Building_Ios iOS build process
+\section Building_iOS_tvOS iOS and tvOS build process (tvOS is still EXPERIMENTAL)
 
-Run cmake_ios.sh. This generates an Xcode project named Urho3D.xcodeproj.
+Run cmake_ios.sh or cmake_tvos.sh, respectively. This generates an Xcode project named Urho3D.xcodeproj.
 
-Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator.) In Architectures -> Base SDK, choose your iOS SDK (CMake would automatically select latest iOS when generating the Xcode project). In Code Signing, enter your developer identity as necessary. Also ensure you have changed the built-in target to ALL_BUILD to build all the targets.
+Open the Xcode project and check the properties for the Urho3D project (topmost in the Project Navigator). In Code Signing, enter your developer identity as necessary. Also ensure you have changed the built-in target to ALL_BUILD to build all the targets. Edit its build scheme to choose debug or release mode. All the samples will be built as Application Bundle, i.e. with all the resources bundled. The library and samples will be built as Mach-O universal binary consisting of multiple archs depending on the chosen platforms.
 
-The Urho3DPlayer target will actually build the application bundle and copy resources from bin/Data and bin/CoreData directories. Edit its build scheme to choose debug or release mode.
-
-To run from Xcode on iPhone/iPad Simulator, edit the Product Scheme to set "Run" destination setting to "iPhone Simulator" or "iPad Simulator", and executable to "Urho3DPlayer.app".
+You can choose one of the provided simulator to run the samples directly from the Xcode.
 
 \section Building_RaspberryPi Raspberry Pi build process
 
@@ -641,7 +641,7 @@ define_resource_dirs (GLOB_PATTERNS ${CMAKE_SOURCE_DIR}/bin/Scene* ${CMAKE_SOURC
 
 You also need to inform the Urho3D library that you have non-conventional resource directory paths. You do that by setting the EP_RESOURCE_PATHS engine parameter, either programmatically during compile time or via '-p' \ref Running_Commandline "command line option" during runtime. In this case you would set it to "Scene1;Scene2;Core" instead of the default "Data;CoreData".
 
-Your project may also want to store the resource directories in other location instead of the 'bin' directory where the executable binary resides. For example when creating macOS bundle or iOS bundle, all the assets are automatically bundled into another directory outside where the executable binary resides. In fact, you can have them in a few separate parent directories and not just one. That is where the EP_RESOURCE_PREFIX_PATHS engine parameter and '-pp' command line option come into picture. With this you can define an alternate resource prefix path where your resource path would be prepended before locating your assets.
+Your project may also want to store the resource directories in other location instead of the 'bin' directory where the executable binary resides. For example when creating macOS/iOS/tvOS bundle, all the assets are automatically bundled into another directory outside where the executable binary resides. In fact, you can have them in a few separate parent directories and not just one. That is where the EP_RESOURCE_PREFIX_PATHS engine parameter and '-pp' command line option come into picture. With this you can define an alternate resource prefix path where your resource path would be prepended before locating your assets.
 
 \section Using_pkg_config Using pkg-config instead of CMake
 
@@ -702,9 +702,9 @@ rake make [<platform>] [<option>=<value> [<option>=<value>]] [[<platform>_]build
 
 The default <generator> when not specified is 'generic', which let CMake to detect and choose what generator is available in the host to use. The possible values are: 'codeblocks', 'eclipse', 'ninja', 'vs2008', 'vs2010', 'vs2012', 'vs2013', 'vs2015', 'xcode'.
 
-The default <platform> when not specified is 'native'. The possible values are: 'android', 'web', 'ios', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
+The default <platform> when not specified is 'native'. The possible values are: 'android', 'web', 'ios', 'tvos', 'mingw', 'rpi'. Naturally this influences the compiler toolchain being used in the generated build tree.
 
-When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absence of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfilter' option to get the output from 'xcodebuild' tool unfiltered regardless the 'xcpretty' is installed or not. You can pass the 'clean_first' option to perform a clean build. By default this task invokes the respective build tool to use all the logical CPU cores available, but you can use the 'numjobs' option to override this default.
+When using the 'rake cmake' task, the <option>=\<value> pairs are optional build options supported by our build scripts as usual. However, the format here does not expect a leading '-D' for each pair. When using the 'rake make' task, the <option>=\<value> pairs are optional build options supported by the respective build tools. For example on iOS/tvOS platform using 'xcodebuild' build tool, one could pass the '-sdk' option as follows: 'rake make ios sdk=iphonesimulator'. Note the absence of leading '-' character in the example. To build a specific built-in target in the project, use the 'target' option, e.g. 'rake make target=install'. In a multi-config project, such as Xcode project or VS solution, use the 'config' option to choose which build configuration to use, e.g. 'rake make config=Release'. For Xcode project building using 'rake make' task, you may optional install the 'xcpretty' filter to address the verbosity of the 'xcodebuild' tool from its standard output stream. On the other hand, pass the 'unfilter' option to get the output from 'xcodebuild' tool unfiltered regardless the 'xcpretty' is installed or not. You can pass the 'clean_first' option to perform a clean build. By default this task invokes the respective build tool to use all the logical CPU cores available, but you can use the 'numjobs' option to override this default.
 
 Use the 'build_tree' option to set the path to the desired build tree location. When not specified then the build tree location would be defaulted to '../<platform>-Build', relative to the project root. To avoid repeating the customized build tree locations for each platform, you can set and export them as environment variables. The '<platform_>build_tree' option takes precedence over normal 'build_tree' option. For example with these commands below, the native and RPI build tree will be generated in the ~/custom-native-Build and ~/custom-rpi-Build, respectively, and then build from there.
 
