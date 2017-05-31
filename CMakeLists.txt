@@ -166,8 +166,8 @@ if (NOT DEFINED ENV{RELEASE_TAG})
 endif ()
 include (CPack)
 
-# Setup MacOSX and iOS/tvOS bundle variables
-if (IOS OR TVOS OR URHO3D_MACOSX_BUNDLE)
+# Setup macOS, iOS, and tvOS bundle variables
+if (URHO3D_MACOSX_BUNDLE OR (APPLE AND ARM))
     if (NOT MACOSX_BUNDLE_ICON_FILE)
         set (MACOSX_BUNDLE_ICON_FILE UrhoIcon)
     endif ()

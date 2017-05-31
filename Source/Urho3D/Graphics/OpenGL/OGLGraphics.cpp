@@ -2795,7 +2795,7 @@ void Graphics::CheckFeatureSupport()
         deferredSupport_ = true;
 
 #if defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
-    // On OS X check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
+    // On macOS check for an Intel driver and use shadow map RGBA dummy color textures, because mixing
     // depth-only FBO rendering and backbuffer rendering will bug, resulting in a black screen in full
     // screen mode, and incomplete shadow maps in windowed mode
     String renderer((const char*)glGetString(GL_RENDERER));

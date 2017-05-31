@@ -617,7 +617,7 @@ task :ci_package_upload do
   # Make the package
   puts "Packaging artifacts...\n\n"; $stdout.flush
   if ENV['IOS'] || ENV['TVOS']
-    # There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
+    # TODO: There is a bug in CMake/CPack that causes the 'package' target failed to build for iOS and tvOS platforms, workaround by calling cpack directly; CMake 3.4 runs the target successfully, however, the result tarball is incomplete (somehow it misses packaging the library itself, another bug?)
     system 'cd ../Build && cpack -G TGZ 2>/dev/null' or abort 'Failed to make binary package'
   else
     if ENV['ANDROID']

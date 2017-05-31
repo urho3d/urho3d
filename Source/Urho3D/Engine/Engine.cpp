@@ -735,10 +735,10 @@ void Engine::ApplyFrameLimit()
 
 #ifndef __EMSCRIPTEN__
     // Perform waiting loop if maximum FPS set
-#ifndef IOS
+#if !defined(IOS) && !defined(TVOS)
     if (maxFps)
 #else
-    // If on iOS and target framerate is 60 or above, just let the animation callback handle frame timing
+    // If on iOS/tvOS and target framerate is 60 or above, just let the animation callback handle frame timing
     // instead of waiting ourselves
     if (maxFps < 60)
 #endif

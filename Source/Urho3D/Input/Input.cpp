@@ -1157,7 +1157,7 @@ void Input::SetScreenKeyboardVisible(bool enable)
 
 void Input::SetTouchEmulation(bool enable)
 {
-#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
+#if !defined(__ANDROID__) && !defined(IOS)
     if (enable != touchEmulation_)
     {
         if (enable)
@@ -2305,7 +2305,7 @@ void Input::HandleSDLEvent(void* sdlEvent)
             case SDL_WINDOWEVENT_MAXIMIZED:
             case SDL_WINDOWEVENT_RESTORED:
 #if defined(IOS) || defined(TVOS) || defined (__ANDROID__)
-                // On iOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
+                // On iOS/tvOS we never lose the GL context, but may have done GPU object changes that could not be applied yet. Apply them now
                 // On Android the old GL context may be lost already, restore GPU objects to the new GL context
                 graphics_->Restore();
 #endif

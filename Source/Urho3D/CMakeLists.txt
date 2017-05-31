@@ -129,8 +129,8 @@ else ()
         list (APPEND EXCLUDED_SOURCE_DIRS Graphics/Direct3D11)
     endif ()
 endif ()
-if (APPLE AND NOT IOS AND NOT TVOS)
-    set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for MacOSX platform at the moment
+if (APPLE AND NOT ARM)
+    set (GLOB_OBJC_PATTERN *.m)     # Should only pick up MacFileWatcher.m for macOS platform at the moment
 endif ()
 string (REPLACE ";" "/[^;]+;" EXCLUDE_PATTERNS "${EXCLUDED_SOURCE_DIRS};")
 define_source_files (EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} GLOB_CPP_PATTERNS *.cpp ${GLOB_OBJC_PATTERN} RECURSE GROUP PCH Precompiled.h)
