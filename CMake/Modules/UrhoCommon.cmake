@@ -1742,7 +1742,6 @@ macro (_setup_target)
         if (URHO3D_LIB_TYPE STREQUAL MODULE)
             if (${TARGET_NAME} STREQUAL Urho3D)
                 # Main module has standard libs statically linked
-                # TODO: with dead code elimination
                 list (APPEND LINK_FLAGS "-s MAIN_MODULE=1")
             elseif ((NOT ARG_NODEPS AND NOT LIB_TYPE) OR LIB_TYPE STREQUAL MODULE)
                 if (LIB_TYPE)
