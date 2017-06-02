@@ -370,7 +370,7 @@ void RigidBody2D::CreateBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
-    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());;
+    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());
     bodyDef_.angle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
 
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
@@ -601,12 +601,12 @@ void RigidBody2D::OnMarkedDirty(Node* node)
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
     float newAngle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
 
-    if(!body_)
+    if (!body_)
     {
         bodyDef_.position = newPosition;
         bodyDef_.angle = newAngle;
     }
-    else if(newPosition != body_->GetPosition() || newAngle != body_->GetAngle())
+    else if (newPosition != body_->GetPosition() || newAngle != body_->GetAngle())
         body_->SetTransform(newPosition, newAngle);
 }
 
