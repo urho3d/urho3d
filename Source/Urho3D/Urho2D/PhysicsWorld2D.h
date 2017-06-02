@@ -267,8 +267,6 @@ protected:
         SharedPtr<Node> nodeA_;
         /// Node B.
         SharedPtr<Node> nodeB_;
-        /// Box2D contact.
-        b2Contact* contact_;
         /// Shape A.
         SharedPtr<CollisionShape2D> shapeA_;
         /// Shape B.
