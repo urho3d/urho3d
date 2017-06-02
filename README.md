@@ -88,6 +88,7 @@ Urho3D development, contributions and bugfixes by:
 - Steven Zhang
 - AGreatFish
 - BlueMagnificent
+- CG-SS
 - Enhex
 - Fastran
 - Firegorilla

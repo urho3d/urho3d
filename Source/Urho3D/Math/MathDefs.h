@@ -275,10 +275,14 @@ inline float HalfToFloat(unsigned short value)
 // Returns a representation of the specified floating-point value as a single format bit layout.
 inline unsigned FloatToRawIntBits(float x)
 {
-    unsigned y;
-    memcpy(&y, &x, 4);
-	
-    return y;
+    union
+    {
+        unsigned i;
+        float x;
+    } u;
+
+    u.x = x;
+    return u.i;
 }
 
 /// Calculate both sine and cosine, with angle in degrees.
