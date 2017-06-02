@@ -426,7 +426,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 - %Enabled : bool [in/out]
@@ -437,7 +436,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 
@@ -447,7 +445,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 
@@ -455,7 +452,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 - %Enabled : bool [in/out]
@@ -464,7 +460,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 
@@ -472,7 +467,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 
