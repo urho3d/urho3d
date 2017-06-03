@@ -44,6 +44,9 @@ public:
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
     
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
+
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
     virtual void ApplyAttributes();
 

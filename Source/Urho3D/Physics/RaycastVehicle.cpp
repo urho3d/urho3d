@@ -36,13 +36,11 @@ namespace Urho3D
 
 struct RaycastVehicleData
 {
-private:
-    WeakPtr<PhysicsWorld> physWorld_;
-public:
     RaycastVehicleData()
     {
         vehicleRayCaster_ = 0;
         vehicle_ = 0;
+        added_ = false;
     }
 
     ~RaycastVehicleData()
@@ -54,10 +52,12 @@ public:
         vehicleRayCaster_ = 0;
         if (vehicle_)
         {
-            if (physWorld_)
+            if (physWorld_ && added_)
             {
                 btDynamicsWorld* pbtDynWorld = physWorld_->GetWorld();
-                pbtDynWorld->removeAction(vehicle_);
+                if (pbtDynWorld)
+                    pbtDynWorld->removeAction(vehicle_);
+                added_ = false;
             }
             delete vehicle_;
         }
@@ -69,7 +69,7 @@ public:
         return vehicle_;
     }
 
-    void Init(Scene* scene, RigidBody* body)
+    void Init(Scene* scene, RigidBody* body, bool enabled)
     {
         int rightIndex = 0;
         int upIndex = 1;
@@ -84,30 +84,57 @@ public:
             delete vehicleRayCaster_;
         if (vehicle_)
         {
-            pbtDynWorld->removeAction(vehicle_);
+            if (added_)
+                pbtDynWorld->removeAction(vehicle_);
             delete vehicle_;
         }
 
         vehicleRayCaster_ = new btDefaultVehicleRaycaster(pbtDynWorld);
         btRigidBody* bthullBody = body->GetBody();
         vehicle_ = new btRaycastVehicle(tuning_, bthullBody, vehicleRayCaster_);
-        pbtDynWorld->addVehicle(vehicle_);
+        if (enabled)
+        {
+            pbtDynWorld->addAction(vehicle_);
+            added_ = true;
+        }
 
         vehicle_->setCoordinateSystem(rightIndex, upIndex, forwardIndex);
         physWorld_ = pPhysWorld;
     }
 
+    void SetEnabled(bool enabled)
+    {
+        if (!physWorld_ || !vehicle_)
+            return;
+        btDynamicsWorld* pbtDynWorld = physWorld_->GetWorld();
+        if (!pbtDynWorld)
+            return;
+
+        if (enabled && !added_)
+        {
+            pbtDynWorld->addAction(vehicle_);
+            added_ = true;
+        }
+        else if (!enabled && added_)
+        {
+            pbtDynWorld->removeAction(vehicle_);
+            added_ = false;
+        }
+    }
+
+    WeakPtr<PhysicsWorld> physWorld_;
     btVehicleRaycaster* vehicleRayCaster_;
     btRaycastVehicle* vehicle_;
     btRaycastVehicle::btVehicleTuning tuning_;
+    bool added_;
 };
 
-RaycastVehicle::RaycastVehicle(Context* context)
-    : LogicComponent(context)
+RaycastVehicle::RaycastVehicle(Context* context) : 
+    LogicComponent(context)
 {
     // fixed update() for inputs and post update() to sync wheels for rendering
     SetUpdateEventMask(USE_FIXEDUPDATE | USE_FIXEDPOSTUPDATE | USE_POSTUPDATE);
-    vehicleData_ = new RaycastVehicleData;
+    vehicleData_ = new RaycastVehicleData();
     wheelNodes_.Clear();
     activate_ = false;
     inAirRPM_ = 0.0f;
@@ -157,12 +184,18 @@ void RaycastVehicle::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
 }
 
+void RaycastVehicle::OnSetEnabled()
+{
+    if (vehicleData_)
+        vehicleData_->SetEnabled(IsEnabledEffective());
+}
+
 void RaycastVehicle::ApplyAttributes()
 {
     int index = 0;
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_);
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
     VariantVector& value = loadedWheelData_;
     int numObjects = value[index++].GetInt();
     int wheelIndex = 0;
@@ -240,7 +273,7 @@ void RaycastVehicle::Init()
 {
     hullBody_ = node_->GetOrCreateComponent<RigidBody>();
     Scene* scene = GetScene();
-    vehicleData_->Init(scene, hullBody_);
+    vehicleData_->Init(scene, hullBody_, IsEnabledEffective());
 }
 
 void RaycastVehicle::FixedUpdate(float timeStep)
