@@ -167,6 +167,18 @@ void Urho3DPlayer::Start()
         ErrorExit("Script file name not specified; cannot proceed");
         return;
     }
+#ifdef __EMSCRIPTEN__
+    else
+    {
+        GetScriptFileName();
+
+        if (scriptFileName_.Empty())
+        {
+            ErrorExit("Script file name not specified; cannot proceed");
+            return;
+        }
+    }
+#endif
 
     String extension = GetExtension(scriptFileName_);
     if (extension != ".lua" && extension != ".luc")
