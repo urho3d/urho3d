@@ -211,7 +211,7 @@ public:
     void SetShadowQuality(ShadowQuality quality);
     /// Set shadow softness, only works when SHADOWQUALITY_BLUR_VSM is used.
     void SetShadowSoftness(float shadowSoftness);
-    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1[
+    /// Set shadow parameters when VSM is used, they help to reduce light bleeding. LightBleeding must be in [0, 1].
     void SetVSMShadowParameters(float minVariance, float lightBleedingReduction);
     /// Set VSM shadow map multisampling level. Default 1 (no multisampling.)
     void SetVSMMultiSample(int multiSample);
