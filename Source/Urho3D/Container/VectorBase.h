@@ -64,9 +64,7 @@ template <class T> struct RandomAccessIterator
     /// Postincrement the pointer.
     RandomAccessIterator<T> operator ++(int)
     {
-        RandomAccessIterator<T> it = *this;
-        ++ptr_;
-        return it;
+        return RandomAccessIterator<T>(ptr_++);
     }
 
     /// Predecrement the pointer.
@@ -79,9 +77,7 @@ template <class T> struct RandomAccessIterator
     /// Postdecrement the pointer.
     RandomAccessIterator<T> operator --(int)
     {
-        RandomAccessIterator<T> it = *this;
-        --ptr_;
-        return it;
+        return RandomAccessIterator<T>(ptr_--);
     }
 
     /// Add an offset to the pointer.
@@ -173,9 +169,7 @@ template <class T> struct RandomAccessConstIterator
     /// Postincrement the pointer.
     RandomAccessConstIterator<T> operator ++(int)
     {
-        RandomAccessConstIterator<T> it = *this;
-        ++ptr_;
-        return it;
+        return RandomAccessIterator<T>(ptr_++);
     }
 
     /// Predecrement the pointer.
@@ -188,9 +182,7 @@ template <class T> struct RandomAccessConstIterator
     /// Postdecrement the pointer.
     RandomAccessConstIterator<T> operator --(int)
     {
-        RandomAccessConstIterator<T> it = *this;
-        --ptr_;
-        return it;
+        return RandomAccessIterator<T>(ptr_--);
     }
 
     /// Add an offset to the pointer.
