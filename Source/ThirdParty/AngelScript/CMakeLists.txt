@@ -30,6 +30,11 @@ endif ()
 # Add compiler define to build the library with the normal function/method macros
 add_definitions (-DAS_IS_BUILDING)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS source/*.cpp GLOB_H_PATTERNS include/*.h source/*.h)
 if (ARM)

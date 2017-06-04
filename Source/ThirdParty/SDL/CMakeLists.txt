@@ -64,6 +64,11 @@ include(CMakeDependentOption)
 include(${SDL2_SOURCE_DIR}/cmake/macros.cmake)
 include(${SDL2_SOURCE_DIR}/cmake/sdlchecks.cmake)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # General settings
 # Edit include/SDL_version.h and change the version, then:
 #   SDL_MICRO_VERSION += 1;

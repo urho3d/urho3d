@@ -23,6 +23,11 @@
 # Define target name
 set (TARGET_NAME LibCpuId)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define preprocessor macros
 add_definitions (-DVERSION="0.4.0")
 if (HAVE_STDINT_H)

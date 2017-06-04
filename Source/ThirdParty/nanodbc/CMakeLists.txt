@@ -23,6 +23,11 @@
 # Define target name
 set (TARGET_NAME nanodbc)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS src/*.cpp GLOB_H_PATTERNS src/*.h)
 

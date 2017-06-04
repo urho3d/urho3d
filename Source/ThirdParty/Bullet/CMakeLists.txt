@@ -23,6 +23,11 @@
 # Define target name
 set (TARGET_NAME Bullet)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 # Workaround for MinGW 6.1.0 and above where it throws ICE (internal compilation error) when -O3 is used
 if (MINGW AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.1.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6.1.0))  # 6.1.0 is the last known bad version
     string (REPLACE -O3 -O2 CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")

@@ -16,6 +16,11 @@
 
 set (TARGET_NAME kNet)
 
+# Disable Visual Studio warnings
+if (MSVC)
+    add_definitions("/W0")
+endif()
+
 file (GLOB kNetSourceFiles src/*.cpp)
 file (GLOB kNetHeaderFiles include/*.h include/kNet/*.h include/kNet/*.inl)
 
