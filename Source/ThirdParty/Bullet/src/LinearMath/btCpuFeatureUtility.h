@@ -1,3 +1,4 @@
+// Modified by Yao Wei Tjong for Urho3D
 
 #ifndef BT_CPU_UTILITY_H
 #define BT_CPU_UTILITY_H
@@ -16,7 +17,10 @@
 #define ARM_NEON_GCC_COMPATIBILITY  1
 #include <arm_neon.h>
 #include <sys/types.h>
+// Urho3D - enable NEON on generic ARM
+#ifdef __APPLE__
 #include <sys/sysctl.h> //for sysctlbyname
+#endif //__APPLE__
 #endif //BT_USE_NEON
 
 ///Rudimentary btCpuFeatureUtility for CPU features: only report the features that Bullet actually uses (SSE4/FMA3, NEON_HPFP)
@@ -42,6 +46,8 @@ public:
 		}
 
 #ifdef BT_USE_NEON
+// Urho3D - enable NEON on generic ARM
+#ifdef __APPLE__
 		{
 			uint32_t hasFeature = 0;
 			size_t featureSize = sizeof(hasFeature);
@@ -49,6 +55,7 @@ public:
 			if (0 == err && hasFeature)
 				capabilities |= CPU_FEATURE_NEON_HPFP;
 		}
+#endif //__APPLE__
 #endif //BT_USE_NEON
 
 #ifdef  BT_ALLOW_SSE4
