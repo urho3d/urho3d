@@ -13,7 +13,6 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni for Urho3D
 
 #ifndef BT_IDEBUG_DRAW__H
 #define BT_IDEBUG_DRAW__H
@@ -79,9 +78,6 @@ class	btIDebugDraw
 	virtual ~btIDebugDraw() {};
 
 	
-	// Urho3D: added function to test visibility of an AABB
-	virtual bool    isVisible(const btVector3& aabbMin,const btVector3& aabbMax)=0;
-
 	virtual DefaultColors	getDefaultColors() const	{	DefaultColors colors;	return colors;	}
 	///the default implementation for setDefaultColors has no effect. A derived class can implement it and store the colors.
 	virtual void setDefaultColors(const DefaultColors& /*colors*/) {}
@@ -170,9 +166,9 @@ class	btIDebugDraw
 	virtual void drawTransform(const btTransform& transform, btScalar orthoLen)
 	{
 		btVector3 start = transform.getOrigin();
-		drawLine(start, start+transform.getBasis() * btVector3(orthoLen, 0, 0), btVector3(0.7f,0,0));
-		drawLine(start, start+transform.getBasis() * btVector3(0, orthoLen, 0), btVector3(0,0.7f,0));
-		drawLine(start, start+transform.getBasis() * btVector3(0, 0, orthoLen), btVector3(0,0,0.7f));
+		drawLine(start, start+transform.getBasis() * btVector3(orthoLen, 0, 0), btVector3(1.f,0.3,0.3));
+		drawLine(start, start+transform.getBasis() * btVector3(0, orthoLen, 0), btVector3(0.3,1.f, 0.3));
+		drawLine(start, start+transform.getBasis() * btVector3(0, 0, orthoLen), btVector3(0.3, 0.3,1.f));
 	}
 
 	virtual void drawArc(const btVector3& center, const btVector3& normal, const btVector3& axis, btScalar radiusA, btScalar radiusB, btScalar minAngle, btScalar maxAngle, 
