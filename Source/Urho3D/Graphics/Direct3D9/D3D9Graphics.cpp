@@ -2352,7 +2352,7 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
         else {
-            if (newFullscreen || newBorderless) 
+            if (newFullscreen) 
             {
                 // Reposition the window on the specified monitor
                 SDL_Rect display_rect;
