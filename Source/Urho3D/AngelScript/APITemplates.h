@@ -363,6 +363,11 @@ template <class T> bool ObjectHasSubscribedToSenderEvent(Object* sender, const S
     return ptr->HasSubscribedToEvent(sender, StringHash(eventType));
 }
 
+template <class T> bool ObjectIsTypeOf(const String& typeName, T* ptr)
+{
+    return ptr->GetTypeInfo()->IsTypeOf(StringHash(typeName));
+}
+
 /// Template function for registering a class derived from Object.
 template <class T> void RegisterObject(asIScriptEngine* engine, const char* className)
 {
@@ -373,6 +378,7 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
     engine->RegisterObjectMethod(className, "void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(ObjectSendEvent<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(const String&in)", asFUNCTION(ObjectHasSubscribedToEvent<T>), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "bool HasSubscribedToEvent(Object@+, const String&in)", asFUNCTION(ObjectHasSubscribedToSenderEvent<T>), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "bool IsTypeOf(const String&in) const", asFUNCTION(ObjectIsTypeOf<T>), asCALL_CDECL_OBJLAST);
     RegisterSubclass<Object, T>(engine, "Object", className);
 }
 
