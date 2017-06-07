@@ -429,9 +429,10 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_Rect display_rect;
         SDL_GetDisplayBounds(monitor, &display_rect);
         SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
+        bool reposition = fullscreen || (borderless && width >= display_rect.w && height >= display_rect.h);
 
-        int x = fullscreen ? display_rect.x : position_.x_;
-        int y = fullscreen ? display_rect.y : position_.y_;
+        int x = reposition ? display_rect.x : position_.x_;
+        int y = reposition ? display_rect.y : position_.y_;
 
         unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
         if (fullscreen)
