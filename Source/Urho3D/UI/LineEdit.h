@@ -86,6 +86,10 @@ public:
     /// Set whether copy-paste operations are allowed, default true.
     void SetTextCopyable(bool enable);
 
+	// Enable Multiline to on.
+	void SetMultiLine(bool enable);
+
+
     /// Return text.
     const String& GetText() const { return line_; }
 
@@ -138,6 +142,8 @@ protected:
     int lastFontSize_;
     /// Text edit cursor position.
     unsigned cursorPosition_;
+	unsigned cursorPosition_x;
+	unsigned cursorPosition_y;
     /// Drag begin cursor position.
     unsigned dragBeginCursor_;
     /// Cursor blink rate.
@@ -154,6 +160,8 @@ protected:
     bool textSelectable_;
     /// Copy-paste enable flag.
     bool textCopyable_;
+
+	bool multiLine_;
 
 private:
     /// Handle being focused.
