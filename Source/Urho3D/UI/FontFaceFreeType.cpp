@@ -77,7 +77,8 @@ private:
 FontFaceFreeType::FontFaceFreeType(Font* font) :
     FontFace(font),
     face_(0),
-    loadMode_(FT_LOAD_DEFAULT)
+    loadMode_(FT_LOAD_DEFAULT),
+    hasMutableGlyph_(false)
 {
 }
 
@@ -140,16 +141,18 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     unsigned numGlyphs = (unsigned)face->num_glyphs;
     URHO3D_LOGDEBUGF("Font face %s (%dpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
 
-    PODVector<unsigned> charCodes(numGlyphs);
-    for (unsigned i = 0; i < numGlyphs; ++i)
-        charCodes[i] = 0;
+    PODVector<unsigned> charCodes(numGlyphs + 1, 0);
+
+    // Attempt to load space glyph first regardless if it's listed or not
+    // In some fonts (Consola) it is missing
+    charCodes[0] = 32;
 
     FT_UInt glyphIndex;
     FT_ULong charCode = FT_Get_First_Char(face, &glyphIndex);
     while (glyphIndex != 0)
     {
         if (glyphIndex < numGlyphs)
-            charCodes[glyphIndex] = (unsigned)charCode;
+            charCodes[glyphIndex + 1] = (unsigned)charCode;
 
         charCode = FT_Get_Next_Char(face, charCode, &glyphIndex);
     }
@@ -175,7 +178,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     int textureWidth = maxTextureSize;
     int textureHeight = maxTextureSize;
-    bool loadAllGlyphs = CanLoadAllGlyphs(charCodes, textureWidth, textureHeight);
+    hasMutableGlyph_ = !CanLoadAllGlyphs(charCodes, textureWidth, textureHeight);
 
     SharedPtr<Image> image(new Image(font_->GetContext()));
     image->SetSize(textureWidth, textureHeight, 1);
@@ -183,17 +186,13 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     memset(imageData, 0, (size_t)(image->GetWidth() * image->GetHeight()));
     allocator_.Reset(FONT_TEXTURE_MIN_SIZE, FONT_TEXTURE_MIN_SIZE, textureWidth, textureHeight);
 
-    // Attempt to load space glyph first regardless if it's listed or not
-    // In some fonts (Consola) it is missing
-    LoadCharGlyph(32, image);
-
-    for (unsigned i = 0; i < numGlyphs; ++i)
+    for (unsigned i = 0; i < charCodes.Size(); ++i)
     {
         unsigned charCode = charCodes[i];
         if (charCode == 0)
             continue;
 
-        if (!loadAllGlyphs && (charCode > 0xff))
+        if (hasMutableGlyph_ && (charCode > 0xff))
             break;
 
         if (!LoadCharGlyph(charCode, image))
@@ -276,14 +275,11 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
             URHO3D_LOGWARNING("Can not read kerning information: not version 0");
     }
 
-    if (loadAllGlyphs)
+    if (!hasMutableGlyph_)
     {
         FT_Done_Face(face);
         face_ = 0;
-        hasMutableGlyph_ = false;
     }
-    else
-        hasMutableGlyph_ = true;
 
     return true;
 }
@@ -330,9 +326,12 @@ bool FontFaceFreeType::CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, in
         {
             int width = Max(RoundToPixels(slot->metrics.width), (int)slot->bitmap.width);
             int height = Max(RoundToPixels(slot->metrics.height), (int)slot->bitmap.rows);
-            int x, y;
-            if (!allocator.Allocate(width + 1, height + 1, x, y))
-                return false;
+            if (width > 0 && height > 0)
+            {
+                int x, y;
+                if (!allocator.Allocate(width + 1, height + 1, x, y))
+                    return false;
+            }
         }
     }
 
@@ -384,6 +383,12 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             int x, y;
             if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
             {
+                if (!HasMutableGlyphs())
+                {
+                    // Should never happen if CanLoadAllGlyphs was used correctly
+                    URHO3D_LOGERROR("Unexpectedly ran out of space in LoadCharGlyph");
+                }
+
                 if (!SetupNextTexture(allocator_.GetWidth(), allocator_.GetHeight()))
                     return false;
 
