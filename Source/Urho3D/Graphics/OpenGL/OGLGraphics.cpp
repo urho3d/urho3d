@@ -650,6 +650,9 @@ bool Graphics::BeginFrame()
     // Re-enable depth test and depth func in case a third party program has modified it
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(glCmpFunc[depthTestMode_]);
+    
+    // Enable seamless if possible
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     // Set default rendertarget and depth buffer
     ResetRenderTargets();
