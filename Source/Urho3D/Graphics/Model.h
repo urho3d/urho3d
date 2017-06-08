@@ -201,6 +201,13 @@ public:
     /// Return vertex buffer morph range vertex count.
     unsigned GetMorphRangeCount(unsigned bufferIndex) const;
 
+    /// Return false if index out of bounds. 
+    bool SetGeometryName(unsigned index, const String& name);
+    /// Return geometry name.
+    const String& GetGeometryName(unsigned index) const;
+    /// Return all geometry names.
+    const Vector<String>& GetGeometryNames() const { return geometryNames_; }
+
 private:
     /// Bounding box.
     BoundingBox boundingBox_;
@@ -228,6 +235,8 @@ private:
     Vector<IndexBufferDesc> loadIBData_;
     /// Geometry definitions for asynchronous loading.
     Vector<PODVector<GeometryDesc> > loadGeometries_;
+    /// Geometry names.
+    Vector<String> geometryNames_;
 };
 
 }
