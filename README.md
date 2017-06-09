@@ -61,6 +61,7 @@ Urho3D development, contributions and bugfixes by:
 - Thorbjørn Lindeijer
 - Nathanial Lydick
 - Xavier Maupeu
+- Iain Merrick
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
