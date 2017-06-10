@@ -12,11 +12,12 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
+// Modified by Lasse Oorni and Yao Wei Tjong for Urho3D
 
 #ifndef BT_SCALAR_H
 #define BT_SCALAR_H
+
 
 #ifdef BT_MANAGED_CODE
 //Aligned data types not supported in managed code
@@ -29,7 +30,7 @@ subject to the following restrictions:
 #include <float.h>
 
 /* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
-#define BT_BULLET_VERSION 284
+#define BT_BULLET_VERSION 286
 
 inline int	btGetVersion()
 {
@@ -59,7 +60,7 @@ inline int	btGetVersion()
 			//#define BT_HAS_ALIGNED_ALLOCATOR
 			#pragma warning(disable : 4324) // disable padding warning
 //			#pragma warning(disable:4530) // Disable the exception disable but used in MSCV Stl warning.
-//			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
+			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
 //			#pragma warning(disable:4786) // Disable the "debug name too long" warning
 
 			#define SIMD_FORCE_INLINE __forceinline
@@ -76,7 +77,6 @@ inline int	btGetVersion()
 
 #if defined (_M_ARM)
             //Do not turn SSE on for ARM (may want to turn on BT_USE_NEON however)
-
 // Urho3D: allow to disable SSE
 #elif ((!defined(_M_IX86_FP) || _M_IX86_FP) && defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400) && (!defined (BT_USE_DOUBLE_PRECISION))
 			#if _MSC_VER>1400
@@ -108,7 +108,7 @@ inline int	btGetVersion()
 #ifdef BT_DEBUG
 	#ifdef _MSC_VER
 		#include <stdio.h>
-		#define btAssert(x) { if(!(x)){printf("Assert "__FILE__ ":%u ("#x")\n", __LINE__);__debugbreak();	}}
+		#define btAssert(x) { if(!(x)){printf("Assert "__FILE__ ":%u (%s)\n", __LINE__, #x);__debugbreak();	}}
 	#else//_MSC_VER
 		#include <assert.h>
 		#define btAssert assert
@@ -179,11 +179,10 @@ inline int	btGetVersion()
 
 // Urho3D - allow to disable SSE/NEON and let Linux, MinGW, & Android platforms in besides Apple
 #if (!defined (BT_USE_DOUBLE_PRECISION))
-    #if defined(__SSE__)
+    #if defined (__SSE__)
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
-		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
-		#define BT_USE_SSE_IN_API
+                #define BT_USE_SSE_IN_API
         #ifdef BT_USE_SSE
             // include appropriate SSE level
             #if defined (__SSE4_1__)
@@ -200,7 +199,7 @@ inline int	btGetVersion()
             #define BT_USE_NEON 1
 			#define BT_USE_SIMD_VECTOR3
 		
-            #ifdef BT_USE_NEON
+            #if defined BT_USE_NEON
                 #include <arm_neon.h>
             #endif//BT_USE_NEON
     #endif//__arm__
