@@ -3724,7 +3724,7 @@ Properties:
 - UIElement* window (readonly)
 
 <a name="Class_Model"></a>
-### Model : Resource
+### Model : ResourceWithMetadata
 
 Methods:
 

@@ -7296,6 +7296,7 @@ public:
 Model();
 Model(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 Model Clone(const String& = String ( )) const;
 Geometry GetGeometry(uint, uint) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -7303,6 +7304,8 @@ bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -7317,7 +7320,10 @@ BoundingBox boundingBox;
 String category;
 Array<Vector3> geometryCenters;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 String name;
 uint numGeometries;
 Array<uint> numGeometryLodLevels;

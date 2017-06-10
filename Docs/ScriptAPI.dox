@@ -9074,6 +9074,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - Model@ Clone(const String& = String ( )) const
 - Geometry@ GetGeometry(uint, uint) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -9081,6 +9082,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -9094,7 +9097,9 @@ Properties:
 - BoundingBox boundingBox
 - String category // readonly
 - Vector3[] geometryCenters
+- bool hasMetadata // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - uint numGeometries
 - uint[] numGeometryLodLevels
