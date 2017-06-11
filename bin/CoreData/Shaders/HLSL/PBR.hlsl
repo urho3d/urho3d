@@ -13,6 +13,8 @@
         float specEnergy = 1.0f;
 
         float radius = cLightRad / 100;
+        float rough2 = max(roughness, 0.08);
+        rough2 *= rough2;
 
         float radius2           = radius * radius;
         float distToLightSqrd   = dot(lightVec,lightVec);
@@ -30,7 +32,7 @@
 
         float sphereAngle = saturate(radius * invDistToLight);
                             
-        specEnergy = (roughness * roughness) / saturate((roughness * roughness) + 0.5f * sphereAngle);
+        specEnergy = rough2 / (rough2 + 0.5f * sphereAngle);
         specEnergy *= specEnergy;                           
 
         float3 R = 2 * dot(toCamera, normal) * normal - toCamera;
@@ -96,7 +98,7 @@
         float ndv = saturate(dot(normal, toCamera));
 
         float distL      = length(closestPoint);
-        float alpha      = roughness * roughness;
+        float alpha      = max(roughness, 0.08) * max(roughness, 0.08);
         float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
 
        const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
