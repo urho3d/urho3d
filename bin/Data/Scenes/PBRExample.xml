@@ -7,8 +7,8 @@
 	<attribute name="Elapsed Time" value="152.788" />
 	<attribute name="Next Replicated Node ID" value="408" />
 	<attribute name="Next Replicated Component ID" value="428" />
-	<attribute name="Next Local Node ID" value="16777274" />
-	<attribute name="Next Local Component ID" value="16777889" />
+	<attribute name="Next Local Node ID" value="16777275" />
+	<attribute name="Next Local Component ID" value="16777901" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
 	<component type="Octree" id="1" />
@@ -925,7 +925,7 @@
 				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 				<attribute name="Font Size" value="15" />
 				<attribute name="Text" value="Low Roughness" />
-				<attribute name="Width" value="134" />
+				<attribute name="Width" value="135" />
 			</component>
 		</node>
 		<node id="138">
@@ -970,7 +970,7 @@
 				<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 				<attribute name="Font Size" value="15" />
 				<attribute name="Text" value="High Roughness" />
-				<attribute name="Width" value="136" />
+				<attribute name="Width" value="137" />
 			</component>
 		</node>
 		<node id="195">
@@ -1190,7 +1190,8 @@
 				<attribute name="Variables" />
 				<component type="Light" id="4">
 					<attribute name="Light Type" value="Directional" />
-					<attribute name="Brightness Multiplier" value="2" />
+					<attribute name="Brightness Multiplier" value="340" />
+					<attribute name="Use Physical Values" value="true" />
 					<attribute name="Cast Shadows" value="true" />
 					<attribute name="CSM Splits" value="10 20 30 40" />
 				</component>
@@ -1582,7 +1583,7 @@
 			<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 			<attribute name="Font Size" value="15" />
 			<attribute name="Text" value="Roughness Value    &lt;-1.0  -&gt;0.0" />
-			<attribute name="Width" value="262" />
+			<attribute name="Width" value="264" />
 		</component>
 	</node>
 	<node id="215">
@@ -1832,7 +1833,7 @@
 		<attribute name="Scale" value="0.648644 0.648644 0.648644" />
 		<attribute name="Variables" />
 		<component type="Light" id="251">
-			<attribute name="Brightness Multiplier" value="800" />
+			<attribute name="Brightness Multiplier" value="1700" />
 			<attribute name="Use Physical Values" value="true" />
 			<attribute name="Radius" value="0.11" />
 			<attribute name="Length" value="6.53" />
@@ -2764,7 +2765,7 @@
 			<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 			<attribute name="Font Size" value="15" />
 			<attribute name="Text" value="Metallic Value    &lt;-0.0  -&gt;1.0" />
-			<attribute name="Width" value="236" />
+			<attribute name="Width" value="237" />
 		</component>
 	</node>
 	<node id="307">
@@ -3190,7 +3191,7 @@
 			<attribute name="Font" value="Font;Fonts/BlueHighway.ttf" />
 			<attribute name="Font Size" value="15" />
 			<attribute name="Text" value="Sphere Lighting" />
-			<attribute name="Width" value="135" />
+			<attribute name="Width" value="134" />
 		</component>
 	</node>
 	<node id="338">
@@ -3999,9 +4000,9 @@
 		<attribute name="Scale" value="0.648644 0.648644 0.648644" />
 		<attribute name="Variables" />
 		<component type="Light" id="416">
-			<attribute name="Brightness Multiplier" value="800" />
+			<attribute name="Brightness Multiplier" value="1700" />
 			<attribute name="Use Physical Values" value="true" />
-			<attribute name="Radius" value="0.61" />
+			<attribute name="Radius" value="25.6" />
 			<attribute name="Range" value="7.61" />
 			<attribute name="Spot FOV" value="62.08" />
 			<attribute name="Light Shape Texture" value="TextureCube;" />

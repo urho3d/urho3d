@@ -220,12 +220,12 @@
     ///     normal: surface normal
     ///     reflection: vector of reflection off of the surface
     ///     roughness: surface roughness
-    float3 GetSpecularDominantDir(float3 normal, float3 reflection, float roughness)
-    {
-        const float smoothness = 1.0 - roughness;
-        const float lerpFactor = smoothness * (sqrt(smoothness) + roughness);
-        return lerp(normal, reflection, lerpFactor);
-    }
+    // float3 GetSpecularDominantDir(float3 normal, float3 reflection, float roughness)
+    // {
+    //     const float smoothness = 1.0 - roughness;
+    //     const float lerpFactor = smoothness * (sqrt(smoothness) + roughness);
+    //     return lerp(normal, reflection, lerpFactor);
+    // }
 
     float GetMipFromRoughness(float roughness)
     {
