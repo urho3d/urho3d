@@ -10,30 +10,6 @@
 
     float3 SphereLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, float3 diffColor, out float ndl)
     {
-        // float3 pos   = (cLightPosPS.xyz - worldPos);
-        // float radius = cLightRad;
-
-        // float3 reflectVec   = reflect(-toCamera, normal);
-        // float3 centreToRay  = dot(pos, reflectVec) * reflectVec - pos;
-        // float3 closestPoint = pos + centreToRay * saturate(radius / length(centreToRay));
-
-        // float3 l = normalize(closestPoint);
-        // float3 h = normalize(toCamera + l);
-
-        // ndl       = saturate(dot(normal, l));
-        // float hdn = saturate(dot(h, normal));
-        // float hdv = dot(h, toCamera);
-        // float ndv = saturate(dot(normal, toCamera));
-
-        // float distL      = length(pos);
-        // float alpha      = roughness * roughness;
-        // float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
-
-        // const float3 fresnelTerm = Fresnel(specColor, hdv) ;
-        // const float distTerm     = Distribution(hdn, alphaPrime);
-        // const float visTerm      = Visibility(ndl, ndv, roughness);
-
-        // return distTerm * visTerm * fresnelTerm ;
         float specEnergy = 1.0f;
 
         float radius = cLightRad / 100;
@@ -83,10 +59,10 @@
 
     }
 
-    float3 TubeLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
+    float3 TubeLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, float3 diffColor, out float ndl)
     {
-         float radius      = cLightRad;
-         float len         = cLightLength; 
+        float radius      = cLightRad / 100;
+        float len         = cLightLength / 10; 
         float3 pos         = (cLightPosPS.xyz - worldPos);
         float3 reflectVec  = reflect(-toCamera, normal);
         
@@ -123,11 +99,12 @@
         float alpha      = roughness * roughness;
         float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
 
-        const float3 fresnelTerm = Fresnel(specColor, hdv) ;
-        const float distTerm     = Distribution(hdn, alphaPrime);
-        const float visTerm      = Visibility(ndl, ndv, roughness);
-
-        return distTerm * visTerm * fresnelTerm ;
+       const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
+       const float3 fresnelTerm = Fresnel(specColor, hdv) ;
+       const float distTerm = Distribution(hdn, roughness);
+       const float visTerm = Visibility(ndl, ndv, roughness);
+       float3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
+       return diffuseFactor + specularFactor;
     }
 
 	//Return the PBR BRDF value
@@ -155,14 +132,12 @@
             {
                 if(cLightLength > 0.0)
                 {
-                    return TubeLight(worldPos, lightVec, normal, toCamera, roughness, specColor, ndl);
+                    return TubeLight(worldPos, lightVec, normal, toCamera, roughness, specColor, diffColor, ndl);
                     
                 }
                 else
                 {
-                    specularFactor = SphereLight(worldPos, lightVec, normal, toCamera, roughness, specColor, diffColor, ndl);
-                    specularFactor *= ndl;
-                    return diffuseFactor + specularFactor;
+                    return SphereLight(worldPos, lightVec, normal, toCamera, roughness, specColor, diffColor, ndl);
                 }
             }
             else
