@@ -229,7 +229,7 @@
 
     float GetMipFromRoughness(float roughness)
     {
-        float Level = 3 - 1.15 * log2( roughness );
+        float Level = 3 - 1.15 * log2(roughness);
         return 9.0 - 1 - Level;
     }
 
@@ -264,6 +264,7 @@
     ///     ambientOcclusion: ambient occlusion
     float3 ImageBasedLighting(in float3 reflectVec, in float3 tangent, in float3 bitangent, in float3 wsNormal, in float3 toCamera, in float3 diffColor, in float3 specColor, in float roughness, inout float3 reflectionCubeColor)
     { 
+        roughness = max(roughness, 0.08);
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         const float ndv = saturate(dot(-toCamera, wsNormal));
 

@@ -26,7 +26,7 @@
     //VdotH     = the dot product of the camera view direction and the half vector 
     float3 Fresnel(float3 specular, float VdotH)
     {
-        return SchlickFresnel(specular, VdotH);
+        return SchlickGaussianFresnel(specular, VdotH);
     }
 
     // Smith GGX corrected Visibility
