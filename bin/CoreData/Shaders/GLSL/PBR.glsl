@@ -63,8 +63,8 @@
 
     vec3 TubeLight(vec3 worldPos, vec3 lightVec, vec3 normal, vec3 toCamera, float roughness, vec3 specColor, vec3 diffColor, out float ndl)
     {
-        float radius      = cLightRad;
-        float len         = cLightLength; 
+        float radius      = cLightRad / 100;
+        float len         = cLightLength / 10; 
         vec3 pos         = (cLightPosPS.xyz - worldPos);
         vec3 reflectVec  = reflect(-toCamera, normal);
         
@@ -92,22 +92,22 @@
         vec3 l = normalize(closestPoint);
         vec3 h = normalize(toCamera + l);
 
-        ndl       =  clamp(dot(normal, lightVec), 0.0, 1.0);
+        ndl       = clamp(dot(normal, lightVec), 0.0, 1.0);
         float hdn = clamp(dot(h, normal), 0.0, 1.0);
         float hdv = dot(h, toCamera);
-        float ndv = clamp(dot(normal, toCamera), 0.0 ,1.0);
+        float ndv = clamp(dot(normal, toCamera), 0.0, 1.0);
         float hdl = clamp(dot(h, lightVec), 0.0, 1.0);
 
         float distL      = length(closestPoint);
         float alpha      = max(roughness, 0.08) * max(roughness, 0.08);
         float alphaPrime = clamp(radius / (distL * 2.0) + alpha, 0.0, 1.0);
 
-       vec3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
-       vec3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
-       float distTerm = Distribution(hdn, roughness);
-       float visTerm = Visibility(ndl, ndv, roughness);
-       vec3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
-       return diffuseFactor + specularFactor;
+        vec3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
+        vec3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
+        float distTerm = Distribution(hdn, roughness);
+        float visTerm = Visibility(ndl, ndv, roughness);
+        vec3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
+        return diffuseFactor + specularFactor;
     }
 
 	//Return the PBR BRDF value
