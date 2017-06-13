@@ -51,9 +51,10 @@
         float hdn = saturate(dot(h, normal));
         float hdv = dot(h, toCamera);
         float ndv = saturate(dot(normal, toCamera));
+        float hdl = saturate(dot(h, lightVec));
 
         const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
-        const float3 fresnelTerm = Fresnel(specColor, hdv) ;
+        const float3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
         const float distTerm = Distribution(hdn, roughness);
         const float visTerm = Visibility(ndl, ndv, roughness);
         float3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
@@ -96,13 +97,14 @@
         float hdn = saturate(dot(h, normal));
         float hdv = dot(h, toCamera);
         float ndv = saturate(dot(normal, toCamera));
+        float hdl = saturate(dot(h, lightVec));
 
         float distL      = length(closestPoint);
         float alpha      = max(roughness, 0.08) * max(roughness, 0.08);
         float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
 
        const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
-       const float3 fresnelTerm = Fresnel(specColor, hdv) ;
+       const float3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
        const float distTerm = Distribution(hdn, roughness);
        const float visTerm = Visibility(ndl, ndv, roughness);
        float3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
@@ -125,6 +127,7 @@
         const float ndh = clamp((dot(normal, Hn)), M_EPSILON, 1.0);
         float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
         const float ndv = clamp((dot(normal, toCamera)), M_EPSILON, 1.0);
+        const float ldh = clamp((dot(lightVec, Hn)), M_EPSILON, 1.0);
 
         const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, vdh)  * ndl;
         float3 specularFactor = 0;
@@ -144,7 +147,7 @@
             }
             else
             {
-                const float3 fresnelTerm = Fresnel(specColor, vdh) ;
+                const float3 fresnelTerm = Fresnel(specColor, vdh, ldh) ;
                 const float distTerm = Distribution(ndh, roughness);
                 const float visTerm = Visibility(ndl, ndv, roughness);
                 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;

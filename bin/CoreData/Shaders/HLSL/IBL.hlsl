@@ -229,8 +229,7 @@
 
     float GetMipFromRoughness(float roughness)
     {
-        float Level = 3 - 1.15 * log2(roughness);
-        return 9.0 - 1 - Level;
+        return (roughness * 12.0 - pow(roughness, 6.0) * 1.5);
     }
 
 
