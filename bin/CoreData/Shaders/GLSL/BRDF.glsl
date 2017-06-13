@@ -53,13 +53,19 @@
         return 0.5 / (lambdaV + lambdaL);
     }
 
+    float NeumannVisibility(float NdotV, float NdotL) 
+    {
+        return NdotL * NdotV / max(1e-7, max(NdotL, NdotV));
+    }
+
     // Get Visibility
     // NdotL        = the dot product of the normal and direction to the light
     // NdotV        = the dot product of the normal and the camera view direction
     // roughness    = the roughness of the pixel
     float Visibility(float NdotL, float NdotV, float roughness)
     {
-        return SmithGGXSchlickVisibility(NdotL, NdotV, roughness);
+        return NeumannVisibility(NdotV, NdotL);
+        //return SmithGGXSchlickVisibility(NdotL, NdotV, roughness);
     }
 
     // Blinn Distribution
@@ -149,7 +155,7 @@
     // VdotH        = the camera view direction dot with the half vector
     vec3 Diffuse(vec3 diffuseColor, float roughness, float NdotV, float NdotL, float VdotH)
     {
-        //return LambertianDiffuse(diffuseColor, NdotL);
+        //return LambertianDiffuse(diffuseColor);
         return CustomLambertianDiffuse(diffuseColor, NdotV, roughness);
         //return BurleyDiffuse(diffuseColor, roughness, NdotV, NdotL, VdotH);
     }
