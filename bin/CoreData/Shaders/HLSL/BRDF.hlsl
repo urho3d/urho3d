@@ -26,9 +26,8 @@
         float ior = 0.25;
         float airIor = 1.000277;
         float f0 = (ior - airIor) / (ior + airIor);
-        // Clamp between ior of 1 and 2.5
         const float max_ior = 2.5;
-        f0 = clamp(f0 * f0, 0.0, (max_ior - airIor) / (max_ior + airIor)); // should get optimized out
+        f0 = clamp(f0 * f0, 0.0, (max_ior - airIor) / (max_ior + airIor));
         return specular * (f0   + (1 - f0) * pow(2, (-5.55473 * LdotH - 6.98316) * LdotH));
     }
 
