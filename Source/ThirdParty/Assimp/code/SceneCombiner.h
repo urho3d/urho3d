@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-// Modified by Lasse Oorni for Urho3D
-
 /** @file Declares a helper class, "SceneCombiner" providing various
  *  utilities to merge scenes.
  */
@@ -58,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include "../include/assimp/Compiler/pstdint.h"
 #endif
+//#include "../include/assimp/Compiler/pstdint.h"
 
 #include <vector>
 
@@ -172,7 +171,7 @@ struct SceneHelper
         id[0] = 0;
     }
 
-    SceneHelper (aiScene* _scene)
+    explicit SceneHelper (aiScene* _scene)
         : scene     (_scene)
         , idlen     (0)
     {

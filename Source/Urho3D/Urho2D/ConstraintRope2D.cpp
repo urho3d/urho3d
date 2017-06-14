@@ -87,7 +87,11 @@ void ConstraintRope2D::SetMaxLength(float maxLength)
 
     jointDef_.maxLength = maxLength;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2RopeJoint*>(joint_)->SetMaxLength(maxLength);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 

@@ -349,12 +349,27 @@ bool XMLElement::SetInt(const String& name, int value)
     return SetAttribute(name, String(value));
 }
 
+bool XMLElement::SetUInt64(const String& name, unsigned long long value)
+{
+    return SetAttribute(name, String(value));
+}
+
+bool XMLElement::SetInt64(const String& name, long long value)
+{
+    return SetAttribute(name, String(value));
+}
+
 bool XMLElement::SetIntRect(const String& name, const IntRect& value)
 {
     return SetAttribute(name, value.ToString());
 }
 
 bool XMLElement::SetIntVector2(const String& name, const IntVector2& value)
+{
+    return SetAttribute(name, value.ToString());
+}
+
+bool XMLElement::SetIntVector3(const String& name, const IntVector3& value)
 {
     return SetAttribute(name, value.ToString());
 }
@@ -774,6 +789,16 @@ int XMLElement::GetInt(const String& name) const
     return ToInt(GetAttribute(name));
 }
 
+unsigned long long XMLElement::GetUInt64(const String& name) const
+{
+    return ToUInt64(GetAttribute(name));
+}
+
+long long XMLElement::GetInt64(const String& name) const
+{
+    return ToInt64(GetAttribute(name));
+}
+
 IntRect XMLElement::GetIntRect(const String& name) const
 {
     return ToIntRect(GetAttribute(name));
@@ -782,6 +807,11 @@ IntRect XMLElement::GetIntRect(const String& name) const
 IntVector2 XMLElement::GetIntVector2(const String& name) const
 {
     return ToIntVector2(GetAttribute(name));
+}
+
+IntVector3 XMLElement::GetIntVector3(const String& name) const
+{
+    return ToIntVector3(GetAttribute(name));
 }
 
 Quaternion XMLElement::GetQuaternion(const String& name) const

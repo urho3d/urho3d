@@ -28,6 +28,8 @@ enum VariantType
     VAR_DOUBLE,
     VAR_STRINGVECTOR,
     VAR_RECT,
+    VAR_INTVECTOR3,
+    VAR_INT64,
     MAX_VAR_TYPES
 };
 
@@ -77,6 +79,8 @@ class Variant
     // All below getters are preserved for backward compatibility and for compatibility with C++ and AngelScript API
     int GetInt() const;
     unsigned GetUInt() const;
+    long long int GetInt64() const;
+    unsigned long long int GetUInt64() const;
     StringHash GetStringHash() const;
     bool GetBool() const;
     float GetFloat() const;
@@ -98,6 +102,7 @@ class Variant
     const Rect& GetRect() const;
     const IntRect& GetIntRect() const;
     const IntVector2& GetIntVector2() const;
+    const IntVector3& GetIntVector3() const;
     RefCounted* GetPtr(const char* type) const;
     const Matrix3& GetMatrix3() const;
     const Matrix3x4& GetMatrix3x4() const;

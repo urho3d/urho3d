@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/ProcessUtils.h"
+#include "../Core/StringUtils.h"
 #include "../IO/FileSystem.h"
 
 #include <cstdio>
@@ -33,19 +34,32 @@
 #endif
 
 #if defined(IOS)
-#include "../Math/MathDefs.h"
 #include <mach/mach_host.h>
+#elif defined(TVOS)
+extern "C" unsigned SDL_TVOS_GetActiveProcessorCount();
 #elif !defined(__linux__) && !defined(__EMSCRIPTEN__)
 #include <LibCpuId/libcpuid.h>
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #include <windows.h>
 #include <io.h>
 #if defined(_MSC_VER)
 #include <float.h>
+#include <Lmcons.h> // For UNLEN. 
+#elif defined(__MINGW32__)
+#include <lmcons.h> // For UNLEN. Apparently MSVC defines "<Lmcons.h>" (with an upperscore 'L' but MinGW uses an underscore 'l'). 
+#include <ntdef.h> 
 #endif
-#else
+#elif defined(__linux__) && !defined(__ANDROID__) 
+#include <pwd.h> 
+#include <sys/sysinfo.h>
+#include <sys/utsname.h>
+#elif defined(__APPLE__)
+#include <sys/sysctl.h>
+#include <SystemConfiguration/SystemConfiguration.h> // For the detection functions inside GetLoginName(). 
+#endif
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 
@@ -145,7 +159,7 @@ static void GetCPUData(struct CpuCoreCount* data)
     }
 }
 
-#elif !defined(__EMSCRIPTEN__)
+#elif !defined(__EMSCRIPTEN__) && !defined(TVOS)
 static void GetCPUData(struct cpu_id_t* data)
 {
     if (cpu_identify(0, data) < 0)
@@ -202,7 +216,7 @@ void OpenConsoleWindow()
 
 void PrintUnicode(const String& str, bool error)
 {
-#if !defined(__ANDROID__) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
 #ifdef _WIN32
     // If the output stream has been redirected, use fprintf instead of WriteConsoleW,
     // though it means that proper Unicode output will not work
@@ -231,7 +245,7 @@ void PrintUnicodeLine(const String& str, bool error)
 
 void PrintLine(const String& str, bool error)
 {
-#if !defined(__ANDROID__) && !defined(IOS)
+#if !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     fprintf(error ? stderr : stdout, "%s\n", str.CString());
 #endif
 }
@@ -369,7 +383,7 @@ String GetConsoleInput()
             }
         }
     }
-#elif !defined(__ANDROID__) && !defined(IOS)
+#elif !defined(__ANDROID__) && !defined(IOS) && !defined(TVOS)
     int flags = fcntl(STDIN_FILENO, F_GETFL);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
     for (;;)
@@ -392,10 +406,12 @@ String GetPlatform()
     return "Android";
 #elif defined(IOS)
     return "iOS";
+#elif defined(TVOS)
+    return "tvOS";
+#elif defined(__APPLE__)
+    return "macOS";
 #elif defined(_WIN32)
     return "Windows";
-#elif defined(__APPLE__)
-    return "Mac OS X";
 #elif defined(RPI)
     return "Raspberry Pi";
 #elif defined(__EMSCRIPTEN__)
@@ -412,11 +428,17 @@ unsigned GetNumPhysicalCPUs()
 #if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-#if defined(TARGET_IPHONE_SIMULATOR)
+#if defined(TARGET_OS_SIMULATOR)
     // Hardcoded to dual-core on simulator mode even if the host has more
     return Min(2, data.physical_cpu);
 #else
     return data.physical_cpu;
+#endif
+#elif defined(TVOS)
+#if defined(TARGET_OS_SIMULATOR)
+    return Min(2, SDL_TVOS_GetActiveProcessorCount());
+#else
+    return SDL_TVOS_GetActiveProcessorCount();
 #endif
 #elif defined(__linux__)
     struct CpuCoreCount data;
@@ -440,10 +462,16 @@ unsigned GetNumLogicalCPUs()
 #if defined(IOS)
     host_basic_info_data_t data;
     GetCPUData(&data);
-#if defined(TARGET_IPHONE_SIMULATOR)
+#if defined(TARGET_OS_SIMULATOR)
     return Min(2, data.logical_cpu);
 #else
     return data.logical_cpu;
+#endif
+#elif defined(TVOS)
+#if defined(TARGET_OS_SIMULATOR)
+    return Min(2, SDL_TVOS_GetActiveProcessorCount());
+#else
+    return SDL_TVOS_GetActiveProcessorCount();
 #endif
 #elif defined(__linux__)
     struct CpuCoreCount data;
@@ -483,6 +511,197 @@ String GetMiniDumpDir()
 #endif
 
     return miniDumpDir;
+}
+
+unsigned long long GetTotalMemory()
+{
+#if defined(__linux__) && !defined(__ANDROID__)
+    struct sysinfo s;
+    if (sysinfo(&s) != -1)
+        return s.totalram; 
+#elif defined(_WIN32)
+    MEMORYSTATUSEX state;
+    state.dwLength = sizeof(state); 
+    if (GlobalMemoryStatusEx(&state)) 
+        return state.ullTotalPhys; 
+#elif defined(__APPLE__)
+    unsigned long long memSize;
+    size_t len = sizeof(memSize);
+    int mib[2]; 
+    mib[0] = CTL_HW;
+    mib[1] = HW_MEMSIZE;
+    sysctl(mib, 2, &memSize, &len, NULL, 0);
+    return memSize;
+#endif
+    return 0ull;
+}
+
+String GetLoginName() 
+{
+#if defined(__linux__) && !defined(__ANDROID__)
+    struct passwd *p = getpwuid(getuid());
+    if (p) 
+        return p->pw_name;
+#elif defined(_WIN32)
+    char name[UNLEN + 1];
+    DWORD len = UNLEN + 1;
+    if (GetUserName(name, &len))
+        return name;
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
+    SCDynamicStoreRef s = SCDynamicStoreCreate(NULL, CFSTR("GetConsoleUser"), NULL, NULL);
+    if (s != NULL)
+    {
+        uid_t u; 
+        CFStringRef n = SCDynamicStoreCopyConsoleUser(s, &u, NULL);
+        CFRelease(s); 
+        if (n != NULL)
+        {
+            char name[256]; 
+            Boolean b = CFStringGetCString(n, name, 256, kCFStringEncodingUTF8);
+            CFRelease(n); 
+
+            if (b == true)
+                return name; 
+        }
+    }
+#endif
+    return "(?)"; 
+}
+
+String GetHostName() 
+{
+#if (defined(__linux__) || defined(__APPLE__)) && !defined(__ANDROID__)
+    char buffer[256]; 
+    if (gethostname(buffer, 256) == 0) 
+        return buffer; 
+#elif defined(_WIN32)
+    char buffer[MAX_COMPUTERNAME_LENGTH + 1]; 
+    DWORD len = MAX_COMPUTERNAME_LENGTH + 1; 
+    if (GetComputerName(buffer, &len))
+        return buffer;
+#endif
+    return String::EMPTY; 
+}
+
+#if defined(_WIN32)
+typedef NTSTATUS (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+static void GetOS(RTL_OSVERSIONINFOW *r)
+{
+    HMODULE m = GetModuleHandle("ntdll.dll");
+    if (m)
+    {
+        RtlGetVersionPtr fPtr = (RtlGetVersionPtr) GetProcAddress(m, "RtlGetVersion");
+        if (r && fPtr && fPtr(r) == 0)
+            r->dwOSVersionInfoSize = sizeof *r; 
+    }
+}
+#endif 
+
+String GetOSVersion() 
+{
+#if defined(__linux__) && !defined(__ANDROID__)
+    struct utsname u;
+    if (uname(&u) == 0)
+        return String(u.sysname) + " " + u.release; 
+#elif defined(_WIN32)
+    RTL_OSVERSIONINFOW r;
+    GetOS(&r); 
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
+    if (r.dwMajorVersion == 5 && r.dwMinorVersion == 0) 
+        return "Windows 2000"; 
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 1) 
+        return "Windows XP"; 
+    else if (r.dwMajorVersion == 5 && r.dwMinorVersion == 2) 
+        return "Windows XP 64-Bit Edition/Windows Server 2003/Windows Server 2003 R2"; 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 0) 
+        return "Windows Vista/Windows Server 2008"; 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 1) 
+        return "Windows 7/Windows Server 2008 R2"; 
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 2) 
+        return "Windows 8/Windows Server 2012";
+    else if (r.dwMajorVersion == 6 && r.dwMinorVersion == 3) 
+        return "Windows 8.1/Windows Server 2012 R2"; 
+    else if (r.dwMajorVersion == 10 && r.dwMinorVersion == 0) 
+        return "Windows 10/Windows Server 2016"; 
+    else 
+        return "Windows Unidentified";
+#elif defined(__APPLE__)
+    char kernel_r[256]; 
+    size_t size = sizeof(kernel_r); 
+
+    if (sysctlbyname("kern.osrelease", &kernel_r, &size, NULL, 0) != -1)
+    {
+        Vector<String> kernel_version = String(kernel_r).Split('.'); 
+        String version = "macOS/Mac OS X "; 
+        int major = ToInt(kernel_version[0]);
+        int minor = ToInt(kernel_version[1]);
+
+        // https://en.wikipedia.org/wiki/Darwin_(operating_system)
+        if (major == 16) // macOS Sierra 
+        {
+            version += "Sierra "; 
+            switch(minor)
+            {
+                case 0: version += "10.12.0 "; break; 
+                case 1: version += "10.12.1 "; break; 
+                case 3: version += "10.12.2 "; break; 
+            }
+        }
+        else if (major == 15) // OS X El Capitan
+        {
+            version += "El Capitan ";
+            switch(minor)
+            {
+                case 0: version += "10.11.0 "; break; 
+                case 6: version += "10.11.6 "; break; 
+            }
+        }
+        else if (major == 14) // OS X Yosemite 
+        {
+            version += "Yosemite "; 
+            switch(minor) 
+            {
+                case 0: version += "10.10.0 "; break; 
+                case 5: version += "10.10.5 "; break; 
+            }
+        }
+        else if (major == 13) // OS X Mavericks
+        {
+            version += "Mavericks ";
+            switch(minor)
+            {
+                case 0: version += "10.9.0 "; break; 
+                case 4: version += "10.9.5 "; break; 
+            }
+        }
+        else if (major == 12) // OS X Mountain Lion
+        {
+            version += "Mountain Lion "; 
+            switch(minor) 
+            {
+                case 0: version += "10.8.0 "; break; 
+                case 6: version += "10.8.5 "; break; 
+            }
+        }
+        else if (major == 11) // Mac OS X Lion
+        {
+            version += "Lion ";
+            switch(minor)
+            {
+                case 0: version += "10.7.0 "; break; 
+                case 4: version += "10.7.5 "; break; 
+            }
+        }
+        else 
+        {
+            version += "Unknown ";
+        }
+
+        return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")"; 
+    }
+#endif
+    return String::EMPTY; 
 }
 
 }

@@ -32,6 +32,7 @@
 #include "../Urho2D/ParticleEmitter2D.h"
 #include "../Urho2D/Renderer2D.h"
 #include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/Urho2DEvents.h"
 
 #include "../DebugNew.h"
 
@@ -265,8 +266,35 @@ void ParticleEmitter2D::UpdateMaterial()
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
+    bool hasParticles = numParticles_ > 0;
+    bool emitting = emissionTime_ > 0.0f;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Update(timeStep);
+
+    if (emitting && emissionTime_ == 0.0f)
+    {
+        // Make a weak pointer to self to check for destruction during event handling
+        WeakPtr<ParticleEmitter2D> self(this);
+        using namespace ParticlesDuration;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
+        SendEvent(E_PARTICLESDURATION, eventData); // Emitting particles stopped
+
+        if (self.Expired())
+            return;
+    }
+    if (hasParticles && numParticles_ == 0)
+    {
+        using namespace ParticlesEnd;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
+
+        SendEvent(E_PARTICLESEND, eventData);      // All particles over
+    }
 }
 
 void ParticleEmitter2D::Update(float timeStep)
@@ -297,7 +325,7 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emissionTime_ >= 0.0f)
+    if (emissionTime_ > 0.0f)
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
 

@@ -27,6 +27,7 @@
 
 class asIScriptFunction;
 class asIScriptObject;
+class asIScriptContext;
 
 namespace Urho3D
 {
@@ -209,17 +210,19 @@ private:
     bool subscribedPostFixed_;
 };
 
-/// Return the Urho3D context of the active script context.
+/// Return the active AngelScript context. Provided as a wrapper to the AngelScript API function to avoid undefined symbol error in shared library Urho3D builds.
+URHO3D_API asIScriptContext* GetActiveASContext();
+/// Return the Urho3D context of the active AngelScript context.
 URHO3D_API Context* GetScriptContext();
-/// Return the ScriptInstance of the active script context.
+/// Return the ScriptInstance of the active AngelScript context.
 URHO3D_API ScriptInstance* GetScriptContextInstance();
-/// Return the scene node of the active script context.
+/// Return the scene node of the active AngelScript context.
 URHO3D_API Node* GetScriptContextNode();
-/// Return the scene of the active script context.
+/// Return the scene of the active AngelScript context.
 URHO3D_API Scene* GetScriptContextScene();
-/// Return the event listener of the active script context.
+/// Return the event listener of the active AngelScript context.
 URHO3D_API ScriptEventListener* GetScriptContextEventListener();
-/// Return the event listener of the active script context as an Object pointer.
+/// Return the event listener of the active AngelScript context as an Object pointer.
 URHO3D_API Object* GetScriptContextEventListenerObject();
 
 }

@@ -1931,8 +1931,18 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
                 return 0;
             }
 
-            unsigned index = (unsigned)ToInt(names[i].Substring(1, names[i].Length() - 1));
-            element = element->GetChild(index);
+            String name = names[i].Substring(1, names[i].Length() - 1);
+            char s = name.Front();
+            if (s >= '0' && s <= '9')
+            {
+                unsigned index = ToUInt(name);
+                element = element->GetChild(index);
+            }
+            else
+            {
+                element = element->GetChild(name, true);
+            }
+
             if (!element)
             {
                 URHO3D_LOGERROR("Could not find element by name " + name);

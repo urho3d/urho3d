@@ -121,6 +121,8 @@ protected:
     bool EmitNewParticle();
     /// Return a free particle index.
     unsigned GetFreeParticle() const;
+    /// Return whether has active particles.
+    bool CheckActiveParticles() const;
 
 private:
     /// Handle scene post-update event.

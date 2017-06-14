@@ -75,7 +75,7 @@ struct TileCompressor : public dtTileCacheCompressor
     virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
         unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize)
     {
-        *compressedSize = LZ4_compress((const char*)buffer, (char*)compressed, bufferSize);
+        *compressedSize = LZ4_compress_default((const char*)buffer, (char*)compressed, bufferSize, LZ4_compressBound(bufferSize));
         return DT_SUCCESS;
     }
 

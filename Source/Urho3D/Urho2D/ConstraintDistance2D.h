@@ -48,6 +48,8 @@ public:
     void SetFrequencyHz(float frequencyHz);
     /// Set damping ratio.
     void SetDampingRatio(float dampingRatio);
+    /// Set length.
+    void SetLength(float length);
 
     /// Return owner body anchor.
     const Vector2& GetOwnerBodyAnchor() const { return ownerBodyAnchor_; }
@@ -60,6 +62,9 @@ public:
 
     /// Return damping ratio.
     float GetDampingRatio() const { return jointDef_.dampingRatio; }
+
+    /// Return length.
+    float GetLength() const { return jointDef_.length; }
 
 private:
     /// Return joint def.

@@ -24,8 +24,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Object.h"
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 #ifdef __ANDROID__
 struct SDL_RWops;
@@ -58,7 +57,7 @@ enum FileMode
 class PackageFile;
 
 /// %File opened either through the filesystem or from within a package file.
-class URHO3D_API File : public Object, public Deserializer, public Serializer
+class URHO3D_API File : public Object, public AbstractFile
 {
     URHO3D_OBJECT(File, Object);
 

@@ -919,9 +919,18 @@ void ScriptInstance::HandleScriptFileReloadFinished(StringHash eventType, Varian
     }
 }
 
+asIScriptContext* GetActiveASContext()
+{
+    return asGetActiveContext();
+}
+
 Context* GetScriptContext()
 {
-    return static_cast<Script*>(asGetActiveContext()->GetEngine()->GetUserData())->GetContext();
+    asIScriptContext* context = asGetActiveContext();
+    if (context)
+        return static_cast<Script*>(context->GetEngine()->GetUserData())->GetContext();
+    else
+        return 0;
 }
 
 ScriptInstance* GetScriptContextInstance()

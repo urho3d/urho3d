@@ -124,10 +124,16 @@ public:
     bool SetUInt(const String& name, unsigned value);
     /// Set an integer attribute.
     bool SetInt(const String& name, int value);
+    /// Set an unsigned long long integer attribute.
+    bool SetUInt64(const String& name, unsigned long long value);
+    /// Set a long long integer attribute.
+    bool SetInt64(const String& name, long long value);
     /// Set an IntRect attribute.
     bool SetIntRect(const String& name, const IntRect& value);
     /// Set an IntVector2 attribute.
     bool SetIntVector2(const String& name, const IntVector2& value);
+    /// Set an IntVector3 attribute.
+    bool SetIntVector3(const String& name, const IntVector3& value);
     /// Set a Rect attribute.
     bool SetRect(const String& name, const Rect& value);
     /// Set a quaternion attribute.
@@ -227,10 +233,16 @@ public:
     unsigned GetUInt(const String& name) const;
     /// Return an integer attribute, or zero if missing.
     int GetInt(const String& name) const;
+    /// Return an unsigned long long integer attribute, or zero if missing.
+    unsigned long long GetUInt64(const String& name) const;
+    /// Return a long long integer attribute, or zero if missing.
+    long long GetInt64(const String& name) const;
     /// Return an IntRect attribute, or default if missing.
     IntRect GetIntRect(const String& name) const;
     /// Return an IntVector2 attribute, or default if missing.
     IntVector2 GetIntVector2(const String& name) const;
+    /// Return an IntVector3 attribute, or default if missing.
+    IntVector3 GetIntVector3(const String& name) const;
     /// Return a Rect attribute, or default if missing.
     Rect GetRect(const String& name) const;
     /// Return a quaternion attribute, or default if missing.

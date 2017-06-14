@@ -376,7 +376,6 @@ function HandleMouseButtonDown(eventType, eventData)
         constraintMouse.maxForce = 1000 * rigidBody.mass
         constraintMouse.collideConnected = true
         constraintMouse.otherBody = dummyBody  -- Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse.dampingRatio = 0
     end
     SubscribeToEvent("MouseMove", "HandleMouseMove")
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp")

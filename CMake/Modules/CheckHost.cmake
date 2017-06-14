@@ -81,8 +81,8 @@ else ()
     endif ()
     # Temporary workaround - test if PCH could be enabled when using Clang compiler toolchain
     if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Turn off PCH when building on macOS host with ccache 3.3.1+ (the last known bad version) and when targeting Android platform
-        if ((APPLE AND NOT CCACHE_VERSION VERSION_LESS 3.3.1) OR ANDROID)
+        # Turn off PCH when building on macOS host with ccache 3.3.1+ (the last known bad version) and when targeting Android and Web platforms
+        if ((APPLE AND NOT CCACHE_VERSION VERSION_LESS 3.3.1) OR ANDROID OR WEB)
             set (URHO3D_PCH FALSE CACHE INTERNAL "" FORCE)
         endif ()
     endif ()

@@ -120,9 +120,43 @@ int ToInt(const char* source, int base)
     return (int)strtol(source, 0, base);
 }
 
+long long ToInt64(const char* source, int base)
+{
+    if (!source)
+        return 0;
+
+    // Shield against runtime library assert by converting illegal base values to 0 (autodetect)
+    if (base < 2 || base > 36)
+        base = 0;
+
+    return strtoll(source, 0, base);
+}
+
+long long ToInt64(const String& source, int base)
+{
+    return ToInt64(source.CString(), base);
+}
+
 unsigned ToUInt(const String& source, int base)
 {
     return ToUInt(source.CString(), base);
+}
+
+unsigned long long ToUInt64(const char* source, int base)
+{
+    if (!source)
+        return 0;
+
+    // Shield against runtime library assert by converting illegal base values to 0 (autodetect)
+    if (base < 2 || base > 36)
+        base = 0;
+
+    return strtoull(source, 0, base);
+}
+
+unsigned long long ToUInt64(const String& source, int base)
+{
+    return ToUInt64(source.CString(), base);
 }
 
 unsigned ToUInt(const char* source, int base)
@@ -223,6 +257,27 @@ IntVector2 ToIntVector2(const char* source)
     char* ptr = (char*)source;
     ret.x_ = (int)strtol(ptr, &ptr, 10);
     ret.y_ = (int)strtol(ptr, &ptr, 10);
+
+    return ret;
+}
+
+IntVector3 ToIntVector3(const String& source)
+{
+    return ToIntVector3(source.CString());
+}
+
+IntVector3 ToIntVector3(const char* source)
+{
+    IntVector3 ret(IntVector3::ZERO);
+
+    unsigned elements = CountElements(source, ' ');
+    if (elements < 3)
+        return ret;
+
+    char* ptr = (char*)source;
+    ret.x_ = (int)strtol(ptr, &ptr, 10);
+    ret.y_ = (int)strtol(ptr, &ptr, 10);
+    ret.z_ = (int)strtol(ptr, &ptr, 10);
 
     return ret;
 }

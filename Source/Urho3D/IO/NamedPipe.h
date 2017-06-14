@@ -24,8 +24,7 @@
 
 #include "../Container/ArrayPtr.h"
 #include "../Core/Object.h"
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 #ifdef __ANDROID__
 #include <SDL/SDL_rwops.h>
@@ -35,7 +34,7 @@ namespace Urho3D
 {
 
 /// Named pipe for interprocess communication.
-class URHO3D_API NamedPipe : public Object, public Deserializer, public Serializer
+class URHO3D_API NamedPipe : public Object, public AbstractFile
 {
     URHO3D_OBJECT(NamedPipe, Object);
 

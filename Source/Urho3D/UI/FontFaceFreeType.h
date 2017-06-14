@@ -48,8 +48,6 @@ public:
     virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
 private:
-    /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.

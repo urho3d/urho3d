@@ -24,6 +24,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "libcpuid.h"
+#include "libcpuid_internal.h"
 #include "recog_intel.h"
 #include "recog_amd.h"
 #include "asm-bits.h"
@@ -53,9 +54,9 @@ static void raw_data_t_constructor(struct cpu_raw_data_t* raw)
 static void cpu_id_t_constructor(struct cpu_id_t* id)
 {
 	memset(id, 0, sizeof(struct cpu_id_t));
-	id->l1_data_cache = id->l1_instruction_cache = id->l2_cache = id->l3_cache = -1;
-	id->l1_assoc = id->l2_assoc = id->l3_assoc = -1;
-	id->l1_cacheline = id->l2_cacheline = id->l3_cacheline = -1;
+	id->l1_data_cache = id->l1_instruction_cache = id->l2_cache = id->l3_cache = id->l4_cache = -1;
+	id->l1_assoc = id->l2_assoc = id->l3_assoc = id->l4_assoc = -1;
+	id->l1_cacheline = id->l2_cacheline = id->l3_cacheline = id->l4_cacheline = -1;
 	id->sse_size = -1;
 }
 
@@ -125,6 +126,7 @@ static int get_total_cpus(void)
 #endif
 
 #if defined __FreeBSD__ || defined __OpenBSD__ || defined __NetBSD__ || defined __bsdi__ || defined __QNX__
+#include <sys/types.h>
 #include <sys/sysctl.h>
 
 static int get_total_cpus(void)
@@ -182,15 +184,21 @@ static void load_features_common(struct cpu_raw_data_t* raw, struct cpu_id_t* da
 	};
 	const struct feature_map_t matchtable_ecx1[] = {
 		{  0, CPU_FEATURE_PNI },
+		{  1, CPU_FEATURE_PCLMUL },
 		{  3, CPU_FEATURE_MONITOR },
 		{  9, CPU_FEATURE_SSSE3 },
 		{ 12, CPU_FEATURE_FMA3 },
 		{ 13, CPU_FEATURE_CX16 },
 		{ 19, CPU_FEATURE_SSE4_1 },
-		{ 21, CPU_FEATURE_X2APIC },
+		{ 20, CPU_FEATURE_SSE4_2 },
+		{ 22, CPU_FEATURE_MOVBE },
 		{ 23, CPU_FEATURE_POPCNT },
+		{ 25, CPU_FEATURE_AES },
+		{ 26, CPU_FEATURE_XSAVE },
+		{ 27, CPU_FEATURE_OSXSAVE },
 		{ 28, CPU_FEATURE_AVX },
 		{ 29, CPU_FEATURE_F16C },
+		{ 30, CPU_FEATURE_RDRAND },
 	};
 	const struct feature_map_t matchtable_ebx7[] = {
 		{  3, CPU_FEATURE_BMI1 },
@@ -366,7 +374,7 @@ int cpuid_get_raw_data(struct cpu_raw_data_t* data)
 		cpu_exec_cpuid(i, data->basic_cpuid[i]);
 	for (i = 0; i < 32; i++)
 		cpu_exec_cpuid(0x80000000 + i, data->ext_cpuid[i]);
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < MAX_INTELFN4_LEVEL; i++) {
 		memset(data->intel_fn4[i], 0, sizeof(data->intel_fn4[i]));
 		data->intel_fn4[i][0] = 4;
 		data->intel_fn4[i][2] = i;
@@ -377,6 +385,18 @@ int cpuid_get_raw_data(struct cpu_raw_data_t* data)
 		data->intel_fn11[i][0] = 11;
 		data->intel_fn11[i][2] = i;
 		cpu_exec_cpuid_ext(data->intel_fn11[i]);
+	}
+	for (i = 0; i < MAX_INTELFN12H_LEVEL; i++) {
+		memset(data->intel_fn12h[i], 0, sizeof(data->intel_fn12h[i]));
+		data->intel_fn12h[i][0] = 0x12;
+		data->intel_fn12h[i][2] = i;
+		cpu_exec_cpuid_ext(data->intel_fn12h[i]);
+	}
+	for (i = 0; i < MAX_INTELFN14H_LEVEL; i++) {
+		memset(data->intel_fn14h[i], 0, sizeof(data->intel_fn14h[i]));
+		data->intel_fn14h[i][0] = 0x14;
+		data->intel_fn14h[i][2] = i;
+		cpu_exec_cpuid_ext(data->intel_fn14h[i]);
 	}
 	return set_error(ERR_OK);
 }
@@ -409,6 +429,14 @@ int cpuid_serialize_raw_data(struct cpu_raw_data_t* data, const char* filename)
 		fprintf(f, "intel_fn11[%d]=%08x %08x %08x %08x\n", i,
 			data->intel_fn11[i][0], data->intel_fn11[i][1],
 			data->intel_fn11[i][2], data->intel_fn11[i][3]);
+	for (i = 0; i < MAX_INTELFN12H_LEVEL; i++)
+		fprintf(f, "intel_fn12h[%d]=%08x %08x %08x %08x\n", i,
+			data->intel_fn12h[i][0], data->intel_fn12h[i][1],
+			data->intel_fn12h[i][2], data->intel_fn12h[i][3]);
+	for (i = 0; i < MAX_INTELFN14H_LEVEL; i++)
+		fprintf(f, "intel_fn14h[%d]=%08x %08x %08x %08x\n", i,
+			data->intel_fn14h[i][0], data->intel_fn14h[i][1],
+			data->intel_fn14h[i][2], data->intel_fn14h[i][3]);
 	
 	if (strcmp(filename, ""))
 		fclose(f);
@@ -453,10 +481,12 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 			recognized = 1;
 		}
 		syntax = 1;
-		syntax = syntax && parse_token("basic_cpuid", token, value, data->basic_cpuid, 32, &recognized);
-		syntax = syntax && parse_token("ext_cpuid", token, value, data->ext_cpuid, 32, &recognized);
-		syntax = syntax && parse_token("intel_fn4", token, value, data->intel_fn4,  4, &recognized);
-		syntax = syntax && parse_token("intel_fn11", token, value, data->intel_fn11,  4, &recognized);
+		syntax = syntax && parse_token("basic_cpuid", token, value, data->basic_cpuid,   MAX_CPUID_LEVEL, &recognized);
+		syntax = syntax && parse_token("ext_cpuid", token, value, data->ext_cpuid,       MAX_EXT_CPUID_LEVEL, &recognized);
+		syntax = syntax && parse_token("intel_fn4", token, value, data->intel_fn4,       MAX_INTELFN4_LEVEL, &recognized);
+		syntax = syntax && parse_token("intel_fn11", token, value, data->intel_fn11,     MAX_INTELFN11_LEVEL, &recognized);
+		syntax = syntax && parse_token("intel_fn12h", token, value, data->intel_fn12h,   MAX_INTELFN12H_LEVEL, &recognized);
+		syntax = syntax && parse_token("intel_fn14h", token, value, data->intel_fn14h,   MAX_INTELFN14H_LEVEL, &recognized);
 		if (!syntax) {
 			warnf("Error: %s:%d: Syntax error\n", filename, cur_line);
 			fclose(f);
@@ -472,7 +502,7 @@ int cpuid_deserialize_raw_data(struct cpu_raw_data_t* data, const char* filename
 	return set_error(ERR_OK);
 }
 
-int cpu_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
+int cpu_ident_internal(struct cpu_raw_data_t* raw, struct cpu_id_t* data, struct internal_id_info_t* internal)
 {
 	int r;
 	struct cpu_raw_data_t myraw;
@@ -486,15 +516,21 @@ int cpu_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
 		return set_error(r);
 	switch (data->vendor) {
 		case VENDOR_INTEL:
-			r = cpuid_identify_intel(raw, data);
+			r = cpuid_identify_intel(raw, data, internal);
 			break;
 		case VENDOR_AMD:
-			r = cpuid_identify_amd(raw, data);
+			r = cpuid_identify_amd(raw, data, internal);
 			break;
 		default:
 			break;
 	}
 	return set_error(r);
+}
+
+int cpu_identify(struct cpu_raw_data_t* raw, struct cpu_id_t* data)
+{
+	struct internal_id_info_t throwaway;
+	return cpu_ident_internal(raw, data, &throwaway);
 }
 
 const char* cpu_feature_str(cpu_feature_t feature)
@@ -598,6 +634,19 @@ const char* cpu_feature_str(cpu_feature_t feature)
 		{ CPU_FEATURE_AVX2, "avx2" },
 		{ CPU_FEATURE_BMI1, "bmi1" },
 		{ CPU_FEATURE_BMI2, "bmi2" },
+		{ CPU_FEATURE_HLE, "hle" },
+		{ CPU_FEATURE_RTM, "rtm" },
+		{ CPU_FEATURE_AVX512F, "avx512f" },
+		{ CPU_FEATURE_AVX512DQ, "avx512dq" },
+		{ CPU_FEATURE_AVX512PF, "avx512pf" },
+		{ CPU_FEATURE_AVX512ER, "avx512er" },
+		{ CPU_FEATURE_AVX512CD, "avx512cd" },
+		{ CPU_FEATURE_SHA_NI, "sha_ni" },
+		{ CPU_FEATURE_AVX512BW, "avx512bw" },
+		{ CPU_FEATURE_AVX512VL, "avx512vl" },
+		{ CPU_FEATURE_SGX, "sgx" },
+		{ CPU_FEATURE_RDSEED, "rdseed" },
+		{ CPU_FEATURE_ADX, "adx" },
 	};
 	unsigned i, n = COUNT_OF(matchtable);
 	if (n != NUM_CPU_FEATURES) {
@@ -629,6 +678,7 @@ const char* cpuid_error(void)
 		{ ERR_INVMSR   , "Invalid MSR"},
 		{ ERR_INVCNB   , "Invalid core number"},
 		{ ERR_HANDLE_R , "Error on handle read"},
+		{ ERR_INVRANGE , "Invalid given range"},
 	};
 	unsigned i;
 	for (i = 0; i < COUNT_OF(matchtable); i++)

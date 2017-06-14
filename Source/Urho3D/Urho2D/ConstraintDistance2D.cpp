@@ -55,6 +55,7 @@ void ConstraintDistance2D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Other Body Anchor", GetOtherBodyAnchor, SetOtherBodyAnchor, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Frequency Hz", GetFrequencyHz, SetFrequencyHz, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Damping Ratio", GetDampingRatio, SetDampingRatio, float, 0.0f, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Length", GetLength, SetLength, float, 1.0f, AM_DEFAULT);
     URHO3D_COPY_BASE_ATTRIBUTES(Constraint2D);
 }
 
@@ -87,7 +88,11 @@ void ConstraintDistance2D::SetFrequencyHz(float frequencyHz)
 
     jointDef_.frequencyHz = frequencyHz;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2DistanceJoint*>(joint_)->SetFrequency(frequencyHz);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 
@@ -98,7 +103,26 @@ void ConstraintDistance2D::SetDampingRatio(float dampingRatio)
 
     jointDef_.dampingRatio = dampingRatio;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2DistanceJoint*>(joint_)->SetDampingRatio(dampingRatio);
+    else
+        RecreateJoint();
+
+    MarkNetworkUpdate();
+}
+
+void ConstraintDistance2D::SetLength(float length)
+{
+    if (length == jointDef_.length)
+        return;
+
+    jointDef_.length = length;
+
+    if (joint_)
+        static_cast<b2DistanceJoint*>(joint_)->SetLength(length);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 

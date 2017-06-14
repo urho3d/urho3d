@@ -4,6 +4,7 @@ class Vector2
 {
     Vector2();
     Vector2(const Vector2& vector);
+    Vector2(const IntVector2& vector);
     Vector2(float x, float y);
     ~Vector2();
 

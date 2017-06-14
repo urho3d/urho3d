@@ -34,6 +34,7 @@
 #include "../Physics/PhysicsEvents.h"
 #include "../Physics/PhysicsUtils.h"
 #include "../Physics/PhysicsWorld.h"
+#include "../Physics/RaycastVehicle.h"
 #include "../Physics/RigidBody.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SceneEvents.h"
@@ -150,6 +151,7 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     world_->setDebugDrawer(this);
     world_->setInternalTickCallback(InternalPreTickCallback, static_cast<void*>(this), true);
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);
+    world_->setSynchronizeAllMotionStates(true);
 }
 
 
@@ -645,15 +647,15 @@ void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const BoundingB
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const RigidBody* body)
 {
     URHO3D_PROFILE(PhysicsBodyQuery);
-    
+
     result.Clear();
-    
+
     if (!body || !body->GetBody())
         return;
 
     PhysicsQueryCallback callback(result, body->GetCollisionMask());
     world_->contactTest(body->GetBody(), callback);
-    
+
     // Remove the body itself from the returned list
     for (unsigned i = 0; i < result.Size(); i++)
     {
@@ -1084,6 +1086,7 @@ void RegisterPhysicsLibrary(Context* context)
     RigidBody::RegisterObject(context);
     Constraint::RegisterObject(context);
     PhysicsWorld::RegisterObject(context);
+    RaycastVehicle::RegisterObject(context);
 }
 
 }

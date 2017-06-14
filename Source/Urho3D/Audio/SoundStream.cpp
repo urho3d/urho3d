@@ -39,6 +39,11 @@ SoundStream::~SoundStream()
 {
 }
 
+bool SoundStream::Seek(unsigned int sample_number)
+{
+    return false;
+}
+    
 void SoundStream::SetFormat(unsigned frequency, bool sixteenBit, bool stereo)
 {
     frequency_ = frequency;

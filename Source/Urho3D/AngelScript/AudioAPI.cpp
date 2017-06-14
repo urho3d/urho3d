@@ -33,7 +33,7 @@ namespace Urho3D
 
 void RegisterSound(asIScriptEngine* engine)
 {
-    RegisterResource<Sound>(engine, "Sound");
+    RegisterResourceWithMetadata<Sound>(engine, "Sound");
     engine->RegisterObjectMethod("Sound", "float get_length() const", asMETHOD(Sound, GetLength), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sound", "uint get_sampleSize() const", asMETHOD(Sound, GetSampleSize), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sound", "float get_frequency() const", asMETHOD(Sound, GetFrequency), asCALL_THISCALL);

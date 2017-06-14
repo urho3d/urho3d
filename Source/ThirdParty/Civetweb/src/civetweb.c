@@ -134,7 +134,7 @@ mg_static_assert(sizeof(void *) >= sizeof(int), "data type size check");
 
 // Urho3D - On Apple platform, use its clock_gettime() when it is available
 #ifndef HAVE_CLOCK_GETTIME
-int clock_gettime(int clk_id, struct timespec *t)
+int clock_gettime_impl(int clk_id, struct timespec *t)
 {
 	if (clk_id == CLOCK_REALTIME) {
 		struct timeval now;
@@ -173,6 +173,7 @@ int clock_gettime(int clk_id, struct timespec *t)
 	}
 	return -1; /* EINVAL - Clock ID is unknown */
 }
+#define clock_gettime clock_gettime_impl
 #endif  // HAVE_CLOCK_GETTIME
 #endif
 

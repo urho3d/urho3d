@@ -6,14 +6,17 @@ class ConstraintDistance2D : Constraint2D
     void SetOtherBodyAnchor(const Vector2& anchor);
     void SetFrequencyHz(float frequencyHz);
     void SetDampingRatio(float dampingRatio);
+    void SetLength(float length);
 
     const Vector2& GetOwnerBodyAnchor() const;
     const Vector2& GetOtherBodyAnchor() const;
     float GetFrequencyHz() const;
     float GetDampingRatio() const;
+    float GetLength() const;
 
     tolua_property__get_set Vector2& ownerBodyAnchor;
     tolua_property__get_set Vector2& otherBodyAnchor;
     tolua_property__get_set float frequencyHz;
     tolua_property__get_set float dampingRatio;
+    tolua_property__get_set float length;
 };

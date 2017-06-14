@@ -279,7 +279,7 @@ UIElement@ CreateNumAttributeEditor(ListView@ list, Array<Serializable@>@ serial
     uint numCoords = 1;
     if (type == VAR_VECTOR2 || type == VAR_INTVECTOR2)
         numCoords = 2;
-    if (type == VAR_VECTOR3 || type == VAR_QUATERNION)
+    if (type == VAR_VECTOR3 || type == VAR_INTVECTOR3 || type == VAR_QUATERNION)
         numCoords = 3;
     else if (type == VAR_VECTOR4 || type == VAR_COLOR || type == VAR_INTRECT || type == VAR_RECT)
         numCoords = 4;
@@ -435,7 +435,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         parent = CreateStringAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_BOOL)
         parent = CreateBoolAttributeEditor(list, serializables, info, index, subIndex);
-    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTRECT || type == VAR_DOUBLE || type == VAR_RECT)
+    else if ((type >= VAR_FLOAT && type <= VAR_VECTOR4) || type == VAR_QUATERNION || type == VAR_COLOR || type == VAR_INTVECTOR2 || type == VAR_INTVECTOR3 || type == VAR_INTRECT || type == VAR_DOUBLE || type == VAR_RECT)
         parent = CreateNumAttributeEditor(list, serializables, info, index, subIndex);
     else if (type == VAR_INT)
         parent = CreateIntAttributeEditor(list, serializables, info, index, subIndex);
@@ -524,11 +524,13 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
         for (uint i = 0; i < keys.length; ++i)
         {
             String varName = GetVarName(keys[i]);
+            bool shouldHide = false;
+
             if (varName.empty)
             {
-                // UIElements will contain internal vars, which do not have known mappings. Skip these
+                // UIElements will contain internal vars, which do not have known mappings. Hide these
                 if (cast<UIElement>(serializables[0]) !is null)
-                    continue;
+                    shouldHide = true;
                 // Else, for scene nodes, show as hexadecimal hashes if nothing else is available
                 varName = keys[i].ToString();
             }
@@ -544,7 +546,7 @@ UIElement@ CreateAttributeEditor(ListView@ list, Array<Serializable@>@ serializa
             {
                 parent.vars["Key"] = keys[i].value;
                 // If variable name is not registered (i.e. it is an editor internal variable) then hide it
-                if (varName.empty)
+                if (varName.empty || shouldHide)
                     parent.visible = false;
             }
         }
@@ -867,7 +869,7 @@ void SanitizeNumericalValue(VariantType type, String& value)
 {
     if ((type >= VAR_FLOAT && type <= VAR_COLOR) || type == VAR_RECT)
         value = String(value.ToFloat());
-    else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2)
+    else if (type == VAR_INT || type == VAR_INTRECT || type == VAR_INTVECTOR2 || type == VAR_INTVECTOR3)
         value = String(value.ToInt());
     else if (type == VAR_DOUBLE)
         value = String(value.ToDouble());

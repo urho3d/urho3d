@@ -24,6 +24,8 @@
 set (TARGET_NAME Civetweb)
 
 # Define preprocessor macros
+# Always disable Common Gateway Interface
+add_definitions (-DNO_CGI)
 if (WIN32)
     include (CheckStructHasMember)
     check_struct_has_member (struct\ timespec tv_sec time.h HAVE_STRUCT_TIMESPEC_TV_SEC)
@@ -34,10 +36,10 @@ if (WIN32)
             add_definitions (-D_TIMESPEC_DEFINED)
         endif ()
     endif ()
-elseif (APPLE)
-    if (CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.12 AND IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 10.0 AND APPLETVOS_DEPLOYMENT_TARGET VERSION_LESS 10.0)
-        add_definitions (-D_DARWIN_FEATURE_CLOCK_GETTIME=0)
-    else ()
+elseif (APPLE AND (NOT IOS OR IPHONEOS_DEPLOYMENT_TARGET STREQUAL "" OR NOT IPHONEOS_DEPLOYMENT_TARGET VERSION_LESS 10.0))    # We cheat a little bit here with a hard-coded check because iOS 10.3 SDK when targeting 9.3 has strong symbol for iPhoneOS archs but weak symbol for iPhoneSimulator archs
+    include (CheckLibraryExists)
+    check_library_exists (c clock_gettime "" FOUND_CLOCK_GETTIME_IN_C)
+    if (FOUND_CLOCK_GETTIME_IN_C)
         add_definitions (-DHAVE_CLOCK_GETTIME)
     endif ()
 endif ()

@@ -83,6 +83,8 @@ public:
     IntRect ReadIntRect();
     /// Read an IntVector2.
     IntVector2 ReadIntVector2();
+    /// Read an IntVector3.
+    IntVector3 ReadIntVector3();
     /// Read a Rect.
     Rect ReadRect();
     /// Read a Vector2.

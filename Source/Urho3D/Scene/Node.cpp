@@ -800,13 +800,8 @@ void Node::AddChild(Node* node, unsigned index)
     if (!node || node == this || node->parent_ == this)
         return;
     // Check for possible cyclic parent assignment
-    Node* parent = parent_;
-    while (parent)
-    {
-        if (parent == node)
-            return;
-        parent = parent->parent_;
-    }
+    if (IsChildOf(node))
+        return;
 
     // Keep a shared ptr to the node while transferring
     SharedPtr<Node> nodeShared(node);
@@ -1176,6 +1171,14 @@ void Node::RemoveListener(Component* component)
     }
 }
 
+Vector3 Node::GetSignedWorldScale() const
+{
+    if (dirty_)
+        UpdateWorldTransform();
+
+    return worldTransform_.SignedScale(worldRotation_.RotationMatrix());
+}
+
 Vector3 Node::LocalToWorld(const Vector3& position) const
 {
     return GetWorldTransform() * position;
@@ -1362,6 +1365,18 @@ bool Node::HasComponent(StringHash type) const
 bool Node::HasTag(const String& tag) const
 {
     return impl_->tags_.Contains(tag);
+}
+
+bool Node::IsChildOf(Node* node) const
+{
+    Node* parent = parent_;
+    while (parent)
+    {
+        if (parent == node)
+            return true;
+        parent = parent->parent_;
+    }
+    return false;
 }
 
 const Variant& Node::GetVar(StringHash key) const
@@ -1901,8 +1916,18 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             if (names[i].Front() != '#')
                 break;
 
-            unsigned index = ToUInt(names[i].Substring(1, names[i].Length() - 1));
-            node = node->GetChild(index);
+            String name = names[i].Substring(1, names[i].Length() - 1);
+            char s = name.Front();
+            if (s >= '0' && s <= '9')
+            {
+                unsigned index = ToUInt(name);
+                node = node->GetChild(index);
+            }
+            else
+            {
+                node = node->GetChild(name, true);
+            }
+
             if (!node)
             {
                 URHO3D_LOGERROR("Could not find node by name " + name);
@@ -2067,9 +2092,12 @@ void Node::UpdateWorldTransform() const
 
 void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
 {
-    // Send change event. Do not send when already being destroyed
-    Node* child = *i;
+    // Keep a shared pointer to the child about to be removed, to make sure the erase from container completes first. Otherwise
+    // it would be possible that other child nodes get removed as part of the node's components' cleanup, causing a re-entrant
+    // erase and a crash
+    SharedPtr<Node> child(*i);
 
+    // Send change event. Do not send when this node is already being destroyed
     if (Refs() > 0 && scene_)
     {
         using namespace NodeRemoved;

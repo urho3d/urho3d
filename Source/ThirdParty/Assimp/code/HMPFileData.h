@@ -37,9 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ----------------------------------------------------------------------
 */
-
-// Modified by Lasse Oorni for Urho3D
-
 //!
 //! @file Data structures for the 3D Game Studio Heightmap format (HMP)
 //!

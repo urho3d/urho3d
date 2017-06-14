@@ -18,6 +18,7 @@ class Serializer
     bool WriteDouble(double value);
     bool WriteIntRect(const IntRect& value);
     bool WriteIntVector2(const IntVector2& value);
+    bool WriteIntVector3(const IntVector3& value);
     bool WriteRect(const Rect& value);
     bool WriteVector2(const Vector2& value);
     bool WriteVector3(const Vector3& value);

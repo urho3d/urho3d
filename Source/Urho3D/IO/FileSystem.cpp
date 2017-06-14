@@ -72,7 +72,7 @@ extern "C"
 const char* SDL_Android_GetFilesDir();
 char** SDL_Android_GetFileList(const char* path, int* count);
 void SDL_Android_FreeFileList(char*** array, int* count);
-#elif IOS
+#elif defined(IOS) || defined(TVOS)
 const char* SDL_IOS_GetResourceDir();
 const char* SDL_IOS_GetDocumentsDir();
 #endif
@@ -85,12 +85,15 @@ namespace Urho3D
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-#if !defined(NO_POPEN) && !defined(MINI_URHO)
+#ifdef TVOS
+    return -1;
+#else
+#if !defined(__EMSCRIPTEN__) && !defined(MINI_URHO)
     if (!redirectToLog)
 #endif
         return system(commandLine.CString());
 
-#if !defined(NO_POPEN) && !defined(MINI_URHO)
+#if !defined(__EMSCRIPTEN__) && !defined(MINI_URHO)
     // Get a platform-agnostic temporary file name for stderr redirection
     String stderrFilename;
     String adjustedCommandLine(commandLine);
@@ -135,10 +138,14 @@ int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* cont
 
     return exitCode;
 #endif
+#endif
 }
 
 int DoSystemRun(const String& fileName, const Vector<String>& arguments)
 {
+#ifdef TVOS
+    return -1;
+#else
     String fixedFileName = GetNativePath(fileName);
 
 #ifdef _WIN32
@@ -188,6 +195,7 @@ int DoSystemRun(const String& fileName, const Vector<String>& arguments)
     }
     else
         return -1;
+#endif
 #endif
 }
 
@@ -686,57 +694,40 @@ void FileSystem::ScanDir(Vector<String>& result, const String& pathName, const S
 
 String FileSystem::GetProgramDir() const
 {
-    // Return cached value if possible
-    if (!programDir_.Empty())
-        return programDir_;
-
 #if defined(__ANDROID__)
     // This is an internal directory specifier pointing to the assets in the .apk
     // Files from this directory will be opened using special handling
-    programDir_ = APK;
-    return programDir_;
-#elif defined(IOS)
-    programDir_ = AddTrailingSlash(SDL_IOS_GetResourceDir());
-    return programDir_;
+    return APK;
+#elif defined(IOS) || defined(TVOS)
+    return AddTrailingSlash(SDL_IOS_GetResourceDir());
 #elif defined(_WIN32)
     wchar_t exeName[MAX_PATH];
     exeName[0] = 0;
     GetModuleFileNameW(0, exeName, MAX_PATH);
-    programDir_ = GetPath(String(exeName));
+    return GetPath(String(exeName));
 #elif defined(__APPLE__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     unsigned size = MAX_PATH;
     _NSGetExecutablePath(exeName, &size);
-    programDir_ = GetPath(String(exeName));
+    return GetPath(String(exeName));
 #elif defined(__linux__)
     char exeName[MAX_PATH];
     memset(exeName, 0, MAX_PATH);
     pid_t pid = getpid();
     String link = "/proc/" + String(pid) + "/exe";
     readlink(link.CString(), exeName, MAX_PATH);
-    programDir_ = GetPath(String(exeName));
+    return GetPath(String(exeName));
+#else
+    return GetCurrentDir();
 #endif
-
-    // If the executable directory does not contain CoreData & Data directories, but the current working directory does, use the
-    // current working directory instead
-    /// \todo Should not rely on such fixed convention
-    String currentDir = GetCurrentDir();
-    if (!DirExists(programDir_ + "CoreData") && !DirExists(programDir_ + "Data") &&
-        (DirExists(currentDir + "CoreData") || DirExists(currentDir + "Data")))
-        programDir_ = currentDir;
-
-    // Sanitate /./ construct away
-    programDir_.Replace("/./", "/");
-
-    return programDir_;
 }
 
 String FileSystem::GetUserDocumentsDir() const
 {
 #if defined(__ANDROID__)
     return AddTrailingSlash(SDL_Android_GetFilesDir());
-#elif defined(IOS)
+#elif defined(IOS) || defined(TVOS)
     return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
 #elif defined(_WIN32)
     wchar_t pathName[MAX_PATH];

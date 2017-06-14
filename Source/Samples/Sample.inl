@@ -47,10 +47,10 @@ Sample::Sample(Context* context) :
     yaw_(0.0f),
     pitch_(0.0f),
     touchEnabled_(false),
+    useMouseMode_(MM_ABSOLUTE),
     screenJoystickIndex_(M_MAX_UNSIGNED),
     screenJoystickSettingsIndex_(M_MAX_UNSIGNED),
-    paused_(false),
-    useMouseMode_(MM_ABSOLUTE)
+    paused_(false)
 {
 }
 

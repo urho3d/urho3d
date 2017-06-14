@@ -16,6 +16,15 @@ class Resource
     tolua_readonly tolua_property__get_set unsigned memoryUse;
 };
 
+class ResourceWithMetadata : public Resource
+{
+    void AddMetadata(const String& name, const Variant& value);
+    void RemoveMetadata(const String& name);
+    void RemoveAllMetadata();
+    const Variant& GetMetadata(const String& name) const;
+    bool HasMetadata() const;
+}
+
 ${
 static bool ResourceLoad(Resource* resource, const String& fileName)
 {

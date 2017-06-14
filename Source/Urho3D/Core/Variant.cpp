@@ -65,6 +65,8 @@ static const char* typeNames[] =
     "Double",
     "StringVector",
     "Rect",
+    "IntVector3",
+    "Int64",
     0
 };
 
@@ -145,6 +147,9 @@ bool Variant::operator ==(const Variant& rhs) const
     case VAR_INT:
         return value_.int_ == rhs.value_.int_;
 
+    case VAR_INT64:
+        return *reinterpret_cast<const long long*>(&value_.int_) == *reinterpret_cast<const long long*>(&rhs.value_.int_);
+
     case VAR_BOOL:
         return value_.bool_ == rhs.value_.bool_;
 
@@ -190,6 +195,9 @@ bool Variant::operator ==(const Variant& rhs) const
 
     case VAR_INTVECTOR2:
         return *(reinterpret_cast<const IntVector2*>(&value_)) == *(reinterpret_cast<const IntVector2*>(&rhs.value_));
+
+    case VAR_INTVECTOR3:
+        return *(reinterpret_cast<const IntVector3*>(&value_)) == *(reinterpret_cast<const IntVector3*>(&rhs.value_));
 
     case VAR_MATRIX3:
         return *(reinterpret_cast<const Matrix3*>(value_.ptr_)) == *(reinterpret_cast<const Matrix3*>(rhs.value_.ptr_));
@@ -249,6 +257,10 @@ void Variant::FromString(VariantType type, const char* value)
     {
     case VAR_INT:
         *this = ToInt(value);
+        break;
+
+    case VAR_INT64:
+        *this = ToInt64(value);
         break;
 
     case VAR_BOOL:
@@ -332,6 +344,10 @@ void Variant::FromString(VariantType type, const char* value)
         *this = ToIntVector2(value);
         break;
 
+    case VAR_INTVECTOR3:
+        *this = ToIntVector3(value);
+        break;
+
     case VAR_PTR:
         // From string to RefCounted pointer not supported, set to null
         *this = (RefCounted*)0;
@@ -391,6 +407,9 @@ String Variant::ToString() const
     case VAR_INT:
         return String(value_.int_);
 
+    case VAR_INT64:
+        return String(*reinterpret_cast<const long long*>(&value_.int_));
+
     case VAR_BOOL:
         return String(value_.bool_);
 
@@ -434,6 +453,9 @@ String Variant::ToString() const
     case VAR_INTVECTOR2:
         return (reinterpret_cast<const IntVector2*>(&value_))->ToString();
 
+    case VAR_INTVECTOR3:
+        return (reinterpret_cast<const IntVector3*>(&value_))->ToString();
+
     case VAR_MATRIX3:
         return (reinterpret_cast<const Matrix3*>(value_.ptr_))->ToString();
 
@@ -463,6 +485,9 @@ bool Variant::IsZero() const
     {
     case VAR_INT:
         return value_.int_ == 0;
+
+    case VAR_INT64:
+        return *reinterpret_cast<const long long*>(&value_.int_) == 0;
 
     case VAR_BOOL:
         return value_.bool_ == false;
@@ -523,6 +548,9 @@ bool Variant::IsZero() const
 
     case VAR_INTVECTOR2:
         return *reinterpret_cast<const IntVector2*>(&value_) == IntVector2::ZERO;
+
+    case VAR_INTVECTOR3:
+        return *reinterpret_cast<const IntVector3*>(&value_) == IntVector3::ZERO;
 
     case VAR_PTR:
         return *reinterpret_cast<const WeakPtr<RefCounted>*>(&value_) == (RefCounted*)0;
@@ -665,6 +693,16 @@ template <> unsigned Variant::Get<unsigned>() const
     return GetUInt();
 }
 
+template <> long long Variant::Get<long long>() const
+{
+    return GetInt64();
+}
+
+template <> unsigned long long Variant::Get<unsigned long long>() const
+{
+    return GetUInt64();
+}
+
 template <> StringHash Variant::Get<StringHash>() const
 {
     return GetStringHash();
@@ -728,6 +766,11 @@ template <> const IntRect& Variant::Get<const IntRect&>() const
 template <> const IntVector2& Variant::Get<const IntVector2&>() const
 {
     return GetIntVector2();
+}
+
+template <> const IntVector3& Variant::Get<const IntVector3&>() const
+{
+    return GetIntVector3();
 }
 
 template <> const PODVector<unsigned char>& Variant::Get<const PODVector<unsigned char>&>() const
@@ -828,6 +871,11 @@ template <> IntRect Variant::Get<IntRect>() const
 template <> IntVector2 Variant::Get<IntVector2>() const
 {
     return GetIntVector2();
+}
+
+template <> IntVector3 Variant::Get<IntVector3>() const
+{
+    return GetIntVector3();
 }
 
 template <> PODVector<unsigned char> Variant::Get<PODVector<unsigned char> >() const

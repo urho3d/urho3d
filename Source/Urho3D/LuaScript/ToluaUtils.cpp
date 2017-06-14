@@ -198,6 +198,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                 variant = (int)value;
                 break;
 
+            case VAR_INT64:
+                variant = (long long)value;
+                break;
+
             case VAR_BOOL:
                 variant = value != 0.0f;
                 break;
@@ -271,6 +275,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                     variant = *static_cast<IntVector2*>(value);
                     break;
 
+                case VAR_INTVECTOR3:
+                    variant = *static_cast<IntVector3*>(value);
+                    break;
+
                 case VAR_MATRIX3:
                     variant = *static_cast<Matrix3*>(value);
                     break;
@@ -335,6 +343,13 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
             tolua_pushnumber(L, (lua_Number)variant->GetInt());
         break;
 
+    case VAR_INT64:
+        if (typeName == "unsigned" || typeName == "unsigned int" || typeName == "UInt" || typeName == "uint")
+            tolua_pushnumber(L, (lua_Number)variant->GetUInt64());
+        else
+            tolua_pushnumber(L, (lua_Number)variant->GetInt64());
+        break;
+
     case VAR_BOOL:
         tolua_pushboolean(L, (int)variant->GetBool());
         break;
@@ -357,6 +372,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
     case VAR_VARIANTMAP:
     case VAR_INTRECT:
     case VAR_INTVECTOR2:
+    case VAR_INTVECTOR3:
         tolua_pushusertype(L, (void*)variant->Get<const VariantValue*>(), variant->GetTypeName().CString());
         break;
 

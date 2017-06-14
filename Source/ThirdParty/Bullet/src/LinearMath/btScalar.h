@@ -18,6 +18,7 @@ subject to the following restrictions:
 #ifndef BT_SCALAR_H
 #define BT_SCALAR_H
 
+
 #ifdef BT_MANAGED_CODE
 //Aligned data types not supported in managed code
 #pragma unmanaged
@@ -29,7 +30,7 @@ subject to the following restrictions:
 #include <float.h>
 
 /* SVN $Revision$ on $Date$ from http://bullet.googlecode.com*/
-#define BT_BULLET_VERSION 284
+#define BT_BULLET_VERSION 286
 
 inline int	btGetVersion()
 {
@@ -44,7 +45,7 @@ inline int	btGetVersion()
 // Urho3D - enable BT_USE_SSE for MinGW
 #if defined(_WIN32) && !defined(__MINGW32__)
 
-		#if defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
+		#if defined(__MINGW32__) || defined(__CYGWIN__) || (defined (_MSC_VER) && _MSC_VER < 1300)
 
 			#define SIMD_FORCE_INLINE inline
 			#define ATTRIBUTE_ALIGNED16(a) a
@@ -59,7 +60,7 @@ inline int	btGetVersion()
 			//#define BT_HAS_ALIGNED_ALLOCATOR
 			#pragma warning(disable : 4324) // disable padding warning
 //			#pragma warning(disable:4530) // Disable the exception disable but used in MSCV Stl warning.
-//			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
+			#pragma warning(disable:4996) //Turn off warnings about deprecated C routines
 //			#pragma warning(disable:4786) // Disable the "debug name too long" warning
 
 			#define SIMD_FORCE_INLINE __forceinline
@@ -108,7 +109,7 @@ inline int	btGetVersion()
 #ifdef BT_DEBUG
 	#ifdef _MSC_VER
 		#include <stdio.h>
-		#define btAssert(x) { if(!(x)){printf("Assert "__FILE__ ":%u ("#x")\n", __LINE__);__debugbreak();	}}
+		#define btAssert(x) { if(!(x)){printf("Assert "__FILE__ ":%u (%s)\n", __LINE__, #x);__debugbreak();	}}
 	#else//_MSC_VER
 		#include <assert.h>
 		#define btAssert assert
@@ -183,6 +184,7 @@ inline int	btGetVersion()
 		#define BT_USE_SIMD_VECTOR3
 		#define BT_USE_SSE
 		//BT_USE_SSE_IN_API is enabled on Mac OSX by default, because memory is automatically aligned on 16-byte boundaries
+		//if apps run into issues, we will disable the next line
 		#define BT_USE_SSE_IN_API
         #ifdef BT_USE_SSE
             // include appropriate SSE level
@@ -197,12 +199,14 @@ inline int	btGetVersion()
             #endif
         #endif //BT_USE_SSE
     #elif defined( __ARM_NEON__ )
+        #ifdef __clang__
             #define BT_USE_NEON 1
 			#define BT_USE_SIMD_VECTOR3
 		
-            #ifdef BT_USE_NEON
+            #if defined BT_USE_NEON && defined (__clang__)
                 #include <arm_neon.h>
             #endif//BT_USE_NEON
+       #endif //__clang__
     #endif//__arm__
 
 	#define SIMD_FORCE_INLINE inline __attribute__ ((always_inline))
@@ -261,7 +265,7 @@ inline int	btGetVersion()
 		#define btFullAssert(x)
 		#define btLikely(_c)  _c
 		#define btUnlikely(_c) _c
-#endif
+#endif //__APPLE__ 
 
 #endif // LIBSPE2
 
