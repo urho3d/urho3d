@@ -158,7 +158,20 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     }
 
     // Load each of the glyphs to see the sizes & store other information
-    loadMode_ = (int)(ui->GetForceAutoHint() ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_DEFAULT);
+    loadMode_ = FT_LOAD_DEFAULT;
+    if (ui->GetForceAutoHint())
+    {
+        loadMode_ |= FT_LOAD_FORCE_AUTOHINT;
+    }
+    if (ui->GetFontHintLevel() == FONT_HINT_LEVEL_NONE)
+    {
+        loadMode_ |= FT_LOAD_NO_HINTING;
+    }
+    if (ui->GetFontHintLevel() == FONT_HINT_LEVEL_LIGHT)
+    {
+        loadMode_ |= FT_LOAD_TARGET_LIGHT;
+    }
+
     ascender_ = RoundToPixels(face->size->metrics.ascender);
     rowHeight_ = RoundToPixels(face->size->metrics.height);
     pointSize_ = pointSize;

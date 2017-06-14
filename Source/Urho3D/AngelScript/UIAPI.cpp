@@ -732,6 +732,11 @@ static CScriptArray* UIGetDragElements(UI* ptr)
 
 static void RegisterUI(asIScriptEngine* engine)
 {
+    engine->RegisterEnum("FontHintLevel");
+    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_NONE", FONT_HINT_LEVEL_NONE);
+    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_LIGHT", FONT_HINT_LEVEL_LIGHT);
+    engine->RegisterEnumValue("FontHintLevel", "FONT_HINT_LEVEL_NORMAL", FONT_HINT_LEVEL_NORMAL);
+
     RegisterObject<UI>(engine, "UI");
     engine->RegisterObjectMethod("UI", "void Clear()", asMETHOD(UI, Clear), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void DebugDraw(UIElement@+)", asMETHOD(UI, DebugDraw), asCALL_THISCALL);
@@ -782,6 +787,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_useMutableGlyphs() const", asMETHOD(UI, GetUseMutableGlyphs), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_forceAutoHint(bool)", asMETHOD(UI, SetForceAutoHint), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontHintLevel(FontHintLevel)", asMETHOD(UI, SetFontHintLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "FontHintLevel get_fontHintLevel() const", asMETHOD(UI, GetFontHintLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_scale(float value)", asMETHOD(UI, SetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHOD(UI, GetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);

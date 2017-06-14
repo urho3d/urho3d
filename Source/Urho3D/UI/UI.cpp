@@ -106,6 +106,7 @@ UI::UI(Context* context) :
 #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
+    fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -601,6 +602,15 @@ void UI::SetForceAutoHint(bool enable)
     if (enable != forceAutoHint_)
     {
         forceAutoHint_ = enable;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontHintLevel(FontHintLevel level)
+{
+    if (level != fontHintLevel_)
+    {
+        fontHintLevel_ = level;
         ReleaseFontFaces();
     }
 }
