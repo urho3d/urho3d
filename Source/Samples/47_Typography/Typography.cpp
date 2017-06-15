@@ -116,7 +116,7 @@ void Typography::CreateText()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Font* font = cache->GetResource<Font>("Fonts/BlueHighway.ttf");
 
-    for (int size = 1; size <= 24; ++size)
+    for (float size = 1; size <= 18; size += 0.5)
     {
         SharedPtr<Text> text(new Text(context_));
         text->SetText(String("The quick brown fox jumps over the lazy dog (") + String(size) + String("pt)"));

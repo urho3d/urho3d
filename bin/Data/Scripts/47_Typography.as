@@ -70,7 +70,7 @@ void CreateText()
     
     Font@ font = cache.GetResource("Font", "Fonts/BlueHighway.ttf");
     
-    for (int size = 1; size <= 24; ++size)
+    for (float size = 1; size <= 18; size += 0.5)
     {
         Text@ text = Text();
         text.text = "The quick brown fox jumps over the lazy dog (" + size + "pt)";

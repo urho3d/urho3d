@@ -48,7 +48,7 @@ FontFaceBitmap::~FontFaceBitmap()
 {
 }
 
-bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
+bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize)
 {
     Context* context = font_->GetContext();
 

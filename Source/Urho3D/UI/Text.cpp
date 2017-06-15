@@ -86,7 +86,7 @@ void Text::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(UIElement);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Use Derived Opacity", false);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_FILE);
-    URHO3D_ATTRIBUTE("Font Size", int, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
+    URHO3D_ATTRIBUTE("Font Size", float, fontSize_, DEFAULT_FONT_SIZE, AM_FILE);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_FILE);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", textAlignment_, horizontalAlignments, HA_LEFT, AM_FILE);
     URHO3D_ATTRIBUTE("Row Spacing", float, rowSpacing_, 1.0f, AM_FILE);
@@ -273,7 +273,7 @@ bool Text::SetFont(const String& fontName, int size)
     return SetFont(cache->GetResource<Font>(fontName), size);
 }
 
-bool Text::SetFont(Font* font, int size)
+bool Text::SetFont(Font* font, float size)
 {
     if (!font)
     {
@@ -291,7 +291,7 @@ bool Text::SetFont(Font* font, int size)
     return true;
 }
 
-bool Text::SetFontSize(int size)
+bool Text::SetFontSize(float size)
 {
     // Initial font must be set
     if (!font_)

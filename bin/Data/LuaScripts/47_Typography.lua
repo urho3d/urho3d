@@ -68,7 +68,7 @@ function CreateText()
 
     local font = cache:GetResource("Font", "Fonts/BlueHighway.ttf")
 
-    for size = 1, 24 do
+    for size = 1, 18, 0.5 do
         local text = Text:new()
         text.text = "The quick brown fox jumps over the lazy dog (" .. size .. "pt)"
         text:SetFont(font, size)

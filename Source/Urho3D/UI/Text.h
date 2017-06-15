@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-static const int DEFAULT_FONT_SIZE = 12;
+static const float DEFAULT_FONT_SIZE = 12;
 
 class Font;
 class FontFace;
@@ -96,9 +96,9 @@ public:
     /// Set font by looking from resource cache by name and font size. Return true if successful.
     bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
-    bool SetFontSize(int size);
+    bool SetFontSize(float size);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
     void SetText(const String& text);
     /// Set row alignment.
@@ -132,7 +132,7 @@ public:
     Font* GetFont() const { return font_; }
 
     /// Return font size.
-    int GetFontSize() const { return fontSize_; }
+    float GetFontSize() const { return fontSize_; }
 
     /// Return text.
     const String& GetText() const { return text_; }
@@ -228,7 +228,7 @@ protected:
     /// Current face.
     WeakPtr<FontFace> fontFace_;
     /// Font size.
-    int fontSize_;
+    float fontSize_;
     /// UTF-8 encoded text.
     String text_;
     /// Row alignment.

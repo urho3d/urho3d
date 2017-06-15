@@ -71,7 +71,7 @@ public:
     ~FontFace();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize) = 0;
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
 
@@ -84,7 +84,7 @@ public:
     bool IsDataLost() const;
 
     /// Return point size.
-    int GetPointSize() const { return pointSize_; }
+    float GetPointSize() const { return pointSize_; }
 
     /// Return row height.
     int GetRowHeight() const { return rowHeight_; }
@@ -108,7 +108,7 @@ protected:
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
-    int pointSize_;
+    float pointSize_;
     /// Row height.
     int rowHeight_;
 };

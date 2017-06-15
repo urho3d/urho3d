@@ -40,7 +40,7 @@ public:
     ~FontFaceFreeType();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
 
