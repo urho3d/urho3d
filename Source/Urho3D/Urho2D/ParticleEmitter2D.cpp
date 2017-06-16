@@ -49,7 +49,8 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     emissionTime_(0.0f),
     emitParticleTime_(0.0f),
     boundingBoxMinPoint_(Vector3::ZERO),
-    boundingBoxMaxPoint_(Vector3::ZERO)
+    boundingBoxMaxPoint_(Vector3::ZERO),
+    emitting_(true)
 {
     sourceBatches_.Resize(1);
     sourceBatches_[0].owner_ = this;
@@ -70,6 +71,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Is Emitting", bool, emitting_, true, AM_FILE);
 }
 
 void ParticleEmitter2D::OnSetEnabled()
@@ -163,6 +165,15 @@ void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
     Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
     if (sprite)
         SetSprite(sprite);
+}
+
+void ParticleEmitter2D::SetEmitting(bool enable)
+{
+    if (enable != emitting_)
+    {
+        emitting_ = enable;
+        emitParticleTime_ = 0.0f;
+    }
 }
 
 ResourceRef ParticleEmitter2D::GetSpriteAttr() const
@@ -325,23 +336,26 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emissionTime_ > 0.0f)
+    if (emitting_)
     {
-        float worldAngle = GetNode()->GetWorldRotation().RollAngle();
-
-        float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
-        emitParticleTime_ += timeStep;
-
-        while (emitParticleTime_ > 0.0f)
-        {
-            if (EmitParticle(worldPosition, worldAngle, worldScale))
-                UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
-
-            emitParticleTime_ -= timeBetweenParticles;
-        }
-
         if (emissionTime_ > 0.0f)
-            emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
+        {
+            float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+
+            float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
+            emitParticleTime_ += timeStep;
+
+            while (emitParticleTime_ > 0.0f)
+            {
+                if (EmitParticle(worldPosition, worldAngle, worldScale))
+                    UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
+
+                emitParticleTime_ -= timeBetweenParticles;
+            }
+
+            if (emissionTime_ > 0.0f)
+                emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
+        }
     }
 
     sourceBatchesDirty_ = true;
