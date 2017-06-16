@@ -1,40 +1,71 @@
 #include "BRDF.hlsl"
 #ifdef COMPILEPS
 
-    
-
-    float3 SphereLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
+    float3 GetSpecularDominantDir(float3 normal, float3 reflection, float roughness)
     {
-        float3 pos   = (cLightPosPS.xyz - worldPos);
-        float radius = cLightRad;
+        const float smoothness = 1.0 - roughness;
+        const float lerpFactor = smoothness * (sqrt(smoothness) + roughness);
+        return lerp(normal, reflection, lerpFactor);
+    }
 
-        float3 reflectVec   = reflect(-toCamera, normal);
-        float3 centreToRay  = dot(pos, reflectVec) * reflectVec - pos;
-        float3 closestPoint = pos + centreToRay * saturate(radius / length(centreToRay));
+    float3 SphereLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, float3 diffColor, out float ndl)
+    {
+        float specEnergy = 1.0f;
 
-        float3 l = normalize(closestPoint);
-        float3 h = normalize(toCamera + l);
+        float radius = cLightRad / 100;
+        float rough2 = max(roughness, 0.08);
+        rough2 *= rough2;
 
-        ndl       = saturate(dot(normal, l));
+        float radius2           = radius * radius;
+        float distToLightSqrd   = dot(lightVec,lightVec);
+        float invDistToLight    = rsqrt(distToLightSqrd);
+        float sinAlphaSqr       = saturate(radius2 / distToLightSqrd);
+        float sinAlpha          = sqrt(sinAlphaSqr);
+
+        ndl       = dot(normal, (lightVec * invDistToLight));
+
+        if(ndl < sinAlpha)
+        {
+            ndl = max(ndl, -sinAlpha);
+            ndl = ((sinAlpha + ndl) * (sinAlpha + ndl)) / (4 * sinAlpha);
+        }
+
+        float sphereAngle = saturate(radius * invDistToLight);
+                            
+        specEnergy = rough2 / (rough2 + 0.5f * sphereAngle);
+        specEnergy *= specEnergy;                           
+
+        float3 R = 2 * dot(toCamera, normal) * normal - toCamera;
+        R = GetSpecularDominantDir(normal, R, roughness);
+
+        // Find closest point on sphere to ray
+        float3 closestPointOnRay = dot(lightVec, R) * R;
+        float3 centerToRay = closestPointOnRay - lightVec;
+        float invDistToRay = rsqrt(dot(centerToRay, centerToRay));
+        float3 closestPointOnSphere = lightVec + centerToRay * saturate(radius * invDistToRay);
+
+        lightVec = closestPointOnSphere;
+        float3 L = normalize(lightVec);
+
+        float3 h = normalize(toCamera + L);
         float hdn = saturate(dot(h, normal));
         float hdv = dot(h, toCamera);
         float ndv = saturate(dot(normal, toCamera));
+        float hdl = saturate(dot(h, lightVec));
 
-        float distL      = length(pos);
-        float alpha      = roughness * roughness;
-        float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
+        const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
+        const float3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
+        const float distTerm = Distribution(hdn, roughness);
+        const float visTerm = Visibility(ndl, ndv, roughness);
+        float3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
+        return diffuseFactor + specularFactor;
 
-        const float3 fresnelTerm = Fresnel(specColor, hdv) ;
-        const float distTerm     = Distribution(hdn, alphaPrime);
-        const float visTerm      = Visibility(ndl, ndv, roughness);
-
-        return distTerm * visTerm * fresnelTerm ;
     }
 
-    float3 TubeLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, out float ndl)
+    float3 TubeLight(float3 worldPos, float3 lightVec, float3 normal, float3 toCamera, float roughness, float3 specColor, float3 diffColor, out float ndl)
     {
-         float radius      = cLightRad;
-         float len         = cLightLength; 
+        float radius      = cLightRad / 100;
+        float len         = cLightLength / 10; 
         float3 pos         = (cLightPosPS.xyz - worldPos);
         float3 reflectVec  = reflect(-toCamera, normal);
         
@@ -66,16 +97,18 @@
         float hdn = saturate(dot(h, normal));
         float hdv = dot(h, toCamera);
         float ndv = saturate(dot(normal, toCamera));
+        float hdl = saturate(dot(h, lightVec));
 
         float distL      = length(closestPoint);
-        float alpha      = roughness * roughness;
+        float alpha      = max(roughness, 0.08) * max(roughness, 0.08);
         float alphaPrime = saturate(radius / (distL * 2.0) + alpha);
 
-        const float3 fresnelTerm = Fresnel(specColor, hdv) ;
-        const float distTerm     = Distribution(hdn, alphaPrime);
-        const float visTerm      = Visibility(ndl, ndv, roughness);
-
-        return distTerm * visTerm * fresnelTerm ;
+       const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, hdv)  * ndl;
+       const float3 fresnelTerm = Fresnel(specColor, hdv, hdl) ;
+       const float distTerm = Distribution(hdn, roughness);
+       const float visTerm = Visibility(ndl, ndv, roughness);
+       float3 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
+       return diffuseFactor + specularFactor;
     }
 
 	//Return the PBR BRDF value
@@ -94,6 +127,7 @@
         const float ndh = clamp((dot(normal, Hn)), M_EPSILON, 1.0);
         float ndl = clamp((dot(normal, lightVec)), M_EPSILON, 1.0);
         const float ndv = clamp((dot(normal, toCamera)), M_EPSILON, 1.0);
+        const float ldh = clamp((dot(lightVec, Hn)), M_EPSILON, 1.0);
 
         const float3 diffuseFactor = Diffuse(diffColor, roughness, ndv, ndl, vdh)  * ndl;
         float3 specularFactor = 0;
@@ -103,21 +137,21 @@
             {
                 if(cLightLength > 0.0)
                 {
-                    specularFactor = TubeLight(worldPos, lightVec, normal, toCamera, roughness, specColor, ndl);
-                    specularFactor *= ndl;
+                    return TubeLight(worldPos, lightVec, normal, toCamera, roughness, specColor, diffColor, ndl);
+                    
                 }
                 else
                 {
-                    specularFactor = SphereLight(worldPos, lightVec, normal, toCamera, roughness, specColor, ndl);
-                    specularFactor *= ndl;
+                    return SphereLight(worldPos, lightVec, normal, toCamera, roughness, specColor, diffColor, ndl);
                 }
             }
             else
             {
-                const float3 fresnelTerm = Fresnel(specColor, vdh) ;
+                const float3 fresnelTerm = Fresnel(specColor, vdh, ldh) ;
                 const float distTerm = Distribution(ndh, roughness);
                 const float visTerm = Visibility(ndl, ndv, roughness);
                 specularFactor = distTerm * visTerm * fresnelTerm * ndl/ M_PI;
+                return diffuseFactor + specularFactor;
             }
 
         #endif
