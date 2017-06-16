@@ -199,7 +199,7 @@ static void RegisterParticleEmitter2D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ParticleEmitter2D", "void set_blendMode(BlendMode)", asMETHOD(ParticleEmitter2D, SetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "BlendMode get_blendMode() const", asMETHOD(ParticleEmitter2D, GetBlendMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ParticleEmitter2D", "void set_emitting(bool)", asMETHOD(ParticleEmitter2D, SetEmitting), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ParticleEmitter2D", "bool is_emitting() const", asMETHOD(ParticleEmitter2D, IsEmitting), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ParticleEmitter2D", "bool get_emitting() const", asMETHOD(ParticleEmitter2D, IsEmitting), asCALL_THISCALL);
 }
 
 static void FakeAddRef(void* ptr)
