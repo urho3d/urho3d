@@ -336,26 +336,23 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emitting_)
+    if (emitting_ && emissionTime_ > 0.0f)
     {
-        if (emissionTime_ > 0.0f)
+        float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+
+        float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
+        emitParticleTime_ += timeStep;
+
+        while (emitParticleTime_ > 0.0f)
         {
-            float worldAngle = GetNode()->GetWorldRotation().RollAngle();
+            if (EmitParticle(worldPosition, worldAngle, worldScale))
+                UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
 
-            float timeBetweenParticles = effect_->GetParticleLifeSpan() / particles_.Size();
-            emitParticleTime_ += timeStep;
-
-            while (emitParticleTime_ > 0.0f)
-            {
-                if (EmitParticle(worldPosition, worldAngle, worldScale))
-                    UpdateParticle(particles_[numParticles_ - 1], emitParticleTime_, worldPosition, worldScale);
-
-                emitParticleTime_ -= timeBetweenParticles;
-            }
-
-            if (emissionTime_ > 0.0f)
-                emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
+            emitParticleTime_ -= timeBetweenParticles;
         }
+
+        if (emissionTime_ > 0.0f)
+            emissionTime_ = Max(0.0f, emissionTime_ - timeStep);
     }
 
     sourceBatchesDirty_ = true;
