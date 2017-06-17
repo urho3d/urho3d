@@ -51,9 +51,11 @@ private:
     SharedPtr<UIElement> uielement_;
 
     void CreateText();
-    void CreateCheckbox(const String& label, EventHandler* handler);
+    SharedPtr<CheckBox> CreateCheckbox(const String& label, EventHandler* handler);
+    SharedPtr<DropDownList> CreateMenu(const String& label, const char** items, EventHandler* handler);
 
     void HandleWhiteBackground(StringHash eventType, VariantMap& eventData);
     void HandleSRGB(StringHash eventType, VariantMap& eventData);
     void HandleForceAutoHint(StringHash eventType, VariantMap& eventData);
+    void HandleFontHintLevel(StringHash eventType, VariantMap& eventData);
 };

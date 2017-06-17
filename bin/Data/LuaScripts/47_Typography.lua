@@ -34,16 +34,28 @@ function Start()
 
     -- Add a checkbox to toggle the background color.
     CreateCheckbox("White background", "HandleWhiteBackground")
+        :SetChecked(false)
 
     -- Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
     CreateCheckbox("UI::SetForceAutoHint", "HandleForceAutoHint")
+        :SetChecked(ui:GetForceAutoHint())
 
     -- Add a checkbox to toggle SRGB output conversion (if available).
     -- This will give more correct text output for FreeType fonts, as the FreeType rasterizer
     -- outputs linear coverage values rather than SRGB values. However, this feature isn't
     -- available on all platforms.
     CreateCheckbox("Graphics::SetSRGB", "HandleSRGB")
+        :SetChecked(graphics:GetSRGB())
 
+    -- Add a drop-down menu to control the font hinting level.
+    local items = {
+        "FONT_HINT_LEVEL_NONE",
+        "FONT_HINT_LEVEL_LIGHT",
+        "FONT_HINT_LEVEL_NORMAL"
+    }
+    CreateMenu("UI::SetFontHintLevel", items, "HandleFontHintLevel")
+        :SetSelection(ui:GetFontHintLevel())
+    
     -- Set the mouse mode to use in the sample
     SampleInitMouseMode(MM_FREE)
 end
@@ -82,6 +94,38 @@ function CreateCheckbox(label, handler)
     text:AddTag(TEXT_TAG)
 
     SubscribeToEvent(box, "Toggled", handler)
+    return box
+end
+
+function CreateMenu(label, items, handler)
+    local container = UIElement:new()
+    container:SetAlignment(HA_LEFT, VA_TOP)
+    container:SetLayout(LM_HORIZONTAL, 8)
+    uielement:AddChild(container)
+    
+    local text = Text:new()
+    container:AddChild(text)
+    text.text = label
+    text:SetStyleAuto()
+    text:AddTag(TEXT_TAG)
+
+    local list = DropDownList:new()
+    container:AddChild(list)
+    list:SetStyleAuto()
+    
+    for i, item in ipairs(items) do
+        local t = Text:new()
+        list:AddItem(t)
+        t.text = item
+        t:SetStyleAuto()
+        t:AddTag(TEXT_TAG) 
+    end
+
+    text:SetMaxWidth(text:GetRowWidth(0))
+    list:SetMaxWidth(text:GetRowWidth(0) * 1.5)
+    
+    SubscribeToEvent(list, "ItemSelected", handler)
+    return list
 end
 
 function HandleWhiteBackground(eventType, eventData)
@@ -115,6 +159,13 @@ function HandleSRGB(eventType, eventData)
     else
         log:Write(LOG_WARNING, "graphics:GetSRGBWriteSupport returned false")
     end
+end
+
+function HandleFontHintLevel(eventType, eventData)
+    local list = eventData["Element"]:GetPtr("DropDownList")
+    local i = list:GetSelection()
+
+    ui:SetFontHintLevel(i)
 end
 
 -- Create XML patch instructions for screen joystick layout specific to this sample app

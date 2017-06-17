@@ -26,6 +26,7 @@
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/UI/CheckBox.h>
+#include <Urho3D/UI/DropDownList.h>
 #include <Urho3D/UI/Font.h>
 #include <Urho3D/UI/Text.h>
 #include <Urho3D/UI/UI.h>
@@ -62,7 +63,8 @@ void Typography::Start()
     XMLFile* style = cache->GetResource<XMLFile>("UI/DefaultStyle.xml");
 
     // Set the loaded style as default style
-    UIElement* root = GetSubsystem<UI>()->GetRoot();
+    UI* ui = GetSubsystem<UI>();
+    UIElement* root = ui->GetRoot();
     root->SetDefaultStyle(style);
 
     // Create a UIElement to hold all our content
@@ -76,16 +78,29 @@ void Typography::Start()
     CreateText();
 
     // Add a checkbox to toggle the background color.
-    CreateCheckbox("White background", URHO3D_HANDLER(Typography, HandleWhiteBackground));
+    CreateCheckbox("White background", URHO3D_HANDLER(Typography, HandleWhiteBackground))
+        ->SetChecked(false);
 
     // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
-    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint));
+    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint))
+        ->SetChecked(ui->GetForceAutoHint());
 
     // Add a checkbox to toggle SRGB output conversion (if available).
     // This will give more correct text output for FreeType fonts, as the FreeType rasterizer
     // outputs linear coverage values rather than SRGB values. However, this feature isn't
     // available on all platforms.
-    CreateCheckbox("Graphics::SetSRGB", URHO3D_HANDLER(Typography, HandleSRGB));
+    CreateCheckbox("Graphics::SetSRGB", URHO3D_HANDLER(Typography, HandleSRGB))
+        ->SetChecked(GetSubsystem<Graphics>()->GetSRGB());
+
+    // Add a drop-down menu to control the font hinting level.
+    const char* items[] = {
+        "FONT_HINT_LEVEL_NONE",
+        "FONT_HINT_LEVEL_LIGHT",
+        "FONT_HINT_LEVEL_NORMAL",
+        NULL
+    };
+    CreateMenu("UI::SetFontHintLevel", items, URHO3D_HANDLER(Typography, HandleFontHintLevel))
+        ->SetSelection(ui->GetFontHintLevel());
 
     // Set the mouse mode to use in the sample
     Sample::InitMouseMode(MM_FREE);
@@ -111,7 +126,7 @@ void Typography::CreateText()
     }
 }
 
-void Typography::CreateCheckbox(const String& label, EventHandler* handler)
+SharedPtr<CheckBox> Typography::CreateCheckbox(const String& label, EventHandler* handler)
 {
     SharedPtr<UIElement> container(new UIElement(context_));
     container->SetAlignment(HA_LEFT, VA_TOP);
@@ -129,6 +144,40 @@ void Typography::CreateCheckbox(const String& label, EventHandler* handler)
     text->AddTag(TEXT_TAG);
 
     SubscribeToEvent(box, E_TOGGLED, handler);
+    return box;
+}
+
+SharedPtr<DropDownList> Typography::CreateMenu(const String& label, const char** items, EventHandler* handler)
+{
+    SharedPtr<UIElement> container(new UIElement(context_));
+    container->SetAlignment(HA_LEFT, VA_TOP);
+    container->SetLayout(LM_HORIZONTAL, 8);
+    uielement_->AddChild(container);
+
+    SharedPtr<Text> text(new Text(context_));
+    container->AddChild(text);
+    text->SetText(label);
+    text->SetStyleAuto();
+    text->AddTag(TEXT_TAG);
+
+    SharedPtr<DropDownList> list(new DropDownList(context_));
+    container->AddChild(list);
+    list->SetStyleAuto();
+
+    for (int i = 0; items[i]; ++i)
+    {
+        SharedPtr<Text> item(new Text(context_));
+        list->AddItem(item);
+        item->SetText(items[i]);
+        item->SetStyleAuto();
+        item->AddTag(TEXT_TAG);
+    }
+
+    text->SetMaxWidth(text->GetRowWidth(0));
+    list->SetMaxWidth(text->GetRowWidth(0) * 1.5);
+
+    SubscribeToEvent(list, E_ITEMSELECTED, handler);
+    return list;
 }
 
 void Typography::HandleWhiteBackground(StringHash eventType, VariantMap& eventData)
@@ -174,4 +223,12 @@ void Typography::HandleSRGB(StringHash eventType, VariantMap& eventData)
         // Note: PostProcess/GammaCorrection.xml implements SRGB conversion.
         // However, post-processing filters don't affect the UI layer.
     }
+}
+
+void Typography::HandleFontHintLevel(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    unsigned i = list->GetSelection();
+
+    GetSubsystem<UI>()->SetFontHintLevel((FontHintLevel)i);
 }

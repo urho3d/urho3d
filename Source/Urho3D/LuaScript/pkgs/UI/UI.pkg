@@ -1,5 +1,12 @@
 $#include "UI/UI.h"
 
+enum FontHintLevel
+{
+    FONT_HINT_LEVEL_NONE = 0,
+    FONT_HINT_LEVEL_LIGHT,
+    FONT_HINT_LEVEL_NORMAL,
+};
+
 class UI : public Object
 {
     void SetCursor(Cursor* cursor);
@@ -23,6 +30,7 @@ class UI : public Object
     void SetUseScreenKeyboard(bool enable);
     void SetUseMutableGlyphs(bool enable);
     void SetForceAutoHint(bool enable);
+    void SetFontHintLevel(FontHintLevel level);
     void SetScale(float scale);
     void SetWidth(float width);
     void SetHeight(float height);
@@ -50,6 +58,7 @@ class UI : public Object
     bool GetUseScreenKeyboard() const;
     bool GetUseMutableGlyphs() const;
     bool GetForceAutoHint() const;
+    FontHintLevel GetFontHintLevel() const;
     bool HasModalElement() const;
     bool IsDragging() const;
     float GetScale() const;
