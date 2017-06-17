@@ -78,15 +78,16 @@ protected:
     const int MAX_VERTEX_MEMORY;
     const int MAX_ELEMENT_MEMORY;
 
-    Urho3D::Graphics* graphics_;
+	Urho3D::SharedPtr<Urho3D::Graphics> graphics_;
 
     Nuklear::nk_context nk_ctx_;
     Nuklear::nk_font_atlas atlas_;
     Nuklear::nk_buffer commands_;
     Nuklear::nk_draw_null_texture null_texture_;
-    Urho3D::VertexBuffer* vertex_buffer_;
-    Urho3D::IndexBuffer* index_buffer_;
+	Urho3D::SharedPtr<Urho3D::VertexBuffer> vertex_buffer_;
+	Urho3D::SharedPtr<Urho3D::IndexBuffer> index_buffer_;
     Urho3D::Vector< Urho3D::SharedPtr< Urho3D::Texture2D > > font_textures_;
     float uiScale_;
     Nuklear::nk_convert_config config_;
+	Urho3D::SharedPtr<Urho3D::Texture2D> nullTex;
 };

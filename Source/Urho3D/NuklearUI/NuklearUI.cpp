@@ -52,6 +52,7 @@ NuklearUI::NuklearUI(Context* ctx)
     , MAX_ELEMENT_MEMORY(512 * 1024)
     , uiScale_(1.0f)
     , graphics_(GetSubsystem< Graphics >())
+	, nullTex(new Texture2D(graphics_->GetContext()))
 {
     nk_init_default(&nk_ctx_, 0);
     nk_ctx_.clip.copy = &ClipboardCopy;
@@ -61,7 +62,6 @@ NuklearUI::NuklearUI(Context* ctx)
     nk_buffer_init_default(&commands_);
     index_buffer_ = new IndexBuffer(graphics_->GetContext());
     vertex_buffer_ = new VertexBuffer(graphics_->GetContext());
-    Texture2D* nullTex = new Texture2D(graphics_->GetContext());
     nullTex->SetNumLevels(1);
     unsigned whiteOpaque = 0xffffffff;
     nullTex->SetSize(1, 1, Graphics::GetRGBAFormat());
