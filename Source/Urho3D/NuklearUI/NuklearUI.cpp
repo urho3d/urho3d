@@ -129,7 +129,7 @@ bool NuklearUI::SetFont(const Urho3D::String &fontFile, float fontSize)
         return false;
     }
 
-    unsigned fileLen = file->Seek(M_MAX_UNSIGNED);
+    unsigned fileLen = file->GetSize();
 
     if (fileLen == 0)
     {
