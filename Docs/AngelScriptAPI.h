@@ -8622,6 +8622,7 @@ bool castShadows;
 String category;
 float drawDistance;
 ParticleEffect2D effect;
+bool emitting;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -13907,6 +13908,7 @@ float doubleClickInterval;
 int dragBeginDistance;
 float dragBeginInterval;
 UIElement focusElement;
+FontHintLevel fontHintLevel;
 bool forceAutoHint;
 /* readonly */
 UIElement frontElement;
@@ -15545,6 +15547,13 @@ FM_NOTFOCUSABLE,
 FM_RESETFOCUS,
 FM_FOCUSABLE,
 FM_FOCUSABLE_DEFOCUSABLE,
+};
+
+enum FontHintLevel
+{
+FONT_HINT_LEVEL_NONE,
+FONT_HINT_LEVEL_LIGHT,
+FONT_HINT_LEVEL_NORMAL,
 };
 
 enum FontType

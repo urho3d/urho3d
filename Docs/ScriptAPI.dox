@@ -1854,6 +1854,7 @@ namespace Urho3D
 - %Particle %Effect : ResourceRef
 - %Sprite : ResourceRef
 - %Blend %Mode : int
+- %Is %Emitting : bool
 
 ### PhysicsWorld
 - %Gravity : Vector3
@@ -10224,6 +10225,7 @@ Properties:
 - String category // readonly
 - float drawDistance
 - ParticleEffect2D@ effect
+- bool emitting
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -14703,6 +14705,7 @@ Properties:
 - int dragBeginDistance
 - float dragBeginInterval
 - UIElement@ focusElement
+- FontHintLevel fontHintLevel
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
 - int maxFontTextureSize
@@ -16109,6 +16112,13 @@ Properties:
 - FM_RESETFOCUS
 - FM_FOCUSABLE
 - FM_FOCUSABLE_DEFOCUSABLE
+
+
+### FontHintLevel
+
+- FONT_HINT_LEVEL_NONE
+- FONT_HINT_LEVEL_LIGHT
+- FONT_HINT_LEVEL_NORMAL
 
 
 ### FontType

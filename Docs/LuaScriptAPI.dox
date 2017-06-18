@@ -4568,15 +4568,18 @@ Methods:
 - void SetEffect(ParticleEffect2D* effect)
 - void SetSprite(Sprite2D* sprite)
 - void SetBlendMode(BlendMode blendMode)
+- void SetEmitting(bool emitting)
 - ParticleEffect2D* GetEffect() const
 - Sprite2D* GetSprite() const
 - BlendMode GetBlendMode() const
+- bool IsEmitting() const
 
 Properties:
 
 - ParticleEffect2D* effect
 - Sprite2D* sprite
 - BlendMode blendMode
+- bool emitting
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
@@ -7023,6 +7026,7 @@ Methods:
 - void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
+- void SetFontHintLevel(FontHintLevel level)
 - void SetScale(float scale)
 - void SetWidth(float width)
 - void SetHeight(float height)
@@ -7048,6 +7052,7 @@ Methods:
 - bool GetUseScreenKeyboard() const
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
+- FontHintLevel GetFontHintLevel() const
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
@@ -8189,6 +8194,12 @@ Properties:
 - int FM_RESETFOCUS
 - int FM_FOCUSABLE
 - int FM_FOCUSABLE_DEFOCUSABLE
+
+### FontHintLevel
+
+- int FONT_HINT_LEVEL_NONE
+- int FONT_HINT_LEVEL_LIGHT
+- int FONT_HINT_LEVEL_NORMAL
 
 ### FontType
 
