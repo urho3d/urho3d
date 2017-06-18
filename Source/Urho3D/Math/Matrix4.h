@@ -96,7 +96,7 @@ public:
 #endif
     }
 
-    /// Copy-cnstruct from a 3x3 matrix and set the extra elements to identity.
+    /// Copy-construct from a 3x3 matrix and set the extra elements to identity.
     Matrix4(const Matrix3& matrix) :
         m00_(matrix.m00_),
         m01_(matrix.m01_),
@@ -557,7 +557,7 @@ public:
     /// Return the rotation part.
     Quaternion Rotation() const { return Quaternion(RotationMatrix()); }
 
-    /// Return the scaling part
+    /// Return the scaling part.
     Vector3 Scale() const
     {
         return Vector3(
@@ -567,7 +567,17 @@ public:
         );
     }
 
-    /// Return transpose
+    /// Return the scaling part with the sign. Reference rotation matrix is required to avoid ambiguity.
+    Vector3 SignedScale(const Matrix3& rotation) const
+    {
+        return Vector3(
+            rotation.m00_ * m00_ + rotation.m10_ * m10_ + rotation.m20_ * m20_,
+            rotation.m01_ * m01_ + rotation.m11_ * m11_ + rotation.m21_ * m21_,
+            rotation.m02_ * m02_ + rotation.m12_ * m12_ + rotation.m22_ * m22_
+        );
+    }
+
+    /// Return transposed.
     Matrix4 Transpose() const
     {
 #ifdef URHO3D_SSE
@@ -621,11 +631,21 @@ public:
 
     /// Return decomposition to translation, rotation and scale.
     void Decompose(Vector3& translation, Quaternion& rotation, Vector3& scale) const;
+
     /// Return inverse.
     Matrix4 Inverse() const;
 
-    /// Return float data
+    /// Return float data.
     const float* Data() const { return &m00_; }
+
+    /// Return matrix element.
+    float Element(unsigned i, unsigned j) const { return Data()[i * 4 + j]; }
+
+    /// Return matrix row.
+    Vector4 Row(unsigned i) const { return Vector4(Element(i, 0), Element(i, 1), Element(i, 2), Element(i, 3)); }
+
+    /// Return matrix column.
+    Vector4 Column(unsigned j) const { return Vector4(Element(0, j), Element(1, j), Element(2, j), Element(3, j)); }
 
     /// Return as string.
     String ToString() const;
@@ -691,7 +711,7 @@ public:
     static const Matrix4 IDENTITY;
 };
 
-/// Multiply a 4x4 matrix with a scalar
+/// Multiply a 4x4 matrix with a scalar.
 inline Matrix4 operator *(float lhs, const Matrix4& rhs) { return rhs * lhs; }
 
 }

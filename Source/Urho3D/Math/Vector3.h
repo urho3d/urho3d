@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Math/Vector2.h"
+#include "../Math/MathDefs.h"
 
 namespace Urho3D
 {
@@ -402,6 +403,17 @@ public:
 
     /// Return as string.
     String ToString() const;
+    
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const 
+    { 
+        unsigned hash = 37;
+        hash = 37 * hash + FloatToRawIntBits(x_);
+        hash = 37 * hash + FloatToRawIntBits(y_);
+        hash = 37 * hash + FloatToRawIntBits(z_);
+        
+        return hash;
+    }
 
     /// X coordinate.
     float x_;

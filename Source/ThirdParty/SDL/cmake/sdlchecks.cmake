@@ -763,7 +763,7 @@ endmacro()
 
 # Requires:
 # - nada
-# Urho3D - rename the macro to be generic OpenGLES check and make it also work for iOS platform
+# Urho3D - rename the macro to be generic OpenGLES check and make it also work for iOS/tvOS platform
 macro(CheckOpenGLES)
   if(VIDEO_OPENGLES)
     check_c_source_compiles("

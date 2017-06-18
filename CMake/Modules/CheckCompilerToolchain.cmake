@@ -169,7 +169,7 @@ else ()
     if (SIZEOF_POINTER EQUAL 8)
         set (NATIVE_64BIT 1)
     endif ()
-    # Android arm64 compiler only emits __aarch64__ while iOS arm64 emits __aarch64__, __arm64__, and __arm__; for armv7a all emit __arm__
+    # Android arm64 compiler only emits __aarch64__ while iOS/tvOS arm64 emits __aarch64__ and __arm64__; for armv7a all emit __arm__
     check_native_define ("__(arm|aarch64)__" ARM)
     # For completeness sake as currently we do not support MIPS and PowerPC (yet)
     check_native_define (__MIPSEL__ MIPS)

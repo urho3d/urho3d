@@ -56,7 +56,7 @@ static const char* filterModeNames[] =
 };
 
 Texture::Texture(Context* context) :
-    Resource(context),
+    ResourceWithMetadata(context),
     GPUObject(GetSubsystem<Graphics>()),
     shaderResourceView_(0),
     sampler_(0),
@@ -204,8 +204,8 @@ void Texture::SetParameters(XMLFile* file)
 
 void Texture::SetParameters(const XMLElement& element)
 {
-    XMLElement paramElem = element.GetChild();
-    while (paramElem)
+    LoadMetadataFromXML(element);
+    for (XMLElement paramElem = element.GetChild(); paramElem; paramElem = paramElem.GetNext())
     {
         String name = paramElem.GetName();
 
@@ -248,8 +248,6 @@ void Texture::SetParameters(const XMLElement& element)
 
         if (name == "srgb")
             SetSRGB(paramElem.GetBool("enable"));
-
-        paramElem = paramElem.GetNext();
     }
 }
 

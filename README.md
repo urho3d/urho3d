@@ -38,6 +38,7 @@ Urho3D development, contributions and bugfixes by:
 - Manuel Freiberger
 - Chris Friesen
 - Alex Fuller
+- Konstantin Guschin
 - Henrik Heino
 - Mika Heinonen
 - Victor Holt
@@ -55,11 +56,13 @@ Urho3D development, contributions and bugfixes by:
 - Ali Kämäräinen
 - Sergey Lapin
 - Pete Leigh
+- Pengfei Li
 - Arnis Lielturks
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
 - Xavier Maupeu
+- Iain Merrick
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
@@ -88,6 +91,7 @@ Urho3D development, contributions and bugfixes by:
 - Steven Zhang
 - AGreatFish
 - BlueMagnificent
+- CG-SS
 - Enhex
 - Fastran
 - Firegorilla
@@ -166,9 +170,9 @@ Urho3D uses the following third-party libraries:
 - AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
-- Bullet 2.83.6 (http://www.bulletphysics.org)
+- Bullet 2.86.1 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.7.1 (https://www.freetype.org)
+- FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)

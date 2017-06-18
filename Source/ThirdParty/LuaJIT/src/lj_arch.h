@@ -3,6 +3,8 @@
 ** Copyright (C) 2005-2016 Mike Pall. See Copyright Notice in luajit.h
 */
 
+// Modified by Yao Wei Tjong for Urho3D
+
 #ifndef _LJ_ARCH_H
 #define _LJ_ARCH_H
 
@@ -517,7 +519,8 @@
 #if defined(__symbian__) || LJ_TARGET_WINDOWS
 #define LUAJIT_NO_EXP2
 #endif
-#if LJ_TARGET_CONSOLE || (LJ_TARGET_IOS && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0)
+// Urho3D - tvOS port, system is not available for tvOS and also its simulator
+#if LJ_TARGET_CONSOLE || (LJ_TARGET_IOS && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0) || __TV_OS_VERSION_MIN_REQUIRED
 #define LJ_NO_SYSTEM		1
 #endif
 

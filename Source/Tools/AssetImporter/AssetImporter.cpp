@@ -1192,8 +1192,9 @@ void BuildAndSaveModel(OutModel& model)
 
             aiMatrix4x4 transform = boneNode->mTransformation;
             // Make the root bone transform relative to the model's root node, if it is not already
+            // (in case there are nodes between that are not accounted for otherwise)
             if (boneNode == model.rootBone_)
-                transform = GetDerivedTransform(boneNode, model.rootNode_);
+                transform = GetDerivedTransform(boneNode, model.rootNode_, false);
 
             GetPosRotScale(transform, newBone.initialPosition_, newBone.initialRotation_, newBone.initialScale_);
 
@@ -1307,7 +1308,6 @@ void BuildAndSaveAnimations(OutModel* model)
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
             aiNode* boneNode = 0;
-            bool isRootBone = false;
 
             if (model)
             {
@@ -1344,7 +1344,6 @@ void BuildAndSaveAnimations(OutModel* model)
 
                     boneNode = model->pivotlessBones_[boneIndex];
                 }
-                isRootBone = boneIndex == 0;
             }
             else
             {
@@ -1458,16 +1457,19 @@ void BuildAndSaveAnimations(OutModel* model)
                 if (track->channelMask_ & CHANNEL_SCALE && k < channel->mNumScalingKeys)
                     scale = channel->mScalingKeys[k].mValue;
 
-                // If root bone, transform with the model root node transform
-                if (model && isRootBone)
+                // If root bone, transform with nodes in between model root node (if any)
+                if (model && boneNode == model->rootBone_)
                 {
                     aiMatrix4x4 transMat, scaleMat, rotMat;
                     aiMatrix4x4::Translation(pos, transMat);
                     aiMatrix4x4::Scaling(scale, scaleMat);
                     rotMat = aiMatrix4x4(rot.GetMatrix());
                     aiMatrix4x4 tform = transMat * rotMat * scaleMat;
-                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_);
-                    tform.Decompose(scale, rot, pos);
+                    aiMatrix4x4 tformOld = tform;
+                    tform = GetDerivedTransform(tform, boneNode, model->rootNode_, false);
+                    // Do not decompose if did not actually change
+                    if (tform != tformOld)
+                        tform.Decompose(scale, rot, pos);
                 }
 
                 if (track->channelMask_ & CHANNEL_POSITION)

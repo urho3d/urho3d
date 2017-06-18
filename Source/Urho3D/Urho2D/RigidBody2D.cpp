@@ -104,7 +104,7 @@ void RigidBody2D::OnSetEnabled()
 
 void RigidBody2D::SetBodyType(BodyType2D type)
 {
-    b2BodyType bodyType = (b2BodyType)type;    
+    b2BodyType bodyType = (b2BodyType)type;
     if (body_)
     {
         body_->SetType(bodyType);
@@ -314,7 +314,7 @@ void RigidBody2D::SetLinearVelocity(const Vector2& linearVelocity)
 void RigidBody2D::SetAngularVelocity(float angularVelocity)
 {
     if (body_)
-        body_->SetAngularVelocity(angularVelocity); 
+        body_->SetAngularVelocity(angularVelocity);
     else
     {
         if (bodyDef_.angularVelocity == angularVelocity)
@@ -370,7 +370,7 @@ void RigidBody2D::CreateBody()
     if (!physicsWorld_ || !physicsWorld_->GetWorld())
         return;
 
-    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());;
+    bodyDef_.position = ToB2Vec2(node_->GetWorldPosition());
     bodyDef_.angle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
 
     body_ = physicsWorld_->GetWorld()->CreateBody(&bodyDef_);
@@ -600,16 +600,14 @@ void RigidBody2D::OnMarkedDirty(Node* node)
     // Check if transform has changed from the last one set in ApplyWorldTransform()
     b2Vec2 newPosition = ToB2Vec2(node_->GetWorldPosition());
     float newAngle = node_->GetWorldRotation().RollAngle() * M_DEGTORAD;
-    if (newPosition != bodyDef_.position || newAngle != bodyDef_.angle)
+
+    if (!body_)
     {
-        if (body_)
-            body_->SetTransform(newPosition, newAngle);
-        else
-        {
-            bodyDef_.position = newPosition;
-            bodyDef_.angle = newAngle;
-        }
+        bodyDef_.position = newPosition;
+        bodyDef_.angle = newAngle;
     }
+    else if (newPosition != body_->GetPosition() || newAngle != body_->GetAngle())
+        body_->SetTransform(newPosition, newAngle);
 }
 
 }

@@ -24,6 +24,8 @@
 set (TARGET_NAME Civetweb)
 
 # Define preprocessor macros
+# Always disable Common Gateway Interface
+add_definitions (-DNO_CGI)
 if (WIN32)
     include (CheckStructHasMember)
     check_struct_has_member (struct\ timespec tv_sec time.h HAVE_STRUCT_TIMESPEC_TV_SEC)

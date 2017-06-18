@@ -44,11 +44,14 @@ public:
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
     
+    /// Handle enabled/disabled state change.
+    virtual void OnSetEnabled();
+
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
     virtual void ApplyAttributes();
 
     /// Add a wheel. All parameters are relative to RigidBody / node.
-    void AddWheel(Node *wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
+    void AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
     /// Reset all suspension.
     void ResetSuspension(void);
     /// Update transform for particular wheel.
@@ -107,7 +110,7 @@ public:
     /// Get number of attached wheels.
     int GetNumWheels() const;
     /// Get node of the wheel.
-    Node *GetWheelNode(int wheel) const;
+    Node* GetWheelNode(int wheel) const;
     /// Get steering value of particular wheel.
     float GetSteeringValue(int wheel) const;
     /// Get suspension stiffness for particular wheel.
@@ -164,7 +167,7 @@ private:
     /// Hull RigidBody
     WeakPtr<RigidBody> hullBody_;
     /// Opaque Bullet data hidden from public
-    RaycastVehicleData *vehicleData_;
+    RaycastVehicleData* vehicleData_;
     /// Nodes of all wheels
     Vector<Node*> wheelNodes_;
     /// All wheels original rotations. These are applied in addition to wheel rotations by btRaycastVehicle

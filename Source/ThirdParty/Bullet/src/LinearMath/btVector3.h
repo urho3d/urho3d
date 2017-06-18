@@ -14,6 +14,7 @@ subject to the following restrictions:
 
 // Modified by Yao Wei Tjong for Urho3D
 
+
 #ifndef BT_VECTOR3_H
 #define BT_VECTOR3_H
 
@@ -267,8 +268,18 @@ public:
 
 	/**@brief Return the norm (length) of the vector */
 	SIMD_FORCE_INLINE btScalar norm() const
-	{
+	{		
 		return length();
+	}
+
+	/**@brief Return the norm (length) of the vector */
+	SIMD_FORCE_INLINE btScalar safeNorm() const
+	{
+		btScalar d = length2();
+		//workaround for some clang/gcc issue of sqrtf(tiny number) = -INF
+		if (d>SIMD_EPSILON)
+			return btSqrt(d);
+		return btScalar(0);
 	}
 
   /**@brief Return the distance squared between the ends of this and another vector
@@ -281,14 +292,16 @@ public:
 
 	SIMD_FORCE_INLINE btVector3& safeNormalize() 
 	{
-		btVector3 absVec = this->absolute();
-		int maxIndex = absVec.maxAxis();
-		if (absVec[maxIndex]>0)
+		btScalar l2 = length2();
+		//triNormal.normalize();
+		if (l2 >= SIMD_EPSILON*SIMD_EPSILON)
 		{
-			*this /= absVec[maxIndex];
-			return *this /= length();
+			(*this) /= btSqrt(l2);
 		}
-		setValue(1,0,0);
+		else
+		{
+			setValue(1, 0, 0);
+		}
 		return *this;
 	}
 
@@ -1004,7 +1017,7 @@ SIMD_FORCE_INLINE   long    btVector3::maxDot( const btVector3 *array, long arra
     #ifdef BT_USE_SSE	// Urho3D - to be consistent with the function return below
         const long scalar_cutoff = 10;
         long _maxdot_large( const float *array, const float *vec, unsigned long array_count, float *dotOut );
-    #elif BT_USE_NEON
+    #elif defined BT_USE_NEON
         const long scalar_cutoff = 4;
         extern long (*_maxdot_large)( const float *array, const float *vec, unsigned long array_count, float *dotOut );
     #endif

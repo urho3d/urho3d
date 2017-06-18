@@ -1,6 +1,6 @@
 $#include "Graphics/Texture.h"
 
-class Texture : public Resource
+class Texture : public ResourceWithMetadata
 {
     void SetNumLevels(unsigned levels);
     void SetFilterMode(TextureFilterMode filter);

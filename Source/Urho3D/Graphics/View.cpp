@@ -655,12 +655,16 @@ void View::Render()
             {
                 BlitFramebuffer(currentRenderTarget_->GetParentTexture(), renderTarget_, false);
                 currentRenderTarget_ = renderTarget_;
+                lastCustomDepthSurface_ = 0;
             }
 
             graphics_->SetRenderTarget(0, currentRenderTarget_);
             for (unsigned i = 1; i < MAX_RENDERTARGETS; ++i)
                 graphics_->SetRenderTarget(i, (RenderSurface*)0);
-            graphics_->SetDepthStencil(GetDepthStencil(currentRenderTarget_));
+
+            // If a custom depth surface was used, use it also for debug rendering
+            graphics_->SetDepthStencil(lastCustomDepthSurface_ ? lastCustomDepthSurface_ : GetDepthStencil(currentRenderTarget_));
+
             IntVector2 rtSizeNow = graphics_->GetRenderTargetDimensions();
             IntRect viewport = (currentRenderTarget_ == renderTarget_) ? viewRect_ : IntRect(0, 0, rtSizeNow.x_,
                 rtSizeNow.y_);
@@ -1793,7 +1797,8 @@ void View::SetRenderTargets(RenderPathCommand& command)
         if (depthTexture)
         {
             useCustomDepth = true;
-            graphics_->SetDepthStencil(GetRenderSurfaceFromTexture(depthTexture));
+            lastCustomDepthSurface_ = GetRenderSurfaceFromTexture(depthTexture);
+            graphics_->SetDepthStencil(lastCustomDepthSurface_);
         }
     }
 
@@ -1972,6 +1977,7 @@ void View::AllocateScreenBuffers()
     bool needSubstitute = false;
     unsigned numViewportTextures = 0;
     depthOnlyDummyTexture_ = 0;
+    lastCustomDepthSurface_ = 0;
 
     // Check for commands with special meaning: has custom depth, renders a scene pass to other than the destination viewport,
     // read the viewport, or pingpong between viewport textures. These may trigger the need to substitute the destination RT

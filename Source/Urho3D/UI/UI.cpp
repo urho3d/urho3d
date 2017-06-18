@@ -99,13 +99,14 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(__ANDROID__) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS) || defined(TVOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
 #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
+    fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -601,6 +602,15 @@ void UI::SetForceAutoHint(bool enable)
     if (enable != forceAutoHint_)
     {
         forceAutoHint_ = enable;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontHintLevel(FontHintLevel level)
+{
+    if (level != fontHintLevel_)
+    {
+        fontHintLevel_ = level;
         ReleaseFontFaces();
     }
 }

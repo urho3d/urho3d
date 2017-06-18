@@ -162,6 +162,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_ResourceWithMetadata"><b>ResourceWithMetadata</b></a>
 <a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
@@ -322,7 +323,7 @@ Properties:
 - LoopMode2D loopMode
 
 <a name="Class_Animation"></a>
-### Animation : Resource
+### Animation : ResourceWithMetadata
 
 Methods:
 
@@ -3723,7 +3724,7 @@ Properties:
 - UIElement* window (readonly)
 
 <a name="Class_Model"></a>
-### Model : Resource
+### Model : ResourceWithMetadata
 
 Methods:
 
@@ -4567,15 +4568,18 @@ Methods:
 - void SetEffect(ParticleEffect2D* effect)
 - void SetSprite(Sprite2D* sprite)
 - void SetBlendMode(BlendMode blendMode)
+- void SetEmitting(bool emitting)
 - ParticleEffect2D* GetEffect() const
 - Sprite2D* GetSprite() const
 - BlendMode GetBlendMode() const
+- bool IsEmitting() const
 
 Properties:
 
 - ParticleEffect2D* effect
 - Sprite2D* sprite
 - BlendMode blendMode
+- bool emitting
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
@@ -5476,6 +5480,17 @@ Properties:
 
 - StringHash type
 
+<a name="Class_ResourceWithMetadata"></a>
+### ResourceWithMetadata : Resource
+
+Methods:
+
+- void AddMetadata(const String name, const Variant& value)
+- void RemoveMetadata(const String name)
+- void RemoveAllMetadata()
+- const Variant& GetMetadata(const String name) const
+- bool HasMetadata() const
+
 <a name="Class_RibbonTrail"></a>
 ### RibbonTrail : Drawable
 
@@ -5965,7 +5980,7 @@ Properties:
 - float repeatRate
 
 <a name="Class_Sound"></a>
-### Sound : Resource
+### Sound : ResourceWithMetadata
 
 Methods:
 
@@ -6687,7 +6702,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 
 <a name="Class_Texture"></a>
-### Texture : Resource
+### Texture : ResourceWithMetadata
 
 Methods:
 
@@ -7011,6 +7026,7 @@ Methods:
 - void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
+- void SetFontHintLevel(FontHintLevel level)
 - void SetScale(float scale)
 - void SetWidth(float width)
 - void SetHeight(float height)
@@ -7036,6 +7052,7 @@ Methods:
 - bool GetUseScreenKeyboard() const
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
+- FontHintLevel GetFontHintLevel() const
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
@@ -8178,6 +8195,12 @@ Properties:
 - int FM_FOCUSABLE
 - int FM_FOCUSABLE_DEFOCUSABLE
 
+### FontHintLevel
+
+- int FONT_HINT_LEVEL_NONE
+- int FONT_HINT_LEVEL_LIGHT
+- int FONT_HINT_LEVEL_NORMAL
+
 ### FontType
 
 - int FONT_NONE
@@ -8643,21 +8666,25 @@ Properties:
 - Variant GetGlobalVar(const String key)
 - VariantMap& GetGlobalVars()
 - Graphics* GetGraphics()
+- String GetHostName()
 - Input* GetInput()
 - String GetInternalPath(const String pathName)
 - Localization* GetLocalization()
 - Log* GetLog()
+- String GetLoginName()
 - String GetMiniDumpDir()
 - String GetNativePath(const String pathName)
 - Network* GetNetwork()
 - unsigned GetNumLogicalCPUs()
 - unsigned GetNumPhysicalCPUs()
+- String GetOSVersion()
 - String GetParentPath(const String pathName)
 - String GetPath(const String fullPath)
 - String GetPlatform()
 - unsigned GetRandomSeed()
 - Renderer* GetRenderer()
 - Time* GetTime()
+- long GetTotalMemory()
 - UI* GetUI()
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
 - bool HasSubscribedToEvent(const String eventName)
@@ -8681,10 +8708,10 @@ Properties:
 - int Rand()
 - float RandStandardNormal()
 - float Random(float min, float max)
-- float Random(float range)
 - float Random()
-- int RandomInt(int range)
+- float Random(float range)
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - void RegisterEventName(const String eventName)
 - String RemoveTrailingSlash(const String pathName)
@@ -8701,11 +8728,11 @@ Properties:
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - float Sqrt(float x)
-- float StableRandom(const Vector3& seed)
 - float StableRandom(float seed)
 - float StableRandom(const Vector2& seed)
-- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- float StableRandom(const Vector3& seed)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -8734,28 +8761,28 @@ Properties:
 - void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
-- Vector2 VectorCeil(const Vector2& vec)
 - Vector4 VectorCeil(const Vector4& vec)
 - Vector3 VectorCeil(const Vector3& vec)
+- Vector2 VectorCeil(const Vector2& vec)
 - IntVector3 VectorCeilToInt(const Vector3& vec)
 - IntVector2 VectorCeilToInt(const Vector2& vec)
-- Vector2 VectorFloor(const Vector2& vec)
-- Vector3 VectorFloor(const Vector3& vec)
 - Vector4 VectorFloor(const Vector4& vec)
+- Vector3 VectorFloor(const Vector3& vec)
+- Vector2 VectorFloor(const Vector2& vec)
 - IntVector2 VectorFloorToInt(const Vector2& vec)
 - IntVector3 VectorFloorToInt(const Vector3& vec)
 - Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
-- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
-- Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
-- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
-- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
-- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
-- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
-- IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
+- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
+- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
 - Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
 - Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
+- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
+- IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
 - IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
 - Vector4 VectorRound(const Vector4& vec)
 - Vector2 VectorRound(const Vector2& vec)

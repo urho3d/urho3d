@@ -1175,15 +1175,8 @@ Vector3 Node::GetSignedWorldScale() const
 {
     if (dirty_)
         UpdateWorldTransform();
-    
-    Vector3 scale = worldTransform_.Scale();
-    Matrix3 rot = worldRotation_.RotationMatrix();
-    
-    scale.x_ *= Sign(rot.m00_) * Sign(worldTransform_.m00_);
-    scale.y_ *= Sign(rot.m11_) * Sign(worldTransform_.m11_);
-    scale.z_ *= Sign(rot.m22_) * Sign(worldTransform_.m22_);
-    
-    return scale;
+
+    return worldTransform_.SignedScale(worldRotation_.RotationMatrix());
 }
 
 Vector3 Node::LocalToWorld(const Vector3& position) const
@@ -1922,7 +1915,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         {
             if (names[i].Front() != '#')
                 break;
-            
+
             String name = names[i].Substring(1, names[i].Length() - 1);
             char s = name.Front();
             if (s >= '0' && s <= '9')
@@ -1934,7 +1927,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             {
                 node = node->GetChild(name, true);
             }
-            
+
             if (!node)
             {
                 URHO3D_LOGERROR("Could not find node by name " + name);
