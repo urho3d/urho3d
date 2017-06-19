@@ -12646,7 +12646,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
-bool SetFont(Font, int);
+bool SetFont(Font, float);
 bool SetFont(const String&, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
@@ -12722,7 +12722,7 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
 Color hoverColor;
@@ -12846,8 +12846,8 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-bool SetFont(Font, int);
-bool SetFont(const String&, int);
+bool SetFont(Font, float);
+bool SetFont(const String&, float);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -12882,7 +12882,7 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 /* readonly */
 int height;
 HorizontalAlignment horizontalAlignment;

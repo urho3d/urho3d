@@ -6551,9 +6551,9 @@ Methods:
 - Text() (GC)
 - Text* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6570,7 +6570,7 @@ Methods:
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
 - Font* GetFont() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - float GetRowSpacing() const
@@ -6596,7 +6596,7 @@ Methods:
 Properties:
 
 - Font* font
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6623,9 +6623,9 @@ Methods:
 - Text3D() (GC)
 - Text3D* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6648,7 +6648,7 @@ Methods:
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - HorizontalAlignment GetHorizontalAlignment() const
@@ -6678,7 +6678,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment

@@ -2369,7 +2369,7 @@ namespace Urho3D
 - %Variables : VariantMap
 - %Tags : StringVector
 - %Font : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -2387,7 +2387,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Font : ResourceRef
 - %Material : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -13697,7 +13697,7 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
-- bool SetFont(Font@, int)
+- bool SetFont(Font@, float)
 - bool SetFont(const String&, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
@@ -13756,7 +13756,7 @@ Properties:
 - bool focus
 - FocusMode focusMode
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height
 - HorizontalAlignment horizontalAlignment
 - Color hoverColor
@@ -13861,8 +13861,8 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- bool SetFont(Font@, int)
-- bool SetFont(const String&, int)
+- bool SetFont(Font@, float)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -13889,7 +13889,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 - bool fixedScreenSize
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height // readonly
 - HorizontalAlignment horizontalAlignment
 - uint id // readonly
