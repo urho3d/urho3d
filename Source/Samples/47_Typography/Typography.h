@@ -58,4 +58,5 @@ private:
     void HandleSRGB(StringHash eventType, VariantMap& eventData);
     void HandleForceAutoHint(StringHash eventType, VariantMap& eventData);
     void HandleFontHintLevel(StringHash eventType, VariantMap& eventData);
+    void HandleSubpixelGlyphPositions(StringHash eventType, VariantMap& eventData);
 };

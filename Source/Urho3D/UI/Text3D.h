@@ -144,9 +144,9 @@ public:
     /// Return width of row by index.
     int GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.

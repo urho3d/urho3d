@@ -45,16 +45,16 @@ enum TextEffect
 struct CharLocation
 {
     /// Position.
-    IntVector2 position_;
+    Vector2 position_;
     /// Size.
-    IntVector2 size_;
+    Vector2 size_;
 };
 
 /// Glyph and its location within the text. Used when preparing text rendering.
 struct GlyphLocation
 {
     /// Construct.
-    GlyphLocation(int x, int y, const FontGlyph* glyph) :
+    GlyphLocation(float x, float y, const FontGlyph* glyph) :
         x_(x),
         y_(y),
         glyph_(glyph)
@@ -62,9 +62,9 @@ struct GlyphLocation
     }
 
     /// X coordinate.
-    int x_;
+    float x_;
     /// Y coordinate.
-    int y_;
+    float y_;
     /// Glyph.
     const FontGlyph* glyph_;
 };
@@ -177,7 +177,7 @@ public:
     const Color& GetEffectColor() const { return effectColor_; }
 
     /// Return row height.
-    int GetRowHeight() const { return rowHeight_; }
+    float GetRowHeight() const { return rowHeight_; }
 
     /// Return number of rows.
     unsigned GetNumRows() const { return rowWidths_.Size(); }
@@ -186,11 +186,11 @@ public:
     unsigned GetNumChars() const { return unicodeText_.Size(); }
 
     /// Return width of row by index.
-    int GetRowWidth(unsigned index) const;
+    float GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
 
     /// Set text effect Z bias. Zero by default, adjusted only in 3D mode.
     void SetEffectDepthBias(float bias);
@@ -220,7 +220,7 @@ protected:
     int GetRowStartPosition(unsigned rowIndex) const;
     /// Contruct batch.
     void ConstructBatch
-        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, int dx = 0, int dy = 0, Color* color = 0,
+        (UIBatch& pageBatch, const PODVector<GlyphLocation>& pageGlyphLocation, float dx = 0, float dy = 0, Color* color = 0,
             float depthBias = 0.0f);
 
     /// Font.
@@ -260,7 +260,7 @@ protected:
     /// Text effect Z bias.
     float effectDepthBias_;
     /// Row height.
-    int rowHeight_;
+    float rowHeight_;
     /// Text as Unicode characters.
     PODVector<unsigned> unicodeText_;
     /// Text modified into printed form.
@@ -268,7 +268,7 @@ protected:
     /// Mapping of printed form back to original char indices.
     PODVector<unsigned> printToText_;
     /// Row widths.
-    PODVector<int> rowWidths_;
+    PODVector<float> rowWidths_;
     /// Glyph locations per each texture in the font.
     Vector<PODVector<GlyphLocation> > pageGlyphLocations_;
     /// Cached locations of each character in the text.

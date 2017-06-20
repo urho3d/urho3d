@@ -76,7 +76,7 @@ static void RegisterFont(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Font", "bool SaveXML(File@+, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLFile), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(VectorBuffer&, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXMLVectorBuffer), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("Font", "bool SaveXML(const String&in, int, bool usedGlyphs = false, const String&in indentation = \"\t\")", asFUNCTION(FontSaveXML), asCALL_CDECL_OBJLAST);
-    engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(int) const", asMETHOD(Font, GetTotalGlyphOffset), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Font", "IntVector2 GetTotalGlyphOffset(float) const", asMETHOD(Font, GetTotalGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "void set_absoluteGlyphOffset(const IntVector2&)", asMETHOD(Font, SetAbsoluteGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "const IntVector2& get_absoluteGlyphOffset() const", asMETHOD(Font, GetAbsoluteGlyphOffset), asCALL_THISCALL);
     engine->RegisterObjectMethod("Font", "void set_scaledGlyphOffset(const Vector2&)", asMETHOD(Font, SetScaledGlyphOffset), asCALL_THISCALL);
@@ -411,10 +411,10 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text", "const Color& get_effectColor() const", asMETHOD(Text, GetEffectColor), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_numRows() const", asMETHOD(Text, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "uint get_numChars() const", asMETHOD(Text, GetNumChars), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "int get_rowWidths(uint) const", asMETHOD(Text, GetRowWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "IntVector2 get_charPositions(uint)", asMETHOD(Text, GetCharPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "IntVector2 get_charSizes(uint)", asMETHOD(Text, GetCharSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text", "int get_rowHeight() const", asMETHOD(Text, GetRowHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "float get_rowWidths(uint) const", asMETHOD(Text, GetRowWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "Vector2 get_charPositions(uint)", asMETHOD(Text, GetCharPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "Vector2 get_charSizes(uint)", asMETHOD(Text, GetCharSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "float get_rowHeight() const", asMETHOD(Text, GetRowHeight), asCALL_THISCALL);
 }
 
 static void RegisterText3D(asIScriptEngine* engine)
@@ -466,10 +466,10 @@ static void RegisterText3D(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Text3D", "FaceCameraMode get_faceCameraMode() const", asMETHOD(Text3D, GetFaceCameraMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numRows() const", asMETHOD(Text3D, GetNumRows), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text3D", "uint get_numChars() const", asMETHOD(Text3D, GetNumChars), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_rowWidths(uint) const", asMETHOD(Text3D, GetRowWidth), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "IntVector2 get_charPositions(uint)", asMETHOD(Text3D, GetCharPosition), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "IntVector2 get_charSizes(uint)", asMETHOD(Text3D, GetCharSize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("Text3D", "int get_rowHeight() const", asMETHOD(Text3D, GetRowHeight), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_rowWidths(uint) const", asMETHOD(Text3D, GetRowWidth), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Vector2 get_charPositions(uint)", asMETHOD(Text3D, GetCharPosition), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "Vector2 get_charSizes(uint)", asMETHOD(Text3D, GetCharSize), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text3D", "float get_rowHeight() const", asMETHOD(Text3D, GetRowHeight), asCALL_THISCALL);
 }
 
 static void RegisterLineEdit(asIScriptEngine* engine)
@@ -789,6 +789,8 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_fontHintLevel(FontHintLevel)", asMETHOD(UI, SetFontHintLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "FontHintLevel get_fontHintLevel() const", asMETHOD(UI, GetFontHintLevel), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_subpixelGlyphPositions(bool)", asMETHOD(UI, SetSubpixelGlyphPositions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "bool get_subpixelGlyphPositions() const", asMETHOD(UI, GetSubpixelGlyphPositions), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_scale(float value)", asMETHOD(UI, SetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHOD(UI, GetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);

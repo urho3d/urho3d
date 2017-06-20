@@ -110,6 +110,8 @@ public:
     void SetForceAutoHint(bool enable);
     /// Set the hinting level used by FreeType fonts.
     void SetFontHintLevel(FontHintLevel level);
+    /// Set whether text glyphs can have fractional positions. Default is false (pixel-aligned).
+    void SetSubpixelGlyphPositions(bool enable);
     /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
     void SetScale(float scale);
     /// Scale %UI to the specified width in pixels.
@@ -185,6 +187,9 @@ public:
 
     /// Return the current FreeType font hinting level.
     FontHintLevel GetFontHintLevel() const { return fontHintLevel_; }
+
+    // Return whether text glyphs can have fractional positions.
+    bool GetSubpixelGlyphPositions() const { return subpixelGlyphPositions_; }
 
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
@@ -351,6 +356,8 @@ private:
     bool forceAutoHint_;
     /// FreeType hinting level (default is FONT_HINT_LEVEL_NORMAL).
     FontHintLevel fontHintLevel_;
+    /// Flag for subpixel text glyph positions.
+    bool subpixelGlyphPositions_;
     /// Flag for UI already being rendered this frame.
     bool uiRendered_;
     /// Non-modal batch size (used internally for rendering).

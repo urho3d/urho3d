@@ -37,16 +37,20 @@ void Start()
     CreateCheckbox("White background", "HandleWhiteBackground")
         .checked = false;
 
-    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
-    CreateCheckbox("UI::SetForceAutoHint", "HandleForceAutoHint")
-        .checked = ui.forceAutoHint;
-
     // Add a checkbox to toggle SRGB output conversion (if available).
     // This will give more correct text output for FreeType fonts, as the FreeType rasterizer
     // outputs linear coverage values rather than SRGB values. However, this feature isn't
     // available on all platforms.
     CreateCheckbox("Graphics::SetSRGB", "HandleSRGB")
         .checked = graphics.sRGB;
+
+    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
+    CreateCheckbox("UI::SetForceAutoHint", "HandleForceAutoHint")
+        .checked = ui.forceAutoHint;
+
+    // Add a checkbox for the global SubpixelGlyphPositions setting. This affects character spacing.
+    CreateCheckbox("UI::SetSubpixelGlyphPositions", "HandleSubpixelGlyphPositions")
+        .checked = ui.subpixelGlyphPositions;
 
     // Add a drop-down menu to control the font hinting level.
     Array<String> items = {
@@ -173,6 +177,15 @@ void HandleSRGB(StringHash eventType, VariantMap& eventData)
         log.Warning("graphics.sRGBWriteSupport is false");
     }
 }
+
+void HandleSubpixelGlyphPositions(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ box = eventData["Element"].GetPtr();
+    bool checked = box.checked;
+
+    ui.subpixelGlyphPositions = checked;
+}
+
 
 void HandleFontHintLevel(StringHash eventType, VariantMap& eventData)
 {

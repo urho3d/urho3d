@@ -41,9 +41,9 @@
 namespace Urho3D
 {
 
-inline int RoundToPixels(FT_Pos value)
+inline float FixedToFloat(FT_Pos value)
 {
-    return (int)(value >> 6) + (((value & 0x3f) >= 0x20) ? 1 : 0);
+    return value / 64.0f;
 }
 
 /// FreeType library subsystem.
@@ -172,19 +172,20 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         loadMode_ |= FT_LOAD_TARGET_LIGHT;
     }
 
-    ascender_ = RoundToPixels(face->size->metrics.ascender);
-    rowHeight_ = RoundToPixels(face->size->metrics.height);
+    ascender_ = FixedToFloat(face->size->metrics.ascender);
+    rowHeight_ = FixedToFloat(face->size->metrics.height);
     pointSize_ = pointSize;
 
     // Check if the font's OS/2 info gives different (larger) values for ascender & descender
     TT_OS2* os2Info = (TT_OS2*)FT_Get_Sfnt_Table(face, ft_sfnt_os2);
     if (os2Info)
     {
-        int descender = RoundToPixels(face->size->metrics.descender);
-        ascender_ = Max(ascender_, os2Info->usWinAscent * face->size->metrics.y_ppem / face->units_per_EM);
-        ascender_ = Max(ascender_, os2Info->sTypoAscender * face->size->metrics.y_ppem / face->units_per_EM);
-        descender = Max(descender, os2Info->usWinDescent * face->size->metrics.y_ppem / face->units_per_EM);
-        descender = Max(descender, os2Info->sTypoDescender * face->size->metrics.y_ppem / face->units_per_EM);
+        float descender = FixedToFloat(face->size->metrics.descender);
+        float unitsPerEm = face->units_per_EM;
+        ascender_ = Max(ascender_, os2Info->usWinAscent * face->size->metrics.y_ppem / unitsPerEm);
+        ascender_ = Max(ascender_, os2Info->sTypoAscender * face->size->metrics.y_ppem / unitsPerEm);
+        descender = Max(descender, os2Info->usWinDescent * face->size->metrics.y_ppem / unitsPerEm);
+        descender = Max(descender, os2Info->sTypoDescender * face->size->metrics.y_ppem / unitsPerEm);
         rowHeight_ = Max(rowHeight_, ascender_ + descender);
     }
 
@@ -265,7 +266,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                     {
                         unsigned leftIndex = deserializer.ReadUShort();
                         unsigned rightIndex = deserializer.ReadUShort();
-                        short amount = RoundToPixels(deserializer.ReadShort());
+                        short amount = FixedToFloat(deserializer.ReadShort());
 
                         unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex] : 0;
                         unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex] : 0;
@@ -367,7 +368,20 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         fontGlyph.height_ = slot->bitmap.rows;
         fontGlyph.offsetX_ = slot->bitmap_left;
         fontGlyph.offsetY_ = ascender_ - slot->bitmap_top;
-        fontGlyph.advanceX_ = (short)RoundToPixels(slot->metrics.horiAdvance);
+
+        UI* ui = font_->GetSubsystem<UI>();
+        FontHintLevel level = ui->GetFontHintLevel();
+        bool subpixel = ui->GetSubpixelGlyphPositions();
+        if (level <= FONT_HINT_LEVEL_LIGHT && subpixel && slot->linearHoriAdvance)
+        {
+            // linearHoriAdvance is stored in 16.16 fixed point, not the usual 26.6
+            fontGlyph.advanceX_ = slot->linearHoriAdvance / 65536.0;
+        }
+        else
+        {
+            // Round to nearest pixel (only necessary when hinting is disabled)
+            fontGlyph.advanceX_ = floor(FixedToFloat(slot->metrics.horiAdvance) + 0.5f);
+        }
     }
 
     int x = 0, y = 0;

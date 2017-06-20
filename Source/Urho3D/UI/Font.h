@@ -80,7 +80,7 @@ public:
     const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
 
     /// Return the total effective offset for a point size.
-    IntVector2 GetTotalGlyphOffset(int pointSize) const;
+    IntVector2 GetTotalGlyphOffset(float pointSize) const;
 
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();

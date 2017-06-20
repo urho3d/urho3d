@@ -107,6 +107,7 @@ UI::UI(Context* context) :
     useMutableGlyphs_(false),
     forceAutoHint_(false),
     fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
+    subpixelGlyphPositions_(false),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -611,6 +612,15 @@ void UI::SetFontHintLevel(FontHintLevel level)
     if (level != fontHintLevel_)
     {
         fontHintLevel_ = level;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetSubpixelGlyphPositions(bool enable)
+{
+    if (enable != subpixelGlyphPositions_)
+    {
+        subpixelGlyphPositions_ = enable;
         ReleaseFontFaces();
     }
 }

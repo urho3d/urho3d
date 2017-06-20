@@ -487,12 +487,12 @@ int Text3D::GetRowWidth(unsigned index) const
     return text_.GetRowWidth(index);
 }
 
-IntVector2 Text3D::GetCharPosition(unsigned index)
+Vector2 Text3D::GetCharPosition(unsigned index)
 {
     return text_.GetCharPosition(index);
 }
 
-IntVector2 Text3D::GetCharSize(unsigned index)
+Vector2 Text3D::GetCharSize(unsigned index)
 {
     return text_.GetCharSize(index);
 }
