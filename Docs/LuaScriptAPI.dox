@@ -2468,7 +2468,7 @@ Methods:
 - void SetScaledGlyphOffset(const Vector2& offset)
 - const IntVector2& GetAbsoluteGlyphOffset() const
 - const Vector2& GetScaledGlyphOffset() const
-- IntVector2 GetTotalGlyphOffset(int pointSize) const
+- IntVector2 GetTotalGlyphOffset(float pointSize) const
 - FontType GetFontType() const
 - bool IsSDFFont() const
 
@@ -6584,12 +6584,12 @@ Methods:
 - int GetEffectStrokeThickness() const
 - bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
 
@@ -6611,7 +6611,7 @@ Properties:
 - int effectStrokeThickness
 - bool effectRoundStroke
 - Color& effectColor
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 
@@ -6663,12 +6663,12 @@ Methods:
 - float GetEffectDepthBias() const
 - int GetWidth() const
 - int GetHeight() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool IsFixedScreenSize() const
@@ -6694,7 +6694,7 @@ Properties:
 - int width
 - Color& color
 - int height (readonly)
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
@@ -7027,6 +7027,7 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetFontHintLevel(FontHintLevel level)
+- void SetSubpixelGlyphPositions(bool enable)
 - void SetScale(float scale)
 - void SetWidth(float width)
 - void SetHeight(float height)
@@ -7053,6 +7054,7 @@ Methods:
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
 - FontHintLevel GetFontHintLevel() const
+- bool GetSubpixelGlyphPositions() const
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
@@ -7077,6 +7079,8 @@ Properties:
 - bool useScreenKeyboard
 - bool useMutableGlyphs
 - bool forceAutoHint
+- FontHintLevel fontHintLevel
+- bool subpixelGlyphPositions
 - bool modalElement (readonly)
 - float scale
 - IntVector2& customSize

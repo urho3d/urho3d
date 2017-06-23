@@ -5236,7 +5236,7 @@ public:
 Font();
 Font(const String&in);
 // Methods:
-IntVector2 GetTotalGlyphOffset(int) const;
+IntVector2 GetTotalGlyphOffset(float) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -12686,9 +12686,9 @@ bool bringToFront;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* readonly */
 IntVector2 childOffset;
 /* readonly */
@@ -12777,10 +12777,10 @@ int refs;
 /* readonly */
 UIElement root;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 /* readonly */
 IntVector2 screenPosition;
 bool selected;
@@ -12871,9 +12871,9 @@ bool castShadows;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* writeonly */
 Color color;
 Array<Color> colors;
@@ -12917,10 +12917,10 @@ float opacity;
 /* readonly */
 int refs;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -13929,6 +13929,7 @@ int refs;
 /* readonly */
 UIElement root;
 float scale;
+bool subpixelGlyphPositions;
 /* readonly */
 StringHash type;
 /* readonly */
