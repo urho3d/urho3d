@@ -7935,6 +7935,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -7945,6 +7947,8 @@ Array<Variant> attributes;
 String category;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 Vector3 direction;
@@ -10019,6 +10023,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 LoadMode asyncLoadMode;
@@ -10038,6 +10044,8 @@ String category;
 uint checksum;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 /* readonly */

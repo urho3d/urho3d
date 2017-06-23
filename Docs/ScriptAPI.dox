@@ -9646,12 +9646,14 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - String category // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - Vector3 direction
 - bool enabled
@@ -11456,6 +11458,7 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - LoadMode asyncLoadMode // readonly
 - bool asyncLoading // readonly
@@ -11467,6 +11470,7 @@ Properties:
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - DebugRenderer@ debugRenderer // readonly
 - Vector3 direction
