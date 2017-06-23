@@ -61,12 +61,12 @@ class Text3D : public Drawable
     float GetEffectDepthBias() const;
     int GetWidth() const;
     int GetHeight() const;
-    int GetRowHeight() const;
+    float GetRowHeight() const;
     unsigned GetNumRows() const;
     unsigned GetNumChars() const;
-    int GetRowWidth(unsigned index) const;
-    IntVector2 GetCharPosition(unsigned index);
-    IntVector2 GetCharSize(unsigned index);
+    float GetRowWidth(unsigned index) const;
+    Vector2 GetCharPosition(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     const Color& GetColor(Corner corner) const;
     float GetOpacity() const;
     bool IsFixedScreenSize() const;
@@ -90,7 +90,7 @@ class Text3D : public Drawable
     tolua_property__get_set int width;
     tolua_property__get_set Color& color; // Write only property.
     tolua_readonly tolua_property__get_set int height;
-    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set float rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
     tolua_property__get_set float opacity;

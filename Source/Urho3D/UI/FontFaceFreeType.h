@@ -60,7 +60,7 @@ private:
     /// Load mode.
     int loadMode_;
     /// Ascender.
-    int ascender_;
+    float ascender_;
     /// Has mutable glyph.
     bool hasMutableGlyph_;
     /// Glyph area allocator.

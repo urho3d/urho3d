@@ -81,16 +81,20 @@ void Typography::Start()
     CreateCheckbox("White background", URHO3D_HANDLER(Typography, HandleWhiteBackground))
         ->SetChecked(false);
 
-    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
-    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint))
-        ->SetChecked(ui->GetForceAutoHint());
-
     // Add a checkbox to toggle SRGB output conversion (if available).
     // This will give more correct text output for FreeType fonts, as the FreeType rasterizer
     // outputs linear coverage values rather than SRGB values. However, this feature isn't
     // available on all platforms.
     CreateCheckbox("Graphics::SetSRGB", URHO3D_HANDLER(Typography, HandleSRGB))
         ->SetChecked(GetSubsystem<Graphics>()->GetSRGB());
+
+    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
+    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint))
+        ->SetChecked(ui->GetForceAutoHint());
+
+    // Add a checkbox for the global SubpixelGlyphPositions setting. This affects character spacing.
+    CreateCheckbox("UI::SetSubpixelGlyphPositions", URHO3D_HANDLER(Typography, HandleSubpixelGlyphPositions))
+        ->SetChecked(ui->GetSubpixelGlyphPositions());
 
     // Add a drop-down menu to control the font hinting level.
     const char* items[] = {
@@ -225,10 +229,16 @@ void Typography::HandleSRGB(StringHash eventType, VariantMap& eventData)
     }
 }
 
+void Typography::HandleSubpixelGlyphPositions(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox* box = static_cast<CheckBox*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    bool checked = box->IsChecked();
+    GetSubsystem<UI>()->SetSubpixelGlyphPositions(checked);
+}
+
 void Typography::HandleFontHintLevel(StringHash eventType, VariantMap& eventData)
 {
     DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
     unsigned i = list->GetSelection();
-
     GetSubsystem<UI>()->SetFontHintLevel((FontHintLevel)i);
 }

@@ -52,7 +52,7 @@ struct URHO3D_API FontGlyph
     /// Glyph Y offset from origin.
     short offsetY_;
     /// Horizontal advance.
-    short advanceX_;
+    float advanceX_;
     /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
     unsigned page_;
     /// Used flag.
@@ -79,7 +79,7 @@ public:
     virtual bool HasMutableGlyphs() const { return false; }
 
     /// Return the kerning for a character and the next character.
-    short GetKerning(unsigned c, unsigned d) const;
+    float GetKerning(unsigned c, unsigned d) const;
     /// Return true when one of the texture has a data loss.
     bool IsDataLost() const;
 
@@ -87,7 +87,7 @@ public:
     float GetPointSize() const { return pointSize_; }
 
     /// Return row height.
-    int GetRowHeight() const { return rowHeight_; }
+    float GetRowHeight() const { return rowHeight_; }
 
     /// Return textures.
     const Vector<SharedPtr<Texture2D> >& GetTextures() const { return textures_; }
@@ -104,13 +104,13 @@ protected:
     /// Glyph mapping.
     HashMap<unsigned, FontGlyph> glyphMapping_;
     /// Kerning mapping.
-    HashMap<unsigned, short> kerningMapping_;
+    HashMap<unsigned, float> kerningMapping_;
     /// Glyph texture pages.
     Vector<SharedPtr<Texture2D> > textures_;
     /// Point size.
     float pointSize_;
     /// Row height.
-    int rowHeight_;
+    float rowHeight_;
 };
 
 }
