@@ -619,6 +619,16 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
         return children[index].Get();
 }
 
+static Node* NodeGetChildByName(const String& name, Node* ptr)
+{
+    return ptr->GetChild(name);
+}
+
+static Node* NodeGetChildByNameRecursive(const String& name, Node* ptr)
+{
+    return ptr->GetChild(name, true);
+}
+
 static CScriptArray* NodeGetChildrenWithScript(bool recursive, Node* ptr)
 {
     PODVector<Node*> nodes;
@@ -772,6 +782,8 @@ template <class T> void RegisterNode(asIScriptEngine* engine, const char* classN
     engine->RegisterObjectMethod(className, "uint get_numChildren() const", asFUNCTION(NodeGetNumChildrenNonRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numAllChildren() const", asFUNCTION(NodeGetNumChildrenRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "Node@+ get_children(uint) const", asFUNCTION(NodeGetChild), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Node@+ get_childrenByName(const String&in) const", asFUNCTION(NodeGetChildByName), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(className, "Node@+ get_allChildrenByName(const String&in) const", asFUNCTION(NodeGetChildByNameRecursive), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "uint get_numComponents() const", asMETHOD(T, GetNumComponents), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "Component@+ get_components(uint) const", asFUNCTION(NodeGetComponent), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod(className, "void set_name(const String&in)", asMETHOD(T, SetName), asCALL_THISCALL);
