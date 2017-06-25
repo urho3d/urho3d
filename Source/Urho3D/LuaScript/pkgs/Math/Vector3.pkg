@@ -25,6 +25,7 @@ class Vector3
     float DotProduct(const Vector3& rhs) const;
     float AbsDotProduct(const Vector3& rhs) const;
     float ProjectOntoAxis(const Vector3& axis) const;
+    Vector3 Orthogonalize(const Vector3& axis) const;
     Vector3 CrossProduct(const Vector3& rhs) const;
     Vector3 Abs() const;
     Vector3 Lerp(const Vector3& rhs, float t) const;
