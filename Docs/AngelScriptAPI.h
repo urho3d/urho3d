@@ -14352,6 +14352,7 @@ bool IsNaN() const;
 Vector3 Lerp(const Vector3&, float) const;
 void Normalize();
 Vector3 Normalized() const;
+Vector3 Orthogonalize(const Vector3&) const;
 float ProjectOntoAxis(const Vector3&) const;
 String ToString() const;
 
