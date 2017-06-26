@@ -29,6 +29,7 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Sergey Bosko
 - Lisandro Bruzzo
+- Thomas Böhm
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
@@ -69,6 +70,7 @@ Urho3D development, contributions and bugfixes by:
 - David Palacios
 - Alex Parlett
 - Jordan Patterson
+- Georgii Pelageikin
 - Anton Petrov
 - Vladimir Pobedinsky
 - Franck Poulain
