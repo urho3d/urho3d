@@ -190,16 +190,24 @@ bool Script::Execute(const String& line)
         module = defaultScriptFile_->GetScriptModule();
     if (!module)
         module = scriptEngine_->GetModule("ExecuteImmediate", asGM_CREATE_IF_NOT_EXISTS);
-    if (!module)
-        return false;
+	if (!module)
+	{
+		URHO3D_LOGINFO("Could not execute in immediate mode.");
+		return false;
+	}
+
 
     asIScriptFunction* function = 0;
-    if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
-        return false;
+	if (module->CompileFunction("", wrappedLine.CString(), -1, 0, &function) < 0)
+	{
+		URHO3D_LOGINFO("Could compile function in immediate mode.");
+		return false;
+	}
 
     if (immediateContext_->Prepare(function) < 0)
     {
         function->Release();
+		URHO3D_LOGINFO("Could not prepare immediate mode function.");
         return false;
     }
 
