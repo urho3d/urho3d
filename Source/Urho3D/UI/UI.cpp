@@ -1700,7 +1700,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     if (element)
     {
         // Switch focus between focusable elements in the same top level window
-        if (key == KEY_TAB)
+        if (key == KEY_TAB & qualifiers_ & QUAL_CTRL)
         {
             UIElement* topLevel = element->GetParent();
             while (topLevel && topLevel->GetParent() != rootElement_ && topLevel->GetParent() != rootModalElement_)
