@@ -583,7 +583,8 @@ String GetHostName()
     return String::EMPTY; 
 }
 
-#if defined(_WIN32)
+// Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
+#if defined(_WIN32) && !defined(MINI_URHO)
 typedef NTSTATUS (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
 static void GetOS(RTL_OSVERSIONINFOW *r)
@@ -604,7 +605,7 @@ String GetOSVersion()
     struct utsname u;
     if (uname(&u) == 0)
         return String(u.sysname) + " " + u.release; 
-#elif defined(_WIN32)
+#elif defined(_WIN32) && !defined(MINI_URHO)
     RTL_OSVERSIONINFOW r;
     GetOS(&r); 
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832(v=vs.85).aspx
