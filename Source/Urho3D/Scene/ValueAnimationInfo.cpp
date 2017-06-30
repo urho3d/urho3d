@@ -32,6 +32,7 @@ namespace Urho3D
 {
 
 ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    RefCounted(),
     animation_(animation),
     wrapMode_(wrapMode),
     speed_(speed),
@@ -42,6 +43,7 @@ ValueAnimationInfo::ValueAnimationInfo(ValueAnimation* animation, WrapMode wrapM
 }
 
 ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation, WrapMode wrapMode, float speed) :
+    RefCounted(),
     target_(target),
     animation_(animation),
     wrapMode_(wrapMode),
@@ -53,6 +55,7 @@ ValueAnimationInfo::ValueAnimationInfo(Object* target, ValueAnimation* animation
 }
 
 ValueAnimationInfo::ValueAnimationInfo(const ValueAnimationInfo& other) :
+    RefCounted(),
     target_(other.target_),
     animation_(other.animation_),
     wrapMode_(other.wrapMode_),
