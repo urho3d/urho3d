@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Scene/Component.h"
+#include "../IO/VectorBuffer.h"
 
 #include <Box2D/Box2D.h>
 
@@ -30,6 +31,7 @@ namespace Urho3D
 {
 
 class Camera;
+class CollisionShape2D;
 class RigidBody2D;
 
 /// 2D Physics raycast hit.
@@ -91,6 +93,8 @@ public:
     virtual void BeginContact(b2Contact* contact);
     /// Called when two fixtures cease to touch.
     virtual void EndContact(b2Contact* contact);
+    /// Called when contact is updated.
+    virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
 
     // Implement b2Draw
     /// Draw a closed polygon provided in CCW order.
@@ -105,6 +109,8 @@ public:
     virtual void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color);
     /// Draw a transform. Choose your own length scale.
     virtual void DrawTransform(const b2Transform& xf);
+    /// Draw a point.
+    virtual void DrawPoint(const b2Vec2& p, float32 size, const b2Color& color);
 
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -197,7 +203,7 @@ public:
     int GetPositionIterations() const { return positionIterations_; }
 
     /// Return the Box2D physics world.
-    b2World* GetWorld() { return world_; }
+    b2World* GetWorld() { return world_.Get(); }
 
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
@@ -209,7 +215,6 @@ protected:
     /// Handle scene being assigned.
     virtual void OnSceneSet(Scene* scene);
 
-private:
     /// Handle the scene subsystem update event, step simulation here.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
     /// Send begin contact events.
@@ -218,7 +223,7 @@ private:
     void SendEndContactEvents();
 
     /// Box2D physics world.
-    b2World* world_;
+    UniquePtr<b2World> world_;
     /// Gravity.
     Vector2 gravity_;
     /// Velocity iterations.
@@ -251,8 +256,8 @@ private:
         ContactInfo();
         /// Construct.
         ContactInfo(b2Contact* contract);
-        /// Copy construct.
-        ContactInfo(const ContactInfo& other);
+        /// Write contact info to buffer.
+        const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 
         /// Rigid body A.
         SharedPtr<RigidBody2D> bodyA_;
@@ -262,13 +267,25 @@ private:
         SharedPtr<Node> nodeA_;
         /// Node B.
         SharedPtr<Node> nodeB_;
-        /// Box2D contact.
-        b2Contact* contact_;
+        /// Shape A.
+        SharedPtr<CollisionShape2D> shapeA_;
+        /// Shape B.
+        SharedPtr<CollisionShape2D> shapeB_;
+        /// Number of contact points.
+        int numPoints_;
+        /// Contact normal in world space.
+        Vector2 worldNormal_;
+        /// Contact positions in world space.
+        Vector2 worldPositions_[b2_maxManifoldPoints];
+        /// Contact overlap values.
+        float separations_[b2_maxManifoldPoints];
     };
     /// Begin contact infos.
     Vector<ContactInfo> beginContactInfos_;
     /// End contact infos.
     Vector<ContactInfo> endContactInfos_;
+    /// Temporary buffer with contact data.
+    VectorBuffer contacts_;
 };
 
 }

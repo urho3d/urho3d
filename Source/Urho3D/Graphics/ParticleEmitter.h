@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +76,8 @@ public:
     void SetEmitting(bool enable);
     /// Set whether particles should be serialized. Default true, set false to reduce scene file size.
     void SetSerializeParticles(bool enable);
+    //// Set to remove either the emitter component or its owner node from the scene automatically on particle effect completion. Disabled by default.
+    void SetAutoRemoveMode(AutoRemoveMode mode);
     /// Reset the emission period timer.
     void ResetEmissionTimer();
     /// Remove all current particles.
@@ -97,6 +99,9 @@ public:
     /// Return whether particles are to be serialized.
     bool GetSerializeParticles() const { return serializeParticles_; }
 
+    /// Return automatic removal mode on particle effect completion.
+    AutoRemoveMode GetAutoRemoveMode() const { return autoRemove_; }
+
     /// Set particles effect attribute.
     void SetEffectAttr(const ResourceRef& value);
     /// Set particles effect attribute.
@@ -116,6 +121,8 @@ protected:
     bool EmitNewParticle();
     /// Return a free particle index.
     unsigned GetFreeParticle() const;
+    /// Return whether has active particles.
+    bool CheckActiveParticles() const;
 
 private:
     /// Handle scene post-update event.
@@ -142,7 +149,9 @@ private:
     /// Serialize particles flag.
     bool serializeParticles_;
     /// Ready to send effect finish event flag.
-    bool sendFinishEvent_;
+    bool sendFinishedEvent_;
+    /// Automatic removal mode.
+    AutoRemoveMode autoRemove_;
 };
 
 }

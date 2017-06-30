@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -156,6 +156,7 @@
 //
 // How to identify different compilers
 //-----------------------------------------
+// Ref: http://nadeausoftware.com/articles/2012/10/c_c_tip_how_detect_compiler_name_and_version_using_compiler_predefined_macros
 
 // MS Visual C++
 //  _MSC_VER   is defined
@@ -168,10 +169,13 @@
 // GNU C based compilers
 //  __GNUC__   is defined
 
+// CLang/LLVM 
+// __clang__ is defined
+
 // Embarcadero C++Builder
 //  __BORLANDC__ is defined
 
-// Sun CC compiler
+// Oracle Solaris Studio (previously known as Sun CC compiler)
 // __SUNPRO_CC is defined
 
 
@@ -472,7 +476,7 @@
 			#ifndef _XBOX
 				// Not tested with xbox (only enabled if is Windows)
 				#undef AS_NO_THISCALL_FUNCTOR_METHOD
-			#endif
+			#endif 
 		#elif defined(_M_X64)
 			#define AS_X64_MSVC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
@@ -491,7 +495,7 @@
 		#define STDCALL_RETURN_SIMPLE_IN_MEMORY
 		#define COMPLEX_MASK (asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY)
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY)
-
+	
 		// Windows CE uses softfp calling convention, while Windows RT uses hardfp calling convention
 		// ref: http://stackoverflow.com/questions/16375355/what-is-the-windows-rt-on-arm-native-code-calling-convention
 		#if defined(_WIN32_WCE)

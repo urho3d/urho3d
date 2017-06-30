@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType private base classes (specification).                   */
 /*                                                                         */
-/*  Copyright 1996-2006, 2008, 2010, 2012-2013 by                          */
+/*  Copyright 1996-2017 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -23,8 +23,8 @@
   /*************************************************************************/
 
 
-#ifndef __FTOBJS_H__
-#define __FTOBJS_H__
+#ifndef FTOBJS_H_
+#define FTOBJS_H_
 
 #include <ft2build.h>
 #include FT_RENDER_H
@@ -72,22 +72,25 @@ FT_BEGIN_HEADER
 
 #define FT_ABS( a )     ( (a) < 0 ? -(a) : (a) )
 
+  /*
+   *  Approximate sqrt(x*x+y*y) using the `alpha max plus beta min'
+   *  algorithm.  We use alpha = 1, beta = 3/8, giving us results with a
+   *  largest error less than 7% compared to the exact value.
+   */
+#define FT_HYPOT( x, y )                 \
+          ( x = FT_ABS( x ),             \
+            y = FT_ABS( y ),             \
+            x > y ? x + ( 3 * y >> 3 )   \
+                  : y + ( 3 * x >> 3 ) )
 
-#define FT_PAD_FLOOR( x, n )  ( (x) & ~((n)-1) )
+  /* we use FT_TYPEOF to suppress signedness compilation warnings */
+#define FT_PAD_FLOOR( x, n )  ( (x) & ~FT_TYPEOF( x )( (n)-1 ) )
 #define FT_PAD_ROUND( x, n )  FT_PAD_FLOOR( (x) + ((n)/2), n )
 #define FT_PAD_CEIL( x, n )   FT_PAD_FLOOR( (x) + ((n)-1), n )
 
-#define FT_PIX_FLOOR( x )     ( (x) & ~63 )
+#define FT_PIX_FLOOR( x )     ( (x) & ~FT_TYPEOF( x )63 )
 #define FT_PIX_ROUND( x )     FT_PIX_FLOOR( (x) + 32 )
 #define FT_PIX_CEIL( x )      FT_PIX_FLOOR( (x) + 63 )
-
-
-  /*
-   *  Return the highest power of 2 that is <= value; this correspond to
-   *  the highest bit in a given 32-bit value.
-   */
-  FT_BASE( FT_UInt32 )
-  ft_highpow2( FT_UInt32  value );
 
 
   /*
@@ -190,6 +193,7 @@ FT_BEGIN_HEADER
   typedef struct  FT_CMap_ClassRec_
   {
     FT_ULong               size;
+
     FT_CMap_InitFunc       init;
     FT_CMap_DoneFunc       done;
     FT_CMap_CharIndexFunc  char_index;
@@ -338,11 +342,19 @@ FT_BEGIN_HEADER
   /*      this data when first opened.  This field exists only if          */
   /*      @FT_CONFIG_OPTION_INCREMENTAL is defined.                        */
   /*                                                                       */
-  /*    ignore_unpatented_hinter ::                                        */
-  /*      This boolean flag instructs the glyph loader to ignore the       */
-  /*      native font hinter, if one is found.  This is exclusively used   */
-  /*      in the case when the unpatented hinter is compiled within the    */
-  /*      library.                                                         */
+  /*    no_stem_darkening ::                                               */
+  /*      Overrides the module-level default, see @stem-darkening[cff],    */
+  /*      for example.  FALSE and TRUE toggle stem darkening on and off,   */
+  /*      respectively, value~-1 means to use the module/driver default.   */
+  /*                                                                       */
+  /*    random_seed ::                                                     */
+  /*      If positive, override the seed value for the CFF `random'        */
+  /*      operator.  Value~0 means to use the font's value.  Value~-1      */
+  /*      means to use the CFF driver's default.                           */
+  /*                                                                       */
+  /*    lcd_weights ::                                                     */
+  /*      Overrides the library default with custom weights for the 5-tap  */
+  /*      FIR filter.  `{0, 0, 0, 0, 0}' means to use the library default. */
   /*                                                                       */
   /*    refcount ::                                                        */
   /*      A counter initialized to~1 at the time an @FT_Face structure is  */
@@ -352,9 +364,9 @@ FT_BEGIN_HEADER
   /*                                                                       */
   typedef struct  FT_Face_InternalRec_
   {
-    FT_Matrix           transform_matrix;
-    FT_Vector           transform_delta;
-    FT_Int              transform_flags;
+    FT_Matrix  transform_matrix;
+    FT_Vector  transform_delta;
+    FT_Int     transform_flags;
 
     FT_ServiceCacheRec  services;
 
@@ -362,8 +374,13 @@ FT_BEGIN_HEADER
     FT_Incremental_InterfaceRec*  incremental_interface;
 #endif
 
-    FT_Bool             ignore_unpatented_hinter;
-    FT_Int              refcount;
+    FT_Char              no_stem_darkening;
+    FT_Int32             random_seed;
+#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+    FT_LcdFiveTapFilter  lcd_weights;  /* preset or custom filter weights */
+#endif
+
+    FT_Int  refcount;
 
   } FT_Face_InternalRec;
 
@@ -402,7 +419,7 @@ FT_BEGIN_HEADER
   /*    glyph_hints       :: Format-specific glyph hints management.       */
   /*                                                                       */
 
-#define FT_GLYPH_OWN_BITMAP  0x1
+#define FT_GLYPH_OWN_BITMAP  0x1U
 
   typedef struct  FT_Slot_InternalRec_
   {
@@ -416,8 +433,6 @@ FT_BEGIN_HEADER
   } FT_GlyphSlot_InternalRec;
 
 
-#if 0
-
   /*************************************************************************/
   /*                                                                       */
   /* <Struct>                                                              */
@@ -425,17 +440,25 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    This structure contains the internal fields of each FT_Size        */
-  /*    object.  Currently, it's empty.                                    */
+  /*    object.                                                            */
+  /*                                                                       */
+  /* <Fields>                                                              */
+  /*    module_data      :: Data specific to a driver module.              */
+  /*                                                                       */
+  /*    autohint_mode    :: The used auto-hinting mode.                    */
+  /*                                                                       */
+  /*    autohint_metrics :: Metrics used by the auto-hinter.               */
   /*                                                                       */
   /*************************************************************************/
 
   typedef struct  FT_Size_InternalRec_
   {
-    /* empty */
+    void*  module_data;
+
+    FT_Render_Mode   autohint_mode;
+    FT_Size_Metrics  autohint_metrics;
 
   } FT_Size_InternalRec;
-
-#endif
 
 
   /*************************************************************************/
@@ -503,6 +526,9 @@ FT_BEGIN_HEADER
 #define FT_DRIVER_HAS_HINTER( x )  ( FT_MODULE_CLASS( x )->module_flags & \
                                      FT_MODULE_DRIVER_HAS_HINTER )
 
+#define FT_DRIVER_HINTS_LIGHTLY( x )  ( FT_MODULE_CLASS( x )->module_flags & \
+                                        FT_MODULE_DRIVER_HINTS_LIGHTLY )
+
 
   /*************************************************************************/
   /*                                                                       */
@@ -531,7 +557,16 @@ FT_BEGIN_HEADER
 
   FT_BASE( FT_Pointer )
   ft_module_get_service( FT_Module    module,
-                         const char*  service_id );
+                         const char*  service_id,
+                         FT_Bool      global );
+
+#ifdef FT_CONFIG_OPTION_ENVIRONMENT_PROPERTIES
+  FT_BASE( FT_Error )
+  ft_property_string_set( FT_Library        library,
+                          const FT_String*  module_name,
+                          const FT_String*  property_name,
+                          FT_String*        value );
+#endif
 
   /* */
 
@@ -611,12 +646,12 @@ FT_BEGIN_HEADER
 
 #define FT_REQUEST_WIDTH( req )                                            \
           ( (req)->horiResolution                                          \
-              ? (FT_Pos)( (req)->width * (req)->horiResolution + 36 ) / 72 \
+              ? ( (req)->width * (FT_Pos)(req)->horiResolution + 36 ) / 72 \
               : (req)->width )
 
 #define FT_REQUEST_HEIGHT( req )                                            \
           ( (req)->vertResolution                                           \
-              ? (FT_Pos)( (req)->height * (req)->vertResolution + 36 ) / 72 \
+              ? ( (req)->height * (FT_Pos)(req)->vertResolution + 36 ) / 72 \
               : (req)->height )
 
 
@@ -738,9 +773,8 @@ FT_BEGIN_HEADER
   /*     faces_list   :: The list of faces currently opened by this        */
   /*                     driver.                                           */
   /*                                                                       */
-  /*     glyph_loader :: The glyph loader for all faces managed by this    */
-  /*                     driver.  This object isn't defined for unscalable */
-  /*                     formats.                                          */
+  /*     glyph_loader :: Unused.  Used to be glyph loader for all faces    */
+  /*                     managed by this driver.                           */
   /*                                                                       */
   typedef struct  FT_DriverRec_
   {
@@ -767,19 +801,19 @@ FT_BEGIN_HEADER
 
   /* This hook is used by the TrueType debugger.  It must be set to an */
   /* alternate truetype bytecode interpreter function.                 */
-#define FT_DEBUG_HOOK_TRUETYPE            0
-
-
-  /* Set this debug hook to a non-null pointer to force unpatented hinting */
-  /* for all faces when both TT_USE_BYTECODE_INTERPRETER and               */
-  /* TT_CONFIG_OPTION_UNPATENTED_HINTING are defined.  This is only used   */
-  /* during debugging.                                                     */
-#define FT_DEBUG_HOOK_UNPATENTED_HINTING  1
+#define FT_DEBUG_HOOK_TRUETYPE  0
 
 
   typedef void  (*FT_Bitmap_LcdFilterFunc)( FT_Bitmap*      bitmap,
                                             FT_Render_Mode  render_mode,
-                                            FT_Library      library );
+                                            FT_Byte*        weights );
+
+
+  /* This is the default LCD filter, an in-place, 5-tap FIR filter. */
+  FT_BASE( void )
+  ft_lcd_filter_fir( FT_Bitmap*           bitmap,
+                     FT_Render_Mode       mode,
+                     FT_LcdFiveTapFilter  weights );
 
 
   /*************************************************************************/
@@ -820,14 +854,17 @@ FT_BEGIN_HEADER
   /*                        handle to the current renderer for the         */
   /*                        FT_GLYPH_FORMAT_OUTLINE format.                */
   /*                                                                       */
-  /*    auto_hinter      :: XXX                                            */
+  /*    auto_hinter      :: The auto-hinter module interface.              */
   /*                                                                       */
   /*    raster_pool      :: The raster object's render pool.  This can     */
   /*                        ideally be changed dynamically at run-time.    */
   /*                                                                       */
   /*    raster_pool_size :: The size of the render pool in bytes.          */
   /*                                                                       */
-  /*    debug_hooks      :: XXX                                            */
+  /*    debug_hooks      :: An array of four function pointers that allow  */
+  /*                        debuggers to hook into a font format's         */
+  /*                        interpreter.  Currently, only the TrueType     */
+  /*                        bytecode debugger uses this.                   */
   /*                                                                       */
   /*    lcd_filter       :: If subpixel rendering is activated, the        */
   /*                        selected LCD filter mode.                      */
@@ -842,7 +879,7 @@ FT_BEGIN_HEADER
   /*                        filtering callback function.                   */
   /*                                                                       */
   /*    pic_container    :: Contains global structs and tables, instead    */
-  /*                        of defining them globallly.                    */
+  /*                        of defining them globally.                     */
   /*                                                                       */
   /*    refcount         :: A counter initialized to~1 at the time an      */
   /*                        @FT_Library structure is created.              */
@@ -875,7 +912,7 @@ FT_BEGIN_HEADER
 #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
     FT_LcdFilter             lcd_filter;
     FT_Int                   lcd_extra;        /* number of extra pixels */
-    FT_Byte                  lcd_weights[7];   /* filter weights, if any */
+    FT_LcdFiveTapFilter      lcd_weights;      /* filter weights, if any */
     FT_Bitmap_LcdFilterFunc  lcd_filter_func;  /* filtering callback     */
 #endif
 
@@ -980,8 +1017,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Outline_Funcs struct.         */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
-  /*    be called with a pre-allocated structure to be filled.             */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
+  /*    to be called with a pre-allocated structure to be filled.          */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
   /*    is used).                                                          */
@@ -1039,8 +1076,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Raster_Funcs struct.          */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
-  /*    be called with a pre-allocated structure to be filled.             */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
+  /*    to be called with a pre-allocated structure to be filled.          */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
   /*    is used).                                                          */
@@ -1099,8 +1136,8 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Glyph_Class struct.           */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
-  /*    be called with a pre-allocated stcture to be filled.               */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
+  /*    to be called with a pre-allocated structure to be filled.          */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
   /*    is used).                                                          */
@@ -1173,11 +1210,11 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Renderer_Class struct.        */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a `create' funtion will need  */
-  /*    to be called with a pointer where the allocated structure is       */
+  /*    When FT_CONFIG_OPTION_PIC is defined a `create' function will      */
+  /*    need to be called with a pointer where the allocated structure is  */
   /*    returned.  And when it is no longer needed a `destroy' function    */
   /*    needs to be called to release that allocation.                     */
-  /*    `fcinit.c' (ft_create_default_module_classes) already contains     */
+  /*    `ftinit.c' (ft_create_default_module_classes) already contains     */
   /*    a mechanism to call these functions for the default modules        */
   /*    described in `ftmodule.h'.                                         */
   /*                                                                       */
@@ -1377,11 +1414,11 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an instance of an FT_Module_Class struct.       */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a `create' funtion needs to   */
-  /*    be called with a pointer where the allocated structure is          */
+  /*    When FT_CONFIG_OPTION_PIC is defined a `create' function needs     */
+  /*    to be called with a pointer where the allocated structure is       */
   /*    returned.  And when it is no longer needed a `destroy' function    */
   /*    needs to be called to release that allocation.                     */
-  /*    `fcinit.c' (ft_create_default_module_classes) already contains     */
+  /*    `ftinit.c' (ft_create_default_module_classes) already contains     */
   /*    a mechanism to call these functions for the default modules        */
   /*    described in `ftmodule.h'.                                         */
   /*                                                                       */
@@ -1563,7 +1600,7 @@ FT_BEGIN_HEADER
 
 FT_END_HEADER
 
-#endif /* __FTOBJS_H__ */
+#endif /* FTOBJS_H_ */
 
 
 /* END */

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,11 +55,11 @@ public:
     virtual UpdateGeometryType GetUpdateGeometryType();
 
     /// Set font by looking from resource cache by name and font size. Return true if successful.
-    bool SetFont(const String& fontName, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(const String& fontName, float size = DEFAULT_FONT_SIZE);
     /// Set font and font size. Return true if successful.
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
     /// Set font size only while retaining the existing font. Return true if successful.
-    bool SetFontSize(int size);
+    bool SetFontSize(float size);
     /// Set material.
     void SetMaterial(Material* material);
     /// Set text. Text is assumed to be either ASCII or UTF8-encoded.
@@ -104,7 +104,7 @@ public:
     /// Return font.
     Font* GetFont() const;
     /// Return font size.
-    int GetFontSize() const;
+    float GetFontSize() const;
     /// Return material.
     Material* GetMaterial() const;
     /// Return text.
@@ -133,6 +133,8 @@ public:
     float GetEffectDepthBias() const;
     /// Return text width.
     int GetWidth() const;
+    /// Return text height.
+    int GetHeight() const;
     /// Return row height.
     int GetRowHeight() const;
     /// Return number of rows.
@@ -142,9 +144,9 @@ public:
     /// Return width of row by index.
     int GetRowWidth(unsigned index) const;
     /// Return position of character by index relative to the text element origin.
-    IntVector2 GetCharPosition(unsigned index);
+    Vector2 GetCharPosition(unsigned index);
     /// Return size of character by index.
-    IntVector2 GetCharSize(unsigned index);
+    Vector2 GetCharSize(unsigned index);
     /// Return corner color.
     const Color& GetColor(Corner corner) const;
     /// Return opacity.
@@ -200,6 +202,8 @@ protected:
     Matrix3x4 customWorldTransform_;
     /// Text rotation mode in relation to the camera.
     FaceCameraMode faceCameraMode_;
+    /// Minimal angle between text normal and look-at direction.
+    float minAngle_;
     /// Fixed screen size flag.
     bool fixedScreenSize_;
     /// Text needs update flag.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ public:
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers);
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
 
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
@@ -124,7 +124,7 @@ public:
     PODVector<UIElement*> GetSelectedItems() const;
     /// Return whether an item at index is seleccted.
     bool IsSelected(unsigned index) const;
-    /// Return whether an item at index has its children expanded (in hierachy mode only).
+    /// Return whether an item at index has its children expanded (in hierarchy mode only).
     bool IsExpanded(unsigned index) const;
 
     /// Return highlight mode.

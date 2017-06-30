@@ -51,9 +51,9 @@ function HandleUpdate(eventType, eventData)
         -- Initializing HTTP request
         if httpRequest.state == HTTP_INITIALIZING then
             return
-        -- An error has occured
+        -- An error has occurred
         elseif httpRequest.state == HTTP_ERROR then
-            text.text = "An error has occured."
+            text.text = "An error has occurred."
             UnsubscribeFromEvent("Update")
         -- Get message data
         else

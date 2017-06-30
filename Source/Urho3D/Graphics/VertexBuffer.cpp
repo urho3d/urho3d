@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,8 @@ VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     lockCount_(0),
     lockScratchData_(0),
     shadowed_(false),
-    dynamic_(false)
+    dynamic_(false),
+    discardLock_(false)
 {
     UpdateOffsets();
 
@@ -199,6 +200,17 @@ unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
     }
 
     return size;
+}
+
+void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
+{
+    unsigned elementOffset = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        i->offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[i->type_];
+    }
 }
 
 }

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -67,12 +67,12 @@ protected:
 	void               ReadData(void *data, asUINT size);
 	void               ReadString(asCString *str);
 	asCScriptFunction *ReadFunction(bool &isNew, bool addToModule = true, bool addToEngine = true, bool addToGC = true);
-	void               ReadFunctionSignature(asCScriptFunction *func);
+	void               ReadFunctionSignature(asCScriptFunction *func, asCObjectType **parentClass = 0);
 	void               ReadGlobalProperty();
 	void               ReadObjectProperty(asCObjectType *ot);
 	void               ReadDataType(asCDataType *dt);
-	asCObjectType *    ReadObjectType();
-	void               ReadObjectTypeDeclaration(asCObjectType *ot, int phase);
+	asCTypeInfo       *ReadTypeInfo();
+	void               ReadTypeDeclaration(asCTypeInfo *ot, int phase);
 	void               ReadByteCode(asCScriptFunction *func);
 	asWORD             ReadEncodedUInt16();
 	asUINT             ReadEncodedUInt();
@@ -84,7 +84,7 @@ protected:
 	void ReadUsedStringConstants();
 	void ReadUsedObjectProps();
 
-	asCObjectType *    FindObjectType(int idx);
+	asCTypeInfo *      FindType(int idx);
 	int                FindTypeId(int idx);
 	short              FindObjectPropOffset(asWORD index);
 	asCScriptFunction *FindFunction(int idx);
@@ -99,7 +99,7 @@ protected:
 
 	// Temporary storage for persisting variable data
 	asCArray<int>                usedTypeIds;
-	asCArray<asCObjectType*>     usedTypes;
+	asCArray<asCTypeInfo*>       usedTypes;
 	asCArray<asCScriptFunction*> usedFunctions;
 	asCArray<void*>              usedGlobalProperties;
 	asCArray<int>                usedStringConstants;
@@ -174,13 +174,13 @@ protected:
 	void WriteGlobalProperty(asCGlobalProperty *prop);
 	void WriteObjectProperty(asCObjectProperty *prop);
 	void WriteDataType(const asCDataType *dt);
-	void WriteObjectType(asCObjectType *ot);
-	void WriteObjectTypeDeclaration(asCObjectType *ot, int phase);
+	void WriteTypeInfo(asCTypeInfo *ot);
+	void WriteTypeDeclaration(asCTypeInfo *ot, int phase);
 	void WriteByteCode(asCScriptFunction *func);
 	void WriteEncodedInt64(asINT64 i);
 
 	// Helper functions for storing variable data
-	int FindObjectTypeIdx(asCObjectType*);
+	int FindTypeInfoIdx(asCTypeInfo *ti);
 	int FindTypeIdIdx(int typeId);
 	int FindFunctionIndex(asCScriptFunction *func);
 	int FindGlobalPropPtrIndex(void *);
@@ -201,7 +201,7 @@ protected:
 
 	// Temporary storage for persisting variable data
 	asCArray<int>                usedTypeIds;
-	asCArray<asCObjectType*>     usedTypes;
+	asCArray<asCTypeInfo*>       usedTypes;
 	asCArray<asCScriptFunction*> usedFunctions;
 	asCArray<void*>              usedGlobalProperties;
 	asCArray<int>                usedStringConstants;

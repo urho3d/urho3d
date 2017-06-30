@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -1014,10 +1014,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
     if (src == 0)
         return 0;
     
-    unsigned short word1 = *src;
+    unsigned short word1 = *src++;
     
     // Check if we are at a low surrogate
-    word1 = *src++;
     if (word1 >= 0xdc00 && word1 < 0xe000)
     {
         while (*src >= 0xdc00 && *src < 0xe000)

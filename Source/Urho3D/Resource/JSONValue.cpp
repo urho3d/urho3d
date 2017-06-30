@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "../Precompiled.h"
 
 #include "../Core/Context.h"
+#include "../Core/StringUtils.h"
 #include "../IO/Log.h"
 #include "../Resource/JSONValue.h"
 
@@ -30,6 +31,26 @@
 
 namespace Urho3D
 {
+
+static const char* valueTypeNames[] =
+{
+    "Null",
+    "Bool",
+    "Number",
+    "String",
+    "Array",
+    "Object",
+    0
+};
+
+static const char* numberTypeNames[] =
+{
+    "NaN",
+    "Int",
+    "Unsigned",
+    "Real",
+    0
+};
 
 const JSONValue JSONValue::EMPTY;
 const JSONArray JSONValue::emptyArray;
@@ -152,6 +173,16 @@ JSONNumberType JSONValue::GetNumberType() const
     return (JSONNumberType)(type_ & 0xffff);
 }
 
+String JSONValue::GetValueTypeName() const
+{
+    return GetValueTypeName(GetValueType());
+}
+
+String JSONValue::GetNumberTypeName() const
+{
+    return GetNumberTypeName(GetNumberType());
+}
+
 JSONValue& JSONValue::operator [](unsigned index)
 {
     // Convert to array type
@@ -212,6 +243,8 @@ unsigned JSONValue::Size() const
 {
     if (GetValueType() == JSON_ARRAY)
         return arrayValue_->Size();
+    else if (GetValueType() == JSON_OBJECT)
+        return objectValue_->Size();
 
     return 0;
 }
@@ -289,7 +322,7 @@ JSONObjectIterator JSONValue::End()
     // Convert to object type.
     SetType(JSON_OBJECT);
 
-    return objectValue_->Begin();
+    return objectValue_->End();
 }
 
 ConstJSONObjectIterator JSONValue::End() const
@@ -548,7 +581,8 @@ VariantMap JSONValue::GetVariantMap() const
 
     for (ConstJSONObjectIterator i = Begin(); i != End(); ++i)
     {
-        StringHash key(ToUInt(i->first_));
+        /// \todo Ideally this should allow any strings, but for now the convention is that the keys need to be hexadecimal StringHashes
+        StringHash key(ToUInt(i->first_, 16));
         Variant variant = i->second_.GetVariant();
         variantMap[key] = variant;
     }
@@ -584,6 +618,36 @@ VariantVector JSONValue::GetVariantVector() const
     }
 
     return variantVector;
+}
+
+String JSONValue::GetValueTypeName(JSONValueType type)
+{
+    return valueTypeNames[type];
+}
+
+String JSONValue::GetNumberTypeName(JSONNumberType type)
+{
+    return numberTypeNames[type];
+}
+
+JSONValueType JSONValue::GetValueTypeFromName(const String& typeName)
+{
+    return GetValueTypeFromName(typeName.CString());
+}
+
+JSONValueType JSONValue::GetValueTypeFromName(const char* typeName)
+{
+    return (JSONValueType)GetStringListIndex(typeName, valueTypeNames, JSON_NULL);
+}
+
+JSONNumberType JSONValue::GetNumberTypeFromName(const String& typeName)
+{
+    return GetNumberTypeFromName(typeName.CString());
+}
+
+JSONNumberType JSONValue::GetNumberTypeFromName(const char* typeName)
+{
+    return (JSONNumberType)GetStringListIndex(typeName, numberTypeNames, JSONNT_NAN);
 }
 
 }

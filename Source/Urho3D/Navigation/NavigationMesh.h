@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -278,9 +278,9 @@ protected:
     /// Detour navigation mesh query.
     dtNavMeshQuery* navMeshQuery_;
     /// Detour navigation mesh query filter.
-    dtQueryFilter* queryFilter_;
+    UniquePtr<dtQueryFilter> queryFilter_;
     /// Temporary data for finding a path.
-    FindPathData* pathData_;
+    UniquePtr<FindPathData> pathData_;
     /// Tile size.
     int tileSize_;
     /// Cell size.

@@ -38,7 +38,7 @@ function CreateScene()
 
     -- Create scene node & StaticModel component for showing a static plane
     local planeNode = scene_:CreateChild("Plane")
-    planeNode.scale = Vector3(100.0, 1.0, 100.0)
+    planeNode.scale = Vector3(50.0, 1.0, 50.0)
     local planeObject = planeNode:CreateComponent("StaticModel")
     planeObject.model = cache:GetResource("Model", "Models/Plane.mdl")
     planeObject.material = cache:GetResource("Material", "Materials/StoneTiled.xml")
@@ -47,8 +47,8 @@ function CreateScene()
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
     zone.boundingBox = BoundingBox(-1000.0, 1000.0)
-    zone.ambientColor = Color(0.15, 0.15, 0.15)
-    zone.fogColor = Color(0.5, 0.5, 0.7)
+    zone.ambientColor = Color(0.5, 0.5, 0.5)
+    zone.fogColor = Color(0.4, 0.5, 0.8)
     zone.fogStart = 100.0
     zone.fogEnd = 300.0
 
@@ -58,29 +58,31 @@ function CreateScene()
     local light = lightNode:CreateComponent("Light")
     light.lightType = LIGHT_DIRECTIONAL
     light.castShadows = true
+    light.color = Color(0.5, 0.5, 0.5)
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
 
     -- Create animated models
-    local uint NUM_MODELS = 100
+    local uint NUM_MODELS = 30
     local MODEL_MOVE_SPEED = 2.0
     local MODEL_ROTATE_SPEED = 100.0
-    local bounds = BoundingBox(Vector3(-47.0, 0.0, -47.0), Vector3(47.0, 0.0, 47.0))
+    local bounds = BoundingBox(Vector3(-20.0, 0.0, -20.0), Vector3(20.0, 0.0, 20.0))
 
     for i = 1, NUM_MODELS do
-        local modelNode = scene_:CreateChild("Jack")
-        modelNode.position = Vector3(Random(90.0) - 45.0, 0.0, Random(90.0) - 45.0)
+        local modelNode = scene_:CreateChild("Jill")
+        modelNode.position = Vector3(Random(40.0) - 20.0, 0.0, Random(40.0) - 20.0)
         modelNode.rotation = Quaternion(0.0, Random(360.0), 0.0)
+
         local modelObject = modelNode:CreateComponent("AnimatedModel")
-        modelObject.model = cache:GetResource("Model", "Models/Jack.mdl")
-        modelObject.material = cache:GetResource("Material", "Materials/Jack.xml")
+        modelObject.model = cache:GetResource("Model", "Models/Kachujin/Kachujin.mdl")
+        modelObject.material = cache:GetResource("Material", "Models/Kachujin/Materials/Kachujin.xml")
         modelObject.castShadows = true
 
         -- Create an AnimationState for a walk animation. Its time position will need to be manually updated to advance the
         -- animation, The alternative would be to use an AnimationController component which updates the animation automatically,
         -- but we need to update the model's position manually in any case
-        local walkAnimation = cache:GetResource("Animation", "Models/Jack_Walk.ani")
+        local walkAnimation = cache:GetResource("Animation", "Models/Kachujin/Kachujin_Walk.ani")
         local state = modelObject:AddAnimationState(walkAnimation)
         -- Enable full blending weight and looping
         state.weight = 1.0
@@ -216,7 +218,7 @@ function Mover:Update(timeStep)
     end
 
     -- Get the model's first (only) animation state and advance its time
-    local model = node:GetComponent("AnimatedModel")
+    local model = node:GetComponent("AnimatedModel", true)
     local state = model:GetAnimationState(0)
     if state ~= nil then
         state:AddTime(timeStep)

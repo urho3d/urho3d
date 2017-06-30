@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -168,7 +168,7 @@ void Run(Vector<String>& arguments)
         ErrorExit("An input and output file must be specified.");
 
     if (frameWidth ^ frameHeight)
-        ErrorExit("Both frameHeight and frameWidth must be ommited or specified.");
+        ErrorExit("Both frameHeight and frameWidth must be omitted or specified.");
 
     // take last input file as output
     if (inputFiles.Size() > 1)
@@ -327,7 +327,7 @@ void Run(Vector<String>& arguments)
                 packedHeight = size.y_;
             }
         }
-        delete packerRects;
+        delete[] packerRects;
         if (!success)
             ErrorExit("Could not allocate for all images.  The max sprite sheet texture size is " + String(MAX_TEXTURE_SIZE) + "x" + String(MAX_TEXTURE_SIZE) + ".");
     }
@@ -362,7 +362,7 @@ void Run(Vector<String>& arguments)
             subTexture.SetInt("offsetY", packerInfo->offsetY);
         }
 
-        URHO3D_LOGINFO("Transfering " + packerInfo->path + " to sprite sheet.");
+        URHO3D_LOGINFO("Transferring " + packerInfo->path + " to sprite sheet.");
 
         File file(context, packerInfo->path);
         Image image(context);

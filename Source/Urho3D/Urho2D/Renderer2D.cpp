@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -305,7 +305,7 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
     return newMaterial;
 }
 
-void CheckDrawableVisibility(const WorkItem* item, unsigned threadIndex)
+void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
     Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
     Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
@@ -348,7 +348,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
         {
             SharedPtr<WorkItem> item = queue->GetFreeItem();
             item->priority_ = M_MAX_UNSIGNED;
-            item->workFunction_ = CheckDrawableVisibility;
+            item->workFunction_ = CheckDrawableVisibilityWork;
             item->aux_ = this;
 
             PODVector<Drawable2D*>::Iterator end = drawables_.End();

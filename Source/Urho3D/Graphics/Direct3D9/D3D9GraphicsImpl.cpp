@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,12 @@ bool GraphicsImpl::CheckFormatSupport(D3DFORMAT format, DWORD usage, D3DRESOURCE
 {
     return interface_ ? SUCCEEDED(interface_->CheckDeviceFormat(adapter_, deviceType_, D3DFMT_X8R8G8B8, usage, type, format)) :
         false;
+}
+
+bool GraphicsImpl::CheckMultiSampleSupport(D3DFORMAT format, int level)
+{
+    return interface_ ? SUCCEEDED(interface_->CheckDeviceMultiSampleType(adapter_, deviceType_, format, FALSE,
+        (D3DMULTISAMPLE_TYPE)level, NULL)) : false;
 }
 
 }

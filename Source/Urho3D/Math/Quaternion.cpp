@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -221,6 +221,16 @@ float Quaternion::RollAngle() const
     return EulerAngles().z_;
 }
 
+Urho3D::Vector3 Quaternion::Axis() const
+{
+    return Vector3(x_, y_, z_) / sqrt(1 - w_ * w_);
+}
+
+float Quaternion::Angle() const
+{
+    return 2 * Acos(w_);
+}
+
 Matrix3 Quaternion::RotationMatrix() const
 {
     return Matrix3(
@@ -236,7 +246,7 @@ Matrix3 Quaternion::RotationMatrix() const
     );
 }
 
-Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
+Quaternion Quaternion::Slerp(const Quaternion& rhs, float t) const
 {
     // Use fast approximation for Emscripten builds
 #ifdef __EMSCRIPTEN__
@@ -272,11 +282,12 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
 #else
     // Favor accuracy for native code builds
     float cosAngle = DotProduct(rhs);
+    float sign = 1.0f;
     // Enable shortest path rotation
     if (cosAngle < 0.0f)
     {
         cosAngle = -cosAngle;
-        rhs = -rhs;
+        sign = -1.0f;
     }
 
     float angle = acosf(cosAngle);
@@ -295,11 +306,11 @@ Quaternion Quaternion::Slerp(Quaternion rhs, float t) const
         t2 = t;
     }
 
-    return *this * t1 + rhs * t2;
+    return *this * t1 + (rhs * sign) * t2;
 #endif
 }
 
-Quaternion Quaternion::Nlerp(Quaternion rhs, float t, bool shortestPath) const
+Quaternion Quaternion::Nlerp(const Quaternion& rhs, float t, bool shortestPath) const
 {
     Quaternion result;
     float fCos = DotProduct(rhs);

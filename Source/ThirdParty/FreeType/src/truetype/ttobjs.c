@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (body).                                              */
 /*                                                                         */
-/*  Copyright 1996-2013                                                    */
+/*  Copyright 1996-2017 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -30,10 +30,6 @@
 
 #ifdef TT_USE_BYTECODE_INTERPRETER
 #include "ttinterp.h"
-#endif
-
-#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
-#include FT_TRUETYPE_UNPATENTED_H
 #endif
 
 #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
@@ -121,7 +117,7 @@
     FT_Error  error;
 
 
-    FT_MEM_ZERO( zone, sizeof ( *zone ) );
+    FT_ZERO( zone );
     zone->memory = memory;
 
     if ( FT_NEW_ARRAY( zone->org,      maxPoints   ) ||
@@ -150,20 +146,44 @@
   tt_check_trickyness_family( FT_String*  name )
   {
 
-#define TRICK_NAMES_MAX_CHARACTERS  16
-#define TRICK_NAMES_COUNT            8
+#define TRICK_NAMES_MAX_CHARACTERS  19
+#define TRICK_NAMES_COUNT           18
 
     static const char trick_names[TRICK_NAMES_COUNT]
                                  [TRICK_NAMES_MAX_CHARACTERS + 1] =
     {
-      "DFKaiSho-SB",     /* dfkaisb.ttf */
+      /*
+         PostScript names are given in brackets if they differ from the
+         family name.  The version numbers, together with the copyright or
+         release year data, are taken from fonts available to the
+         developers.
+
+         Note that later versions of the fonts might be no longer tricky;
+         for example, `MingLiU' version 7.00 (file `mingliu.ttc' from
+         Windows 7) is an ordinary TTC with non-tricky subfonts.
+       */
+
+      "cpop",               /* dftt-p7.ttf; version 1.00, 1992 [DLJGyShoMedium] */
+      "DFGirl-W6-WIN-BF",   /* dftt-h6.ttf; version 1.00, 1993 */
+      "DFKaiSho-SB",        /* dfkaisb.ttf */
       "DFKaiShu",
-      "DFKai-SB",        /* kaiu.ttf */
-      "HuaTianKaiTi?",   /* htkt2.ttf */
-      "HuaTianSongTi?",  /* htst3.ttf */
-      "MingLiU",         /* mingliu.ttf & mingliu.ttc */
-      "PMingLiU",        /* mingliu.ttc */
-      "MingLi43",        /* mingli.ttf */
+      "DFKai-SB",           /* kaiu.ttf; version 3.00, 1998 [DFKaiShu-SB-Estd-BF] */
+      "DLC",                /* dftt-m7.ttf; version 1.00, 1993 [DLCMingBold] */
+                            /* dftt-f5.ttf; version 1.00, 1993 [DLCFongSung] */
+      "DLCHayMedium",       /* dftt-b5.ttf; version 1.00, 1993 */
+      "DLCHayBold",         /* dftt-b7.ttf; version 1.00, 1993 */
+      "DLCKaiMedium",       /* dftt-k5.ttf; version 1.00, 1992 */
+      "DLCLiShu",           /* dftt-l5.ttf; version 1.00, 1992 */
+      "DLCRoundBold",       /* dftt-r7.ttf; version 1.00, 1993 */
+      "HuaTianKaiTi?",      /* htkt2.ttf */
+      "HuaTianSongTi?",     /* htst3.ttf */
+      "Ming(for ISO10646)", /* hkscsiic.ttf; version 0.12, 2007 [Ming] */
+                            /* iicore.ttf; version 0.07, 2007 [Ming] */
+      "MingLiU",            /* mingliu.ttf */
+                            /* mingliu.ttc; version 3.21, 2001 */
+      "MingMedium",         /* dftt-m5.ttf; version 1.00, 1993 [DLCMingMedium] */
+      "PMingLiU",           /* mingliu.ttc; version 3.21, 2001 */
+      "MingLi43",           /* mingli.ttf; version 1.00, 1992 */
     };
 
     int  nn;
@@ -190,7 +210,7 @@
   {
     FT_Error   error;
     FT_UInt32  checksum = 0;
-    int        i;
+    FT_UInt    i;
 
 
     if ( FT_FRAME_ENTER( length ) )
@@ -199,8 +219,8 @@
     for ( ; length > 3; length -= 4 )
       checksum += (FT_UInt32)FT_GET_ULONG();
 
-    for ( i = 3; length > 0; length --, i-- )
-      checksum += (FT_UInt32)( FT_GET_BYTE() << ( i * 8 ) );
+    for ( i = 3; length > 0; length--, i-- )
+      checksum += (FT_UInt32)FT_GET_BYTE() << ( i * 8 );
 
     FT_FRAME_EXIT();
 
@@ -245,7 +265,7 @@
   tt_check_trickyness_sfnt_ids( TT_Face  face )
   {
 #define TRICK_SFNT_IDS_PER_FACE   3
-#define TRICK_SFNT_IDS_NUM_FACES  17
+#define TRICK_SFNT_IDS_NUM_FACES  19
 
     static const tt_sfnt_id_rec sfnt_id[TRICK_SFNT_IDS_NUM_FACES]
                                        [TRICK_SFNT_IDS_PER_FACE] = {
@@ -255,89 +275,99 @@
 #define TRICK_SFNT_ID_prep  2
 
       { /* MingLiU 1995 */
-        { 0x05bcf058, 0x000002e4 }, /* cvt  */
-        { 0x28233bf1, 0x000087c4 }, /* fpgm */
-        { 0xa344a1ea, 0x000001e1 }  /* prep */
+        { 0x05BCF058UL, 0x000002E4UL }, /* cvt  */
+        { 0x28233BF1UL, 0x000087C4UL }, /* fpgm */
+        { 0xA344A1EAUL, 0x000001E1UL }  /* prep */
       },
       { /* MingLiU 1996- */
-        { 0x05bcf058, 0x000002e4 }, /* cvt  */
-        { 0x28233bf1, 0x000087c4 }, /* fpgm */
-        { 0xa344a1eb, 0x000001e1 }  /* prep */
+        { 0x05BCF058UL, 0x000002E4UL }, /* cvt  */
+        { 0x28233BF1UL, 0x000087C4UL }, /* fpgm */
+        { 0xA344A1EBUL, 0x000001E1UL }  /* prep */
       },
       { /* DFKaiShu */
-        { 0x11e5ead4, 0x00000350 }, /* cvt  */
-        { 0x5a30ca3b, 0x00009063 }, /* fpgm */
-        { 0x13a42602, 0x0000007e }  /* prep */
+        { 0x11E5EAD4UL, 0x00000350UL }, /* cvt  */
+        { 0x5A30CA3BUL, 0x00009063UL }, /* fpgm */
+        { 0x13A42602UL, 0x0000007EUL }  /* prep */
+      },
+      { /* DFKaiShu, variant */
+        { 0x11E5EAD4UL, 0x00000350UL }, /* cvt  */
+        { 0xA6E78C01UL, 0x00008998UL }, /* fpgm */
+        { 0x13A42602UL, 0x0000007EUL }  /* prep */
       },
       { /* HuaTianKaiTi */
-        { 0xfffbfffc, 0x00000008 }, /* cvt  */
-        { 0x9c9e48b8, 0x0000bea2 }, /* fpgm */
-        { 0x70020112, 0x00000008 }  /* prep */
+        { 0xFFFBFFFCUL, 0x00000008UL }, /* cvt  */
+        { 0x9C9E48B8UL, 0x0000BEA2UL }, /* fpgm */
+        { 0x70020112UL, 0x00000008UL }  /* prep */
       },
       { /* HuaTianSongTi */
-        { 0xfffbfffc, 0x00000008 }, /* cvt  */
-        { 0x0a5a0483, 0x00017c39 }, /* fpgm */
-        { 0x70020112, 0x00000008 }  /* prep */
+        { 0xFFFBFFFCUL, 0x00000008UL }, /* cvt  */
+        { 0x0A5A0483UL, 0x00017C39UL }, /* fpgm */
+        { 0x70020112UL, 0x00000008UL }  /* prep */
       },
       { /* NEC fadpop7.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40c92555, 0x000000e5 }, /* fpgm */
-        { 0xa39b58e3, 0x0000117c }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x40C92555UL, 0x000000E5UL }, /* fpgm */
+        { 0xA39B58E3UL, 0x0000117CUL }  /* prep */
       },
       { /* NEC fadrei5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x33c41652, 0x000000e5 }, /* fpgm */
-        { 0x26d6c52a, 0x00000f6a }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x33C41652UL, 0x000000E5UL }, /* fpgm */
+        { 0x26D6C52AUL, 0x00000F6AUL }  /* prep */
       },
       { /* NEC fangot7.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x6db1651d, 0x0000019d }, /* fpgm */
-        { 0x6c6e4b03, 0x00002492 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x6DB1651DUL, 0x0000019DUL }, /* fpgm */
+        { 0x6C6E4B03UL, 0x00002492UL }  /* prep */
       },
       { /* NEC fangyo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40c92555, 0x000000e5 }, /* fpgm */
-        { 0xde51fad0, 0x0000117c }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x40C92555UL, 0x000000E5UL }, /* fpgm */
+        { 0xDE51FAD0UL, 0x0000117CUL }  /* prep */
       },
       { /* NEC fankyo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x85e47664, 0x000000e5 }, /* fpgm */
-        { 0xa6c62831, 0x00001caa }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x85E47664UL, 0x000000E5UL }, /* fpgm */
+        { 0xA6C62831UL, 0x00001CAAUL }  /* prep */
       },
       { /* NEC fanrgo5.ttf */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x2d891cfd, 0x0000019d }, /* fpgm */
-        { 0xa0604633, 0x00001de8 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x2D891CFDUL, 0x0000019DUL }, /* fpgm */
+        { 0xA0604633UL, 0x00001DE8UL }  /* prep */
       },
       { /* NEC fangot5.ttc */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x40aa774c, 0x000001cb }, /* fpgm */
-        { 0x9b5caa96, 0x00001f9a }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x40AA774CUL, 0x000001CBUL }, /* fpgm */
+        { 0x9B5CAA96UL, 0x00001F9AUL }  /* prep */
       },
       { /* NEC fanmin3.ttc */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x0d3de9cb, 0x00000141 }, /* fpgm */
-        { 0xd4127766, 0x00002280 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x0D3DE9CBUL, 0x00000141UL }, /* fpgm */
+        { 0xD4127766UL, 0x00002280UL }  /* prep */
       },
       { /* NEC FA-Gothic, 1996 */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x4a692698, 0x000001f0 }, /* fpgm */
-        { 0x340d4346, 0x00001fca }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x4A692698UL, 0x000001F0UL }, /* fpgm */
+        { 0x340D4346UL, 0x00001FCAUL }  /* prep */
       },
       { /* NEC FA-Minchou, 1996 */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0xcd34c604, 0x00000166 }, /* fpgm */
-        { 0x6cf31046, 0x000022b0 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0xCD34C604UL, 0x00000166UL }, /* fpgm */
+        { 0x6CF31046UL, 0x000022B0UL }  /* prep */
       },
       { /* NEC FA-RoundGothicB, 1996 */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0x5da75315, 0x0000019d }, /* fpgm */
-        { 0x40745a5f, 0x000022e0 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0x5DA75315UL, 0x0000019DUL }, /* fpgm */
+        { 0x40745A5FUL, 0x000022E0UL }  /* prep */
       },
       { /* NEC FA-RoundGothicM, 1996 */
-        { 0x00000000, 0x00000000 }, /* cvt  */
-        { 0xf055fc48, 0x000001c2 }, /* fpgm */
-        { 0x3900ded3, 0x00001e18 }  /* prep */
+        { 0x00000000UL, 0x00000000UL }, /* cvt  */
+        { 0xF055FC48UL, 0x000001C2UL }, /* fpgm */
+        { 0x3900DED3UL, 0x00001E18UL }  /* prep */
+      },
+        { /* MINGLI.TTF, 1992 */
+        { 0x00170003UL, 0x00000060UL }, /* cvt  */
+        { 0xDBB4306EUL, 0x000058AAUL }, /* fpgm */
+        { 0xD643482AUL, 0x00000035UL }  /* prep */
       }
     };
 
@@ -396,11 +426,11 @@
     for ( j = 0; j < TRICK_SFNT_IDS_NUM_FACES; j++ )
     {
       if ( !has_cvt  && !sfnt_id[j][TRICK_SFNT_ID_cvt].Length )
-        num_matched_ids[j] ++;
+        num_matched_ids[j]++;
       if ( !has_fpgm && !sfnt_id[j][TRICK_SFNT_ID_fpgm].Length )
-        num_matched_ids[j] ++;
+        num_matched_ids[j]++;
       if ( !has_prep && !sfnt_id[j][TRICK_SFNT_ID_prep].Length )
-        num_matched_ids[j] ++;
+        num_matched_ids[j]++;
       if ( num_matched_ids[j] == TRICK_SFNT_IDS_PER_FACE )
         return TRUE;
     }
@@ -489,7 +519,10 @@
   /* <Input>                                                               */
   /*    stream     :: The source font stream.                              */
   /*                                                                       */
-  /*    face_index :: The index of the font face in the resource.          */
+  /*    face_index :: The index of the TrueType font, if we are opening a  */
+  /*                  collection, in bits 0-15.  The numbered instance     */
+  /*                  index~+~1 of a GX (sub)font, if applicable, in bits  */
+  /*                  16-30.                                               */
   /*                                                                       */
   /*    num_params :: Number of additional generic parameters.  Ignored.   */
   /*                                                                       */
@@ -531,6 +564,7 @@
       goto Exit;
 
     /* check that we have a valid TrueType file */
+    FT_TRACE2(( "  " ));
     error = sfnt->init_face( stream, face, face_index, num_params, params );
 
     /* Stream may have changed. */
@@ -572,82 +606,99 @@
 
     if ( FT_IS_SCALABLE( ttface ) )
     {
-
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
-
       if ( !ttface->internal->incremental_interface )
-        error = tt_face_load_loca( face, stream );
-      if ( !error )
-        error = tt_face_load_cvt( face, stream );
-      if ( !error )
-        error = tt_face_load_fpgm( face, stream );
-      if ( !error )
-        error = tt_face_load_prep( face, stream );
-
-      /* Check the scalable flag based on `loca'. */
-      if ( !ttface->internal->incremental_interface &&
-           ttface->num_fixed_sizes                  &&
-           face->glyph_locations                    &&
-           tt_check_single_notdef( ttface )         )
-      {
-        FT_TRACE5(( "tt_face_init:"
-                    " Only the `.notdef' glyph has an outline.\n"
-                    "             "
-                    " Resetting scalable flag to FALSE.\n" ));
-
-        ttface->face_flags &= ~FT_FACE_FLAG_SCALABLE;
-      }
-
-#else
-
-      if ( !error )
-        error = tt_face_load_loca( face, stream );
-      if ( !error )
-        error = tt_face_load_cvt( face, stream );
-      if ( !error )
-        error = tt_face_load_fpgm( face, stream );
-      if ( !error )
-        error = tt_face_load_prep( face, stream );
-
-      /* Check the scalable flag based on `loca'. */
-      if ( ttface->num_fixed_sizes          &&
-           face->glyph_locations            &&
-           tt_check_single_notdef( ttface ) )
-      {
-        FT_TRACE5(( "tt_face_init:"
-                    " Only the `.notdef' glyph has an outline.\n"
-                    "             "
-                    " Resetting scalable flag to FALSE.\n" ));
-
-        ttface->face_flags &= ~FT_FACE_FLAG_SCALABLE;
-      }
-
 #endif
+      {
+        error = tt_face_load_loca( face, stream );
 
+        /* having a (non-zero) `glyf' table without */
+        /* a `loca' table is not valid              */
+        if ( face->glyf_len && FT_ERR_EQ( error, Table_Missing ) )
+          goto Exit;
+        if ( error )
+          goto Exit;
+      }
+
+      /* `fpgm', `cvt', and `prep' are optional */
+      error = tt_face_load_cvt( face, stream );
+      if ( error && FT_ERR_NEQ( error, Table_Missing ) )
+        goto Exit;
+
+      error = tt_face_load_fpgm( face, stream );
+      if ( error && FT_ERR_NEQ( error, Table_Missing ) )
+        goto Exit;
+
+      error = tt_face_load_prep( face, stream );
+      if ( error && FT_ERR_NEQ( error, Table_Missing ) )
+        goto Exit;
+
+      /* Check the scalable flag based on `loca'. */
+#ifdef FT_CONFIG_OPTION_INCREMENTAL
+      if ( !ttface->internal->incremental_interface )
+#endif
+      {
+        if ( ttface->num_fixed_sizes          &&
+             face->glyph_locations            &&
+             tt_check_single_notdef( ttface ) )
+        {
+          FT_TRACE5(( "tt_face_init:"
+                      " Only the `.notdef' glyph has an outline.\n"
+                      "             "
+                      " Resetting scalable flag to FALSE.\n" ));
+
+          ttface->face_flags &= ~FT_FACE_FLAG_SCALABLE;
+        }
+      }
     }
 
-#if defined( TT_CONFIG_OPTION_UNPATENTED_HINTING    ) && \
-    !defined( TT_CONFIG_OPTION_BYTECODE_INTERPRETER )
+#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
 
     {
-      FT_Bool  unpatented_hinting;
-      int      i;
+      FT_Int  instance_index = face_index >> 16;
 
 
-      /* Determine whether unpatented hinting is to be used for this face. */
-      unpatented_hinting = FT_BOOL
-        ( library->debug_hooks[FT_DEBUG_HOOK_UNPATENTED_HINTING] != NULL );
+      if ( FT_HAS_MULTIPLE_MASTERS( ttface ) &&
+           instance_index > 0                )
+      {
+        error = TT_Get_MM_Var( face, NULL );
+        if ( error )
+          goto Exit;
 
-      for ( i = 0; i < num_params && !face->unpatented_hinting; i++ )
-        if ( params[i].tag == FT_PARAM_TAG_UNPATENTED_HINTING )
-          unpatented_hinting = TRUE;
+        if ( face->blend->mmvar->namedstyle )
+        {
+          FT_Memory  memory = ttface->memory;
 
-      if ( !unpatented_hinting )
-        ttface->internal->ignore_unpatented_hinter = TRUE;
+          FT_Var_Named_Style*  named_style;
+          FT_String*           style_name;
+
+
+          /* in `face_index', the instance index starts with value 1 */
+          named_style = face->blend->mmvar->namedstyle + instance_index - 1;
+          error = sfnt->get_name( face,
+                                  (FT_UShort)named_style->strid,
+                                  &style_name );
+          if ( error )
+            goto Exit;
+
+          /* set style name; if already set, replace it */
+          if ( face->root.style_name )
+            FT_FREE( face->root.style_name );
+          face->root.style_name = style_name;
+
+          /* finally, select the named instance */
+          error = TT_Set_Var_Design( face,
+                                     face->blend->mmvar->num_axis,
+                                     named_style->coords );
+          if ( error )
+            goto Exit;
+
+          tt_apply_mvar( face );
+        }
+      }
     }
 
-#endif /* TT_CONFIG_OPTION_UNPATENTED_HINTING &&
-          !TT_CONFIG_OPTION_BYTECODE_INTERPRETER */
+#endif /* TT_CONFIG_OPTION_GX_VAR_SUPPORT */
 
     /* initialize standard glyph loading routines */
     TT_Init_Glyph_Loading( face );
@@ -711,7 +762,7 @@
     face->cvt_program_size  = 0;
 
 #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
-    tt_done_blend( memory, face->blend );
+    tt_done_blend( face );
     face->blend = NULL;
 #endif
   }
@@ -750,16 +801,11 @@
     FT_Error        error;
 
 
-    /* debugging instances have their own context */
-    if ( size->debug )
-      exec = size->context;
-    else
-      exec = ( (TT_Driver)FT_FACE_DRIVER( face ) )->context;
+    exec = size->context;
 
-    if ( !exec )
-      return FT_THROW( Could_Not_Find_Context );
-
-    TT_Load_Context( exec, face, size );
+    error = TT_Load_Context( exec, face, size );
+    if ( error )
+      return error;
 
     exec->callTop = 0;
     exec->top     = 0;
@@ -774,14 +820,14 @@
     exec->pedantic_hinting = pedantic;
 
     {
-      FT_Size_Metrics*  metrics    = &exec->metrics;
-      TT_Size_Metrics*  tt_metrics = &exec->tt_metrics;
+      FT_Size_Metrics*  size_metrics = &exec->metrics;
+      TT_Size_Metrics*  tt_metrics   = &exec->tt_metrics;
 
 
-      metrics->x_ppem   = 0;
-      metrics->y_ppem   = 0;
-      metrics->x_scale  = 0;
-      metrics->y_scale  = 0;
+      size_metrics->x_ppem   = 0;
+      size_metrics->y_ppem   = 0;
+      size_metrics->x_scale  = 0;
+      size_metrics->y_scale  = 0;
 
       tt_metrics->ppem  = 0;
       tt_metrics->scale = 0;
@@ -792,7 +838,7 @@
     TT_Set_CodeRange( exec,
                       tt_coderange_font,
                       face->font_program,
-                      face->font_program_size );
+                      (FT_Long)face->font_program_size );
 
     /* disable CVT and glyph programs coderange */
     TT_Clear_CodeRange( exec, tt_coderange_cvt );
@@ -800,17 +846,20 @@
 
     if ( face->font_program_size > 0 )
     {
-      error = TT_Goto_CodeRange( exec, tt_coderange_font, 0 );
+      TT_Goto_CodeRange( exec, tt_coderange_font, 0 );
 
-      if ( !error )
-      {
-        FT_TRACE4(( "Executing `fpgm' table.\n" ));
-
-        error = face->interpreter( exec );
-      }
+      FT_TRACE4(( "Executing `fpgm' table.\n" ));
+      error = face->interpreter( exec );
+#ifdef FT_DEBUG_LEVEL_TRACE
+      if ( error )
+        FT_TRACE4(( "  interpretation failed with error code 0x%x\n",
+                    error ));
+#endif
     }
     else
       error = FT_Err_Ok;
+
+    size->bytecode_ready = error;
 
     if ( !error )
       TT_Save_Context( exec, size );
@@ -844,16 +893,11 @@
     FT_Error        error;
 
 
-    /* debugging instances have their own context */
-    if ( size->debug )
-      exec = size->context;
-    else
-      exec = ( (TT_Driver)FT_FACE_DRIVER( face ) )->context;
+    exec = size->context;
 
-    if ( !exec )
-      return FT_THROW( Could_Not_Find_Context );
-
-    TT_Load_Context( exec, face, size );
+    error = TT_Load_Context( exec, face, size );
+    if ( error )
+      return error;
 
     exec->callTop = 0;
     exec->top     = 0;
@@ -865,23 +909,26 @@
     TT_Set_CodeRange( exec,
                       tt_coderange_cvt,
                       face->cvt_program,
-                      face->cvt_program_size );
+                      (FT_Long)face->cvt_program_size );
 
     TT_Clear_CodeRange( exec, tt_coderange_glyph );
 
     if ( face->cvt_program_size > 0 )
     {
-      error = TT_Goto_CodeRange( exec, tt_coderange_cvt, 0 );
+      TT_Goto_CodeRange( exec, tt_coderange_cvt, 0 );
 
-      if ( !error && !size->debug )
-      {
-        FT_TRACE4(( "Executing `prep' table.\n" ));
-
-        error = face->interpreter( exec );
-      }
+      FT_TRACE4(( "Executing `prep' table.\n" ));
+      error = face->interpreter( exec );
+#ifdef FT_DEBUG_LEVEL_TRACE
+      if ( error )
+        FT_TRACE4(( "  interpretation failed with error code 0x%x\n",
+                    error ));
+#endif
     }
     else
       error = FT_Err_Ok;
+
+    size->cvt_ready = error;
 
     /* UNDOCUMENTED!  The MS rasterizer doesn't allow the following */
     /* graphics state variables to be modified by the CVT program.  */
@@ -911,10 +958,6 @@
     return error;
   }
 
-#endif /* TT_USE_BYTECODE_INTERPRETER */
-
-
-#ifdef TT_USE_BYTECODE_INTERPRETER
 
   static void
   tt_size_done_bytecode( FT_Size  ftsize )
@@ -923,12 +966,10 @@
     TT_Face    face   = (TT_Face)ftsize->face;
     FT_Memory  memory = face->root.memory;
 
-
-    if ( size->debug )
+    if ( size->context )
     {
-      /* the debug context must be deleted by the debugger itself */
+      TT_Done_Context( size->context );
       size->context = NULL;
-      size->debug   = FALSE;
     }
 
     FT_FREE( size->cvt );
@@ -952,8 +993,8 @@
     size->max_func = 0;
     size->max_ins  = 0;
 
-    size->bytecode_ready = 0;
-    size->cvt_ready      = 0;
+    size->bytecode_ready = -1;
+    size->cvt_ready      = -1;
   }
 
 
@@ -967,14 +1008,25 @@
     TT_Size    size = (TT_Size)ftsize;
     TT_Face    face = (TT_Face)ftsize->face;
     FT_Memory  memory = face->root.memory;
-    FT_Int     i;
 
     FT_UShort       n_twilight;
     TT_MaxProfile*  maxp = &face->max_profile;
 
 
-    size->bytecode_ready = 1;
-    size->cvt_ready      = 0;
+    /* clean up bytecode related data */
+    FT_FREE( size->function_defs );
+    FT_FREE( size->instruction_defs );
+    FT_FREE( size->cvt );
+    FT_FREE( size->storage );
+
+    if ( size->context )
+      TT_Done_Context( size->context );
+    tt_glyphzone_done( &size->twilight );
+
+    size->bytecode_ready = -1;
+    size->cvt_ready      = -1;
+
+    size->context = TT_New_Context( (TT_Driver)face->root.driver );
 
     size->max_function_defs    = maxp->maxFunctionDefs;
     size->max_instruction_defs = maxp->maxInstructionDefs;
@@ -990,15 +1042,17 @@
 
     /* Set default metrics */
     {
-      TT_Size_Metrics*  metrics = &size->ttmetrics;
+      TT_Size_Metrics*  tt_metrics = &size->ttmetrics;
 
 
-      metrics->rotated   = FALSE;
-      metrics->stretched = FALSE;
+      tt_metrics->rotated   = FALSE;
+      tt_metrics->stretched = FALSE;
 
-      /* set default compensation (all 0) */
-      for ( i = 0; i < 4; i++ )
-        metrics->compensations[i] = 0;
+      /* set default engine compensation */
+      tt_metrics->compensations[0] = 0;   /* gray     */
+      tt_metrics->compensations[1] = 0;   /* black    */
+      tt_metrics->compensations[2] = 0;   /* white    */
+      tt_metrics->compensations[3] = 0;   /* reserved */
     }
 
     /* allocate function defs, instruction defs, cvt, and storage area */
@@ -1034,7 +1088,15 @@
     }
 
     /* Fine, now run the font program! */
+
+    /* In case of an error while executing `fpgm', we intentionally don't */
+    /* clean up immediately – bugs in the `fpgm' are so fundamental that  */
+    /* all following hinting calls should fail.  Additionally, `fpgm' is  */
+    /* to be executed just once; calling it again is completely useless   */
+    /* and might even lead to extremely slow behaviour if it is malformed */
+    /* (containing an infinite loop, for example).                        */
     error = tt_size_run_fpgm( size, pedantic );
+    return error;
 
   Exit:
     if ( error )
@@ -1051,15 +1113,16 @@
     FT_Error  error = FT_Err_Ok;
 
 
-    if ( !size->bytecode_ready )
-    {
+    if ( size->bytecode_ready < 0 )
       error = tt_size_init_bytecode( (FT_Size)size, pedantic );
-      if ( error )
-        goto Exit;
-    }
+    else
+      error = size->bytecode_ready;
+
+    if ( error )
+      goto Exit;
 
     /* rescale CVT when needed */
-    if ( !size->cvt_ready )
+    if ( size->cvt_ready < 0 )
     {
       FT_UInt  i;
       TT_Face  face = (TT_Face)size->root.face;
@@ -1086,9 +1149,9 @@
       size->GS = tt_default_graphics_state;
 
       error = tt_size_run_prep( size, pedantic );
-      if ( !error )
-        size->cvt_ready = 1;
     }
+    else
+      error = size->cvt_ready;
 
   Exit:
     return error;
@@ -1117,9 +1180,10 @@
     TT_Size   size  = (TT_Size)ttsize;
     FT_Error  error = FT_Err_Ok;
 
+
 #ifdef TT_USE_BYTECODE_INTERPRETER
-    size->bytecode_ready = 0;
-    size->cvt_ready      = 0;
+    size->bytecode_ready = -1;
+    size->cvt_ready      = -1;
 #endif
 
     size->ttmetrics.valid = FALSE;
@@ -1147,8 +1211,7 @@
 
 
 #ifdef TT_USE_BYTECODE_INTERPRETER
-    if ( size->bytecode_ready )
-      tt_size_done_bytecode( ttsize );
+    tt_size_done_bytecode( ttsize );
 #endif
 
     size->ttmetrics.valid = FALSE;
@@ -1165,26 +1228,32 @@
   /*    have been changed.                                                 */
   /*                                                                       */
   /* <Input>                                                               */
-  /*    size :: A handle to the target size object.                        */
+  /*    size        :: A handle to the target size object.                 */
+  /*                                                                       */
+  /*    only_height :: Only recompute ascender, descender, and height.     */
   /*                                                                       */
   FT_LOCAL_DEF( FT_Error )
-  tt_size_reset( TT_Size  size )
+  tt_size_reset( TT_Size  size,
+                 FT_Bool  only_height )
   {
     TT_Face           face;
-    FT_Error          error = FT_Err_Ok;
-    FT_Size_Metrics*  metrics;
+    FT_Size_Metrics*  size_metrics;
 
-
-    size->ttmetrics.valid = FALSE;
 
     face = (TT_Face)size->root.face;
 
-    metrics = &size->metrics;
+    /* nothing to do for CFF2 */
+    if ( face->is_cff2 )
+      return FT_Err_Ok;
+
+    size->ttmetrics.valid = FALSE;
+
+    size_metrics = &size->hinted_metrics;
 
     /* copy the result from base layer */
-    *metrics = size->root.metrics;
+    *size_metrics = size->root.metrics;
 
-    if ( metrics->x_ppem < 1 || metrics->y_ppem < 1 )
+    if ( size_metrics->x_ppem < 1 || size_metrics->y_ppem < 1 )
       return FT_THROW( Invalid_PPem );
 
     /* This bit flag, if set, indicates that the ppems must be       */
@@ -1193,48 +1262,62 @@
     /*                                                               */
     if ( face->header.Flags & 8 )
     {
-      metrics->x_scale = FT_DivFix( metrics->x_ppem << 6,
-                                    face->root.units_per_EM );
-      metrics->y_scale = FT_DivFix( metrics->y_ppem << 6,
-                                    face->root.units_per_EM );
+      /* the TT spec always asks for ROUND, not FLOOR or CEIL */
+      size_metrics->ascender = FT_PIX_ROUND(
+                                 FT_MulFix( face->root.ascender,
+                                            size_metrics->y_scale ) );
+      size_metrics->descender = FT_PIX_ROUND(
+                                 FT_MulFix( face->root.descender,
+                                            size_metrics->y_scale ) );
+      size_metrics->height = FT_PIX_ROUND(
+                               FT_MulFix( face->root.height,
+                                          size_metrics->y_scale ) );
+    }
 
-      metrics->ascender =
-        FT_PIX_ROUND( FT_MulFix( face->root.ascender, metrics->y_scale ) );
-      metrics->descender =
-        FT_PIX_ROUND( FT_MulFix( face->root.descender, metrics->y_scale ) );
-      metrics->height =
-        FT_PIX_ROUND( FT_MulFix( face->root.height, metrics->y_scale ) );
-      metrics->max_advance =
-        FT_PIX_ROUND( FT_MulFix( face->root.max_advance_width,
-                                 metrics->x_scale ) );
+    size->ttmetrics.valid = TRUE;
+
+    if ( only_height )
+      return FT_Err_Ok;
+
+    if ( face->header.Flags & 8 )
+    {
+      /* base scaling values on integer ppem values, */
+      /* as mandated by the TrueType specification   */
+      size_metrics->x_scale = FT_DivFix( size_metrics->x_ppem << 6,
+                                         face->root.units_per_EM );
+      size_metrics->y_scale = FT_DivFix( size_metrics->y_ppem << 6,
+                                         face->root.units_per_EM );
+
+      size_metrics->max_advance = FT_PIX_ROUND(
+                                    FT_MulFix( face->root.max_advance_width,
+                                               size_metrics->x_scale ) );
     }
 
     /* compute new transformation */
-    if ( metrics->x_ppem >= metrics->y_ppem )
+    if ( size_metrics->x_ppem >= size_metrics->y_ppem )
     {
-      size->ttmetrics.scale   = metrics->x_scale;
-      size->ttmetrics.ppem    = metrics->x_ppem;
+      size->ttmetrics.scale   = size_metrics->x_scale;
+      size->ttmetrics.ppem    = size_metrics->x_ppem;
       size->ttmetrics.x_ratio = 0x10000L;
-      size->ttmetrics.y_ratio = FT_DivFix( metrics->y_ppem,
-                                           metrics->x_ppem );
+      size->ttmetrics.y_ratio = FT_DivFix( size_metrics->y_ppem,
+                                           size_metrics->x_ppem );
     }
     else
     {
-      size->ttmetrics.scale   = metrics->y_scale;
-      size->ttmetrics.ppem    = metrics->y_ppem;
-      size->ttmetrics.x_ratio = FT_DivFix( metrics->x_ppem,
-                                           metrics->y_ppem );
+      size->ttmetrics.scale   = size_metrics->y_scale;
+      size->ttmetrics.ppem    = size_metrics->y_ppem;
+      size->ttmetrics.x_ratio = FT_DivFix( size_metrics->x_ppem,
+                                           size_metrics->y_ppem );
       size->ttmetrics.y_ratio = 0x10000L;
     }
 
+    size->metrics = size_metrics;
+
 #ifdef TT_USE_BYTECODE_INTERPRETER
-    size->cvt_ready = 0;
+    size->cvt_ready = -1;
 #endif /* TT_USE_BYTECODE_INTERPRETER */
 
-    if ( !error )
-      size->ttmetrics.valid = TRUE;
-
-    return error;
+    return FT_Err_Ok;
   }
 
 
@@ -1260,14 +1343,12 @@
 
     TT_Driver  driver = (TT_Driver)ttdriver;
 
-
-    if ( !TT_New_Context( driver ) )
-      return FT_THROW( Could_Not_Find_Context );
-
-#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-    driver->interpreter_version = TT_INTERPRETER_VERSION_38;
-#else
     driver->interpreter_version = TT_INTERPRETER_VERSION_35;
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_INFINALITY
+    driver->interpreter_version = TT_INTERPRETER_VERSION_38;
+#endif
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+    driver->interpreter_version = TT_INTERPRETER_VERSION_40;
 #endif
 
 #else /* !TT_USE_BYTECODE_INTERPRETER */
@@ -1294,20 +1375,7 @@
   FT_LOCAL_DEF( void )
   tt_driver_done( FT_Module  ttdriver )     /* TT_Driver */
   {
-#ifdef TT_USE_BYTECODE_INTERPRETER
-    TT_Driver  driver = (TT_Driver)ttdriver;
-
-
-    /* destroy the execution context */
-    if ( driver->context )
-    {
-      TT_Done_Context( driver->context );
-      driver->context = NULL;
-    }
-#else
     FT_UNUSED( ttdriver );
-#endif
-
   }
 
 

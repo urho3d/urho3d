@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -227,6 +227,16 @@ IntVector2 PListValue::GetIntVector2() const
     int x, y;
     sscanf(string_->CString(), "{%d,%d}", &x, &y);
     return IntVector2(x, y);
+}
+
+IntVector3 PListValue::GetIntVector3() const
+{
+    if (type_ != PLVT_STRING)
+        return IntVector3::ZERO;
+
+    int x, y, z;
+    sscanf(string_->CString(), "{%d,%d,%d}", &x, &y, &z);
+    return IntVector3(x, y, z);
 }
 
 const PListValueMap& PListValue::GetValueMap() const

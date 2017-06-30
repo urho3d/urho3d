@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ void CalculateShadowMatrix(Matrix4& dest, LightBatchQueue* queue, unsigned split
     const IntRect& viewport = queue->shadowSplits_[split].shadowViewport_;
 
     Matrix3x4 shadowView(shadowCamera->GetView());
-    Matrix4 shadowProj(shadowCamera->GetProjection());
+    Matrix4 shadowProj(shadowCamera->GetGPUProjection());
     Matrix4 texAdjust(Matrix4::IDENTITY);
 
     Texture2D* shadowMap = queue->shadowMap_;
@@ -163,11 +163,9 @@ void Batch::CalculateSortKey()
 {
     unsigned shaderID = (unsigned)(
         ((*((unsigned*)&vertexShader_) / sizeof(ShaderVariation)) + (*((unsigned*)&pixelShader_) / sizeof(ShaderVariation))) &
-        0x3fff);
+        0x7fff);
     if (!isBase_)
         shaderID |= 0x8000;
-    if (pass_ && pass_->GetAlphaMask())
-        shaderID |= 0x4000;
 
     unsigned lightQueueID = (unsigned)((*((unsigned*)&lightQueue_) / sizeof(LightBatchQueue)) & 0xffff);
     unsigned materialID = (unsigned)((*((unsigned*)&material_) / sizeof(Material)) & 0xffff);
@@ -203,7 +201,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             else if (blend == BLEND_ADDALPHA)
                 blend = BLEND_SUBTRACTALPHA;
         }
-        graphics->SetBlendMode(blend);
+        graphics->SetBlendMode(blend, pass_->GetAlphaToCoverage() || material_->GetAlphaToCoverage());
+        graphics->SetLineAntiAlias(material_->GetLineAntiAlias());
 
         bool isShadowPass = pass_->GetIndex() == Technique::shadowPassIndex;
         CullMode effectiveCullMode = pass_->GetCullMode();
@@ -284,6 +283,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
 
         graphics->SetShaderParameter(PSP_AMBIENTCOLOR, zone_->GetAmbientColor());
         graphics->SetShaderParameter(PSP_FOGCOLOR, overrideFogColorToBlack ? Color::BLACK : zone_->GetFogColor());
+        graphics->SetShaderParameter(PSP_ZONEMIN, zone_->GetBoundingBox().min_);
+        graphics->SetShaderParameter(PSP_ZONEMAX, zone_->GetBoundingBox().max_);
 
         float farClip = camera->GetFarClip();
         float fogStart = Min(zone_->GetFogStart(), farClip);
@@ -374,6 +375,8 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
                 light->GetEffectiveSpecularIntensity()) * fade);
             graphics->SetShaderParameter(PSP_LIGHTDIR, lightDir);
             graphics->SetShaderParameter(PSP_LIGHTPOS, lightPos);
+            graphics->SetShaderParameter(PSP_LIGHTRAD, light->GetRadius());
+            graphics->SetShaderParameter(PSP_LIGHTLENGTH, light->GetLength());
 
             if (graphics->HasShaderParameter(PSP_LIGHTMATRICES))
             {
@@ -580,6 +583,16 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
         }
     }
 
+    // Set zone texture if necessary
+#ifndef GL_ES_VERSION_2_0
+    if (zone_ && graphics->HasTextureUnit(TU_ZONE))
+        graphics->SetTexture(TU_ZONE, zone_->GetZoneTexture());
+#else
+    // On OpenGL ES set the zone texture to the environment unit instead
+    if (zone_ && zone_->GetZoneTexture() && graphics->HasTextureUnit(TU_ENVIRONMENT))
+        graphics->SetTexture(TU_ENVIRONMENT, zone_->GetZoneTexture());
+#endif
+
     // Set material-specific shader parameters and textures
     if (material_)
     {
@@ -618,12 +631,6 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             graphics->SetTexture(TU_LIGHTSHAPE, shapeTexture);
         }
     }
-
-    // Set zone texture if necessary
-#ifdef DESKTOP_GRAPHICS
-    if (zone_ && graphics->HasTextureUnit(TU_ZONE))
-        graphics->SetTexture(TU_ZONE, zone_->GetZoneTexture());
-#endif
 }
 
 void Batch::Draw(View* view, Camera* camera, bool allowDepthWrite) const
@@ -796,7 +803,7 @@ void BatchQueue::SortFrontToBack2Pass(PODVector<Batch*>& batches)
             shaderID = j->second_;
         else
         {
-            shaderID = shaderRemapping_[shaderID] = freeShaderID | (shaderID & 0xc0000000);
+            shaderID = shaderRemapping_[shaderID] = freeShaderID | (shaderID & 0x80000000);
             ++freeShaderID;
         }
 

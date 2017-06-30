@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ namespace Urho3D
 class Drawable;
 class Node;
 class Scene;
+class Zone;
 
 }
 
@@ -63,4 +64,23 @@ private:
     void MoveCamera(float timeStep);
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
+    /// Construct an instruction text to the UI.
+    void CreateInstructions();
+    /// Handle the roughness slider drag event.
+    void HandleRoughnessSliderChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle the metallic slider drag event.
+    void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData);
+    /// Handle the ambient HDR scale slider drag event.
+    void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
+    
+    /// Dynamic material.
+    Material* dynamicMaterial_;
+    /// Roughness label.
+    Text* roughnessLabel_;
+    /// Metallic label.
+    Text* metallicLabel_;
+    /// Ambient HDR scale label.
+    Text* ambientLabel_;
+    /// Zone component in scene.
+    WeakPtr<Zone> zone_;
 };

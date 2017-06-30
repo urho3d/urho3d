@@ -70,7 +70,7 @@
                         </element>
                     </element>
                 </element>
-            </element>                           
+            </element>
         </element>
     </element>
     <element type="BorderImage" style="EditorDivider" />
@@ -146,6 +146,34 @@
                 <element type="BorderImage" style="EditorDivider" />
                 <element style="Panel">
                     <element type="Text">
+                        <attribute name="Text" value="Shader compile defines" />
+                        <attribute name="Auto Localizable" value="true" />
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Vertex shader" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="VSDefinesEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Pixel shader" />
+                        </element>
+                        <element type="LineEdit">
+                            <attribute name="Name" value="PSDefinesEdit" />
+                        </element>
+                    </element>
+                    <element type="Text">
                         <attribute name="Text" value="Shader parameters" />
                         <attribute name="Auto Localizable" value="true" />
                     </element>
@@ -191,6 +219,12 @@
                                             </element>
                                             <element type="Text" style="EditorEnumAttributeText">
                                                 <attribute name="Text" value="Vector4" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Int" />
+                                            </element>
+                                            <element type="Text" style="EditorEnumAttributeText">
+                                                <attribute name="Text" value="Bool" />
                                             </element>
                                         </element>
                                     </element>
@@ -334,6 +368,42 @@
                                     </element>
                                 </element>
                             </element>
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Alpha-to-coverage" />
+                        </element>
+                        <element type="CheckBox">
+                            <attribute name="Name" value="AlphaToCoverageEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Line antialias" />
+                        </element>
+                        <element type="CheckBox">
+                            <attribute name="Name" value="LineAntiAliasEdit" />
+                        </element>
+                    </element>
+                    <element>
+                        <attribute name="Min Size" value="0 16" />
+                        <attribute name="Max Size" value="2147483647 16" />
+                        <attribute name="Layout Mode" value="Horizontal" />
+                        <attribute name="Layout Spacing" value="10" />
+                        <element type="Text" style="EditorAttributeText">
+                            <attribute name="Text" value="Occlusion" />
+                        </element>
+                        <element type="CheckBox">
+                            <attribute name="Name" value="OcclusionEdit" />
                         </element>
                     </element>
                 </element>

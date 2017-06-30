@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ public:
     bool AddPackageFile(PackageFile* package, unsigned priority = PRIORITY_LAST);
     /// Add a package file for loading resources from by name. Optional priority parameter which will control search order.
     bool AddPackageFile(const String& fileName, unsigned priority = PRIORITY_LAST);
-    /// Add a manually created resource. Must be uniquely named.
+    /// Add a manually created resource. Must be uniquely named within its type.
     bool AddManualResource(Resource* resource);
     /// Remove a resource load directory.
     void RemoveResourceDir(const String& pathName);
@@ -170,7 +170,7 @@ public:
     template <class T> bool BackgroundLoadResource(const String& name, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
-    /// Return whether a file exists by name.
+    /// Return whether a file exists in the resource directories or package files. Does not check manually added in-memory resources.
     bool Exists(const String& name) const;
     /// Return memory budget for a resource type.
     unsigned long long GetMemoryBudget(StringHash type) const;
@@ -178,7 +178,7 @@ public:
     unsigned long long GetMemoryUse(StringHash type) const;
     /// Return total memory use for all resources.
     unsigned long long GetTotalMemoryUse() const;
-    /// Return full absolute file name of resource if possible.
+    /// Return full absolute file name of resource if possible, or empty if not found.
     String GetResourceFileName(const String& name) const;
 
     /// Return whether automatic resource reloading is enabled.

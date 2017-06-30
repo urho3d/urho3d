@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -223,7 +223,11 @@ void CollisionShape2D::CreateFixture()
     // Chain shape must have atleast two vertices before creating fixture
     if (fixtureDef_.shape->m_type != b2Shape::e_chain || static_cast<const b2ChainShape*>(fixtureDef_.shape)->m_count >= 2)
     {
+        b2MassData massData;
+        body->GetMassData(&massData);
         fixture_ = body->CreateFixture(&fixtureDef_);
+        if (!rigidBody_->GetUseFixtureMass()) // Workaround for resetting mass in CreateFixture().
+            body->SetMassData(&massData);
         fixture_->SetUserData(this);
     }
 }
@@ -240,7 +244,11 @@ void CollisionShape2D::ReleaseFixture()
     if (!body)
         return;
 
+    b2MassData massData;
+    body->GetMassData(&massData);
     body->DestroyFixture(fixture_);
+    if (!rigidBody_->GetUseFixtureMass()) // Workaround for resetting mass in DestroyFixture().
+        body->SetMassData(&massData);
     fixture_ = 0;
 }
 
@@ -295,7 +303,8 @@ void CollisionShape2D::OnNodeSet(Node* node)
 
 void CollisionShape2D::OnMarkedDirty(Node* node)
 {
-    Vector3 newWorldScale = node_->GetWorldScale();
+    // Use signed world scale to allow flipping of sprites by negative scale to work properly in regard to the collision shape
+    Vector3 newWorldScale = node_->GetSignedWorldScale();
 
     Vector3 delta = newWorldScale - cachedWorldScale_;
     if (delta.DotProduct(delta) < 0.01f)

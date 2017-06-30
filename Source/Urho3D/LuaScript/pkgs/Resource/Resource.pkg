@@ -1,38 +1,38 @@
-$#include "IO/File.h"
 $#include "Resource/Resource.h"
 
 class Resource
 {
     bool Load(Deserializer& source);
     bool Save(Serializer& dest) const;
-    tolua_outside bool ResourceLoad @ Load(const String fileName);
-    tolua_outside bool ResourceSave @ Save(const String fileName) const;
-    
+    tolua_outside bool ResourceLoad @ Load(const String& fileName);
+    tolua_outside bool ResourceSave @ Save(const String& fileName) const;
+
     const String GetName() const;
     StringHash GetNameHash() const;
     unsigned GetMemoryUse() const;
-    
+
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set StringHash nameHash;
     tolua_readonly tolua_property__get_set unsigned memoryUse;
 };
 
+class ResourceWithMetadata : public Resource
+{
+    void AddMetadata(const String& name, const Variant& value);
+    void RemoveMetadata(const String& name);
+    void RemoveAllMetadata();
+    const Variant& GetMetadata(const String& name) const;
+    bool HasMetadata() const;
+}
+
 ${
 static bool ResourceLoad(Resource* resource, const String& fileName)
 {
-    if (!resource)
-        return false;
-
-    File file(resource->GetContext());
-    return file.Open(fileName, FILE_READ) && resource->Load(file);
+    return resource->LoadFile(fileName);
 }
 
 static bool ResourceSave(const Resource* resource, const String& fileName)
 {
-    if (!resource)
-        return false;
-
-    File file(resource->GetContext());
-    return file.Open(fileName, FILE_WRITE) && resource->Save(file);
+    return resource->SaveFile(fileName);
 }
 $}

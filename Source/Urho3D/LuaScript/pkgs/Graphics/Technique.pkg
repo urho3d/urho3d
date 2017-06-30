@@ -14,12 +14,14 @@ class Pass : public RefCounted
     void SetDepthTestMode(CompareMode mode);
     void SetLightingMode(PassLightingMode mode);
     void SetDepthWrite(bool enable);
-    void SetAlphaMask(bool enable);
+    void SetAlphaToCoverage(bool enable);
     void SetIsDesktop(bool enable);
     void SetVertexShader(const String name);
     void SetPixelShader(const String name);
     void SetVertexShaderDefines(const String defines);
     void SetPixelShaderDefines(const String defines);
+    void SetVertexShaderDefineExcludes(const String excludes);
+    void SetPixelShaderDefineExcludes(const String excludes);
     void ReleaseShaders();
 
     const String GetName() const;
@@ -29,12 +31,14 @@ class Pass : public RefCounted
     CompareMode GetDepthTestMode() const;
     PassLightingMode GetLightingMode() const;
     bool GetDepthWrite() const;
-    bool GetAlphaMask() const;
+    bool GetAlphaToCoverage() const;
     bool IsDesktop() const;
     const String GetVertexShader() const;
     const String GetPixelShader() const;
     const String GetVertexShaderDefines() const;
     const String GetPixelShaderDefines() const;
+    const String GetVertexShaderDefineExcludes() const;
+    const String GetPixelShaderDefineExcludes() const;
 
     tolua_readonly tolua_property__get_set String name;
     tolua_readonly tolua_property__get_set unsigned index;
@@ -43,12 +47,14 @@ class Pass : public RefCounted
     tolua_property__get_set CompareMode depthTestMode;
     tolua_property__get_set PassLightingMode lightingMode;
     tolua_property__get_set bool depthWrite;
-    tolua_property__get_set bool alphaMask;
+    tolua_property__get_set bool alphaToCoverage;
     tolua_readonly tolua_property__is_set bool desktop;
     tolua_property__get_set String vertexShader;
     tolua_property__get_set String pixelShader;
     tolua_property__get_set String vertexShaderDefines;
     tolua_property__get_set String pixelShaderDefines;
+    tolua_property__get_set String vertexShaderDefineExcludes;
+    tolua_property__get_set String pixelShaderDefineExcludes;
 };
 
 class Technique : public Resource

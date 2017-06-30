@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,11 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
     const char* zLeftover = 0;
     sqlite3_stmt* pStmt = 0;
     assert(connectionImpl_);
-    int rc = sqlite3_prepare_v2(connectionImpl_, sql.Trimmed().CString(), -1, &pStmt, &zLeftover);
+
+    // 2016-10-09: Prevent string corruption when trimmed is returned.
+    String trimmedSqlStr = sql.Trimmed();
+
+    int rc = sqlite3_prepare_v2(connectionImpl_, trimmedSqlStr.CString(), -1, &pStmt, &zLeftover);
     if (rc != SQLITE_OK)
     {
         URHO3D_LOGERRORF("Could not execute: %s", sqlite3_errmsg(connectionImpl_));

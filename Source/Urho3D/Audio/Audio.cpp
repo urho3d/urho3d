@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,8 @@ Audio::Audio(Context* context) :
     sampleSize_(0),
     playing_(false)
 {
+    context_->RequireSDL(SDL_INIT_AUDIO);
+
     // Set the master to the default value
     masterGain_[SOUND_MASTER_HASH] = 1.0f;
 
@@ -70,6 +72,7 @@ Audio::Audio(Context* context) :
 Audio::~Audio()
 {
     Release();
+    context_->ReleaseSDL();
 }
 
 bool Audio::SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation)

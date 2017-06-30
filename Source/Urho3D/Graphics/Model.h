@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -105,9 +105,9 @@ struct GeometryDesc
 };
 
 /// 3D model resource.
-class URHO3D_API Model : public Resource
+class URHO3D_API Model : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(Model, Resource);
+    URHO3D_OBJECT(Model, ResourceWithMetadata);
 
 public:
     /// Construct.

@@ -33,7 +33,14 @@
 
 #include "SDL.h"
 
-static const char* SDL_UDEV_LIBS[] = { "libudev.so.1", "libudev.so.0" };
+static const char *SDL_UDEV_LIBS[] = {
+#ifdef SDL_UDEV_DYNAMIC
+	SDL_UDEV_DYNAMIC
+#else
+	"libudev.so.1",
+	"libudev.so.0"
+#endif
+};
 
 #define _THIS SDL_UDEV_PrivateData *_this
 static _THIS = NULL;
@@ -252,8 +259,12 @@ SDL_UDEV_LoadLibrary(void)
     if (_this == NULL) {
         return SDL_SetError("UDEV not initialized");
     }
-    
-   
+ 
+    /* See if there is a udev library already loaded */
+    if (SDL_UDEV_load_syms() == 0) {
+        return 0;
+    }
+
     if (_this->udev_handle == NULL) {
         for( i = 0 ; i < SDL_arraysize(SDL_UDEV_LIBS); i++) {
             _this->udev_handle = SDL_LoadObject(SDL_UDEV_LIBS[i]);
@@ -349,7 +360,9 @@ guess_device_class(struct udev_device *dev)
         } else if (test_bit(BTN_MOUSE, bitmask_key)) {
             devclass |= SDL_UDEV_DEVICE_MOUSE; /* ID_INPUT_MOUSE */
         } else if (test_bit(BTN_TOUCH, bitmask_key)) {
-            ; /* ID_INPUT_TOUCHSCREEN */
+            /* TODO: better determining between touchscreen and multitouch touchpad,
+               see https://github.com/systemd/systemd/blob/master/src/udev/udev-builtin-input_id.c */
+            devclass |= SDL_UDEV_DEVICE_TOUCHSCREEN; /* ID_INPUT_TOUCHSCREEN */
         }
 
         if (test_bit(BTN_TRIGGER, bitmask_key) ||
@@ -410,6 +423,11 @@ device_event(SDL_UDEV_deviceevent type, struct udev_device *dev)
         val = _this->udev_device_get_property_value(dev, "ID_INPUT_MOUSE");
         if (val != NULL && SDL_strcmp(val, "1") == 0 ) {
             devclass |= SDL_UDEV_DEVICE_MOUSE;
+        }
+        
+        val = _this->udev_device_get_property_value(dev, "ID_INPUT_TOUCHSCREEN");
+        if (val != NULL && SDL_strcmp(val, "1") == 0 ) {
+            devclass |= SDL_UDEV_DEVICE_TOUCHSCREEN;
         }
 
         /* The undocumented rule is:
@@ -530,3 +548,5 @@ SDL_UDEV_DelCallback(SDL_UDEV_Callback cb)
 
 
 #endif /* SDL_USE_LIBUDEV */
+
+/* vi: set ts=4 sw=4 expandtab: */

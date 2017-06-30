@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -583,6 +583,17 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
             propertySet->Load(tileElem.GetChild("properties"));
             gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
+        }
+        else if (tileElem.HasChild("objectgroup"))
+        {
+            XMLElement objectGroup = tileElem.GetChild("objectgroup");
+
+            if (objectGroup.HasChild("properties"))
+            {
+                SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
+                propertySet->Load(objectGroup.GetChild("properties"));
+                gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
+            }
         }
     }
 

@@ -3,6 +3,7 @@
 //     - Implementing a crude text adventure game, which accepts input both through the engine console,
 //       and standard input.
 //     - Disabling default execution of console commands as immediate mode AngelScript.
+//     - Adding autocomplete options to the engine console.
 
 #include "Scripts/Utilities/Sample.as"
 
@@ -53,7 +54,13 @@ void Start()
     console.numBufferedRows = 2 * console.numRows;
     console.commandInterpreter = "ScriptEventInvoker";
     console.visible = true;
-    console.closeButton.visible = false;
+	console.closeButton.visible = false;
+	console.AddAutoComplete("help");
+	console.AddAutoComplete("eat");
+	console.AddAutoComplete("hide");
+	console.AddAutoComplete("wait");
+	console.AddAutoComplete("score");
+	console.AddAutoComplete("quit");
 
     // Show OS mouse cursor
     input.mouseVisible = true;

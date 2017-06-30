@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ class Audio;
 class Sound;
 class SoundStream;
 
-// Compressed audio decode buffer length in milliseconds
+/// Compressed audio decode buffer length in milliseconds.
 static const int STREAM_BUFFER_LENGTH = 100;
 
 /// %Sound source component with stereo position. A sound source needs to be created to a node to be considered "enabled" and be able to play, however that node does not need to belong to a scene.
@@ -48,6 +48,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Seek to time.
+    void Seek(float seekTime);
     /// Play a sound.
     void Play(Sound* sound);
     /// Play a sound with specified frequency.
@@ -70,8 +72,8 @@ public:
     void SetAttenuation(float attenuation);
     /// Set stereo panning. -1.0 is full left and 1.0 is full right.
     void SetPanning(float panning);
-    /// \deprecated Set whether sound source will be automatically removed from the scene node when playback stops. Note: this is deprecated, consider subscribing to the SoundFinished event instead.
-    URHO3D_DEPRECATED void SetAutoRemove(bool enable);
+    /// Set to remove either the sound source component or its owner node from the scene automatically on sound playback completion. Disabled by default.
+    void SetAutoRemoveMode(AutoRemoveMode mode);
     /// Set new playback position.
     void SetPlayPosition(signed char* pos);
 
@@ -99,8 +101,8 @@ public:
     /// Return stereo panning.
     float GetPanning() const { return panning_; }
 
-    /// \deprecated Return autoremove mode.
-    URHO3D_DEPRECATED bool GetAutoRemove() const { return autoRemove_; }
+    /// Return automatic removal mode on sound playback completion.
+    AutoRemoveMode GetAutoRemoveMode() const { return autoRemove_; }
 
     /// Return whether is playing.
     bool IsPlaying() const;
@@ -138,14 +140,12 @@ protected:
     float attenuation_;
     /// Stereo panning.
     float panning_;
-    /// Autoremove timer.
-    float autoRemoveTimer_;
     /// Effective master gain.
     float masterGain_;
-    /// Autoremove flag.
-    bool autoRemove_;
     /// Whether finished event should be sent on playback stop.
     bool sendFinishedEvent_;
+    /// Automatic removal mode.
+    AutoRemoveMode autoRemove_;
 
 private:
     /// Play a sound without locking the audio mutex. Called internally.

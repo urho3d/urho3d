@@ -75,7 +75,7 @@ void CreateScene()
 
     // Create heightmap terrain with collision
     Node@ terrainNode = scene_.CreateChild("Terrain");
-    terrainNode.position = Vector3(0.0f, 0.0f, 0.0f);
+    terrainNode.position = Vector3::ZERO;
     Terrain@ terrain = terrainNode.CreateComponent("Terrain");
     terrain.patchSize = 64;
     terrain.spacing = Vector3(2.0f, 0.1f, 2.0f); // Spacing between vertices and vertical resolution of the height map
@@ -100,7 +100,7 @@ void CreateScene()
         position.y = terrain.GetHeight(position) - 0.1f;
         objectNode.position = position;
         // Create a rotation quaternion from up vector to terrain normal
-        objectNode.rotation = Quaternion(Vector3(0.0f, 1.0f, 0.0), terrain.GetNormal(position));
+        objectNode.rotation = Quaternion(Vector3::UP, terrain.GetNormal(position));
         objectNode.SetScale(3.0f);
         StaticModel@ object = objectNode.CreateComponent("StaticModel");
         object.model = cache.GetResource("Model", "Models/Mushroom.mdl");
@@ -224,9 +224,9 @@ void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
         return;
 
     // Physics update has completed. Position camera behind vehicle
-    Quaternion dir(vehicleNode.rotation.yaw, Vector3(0.0f, 1.0f, 0.0f));
-    dir = dir * Quaternion(vehicle.controls.yaw, Vector3(0.0f, 1.0f, 0.0f));
-    dir = dir * Quaternion(vehicle.controls.pitch, Vector3(1.0f, 0.0f, 0.0f));
+    Quaternion dir(vehicleNode.rotation.yaw, Vector3::UP);
+    dir = dir * Quaternion(vehicle.controls.yaw, Vector3::UP);
+    dir = dir * Quaternion(vehicle.controls.pitch, Vector3::RIGHT);
 
     Vector3 cameraTargetPos = vehicleNode.position - dir * Vector3(0.0f, 0.0f, CAMERA_DISTANCE);
     Vector3 cameraStartPos = vehicleNode.position;
@@ -291,7 +291,7 @@ class Vehicle : ScriptObject
         hullObject.model = cache.GetResource("Model", "Models/Box.mdl");
         hullObject.material = cache.GetResource("Material", "Materials/Stone.xml");
         hullObject.castShadows = true;
-        hullShape.SetBox(Vector3(1.0f, 1.0f, 1.0f));
+        hullShape.SetBox(Vector3::ONE);
         hullBody.mass = 4.0f;
         hullBody.linearDamping = 0.2f; // Some air resistance
         hullBody.angularDamping = 0.5f;
@@ -337,8 +337,8 @@ class Vehicle : ScriptObject
         wheelConstraint.constraintType = CONSTRAINT_HINGE;
         wheelConstraint.otherBody = node.GetComponent("RigidBody");
         wheelConstraint.worldPosition = wheelNode.worldPosition; // Set constraint's both ends at wheel's location
-        wheelConstraint.axis = Vector3(0.0f, 1.0f, 0.0f); // Wheel rotates around its local Y-axis
-        wheelConstraint.otherAxis = offset.x >= 0.0f ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(-1.0f, 0.0f, 0.0f); // Wheel's hull axis points either left or right
+        wheelConstraint.axis = Vector3::UP; // Wheel rotates around its local Y-axis
+        wheelConstraint.otherAxis = offset.x >= 0.0f ? Vector3::RIGHT : Vector3::LEFT; // Wheel's hull axis points either left or right
         wheelConstraint.lowLimit = Vector2(-180.0f, 0.0f); // Let the wheel rotate freely around the axis
         wheelConstraint.highLimit = Vector2(180.0f, 0.0f);
         wheelConstraint.disableCollision = true; // Let the wheel intersect the vehicle hull
@@ -372,8 +372,8 @@ class Vehicle : ScriptObject
 
         Quaternion steeringRot(0.0f, steering * MAX_WHEEL_ANGLE, 0.0f);
 
-        frontLeftAxis.otherAxis = steeringRot * Vector3(-1.0f, 0.0f, 0.0f);
-        frontRightAxis.otherAxis = steeringRot * Vector3(1.0f, 0.0f, 0.0f);
+        frontLeftAxis.otherAxis = steeringRot * Vector3::LEFT;
+        frontRightAxis.otherAxis = steeringRot * Vector3::RIGHT;
 
         if (accelerator != 0.0f)
         {
@@ -388,7 +388,7 @@ class Vehicle : ScriptObject
 
         // Apply downforce proportional to velocity
         Vector3 localVelocity = hullBody.rotation.Inverse() * hullBody.linearVelocity;
-        hullBody.ApplyForce(hullBody.rotation * Vector3(0.0f, -1.0f, 0.0f) * Abs(localVelocity.z) * DOWN_FORCE);
+        hullBody.ApplyForce(hullBody.rotation * Vector3::DOWN * Abs(localVelocity.z) * DOWN_FORCE);
     }
 }
 

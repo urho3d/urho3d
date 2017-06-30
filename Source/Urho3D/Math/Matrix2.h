@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -220,7 +220,6 @@ public:
 
     float m00_;
     float m01_;
-    float m02_;
     float m10_;
     float m11_;
 

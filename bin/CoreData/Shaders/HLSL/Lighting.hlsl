@@ -85,7 +85,7 @@ void GetShadowPos(float4 projWorldPos, float3 normal, out float4 shadowPos[NUMCA
         #ifdef DIRLIGHT
             float cosAngle = saturate(1.0 - dot(normal, cLightDir));
         #else
-            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)));
+            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPos.xyz - projWorldPos.xyz)));
         #endif
 
         #if defined(DIRLIGHT)
@@ -136,6 +136,35 @@ float GetDiffuse(float3 normal, float3 worldPos, out float3 lightDir)
     #endif
 }
 
+float GetAtten(float3 normal, float3 worldPos, out float3 lightDir)
+{
+    lightDir = cLightDirPS;
+    return saturate(dot(normal, lightDir));
+    
+}
+
+float GetAttenPoint(float3 normal, float3 worldPos, out float3 lightDir)
+{
+    float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
+    float lightDist = length(lightVec);
+    float falloff = pow(saturate(1.0 - pow(lightDist / 1.0, 4.0)), 2.0) * 3.14159265358979323846 / (4 * 3.14159265358979323846)*(pow(lightDist, 2.0) + 1.0);
+    lightDir = lightVec / lightDist;
+    return saturate(dot(normal, lightDir)) * falloff;
+
+}
+
+float GetAttenSpot(float3 normal, float3 worldPos, out float3 lightDir)
+{
+    float3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
+    float lightDist = length(lightVec);
+    float falloff = pow(saturate(1.0 - pow(lightDist / 1.0, 4.0)), 2.0) / (pow(lightDist, 2.0) + 1.0);
+
+    lightDir = lightVec / lightDist;
+    return saturate(dot(normal, lightDir)) * falloff;
+
+}
+
+
 float GetDiffuseVolumetric(float3 worldPos)
 {
     #ifdef DIRLIGHT
@@ -176,7 +205,7 @@ float Chebyshev(float2 Moments, float depth)
 {  
     //One-tailed inequality valid if depth > Moments.x  
     float p = float(depth <= Moments.x);  
-    //Compute variance.  
+    //Compute variance.
     float Variance = Moments.y - (Moments.x * Moments.x); 
 
     float minVariance = cVSMShadowParams.x;
@@ -336,7 +365,7 @@ float GetShadowDeferred(float4 projWorldPos, float3 normal, float depth)
         return GetDirShadowDeferred(projWorldPos, normal, depth);
     #else
         #ifdef NORMALOFFSET
-            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPosPS - projWorldPos.xyz)));
+            float cosAngle = saturate(1.0 - dot(normal, normalize(cLightPosPS.xyz - projWorldPos.xyz)));
             projWorldPos.xyz += cosAngle * cNormalOffsetScalePS.x * normal;
         #endif
 

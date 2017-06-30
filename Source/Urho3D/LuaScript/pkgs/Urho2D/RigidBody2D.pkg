@@ -27,6 +27,7 @@ class RigidBody2D : Component
     void ApplyForceToCenter(const Vector2& force, bool wake);
     void ApplyTorque(float torque, bool wake);
     void ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake);
+    void ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake);
     void ApplyAngularImpulse(float impulse, bool wake);
 
     BodyType2D GetBodyType() const;

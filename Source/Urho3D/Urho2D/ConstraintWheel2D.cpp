@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,11 @@ void ConstraintWheel2D::SetEnableMotor(bool enableMotor)
 
     jointDef_.enableMotor = enableMotor;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2WheelJoint*>(joint_)->EnableMotor(enableMotor);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 
@@ -101,7 +105,11 @@ void ConstraintWheel2D::SetMaxMotorTorque(float maxMotorTorque)
 
     jointDef_.maxMotorTorque = maxMotorTorque;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2WheelJoint*>(joint_)->SetMaxMotorTorque(maxMotorTorque);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 
@@ -112,7 +120,11 @@ void ConstraintWheel2D::SetMotorSpeed(float motorSpeed)
 
     jointDef_.motorSpeed = motorSpeed;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2WheelJoint*>(joint_)->SetMotorSpeed(motorSpeed);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 
@@ -123,7 +135,11 @@ void ConstraintWheel2D::SetFrequencyHz(float frequencyHz)
 
     jointDef_.frequencyHz = frequencyHz;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2WheelJoint*>(joint_)->SetSpringFrequencyHz(frequencyHz);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 
@@ -134,7 +150,11 @@ void ConstraintWheel2D::SetDampingRatio(float dampingRatio)
 
     jointDef_.dampingRatio = dampingRatio;
 
-    RecreateJoint();
+    if (joint_)
+        static_cast<b2WheelJoint*>(joint_)->SetSpringDampingRatio(dampingRatio);
+    else
+        RecreateJoint();
+
     MarkNetworkUpdate();
 }
 

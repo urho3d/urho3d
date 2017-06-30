@@ -27,6 +27,7 @@ class Camera : public Component
     void SetReflectionPlane(const Plane& reflectionPlane);
     void SetUseClipping(bool enable);
     void SetClipPlane(const Plane& clipPlane);
+    void SetProjection(const Matrix4& projection);
 
     float GetFarClip() const;
     float GetNearClip() const;
@@ -41,7 +42,8 @@ class Camera : public Component
     bool IsOrthographic() const;
     bool GetAutoAspectRatio() const;
     const Frustum& GetFrustum() const;
-    const Matrix4& GetProjection() const;
+    Matrix4 GetProjection() const;
+    Matrix4 GetGPUProjection() const;
     const Matrix3x4& GetView() const;
     void GetFrustumSize(Vector3& near, Vector3& far) const;
     float GetHalfViewSize() const;
@@ -76,7 +78,8 @@ class Camera : public Component
     tolua_property__is_set bool orthographic;
     tolua_property__get_set bool autoAspectRatio;
     tolua_readonly tolua_property__get_set Frustum& frustum;
-    tolua_readonly tolua_property__get_set Matrix4& projection;
+    tolua_readonly tolua_property__get_set Matrix4 projection;
+    tolua_readonly tolua_property__get_set Matrix4 GPUProjection;
     tolua_readonly tolua_property__get_set Matrix3x4& view;
     tolua_readonly tolua_property__get_set float halfViewSize;
     tolua_readonly tolua_property__get_set Frustum viewSpaceFrustum;

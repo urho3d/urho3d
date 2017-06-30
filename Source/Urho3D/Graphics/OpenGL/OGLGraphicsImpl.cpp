@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,8 @@ GraphicsImpl::GraphicsImpl() :
     boundFBO_(0),
     boundVBO_(0),
     boundUBO_(0),
+    resolveSrcFBO_(0),
+    resolveDestFBO_(0),
     pixelFormat_(0),
     fboDirty_(false),
     vertexBuffersDirty_(false),

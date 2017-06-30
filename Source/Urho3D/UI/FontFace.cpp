@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ const FontGlyph* FontFace::GetGlyph(unsigned c)
         return 0;
 }
 
-short FontFace::GetKerning(unsigned c, unsigned d) const
+float FontFace::GetKerning(unsigned c, unsigned d) const
 {
     if (kerningMapping_.Empty())
         return 0;
@@ -83,7 +83,7 @@ short FontFace::GetKerning(unsigned c, unsigned d) const
 
     unsigned value = (c << 16) + d;
 
-    HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Find(value);
+    HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Find(value);
     if (i != kerningMapping_.End())
         return i->second_;
 
@@ -107,8 +107,8 @@ SharedPtr<Texture2D> FontFace::CreateFaceTexture()
     texture->SetMipsToSkip(QUALITY_LOW, 0); // No quality reduction
     texture->SetNumLevels(1); // No mipmaps
     texture->SetAddressMode(COORD_U, ADDRESS_BORDER);
-    texture->SetAddressMode(COORD_V, ADDRESS_BORDER),
-        texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
+    texture->SetAddressMode(COORD_V, ADDRESS_BORDER);
+    texture->SetBorderColor(Color(0.0f, 0.0f, 0.0f, 0.0f));
     return texture;
 }
 

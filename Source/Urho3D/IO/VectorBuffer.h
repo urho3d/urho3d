@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,13 @@
 
 #pragma once
 
-#include "../IO/Deserializer.h"
-#include "../IO/Serializer.h"
+#include "../IO/AbstractFile.h"
 
 namespace Urho3D
 {
 
 /// Dynamically sized buffer that can be read and written to as a stream.
-class URHO3D_API VectorBuffer : public Deserializer, public Serializer
+class URHO3D_API VectorBuffer : public AbstractFile
 {
 public:
     /// Construct an empty buffer.

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ public:
     /// Apply attribute changes that can not be applied immediately.
     virtual void ApplyAttributes();
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
     /// React to editable status change.
     virtual void OnSetEditable();
 

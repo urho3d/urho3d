@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,7 @@ protected:
 };
 
 // Macro for defining a main function which creates a Context and the application, then runs it
-#ifndef IOS
+#if !defined(IOS) && !defined(TVOS)
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \
@@ -79,7 +79,7 @@ int RunApplication() \
 } \
 URHO3D_DEFINE_MAIN(RunApplication());
 #else
-// On iOS we will let this function exit, so do not hold the context and application in SharedPtr's
+// On iOS/tvOS we will let this function exit, so do not hold the context and application in SharedPtr's
 #define URHO3D_DEFINE_APPLICATION_MAIN(className) \
 int RunApplication() \
 { \

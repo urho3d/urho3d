@@ -11,8 +11,9 @@ void Start()
     // Execute the common startup for samples
     SampleStart();
 
-    // Enable OS cursor
+    // Enable and center OS cursor
     input.mouseVisible = true;
+    input.CenterMousePosition();
 
     // Load strings from JSON files and subscribe to the change language event
     InitLocalizationSystem();
@@ -30,7 +31,7 @@ void Start()
 void InitLocalizationSystem()
 {
     // JSON files must be in UTF8 encoding without BOM
-    // The first founded language will be set as current
+    // The first found language will be set as current
     localization.LoadJSONFile("StringsEnRu.json");
     // You can load multiple files
     localization.LoadJSONFile("StringsDe.json");

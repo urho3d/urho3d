@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ unsigned CompressData(void* dest, const void* src, unsigned srcSize)
     if (!dest || !src || !srcSize)
         return 0;
     else
-        return (unsigned)LZ4_compressHC((const char*)src, (char*)dest, srcSize);
+        return (unsigned)LZ4_compress_HC((const char*)src, (char*)dest, srcSize, LZ4_compressBound(srcSize), 0);
 }
 
 unsigned DecompressData(void* dest, const void* src, unsigned destSize)
@@ -73,7 +73,7 @@ bool CompressStream(Serializer& dest, Deserializer& src)
     if (src.Read(srcBuffer, srcSize) != srcSize)
         return false;
 
-    unsigned destSize = (unsigned)LZ4_compressHC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize);
+    unsigned destSize = (unsigned)LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0);
     bool success = true;
     success &= dest.WriteUInt(srcSize);
     success &= dest.WriteUInt(destSize);

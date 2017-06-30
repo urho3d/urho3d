@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -145,7 +145,7 @@ void Run(const Vector<String>& arguments)
         for (unsigned i = fileNames.Size() - 1; i < fileNames.Size(); --i)
         {
             String extension = GetExtension(fileNames[i]);
-            for (unsigned j = 0; ignoreExtensions_[j].Length(); ++j)
+            for (unsigned j = 0; j < ignoreExtensions_[j].Length(); ++j)
             {
                 if (extension == ignoreExtensions_[j])
                 {
@@ -286,9 +286,9 @@ void WritePackageFile(const String& fileName, const String& rootDir)
                 if (pos + unpackedSize > dataSize)
                     unpackedSize = dataSize - pos;
 
-                unsigned packedSize = (unsigned)LZ4_compressHC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize);
+                unsigned packedSize = (unsigned)LZ4_compress_HC((const char*)&buffer[pos], (char*)compressBuffer.Get(), unpackedSize, LZ4_compressBound(unpackedSize), 0);
                 if (!packedSize)
-                    ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + pos);
+                    ErrorExit("LZ4 compression failed for file " + entries_[i].name_ + " at offset " + String(pos));
 
                 dest.WriteUShort((unsigned short)unpackedSize);
                 dest.WriteUShort((unsigned short)packedSize);

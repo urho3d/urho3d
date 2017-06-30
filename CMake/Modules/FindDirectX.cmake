@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
             if (DEFINED ENV{MINGW_SYSROOT})
                 file (TO_CMAKE_PATH $ENV{MINGW_SYSROOT} MINGW_SYSROOT)
             else ()
-                execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE find_mingw_sysroot_output ERROR_QUIET)
+                execute_process (COMMAND ${CMAKE_COMMAND} -E echo "#include <_mingw.h>" COMMAND ${CMAKE_C_COMPILER} -E -M - OUTPUT_FILE ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output ERROR_QUIET)
                 file (STRINGS ${CMAKE_BINARY_DIR}/find_mingw_sysroot_output MINGW_SYSROOT REGEX _mingw\\.h)
                 string (REGEX REPLACE "^[^ ]* *(.*)/include.*$" \\1 MINGW_SYSROOT "${MINGW_SYSROOT}")  # Stringify for string replacement
                 string (REPLACE "\\ " " " MINGW_SYSROOT "${MINGW_SYSROOT}")
@@ -84,13 +84,13 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
                 message (FATAL_ERROR "Could not find MinGW system root. "
                     "Use MINGW_SYSROOT environment variable or build option to specify the location of system root.")
             endif ()
-            set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW build only); should only be used when the system root could not be auto-detected" FORCE)
+            set (MINGW_SYSROOT ${MINGW_SYSROOT} CACHE PATH "Path to MinGW system root (MinGW only); should only be used when the system root could not be auto-detected" FORCE)
         endif ()
         # MinGW Cross-compiling uses CMAKE_FIND_ROOT_PATH while MinGW on Windows host uses CMAKE_PREFIX_PATH
         if (CMAKE_HOST_WIN32)
             set (CMAKE_PREFIX_PATH ${MINGW_SYSROOT})
         endif ()
-        # MinGW does not need search paths as DirectX headers and libraries (when installed) are in its default search path
+        # MinGW does not usually need search paths as DirectX headers and libraries (when installed) are in its default search path
         # However, we do not explicitly unset the DIRECTX_INC_SEARCH_PATHS and DIRECTX_LIB_SEARCH_PATHS variables here, so module user could set these two variables externally when for some reasons the DirectX headers and libraries are not installed in MinGW default search path
     else ()
         set (D3DCOMPILER_NAMES d3dcompiler)
@@ -113,12 +113,12 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
                 $ENV{DXSDK_DIR}/Lib)
         endif ()
     endif ()
-    find_path (DIRECTX_INCLUDE_DIRS NAMES ${DIRECTX_HEADERS} PATHS ${DIRECTX_INC_SEARCH_PATHS} DOC "DirectX include directory")
+    find_path (DIRECTX_INCLUDE_DIRS NAMES ${DIRECTX_HEADERS} PATHS ${DIRECTX_INC_SEARCH_PATHS} DOC "DirectX include directory" CMAKE_FIND_ROOT_PATH_BOTH)
     if (DIRECTX_INCLUDE_DIRS)
         set (CMAKE_REQUIRED_INCLUDES ${DIRECTX_INCLUDE_DIRS})
         set (DIRECTX_LIBRARY_DIRS)
         set (DIRECT3D_LIBRARIES)
-        find_library (DIRECTX_D3DCOMPILER NAMES ${D3DCOMPILER_NAMES} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX d3dcompiler library")
+        find_library (DIRECTX_D3DCOMPILER NAMES ${D3DCOMPILER_NAMES} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX d3dcompiler library" CMAKE_FIND_ROOT_PATH_BOTH)
         if (DIRECTX_D3DCOMPILER)
             get_filename_component (NAME ${DIRECTX_D3DCOMPILER} NAME)
             string (REGEX REPLACE "^.*(d3dcompiler[_0-9]*).*$" \\1 D3DCOMPILER_LIB_NAME ${NAME})
@@ -134,7 +134,7 @@ if (NOT MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below t
             foreach (NAME ${D3DCOMPILER_LIB_NAME} ${DIRECT3D_LIB_NAMES})
                 string (REGEX REPLACE _[0-9]+$ "" BASE_NAME ${NAME})
                 string (TOUPPER ${BASE_NAME} UPCASE_NAME)
-                find_library (DIRECTX_${UPCASE_NAME} NAMES ${NAME} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX ${BASE_NAME} library")
+                find_library (DIRECTX_${UPCASE_NAME} NAMES ${NAME} PATHS ${DIRECTX_LIB_SEARCH_PATHS} DOC "DirectX ${BASE_NAME} library" CMAKE_FIND_ROOT_PATH_BOTH)
                 if (DIRECTX_${UPCASE_NAME})
                     get_filename_component (PATH ${DIRECTX_${UPCASE_NAME}} PATH)
                     list (APPEND DIRECTX_LIBRARY_DIRS ${PATH})      # All the libs should be found in a same place, but just in case
@@ -183,7 +183,7 @@ if (MSVC_VERSION GREATER 1600 OR MINGW)     # MinGW reuses the logic below to fi
     endif ()
     foreach (VERSION 10.0 8.1 8.0)
         list (APPEND DIRECT3D_DLL_REDIST_SEARCH_PATHS "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Microsoft SDKs\\Windows\\v${VERSION};InstallationFolder]/Redist/D3D/${PATH_SUFFIX}")
-    endforeach()
+    endforeach ()
     find_file (DIRECT3D_DLL NAMES ${DIRECT3D_DLL_NAMES} PATHS ${DIRECT3D_DLL_REDIST_SEARCH_PATHS} DOC "Direct3D DLL"
         NO_DEFAULT_PATH)    # Do not use default paths such as the PATH variable, to potentially avoid using a wrong architecture DLL
     if (DIRECT3D_DLL AND NOT MINGW)

@@ -36,6 +36,8 @@ struct RenderTargetInfo
     unsigned format_ @ format;
     Vector2 size_ @ size;
     RenderTargetSizeMode sizeMode_ @ sizeMode;
+    int multiSample_ @ multiSample;
+    bool autoResolve_ @ autoResolve;
     bool enabled_ @ enabled;
     bool cubemap_ @ cubemap;
     bool filtered_ @ filtered;
@@ -122,11 +124,7 @@ static RenderPath* RenderPathClone(RenderPath* renderPath)
 {
     if (!renderPath)
         return 0;
-    
-    SharedPtr<RenderPath> clonedRenderPathPtr = renderPath->Clone();
-    RenderPath* clonedRenderPath = clonedRenderPathPtr.Get();
-    clonedRenderPathPtr.Detach();
-    
-    return clonedRenderPath;
+
+    return renderPath->Clone().Detach();
 }
 $}

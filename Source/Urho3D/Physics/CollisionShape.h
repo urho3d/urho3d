@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,11 +75,11 @@ struct TriangleMeshData : public CollisionGeometryData
     ~TriangleMeshData();
 
     /// Bullet triangle mesh interface.
-    TriangleMeshInterface* meshInterface_;
+    UniquePtr<TriangleMeshInterface> meshInterface_;
     /// Bullet triangle mesh collision shape.
-    btBvhTriangleMeshShape* shape_;
+    UniquePtr<btBvhTriangleMeshShape> shape_;
     /// Bullet triangle info map.
-    btTriangleInfoMap* infoMap_;
+    UniquePtr<btTriangleInfoMap> infoMap_;
 };
 
 /// Convex hull geometry data.
@@ -196,7 +196,7 @@ public:
     void SetLodLevel(unsigned lodLevel);
 
     /// Return Bullet collision shape.
-    btCollisionShape* GetCollisionShape() const { return shape_; }
+    btCollisionShape* GetCollisionShape() const { return shape_.Get(); }
 
     /// Return the shared geometry data.
     CollisionGeometryData* GetGeometryData() const { return geometry_; }
@@ -244,6 +244,14 @@ protected:
     virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /**
+     * Called when instantiating a collision shape that is not one of ShapeType (default no-op).
+     *
+     * Useful for custom shape types that subclass CollisionShape and use a non-standard underlying
+     * btCollisionShape. UpdateDerivedShape can then be overridden to create the required
+     * btCollisionShape subclass.
+     */
+    virtual btCollisionShape* UpdateDerivedShape(int shapeType, const Vector3& newWorldScale);
 
 private:
     /// Find the parent rigid body component and return its compound collision shape.
@@ -264,7 +272,7 @@ private:
     /// Shared geometry data.
     SharedPtr<CollisionGeometryData> geometry_;
     /// Bullet collision shape.
-    btCollisionShape* shape_;
+    UniquePtr<btCollisionShape> shape_;
     /// Collision shape type.
     ShapeType shapeType_;
     /// Offset position.

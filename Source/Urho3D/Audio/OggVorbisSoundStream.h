@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,9 @@ public:
     OggVorbisSoundStream(const Sound* sound);
     /// Destruct.
     ~OggVorbisSoundStream();
+
+    /// Seek to sample number. Return true on success.
+    virtual bool Seek(unsigned sample_number);
 
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
     virtual unsigned GetData(signed char* dest, unsigned numBytes);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -524,7 +524,6 @@ void Urho2DConstraints::HandleMouseButtonDown(StringHash eventType, VariantMap& 
         constraintMouse->SetMaxForce(1000 * rigidBody->GetMass());
         constraintMouse->SetCollideConnected(true);
         constraintMouse->SetOtherBody(dummyBody);  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse->SetDampingRatio(0.0f);
     }
     SubscribeToEvent(E_MOUSEMOVE, URHO3D_HANDLER(Urho2DConstraints, HandleMouseMove));
     SubscribeToEvent(E_MOUSEBUTTONUP, URHO3D_HANDLER(Urho2DConstraints, HandleMouseButtonUp));

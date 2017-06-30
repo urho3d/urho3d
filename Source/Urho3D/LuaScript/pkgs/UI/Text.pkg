@@ -12,9 +12,9 @@ class Text : public UIElement
     Text();
     virtual ~Text();
 
-    bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE);
-    bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE);
-    bool SetFontSize(int size);
+    bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE);
+    bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE);
+    bool SetFontSize(float size);
 
     void SetText(const String text);
 
@@ -35,7 +35,7 @@ class Text : public UIElement
     void SetAutoLocalizable(bool enable);
 
     Font* GetFont() const;
-    int GetFontSize() const;
+    float GetFontSize() const;
     const String GetText() const;
     HorizontalAlignment GetTextAlignment() const;
     float GetRowSpacing() const;
@@ -49,18 +49,18 @@ class Text : public UIElement
     int GetEffectStrokeThickness() const;
     bool GetEffectRoundStroke() const;
     const Color& GetEffectColor() const;
-    int GetRowHeight() const;
+    float GetRowHeight() const;
     unsigned GetNumRows() const;
     unsigned GetNumChars() const;
-    int GetRowWidth(unsigned index) const;
-    IntVector2 GetCharPosition(unsigned index);
-    IntVector2 GetCharSize(unsigned index);
+    float GetRowWidth(unsigned index) const;
+    Vector2 GetCharPosition(unsigned index);
+    Vector2 GetCharSize(unsigned index);
 
     void SetEffectDepthBias(float bias);
     float GetEffectDepthBias() const;
 
     tolua_property__get_set Font* font;
-    tolua_property__get_set int fontSize;
+    tolua_property__get_set float fontSize;
     tolua_property__get_set String text;
     tolua_property__get_set HorizontalAlignment textAlignment;
     tolua_property__get_set float rowSpacing;
@@ -75,7 +75,7 @@ class Text : public UIElement
     tolua_property__get_set int effectStrokeThickness;
     tolua_property__get_set bool effectRoundStroke;
     tolua_property__get_set Color& effectColor;
-    tolua_readonly tolua_property__get_set int rowHeight;
+    tolua_readonly tolua_property__get_set float rowHeight;
     tolua_readonly tolua_property__get_set unsigned numRows;
     tolua_readonly tolua_property__get_set unsigned numChars;
 };

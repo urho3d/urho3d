@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,19 @@
 
 namespace Urho3D
 {
+
+/// Font hinting level (only used for FreeType fonts)
+enum FontHintLevel
+{
+    /// Completely disable font hinting. Output will be blurrier but more "correct".
+    FONT_HINT_LEVEL_NONE = 0,
+
+    /// Light hinting. FreeType will pixel-align fonts vertically, but not horizontally.
+    FONT_HINT_LEVEL_LIGHT,
+
+    /// Full hinting, using either the font's own hinting or FreeType's auto-hinter.
+    FONT_HINT_LEVEL_NORMAL
+};
 
 class Cursor;
 class Graphics;
@@ -95,12 +108,20 @@ public:
     void SetUseMutableGlyphs(bool enable);
     /// Set whether to force font autohinting instead of using FreeType's TTF bytecode interpreter.
     void SetForceAutoHint(bool enable);
+    /// Set the hinting level used by FreeType fonts.
+    void SetFontHintLevel(FontHintLevel level);
+    /// Set whether text glyphs can have fractional positions. Default is false (pixel-aligned).
+    void SetSubpixelGlyphPositions(bool enable);
     /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
     void SetScale(float scale);
     /// Scale %UI to the specified width in pixels.
-    void SetWidth(float size);
+    void SetWidth(float width);
     /// Scale %UI to the specified height in pixels.
-    void SetHeight(float size);
+    void SetHeight(float height);
+    /// Set custom size of the root element. This disables automatic resizing of the root element according to window size. Set custom size 0,0 to return to automatic resizing.
+    void SetCustomSize(const IntVector2& size);
+    /// Set custom size of the root element.
+    void SetCustomSize(int width, int height);
 
     /// Return root UI element.
     UIElement* GetRoot() const { return rootElement_; }
@@ -164,11 +185,23 @@ public:
     /// Return whether is using forced autohinting.
     bool GetForceAutoHint() const { return forceAutoHint_; }
 
+    /// Return the current FreeType font hinting level.
+    FontHintLevel GetFontHintLevel() const { return fontHintLevel_; }
+
+    // Return whether text glyphs can have fractional positions.
+    bool GetSubpixelGlyphPositions() const { return subpixelGlyphPositions_; }
+
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
 
     /// Return whether a drag is in progress.
     bool IsDragging() const { return dragConfirmedCount_ > 0; };
+
+    /// Return current UI scale.
+    float GetScale() const { return uiScale_; }
+
+    /// Return root element custom size. Returns 0,0 when custom size is not being used and automatic resizing according to window size is in use instead (default.)
+    const IntVector2& GetCustomSize() const { return customSize_; }
 
     /// Data structure used to represent the drag data associated to a UIElement.
     struct DragData
@@ -186,9 +219,6 @@ public:
         /// Drag start position.
         IntVector2 dragBeginSumPos;
     };
-
-    /// Return current UI scale.
-    float GetScale() const { return uiScale_; }
 
 private:
     /// Initialize when screen mode initially set.
@@ -212,7 +242,7 @@ private:
     void SetCursorShape(CursorShape shape);
     /// Force release of font faces when global font properties change.
     void ReleaseFontFaces();
-    /// Handle button or touch hover
+    /// Handle button or touch hover.
     void ProcessHover(const IntVector2& cursorPos, int buttons, int qualifiers, Cursor* cursor);
     /// Handle button or touch begin.
     void
@@ -263,6 +293,10 @@ private:
     void ProcessDragCancel();
     /// Sum touch positions and return the begin position ready to send.
     IntVector2 SumTouchPositions(UI::DragData* dragData, const IntVector2& oldSendPos);
+    /// Resize root element to effective size.
+    void ResizeRootElement();
+    /// Return effective size of the root element, according to UI scale and resolution / custom size.
+    IntVector2 GetEffectiveRootElementSize(bool applyScale = true) const;
 
     /// Graphics subsystem.
     WeakPtr<Graphics> graphics_;
@@ -320,6 +354,10 @@ private:
     bool useMutableGlyphs_;
     /// Flag for forcing FreeType auto hinting.
     bool forceAutoHint_;
+    /// FreeType hinting level (default is FONT_HINT_LEVEL_NORMAL).
+    FontHintLevel fontHintLevel_;
+    /// Flag for subpixel text glyph positions.
+    bool subpixelGlyphPositions_;
     /// Flag for UI already being rendered this frame.
     bool uiRendered_;
     /// Non-modal batch size (used internally for rendering).
@@ -340,8 +378,10 @@ private:
     HashMap<WeakPtr<UIElement>, int> touchDragElements_;
     /// Confirmed drag elements cache.
     Vector<UIElement*> dragElementsConfirmed_;
-    /// Current scale of UI
+    /// Current scale of UI.
     float uiScale_;
+    /// Root element custom size. 0,0 for automatic resizing (default.)
+    IntVector2 customSize_;
 };
 
 /// Register UI library objects.

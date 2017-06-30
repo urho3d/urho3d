@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ struct URHO3D_API TileMapInfo2D
     /// Convert tile index to position.
     Vector2 TileIndexToPosition(int x, int y) const;
     /// Convert position to tile index, if out of map return false.
-    bool PositionToTileIndex(int& x, int& y, const Vector2& positon) const;
+    bool PositionToTileIndex(int& x, int& y, const Vector2& position) const;
 };
 
 /// Tile map layer type.

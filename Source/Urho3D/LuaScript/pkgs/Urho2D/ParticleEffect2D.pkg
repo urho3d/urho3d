@@ -18,11 +18,7 @@ static ParticleEffect2D* ParticleEffect2DClone(const ParticleEffect2D* effect, c
 {
     if (!effect)
         return 0;
-        
-    SharedPtr<ParticleEffect2D> clonedEffectPtr = effect->Clone(cloneName);
-    ParticleEffect2D* clonedEffect = clonedEffectPtr.Get();
-    clonedEffectPtr.Detach();
 
-    return clonedEffect;
+    return effect->Clone(cloneName).Detach();
 }
 $}

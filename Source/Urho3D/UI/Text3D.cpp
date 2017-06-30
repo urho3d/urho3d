@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "../Core/Context.h"
 #include "../Graphics/Camera.h"
 #include "../Graphics/Geometry.h"
+#include "../Graphics/Graphics.h"
 #include "../Graphics/Material.h"
 #include "../Graphics/Technique.h"
 #include "../Graphics/VertexBuffer.h"
@@ -53,6 +54,7 @@ Text3D::Text3D(Context* context) :
     vertexBuffer_(new VertexBuffer(context_)),
     customWorldTransform_(Matrix3x4::IDENTITY),
     faceCameraMode_(FC_NONE),
+    minAngle_(0.0f),
     fixedScreenSize_(false),
     textDirty_(true),
     geometryDirty_(true),
@@ -74,7 +76,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Font Size", int, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Font Size", float, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
@@ -82,6 +84,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Can Be Occluded", IsOccludee, SetOccludee, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Fixed Screen Size", IsFixedScreenSize, SetFixedScreenSize, bool, false, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Face Camera Mode", faceCameraMode_, faceCameraModeNames, FC_NONE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Min Angle", float, minAngle_, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Distance", GetDrawDistance, SetDrawDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Width", GetWidth, SetWidth, int, 0, AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Horiz Alignment", GetHorizontalAlignment, SetHorizontalAlignment, HorizontalAlignment,
@@ -153,7 +156,7 @@ void Text3D::UpdateGeometry(const FrameInfo& frame)
         for (unsigned i = 0; i < batches_.Size() && i < uiBatches_.Size(); ++i)
         {
             Geometry* geometry = geometries_[i];
-            geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_,
+            geometry->SetDrawRange(TRIANGLE_LIST, 0, 0, uiBatches_[i].vertexStart_ / UI_VERTEX_SIZE,
                 (uiBatches_[i].vertexEnd_ - uiBatches_[i].vertexStart_) / UI_VERTEX_SIZE);
         }
     }
@@ -184,7 +187,7 @@ void Text3D::SetMaterial(Material* material)
     UpdateTextMaterials(true);
 }
 
-bool Text3D::SetFont(const String& fontName, int size)
+bool Text3D::SetFont(const String& fontName, float size)
 {
     bool success = text_.SetFont(fontName, size);
 
@@ -197,7 +200,7 @@ bool Text3D::SetFont(const String& fontName, int size)
     return success;
 }
 
-bool Text3D::SetFont(Font* font, int size)
+bool Text3D::SetFont(Font* font, float size)
 {
     bool success = text_.SetFont(font, size);
 
@@ -208,7 +211,7 @@ bool Text3D::SetFont(Font* font, int size)
     return success;
 }
 
-bool Text3D::SetFontSize(int size)
+bool Text3D::SetFontSize(float size)
 {
     bool success = text_.SetFontSize(size);
 
@@ -389,7 +392,7 @@ Font* Text3D::GetFont() const
     return text_.GetFont();
 }
 
-int Text3D::GetFontSize() const
+float Text3D::GetFontSize() const
 {
     return text_.GetFontSize();
 }
@@ -459,6 +462,11 @@ int Text3D::GetWidth() const
     return text_.GetWidth();
 }
 
+int Text3D::GetHeight() const
+{
+    return text_.GetHeight();
+}
+
 int Text3D::GetRowHeight() const
 {
     return text_.GetRowHeight();
@@ -479,12 +487,12 @@ int Text3D::GetRowWidth(unsigned index) const
     return text_.GetRowWidth(index);
 }
 
-IntVector2 Text3D::GetCharPosition(unsigned index)
+Vector2 Text3D::GetCharPosition(unsigned index)
 {
     return text_.GetCharPosition(index);
 }
 
-IntVector2 Text3D::GetCharSize(unsigned index)
+Vector2 Text3D::GetCharSize(unsigned index)
 {
     return text_.GetCharSize(index);
 }
@@ -599,16 +607,21 @@ void Text3D::UpdateTextBatches()
         break;
     }
 
-    boundingBox_.Clear();
-
-    for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
+    if (uiVertexData_.Size())
     {
-        Vector3& position = *(reinterpret_cast<Vector3*>(&uiVertexData_[i]));
-        position += offset;
-        position *= TEXT_SCALING;
-        position.y_ = -position.y_;
-        boundingBox_.Merge(position);
+        boundingBox_.Clear();
+
+        for (unsigned i = 0; i < uiVertexData_.Size(); i += UI_VERTEX_SIZE)
+        {
+            Vector3& position = *(reinterpret_cast<Vector3*>(&uiVertexData_[i]));
+            position += offset;
+            position *= TEXT_SCALING;
+            position.y_ = -position.y_;
+            boundingBox_.Merge(position);
+        }
     }
+    else
+        boundingBox_.Define(Vector3::ZERO, Vector3::ZERO);
 
     textDirty_ = false;
     geometryDirty_ = true;
@@ -641,8 +654,30 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 Pass* pass = tech->CreatePass("alpha");
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");
+                pass->SetBlendMode(BLEND_ALPHA);
+                pass->SetDepthWrite(false);
+                material->SetTechnique(0, tech);
+                material->SetCullMode(CULL_NONE);
+                batches_[i].material_ = material;
+            }
+            else
+                batches_[i].material_ = material_->Clone();
 
-                if (isSDFFont)
+            usingSDFShader_ = isSDFFont;
+        }
+
+        Material* material = batches_[i].material_;
+        Texture* texture = uiBatches_[i].texture_;
+        material->SetTexture(TU_DIFFUSE, texture);
+
+        if (isSDFFont)
+        {
+            // Note: custom defined material is assumed to have right shader defines; they aren't modified here
+            if (!material_)
+            {
+                Technique* tech = material->GetTechnique(0);
+                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                if (pass)
                 {
                     switch (GetTextEffect())
                     {
@@ -659,26 +694,8 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                         break;
                     }
                 }
-
-                pass->SetBlendMode(BLEND_ALPHA);
-                pass->SetDepthWrite(false);
-                material->SetTechnique(0, tech);
-                material->SetCullMode(CULL_NONE);
-                batches_[i].material_ = material;
             }
-            else
-                batches_[i].material_ = material_->Clone();
 
-            // Note: custom material is assumed to use the right kind of shader; it is not modified to define SIGNED_DISTANCE_FIELD
-            usingSDFShader_ = isSDFFont;
-        }
-
-        Material* material = batches_[i].material_;
-        Texture* texture = uiBatches_[i].texture_;
-        material->SetTexture(TU_DIFFUSE, texture);
-
-        if (isSDFFont)
-        {
             switch (GetTextEffect())
             {
             case TE_SHADOW:
@@ -698,6 +715,22 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
                 break;
             }
         }
+        else
+        {
+            // If not SDF, set shader defines based on whether font texture is full RGB or just alpha
+            if (!material_)
+            {
+                Technique* tech = material->GetTechnique(0);
+                Pass* pass = tech ? tech->GetPass("alpha") : (Pass*)0;
+                if (pass)
+                {
+                    if (texture && texture->GetFormat() == Graphics::GetAlphaFormat())
+                        pass->SetPixelShaderDefines("ALPHAMAP");
+                    else
+                        pass->SetPixelShaderDefines("");
+                }
+            }
+        }
     }
 }
 
@@ -713,7 +746,7 @@ void Text3D::CalculateFixedScreenSize(const FrameInfo& frame)
 
         if (!frame.camera_->IsOrthographic())
         {
-            Matrix4 viewProj(frame.camera_->GetProjection(false) * frame.camera_->GetView());
+            Matrix4 viewProj(frame.camera_->GetProjection() * frame.camera_->GetView());
             Vector4 projPos(viewProj * Vector4(worldPosition, 1.0f));
             worldScale *= textScaling * halfViewWorldSize * projPos.w_;
         }
@@ -722,7 +755,7 @@ void Text3D::CalculateFixedScreenSize(const FrameInfo& frame)
     }
 
     customWorldTransform_ = Matrix3x4(worldPosition, frame.camera_->GetFaceCameraRotation(
-        worldPosition, node_->GetWorldRotation(), faceCameraMode_), worldScale);
+        worldPosition, node_->GetWorldRotation(), faceCameraMode_, minAngle_), worldScale);
     worldBoundingBoxDirty_ = true;
 }
 

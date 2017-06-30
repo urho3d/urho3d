@@ -18,6 +18,9 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
+
+// Modified by Yao Wei Tjong for Urho3D
+
 #include "../../SDL_internal.h"
 
 #ifndef _SDL_xinput_h
@@ -100,6 +103,8 @@
 #endif
 
 /* typedef's for XInput structs we use */
+// Urho3D - declara only when built-in xinput.h hasn't declared it
+#ifndef HAVE_XINPUT_GAMEPAD_EX
 typedef struct
 {
     WORD wButtons;
@@ -111,12 +116,14 @@ typedef struct
     SHORT sThumbRY;
     DWORD dwPaddingReserved;
 } XINPUT_GAMEPAD_EX;
-
+#endif
+#ifndef HAVE_XINPUT_STATE_EX
 typedef struct
 {
     DWORD dwPacketNumber;
     XINPUT_GAMEPAD_EX Gamepad;
 } XINPUT_STATE_EX;
+#endif
 
 typedef struct
 {

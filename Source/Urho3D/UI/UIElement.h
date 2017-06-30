@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,8 @@ enum HorizontalAlignment
 {
     HA_LEFT = 0,
     HA_CENTER,
-    HA_RIGHT
+    HA_RIGHT,
+    HA_CUSTOM
 };
 
 /// %UI element vertical alignment.
@@ -43,7 +44,8 @@ enum VerticalAlignment
 {
     VA_TOP = 0,
     VA_CENTER,
-    VA_BOTTOM
+    VA_BOTTOM,
+    VA_CUSTOM
 };
 
 /// %UI element corners.
@@ -90,9 +92,9 @@ enum LayoutMode
 /// Traversal mode for rendering.
 enum TraversalMode
 {
-    /// Traverse thru children having same priority first and recurse into their children before traversing children having higher priority.
+    /// Traverse through children having same priority first and recurse into their children before traversing children having higher priority.
     TM_BREADTH_FIRST = 0,
-    /// Traverse thru each child and its children immediately after in sequence.
+    /// Traverse through each child and its children immediately after in sequence.
     TM_DEPTH_FIRST
 };
 
@@ -127,8 +129,8 @@ public:
     virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
     /// Load from XML data with style. Return true if successful.
     virtual bool LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault = false);
-    /// Create a child by loading from XML data with style. Return true if successful.
-    virtual bool LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
+    /// Create a child by loading from XML data with style. Returns the child element if successful, null if otherwise.
+    virtual UIElement* LoadChildXML(const XMLElement& childElem, XMLFile* styleFile = 0, bool setInstanceDefault = false);
     /// Save as XML data. Return true if successful.
     virtual bool SaveXML(XMLElement& dest) const;
 
@@ -176,13 +178,13 @@ public:
     /// React to a key press.
     virtual void OnKey(int key, int buttons, int qualifiers) { }
     /// React to text input event.
-    virtual void OnTextInput(const String& text, int buttons, int qualifiers) { }
+    virtual void OnTextInput(const String& text) { }
 
     /// React to resize.
-    virtual void OnResize() { }
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) { }
 
     /// React to position change.
-    virtual void OnPositionSet() { }
+    virtual void OnPositionSet(const IntVector2& newPosition) { }
 
     /// React to editable status change.
     virtual void OnSetEditable() { }
@@ -246,6 +248,24 @@ public:
     void SetHorizontalAlignment(HorizontalAlignment align);
     /// Set vertical alignment.
     void SetVerticalAlignment(VerticalAlignment align);
+    /// Enable automatic positioning & sizing of the element relative to its parent using min/max anchor and min/max offset. Default false.
+    void SetEnableAnchor(bool enable);
+    /// Set minimum (top left) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    void SetMinAnchor(const Vector2& anchor);
+    /// Set minimum anchor.
+    void SetMinAnchor(float x, float y);
+    /// Set maximum (bottom right) anchor in relation to the parent element (from 0 to 1.) No effect when anchor is not enabled.
+    void SetMaxAnchor(const Vector2& anchor);
+    /// Set maximum anchor.
+    void SetMaxAnchor(float x, float y);
+    /// Set offset of element's top left from the minimum anchor in pixels. No effect when anchor is not enabled.
+    void SetMinOffset(const IntVector2& offset);
+    /// Set offset of element's bottom right from the maximum anchor in pixels. No effect when anchor is not enabled.
+    void SetMaxOffset(const IntVector2& offset);
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    void SetPivot(const Vector2& pivot);
+    /// Set pivot relative to element's size (from 0 to 1, where 0.5 is center.) Overrides horizontal & vertical alignment.
+    void SetPivot(float x, float y);
     /// Set child element clipping border.
     void SetClipBorder(const IntRect& rect);
     /// Set color on all corners.
@@ -290,11 +310,11 @@ public:
     bool SetStyle(const String& styleName, XMLFile* file = 0);
     /// Set style from an XML element. Return true if the style is applied successfully.
     bool SetStyle(const XMLElement& element);
-    /// Set style from an XML file. Find the style element automatically. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
+    /// Set style from an XML file. Find the style element automatically by using the element's typename. If the style file is not explicitly provided, use the default style from parental chain. Return true if the style is applied successfully.
     bool SetStyleAuto(XMLFile* file = 0);
     /// Set default style file for later use by children elements.
     void SetDefaultStyle(XMLFile* style);
-    /// Set layout.
+    /// Set layout parameters.
     void SetLayout(LayoutMode mode, int spacing = 0, const IntRect& border = IntRect::ZERO);
     /// Set layout mode only.
     void SetLayoutMode(LayoutMode mode);
@@ -416,11 +436,29 @@ public:
     /// Return child element offset.
     const IntVector2& GetChildOffset() const { return childOffset_; }
 
-    /// Return horizontal alignment.
-    HorizontalAlignment GetHorizontalAlignment() const { return horizontalAlignment_; }
+    /// Return horizontal alignment. If pivot has been adjusted to a custom horizontal setting, returns HA_CUSTOM.
+    HorizontalAlignment GetHorizontalAlignment() const;
 
-    /// Return vertical alignment.
-    VerticalAlignment GetVerticalAlignment() const { return verticalAlignment_; }
+    /// Return vertical alignment. If pivot has been adjusted to a custom vertical setting, returns VA_CUSTOM.
+    VerticalAlignment GetVerticalAlignment() const;
+
+    /// Return whether anchor positioning & sizing is enabled.
+    bool GetEnableAnchor() const { return enableAnchor_; }
+
+    /// Return minimum anchor.
+    const Vector2& GetMinAnchor() const { return anchorMin_; }
+
+    /// Return maximum anchor.
+    const Vector2& GetMaxAnchor() const { return anchorMax_; }
+
+    // Return minimum offset.
+    const IntVector2& GetMinOffset() const { return minOffset_; }
+
+    // Return maximum offset.
+    const IntVector2& GetMaxOffset() const { return maxOffset_; }
+
+    /// Return pivot.
+    const Vector2& GetPivot() const { return pivot_; }
 
     /// Return child element clipping border.
     const IntRect& GetClipBorder() const { return clipBorder_; }
@@ -542,6 +580,9 @@ public:
     /// Return child elements with a specific tag either recursively or non-recursively.
     void GetChildrenWithTag(PODVector<UIElement*>& dest, const String& tag, bool recursive = false) const;
 
+    /// Return child elements with a specific tag either recursively or non-recursively.
+    PODVector<UIElement*> GetChildrenWithTag(const String& tag, bool recursive = false) const;
+
     /// Return the drag button combo if this element is being dragged.
     int GetDragButtonCombo() const { return dragButtonCombo_; }
 
@@ -610,6 +651,8 @@ protected:
     bool FilterUIStyleAttributes(XMLElement& dest, const XMLElement& styleElem) const;
     /// Filter implicit attributes in serialization process.
     virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    /// Update anchored size & position. Only called when anchoring is enabled.
+    void UpdateAnchoring();
 
     /// Name.
     String name_;
@@ -716,10 +759,20 @@ private:
     IntVector2 childOffset_;
     /// Parent's minimum size calculated by layout. Used internally.
     IntVector2 layoutMinSize_;
-    /// Horizontal alignment.
-    HorizontalAlignment horizontalAlignment_;
-    /// Vertical alignment.
-    VerticalAlignment verticalAlignment_;
+    /// Minimum offset.
+    IntVector2 minOffset_;
+    /// Maximum offset.
+    IntVector2 maxOffset_;
+    /// Use min/max anchor & min/max offset for position & size instead of setting explicitly.
+    bool enableAnchor_;
+    /// Has pivot changed manually.
+    bool pivotSet_;
+    /// Anchor minimum position.
+    Vector2 anchorMin_;
+    /// Anchor maximum position.
+    Vector2 anchorMax_;
+    /// Pivot Position
+    Vector2 pivot_;
     /// Opacity.
     float opacity_;
     /// Derived opacity.

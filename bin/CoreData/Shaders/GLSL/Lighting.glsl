@@ -86,7 +86,7 @@ vec4 GetShadowPos(int index, vec3 normal, vec4 projWorldPos)
         #ifdef DIRLIGHT
             float cosAngle = clamp(1.0 - dot(normal, cLightDir), 0.0, 1.0);
         #else
-            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPos - projWorldPos.xyz)), 0.0, 1.0);
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPos.xyz - projWorldPos.xyz)), 0.0, 1.0);
         #endif
         projWorldPos.xyz += cosAngle * normalOffsetScale[index] * normal;
     #endif
@@ -123,6 +123,33 @@ float GetDiffuse(vec3 normal, vec3 worldPos, out vec3 lightDir)
             return max(dot(normal, lightDir), 0.0) * texture2D(sLightRampMap, vec2(lightDist, 0.0)).r;
         #endif
     #endif
+}
+
+float GetAtten(vec3 normal, vec3 worldPos, out vec3 lightDir)
+{
+    lightDir = cLightDirPS;
+    return clamp(dot(normal, lightDir), 0.0, 1.0);
+}
+
+float GetAttenPoint(vec3 normal, vec3 worldPos, out vec3 lightDir)
+{
+    vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
+    float lightDist = length(lightVec);
+    float falloff = pow(clamp(1.0 - pow(lightDist / 1.0, 4.0), 0.0, 1.0), 2.0) * 3.14159265358979323846 / (4.0 * 3.14159265358979323846)*(pow(lightDist, 2.0) + 1.0);
+    lightDir = lightVec / lightDist;
+    return clamp(dot(normal, lightDir), 0.0, 1.0) * falloff;
+
+}
+
+float GetAttenSpot(vec3 normal, vec3 worldPos, out vec3 lightDir)
+{
+    vec3 lightVec = (cLightPosPS.xyz - worldPos) * cLightPosPS.w;
+    float lightDist = length(lightVec);
+    float falloff = pow(clamp(1.0 - pow(lightDist / 1.0, 4.0), 0.0, 1.0), 2.0) / (pow(lightDist, 2.0) + 1.0);
+
+    lightDir = lightVec / lightDist;
+    return clamp(dot(normal, lightDir), 0.0, 1.0) * falloff;
+
 }
 
 float GetDiffuseVolumetric(vec3 worldPos)
@@ -283,7 +310,7 @@ float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
     return GetDirShadowFade(GetShadow(shadowPos), depth);
 }
 #else
-float GetDirShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
+float GetDirShadow(const highp vec4 iShadowPos[NUMCASCADES], float depth)
 {
     return GetDirShadowFade(GetShadow(iShadowPos[0]), depth);
 }
@@ -320,7 +347,11 @@ float GetDirShadowDeferred(vec4 projWorldPos, vec3 normal, float depth)
 #endif
 #endif
 
-float GetShadow(vec4 iShadowPos[NUMCASCADES], float depth)
+#ifndef GL_ES
+float GetShadow(const vec4 iShadowPos[NUMCASCADES], float depth)
+#else
+float GetShadow(const highp vec4 iShadowPos[NUMCASCADES], float depth)
+#endif
 {
     #if defined(DIRLIGHT)
         return GetDirShadow(iShadowPos, depth);
@@ -338,7 +369,7 @@ float GetShadowDeferred(vec4 projWorldPos, vec3 normal, float depth)
         return GetDirShadowDeferred(projWorldPos, normal, depth);
     #else
         #ifdef NORMALOFFSET
-            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPosPS - projWorldPos.xyz)), 0.0, 1.0);
+            float cosAngle = clamp(1.0 - dot(normal, normalize(cLightPosPS.xyz - projWorldPos.xyz)), 0.0, 1.0);
             projWorldPos.xyz += cosAngle * cNormalOffsetScalePS.x * normal;
         #endif
 

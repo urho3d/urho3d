@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -125,7 +125,7 @@ void OcclusionBuffer::SetView(Camera* camera)
         return;
 
     view_ = camera->GetView();
-    projection_ = camera->GetProjection(false);
+    projection_ = camera->GetProjection();
     viewProj_ = projection_ * view_;
     nearClip_ = camera->GetNearClip();
     farClip_ = camera->GetFarClip();

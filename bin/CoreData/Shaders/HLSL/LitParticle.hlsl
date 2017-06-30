@@ -2,7 +2,21 @@
 #include "Samplers.hlsl"
 #include "Transform.hlsl"
 #include "Lighting.hlsl"
+#include "ScreenPos.hlsl"
 #include "Fog.hlsl"
+
+#if defined(COMPILEPS) && defined(SOFTPARTICLES)
+#ifndef D3D11
+// D3D9 uniform
+uniform float cSoftParticleFadeScale;
+#else
+// D3D11 constant buffer
+cbuffer CustomPS : register(b6)
+{
+    float cSoftParticleFadeScale;
+}
+#endif
+#endif
 
 void VS(float4 iPos : POSITION,
     #if !defined(BILLBOARD) && !defined(TRAILFACECAM)
@@ -28,6 +42,9 @@ void VS(float4 iPos : POSITION,
         float4 iTangent : TANGENT,
     #endif
     out float2 oTexCoord : TEXCOORD0,
+    #ifdef SOFTPARTICLES
+        out float4 oScreenPos : TEXCOORD1,
+    #endif
     out float4 oWorldPos : TEXCOORD3,
     #if PERPIXEL
         #ifdef SHADOW
@@ -65,6 +82,10 @@ void VS(float4 iPos : POSITION,
         oClip = dot(oPos, cClipPlane);
     #endif
 
+    #ifdef SOFTPARTICLES
+        oScreenPos = GetScreenPos(oPos);
+    #endif
+
     #ifdef VERTEXCOLOR
         oColor = iColor;
     #endif
@@ -98,6 +119,9 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(float2 iTexCoord : TEXCOORD0,
+    #ifdef SOFTPARTICLES
+        float4 iScreenPos: TEXCOORD1,
+    #endif
     float4 iWorldPos : TEXCOORD3,
     #ifdef PERPIXEL
         #ifdef SHADOW
@@ -141,6 +165,31 @@ void PS(float2 iTexCoord : TEXCOORD0,
         float fogFactor = GetHeightFogFactor(iWorldPos.w, iWorldPos.y);
     #else
         float fogFactor = GetFogFactor(iWorldPos.w);
+    #endif
+
+    // Soft particle fade
+    // In expand mode depth test should be off. In that case do manual alpha discard test first to reduce fill rate
+    #ifdef SOFTPARTICLES
+        #ifdef EXPAND
+            if (diffColor.a < 0.01)
+                discard;
+        #endif
+
+        float particleDepth = iWorldPos.w;
+        float depth = Sample2DProj(DepthBuffer, iScreenPos).r;
+        #ifdef HWDEPTH
+            depth = ReconstructDepth(depth);
+        #endif
+
+        #ifdef EXPAND
+            float diffZ = max(particleDepth - depth, 0.0) * (cFarClipPS - cNearClipPS);
+            float fade = saturate(diffZ * cSoftParticleFadeScale);
+        #else
+            float diffZ = (depth - particleDepth) * (cFarClipPS - cNearClipPS);
+            float fade = saturate(1.0 - diffZ * cSoftParticleFadeScale);
+        #endif
+
+        diffColor.a = max(diffColor.a - fade, 0.0);
     #endif
 
     #ifdef PERPIXEL

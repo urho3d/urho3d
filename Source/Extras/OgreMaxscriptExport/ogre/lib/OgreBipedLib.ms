@@ -117,7 +117,7 @@ function writeTrack bone_name boneId firstframe lastframe samplerate IKsamplerat
 	if (not g_MAX) then
 		format "retrieving key information for % ...\n" (bone_name) ;
 
-	-- gets bone acording to the parameter boneId
+	-- gets bone according to the parameter boneId
 	bname = bone_name ;
 	replaceSpaces bname ;
 	d = getNodeByName bname ;
@@ -184,7 +184,7 @@ function writeTrack bone_name boneId firstframe lastframe samplerate IKsamplerat
 				Tform = flipYZTransform Tform ;
 			)
 			
-			-- substracts position of the initial transform
+			-- subtracts position of the initial transform
 			Tform.pos -= initTform.pos ;
 			Tform.pos = Tform.pos * scale ;
 			
@@ -368,7 +368,7 @@ function computeBonesList phy sk exportHelpers =
 ------------------
 function writeB bone_name id scale flipYZ outFile =
 (
-	-- gets bone acording to the parameter boneId
+	-- gets bone according to the parameter boneId
 	bname = bone_name ;
 	replaceSpaces bname;
 	d = getNodeByName bname ;

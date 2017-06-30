@@ -1,0 +1,13 @@
+$#include "IK/IKConstraint.h"
+
+class IKConstraint : public Component
+{
+    float GetStiffness() const;
+    void SetStiffness(float stiffness);
+
+    float GetStretchiness() const;
+    void SetStretchiness(float stretchiness);
+
+    const Vector2& GetLengthConstraints() const;
+    void SetLengthConstraints(const Vector2& lengthConstraints);
+};

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -314,9 +314,9 @@ void ListView::OnKey(int key, int buttons, int qualifiers)
     SendEvent(E_UNHANDLEDKEY, eventData);
 }
 
-void ListView::OnResize()
+void ListView::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
-    ScrollView::OnResize();
+    ScrollView::OnResize(newSize, delta);
 
     // When in hierarchy mode also need to resize the overlay container
     if (hierarchyMode_)

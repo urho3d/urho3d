@@ -4,14 +4,13 @@
     <attribute name="Layout Mode" value="Horizontal" />
     <attribute name="Layout Spacing" value="4" />
     <element type="Button">
-                <attribute name="Name" value="TagsSelect" />
-                <attribute name="Min Size" value="16 16" />
-                <attribute name="Max Size" value="16 16" />
-                <attribute name="Layout Mode" value="Horizontal" />
-                <element type="BorderImage">
-                    <attribute name="Texture" value="Texture2D;Textures/UI.png" />
-                    <attribute name="Image Rect" value="190 0 208 15" />
-                </element>
+        <attribute name="Name" value="TagsSelect" />
+        <attribute name="Min Size" value="16 16" />
+        <attribute name="Max Size" value="16 16" />
+        <attribute name="Layout Mode" value="Horizontal" />
+        <element type="BorderImage">
+            <attribute name="Image Rect" value="190 0 208 15" />
+        </element>
     </element>
     <element type="Text" style="EditorAttributeText">
         <attribute name="Name" value="TagsLabel" />

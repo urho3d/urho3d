@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -69,6 +69,8 @@ struct URHO3D_API RenderTargetInfo
     RenderTargetInfo() :
         size_(Vector2::ZERO),
         sizeMode_(SIZE_ABSOLUTE),
+        multiSample_(1),
+        autoResolve_(true),
         enabled_(true),
         cubemap_(false),
         filtered_(false),
@@ -90,6 +92,10 @@ struct URHO3D_API RenderTargetInfo
     Vector2 size_;
     /// Size mode.
     RenderTargetSizeMode sizeMode_;
+    /// Multisampling level (1 = no multisampling).
+    int multiSample_;
+    /// Multisampling autoresolve flag.
+    bool autoResolve_;
     /// Enabled flag.
     bool enabled_;
     /// Cube map flag.

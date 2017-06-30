@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -175,9 +175,8 @@ bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned fo
     {
         renderSurface_ = new RenderSurface(this);
 
-        // Nearest filtering and mipmaps disabled by default
+        // Nearest filtering by default
         filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
     }
 
     if (usage == TEXTURE_RENDERTARGET)
@@ -188,6 +187,7 @@ bool Texture2DArray::SetSize(unsigned layers, int width, int height, unsigned fo
     width_ = width;
     height_ = height;
     format_ = format;
+    depth_ = 1;
     if (layers)
         layers_ = layers;
 

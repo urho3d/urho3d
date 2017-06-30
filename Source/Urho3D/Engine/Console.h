@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,10 @@ public:
     void SetNumHistoryRows(unsigned rows);
     /// Set whether to automatically focus the line edit when showing. Default true on desktops and false on mobile devices, as on mobiles it would pop up the screen keyboard.
     void SetFocusOnShow(bool enable);
+    /// Add auto complete option.
+    void AddAutoComplete(const String& option);
+    /// Remove auto complete option.
+    void RemoveAutoComplete(const String& option);
     /// Update elements to layout properly. Call this after manually adjusting the sub-elements.
     void UpdateElements();
 
@@ -120,6 +124,8 @@ private:
     bool PopulateInterpreter();
     /// Handle interpreter being selected on the drop down list.
     void HandleInterpreterSelected(StringHash eventType, VariantMap& eventData);
+    /// Handle text change in the line edit.
+    void HandleTextChanged(StringHash eventType, VariantMap& eventData);
     /// Handle enter pressed on the line edit.
     void HandleTextFinished(StringHash eventType, VariantMap& eventData);
     /// Handle unhandled key on the line edit for scrolling the history.
@@ -149,6 +155,7 @@ private:
     SharedPtr<Button> closeButton_;
     /// Last used command interpreter.
     String commandInterpreter_;
+
     /// Command history.
     Vector<String> history_;
     /// Pending log message rows.
@@ -161,10 +168,29 @@ private:
     unsigned historyRows_;
     /// Command history current position.
     unsigned historyPosition_;
+
+    /**
+    Command auto complete options.
+
+    down arrow key
+    Unless currently going through history options, will loop through next auto complete options.
+
+    up arrow key
+    Unless currently going through history options, will go through previous auto complete options.
+    When no previous options are left will start going through history options.
+    */
+    Vector<String> autoComplete_;
+    /// Command auto complete current position.
+    unsigned autoCompletePosition_;
+    /// Store the original line which is being auto-completed
+    String autoCompleteLine_;
+
     /// Flag when printing messages to prevent endless loop.
     bool printing_;
     /// Flag for automatically focusing the line edit on showing the console.
     bool focusOnShow_;
+    /// Internal flag whether currently in an autocomplete or history change.
+    bool historyOrAutoCompleteChange_;
 };
 
 }

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,24 +21,17 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-    if (WIN32)
-        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
-    else ()
-        cmake_minimum_required (VERSION 2.8.6)
-    endif ()
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
+    cmake_minimum_required (VERSION 3.2.3)
     if (COMMAND cmake_policy)
+        # Libraries linked via full path no longer produce linker search paths
         cmake_policy (SET CMP0003 NEW)
-        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-            # INTERFACE_LINK_LIBRARIES defines the link interface
-            cmake_policy (SET CMP0022 NEW)
-        endif ()
-        if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-            cmake_policy (SET CMP0026 OLD)
-            # MACOSX_RPATH is enabled by default
-            cmake_policy (SET CMP0042 NEW)
-        endif ()
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 
     # Set project name
@@ -47,8 +40,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D Cmake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # Define additional source files
     set (MINI_URHO_CPP_FILES
@@ -87,14 +80,7 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         ${BAKED_CMAKE_SOURCE_DIR}/Source/Urho3D/Math/Vector4.cpp
     )
 
-    # Check existence of stdint.h for LibCpuId
-    include (CheckIncludeFiles)
-    check_include_files (stdint.h HAVE_STDINT_H)
-    if (HAVE_STDINT_H)
-        add_definitions (-DHAVE_STDINT_H)
-    endif ()
-
-    # Define that we are building mini Urho
+    # Define preprocessor macros
     add_definitions (-DMINI_URHO)
 
     # Setup SDK-like include dir in the build tree for building the mini-urho
@@ -102,10 +88,14 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
 
     # Add dependency targets
-    add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LibCpuId host/LibCpuId)
+    if (NOT CMAKE_SYSTEM_NAME STREQUAL Linux)
+        include (CheckIncludeFile)
+        check_include_file (stdint.h HAVE_STDINT_H)
+        add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LibCpuId host/LibCpuId)
+        set (LIBS LibCpuId)
+    endif ()
     add_subdirectory (${BAKED_CMAKE_SOURCE_DIR}/Source/ThirdParty/LZ4 host/LZ4)
     set (INCLUDE_DIRS ${BAKED_CMAKE_BINARY_DIR}/include ${BAKED_CMAKE_BINARY_DIR}/include/Urho3D ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
-    set (LIBS LibCpuId)
 endif ()
 
 # Define target name

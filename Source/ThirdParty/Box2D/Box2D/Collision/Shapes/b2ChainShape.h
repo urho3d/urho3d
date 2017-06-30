@@ -19,7 +19,7 @@
 #ifndef B2_CHAIN_SHAPE_H
 #define B2_CHAIN_SHAPE_H
 
-#include <Box2D/Collision/Shapes/b2Shape.h>
+#include "Box2D/Collision/Shapes/b2Shape.h"
 
 class b2EdgeShape;
 
@@ -36,6 +36,9 @@ public:
 
 	/// The destructor frees the vertices using b2Free.
 	~b2ChainShape();
+
+	/// Clear all data.
+	void Clear();
 
 	/// Create a loop. This automatically adjusts connectivity.
 	/// @param vertices an array of vertices, these are copied

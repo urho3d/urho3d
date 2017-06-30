@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,11 @@ const Vector2 Vector2::DOWN(0.0f, -1.0f);
 const Vector2 Vector2::ONE(1.0f, 1.0f);
 
 const IntVector2 IntVector2::ZERO;
+const IntVector2 IntVector2::LEFT(-1, 0);
+const IntVector2 IntVector2::RIGHT(1, 0);
+const IntVector2 IntVector2::UP(0, 1);
+const IntVector2 IntVector2::DOWN(0, -1);
+const IntVector2 IntVector2::ONE(1, 1);
 
 String Vector2::ToString() const
 {

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,8 @@ void Texture2DArray::Release()
     URHO3D_SAFE_RELEASE(object_.ptr_);
     URHO3D_SAFE_RELEASE(shaderResourceView_);
     URHO3D_SAFE_RELEASE(sampler_);
+
+    levelsDirty_ = false;
 }
 
 bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int width, int height, const void* data)
@@ -392,8 +394,8 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(stagingTexture);
         URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return false;
     }
 
@@ -417,7 +419,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     if (FAILED(hr) || !mappedData.pData)
     {
         URHO3D_LOGD3DERROR("Failed to map staging texture for GetData", hr);
-        stagingTexture->Release();
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return false;
     }
     else
@@ -425,7 +427,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
         for (unsigned row = 0; row < numRows; ++row)
             memcpy((unsigned char*)dest + row * rowSize, (unsigned char*)mappedData.pData + row * mappedData.RowPitch, rowSize);
         graphics_->GetImpl()->GetDeviceContext()->Unmap((ID3D11Resource*)stagingTexture, 0);
-        stagingTexture->Release();
+        URHO3D_SAFE_RELEASE(stagingTexture);
         return true;
     }
 }
@@ -441,6 +443,11 @@ bool Texture2DArray::Create()
 
     D3D11_TEXTURE2D_DESC textureDesc;
     memset(&textureDesc, 0, sizeof textureDesc);
+
+    // Set mipmapping
+    if (usage_ == TEXTURE_RENDERTARGET && levels_ != 1)
+        textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
     textureDesc.Width = (UINT)width_;
     textureDesc.Height = (UINT)height_;
     textureDesc.MipLevels = levels_;
@@ -459,8 +466,8 @@ bool Texture2DArray::Create()
     HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Failed to create texture array", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 
@@ -486,8 +493,8 @@ bool Texture2DArray::Create()
         (ID3D11ShaderResourceView**)&shaderResourceView_);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(shaderResourceView_);
         URHO3D_LOGD3DERROR("Failed to create shader resource view for texture array", hr);
+        URHO3D_SAFE_RELEASE(shaderResourceView_);
         return false;
     }
 
@@ -514,8 +521,8 @@ bool Texture2DArray::Create()
 
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(renderSurface_->renderTargetView_);
             URHO3D_LOGD3DERROR("Failed to create rendertarget view for texture array", hr);
+            URHO3D_SAFE_RELEASE(renderSurface_->renderTargetView_);
             return false;
         }
     }

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,8 @@ RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
     surface_(0),
     updateMode_(SURFACE_UPDATEVISIBLE),
-    updateQueued_(false)
+    updateQueued_(false),
+    resolveDirty_(false)
 {
 }
 
@@ -60,7 +61,7 @@ void RenderSurface::Release()
     URHO3D_SAFE_RELEASE(surface_);
 }
 
-bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format)
+bool RenderSurface::CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample)
 {
     // Not used on Direct3D
     return false;

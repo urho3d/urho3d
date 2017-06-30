@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,33 @@ GraphicsImpl::GraphicsImpl() :
         constantBuffers_[VS][i] = 0;
         constantBuffers_[PS][i] = 0;
     }
+}
+
+bool GraphicsImpl::CheckMultiSampleSupport(DXGI_FORMAT format, unsigned sampleCount) const
+{
+    if (sampleCount < 2)
+        return true; // Not multisampled
+
+    UINT numLevels = 0;
+    if (FAILED(device_->CheckMultisampleQualityLevels(format, sampleCount, &numLevels)))
+        return false;
+    else
+        return numLevels > 0;
+}
+
+unsigned GraphicsImpl::GetMultiSampleQuality(DXGI_FORMAT format, unsigned sampleCount) const
+{
+    if (sampleCount < 2)
+        return 0; // Not multisampled, should use quality 0
+
+    if (device_->GetFeatureLevel() >= D3D_FEATURE_LEVEL_10_1)
+        return 0xffffffff; // D3D10.1+ standard level
+
+    UINT numLevels = 0;
+    if (FAILED(device_->CheckMultisampleQualityLevels(format, sampleCount, &numLevels)) || !numLevels)
+        return 0; // Errored or sample count not supported
+    else
+        return numLevels - 1; // D3D10.0 and below: use the best quality
 }
 
 }

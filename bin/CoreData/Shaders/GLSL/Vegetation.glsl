@@ -48,7 +48,7 @@ void VS()
 {
     mat4 modelMatrix = iModelMatrix;
     vec3 worldPos = GetWorldPos(modelMatrix);
-    float height = worldPos.y - cModel[1][3];
+    float height = worldPos.y - modelMatrix[1][3];
 
     float windStrength = max(height - cWindHeightPivot, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
@@ -64,10 +64,10 @@ void VS()
     #endif
 
     #ifdef NORMALMAP
-        vec3 tangent = GetWorldTangent(modelMatrix);
-        vec3 bitangent = cross(tangent, vNormal) * iTangent.w;
+        vec4 tangent = GetWorldTangent(modelMatrix);
+        vec3 bitangent = cross(tangent.xyz, vNormal) * tangent.w;
         vTexCoord = vec4(GetTexCoord(iTexCoord), bitangent.xy);
-        vTangent = vec4(tangent, bitangent.z);
+        vTangent = vec4(tangent.xyz, bitangent.z);
     #else
         vTexCoord = GetTexCoord(iTexCoord);
     #endif
@@ -86,7 +86,7 @@ void VS()
             // Spotlight projection: transform from world space to projector texture coordinates
             vSpotPos = projWorldPos * cLightMatrices[0];
         #endif
-    
+
         #ifdef POINTLIGHT
             vCubeMaskVec = (worldPos - cLightPos.xyz) * mat3(cLightMatrices[0][0].xyz, cLightMatrices[0][1].xyz, cLightMatrices[0][2].xyz);
         #endif
@@ -100,12 +100,12 @@ void VS()
         #else
             vVertexLight = GetAmbient(GetZonePos(worldPos));
         #endif
-        
+
         #ifdef NUMVERTEXLIGHTS
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 vVertexLight += GetVertexLight(i, worldPos, vNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
+
         vScreenPos = GetScreenPos(gl_Position);
 
         #ifdef ENVCUBEMAP

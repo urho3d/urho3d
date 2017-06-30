@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,9 @@ namespace Urho3D
 class SoundStream;
 
 /// %Sound resource.
-class URHO3D_API Sound : public Resource
+class URHO3D_API Sound : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(Sound, Resource);
+    URHO3D_OBJECT(Sound, ResourceWithMetadata);
 
 public:
     /// Construct.

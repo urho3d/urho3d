@@ -156,7 +156,7 @@ void PS()
         #endif
 
         #ifdef AMBIENT
-            finalColor += cAmbientColor * diffColor.rgb;
+            finalColor += cAmbientColor.rgb * diffColor.rgb;
             finalColor += cMatEmissiveColor;
             gl_FragColor = vec4(GetFog(finalColor, fogFactor), diffColor.a);
         #else

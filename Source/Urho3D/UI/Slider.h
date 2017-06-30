@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ public:
     virtual void
         OnDragEnd(const IntVector2& position, const IntVector2& screenPosition, int dragButtons, int buttons, Cursor* cursor);
     /// React to resize.
-    virtual void OnResize();
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);

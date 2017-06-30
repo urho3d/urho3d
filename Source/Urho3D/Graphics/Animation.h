@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -107,9 +107,9 @@ static const unsigned char CHANNEL_ROTATION = 0x2;
 static const unsigned char CHANNEL_SCALE = 0x4;
 
 /// Skeletal animation resource.
-class URHO3D_API Animation : public Resource
+class URHO3D_API Animation : public ResourceWithMetadata
 {
-    URHO3D_OBJECT(Animation, Resource);
+    URHO3D_OBJECT(Animation, ResourceWithMetadata);
 
 public:
     /// Construct.
@@ -163,6 +163,9 @@ public:
 
     /// Return number of animation tracks.
     unsigned GetNumTracks() const { return tracks_.Size(); }
+
+    /// Return animation track by index.
+    AnimationTrack *GetTrack(unsigned index);
 
     /// Return animation track by name.
     AnimationTrack* GetTrack(const String& name);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,12 +94,11 @@ namespace Urho3D
 
 #define GET_IP_SAMPLE_RIGHT() (((((int)pos[3] - (int)pos[1]) * fractPos) / 65536) + (int)pos[1])
 
-static const float AUTOREMOVE_DELAY = 0.25f;
-
 static const int STREAM_SAFETY_SAMPLES = 4;
 
 extern const char* AUDIO_CATEGORY;
 
+extern const char* autoRemoveModeNames[];
 
 SoundSource::SoundSource(Context* context) :
     Component(context),
@@ -108,9 +107,8 @@ SoundSource::SoundSource(Context* context) :
     gain_(1.0f),
     attenuation_(1.0f),
     panning_(0.0f),
-    autoRemoveTimer_(0.0f),
-    autoRemove_(false),
     sendFinishedEvent_(false),
+    autoRemove_(REMOVE_DISABLED),
     position_(0),
     fractPosition_(0),
     timePosition_(0.0f),
@@ -142,8 +140,32 @@ void SoundSource::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Attenuation", float, attenuation_, 1.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Panning", float, panning_, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Playing", IsPlaying, SetPlayingAttr, bool, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Autoremove on Stop", bool, autoRemove_, false, AM_FILE);
+    URHO3D_ENUM_ATTRIBUTE("Autoremove Mode", autoRemove_, autoRemoveModeNames, REMOVE_DISABLED, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Play Position", GetPositionAttr, SetPositionAttr, int, 0, AM_FILE);
+}
+
+void SoundSource::Seek(float seekTime)
+{
+    // Ignore buffered sound stream
+    if (!audio_ || !sound_ || (soundStream_ && !sound_->IsCompressed()))
+        return;
+
+    // Set to valid range
+    seekTime = Clamp(seekTime, 0.0f, sound_->GetLength());
+
+    if (!soundStream_)
+    {
+        // Raw or wav format
+        SetPositionAttr((int)(seekTime * (sound_->GetSampleSize() * sound_->GetFrequency())));
+    }
+    else
+    {
+        // Ogg format
+        if (soundStream_->Seek((unsigned)(seekTime * soundStream_->GetFrequency())))
+        {
+            timePosition_ = seekTime;
+        }
+    }
 }
 
 void SoundSource::Play(Sound* sound)
@@ -283,12 +305,10 @@ void SoundSource::SetPanning(float panning)
     MarkNetworkUpdate();
 }
 
-void SoundSource::SetAutoRemove(bool enable)
+void SoundSource::SetAutoRemoveMode(AutoRemoveMode mode)
 {
-    if (enable == true)
-        URHO3D_LOGWARNING("SoundSource::SetAutoRemove is deprecated. Consider using the SoundFinished event instead");
-
-    autoRemove_ = enable;
+    autoRemove_ = mode;
+    MarkNetworkUpdate();
 }
 
 bool SoundSource::IsPlaying() const
@@ -338,23 +358,8 @@ void SoundSource::Update(float timeStep)
 
         if (self.Expired())
             return;
-    }
 
-    // Check for autoremove
-    if (autoRemove_)
-    {
-        if (!playing)
-        {
-            autoRemoveTimer_ += timeStep;
-            if (autoRemoveTimer_ > AUTOREMOVE_DELAY)
-            {
-                Remove();
-                // Note: this object is now deleted, so only returning immediately is safe
-                return;
-            }
-        }
-        else
-            autoRemoveTimer_ = 0.0f;
+        DoAutoRemove(autoRemove_);
     }
 }
 

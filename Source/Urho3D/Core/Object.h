@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,12 +99,6 @@ public:
 
     /// Return type info static.
     static const TypeInfo* GetTypeInfoStatic() { return 0; }
-    /// Check current type is type of specified type.
-    static bool IsTypeOf(StringHash type);
-    /// Check current type is type of specified type.
-    static bool IsTypeOf(const TypeInfo* typeInfo);
-    /// Check current type is type of specified class.
-    template<typename T> static bool IsTypeOf() { return IsTypeOf(T::GetTypeInfoStatic()); }
     /// Check current instance is type of specified type.
     bool IsInstanceOf(StringHash type) const;
     /// Check current instance is type of specified type.
@@ -251,7 +245,6 @@ public:
         sender_(0),
         userData_(userData)
     {
-        assert(receiver_);
     }
 
     /// Destruct.
@@ -303,6 +296,7 @@ public:
         EventHandler(receiver, userData),
         function_(function)
     {
+        assert(receiver_);
         assert(function_);
     }
 
@@ -331,8 +325,7 @@ class EventHandler11Impl : public EventHandler
 public:
     /// Construct with receiver and function pointers and userdata.
     EventHandler11Impl(std::function<void(StringHash, VariantMap&)> function, void* userData = 0) :
-        EventHandler((Object*)0xDEADBEEF /* EventHandler insists for receiver_ not being null but it is captured in
-                                          * `function_` already and is not used by `EventHandler11Impl` */, userData),
+        EventHandler(0, userData),
         function_(function)
     {
         assert(function_);
@@ -359,6 +352,7 @@ private:
 /// Register event names.
 struct URHO3D_API EventNameRegistrar
 {
+    /// Register an event name for hash reverse mapping.
     static StringHash RegisterEventName(const char* eventName);
     /// Return Event name or empty string if not found.
     static const String& GetEventName(StringHash eventID);

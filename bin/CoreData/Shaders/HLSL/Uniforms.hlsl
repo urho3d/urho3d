@@ -41,7 +41,7 @@ uniform float4x3 cZone;
 #ifdef COMPILEPS
 
 // Pixel shader uniforms
-uniform float3 cAmbientColor;
+uniform float4 cAmbientColor;
 uniform float3 cCameraPosPS;
 uniform float cDeltaTimePS;
 uniform float4 cDepthReconstruct;
@@ -58,9 +58,13 @@ uniform float3 cMatEmissiveColor;
 uniform float3 cMatEnvMapColor;
 uniform float4 cMatSpecColor;
 #ifdef PBR
-    uniform float cRoughnessPS; 
-    uniform float cMetallicPS;
+    uniform float cRoughness;
+    uniform float cMetallic;
+    uniform float cLightRad;
+    uniform float cLightLength;
 #endif
+uniform float3 cZoneMin;
+uniform float3 cZoneMax;
 uniform float cNearClipPS;
 uniform float cFarClipPS;
 uniform float4 cShadowCubeAdjust;
@@ -160,9 +164,11 @@ cbuffer CameraPS : register(b1)
 
 cbuffer ZonePS : register(b2)
 {
-    float3 cAmbientColor;
+    float4 cAmbientColor;
     float4 cFogParams;
     float3 cFogColor;
+    float3 cZoneMin;
+    float3 cZoneMax;
 }
 
 cbuffer LightPS : register(b3)
@@ -178,6 +184,10 @@ cbuffer LightPS : register(b3)
     float4 cShadowSplits;
     float2 cVSMShadowParams;
     float4x4 cLightMatricesPS[4];
+    #ifdef PBR
+        float cLightRad;
+        float cLightLength;
+    #endif
 }
 
 #ifndef CUSTOM_MATERIAL_CBUFFER
@@ -188,8 +198,8 @@ cbuffer MaterialPS : register(b4)
     float3 cMatEnvMapColor;
     float4 cMatSpecColor;
     #ifdef PBR
-        float cRoughnessPS; 
-        float cMetallicPS;
+        float cRoughness;
+        float cMetallic;
     #endif
 }
 #endif

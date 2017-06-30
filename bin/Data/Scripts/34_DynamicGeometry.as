@@ -196,6 +196,19 @@ void CreateScene()
         fromScratchModel.SetGeometry(0, 0, geom);
         fromScratchModel.boundingBox = BoundingBox(Vector3(-0.5, -0.5, -0.5), Vector3(0.5, 0.5, 0.5));
 
+        // Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
+        Array<VertexBuffer@> vertexBuffers;
+        Array<IndexBuffer@> indexBuffers;
+        vertexBuffers.Push(vb);
+        indexBuffers.Push(ib);
+        // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
+        Array<uint> morphRangeStarts;
+        Array<uint> morphRangeCounts;
+        morphRangeStarts.Push(0);
+        morphRangeCounts.Push(0);
+        fromScratchModel.SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
+        fromScratchModel.SetIndexBuffers(indexBuffers);
+
         Node@ node = scene_.CreateChild("FromScratchObject");
         node.position = Vector3(0.0, 3.0, 0.0);
         StaticModel@ object = node.CreateComponent("StaticModel");
@@ -261,13 +274,13 @@ void MoveCamera(float timeStep)
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
     if (input.keyDown[KEY_W])
-        cameraNode.Translate(Vector3(0.0, 0.0, 1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::FORWARD * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_S])
-        cameraNode.Translate(Vector3(0.0, 0.0, -1.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::BACK * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_A])
-        cameraNode.Translate(Vector3(-1.0, 0.0, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
     if (input.keyDown[KEY_D])
-        cameraNode.Translate(Vector3(1.0, 0.0, 0.0f) * MOVE_SPEED * timeStep);
+        cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 }
 
 void AnimateObjects(float timeStep)

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -392,7 +392,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, unsigned v
 
     // If the closest face is a backface, that means that the ray originates from the inside of the geometry
     // NOTE: there may be cases where both are equal, as in, no collision to either. This is prevented in the most likely case
-    // (ray doesnt hit either) by this conditional
+    // (ray doesn't hit either) by this conditional
     if (currentFrontFace != M_INFINITY || currentBackFace != M_INFINITY)
         return currentBackFace < currentFrontFace;
 

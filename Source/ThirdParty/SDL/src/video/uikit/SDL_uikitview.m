@@ -48,7 +48,9 @@
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.autoresizesSubviews = YES;
 
+#if !TARGET_OS_TV
         self.multipleTouchEnabled = YES;
+#endif
 
         touchId = 1;
         SDL_AddTouch(touchId, "");
@@ -144,13 +146,14 @@
 
         if (!firstFingerDown) {
             CGPoint locationInView = [self touchLocation:touch shouldNormalize:NO];
+            int clicks = (int) touch.tapCount;
 
             // Urho3D: do not send emulated mouse events
             /* send moved event */
             //SDL_SendMouseMotion(sdlwindow, SDL_TOUCH_MOUSEID, 0, locationInView.x, locationInView.y);
 
             /* send mouse down event */
-            //SDL_SendMouseButton(sdlwindow, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT);
+            //SDL_SendMouseButtonClicks(sdlwindow, SDL_TOUCH_MOUSEID, SDL_PRESSED, SDL_BUTTON_LEFT, clicks);
 
             firstFingerDown = touch;
         }
@@ -168,7 +171,8 @@
 
         if (touch == firstFingerDown) {
             /* send mouse up */
-            //SDL_SendMouseButton(sdlwindow, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT);    // Urho3D
+            int clicks = (int) touch.tapCount;
+            //SDL_SendMouseButtonClicks(sdlwindow, SDL_TOUCH_MOUSEID, SDL_RELEASED, SDL_BUTTON_LEFT, clicks);
             firstFingerDown = nil;
         }
 
@@ -200,6 +204,69 @@
                             locationInView.x, locationInView.y, pressure);
     }
 }
+
+#if TARGET_OS_TV || defined(__IPHONE_9_1)
+- (SDL_Scancode)scancodeFromPressType:(UIPressType)presstype
+{
+    switch (presstype) {
+    case UIPressTypeUpArrow:
+        return SDL_SCANCODE_UP;
+    case UIPressTypeDownArrow:
+        return SDL_SCANCODE_DOWN;
+    case UIPressTypeLeftArrow:
+        return SDL_SCANCODE_LEFT;
+    case UIPressTypeRightArrow:
+        return SDL_SCANCODE_RIGHT;
+    case UIPressTypeSelect:
+        /* HIG says: "primary button behavior" */
+        return SDL_SCANCODE_SELECT;
+    case UIPressTypeMenu:
+        /* HIG says: "returns to previous screen" */
+        return SDL_SCANCODE_MENU;
+    case UIPressTypePlayPause:
+        /* HIG says: "secondary button behavior" */
+        return SDL_SCANCODE_PAUSE;
+    default:
+        return SDL_SCANCODE_UNKNOWN;
+    }
+}
+
+- (void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+    for (UIPress *press in presses) {
+        SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+        SDL_SendKeyboardKey(SDL_PRESSED, scancode);
+    }
+
+    [super pressesBegan:presses withEvent:event];
+}
+
+- (void)pressesEnded:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+    for (UIPress *press in presses) {
+        SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+    }
+
+    [super pressesEnded:presses withEvent:event];
+}
+
+- (void)pressesCancelled:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+    for (UIPress *press in presses) {
+        SDL_Scancode scancode = [self scancodeFromPressType:press.type];
+        SDL_SendKeyboardKey(SDL_RELEASED, scancode);
+    }
+
+    [super pressesCancelled:presses withEvent:event];
+}
+
+- (void)pressesChanged:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event
+{
+    /* This is only called when the force of a press changes. */
+    [super pressesChanged:presses withEvent:event];
+}
+#endif /* TARGET_OS_TV || defined(__IPHONE_9_1) */
 
 @end
 

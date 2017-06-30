@@ -83,6 +83,8 @@
 #cmakedefine HAVE_PTHREAD_NP_H 1
 #cmakedefine HAVE_LIBUDEV_H 1
 #cmakedefine HAVE_DBUS_DBUS_H 1
+#cmakedefine HAVE_IBUS_IBUS_H 1
+#cmakedefine HAVE_FCITX_FRONTEND_H 1
 
 /* C library functions */
 #cmakedefine HAVE_MALLOC 1
@@ -275,7 +277,7 @@
 #cmakedefine SDL_VIDEO_DRIVER_ANDROID @SDL_VIDEO_DRIVER_ANDROID@
 #cmakedefine SDL_VIDEO_DRIVER_HAIKU @SDL_VIDEO_DRIVER_HAIKU@
 #cmakedefine SDL_VIDEO_DRIVER_COCOA @SDL_VIDEO_DRIVER_COCOA@
-// Urho3D - needed on iOS platform
+// Urho3D - needed on iOS/tvOS platform
 #cmakedefine SDL_VIDEO_DRIVER_UIKIT @SDL_VIDEO_DRIVER_UIKIT@
 #cmakedefine SDL_VIDEO_DRIVER_DIRECTFB @SDL_VIDEO_DRIVER_DIRECTFB@
 #cmakedefine SDL_VIDEO_DRIVER_DIRECTFB_DYNAMIC @SDL_VIDEO_DRIVER_DIRECTFB_DYNAMIC@
@@ -342,7 +344,7 @@
 #cmakedefine SDL_POWER_LINUX @SDL_POWER_LINUX@
 #cmakedefine SDL_POWER_WINDOWS @SDL_POWER_WINDOWS@
 #cmakedefine SDL_POWER_MACOSX @SDL_POWER_MACOSX@
-// Urho3D - needed on iOS platform
+// Urho3D - needed on iOS/tvOS platform
 #cmakedefine SDL_POWER_UIKIT @SDL_POWER_UIKIT@
 #cmakedefine SDL_POWER_HAIKU @SDL_POWER_HAIKU@
 #cmakedefine SDL_POWER_EMSCRIPTEN @SDL_POWER_EMSCRIPTEN@
@@ -361,7 +363,16 @@
 #cmakedefine SDL_ASSEMBLY_ROUTINES @SDL_ASSEMBLY_ROUTINES@
 #cmakedefine SDL_ALTIVEC_BLITTERS @SDL_ALTIVEC_BLITTERS@
 
-// Urho3D - needed on iOS platform
+/* Enable ime support */
+#cmakedefine SDL_USE_IME @SDL_USE_IME@
+
+/* Enable dynamic udev support */
+#cmakedefine SDL_UDEV_DYNAMIC @SDL_UDEV_DYNAMIC@
+
+/* Enable dynamic libsamplerate support */
+#cmakedefine SDL_LIBSAMPLERATE_DYNAMIC @SDL_LIBSAMPLERATE_DYNAMIC@
+
+// Urho3D - needed on iOS/tvOS platform
 #cmakedefine SDL_IPHONE_KEYBOARD @SDL_IPHONE_KEYBOARD@
 #cmakedefine SDL_IPHONE_LAUNCHSCREEN @SDL_IPHONE_LAUNCHSCREEN@
 #cmakedefine SDL_IPHONE_MAX_GFORCE @SDL_IPHONE_MAX_GFORCE@

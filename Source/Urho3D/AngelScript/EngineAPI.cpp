@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,8 @@ static void RegisterConsole(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Console", "BorderImage@+ get_background() const", asMETHOD(Console, GetBackground), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "LineEdit@+ get_lineEdit() const", asMETHOD(Console, GetLineEdit), asCALL_THISCALL);
     engine->RegisterObjectMethod("Console", "Button@+ get_closeButton() const", asMETHOD(Console, GetCloseButton), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void AddAutoComplete(const String&in)", asMETHOD(Console, AddAutoComplete), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Console", "void RemoveAutoComplete(const String&in)", asMETHOD(Console, RemoveAutoComplete), asCALL_THISCALL);
     engine->RegisterGlobalFunction("Console@+ get_console()", asFUNCTION(GetConsole), asCALL_CDECL);
 }
 
@@ -79,7 +81,6 @@ static void RegisterDebugHud(asIScriptEngine* engine)
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_EVENTPROFILER", (void*)&DEBUGHUD_SHOW_EVENTPROFILER);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_MEMORY", (void*)&DEBUGHUD_SHOW_MEMORY);
     engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL", (void*)&DEBUGHUD_SHOW_ALL);
-    engine->RegisterGlobalProperty("const uint DEBUGHUD_SHOW_ALL_MEMORY", (void*)&DEBUGHUD_SHOW_ALL_MEMORY);
 
     RegisterObject<Console>(engine, "DebugHud");
     engine->RegisterObjectMethod("DebugHud", "void Update()", asMETHOD(DebugHud, Update), asCALL_THISCALL);

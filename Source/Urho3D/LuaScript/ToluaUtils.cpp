@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
 
 #include "../Precompiled.h"
 
+#ifndef _WIN32
+#include "../Graphics/IndexBuffer.h"
+#include "../Graphics/VertexBuffer.h"
+#endif
 #include "../IO/VectorBuffer.h"
 
 #include <toluapp/tolua++.h>
@@ -57,7 +61,7 @@ Context* GetContext(lua_State* L)
     return tolua_isusertype(L, -1, "Context", 0, &error) ? static_cast<Context*>(tolua_tousertype(L, -1, 0)) : 0;
 }
 
-// Explicit template specialization only required for StringVector
+// Explicit template specialization for StringVector
 
 template <> int ToluaIsVector<String>(lua_State* L, int lo, const char* /*type*/, int def, tolua_Error* err)
 {
@@ -92,7 +96,7 @@ template <> int ToluaPushVector<String>(lua_State* L, void* data, const char* /*
     return 1;
 }
 
-// Explicit template specialization only required for boolean
+// Explicit template specialization for boolean
 
 template <> int ToluaIsPODVector<bool>(double /*overload*/, lua_State* L, int lo, const char* /*type*/, int def, tolua_Error* err)
 {
@@ -127,6 +131,40 @@ template <> int ToluaPushPODVector<bool>(double /*overload*/, lua_State* L, void
     return 1;
 }
 
+// Explicit template specialization for Vector<SharedPtr<IndexBuffer> > and Vector<SharedPtr<VertexBuffer> >
+
+template <> void* ToluaToVector<SharedPtr<IndexBuffer> >(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static Vector<SharedPtr<IndexBuffer> > result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
+        result[i] = SharedPtr<IndexBuffer>(static_cast<IndexBuffer*>(tolua_tousertype(L, -1, def)));
+        lua_pop(L, 1);
+    }
+    return &result;
+}
+
+template <> void* ToluaToVector<SharedPtr<VertexBuffer> >(lua_State* L, int narg, void* def)
+{
+    if (!lua_istable(L, narg))
+        return 0;
+    static Vector<SharedPtr<VertexBuffer> > result;
+    result.Clear();
+    result.Resize((unsigned)lua_objlen(L, narg));
+    for (unsigned i = 0; i < result.Size(); ++i)
+    {
+        lua_rawgeti(L, narg, i + 1);    // Lua index starts from 1
+        result[i] = SharedPtr<VertexBuffer>(static_cast<VertexBuffer*>(tolua_tousertype(L, -1, def)));
+        lua_pop(L, 1);
+    }
+    return &result;
+}
+
 namespace Urho3D
 {
 
@@ -158,6 +196,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
             {
             case VAR_INT:
                 variant = (int)value;
+                break;
+
+            case VAR_INT64:
+                variant = (long long)value;
                 break;
 
             case VAR_BOOL:
@@ -233,6 +275,10 @@ void ToluaToVariant(lua_State* L, int narg, void* def, Variant& variant)
                     variant = *static_cast<IntVector2*>(value);
                     break;
 
+                case VAR_INTVECTOR3:
+                    variant = *static_cast<IntVector3*>(value);
+                    break;
+
                 case VAR_MATRIX3:
                     variant = *static_cast<Matrix3*>(value);
                     break;
@@ -297,6 +343,13 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
             tolua_pushnumber(L, (lua_Number)variant->GetInt());
         break;
 
+    case VAR_INT64:
+        if (typeName == "unsigned" || typeName == "unsigned int" || typeName == "UInt" || typeName == "uint")
+            tolua_pushnumber(L, (lua_Number)variant->GetUInt64());
+        else
+            tolua_pushnumber(L, (lua_Number)variant->GetInt64());
+        break;
+
     case VAR_BOOL:
         tolua_pushboolean(L, (int)variant->GetBool());
         break;
@@ -319,6 +372,7 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
     case VAR_VARIANTMAP:
     case VAR_INTRECT:
     case VAR_INTVECTOR2:
+    case VAR_INTVECTOR3:
         tolua_pushusertype(L, (void*)variant->Get<const VariantValue*>(), variant->GetTypeName().CString());
         break;
 

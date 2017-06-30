@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,6 +93,8 @@ public:
     void ApplyTorque(float torque, bool wake);
     /// Apply linear impulse.
     void ApplyLinearImpulse(const Vector2& impulse, const Vector2& point, bool wake);
+    /// Apply linear impulse to center.
+    void ApplyLinearImpulseToCenter(const Vector2& impulse, bool wake);
     /// Apply angular impulse.
     void ApplyAngularImpulse(float impulse, bool wake);
 

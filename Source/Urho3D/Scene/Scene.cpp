@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -537,8 +537,8 @@ Node* Scene::Instantiate(Deserializer& source, const Vector3& position, const Qu
     if (node->Load(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -560,8 +560,8 @@ Node* Scene::InstantiateXML(const XMLElement& source, const Vector3& position, c
     if (node->LoadXML(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -583,8 +583,8 @@ Node* Scene::InstantiateJSON(const JSONValue& source, const Vector3& position, c
     if (node->LoadJSON(source, resolver, true, true, mode))
     {
         resolver.Resolve();
-        node->ApplyAttributes();
         node->SetTransform(position, rotation);
+        node->ApplyAttributes();
         return node;
     }
     else
@@ -1080,7 +1080,7 @@ String Scene::GetVarNamesAttr() const
     if (!varNames_.Empty())
     {
         for (HashMap<StringHash, String>::ConstIterator i = varNames_.Begin(); i != varNames_.End(); ++i)
-            ret += i->second_ + ';';
+            ret += i->second_ + ";";
 
         ret.Resize(ret.Length() - 1);
     }

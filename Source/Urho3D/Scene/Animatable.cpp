@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -517,11 +517,19 @@ void Animatable::UpdateAttributeAnimations(float timeStep)
     if (!animationEnabled_)
         return;
 
+    // Keep weak pointer to self to check for destruction caused by event handling
+    WeakPtr<Animatable> self(this);
+
     Vector<String> finishedNames;
     for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
     {
-        if (i->second_->Update(timeStep))
+        bool finished = i->second_->Update(timeStep);
+        // If self deleted as a result of an event sent during animation playback, nothing more to do
+        if (self.Expired())
+            return;
+
+        if (finished)
             finishedNames.Push(i->second_->GetAttributeInfo().name_);
     }
 

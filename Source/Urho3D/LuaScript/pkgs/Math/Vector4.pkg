@@ -20,6 +20,7 @@ class Vector4
 
     float DotProduct(const Vector4& rhs) const;
     float AbsDotProduct(const Vector4& rhs) const;
+    float ProjectOntoAxis(const Vector3& axis) const;
     Vector4 Abs() const;
     Vector4 Lerp(const Vector4& rhs, float t) const;
     bool Equals(const Vector4& rhs) const;
@@ -35,3 +36,10 @@ class Vector4
     static const Vector4 ZERO;
     static const Vector4 ONE;
 };
+
+Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t);
+Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs);
+Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs);
+Vector4 VectorFloor(const Vector4& vec);
+Vector4 VectorRound(const Vector4& vec);
+Vector4 VectorCeil(const Vector4& vec);

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@
 #include "../Urho2D/ParticleEmitter2D.h"
 #include "../Urho2D/Renderer2D.h"
 #include "../Urho2D/Sprite2D.h"
+#include "../Urho2D/Urho2DEvents.h"
 
 #include "../DebugNew.h"
 
@@ -48,7 +49,8 @@ ParticleEmitter2D::ParticleEmitter2D(Context* context) :
     emissionTime_(0.0f),
     emitParticleTime_(0.0f),
     boundingBoxMinPoint_(Vector3::ZERO),
-    boundingBoxMaxPoint_(Vector3::ZERO)
+    boundingBoxMaxPoint_(Vector3::ZERO),
+    emitting_(true)
 {
     sourceBatches_.Resize(1);
     sourceBatches_[0].owner_ = this;
@@ -69,6 +71,7 @@ void ParticleEmitter2D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Sprite ", GetSpriteAttr, SetSpriteAttr, ResourceRef, ResourceRef(Sprite2D::GetTypeStatic()),
         AM_DEFAULT);
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Blend Mode", GetBlendMode, SetBlendMode, BlendMode, blendModeNames, BLEND_ALPHA, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Is Emitting", IsEmitting, SetEmitting, bool, true, AM_DEFAULT);
 }
 
 void ParticleEmitter2D::OnSetEnabled()
@@ -162,6 +165,15 @@ void ParticleEmitter2D::SetSpriteAttr(const ResourceRef& value)
     Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
     if (sprite)
         SetSprite(sprite);
+}
+
+void ParticleEmitter2D::SetEmitting(bool enable)
+{
+    if (enable != emitting_)
+    {
+        emitting_ = enable;
+        emitParticleTime_ = 0.0f;
+    }
 }
 
 ResourceRef ParticleEmitter2D::GetSpriteAttr() const
@@ -265,8 +277,35 @@ void ParticleEmitter2D::UpdateMaterial()
 void ParticleEmitter2D::HandleScenePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace ScenePostUpdate;
+    bool hasParticles = numParticles_ > 0;
+    bool emitting = emissionTime_ > 0.0f;
     float timeStep = eventData[P_TIMESTEP].GetFloat();
     Update(timeStep);
+
+    if (emitting && emissionTime_ == 0.0f)
+    {
+        // Make a weak pointer to self to check for destruction during event handling
+        WeakPtr<ParticleEmitter2D> self(this);
+        using namespace ParticlesDuration;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
+        SendEvent(E_PARTICLESDURATION, eventData); // Emitting particles stopped
+
+        if (self.Expired())
+            return;
+    }
+    if (hasParticles && numParticles_ == 0)
+    {
+        using namespace ParticlesEnd;
+
+        VariantMap& eventData = GetEventDataMap();
+        eventData[P_NODE] = node_;
+        eventData[P_EFFECT] = effect_;
+
+        SendEvent(E_PARTICLESEND, eventData);      // All particles over
+    }
 }
 
 void ParticleEmitter2D::Update(float timeStep)
@@ -297,7 +336,7 @@ void ParticleEmitter2D::Update(float timeStep)
         }
     }
 
-    if (emissionTime_ >= 0.0f)
+    if (emitting_ && emissionTime_ > 0.0f)
     {
         float worldAngle = GetNode()->GetWorldRotation().RollAngle();
 

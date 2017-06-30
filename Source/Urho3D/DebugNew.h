@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+
+// This file overrides global new to provide file and line information to allocations for easier memory leak detection on MSVC
+// compilers. Do not include this file in a compilation unit that uses placement new. Include this file last after other
+// includes; e.g. Bullet's include files will cause a compile error if this file is included before them. Also note that
+// using DebugNew.h is by no means mandatory, but just a debugging convenience.
 
 #pragma once
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,14 @@ platform:
   - x86
   - x64
 clone_depth: 50
+cache:
+  # AppVeyor seems to restore caches based on the job ordering alone, it does not use the env-vars as the key like Travis
+  # Therefore, we are forced to list out all the cache items for our master CI and MinGW CI builds here
+  # Build
+  # mingw-Build
+  # Cache the MinGW compiler toolchains so that our CI builds do not chalk up their download stats
+  - C:\tools\mingw32
+  - C:\tools\mingw64
 environment:
   GIT_NAME:
     secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
@@ -36,6 +44,9 @@ environment:
     secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
   SF_API:
     secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+# VS build actually does not need MinGW compiler toolchains so prevent its restoration and update check
+  APPVEYOR_CACHE_SKIP_RESTORE: true
+  APPVEYOR_CACHE_SKIP_SAVE: true
 # Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
   build_tree: Build
   config: Release
@@ -44,10 +55,11 @@ environment:
   matrix:
     - URHO3D_LIB_TYPE: STATIC
     - URHO3D_LIB_TYPE: SHARED
-install:
+before_build:
   - rake ci_timer
-  - ps: if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
-        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED))))
+  - ps: if (!$env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT) };
+        if ($env:APPVEYOR_REPO_TAG -eq "true") { $env:RELEASE_TAG = $env:APPVEYOR_REPO_TAG_NAME };
+        if ($env:RELEASE_TAG -or ($env:APPVEYOR_REPO_BRANCH -eq "master" -and (!$env:APPVEYOR_PULL_REQUEST_NUMBER -and (select-string '\[ci package\]' -inputobject $env:COMMIT_MESSAGE))))
         {
           $env:PACKAGE_UPLOAD = "1";
           if ($env:URHO3D_LIB_TYPE -eq "STATIC" -and ($env:Platform -eq "x64")) { $env:SF_DEFAULT = "windows:Windows-64bit-STATIC-3D11.zip" };
@@ -55,18 +67,18 @@ install:
         }
         else
         {
+          $env:URHO3D_TOOLS = "0";
           iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
         }
-build_script:
-  - ps: $env:COMMIT_MESSAGE = $(git log --format=%B -n 1 $env:APPVEYOR_REPO_COMMIT)
   - if "%PLATFORM%" == "x64" set "URHO3D_64BIT=1"
-# Our free AppVeyor account is slow for normal daily CI, speed up the build a little bit by excluding Assimp and other tools in the normal build and use the Debug build configuration instead
-  - if "%PACKAGE_UPLOAD%" == "" set "URHO3D_TOOLS=0" && set "config=Debug"
-  - rake ci && if "%PACKAGE_UPLOAD%" == "1" rake ci_package_upload
+  # rake ci_setup_cache
+build_script:
+  - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
+#after_build: rake ci_teardown_cache
 test: off
 artifacts:
-  - path: Build\*.zip
+  - path: .\*.zip
 deploy: off
 
 # vi: set ts=2 sw=2 expandtab:

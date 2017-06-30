@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ void SoundSynthesis::Setup()
 {
     // Modify engine startup parameters
     Sample::Setup();
-    engineParameters_["Sound"] = true;
+    engineParameters_[EP_SOUND] = true;
 }
 
 void SoundSynthesis::Start()

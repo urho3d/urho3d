@@ -27,7 +27,7 @@ enum IconsColorType
 
 Array<Color> debugIconsColors = { Color(1,1,1) , Color(1,1,0), Color(0,1,0) };
 
-Array<String> IconsTypesMaterials = {"DebugIconPointLight.xml", 
+Array<String> iconsTypesMaterials = {"DebugIconPointLight.xml",
                                      "DebugIconSpotLight.xml",
                                      "DebugIconLight.xml",
                                      "DebugIconCamera.xml",
@@ -40,7 +40,7 @@ Array<String> IconsTypesMaterials = {"DebugIconPointLight.xml",
                                      "DebugIconCustomGeometry.xml",
                                      "DebugIconParticleEmitter.xml"};
 
-Array<String> ComponentTypes = {"Light",
+Array<String> componentTypes = {"Light",
                                 "Light",
                                 "Light",
                                 "Camera",
@@ -77,7 +77,7 @@ void CreateDebugIcons(Node@ tempNode)
     for (int i = 0; i < ICON_COUNT; ++i)
     {
         debugIconsSet[i] = tempNode.CreateComponent("BillboardSet");
-        debugIconsSet[i].material = cache.GetResource("Material", "Materials/Editor/" + IconsTypesMaterials[i]);
+        debugIconsSet[i].material = cache.GetResource("Material", "Materials/Editor/" + iconsTypesMaterials[i]);
         debugIconsSet[i].sorted = true;
         debugIconsSet[i].temporary = true;
         debugIconsSet[i].fixedScreenSize = true;
@@ -121,15 +121,13 @@ void UpdateViewDebugIcons()
             if (iconType == ICON_SPLINE_PATH && timeToNextDebugIconsUpdateSplinePath > time.systemTime)
                 continue;
 
-            Array<Node@> nodes = editorScene.GetChildrenWithComponent(ComponentTypes[iconType], true);
+            Array<Node@> nodes = editorScene.GetChildrenWithComponent(componentTypes[iconType], true);
 
             // Clear old data
             if (iconType == ICON_SPLINE_PATH)
                 ClearCommit(ICON_SPLINE_PATH, ICON_SPLINE_PATH + 1, nodes.length * splinePathResolution);
             else if (iconType == ICON_POINT_LIGHT || iconType == ICON_SPOT_LIGHT || iconType == ICON_DIRECTIONAL_LIGHT)
                 ClearCommit(ICON_POINT_LIGHT, ICON_DIRECTIONAL_LIGHT + 1, nodes.length);
-            else if (iconType == ICON_SOUND_SOURCE || iconType == ICON_SOUND_SOURCE_3D)
-                ClearCommit(ICON_SOUND_SOURCE, ICON_SOUND_SOURCE_3D + 1, nodes.length);
             else
                 ClearCommit(iconType, iconType + 1, nodes.length);
 
@@ -138,7 +136,7 @@ void UpdateViewDebugIcons()
                 // Fill with new data
                 for (uint i = 0; i < nodes.length; ++i)
                 {
-                    Component@ component = nodes[i].GetComponent(ComponentTypes[iconType]);
+                    Component@ component = nodes[i].GetComponent(componentTypes[iconType]);
                     if (component is null) continue;
 
                     Color finalIconColor = debugIconsColors[ICON_COLOR_DEFAULT];
@@ -194,7 +192,6 @@ void UpdateViewDebugIcons()
                     else
                     {
                         Billboard@ bb = debugIconsSet[iconType].billboards[i];
-                        bb.size = debugIconsSize;
 
                         if (iconType == ICON_TRIGGER)
                         {
@@ -222,6 +219,8 @@ void UpdateViewDebugIcons()
                         }
 
                         bb.position = nodes[i].worldPosition;
+                        bb.size = debugIconsSize;
+
                         // Blend Icon relatively by distance to it
                         bb.color = Color(finalIconColor.r, finalIconColor.g, finalIconColor.b, 1.2f - 1.0f / (maxDistance / distance));
                         bb.enabled = component.enabled;

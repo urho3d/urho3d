@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -91,10 +91,10 @@ void HttpRequestDemo::HandleUpdate(StringHash eventType, VariantMap& eventData)
         // Initializing HTTP request
         if (httpRequest_->GetState() == HTTP_INITIALIZING)
             return;
-        // An error has occured
+        // An error has occurred
         else if (httpRequest_->GetState() == HTTP_ERROR)
         {
-            text_->SetText("An error has occured.");
+            text_->SetText("An error has occurred.");
             UnsubscribeFromEvent("Update");
         }
         // Get message data

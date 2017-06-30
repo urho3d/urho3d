@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,12 +57,16 @@ public:
     /// Return size.
     unsigned GetSize() const { return size_; }
 
+    /// Read a 64-bit integer.
+    long long ReadInt64();
     /// Read a 32-bit integer.
     int ReadInt();
     /// Read a 16-bit integer.
     short ReadShort();
     /// Read an 8-bit integer.
     signed char ReadByte();
+    /// Read a 64-bit unsigned integer.
+    unsigned long long ReadUInt64();
     /// Read a 32-bit unsigned integer.
     unsigned ReadUInt();
     /// Read a 16-bit unsigned integer.
@@ -79,6 +83,8 @@ public:
     IntRect ReadIntRect();
     /// Read an IntVector2.
     IntVector2 ReadIntVector2();
+    /// Read an IntVector3.
+    IntVector3 ReadIntVector3();
     /// Read a Rect.
     Rect ReadRect();
     /// Read a Vector2.

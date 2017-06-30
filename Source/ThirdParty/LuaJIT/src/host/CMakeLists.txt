@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,21 @@
 #
 
 if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
     if (APPLE)
         cmake_minimum_required (VERSION 3.4.1)
-    elseif (WIN32)
-        cmake_minimum_required (VERSION 3.2.3)
     else ()
-        cmake_minimum_required (VERSION 2.8.6)
+        cmake_minimum_required (VERSION 3.2.3)
     endif ()
     if (COMMAND cmake_policy)
+        # Libraries linked via full path no longer produce linker search paths
         cmake_policy (SET CMP0003 NEW)
-        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-            # INTERFACE_LINK_LIBRARIES defines the link interface
-            cmake_policy (SET CMP0022 NEW)
-        endif ()
-        if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-            cmake_policy (SET CMP0026 OLD)
-            # MACOSX_RPATH is enabled by default
-            cmake_policy (SET CMP0042 NEW)
-        endif ()
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 
     # Set project name
@@ -49,14 +44,19 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D Cmake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # Unescape the variables
     foreach (ESCAPED_VAR HOST_XCFLAGS TARGET_ARCH DASM_FLAGS DASM_ARCH)
         string (REPLACE +D -D ${ESCAPED_VAR} "${${ESCAPED_VAR}}")       # Stringify against empty variable
         string (REPLACE , ";" ${ESCAPED_VAR} "${${ESCAPED_VAR}}")
     endforeach ()
+endif ()
+
+# When performing Xcode CI build suppress all the warnings for 3rd party libraries because there are just too many of them
+if (XCODE AND DEFINED ENV{CI})
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 endif ()
 
 # Add dependency target

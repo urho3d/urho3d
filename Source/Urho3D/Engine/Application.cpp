@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 #include "../IO/IOEvents.h"
 #include "../IO/Log.h"
 
-#ifdef IOS
+#if defined(IOS) || defined(TVOS)
 #include "../Graphics/Graphics.h"
 #include <SDL/SDL.h>
 #endif
@@ -36,7 +36,7 @@
 namespace Urho3D
 {
 
-#if defined(IOS) || defined(__EMSCRIPTEN__)
+#if defined(IOS) || defined(TVOS) || defined(__EMSCRIPTEN__)
 // Code for supporting SDL_iPhoneSetAnimationCallback() and emscripten_set_main_loop_arg()
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
@@ -62,11 +62,10 @@ Application::Application(Context* context) :
 
 int Application::Run()
 {
-    // Emscripten-specific: C++ exceptions are turned off by default in -O1 (and above), unless '-s DISABLE_EXCEPTION_CATCHING=0' flag is set
-    // Urho3D build configuration uses -O3 (Release), -O2 (RelWithDebInfo), and -O0 (Debug)
-    // Thus, the try-catch block below should be optimised out except in Debug build configuration
+#if !defined(__GNUC__) || __EXCEPTIONS
     try
     {
+#endif
         Setup();
         if (exitCode_)
             return exitCode_;
@@ -81,16 +80,16 @@ int Application::Run()
         if (exitCode_)
             return exitCode_;
 
-        // Platforms other than iOS and Emscripten run a blocking main loop
-#if !defined(IOS) && !defined(__EMSCRIPTEN__)
+        // Platforms other than iOS/tvOS and Emscripten run a blocking main loop
+#if !defined(IOS) && !defined(TVOS) && !defined(__EMSCRIPTEN__)
         while (!engine_->IsExiting())
             engine_->RunFrame();
 
         Stop();
-        // iOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
+        // iOS/tvOS will setup a timer for running animation frames so eg. Game Center can run. In this case we do not
         // support calling the Stop() function, as the application will never stop manually
 #else
-#if defined(IOS)
+#if defined(IOS) || defined(TVOS)
         SDL_iPhoneSetAnimationCallback(GetSubsystem<Graphics>()->GetWindow(), 1, &RunFrame, engine_);
 #elif defined(__EMSCRIPTEN__)
         emscripten_set_main_loop_arg(RunFrame, engine_, 0, 1);
@@ -98,12 +97,14 @@ int Application::Run()
 #endif
 
         return exitCode_;
+#if !defined(__GNUC__) || __EXCEPTIONS
     }
     catch (std::bad_alloc&)
     {
         ErrorDialog(GetTypeName(), "An out-of-memory error occurred. The application will now exit.");
         return EXIT_FAILURE;
     }
+#endif
 }
 
 void Application::ErrorExit(const String& message)

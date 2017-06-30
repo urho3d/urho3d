@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -53,6 +53,7 @@ class asCModule;
 class asCConfigGroup;
 class asCGlobalProperty;
 class asCScriptNode;
+class asCFuncdefType;
 struct asSNameSpace;
 
 struct asSScriptVariable
@@ -98,9 +99,9 @@ enum asEObjVarInfoOption
 
 struct asSObjectVariableInfo
 {
-	asUINT programPos;
-	int    variableOffset;
-	asUINT option;
+	asUINT              programPos;
+	int                 variableOffset;
+	asEObjVarInfoOption option;
 };
 
 struct asSSystemFunctionInterface;
@@ -129,9 +130,10 @@ public:
 	const char          *GetScriptSectionName() const;
 	const char          *GetConfigGroup() const;
 	asDWORD              GetAccessMask() const;
+	void                *GetAuxiliary() const;
 
 	// Function signature
-	asIObjectType       *GetObjectType() const;
+	asITypeInfo         *GetObjectType() const;
 	const char          *GetObjectName() const;
 	const char          *GetName() const;
 	const char          *GetNamespace() const;
@@ -156,7 +158,7 @@ public:
 
 	// Delegates
 	void                *GetDelegateObject() const;
-	asIObjectType       *GetDelegateObjectType() const;
+	asITypeInfo         *GetDelegateObjectType() const;
 	asIScriptFunction   *GetDelegateFunction() const;
 
 	// Debug information
@@ -210,7 +212,7 @@ public:
 	bool      IsSignatureExceptNameAndReturnTypeEqual(const asCArray<asCDataType> &paramTypes, const asCArray<asETypeModifiers> &inOutFlags, const asCObjectType *type, bool isReadOnly) const;
 	bool      IsSignatureExceptNameAndObjectTypeEqual(const asCScriptFunction *func) const;
 
-	asCObjectType *GetObjectTypeOfLocalVar(short varOffset);
+	asCTypeInfo *GetTypeInfoOfLocalVar(short varOffset);
 
 	void      MakeDelegate(asCScriptFunction *func, void *obj);
 
@@ -269,7 +271,12 @@ public:
 	asDWORD                      accessMask;
 	bool                         isShared;
 
+	// Namespace will be null for funcdefs that are declared as child funcdefs 
+	// of a class. In this case the namespace shall be taken from the parentClass 
+	// in the funcdefType
 	asSNameSpace                *nameSpace;
+
+	asCFuncdefType              *funcdefType; // Doesn't increase refCount
 
 	// Used by asFUNC_DELEGATE
 	void              *objForDelegate;
@@ -289,8 +296,7 @@ public:
 
 		// These hold information on objects and function pointers, including temporary
 		// variables used by exception handler and when saving bytecode
-		asCArray<asCObjectType*>        objVariableTypes;
-		asCArray<asCScriptFunction*>    funcVariableTypes;
+		asCArray<asCTypeInfo*>          objVariableTypes;
 		asCArray<int>                   objVariablePos;
 
 		// The first variables in above array are allocated on the heap, the rest on the stack.

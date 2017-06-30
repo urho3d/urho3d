@@ -1,5 +1,12 @@
 $#include "UI/UI.h"
 
+enum FontHintLevel
+{
+    FONT_HINT_LEVEL_NONE = 0,
+    FONT_HINT_LEVEL_LIGHT,
+    FONT_HINT_LEVEL_NORMAL,
+};
+
 class UI : public Object
 {
     void SetCursor(Cursor* cursor);
@@ -23,9 +30,13 @@ class UI : public Object
     void SetUseScreenKeyboard(bool enable);
     void SetUseMutableGlyphs(bool enable);
     void SetForceAutoHint(bool enable);
+    void SetFontHintLevel(FontHintLevel level);
+    void SetSubpixelGlyphPositions(bool enable);
     void SetScale(float scale);
-    void SetWidth(float size);
-    void SetHeight(float size);
+    void SetWidth(float width);
+    void SetHeight(float height);
+    void SetCustomSize(const IntVector2& size);
+    void SetCustomSize(int width, int height);
 
     UIElement* GetRoot() const;
     UIElement* GetRootModalElement() const;
@@ -48,9 +59,12 @@ class UI : public Object
     bool GetUseScreenKeyboard() const;
     bool GetUseMutableGlyphs() const;
     bool GetForceAutoHint() const;
+    FontHintLevel GetFontHintLevel() const;
+    bool GetSubpixelGlyphPositions() const;
     bool HasModalElement() const;
     bool IsDragging() const;
     float GetScale() const;
+    const IntVector2& GetCustomSize() const;
 
     tolua_readonly tolua_property__get_set UIElement* root;
     tolua_readonly tolua_property__get_set UIElement* rootModalElement;
@@ -70,8 +84,11 @@ class UI : public Object
     tolua_property__get_set bool useScreenKeyboard;
     tolua_property__get_set bool useMutableGlyphs;
     tolua_property__get_set bool forceAutoHint;
+    tolua_property__get_set FontHintLevel fontHintLevel;
+    tolua_property__get_set bool subpixelGlyphPositions;
     tolua_readonly tolua_property__has_set bool modalElement;
     tolua_property__get_set float scale;
+    tolua_property__get_set IntVector2& customSize;
 };
 
 UI* GetUI();
@@ -83,14 +100,7 @@ static UIElement* UILoadLayout(UI* ui, File* source, XMLFile* styleFile)
     if (!source)
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(*source, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(*source, styleFile).Detach();
 }
 
 static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFile)
@@ -99,14 +109,7 @@ static UIElement* UILoadLayout(UI* ui, const String& fileName, XMLFile* styleFil
     if (!file.IsOpen())
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(file, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(file, styleFile).Detach();
 }
 
 static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
@@ -114,14 +117,7 @@ static UIElement* UILoadLayout(UI* ui, XMLFile* source, XMLFile* styleFile)
     if (!source)
         return 0;
 
-    SharedPtr<UIElement> elementPtr = ui->LoadLayout(source, styleFile);
-    if (!elementPtr)
-        return 0;
-
-    UIElement* element = elementPtr.Get();
-    elementPtr.Detach();
-
-    return element;
+    return ui->LoadLayout(source, styleFile).Detach();
 }
 
 #define TOLUA_DISABLE_tolua_UILuaAPI_GetUI00

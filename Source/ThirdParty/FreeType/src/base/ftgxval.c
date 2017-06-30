@@ -2,9 +2,9 @@
 /*                                                                         */
 /*  ftgxval.c                                                              */
 /*                                                                         */
-/*    FreeType API for validating TrueTyepGX/AAT tables (body).            */
+/*    FreeType API for validating TrueTypeGX/AAT tables (body).            */
 /*                                                                         */
-/*  Copyright 2004-2006, 2010, 2013 by                                     */
+/*  Copyright 2004-2017 by                                                 */
 /*  Masatake YAMATO, Redhat K.K,                                           */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
@@ -50,7 +50,7 @@
       goto Exit;
     }
 
-    if ( tables == NULL )
+    if ( !tables )
     {
       error = FT_THROW( Invalid_Argument );
       goto Exit;
@@ -102,7 +102,7 @@
       goto Exit;
     }
 
-    if ( ckern_table == NULL )
+    if ( !ckern_table )
     {
       error = FT_THROW( Invalid_Argument );
       goto Exit;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -271,6 +271,16 @@ public:
     PODVector<BatchGroup*> sortedBatchGroups_;
     /// Maximum sorted instances.
     unsigned maxSortedInstances_;
+    /// Whether the pass command contains extra shader defines.
+    bool hasExtraDefines_;
+    /// Vertex shader extra defines.
+    String vsExtraDefines_;
+    /// Pixel shader extra defines.
+    String psExtraDefines_;
+    /// Hash for vertex shader extra defines.
+    StringHash vsExtraDefinesHash_;
+    /// Hash for pixel shader extra defines.
+    StringHash psExtraDefinesHash_;
 };
 
 /// Queue for shadow map draw calls

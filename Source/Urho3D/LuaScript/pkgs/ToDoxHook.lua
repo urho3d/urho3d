@@ -1,5 +1,5 @@
 --
--- Copyright (c) 2008-2016 the Urho3D project.
+-- Copyright (c) 2008-2017 the Urho3D project.
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -533,7 +533,7 @@ function writeFunction(file, func)
       local declaration = func.declarations[i]
       if declaration.type ~= "void" then
         line = line .. declaration.type .. declaration.ptr .. " " .. declaration.name
-        -- add paramter default value
+        -- add parameter default value
         if declaration.def ~= "" then
           line = line .. " = " .. declaration.def
         end

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -129,6 +129,9 @@ public:
     /// Return vertex size for a legacy vertex element bitmask.
     static unsigned GetVertexSize(unsigned elementMask);
 
+    /// Update offsets of vertex elements.
+    static void UpdateOffsets(PODVector<VertexElement>& elements);
+
 private:
     /// Update offsets of vertex elements.
     void UpdateOffsets();
@@ -165,6 +168,8 @@ private:
     bool dynamic_;
     /// Shadowed flag.
     bool shadowed_;
+    /// Discard lock flag. Used by OpenGL only.
+    bool discardLock_;
 };
 
 }

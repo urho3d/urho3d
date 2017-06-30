@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -104,22 +104,28 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Set line antialiasing on/off. Default false.
+    void SetLineAntiAlias(bool enable);
     /// Set the camera viewpoint. Call before rendering, or before adding geometry if you want to use culling.
     void SetView(Camera* camera);
     /// Add a line.
     void AddLine(const Vector3& start, const Vector3& end, const Color& color, bool depthTest = true);
     /// Add a line with color already converted to unsigned.
     void AddLine(const Vector3& start, const Vector3& end, unsigned color, bool depthTest = true);
-    /// Add a triangle.
+    /// Add a solid triangle.
     void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Color& color, bool depthTest = true);
-    /// Add a triangle with color already converted to unsigned.
+    /// Add a solid triangle with color already converted to unsigned.
     void AddTriangle(const Vector3& v1, const Vector3& v2, const Vector3& v3, unsigned color, bool depthTest = true);
+    /// Add a solid quadrangular polygon.
+    void AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, const Color& color, bool depthTest = true);
+    /// Add a solid quadrangular polygon with color already converted to unsigned.
+    void AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, unsigned color, bool depthTest = true);
     /// Add a scene node represented as its coordinate axes.
     void AddNode(Node* node, float scale = 1.0f, bool depthTest = true);
     /// Add a bounding box.
-    void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest = true, bool solid = false);
     /// Add a bounding box with transform.
-    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true);
+    void AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest = true, bool solid = false);
     /// Add a frustum.
     void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true);
     /// Add a polyhedron.
@@ -143,6 +149,9 @@ public:
 
     /// Update vertex buffer and render all debug lines. The viewport and rendertarget should be set before.
     void Render();
+
+    /// Return whether line antialiasing is enabled.
+    bool GetLineAntiAlias() const { return lineAntiAlias_; }
 
     /// Return the view transform.
     const Matrix3x4& GetView() const { return view_; }
@@ -174,10 +183,14 @@ private:
     Matrix3x4 view_;
     /// Projection transform.
     Matrix4 projection_;
+    /// Projection transform in API-specific format.
+    Matrix4 gpuProjection_;
     /// View frustum.
     Frustum frustum_;
     /// Vertex buffer.
     SharedPtr<VertexBuffer> vertexBuffer_;
+    /// Line antialiasing flag.
+    bool lineAntiAlias_;
 };
 
 }

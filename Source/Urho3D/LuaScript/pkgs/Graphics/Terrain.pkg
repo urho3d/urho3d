@@ -9,6 +9,11 @@ class Terrain : public Component
     void SetSmoothing(bool enable);
     bool SetHeightMap(Image* image);
     void SetMaterial(Material* material);
+    void SetNorthNeighbor(Terrain* north);
+    void SetSouthNeighbor(Terrain* south);
+    void SetWestNeighbor(Terrain* west);
+    void SetEastNeighbor(Terrain* east);
+    void SetNeighbors(Terrain* north, Terrain* south, Terrain* west, Terrain* east);
     void SetDrawDistance(float distance);
     void SetShadowDistance(float distance);
     void SetLodBias(float bias);
@@ -31,8 +36,13 @@ class Terrain : public Component
     bool GetSmoothing() const;
     Image* GetHeightMap() const;
     Material* GetMaterial() const;
+    Terrain* GetNorthNeighbor() const;
+    Terrain* GetSouthNeighbor() const;
+    Terrain* GetWestNeighbor() const;
+    Terrain* GetEastNeighbor() const;
     TerrainPatch* GetPatch(unsigned index) const;
     TerrainPatch* GetPatch(int x, int z) const;
+    TerrainPatch* GetNeighborPatch(int x, int z) const;
     float GetHeight(const Vector3& worldPosition) const;
     Vector3 GetNormal(const Vector3& worldPosition) const;
     IntVector2 WorldToHeightMap(const Vector3& worldPosition) const;
@@ -49,7 +59,7 @@ class Terrain : public Component
     bool GetCastShadows() const;
     bool IsOccluder() const;
     bool IsOccludee() const;
-    
+
     tolua_property__get_set int patchSize;
     tolua_property__get_set Vector3& spacing;
     tolua_readonly tolua_property__get_set IntVector2& numVertices;
@@ -59,6 +69,10 @@ class Terrain : public Component
     tolua_property__get_set bool smoothing;
     tolua_property__get_set Image* heightMap;
     tolua_property__get_set Material* material;
+    tolua_property__get_set Terrain* northNeighbor;
+    tolua_property__get_set Terrain* southNeighbor;
+    tolua_property__get_set Terrain* westNeighbor;
+    tolua_property__get_set Terrain* eastNeighbor;
     tolua_property__get_set float drawDistance;
     tolua_property__get_set float shadowDistance;
     tolua_property__get_set float lodBias;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@
 #include "../Core/Context.h"
 #include "../Core/Thread.h"
 #include "../IO/Log.h"
-#include "../Core/EventProfiler.h"
-#include "../Container/HashMap.h"
 
 #include "../DebugNew.h"
 
@@ -125,16 +123,6 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
     }
 }
 
-bool Object::IsTypeOf(StringHash type)
-{
-    return GetTypeInfoStatic()->IsTypeOf(type);
-}
-
-bool Object::IsTypeOf(const TypeInfo* typeInfo)
-{
-    return GetTypeInfoStatic()->IsTypeOf(typeInfo);
-}
-
 bool Object::IsInstanceOf(StringHash type) const
 {
     return GetTypeInfo()->IsTypeOf(type);
@@ -155,11 +143,15 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
     EventHandler* previous;
     EventHandler* oldHandler = FindSpecificEventHandler(0, eventType, &previous);
     if (oldHandler)
+    {
         eventHandlers_.Erase(oldHandler, previous);
-
-    eventHandlers_.InsertFront(handler);
-
-    context_->AddEventReceiver(this, eventType);
+        eventHandlers_.InsertFront(handler);
+    }
+    else
+    {
+        eventHandlers_.InsertFront(handler);
+        context_->AddEventReceiver(this, eventType);
+    }
 }
 
 void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler)
@@ -176,11 +168,15 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     EventHandler* previous;
     EventHandler* oldHandler = FindSpecificEventHandler(sender, eventType, &previous);
     if (oldHandler)
+    {
         eventHandlers_.Erase(oldHandler, previous);
-
-    eventHandlers_.InsertFront(handler);
-
-    context_->AddEventReceiver(this, sender, eventType);
+        eventHandlers_.InsertFront(handler);
+    }
+    else
+    {
+        eventHandlers_.InsertFront(handler);
+        context_->AddEventReceiver(this, sender, eventType);
+    }
 }
 
 #if URHO3D_CXX11
@@ -305,128 +301,91 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         return;
     }
 
-#ifdef URHO3D_PROFILING
-    EventProfiler* eventProfiler = 0;
-    if (EventProfiler::IsActive())
-    {
-        eventProfiler = GetSubsystem<EventProfiler>();
-        if (eventProfiler)
-            eventProfiler->BeginBlock(eventType);
-    }
-#endif
-
     // Make a weak pointer to self to check for destruction during event handling
     WeakPtr<Object> self(this);
     Context* context = context_;
     HashSet<Object*> processed;
 
-    context->BeginSendEvent(this);
+    context->BeginSendEvent(this, eventType);
 
     // Check first the specific event receivers
-    const HashSet<Object*>* group = context->GetEventReceivers(this, eventType);
+    // Note: group is held alive with a shared ptr, as it may get destroyed along with the sender
+    SharedPtr<EventReceiverGroup> group(context->GetEventReceivers(this, eventType));
     if (group)
     {
-        for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
-        {
-            HashSet<Object*>::ConstIterator current = i++;
-            Object* receiver = *current;
-            Object* next = 0;
-            if (i != group->End())
-                next = *i;
+        group->BeginSendEvent();
 
-            unsigned oldSize = group->Size();
+        for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+        {
+            Object* receiver = group->receivers_[i];
+            // Holes may exist if receivers removed during send
+            if (!receiver)
+                continue;
+
             receiver->OnEvent(this, eventType, eventData);
 
             // If self has been destroyed as a result of event handling, exit
             if (self.Expired())
             {
+                group->EndSendEvent();
                 context->EndSendEvent();
-#ifdef URHO3D_PROFILING
-                if (eventProfiler)
-                    eventProfiler->EndBlock();
-#endif
                 return;
             }
 
-            // If group has changed size during iteration (removed/added subscribers) try to recover
-            /// \todo This is not entirely foolproof, as a subscriber could have been added to make up for the removed one
-            if (group->Size() != oldSize)
-                i = group->Find(next);
-
             processed.Insert(receiver);
         }
+
+        group->EndSendEvent();
     }
 
     // Then the non-specific receivers
     group = context->GetEventReceivers(eventType);
     if (group)
     {
+        group->BeginSendEvent();
+
         if (processed.Empty())
         {
-            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
             {
-                HashSet<Object*>::ConstIterator current = i++;
-                Object* receiver = *current;
-                Object* next = 0;
-                if (i != group->End())
-                    next = *i;
+                Object* receiver = group->receivers_[i];
+                if (!receiver)
+                    continue;
 
-                unsigned oldSize = group->Size();
                 receiver->OnEvent(this, eventType, eventData);
 
                 if (self.Expired())
                 {
+                    group->EndSendEvent();
                     context->EndSendEvent();
-#ifdef URHO3D_PROFILING
-                    if (eventProfiler)
-                         eventProfiler->EndBlock();
-#endif
                     return;
                 }
-
-                if (group->Size() != oldSize)
-                    i = group->Find(next);
             }
         }
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (HashSet<Object*>::ConstIterator i = group->Begin(); i != group->End();)
+            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
             {
-                HashSet<Object*>::ConstIterator current = i++;
-                Object* receiver = *current;
-                Object* next = 0;
-                if (i != group->End())
-                    next = *i;
+                Object* receiver = group->receivers_[i];
+                if (!receiver || processed.Contains(receiver))
+                    continue;
 
-                if (!processed.Contains(receiver))
+                receiver->OnEvent(this, eventType, eventData);
+
+                if (self.Expired())
                 {
-                    unsigned oldSize = group->Size();
-                    receiver->OnEvent(this, eventType, eventData);
-
-                    if (self.Expired())
-                    {
-                        context->EndSendEvent();
-#ifdef URHO3D_PROFILING
-                        if (eventProfiler)
-                            eventProfiler->EndBlock();
-#endif
-                        return;
-                    }
-
-                    if (group->Size() != oldSize)
-                        i = group->Find(next);
+                    group->EndSendEvent();
+                    context->EndSendEvent();
+                    return;
                 }
             }
         }
+
+        group->EndSendEvent();
     }
 
     context->EndSendEvent();
-
-#ifdef URHO3D_PROFILING
-    if (eventProfiler)
-        eventProfiler->EndBlock();
-#endif
 }
 
 VariantMap& Object::GetEventDataMap() const
@@ -439,9 +398,9 @@ const Variant& Object::GetGlobalVar(StringHash key) const
     return context_->GetGlobalVar(key);
 }
 
-const VariantMap& Object::GetGlobalVars() const 
-{ 
-    return context_->GetGlobalVars(); 
+const VariantMap& Object::GetGlobalVars() const
+{
+    return context_->GetGlobalVars();
 }
 
 void Object::SetGlobalVar(StringHash key, const Variant& value)
@@ -566,13 +525,13 @@ void Object::RemoveEventSender(Object* sender)
 
 
 Urho3D::StringHash EventNameRegistrar::RegisterEventName(const char* eventName)
-{  
+{
     StringHash id(eventName);
     GetEventNameMap()[id] = eventName;
     return id;
 }
 
-const String& EventNameRegistrar::GetEventName(StringHash eventID) 
+const String& EventNameRegistrar::GetEventName(StringHash eventID)
 {
     HashMap<StringHash, String>::ConstIterator it = GetEventNameMap().Find(eventID);
     return  it != GetEventNameMap().End() ? it->second_ : String::EMPTY ;

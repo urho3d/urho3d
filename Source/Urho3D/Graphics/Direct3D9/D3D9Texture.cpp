@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,6 +102,12 @@ unsigned Texture::GetRowDataSize(int width) const
     default:
         return 0;
     }
+}
+
+void Texture::RegenerateLevels()
+{
+    // No-op on Direct3D9
+    levelsDirty_ = false;
 }
 
 }

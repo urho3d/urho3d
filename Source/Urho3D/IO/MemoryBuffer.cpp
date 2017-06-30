@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
-    Deserializer(size),
+    AbstractFile(size),
     buffer_((unsigned char*)data),
     readOnly_(false)
 {
@@ -37,7 +37,7 @@ MemoryBuffer::MemoryBuffer(void* data, unsigned size) :
 }
 
 MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
-    Deserializer(size),
+    AbstractFile(size),
     buffer_((unsigned char*)data),
     readOnly_(true)
 {
@@ -46,14 +46,14 @@ MemoryBuffer::MemoryBuffer(const void* data, unsigned size) :
 }
 
 MemoryBuffer::MemoryBuffer(PODVector<unsigned char>& data) :
-    Deserializer(data.Size()),
+    AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(false)
 {
 }
 
 MemoryBuffer::MemoryBuffer(const PODVector<unsigned char>& data) :
-    Deserializer(data.Size()),
+    AbstractFile(data.Size()),
     buffer_(data.Begin().ptr_),
     readOnly_(true)
 {

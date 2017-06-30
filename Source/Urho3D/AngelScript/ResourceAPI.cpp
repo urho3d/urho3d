@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,6 +57,18 @@ static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
     if (file)
         file->AddRef();
     return file.Get();
+}
+
+static CScriptArray* ResourceCacheGetResources(StringHash type, ResourceCache* ptr)
+{
+    PODVector<Resource*> resources;
+    ptr->GetResources(resources, type);
+    return VectorToHandleArray(resources, "Array<Resource@>");
+}
+
+static CScriptArray* ResourceCacheGetResourcesString(const String& type, ResourceCache* ptr)
+{
+    return ResourceCacheGetResources(StringHash(type), ptr);
 }
 
 static void ResourceCacheReleaseResource(const String& type, const String& name, bool force, ResourceCache* ptr)
@@ -154,6 +166,8 @@ static void RegisterResourceCache(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetExistingResource(const String&in, const String&in)", asFUNCTION(ResourceCacheGetExistingResource), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "Resource@+ GetExistingResource(StringHash, const String&in)", asMETHODPR(ResourceCache, GetExistingResource, (StringHash, const String&), Resource*), asCALL_THISCALL);
     engine->RegisterObjectMethod("ResourceCache", "bool BackgroundLoadResource(const String&in, const String&in, bool sendEventOnFailure = true)", asFUNCTION(ResourceCacheBackgroundLoadResource), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Array<Resource@>@ GetResources(const String&in)", asFUNCTION(ResourceCacheGetResourcesString), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("ResourceCache", "Array<Resource@>@ GetResources(StringHash)", asFUNCTION(ResourceCacheGetResources), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "void set_memoryBudget(const String&in, uint64)", asFUNCTION(ResourceCacheSetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint64 get_memoryBudget(const String&in) const", asFUNCTION(ResourceCacheGetMemoryBudget), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("ResourceCache", "uint64 get_memoryUse(const String&in) const", asFUNCTION(ResourceCacheGetMemoryUse), asCALL_CDECL_OBJLAST);
@@ -215,6 +229,7 @@ static void RegisterImage(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Image", "bool SavePNG(const String&in) const", asMETHOD(Image, SavePNG), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SaveTGA(const String&in) const", asMETHOD(Image, SaveTGA), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "bool SaveJPG(const String&in, int) const", asMETHOD(Image, SaveJPG), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Image", "bool SaveDDS(const String&in) const", asMETHOD(Image, SaveDDS), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int) const", asMETHODPR(Image, GetPixel, (int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "Color GetPixel(int, int, int) const", asMETHODPR(Image, GetPixel, (int, int, int) const, Color), asCALL_THISCALL);
     engine->RegisterObjectMethod("Image", "uint GetPixelInt(int, int) const", asMETHODPR(Image, GetPixelInt, (int, int) const, unsigned), asCALL_THISCALL);
@@ -289,6 +304,46 @@ static JSONValue& JSONValueAtKey(const String& key, JSONValue& jsonValue)
     return jsonValue[key];
 }
 
+static CScriptArray* JSONValueGetKeys(const JSONValue& jsonValue)
+{
+    Vector<String> keys;
+    if (jsonValue.IsObject())
+    {
+        for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+            keys.Push(i->first_);
+    }
+
+    return VectorToArray<String>(keys, "Array<String>");
+}
+
+static CScriptArray* JSONValueGetValues(const JSONValue& jsonValue)
+{
+    if (jsonValue.IsArray())
+        return VectorToArray<JSONValue>(jsonValue.GetArray(), "Array<JSONValue>");
+    else
+    {
+        Vector<JSONValue> values;
+
+        if (jsonValue.IsObject())
+        {
+            for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+                values.Push(i->second_);
+        }
+
+        return VectorToArray<JSONValue>(values, "Array<JSONValue>");
+    }
+}
+
+static void JSONValueSetVariant(const Variant& variant, JSONValue& jsonValue)
+{
+    jsonValue.SetVariant(variant, GetScriptContext());
+}
+
+static void JSONValueSetVariantMap(const VariantMap& variantMap, JSONValue& jsonValue)
+{
+    jsonValue.SetVariantMap(variantMap, GetScriptContext());
+}
+
 static void RegisterJSONValue(asIScriptEngine* engine)
 {
     engine->RegisterEnum("JSONValueType");
@@ -298,6 +353,12 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterEnumValue("JSONValueType", "JSON_STRING", JSON_STRING);
     engine->RegisterEnumValue("JSONValueType", "JSON_ARRAY", JSON_ARRAY);
     engine->RegisterEnumValue("JSONValueType", "JSON_OBJECT", JSON_OBJECT);
+
+    engine->RegisterEnum("JSONNumberType");
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_NAN", JSONNT_NAN);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_INT", JSONNT_INT);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_UINT", JSONNT_UINT);
+    engine->RegisterEnumValue("JSONNumberType", "JSONNT_FLOAT_DOUBLE", JSONNT_FLOAT_DOUBLE);
 
     engine->RegisterObjectType("JSONValue", sizeof(JSONValue), asOBJ_VALUE | asOBJ_APP_CLASS_CDAK);
     engine->RegisterObjectBehaviour("JSONValue", asBEHAVE_CONSTRUCT, "void f()", asFUNCTION(ConstructJSONValue), asCALL_CDECL_OBJLAST);
@@ -317,8 +378,13 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(double)", asMETHODPR(JSONValue, operator =, (double), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const String&in)", asMETHODPR(JSONValue, operator =, (const String&), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHODPR(JSONValue, operator =, (const JSONValue&), JSONValue&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "void SetVariant(const Variant&in)", asFUNCTION(JSONValueSetVariant), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "void SetVariantMap(const VariantMap&in)", asFUNCTION(JSONValueSetVariantMap), asCALL_CDECL_OBJLAST);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValueType get_valueType() const", asMETHOD(JSONValue, GetValueType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "JSONNumberType get_numberType() const", asMETHOD(JSONValue, GetNumberType), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "String get_valueTypeName() const", asMETHODPR(JSONValue, GetValueTypeName, () const, String), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "String get_numberTypeName() const", asMETHODPR(JSONValue, GetNumberTypeName, () const, String), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNull() const", asMETHOD(JSONValue, IsNull), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isBool() const", asMETHOD(JSONValue, IsBool), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "bool get_isNumber() const", asMETHOD(JSONValue, IsNumber), asCALL_THISCALL);
@@ -332,6 +398,8 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "float GetFloat() const", asMETHOD(JSONValue, GetFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "double GetDouble() const", asMETHOD(JSONValue, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "const String& GetString() const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Variant GetVariant() const", asMETHOD(JSONValue, GetVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "VariantMap GetVariantMap() const", asMETHOD(JSONValue, GetVariantMap), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(uint)", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(uint) const", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
@@ -340,7 +408,7 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "void Insert(uint, const JSONValue&in)", asMETHODPR(JSONValue, Insert, (unsigned, const JSONValue&), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Erase(uint, uint length = 1)", asMETHODPR(JSONValue, Erase, (unsigned, unsigned), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "void Resize(uint)", asMETHOD(JSONValue, Resize), asCALL_THISCALL);
-    engine->RegisterObjectMethod("JSONValue", "uint get_size()", asMETHOD(JSONValue, Size), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "uint get_size() const", asMETHOD(JSONValue, Size), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(const String&in)", asFUNCTION(JSONValueAtKey), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(const String&in) const", asFUNCTION(JSONValueAtKey), asCALL_CDECL_OBJLAST);
@@ -350,6 +418,9 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "bool Contains(const String&in) const", asMETHOD(JSONValue, Contains), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "void Clear()", asMETHOD(JSONValue, Clear), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ get_keys() const", asFUNCTION(JSONValueGetKeys), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "Array<JSONValue>@ get_values() const", asFUNCTION(JSONValueGetValues), asCALL_CDECL_OBJLAST);
 }
 
 static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
@@ -444,6 +515,7 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectBehaviour("XMLElement", asBEHAVE_DESTRUCT, "void f()", asFUNCTION(DestructXMLElement), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLElement", "XMLElement& opAssign(const XMLElement&in)", asMETHOD(XMLElement, operator =), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "XMLElement CreateChild(const String&in)", asMETHODPR(XMLElement, CreateChild, (const String&), XMLElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "XMLElement GetOrCreateChild(const String&in)", asMETHODPR(XMLElement, GetOrCreateChild, (const String&), XMLElement), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const XMLElement&in)", asMETHODPR(XMLElement, RemoveChild, (const XMLElement&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChild(const String&in)", asMETHODPR(XMLElement, RemoveChild, (const String&), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool RemoveChildren(const String&in name = String())", asMETHODPR(XMLElement, RemoveChildren, (const String&), bool), asCALL_THISCALL);
@@ -462,8 +534,11 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "bool SetDouble(const String&in, double)", asMETHOD(XMLElement, SetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetInt(const String&in, int)", asMETHOD(XMLElement, SetInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetUInt(const String&in, uint)", asMETHOD(XMLElement, SetUInt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetInt64(const String&in, int64)", asMETHOD(XMLElement, SetInt64), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetUInt64(const String&in, uint64)", asMETHOD(XMLElement, SetUInt64), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetIntRect(const String&in, const IntRect&in)", asMETHOD(XMLElement, SetIntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetIntVector2(const String&in, const IntVector2&in)", asMETHOD(XMLElement, SetIntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "bool SetIntVector3(const String&in, const IntVector3&in)", asMETHOD(XMLElement, SetIntVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetQuaternion(const String&in, const Quaternion&in)", asMETHOD(XMLElement, SetQuaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetVariant(const Variant&in)", asMETHOD(XMLElement, SetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "bool SetResourceRef(const String&in, const ResourceRef&in)", asMETHOD(XMLElement, SetResourceRef), asCALL_THISCALL);
@@ -493,8 +568,11 @@ static void RegisterXMLElement(asIScriptEngine* engine)
     engine->RegisterObjectMethod("XMLElement", "double GetDouble(const String&in) const", asMETHOD(XMLElement, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "uint GetUInt(const String&in) const", asMETHOD(XMLElement, GetUInt), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "int GetInt(const String&in) const", asMETHOD(XMLElement, GetInt), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "uint64 GetUInt64(const String&in) const", asMETHOD(XMLElement, GetUInt64), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "int64 GetInt64(const String&in) const", asMETHOD(XMLElement, GetInt64), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "IntRect GetIntRect(const String&in) const", asMETHOD(XMLElement, GetIntRect), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "IntVector2 GetIntVector2(const String&in) const", asMETHOD(XMLElement, GetIntVector2), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLElement", "IntVector3 GetIntVector3(const String&in) const", asMETHOD(XMLElement, GetIntVector3), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Quaternion GetQuaternion(const String&in) const", asMETHOD(XMLElement, GetQuaternion), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "Variant GetVariant() const", asMETHOD(XMLElement, GetVariant), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLElement", "ResourceRef GetResourceRef() const", asMETHOD(XMLElement, GetResourceRef), asCALL_THISCALL);
@@ -559,6 +637,7 @@ static void RegisterXMLFile(asIScriptEngine* engine)
 {
     engine->RegisterObjectMethod("XMLFile", "bool FromString(const String&in)", asMETHOD(XMLFile, FromString), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement CreateRoot(const String&in)", asMETHOD(XMLFile, CreateRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("XMLFile", "XMLElement GetOrCreateRoot(const String&in)", asMETHOD(XMLFile, GetOrCreateRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "XMLElement GetRoot(const String&in name = String())", asMETHOD(XMLFile, GetRoot), asCALL_THISCALL);
     engine->RegisterObjectMethod("XMLFile", "bool Save(File@+, const String&in) const", asFUNCTION(XMLFileSave), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("XMLFile", "String ToString(const String&in = String(\"\t\")) const", asMETHOD(XMLFile, ToString), asCALL_THISCALL);

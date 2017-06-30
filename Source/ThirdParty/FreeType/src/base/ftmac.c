@@ -8,7 +8,7 @@
 /*  This file is for Mac OS X only; see builds/mac/ftoldmac.c for          */
 /*  classic platforms built by MPW.                                        */
 /*                                                                         */
-/*  Copyright 1996-2009, 2013 by                                           */
+/*  Copyright 1996-2017 by                                                 */
 /*  Just van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.     */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -71,6 +71,9 @@
 #include FT_INTERNAL_STREAM_H
 #include "ftbase.h"
 
+
+#ifdef FT_MACINTOSH
+
   /* This is for Mac OS X.  Without redefinition, OS_INLINE */
   /* expands to `static inline' which doesn't survive the   */
   /* -ansi compilation flag of GCC.                         */
@@ -117,8 +120,6 @@
 #define PREFER_LWFN  1
 #endif
 
-
-#ifdef FT_MACINTOSH
 
   /* This function is deprecated because FSSpec is deprecated in Mac OS X  */
   FT_EXPORT_DEF( FT_Error )
@@ -227,6 +228,9 @@
     FT_Error  err;
 
 
+    if ( !fontName || !face_index )
+      return FT_THROW( Invalid_Argument);
+
     err = FT_GetFileRef_From_Mac_ATS_Name( fontName, &ref, face_index );
     if ( err )
       return err;
@@ -255,6 +259,9 @@
     FSRef     ref;
     FT_Error  err;
 
+
+    if ( !fontName || !face_index )
+      return FT_THROW( Invalid_Argument );
 
     err = FT_GetFileRef_From_Mac_ATS_Name( fontName, &ref, face_index );
     if ( err )
@@ -440,9 +447,10 @@
       style = (StyleTable*)p;
       p += sizeof ( StyleTable );
       string_count = EndianS16_BtoN( *(short*)(p) );
+      string_count = FT_MIN( 64, string_count );
       p += sizeof ( short );
 
-      for ( i = 0; i < string_count && i < 64; i++ )
+      for ( i = 0; i < string_count; i++ )
       {
         names[i] = p;
         p       += names[i][0];
@@ -459,7 +467,7 @@
           ps_name[ps_name_len] = 0;
         }
         if ( style->indexes[face_index] > 1 &&
-             style->indexes[face_index] <= FT_MIN( string_count, 64 ) )
+             style->indexes[face_index] <= string_count )
         {
           unsigned char*  suffixes = names[style->indexes[face_index] - 1];
 
@@ -598,7 +606,7 @@
     for (;;)
     {
       post_data = Get1Resource( TTAG_POST, res_id++ );
-      if ( post_data == NULL )
+      if ( !post_data )
         break;  /* we are done */
 
       code = (*post_data)[0];
@@ -611,11 +619,11 @@
           total_size += 6; /* code + 4 bytes chunk length */
       }
 
-      total_size += GetHandleSize( post_data ) - 2;
+      total_size += (FT_ULong)GetHandleSize( post_data ) - 2;
       last_code = code;
 
-      /* detect integer overflows */
-      if ( total_size < old_total_size )
+      /* detect resource fork overflow */
+      if ( FT_MAC_RFORK_MAX_LEN < total_size )
       {
         error = FT_THROW( Array_Too_Large );
         goto Error;
@@ -637,7 +645,7 @@
     for (;;)
     {
       post_data = Get1Resource( TTAG_POST, res_id++ );
-      if ( post_data == NULL )
+      if ( !post_data )
         break;  /* we are done */
 
       post_size = (FT_ULong)GetHandleSize( post_data ) - 2;
@@ -648,7 +656,7 @@
         if ( last_code != -1 )
         {
           /* we are done adding a chunk, fill in the size field */
-          if ( size_p != NULL )
+          if ( size_p )
           {
             *size_p++ = (FT_Byte)(   pfb_chunk_size         & 0xFF );
             *size_p++ = (FT_Byte)( ( pfb_chunk_size >> 8  ) & 0xFF );
@@ -736,10 +744,15 @@
 
 
     sfnt = GetResource( TTAG_sfnt, sfnt_id );
-    if ( sfnt == NULL )
+    if ( !sfnt )
       return FT_THROW( Invalid_Handle );
 
     sfnt_size = (FT_ULong)GetHandleSize( sfnt );
+
+    /* detect resource fork overflow */
+    if ( FT_MAC_RFORK_MAX_LEN < sfnt_size )
+      return FT_THROW( Array_Too_Large );
+
     if ( FT_ALLOC( sfnt_data, (FT_Long)sfnt_size ) )
     {
       ReleaseResource( sfnt );
@@ -809,7 +822,7 @@
       return FT_THROW( Cannot_Open_Resource );
 
     num_faces_in_res = 0;
-    for ( res_index = 1; ; ++res_index )
+    for ( res_index = 1; ; res_index++ )
     {
       short  num_faces_in_fond;
 
@@ -851,6 +864,8 @@
     OSErr     err;
     FT_Error  error = FT_Err_Ok;
 
+
+    /* check of `library' and `aface' delayed to `FT_New_Face_From_XXX' */
 
     GetResInfo( fond, &fond_id, &fond_type, fond_name );
     if ( ResError() != noErr || fond_type != TTAG_FOND )
@@ -928,13 +943,14 @@
     /* if it works, fine.                                           */
 
     error = FT_New_Face_From_Suitcase( library, pathname, face_index, aface );
-    if ( error == 0 )
-      return error;
+    if ( error )
+    {
+      /* let it fall through to normal loader (.ttf, .otf, etc.); */
+      /* we signal this by returning no error and no FT_Face      */
+      *aface = NULL;
+    }
 
-    /* let it fall through to normal loader (.ttf, .otf, etc.); */
-    /* we signal this by returning no error and no FT_Face      */
-    *aface = NULL;
-    return 0;
+    return FT_Err_Ok;
   }
 
 
@@ -968,12 +984,13 @@
     /* try resourcefork based font: LWFN, FFIL */
     error = FT_New_Face_From_Resource( library, (UInt8 *)pathname,
                                        face_index, aface );
-    if ( error != 0 || *aface != NULL )
+    if ( error || *aface )
       return error;
 
     /* let it fall through to normal loader (.ttf, .otf, etc.) */
     args.flags    = FT_OPEN_PATHNAME;
     args.pathname = (char*)pathname;
+
     return FT_Open_Face( library, &args, face_index, aface );
   }
 
@@ -997,9 +1014,13 @@
   {
     FT_Error      error;
     FT_Open_Args  args;
-    OSErr   err;
-    UInt8   pathname[PATH_MAX];
 
+    OSErr  err;
+    UInt8  pathname[PATH_MAX];
+
+
+    /* check of `library' and `aface' delayed to */
+    /* `FT_New_Face_From_Resource'               */
 
     if ( !ref )
       return FT_THROW( Invalid_Argument );
@@ -1009,7 +1030,7 @@
       error = FT_THROW( Cannot_Open_Resource );
 
     error = FT_New_Face_From_Resource( library, pathname, face_index, aface );
-    if ( error != 0 || *aface != NULL )
+    if ( error || *aface )
       return error;
 
     /* fallback to datafork font */
@@ -1047,6 +1068,8 @@
     FSRef  ref;
 
 
+    /* check of `library' and `aface' delayed to `FT_New_Face_From_FSRef' */
+
     if ( !spec || FSpMakeFSRef( spec, &ref ) != noErr )
       return FT_THROW( Invalid_Argument );
     else
@@ -1054,7 +1077,12 @@
 #endif
   }
 
-#endif /* FT_MACINTOSH */
+#else /* !FT_MACINTOSH */
+
+  /* ANSI C doesn't like empty source files */
+  typedef int  _ft_mac_dummy;
+
+#endif /* !FT_MACINTOSH */
 
 
 /* END */

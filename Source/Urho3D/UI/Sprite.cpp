@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -129,10 +129,10 @@ void Sprite::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexDat
     hovering_ = false;
 }
 
-void Sprite::OnPositionSet()
+void Sprite::OnPositionSet(const IntVector2& newPosition)
 {
     // If the integer position was set (layout update?), copy to the float position
-    floatPosition_ = Vector2((float)position_.x_, (float)position_.y_);
+    floatPosition_ = Vector2((float)newPosition.x_, (float)newPosition.y_);
 }
 
 void Sprite::SetPosition(const Vector2& position)

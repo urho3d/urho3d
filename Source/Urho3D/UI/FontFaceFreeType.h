@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ public:
     ~FontFaceFreeType();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
 
@@ -48,8 +48,6 @@ public:
     virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
 private:
-    /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
@@ -62,7 +60,7 @@ private:
     /// Load mode.
     int loadMode_;
     /// Ascender.
-    int ascender_;
+    float ascender_;
     /// Has mutable glyph.
     bool hasMutableGlyph_;
     /// Glyph area allocator.

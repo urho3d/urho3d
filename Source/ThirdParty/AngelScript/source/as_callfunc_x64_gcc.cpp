@@ -345,7 +345,7 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 		else
 		{
 			// An object is being passed by value
-			if( (parmType.GetObjectType()->flags & COMPLEX_MASK) ||
+			if( (parmType.GetTypeInfo()->flags & COMPLEX_MASK) ||
 			    parmType.GetSizeInMemoryDWords() > 4 )
 			{
 				// Copy the address of the object
@@ -353,8 +353,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				memcpy(paramBuffer + argIndex, stack_pointer, sizeof(asQWORD));
 				argIndex++;
 			}
-			else if( (parmType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLINTS) ||
-			         (parmType.GetObjectType()->flags & asOBJ_APP_PRIMITIVE) )
+			else if( (parmType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLINTS) ||
+			         (parmType.GetTypeInfo()->flags & asOBJ_APP_PRIMITIVE) )
 			{
 				// Copy the value of the object
 				if( parmType.GetSizeInMemoryDWords() > 2 )
@@ -373,8 +373,8 @@ asQWORD CallSystemFunctionNative(asCContext *context, asCScriptFunction *descr, 
 				// Delete the original memory
 				engine->CallFree(*(void**)stack_pointer);
 			}
-			else if( (parmType.GetObjectType()->flags & asOBJ_APP_CLASS_ALLFLOATS) ||
-			         (parmType.GetObjectType()->flags & asOBJ_APP_FLOAT) )
+			else if( (parmType.GetTypeInfo()->flags & asOBJ_APP_CLASS_ALLFLOATS) ||
+			         (parmType.GetTypeInfo()->flags & asOBJ_APP_FLOAT) )
 			{
 				// Copy the value of the object
 				if( parmType.GetSizeInMemoryDWords() > 2 )

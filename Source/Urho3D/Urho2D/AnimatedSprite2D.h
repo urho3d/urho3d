@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -143,7 +143,7 @@ protected:
 #endif
     
     /// Spriter instance.
-    Spriter::SpriterInstance* spriterInstance_;
+    UniquePtr<Spriter::SpriterInstance> spriterInstance_;
 };
 
 }

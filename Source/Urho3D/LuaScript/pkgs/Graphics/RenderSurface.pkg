@@ -22,6 +22,7 @@ class RenderSurface
     RenderSurfaceUpdateMode GetUpdateMode() const;
     RenderSurface* GetLinkedRenderTarget() const;
     RenderSurface* GetLinkedDepthStencil() const;
+    bool IsResolveDirty() const;
     
     tolua_readonly tolua_property__get_set Texture* parentTexture;
     tolua_readonly tolua_property__get_set int width;
@@ -31,4 +32,5 @@ class RenderSurface
     tolua_property__get_set RenderSurfaceUpdateMode updateMode;
     tolua_property__get_set RenderSurface* linkedRenderTarget;
     tolua_property__get_set RenderSurface* linkedDepthStencil;
+    tolua_readonly tolua_property__is_set bool resolveDirty;
 };

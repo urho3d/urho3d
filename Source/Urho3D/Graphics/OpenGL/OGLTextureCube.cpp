@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,6 +99,9 @@ void TextureCube::Release()
 
         object_.name_ = 0;
     }
+
+    resolveDirty_ = false;
+    levelsDirty_ = false;
 }
 
 bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int width, int height, const void* data)
@@ -390,6 +393,15 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         return false;
     }
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGERROR("Can not get data from multisampled texture without autoresolve");
+        return false;
+    }
+    
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<TextureCube*>(this));
+
     graphics_->SetTextureForUpdate(const_cast<TextureCube*>(this));
 
     if (!IsCompressed())
@@ -428,6 +440,15 @@ bool TextureCube::Create()
         return true;
     }
 
+#ifdef GL_ES_VERSION_2_0
+    if (multiSample_ > 1)
+    {
+        URHO3D_LOGWARNING("Multisampled texture is not supported on OpenGL ES");
+        multiSample_ = 1;
+        autoResolve_ = false;
+    }
+#endif
+    
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0
@@ -437,6 +458,13 @@ bool TextureCube::Create()
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
+
+    // If multisample, create renderbuffers for each face
+    if (multiSample_ > 1)
+    {
+        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+            renderSurfaces_[i]->CreateRenderBuffer(width_, height_, format, multiSample_);
+    }
 
     bool success = true;
     if (!IsCompressed())
@@ -453,6 +481,24 @@ bool TextureCube::Create()
         URHO3D_LOGERROR("Failed to create texture");
 
     // Set mipmapping
+    if (usage_ == TEXTURE_DEPTHSTENCIL)
+        requestedLevels_ = 1;
+    else if (usage_ == TEXTURE_RENDERTARGET)
+    {
+#if defined(__EMSCRIPTEN__) || defined(IOS) || defined(TVOS)
+        // glGenerateMipmap appears to not be working on WebGL or iOS/tvOS, disable rendertarget mipmaps for now
+        requestedLevels_ = 1;
+#else
+        if (requestedLevels_ != 1)
+        {
+            // Generate levels for the first time now
+            RegenerateLevels();
+            // Determine max. levels automatically
+            requestedLevels_ = 0;
+        }
+#endif
+    }
+
     levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);

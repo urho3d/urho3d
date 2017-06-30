@@ -1,4 +1,7 @@
 // Editor main handlers (add your local handler in proper main handler to prevent losing events)
+const String EDITOR_EVENT_SCENE_LOADED("EditorEventSceneLoaded");
+const String EDITOR_EVENT_ORIGIN_START_HOVER("EditorEventOriginStartHover");
+const String EDITOR_EVENT_ORIGIN_END_HOVER("EditorEventOriginEndHover");
 
 void EditorSubscribeToEvents()
 {
@@ -19,6 +22,19 @@ void EditorSubscribeToEvents()
     SubscribeToEvent("EndViewUpdate", "EditorMainHandleEndViewUpdate");
     SubscribeToEvent("BeginViewRender", "EditorMainHandleBeginViewRender");
     SubscribeToEvent("EndViewRender", "EditorMainHandleEndViewRender");
+    
+    SubscribeToEvent(EDITOR_EVENT_SCENE_LOADED, "EditorMainHandleSceneLoaded");
+    
+    SubscribeToEvent("HoverBegin", "EditorMainHandleHoverBegin");
+    SubscribeToEvent("HoverEnd", "EditorMainHandleHoverEnd");
+    
+    SubscribeToEvent(EDITOR_EVENT_ORIGIN_START_HOVER, "EditorMainHandleOriginStartHover");
+    SubscribeToEvent(EDITOR_EVENT_ORIGIN_END_HOVER, "EditorMainHandleOriginEndHover");
+    
+    SubscribeToEvent("NodeAdded", "EditorMainHandleNodeAdded");
+    SubscribeToEvent("NodeRemoved", "EditorMainHandleNodeRemoved");
+    
+    SubscribeToEvent("NodeNameChanged", "EditorMainHandleNodeNameChanged");
 }
 
 void EditorMainHandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -46,6 +62,9 @@ void EditorMainHandleMouseMove(StringHash eventType, VariantMap& eventData)
 
     // EditorLayer.as handler
     HandleHideLayerEditor(eventType, eventData);
+    
+    // PaintSelectionMouseMove
+    HandlePaintSelectionMouseMove(eventType, eventData);
 }
 
 void EditorMainHandleMouseWheel(StringHash eventType, VariantMap& eventData)
@@ -54,7 +73,9 @@ void EditorMainHandleMouseWheel(StringHash eventType, VariantMap& eventData)
     HandleColorWheelMouseWheel(eventType, eventData);
 
     // EditorLayer.as handler
-    HandleMaskTypeScroll(eventType, eventData);    
+    HandleMaskTypeScroll(eventType, eventData);
+    // PaintSelection handler
+    HandlePaintSelectionWheel(eventType, eventData);
 }
 
 void EditorMainHandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
@@ -83,6 +104,7 @@ void EditorMainHandleUIMouseClick(StringHash eventType, VariantMap& eventData)
 {
     // EditorView.as handler
     ViewMouseClick();
+    HandleOriginToggled(eventType, eventData);
 }
 
 void EditorMainHandleUIMouseClickEnd(StringHash eventType, VariantMap& eventData)
@@ -111,4 +133,55 @@ void EditorMainHandleBeginViewRender(StringHash eventType, VariantMap& eventData
 void EditorMainHandleEndViewRender(StringHash eventType, VariantMap& eventData)
 {
     HandleEndViewRender(eventType, eventData);
+}
+
+void EditorMainHandleSceneLoaded(StringHash eventType, VariantMap& eventData)
+{
+    HandleSceneLoadedForOrigins();
+}
+
+void EditorMainHandleHoverBegin(StringHash eventType, VariantMap& eventData)
+{
+    HandleOriginsHoverBegin(eventType, eventData);
+}
+
+void EditorMainHandleHoverEnd(StringHash eventType, VariantMap& eventData)
+{
+    HandleOriginsHoverEnd(eventType, eventData);
+}
+
+void EditorMainHandleNodeAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (GetEventSender() !is editorScene)
+        return;
+
+    HandleNodeAdded(eventType, eventData);
+    rebuildSceneOrigins = true;
+}
+
+void EditorMainHandleNodeRemoved(StringHash eventType, VariantMap& eventData)
+{
+    if (GetEventSender() !is editorScene)
+        return;
+
+    HandleNodeRemoved(eventType, eventData);
+    rebuildSceneOrigins = true;
+}
+
+void EditorMainHandleNodeNameChanged(StringHash eventType, VariantMap& eventData)
+{
+    if (GetEventSender() !is editorScene)
+        return;
+
+    HandleNodeNameChanged(eventType, eventData);
+}
+
+void EditorMainHandleOriginStartHover(StringHash eventType, VariantMap& eventData)
+{
+
+}
+
+void EditorMainHandleOriginEndHover(StringHash eventType, VariantMap& eventData)
+{
+
 }

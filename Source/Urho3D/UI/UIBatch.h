@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ public:
     /// Restore UI element's default color.
     void SetDefaultColor();
     /// Add a quad.
-    void AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
+    void AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth = 0, int texHeight = 0);
     /// Add a quad using a transform matrix.
     void AddQuad(const Matrix3x4& transform, int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth = 0,
         int texHeight = 0);
@@ -67,7 +67,7 @@ public:
     /// Merge with another batch.
     bool Merge(const UIBatch& batch);
     /// Return an interpolated color for the UI element.
-    unsigned GetInterpolatedColor(int x, int y);
+    unsigned GetInterpolatedColor(float x, float y);
 
     /// Add or merge a batch.
     static void AddOrMerge(const UIBatch& batch, PODVector<UIBatch>& batches);

@@ -1,0 +1,6 @@
+<material>
+    <technique name="Techniques/DiffLitParticleAlphaSoft.xml" />
+    <parameter name="MatDiffColor" value="0.5 0.5 0.5 0.5" />
+    <parameter name="SoftParticleFadeScale" value="1" />
+    <texture unit="diffuse" name="Textures/Smoke.dds" />
+</material>

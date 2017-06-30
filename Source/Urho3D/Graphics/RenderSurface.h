@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ public:
     /// Mark the GPU resource destroyed on graphics context destruction. Only used on OpenGL.
     void OnDeviceLost();
     /// Create renderbuffer that cannot be sampled as a texture. Only used on OpenGL.
-    bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format);
+    bool CreateRenderBuffer(unsigned width, unsigned height, unsigned format, int multiSample);
 
     /// Return width.
     int GetWidth() const;
@@ -70,6 +70,12 @@ public:
     
     /// Return usage.
     TextureUsage GetUsage() const;
+
+    /// Return multisampling level.
+    int GetMultiSample() const;
+
+    /// Return multisampling autoresolve mode.
+    bool GetAutoResolve() const;
 
     /// Return number of viewports.
     unsigned GetNumViewports() const { return viewports_.Size(); }
@@ -110,6 +116,12 @@ public:
     /// Return OpenGL renderbuffer if created.
     unsigned GetRenderBuffer() const { return renderBuffer_; }
 
+    /// Return whether multisampled rendertarget needs resolve.
+    bool IsResolveDirty() const { return resolveDirty_; }
+
+    /// Set or clear the need resolve flag. Called internally by Graphics.
+    void SetResolveDirty(bool enable) { resolveDirty_ = enable; }
+
 private:
     /// Parent texture.
     Texture* parentTexture_;
@@ -142,6 +154,8 @@ private:
     RenderSurfaceUpdateMode updateMode_;
     /// Update queued flag.
     bool updateQueued_;
+    /// Multisampled resolve dirty flag.
+    bool resolveDirty_;
 };
 
 }

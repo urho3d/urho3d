@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public:
     /// Return UI rendering batches.
     virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
     /// React to position change.
-    virtual void OnPositionSet();
+    virtual void OnPositionSet(const IntVector2& newPosition);
     /// Convert screen coordinates to element coordinates.
     virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
     /// Convert element coordinates to screen coordinates.

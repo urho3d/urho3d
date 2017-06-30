@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -147,14 +147,20 @@ void WorkQueue::AddWorkItem(SharedPtr<WorkItem> item)
         queue_.Push(item);
     else
     {
+        bool inserted = false;
+
         for (List<WorkItem*>::Iterator i = queue_.Begin(); i != queue_.End(); ++i)
         {
             if ((*i)->priority_ <= item->priority_)
             {
                 queue_.Insert(i, item);
+                inserted = true;
                 break;
             }
         }
+
+        if (!inserted)
+            queue_.Push(item);
     }
 
     if (threads_.Size())

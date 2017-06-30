@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,18 @@ namespace Urho3D
 {
 
 extern const char* GEOMETRY_CATEGORY;
+
+const char* animationStatesStructureElementNames[] =
+{
+    "Anim State Count",
+    "   Animation",
+    "   Start Bone",
+    "   Is Looped",
+    "   Weight",
+    "   Time",
+    "   Layer",
+    0
+};
 
 static bool CompareAnimationOrder(const SharedPtr<AnimationState>& lhs, const SharedPtr<AnimationState>& rhs)
 {
@@ -107,8 +119,9 @@ void AnimatedModel::RegisterObject(Context* context)
     URHO3D_COPY_BASE_ATTRIBUTES(Drawable);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Bone Animation Enabled", GetBonesEnabledAttr, SetBonesEnabledAttr, VariantVector,
         Variant::emptyVariantVector, AM_FILE | AM_NOEDIT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr, VariantVector,
-        Variant::emptyVariantVector, AM_FILE);
+    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Animation States", GetAnimationStatesAttr, SetAnimationStatesAttr,
+                                                            VariantVector, Variant::emptyVariantVector,
+                                                            animationStatesStructureElementNames, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Morphs", GetMorphsAttr, SetMorphsAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_DEFAULT | AM_NOEDIT);
 }
@@ -322,6 +335,12 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
     if (model == model_)
         return;
 
+    if (!node_)
+    {
+        URHO3D_LOGERROR("Can not set model while model component is not attached to a scene node");
+        return;
+    }
+
     // Unsubscribe from the reload event of previous model (if any), then subscribe to the new
     if (model_)
         UnsubscribeFromEvent(model_, E_RELOADFINISHED);
@@ -375,6 +394,10 @@ void AnimatedModel::SetModel(Model* model, bool createBones)
         boneBoundingBoxDirty_ = true;
         SetSkeleton(model->GetSkeleton(), createBones);
         ResetLodLevels();
+
+        // Reserve space for skinning matrices
+        skinMatrices_.Resize(skeleton_.GetNumBones());
+        SetGeometryBoneMappings();
 
         // Enable skinning in batches
         for (unsigned i = 0; i < batches_.Size(); ++i)
@@ -533,10 +556,8 @@ void AnimatedModel::SetMorphWeight(unsigned index, float weight)
         return;
 
     // If morph vertex buffers have not been created yet, create now
-    if (weight > 0.0f && morphVertexBuffers_.Empty())
+    if (weight != 0.0f && morphVertexBuffers_.Empty())
         CloneGeometries();
-
-    weight = Clamp(weight, 0.0f, 1.0f);
 
     if (weight != morphs_[index].weight_)
     {
@@ -772,10 +793,6 @@ void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
             }
         }
     }
-
-    // Reserve space for skinning matrices
-    skinMatrices_.Resize(skeleton_.GetNumBones());
-    SetGeometryBoneMappings();
 
     assignBonesPending_ = !createBones;
 }
@@ -1254,6 +1271,11 @@ void AnimatedModel::UpdateAnimation(const FrameInfo& frame)
             animationLodTimer_ = 0.0f;
     }
 
+    ApplyAnimation();
+}
+
+void AnimatedModel::ApplyAnimation()
+{
     // Make sure animations are in ascending priority order
     if (animationOrderDirty_)
     {
@@ -1345,7 +1367,7 @@ void AnimatedModel::UpdateMorphs()
 
                     for (unsigned j = 0; j < morphs_.Size(); ++j)
                     {
-                        if (morphs_[j].weight_ > 0.0f)
+                        if (morphs_[j].weight_ != 0.0f)
                         {
                             HashMap<unsigned, VertexBufferMorph>::Iterator k = morphs_[j].buffers_.Find(i);
                             if (k != morphs_[j].buffers_.End())

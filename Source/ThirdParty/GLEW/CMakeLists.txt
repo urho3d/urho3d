@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@
 
 # Define target name
 set (TARGET_NAME GLEW)
+
+# Define preprocessor macros
+add_definitions (-DGLEW_STATIC -DGLEW_NO_GLU)
 
 # Define source files
 define_source_files (GLOB_CPP_PATTERNS *.c)

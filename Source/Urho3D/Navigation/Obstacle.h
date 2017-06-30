@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,8 +70,12 @@ public:
     void DrawDebugGeometry(bool depthTest);
 
 protected:
+    /// Handle node being assigned.
+    virtual void OnNodeSet(Node* node);
     /// Handle scene being assigned, identify our DynamicNavigationMesh.
     virtual void OnSceneSet(Scene* scene);
+    /// Handle node transform being dirtied.
+    virtual void OnMarkedDirty(Node* node);
 
 private:
     /// Radius of this obstacle.

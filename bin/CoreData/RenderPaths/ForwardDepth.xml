@@ -9,6 +9,8 @@
     <command type="scenepass" pass="refract">
         <texture unit="environment" name="viewport" />
     </command>
-    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" />
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha">
+        <texture unit="depth" name="depth" />
+    </command>
     <command type="scenepass" pass="postalpha" sort="backtofront" />
 </renderpath>

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,14 @@
 
 #include "../Core/Object.h"
 #include "../Core/Timer.h"
+#include "../Resource/JSONValue.h"
 
 namespace Urho3D
 {
 
 class Deserializer;
 class Serializer;
+class XMLElement;
 
 /// Asynchronous loading state of a resource.
 enum AsyncLoadState
@@ -63,6 +65,11 @@ public:
     virtual bool EndLoad();
     /// Save resource. Return true if successful.
     virtual bool Save(Serializer& dest) const;
+
+    /// Load resource from file.
+    bool LoadFile(const String& fileName);
+    /// Save resource to file.
+    virtual bool SaveFile(const String& fileName) const;
 
     /// Set name.
     void SetName(const String& name);
@@ -99,6 +106,43 @@ private:
     unsigned memoryUse_;
     /// Asynchronous loading state.
     AsyncLoadState asyncLoadState_;
+};
+
+/// Base class for resources that support arbitrary metadata stored. Metadata serialization shall be implemented in derived classes.
+class URHO3D_API ResourceWithMetadata : public Resource
+{
+    URHO3D_OBJECT(ResourceWithMetadata, Resource);
+
+public:
+    /// Construct.
+    ResourceWithMetadata(Context* context) : Resource(context) {}
+
+    /// Add new metadata variable or overwrite old value.
+    void AddMetadata(const String& name, const Variant& value);
+    /// Remove metadata variable.
+    void RemoveMetadata(const String& name);
+    /// Remove all metadata variables.
+    void RemoveAllMetadata();
+    /// Return metadata variable.
+    const Variant& GetMetadata(const String& name) const;
+    /// Return whether the resource has metadata.
+    bool HasMetadata() const;
+
+protected:
+    /// Load metadata from <metadata> children of XML element.
+    void LoadMetadataFromXML(const XMLElement& source);
+    /// Load metadata from JSON array.
+    void LoadMetadataFromJSON(const JSONArray& array);
+    /// Save as <metadata> children of XML element.
+    void SaveMetadataToXML(XMLElement& destination) const;
+    /// Copy metadata from another resource.
+    void CopyMetadata(const ResourceWithMetadata& source);
+
+private:
+    /// Animation metadata variables.
+    VariantMap metadata_;
+    /// Animation metadata keys.
+    StringVector metadataKeys_;
 };
 
 inline const String& GetResourceName(Resource* resource)

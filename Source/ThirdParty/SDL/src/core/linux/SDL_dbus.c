@@ -27,7 +27,7 @@
 static const char *dbus_library = "libdbus-1.so.3";
 static void *dbus_handle = NULL;
 static unsigned int screensaver_cookie = 0;
-static SDL_DBusContext dbus = {0};
+static SDL_DBusContext dbus;
 
 static int
 LoadDBUSSyms(void)
@@ -237,3 +237,5 @@ SDL_DBus_ScreensaverInhibit(SDL_bool inhibit)
     }
 }
 #endif
+
+/* vi: set ts=4 sw=4 expandtab: */

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -189,6 +189,9 @@ void RenderToTexture::CreateScene()
             SharedPtr<Material> renderMaterial(new Material(context_));
             renderMaterial->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
             renderMaterial->SetTexture(TU_DIFFUSE, renderTexture);
+            // Since the screen material is on top of the box model and may Z-fight, use negative depth bias
+            // to push it forward (particularly necessary on mobiles with possibly less Z resolution)
+            renderMaterial->SetDepthBias(BiasParameters(-0.001f, 0.0f));
             screenObject->SetMaterial(renderMaterial);
 
             // Get the texture's RenderSurface object (exists when the texture has been created in rendertarget mode)

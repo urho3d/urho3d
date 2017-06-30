@@ -11,6 +11,8 @@ class Console : public Object
     void SetNumRows(unsigned rows);
     void SetNumHistoryRows(unsigned rows);
     void SetFocusOnShow(bool enable);
+    void AddAutoComplete(const String option);
+    void RemoveAutoComplete(const String option);
     void UpdateElements();
     
     XMLFile* GetDefaultStyle() const;

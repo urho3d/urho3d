@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,24 +27,17 @@ if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
     # All Clang-tools must be natively built and output to bin/tool/clang subdir to differentiate them from the rest
     set_output_directories (${CMAKE_BINARY_DIR}/bin/tool/clang RUNTIME PDB)
 else ()
-    # Set CMake minimum version and CMake policy required by Urho3D-CMake-common module
-    if (WIN32)
-        cmake_minimum_required (VERSION 3.2.3)      # Going forward all platforms will use this as minimum version
-    else ()
-        cmake_minimum_required (VERSION 2.8.6)
-    endif ()
+    # Set CMake minimum version and CMake policy required by UrhoCommon module
+    cmake_minimum_required (VERSION 3.2.3)
     if (COMMAND cmake_policy)
+        # Libraries linked via full path no longer produce linker search paths
         cmake_policy (SET CMP0003 NEW)
-        if (CMAKE_VERSION VERSION_GREATER 2.8.12 OR CMAKE_VERSION VERSION_EQUAL 2.8.12)
-            # INTERFACE_LINK_LIBRARIES defines the link interface
-            cmake_policy (SET CMP0022 NEW)
-        endif ()
-        if (CMAKE_VERSION VERSION_GREATER 3.0.0 OR CMAKE_VERSION VERSION_EQUAL 3.0.0)
-            # Disallow use of the LOCATION target property - so we set to OLD as we still need it
-            cmake_policy (SET CMP0026 OLD)
-            # MACOSX_RPATH is enabled by default
-            cmake_policy (SET CMP0042 NEW)
-        endif ()
+        # INTERFACE_LINK_LIBRARIES defines the link interface
+        cmake_policy (SET CMP0022 NEW)
+        # Disallow use of the LOCATION target property - so we set to OLD as we still need it
+        cmake_policy (SET CMP0026 OLD)
+        # MACOSX_RPATH is enabled by default
+        cmake_policy (SET CMP0042 NEW)
     endif ()
 
     # Set project name
@@ -53,8 +46,8 @@ else ()
     # Set CMake modules search path
     set (CMAKE_MODULE_PATH ${BAKED_CMAKE_SOURCE_DIR}/CMake/Modules)
 
-    # Include Urho3D Cmake common module
-    include (Urho3D-CMake-common)
+    # Include UrhoCommon.cmake module after setting project name
+    include (UrhoCommon)
 
     # Setup SDK-like include dir in the build tree for building the Clang-tools
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEST_INCLUDE_DIR}/ThirdParty)
@@ -62,8 +55,7 @@ endif ()
 
 # LLVM/Clang is assumed to be installed in a system-wide location when not explicitily defined using env-var
 if (DEFINED ENV{LLVM_CLANG_ROOT})
-    link_directories ($ENV{LLVM_CLANG_ROOT}/lib)
-    include_directories ($ENV{LLVM_CLANG_ROOT}/include)
+    set (CMAKE_SYSROOT $ENV{LLVM_CLANG_ROOT})
 endif ()
 execute_process (COMMAND ${LLVM_CONFIG} --bindir OUTPUT_VARIABLE LLVM_BINDIR OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 

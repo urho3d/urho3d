@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,11 +113,11 @@ private:
     /// Detour tile cache instance that works with the nav mesh.
     dtTileCache* tileCache_;
     /// Used by dtTileCache to allocate blocks of memory.
-    dtTileCacheAlloc* allocator_;
+    UniquePtr<dtTileCacheAlloc> allocator_;
     /// Used by dtTileCache to compress the original tiles to use when reconstructing for changes.
-    dtTileCacheCompressor* compressor_;
-    /// Mesh processer used by Detour, in this case a 'pass-through' processor.
-    dtTileCacheMeshProcess* meshProcessor_;
+    UniquePtr<dtTileCacheCompressor> compressor_;
+    /// Mesh processor used by Detour, in this case a 'pass-through' processor.
+    UniquePtr<dtTileCacheMeshProcess> meshProcessor_;
     /// Maximum number of obstacle objects allowed.
     unsigned maxObstacles_;
     /// Maximum number of layers that are allowed to be constructed.

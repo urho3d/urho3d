@@ -4,7 +4,8 @@
 /*                                                                         */
 /*    PNG Bitmap glyph support.                                            */
 /*                                                                         */
-/*  Copyright 2013 by Google, Inc.                                         */
+/*  Copyright 2013-2017 by                                                 */
+/*  Google, Inc.                                                           */
 /*  Written by Stuart Gill and Behdad Esfahbod.                            */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -23,9 +24,10 @@
 #include FT_CONFIG_STANDARD_LIBRARY_H
 
 
-#ifdef FT_CONFIG_OPTION_USE_PNG
+#if defined( TT_CONFIG_OPTION_EMBEDDED_BITMAPS ) && \
+    defined( FT_CONFIG_OPTION_USE_PNG )
 
-  /* We always include <stjmp.h>, so make libpng shut up! */
+  /* We always include <setjmp.h>, so make libpng shut up! */
 #define PNG_SKIP_SETJMP_CHECK 1
 #include <png.h>
 #include "pngshim.h"
@@ -36,11 +38,11 @@
   /* This code is freely based on cairo-png.c.  There's so many ways */
   /* to call libpng, and the way cairo does it is defacto standard.  */
 
-  static int
-  multiply_alpha( int  alpha,
-                  int  color )
+  static unsigned int
+  multiply_alpha( unsigned int  alpha,
+                  unsigned int  color )
   {
-    int  temp = ( alpha * color ) + 0x80;
+    unsigned int  temp = alpha * color + 0x80;
 
 
     return ( temp + ( temp >> 8 ) ) >> 8;
@@ -81,10 +83,10 @@
           blue  = multiply_alpha( alpha, blue  );
         }
 
-        base[0] = blue;
-        base[1] = green;
-        base[2] = red;
-        base[3] = alpha;
+        base[0] = (unsigned char)blue;
+        base[1] = (unsigned char)green;
+        base[2] = (unsigned char)red;
+        base[3] = (unsigned char)alpha;
       }
     }
   }
@@ -109,9 +111,9 @@
       unsigned int    blue  = base[2];
 
 
-      base[0] = blue;
-      base[1] = green;
-      base[2] = red;
+      base[0] = (unsigned char)blue;
+      base[1] = (unsigned char)green;
+      base[2] = (unsigned char)red;
       base[3] = 0xFF;
     }
   }
@@ -129,7 +131,7 @@
 
     *error = FT_THROW( Out_Of_Memory );
 #ifdef PNG_SETJMP_SUPPORTED
-    longjmp( png_jmpbuf( png ), 1 );
+    ft_longjmp( png_jmpbuf( png ), 1 );
 #endif
     /* if we get here, then we have no choice but to abort ... */
   }
@@ -183,7 +185,8 @@
                  FT_Memory        memory,
                  FT_Byte*         data,
                  FT_UInt          png_len,
-                 FT_Bool          populate_map_and_metrics )
+                 FT_Bool          populate_map_and_metrics,
+                 FT_Bool          metrics_only )
   {
     FT_Bitmap    *map   = &slot->bitmap;
     FT_Error      error = FT_Err_Ok;
@@ -205,11 +208,11 @@
       goto Exit;
     }
 
-    if ( !populate_map_and_metrics                   &&
-         ( x_offset + metrics->width  > map->width ||
-           y_offset + metrics->height > map->rows  ||
-           pix_bits != 32                          ||
-           map->pixel_mode != FT_PIXEL_MODE_BGRA   ) )
+    if ( !populate_map_and_metrics                            &&
+         ( (FT_UInt)x_offset + metrics->width  > map->width ||
+           (FT_UInt)y_offset + metrics->height > map->rows  ||
+           pix_bits != 32                                   ||
+           map->pixel_mode != FT_PIXEL_MODE_BGRA            ) )
     {
       error = FT_THROW( Invalid_Argument );
       goto Exit;
@@ -257,23 +260,21 @@
 
     if ( populate_map_and_metrics )
     {
-      FT_Long  size;
-
-
-      metrics->width  = (FT_Int)imgWidth;
-      metrics->height = (FT_Int)imgHeight;
+      metrics->width  = (FT_UShort)imgWidth;
+      metrics->height = (FT_UShort)imgHeight;
 
       map->width      = metrics->width;
       map->rows       = metrics->height;
       map->pixel_mode = FT_PIXEL_MODE_BGRA;
-      map->pitch      = map->width * 4;
+      map->pitch      = (int)( map->width * 4 );
       map->num_grays  = 256;
 
-      size = map->rows * map->pitch;
-
-      error = ft_glyphslot_alloc_bitmap( slot, size );
-      if ( error )
+      /* reject too large bitmaps similarly to the rasterizer */
+      if ( map->rows > 0x7FFF || map->width > 0x7FFF )
+      {
+        error = FT_THROW( Array_Too_Large );
         goto DestroyExit;
+      }
     }
 
     /* convert palette/gray image to rgb */
@@ -325,6 +326,9 @@
       goto DestroyExit;
     }
 
+    if ( metrics_only )
+      goto DestroyExit;
+
     switch ( color_type )
     {
     default:
@@ -338,6 +342,17 @@
       /* Humm, this smells.  Carry on though. */
       png_set_read_user_transform_fn( png, convert_bytes_to_data );
       break;
+    }
+
+    if ( populate_map_and_metrics )
+    {
+      /* this doesn't overflow: 0x7FFF * 0x7FFF * 4 < 2^32 */
+      FT_ULong  size = map->rows * (FT_ULong)map->pitch;
+
+
+      error = ft_glyphslot_alloc_bitmap( slot, size );
+      if ( error )
+        goto DestroyExit;
     }
 
     if ( FT_NEW_ARRAY( rows, imgHeight ) )
@@ -363,7 +378,12 @@
     return error;
   }
 
-#endif /* FT_CONFIG_OPTION_USE_PNG */
+#else /* !(TT_CONFIG_OPTION_EMBEDDED_BITMAPS && FT_CONFIG_OPTION_USE_PNG) */
+
+  /* ANSI C doesn't like empty source files */
+  typedef int  _pngshim_dummy;
+
+#endif /* !(TT_CONFIG_OPTION_EMBEDDED_BITMAPS && FT_CONFIG_OPTION_USE_PNG) */
 
 
 /* END */

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -94,6 +94,9 @@ void Texture2D::Release()
         if (renderSurface_)
             renderSurface_->Release();
     }
+
+    resolveDirty_ = false;
+    levelsDirty_ = false;
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
@@ -324,6 +327,15 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGERROR("Can not get data from multisampled texture without autoresolve");
+        return false;
+    }
+    
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<Texture2D*>(this));
+
     graphics_->SetTextureForUpdate(const_cast<Texture2D*>(this));
 
     if (!IsCompressed())
@@ -362,6 +374,15 @@ bool Texture2D::Create()
         return true;
     }
 
+#ifdef GL_ES_VERSION_2_0
+    if (multiSample_ > 1)
+    {
+        URHO3D_LOGWARNING("Multisampled texture is not supported on OpenGL ES");
+        multiSample_ = 1;
+        autoResolve_ = false;
+    }
+#endif
+
     unsigned format = GetSRGB() ? GetSRGBFormat(format_) : format_;
     unsigned externalFormat = GetExternalFormat(format_);
     unsigned dataType = GetDataType(format_);
@@ -377,11 +398,37 @@ bool Texture2D::Create()
     {
         if (renderSurface_)
         {
-            renderSurface_->CreateRenderBuffer(width_, height_, format);
+            renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
             return true;
         }
         else
             return false;
+    }
+    else
+    {
+        if (multiSample_ > 1)
+        {
+            if (autoResolve_)
+            {
+                // Multisample with autoresolve: create a renderbuffer for rendering, but also a texture
+                renderSurface_->CreateRenderBuffer(width_, height_, format, multiSample_);
+            }
+            else
+            {
+                // Multisample without autoresolve: create a texture only
+#ifndef GL_ES_VERSION_2_0
+                if (!Graphics::GetGL3Support() && !GLEW_ARB_texture_multisample)
+                {
+                    URHO3D_LOGERROR("Multisampled texture extension not available");
+                    return false;
+                }
+
+                target_ = GL_TEXTURE_2D_MULTISAMPLE;
+                if (renderSurface_)
+                    renderSurface_->target_ = GL_TEXTURE_2D_MULTISAMPLE;
+#endif
+            }
+        }
     }
 
     glGenTextures(1, &object_.name_);
@@ -395,6 +442,11 @@ bool Texture2D::Create()
     if (!IsCompressed())
     {
         glGetError();
+#ifndef GL_ES_VERSION_2_0
+        if (multiSample_ > 1 && !autoResolve_)
+            glTexImage2DMultisample(target_, multiSample_, format, width_, height_, GL_TRUE);
+        else
+#endif
         glTexImage2D(target_, 0, format, width_, height_, 0, externalFormat, dataType, 0);
         if (glGetError())
         {
@@ -404,6 +456,24 @@ bool Texture2D::Create()
     }
 
     // Set mipmapping
+    if (usage_ == TEXTURE_DEPTHSTENCIL)
+        requestedLevels_ = 1;
+    else if (usage_ == TEXTURE_RENDERTARGET)
+    {
+#if defined(__EMSCRIPTEN__) || defined(IOS) || defined(TVOS)
+        // glGenerateMipmap appears to not be working on WebGL or iOS/tvOS, disable rendertarget mipmaps for now
+        requestedLevels_ = 1;
+#else
+        if (requestedLevels_ != 1)
+        {
+            // Generate levels for the first time now
+            RegenerateLevels();
+            // Determine max. levels automatically
+            requestedLevels_ = 0;
+        }
+#endif
+    }
+
     levels_ = CheckMaxLevels(width_, height_, requestedLevels_);
 #ifndef GL_ES_VERSION_2_0
     glTexParameteri(target_, GL_TEXTURE_BASE_LEVEL, 0);

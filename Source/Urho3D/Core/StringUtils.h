@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,14 +39,22 @@ URHO3D_API float ToFloat(const char* source);
 URHO3D_API double ToDouble(const String& source);
 /// Parse a double from a C string.
 URHO3D_API double ToDouble(const char* source);
-/// Parse an integer from a string.
-URHO3D_API int ToInt(const String& source);
-/// Parse an integer from a C string.
-URHO3D_API int ToInt(const char* source);
-/// Parse an unsigned integer from a string.
-URHO3D_API unsigned ToUInt(const String& source);
-/// Parse an unsigned integer from a C string.
-URHO3D_API unsigned ToUInt(const char* source);
+/// Parse an integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API int ToInt(const String& source, int base = 10);
+/// Parse an integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API int ToInt(const char* source, int base = 10);
+/// Parse an unsigned integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned ToUInt(const String& source, int base = 10);
+/// Parse an unsigned integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned ToUInt(const char* source, int base = 10);
+/// Parse an 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API long long ToInt64(const String& source, int base = 10);
+/// Parse an 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API long long ToInt64(const char* source, int base = 10);
+/// Parse an unsigned 64 bit integer from a string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned long long ToUInt64(const String& source, int base = 10);
+/// Parse an unsigned 64 bit integer from a C string. Assumed to be decimal by default (base 10). Use base 0 to autodetect from string.
+URHO3D_API unsigned long long ToUInt64(const char* source, int base = 10);
 /// Parse a Color from a string.
 URHO3D_API Color ToColor(const String& source);
 /// Parse a Color from a C string.
@@ -59,6 +67,10 @@ URHO3D_API IntRect ToIntRect(const char* source);
 URHO3D_API IntVector2 ToIntVector2(const String& source);
 /// Parse an IntVector2 from a C string.
 URHO3D_API IntVector2 ToIntVector2(const char* source);
+/// Parse an IntVector3 from a string.
+URHO3D_API IntVector3 ToIntVector3(const String& source);
+/// Parse an IntVector3 from a C string.
+URHO3D_API IntVector3 ToIntVector3(const char* source);
 /// Parse a Quaternion from a string. If only 3 components specified, convert Euler angles (degrees) to quaternion.
 URHO3D_API Quaternion ToQuaternion(const String& source);
 /// Parse a Quaternion from a C string. If only 3 components specified, convert Euler angles (degrees) to quaternion.
@@ -123,5 +135,31 @@ URHO3D_API unsigned ToUpper(unsigned ch);
 URHO3D_API unsigned ToLower(unsigned ch);
 /// Convert a memory size into a formatted size string, of the style "1.5 Mb".
 URHO3D_API String GetFileSizeString(unsigned long long memorySize);
+/// Parse type from a C string.
+template <class T> T FromString(const char* source);
+
+template <> inline const char* FromString<const char*>(const char* source) { return source; }
+template <> inline String FromString<String>(const char* source) { return source; }
+template <> inline bool FromString<bool>(const char* source) { return ToBool(source); }
+template <> inline float FromString<float>(const char* source) { return ToFloat(source); }
+template <> inline double FromString<double>(const char* source) { return ToDouble(source); }
+template <> inline int FromString<int>(const char* source) { return ToInt(source); }
+template <> inline unsigned FromString<unsigned>(const char* source) { return ToUInt(source); }
+template <> inline Color FromString<Color>(const char* source) { return ToColor(source); }
+template <> inline IntRect FromString<IntRect>(const char* source) { return ToIntRect(source); }
+template <> inline IntVector2 FromString<IntVector2>(const char* source) { return ToIntVector2(source); }
+template <> inline IntVector3 FromString<IntVector3>(const char* source) { return ToIntVector3(source); }
+template <> inline Quaternion FromString<Quaternion>(const char* source) { return ToQuaternion(source); }
+template <> inline Rect FromString<Rect>(const char* source) { return ToRect(source); }
+template <> inline Vector2 FromString<Vector2>(const char* source) { return ToVector2(source); }
+template <> inline Vector3 FromString<Vector3>(const char* source) { return ToVector3(source); }
+template <> inline Vector4 FromString<Vector4>(const char* source) { return ToVector4(source); }
+template <> inline Variant FromString<Variant>(const char* source) { return ToVectorVariant(source); }
+template <> inline Matrix3 FromString<Matrix3>(const char* source) { return ToMatrix3(source); }
+template <> inline Matrix3x4 FromString<Matrix3x4>(const char* source) { return ToMatrix3x4(source); }
+template <> inline Matrix4 FromString<Matrix4>(const char* source) { return ToMatrix4(source); }
+
+/// Parse type from a string.
+template <class T> T FromString(const String& source) { return FromString<T>(source.CString()); }
 
 }

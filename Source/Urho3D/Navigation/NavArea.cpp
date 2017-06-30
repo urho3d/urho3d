@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,6 +81,7 @@ void NavArea::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         Matrix3x4 mat;
         mat.SetTranslation(node_->GetWorldPosition());
         debug->AddBoundingBox(boundingBox_, mat, Color::GREEN, depthTest);
+        debug->AddBoundingBox(boundingBox_, mat, Color(0.0f, 1.0f, 0.0f, 0.15f), true, true);
     }
 }
 

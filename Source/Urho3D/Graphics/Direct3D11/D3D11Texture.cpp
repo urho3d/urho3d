@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,10 +42,12 @@ static const D3D11_FILTER d3dFilterMode[] =
     D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT,
     D3D11_FILTER_MIN_MAG_MIP_LINEAR,
     D3D11_FILTER_ANISOTROPIC,
+    D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR,
     D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT,
     D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT,
     D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
-    D3D11_FILTER_COMPARISON_ANISOTROPIC
+    D3D11_FILTER_COMPARISON_ANISOTROPIC,
+    D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR
 };
 
 static const D3D11_TEXTURE_ADDRESS_MODE d3dAddressMode[] =
@@ -133,12 +135,12 @@ void Texture::UpdateParameters()
     memset(&samplerDesc, 0, sizeof samplerDesc);
     unsigned filterModeIndex = filterMode_ != FILTER_DEFAULT ? filterMode_ : graphics_->GetDefaultTextureFilterMode();
     if (shadowCompare_)
-        filterModeIndex += 4;
+        filterModeIndex += 5;
     samplerDesc.Filter = d3dFilterMode[filterModeIndex];
     samplerDesc.AddressU = d3dAddressMode[addressMode_[0]];
     samplerDesc.AddressV = d3dAddressMode[addressMode_[1]];
     samplerDesc.AddressW = d3dAddressMode[addressMode_[2]];
-    samplerDesc.MaxAnisotropy = graphics_->GetTextureAnisotropy();
+    samplerDesc.MaxAnisotropy = anisotropy_ ? anisotropy_ : graphics_->GetDefaultTextureAnisotropy();
     samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
     samplerDesc.MinLOD = -M_INFINITY;
     samplerDesc.MaxLOD = M_INFINITY;
@@ -190,6 +192,15 @@ unsigned Texture::GetSRGBFormat(unsigned format)
         return DXGI_FORMAT_BC3_UNORM_SRGB;
     else
         return format;
+}
+
+void Texture::RegenerateLevels()
+{
+    if (!shaderResourceView_)
+        return;
+
+    graphics_->GetImpl()->GetDeviceContext()->GenerateMips((ID3D11ShaderResourceView*)shaderResourceView_);
+    levelsDirty_ = false;
 }
 
 }

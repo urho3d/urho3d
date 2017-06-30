@@ -6,3 +6,5 @@ Door Panel by isaacpapismado (https://share.allegorithmic.com/libraries/979)
 
 
 IBL texture gathered from HDRLab's sIBL Archive (http://www.hdrlabs.com/sibl/archive.html)
+
+Dieselpunk Moto by allexandr007 is licensed under CC Attribution https://skfb.ly/EOsI

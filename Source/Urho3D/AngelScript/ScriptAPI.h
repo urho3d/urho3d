@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,9 +55,15 @@ void RegisterNetworkAPI(asIScriptEngine* engine);
 /// Register the Database library to script.
 void RegisterDatabaseAPI(asIScriptEngine* engine);
 #endif
+#ifdef URHO3D_IK
+/// Register the inverse kinematics library to script
+void RegisterIKAPI(asIScriptEngine* engine);
+#endif
 #ifdef URHO3D_PHYSICS
 /// Register the Physics library to script.
 void RegisterPhysicsAPI(asIScriptEngine* engine);
+/// Register RaycastVehicle component to script.
+void RegisterRaycastVehicleAPI(asIScriptEngine* engine);
 #endif
 #ifdef URHO3D_NAVIGATION
 /// Register the Navigation library to script.

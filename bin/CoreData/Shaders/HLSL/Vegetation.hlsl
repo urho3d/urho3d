@@ -39,7 +39,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)
+    #if (defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)) && !defined(BILLBOARD) && !defined(DIRBILLBOARD)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -95,7 +95,7 @@ void VS(float4 iPos : POSITION,
 
     float4x3 modelMatrix = iModelMatrix;
     float3 worldPos = GetWorldPos(modelMatrix);
-    float height = worldPos.y - cModel._m31;
+    float height = worldPos.y - modelMatrix._m31;
 
     float windStrength = max(height - cWindHeightPivot, 0.0) * cWindHeightFactor;
     float windPeriod = cElapsedTime * cWindPeriod + dot(worldPos.xz, cWindWorldSpacing);
@@ -115,10 +115,10 @@ void VS(float4 iPos : POSITION,
     #endif
 
     #ifdef NORMALMAP
-        float3 tangent = GetWorldTangent(modelMatrix);
-        float3 bitangent = cross(tangent, oNormal) * iTangent.w;
+        float4 tangent = GetWorldTangent(modelMatrix);
+        float3 bitangent = cross(tangent.xyz, oNormal) * tangent.w;
         oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
-        oTangent = float4(tangent, bitangent.z);
+        oTangent = float4(tangent.xyz, bitangent.z);
     #else
         oTexCoord = GetTexCoord(iTexCoord);
     #endif
@@ -155,7 +155,7 @@ void VS(float4 iPos : POSITION,
             for (int i = 0; i < NUMVERTEXLIGHTS; ++i)
                 oVertexLight += GetVertexLight(i, worldPos, oNormal) * cVertexLights[i * 3].rgb;
         #endif
-        
+
         oScreenPos = GetScreenPos(oPos);
 
         #ifdef ENVCUBEMAP

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2016 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -553,7 +553,7 @@ asBYTE asCContext::GetReturnByte()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return *(asBYTE*)&m_regs.valueRegister;
 }
@@ -564,7 +564,7 @@ asWORD asCContext::GetReturnWord()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return *(asWORD*)&m_regs.valueRegister;
 }
@@ -575,7 +575,7 @@ asDWORD asCContext::GetReturnDWord()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return *(asDWORD*)&m_regs.valueRegister;
 }
@@ -586,7 +586,7 @@ asQWORD asCContext::GetReturnQWord()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return m_regs.valueRegister;
 }
@@ -597,7 +597,7 @@ float asCContext::GetReturnFloat()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return *(float*)&m_regs.valueRegister;
 }
@@ -608,7 +608,7 @@ double asCContext::GetReturnDouble()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( dt->IsObject() || dt->IsReference() ) return 0;
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() ) return 0;
 
 	return *(double*)&m_regs.valueRegister;
 }
@@ -621,7 +621,7 @@ void *asCContext::GetReturnAddress()
 
 	if( dt->IsReference() )
 		return *(void**)&m_regs.valueRegister;
-	else if( dt->IsObject() )
+	else if( dt->IsObject() || dt->IsFuncdef() )
 	{
 		if( m_initialFunction->DoesReturnOnStack() )
 		{
@@ -645,7 +645,7 @@ void *asCContext::GetReturnObject()
 
 	asCDataType *dt = &m_initialFunction->returnType;
 
-	if( !dt->IsObject() ) return 0;
+	if( !dt->IsObject() && !dt->IsFuncdef() ) return 0;
 
 	if( dt->IsReference() )
 		return *(void**)(asPWORD)m_regs.valueRegister;
@@ -672,7 +672,7 @@ void *asCContext::GetAddressOfReturnValue()
 	asCDataType *dt = &m_initialFunction->returnType;
 
 	// An object is stored in the objectRegister
-	if( !dt->IsReference() && dt->IsObject() )
+	if( !dt->IsReference() && (dt->IsObject() || dt->IsFuncdef()) )
 	{
 		// Need to dereference objects
 		if( !dt->IsObjectHandle() )
@@ -732,7 +732,7 @@ int asCContext::SetArgByte(asUINT arg, asBYTE value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -775,7 +775,7 @@ int asCContext::SetArgWord(asUINT arg, asWORD value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -818,7 +818,7 @@ int asCContext::SetArgDWord(asUINT arg, asDWORD value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -861,7 +861,7 @@ int asCContext::SetArgQWord(asUINT arg, asQWORD value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -904,7 +904,7 @@ int asCContext::SetArgFloat(asUINT arg, float value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -947,7 +947,7 @@ int asCContext::SetArgDouble(asUINT arg, double value)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( dt->IsObject() || dt->IsReference() )
+	if( dt->IsObject() || dt->IsFuncdef() || dt->IsReference() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -1027,7 +1027,7 @@ int asCContext::SetArgObject(asUINT arg, void *obj)
 
 	// Verify the type of the argument
 	asCDataType *dt = &m_initialFunction->parameterTypes[arg];
-	if( !dt->IsObject() )
+	if( !dt->IsObject() && !dt->IsFuncdef() )
 	{
 		m_status = asEXECUTION_ERROR;
 		return asINVALID_TYPE;
@@ -1039,13 +1039,18 @@ int asCContext::SetArgObject(asUINT arg, void *obj)
 		if( dt->IsObjectHandle() )
 		{
 			// Increase the reference counter
-			asSTypeBehaviour *beh = &dt->GetObjectType()->beh;
-			if( obj && beh->addref )
-				m_engine->CallObjectMethod(obj, beh->addref);
+			if (obj && dt->IsFuncdef())
+				((asIScriptFunction*)obj)->AddRef();
+			else
+			{
+				asSTypeBehaviour *beh = &CastToObjectType(dt->GetTypeInfo())->beh;
+				if (obj && beh->addref)
+					m_engine->CallObjectMethod(obj, beh->addref);
+			}
 		}
 		else
 		{
-			obj = m_engine->CreateScriptObjectCopy(obj, dt->GetObjectType());
+			obj = m_engine->CreateScriptObjectCopy(obj, dt->GetTypeInfo());
 		}
 	}
 
@@ -1326,7 +1331,7 @@ int asCContext::Execute()
 
 	if( m_status == asEXECUTION_FINISHED )
 	{
-		m_regs.objectType = m_initialFunction->returnType.GetObjectType();
+		m_regs.objectType = m_initialFunction->returnType.GetTypeInfo();
 		return asEXECUTION_FINISHED;
 	}
 
@@ -1427,7 +1432,7 @@ int asCContext::PopState()
 	m_regs.valueRegister   = asQWORD(asDWORD(tmp[5]));
 	m_regs.valueRegister  |= asQWORD(tmp[6])<<32;
 	m_regs.objectRegister  = (void*)tmp[7];
-	m_regs.objectType      = (asIObjectType*)tmp[8];
+	m_regs.objectType      = (asITypeInfo*)tmp[8];
 
 	// Calculate the returnValueSize
 	if( m_initialFunction->DoesReturnOnStack() )
@@ -2804,7 +2809,7 @@ void asCContext::ExecuteNext()
 		{
 			// Read variable index from location on stack
 			asPWORD *a = (asPWORD*)(l_sp + asBC_WORDARG0(l_bc));
-			asDWORD offset = *(asDWORD*)a;
+			asPWORD offset = *a;
 			// Move pointer from variable to the same location on the stack
 			asPWORD *v = (asPWORD*)(l_fp - offset);
 			*a = *v;
@@ -4340,17 +4345,24 @@ void asCContext::ExecuteNext()
 
 			// Pop the thispointer from the stack
 			void *obj = *(void**)l_sp;
-			l_sp += AS_PTR_SIZE;
+			if (obj == 0)
+				SetInternalException(TXT_NULL_POINTER_ACCESS);
+			else
+			{
+				// Only update the stack pointer if all is OK so the 
+				// exception handler can properly clean up the stack
+				l_sp += AS_PTR_SIZE;
 
-			// Pop the int arg from the stack
-			int arg = *(int*)l_sp;
-			l_sp++;
+				// Pop the int arg from the stack
+				int arg = *(int*)l_sp;
+				l_sp++;
 
-			// Call the method
-			m_callingSystemFunction = m_engine->scriptFunctions[i];
-			void *ptr = m_engine->CallObjectMethodRetPtr(obj, arg, m_callingSystemFunction);
-			m_callingSystemFunction = 0;
-			*(asPWORD*)&m_regs.valueRegister = (asPWORD)ptr;
+				// Call the method
+				m_callingSystemFunction = m_engine->scriptFunctions[i];
+				void *ptr = m_engine->CallObjectMethodRetPtr(obj, arg, m_callingSystemFunction);
+				m_callingSystemFunction = 0;
+				*(asPWORD*)&m_regs.valueRegister = (asPWORD)ptr;
+			}
 
 			// Update the program position after the call so that line number is correct
 			l_bc += 2;
@@ -4511,8 +4523,8 @@ void asCContext::CleanReturnObject()
 	if( m_initialFunction && m_initialFunction->DoesReturnOnStack() && m_status == asEXECUTION_FINISHED )
 	{
 		// If function returns on stack we need to call the destructor on the returned object
-		if( m_initialFunction->returnType.GetObjectType()->beh.destruct )
-			m_engine->CallObjectMethod(GetReturnObject(), m_initialFunction->returnType.GetObjectType()->beh.destruct);
+		if(CastToObjectType(m_initialFunction->returnType.GetTypeInfo())->beh.destruct )
+			m_engine->CallObjectMethod(GetReturnObject(), CastToObjectType(m_initialFunction->returnType.GetTypeInfo())->beh.destruct);
 
 		return;
 	}
@@ -4523,25 +4535,34 @@ void asCContext::CleanReturnObject()
 
 	if( m_regs.objectType )
 	{
-		// Call the destructor on the object
-		asSTypeBehaviour *beh = &((asCObjectType*)m_regs.objectType)->beh;
-		if( m_regs.objectType->GetFlags() & asOBJ_REF )
+		if (m_regs.objectType->GetFlags() & asOBJ_FUNCDEF)
 		{
-			asASSERT( beh->release || (m_regs.objectType->GetFlags() & asOBJ_NOCOUNT) );
-
-			if( beh->release )
-				m_engine->CallObjectMethod(m_regs.objectRegister, beh->release);
-
+			// Release the function pointer
+			reinterpret_cast<asIScriptFunction*>(m_regs.objectRegister)->Release();
 			m_regs.objectRegister = 0;
 		}
 		else
 		{
-			if( beh->destruct )
-				m_engine->CallObjectMethod(m_regs.objectRegister, beh->destruct);
+			// Call the destructor on the object
+			asSTypeBehaviour *beh = &(CastToObjectType(reinterpret_cast<asCTypeInfo*>(m_regs.objectType))->beh);
+			if (m_regs.objectType->GetFlags() & asOBJ_REF)
+			{
+				asASSERT(beh->release || (m_regs.objectType->GetFlags() & asOBJ_NOCOUNT));
 
-			// Free the memory
-			m_engine->CallFree(m_regs.objectRegister);
-			m_regs.objectRegister = 0;
+				if (beh->release)
+					m_engine->CallObjectMethod(m_regs.objectRegister, beh->release);
+
+				m_regs.objectRegister = 0;
+			}
+			else
+			{
+				if (beh->destruct)
+					m_engine->CallObjectMethod(m_regs.objectRegister, beh->destruct);
+
+				// Free the memory
+				m_engine->CallFree(m_regs.objectRegister);
+				m_regs.objectRegister = 0;
+			}
 		}
 	}
 }
@@ -4780,7 +4801,7 @@ void asCContext::CleanArgsOnStack()
 		for( v = 0; v < m_currentFunction->scriptData->objVariablePos.GetLength(); v++ )
 			if( m_currentFunction->scriptData->objVariablePos[v] == var )
 			{
-				func = m_currentFunction->scriptData->funcVariableTypes[v];
+				func = CastToFuncdefType(m_currentFunction->scriptData->objVariableTypes[v])->funcdef;
 				break;
 			}
 
@@ -4796,7 +4817,8 @@ void asCContext::CleanArgsOnStack()
 			{
 				if( var == paramPos )
 				{
-					func = m_currentFunction->parameterTypes[v].GetFuncDef();
+					if (m_currentFunction->parameterTypes[v].IsFuncdef())
+						func = CastToFuncdefType(m_currentFunction->parameterTypes[v].GetTypeInfo())->funcdef;
 					break;
 				}
 				paramPos -= m_currentFunction->parameterTypes[v].GetSizeOnStackDWords();
@@ -4816,19 +4838,23 @@ void asCContext::CleanArgsOnStack()
 		offset += AS_PTR_SIZE;
 	for( asUINT n = 0; n < func->parameterTypes.GetLength(); n++ )
 	{
-		if( func->parameterTypes[n].IsObject() && !func->parameterTypes[n].IsReference() )
+		if( (func->parameterTypes[n].IsObject() || func->parameterTypes[n].IsFuncdef()) && !func->parameterTypes[n].IsReference() )
 		{
+			// TODO: cleanup: This logic is repeated twice in CleanStackFrame too. Should create a common function to share the code
 			if( *(asPWORD*)&m_regs.stackPointer[offset] )
 			{
 				// Call the object's destructor
 				asSTypeBehaviour *beh = func->parameterTypes[n].GetBehaviour();
-				if( func->parameterTypes[n].GetObjectType()->flags & asOBJ_REF )
+				if (func->parameterTypes[n].GetTypeInfo()->flags & asOBJ_FUNCDEF)
 				{
-					asASSERT( (func->parameterTypes[n].GetObjectType()->flags & asOBJ_NOCOUNT) || beh->release );
+					(*(asCScriptFunction**)&m_regs.stackPointer[offset])->Release();
+				}
+				else if( func->parameterTypes[n].GetTypeInfo()->flags & asOBJ_REF )
+				{
+					asASSERT( (func->parameterTypes[n].GetTypeInfo()->flags & asOBJ_NOCOUNT) || beh->release );
 
 					if( beh->release )
 						m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackPointer[offset], beh->release);
-					*(asPWORD*)&m_regs.stackPointer[offset] = 0;
 				}
 				else
 				{
@@ -4837,8 +4863,8 @@ void asCContext::CleanArgsOnStack()
 
 					// Free the memory
 					m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackPointer[offset]);
-					*(asPWORD*)&m_regs.stackPointer[offset] = 0;
 				}
+				*(asPWORD*)&m_regs.stackPointer[offset] = 0;
 			}
 		}
 
@@ -4876,25 +4902,29 @@ void asCContext::CleanStackFrame()
 				if( *(asPWORD*)&m_regs.stackFramePointer[-pos] )
 				{
 					// Call the object's destructor
-					asSTypeBehaviour *beh = &m_currentFunction->scriptData->objVariableTypes[n]->beh;
-					if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_REF )
+					if (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_FUNCDEF)
 					{
+						(*(asCScriptFunction**)&m_regs.stackFramePointer[-pos])->Release();
+					}
+					else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_REF )
+					{
+						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 						asASSERT( (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_NOCOUNT) || beh->release );
 						if( beh->release )
 							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->release);
-						*(asPWORD*)&m_regs.stackFramePointer[-pos] = 0;
 					}
 					else
 					{
+						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 						if( beh->destruct )
 							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
 						else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_LIST_PATTERN )
-							m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], m_currentFunction->scriptData->objVariableTypes[n]);
+							m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n]));
 
 						// Free the memory
 						m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos]);
-						*(asPWORD*)&m_regs.stackFramePointer[-pos] = 0;
 					}
+					*(asPWORD*)&m_regs.stackFramePointer[-pos] = 0;
 				}
 			}
 			else
@@ -4904,7 +4934,7 @@ void asCContext::CleanStackFrame()
 				// Only destroy the object if it is truly alive
 				if( liveObjects[n] > 0 )
 				{
-					asSTypeBehaviour *beh = &m_currentFunction->scriptData->objVariableTypes[n]->beh;
+					asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 					if( beh->destruct )
 						m_engine->CallObjectMethod((void*)(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
 				}
@@ -4926,19 +4956,22 @@ void asCContext::CleanStackFrame()
 		offset += AS_PTR_SIZE;
 	for( asUINT n = 0; n < m_currentFunction->parameterTypes.GetLength(); n++ )
 	{
-		if( m_currentFunction->parameterTypes[n].IsObject() && !m_currentFunction->parameterTypes[n].IsReference() )
+		if( (m_currentFunction->parameterTypes[n].IsObject() ||m_currentFunction->parameterTypes[n].IsFuncdef()) && !m_currentFunction->parameterTypes[n].IsReference() )
 		{
 			if( *(asPWORD*)&m_regs.stackFramePointer[offset] )
 			{
 				// Call the object's destructor
 				asSTypeBehaviour *beh = m_currentFunction->parameterTypes[n].GetBehaviour();
-				if( m_currentFunction->parameterTypes[n].GetObjectType()->flags & asOBJ_REF )
+				if (m_currentFunction->parameterTypes[n].GetTypeInfo()->flags & asOBJ_FUNCDEF)
 				{
-					asASSERT( (m_currentFunction->parameterTypes[n].GetObjectType()->flags & asOBJ_NOCOUNT) || beh->release );
+					(*(asCScriptFunction**)&m_regs.stackFramePointer[offset])->Release();
+				}
+				else if( m_currentFunction->parameterTypes[n].GetTypeInfo()->flags & asOBJ_REF )
+				{
+					asASSERT( (m_currentFunction->parameterTypes[n].GetTypeInfo()->flags & asOBJ_NOCOUNT) || beh->release );
 
 					if( beh->release )
 						m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[offset], beh->release);
-					*(asPWORD*)&m_regs.stackFramePointer[offset] = 0;
 				}
 				else
 				{
@@ -4947,8 +4980,8 @@ void asCContext::CleanStackFrame()
 
 					// Free the memory
 					m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackFramePointer[offset]);
-					*(asPWORD*)&m_regs.stackFramePointer[offset] = 0;
 				}
+				*(asPWORD*)&m_regs.stackFramePointer[offset] = 0;
 			}
 		}
 
@@ -5123,12 +5156,27 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 	asCGeneric gen(m_engine, descr, currentObject, args);
 
 	m_callingSystemFunction = descr;
+#ifdef AS_NO_EXCEPTIONS
 	func(&gen);
+#else
+	// This try/catch block is to catch potential exception that may 
+	// be thrown by the registered function. 
+	try
+	{
+		func(&gen);
+	}
+	catch (...)
+	{
+		// Convert the exception to a script exception so the VM can 
+		// properly report the error to the application and then clean up
+		SetException(TXT_EXCEPTION_CAUGHT);
+	}
+#endif
 	m_callingSystemFunction = 0;
 
 	m_regs.valueRegister = gen.returnVal;
 	m_regs.objectRegister = gen.objectRegister;
-	m_regs.objectType = descr->returnType.GetObjectType();
+	m_regs.objectType = descr->returnType.GetTypeInfo();
 
 	// Urho3D: add autohandle support
 	// based on http://www.gamedev.net/topic/630414-autohandles-with-generic-callconv/
@@ -5137,7 +5185,7 @@ int asCContext::CallGeneric(asCScriptFunction *descr)
 			&& descr->returnType.IsObjectHandle()
 			&& sysFunc->returnAutoHandle
 			&& m_regs.objectRegister )
-		m_engine->CallObjectMethod( m_regs.objectRegister, descr->returnType.GetObjectType()->beh.addref );
+			m_engine->AddRefScriptObject(m_regs.objectRegister, descr->returnType.GetTypeInfo());
 
 	// Clean up arguments
 	const asUINT cleanCount = sysFunc->cleanArgs.GetLength();
@@ -5254,7 +5302,7 @@ void *asCContext::GetAddressOfVar(asUINT varIndex, asUINT stackLevel)
 			!func->scriptData->variables[varIndex]->type.IsObjectHandle() )
 		{
 			onHeap = true;
-			if( func->scriptData->variables[varIndex]->type.GetObjectType()->GetFlags() & asOBJ_VALUE )
+			if( func->scriptData->variables[varIndex]->type.GetTypeInfo()->GetFlags() & asOBJ_VALUE )
 			{
 				for( asUINT n = 0; n < func->scriptData->objVariablePos.GetLength(); n++ )
 				{
@@ -5322,7 +5370,7 @@ int asCContext::GetThisTypeId(asUINT stackLevel)
 		return 0; // not in a method
 
 	// create a datatype
-	asCDataType dt = asCDataType::CreateObject((asCObjectType*)func->GetObjectType(), false);
+	asCDataType dt = asCDataType::CreateType((asCObjectType*)func->GetObjectType(), false);
 
 	// return a typeId from the data type
 	return m_engine->GetTypeIdFromDataType(dt);

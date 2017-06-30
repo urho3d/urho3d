@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -128,7 +128,7 @@ bool JSONFile::BeginLoad(Deserializer& source)
     buffer[dataSize] = '\0';
 
     rapidjson::Document document;
-    if (document.Parse<0>(buffer).HasParseError())
+    if (document.Parse<kParseCommentsFlag | kParseTrailingCommasFlag>(buffer).HasParseError())
     {
         URHO3D_LOGERROR("Could not parse JSON data from " + source.GetName());
         return false;
@@ -186,8 +186,8 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             for (unsigned i = 0; i < jsonArray.Size(); ++i)
             {
                 rapidjson::Value value;
+                ToRapidjsonValue(value, jsonArray[i], allocator);
                 rapidjsonValue.PushBack(value, allocator);
-                ToRapidjsonValue(rapidjsonValue[i], jsonArray[i], allocator);
             }
         }
         break;
@@ -201,8 +201,8 @@ static void ToRapidjsonValue(rapidjson::Value& rapidjsonValue, const JSONValue& 
             {
                 const char* name = i->first_.CString();
                 rapidjson::Value value;
-                rapidjsonValue.AddMember(name, value, allocator);
-                ToRapidjsonValue(rapidjsonValue[name], i->second_, allocator);
+                ToRapidjsonValue(value, i->second_, allocator);
+                rapidjsonValue.AddMember(StringRef(name), value, allocator);
             }
         }
         break;
@@ -223,7 +223,7 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     ToRapidjsonValue(document, root_, document.GetAllocator());
 
     StringBuffer buffer;
-    PrettyWriter<StringBuffer> writer(buffer, &(document.GetAllocator()));
+    PrettyWriter<StringBuffer> writer(buffer);
     writer.SetIndent(!indendation.Empty() ? indendation.Front() : '\0', indendation.Length());
 
     document.Accept(writer);

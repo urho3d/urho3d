@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,6 +57,16 @@ OggVorbisSoundStream::~OggVorbisSoundStream()
         stb_vorbis_close(vorbis);
         decoder_ = 0;
     }
+}
+
+bool OggVorbisSoundStream::Seek(unsigned sample_number)
+{
+    if (!decoder_)
+        return false;
+    
+    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+    
+    return stb_vorbis_seek(vorbis, sample_number) == 1;
 }
 
 unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)

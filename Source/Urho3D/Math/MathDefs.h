@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,10 @@ inline bool Equals(T lhs, T rhs) { return lhs + std::numeric_limits<T>::epsilon(
 template <class T, class U>
 inline T Lerp(T lhs, T rhs, U t) { return lhs * (1.0 - t) + rhs * t; }
 
+/// Inverse linear interpolation between two values.
+template <class T>
+inline T InverseLerp(T lhs, T rhs, T x) { return (x - lhs) / (rhs - lhs); }
+
 /// Return the smaller of two values.
 template <class T, class U>
 inline T Min(T lhs, U rhs) { return lhs < rhs ? lhs : rhs; }
@@ -87,6 +91,13 @@ inline T Abs(T value) { return value >= 0.0 ? value : -value; }
 template <class T>
 inline T Sign(T value) { return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0); }
 
+/// Return a representation of the specified floating-point value as a single format bit layout.
+inline unsigned FloatToRawIntBits(float value)
+{
+    unsigned u = *((unsigned*)&value);
+    return u;
+}
+
 /// Check whether a floating point value is NaN.
 /// Use a workaround for GCC, see https://github.com/urho3d/Urho3D/issues/655
 #ifndef __GNUC__
@@ -95,7 +106,7 @@ inline bool IsNaN(float value) { return value != value; }
 
 inline bool IsNaN(float value)
 {
-    unsigned u = *(unsigned*)(&value);
+    unsigned u = FloatToRawIntBits(value);
     return (u & 0x7fffffff) > 0x7f800000;
 }
 
@@ -121,47 +132,59 @@ inline T SmoothStep(T lhs, T rhs, T t)
     return t * t * (3.0 - 2.0 * t);
 }
 
-/// Return sine of an angle in degrees. Uses sinf() for floats, sin() for
-/// everything else
-template <class T>
-inline T Sin(T angle) { return sin(angle * M_DEGTORAD); }
-template <> inline float Sin<float>(float angle) { return sinf(angle * M_DEGTORAD); }
+/// Return sine of an angle in degrees.
+template <class T> inline T Sin(T angle) { return sin(angle * M_DEGTORAD); }
 
-/// Return cosine of an angle in degrees. Uses cosf() for floats, cos() for
-/// everything else
-template <class T>
-inline T Cos(T angle) { return cos(angle * M_DEGTORAD); }
-template <> inline float Cos<float>(float angle) { return cosf(angle * M_DEGTORAD); }
+/// Return cosine of an angle in degrees.
+template <class T> inline T Cos(T angle) { return cos(angle * M_DEGTORAD); }
 
-/// Return tangent of an angle in degrees. Uses tanf() for floats, tan() for
-/// everything else
-template <class T>
-inline T Tan(T angle) { return tan(angle * M_DEGTORAD); }
-template <> inline float Tan<float>(float angle) { return tanf(angle * M_DEGTORAD); }
+/// Return tangent of an angle in degrees.
+template <class T> inline T Tan(T angle) { return tan(angle * M_DEGTORAD); }
 
-/// Return arc sine in degrees. Uses asinf() for floats, asin() for everything
-/// else
-template <class T>
-inline T Asin(T x) { return M_RADTODEG * asin(Clamp(x, -1.0, 1.0)); }
-template <> inline float Asin<float>(float x) { return M_RADTODEG * asinf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc sine in degrees.
+template <class T> inline T Asin(T x) { return M_RADTODEG * asin(Clamp(x, T(-1.0), T(1.0))); }
 
-/// Return arc cosine in degrees. Uses acosf() for floats, acos() for
-/// everything else
-template <class T>
-inline T Acos(T x) { return M_RADTODEG * acos(Clamp(x, -1.0, 1.0)); }
-template <> inline float Acos<float>(float x) { return M_RADTODEG * acosf(Clamp(x, -1.0f, 1.0f)); }
+/// Return arc cosine in degrees.
+template <class T> inline T Acos(T x) { return M_RADTODEG * acos(Clamp(x, T(-1.0), T(1.0))); }
 
-/// Return arc tangent in degrees. Uses atanf() for floats, atan() for
-/// everything else
-template <class T>
-inline T Atan(T x) { return M_RADTODEG * atan(x); }
-template <> inline float Atan<float>(float x) { return M_RADTODEG * atanf(x); }
+/// Return arc tangent in degrees.
+template <class T> inline T Atan(T x) { return M_RADTODEG * atan(x); }
 
-/// Return arc tangent of y/x in degrees. Uses atan2f() for floats, atan2()
-/// for everything else
-template <class T>
-inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
-template <> inline float Atan2<float>(float y, float x) { return M_RADTODEG * atan2f(y, x); }
+/// Return arc tangent of y/x in degrees.
+template <class T> inline T Atan2(T y, T x) { return M_RADTODEG * atan2(y, x); }
+
+/// Return X in power Y.
+template <class T> T Pow(T x, T y) { return pow(x, y); }
+
+/// Return natural logarithm of X.
+template <class T> T Ln(T x) { return log(x); }
+
+/// Return square root of X.
+template <class T> T Sqrt(T x) { return sqrt(x); }
+
+/// Return floating-point remainder of X/Y.
+template <class T> T Mod(T x, T y) { return fmod(x, y); }
+
+/// Return fractional part of passed value in range [0, 1).
+template <class T> T Fract(T value) { return value - floor(value); }
+
+/// Round value down.
+template <class T> T Floor(T x) { return floor(x); }
+
+/// Round value down. Returns integer value.
+template <class T> int FloorToInt(T x) { return static_cast<int>(floor(x)); }
+
+/// Round value to nearest integer.
+template <class T> T Round(T x) { return floor(x + T(0.5)); }
+
+/// Round value to nearest integer.
+template <class T> int RoundToInt(T x) { return static_cast<int>(floor(x + T(0.5))); }
+
+/// Round value up.
+template <class T> T Ceil(T x) { return ceil(x); }
+
+/// Round value up.
+template <class T> int CeilToInt(T x) { return static_cast<int>(ceil(x)); }
 
 /// Check whether an unsigned integer is a power of two.
 inline bool IsPowerOfTwo(unsigned value)
@@ -216,7 +239,7 @@ inline float RandomNormal(float meanValue, float variance) { return RandStandard
 /// Convert float to half float. From https://gist.github.com/martinkallman/5049614
 inline unsigned short FloatToHalf(float value)
 {
-    unsigned inu = *((unsigned*)&value);
+    unsigned inu = FloatToRawIntBits(value);
     unsigned t1 = inu & 0x7fffffff;         // Non-sign bits
     unsigned t2 = inu & 0x80000000;         // Sign bit
     unsigned t3 = inu & 0x7f800000;         // Exponent

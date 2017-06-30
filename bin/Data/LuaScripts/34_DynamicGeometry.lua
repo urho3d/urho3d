@@ -200,6 +200,19 @@ function CreateScene()
     fromScratchModel:SetGeometry(0, 0, geom)
     fromScratchModel.boundingBox = BoundingBox(Vector3(-0.5, -0.5, -0.5), Vector3(0.5, 0.5, 0.5))
 
+    -- Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
+    local vertexBuffers = {}
+    local indexBuffers = {}
+    table.insert(vertexBuffers, vb)
+    table.insert(indexBuffers, ib)
+    -- Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
+    local morphRangeStarts = {}
+    local morphRangeCounts = {}
+    table.insert(morphRangeStarts, 0)
+    table.insert(morphRangeCounts, 0)
+    fromScratchModel:SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts)
+    fromScratchModel:SetIndexBuffers(indexBuffers)
+
     local node = scene_:CreateChild("FromScratchObject")
     node.position = Vector3(0.0, 3.0, 0.0)
     local object = node:CreateComponent("StaticModel")

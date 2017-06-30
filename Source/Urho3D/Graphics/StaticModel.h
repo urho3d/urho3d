@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,11 +63,11 @@ public:
     virtual bool DrawOcclusion(OcclusionBuffer* buffer);
 
     /// Set model.
-    void SetModel(Model* model);
+    virtual void SetModel(Model* model);
     /// Set material on all geometries.
-    void SetMaterial(Material* material);
+    virtual void SetMaterial(Material* material);
     /// Set material on one geometry. Return true if successful.
-    bool SetMaterial(unsigned index, Material* material);
+    virtual bool SetMaterial(unsigned index, Material* material);
     /// Set occlusion LOD level. By default (M_MAX_UNSIGNED) same as visible.
     void SetOcclusionLodLevel(unsigned level);
     /// Apply default materials from a material list file. If filename is empty (default), the model's resource name with extension .txt will be used.
@@ -80,7 +80,7 @@ public:
     unsigned GetNumGeometries() const { return geometries_.Size(); }
 
     /// Return material by geometry index.
-    Material* GetMaterial(unsigned index = 0) const;
+    virtual Material* GetMaterial(unsigned index = 0) const;
 
     /// Return occlusion LOD level.
     unsigned GetOcclusionLodLevel() const { return occlusionLodLevel_; }

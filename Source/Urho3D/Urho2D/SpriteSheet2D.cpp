@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -155,7 +155,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
     if (!texture_)
     {
         URHO3D_LOGERROR("Could not load texture " + loadTextureName_);
-        loadXMLFile_.Reset();
+        loadPListFile_.Reset();
         loadTextureName_.Clear();
         return false;
     }
@@ -191,7 +191,7 @@ bool SpriteSheet2D::EndLoadFromPListFile()
         DefineSprite(name, rectangle, hotSpot, offset);
     }
 
-    loadXMLFile_.Reset();
+    loadPListFile_.Reset();
     loadTextureName_.Clear();
     return true;
 }
@@ -329,7 +329,7 @@ bool SpriteSheet2D::EndLoadFromJSONFile()
         JSONValue frameWidthVal = subTextureVal.Get("frameWidth");
         JSONValue frameHeightVal = subTextureVal.Get("frameHeight");
 
-        if (!frameHeightVal.IsNull() && !frameHeightVal.IsNull())
+        if (!frameWidthVal.IsNull() && !frameHeightVal.IsNull())
         {
             offset.x_ = subTextureVal.Get("frameX").GetInt();
             offset.y_ = subTextureVal.Get("frameY").GetInt();

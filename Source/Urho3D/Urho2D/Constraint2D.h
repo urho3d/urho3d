@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,11 +45,15 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Handle attribute write access.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
+    virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
-    /// Create Joint.
+    /// Create joint.
     void CreateJoint();
-    /// Release Joint.
+    /// Release joint.
     void ReleaseJoint();
 
     /// Set other rigid body.
@@ -94,8 +98,12 @@ protected:
     WeakPtr<RigidBody2D> ownerBody_;
     /// Other body.
     WeakPtr<RigidBody2D> otherBody_;
-    /// Collide connected.
+    /// Other body node ID for serialization.
+    unsigned otherBodyNodeID_;
+    /// Collide connected flag.
     bool collideConnected_;
+    /// Other body node ID dirty flag.
+    bool otherBodyNodeIDDirty_;
     /// Attached constraint.
     WeakPtr<Constraint2D> attachedConstraint_;
 };

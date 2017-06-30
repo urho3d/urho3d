@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,8 @@ static const unsigned MAX_LINES = 1000000;
 static const unsigned MAX_TRIANGLES = 100000;
 
 DebugRenderer::DebugRenderer(Context* context) :
-    Component(context)
+    Component(context),
+    lineAntiAlias_(false)
 {
     vertexBuffer_ = new VertexBuffer(context_);
 
@@ -62,6 +63,16 @@ DebugRenderer::~DebugRenderer()
 void DebugRenderer::RegisterObject(Context* context)
 {
     context->RegisterFactory<DebugRenderer>(SUBSYSTEM_CATEGORY);
+    URHO3D_ACCESSOR_ATTRIBUTE("Line Antialias", GetLineAntiAlias, SetLineAntiAlias, bool, false, AM_DEFAULT);
+}
+
+void DebugRenderer::SetLineAntiAlias(bool enable)
+{
+    if (enable != lineAntiAlias_)
+    {
+        lineAntiAlias_ = enable;
+        MarkNetworkUpdate();
+    }
 }
 
 void DebugRenderer::SetView(Camera* camera)
@@ -71,6 +82,7 @@ void DebugRenderer::SetView(Camera* camera)
 
     view_ = camera->GetView();
     projection_ = camera->GetProjection();
+    gpuProjection_ = camera->GetGPUProjection();
     frustum_ = camera->GetFrustum();
 }
 
@@ -106,6 +118,18 @@ void DebugRenderer::AddTriangle(const Vector3& v1, const Vector3& v2, const Vect
         noDepthTriangles_.Push(DebugTriangle(v1, v2, v3, color));
 }
 
+void DebugRenderer::AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, const Color& color, bool depthTest)
+{
+    AddTriangle(v1, v2, v3, color, depthTest);
+    AddTriangle(v3, v4, v1, color, depthTest);
+}
+
+void DebugRenderer::AddPolygon(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4, unsigned color, bool depthTest)
+{
+    AddTriangle(v1, v2, v3, color, depthTest);
+    AddTriangle(v3, v4, v1, color, depthTest);
+}
+
 void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
 {
     if (!node)
@@ -119,7 +143,7 @@ void DebugRenderer::AddNode(Node* node, float scale, bool depthTest)
     AddLine(start, start + rotation * (scale * Vector3::FORWARD), Color::BLUE.ToUInt(), depthTest);
 }
 
-void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest)
+void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, bool depthTest, bool solid)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
@@ -133,21 +157,33 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Color& color, b
 
     unsigned uintColor = color.ToUInt();
 
-    AddLine(min, v1, uintColor, depthTest);
-    AddLine(v1, v2, uintColor, depthTest);
-    AddLine(v2, v3, uintColor, depthTest);
-    AddLine(v3, min, uintColor, depthTest);
-    AddLine(v4, v5, uintColor, depthTest);
-    AddLine(v5, max, uintColor, depthTest);
-    AddLine(max, v6, uintColor, depthTest);
-    AddLine(v6, v4, uintColor, depthTest);
-    AddLine(min, v4, uintColor, depthTest);
-    AddLine(v1, v5, uintColor, depthTest);
-    AddLine(v2, max, uintColor, depthTest);
-    AddLine(v3, v6, uintColor, depthTest);
+    if (!solid)
+    {
+        AddLine(min, v1, uintColor, depthTest);
+        AddLine(v1, v2, uintColor, depthTest);
+        AddLine(v2, v3, uintColor, depthTest);
+        AddLine(v3, min, uintColor, depthTest);
+        AddLine(v4, v5, uintColor, depthTest);
+        AddLine(v5, max, uintColor, depthTest);
+        AddLine(max, v6, uintColor, depthTest);
+        AddLine(v6, v4, uintColor, depthTest);
+        AddLine(min, v4, uintColor, depthTest);
+        AddLine(v1, v5, uintColor, depthTest);
+        AddLine(v2, max, uintColor, depthTest);
+        AddLine(v3, v6, uintColor, depthTest);
+    }
+    else
+    {
+        AddPolygon(min, v1, v2, v3, uintColor, depthTest);
+        AddPolygon(v4, v5, max, v6, uintColor, depthTest);
+        AddPolygon(min, v4, v6, v3, uintColor, depthTest);
+        AddPolygon(v1, v5, max, v2, uintColor, depthTest);
+        AddPolygon(v3, v2, max, v6, uintColor, depthTest);
+        AddPolygon(min, v1, v5, v4, uintColor, depthTest);
+    }
 }
 
-void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest)
+void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& transform, const Color& color, bool depthTest, bool solid)
 {
     const Vector3& min = box.min_;
     const Vector3& max = box.max_;
@@ -163,18 +199,30 @@ void DebugRenderer::AddBoundingBox(const BoundingBox& box, const Matrix3x4& tran
 
     unsigned uintColor = color.ToUInt();
 
-    AddLine(v0, v1, uintColor, depthTest);
-    AddLine(v1, v2, uintColor, depthTest);
-    AddLine(v2, v3, uintColor, depthTest);
-    AddLine(v3, v0, uintColor, depthTest);
-    AddLine(v4, v5, uintColor, depthTest);
-    AddLine(v5, v7, uintColor, depthTest);
-    AddLine(v7, v6, uintColor, depthTest);
-    AddLine(v6, v4, uintColor, depthTest);
-    AddLine(v0, v4, uintColor, depthTest);
-    AddLine(v1, v5, uintColor, depthTest);
-    AddLine(v2, v7, uintColor, depthTest);
-    AddLine(v3, v6, uintColor, depthTest);
+    if (!solid)
+    {
+        AddLine(v0, v1, uintColor, depthTest);
+        AddLine(v1, v2, uintColor, depthTest);
+        AddLine(v2, v3, uintColor, depthTest);
+        AddLine(v3, v0, uintColor, depthTest);
+        AddLine(v4, v5, uintColor, depthTest);
+        AddLine(v5, v7, uintColor, depthTest);
+        AddLine(v7, v6, uintColor, depthTest);
+        AddLine(v6, v4, uintColor, depthTest);
+        AddLine(v0, v4, uintColor, depthTest);
+        AddLine(v1, v5, uintColor, depthTest);
+        AddLine(v2, v7, uintColor, depthTest);
+        AddLine(v3, v6, uintColor, depthTest);
+    }
+    else
+    {
+        AddPolygon(v0, v1, v2, v3, uintColor, depthTest);
+        AddPolygon(v4, v5, v7, v6, uintColor, depthTest);
+        AddPolygon(v0, v4, v6, v3, uintColor, depthTest);
+        AddPolygon(v1, v5, v7, v2, uintColor, depthTest);
+        AddPolygon(v3, v2, v7, v6, uintColor, depthTest);
+        AddPolygon(v0, v1, v5, v4, uintColor, depthTest);
+    }
 }
 
 
@@ -490,17 +538,18 @@ void DebugRenderer::Render()
 
     vertexBuffer_->Unlock();
 
-    graphics->SetBlendMode(BLEND_REPLACE);
+    graphics->SetBlendMode(lineAntiAlias_ ? BLEND_ALPHA : BLEND_REPLACE);
     graphics->SetColorWrite(true);
     graphics->SetCullMode(CULL_NONE);
     graphics->SetDepthWrite(true);
+    graphics->SetLineAntiAlias(lineAntiAlias_);
     graphics->SetScissorTest(false);
     graphics->SetStencilTest(false);
     graphics->SetShaders(vs, ps);
     graphics->SetShaderParameter(VSP_MODEL, Matrix3x4::IDENTITY);
     graphics->SetShaderParameter(VSP_VIEW, view_);
     graphics->SetShaderParameter(VSP_VIEWINV, view_.Inverse());
-    graphics->SetShaderParameter(VSP_VIEWPROJ, projection_ * view_);
+    graphics->SetShaderParameter(VSP_VIEWPROJ, gpuProjection_ * view_);
     graphics->SetShaderParameter(PSP_MATDIFFCOLOR, Color(1.0f, 1.0f, 1.0f, 1.0f));
     graphics->SetVertexBuffer(vertexBuffer_);
 
@@ -522,6 +571,7 @@ void DebugRenderer::Render()
     }
 
     graphics->SetBlendMode(BLEND_ALPHA);
+    graphics->SetDepthWrite(false);
 
     if (triangles_.Size())
     {
@@ -536,6 +586,8 @@ void DebugRenderer::Render()
         graphics->SetDepthTest(CMP_ALWAYS);
         graphics->Draw(TRIANGLE_LIST, start, count);
     }
+
+    graphics->SetLineAntiAlias(false);
 }
 
 bool DebugRenderer::IsInside(const BoundingBox& box) const

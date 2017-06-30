@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -160,7 +160,7 @@ void Slider::OnDragEnd(const IntVector2& position, const IntVector2& screenPosit
     }
 }
 
-void Slider::OnResize()
+void Slider::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
     UpdateSlider();
 }
@@ -236,7 +236,7 @@ void Slider::UpdateSlider()
         {
             int sliderLength = (int)Max((float)GetWidth() / (range_ + 1.0f), (float)(border.left_ + border.right_));
 
-            if (knob_->IsFixedSize())
+            if (knob_->IsFixedWidth())
                 sliderLength = knob_->GetWidth();
 
             float sliderPos = (float)(GetWidth() - sliderLength) * value_ / range_;
@@ -253,7 +253,7 @@ void Slider::UpdateSlider()
         {
             int sliderLength = (int)Max((float)GetHeight() / (range_ + 1.0f), (float)(border.top_ + border.bottom_));
 
-            if (knob_->IsFixedSize())
+            if (knob_->IsFixedHeight())
                 sliderLength = knob_->GetHeight();
 
             float sliderPos = (float)(GetHeight() - sliderLength) * value_ / range_;

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -130,6 +130,8 @@ URHO3D_EVENT(E_RESIZED, Resized)
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
     URHO3D_PARAM(P_WIDTH, Width);                  // int
     URHO3D_PARAM(P_HEIGHT, Height);                // int
+    URHO3D_PARAM(P_DX, DX);                        // int
+    URHO3D_PARAM(P_DY, DY);                        // int
 }
 
 /// UI element positioned.
@@ -200,6 +202,13 @@ URHO3D_EVENT(E_SLIDERPAGED, SliderPaged)
     URHO3D_PARAM(P_PRESSED, Pressed);              // bool
 }
 
+/// UI progressbar value changed
+URHO3D_EVENT(E_PROGRESSBARCHANGED, ProgressBarChanged)
+{
+    URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
+    URHO3D_PARAM(P_VALUE, Value);                  // float
+}
+
 /// UI scrollbar value changed.
 URHO3D_EVENT(E_SCROLLBARCHANGED, ScrollBarChanged)
 {
@@ -222,13 +231,11 @@ URHO3D_EVENT(E_MODALCHANGED, ModalChanged)
     URHO3D_PARAM(P_MODAL, Modal);                  // bool
 }
 
-/// Text entry into a LineEdit. The char can be modified in the event data.
-URHO3D_EVENT(E_TEXTENTRY, CharEntry)
+/// Text entry into a LineEdit. The text can be modified in the event data.
+URHO3D_EVENT(E_TEXTENTRY, TextEntry)
 {
     URHO3D_PARAM(P_ELEMENT, Element);              // UIElement pointer
-    URHO3D_PARAM(P_TEXT, Text);                    // String
-    URHO3D_PARAM(P_BUTTONS, Buttons);              // int
-    URHO3D_PARAM(P_QUALIFIERS, Qualifiers);        // int
+    URHO3D_PARAM(P_TEXT, Text);                    // String [in/out]
 }
 
 /// Editable text changed

@@ -25,6 +25,7 @@ class Rect
     Vector2 HalfSize() const;
     bool Equals(const Rect& rhs) const;
     Intersection IsInside(const Vector2& point) const;
+    Intersection IsInside(const Rect& rect) const;
     Vector4 ToVector4() const;
     
     String ToString() const;

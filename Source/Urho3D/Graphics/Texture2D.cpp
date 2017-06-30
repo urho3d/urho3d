@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -109,13 +109,26 @@ bool Texture2D::EndLoad()
     return success;
 }
 
-bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage)
+bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usage, int multiSample, bool autoResolve)
 {
     if (width <= 0 || height <= 0)
     {
         URHO3D_LOGERROR("Zero or negative texture dimensions");
         return false;
     }
+
+    multiSample = Clamp(multiSample, 1, 16);
+    if (multiSample == 1)
+        autoResolve = false;
+    else if (multiSample > 1 && usage < TEXTURE_RENDERTARGET)
+    {
+        URHO3D_LOGERROR("Multisampling is only supported for rendertarget or depth-stencil textures");
+        return false;
+    }
+
+    // Disable mipmaps if multisample & custom resolve
+    if (multiSample > 1 && autoResolve == false)
+        requestedLevels_ = 1;
 
     // Delete the old rendersurface if any
     renderSurface_.Reset();
@@ -126,11 +139,10 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     {
         renderSurface_ = new RenderSurface(this);
 
-        // Clamp mode addressing by default, nearest filtering, and mipmaps disabled
+        // Clamp mode addressing by default and nearest filtering
         addressMode_[COORD_U] = ADDRESS_CLAMP;
         addressMode_[COORD_V] = ADDRESS_CLAMP;
         filterMode_ = FILTER_NEAREST;
-        requestedLevels_ = 1;
     }
 
     if (usage == TEXTURE_RENDERTARGET)
@@ -141,8 +153,31 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
     width_ = width;
     height_ = height;
     format_ = format;
+    depth_ = 1;
+    multiSample_ = multiSample;
+    autoResolve_ = autoResolve;
 
     return Create();
+}
+
+SharedPtr<Image> Texture2D::GetImage() const
+{
+    if (format_ != Graphics::GetRGBAFormat() && format_ != Graphics::GetRGBFormat())
+    {
+        URHO3D_LOGERROR("Unsupported texture format, can not convert to Image");
+        return SharedPtr<Image>();
+    }
+
+    Image* rawImage = new Image(context_);
+    if (format_ == Graphics::GetRGBAFormat())
+        rawImage->SetSize(width_, height_, 4);
+    else if (format_ == Graphics::GetRGBFormat())
+        rawImage->SetSize(width_, height_, 3);
+    else
+        assert(0);
+
+    GetData(0, rawImage->GetData());
+    return SharedPtr<Image>(rawImage);
 }
 
 void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)

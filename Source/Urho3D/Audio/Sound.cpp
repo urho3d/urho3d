@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ struct WavHeader
 static const unsigned IP_SAFETY = 4;
 
 Sound::Sound(Context* context) :
-    Resource(context),
+    ResourceWithMetadata(context),
     repeat_(0),
     end_(0),
     dataSize_(0),
@@ -348,9 +348,9 @@ void Sound::LoadParameters()
         return;
 
     XMLElement rootElem = file->GetRoot();
-    XMLElement paramElem = rootElem.GetChild();
+    LoadMetadataFromXML(rootElem);
 
-    while (paramElem)
+    for (XMLElement paramElem = rootElem.GetChild(); paramElem; paramElem = paramElem.GetNext())
     {
         String name = paramElem.GetName();
 
@@ -373,8 +373,6 @@ void Sound::LoadParameters()
             if (paramElem.HasAttribute("start") && paramElem.HasAttribute("end"))
                 SetLoop((unsigned)paramElem.GetInt("start"), (unsigned)paramElem.GetInt("end"));
         }
-
-        paramElem = paramElem.GetNext();
     }
 }
 

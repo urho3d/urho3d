@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,9 @@ void Texture2D::Release()
         renderSurface_->Release();
 
     URHO3D_SAFE_RELEASE(object_.ptr_);
+
+    resolveDirty_ = false;
+    levelsDirty_ = false;
 }
 
 bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, const void* data)
@@ -351,6 +354,9 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         return false;
     }
 
+    if (resolveDirty_)
+        graphics_->ResolveToTexture(const_cast<Texture2D*>(this));
+
     int levelWidth = GetLevelWidth(level);
     int levelHeight = GetLevelHeight(level);
 
@@ -371,27 +377,48 @@ bool Texture2D::GetData(unsigned level, void* dest) const
             return false;
         }
 
+        // If multisampled, must copy the surface of the resolve texture instead of the multisampled surface
+        IDirect3DSurface9* resolveSurface = 0;
+        if (multiSample_ > 1)
+        {
+            HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&resolveSurface);
+            if (FAILED(hr))
+            {
+                URHO3D_LOGD3DERROR("Could not get surface of the resolve texture", hr);
+                URHO3D_SAFE_RELEASE(resolveSurface);
+                return false;
+            }
+        }
+
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_,
             D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(offscreenSurface);
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
+            URHO3D_SAFE_RELEASE(offscreenSurface)
+            URHO3D_SAFE_RELEASE(resolveSurface);
             return false;
         }
-        hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
+        
+        if (resolveSurface)
+            hr = device->GetRenderTargetData(resolveSurface, offscreenSurface);
+        else
+            hr = device->GetRenderTargetData((IDirect3DSurface9*)renderSurface_->GetSurface(), offscreenSurface);
+        URHO3D_SAFE_RELEASE(resolveSurface);
+
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not get rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
+
         hr = offscreenSurface->LockRect(&d3dLockedRect, &d3dRect, D3DLOCK_READONLY);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not lock surface for getting rendertarget data", hr);
-            offscreenSurface->Release();
+            URHO3D_SAFE_RELEASE(offscreenSurface);
             return false;
         }
     }
@@ -459,13 +486,11 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     }
 
     if (offscreenSurface)
-    {
         offscreenSurface->UnlockRect();
-        offscreenSurface->Release();
-    }
     else
         ((IDirect3DTexture9*)object_.ptr_)->UnlockRect(level);
 
+    URHO3D_SAFE_RELEASE(offscreenSurface);
     return true;
 }
 
@@ -482,6 +507,14 @@ bool Texture2D::Create()
         return true;
     }
 
+    if (multiSample_ > 1 && !autoResolve_)
+    {
+        URHO3D_LOGWARNING("Multisampled texture without autoresolve is not supported on Direct3D9");
+        autoResolve_ = true;
+    }
+
+    GraphicsImpl* impl = graphics_->GetImpl();
+
     unsigned pool = usage_ > TEXTURE_STATIC ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
     unsigned d3dUsage = 0;
 
@@ -492,31 +525,56 @@ bool Texture2D::Create()
         break;
     case TEXTURE_RENDERTARGET:
         d3dUsage |= D3DUSAGE_RENDERTARGET;
+        if (requestedLevels_ != 1)
+        {
+            // Check mipmap autogeneration support
+            if (impl->CheckFormatSupport((D3DFORMAT)format_, D3DUSAGE_AUTOGENMIPMAP, D3DRTYPE_TEXTURE))
+            {
+                requestedLevels_ = 0;
+                d3dUsage |= D3DUSAGE_AUTOGENMIPMAP;
+            }
+            else
+                requestedLevels_ = 1;
+        }
         break;
     case TEXTURE_DEPTHSTENCIL:
         d3dUsage |= D3DUSAGE_DEPTHSTENCIL;
+        // No mipmaps for depth-stencil textures
+        requestedLevels_ = 1;
         break;
     default:
         break;
     }
 
+    if (multiSample_ > 1)
+    {
+        // Fall back to non-multisampled if unsupported multisampling mode
+        if (!impl->CheckMultiSampleSupport((D3DFORMAT)format_,  multiSample_))
+        {
+            multiSample_ = 1;
+            autoResolve_ = false;
+        }
+    }
+
     IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
     // If creating a depth-stencil texture, and it is not supported, create a depth-stencil surface instead
-    if (usage_ == TEXTURE_DEPTHSTENCIL && !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, d3dUsage, D3DRTYPE_TEXTURE))
+    // Multisampled surfaces need also to be created this way
+    if (usage_ == TEXTURE_DEPTHSTENCIL && (multiSample_ > 1 || !graphics_->GetImpl()->CheckFormatSupport((D3DFORMAT)format_, 
+        d3dUsage, D3DRTYPE_TEXTURE)))
     {
         HRESULT hr = device->CreateDepthStencilSurface(
             (UINT)width_,
             (UINT)height_,
             (D3DFORMAT)format_,
-            D3DMULTISAMPLE_NONE,
+            (multiSample_ > 1) ? (D3DMULTISAMPLE_TYPE)multiSample_ : D3DMULTISAMPLE_NONE,
             0,
             FALSE,
             (IDirect3DSurface9**)&renderSurface_->surface_,
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(renderSurface_->surface_);
             URHO3D_LOGD3DERROR("Could not create depth-stencil surface", hr);
+            URHO3D_SAFE_RELEASE(renderSurface_->surface_);
             return false;
         }
 
@@ -535,18 +593,42 @@ bool Texture2D::Create()
             0);
         if (FAILED(hr))
         {
-            URHO3D_SAFE_RELEASE(object_.ptr_);
             URHO3D_LOGD3DERROR("Could not create texture", hr);
+            URHO3D_SAFE_RELEASE(object_.ptr_);
             return false;
         }
 
         levels_ = ((IDirect3DTexture9*)object_.ptr_)->GetLevelCount();
 
-        if (usage_ >= TEXTURE_RENDERTARGET)
+        // Create the multisampled rendertarget for rendering to if necessary
+        if (usage_ == TEXTURE_RENDERTARGET && multiSample_ > 1)
         {
+            HRESULT hr = device->CreateRenderTarget(
+                (UINT)width_,
+                (UINT)height_,
+                (D3DFORMAT)format_,
+                (D3DMULTISAMPLE_TYPE)multiSample_,
+                0,
+                FALSE,
+                (IDirect3DSurface9**)&renderSurface_->surface_,
+                0);
+            if (FAILED(hr))
+            {
+                URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);
+                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
+                return false;
+            }
+        }
+        else if (usage_ >= TEXTURE_RENDERTARGET)
+        {
+            // Else use the texture surface directly for rendering
             hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&renderSurface_->surface_);
             if (FAILED(hr))
+            {
                 URHO3D_LOGD3DERROR("Could not get rendertarget surface", hr);
+                URHO3D_SAFE_RELEASE(renderSurface_->surface_);
+                return false;
+            }
         }
     }
 

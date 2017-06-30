@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -242,6 +242,19 @@ void DynamicGeometry::CreateScene()
         fromScratchModel->SetNumGeometries(1);
         fromScratchModel->SetGeometry(0, 0, geom);
         fromScratchModel->SetBoundingBox(BoundingBox(Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, 0.5f, 0.5f)));
+
+        // Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
+        Vector<SharedPtr<VertexBuffer> > vertexBuffers;
+        Vector<SharedPtr<IndexBuffer> > indexBuffers;
+        vertexBuffers.Push(vb);
+        indexBuffers.Push(ib);
+        // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
+        PODVector<unsigned> morphRangeStarts;
+        PODVector<unsigned> morphRangeCounts;
+        morphRangeStarts.Push(0);
+        morphRangeCounts.Push(0);
+        fromScratchModel->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
+        fromScratchModel->SetIndexBuffers(indexBuffers);
 
         Node* node = scene_->CreateChild("FromScratchObject");
         node->SetPosition(Vector3(0.0f, 3.0f, 0.0f));

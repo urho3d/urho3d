@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,10 @@ View3D::View3D(Context* context) :
     depthTexture_ = new Texture2D(context_);
     viewport_ = new Viewport(context_);
 
+    // Disable mipmaps since the texel ratio should be 1:1
+    renderTexture_->SetNumLevels(1);
+    depthTexture_->SetNumLevels(1);
+
     SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(View3D, HandleRenderSurfaceUpdate));
 }
 
@@ -68,10 +72,10 @@ void View3D::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
 }
 
-void View3D::OnResize()
+void View3D::OnResize(const IntVector2& newSize, const IntVector2& delta)
 {
-    int width = GetWidth();
-    int height = GetHeight();
+    int width = newSize.x_;
+    int height = newSize.y_;
 
     if (width > 0 && height > 0)
     {
@@ -108,7 +112,7 @@ void View3D::SetFormat(unsigned format)
     if (format != rttFormat_)
     {
         rttFormat_ = format;
-        OnResize();
+        OnResize(GetSize(), IntVector2::ZERO);
     }
 }
 

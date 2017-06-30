@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,8 +67,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     Urho3D::ParseArguments(GetCommandLineW()); \
     return function; \
 }
-// Android or iOS: use SDL_main
-#elif defined(__ANDROID__) || defined(IOS)
+// Android or iOS or tvOS: use SDL_main
+#elif defined(__ANDROID__) || defined(IOS) || defined(TVOS)
 #define URHO3D_DEFINE_MAIN(function) \
 extern "C" int SDL_main(int argc, char** argv); \
 int SDL_main(int argc, char** argv) \

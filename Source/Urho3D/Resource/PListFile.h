@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -106,6 +106,8 @@ public:
     IntRect GetIntRect() const;
     /// Return IntVector2, for string type.
     IntVector2 GetIntVector2() const;
+    /// Return IntVector3, for string type.
+    IntVector3 GetIntVector3() const;
     /// Return value map.
     const PListValueMap& GetValueMap() const;
     /// Return value vector.

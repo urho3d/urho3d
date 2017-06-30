@@ -110,14 +110,16 @@ btCollisionWorld::~btCollisionWorld()
 
 
 
-void	btCollisionWorld::addCollisionObject(btCollisionObject* collisionObject,short int collisionFilterGroup,short int collisionFilterMask)
+void	btCollisionWorld::addCollisionObject(btCollisionObject* collisionObject, int collisionFilterGroup, int collisionFilterMask)
 {
 
 	btAssert(collisionObject);
 
 	//check that the object isn't already added
 	btAssert( m_collisionObjects.findLinearSearch(collisionObject)  == m_collisionObjects.size());
+    btAssert(collisionObject->getWorldArrayIndex() == -1);  // do not add the same object to more than one collision world
 
+    collisionObject->setWorldArrayIndex(m_collisionObjects.size());
 	m_collisionObjects.push_back(collisionObject);
 
 	//calculate new AABB
@@ -135,8 +137,7 @@ void	btCollisionWorld::addCollisionObject(btCollisionObject* collisionObject,sho
 		collisionObject,
 		collisionFilterGroup,
 		collisionFilterMask,
-		m_dispatcher1,0
-		))	;
+		m_dispatcher1))	;
 
 
 
@@ -197,6 +198,7 @@ void	btCollisionWorld::updateAabbs()
 	for ( int i=0;i<m_collisionObjects.size();i++)
 	{
 		btCollisionObject* colObj = m_collisionObjects[i];
+        btAssert(colObj->getWorldArrayIndex() == i);
 
 		//only update aabb of active objects
 		if (m_forceUpdateAllAabbs || colObj->isActive())
@@ -255,9 +257,25 @@ void	btCollisionWorld::removeCollisionObject(btCollisionObject* collisionObject)
 	}
 
 
-	//swapremove
-	m_collisionObjects.remove(collisionObject);
-
+    int iObj = collisionObject->getWorldArrayIndex();
+//    btAssert(iObj >= 0 && iObj < m_collisionObjects.size()); // trying to remove an object that was never added or already removed previously?
+    if (iObj >= 0 && iObj < m_collisionObjects.size())
+    {
+        btAssert(collisionObject == m_collisionObjects[iObj]);
+        m_collisionObjects.swap(iObj, m_collisionObjects.size()-1);
+        m_collisionObjects.pop_back();
+        if (iObj < m_collisionObjects.size())
+        {
+            m_collisionObjects[iObj]->setWorldArrayIndex(iObj);
+        }
+    }
+    else
+    {
+        // slow linear search
+        //swapremove
+        m_collisionObjects.remove(collisionObject);
+    }
+    collisionObject->setWorldArrayIndex(-1);
 }
 
 
@@ -792,23 +810,50 @@ void	btCollisionWorld::objectQuerySingleInternal(const btConvexShape* castShape,
 				}
 			}
 		} else {
-			///@todo : use AABB tree or other BVH acceleration structure!
 			if (collisionShape->isCompound())
 			{
-				BT_PROFILE("convexSweepCompound");
-				const btCompoundShape* compoundShape = static_cast<const btCompoundShape*>(collisionShape);
-				int i=0;
-				for (i=0;i<compoundShape->getNumChildShapes();i++)
+				struct	btCompoundLeafCallback : btDbvt::ICollide
 				{
-					btTransform childTrans = compoundShape->getChildTransform(i);
-					const btCollisionShape* childCollisionShape = compoundShape->getChildShape(i);
-					btTransform childWorldTrans = colObjWorldTransform * childTrans;
-					
-                    struct	LocalInfoAdder : public ConvexResultCallback {
-                            ConvexResultCallback* m_userCallback;
+					btCompoundLeafCallback(
+										   const btCollisionObjectWrapper* colObjWrap,
+										   const btConvexShape* castShape,
+										   const btTransform& convexFromTrans,
+										   const btTransform& convexToTrans,
+										   btScalar allowedPenetration,
+										   const btCompoundShape* compoundShape,
+										   const btTransform& colObjWorldTransform,
+										   ConvexResultCallback& resultCallback)
+					: 
+					  m_colObjWrap(colObjWrap),
+						m_castShape(castShape),
+						m_convexFromTrans(convexFromTrans),
+						m_convexToTrans(convexToTrans),
+						m_allowedPenetration(allowedPenetration),
+						m_compoundShape(compoundShape),
+						m_colObjWorldTransform(colObjWorldTransform),
+						m_resultCallback(resultCallback) {
+					}
+
+				  const btCollisionObjectWrapper* m_colObjWrap;
+					const btConvexShape* m_castShape;
+					const btTransform& m_convexFromTrans;
+					const btTransform& m_convexToTrans;
+					btScalar m_allowedPenetration;
+					const btCompoundShape* m_compoundShape;
+					const btTransform& m_colObjWorldTransform;
+					ConvexResultCallback& m_resultCallback;
+
+				public:
+
+					void		ProcessChild(int index, const btTransform& childTrans, const btCollisionShape* childCollisionShape)
+					{
+						btTransform childWorldTrans = m_colObjWorldTransform * childTrans;
+
+						struct	LocalInfoAdder : public ConvexResultCallback {
+							ConvexResultCallback* m_userCallback;
 							int m_i;
 
-                            LocalInfoAdder (int i, ConvexResultCallback *user)
+							LocalInfoAdder(int i, ConvexResultCallback *user)
 								: m_userCallback(user), m_i(i)
 							{
 								m_closestHitFraction = m_userCallback->m_closestHitFraction;
@@ -817,27 +862,66 @@ void	btCollisionWorld::objectQuerySingleInternal(const btConvexShape* castShape,
 							{
 								return m_userCallback->needsCollision(p);
 							}
-                            virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult&	r,	bool b)
-                            {
-                                    btCollisionWorld::LocalShapeInfo	shapeInfo;
-                                    shapeInfo.m_shapePart = -1;
-                                    shapeInfo.m_triangleIndex = m_i;
-                                    if (r.m_localShapeInfo == NULL)
-                                        r.m_localShapeInfo = &shapeInfo;
-									const btScalar result = m_userCallback->addSingleResult(r, b);
-									m_closestHitFraction = m_userCallback->m_closestHitFraction;
-									return result;
-                                    
-                            }
-                    };
+							virtual btScalar addSingleResult(btCollisionWorld::LocalConvexResult&	r, bool b)
+							{
+								btCollisionWorld::LocalShapeInfo	shapeInfo;
+								shapeInfo.m_shapePart = -1;
+								shapeInfo.m_triangleIndex = m_i;
+								if (r.m_localShapeInfo == NULL)
+									r.m_localShapeInfo = &shapeInfo;
+								const btScalar result = m_userCallback->addSingleResult(r, b);
+								m_closestHitFraction = m_userCallback->m_closestHitFraction;
+								return result;
 
-                    LocalInfoAdder my_cb(i, &resultCallback);
-					
-					btCollisionObjectWrapper tmpObj(colObjWrap,childCollisionShape,colObjWrap->getCollisionObject(),childWorldTrans,-1,i);
+							}
+						};
 
-					objectQuerySingleInternal(castShape, convexFromTrans,convexToTrans,
-						&tmpObj,my_cb, allowedPenetration);
-					
+						LocalInfoAdder my_cb(index, &m_resultCallback);
+
+						btCollisionObjectWrapper tmpObj(m_colObjWrap, childCollisionShape, m_colObjWrap->getCollisionObject(), childWorldTrans, -1, index);
+
+						objectQuerySingleInternal(m_castShape, m_convexFromTrans, m_convexToTrans, &tmpObj, my_cb, m_allowedPenetration);
+					}
+
+					void		Process(const btDbvtNode* leaf)
+					{
+						// Processing leaf node
+						int index = leaf->dataAsInt;
+
+						btTransform childTrans = m_compoundShape->getChildTransform(index);
+						const btCollisionShape* childCollisionShape = m_compoundShape->getChildShape(index);
+
+						ProcessChild(index, childTrans, childCollisionShape);
+					}
+				};
+
+				BT_PROFILE("convexSweepCompound");
+				const btCompoundShape* compoundShape = static_cast<const btCompoundShape*>(collisionShape);
+
+				btVector3 fromLocalAabbMin, fromLocalAabbMax;
+				btVector3 toLocalAabbMin, toLocalAabbMax;
+
+				castShape->getAabb(colObjWorldTransform.inverse() * convexFromTrans, fromLocalAabbMin, fromLocalAabbMax);
+				castShape->getAabb(colObjWorldTransform.inverse() * convexToTrans, toLocalAabbMin, toLocalAabbMax);
+
+				fromLocalAabbMin.setMin(toLocalAabbMin);
+				fromLocalAabbMax.setMax(toLocalAabbMax);
+
+				btCompoundLeafCallback callback(colObjWrap, castShape, convexFromTrans, convexToTrans,
+					  allowedPenetration, compoundShape, colObjWorldTransform, resultCallback);
+
+				const btDbvt* tree = compoundShape->getDynamicAabbTree();
+				if (tree) {
+					const ATTRIBUTE_ALIGNED16(btDbvtVolume)	bounds = btDbvtVolume::FromMM(fromLocalAabbMin, fromLocalAabbMax);
+					tree->collideTV(tree->m_root, bounds, callback);
+				} else {
+					int i;
+					for (i=0;i<compoundShape->getNumChildShapes();i++)
+					{
+						const btCollisionShape* childCollisionShape = compoundShape->getChildShape(i);
+						btTransform childTrans = compoundShape->getChildTransform(i);
+						callback.ProcessChild(i, childTrans, childCollisionShape);
+					}
 				}
 			}
 		}
@@ -1148,7 +1232,7 @@ struct btSingleContactCallback : public btBroadphaseAabbCallback
 			btCollisionObjectWrapper ob0(0,m_collisionObject->getCollisionShape(),m_collisionObject,m_collisionObject->getWorldTransform(),-1,-1);
 			btCollisionObjectWrapper ob1(0,collisionObject->getCollisionShape(),collisionObject,collisionObject->getWorldTransform(),-1,-1);
 
-			btCollisionAlgorithm* algorithm = m_world->getDispatcher()->findAlgorithm(&ob0,&ob1);
+			btCollisionAlgorithm* algorithm = m_world->getDispatcher()->findAlgorithm(&ob0,&ob1,0, BT_CLOSEST_POINT_ALGORITHMS);
 			if (algorithm)
 			{
 				btBridgedManifoldResult contactPointResult(&ob0,&ob1, m_resultCallback);
@@ -1184,10 +1268,11 @@ void	btCollisionWorld::contactPairTest(btCollisionObject* colObjA, btCollisionOb
 	btCollisionObjectWrapper obA(0,colObjA->getCollisionShape(),colObjA,colObjA->getWorldTransform(),-1,-1);
 	btCollisionObjectWrapper obB(0,colObjB->getCollisionShape(),colObjB,colObjB->getWorldTransform(),-1,-1);
 
-	btCollisionAlgorithm* algorithm = getDispatcher()->findAlgorithm(&obA,&obB);
+	btCollisionAlgorithm* algorithm = getDispatcher()->findAlgorithm(&obA,&obB, 0, BT_CLOSEST_POINT_ALGORITHMS);
 	if (algorithm)
 	{
 		btBridgedManifoldResult contactPointResult(&obA,&obB, resultCallback);
+		contactPointResult.m_closestPointDistanceThreshold = resultCallback.m_closestDistanceThreshold;
 		//discrete collision detection query
 		algorithm->processCollision(&obA,&obB, getDispatchInfo(),&contactPointResult);
 
@@ -1499,6 +1584,8 @@ void	btCollisionWorld::debugDrawWorld()
 								color = btVector3(btScalar(.3),btScalar(0.3),btScalar(0.3));
 							}
 						};
+
+						colObj->getCustomDebugColor(color);
 
 						debugDrawObject(colObj->getWorldTransform(),colObj->getCollisionShape(),color);
 					}

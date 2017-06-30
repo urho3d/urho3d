@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,20 @@
 # Define target name
 set (TARGET_NAME sqlite)
 
-# https://www.sqlite.org/compile.html
-add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)
-# Do not use pthread and dl libraries for Web platform
+# Define preprocessor macros
+add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)   # https://www.sqlite.org/compile.html
 if (WEB)
+    # Do not use pthread and dl libraries for Web platform
     add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
+elseif (MINGW)
+    # We only support MinGW with "_mingw.h" header file, note the leading underscore
+    add_definitions (-D_HAVE__MINGW_H)
 endif ()
+foreach (VAR HAVE_STDINT_H HAVE_INTTYPES_H HAVE_MALLOC_H HAVE_MALLOC_USABLE_SIZE)
+    if (${VAR})
+        add_definitions (-D${VAR})
+    endif ()
+endforeach ()
 
 # Define source files
 set (SOURCE_FILES src/sqlite3.c)
@@ -40,7 +48,7 @@ setup_library ()
 install_header_files (DIRECTORY src/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SQLite FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
 
 # Setup additional SQLite CLI standalone target (this target can be transfered and executed on an embedded device, such as Raspberry Pi and Android)
-if (NOT IOS AND NOT WEB)
+if (NOT IOS AND NOT TVOS AND NOT WEB)
     # Define target name for SQLite shell
     set (TARGET_NAME isql)
 
@@ -50,20 +58,16 @@ if (NOT IOS AND NOT WEB)
     # Define dependency libs
     if (NOT WIN32)
         set (LIBS dl)
-    endif ()
-    if (READLINE_FOUND)
-        add_definitions (-DHAVE_READLINE)
-        # FIXME: temporary quick fix
-        if (SYSROOT)
-            set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=\"${SYSROOT}\"")
+        if (READLINE_FOUND)
+            add_definitions (-DHAVE_READLINE)
+            list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
+            list (APPEND LIBS ${READLINE_LIBRARIES})
         endif ()
-        list (APPEND INCLUDE_DIRS ${READLINE_INCLUDE_DIRS})
-        list (APPEND LIBS ${READLINE_LIBRARIES})
     endif ()
 
     # Setup target
     setup_executable (NODEPS)
 endif ()
 
-# SQLite will not work correctly with the -ffast-math option of GCC
-string (REPLACE -ffast-math "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+# SQLite will not work correctly with the -ffast-math option, so unset it in this scope only
+string (REPLACE -ffast-math "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")    # Stringify for string replacement

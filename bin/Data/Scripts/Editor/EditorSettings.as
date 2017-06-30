@@ -114,6 +114,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ gammaCorrectionToggle = settingsDialog.GetChild("GammaCorrectionToggle", true);
     gammaCorrectionToggle.checked = gammaCorrection;
 
+    CheckBox@ HDRToggle = settingsDialog.GetChild("HDRToggle", true);
+    HDRToggle.checked = HDR;
+
     LineEdit@ cubemapPath = settingsDialog.GetChild("CubeMapGenPath", true);
     cubemapPath.text = cubeMapGen_Path;
     LineEdit@ cubemapName = settingsDialog.GetChild("CubeMapGenKey", true);
@@ -169,6 +172,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(dynamicInstancingToggle, "Toggled", "EditDynamicInstancing");
         SubscribeToEvent(frameLimiterToggle, "Toggled", "EditFrameLimiter");
         SubscribeToEvent(gammaCorrectionToggle, "Toggled", "EditGammaCorrection");
+        SubscribeToEvent(HDRToggle, "Toggled", "EditHDR");
         SubscribeToEvent(settingsDialog.GetChild("CloseButton", true), "Released", "HideEditorSettingsDialog");
         
         SubscribeToEvent(cubemapPath, "TextChanged",  "EditCubemapPath");
@@ -428,6 +432,12 @@ void EditGammaCorrection(StringHash eventType, VariantMap& eventData)
 {
     CheckBox@ edit = eventData["Element"].GetPtr();
     SetGammaCorrection(edit.checked);
+}
+
+void EditHDR(StringHash eventType, VariantMap& eventData)
+{
+    CheckBox@ edit = eventData["Element"].GetPtr();
+    SetHDR(edit.checked);
 }
 
 void EditCubemapPath(StringHash eventType, VariantMap& eventData)

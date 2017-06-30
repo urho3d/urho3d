@@ -53,7 +53,7 @@ function writeTrack sk boneId firstframe lastframe length scale flipYZ outFile=
 	-- displays information in the maxscript listener
 	format "retrieving key information for % ...\n" (skinOps.GetBoneName sk boneId 1) ;
 	
-	-- gets bone acording to the parameter boneId
+	-- gets bone according to the parameter boneId
 	bname= skinOps.GetBoneName sk boneId 1 ;
 	replaceSpaces bname ;
 	d = getNodeByName bname ;
@@ -114,7 +114,7 @@ function writeTrack sk boneId firstframe lastframe length scale flipYZ outFile=
 				Tform = flipYZTransform Tform ;
 			)
 			
-			-- substracts position of the initial transform
+			-- subtracts position of the initial transform
 			Tform.pos -= initTform.pos ;
 			Tform.pos = Tform.pos * scale ;
 			
@@ -151,7 +151,7 @@ function writeTrack sk boneId firstframe lastframe length scale flipYZ outFile=
 
 function writeB sk id scale flipYZ outFile =
 (
-	-- gets bone acording to the parameter boneId
+	-- gets bone according to the parameter boneId
 	bname= skinOps.GetBoneName sk id 1 ;
 	replaceSpaces bname ;
 	d = getNodeByName bname ;

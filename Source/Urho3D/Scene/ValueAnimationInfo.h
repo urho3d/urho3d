@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,9 @@
 
 #pragma once
 
+#include "../Container/Ptr.h"
 #include "../Container/RefCounted.h"
+#include "../Container/Vector.h"
 #include "../Scene/AnimationDefs.h"
 
 namespace Urho3D
@@ -30,6 +32,7 @@ namespace Urho3D
 
 class Object;
 class ValueAnimation;
+class Variant;
 struct VAnimEventFrame;
 
 /// Base class for a value animation instance, which includes animation runtime information and updates the target object's value automatically.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2016 the Urho3D project.
+# Copyright (c) 2008-2017 the Urho3D project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ set (TARGET_NAME 42_PBRMaterials)
 
 # Define source files
 define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
+define_resource_dirs (EXTRA_DIRS ${CMAKE_SOURCE_DIR}/bin/Autoload)
 
 # Setup target with resource copying
 setup_main_executable ()

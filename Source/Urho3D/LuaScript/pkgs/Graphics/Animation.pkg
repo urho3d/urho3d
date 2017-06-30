@@ -38,7 +38,7 @@ struct AnimationTriggerPoint
     Variant data_ @ data;
 };
 
-class Animation : public Resource
+class Animation : public ResourceWithMetadata
 {
     Animation();
     ~Animation();
@@ -61,7 +61,8 @@ class Animation : public Resource
     float GetLength() const;
     unsigned GetNumTracks() const;
     AnimationTrack* GetTrack(const String name);
-    AnimationTrack* GetTrack(StringHash nameHash);
+    AnimationTrack* GetTrack(StringHash nameHash); 
+    AnimationTrack* GetTrack(unsigned index); 
     unsigned GetNumTriggers() const;
     AnimationTriggerPoint* GetTrigger(unsigned index);
 
@@ -89,10 +90,6 @@ static Animation* AnimationClone(const Animation* animation, const String& clone
     if (!animation)
         return 0;
         
-    SharedPtr<Animation> clonedAnimationPtr = animation->Clone(cloneName);
-    Animation* clonedAnimation = clonedAnimationPtr.Get();
-    clonedAnimationPtr.Detach();
-    
-    return clonedAnimation;
+    return animation->Clone(cloneName).Detach();
 }
 $}

@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2015 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -49,7 +49,7 @@ class asCScriptFunction;
 class asCObjectType;
 struct asSSystemFunctionInterface;
 
-int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *objForThiscall, asSSystemFunctionInterface *internal);
+int DetectCallingConvention(bool isMethod, const asSFuncPtr &ptr, int callConv, void *auxiliary, asSSystemFunctionInterface *internal);
 
 int PrepareSystemFunctionGeneric(asCScriptFunction *func, asSSystemFunctionInterface *internal, asCScriptEngine *engine);
 
@@ -108,7 +108,7 @@ struct asSSystemFunctionInterface
 	bool                 takesObjByVal;
 	asCArray<bool>       paramAutoHandles; // TODO: Should be able to remove this array. Perhaps the flags can be stored together with the inOutFlags in asCScriptFunction?
 	bool                 returnAutoHandle;
-	void                *objForThiscall;
+	void                *auxiliary; // can be used for functors, e.g. by asCALL_THISCALL_ASGLOBAL or asCALL_THISCALL_OBJFIRST
 
 	struct SClean
 	{
@@ -138,7 +138,7 @@ struct asSSystemFunctionInterface
 		takesObjByVal      = in.takesObjByVal;
 		paramAutoHandles   = in.paramAutoHandles;
 		returnAutoHandle   = in.returnAutoHandle;
-		objForThiscall     = in.objForThiscall;
+		auxiliary          = in.auxiliary;
 		cleanArgs          = in.cleanArgs;
 		return *this;
 	}

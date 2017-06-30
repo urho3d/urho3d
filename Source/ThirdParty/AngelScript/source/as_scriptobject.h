@@ -84,7 +84,7 @@ public:
 
 	// Type info
 	int            GetTypeId() const;
-	asIObjectType *GetObjectType() const;
+	asITypeInfo   *GetObjectType() const;
 
 	// Class properties
 	asUINT      GetPropertyCount() const;

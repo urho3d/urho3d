@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -485,8 +485,8 @@ bool Texture3D::Create()
         0);
     if (FAILED(hr))
     {
-        URHO3D_SAFE_RELEASE(object_.ptr_);
         URHO3D_LOGD3DERROR("Could not create texture", hr);
+        URHO3D_SAFE_RELEASE(object_.ptr_);
         return false;
     }
 

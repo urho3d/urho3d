@@ -25,8 +25,8 @@ THE SOFTWARE.
 */
 
 
-#ifndef __PCF_H__
-#define __PCF_H__
+#ifndef PCF_H_
+#define PCF_H_
 
 
 #include <ft2build.h>
@@ -148,9 +148,9 @@ FT_BEGIN_HEADER
     int            nprops;
     PCF_Property   properties;
 
-    FT_Long        nmetrics;
+    FT_ULong       nmetrics;
     PCF_Metric     metrics;
-    FT_Long        nencodings;
+    FT_ULong       nencodings;
     PCF_Encoding   encodings;
 
     FT_Short       defaultChar;
@@ -161,6 +161,15 @@ FT_BEGIN_HEADER
     FT_CharMapRec  charmap;  /* a single charmap per face */
 
   } PCF_FaceRec, *PCF_Face;
+
+
+  typedef struct  PCF_DriverRec_
+  {
+    FT_DriverRec  root;
+
+    FT_Bool  no_long_family_names;
+
+  } PCF_DriverRec, *PCF_Driver;
 
 
   /* macros for pcf font format */
@@ -226,12 +235,13 @@ FT_BEGIN_HEADER
 #define GLYPHPADOPTIONS  4 /* I'm not sure about this */
 
   FT_LOCAL( FT_Error )
-  pcf_load_font( FT_Stream,
-                 PCF_Face );
+  pcf_load_font( FT_Stream  stream,
+                 PCF_Face   face,
+                 FT_Long    face_index );
 
 FT_END_HEADER
 
-#endif /* __PCF_H__ */
+#endif /* PCF_H_ */
 
 
 /* END */

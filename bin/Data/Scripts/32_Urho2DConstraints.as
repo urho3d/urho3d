@@ -349,10 +349,10 @@ void MoveCamera(float timeStep)
     uint MOVE_SPEED = 4; // Movement speed as world units per second
 
     // Read WASD keys and move the camera scene node to the corresponding direction if they are pressed
-    if (input.keyDown[KEY_W]) cameraNode.Translate(Vector3(0.0f, 1.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown[KEY_S]) cameraNode.Translate(Vector3(0.0f, -1.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown[KEY_A]) cameraNode.Translate(Vector3(-1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
-    if (input.keyDown[KEY_D]) cameraNode.Translate(Vector3(1.0f, 0.0f, 0.0f) * MOVE_SPEED * timeStep);
+    if (input.keyDown[KEY_W]) cameraNode.Translate(Vector3::UP * MOVE_SPEED * timeStep);
+    if (input.keyDown[KEY_S]) cameraNode.Translate(Vector3::DOWN * MOVE_SPEED * timeStep);
+    if (input.keyDown[KEY_A]) cameraNode.Translate(Vector3::LEFT * MOVE_SPEED * timeStep);
+    if (input.keyDown[KEY_D]) cameraNode.Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
 
     if (input.keyDown[KEY_PAGEUP]) camera.zoom = camera.zoom * 1.01f; // Zoom In
     if (input.keyDown[KEY_PAGEDOWN]) camera.zoom = camera.zoom * 0.99f; // Zoom Out
@@ -405,7 +405,6 @@ void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData)
         constraintMouse.maxForce = 1000 * rigidBody.mass;
         constraintMouse.collideConnected = true;
         constraintMouse.otherBody = dummyBody;  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
-        constraintMouse.dampingRatio = 0.0f;
     }
     SubscribeToEvent("MouseMove", "HandleMouseMove");
     SubscribeToEvent("MouseButtonUp", "HandleMouseButtonUp");

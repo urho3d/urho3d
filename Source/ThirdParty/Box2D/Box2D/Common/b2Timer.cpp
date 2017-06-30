@@ -16,13 +16,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <Box2D/Common/b2Timer.h>
+#include "Box2D/Common/b2Timer.h"
 
 #if defined(_WIN32)
 
 float64 b2Timer::s_invFrequency = 0.0f;
 
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+
 #include <windows.h>
 
 b2Timer::b2Timer()

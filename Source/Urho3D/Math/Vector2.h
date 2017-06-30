@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,130 @@
 namespace Urho3D
 {
 
+/// Two-dimensional vector with integer values.
+class URHO3D_API IntVector2
+{
+public:
+    /// Construct a zero vector.
+    IntVector2() :
+        x_(0),
+        y_(0)
+    {
+    }
+
+    /// Construct from coordinates.
+    IntVector2(int x, int y) :
+        x_(x),
+        y_(y)
+    {
+    }
+
+    /// Construct from an int array.
+    IntVector2(const int* data) :
+        x_(data[0]),
+        y_(data[1])
+    {
+    }
+
+    /// Copy-construct from another vector.
+    IntVector2(const IntVector2& rhs) :
+        x_(rhs.x_),
+        y_(rhs.y_)
+    {
+    }
+
+    /// Assign from another vector.
+    IntVector2& operator =(const IntVector2& rhs)
+    {
+        x_ = rhs.x_;
+        y_ = rhs.y_;
+        return *this;
+    }
+
+    /// Test for equality with another vector.
+    bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
+
+    /// Test for inequality with another vector.
+    bool operator !=(const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
+
+    /// Add a vector.
+    IntVector2 operator +(const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
+
+    /// Return negation.
+    IntVector2 operator -() const { return IntVector2(-x_, -y_); }
+
+    /// Subtract a vector.
+    IntVector2 operator -(const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
+
+    /// Multiply with a scalar.
+    IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
+
+    /// Divide by a scalar.
+    IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
+
+    /// Add-assign a vector.
+    IntVector2& operator +=(const IntVector2& rhs)
+    {
+        x_ += rhs.x_;
+        y_ += rhs.y_;
+        return *this;
+    }
+
+    /// Subtract-assign a vector.
+    IntVector2& operator -=(const IntVector2& rhs)
+    {
+        x_ -= rhs.x_;
+        y_ -= rhs.y_;
+        return *this;
+    }
+
+    /// Multiply-assign a scalar.
+    IntVector2& operator *=(int rhs)
+    {
+        x_ *= rhs;
+        y_ *= rhs;
+        return *this;
+    }
+
+    /// Divide-assign a scalar.
+    IntVector2& operator /=(int rhs)
+    {
+        x_ /= rhs;
+        y_ /= rhs;
+        return *this;
+    }
+
+    /// Return integer data.
+    const int* Data() const { return &x_; }
+
+    /// Return as string.
+    String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+
+    /// Return length.
+    float Length() const { return sqrtf((float)(x_ * x_ + y_ * y_)); }
+
+    /// X coordinate.
+    int x_;
+    /// Y coordinate.
+    int y_;
+
+    /// Zero vector.
+    static const IntVector2 ZERO;
+    /// (-1,0) vector.
+    static const IntVector2 LEFT;
+    /// (1,0) vector.
+    static const IntVector2 RIGHT;
+    /// (0,1) vector.
+    static const IntVector2 UP;
+    /// (0,-1) vector.
+    static const IntVector2 DOWN;
+    /// (1,1) vector.
+    static const IntVector2 ONE;
+};
+
 /// Two-dimensional vector.
 class URHO3D_API Vector2
 {
@@ -43,6 +167,13 @@ public:
     Vector2(const Vector2& vector) :
         x_(vector.x_),
         y_(vector.y_)
+    {
+    }
+
+    /// Construct from an IntVector2.
+    explicit Vector2(const IntVector2& vector) :
+        x_((float)vector.x_),
+        y_((float)vector.y_)
     {
     }
 
@@ -168,6 +299,9 @@ public:
     /// Calculate absolute dot product.
     float AbsDotProduct(const Vector2& rhs) const { return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_); }
 
+    /// Project vector onto axis.
+    float ProjectOntoAxis(const Vector2& axis) const { return DotProduct(axis.Normalized()); }
+
     /// Returns the angle between this vector and another vector in degrees.
     float Angle(const Vector2& rhs) const { return Urho3D::Acos(DotProduct(rhs) / (Length() * rhs.Length())); }
 
@@ -224,115 +358,47 @@ public:
 /// Multiply Vector2 with a scalar
 inline Vector2 operator *(float lhs, const Vector2& rhs) { return rhs * lhs; }
 
-/// Two-dimensional vector with integer values.
-class URHO3D_API IntVector2
-{
-public:
-    /// Construct a zero vector.
-    IntVector2() :
-        x_(0),
-        y_(0)
-    {
-    }
-
-    /// Construct from coordinates.
-    IntVector2(int x, int y) :
-        x_(x),
-        y_(y)
-    {
-    }
-
-    /// Construct from an int array.
-    IntVector2(const int* data) :
-        x_(data[0]),
-        y_(data[1])
-    {
-    }
-
-    /// Copy-construct from another vector.
-    IntVector2(const IntVector2& rhs) :
-        x_(rhs.x_),
-        y_(rhs.y_)
-    {
-    }
-
-    /// Assign from another vector.
-    IntVector2& operator =(const IntVector2& rhs)
-    {
-        x_ = rhs.x_;
-        y_ = rhs.y_;
-        return *this;
-    }
-
-    /// Test for equality with another vector.
-    bool operator ==(const IntVector2& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_; }
-
-    /// Test for inequality with another vector.
-    bool operator !=(const IntVector2& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_; }
-
-    /// Add a vector.
-    IntVector2 operator +(const IntVector2& rhs) const { return IntVector2(x_ + rhs.x_, y_ + rhs.y_); }
-
-    /// Return negation.
-    IntVector2 operator -() const { return IntVector2(-x_, -y_); }
-
-    /// Subtract a vector.
-    IntVector2 operator -(const IntVector2& rhs) const { return IntVector2(x_ - rhs.x_, y_ - rhs.y_); }
-
-    /// Multiply with a scalar.
-    IntVector2 operator *(int rhs) const { return IntVector2(x_ * rhs, y_ * rhs); }
-
-    /// Divide by a scalar.
-    IntVector2 operator /(int rhs) const { return IntVector2(x_ / rhs, y_ / rhs); }
-
-    /// Add-assign a vector.
-    IntVector2& operator +=(const IntVector2& rhs)
-    {
-        x_ += rhs.x_;
-        y_ += rhs.y_;
-        return *this;
-    }
-
-    /// Subtract-assign a vector.
-    IntVector2& operator -=(const IntVector2& rhs)
-    {
-        x_ -= rhs.x_;
-        y_ -= rhs.y_;
-        return *this;
-    }
-
-    /// Multiply-assign a scalar.
-    IntVector2& operator *=(int rhs)
-    {
-        x_ *= rhs;
-        y_ *= rhs;
-        return *this;
-    }
-
-    /// Divide-assign a scalar.
-    IntVector2& operator /=(int rhs)
-    {
-        x_ /= rhs;
-        y_ /= rhs;
-        return *this;
-    }
-
-    /// Return integer data.
-    const int* Data() const { return &x_; }
-
-    /// Return as string.
-    String ToString() const;
-
-    /// X coordinate.
-    int x_;
-    /// Y coordinate.
-    int y_;
-
-    /// Zero vector.
-    static const IntVector2 ZERO;
-};
-
 /// Multiply IntVector2 with a scalar.
 inline IntVector2 operator *(int lhs, const IntVector2& rhs) { return rhs * lhs; }
+
+/// Per-component linear interpolation between two 2-vectors.
+inline Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t) { return lhs + (rhs - lhs) * t; }
+
+/// Per-component min of two 2-vectors.
+inline Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs) { return Vector2(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_)); }
+
+/// Per-component max of two 2-vectors.
+inline Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs) { return Vector2(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_)); }
+
+/// Per-component floor of 2-vector.
+inline Vector2 VectorFloor(const Vector2& vec) { return Vector2(Floor(vec.x_), Floor(vec.y_)); }
+
+/// Per-component round of 2-vector.
+inline Vector2 VectorRound(const Vector2& vec) { return Vector2(Round(vec.x_), Round(vec.y_)); }
+
+/// Per-component ceil of 2-vector.
+inline Vector2 VectorCeil(const Vector2& vec) { return Vector2(Ceil(vec.x_), Ceil(vec.y_)); }
+
+/// Per-component floor of 2-vector. Returns IntVector2.
+inline IntVector2 VectorFloorToInt(const Vector2& vec) { return IntVector2(FloorToInt(vec.x_), FloorToInt(vec.y_)); }
+
+/// Per-component round of 2-vector. Returns IntVector2.
+inline IntVector2 VectorRoundToInt(const Vector2& vec) { return IntVector2(RoundToInt(vec.x_), RoundToInt(vec.y_)); }
+
+/// Per-component ceil of 2-vector. Returns IntVector2.
+inline IntVector2 VectorCeilToInt(const Vector2& vec) { return IntVector2(CeilToInt(vec.x_), CeilToInt(vec.y_)); }
+
+/// Per-component min of two 2-vectors.
+inline IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs) { return IntVector2(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_)); }
+
+/// Per-component max of two 2-vectors.
+inline IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs) { return IntVector2(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_)); }
+
+/// Return a random value from [0, 1) from 2-vector seed.
+/// http://stackoverflow.com/questions/12964279/whats-the-origin-of-this-glsl-rand-one-liner
+inline float StableRandom(const Vector2& seed) { return Fract(Sin(seed.DotProduct(Vector2(12.9898f, 78.233f)) * M_RADTODEG) * 43758.5453f); }
+
+/// Return a random value from [0, 1) from scalar seed.
+inline float StableRandom(float seed) { return StableRandom(Vector2(seed, seed)); }
 
 }

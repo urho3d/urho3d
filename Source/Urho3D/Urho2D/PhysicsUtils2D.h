@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,18 +54,6 @@ inline b2Vec2 ToB2Vec2(const Vector3& vector)
 inline Vector3 ToVector3(const b2Vec2& vec2)
 {
     return Vector3(vec2.x, vec2.y, 0.0f);
-}
-
-/*
-inline bool operator == (const b2Vec2& left, const b2Vec2& right)
-{
-    return left.x == right.x && left.y == right.y;
-}
-*/
-
-inline bool operator !=(const b2Vec2& left, const b2Vec2& right)
-{
-    return left.x != right.x || left.y != right.y;
 }
 
 }

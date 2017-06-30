@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,9 @@ public:
     virtual void Start();
 
 protected:
+
+    SoundSource* musicSource_;
+
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
     virtual String GetScreenJoystickPatchString() const { return
         "<patch>"
@@ -80,8 +83,6 @@ private:
     void HandleSoundVolume(StringHash eventType, VariantMap& eventData);
     /// Handle music volume slider change.
     void HandleMusicVolume(StringHash eventType, VariantMap& eventData);
-    /// Handle sound effect finished.
-    void HandleSoundFinished(StringHash eventType, VariantMap& eventData);
 };
 
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ void SinCos(float angle, float& sin, float& cos)
     float angleRadians = angle * M_DEGTORAD;
 #if defined(HAVE_SINCOSF)
     sincosf(angleRadians, &sin, &cos);
-#elif defined(HAVE_UNDERSCORE_SINCOSF)
+#elif defined(HAVE___SINCOSF)
     __sincosf(angleRadians, &sin, &cos);
 #else
     sin = sinf(angleRadians);

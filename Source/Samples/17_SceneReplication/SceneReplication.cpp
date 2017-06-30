@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2008-2016 the Urho3D project.
+// Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -99,7 +99,6 @@ void SceneReplication::CreateScene()
 {
     scene_ = new Scene(context_);
 
-    // Create scene content on the server only
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     // Create octree and physics world with default settings. Create them as local so that they are not needlessly replicated
