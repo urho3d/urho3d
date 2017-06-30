@@ -789,8 +789,10 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterObjectMethod("UI", "bool get_forceAutoHint() const", asMETHOD(UI, GetForceAutoHint), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_fontHintLevel(FontHintLevel)", asMETHOD(UI, SetFontHintLevel), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "FontHintLevel get_fontHintLevel() const", asMETHOD(UI, GetFontHintLevel), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "void set_subpixelGlyphPositions(bool)", asMETHOD(UI, SetSubpixelGlyphPositions), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UI", "bool get_subpixelGlyphPositions() const", asMETHOD(UI, GetSubpixelGlyphPositions), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontSubpixelThreshold(float)", asMETHOD(UI, SetFontSubpixelThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "float get_fontSubpixelThreshold() const", asMETHOD(UI, GetFontSubpixelThreshold), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "void set_fontOversampling(int)", asMETHOD(UI, SetFontOversampling), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UI", "int get_fontOversampling() const", asMETHOD(UI, GetFontOversampling), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_scale(float value)", asMETHOD(UI, SetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "float get_scale() const", asMETHOD(UI, GetScale), asCALL_THISCALL);
     engine->RegisterObjectMethod("UI", "void set_customSize(const IntVector2&in)", asMETHODPR(UI, SetCustomSize, (const IntVector2&), void), asCALL_THISCALL);

@@ -52,6 +52,8 @@ private:
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
     bool LoadCharGlyph(unsigned charCode, Image* image = 0);
+    /// Smooth one row of a horizontally oversampled glyph image.
+    void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
 
     /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
@@ -59,6 +61,10 @@ private:
     void* face_;
     /// Load mode.
     int loadMode_;
+    /// Use subpixel glyph positioning?
+    bool subpixel_;
+    /// Oversampling level.
+    int oversampling_;
     /// Ascender.
     float ascender_;
     /// Has mutable glyph.

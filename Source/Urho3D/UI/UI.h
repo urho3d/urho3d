@@ -110,8 +110,10 @@ public:
     void SetForceAutoHint(bool enable);
     /// Set the hinting level used by FreeType fonts.
     void SetFontHintLevel(FontHintLevel level);
-    /// Set whether text glyphs can have fractional positions. Default is false (pixel-aligned).
-    void SetSubpixelGlyphPositions(bool enable);
+    /// Set the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    void SetFontSubpixelThreshold(float threshold);
+    /// Set the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    void SetFontOversampling(int oversampling);
     /// Set %UI scale. 1.0 is default (pixel perfect). Resize the root element to match.
     void SetScale(float scale);
     /// Scale %UI to the specified width in pixels.
@@ -188,8 +190,11 @@ public:
     /// Return the current FreeType font hinting level.
     FontHintLevel GetFontHintLevel() const { return fontHintLevel_; }
 
-    // Return whether text glyphs can have fractional positions.
-    bool GetSubpixelGlyphPositions() const { return subpixelGlyphPositions_; }
+    /// Get the font subpixel threshold. Below this size, if the hint level is LIGHT or NONE, fonts will use subpixel positioning plus oversampling for higher-quality rendering. Has no effect at hint level NORMAL.
+    float GetFontSubpixelThreshold() const { return fontSubpixelThreshold_; }
+
+    /// Get the oversampling (horizonal stretching) used to improve subpixel font rendering. Only affects fonts smaller than the subpixel limit.
+    int GetFontOversampling() const { return fontOversampling_; }
 
     /// Return true when UI has modal element(s).
     bool HasModalElement() const;
@@ -356,8 +361,10 @@ private:
     bool forceAutoHint_;
     /// FreeType hinting level (default is FONT_HINT_LEVEL_NORMAL).
     FontHintLevel fontHintLevel_;
-    /// Flag for subpixel text glyph positions.
-    bool subpixelGlyphPositions_;
+    /// Maxmimum font size for subpixel glyph positioning and oversampling (default is 12).
+    float fontSubpixelThreshold_;
+    /// Horizontal oversampling for subpixel fonts (default is 2).
+    int fontOversampling_;
     /// Flag for UI already being rendered this frame.
     bool uiRendered_;
     /// Non-modal batch size (used internally for rendering).

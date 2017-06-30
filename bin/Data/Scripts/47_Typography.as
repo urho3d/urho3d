@@ -27,7 +27,7 @@ void Start()
     // (Don't modify the root directly, as the base Sample class uses it)
     uielement = UIElement();
     uielement.SetAlignment(HA_CENTER, VA_CENTER);
-    uielement.SetLayout(LM_VERTICAL, 20, IntRect(20, 40, 20, 40));
+    uielement.SetLayout(LM_VERTICAL, 10, IntRect(20, 40, 20, 40));
     ui.root.AddChild(uielement);
     
     // Add some sample text
@@ -48,18 +48,42 @@ void Start()
     CreateCheckbox("UI::SetForceAutoHint", "HandleForceAutoHint")
         .checked = ui.forceAutoHint;
 
-    // Add a checkbox for the global SubpixelGlyphPositions setting. This affects character spacing.
-    CreateCheckbox("UI::SetSubpixelGlyphPositions", "HandleSubpixelGlyphPositions")
-        .checked = ui.subpixelGlyphPositions;
-
     // Add a drop-down menu to control the font hinting level.
-    Array<String> items = {
+    Array<String> levels = {
         "FONT_HINT_LEVEL_NONE",
         "FONT_HINT_LEVEL_LIGHT",
         "FONT_HINT_LEVEL_NORMAL"
     };
-    CreateMenu("UI::SetFontHintLevel", items, "HandleFontHintLevel")
+    CreateMenu("UI::SetFontHintLevel", levels, "HandleFontHintLevel")
         .selection = ui.fontHintLevel;
+
+    // Add a drop-down menu to control the subpixel threshold.
+    Array<String> thresholds = {
+        "0",
+        "3",
+        "6",
+        "9",
+        "12",
+        "15",
+        "18",
+        "21"
+    };
+    CreateMenu("UI::SetFontSubpixelThreshold", thresholds, "HandleFontSubpixel")
+        .selection = ui.fontSubpixelThreshold / 3;
+
+    // Add a drop-down menu to control oversampling.
+    Array<String>  limits = {
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+    };
+    CreateMenu("UI::SetFontOversampling", limits, "HandleFontOversampling")
+        .selection = ui.fontOversampling - 1;
 
     // Set the mouse mode to use in the sample
     SampleInitMouseMode(MM_FREE);
@@ -128,11 +152,11 @@ DropDownList@ CreateMenu(String label, Array<String> items, String handler)
         list.AddItem(t);
         t.text = items[i];
         t.SetStyleAuto();
+        t.minWidth = t.rowWidths[0] + 10;
         t.AddTag(TEXT_TAG);
     }
     
     text.maxWidth = text.rowWidths[0];
-    list.maxWidth = text.rowWidths[0] * 1.5;
     
     SubscribeToEvent(list, "ItemSelected", handler);
     return list;
@@ -178,21 +202,28 @@ void HandleSRGB(StringHash eventType, VariantMap& eventData)
     }
 }
 
-void HandleSubpixelGlyphPositions(StringHash eventType, VariantMap& eventData)
-{
-    CheckBox@ box = eventData["Element"].GetPtr();
-    bool checked = box.checked;
-
-    ui.subpixelGlyphPositions = checked;
-}
-
-
 void HandleFontHintLevel(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ list = eventData["Element"].GetPtr();
     int i = list.selection;
 
     ui.fontHintLevel = FontHintLevel(i);    
+}
+
+void HandleFontSubpixel(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ list = eventData["Element"].GetPtr();
+    int i = list.selection;
+
+    ui.fontSubpixelThreshold = i * 3;    
+}
+
+void HandleFontOversampling(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList@ list = eventData["Element"].GetPtr();
+    int i = list.selection;
+
+    ui.fontOversampling = i + 1;
 }
 
 // Create XML patch instructions for screen joystick layout specific to this sample app

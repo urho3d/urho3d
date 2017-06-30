@@ -57,6 +57,7 @@
 #include "../UI/Window.h"
 #include "../UI/View3D.h"
 
+#include <assert.h>
 #include <SDL/SDL.h>
 
 #include "../DebugNew.h"
@@ -107,7 +108,8 @@ UI::UI(Context* context) :
     useMutableGlyphs_(false),
     forceAutoHint_(false),
     fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
-    subpixelGlyphPositions_(false),
+    fontSubpixelThreshold_(12),
+    fontOversampling_(2),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -616,11 +618,23 @@ void UI::SetFontHintLevel(FontHintLevel level)
     }
 }
 
-void UI::SetSubpixelGlyphPositions(bool enable)
+void UI::SetFontSubpixelThreshold(float threshold)
 {
-    if (enable != subpixelGlyphPositions_)
+    assert(threshold >= 0);
+    if (threshold != fontSubpixelThreshold_)
     {
-        subpixelGlyphPositions_ = enable;
+        fontSubpixelThreshold_ = threshold;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontOversampling(int oversampling)
+{
+    assert(oversampling >= 1);
+    oversampling = Clamp(oversampling, 1, 8);
+    if (oversampling != fontOversampling_)
+    {
+        fontOversampling_ = oversampling;
         ReleaseFontFaces();
     }
 }
