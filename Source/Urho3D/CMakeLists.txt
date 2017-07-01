@@ -91,9 +91,11 @@ endif ()
 if (ODBC_VERSION AND NOT ODBC_VERSION VERSION_LESS 3)
     add_definitions (-DODBC_3_OR_LATER)
 endif ()
-
 if (WIN32)
     set (CMAKE_DEBUG_POSTFIX _d)
+    if (NOT MINGW OR HAVE_RTL_OSVERSIONINFOW)
+        add_definitions (-DHAVE_RTL_OSVERSIONINFOW)
+    endif ()
 endif ()
 
 # Define source files
