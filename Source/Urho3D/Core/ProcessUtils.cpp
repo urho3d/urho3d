@@ -419,7 +419,7 @@ String GetPlatform()
 #elif defined(__linux__)
     return "Linux";
 #else
-    return String::EMPTY;
+    return "(?)";
 #endif
 }
 
@@ -565,7 +565,7 @@ String GetLoginName()
         }
     }
 #endif
-    return "(?)"; 
+    return "(?)";
 }
 
 String GetHostName() 
@@ -580,7 +580,7 @@ String GetHostName()
     if (GetComputerName(buffer, &len))
         return buffer;
 #endif
-    return "(?)"; 
+    return "(?)";
 }
 
 // Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
@@ -702,7 +702,7 @@ String GetOSVersion()
         return version + " (Darwin kernel " + kernel_version[0] + "." + kernel_version[1] + "." + kernel_version[2] + ")"; 
     }
 #endif
-    return "(?)"; 
+    return "(?)";
 }
 
 }
