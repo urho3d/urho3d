@@ -268,8 +268,8 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                         unsigned rightIndex = deserializer.ReadUShort();
                         short amount = FixedToFloat(deserializer.ReadShort());
 
-                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex] : 0;
-                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex] : 0;
+                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex + 1] : 0;
+                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex + 1] : 0;
                         if (leftCharCode != 0 && rightCharCode != 0)
                         {
                             unsigned value = (leftCharCode << 16) + rightCharCode;
