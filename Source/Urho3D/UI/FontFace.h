@@ -43,9 +43,9 @@ struct URHO3D_API FontGlyph
     short x_;
     /// Y position in texture.
     short y_;
-    /// X position in texture.
+    /// Width in texture.
     short texWidth_;
-    /// Y position in texture.
+    /// Height in texture.
     short texHeight_;
     /// Width on screen.
     float width_;

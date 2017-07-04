@@ -2244,7 +2244,7 @@ Hint levels LIGHT and NONE allow for subpixel glyph positioning, which greatly i
 
 When textures aren't pixel-aligned, bilinear texture filtering makes them appear blurry. Therefore, subpixel font textures are oversampled (stretched horizontally) to reduce this blurriness, at the cost of extra memory usage. By default, subpixel fonts use 2x oversampling. Call \ref UI::SetFontOversampling "SetFontOversampling" to change this.
 
-Subpixel positioning only operates horizontally. Text is always pixel-aligned vertically.
+Subpixel positioning only operates horizontally. %Text is always pixel-aligned vertically.
 
 \section UI_Sprites Sprites
 
