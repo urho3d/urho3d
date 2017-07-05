@@ -117,19 +117,20 @@ bool TmxTileLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     if (dataElem.HasAttribute("encoding"))
     {
         String encodingAttribute = dataElem.GetAttribute("encoding");
-        if (encodingAttribute == "xml") {
+        if (encodingAttribute == "xml")
             encoding = XML;
-        } else if (encodingAttribute == "csv") {
+        else if (encodingAttribute == "csv")
             encoding = CSV;
-        } else if (encodingAttribute == "base64") {
+        else if (encodingAttribute == "base64")
             encoding = Base64;
-        } else {
+        else
+        {
             URHO3D_LOGERROR("Invalid encoding: " + encodingAttribute);
             return false;
         }
-    } else {
-        encoding = XML;
     }
+    else
+        encoding = XML;
 
     tiles_.Resize((unsigned)(width_ * height_));
     if (encoding == XML)
