@@ -14710,6 +14710,8 @@ Properties:
 - float dragBeginInterval
 - UIElement@ focusElement
 - FontHintLevel fontHintLevel
+- int fontOversampling
+- float fontSubpixelThreshold
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
 - int maxFontTextureSize
@@ -14718,7 +14720,6 @@ Properties:
 - int refs // readonly
 - UIElement@ root // readonly
 - float scale
-- bool subpixelGlyphPositions
 - StringHash type // readonly
 - String typeName // readonly
 - bool useMutableGlyphs

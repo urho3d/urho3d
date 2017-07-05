@@ -13917,6 +13917,8 @@ int dragBeginDistance;
 float dragBeginInterval;
 UIElement focusElement;
 FontHintLevel fontHintLevel;
+int fontOversampling;
+float fontSubpixelThreshold;
 bool forceAutoHint;
 /* readonly */
 UIElement frontElement;
@@ -13929,7 +13931,6 @@ int refs;
 /* readonly */
 UIElement root;
 float scale;
-bool subpixelGlyphPositions;
 /* readonly */
 StringHash type;
 /* readonly */
