@@ -269,11 +269,14 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                     // Skip searchRange, entrySelector and rangeShift
                     deserializer.Seek((unsigned)(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
 
+                    // x_scale is a 16.16 fixed-point value that converts font units -> 26.6 pixels (oversampled!)
+                    float xScale = face->size->metrics.x_scale / float(1 << 22) / oversampling_;
+
                     for (unsigned j = 0; j < numKerningPairs; ++j)
                     {
                         unsigned leftIndex = deserializer.ReadUShort();
                         unsigned rightIndex = deserializer.ReadUShort();
-                        short amount = FixedToFloat(deserializer.ReadShort());
+                        float amount = deserializer.ReadShort() * xScale;
 
                         unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex + 1] : 0;
                         unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex + 1] : 0;
