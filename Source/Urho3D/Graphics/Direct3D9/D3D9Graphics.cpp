@@ -2122,6 +2122,7 @@ void Graphics::OnWindowResized()
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
