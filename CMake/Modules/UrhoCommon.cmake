@@ -933,9 +933,10 @@ endmacro ()
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
 #  PCH <list> - Enable precompiled header support on the defined source files using the specified header file, the list is "<path/to/header> [C++|C]"
 #  RECURSE - Option to glob recursively
+#  GROUP - Option to group source files based on its relative path to the corresponding parent directory
 macro (define_source_files)
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
-    cmake_parse_arguments (ARG "RECURSE" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "RECURSE;GROUP" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
     if (NOT ARG_GLOB_CPP_PATTERNS)
         set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
     endif ()
@@ -967,6 +968,23 @@ macro (define_source_files)
     # Optionally enable PCH
     if (ARG_PCH)
         enable_pch (${ARG_PCH})
+    endif ()
+    # Optionally group the sources based on their physical subdirectories
+    if (ARG_GROUP)
+        foreach (CPP_FILE ${CPP_FILES})
+            get_filename_component (PATH ${CPP_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
+            endif ()
+        endforeach ()
+        foreach (H_FILE ${H_FILES})
+            get_filename_component (PATH ${H_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Header Files\\${PATH}" FILES ${H_FILE})
+            endif ()
+        endforeach ()
     endif ()
 endmacro ()
 
