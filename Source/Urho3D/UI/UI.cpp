@@ -58,6 +58,7 @@
 #include "../UI/View3D.h"
 #include "../UI/MultiLineEdit.h"
 
+#include <assert.h>
 #include <SDL/SDL.h>
 
 #include "../DebugNew.h"
@@ -100,13 +101,16 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(__ANDROID__) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS) || defined(TVOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
 #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
+    fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
+    fontSubpixelThreshold_(12),
+    fontOversampling_(2),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -602,6 +606,36 @@ void UI::SetForceAutoHint(bool enable)
     if (enable != forceAutoHint_)
     {
         forceAutoHint_ = enable;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontHintLevel(FontHintLevel level)
+{
+    if (level != fontHintLevel_)
+    {
+        fontHintLevel_ = level;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontSubpixelThreshold(float threshold)
+{
+    assert(threshold >= 0);
+    if (threshold != fontSubpixelThreshold_)
+    {
+        fontSubpixelThreshold_ = threshold;
+        ReleaseFontFaces();
+    }
+}
+
+void UI::SetFontOversampling(int oversampling)
+{
+    assert(oversampling >= 1);
+    oversampling = Clamp(oversampling, 1, 8);
+    if (oversampling != fontOversampling_)
+    {
+        fontOversampling_ = oversampling;
         ReleaseFontFaces();
     }
 }

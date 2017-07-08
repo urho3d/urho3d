@@ -76,7 +76,7 @@ void Text3D::RegisterObject(Context* context)
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Font", GetFontAttr, SetFontAttr, ResourceRef, ResourceRef(Font::GetTypeStatic()), AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Material", GetMaterialAttr, SetMaterialAttr, ResourceRef, ResourceRef(Material::GetTypeStatic()),
         AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Font Size", int, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Font Size", float, text_.fontSize_, DEFAULT_FONT_SIZE, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Text", GetTextAttr, SetTextAttr, String, String::EMPTY, AM_DEFAULT);
     URHO3D_ENUM_ATTRIBUTE("Text Alignment", text_.textAlignment_, horizontalAlignments, HA_LEFT, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Row Spacing", float, text_.rowSpacing_, 1.0f, AM_DEFAULT);
@@ -187,7 +187,7 @@ void Text3D::SetMaterial(Material* material)
     UpdateTextMaterials(true);
 }
 
-bool Text3D::SetFont(const String& fontName, int size)
+bool Text3D::SetFont(const String& fontName, float size)
 {
     bool success = text_.SetFont(fontName, size);
 
@@ -200,7 +200,7 @@ bool Text3D::SetFont(const String& fontName, int size)
     return success;
 }
 
-bool Text3D::SetFont(Font* font, int size)
+bool Text3D::SetFont(Font* font, float size)
 {
     bool success = text_.SetFont(font, size);
 
@@ -211,7 +211,7 @@ bool Text3D::SetFont(Font* font, int size)
     return success;
 }
 
-bool Text3D::SetFontSize(int size)
+bool Text3D::SetFontSize(float size)
 {
     bool success = text_.SetFontSize(size);
 
@@ -392,7 +392,7 @@ Font* Text3D::GetFont() const
     return text_.GetFont();
 }
 
-int Text3D::GetFontSize() const
+float Text3D::GetFontSize() const
 {
     return text_.GetFontSize();
 }
@@ -487,12 +487,12 @@ int Text3D::GetRowWidth(unsigned index) const
     return text_.GetRowWidth(index);
 }
 
-IntVector2 Text3D::GetCharPosition(unsigned index)
+Vector2 Text3D::GetCharPosition(unsigned index)
 {
     return text_.GetCharPosition(index);
 }
 
-IntVector2 Text3D::GetCharSize(unsigned index)
+Vector2 Text3D::GetCharSize(unsigned index)
 {
     return text_.GetCharSize(index);
 }

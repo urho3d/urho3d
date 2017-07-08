@@ -31,6 +31,11 @@
 namespace Urho3D
 {
 
+static const String base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+
 unsigned CountElements(const char* buffer, char separator)
 {
     if (!buffer)
@@ -751,6 +756,89 @@ String GetFileSizeString(unsigned long long memorySize)
     }
 
     return output;
+}
+
+// Implementation of base64 decoding originally by René Nyffenegger.
+// Modified by Konstantin Guschin and Lasse Oorni
+
+/*
+base64.cpp and base64.h
+
+Copyright (C) 2004-2017 René Nyffenegger
+
+This source code is provided 'as-is', without any express or implied
+warranty. In no event will the author be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this source code must not be misrepresented; you must not
+claim that you wrote the original source code. If you use this source code
+in a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original source code.
+
+3. This notice may not be removed or altered from any source distribution.
+
+René Nyffenegger rene.nyffenegger@adp-gmbh.ch
+
+*/
+
+static inline bool IsBase64(char c) {
+    return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+PODVector<unsigned char> DecodeBase64(String encodedString) 
+{
+    int inLen = encodedString.Length();
+    int i = 0;
+    int j = 0;
+    int in_ = 0;
+    unsigned char charArray4[4], charArray3[3];
+    PODVector<unsigned char> ret;
+
+    while (inLen-- && (encodedString[in_] != '=') && IsBase64(encodedString[in_])) 
+    {
+        charArray4[i++] = encodedString[in_]; 
+        in_++;
+
+        if (i == 4)
+        {
+            for (i = 0; i < 4; i++)
+                charArray4[i] = base64_chars.Find(charArray4[i]);
+
+            charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+            charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+            charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+            for (i = 0; (i < 3); i++)
+                ret.Push(charArray3[i]);
+
+            i = 0;
+        }
+    }
+
+    if (i)
+    {
+        for (j = i; j <4; j++)
+            charArray4[j] = 0;
+
+        for (j = 0; j <4; j++)
+            charArray4[j] = base64_chars.Find(charArray4[j]);
+
+        charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
+        charArray3[1] = ((charArray4[1] & 0xf) << 4) + ((charArray4[2] & 0x3c) >> 2);
+        charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
+
+        for (j = 0; (j < i - 1); j++) 
+            ret.Push(charArray3[j]);
+    }
+
+    return ret;
 }
 
 }

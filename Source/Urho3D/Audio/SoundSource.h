@@ -48,6 +48,8 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
+    /// Seek to time.
+    void Seek(float seekTime);
     /// Play a sound.
     void Play(Sound* sound);
     /// Play a sound with specified frequency.

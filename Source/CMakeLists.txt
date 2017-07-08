@@ -35,9 +35,13 @@ foreach (FUNCT __sincosf malloc_usable_size)
 endforeach ()
 include (CheckLibraryExists)
 check_library_exists (m sincosf "" HAVE_SINCOSF)
+if (MINGW)
+    include (CheckStructHasMember)
+    check_struct_has_member (RTL_OSVERSIONINFOW dwOSVersionInfoSize minwindef.h\;winnt.h HAVE_RTL_OSVERSIONINFOW)
+endif ()
 
 # Setup RPATH settings
-if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT WEB)
+if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Add RPATH entries when building
     set (CMAKE_SKIP_BUILD_RPATH FALSE)
     # But don't set them yet in the build tree
@@ -135,7 +139,7 @@ endif ()
 add_subdirectory (Tools)
 
 # Urho3D samples
-# Samples are built on iOS platform too when enabled. Currently there is no available mechanism to package each sample apps into individual *.apk
+# Samples are built on iOS/tvOS platform too when enabled. Currently there is no available mechanism to package each sample apps into individual *.apk
 # for Android platform, so we deploy all samples into one apk and use a simple list view activity launcher to select the sample to run
 if (URHO3D_SAMPLES)
     add_subdirectory (Samples)

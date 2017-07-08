@@ -36,7 +36,12 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 
 
 static int os_execute (lua_State *L) {
+// Urho3D - tvOS port, system not available for AppleTVOS and also its simulator
+#ifdef TVOS
+  lua_pushinteger(L, -1);
+#else
   lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
+#endif
   return 1;
 }
 

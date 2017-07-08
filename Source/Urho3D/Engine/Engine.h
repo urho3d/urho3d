@@ -66,7 +66,7 @@ public:
     void SetAutoExit(bool enable);
     /// Override timestep of the next frame. Should be called in between RunFrame() calls.
     void SetNextTimeStep(float seconds);
-    /// Close the graphics window and set the exit flag. No-op on iOS, as an iOS application can not legally exit.
+    /// Close the graphics window and set the exit flag. No-op on iOS/tvOS, as an iOS/tvOS application can not legally exit.
     void Exit();
     /// Dump profiling information to the log.
     void DumpProfiler();

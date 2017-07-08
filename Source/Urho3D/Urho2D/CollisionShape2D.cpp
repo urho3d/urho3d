@@ -303,7 +303,8 @@ void CollisionShape2D::OnNodeSet(Node* node)
 
 void CollisionShape2D::OnMarkedDirty(Node* node)
 {
-    Vector3 newWorldScale = node_->GetWorldScale();
+    // Use signed world scale to allow flipping of sprites by negative scale to work properly in regard to the collision shape
+    Vector3 newWorldScale = node_->GetSignedWorldScale();
 
     Vector3 delta = newWorldScale - cachedWorldScale_;
     if (delta.DotProduct(delta) < 0.01f)

@@ -14,14 +14,11 @@ subject to the following restrictions:
 */
 ///original version written by Erwin Coumans, October 2013
 
-// Modified by Jukka Jylanki for Urho3D
-
 #ifndef BT_MATRIX_X_H
 #define BT_MATRIX_X_H
 
 #include "LinearMath/btQuickprof.h"
 #include "LinearMath/btAlignedObjectArray.h"
-// Urho3D: fix Emscripten build
 #include <stdio.h>
 
 //#define BT_DEBUG_OSTREAM

@@ -150,6 +150,7 @@ namespace Urho3D
 <a href="#Class_Quaternion"><b>Quaternion</b></a>
 <a href="#Class_Ray"><b>Ray</b></a>
 <a href="#Class_RayQueryResult"><b>RayQueryResult</b></a>
+<a href="#Class_RaycastVehicle"><b>RaycastVehicle</b></a>
 <a href="#Class_Rect"><b>Rect</b></a>
 <a href="#Class_RemoteEvent"><b>RemoteEvent</b></a>
 <a href="#Class_RenderPath"><b>RenderPath</b></a>
@@ -161,6 +162,7 @@ namespace Urho3D
 <a href="#Class_ResourceCache"><b>ResourceCache</b></a>
 <a href="#Class_ResourceRef"><b>ResourceRef</b></a>
 <a href="#Class_ResourceRefList"><b>ResourceRefList</b></a>
+<a href="#Class_ResourceWithMetadata"><b>ResourceWithMetadata</b></a>
 <a href="#Class_RibbonTrail"><b>RibbonTrail</b></a>
 <a href="#Class_RigidBody"><b>RigidBody</b></a>
 <a href="#Class_RigidBody2D"><b>RigidBody2D</b></a>
@@ -321,7 +323,7 @@ Properties:
 - LoopMode2D loopMode
 
 <a name="Class_Animation"></a>
-### Animation : Resource
+### Animation : ResourceWithMetadata
 
 Methods:
 
@@ -2466,7 +2468,7 @@ Methods:
 - void SetScaledGlyphOffset(const Vector2& offset)
 - const IntVector2& GetAbsoluteGlyphOffset() const
 - const Vector2& GetScaledGlyphOffset() const
-- IntVector2 GetTotalGlyphOffset(int pointSize) const
+- IntVector2 GetTotalGlyphOffset(float pointSize) const
 - FontType GetFontType() const
 - bool IsSDFFont() const
 
@@ -3113,6 +3115,8 @@ Methods:
 - void SetString(const String value)
 - void SetArray(const JSONArray& value)
 - void SetObject(const JSONObject& value)
+- void SetVariant(const Variant& value)
+- void SetVariantMap(const VariantMap& value)
 - JSONValueType GetValueType() const
 - JSONNumberType GetNumberType() const
 - String GetValueTypeName() const
@@ -3131,6 +3135,8 @@ Methods:
 - const String GetString() const
 - const JSONArray& GetArray() const
 - const JSONObject& GetObject() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - JSONValue operator&[](unsigned index, JSONValue tolua_value)
 - JSONValue operator[](unsigned index)
 - const JSONValue operator[](unsigned index) const
@@ -3718,7 +3724,7 @@ Properties:
 - UIElement* window (readonly)
 
 <a name="Class_Model"></a>
-### Model : Resource
+### Model : ResourceWithMetadata
 
 Methods:
 
@@ -4174,6 +4180,7 @@ Methods:
 - Vector3 GetWorldUp() const
 - Vector3 GetWorldRight() const
 - Vector3 GetWorldScale() const
+- Vector3 GetSignedWorldScale() const
 - Vector2 GetWorldScale2D() const
 - const Matrix3x4& GetWorldTransform() const
 - Vector3 LocalToWorld(const Vector3& position) const
@@ -4236,6 +4243,7 @@ Properties:
 - Vector3 worldUp (readonly)
 - Vector3 worldRight (readonly)
 - Vector3 worldScale
+- Vector3 signedWorldScale (readonly)
 - Vector2 worldScale2D
 - Matrix3x4& worldTransform (readonly)
 - bool dirty (readonly)
@@ -4560,15 +4568,18 @@ Methods:
 - void SetEffect(ParticleEffect2D* effect)
 - void SetSprite(Sprite2D* sprite)
 - void SetBlendMode(BlendMode blendMode)
+- void SetEmitting(bool emitting)
 - ParticleEffect2D* GetEffect() const
 - Sprite2D* GetSprite() const
 - BlendMode GetBlendMode() const
+- bool IsEmitting() const
 
 Properties:
 
 - ParticleEffect2D* effect
 - Sprite2D* sprite
 - BlendMode blendMode
+- bool emitting
 
 <a name="Class_Pass"></a>
 ### Pass : RefCounted
@@ -4928,6 +4939,8 @@ Methods:
 - float YawAngle() const
 - float PitchAngle() const
 - float RollAngle() const
+- Vector3 Axis() const
+- float Angle() const
 - Matrix3 RotationMatrix() const
 - Quaternion Slerp(const Quaternion& rhs, float t) const
 - Quaternion Nlerp(const Quaternion& rhs, float t, bool shortestPath) const
@@ -4990,6 +5003,66 @@ Properties:
 - Drawable* drawable
 - Node* node
 - unsigned subObject
+
+<a name="Class_RaycastVehicle"></a>
+### RaycastVehicle : LogicComponent
+
+Methods:
+
+- RaycastVehicle(Urho3D::Context* context) (GC)
+- RaycastVehicle* new(Urho3D::Context* context)
+- void delete()
+- void RegisterObject(Context* context)
+- void ApplyAttributes()
+- void AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel)
+- void ResetSuspension()
+- void UpdateWheelTransform(int wheel, bool interpolated)
+- void SetSteeringValue(int wheel, float steeringValue)
+- void SetWheelSuspensionStiffness(int wheel, float stiffness)
+- void SetWheelDampingRelaxation(int wheel, float damping)
+- void SetWheelDampingCompression(int wheel, float compression)
+- void SetWheelFrictionSlip(int wheel, float slip)
+- void SetWheelRollInfluence(int wheel, float rollInfluence)
+- void SetEngineForce(int wheel, float force)
+- void SetBrake(int wheel, float force)
+- void SetWheelRadius(int wheel, float wheelRadius)
+- void ResetWheels()
+- void SetWheelRestLength(int wheel, float length)
+- void SetWheelSkidInfo(int wheel, float factor)
+- bool WheelIsGrounded(int wheel) const
+- void SetMaxSuspensionTravel(int wheel, float maxSuspensionTravel)
+- void SetWheelDirection(int wheel, Vector3 direction)
+- void SetWheelAxle(int wheel, Vector3 axle)
+- void SetMaxSideSlipSpeed(float speed)
+- void SetWheelSkidInfoCumulative(int wheel, float skid)
+- void SetInAirRPM(float rpm)
+- void Init()
+- Vector3 GetWheelPosition(int wheel)
+- Quaternion GetWheelRotation(int wheel)
+- Vector3 GetWheelConnectionPoint(int wheel)
+- int GetNumWheels()
+- Node* GetWheelNode(int wheel)
+- float GetSteeringValue(int wheel) const
+- float GetWheelSuspensionStiffness(int wheel) const
+- float GetWheelDampingRelaxation(int wheel) const
+- float GetWheelDampingCompression(int wheel) const
+- float GetWheelFrictionSlip(int wheel) const
+- float GetWheelRollInfluence(int wheel) const
+- float GetEngineForce(int wheel) const
+- float GetBrake(int wheel) const
+- float GetWheelRadius(int wheel) const
+- float GetWheelRestLength(int wheel) const
+- float GetWheelSkidInfo(int wheel) const
+- float GetMaxSuspensionTravel(int wheel)
+- float GetWheelSideSlipSpeed(int wheel) const
+- float GetMaxSideSlipSpeed() const
+- float GetWheelSkidInfoCumulative(int wheel) const
+- Vector3 GetWheelDirection(int wheel) const
+- bool IsFrontWheel(int wheel) const
+- Vector3 GetWheelAxle(int wheel) const
+- Vector3 GetContactPosition(int wheel) const
+- Vector3 GetContactNormal(int wheel) const
+- float GetInAirRPM() const
 
 <a name="Class_Rect"></a>
 ### Rect
@@ -5406,6 +5479,17 @@ Methods:
 Properties:
 
 - StringHash type
+
+<a name="Class_ResourceWithMetadata"></a>
+### ResourceWithMetadata : Resource
+
+Methods:
+
+- void AddMetadata(const String name, const Variant& value)
+- void RemoveMetadata(const String name)
+- void RemoveAllMetadata()
+- const Variant& GetMetadata(const String name) const
+- bool HasMetadata() const
 
 <a name="Class_RibbonTrail"></a>
 ### RibbonTrail : Drawable
@@ -5896,7 +5980,7 @@ Properties:
 - float repeatRate
 
 <a name="Class_Sound"></a>
-### Sound : Resource
+### Sound : ResourceWithMetadata
 
 Methods:
 
@@ -5945,6 +6029,7 @@ Properties:
 
 Methods:
 
+- void Seek(float seekTime)
 - void Play(Sound* sound)
 - void Play(Sound* sound, float frequency)
 - void Play(Sound* sound, float frequency, float gain)
@@ -6466,9 +6551,9 @@ Methods:
 - Text() (GC)
 - Text* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6485,7 +6570,7 @@ Methods:
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
 - Font* GetFont() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - float GetRowSpacing() const
@@ -6499,19 +6584,19 @@ Methods:
 - int GetEffectStrokeThickness() const
 - bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
 
 Properties:
 
 - Font* font
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6526,7 +6611,7 @@ Properties:
 - int effectStrokeThickness
 - bool effectRoundStroke
 - Color& effectColor
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 
@@ -6538,9 +6623,9 @@ Methods:
 - Text3D() (GC)
 - Text3D* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6563,7 +6648,7 @@ Methods:
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - HorizontalAlignment GetHorizontalAlignment() const
@@ -6578,12 +6663,12 @@ Methods:
 - float GetEffectDepthBias() const
 - int GetWidth() const
 - int GetHeight() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool IsFixedScreenSize() const
@@ -6593,7 +6678,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
@@ -6609,7 +6694,7 @@ Properties:
 - int width
 - Color& color
 - int height (readonly)
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
@@ -6617,7 +6702,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 
 <a name="Class_Texture"></a>
-### Texture : Resource
+### Texture : ResourceWithMetadata
 
 Methods:
 
@@ -6941,6 +7026,9 @@ Methods:
 - void SetUseScreenKeyboard(bool enable)
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
+- void SetFontHintLevel(FontHintLevel level)
+- void SetFontSubpixelThreshold(float threshold)
+- void SetFontOversampling(int limit)
 - void SetScale(float scale)
 - void SetWidth(float width)
 - void SetHeight(float height)
@@ -6966,6 +7054,9 @@ Methods:
 - bool GetUseScreenKeyboard() const
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
+- FontHintLevel GetFontHintLevel() const
+- float GetFontSubpixelThreshold() const
+- int GetFontOversampling() const
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
@@ -6990,6 +7081,9 @@ Properties:
 - bool useScreenKeyboard
 - bool useMutableGlyphs
 - bool forceAutoHint
+- FontHintLevel fontHintLevel
+- float fontSubpixelThreshold
+- int fontOversampling
 - bool modalElement (readonly)
 - float scale
 - IntVector2& customSize
@@ -7417,6 +7511,7 @@ Methods:
 - float DotProduct(const Vector3& rhs) const
 - float AbsDotProduct(const Vector3& rhs) const
 - float ProjectOntoAxis(const Vector3& axis) const
+- Vector3 Orthogonalize(const Vector3& axis) const
 - Vector3 CrossProduct(const Vector3& rhs) const
 - Vector3 Abs() const
 - Vector3 Lerp(const Vector3& rhs, float t) const
@@ -8108,6 +8203,12 @@ Properties:
 - int FM_FOCUSABLE
 - int FM_FOCUSABLE_DEFOCUSABLE
 
+### FontHintLevel
+
+- int FONT_HINT_LEVEL_NONE
+- int FONT_HINT_LEVEL_LIGHT
+- int FONT_HINT_LEVEL_NORMAL
+
 ### FontType
 
 - int FONT_NONE
@@ -8573,21 +8674,25 @@ Properties:
 - Variant GetGlobalVar(const String key)
 - VariantMap& GetGlobalVars()
 - Graphics* GetGraphics()
+- String GetHostName()
 - Input* GetInput()
 - String GetInternalPath(const String pathName)
 - Localization* GetLocalization()
 - Log* GetLog()
+- String GetLoginName()
 - String GetMiniDumpDir()
 - String GetNativePath(const String pathName)
 - Network* GetNetwork()
 - unsigned GetNumLogicalCPUs()
 - unsigned GetNumPhysicalCPUs()
+- String GetOSVersion()
 - String GetParentPath(const String pathName)
 - String GetPath(const String fullPath)
 - String GetPlatform()
 - unsigned GetRandomSeed()
 - Renderer* GetRenderer()
 - Time* GetTime()
+- long GetTotalMemory()
 - UI* GetUI()
 - bool HasSubscribedToEvent(Object* sender, const String eventName)
 - bool HasSubscribedToEvent(const String eventName)
@@ -8611,10 +8716,10 @@ Properties:
 - int Rand()
 - float RandStandardNormal()
 - float Random(float min, float max)
-- float Random(float range)
 - float Random()
-- int RandomInt(int range)
+- float Random(float range)
 - int RandomInt(int min, int max)
+- int RandomInt(int range)
 - float RandomNormal(float meanValue, float variance)
 - void RegisterEventName(const String eventName)
 - String RemoveTrailingSlash(const String pathName)
@@ -8631,11 +8736,11 @@ Properties:
 - float Sin(float angle)
 - float SmoothStep(float lhs, float rhs, float t)
 - float Sqrt(float x)
-- float StableRandom(const Vector3& seed)
 - float StableRandom(float seed)
 - float StableRandom(const Vector2& seed)
-- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
+- float StableRandom(const Vector3& seed)
 - void SubscribeToEvent(void* sender, const String eventName, void* functionOrFunctionName)
+- void SubscribeToEvent(const String eventName, void* functionOrFunctionName)
 - float Tan(float angle)
 - bool ToBool(const String source)
 - Color ToColor(const String source)
@@ -8664,28 +8769,28 @@ Properties:
 - void UnsubscribeFromEvent(Object* sender, const String eventName)
 - void UnsubscribeFromEvent(const String eventName)
 - void UnsubscribeFromEvents(Object* sender)
-- Vector2 VectorCeil(const Vector2& vec)
 - Vector4 VectorCeil(const Vector4& vec)
 - Vector3 VectorCeil(const Vector3& vec)
+- Vector2 VectorCeil(const Vector2& vec)
 - IntVector3 VectorCeilToInt(const Vector3& vec)
 - IntVector2 VectorCeilToInt(const Vector2& vec)
-- Vector2 VectorFloor(const Vector2& vec)
-- Vector3 VectorFloor(const Vector3& vec)
 - Vector4 VectorFloor(const Vector4& vec)
+- Vector3 VectorFloor(const Vector3& vec)
+- Vector2 VectorFloor(const Vector2& vec)
 - IntVector2 VectorFloorToInt(const Vector2& vec)
 - IntVector3 VectorFloorToInt(const Vector3& vec)
 - Vector2 VectorLerp(const Vector2& lhs, const Vector2& rhs, const Vector2& t)
-- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorLerp(const Vector3& lhs, const Vector3& rhs, const Vector3& t)
-- Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
-- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
-- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
-- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t)
 - Vector3 VectorMax(const Vector3& lhs, const Vector3& rhs)
-- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
-- IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
+- IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs)
+- Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs)
+- Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs)
+- IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs)
 - Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs)
 - Vector3 VectorMin(const Vector3& lhs, const Vector3& rhs)
+- Vector2 VectorMin(const Vector2& lhs, const Vector2& rhs)
+- IntVector3 VectorMin(const IntVector3& lhs, const IntVector3& rhs)
 - IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs)
 - Vector4 VectorRound(const Vector4& vec)
 - Vector2 VectorRound(const Vector2& vec)

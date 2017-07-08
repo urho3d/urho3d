@@ -20,6 +20,7 @@ Urho3D development, contributions and bugfixes by:
 - Lasse Öörni
 - Wei Tjong Yao
 - Aster Jian
+- Ricardo Abreu
 - Vivienne Anthony
 - Colin Barrett
 - Erik Beran
@@ -28,15 +29,18 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Sergey Bosko
 - Lisandro Bruzzo
+- Thomas Böhm
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
+- Stanislav Demyanovich
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
 - Chris Friesen
 - Alex Fuller
+- Konstantin Guschin
 - Henrik Heino
 - Mika Heinonen
 - Victor Holt
@@ -52,18 +56,22 @@ Urho3D development, contributions and bugfixes by:
 - Artem Kulyk
 - Rokas Kupstys
 - Ali Kämäräinen
+- Sergey Lapin
 - Pete Leigh
+- Pengfei Li
 - Arnis Lielturks
 - Frode 'Modanung' Lindeijer
 - Thorbjørn Lindeijer
 - Nathanial Lydick
 - Xavier Maupeu
+- Iain Merrick
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
 - David Palacios
 - Alex Parlett
 - Jordan Patterson
+- Georgii Pelageikin
 - Anton Petrov
 - Vladimir Pobedinsky
 - Franck Poulain
@@ -86,6 +94,7 @@ Urho3D development, contributions and bugfixes by:
 - Steven Zhang
 - AGreatFish
 - BlueMagnificent
+- CG-SS
 - Enhex
 - Fastran
 - Firegorilla
@@ -115,8 +124,10 @@ Urho3D development, contributions and bugfixes by:
 - fredakilla
 - gleblebedev
 - hdunderscore
+- lhinuz
 - lvshiling
 - marynate
+- meshonline
 - mightyCelu
 - neat3d
 - nemerle
@@ -162,9 +173,9 @@ Urho3D uses the following third-party libraries:
 - AngelScript 2.31.2 (http://www.angelcode.com/angelscript)
 - Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
-- Bullet 2.83.6 (http://www.bulletphysics.org)
+- Bullet 2.86.1 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
-- FreeType 2.7.1 (https://www.freetype.org)
+- FreeType 2.8 (https://www.freetype.org)
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - jo_jpeg 1.52 (http://www.jonolick.com/uploads/7/9/2/1/7921194/jo_jpeg.cpp)
 - kNet (https://github.com/juj/kNet)
@@ -177,7 +188,7 @@ Urho3D uses the following third-party libraries:
 - nanodbc 2.12.4 (https://lexicalunit.github.io/nanodbc)
 - Open Asset Import Library 3.2 (http://assimp.sourceforge.net)
 - pugixml 1.7 (http://pugixml.org)
-- rapidjson 0.11 (https://code.google.com/p/rapidjson)
+- rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.5 (https://www.libsdl.org)
 - SQLite 3.18.0 (https://www.sqlite.org)

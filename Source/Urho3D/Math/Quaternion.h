@@ -431,6 +431,10 @@ public:
     float PitchAngle() const;
     /// Return roll angle in degrees.
     float RollAngle() const;
+    /// Return rotation axis.
+    Vector3 Axis() const;
+    /// Return rotation angle.
+    float Angle() const;
     /// Return the rotation matrix that corresponds to this quaternion.
     Matrix3 RotationMatrix() const;
     /// Spherical interpolation with another quaternion.

@@ -67,8 +67,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
     Urho3D::ParseArguments(GetCommandLineW()); \
     return function; \
 }
-// Android or iOS: use SDL_main
-#elif defined(__ANDROID__) || defined(IOS)
+// Android or iOS or tvOS: use SDL_main
+#elif defined(__ANDROID__) || defined(IOS) || defined(TVOS)
 #define URHO3D_DEFINE_MAIN(function) \
 extern "C" int SDL_main(int argc, char** argv); \
 int SDL_main(int argc, char** argv) \

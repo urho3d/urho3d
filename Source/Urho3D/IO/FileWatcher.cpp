@@ -36,7 +36,7 @@ extern "C"
 // Need read/close for inotify
 #include "unistd.h"
 }
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
 extern "C"
 {
 #include "../IO/MacFileWatcher.h"
@@ -58,7 +58,7 @@ FileWatcher::FileWatcher(Context* context) :
 #ifdef URHO3D_FILEWATCHER
 #ifdef __linux__
     watchHandle_ = inotify_init();
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
     supported_ = IsFileWatcherSupported();
 #endif
 #endif
@@ -156,7 +156,7 @@ bool FileWatcher::StartWatching(const String& pathName, bool watchSubDirs)
         URHO3D_LOGDEBUG("Started watching path " + pathName);
         return true;
     }
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
     if (!supported_)
     {
         URHO3D_LOGERROR("Individual file watching not supported by this OS version, can not start watching path " + pathName);
@@ -205,7 +205,7 @@ void FileWatcher::StopWatching()
             fileSystem_->Delete(dummyFileName);
 #endif
 
-#if defined(__APPLE__) && !defined(IOS)
+#if defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
         // Our implementation of file watcher requires the thread to be stopped first before closing the watcher
         Stop();
 #endif
@@ -216,7 +216,7 @@ void FileWatcher::StopWatching()
         for (HashMap<int, String>::Iterator i = dirHandle_.Begin(); i != dirHandle_.End(); ++i)
             inotify_rm_watch(watchHandle_, i->first_);
         dirHandle_.Clear();
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
         CloseFileWatcher(watcher_);
 #endif
 
@@ -306,7 +306,7 @@ void FileWatcher::ThreadFunction()
             i += sizeof(inotify_event) + event->len;
         }
     }
-#elif defined(__APPLE__) && !defined(IOS)
+#elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
     while (shouldRun_)
     {
         Time::Sleep(100);

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Math/Vector2.h"
+#include "../Math/MathDefs.h"
 
 namespace Urho3D
 {
@@ -356,6 +357,9 @@ public:
     /// Project vector onto axis.
     float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(axis.Normalized()); }
 
+    /// Make vector orthogonal to the axis.
+    Vector3 Orthogonalize(const Vector3& axis) const { return axis.CrossProduct(*this).CrossProduct(axis).Normalized(); }
+
     /// Calculate cross product.
     Vector3 CrossProduct(const Vector3& rhs) const
     {
@@ -402,6 +406,17 @@ public:
 
     /// Return as string.
     String ToString() const;
+
+    /// Return hash value for HashSet & HashMap.
+    unsigned ToHash() const
+    {
+        unsigned hash = 37;
+        hash = 37 * hash + FloatToRawIntBits(x_);
+        hash = 37 * hash + FloatToRawIntBits(y_);
+        hash = 37 * hash + FloatToRawIntBits(z_);
+
+        return hash;
+    }
 
     /// X coordinate.
     float x_;

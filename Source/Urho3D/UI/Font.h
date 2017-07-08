@@ -65,7 +65,7 @@ public:
     void SetScaledGlyphOffset(const Vector2& offset);
 
     /// Return font face. Pack and render to a texture if not rendered yet. Return null on error.
-    FontFace* GetFace(int pointSize);
+    FontFace* GetFace(float pointSize);
 
     /// Return font type.
     FontType GetFontType() const { return fontType_; }
@@ -80,7 +80,7 @@ public:
     const Vector2& GetScaledGlyphOffset() const { return scaledOffset_; }
 
     /// Return the total effective offset for a point size.
-    IntVector2 GetTotalGlyphOffset(int pointSize) const;
+    IntVector2 GetTotalGlyphOffset(float pointSize) const;
 
     /// Release font faces and recreate them next time when requested. Called when font textures lost or global font properties change.
     void ReleaseFaces();
@@ -89,9 +89,9 @@ private:
     /// Load font glyph offset parameters from an optional XML file. Called internally when loading TrueType fonts.
     void LoadParameters();
     /// Return font face using FreeType. Called internally. Return null on error.
-    FontFace* GetFaceFreeType(int pointSize);
+    FontFace* GetFaceFreeType(float pointSize);
     /// Return bitmap font face. Called internally. Return null on error.
-    FontFace* GetFaceBitmap(int pointSize);
+    FontFace* GetFaceBitmap(float pointSize);
 
     /// Created faces.
     HashMap<int, SharedPtr<FontFace> > faces_;

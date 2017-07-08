@@ -25,6 +25,9 @@ set (TARGET_NAME Urho3DPlayer)
 
 # Define source files
 define_source_files ()
+if (NOT WEB)
+    define_resource_dirs (EXTRA_DIRS ${CMAKE_SOURCE_DIR}/bin/Autoload)
+endif ()
 
 # Setup target with resource copying
 setup_main_executable (NOBUNDLE)
@@ -40,10 +43,11 @@ if (URHO3D_LUA)
 endif ()
 
 # Symlink/copy helper shell scripts or batch files to invoke Urho3DPlayer
-if (NOT IOS AND NOT ANDROID AND NOT WEB AND NOT CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+if (NOT IOS AND NOT TVOS AND NOT ANDROID AND NOT WEB AND NOT CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Ensure the output directory exist before creating the symlinks
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    foreach (FILE Editor NinjaSnowWar PBRDemo)
-        create_symlink (${CMAKE_SOURCE_DIR}/bin/${FILE}${SCRIPT_EXT} ${CMAKE_BINARY_DIR}/bin/${FILE}${SCRIPT_EXT} FALLBACK_TO_COPY)
+    file (GLOB FILES RELATIVE ${CMAKE_SOURCE_DIR}/bin ${CMAKE_SOURCE_DIR}/bin/*${SCRIPT_EXT})
+    foreach (FILE ${FILES})
+        create_symlink (${CMAKE_SOURCE_DIR}/bin/${FILE} ${CMAKE_BINARY_DIR}/bin/${FILE} FALLBACK_TO_COPY)
     endforeach ()
 endif ()

@@ -156,6 +156,7 @@ class Node : public Animatable
     Vector3 GetWorldUp() const;
     Vector3 GetWorldRight() const;
     Vector3 GetWorldScale() const;
+    Vector3 GetSignedWorldScale() const;
     Vector2 GetWorldScale2D() const;
 
     const Matrix3x4& GetWorldTransform() const;
@@ -234,6 +235,7 @@ class Node : public Animatable
     tolua_readonly tolua_property__get_set Vector3 worldUp;
     tolua_readonly tolua_property__get_set Vector3 worldRight;
     tolua_property__get_set Vector3 worldScale;
+    tolua_readonly tolua_property__get_set Vector3 signedWorldScale;
     tolua_property__get_set Vector2 worldScale2D;
     tolua_readonly tolua_property__get_set Matrix3x4& worldTransform;
     tolua_readonly tolua_property__is_set bool dirty;

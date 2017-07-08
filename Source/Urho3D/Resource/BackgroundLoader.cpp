@@ -290,6 +290,10 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
         owner_->SendEvent(E_LOADFAILED, eventData);
     }
 
+    // Store to the cache just before sending the event; use same mechanism as for manual resources
+    if (success || owner_->GetReturnFailedResources())
+        owner_->AddManualResource(resource);
+
     // Send event, either success or failure
     {
         using namespace ResourceBackgroundLoaded;
@@ -300,10 +304,6 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
         eventData[P_RESOURCE] = resource;
         owner_->SendEvent(E_RESOURCEBACKGROUNDLOADED, eventData);
     }
-
-    // Store to the cache; use same mechanism as for manual resources
-    if (success || owner_->GetReturnFailedResources())
-        owner_->AddManualResource(resource);
 }
 
 }

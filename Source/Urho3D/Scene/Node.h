@@ -464,6 +464,9 @@ public:
         return worldTransform_.Scale();
     }
 
+    /// Return signed scale in world space. Utilized for Urho2D physics.
+    Vector3 GetSignedWorldScale() const;
+
     /// Return scale in world space (for Urho2D).
     Vector2 GetWorldScale2D() const
     {

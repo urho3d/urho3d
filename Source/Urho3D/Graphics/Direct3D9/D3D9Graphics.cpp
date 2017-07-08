@@ -2122,6 +2122,7 @@ void Graphics::OnWindowResized()
     eventData[P_FULLSCREEN] = fullscreen_;
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
+    eventData[P_HIGHDPI] = highDPI_;
     SendEvent(E_SCREENMODE, eventData);
 }
 
@@ -2352,11 +2353,12 @@ void Graphics::AdjustWindow(int& newWidth, int& newHeight, bool& newFullscreen, 
             SDL_GetWindowSize(window_, &newWidth, &newHeight);
         }
         else {
-            if (newFullscreen || newBorderless) 
+            SDL_Rect display_rect;
+            SDL_GetDisplayBounds(monitor, &display_rect);
+
+            if (newFullscreen || (newBorderless && newWidth >= display_rect.w && newHeight >= display_rect.h))
             {
-                // Reposition the window on the specified monitor
-                SDL_Rect display_rect;
-                SDL_GetDisplayBounds(monitor, &display_rect);
+                // Reposition the window on the specified monitor if it's supposed to cover the entire monitor
                 SDL_SetWindowPosition(window_, display_rect.x, display_rect.y);
             }
 
