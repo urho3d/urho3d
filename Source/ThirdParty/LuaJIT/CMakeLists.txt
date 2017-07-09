@@ -595,6 +595,7 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}
         COMMENT "Copying dependency files for luajit standalone executable")
+    add_make_clean_files (${LUAJIT_DEP_DIR})
 
     # Install dependency files required by luajit
     if (DEST_RUNTIME_DIR)

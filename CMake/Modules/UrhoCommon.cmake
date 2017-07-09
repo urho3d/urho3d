@@ -828,6 +828,12 @@ macro (create_symlink SOURCE DESTINATION)
     endif ()
 endmacro ()
 
+# Macro for adding additional make clean files
+macro (add_make_clean_files)
+    get_directory_property (ADDITIONAL_MAKE_CLEAN_FILES ADDITIONAL_MAKE_CLEAN_FILES)
+    set_directory_properties (PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ADDITIONAL_MAKE_CLEAN_FILES};${ARGN}")
+endmacro ()
+
 # *** THIS IS A DEPRECATED MACRO ***
 # Macro for defining external library dependencies
 # The purpose of this macro is emulate CMake to set the external library dependencies transitively
@@ -1468,15 +1474,18 @@ macro (setup_executable)
         # Make a copy of the Urho3D DLL to the runtime directory in the build tree
         if (TARGET Urho3D)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${RUNTIME_DIR})
+            add_make_clean_files (${RUNTIME_DIR}/$<TARGET_FILE_NAME:Urho3D>)
         else ()
             foreach (DLL ${URHO3D_DLL})
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL} ${RUNTIME_DIR})
+                add_make_clean_files (${RUNTIME_DIR}/${DLL})
             endforeach ()
         endif ()
     endif ()
     if (DIRECT3D_DLL AND NOT ARG_NODEPS)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${RUNTIME_DIR})
+        add_make_clean_files (${RUNTIME_DIR}/${DIRECT3D_DLL})
     endif ()
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (NOT ARG_PRIVATE)
@@ -1594,6 +1603,13 @@ macro (setup_main_executable)
             install (TARGETS ${TARGET_NAME} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
         endif ()
         # Copy other dependent shared libraries to Android library output path
+        if (ANDROID_STL MATCHES shared)
+            # Android toolchain may already copy a shared C++ STL runtime to library output path,
+            # still we configure another post build command to copy the runtime and its clean up here for consistency sake
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${STL_LIBRARY_DIR}/lib${ANDROID_STL}.so ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+            add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+        endif ()
         foreach (FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
             if (EXT STREQUAL .so)
@@ -1601,6 +1617,7 @@ macro (setup_main_executable)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}
                     COMMENT "Copying ${NAME} to library output directory")
+                add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/${NAME})
             endif ()
         endforeach ()
         if (ANDROID_NDK_GDB)
@@ -1608,6 +1625,7 @@ macro (setup_main_executable)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
                 COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
+            add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
         endif ()
         # When performing packaging, include the final apk file
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
@@ -1658,6 +1676,11 @@ macro (setup_main_executable)
             endif ()
         endif ()
         setup_executable (${EXE_TYPE} ${ARG_UNPARSED_ARGUMENTS})
+        if (HAS_SHELL_FILE)
+            get_target_property (LOCATION ${TARGET_NAME} LOCATION)
+            get_filename_component (NAME_WE ${LOCATION} NAME_WE)
+            add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/${NAME_WE}.js $<TARGET_FILE_DIR:${TARGET_NAME}>/${NAME_WE}.wasm)
+        endif ()
     endif ()
     # Setup custom resource checker target
     if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
@@ -1691,6 +1714,7 @@ macro (setup_main_executable)
                 endif ()
                 list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && bash -c \"\(\( `find ${DIR} -newer ${DIR} |wc -l` \)\)\" && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
             endif ()
+            add_make_clean_files (${RESOURCE_${DIR}_PATHNAME})
         endforeach ()
         string (MD5 MD5ALL ${MD5ALL})
         # Ensure the resource check is done before building the main executable target
@@ -1797,6 +1821,7 @@ macro (_setup_target)
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}> $<TARGET_FILE_DIR:${TARGET_NAME}>
                     COMMAND ${CMAKE_COMMAND} -E $<$<NOT:$<CONFIG:Debug>>:echo> copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>.map>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}.map> $<TARGET_FILE_DIR:${TARGET_NAME}> $<$<NOT:$<CONFIG:Debug>>:$<ANGLE-R>${NULL_DEVICE}>
                     COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${CMAKE_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
+                add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js $<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js.map)
             endif ()
         endif ()
         # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file

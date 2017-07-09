@@ -175,6 +175,7 @@ if (URHO3D_BINDINGS)
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/Clang-Tools
         CMAKE_ARGS -DURHO3D_CLANG_TOOLS=AutoBinder -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool/clang -DDEST_INCLUDE_DIR=${DEST_INCLUDE_DIR} -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
         ${ALTERNATE_COMMAND})
+    add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/clang/AutoBinder)
     file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/generated)
     foreach (SCRIPT AngelScript LuaScript JavaScript)
         string (TOUPPER URHO3D_${SCRIPT} OPT)
@@ -206,6 +207,7 @@ if (URHO3D_LUA)
             SOURCE_DIR ${CMAKE_SOURCE_DIR}/Source/ThirdParty/toluapp/src/bin
             CMAKE_ARGS -DDEST_RUNTIME_DIR=${CMAKE_BINARY_DIR}/bin/tool -DBAKED_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DURHO3D_UPDATE_SOURCE_TREE=${URHO3D_UPDATE_SOURCE_TREE}
             ${ALTERNATE_COMMAND})
+        add_make_clean_files (${CMAKE_BINARY_DIR}/bin/tool/tolua++)
     else ()
         # Otherwise, build it internally as per normal
         add_subdirectory (../ThirdParty/toluapp/src/bin ../ThirdParty/toluapp/src/bin)
@@ -539,6 +541,7 @@ if (ANDROID_NDK_GDB)
     # Copy the library while it still has debug symbols for ndk-gdb
     add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
         COMMENT "Copying Urho3D library with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
+    add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
 endif ()
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND (ANDROID OR ARM))
     # Strip the output shared library for embedded devices
