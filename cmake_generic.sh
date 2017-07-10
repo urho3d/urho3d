@@ -47,6 +47,9 @@ for a in $@; do
         -DIOS=1)
             IOS=1
             ;;
+        -DTVOS=1)
+            TVOS=1
+            ;;
         -DANDROID=1)
             ANDROID=1 && OPTS="-DCMAKE_TOOLCHAIN_FILE=$TOOLCHAINS/Android.cmake"
             ;;

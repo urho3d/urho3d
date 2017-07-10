@@ -336,6 +336,8 @@ private:
     Texture* viewportTextures_[MAX_VIEWPORT_TEXTURES];
     /// Color rendertarget active for the current renderpath command.
     RenderSurface* currentRenderTarget_;
+    /// Last used custom depth render surface.
+    RenderSurface* lastCustomDepthSurface_;
     /// Texture containing the latest viewport texture.
     Texture* currentViewportTexture_;
     /// Dummy texture for D3D9 depth only rendering.

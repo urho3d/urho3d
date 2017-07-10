@@ -229,17 +229,16 @@
     ///     normal: surface normal
     ///     reflection: vector of reflection off of the surface
     ///     roughness: surface roughness
-    vec3 GetSpecularDominantDir(vec3 normal, vec3 reflection, float roughness)
-    {
-        float smoothness = 1.0 - roughness;
-        float lerpFactor = smoothness * (sqrt(smoothness) + roughness);
-        return mix(normal, reflection, lerpFactor);
-    }
+    // vec3 GetSpecularDominantDir(vec3 normal, vec3 reflection, float roughness)
+    // {
+    //     float smoothness = 1.0 - roughness;
+    //     float lerpFactor = smoothness * (sqrt(smoothness) + roughness);
+    //     return mix(normal, reflection, lerpFactor);
+    // }
 
     float GetMipFromRoughness(float roughness)
     {
-        float Level = 3 - 1.15 * log2( roughness );
-        return 9.0 - 1 - Level;
+        return (roughness * 12.0 - pow(roughness, 6.0) * 1.5);
     }
 
 
@@ -273,6 +272,7 @@
     ///     ambientOcclusion: ambient occlusion
     vec3 ImageBasedLighting(vec3 reflectVec, vec3 tangent, vec3 bitangent, vec3 wsNormal, vec3 toCamera, vec3 diffColor, vec3 specColor, float roughness, inout vec3 reflectionCubeColor)
     {
+        roughness = max(roughness, 0.08);
         reflectVec = GetSpecularDominantDir(wsNormal, reflectVec, roughness);
         float ndv = clamp(dot(-toCamera, wsNormal), 0.0, 1.0);
 

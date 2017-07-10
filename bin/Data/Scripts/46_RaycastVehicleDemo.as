@@ -103,9 +103,7 @@ void CreateScene()
     }
 }
 
-
-void
-CreateVehicle()
+void CreateVehicle()
 {
     vehicleNode = scene_.CreateChild("Vehicle");
     vehicleNode.position = Vector3(0.0f, 5.0f, 0.0f);
@@ -124,9 +122,7 @@ CreateVehicle()
     hullBody.collisionLayer = 1;
 }
 
-void
-
-CreateInstructions()
+void CreateInstructions()
 {
     // Construct new Text object, set string to display and font to use
     Text@ instructionText = ui.root.CreateChild("Text");
@@ -143,9 +139,7 @@ CreateInstructions()
     instructionText.SetPosition(0, ui.root.height / 4);
 }
 
-void
-
-SubscribeToEvents()
+void SubscribeToEvents()
 {
     // Subscribe to Update event for setting the vehicle controls before physics simulation
     SubscribeToEvent("Update", "HandleUpdate");
@@ -155,12 +149,11 @@ SubscribeToEvents()
     UnsubscribeFromEvent("SceneUpdate");
 }
 
-void
-
-HandleUpdate(StringHash eventType, VariantMap& eventData)
+void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (vehicleNode is null)
         return;
+
     Vehicle@ vehicle = cast < Vehicle > (vehicleNode.scriptObject);
     if (vehicle is null)
         return;
@@ -220,9 +213,7 @@ HandleUpdate(StringHash eventType, VariantMap& eventData)
         vehicle.controls.Set(CTRL_FORWARD | CTRL_BACK | CTRL_LEFT | CTRL_RIGHT | CTRL_BRAKE, false);
 }
 
-
-void
-HandlePostUpdate(StringHash eventType, VariantMap& eventData)
+void HandlePostUpdate(StringHash eventType, VariantMap& eventData)
 {
     if (vehicleNode is null)
         return;
@@ -245,7 +236,6 @@ HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     cameraNode.position = cameraTargetPos;
     cameraNode.rotation = dir;
 }
-
 
 // Vehicle script object class
 //

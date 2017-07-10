@@ -312,6 +312,7 @@ public:
 Animation();
 Animation(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void AddTrigger(const AnimationTriggerPoint&);
 void AddTrigger(float, bool, const Variant&);
 Animation Clone(const String& = String ( )) const;
@@ -322,8 +323,10 @@ bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
 bool RemoveAllTracks();
 void RemoveAllTriggers();
+void RemoveMetadata(const String&);
 bool RemoveTrack(const String&);
 void RemoveTrigger(uint);
 bool Save(File) const;
@@ -335,9 +338,12 @@ void SendEvent(const String&, VariantMap& = VariantMap ( ));
 String animationName;
 /* readonly */
 String category;
+/* readonly */
+bool hasMetadata;
 float length;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 String name;
 /* readonly */
 uint numTracks;
@@ -5230,7 +5236,7 @@ public:
 Font();
 Font(const String&in);
 // Methods:
-IntVector2 GetTotalGlyphOffset(int) const;
+IntVector2 GetTotalGlyphOffset(float) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -6082,12 +6088,16 @@ double GetDouble() const;
 float GetFloat() const;
 int GetInt() const;
 uint GetUInt() const;
+Variant GetVariant() const;
+VariantMap GetVariantMap() const;
 void Insert(uint, const JSONValue&);
 const JSONValue& Get(const String&) const;
 void Pop();
 void Push(const JSONValue&);
 void Resize(uint);
 void Set(const String&, const JSONValue&);
+void SetVariant(const Variant&);
+void SetVariantMap(const VariantMap&);
 const String& GetString() const;
 
 // Properties:
@@ -6104,6 +6114,8 @@ bool isObject;
 /* readonly */
 bool isString;
 /* readonly */
+Array<String> keys;
+/* readonly */
 JSONNumberType numberType;
 /* readonly */
 String numberTypeName;
@@ -6113,6 +6125,8 @@ uint size;
 JSONValueType valueType;
 /* readonly */
 String valueTypeName;
+/* readonly */
+Array<JSONValue> values;
 };
 
 class JoystickState
@@ -7282,6 +7296,7 @@ public:
 Model();
 Model(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 Model Clone(const String& = String ( )) const;
 Geometry GetGeometry(uint, uint) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -7289,6 +7304,8 @@ bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -7303,7 +7320,10 @@ BoundingBox boundingBox;
 String category;
 Array<Vector3> geometryCenters;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 String name;
 uint numGeometries;
 Array<uint> numGeometryLodLevels;
@@ -7915,6 +7935,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -7925,6 +7947,8 @@ Array<Variant> attributes;
 String category;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 Vector3 direction;
@@ -7958,6 +7982,8 @@ Vector2 scale2D;
 Scene scene;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Vector3 signedWorldScale;
 /* readonly */
 Array<String> tags;
 bool temporary;
@@ -8600,6 +8626,7 @@ bool castShadows;
 String category;
 float drawDistance;
 ParticleEffect2D effect;
+bool emitting;
 bool enabled;
 /* readonly */
 bool enabledEffective;
@@ -9003,6 +9030,10 @@ Quaternion Slerp(const Quaternion&, float) const;
 String ToString() const;
 
 // Properties:
+/* readonly */
+float angle;
+/* readonly */
+Vector3 axis;
 /* readonly */
 Vector3 eulerAngles;
 /* readonly */
@@ -9992,6 +10023,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 LoadMode asyncLoadMode;
@@ -10011,6 +10044,8 @@ String category;
 uint checksum;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 /* readonly */
@@ -10051,6 +10086,8 @@ Vector3 scale;
 Vector2 scale2D;
 /* readonly */
 ScriptObject scriptObject;
+/* readonly */
+Vector3 signedWorldScale;
 float smoothingConstant;
 float snapThreshold;
 /* readonly */
@@ -11175,11 +11212,14 @@ public:
 Sound();
 Sound(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -11193,10 +11233,13 @@ bool compressed;
 /* readonly */
 float frequency;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 float length;
 bool looped;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 String name;
 /* readonly */
 int refs;
@@ -11318,6 +11361,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
+void Seek(float);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAnimationTime(float);
 bool SetAttribute(const String&, const Variant&);
@@ -11404,6 +11448,7 @@ bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool SaveJSON(JSONValue&) const;
 bool SaveXML(XMLElement&) const;
+void Seek(float);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetAngleAttenuation(float, float);
 void SetAnimationTime(float);
@@ -12609,7 +12654,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
-bool SetFont(Font, int);
+bool SetFont(Font, float);
 bool SetFont(const String&, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
@@ -12641,9 +12686,9 @@ bool bringToFront;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* readonly */
 IntVector2 childOffset;
 /* readonly */
@@ -12685,7 +12730,7 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
 Color hoverColor;
@@ -12732,10 +12777,10 @@ int refs;
 /* readonly */
 UIElement root;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 /* readonly */
 IntVector2 screenPosition;
 bool selected;
@@ -12809,8 +12854,8 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-bool SetFont(Font, int);
-bool SetFont(const String&, int);
+bool SetFont(Font, float);
+bool SetFont(const String&, float);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -12826,9 +12871,9 @@ bool castShadows;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* writeonly */
 Color color;
 Array<Color> colors;
@@ -12845,7 +12890,7 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 /* readonly */
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -12872,10 +12917,10 @@ float opacity;
 /* readonly */
 int refs;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -12903,12 +12948,15 @@ public:
 Texture();
 Texture(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void ClearDataLost();
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -12934,6 +12982,8 @@ TextureFilterMode filterMode;
 /* readonly */
 uint format;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 int height;
 /* readonly */
 Array<int> levelHeight;
@@ -12945,6 +12995,7 @@ uint levels;
 bool levelsDirty;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 Array<int> mipsToSkip;
 /* readonly */
 int multiSample;
@@ -12974,6 +13025,7 @@ public:
 Texture2D();
 Texture2D(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void ClearDataLost();
 Image GetImage() const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -12981,6 +13033,8 @@ bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -13008,6 +13062,8 @@ TextureFilterMode filterMode;
 /* readonly */
 uint format;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 int height;
 /* readonly */
 Array<int> levelHeight;
@@ -13019,6 +13075,7 @@ uint levels;
 bool levelsDirty;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 Array<int> mipsToSkip;
 /* readonly */
 int multiSample;
@@ -13050,12 +13107,15 @@ public:
 Texture2DArray();
 Texture2DArray(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void ClearDataLost();
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -13083,6 +13143,8 @@ TextureFilterMode filterMode;
 /* readonly */
 uint format;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 int height;
 uint layers;
 /* readonly */
@@ -13095,6 +13157,7 @@ uint levels;
 bool levelsDirty;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 Array<int> mipsToSkip;
 /* readonly */
 int multiSample;
@@ -13126,12 +13189,15 @@ public:
 Texture3D();
 Texture3D(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void ClearDataLost();
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -13159,6 +13225,8 @@ TextureFilterMode filterMode;
 /* readonly */
 uint format;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 int height;
 /* readonly */
 Array<int> levelHeight;
@@ -13170,6 +13238,7 @@ uint levels;
 bool levelsDirty;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 Array<int> mipsToSkip;
 /* readonly */
 int multiSample;
@@ -13199,6 +13268,7 @@ public:
 TextureCube();
 TextureCube(const String&in);
 // Methods:
+void AddMetadata(const String&, const Variant&);
 void ClearDataLost();
 Image GetImage(CubeMapFace) const;
 bool HasSubscribedToEvent(Object, const String&);
@@ -13206,6 +13276,8 @@ bool HasSubscribedToEvent(const String&);
 bool Load(File);
 bool Load(VectorBuffer&);
 bool Load(const String&);
+void RemoveAllMetadata();
+void RemoveMetadata(const String&);
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
 bool Save(const String&) const;
@@ -13233,6 +13305,8 @@ TextureFilterMode filterMode;
 /* readonly */
 uint format;
 /* readonly */
+bool hasMetadata;
+/* readonly */
 int height;
 /* readonly */
 Array<int> levelHeight;
@@ -13244,6 +13318,7 @@ uint levels;
 bool levelsDirty;
 /* readonly */
 uint memoryUse;
+Array<Variant> metadata;
 Array<int> mipsToSkip;
 /* readonly */
 int multiSample;
@@ -13841,6 +13916,9 @@ float doubleClickInterval;
 int dragBeginDistance;
 float dragBeginInterval;
 UIElement focusElement;
+FontHintLevel fontHintLevel;
+int fontOversampling;
+float fontSubpixelThreshold;
 bool forceAutoHint;
 /* readonly */
 UIElement frontElement;
@@ -14275,6 +14353,7 @@ bool IsNaN() const;
 Vector3 Lerp(const Vector3&, float) const;
 void Normalize();
 Vector3 Normalized() const;
+Vector3 Orthogonalize(const Vector3&) const;
 float ProjectOntoAxis(const Vector3&) const;
 String ToString() const;
 
@@ -15481,6 +15560,13 @@ FM_FOCUSABLE,
 FM_FOCUSABLE_DEFOCUSABLE,
 };
 
+enum FontHintLevel
+{
+FONT_HINT_LEVEL_NONE,
+FONT_HINT_LEVEL_LIGHT,
+FONT_HINT_LEVEL_NORMAL,
+};
+
 enum FontType
 {
 FONT_NONE,
@@ -15914,14 +16000,17 @@ uint GetFloat16Format();
 uint GetFloat32Format();
 uint GetFormat(const String&);
 Variant GetGlobalVar(const String&);
+String GetHostName();
 String GetInternalPath(const String&);
 uint GetLinearDepthFormat();
+String GetLoginName();
 uint GetLuminanceAlphaFormat();
 uint GetLuminanceFormat();
 uint GetMaxBones();
 String GetMiniDumpDir();
 uint GetNumLogicalCPUs();
 uint GetNumPhysicalCPUs();
+String GetOSVersion();
 Array<AttributeInfo> GetObjectAttributeInfos(const String&);
 Array<String> GetObjectCategories();
 Array<String> GetObjectsByCategory(const String&);
@@ -15939,6 +16028,7 @@ uint GetRGFloat32Format();
 uint GetRandomSeed();
 uint GetReadableDepthFormat();
 String GetTextureUnitName(TextureUnit);
+uint64 GetTotalMemory();
 VariantType GetVariantTypeFromName(const String&);
 String GetVariantTypeName(VariantType);
 bool HasSubscribedToEvent(Object, const String&);
@@ -15966,7 +16056,9 @@ void Print(const String&, bool = false);
 void Print(const Variant&, bool = false);
 void Print(float, bool = false);
 void Print(int, bool = false);
+void Print(int64, bool = false);
 void Print(uint, bool = false);
+void Print(uint64, bool = false);
 void PrintCallStack(bool = false);
 float Random();
 float Random(float);

@@ -1171,6 +1171,14 @@ void Node::RemoveListener(Component* component)
     }
 }
 
+Vector3 Node::GetSignedWorldScale() const
+{
+    if (dirty_)
+        UpdateWorldTransform();
+
+    return worldTransform_.SignedScale(worldRotation_.RotationMatrix());
+}
+
 Vector3 Node::LocalToWorld(const Vector3& position) const
 {
     return GetWorldTransform() * position;
@@ -1907,7 +1915,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         {
             if (names[i].Front() != '#')
                 break;
-            
+
             String name = names[i].Substring(1, names[i].Length() - 1);
             char s = name.Front();
             if (s >= '0' && s <= '9')
@@ -1919,7 +1927,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             {
                 node = node->GetChild(name, true);
             }
-            
+
             if (!node)
             {
                 URHO3D_LOGERROR("Could not find node by name " + name);

@@ -31,6 +31,9 @@
 #include "../Graphics/VertexBuffer.h"
 #include "../IO/Log.h"
 #include "../IO/File.h"
+#include "../IO/FileSystem.h"
+#include "../Resource/ResourceCache.h"
+#include "../Resource/XMLFile.h"
 
 #include "../DebugNew.h"
 
@@ -58,7 +61,7 @@ unsigned LookupIndexBuffer(IndexBuffer* buffer, const Vector<SharedPtr<IndexBuff
 }
 
 Model::Model(Context* context) :
-    Resource(context)
+    ResourceWithMetadata(context)
 {
 }
 
@@ -306,6 +309,13 @@ bool Model::BeginLoad(Deserializer& source)
         geometryCenters_.Push(Vector3::ZERO);
     memoryUse += sizeof(Vector3) * geometries_.Size();
 
+    // Read metadata
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    String xmlName = ReplaceExtension(GetName(), ".xml");
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
+    if (file)
+        LoadMetadataFromXML(file->GetRoot());
+
     SetMemoryUse(memoryUse);
     return true;
 }
@@ -452,6 +462,25 @@ bool Model::Save(Serializer& dest) const
     // Write geometry centers
     for (unsigned i = 0; i < geometryCenters_.Size(); ++i)
         dest.WriteVector3(geometryCenters_[i]);
+
+    // Write metadata
+    if (HasMetadata())
+    {
+        File* destFile = dynamic_cast<File*>(&dest);
+        if (destFile)
+        {
+            String xmlName = ReplaceExtension(destFile->GetName(), ".xml");
+
+            SharedPtr<XMLFile> xml(new XMLFile(context_));
+            XMLElement rootElem = xml->CreateRoot("model");
+            SaveMetadataToXML(rootElem);
+
+            File xmlFile(context_, xmlName, FILE_WRITE);
+            xml->Save(xmlFile);
+        }
+        else
+            URHO3D_LOGWARNING("Can not save model metadata when not saving into a file");
+    }
 
     return true;
 }

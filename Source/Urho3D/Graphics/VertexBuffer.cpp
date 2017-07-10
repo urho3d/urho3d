@@ -202,4 +202,15 @@ unsigned VertexBuffer::GetVertexSize(unsigned elementMask)
     return size;
 }
 
+void VertexBuffer::UpdateOffsets(PODVector<VertexElement>& elements)
+{
+    unsigned elementOffset = 0;
+
+    for (PODVector<VertexElement>::Iterator i = elements.Begin(); i != elements.End(); ++i)
+    {
+        i->offset_ = elementOffset;
+        elementOffset += ELEMENT_TYPESIZES[i->type_];
+    }
+}
+
 }

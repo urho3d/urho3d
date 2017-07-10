@@ -186,7 +186,7 @@ The full list of supported parameters, their datatypes and default values: (also
 - LogLevel (int) %Log verbosity level. Default LOG_INFO in release builds and LOG_DEBUG in debug builds.
 - LogQuiet (bool) %Log quiet mode, ie. to not write warning/info/debug log entries into standard output. Default false.
 - LogName (string) %Log filename. Default "Urho3D.log".
-- FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS.) Default true.
+- FrameLimiter (bool) Whether to cap maximum framerate to 200 (desktop) or 60 (Android/iOS/tvOS). Default true.
 - WorkerThreads (bool) Whether to create worker threads for the %WorkQueue subsystem according to available CPU cores. Default true.
 - %EventProfiler (bool) Whether to create the EventProfiler subsystem. Default true.
 - ResourcePrefixPaths (string) A semicolon-separated list of resource prefix paths to use. If not specified then the default prefix path is set to executable path. The resource prefix paths can also be defined using URHO3D_PREFIX_PATH env-var. When both are defined, the paths set by -pp takes higher precedence.
@@ -203,7 +203,7 @@ The full list of supported parameters, their datatypes and default values: (also
 - FullScreen (bool) Whether to create a full-screen window. Default true.
 - Borderless (bool) Whether to create the window as borderless. Default false.
 - WindowResizable (bool) Whether window is resizable. Default false.
-- HighDPI (bool) Whether window is high DPI. Default true. Currently only supported by Apple platforms (OSX, iOS, and tvOS).
+- HighDPI (bool) Whether window is high DPI. Default true. Currently only supported by Apple platforms (macOS, iOS, and tvOS).
 - TripleBuffer (bool) Whether to use triple-buffering. Default false.
 - VSync (bool) Whether to wait for vertical sync when presenting rendering window contents. Default false.
 - FlushGPU (bool) Whether to flush GPU command buffer each frame (Direct3D9) or limit the amount of buffered frames (Direct3D11) for less input latency. Ineffective on OpenGL. Default false.
@@ -259,13 +259,13 @@ The application window's state (has input focus, minimized or not) can be querie
 
 - To avoid spinning the CPU and GPU unnecessarily, it is possible to define a smaller maximum FPS when no input focus. See \ref Engine::SetMaxInactiveFps "SetMaxInactiveFps()"
 
-- It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS.) For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
+- It is also possible to automatically pause update events and audio when the window is minimized. Use \ref Engine::SetPauseMinimized "SetPauseMinimized()" to control this behaviour. By default it is not enabled on desktop, and enabled on mobile devices (Android and iOS/tvOS). For singleplayer games this is recommended to avoid unwanted progression while away from the program. However in a multiplayer game this should not be used, as the missing scene updates would likely desync the client with the server.
 
 - On mobile devices the window becoming minimized can mean that it will never become maximized again, in case the OS decides it needs to free memory and kills your program. Therefore you should listen for the E_INPUTFOCUS event from the Input subsystem and immediately save your program state as applicable if the program loses input focus or is minimized.
 
 - On mobile devices it is also unsafe to access or create any graphics resources while the window is minimized (as the graphics context may be destroyed during this time); doing so can crash the program. It is recommended to leave the pause-minimized feature on to ensure you do not have to check for this in your update code.
 
-Note that on iOS calling \ref Engine::Exit "Exit()" is a no-op as there is no officially sanctioned way to manually exit your program. On Android it will cause the activity to manually exit.
+Note that on iOS/tvOS calling \ref Engine::Exit "Exit()" is a no-op as there is no officially sanctioned way to manually exit your program. On Android it will cause the activity to manually exit.
 
 \section MainLoop_ApplicationFramework Application framework
 
@@ -1107,7 +1107,7 @@ These differences need to be observed when using the low-level rendering functio
 
 OpenGL ES 2.0 has further limitations:
 
-- Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS) compressed textures are supported through the .ktx and .pvr file formats.
+- Of the DXT formats, only DXT1 compressed textures will be uploaded as compressed, and only if the EXT_texture_compression_dxt1 extension is present. Other DXT formats will be uploaded as uncompressed RGBA. ETC1 (Android) and PVRTC (iOS/tvOS) compressed textures are supported through the .ktx and .pvr file formats.
 
 - %Texture formats such as 16-bit and 32-bit floating point are not available. Corresponding integer 8-bit formats will be returned instead.
 
@@ -1119,7 +1119,7 @@ OpenGL ES 2.0 has further limitations:
 
 - To reduce fillrate, the stencil buffer is not reserved and the stencil test is not available. As a consequence, the light stencil masking optimization is not used.
 
-- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the simple shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS hardware.
+- For improved performance, shadow mapping quality is reduced: there is no smooth PCF filtering and directional lights do not support shadow cascades. Consider also using the simple shadow quality (1 sample) to avoid dependent texture reads in the pixel shader, which have an especially high performance cost on iOS/tvOS hardware.
 
 - Custom clip planes are not currently supported.
 
@@ -2233,6 +2233,18 @@ For FreeType fonts, it is possible to adjust the positioning of the font glyphs.
     <scaledoffset x="xFloat" y="yFloat" />
 </font>
 \endcode
+
+The \ref UI "UI" class has various global configuration options for font rendering. The default settings are similar to Windows-style rendering, with crisp characters but uneven spacing. For macOS-style rendering, with accurate spacing but slightly blurrier outlines, call \ref UI::SetFontHintLevel "UI::SetFontHintLevel(FONT_HINT_LEVEL_NONE)". Use the Typography sample to explore these options and find the best configuration for your game.
+
+By default, outline fonts will be hinted (aligned to pixel boundaries), using the font's embedded hints if possible. Call \ref UI::SetForceAutoHint "SetForceAutoHint()" to use FreeType's standard auto-hinter rather than each font's embedded hints.
+
+To adjust hinting, call \ref UI::SetFontHintLevel "SetFontHintLevel()". If the level is set to FONT_HINT_LEVEL_LIGHT, fonts will be aligned to the pixel grid vertically, but not horizontally. At FONT_HINT_LEVEL_NONE, hinting is completely disabled.
+
+Hint levels LIGHT and NONE allow for subpixel glyph positioning, which greatly improves spacing, especially at small font sizes. By default, subpixel positioning is only used at sizes up to 12 points; at larger sizes, each glyph is pixel-aligned. Call \ref UI::SetFontSubpixelThreshold "SetFontSubpixelThreshold" to change this threshold.
+
+When textures aren't pixel-aligned, bilinear texture filtering makes them appear blurry. Therefore, subpixel font textures are oversampled (stretched horizontally) to reduce this blurriness, at the cost of extra memory usage. By default, subpixel fonts use 2x oversampling. Call \ref UI::SetFontOversampling "SetFontOversampling" to change this.
+
+Subpixel positioning only operates horizontally. %Text is always pixel-aligned vertically.
 
 \section UI_Sprites Sprites
 
@@ -3535,6 +3547,8 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 - Please heed all the \ref CodingConventions "coding conventions" and study existing code where unsure. Ensure that your text editor or IDE is configured to show whitespace, so that you don't accidentally mix spaces and tabs.
 
 - Whenever you are creating a major new feature, its usage should be documented in the .dox pages in addition to the function documentation in the header files. Create a new page if necessary, and link from an appropriate place in the existing documentation. If it's for example a new rendering feature, it could be linked from the \ref Rendering page. If the feature introduces a completely new subsystem, it should be linked from the main page list in Urho3D.dox.
+
+- When you add a new sample application, it should be implemented in all of C++, AngelScript and Lua if possible, to show how all of the APIs are used. Check sample numbering for the next free one available. If a (C++) sample depends on a specific Urho3D build option, for example physics or networking, it can be conditionally disabled in its CMakeLists.txt. See 11_Physics sample for an example.
 
 \section ContributionThirdParty Third party library considerations
 

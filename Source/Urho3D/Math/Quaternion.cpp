@@ -221,6 +221,16 @@ float Quaternion::RollAngle() const
     return EulerAngles().z_;
 }
 
+Urho3D::Vector3 Quaternion::Axis() const
+{
+    return Vector3(x_, y_, z_) / sqrt(1 - w_ * w_);
+}
+
+float Quaternion::Angle() const
+{
+    return 2 * Acos(w_);
+}
+
 Matrix3 Quaternion::RotationMatrix() const
 {
     return Matrix3(

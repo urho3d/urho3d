@@ -426,7 +426,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 - %Enabled : bool [in/out]
@@ -437,7 +436,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 
@@ -447,7 +445,6 @@ namespace Urho3D
 - %BodyB : RigidBody2D pointer
 - %NodeA : Node pointer
 - %NodeB : Node pointer
-- %Contact : b2Contact pointer
 - %ShapeA : CollisionShape2D pointer
 - %ShapeB : CollisionShape2D pointer
 
@@ -455,7 +452,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 - %Enabled : bool [in/out]
@@ -464,7 +460,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 
@@ -472,7 +467,6 @@ namespace Urho3D
 - %Body : RigidBody2D pointer
 - %OtherNode : Node pointer
 - %OtherBody : RigidBody2D pointer
-- %Contact : b2Contact pointer
 - %Shape : CollisionShape2D pointer
 - %OtherShape : CollisionShape2D pointer
 
@@ -1860,6 +1854,7 @@ namespace Urho3D
 - %Particle %Effect : ResourceRef
 - %Sprite : ResourceRef
 - %Blend %Mode : int
+- %Is %Emitting : bool
 
 ### PhysicsWorld
 - %Gravity : Vector3
@@ -2374,7 +2369,7 @@ namespace Urho3D
 - %Variables : VariantMap
 - %Tags : StringVector
 - %Font : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -2392,7 +2387,7 @@ namespace Urho3D
 - %Is %Enabled : bool
 - %Font : ResourceRef
 - %Material : ResourceRef
-- %Font %Size : int
+- %Font %Size : float
 - %Text : String
 - %Text %Alignment : int
 - %Row %Spacing : float
@@ -3125,6 +3120,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void AddTrigger(const AnimationTriggerPoint&)
 - void AddTrigger(float, bool, const Variant&)
 - Animation@ Clone(const String& = String ( )) const
@@ -3135,8 +3131,10 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
 - bool RemoveAllTracks()
 - void RemoveAllTriggers()
+- void RemoveMetadata(const String&)
 - bool RemoveTrack(const String&)
 - void RemoveTrigger(uint)
 - bool Save(File@) const
@@ -3148,8 +3146,10 @@ Properties:
 
 - String animationName
 - String category // readonly
+- bool hasMetadata // readonly
 - float length
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - uint numTracks // readonly
 - uint numTriggers
@@ -7353,7 +7353,7 @@ Properties:
 
 Methods:
 
-- IntVector2 GetTotalGlyphOffset(int) const
+- IntVector2 GetTotalGlyphOffset(float) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
@@ -8041,12 +8041,16 @@ Methods:
 - float GetFloat() const
 - int GetInt() const
 - uint GetUInt() const
+- Variant GetVariant() const
+- VariantMap GetVariantMap() const
 - void Insert(uint, const JSONValue&)
 - const JSONValue& Get(const String&) const
 - void Pop()
 - void Push(const JSONValue&)
 - void Resize(uint)
 - void Set(const String&, const JSONValue&)
+- void SetVariant(const Variant&)
+- void SetVariantMap(const VariantMap&)
 - const String& GetString() const
 
 Properties:
@@ -8057,11 +8061,13 @@ Properties:
 - bool isNumber // readonly
 - bool isObject // readonly
 - bool isString // readonly
+- String[]@ keys // readonly
 - JSONNumberType numberType // readonly
 - String numberTypeName // readonly
 - uint size // readonly
 - JSONValueType valueType // readonly
 - String valueTypeName // readonly
+- JSONValue[]@ values // readonly
 
 <a name="Class_JoystickState"></a>
 
@@ -9069,6 +9075,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - Model@ Clone(const String& = String ( )) const
 - Geometry@ GetGeometry(uint, uint) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -9076,6 +9083,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -9089,7 +9098,9 @@ Properties:
 - BoundingBox boundingBox
 - String category // readonly
 - Vector3[] geometryCenters
+- bool hasMetadata // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - uint numGeometries
 - uint[] numGeometryLodLevels
@@ -9635,12 +9646,14 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
 - String category // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - Vector3 direction
 - bool enabled
@@ -9664,6 +9677,7 @@ Properties:
 - Vector2 scale2D
 - Scene@ scene // readonly
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - String[]@ tags // readonly
 - bool temporary
 - Matrix3x4 transform // readonly
@@ -10213,6 +10227,7 @@ Properties:
 - String category // readonly
 - float drawDistance
 - ParticleEffect2D@ effect
+- bool emitting
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -10559,6 +10574,8 @@ Methods:
 
 Properties:
 
+- float angle // readonly
+- Vector3 axis // readonly
 - Vector3 eulerAngles // readonly
 - float pitch // readonly
 - float roll // readonly
@@ -11441,6 +11458,7 @@ Methods:
 
 Properties:
 
+- Node@[] allChildrenByName // readonly
 - bool animationEnabled
 - LoadMode asyncLoadMode // readonly
 - bool asyncLoading // readonly
@@ -11452,6 +11470,7 @@ Properties:
 - String category // readonly
 - uint checksum // readonly
 - Node@[] children // readonly
+- Node@[] childrenByName // readonly
 - Component@[] components // readonly
 - DebugRenderer@ debugRenderer // readonly
 - Vector3 direction
@@ -11478,6 +11497,7 @@ Properties:
 - Vector3 scale
 - Vector2 scale2D
 - ScriptObject@ scriptObject // readonly
+- Vector3 signedWorldScale // readonly
 - float smoothingConstant
 - float snapThreshold
 - String[]@ tags // readonly
@@ -12443,11 +12463,14 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -12458,9 +12481,11 @@ Properties:
 - String category // readonly
 - bool compressed // readonly
 - float frequency // readonly
+- bool hasMetadata // readonly
 - float length // readonly
 - bool looped
 - uint memoryUse // readonly
+- Variant[] metadata
 - String name
 - int refs // readonly
 - uint sampleSize // readonly
@@ -12565,6 +12590,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAnimationTime(float)
 - bool SetAttribute(const String&, const Variant&)
@@ -12638,6 +12664,7 @@ Methods:
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
 - bool SaveXML(XMLElement&) const
+- void Seek(float)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
 - void SetAngleAttenuation(float, float)
 - void SetAnimationTime(float)
@@ -13674,7 +13701,7 @@ Methods:
 - void SetFixedHeight(int)
 - void SetFixedSize(int, int)
 - void SetFixedWidth(int)
-- bool SetFont(Font@, int)
+- bool SetFont(Font@, float)
 - bool SetFont(const String&, int)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ))
@@ -13703,8 +13730,8 @@ Properties:
 - bool bringToBack
 - bool bringToFront
 - String category // readonly
-- IntVector2[] charPositions // readonly
-- IntVector2[] charSizes // readonly
+- Vector2[] charPositions // readonly
+- Vector2[] charSizes // readonly
 - IntVector2 childOffset // readonly
 - UIElement@[] children // readonly
 - IntRect clipBorder
@@ -13733,7 +13760,7 @@ Properties:
 - bool focus
 - FocusMode focusMode
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height
 - HorizontalAlignment horizontalAlignment
 - Color hoverColor
@@ -13770,9 +13797,9 @@ Properties:
 - int priority
 - int refs // readonly
 - UIElement@ root // readonly
-- int rowHeight // readonly
+- float rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths // readonly
+- float[] rowWidths // readonly
 - IntVector2 screenPosition // readonly
 - bool selected
 - Color selectionColor
@@ -13838,8 +13865,8 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- bool SetFont(Font@, int)
-- bool SetFont(const String&, int)
+- bool SetFont(Font@, float)
+- bool SetFont(const String&, float)
 - void SetInterceptNetworkUpdate(const String&, bool)
 
 Properties:
@@ -13851,8 +13878,8 @@ Properties:
 - BoundingBox boundingBox // readonly
 - bool castShadows
 - String category // readonly
-- IntVector2[] charPositions // readonly
-- IntVector2[] charSizes // readonly
+- Vector2[] charPositions // readonly
+- Vector2[] charSizes // readonly
 - Color color // writeonly
 - Color[] colors
 - float drawDistance
@@ -13866,7 +13893,7 @@ Properties:
 - FaceCameraMode faceCameraMode
 - bool fixedScreenSize
 - Font@ font // readonly
-- int fontSize
+- float fontSize
 - int height // readonly
 - HorizontalAlignment horizontalAlignment
 - uint id // readonly
@@ -13884,9 +13911,9 @@ Properties:
 - bool occluder
 - float opacity
 - int refs // readonly
-- int rowHeight // readonly
+- float rowHeight // readonly
 - float rowSpacing
-- int[] rowWidths // readonly
+- float[] rowWidths // readonly
 - float shadowDistance
 - uint shadowMask
 - bool temporary
@@ -13909,12 +13936,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13934,12 +13964,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -13959,6 +13991,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - Image@ GetImage() const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -13966,6 +13999,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -13987,12 +14022,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -14013,12 +14050,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -14040,6 +14080,7 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - uint layers
 - int[] levelHeight // readonly
@@ -14047,6 +14088,7 @@ Properties:
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -14067,12 +14109,15 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -14094,12 +14139,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -14119,6 +14166,7 @@ Properties:
 
 Methods:
 
+- void AddMetadata(const String&, const Variant&)
 - void ClearDataLost()
 - Image@ GetImage(CubeMapFace) const
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -14126,6 +14174,8 @@ Methods:
 - bool Load(File@)
 - bool Load(VectorBuffer&)
 - bool Load(const String&)
+- void RemoveAllMetadata()
+- void RemoveMetadata(const String&)
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool Save(const String&) const
@@ -14147,12 +14197,14 @@ Properties:
 - bool dataLost // readonly
 - TextureFilterMode filterMode
 - uint format // readonly
+- bool hasMetadata // readonly
 - int height // readonly
 - int[] levelHeight // readonly
 - int[] levelWidth // readonly
 - uint levels // readonly
 - bool levelsDirty // readonly
 - uint memoryUse // readonly
+- Variant[] metadata
 - int[] mipsToSkip
 - int multiSample // readonly
 - String name
@@ -14657,6 +14709,9 @@ Properties:
 - int dragBeginDistance
 - float dragBeginInterval
 - UIElement@ focusElement
+- FontHintLevel fontHintLevel
+- int fontOversampling
+- float fontSubpixelThreshold
 - bool forceAutoHint
 - UIElement@ frontElement // readonly
 - int maxFontTextureSize
@@ -14996,6 +15051,7 @@ Methods:
 - Vector3 Lerp(const Vector3&, float) const
 - void Normalize()
 - Vector3 Normalized() const
+- Vector3 Orthogonalize(const Vector3&) const
 - float ProjectOntoAxis(const Vector3&) const
 - String ToString() const
 
@@ -16065,6 +16121,13 @@ Properties:
 - FM_FOCUSABLE_DEFOCUSABLE
 
 
+### FontHintLevel
+
+- FONT_HINT_LEVEL_NONE
+- FONT_HINT_LEVEL_LIGHT
+- FONT_HINT_LEVEL_NORMAL
+
+
 ### FontType
 
 - FONT_NONE
@@ -16497,14 +16560,17 @@ Properties:
 - uint GetFloat32Format()
 - uint GetFormat(const String&)
 - Variant GetGlobalVar(const String&)
+- String GetHostName()
 - String GetInternalPath(const String&)
 - uint GetLinearDepthFormat()
+- String GetLoginName()
 - uint GetLuminanceAlphaFormat()
 - uint GetLuminanceFormat()
 - uint GetMaxBones()
 - String GetMiniDumpDir()
 - uint GetNumLogicalCPUs()
 - uint GetNumPhysicalCPUs()
+- String GetOSVersion()
 - AttributeInfo[]@ GetObjectAttributeInfos(const String&)
 - String[]@ GetObjectCategories()
 - String[]@ GetObjectsByCategory(const String&)
@@ -16522,6 +16588,7 @@ Properties:
 - uint GetRandomSeed()
 - uint GetReadableDepthFormat()
 - String GetTextureUnitName(TextureUnit)
+- uint64 GetTotalMemory()
 - VariantType GetVariantTypeFromName(const String&)
 - String GetVariantTypeName(VariantType)
 - bool HasSubscribedToEvent(Object@, const String&)
@@ -16549,7 +16616,9 @@ Properties:
 - void Print(const Variant&, bool = false)
 - void Print(float, bool = false)
 - void Print(int, bool = false)
+- void Print(int64, bool = false)
 - void Print(uint, bool = false)
+- void Print(uint64, bool = false)
 - void PrintCallStack(bool = false)
 - float Random()
 - float Random(float)

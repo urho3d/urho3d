@@ -40,7 +40,7 @@ public:
     ~FontFaceFreeType();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
 
@@ -48,12 +48,12 @@ public:
     virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
 private:
-    /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
     bool LoadCharGlyph(unsigned charCode, Image* image = 0);
+    /// Smooth one row of a horizontally oversampled glyph image.
+    void BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize);
 
     /// FreeType library.
     SharedPtr<FreeTypeLibrary> freeType_;
@@ -61,8 +61,12 @@ private:
     void* face_;
     /// Load mode.
     int loadMode_;
+    /// Use subpixel glyph positioning?
+    bool subpixel_;
+    /// Oversampling level.
+    int oversampling_;
     /// Ascender.
-    int ascender_;
+    float ascender_;
     /// Has mutable glyph.
     bool hasMutableGlyph_;
     /// Glyph area allocator.

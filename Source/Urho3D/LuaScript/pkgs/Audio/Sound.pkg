@@ -1,7 +1,7 @@
 $#include "IO/File.h"
 $#include "Audio/Sound.h"
 
-class Sound : public Resource
+class Sound : public ResourceWithMetadata
 {
     Sound();
     ~Sound();

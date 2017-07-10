@@ -35,15 +35,15 @@ cache:
   - C:\tools\mingw64
 environment:
   GIT_NAME:
-    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
+    secure: JatNbOZZZKMvMHL8sRq9XpHgESzJ13eh9NHbMK99rX8=
   GIT_EMAIL:
-    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
+    secure: 7EAYZJ5nFqEhMKcPmUvnqPp81XAoJEILzDJJ2qZXrKA=
   GH_TOKEN:
-    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
+    secure: xx7og+aLQbdBSsdVo79OTGtdfqedOpYpIJjduNlzjFSXsTkD8NX8fEPq0XE1KT5n
   SF_KEY:
-    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
+    secure: 6Vuo+sNP2YT/iI4ilNDdyJbKpu1AYxSpkdwjJxeZ3BVXM0XQQnG7VS/6IspV9kgWXmYpeVnUTqpoxAg7GDf3MTN9SeXgwHuSsblIAHDaOJk=
   SF_API:
-    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+    secure: gEDrho4yNr5++SbgkWsxQiFA62GJfTLrZU9Dzjz9HCUcS7XwjTGg3XsFm84w6B1s
 # VS build actually does not need MinGW compiler toolchains so prevent its restoration and update check
   APPVEYOR_CACHE_SKIP_RESTORE: true
   APPVEYOR_CACHE_SKIP_SAVE: true

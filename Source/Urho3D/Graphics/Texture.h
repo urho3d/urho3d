@@ -36,7 +36,7 @@ class XMLElement;
 class XMLFile;
 
 /// Base class for texture resources.
-class URHO3D_API Texture : public Resource, public GPUObject
+class URHO3D_API Texture : public ResourceWithMetadata, public GPUObject
 {
 public:
     /// Construct.
@@ -114,7 +114,7 @@ public:
 
     /// Return whether rendertarget mipmap levels need regenration.
     bool GetLevelsDirty() const { return levelsDirty_; }
-    
+
     /// Return backup texture.
     Texture* GetBackupTexture() const { return backupTexture_; }
 

@@ -15,7 +15,7 @@ class Font : public Resource
     
     const IntVector2& GetAbsoluteGlyphOffset() const;
     const Vector2& GetScaledGlyphOffset() const;
-    IntVector2 GetTotalGlyphOffset(int pointSize) const;
+    IntVector2 GetTotalGlyphOffset(float pointSize) const;
     FontType GetFontType() const;
     bool IsSDFFont() const;
     

@@ -256,8 +256,8 @@ protected:
         ContactInfo();
         /// Construct.
         ContactInfo(b2Contact* contract);
-        /// Copy construct.
-        ContactInfo(const ContactInfo& other);
+        /// Write contact info to buffer.
+        const PODVector<unsigned char>& Serialize(VectorBuffer& buffer) const;
 
         /// Rigid body A.
         SharedPtr<RigidBody2D> bodyA_;
@@ -267,12 +267,18 @@ protected:
         SharedPtr<Node> nodeA_;
         /// Node B.
         SharedPtr<Node> nodeB_;
-        /// Box2D contact.
-        b2Contact* contact_;
         /// Shape A.
         SharedPtr<CollisionShape2D> shapeA_;
         /// Shape B.
         SharedPtr<CollisionShape2D> shapeB_;
+        /// Number of contact points.
+        int numPoints_;
+        /// Contact normal in world space.
+        Vector2 worldNormal_;
+        /// Contact positions in world space.
+        Vector2 worldPositions_[b2_maxManifoldPoints];
+        /// Contact overlap values.
+        float separations_[b2_maxManifoldPoints];
     };
     /// Begin contact infos.
     Vector<ContactInfo> beginContactInfos_;

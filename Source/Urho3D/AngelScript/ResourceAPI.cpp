@@ -304,6 +304,46 @@ static JSONValue& JSONValueAtKey(const String& key, JSONValue& jsonValue)
     return jsonValue[key];
 }
 
+static CScriptArray* JSONValueGetKeys(const JSONValue& jsonValue)
+{
+    Vector<String> keys;
+    if (jsonValue.IsObject())
+    {
+        for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+            keys.Push(i->first_);
+    }
+
+    return VectorToArray<String>(keys, "Array<String>");
+}
+
+static CScriptArray* JSONValueGetValues(const JSONValue& jsonValue)
+{
+    if (jsonValue.IsArray())
+        return VectorToArray<JSONValue>(jsonValue.GetArray(), "Array<JSONValue>");
+    else
+    {
+        Vector<JSONValue> values;
+
+        if (jsonValue.IsObject())
+        {
+            for (ConstJSONObjectIterator i = jsonValue.Begin(); i != jsonValue.End(); ++i)
+                values.Push(i->second_);
+        }
+
+        return VectorToArray<JSONValue>(values, "Array<JSONValue>");
+    }
+}
+
+static void JSONValueSetVariant(const Variant& variant, JSONValue& jsonValue)
+{
+    jsonValue.SetVariant(variant, GetScriptContext());
+}
+
+static void JSONValueSetVariantMap(const VariantMap& variantMap, JSONValue& jsonValue)
+{
+    jsonValue.SetVariantMap(variantMap, GetScriptContext());
+}
+
 static void RegisterJSONValue(asIScriptEngine* engine)
 {
     engine->RegisterEnum("JSONValueType");
@@ -338,6 +378,8 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(double)", asMETHODPR(JSONValue, operator =, (double), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const String&in)", asMETHODPR(JSONValue, operator =, (const String&), JSONValue&), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opAssign(const JSONValue&in)", asMETHODPR(JSONValue, operator =, (const JSONValue&), JSONValue&), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "void SetVariant(const Variant&in)", asFUNCTION(JSONValueSetVariant), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "void SetVariantMap(const VariantMap&in)", asFUNCTION(JSONValueSetVariantMap), asCALL_CDECL_OBJLAST);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValueType get_valueType() const", asMETHOD(JSONValue, GetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "JSONNumberType get_numberType() const", asMETHOD(JSONValue, GetNumberType), asCALL_THISCALL);
@@ -356,6 +398,8 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "float GetFloat() const", asMETHOD(JSONValue, GetFloat), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "double GetDouble() const", asMETHOD(JSONValue, GetDouble), asCALL_THISCALL);
     engine->RegisterObjectMethod("JSONValue", "const String& GetString() const", asMETHOD(JSONValue, GetString), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "Variant GetVariant() const", asMETHOD(JSONValue, GetVariant), asCALL_THISCALL);
+    engine->RegisterObjectMethod("JSONValue", "VariantMap GetVariantMap() const", asMETHOD(JSONValue, GetVariantMap), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "JSONValue& opIndex(uint)", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
     engine->RegisterObjectMethod("JSONValue", "const JSONValue& opIndex(uint) const", asFUNCTION(JSONValueAtPosition), asCALL_CDECL_OBJLAST);
@@ -374,6 +418,9 @@ static void RegisterJSONValue(asIScriptEngine* engine)
     engine->RegisterObjectMethod("JSONValue", "bool Contains(const String&in) const", asMETHOD(JSONValue, Contains), asCALL_THISCALL);
 
     engine->RegisterObjectMethod("JSONValue", "void Clear()", asMETHOD(JSONValue, Clear), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod("JSONValue", "Array<String>@ get_keys() const", asFUNCTION(JSONValueGetKeys), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod("JSONValue", "Array<JSONValue>@ get_values() const", asFUNCTION(JSONValueGetValues), asCALL_CDECL_OBJLAST);
 }
 
 static bool JSONFileSave(File* file, const String& indendation, JSONFile* ptr)
