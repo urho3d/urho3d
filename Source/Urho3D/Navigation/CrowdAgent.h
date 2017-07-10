@@ -89,7 +89,7 @@ public:
     /// Handle enabled/disabled state change.
     virtual void OnSetEnabled();
     /// Draw debug geometry.
-    void DrawDebugGeometry(bool);
+    void DrawDebugGeometry(bool depthTest);
     /// Draw debug feelers.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
