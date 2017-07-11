@@ -46,7 +46,7 @@ static Resource* ResourceCacheGetResource(const String& type, const String& name
 
 static Resource* ResourceCacheGetExistingResource(const String& type, const String& name, ResourceCache* ptr)
 {
-    return ptr->GetResource(StringHash(type), name);
+    return ptr->GetExistingResource(StringHash(type), name);
 }
 
 static File* ResourceCacheGetFile(const String& name, ResourceCache* ptr)
