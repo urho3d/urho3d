@@ -202,7 +202,7 @@ void BorderImage::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vert
 void BorderImage::SetTextureAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetTexture(cache->GetResource<Texture2D>(value.name_));
+    SetTexture(cache->GetResource<Texture2D>(value.name_, GetBasePath()));
 }
 
 ResourceRef BorderImage::GetTextureAttr() const

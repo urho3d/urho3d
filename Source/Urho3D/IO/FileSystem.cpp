@@ -1067,4 +1067,82 @@ bool IsAbsolutePath(const String& pathName)
     return false;
 }
 
+String CompressRelativePath(const String& path)
+{
+    Vector<String> paths = path.Split('/');
+    String ret;
+    unsigned skip = 0;
+    for (int i = paths.Size() - 1; i >= 0; --i)
+        if (paths[i] == ".")
+            continue;
+        else if (paths[i] == "..")
+            ++skip;
+        else if (skip)
+            --skip;
+        else if (ret.Empty())
+            ret = paths[i];
+        else
+            ret = paths[i] + "/" + ret;
+
+    //NOTE: have elected to prepend ../../ ... according to the remaining skip count.
+    //      This will mean CompressRelativePath("../../Texture.png") will return "../../Texture.png"
+
+    for (int i = 0; i < skip; ++i)
+        ret = "../" + ret;
+
+    return ret;
+}
+
+String ResolvePath(const String& relative, const String& absolute)
+{
+    if (relative.Empty())
+        return absolute;
+    else if (relative[0] == '.')
+        if (relative.Length() == 1)
+            return absolute;
+        else if (relative[1] == '/')
+        {
+            //Parse relative path
+            if (absolute.Empty())
+            {
+                return CompressRelativePath(relative.Substring(1));
+            }
+            else if (absolute[absolute.Length() - 1] == '/')
+            {
+                return CompressRelativePath(absolute + relative.Substring(2));
+            }
+            else
+            {
+                return CompressRelativePath(absolute + relative.Substring(1));
+            }
+        }
+        else if (relative[1] == '.')
+        {
+            if (relative.Length() == 2)
+                return CompressRelativePath(absolute + "/..");
+            else if (relative[2] == '/')
+            {
+                //Parse relative path from trimmed abs directory
+                if (absolute.Empty())
+                {
+                    return CompressRelativePath(relative);
+                }
+                else if (absolute[absolute.Length() - 1] == '/')
+                {
+                    return CompressRelativePath(absolute + relative);
+                }
+                else
+                {
+                    return CompressRelativePath(absolute + "/" + relative);
+                }
+            }
+            else
+                return CompressRelativePath(relative);//Relative is actually an absolute path that happens to begin with ..
+        }
+        else
+            return CompressRelativePath(relative);//Relative is actually an absolute path that happens to begin with .
+    else
+        return CompressRelativePath(relative);//Relative is actually an absolute path
+}
+
 }

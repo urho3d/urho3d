@@ -346,7 +346,7 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     source_ = imageElem.GetAttribute("source");
     String textureFilePath = GetParentPath(tmxFile_->GetName()) + source_;
     ResourceCache* cache = tmxFile_->GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
     if (!texture)
     {
         URHO3D_LOGERROR("Could not load texture " + textureFilePath);
@@ -616,7 +616,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     XMLElement imageElem = tileSetElem.GetChild("image");
     String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
     if (!texture)
     {
         URHO3D_LOGERROR("Could not load texture " + textureFilePath);

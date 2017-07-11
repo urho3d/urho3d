@@ -80,6 +80,7 @@ void Node::RegisterObject(Context* context)
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Name", GetName, SetName, String, String::EMPTY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Base Path", GetBasePath, SetBasePath, String, String::EMPTY, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, StringVector, Variant::emptyStringVector, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
@@ -339,6 +340,16 @@ void Node::SetName(const String& name)
 
             scene_->SendEvent(E_NODENAMECHANGED, eventData);
         }
+    }
+}
+
+void Node::SetBasePath(const String& basePath)
+{
+    if (basePath != impl_->basePath_)
+    {
+        impl_->basePath_ = basePath;
+
+        MarkNetworkUpdate();
     }
 }
 

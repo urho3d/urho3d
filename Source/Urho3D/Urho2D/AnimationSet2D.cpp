@@ -356,7 +356,7 @@ bool AnimationSet2D::EndLoadSpriter()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     if (hasSpriteSheet_)
     {
-        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_);
+        spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_, GetName());
         if (!spriteSheet_)
             return false;
 
@@ -409,7 +409,7 @@ bool AnimationSet2D::EndLoadSpriter()
             {
                 Spriter::File* file = folder->files_[j];
                 String imagePath = parentPath + file->name_;
-                SharedPtr<Image> image(cache->GetResource<Image>(imagePath));
+                SharedPtr<Image> image(cache->GetResource<Image>(imagePath, GetName()));
                 if (!image)
                 {
                     URHO3D_LOGERROR("Could not load image");

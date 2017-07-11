@@ -67,6 +67,8 @@ struct URHO3D_API NodeImpl
     StringHash nameHash_;
     /// Attribute buffer for network updates.
     mutable VectorBuffer attrBuffer_;
+    /// Path to use in resolving relative paths in components
+    String basePath_;
 };
 
 /// %Scene node that may contain components and child nodes.
@@ -113,6 +115,9 @@ public:
     bool SaveJSON(Serializer& dest, const String& indentation = "\t") const;
     /// Set name of the scene node. Names are not required to be unique.
     void SetName(const String& name);
+
+    /// Sets the absolute path associated with this node (set during loading or manually)
+    virtual void SetBasePath(const String& basePath);
 
     /// Set tags. Old tags are overwritten.
     void SetTags(const StringVector& tags);
@@ -342,6 +347,9 @@ public:
 
     /// Return name hash.
     StringHash GetNameHash() const { return impl_->nameHash_; }
+
+    /// Returns the absolute path associated with this node (set during loading or manually)
+    virtual const String& GetBasePath() const { return impl_->basePath_; }
 
     /// Return all tags.
     const StringVector& GetTags() const { return impl_->tags_; }

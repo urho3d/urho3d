@@ -115,7 +115,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         if (resourcePtr)
             resourcePtr->ReleaseRef();
         const ResourceRef& ref = src.GetResourceRef();
-        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_);
+        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_, GetBasePath()); //TODO: Decide how to handle script instance's relative paths NEL
         if (resourcePtr)
             resourcePtr->AddRef();
     }
@@ -410,7 +410,7 @@ bool ScriptInstance::HasMethod(const String& declaration) const
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
+    SetScriptFile(cache->GetResource<ScriptFile>(value.name_, GetBasePath()));
 }
 
 void ScriptInstance::SetDelayedCallsAttr(const PODVector<unsigned char>& value)

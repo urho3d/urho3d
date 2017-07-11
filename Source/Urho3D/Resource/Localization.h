@@ -62,7 +62,7 @@ public:
     /// Load strings from JSONValue.
     void LoadJSON(const JSONValue& source);
     /// Load strings from JSONFile. The file should be UTF8 without BOM.
-    void LoadJSONFile(const String& name);
+    void LoadJSONFile(const String& name, const String& basePath = String::EMPTY);
 
 private:
     /// Language names.

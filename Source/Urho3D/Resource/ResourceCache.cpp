@@ -559,9 +559,9 @@ Resource* ResourceCache::GetExistingResource(StringHash type, const String& name
     return existing;
 }
 
-Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, bool sendEventOnFailure)
+Resource* ResourceCache::GetResource(StringHash type, const String& nameIn, const String &basePath, bool sendEventOnFailure)
 {
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
 
     if (!Thread::IsMainThread())
     {

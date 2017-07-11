@@ -972,6 +972,14 @@ XMLFile* XMLElement::GetFile() const
     return file_;
 }
 
+const String &XMLElement::GetBasePath() const
+{
+    if (file_)
+        return file_->GetName();
+    else
+        return String::EMPTY;
+}
+
 XMLElement XMLElement::NextResult() const
 {
     if (!xpathResultSet_ || !xpathNode_)

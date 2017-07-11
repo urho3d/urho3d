@@ -176,7 +176,7 @@ void Urho3DPlayer::Start()
         context_->RegisterSubsystem(new Script(context_));
 
         // Hold a shared pointer to the script file to make sure it is not unloaded during runtime
-        scriptFile_ = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_);
+		scriptFile_ = GetSubsystem<ResourceCache>()->GetResource<ScriptFile>(scriptFileName_,"");//TODO:Remove this NEL
 
         /// \hack If we are running the editor, also instantiate Lua subsystem to enable editing Lua ScriptInstances
 #ifdef URHO3D_LUA

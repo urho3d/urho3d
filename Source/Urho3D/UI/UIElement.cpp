@@ -1498,6 +1498,11 @@ void UIElement::SetElementEventSender(bool flag)
     elementEventSender_ = flag;
 }
 
+void UIElement::SetBasePath(const String &basePath)
+{
+    basePath_ = basePath;
+}
+
 void UIElement::SetTags(const StringVector& tags)
 {
     RemoveAllTags();

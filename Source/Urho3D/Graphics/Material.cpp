@@ -438,7 +438,7 @@ bool Material::Load(const XMLElement& source)
 
     while (techniqueElem)
     {
-        Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
+        Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"), GetName());
         if (tech)
         {
             TechniqueEntry newTechnique;
@@ -474,15 +474,15 @@ bool Material::Load(const XMLElement& source)
                     type = Texture3D::GetTypeStatic();
 
                 if (type == Texture3D::GetTypeStatic())
-                    SetTexture(unit, cache->GetResource<Texture3D>(name));
+                    SetTexture(unit, cache->GetResource<Texture3D>(name, GetName()));
                 else if (type == Texture2DArray::GetTypeStatic())
-                    SetTexture(unit, cache->GetResource<Texture2DArray>(name));
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(name, GetName()));
                 else
 #endif
-                    SetTexture(unit, cache->GetResource<TextureCube>(name));
+                    SetTexture(unit, cache->GetResource<TextureCube>(name, GetName()));
             }
             else
-                SetTexture(unit, cache->GetResource<Texture2D>(name));
+                SetTexture(unit, cache->GetResource<Texture2D>(name, GetName()));
         }
         textureElem = textureElem.GetNext("texture");
     }
@@ -592,7 +592,7 @@ bool Material::Load(const JSONValue& source)
     for (unsigned i = 0; i < techniquesArray.Size(); i++)
     {
         const JSONValue& techVal = techniquesArray[i];
-        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
+        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString(), GetName());
         if (tech)
         {
             TechniqueEntry newTechnique;
@@ -631,15 +631,15 @@ bool Material::Load(const JSONValue& source)
                     type = Texture3D::GetTypeStatic();
 
                 if (type == Texture3D::GetTypeStatic())
-                    SetTexture(unit, cache->GetResource<Texture3D>(textureName));
+                    SetTexture(unit, cache->GetResource<Texture3D>(textureName, GetName()));
                 else if (type == Texture2DArray::GetTypeStatic())
-                    SetTexture(unit, cache->GetResource<Texture2DArray>(textureName));
+                    SetTexture(unit, cache->GetResource<Texture2DArray>(textureName, GetName()));
                 else
 #endif
-                    SetTexture(unit, cache->GetResource<TextureCube>(textureName));
+                    SetTexture(unit, cache->GetResource<TextureCube>(textureName, GetName()));
             }
             else
-                SetTexture(unit, cache->GetResource<Texture2D>(textureName));
+                SetTexture(unit, cache->GetResource<Texture2D>(textureName, GetName()));
         }
     }
 

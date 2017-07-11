@@ -194,10 +194,10 @@ void Localization::LoadJSON(const JSONValue& source)
     }
 }
 
-void Localization::LoadJSONFile(const String& name)
+void Localization::LoadJSONFile(const String& name, const String &basePath)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
-    JSONFile* jsonFile = cache->GetResource<JSONFile>(name);
+    JSONFile* jsonFile = cache->GetResource<JSONFile>(name, basePath);
     if (jsonFile)
         LoadJSON(jsonFile->GetRoot());
 }

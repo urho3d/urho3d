@@ -121,7 +121,7 @@ bool ParticleEffect::EndLoad()
     // Apply the material now
     if (!loadMaterialName_.Empty())
     {
-        SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(loadMaterialName_));
+        SetMaterial(GetSubsystem<ResourceCache>()->GetResource<Material>(loadMaterialName_, GetName()));
         loadMaterialName_.Clear();
     }
 

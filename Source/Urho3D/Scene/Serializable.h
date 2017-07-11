@@ -81,6 +81,11 @@ public:
     /// Mark for attribute check on the next network update.
     virtual void MarkNetworkUpdate() { }
 
+    /// Sets the absolute path associated with this object. Implemented in Node and UIElement
+    virtual void SetBasePath(const String& basePath) {} //no-op
+    /// Returns the absolute path associated with this object. Implemented in Node, Component, and UIElement
+    virtual const String& GetBasePath() const { return String::EMPTY; }
+
     /// Set attribute by index. Return true if successfully set.
     bool SetAttribute(unsigned index, const Variant& value);
     /// Set attribute by name. Return true if successfully set.

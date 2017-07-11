@@ -121,6 +121,7 @@ void RenderPathCommand::Load(const XMLElement& element)
         enabled_ = element.GetBool("enabled");
     if (element.HasAttribute("metadata"))
         metadata_ = element.GetAttribute("metadata");
+    basePath_ = element.GetBasePath();
 
     switch (type_)
     {

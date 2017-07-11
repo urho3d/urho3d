@@ -97,7 +97,8 @@ static void RegisterScriptFile(asIScriptEngine* engine)
 static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
 {
     ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
-    return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, mode, ptr);
+    return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName, ""), className, mode, ptr);
+    //TODO: Decide how relative paths should be handled in this case (with scripting). NEL
 }
 
 asIScriptObject* NodeGetScriptObject(Node* ptr)

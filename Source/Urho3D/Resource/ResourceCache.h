@@ -136,8 +136,8 @@ public:
 
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
-    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread.
-    Resource* GetResource(StringHash type, const String& name, bool sendEventOnFailure = true);
+    /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread. Base path should be a file (the parent directory will be used as the base) using Urho's internal format (i.e. forward slashes)
+    Resource* GetResource(StringHash type, const String& name, const String& basePath, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
     SharedPtr<Resource> GetTempResource(StringHash type, const String& name, bool sendEventOnFailure = true);
     /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
@@ -159,7 +159,7 @@ public:
     const Vector<SharedPtr<PackageFile> >& GetPackageFiles() const { return packages_; }
 
     /// Template version of returning a resource by name.
-    template <class T> T* GetResource(const String& name, bool sendEventOnFailure = true);
+    template <class T> T* GetResource(const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true);
     /// Template version of returning an existing resource by name.
     template <class T> T* GetExistingResource(const String& name);
     /// Template version of loading a resource without storing it to the cache.
@@ -260,10 +260,10 @@ template <class T> T* ResourceCache::GetExistingResource(const String& name)
     return static_cast<T*>(GetExistingResource(type, name));
 }
 
-template <class T> T* ResourceCache::GetResource(const String& name, bool sendEventOnFailure)
+template <class T> T* ResourceCache::GetResource(const String& name, const String &basePath, bool sendEventOnFailure)
 {
     StringHash type = T::GetTypeStatic();
-    return static_cast<T*>(GetResource(type, name, sendEventOnFailure));
+    return static_cast<T*>(GetResource(type, name, basePath, sendEventOnFailure));
 }
 
 template <class T> void ResourceCache::ReleaseResource(const String& name, bool force)
