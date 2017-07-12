@@ -16,7 +16,7 @@ class ResourceCache
 
     tolua_outside File* ResourceCacheGetFile @ GetFile(const String name);
 
-    Resource* GetResource(const String type, const String name, bool sendEventOnFailure = true);
+    Resource* GetResource(const String type, const String name, const String basePath, bool sendEventOnFailure = true);
     Resource* GetExistingResource(const String type, const String name);
     tolua_outside bool ResourceCacheBackgroundLoadResource @ BackgroundLoadResource(const String type, const String name, bool sendEventOnFailure = true);
     unsigned GetNumBackgroundLoadResources() const;
