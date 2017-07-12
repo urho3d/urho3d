@@ -566,6 +566,8 @@ if (MSVC)
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
 else ()
     # GCC/Clang-specific setup
+    set (CMAKE_CXX_VISIBILITY_PRESET hidden)
+    set (CMAKE_VISIBILITY_INLINES_HIDDEN true)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
     if (NOT ANDROID)    # Most of the flags are already setup in Android toolchain file
         if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux)
@@ -1207,10 +1209,9 @@ macro (enable_pch HEADER_PATHNAME)
                 get_target_property (TYPE ${TARGET_NAME} TYPE)
                 if (TYPE MATCHES SHARED)
                     list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
-                    # todo: Reevaluate the replacement of this deprecated function (since CMake 2.8.12) when the CMake minimum required version is set to 2.8.12
-                    # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
-                    # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
-                    add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
+                    if (LANG STREQUAL CXX)
+                        _test_compiler_hidden_visibility ()
+                    endif ()
                 endif ()
                 # Use PIC flags as necessary, except when compiling using MinGW which already uses PIC flags for all codes
                 if (NOT MINGW)
@@ -1230,7 +1231,7 @@ macro (enable_pch HEADER_PATHNAME)
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                     file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                     # Determine the dependency list
@@ -1546,12 +1547,6 @@ macro (setup_library)
         list (APPEND TARGET_PROPERTIES XCODE_ATTRIBUTE_OTHER_LDFLAGS[arch=x86_64] "${LUAJIT_SHARED_LINKER_FLAGS_APPLE} $(OTHER_LDFLAGS)")    # Xcode universal build linker flags when targeting 64-bit OSX with LuaJIT enabled
     endif ()
     _setup_target ()
-
-    # Setup the compiler flags for building shared library
-    if (LIB_TYPE STREQUAL SHARED_LIBRARY)
-        # Hide the symbols that are not explicitly marked for export
-        add_compiler_export_flags ()
-    endif ()
 
     if (PROJECT_NAME STREQUAL Urho3D)
         # Accumulate all the dependent static libraries that are used in building the Urho3D library itself

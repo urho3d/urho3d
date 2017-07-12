@@ -31,6 +31,8 @@ if (COMMAND cmake_policy)
     cmake_policy (SET CMP0026 OLD)
     # MACOSX_RPATH is enabled by default
     cmake_policy (SET CMP0042 NEW)
+    # Honor the visibility properties for SHARED target types only
+    cmake_policy (SET CMP0063 OLD)
 endif ()
 
 # Set project name
