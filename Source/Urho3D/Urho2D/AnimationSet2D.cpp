@@ -308,11 +308,11 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
     spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
-    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+    hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_, source.GetName());
     if (!hasSpriteSheet_)
     {
         spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".plist";
-        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
+        hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_, source.GetName());
     }
 
     if (GetAsyncLoadState() == ASYNC_LOADING)

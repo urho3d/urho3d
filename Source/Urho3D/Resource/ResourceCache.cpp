@@ -729,11 +729,11 @@ void ResourceCache::GetResources(PODVector<Resource*>& result, StringHash type) 
     }
 }
 
-bool ResourceCache::Exists(const String& nameIn) const
+bool ResourceCache::Exists(const String& nameIn, const String& basePath) const
 {
     MutexLock lock(resourceMutex_);
 
-    String name = SanitateResourceName(nameIn);
+    String name = SanitateResourceName(ResolvePath(GetInternalPath(nameIn),GetParentPath(basePath)));
     if (!isRouting_)
     {
         isRouting_ = true;

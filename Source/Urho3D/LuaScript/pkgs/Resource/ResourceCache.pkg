@@ -22,7 +22,7 @@ class ResourceCache
     unsigned GetNumBackgroundLoadResources() const;
     const Vector<String>& GetResourceDirs() const;
 
-    bool Exists(const String name) const;
+    bool Exists(const String name, const String basePath = String::EMPTY) const;
     unsigned long long GetMemoryBudget(StringHash type) const;
     unsigned long long GetMemoryUse(StringHash type) const;
     unsigned long long GetTotalMemoryUse() const;

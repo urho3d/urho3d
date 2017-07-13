@@ -631,10 +631,10 @@ bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
                         pos += len;
 
                         // If the file is not found as it is, add the path of current file but only if it is found there
-                        if (!cache->Exists(includeFile))
+                        if (!cache->Exists(includeFile, GetName()))
                         {
                             String prefixedIncludeFile = GetPath(GetName()) + includeFile;
-                            if (cache->Exists(prefixedIncludeFile))
+                            if (cache->Exists(prefixedIncludeFile, GetName())) //I think that this should possibly just use the absolute Exists (i.e. "" as the base path, not GetName())
                                 includeFile = prefixedIncludeFile;
                         }
 

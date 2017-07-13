@@ -137,11 +137,11 @@ public:
     /// Open and return a file from the resource load paths or from inside a package file. If not found, use a fallback search with absolute path. Return null if fails. Can be called from outside the main thread.
     SharedPtr<File> GetFile(const String& name, bool sendEventOnFailure = true);
     /// Return a resource by type and name. Load if not loaded yet. Return null if not found or if fails, unless SetReturnFailedResources(true) has been called. Can be called only from the main thread. Base path should be a file (the parent directory will be used as the base) using Urho's internal format (i.e. forward slashes)
-    Resource* GetResource(StringHash type, const String& name, const String& basePath, bool sendEventOnFailure = true);
+    Resource* GetResource(StringHash type, const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true);
     /// Load a resource without storing it in the resource cache. Return null if not found or if fails. Can be called from outside the main thread if the resource itself is safe to load completely (it does not possess for example GPU data.)
-    SharedPtr<Resource> GetTempResource(StringHash type, const String& name, const String& basePath, bool sendEventOnFailure = true);
+    SharedPtr<Resource> GetTempResource(StringHash type, const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true);
     /// Background load a resource. An event will be sent when complete. Return true if successfully stored to the load queue, false if eg. already exists. Can be called from outside the main thread.
-    bool BackgroundLoadResource(StringHash type, const String& name, const String& basePath, bool sendEventOnFailure = true, Resource* caller = 0);
+    bool BackgroundLoadResource(StringHash type, const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Return number of pending background-loaded resources.
     unsigned GetNumBackgroundLoadResources() const;
     /// Return all loaded resources of a specific type.
@@ -163,15 +163,15 @@ public:
     /// Template version of returning an existing resource by name.
     template <class T> T* GetExistingResource(const String& name);
     /// Template version of loading a resource without storing it to the cache.
-    template <class T> SharedPtr<T> GetTempResource(const String& name, const String& basePath, bool sendEventOnFailure = true);
+    template <class T> SharedPtr<T> GetTempResource(const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true);
     /// Template version of releasing a resource by name.
     template <class T> void ReleaseResource(const String& name, bool force = false);
     /// Template version of queueing a resource background load.
-    template <class T> bool BackgroundLoadResource(const String& name, const String& basePath, bool sendEventOnFailure = true, Resource* caller = 0);
+    template <class T> bool BackgroundLoadResource(const String& name, const String& basePath = String::EMPTY, bool sendEventOnFailure = true, Resource* caller = 0);
     /// Template version of returning loaded resources of a specific type.
     template <class T> void GetResources(PODVector<T*>& result) const;
     /// Return whether a file exists in the resource directories or package files. Does not check manually added in-memory resources.
-    bool Exists(const String& name) const;
+    bool Exists(const String& name, const String& basePath = String::EMPTY) const;
     /// Return memory budget for a resource type.
     unsigned long long GetMemoryBudget(StringHash type) const;
     /// Return total memory use for a resource type.
