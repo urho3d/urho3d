@@ -111,9 +111,9 @@ static CScriptArray* ResourceCacheGetPackageFiles(ResourceCache* ptr)
     return VectorToHandleArray<PackageFile>(ptr->GetPackageFiles(), "Array<PackageFile@>");
 }
 
-static bool ResourceCacheBackgroundLoadResource(const String& type, const String& name, bool sendEventOnFailure, ResourceCache* ptr)
+static bool ResourceCacheBackgroundLoadResource(const String& type, const String& name, const String& basePath, bool sendEventOnFailure, ResourceCache* ptr)
 {
-    return ptr->BackgroundLoadResource(type, name, sendEventOnFailure);
+    return ptr->BackgroundLoadResource(type, name, basePath, sendEventOnFailure);
 }
 
 static Localization* GetLocalization()

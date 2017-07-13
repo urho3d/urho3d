@@ -124,7 +124,7 @@ bool TextureCube::BeginLoad(Deserializer& source)
         if (GetPath(name).Empty())
             name = texPath + name;
 
-        SharedPtr<Image> image = cache->GetTempResource<Image>(name);
+        SharedPtr<Image> image = cache->GetTempResource<Image>(name, GetName());
         if (!image)
             return false;
 
@@ -218,7 +218,7 @@ bool TextureCube::BeginLoad(Deserializer& source)
             if (GetPath(name).Empty())
                 name = texPath + name;
 
-            loadImages_.Push(cache->GetTempResource<Image>(name));
+            loadImages_.Push(cache->GetTempResource<Image>(name, GetName()));
             cache->StoreResourceDependency(this, name);
 
             faceElem = faceElem.GetNext("face");

@@ -424,12 +424,12 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
                 String textureFilePath =
                     GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
             else
             {
                 String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
         }
 
@@ -437,7 +437,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
              imageLayerElem = imageLayerElem.GetNext("imagelayer"))
         {
             String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
         }
     }
 

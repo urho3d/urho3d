@@ -318,7 +318,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
     if (GetAsyncLoadState() == ASYNC_LOADING)
     {
         if (hasSpriteSheet_)
-            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, true, this);
+            cache->BackgroundLoadResource<SpriteSheet2D>(spriteSheetFilePath_, source.GetName(), true, this);
         else
         {
             for (unsigned i = 0; i < spriterData_->folders_.Size(); ++i)
@@ -328,7 +328,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
                 {
                     Spriter::File* file = folder->files_[j];
                     String imagePath = parentPath + file->name_;
-                    cache->BackgroundLoadResource<Image>(imagePath, true, this);
+                    cache->BackgroundLoadResource<Image>(imagePath, source.GetName(), true, this);
                 }
             }
         }
