@@ -1291,7 +1291,7 @@ void BuildAndSaveAnimations(OutModel* model)
                 startTime = Min(startTime, (float)channel->mPositionKeys[0].mTime);
             if (channel->mNumRotationKeys > 0)
                 startTime = Min(startTime, (float)channel->mRotationKeys[0].mTime);
-            if (channel->mScalingKeys > 0)
+            if (channel->mNumScalingKeys > 0)
                 startTime = Min(startTime, (float)channel->mScalingKeys[0].mTime);
         }
         if (startTime > thisImportStartTime)
