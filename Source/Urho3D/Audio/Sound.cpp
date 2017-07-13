@@ -343,7 +343,7 @@ void Sound::LoadParameters()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
-    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
+    SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, GetName(), false));
     if (!file)
         return;
 
