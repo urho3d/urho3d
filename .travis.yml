@@ -42,6 +42,18 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
     - URHO3D_DEPLOYMENT_TARGET=generic
+# Below are our custom data to preset build stages for other documents in this YAML stream, we do this because YAML anchor cannot be referenced across document boundary
+data:
+  stages:
+    base: &base
+      addons:
+      before_script:
+      after_script:
+    housekeep:
+      <<: *base
+      cache:
+      script: rake ci_delete_mirror
+stage: build
 matrix:
   fast_finish: true
   exclude:
@@ -89,6 +101,10 @@ matrix:
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+# TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' (potentially also the 'precache'/'package') stages here
+    - stage: lint (to be implemented)
+      <<: *base
+      script: true  # Using clang-tidy or something like that or using CMake/clang-tidy integration (see <LANG>_CLANG_TIDY CMake property)
 before_script:
   - rake ci_timer
   # Upgrade CMake using tarball from its vendor and cache the installation
@@ -121,7 +137,7 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: MinGW-CI, active: yes, appveyor: yes, last_job: 'x64:SHARED'}
+branch: {name: MinGW-CI, active: yes, appveyor: yes}
 version: '{build}'
 platform:
   - x86
@@ -180,7 +196,9 @@ before_build:
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
-#after_build: rake ci_teardown_cache
+after_build:
+  # rake ci_teardown_cache
+  - if "%PLATFORM%:%URHO3D_LIB_TYPE%" == "x64:SHARED" rake ci_delete_mirror
 test: off
 artifacts:
   - path: .\*.zip
@@ -218,6 +236,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+stage: scan
 before_script:
   - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
@@ -225,7 +244,9 @@ before_script:
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - rake ci_setup_cache
 script: true
-after_script: rake ci_teardown_cache
+after_script:
+  - rake ci_teardown_cache
+  - rake ci_delete_mirror
 
 ---
 
@@ -246,6 +267,7 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+stage: annotate
 before_script:
   - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
   - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
@@ -254,7 +276,9 @@ before_script:
   - git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang
   - rake ci_setup_cache
 script: rake ci_annotate
-after_script: rake ci_teardown_cache
+after_script:
+  - rake ci_teardown_cache
+  - rake ci_delete_mirror
 
 ---
 
@@ -280,6 +304,8 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
   matrix:
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC                 # Using default native API Level android-9
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
     - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level android-21
     - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
@@ -288,10 +314,10 @@ env:
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
     - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level android-21
     - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
-    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC                 # Using default native API Level android-9
-    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
   - export NO_SDK_SYSIMG=1; unset AVD INSTALL
@@ -340,8 +366,10 @@ env:
     # RPI 2/3
     - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
     - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
   - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
@@ -386,8 +414,10 @@ env:
     # ODROID-C2
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
   - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
@@ -436,8 +466,10 @@ env:
     # URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=1 BRANCH=incoming numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=1 BRANCH=incoming
     - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=1 BRANCH=incoming
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
   - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
@@ -470,14 +502,16 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
-    - MAKEFILE=1     URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
-    - MAKEFILE=1     URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-    - XCODE=1        URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1        URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
     - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=10.2 sdk=appletvsimulator
     - XCODE=1 IOS=1  URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=10.3 sdk=iphonesimulator
+    - XCODE=1        URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1        URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
+    - MAKEFILE=1     URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
+    - MAKEFILE=1     URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
