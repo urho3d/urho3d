@@ -65,8 +65,8 @@ void CreateScene()
     Node@ zoneNode = scene_.CreateChild("Zone");
     Zone@ zone = zoneNode.CreateComponent("Zone");
     zone.boundingBox = BoundingBox(-1000.0f, 1000.0f);
-    zone.ambientColor = Color(0.15f, 0.15f, 0.15f);
-    zone.fogColor = Color(0.5f, 0.5f, 0.7f);
+    zone.ambientColor = Color(0.5f, 0.5f, 0.5f);
+    zone.fogColor = Color(0.4f, 0.5f, 0.8f);
     zone.fogStart = 100.0f;
     zone.fogEnd = 300.0f;
 
@@ -79,6 +79,7 @@ void CreateScene()
     light.shadowBias = BiasParameters(0.00025f, 0.5f);
     // Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f);
+    light.color = Color(0.5f, 0.5f, 0.5f);
 
     // Create the floor object
     Node@ floorNode = scene_.CreateChild("Floor");
@@ -143,15 +144,12 @@ void CreateCharacter()
     characterNode = scene_.CreateChild("Jack");
     characterNode.position = Vector3(0.0f, 1.0f, 0.0f);
 
-    Node@ adjNode = characterNode.CreateChild("AdjNode");
-    adjNode.rotation = Quaternion(180.0f, Vector3::UP);
-
     // Create the rendering component + animation controller
-    AnimatedModel@ object = adjNode.CreateComponent("AnimatedModel");
+    AnimatedModel@ object = characterNode.CreateComponent("AnimatedModel");
     object.model = cache.GetResource("Model", "Models/Mutant/Mutant.mdl");
-    object.material = cache.GetResource("Material", "Models/Mutant/Materials/mutant_M.xml");
+    object.material = cache.GetResource("Material", "Models/Mutant/Materials/Mutant.xml");
     object.castShadows = true;
-    adjNode.CreateComponent("AnimationController");
+    characterNode.CreateComponent("AnimationController");
 
     // Set the head bone for manual control
     object.skeleton.GetBone("Mutant:Head").animated = false;
@@ -438,7 +436,8 @@ class Character : ScriptObject
                 {
                     body.ApplyImpulse(Vector3::UP * JUMP_FORCE);
                     okToJump = false;
-                    animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+                    animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump.ani", 0, false, 0.2f);
+                    animCtrl.SetTime("Models/Mutant/Mutant_Jump.ani", 0.0f);
                 }
             }
             else
@@ -447,7 +446,7 @@ class Character : ScriptObject
 
         if (!onGround)
         {
-            animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2f);
+            animCtrl.PlayExclusive("Models/Mutant/Mutant_Jump.ani", 0, false, 0.2f);
         }
         else
         {
@@ -459,7 +458,7 @@ class Character : ScriptObject
                 animCtrl.SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity.length * 0.3f);
             }
             else
-                animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2f);
+                animCtrl.PlayExclusive("Models/Mutant/Mutant_Idle.ani", 0, true, 0.2f);
 
         }
 
