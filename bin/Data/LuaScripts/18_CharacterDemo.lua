@@ -66,8 +66,8 @@ function CreateScene()
     local zoneNode = scene_:CreateChild("Zone")
     local zone = zoneNode:CreateComponent("Zone")
     zone.boundingBox = BoundingBox(-1000.0, 1000.0)
-    zone.ambientColor = Color(0.15, 0.15, 0.15)
-    zone.fogColor = Color(0.5, 0.5, 0.7)
+    zone.ambientColor = Color(0.5, 0.5, 0.5)
+    zone.fogColor = Color(0.4, 0.5, 0.8)
     zone.fogStart = 100.0
     zone.fogEnd = 300.0
 
@@ -80,6 +80,7 @@ function CreateScene()
     light.shadowBias = BiasParameters(0.00025, 0.5)
     -- Set cascade splits at 10, 50 and 200 world units, fade shadows out at 80% of maximum shadow distance
     light.shadowCascade = CascadeParameters(10.0, 50.0, 200.0, 0.0, 0.8)
+    light.color = Color(0.5, 0.5, 0.5)
 
     -- Create the floor object
     local floorNode = scene_:CreateChild("Floor")
@@ -141,16 +142,12 @@ function CreateCharacter()
     characterNode = scene_:CreateChild("Jack")
     characterNode.position = Vector3(0.0, 1.0, 0.0)
 
-    -- spin node
-    local adjNode = characterNode:CreateChild("AdjNode")
-    adjNode.rotation = Quaternion(180.0, Vector3(0.0, 1.0, 0.0))
-
     -- Create the rendering component + animation controller
-    local object = adjNode:CreateComponent("AnimatedModel")
+    local object = characterNode:CreateComponent("AnimatedModel")
     object.model = cache:GetResource("Model", "Models/Mutant/Mutant.mdl")
-    object.material = cache:GetResource("Material", "Models/Mutant/Materials/mutant_M.xml")
+    object.material = cache:GetResource("Material", "Models/Mutant/Materials/Mutant.xml")
     object.castShadows = true
-    adjNode:CreateComponent("AnimationController")
+    characterNode:CreateComponent("AnimationController")
 
     -- Set the head bone for manual control
     object.skeleton:GetBone("Mutant:Head").animated = false
@@ -421,7 +418,8 @@ function Character:FixedUpdate(timeStep)
             if self.okToJump then
                 body:ApplyImpulse(Vector3(0.0, 1.0, 0.0) * JUMP_FORCE)
                 self.okToJump = false
-                animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2)
+                animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump.ani", 0, false, 0.2)
+                animCtrl:SetTime("Models/Mutant/Mutant_Jump.ani", 0.0)
             end
         else
             self.okToJump = true
@@ -429,7 +427,7 @@ function Character:FixedUpdate(timeStep)
     end
 
     if not self.onGround then
-        animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump1.ani", 0, false, 0.2)
+        animCtrl:PlayExclusive("Models/Mutant/Mutant_Jump.ani", 0, false, 0.2)
     else
         -- Play walk animation if moving on ground, otherwise fade it out
         if softGrounded and not moveDir:Equals(Vector3(0.0, 0.0, 0.0)) then
@@ -437,7 +435,7 @@ function Character:FixedUpdate(timeStep)
             -- Set walk animation speed proportional to velocity
             animCtrl:SetSpeed("Models/Mutant/Mutant_Run.ani", planeVelocity:Length() * 0.3)
         else
-            animCtrl:PlayExclusive("Models/Mutant/Mutant_Idle0.ani", 0, true, 0.2)
+            animCtrl:PlayExclusive("Models/Mutant/Mutant_Idle.ani", 0, true, 0.2)
         end
     end
 

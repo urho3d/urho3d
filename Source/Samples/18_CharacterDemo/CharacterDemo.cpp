@@ -106,8 +106,8 @@ void CharacterDemo::CreateScene()
     // Create static scene content. First create a zone for ambient lighting and fog control
     Node* zoneNode = scene_->CreateChild("Zone");
     Zone* zone = zoneNode->CreateComponent<Zone>();
-    zone->SetAmbientColor(Color(0.15f, 0.15f, 0.15f));
-    zone->SetFogColor(Color(0.5f, 0.5f, 0.7f));
+    zone->SetAmbientColor(Color(0.5f, 0.5f, 0.5f));
+    zone->SetFogColor(Color(0.4f, 0.5f, 0.8f));
     zone->SetFogStart(100.0f);
     zone->SetFogEnd(300.0f);
     zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
@@ -121,6 +121,7 @@ void CharacterDemo::CreateScene()
     light->SetShadowBias(BiasParameters(0.00025f, 0.5f));
     light->SetShadowCascade(CascadeParameters(10.0f, 50.0f, 200.0f, 0.0f, 0.8f));
     light->SetSpecularIntensity(0.5f);
+    light->SetColor(Color(0.5f, 0.5f, 0.5f));
 
     // Create the floor object
     Node* floorNode = scene_->CreateChild("Floor");
@@ -187,16 +188,12 @@ void CharacterDemo::CreateCharacter()
     Node* objectNode = scene_->CreateChild("Jack");
     objectNode->SetPosition(Vector3(0.0f, 1.0f, 0.0f));
 
-    // spin node
-    Node* adjustNode = objectNode->CreateChild("AdjNode");
-    adjustNode->SetRotation( Quaternion(180, Vector3(0,1,0) ) );
-    
     // Create the rendering component + animation controller
-    AnimatedModel* object = adjustNode->CreateComponent<AnimatedModel>();
+    AnimatedModel* object = objectNode->CreateComponent<AnimatedModel>();
     object->SetModel(cache->GetResource<Model>("Models/Mutant/Mutant.mdl"));
-    object->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/mutant_M.xml"));
+    object->SetMaterial(cache->GetResource<Material>("Models/Mutant/Materials/Mutant.xml"));
     object->SetCastShadows(true);
-    adjustNode->CreateComponent<AnimationController>();
+    objectNode->CreateComponent<AnimationController>();
 
     // Set the head bone for manual control
     object->GetSkeleton().GetBone("Mutant:Head")->animated_ = false;
