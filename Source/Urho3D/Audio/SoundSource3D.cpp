@@ -139,6 +139,13 @@ void SoundSource3D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     // Draw cones for directional sounds, or spheres for non-directional
     if (innerAngle_ < DEFAULT_ANGLE && outerAngle_ > 0.0f)
     {
+        /// \todo Replace arcs with sphere sector
+        //const Quaternion rotation = worldRotation * Quaternion(Vector3::UP, Vector3::FORWARD);
+        //debug->AddSphereSector(Sphere(worldPosition, nearDistance_), rotation, innerAngle_, false, INNER_COLOR, depthTest);
+        //debug->AddSphereSector(Sphere(worldPosition, nearDistance_), rotation, outerAngle_, false, OUTER_COLOR, depthTest);
+        //debug->AddSphereSector(Sphere(worldPosition, farDistance_), rotation, innerAngle_, true, INNER_COLOR, depthTest);
+        //debug->AddSphereSector(Sphere(worldPosition, farDistance_), rotation, outerAngle_, true, OUTER_COLOR, depthTest);
+
         DrawDebugArc(worldPosition, worldRotation, innerAngle_, nearDistance_, false, INNER_COLOR, debug, depthTest);
         DrawDebugArc(worldPosition, worldRotation, outerAngle_, nearDistance_, false, OUTER_COLOR, debug, depthTest);
         DrawDebugArc(worldPosition, worldRotation, innerAngle_, farDistance_, true, INNER_COLOR, debug, depthTest);

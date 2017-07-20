@@ -1302,6 +1302,8 @@ static void RegisterVolumes(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Sphere", "Intersection IsInside(const BoundingBox&in) const", asMETHODPR(Sphere, IsInside, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "Intersection IsInsideFast(const BoundingBox&in) const", asMETHODPR(Sphere, IsInsideFast, (const BoundingBox&) const, Intersection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Sphere", "float Distance(const Vector3&in) const", asMETHOD(Sphere, Distance), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sphere", "Vector3 GetLocalPoint(float, float) const", asMETHOD(Sphere, GetLocalPoint), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Sphere", "Vector3 GetPoint(float, float) const", asMETHOD(Sphere, GetPoint), asCALL_THISCALL);
     engine->RegisterObjectProperty("Sphere", "Vector3 center", offsetof(Sphere, center_));
     engine->RegisterObjectProperty("Sphere", "float radius", offsetof(Sphere, radius_));
 }
