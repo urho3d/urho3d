@@ -141,6 +141,7 @@ option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB AND EXCEPTIONS" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
+option (URHO3D_WEBP "Enable WebP support" FALSE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT APPLE)
     set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
@@ -443,6 +444,7 @@ foreach (OPT
         URHO3D_PROFILING
         URHO3D_THREADING
         URHO3D_URHO2D
+        URHO3D_WEBP
         URHO3D_WIN32_CONSOLE)
     if (${OPT})
         add_definitions (-D${OPT})
