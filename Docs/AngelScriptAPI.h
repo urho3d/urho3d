@@ -12407,6 +12407,7 @@ Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+Vector3 HeightMapToWorld(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
