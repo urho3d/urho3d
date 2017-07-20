@@ -24,14 +24,18 @@
 
 #include "../Core/Context.h"
 #include "../Graphics/Texture2D.h"
+#include "../Graphics/Graphics.h"
 #include "../IO/FileSystem.h"
 #include "../IO/Log.h"
 #include "../Resource/ResourceCache.h"
 #include "../Resource/XMLFile.h"
+#include "../Resource/Image.h"
 #include "../Urho2D/Sprite2D.h"
 #include "../Urho2D/TmxFile2D.h"
+#include "../Math/AreaAllocator.h"
 
 #include "../DebugNew.h"
+
 
 namespace Urho3D
 {
@@ -565,6 +569,14 @@ PropertySet2D* TmxFile2D::GetTilePropertySet(int gid) const
     return i->second_;
 }
 
+TmxObjectGroup2D* TmxFile2D::GetCollisionObjectGroup(int gid) const
+{
+    HashMap<int, SharedPtr<TmxObjectGroup2D> >::ConstIterator i = gidToCollisionObjectGroupMapping_.Find(gid);
+    if (i == gidToCollisionObjectGroupMapping_.End())
+        return 0;
+    return i->second_;
+}
+
 const TmxLayer2D* TmxFile2D::GetLayer(unsigned index) const
 {
     if (index >= layers_.Size())
@@ -586,6 +598,15 @@ SharedPtr<XMLFile> TmxFile2D::LoadTSXFile(const String& source)
 
     return tsxXMLFile;
 }
+
+struct TileImageInfo {
+    Image* image;
+    int tileGid;
+    int imageWidth;
+    int imageHeight;
+    int x;
+    int y;
+};
 
 bool TmxFile2D::LoadTileSet(const XMLElement& element)
 {
@@ -613,24 +634,17 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     else
         tileSetElem = element;
 
-    XMLElement imageElem = tileSetElem.GetChild("image");
-    String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
-    if (!texture)
-    {
-        URHO3D_LOGERROR("Could not load texture " + textureFilePath);
-        return false;
-    }
-
-    tileSetTextures_.Push(texture);
-
+    bool isIsometricGrid = tileSetElem.HasChild("grid") && tileSetElem.GetChild("grid").GetAttribute("orientation") == "isometric";
     int tileWidth = tileSetElem.GetInt("tilewidth");
     int tileHeight = tileSetElem.GetInt("tileheight");
     int spacing = tileSetElem.GetInt("spacing");
     int margin = tileSetElem.GetInt("margin");
-    int imageWidth = imageElem.GetInt("width");
-    int imageHeight = imageElem.GetInt("height");
+    bool isSingleTileSet = false;
+    int imageWidth;
+    int imageHeight;
+
+    if (isIsometricGrid)
+        URHO3D_LOGWARNING("Tilesets with isometric orientation are not supported yet");
 
     // Set hot spot at left bottom
     Vector2 hotSpot(0.0f, 0.0f);
@@ -641,39 +655,127 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
         hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
     }
 
-    int gid = firstgid;
-    for (int y = margin; y + tileHeight <= imageHeight - margin; y += tileHeight + spacing)
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
     {
-        for (int x = margin; x + tileWidth <= imageWidth - margin; x += tileWidth + spacing)
-        {
-            SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
-            sprite->SetTexture(texture);
-            sprite->SetRectangle(IntRect(x, y, x + tileWidth, y + tileHeight));
-            sprite->SetHotSpot(hotSpot);
+        XMLElement imageElem = tileSetElem.GetChild("image");
+        // Tileset based on single tileset image
+        if (imageElem.NotNull()) {
+            isSingleTileSet = true;
+            String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+            SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+            if (!texture)
+            {
+                URHO3D_LOGERROR("Could not load texture " + textureFilePath);
+                return false;
+            }
 
-            gidToSpriteMapping_[gid++] = sprite;
+            tileSetTextures_.Push(texture);
+
+            imageWidth = imageElem.GetInt("width");
+            imageHeight = imageElem.GetInt("height");
+
+            int gid = firstgid;
+            for (int y = margin; y + tileHeight <= imageHeight - margin; y += tileHeight + spacing)
+            {
+                for (int x = margin; x + tileWidth <= imageWidth - margin; x += tileWidth + spacing)
+                {
+                    SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
+                    sprite->SetTexture(texture);
+                    sprite->SetRectangle(IntRect(x, y, x + tileWidth, y + tileHeight));
+                    sprite->SetHotSpot(hotSpot);
+
+                    gidToSpriteMapping_[gid++] = sprite;
+                }
+            }
         }
     }
 
+    Vector<TileImageInfo> tileImageInfos;
     for (XMLElement tileElem = tileSetElem.GetChild("tile"); tileElem; tileElem = tileElem.GetNext("tile"))
     {
+        int gid = firstgid + tileElem.GetInt("id");
+        // Tileset based on collection of images
+        if (!isSingleTileSet)
+        {
+            XMLElement imageElem = tileElem.GetChild("image");
+            if (imageElem.NotNull()) {
+                String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
+                SharedPtr<Image> image(cache->GetResource<Image>(textureFilePath));
+                if (!image)
+                {
+                    URHO3D_LOGERROR("Could not load image " + textureFilePath);
+                    return false;
+                }
+                tileWidth = imageWidth = imageElem.GetInt("width");
+                tileHeight = imageHeight = imageElem.GetInt("height");
+                TileImageInfo info = {image, gid, imageWidth, imageHeight, 0, 0};
+                tileImageInfos.Push(info);
+            }
+        }
         if (tileElem.HasChild("properties"))
         {
             SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
             propertySet->Load(tileElem.GetChild("properties"));
-            gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
+            gidToPropertySetMapping_[gid] = propertySet;
         }
-        else if (tileElem.HasChild("objectgroup"))
+        if (tileElem.HasChild("objectgroup"))
         {
-            XMLElement objectGroup = tileElem.GetChild("objectgroup");
-
-            if (objectGroup.HasChild("properties"))
+            if (!isIsometricGrid)
             {
-                SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
-                propertySet->Load(objectGroup.GetChild("properties"));
-                gidToPropertySetMapping_[firstgid + tileElem.GetInt("id")] = propertySet;
+                TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
+                TileMapInfo2D info = info_;
+                info.width_ = tileWidth * PIXEL_SIZE / info.tileWidth_;
+                info.height_ = tileHeight * PIXEL_SIZE / info.tileHeight_;
+                objectGroup->Load(tileElem.GetChild("objectgroup"), info);
+                gidToCollisionObjectGroupMapping_[gid] = SharedPtr<TmxObjectGroup2D>(objectGroup);
             }
         }
+    }
+
+    if (!isSingleTileSet)
+    {
+        if (tileImageInfos.Empty())
+            return false;
+
+        AreaAllocator allocator(128, 128, 2048, 2048);
+
+        for (int i = 0; i < tileImageInfos.Size(); ++i)
+        {
+            TileImageInfo& info = tileImageInfos[i];
+            if (!allocator.Allocate(info.imageWidth + 1, info.imageHeight + 1, info.x, info.y))
+            {
+                URHO3D_LOGERROR("Could not allocate area");
+                return false;
+            }
+        }
+        SharedPtr<Texture2D> texture(new Texture2D(context_));
+        texture->SetMipsToSkip(QUALITY_LOW, 0);
+        texture->SetNumLevels(1);
+        texture->SetSize(allocator.GetWidth(), allocator.GetHeight(), Graphics::GetRGBAFormat());
+
+        unsigned textureDataSize = allocator.GetWidth() * allocator.GetHeight() * 4;
+        SharedArrayPtr<unsigned char> textureData(new unsigned char[textureDataSize]);
+        memset(textureData.Get(), 0, textureDataSize);
+
+        for (int i = 0; i < tileImageInfos.Size(); ++i)
+        {
+            TileImageInfo& info = tileImageInfos[i];
+            Image* image = info.image;
+
+            for (int y = 0; y < image->GetHeight(); ++y)
+            {
+                memcpy(textureData.Get() + ((info.y + y) * allocator.GetWidth() + info.x) * 4,
+                    image->GetData() + y * image->GetWidth() * 4, image->GetWidth() * 4);
+            }
+
+            SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
+            sprite->SetTexture(texture);
+            sprite->SetRectangle(IntRect(info.x, info.y, info.x + info.imageWidth, info.y +  + info.imageHeight));
+            sprite->SetHotSpot(hotSpot);
+            gidToSpriteMapping_[info.tileGid] = sprite;
+        }
+        texture->SetData(0, 0, 0, allocator.GetWidth(), allocator.GetHeight(), textureData.Get());
+        tileSetTextures_.Push(texture);
     }
 
     return true;

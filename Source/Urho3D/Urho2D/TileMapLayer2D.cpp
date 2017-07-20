@@ -53,6 +53,19 @@ void TileMapLayer2D::RegisterObject(Context* context)
     context->RegisterFactory<TileMapLayer2D>();
 }
 
+// Transform vector from tiled isometric space to Urho3d node-local space
+static Vector2 TransformIsometricVector(Vector2 vec)
+{
+    return Vector2(vec.x_ - vec.y_, - (vec.x_ + vec.y_) / 2);
+}
+
+// Transform vector from node-local space to global space
+Vector2 TransformNode2D(Matrix3x4 transform, Vector2 local)
+{
+    Vector3 transformed = transform * Vector4(local.x_, local.y_, 0.f, 1.f);
+    return Vector2(transformed.x_, transformed.y_);
+}
+
 void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (!debug)
@@ -60,6 +73,7 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
     if (objectGroup_)
     {
+        const Matrix3x4 transform = GetTileMap()->GetNode()->GetTransform();
         for (unsigned i = 0; i < objectGroup_->GetNumObjects(); ++i)
         {
             TileMapObject2D* object = objectGroup_->GetObject(i);
@@ -69,28 +83,75 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             {
             case OT_RECTANGLE:
                 {
-                    const Vector2& lb = object->GetPosition();
-                    const Vector2& rt = lb + object->GetSize();
-
-                    debug->AddLine(Vector2(lb.x_, lb.y_), Vector2(rt.x_, lb.y_), color, depthTest);
-                    debug->AddLine(Vector2(rt.x_, lb.y_), Vector2(rt.x_, rt.y_), color, depthTest);
-                    debug->AddLine(Vector2(rt.x_, rt.y_), Vector2(lb.x_, rt.y_), color, depthTest);
-                    debug->AddLine(Vector2(lb.x_, rt.y_), Vector2(lb.x_, lb.y_), color, depthTest);
+                    switch (GetTileMap()->GetInfo().orientation_)
+                    {
+                    case O_ORTHOGONAL:
+                    case O_HEXAGONAL:
+                    case O_STAGGERED:
+                        {
+                            const Vector2& lb = object->GetPosition();
+                            const Vector2& rt = lb + object->GetSize();
+                            debug->AddLine(TransformNode2D(transform, Vector2(lb.x_, lb.y_)), TransformNode2D(transform, Vector2(rt.x_, lb.y_)), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, Vector2(rt.x_, lb.y_)), TransformNode2D(transform, Vector2(rt.x_, rt.y_)), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, Vector2(rt.x_, rt.y_)), TransformNode2D(transform, Vector2(lb.x_, rt.y_)), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, Vector2(lb.x_, rt.y_)), TransformNode2D(transform, Vector2(lb.x_, lb.y_)), color, depthTest);
+                            break;
+                        }
+                    case O_ISOMETRIC:
+                        {
+                            const Vector2& size = object->GetSize();
+                            const Vector2 lt = object->GetPosition();
+                            const Vector2 lb = lt - TransformIsometricVector(Vector2(0, size.y_));
+                            const Vector2 rb = lb + TransformIsometricVector(Vector2(size.x_, 0));
+                            const Vector2 rt = lb + TransformIsometricVector(Vector2(size.x_, size.y_));
+                            debug->AddLine(TransformNode2D(transform, lt), TransformNode2D(transform, lb), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, lb), TransformNode2D(transform, rb), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, rb), TransformNode2D(transform, rt), color, depthTest);
+                            debug->AddLine(TransformNode2D(transform, rt), TransformNode2D(transform, lt), color, depthTest);
+                            break;
+                        }
+                    }
                 }
                 break;
 
             case OT_ELLIPSE:
                 {
-                    const Vector2 halfSize = object->GetSize() * 0.5f;
-                    const Vector2 center = object->GetPosition() + halfSize;
-                    for (unsigned i = 0; i < 360; i += 30)
+                    switch (GetTileMap()->GetInfo().orientation_)
                     {
-                        unsigned j = i + 30;
-                        float x1 = halfSize.x_ * Cos((float)i);
-                        float y1 = halfSize.y_ * Sin((float)i);
-                        float x2 = halfSize.x_ * Cos((float)j);
-                        float y2 = halfSize.y_ * Sin((float)j);
-                        debug->AddLine(center + Vector2(x1, y1), center + Vector2(x2, y2), color, depthTest);
+                    case O_ORTHOGONAL:
+                    case O_HEXAGONAL:
+                    case O_STAGGERED:
+                        {
+                            const Vector2 halfSize = object->GetSize() * 0.5f;
+                            const Vector2 center = object->GetPosition() + halfSize;
+                            for (unsigned i = 0; i < 360; i += 30)
+                            {
+                                unsigned j = i + 30;
+                                float x1 = halfSize.x_ * Cos((float)i);
+                                float y1 = halfSize.y_ * Sin((float)i);
+                                float x2 = halfSize.x_ * Cos((float)j);
+                                float y2 = halfSize.y_ * Sin((float)j);
+                                debug->AddLine(TransformNode2D(transform, center + Vector2(x1, y1)),
+                                               TransformNode2D(transform, center + Vector2(x2, y2)), color, depthTest);
+                            }
+                            break;
+                        }
+                    case O_ISOMETRIC:
+                        {
+                            const Vector2 halfSize = object->GetSize() * 0.5f;
+                            const Vector2 center = object->GetPosition() + TransformIsometricVector(Vector2(halfSize.x_, -halfSize.y_));
+                            for (unsigned i = 0; i < 360; i += 30)
+                            {
+                                unsigned j = i + 30;
+                                float x1 = halfSize.x_ * Cos((float)i);
+                                float y1 = halfSize.y_ * Sin((float)i);
+                                float x2 = halfSize.x_ * Cos((float)j);
+                                float y2 = halfSize.y_ * Sin((float)j);
+                                debug->AddLine(TransformNode2D(transform, center + TransformIsometricVector(Vector2(x1, y1))),
+                                               TransformNode2D(transform, center + TransformIsometricVector(Vector2(x2, y2))), color, depthTest);
+                            }
+                            break;
+                        }
                     }
                 }
                 break;
@@ -99,10 +160,12 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             case OT_POLYLINE:
                 {
                     for (unsigned j = 0; j < object->GetNumPoints() - 1; ++j)
-                        debug->AddLine(object->GetPoint(j), object->GetPoint(j + 1), color, depthTest);
+                        debug->AddLine(TransformNode2D(transform, object->GetPoint(j)),
+                                       TransformNode2D(transform, object->GetPoint(j + 1)), color, depthTest);
 
                     if (object->GetObjectType() == OT_POLYGON)
-                        debug->AddLine(object->GetPoint(0), object->GetPoint(object->GetNumPoints() - 1), color, depthTest);
+                        debug->AddLine(TransformNode2D(transform, object->GetPoint(0)),
+                                       TransformNode2D(transform, object->GetPoint(object->GetNumPoints() - 1)), color, depthTest);
                 }
                 break;
 

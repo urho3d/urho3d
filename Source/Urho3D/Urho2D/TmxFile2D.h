@@ -186,6 +186,9 @@ public:
     /// Return tile property set by gid, if not exist return 0.
     PropertySet2D* GetTilePropertySet(int gid) const;
 
+    /// Return collision object group by gid, if not exist return 0.
+    TmxObjectGroup2D* GetCollisionObjectGroup(int gid) const;
+
     /// Return number of layers.
     unsigned GetNumLayers() const { return layers_.Size(); }
 
@@ -210,6 +213,8 @@ private:
     HashMap<int, SharedPtr<Sprite2D> > gidToSpriteMapping_;
     /// Gid to tile property set mapping.
     HashMap<int, SharedPtr<PropertySet2D> > gidToPropertySetMapping_;
+    /// Gid to collision object group mapping.
+    HashMap<int, SharedPtr<TmxObjectGroup2D> > gidToCollisionObjectGroupMapping_;
     /// Layers.
     Vector<TmxLayer2D*> layers_;
 };
