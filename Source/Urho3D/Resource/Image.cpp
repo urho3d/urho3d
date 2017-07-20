@@ -1355,13 +1355,17 @@ bool Image::SaveDDS(const String& fileName) const
     return true;
 }
 
-#ifdef URHO3D_WEBP
 bool Image::SaveWEBP(const String& fileName) const
 {
+#ifdef URHO3D_WEBP
     URHO3D_LOGERROR("SaveWEBP not yet implemented.");
     return false;
-}
+#else
+    URHO3D_LOGERROR("Cannot save in WEBP format, support not compiled in.");
+    return false;
 #endif
+}
+
 
 Color Image::GetPixel(int x, int y) const
 {
