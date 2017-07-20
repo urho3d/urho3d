@@ -99,7 +99,7 @@ if (WIN32)
 endif ()
 
 # Define source files
-foreach (DIR IK Navigation Network Physics Urho2D)
+foreach (DIR IK Navigation Network Physics Urho2D WebP)
     string (TOUPPER URHO3D_${DIR} OPT)
     if (NOT ${OPT})
         list (APPEND EXCLUDED_SOURCE_DIRS ${DIR})

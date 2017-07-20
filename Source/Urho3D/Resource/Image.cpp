@@ -35,6 +35,10 @@
 #include <STB/stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <STB/stb_image_write.h>
+#ifdef URHO3D_WEBP
+#include <webp/decode.h>
+#include <webp/encode.h>
+#endif
 
 #include "../DebugNew.h"
 
@@ -733,6 +737,75 @@ bool Image::BeginLoad(Deserializer& source)
         source.Read(data_.Get(), dataSize);
         SetMemoryUse(dataSize);
     }
+#ifdef URHO3D_WEBP
+    else if (fileID == "RIFF")
+    {
+        // WebP: https://developers.google.com/speed/webp/docs/api
+
+        // RIFF layout is:
+        //   Offset  tag
+        //   0...3   "RIFF" 4-byte tag
+        //   4...7   size of image data (including metadata) starting at offset 8
+        //   8...11  "WEBP"   our form-type signature
+        const uint8_t TAG_SIZE(4);
+
+        source.Seek(8);
+        uint8_t fourCC[TAG_SIZE];
+        memset(&fourCC, 0, sizeof(uint8_t) * TAG_SIZE);
+
+        unsigned bytesRead(source.Read(&fourCC, TAG_SIZE));
+        if (bytesRead != TAG_SIZE)
+        {
+            // Truncated.
+            URHO3D_LOGERROR("Truncated RIFF data.");
+            return false;
+        }
+        const uint8_t WEBP[TAG_SIZE] = {'W', 'E', 'B', 'P'};
+        if (memcmp(fourCC, WEBP, TAG_SIZE))
+        {
+            // VP8_STATUS_BITSTREAM_ERROR
+            URHO3D_LOGERROR("Invalid header.");
+            return false;
+        }
+
+        // Read the file to buffer.
+        size_t dataSize(source.GetSize());
+        SharedArrayPtr<uint8_t> data(new uint8_t[dataSize]);
+
+        memset(data.Get(), 0, sizeof(uint8_t) * dataSize);
+        source.Seek(0);
+        source.Read(data.Get(), dataSize);
+
+        WebPBitstreamFeatures features;
+
+        if (WebPGetFeatures(data.Get(), dataSize, &features) != VP8_STATUS_OK)
+        {
+            URHO3D_LOGERROR("Error reading WebP image: " + source.GetName());
+            return false;
+        }
+
+        size_t imgSize = features.width * features.height * (features.has_alpha ? 4 : 3);
+        SharedArrayPtr<uint8_t> pixelData(new uint8_t[imgSize]);
+
+        bool decodeError(false);
+        if (features.has_alpha)
+        {
+            decodeError = WebPDecodeRGBAInto(data.Get(), dataSize, pixelData.Get(), imgSize, 4 * features.width) == NULL;
+        }
+        else
+        {
+            decodeError = WebPDecodeRGBInto(data.Get(), dataSize, pixelData.Get(), imgSize, 3 * features.width) == NULL;
+        }
+        if (decodeError)
+        {
+            URHO3D_LOGERROR("Error decoding WebP image:" + source.GetName());
+            return false;
+        }
+
+        SetSize(features.width, features.height, features.has_alpha ? 4 : 3);
+        SetData(pixelData);
+    }
+#endif
     else
     {
         // Not DDS, KTX or PVR, use STBImage to load other image formats as uncompressed
@@ -786,6 +859,10 @@ bool Image::SaveFile(const String& fileName) const
         return SaveJPG(fileName, 100);
     else if (fileName.EndsWith(".tga", false))
         return SaveTGA(fileName);
+#ifdef URHO3D_WEBP
+    else if (fileName.EndsWith(".webp", false))
+        return SaveWEBP(fileName);
+#endif
     else
         return SavePNG(fileName);
 }
@@ -1277,6 +1354,14 @@ bool Image::SaveDDS(const String& fileName) const
 
     return true;
 }
+
+#ifdef URHO3D_WEBP
+bool Image::SaveWEBP(const String& fileName) const
+{
+    URHO3D_LOGERROR("SaveWEBP not yet implemented.");
+    return false;
+}
+#endif
 
 Color Image::GetPixel(int x, int y) const
 {
