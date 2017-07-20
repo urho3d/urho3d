@@ -1788,6 +1788,7 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetPatch(int, int) const", asMETHODPR(Terrain, GetPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetNeighborPatch(int, int) const", asMETHODPR(Terrain, GetNeighborPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "IntVector2 WorldToHeightMap(const Vector3&in) const", asMETHOD(Terrain, WorldToHeightMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Vector3 HeightMapToWorld(const IntVector2&in) const", asMETHOD(Terrain, HeightMapToWorld), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void SetNeighbors(Terrain@+, Terrain@+, Terrain@+, Terrain@+)", asMETHOD(Terrain, SetNeighbors), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_material(Material@+)", asMETHOD(Terrain, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "Material@+ get_material() const", asMETHOD(Terrain, GetMaterial), asCALL_THISCALL);
