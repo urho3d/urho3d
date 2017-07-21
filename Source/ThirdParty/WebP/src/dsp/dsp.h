@@ -11,6 +11,8 @@
 //
 // Author: Skal (pascal.massimino@gmail.com)
 
+// Modified by Lasse Oorni for Urho3D
+
 #ifndef WEBP_DSP_DSP_H_
 #define WEBP_DSP_DSP_H_
 
@@ -72,7 +74,8 @@ extern "C" {
 #endif
 
 #if defined(__ANDROID__) && defined(__ARM_ARCH_7A__)
-#define WEBP_ANDROID_NEON  // Android targets that might support NEON
+// Urho3D: disable Android NEON instruction set for now, as it might not be in use, resulting in compile error
+// #define WEBP_ANDROID_NEON  // Android targets that might support NEON
 #endif
 
 // The intrinsics currently cause compiler errors with arm-nacl-gcc and the
