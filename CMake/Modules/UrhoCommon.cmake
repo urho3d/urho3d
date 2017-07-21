@@ -695,14 +695,8 @@ else ()
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
                 else ()
-                    if (DEFINED ENV{TRAVIS})
-                        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
-                        set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
-                        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
-                    else ()
-                        set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
-                        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
-                    endif ()
+                    set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
+                    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
                 endif ()
             endif ()
         else ()
@@ -721,11 +715,6 @@ else ()
             # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
-        endif ()
-        # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
-        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
-        if (DEFINED ENV{TRAVIS} AND "$ENV{LINUX}")
-            add_definitions (-D__extern_always_inline=inline)
         endif ()
     else ()
         # GCC-specific
