@@ -73,9 +73,9 @@ extern "C" {
 #define WEBP_USE_AVX2
 #endif
 
-#if defined(__ANDROID__) && defined(__ARM_ARCH_7A__)
-// Urho3D: disable Android NEON instruction set for now, as it might not be in use, resulting in compile error
-// #define WEBP_ANDROID_NEON  // Android targets that might support NEON
+// Urho3D: additional test for actually having NEON support enabled
+#if defined(__ANDROID__) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON)
+    #define WEBP_ANDROID_NEON  // Android targets that might support NEON
 #endif
 
 // The intrinsics currently cause compiler errors with arm-nacl-gcc and the
