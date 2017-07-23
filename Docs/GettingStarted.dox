@@ -123,6 +123,7 @@ A number of build options can be defined when invoking the build scripts or when
 |URHO3D_PCH           |1|Enable PCH support|
 |URHO3D_DATABASE_ODBC |0|Enable %Database support with ODBC, requires vendor-specific ODBC driver|
 |URHO3D_DATABASE_SQLITE|0|Enable %Database support with SQLite embedded|
+|URHO3D_WEBP          |1|Enable WebP image support|
 |URHO3D_C++11         |0|Enable use of C++11 standard; it is not enabled by default, but certain build option combinations will force it enabled internally, such as: URHO3D_ANGELSCRIPT on Web platform and Android/ARM platforms that use aarch64 architecture, and URHO3D_DATABASE_ODBC on all platforms|
 |URHO3D_MMX           |0|Enable MMX instruction set (32-bit Linux platform only); the MMX is effectively enabled when 3DNow! or SSE is enabled; should only be used for older CPU with MMX support|
 |URHO3D_3DNOW         |0|Enable 3DNow! instruction set (Linux platform only); should only be used for older CPU with (legacy) 3DNow! support|

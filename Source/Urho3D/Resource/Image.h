@@ -143,6 +143,8 @@ public:
     bool SaveJPG(const String& fileName, int quality) const;
     /// Save in DDS format. Only uncompressed RGBA images are supported. Return true if successful.
     bool SaveDDS(const String& fileName) const;
+    /// Save in WebP format. Return true if successful. Fails always if WebP support is not compiled in.
+    bool SaveWEBP(const String& fileName) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.
