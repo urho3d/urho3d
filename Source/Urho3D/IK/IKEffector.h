@@ -151,9 +151,6 @@ public:
      */
     void EnableWeightedNlerp(bool enable);
 
-    bool InheritParentRotationEnabled() const;
-    void EnableInheritParentRotation(bool enable);
-
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 

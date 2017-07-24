@@ -9,13 +9,18 @@ class IKSolver : public Component
 
     Algorithm GetAlgorithm() const;
     void SetAlgorithm(Algorithm algorithm);
+
     unsigned GetMaximumIterations() const;
     void SetMaximumIterations(unsigned iterations);
+
     float GetTolerance() const;
     void SetTolerance(float tolerance);
 
     bool BoneRotationsEnabled() const;
     void EnableBoneRotations(bool enable);
+
+    bool ConstraintsEnabled() const;
+    void EnableConstraints(bool enable);
 
     bool TargetRotationEnabled() const;
     void EnableTargetRotation(bool enable);
@@ -23,17 +28,23 @@ class IKSolver : public Component
     bool ContinuousSolvingEnabled() const;
     void EnableContinuousSolving(bool enable);
 
-    bool UpdatePoseEnabled() const;
-    void EnableUpdatePose(bool enable);
+    bool AutoUpdateInitialPoseEnabled() const;
+    void EnableAutoUpdateInitialPose(bool enable);
 
+    /// Whether or not the solver should be invoked automatically
     bool AutoSolveEnabled() const;
     void EnableAutoSolve(bool enable);
 
     void Solve();
-    void ResetToInitialPose();
-    void UpdateInitialPose();
 
-    void MarkSolverTreeDirty();
+    void ApplyInitialPoseToScene();
+    void ApplySceneToInitialPose();
+    void ApplySolvedPoseToScene();
+    void ApplySceneToSolvedPose();
+    void ResetSolvedPoseToInitialPose();
+
+    virtual void ApplyConstraints(Node* tree);
+
     void DrawDebugGeometry(bool depthTest);
 
     tolua_property__get_set Algorithm algorithm;

@@ -46,17 +46,23 @@ static void RegisterIKSolver(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKSolver", "void set_tolerance(float)", asMETHOD(IKSolver, SetTolerance), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "bool get_boneRotations() const", asMETHOD(IKSolver, BoneRotationsEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_boneRotations(bool)", asMETHOD(IKSolver, EnableBoneRotations), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_constraints() const", asMETHOD(IKSolver, ConstraintsEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_constraints(bool)", asMETHOD(IKSolver, EnableConstraints), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "bool get_targetRotation() const", asMETHOD(IKSolver, TargetRotationEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_targetRotation(bool)", asMETHOD(IKSolver, EnableTargetRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "bool get_continuousSolving() const", asMETHOD(IKSolver, ContinuousSolvingEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_continuousSolving(bool)", asMETHOD(IKSolver, EnableContinuousSolving), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_updatePose() const", asMETHOD(IKSolver, UpdatePoseEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_updatePose(bool)", asMETHOD(IKSolver, EnableUpdatePose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool get_autoUpdateInitialPose() const", asMETHOD(IKSolver, AutoUpdateInitialPoseEnabled), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void set_autoUpdateInitialPose(bool)", asMETHOD(IKSolver, EnableAutoUpdateInitialPose), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "bool get_autoSolve() const", asMETHOD(IKSolver, AutoSolveEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_autoSolve(bool)", asMETHOD(IKSolver, EnableAutoSolve), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void Solve()", asMETHOD(IKSolver, Solve), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ResetToInitialPose()", asMETHOD(IKSolver, ResetToInitialPose), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void UpdateInitialPose()", asMETHOD(IKSolver, UpdateInitialPose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyInitialPoseToScene()", asMETHOD(IKSolver, ApplyInitialPoseToScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToInitialPose()", asMETHOD(IKSolver, ApplySceneToInitialPose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySolvedPoseToScene()", asMETHOD(IKSolver, ApplySolvedPoseToScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToSolvedPose()", asMETHOD(IKSolver, ApplySceneToSolvedPose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ResetSolvedPoseToInitialPose()", asMETHOD(IKSolver, ResetSolvedPoseToInitialPose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyConstraints(Node@+)", asMETHODPR(IKSolver, ApplyConstraints, (Node*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(bool)", asMETHODPR(IKSolver, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
 }
 
@@ -81,8 +87,6 @@ static void RegisterIKEffector(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKEffector", "void set_rotationDecay(float)", asMETHOD(IKEffector, SetRotationDecay), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKEffector", "bool get_weightedNlerp() const", asMETHOD(IKEffector, WeightedNlerpEnabled), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKEffector", "void set_weightedNlerp(bool)", asMETHOD(IKEffector, EnableWeightedNlerp), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "bool get_inheritParentRotation() const", asMETHOD(IKEffector, InheritParentRotationEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKEffector", "void set_inheritParentRotation(bool)", asMETHOD(IKEffector, EnableInheritParentRotation), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKEffector", "void DrawDebugGeometry(bool)", asMETHODPR(IKEffector, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
 }
 

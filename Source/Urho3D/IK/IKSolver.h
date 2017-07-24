@@ -47,7 +47,9 @@ public:
 
     enum Algorithm
     {
-        FABRIK
+        FABRIK,
+        TWO_BONE,
+        ONE_BONE
         /* not implemented yet
         JACOBIAN_INVERSE,
         JACOBIAN_TRANSPOSE*/
@@ -125,6 +127,18 @@ public:
      */
     void EnableBoneRotations(bool enable);
 
+    /// Whether or not constraints have any effect on the result
+    bool ConstraintsEnabled() const;
+
+    /*!
+     * @brief Due to the somewhat unfortunate performance impacts, the solver
+     * does not enable constraints by default. Enabling constraints causes
+     * the solver's tree to be written to and from Urho3D's scene graph every
+     * iteration, while calling ApplyConstraints(). Disabling constraints means
+     * ApplyConstraints() is never called.
+     */
+    void EnableConstraints(bool enable);
+
     /// Whether or not target rotation is enabled
     bool TargetRotationEnabled() const;
 
@@ -139,7 +153,7 @@ public:
      */
     void EnableTargetRotation(bool enable);
 
-    /// Whether or not continuous solving is enabled or not.
+    /// Whether or not continuous solving is enabled.
     bool ContinuousSolvingEnabled() const;
 
     /*!
@@ -163,8 +177,8 @@ public:
      */
     void EnableContinuousSolving(bool enable);
 
-    /// Whether or not the initial pose is updated for every solution
-    bool UpdatePoseEnabled() const;
+    /// Whether or not the initial pose is updated when calling Solve()
+    bool AutoUpdateInitialPoseEnabled() const;
 
     /*!
      * @brief When enabled, the current Urho3D node positions and rotations in
@@ -177,7 +191,7 @@ public:
      * is set when the solver is first created. You can manually update the
      * initial pose at any time by calling UpdateInitialPose().
      */
-    void EnableUpdatePose(bool enable);
+    void EnableAutoUpdateInitialPose(bool enable);
 
     /// Whether or not the solver should be invoked automatically
     bool AutoSolveEnabled() const;
@@ -203,7 +217,7 @@ public:
      * @brief Causes the initial tree to be applied back to Urho3D's scene
      * graph. This is what gets called when continuous solving is disabled.
      */
-    void ResetToInitialPose();
+    void ApplyInitialPoseToScene();
 
     /*!
      * @brief Causes the current scene graph data to be copied into the solvers
@@ -212,15 +226,24 @@ public:
      * then the result will be a "continuous solution", where the solver will
      * use the previously calculated tree as a basis for the new solution.
      */
-    void UpdateInitialPose();
+    void ApplySceneToInitialPose();
 
-    /// Causes the solver tree to be rebuilt before solving the next time.
-    void MarkSolverTreeDirty();
+    void ApplySolvedPoseToScene();
+
+    void ApplySceneToSolvedPose();
+
+    void ResetSolvedPoseToInitialPose();
+
+    virtual void ApplyConstraints(Node* tree);
 
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
+    friend class IKEffector;
+
+    /// Causes the solver tree to be rebuilt before solving the next time. Intended to be used by IKEffector.
+    void MarkSolverTreeDirty();
     /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
     /// Destroys and creates the tree
@@ -244,9 +267,11 @@ private:
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
     PODVector<IKEffector*> effectorList_;
+    PODVector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
     bool solverTreeNeedsRebuild_;
+    bool continuousSolvingEnabled_;
     bool updateInitialPose_;
     bool autoSolveEnabled_;
 };
