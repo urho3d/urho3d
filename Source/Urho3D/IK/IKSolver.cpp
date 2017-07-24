@@ -69,16 +69,6 @@ static void ApplyConstraintsCallback(ik_node_t* ikNode)
     quat_set_identity(ikNode->rotation.f);
 }
 
-static void ApplyConstraintsCallback(ik_node_t* ikNode)
-{
-    Node* node = (Node*)ikNode->user_data;
-    IKConstraint* constraint = node->GetComponent<IKConstraint>();
-    if (constraint == NULL)
-        return;
-
-    quat_set_identity(ikNode->rotation.f);
-}
-
 // ----------------------------------------------------------------------------
 IKSolver::IKSolver(Context* context) :
     Component(context),
@@ -303,7 +293,7 @@ void IKSolver::Solve()
     if (solverTreeNeedsRebuild_)
     {
         ik_solver_rebuild_data(solver_);
-        ik_calculate_rotation_weight_decays(solver_->chain_tree);
+        ik_calculate_rotation_weight_decays(&solver_->chain_tree);
         solverTreeNeedsRebuild_ = false;
     }
 

@@ -191,7 +191,7 @@ void IKEffector::SetRotationWeight(float weight)
     if (ikEffector_ != NULL)
     {
         ikEffector_->rotation_weight = rotationWeight_;
-        ik_calculate_rotation_weight_decays(solver_->solver_->chain_tree);
+        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
     }
 }
 
@@ -207,7 +207,7 @@ void IKEffector::SetRotationDecay(float decay)
     rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
     if (ikEffector_ != NULL)
     {
-        ik_calculate_rotation_weight_decays(solver_->solver_->chain_tree);
+        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
         ikEffector_->rotation_decay = rotationDecay_;
     }
 }

@@ -42,7 +42,7 @@ if (IK_MEMORY_BACKTRACE)
 endif ()
 
 # Define generated source files
-set (IK_BUILD_TYPE STATIC)      # Urho always builds its 3rd-party as STATIC lib
+set (IK_LIB_TYPE STATIC)      # Urho always builds its 3rd-party as STATIC lib
 configure_file (include/ik/export.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/export.h)
 configure_file (include/ik/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/generated/ik/config.h)
 
