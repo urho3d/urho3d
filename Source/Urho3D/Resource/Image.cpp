@@ -38,6 +38,7 @@
 #ifdef URHO3D_WEBP
 #include <webp/decode.h>
 #include <webp/encode.h>
+#include <webp/mux.h>
 #endif
 
 #include "../DebugNew.h"
@@ -757,14 +758,14 @@ bool Image::BeginLoad(Deserializer& source)
         if (bytesRead != TAG_SIZE)
         {
             // Truncated.
-            URHO3D_LOGERROR("Truncated RIFF data.");
+            URHO3D_LOGERROR("Truncated RIFF data");
             return false;
         }
         const uint8_t WEBP[TAG_SIZE] = {'W', 'E', 'B', 'P'};
         if (memcmp(fourCC, WEBP, TAG_SIZE))
         {
             // VP8_STATUS_BITSTREAM_ERROR
-            URHO3D_LOGERROR("Invalid header.");
+            URHO3D_LOGERROR("Invalid header");
             return false;
         }
 
@@ -784,7 +785,7 @@ bool Image::BeginLoad(Deserializer& source)
             return false;
         }
 
-        size_t imgSize = features.width * features.height * (features.has_alpha ? 4 : 3);
+        size_t imgSize(features.width * features.height * (features.has_alpha ? 4 : 3));
         SharedArrayPtr<uint8_t> pixelData(new uint8_t[imgSize]);
 
         bool decodeError(false);
@@ -861,7 +862,7 @@ bool Image::SaveFile(const String& fileName) const
         return SaveTGA(fileName);
 #ifdef URHO3D_WEBP
     else if (fileName.EndsWith(".webp", false))
-        return SaveWEBP(fileName);
+        return SaveWEBP(fileName, 100.0f);
 #endif
     else
         return SavePNG(fileName);
@@ -1355,13 +1356,95 @@ bool Image::SaveDDS(const String& fileName) const
     return true;
 }
 
-bool Image::SaveWEBP(const String& fileName) const
+bool Image::SaveWEBP(const String& fileName, float compression /* = 0.0f */) const
 {
 #ifdef URHO3D_WEBP
-    URHO3D_LOGERROR("SaveWEBP not yet implemented.");
-    return false;
+    URHO3D_PROFILE(SaveImageWEBP);
+
+    FileSystem* fileSystem(GetSubsystem<FileSystem>());
+    File outFile(context_, fileName, FILE_WRITE);
+
+    if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
+    {
+        URHO3D_LOGERROR("Access denied to " + fileName);
+        return false;
+    }
+
+    if (IsCompressed())
+    {
+        URHO3D_LOGERROR("Can not save compressed image to WebP");
+        return false;
+    }
+
+    if (height_ > WEBP_MAX_DIMENSION || width_ > WEBP_MAX_DIMENSION)
+    {
+        URHO3D_LOGERROR("Maximum dimension supported by WebP is " + String(WEBP_MAX_DIMENSION));
+        return false;
+    }
+
+    if (components_ != 4 && components_ != 3)
+    {
+        URHO3D_LOGERRORF("Can not save image with %u components to WebP, which requires 3 or 4; Try ConvertToRGBA first?", components_);
+        return false;
+    }
+
+    if (!data_)
+    {
+        URHO3D_LOGERROR("No image data to save");
+        return false;
+    }
+
+    WebPPicture pic;
+    WebPConfig config;
+    WebPMemoryWriter wrt;
+    int importResult(0);
+    size_t encodeResult(0);
+
+    if (!WebPConfigPreset(&config, WEBP_PRESET_DEFAULT, compression) || !WebPPictureInit(&pic))
+    {
+        URHO3D_LOGERROR("WebP initialization failed; check installation");
+        return false;
+    }
+    config.lossless = 1;
+    config.exact = 1; // Preserve RGB values under transparency, as they may be wanted.
+
+    pic.use_argb = 1;
+    pic.width = width_;
+    pic.height = height_;
+    pic.writer = WebPMemoryWrite;
+    pic.custom_ptr = &wrt;
+    WebPMemoryWriterInit(&wrt);
+
+    if (components_ == 4)
+        importResult = WebPPictureImportRGBA(&pic, data_.Get(), components_ * width_);
+    else if (components_ == 3)
+        importResult = WebPPictureImportRGB(&pic, data_.Get(), components_ * width_);
+
+    if (!importResult)
+    {
+        URHO3D_LOGERROR("WebP import of image data failed (truncated RGBA/RGB data or memory error?)");
+        WebPPictureFree(&pic);
+        WebPMemoryWriterClear(&wrt);
+        return false;
+    }
+
+    encodeResult = WebPEncode(&config, &pic);
+    // Check only general failure. WebPEncode() sets pic.error_code with specific error.
+    if (!encodeResult)
+    {
+        URHO3D_LOGERRORF("WebP encoding failed (memory error?). WebPEncodingError = %d", pic.error_code);
+        WebPPictureFree(&pic);
+        WebPMemoryWriterClear(&wrt);
+        return false;
+    }
+
+    WebPPictureFree(&pic);
+    outFile.Write(wrt.mem, wrt.size);
+    WebPMemoryWriterClear(&wrt);
+
+    return true;
 #else
-    URHO3D_LOGERROR("Cannot save in WEBP format, support not compiled in.");
+    URHO3D_LOGERROR("Cannot save in WEBP format, support not compiled in");
     return false;
 #endif
 }
