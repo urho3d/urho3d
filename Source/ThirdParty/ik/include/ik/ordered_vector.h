@@ -30,7 +30,7 @@ struct ordered_vector_t
  * the vector to store. Typically one would pass sizeof(my_data_type).
  * @return Returns the newly created vector object.
  */
-IK_PUBLIC_API struct ordered_vector_t*
+IK_PUBLIC_API ordered_vector_t*
 ordered_vector_create(const uint32_t element_size);
 
 /*!
@@ -42,7 +42,7 @@ ordered_vector_create(const uint32_t element_size);
  * want the vector to store. Typically one would pass sizeof(my_data_type).
  */
 IK_PUBLIC_API void
-ordered_vector_construct(struct ordered_vector_t* vector,
+ordered_vector_construct(ordered_vector_t* vector,
                            const uint32_t element_size);
 
 /*!
@@ -51,7 +51,7 @@ ordered_vector_construct(struct ordered_vector_t* vector,
  * @param[in] vector The vector to destroy.
  */
 IK_PUBLIC_API void
-ordered_vector_destroy(struct ordered_vector_t* vector);
+ordered_vector_destroy(ordered_vector_t* vector);
 
 /*!
  * @brief Erases all elements in a vector.
@@ -61,14 +61,14 @@ ordered_vector_destroy(struct ordered_vector_t* vector);
  * @param[in] vector The vector to clear.
  */
 IK_PUBLIC_API void
-ordered_vector_clear(struct ordered_vector_t* vector);
+ordered_vector_clear(ordered_vector_t* vector);
 
 /*!
  * @brief Erases all elements in a vector and frees their memory.
  * @param[in] vector The vector to clear.
  */
 IK_PUBLIC_API void
-ordered_vector_clear_free(struct ordered_vector_t* vector);
+ordered_vector_clear_free(ordered_vector_t* vector);
 
 /*!
  * @brief Sets the size of the vector to exactly the size specified. If the
@@ -80,7 +80,7 @@ ordered_vector_clear_free(struct ordered_vector_t* vector);
  * @return Returns -1 on failure, 0 on success.
  */
 IK_PUBLIC_API int
-ordered_vector_resize(struct ordered_vector_t* vector, uint32_t size);
+ordered_vector_resize(ordered_vector_t* vector, uint32_t size);
 
 /*!
  * @brief Gets the number of elements that have been inserted into the vector.
@@ -102,7 +102,7 @@ ordered_vector_resize(struct ordered_vector_t* vector, uint32_t size);
  * otherwise.
  */
 IK_PUBLIC_API int
-ordered_vector_push(struct ordered_vector_t* vector, void* data);
+ordered_vector_push(ordered_vector_t* vector, void* data);
 
 /*!
  * @brief Allocates space for a new element at the head of the vector, but does
@@ -116,14 +116,14 @@ ordered_vector_push(struct ordered_vector_t* vector, void* data);
  * warning and use with caution.
  */
 IK_PUBLIC_API void*
-ordered_vector_push_emplace(struct ordered_vector_t* vector);
+ordered_vector_push_emplace(ordered_vector_t* vector);
 
 /*!
  * @brief Copies the contents of another vector and pushes it into the vector.
  * @return Returns 0 if successful, -1 if otherwise.
  */
 IK_PUBLIC_API int
-ordered_vector_push_vector(struct ordered_vector_t* vector, struct ordered_vector_t* source_vector);
+ordered_vector_push_vector(ordered_vector_t* vector, ordered_vector_t* source_vector);
 
 /*!
  * @brief Removes an element from the back (end) of the vector.
@@ -136,7 +136,7 @@ ordered_vector_push_vector(struct ordered_vector_t* vector, struct ordered_vecto
  * If there are no elements to pop, NULL is returned.
  */
 IK_PUBLIC_API void*
-ordered_vector_pop(struct ordered_vector_t* vector);
+ordered_vector_pop(ordered_vector_t* vector);
 
 /*!
  * @brief Returns the very last element of the vector.
@@ -149,7 +149,7 @@ ordered_vector_pop(struct ordered_vector_t* vector);
  * If there are no elements in the vector, NULL is returned.
  */
 IK_PUBLIC_API void*
-ordered_vector_back(const struct ordered_vector_t* vector);
+ordered_vector_back(const ordered_vector_t* vector);
 
 /*!
  * @brief Allocates space for a new element at the specified index, but does
@@ -166,7 +166,7 @@ ordered_vector_back(const struct ordered_vector_t* vector);
  * @return A pointer to the emplaced element. See warning and use with caution.
  */
 IK_PUBLIC_API void*
-ordered_vector_insert_emplace(struct ordered_vector_t* vector, uint32_t index);
+ordered_vector_insert_emplace(ordered_vector_t* vector, uint32_t index);
 
 /*!
  * @brief Inserts (copies) a new element at the specified index.
@@ -181,7 +181,7 @@ ordered_vector_insert_emplace(struct ordered_vector_t* vector, uint32_t index);
  * created. If this is not the case then it could cause undefined behaviour.
  */
 IK_PUBLIC_API int
-ordered_vector_insert(struct ordered_vector_t* vector, uint32_t index, void* data);
+ordered_vector_insert(ordered_vector_t* vector, uint32_t index, void* data);
 
 /*!
  * @brief Erases the specified element from the vector.
@@ -191,7 +191,7 @@ ordered_vector_insert(struct ordered_vector_t* vector, uint32_t index, void* dat
  * ranges from **0** to **ordered_vector_count()-1**.
  */
 IK_PUBLIC_API void
-ordered_vector_erase_index(struct ordered_vector_t* vector, uint32_t index);
+ordered_vector_erase_index(ordered_vector_t* vector, uint32_t index);
 
 /*!
  * @brief Removes the element in the vector pointed to by **element**.
@@ -199,7 +199,7 @@ ordered_vector_erase_index(struct ordered_vector_t* vector, uint32_t index);
  * @param[in] element A pointer to an element within the vector.
  */
 IK_PUBLIC_API void
-ordered_vector_erase_element(struct ordered_vector_t* vector, void* element);
+ordered_vector_erase_element(ordered_vector_t* vector, void* element);
 
 /*!
  * @brief Gets a pointer to the specified element in the vector.
@@ -215,17 +215,17 @@ ordered_vector_erase_element(struct ordered_vector_t* vector, void* element);
  * returned.
  */
 IK_PUBLIC_API void*
-ordered_vector_get_element(struct ordered_vector_t*, uint32_t index);
+ordered_vector_get_element(ordered_vector_t*, uint32_t index);
 
 /*!
  * @brief Convenient macro for iterating a vector's elements.
  *
  * Example:
  * ```
- * ordered_vector_t* some_vector = (a vector containing elements of type "struct bar")
- * ORDERED_VECTOR_FOR_EACH(some_vector, struct bar, element)
+ * ordered_vector_t* some_vector = (a vector containing elements of type "bar")
+ * ORDERED_VECTOR_FOR_EACH(some_vector, bar, element)
  * {
- *     do_something_with(element);  ("element" is now of type "struct bar*")
+ *     do_something_with(element);  ("element" is now of type "bar*")
  * }
  * ```
  * @param[in] vector A pointer to the vector to iterate.
@@ -252,8 +252,8 @@ ordered_vector_get_element(struct ordered_vector_t*, uint32_t index);
  * @brief Convenient macro for iterating a range of a vector's elements.
  * @param[in] vector A pointer to the vector to iterate.
  * @param[in] var_type Should be the type of data stored in the vector. For
- * example, if your vector is storing ```struct type_t*``` objects then
- * var_type should equal ```struct type_t``` (without the pointer).
+ * example, if your vector is storing ```type_t*``` objects then
+ * var_type should equal ```type_t``` (without the pointer).
  * @param[in] var The name of a temporary variable you'd like to use within the
  * for loop to reference the current element.
  * @param[in] begin_index The index (starting at 0) of the first element to
@@ -277,9 +277,9 @@ ordered_vector_get_element(struct ordered_vector_t*, uint32_t index);
  * @warning Only call this while iterating.
  * Example:
  * ```
- * ORDERED_VECTOR_FOR_EACH(some_vector, struct bar, element)
+ * ORDERED_VECTOR_FOR_EACH(some_vector, bar, element)
  * {
- *     ORDERED_VECTOR_ERASE_IN_FOR_LOOP(some_vector, struct bar, element);
+ *     ORDERED_VECTOR_ERASE_IN_FOR_LOOP(some_vector, bar, element);
  * }
  * ```
  * @param[in] vector The vector to erase from.

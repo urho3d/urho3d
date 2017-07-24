@@ -12,7 +12,8 @@
 #   define OFF    0
 #   define ON     1
 
-#   define HAVE_STDINT_H @HAVE_STDINT_H@
+#   define IK_HAVE_STDINT_H @IK_HAVE_STDINT_H@
+#   define IK_RESTRICT @IK_RESTRICT@
 #   define ik_real @IK_REAL@
 #   define IK_MEMORY_DEBUGGING @IK_MEMORY_DEBUGGING@
 #   if IK_MEMORY_DEBUGGING == ON
@@ -25,6 +26,7 @@
      * --------------------------------------------------------------*/
 
 #   include "ik/export.h"
+#   include "ik/types.h"
 #   include <stddef.h>
 
 #   if HAVE_STDINT_H == ON
