@@ -2839,7 +2839,7 @@ Methods:
 - bool SaveTGA(const String fileName) const
 - bool SaveJPG(const String fileName, int quality) const
 - bool SaveDDS(const String fileName) const
-- bool SaveWEBP(const String fileName) const
+- bool SaveWEBP(const String fileName, float compression = 0.0f) const
 - Color GetPixel(int x, int y) const
 - Color GetPixel(int x, int y, int z) const
 - unsigned GetPixelInt(int x, int y) const
