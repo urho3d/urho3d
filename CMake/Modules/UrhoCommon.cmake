@@ -141,6 +141,7 @@ option (URHO3D_NAVIGATION "Enable navigation support" TRUE)
 cmake_dependent_option (URHO3D_NETWORK "Enable networking support" TRUE "NOT WEB AND EXCEPTIONS" FALSE)
 option (URHO3D_PHYSICS "Enable physics support" TRUE)
 option (URHO3D_URHO2D "Enable 2D graphics and physics support" TRUE)
+option (URHO3D_WEBP "Enable WebP support" TRUE)
 if (ARM AND NOT ANDROID AND NOT RPI AND NOT APPLE)
     set (ARM_ABI_FLAGS "" CACHE STRING "Specify ABI compiler flags (ARM on Linux platform only); e.g. Orange-Pi Mini 2 could use '-mcpu=cortex-a7 -mfpu=neon-vfpv4'")
 endif ()
@@ -443,6 +444,7 @@ foreach (OPT
         URHO3D_PROFILING
         URHO3D_THREADING
         URHO3D_URHO2D
+        URHO3D_WEBP
         URHO3D_WIN32_CONSOLE)
     if (${OPT})
         add_definitions (-D${OPT})
@@ -545,9 +547,11 @@ if (MSVC)
         set (RELEASE_RUNTIME /MT)
         set (DEBUG_RUNTIME /MTd)
     endif ()
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
     set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS-")
     set (CMAKE_C_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELWITHDEBINFO})
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_RUNTIME}")
     set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_RUNTIME} /fp:fast /Zi /GS- /D _SECURE_SCL=0")
     set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
@@ -566,6 +570,8 @@ if (MSVC)
     set (CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF")
 else ()
     # GCC/Clang-specific setup
+    set (CMAKE_CXX_VISIBILITY_PRESET hidden)
+    set (CMAKE_VISIBILITY_INLINES_HIDDEN true)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-offsetof")
     if (NOT ANDROID)    # Most of the flags are already setup in Android toolchain file
         if (ARM AND CMAKE_SYSTEM_NAME STREQUAL Linux)
@@ -693,14 +699,8 @@ else ()
                     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mstackrealign")
                     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mstackrealign")
                 else ()
-                    if (DEFINED ENV{TRAVIS})
-                        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
-                        set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
-                        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-slp-vectorize -fno-tree-vectorize")
-                    else ()
-                        set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
-                        set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
-                    endif ()
+                    set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
+                    set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fno-tree-vectorize")
                 endif ()
             endif ()
         else ()
@@ -719,11 +719,6 @@ else ()
             # When ccache support is on, these flags keep the color diagnostics pipe through ccache output and suppress Clang warning due ccache internal preprocessing step
             set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcolor-diagnostics")
             set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
-        endif ()
-        # Temporary workaround for Travis CI VM as Ubuntu 12.04 LTS still uses old glibc header files that do not have the necessary patch for Clang to work correctly
-        # TODO: Remove this workaround when Travis CI VM has been migrated to Ubuntu 14.04 LTS
-        if (DEFINED ENV{TRAVIS} AND "$ENV{LINUX}")
-            add_definitions (-D__extern_always_inline=inline)
         endif ()
     else ()
         # GCC-specific
@@ -826,6 +821,12 @@ macro (create_symlink SOURCE DESTINATION)
     else ()
         execute_process (COMMAND ${CMAKE_COMMAND} -E create_symlink ${ABS_SOURCE} ${ABS_DESTINATION})
     endif ()
+endmacro ()
+
+# Macro for adding additional make clean files
+macro (add_make_clean_files)
+    get_directory_property (ADDITIONAL_MAKE_CLEAN_FILES ADDITIONAL_MAKE_CLEAN_FILES)
+    set_directory_properties (PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ADDITIONAL_MAKE_CLEAN_FILES};${ARGN}")
 endmacro ()
 
 # *** THIS IS A DEPRECATED MACRO ***
@@ -933,9 +934,10 @@ endmacro ()
 #  EXTRA_H_FILES <list> - Include the provided list of files into H_FILES result
 #  PCH <list> - Enable precompiled header support on the defined source files using the specified header file, the list is "<path/to/header> [C++|C]"
 #  RECURSE - Option to glob recursively
+#  GROUP - Option to group source files based on its relative path to the corresponding parent directory
 macro (define_source_files)
     # Source files are defined by globbing source files in current source directory and also by including the extra source files if provided
-    cmake_parse_arguments (ARG "RECURSE" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
+    cmake_parse_arguments (ARG "RECURSE;GROUP" "" "PCH;EXTRA_CPP_FILES;EXTRA_H_FILES;GLOB_CPP_PATTERNS;GLOB_H_PATTERNS;EXCLUDE_PATTERNS" ${ARGN})
     if (NOT ARG_GLOB_CPP_PATTERNS)
         set (ARG_GLOB_CPP_PATTERNS *.cpp)    # Default glob pattern
     endif ()
@@ -967,6 +969,23 @@ macro (define_source_files)
     # Optionally enable PCH
     if (ARG_PCH)
         enable_pch (${ARG_PCH})
+    endif ()
+    # Optionally group the sources based on their physical subdirectories
+    if (ARG_GROUP)
+        foreach (CPP_FILE ${CPP_FILES})
+            get_filename_component (PATH ${CPP_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Source Files\\${PATH}" FILES ${CPP_FILE})
+            endif ()
+        endforeach ()
+        foreach (H_FILE ${H_FILES})
+            get_filename_component (PATH ${H_FILE} PATH)
+            if (PATH)
+                string (REPLACE / \\ PATH ${PATH})
+                source_group ("Header Files\\${PATH}" FILES ${H_FILE})
+            endif ()
+        endforeach ()
     endif ()
 endmacro ()
 
@@ -1183,10 +1202,9 @@ macro (enable_pch HEADER_PATHNAME)
                 get_target_property (TYPE ${TARGET_NAME} TYPE)
                 if (TYPE MATCHES SHARED)
                     list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
-                    # todo: Reevaluate the replacement of this deprecated function (since CMake 2.8.12) when the CMake minimum required version is set to 2.8.12
-                    # At the moment it seems using the function is the "only way" to get the export flags into a CMake variable
-                    # Additionally, CMake implementation of 'VISIBILITY_INLINES_HIDDEN' has a bug (tested in 2.8.12.2) that it erroneously sets the flag for C compiler too
-                    add_compiler_export_flags (COMPILER_EXPORT_FLAGS)
+                    if (LANG STREQUAL CXX)
+                        _test_compiler_hidden_visibility ()
+                    endif ()
                 endif ()
                 # Use PIC flags as necessary, except when compiling using MinGW which already uses PIC flags for all codes
                 if (NOT MINGW)
@@ -1206,7 +1224,7 @@ macro (enable_pch HEADER_PATHNAME)
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_EXPORT_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
                     file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
                     # Determine the dependency list
@@ -1450,15 +1468,18 @@ macro (setup_executable)
         # Make a copy of the Urho3D DLL to the runtime directory in the build tree
         if (TARGET Urho3D)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Urho3D> ${RUNTIME_DIR})
+            add_make_clean_files (${RUNTIME_DIR}/$<TARGET_FILE_NAME:Urho3D>)
         else ()
             foreach (DLL ${URHO3D_DLL})
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL} ${RUNTIME_DIR})
+                add_make_clean_files (${RUNTIME_DIR}/${DLL})
             endforeach ()
         endif ()
     endif ()
     if (DIRECT3D_DLL AND NOT ARG_NODEPS)
         # Make a copy of the D3D DLL to the runtime directory in the build tree
         add_custom_command (TARGET ${TARGET_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DIRECT3D_DLL} ${RUNTIME_DIR})
+        add_make_clean_files (${RUNTIME_DIR}/${DIRECT3D_DLL})
     endif ()
     # Need to check if the destination variable is defined first because this macro could be called by downstream project that does not wish to install anything
     if (NOT ARG_PRIVATE)
@@ -1520,12 +1541,6 @@ macro (setup_library)
     endif ()
     _setup_target ()
 
-    # Setup the compiler flags for building shared library
-    if (LIB_TYPE STREQUAL SHARED_LIBRARY)
-        # Hide the symbols that are not explicitly marked for export
-        add_compiler_export_flags ()
-    endif ()
-
     if (PROJECT_NAME STREQUAL Urho3D)
         # Accumulate all the dependent static libraries that are used in building the Urho3D library itself
         if (NOT ${TARGET_NAME} STREQUAL Urho3D AND LIB_TYPE STREQUAL STATIC_LIBRARY)
@@ -1576,6 +1591,13 @@ macro (setup_main_executable)
             install (TARGETS ${TARGET_NAME} LIBRARY DESTINATION ${DEST_LIBRARY_DIR} ARCHIVE DESTINATION ${DEST_LIBRARY_DIR})
         endif ()
         # Copy other dependent shared libraries to Android library output path
+        if (ANDROID_STL MATCHES shared)
+            # Android toolchain may already copy a shared C++ STL runtime to library output path,
+            # still we configure another post build command to copy the runtime and its clean up here for consistency sake
+            add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${STL_LIBRARY_DIR}/lib${ANDROID_STL}.so ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+            add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/lib${ANDROID_STL}.so)
+        endif ()
         foreach (FILE ${ABSOLUTE_PATH_LIBS})
             get_filename_component (EXT ${FILE} EXT)
             if (EXT STREQUAL .so)
@@ -1583,6 +1605,7 @@ macro (setup_main_executable)
                 add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILE} ${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}
                     COMMENT "Copying ${NAME} to library output directory")
+                add_make_clean_files (${CMAKE_BINARY_DIR}/libs/${ANDROID_NDK_ABI_NAME}/${NAME})
             endif ()
         endforeach ()
         if (ANDROID_NDK_GDB)
@@ -1590,6 +1613,7 @@ macro (setup_main_executable)
             add_custom_command (TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${TARGET_NAME}> ${NDK_GDB_SOLIB_PATH}
                 COMMENT "Copying lib${TARGET_NAME}.so with debug symbols to ${NDK_GDB_SOLIB_PATH} directory")
+            add_make_clean_files (${NDK_GDB_SOLIB_PATH}/$<TARGET_FILE_NAME:${TARGET_NAME}>)
         endif ()
         # When performing packaging, include the final apk file
         if (CMAKE_PROJECT_NAME STREQUAL Urho3D AND NOT APK_INCLUDED)
@@ -1640,6 +1664,11 @@ macro (setup_main_executable)
             endif ()
         endif ()
         setup_executable (${EXE_TYPE} ${ARG_UNPARSED_ARGUMENTS})
+        if (HAS_SHELL_FILE)
+            get_target_property (LOCATION ${TARGET_NAME} LOCATION)
+            get_filename_component (NAME_WE ${LOCATION} NAME_WE)
+            add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/${NAME_WE}.js $<TARGET_FILE_DIR:${TARGET_NAME}>/${NAME_WE}.wasm)
+        endif ()
     endif ()
     # Setup custom resource checker target
     if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
@@ -1673,6 +1702,7 @@ macro (setup_main_executable)
                 endif ()
                 list (APPEND COMMANDS COMMAND echo Checking ${DIR}... && bash -c \"\(\( `find ${DIR} -newer ${DIR} |wc -l` \)\)\" && touch -cm ${DIR} ${PACKAGING_COMMAND} || ${OUTPUT_COMMAND})
             endif ()
+            add_make_clean_files (${RESOURCE_${DIR}_PATHNAME})
         endforeach ()
         string (MD5 MD5ALL ${MD5ALL})
         # Ensure the resource check is done before building the main executable target
@@ -1779,6 +1809,7 @@ macro (_setup_target)
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}> $<TARGET_FILE_DIR:${TARGET_NAME}>
                     COMMAND ${CMAKE_COMMAND} -E $<$<NOT:$<CONFIG:Debug>>:echo> copy_if_different $<$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>:$<TARGET_FILE:Urho3D>.map>$<$<NOT:$<STREQUAL:${URHO3D_LIBRARIES},Urho3D>>:${URHO3D_LIBRARIES}.map> $<TARGET_FILE_DIR:${TARGET_NAME}> $<$<NOT:$<CONFIG:Debug>>:$<ANGLE-R>${NULL_DEVICE}>
                     COMMAND ${CMAKE_COMMAND} -DTARGET_NAME=${TARGET_NAME} -DTARGET_FILE=$<TARGET_FILE:${TARGET_NAME}> -DTARGET_DIR=$<TARGET_FILE_DIR:${TARGET_NAME}> -DHAS_SHELL_FILE=${HAS_SHELL_FILE} -DSIDE_MODULES="${SIDE_MODULES}" -P ${CMAKE_SOURCE_DIR}/CMake/Modules/PostProcessForWebModule.cmake)
+                add_make_clean_files ($<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js $<TARGET_FILE_DIR:${TARGET_NAME}>/libUrho3D.js.map)
             endif ()
         endif ()
         # Pass additional source files to linker with the supported flags, such as: js-library, pre-js, post-js, embed-file, preload-file, shell-file

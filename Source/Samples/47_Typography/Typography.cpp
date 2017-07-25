@@ -71,7 +71,7 @@ void Typography::Start()
     // (Don't modify the root directly, as the base Sample class uses it)
     uielement_ = new UIElement(context_);
     uielement_->SetAlignment(HA_CENTER, VA_CENTER);
-    uielement_->SetLayout(LM_VERTICAL, 20, IntRect(20, 40, 20, 40));
+    uielement_->SetLayout(LM_VERTICAL, 10, IntRect(20, 40, 20, 40));
     root->AddChild(uielement_);
 
     // Add some sample text.
@@ -81,10 +81,6 @@ void Typography::Start()
     CreateCheckbox("White background", URHO3D_HANDLER(Typography, HandleWhiteBackground))
         ->SetChecked(false);
 
-    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
-    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint))
-        ->SetChecked(ui->GetForceAutoHint());
-
     // Add a checkbox to toggle SRGB output conversion (if available).
     // This will give more correct text output for FreeType fonts, as the FreeType rasterizer
     // outputs linear coverage values rather than SRGB values. However, this feature isn't
@@ -92,15 +88,49 @@ void Typography::Start()
     CreateCheckbox("Graphics::SetSRGB", URHO3D_HANDLER(Typography, HandleSRGB))
         ->SetChecked(GetSubsystem<Graphics>()->GetSRGB());
 
+    // Add a checkbox for the global ForceAutoHint setting. This affects character spacing.
+    CreateCheckbox("UI::SetForceAutoHint", URHO3D_HANDLER(Typography, HandleForceAutoHint))
+        ->SetChecked(ui->GetForceAutoHint());
+
     // Add a drop-down menu to control the font hinting level.
-    const char* items[] = {
+    const char* levels[] = {
         "FONT_HINT_LEVEL_NONE",
         "FONT_HINT_LEVEL_LIGHT",
         "FONT_HINT_LEVEL_NORMAL",
         NULL
     };
-    CreateMenu("UI::SetFontHintLevel", items, URHO3D_HANDLER(Typography, HandleFontHintLevel))
+    CreateMenu("UI::SetFontHintLevel", levels, URHO3D_HANDLER(Typography, HandleFontHintLevel))
         ->SetSelection(ui->GetFontHintLevel());
+
+    // Add a drop-down menu to control the subpixel threshold.
+    const char* thresholds[] = {
+        "0",
+        "3",
+        "6",
+        "9",
+        "12",
+        "15",
+        "18",
+        "21",
+        NULL
+    };
+    CreateMenu("UI::SetFontSubpixelThreshold", thresholds, URHO3D_HANDLER(Typography, HandleFontSubpixel))
+        ->SetSelection(ui->GetFontSubpixelThreshold() / 3);
+
+    // Add a drop-down menu to control oversampling.
+    const char* limits[] = {
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        NULL
+    };
+    CreateMenu("UI::SetFontOversampling", limits, URHO3D_HANDLER(Typography, HandleFontOversampling))
+        ->SetSelection(ui->GetFontOversampling() - 1);
 
     // Set the mouse mode to use in the sample
     Sample::InitMouseMode(MM_FREE);
@@ -116,7 +146,7 @@ void Typography::CreateText()
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     Font* font = cache->GetResource<Font>("Fonts/BlueHighway.ttf");
 
-    for (int size = 1; size <= 24; ++size)
+    for (float size = 1; size <= 18; size += 0.5)
     {
         SharedPtr<Text> text(new Text(context_));
         text->SetText(String("The quick brown fox jumps over the lazy dog (") + String(size) + String("pt)"));
@@ -170,11 +200,11 @@ SharedPtr<DropDownList> Typography::CreateMenu(const String& label, const char**
         list->AddItem(item);
         item->SetText(items[i]);
         item->SetStyleAuto();
+        item->SetMinWidth(item->GetRowWidth(0) + 10);
         item->AddTag(TEXT_TAG);
     }
 
     text->SetMaxWidth(text->GetRowWidth(0));
-    list->SetMaxWidth(text->GetRowWidth(0) * 1.5);
 
     SubscribeToEvent(list, E_ITEMSELECTED, handler);
     return list;
@@ -229,6 +259,19 @@ void Typography::HandleFontHintLevel(StringHash eventType, VariantMap& eventData
 {
     DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
     unsigned i = list->GetSelection();
-
     GetSubsystem<UI>()->SetFontHintLevel((FontHintLevel)i);
+}
+
+void Typography::HandleFontSubpixel(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    unsigned i = list->GetSelection();
+    GetSubsystem<UI>()->SetFontSubpixelThreshold(i * 3);
+}
+
+void Typography::HandleFontOversampling(StringHash eventType, VariantMap& eventData)
+{
+    DropDownList* list = static_cast<DropDownList*>(eventData[Toggled::P_ELEMENT].GetPtr());
+    unsigned i = list->GetSelection();
+    GetSubsystem<UI>()->SetFontOversampling(i + 1);
 }

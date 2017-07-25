@@ -74,10 +74,12 @@ Urho3D development, contributions and bugfixes by:
 - Danny Boisvert
 - Sergey Bosko
 - Lisandro Bruzzo
+- Thomas Böhm
 - Carlo Carollo
 - Pete Chown
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
+- Stanislav Demyanovich
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
@@ -108,12 +110,14 @@ Urho3D development, contributions and bugfixes by:
 - Nathanial Lydick
 - Xavier Maupeu
 - Iain Merrick
+- Justin Miller
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
 - David Palacios
 - Alex Parlett
 - Jordan Patterson
+- Georgii Pelageikin
 - Anton Petrov
 - Vladimir Pobedinsky
 - Franck Poulain
@@ -231,6 +235,7 @@ Urho3D uses the following third-party libraries:
 - stb_rect_pack 0.08 (https://nothings.org)
 - stb_vorbis 1.09 (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
+- WebP (https://chromium.googlesource.com/webm/libwebp)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong %Engine.<br>
 Jack and mushroom models from the realXtend project. (https://www.realxtend.org)<br>
@@ -1087,6 +1092,7 @@ From 1.6 to master:
   If you ship a prewarmed (read-only) cache with your application you can set the directory yourself from the engine startup parameter "ShaderCacheDir" or call Graphics::SetShaderCacheDir() on initialization.
   Use the directory "Shaders/HLSL/Cache" to get the old behavior.
 - Signatures of UIElement virtual functions OnResize() and OnPositionSet() have changed.
+- The Font class and related classes take font size as a float instead of int to allow fractional point sizes. Glyphs themselves may also have fractional positions, so floats are now used internally in text rendering.
 - UIElement::LoadChildXML() now returns the created element on success, instead of a boolean.
 - Rendertargets have gained the ability to have automatically regenerated mipmaps. Screen buffers received from the Renderer subsystem have mipmaps off, but for manually created rendertargets the default is mipmaps on, like for ordinary textures. Use SetNumLevels(1) to disable.
 - The shader function GetWorldTangent() now returns a 4-component vector.

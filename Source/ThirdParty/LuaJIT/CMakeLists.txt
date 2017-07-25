@@ -39,6 +39,8 @@ if (NOT CMAKE_PROJECT_NAME STREQUAL Urho3D)
         cmake_policy (SET CMP0026 OLD)
         # MACOSX_RPATH is enabled by default
         cmake_policy (SET CMP0042 NEW)
+        # Honor the visibility properties for SHARED target types only
+        cmake_policy (SET CMP0063 OLD)
     endif ()
 
     # Set project name
@@ -595,6 +597,7 @@ if (NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-LuaJIT AND NOT IOS AN
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/jit ${LUAJIT_DEP_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/vmdef.lua ${LUAJIT_DEP_DIR}
         COMMENT "Copying dependency files for luajit standalone executable")
+    add_make_clean_files (${LUAJIT_DEP_DIR})
 
     # Install dependency files required by luajit
     if (DEST_RUNTIME_DIR)

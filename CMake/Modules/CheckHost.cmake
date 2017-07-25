@@ -39,7 +39,7 @@ if (CMAKE_HOST_WIN32)
     set (NULL_DEVICE nul)
     if (NOT DEFINED HAS_MKLINK)
         # Test whether the host system is capable of setting up symbolic link
-        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+        execute_process (COMMAND cmd /C mklink test-link CMakeCache.txt WORKING_DIRECTORY ${CMAKE_BINARY_DIR} RESULT_VARIABLE MKLINK_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
         if (MKLINK_EXIT_CODE EQUAL 0)
             set (HAS_MKLINK TRUE)
             file (REMOVE ${CMAKE_BINARY_DIR}/test-link)

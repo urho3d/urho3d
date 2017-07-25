@@ -48,7 +48,7 @@ FontFaceBitmap::~FontFaceBitmap()
 {
 }
 
-bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize)
+bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize)
 {
     Context* context = font_->GetContext();
 
@@ -133,8 +133,8 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         FontGlyph glyph;
         glyph.x_ = (short)charElem.GetInt("x");
         glyph.y_ = (short)charElem.GetInt("y");
-        glyph.width_ = (short)charElem.GetInt("width");
-        glyph.height_ = (short)charElem.GetInt("height");
+        glyph.width_ = glyph.texWidth_ = (short)charElem.GetInt("width");
+        glyph.height_ = glyph.texHeight_ = (short)charElem.GetInt("height");
         glyph.offsetX_ = (short)charElem.GetInt("xoffset");
         glyph.offsetY_ = (short)charElem.GetInt("yoffset");
         glyph.advanceX_ = (short)charElem.GetInt("xadvance");
@@ -251,7 +251,7 @@ bool FontFaceBitmap::Load(FontFace* fontFace, bool usedGlyphs)
     for (unsigned i = 0; i < newImages.Size(); ++i)
         textures_[i] = LoadFaceTexture(newImages[i]);
 
-    for (HashMap<unsigned, short>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
+    for (HashMap<unsigned, float>::ConstIterator i = fontFace->kerningMapping_.Begin(); i != fontFace->kerningMapping_.End(); ++i)
     {
         unsigned first = (i->first_) >> 16;
         unsigned second = (i->first_) & 0xffff;
@@ -329,7 +329,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
     if (!kerningMapping_.Empty())
     {
         XMLElement kerningsElem = rootElem.CreateChild("kernings");
-        for (HashMap<unsigned, short>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
+        for (HashMap<unsigned, float>::ConstIterator i = kerningMapping_.Begin(); i != kerningMapping_.End(); ++i)
         {
             XMLElement kerningElem = kerningsElem.CreateChild("kerning");
             kerningElem.SetInt("first", i->first_ >> 16);

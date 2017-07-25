@@ -27,8 +27,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons: {apt: {packages: &default_packages [doxygen, graphviz]}}
@@ -42,6 +42,18 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
     - URHO3D_DEPLOYMENT_TARGET=generic
+# Below are our custom data to preset build stages for other documents in this YAML stream, we do this because YAML anchor cannot be referenced across document boundary
+data:
+  stages:
+    base: &base
+      addons:
+      before_script:
+      after_script:
+    housekeep:
+      <<: *base
+      cache:
+      script: rake ci_delete_mirror
+stage: build
 matrix:
   fast_finish: true
   exclude:
@@ -89,11 +101,15 @@ matrix:
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
+# TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' (potentially also the 'precache'/'package') stages here
+    - stage: lint (to be implemented)
+      <<: *base
+      script: true  # Using clang-tidy or something like that or using CMake/clang-tidy integration (see <LANG>_CLANG_TIDY CMake property)
 before_script:
   - rake ci_timer
   # Upgrade CMake using tarball from its vendor and cache the installation
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   # Rely on git directly to detect the commit message and the release tag instead of using the corresponding Travis's environment variable because we may be querying for different commit SHA
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT); fi
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
@@ -121,7 +137,7 @@ notifications: {email: {on_success: never, on_failure: change}}
 
 ---
 
-branch: {name: MinGW-CI, active: yes, appveyor: yes, last_job: 'x64:SHARED'}
+branch: {name: MinGW-CI, active: yes, appveyor: yes}
 version: '{build}'
 platform:
   - x86
@@ -137,15 +153,15 @@ cache:
   - C:\tools\mingw64
 environment:
   GIT_NAME:
-    secure: onlJNy/nGFT1GXNdusL4jokojSPZ732EFaXwdhPnpM0=
+    secure: JatNbOZZZKMvMHL8sRq9XpHgESzJ13eh9NHbMK99rX8=
   GIT_EMAIL:
-    secure: RdTdiZIl3fnggJFH8JhmqT2TAg/23ENX/4sFCrJfQ3s=
+    secure: 7EAYZJ5nFqEhMKcPmUvnqPp81XAoJEILzDJJ2qZXrKA=
   GH_TOKEN:
-    secure: VP9a1Mu28nO7cN+RVyccA9bNvIG92pGQ0zgFjTIds62In6BdiIxj3FgIb8G3XR0K
+    secure: xx7og+aLQbdBSsdVo79OTGtdfqedOpYpIJjduNlzjFSXsTkD8NX8fEPq0XE1KT5n
   SF_KEY:
-    secure: JgsjFoVAP5yjNxyS/+S+4byhtnTKCWfI3bkCmHws3P1MwSaUS5+0C6WV1pHIJTVW00Qvo3+JsgVqMYUJ7fo2m/bXvUPNCoSa4BifXZlS6bE=
+    secure: 6Vuo+sNP2YT/iI4ilNDdyJbKpu1AYxSpkdwjJxeZ3BVXM0XQQnG7VS/6IspV9kgWXmYpeVnUTqpoxAg7GDf3MTN9SeXgwHuSsblIAHDaOJk=
   SF_API:
-    secure: cc1q9CXo5BwIYqtgigHpkCGG90zEVM45xx/YzXTOjVp512oQNUzTJq0AmxEYXP78
+    secure: gEDrho4yNr5++SbgkWsxQiFA62GJfTLrZU9Dzjz9HCUcS7XwjTGg3XsFm84w6B1s
 # Using neither-in-nor-out-of-source (Urho3D-legacy) build tree when on AppVeyor; using out-of-source (and in-the-source) build tree when on Travis-CI for test coverage
   build_tree: mingw-Build
   config: Release
@@ -180,7 +196,9 @@ before_build:
 build_script:
   - rake ci && if "%PACKAGE_UPLOAD%" == "1" (rake ci_package_upload && move %build_tree%\*.zip . && rd /S /Q %build_tree%\_CPack_Packages)
   - rake ci_timer
-#after_build: rake ci_teardown_cache
+after_build:
+  # rake ci_teardown_cache
+  - if "%PLATFORM%:%URHO3D_LIB_TYPE%" == "x64:SHARED" rake ci_delete_mirror
 test: off
 artifacts:
   - path: .\*.zip
@@ -194,8 +212,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons:
@@ -218,14 +236,17 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+stage: scan
 before_script:
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - rake ci_setup_cache
 script: true
-after_script: rake ci_teardown_cache
+after_script:
+  - rake ci_teardown_cache
+  - rake ci_delete_mirror
 
 ---
 
@@ -235,8 +256,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 addons: {apt: {packages: libpulse-dev}}
 env:
   global:
@@ -246,15 +267,18 @@ env:
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
+stage: annotate
 before_script:
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - git clone --depth 1 https://github.com/urho3d/fastcomp-clang.git && export LLVM_CLANG_ROOT=$(pwd)/fastcomp-clang
   - rake ci_setup_cache
 script: rake ci_annotate
-after_script: rake ci_teardown_cache
+after_script:
+  - rake ci_teardown_cache
+  - rake ci_delete_mirror
 
 ---
 
@@ -263,8 +287,8 @@ language: android
 cache:
   directories:
     - $HOME/.ccache
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons: {apt: {packages: &default_packages [doxygen, graphviz, g++-multilib]}}
@@ -280,6 +304,8 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=100M
   matrix:
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC                 # Using default native API Level android-9
+    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
     # x86 and x86_64 emulation currently requires hardware acceleration which Travis-CI cannot provide, so skip testing using AVD for now
     - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=STATIC INSTALL=sys-img-x86_64-android-21   # Using default native API level android-21
     - ANDROID_ABI=x86_64 ANDROID_TOOLCHAIN_NAME=x86_64-clang URHO3D_LIB_TYPE=SHARED INSTALL=sys-img-x86_64-android-21
@@ -288,16 +314,16 @@ env:
     # ANDROID_ANDROID_ABI=arm64-v8a uses NEON by default, so the following two CI jobs also test NEON code path in the build
     - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=STATIC NO_SDK_SYSIMG=1   # Using default native API level android-21
     - ANDROID_ABI=arm64-v8a ANDROID_TOOLCHAIN_NAME=aarch64-linux-android-clang URHO3D_LIB_TYPE=SHARED NO_SDK_SYSIMG=1
-    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=STATIC                 # Using default native API Level android-9
-    - ANDROID_ABI=armeabi-v7a ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang URHO3D_LIB_TYPE=SHARED AVD=21
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   # Temporarily disable the test to build the APK as Travis-CI Trusty beta VM has not yet setup the environment for Android properly
   - export NO_SDK_SYSIMG=1; unset AVD INSTALL
   - rake ci_timer
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
@@ -318,8 +344,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons: {apt: {packages: [doxygen, graphviz, g++-multilib, rpm]}}
@@ -340,12 +366,14 @@ env:
     # RPI 2/3
     - URHO3D_LIB_TYPE=STATIC RPI_ABI='armeabi-v7a with NEON'
     - URHO3D_LIB_TYPE=SHARED RPI_ABI='armeabi-v7a with NEON'
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - git clone --depth 1 https://github.com/raspberrypi/tools.git rpi-tools && export RPI_PREFIX=$(pwd)/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf && git clone --depth 1 https://github.com/urho3d/rpi-sysroot.git && export RPI_SYSROOT=$(pwd)/rpi-sysroot && for compiler in $RPI_PREFIX-{gcc,g++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
@@ -364,8 +392,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons: {apt: {packages: [doxygen, graphviz, g++-multilib, rpm]}}
@@ -386,12 +414,14 @@ env:
     # ODROID-C2
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=STATIC ARM_ABI_FLAGS='-mcpu=cortex-a53'
     - SYSROOT=arm64-sysroot URHO3D_LIB_TYPE=SHARED ARM_ABI_FLAGS='-mcpu=cortex-a53'
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - if [[ $SYSROOT =~ arm64 ]]; then export triplet=aarch64-linux-gnu; else export triplet=arm-linux-gnueabihf; fi
   - wget https://releases.linaro.org/components/toolchain/binaries/latest-5/$triplet/gcc-linaro-5.4.1-2017.05-x86_64_$triplet.tar.xz -O arm-tools.tar.xz && tar xf arm-tools.tar.xz && rm arm-tools.tar.xz && mv gcc-linaro* gcc-linaro && export ARM_PREFIX=$(pwd)/gcc-linaro/bin/$triplet
   - for compiler in $ARM_PREFIX-{gcc,g++}; do touch -d "2017-01-01 00:00:00 +0800" $compiler; done
@@ -413,8 +443,8 @@ compiler: gcc
 cache:
   ccache: true
   directories:
-    - $HOME/cmake-3.8.1-Linux-x86_64/bin
-    - $HOME/cmake-3.8.1-Linux-x86_64/share
+    - $HOME/cmake-3.8.2-Linux-x86_64/bin
+    - $HOME/cmake-3.8.2-Linux-x86_64/share
 dist: trusty
 sudo: false
 addons: {apt: {packages: [doxygen, graphviz]}}
@@ -436,12 +466,14 @@ env:
     # URHO3D_LIB_TYPE=MODULE EMSCRIPTEN_WASM=1 BRANCH=incoming numjobs=4
     - URHO3D_LIB_TYPE=STATIC EMSCRIPTEN_WASM=1 BRANCH=incoming
     - URHO3D_LIB_TYPE=SHARED EMSCRIPTEN_WASM=1 BRANCH=incoming
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
-  - if [[ ! -f $HOME/cmake-3.8.1-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.1-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
-  - export PATH=$HOME/cmake-3.8.1-Linux-x86_64/bin:$PATH
+  - if [[ ! -f $HOME/cmake-3.8.2-Linux-x86_64/bin/cmake ]]; then wget --no-check-certificate https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz -O $HOME/cmake.tar.gz && tar xf $HOME/cmake.tar.gz -C $HOME && rm $HOME/cmake.tar.gz; fi
+  - export PATH=$HOME/cmake-3.8.2-Linux-x86_64/bin:$PATH
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~
   - export COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
   - export TAG=$(git describe --exact-match $TRAVIS_COMMIT 2>/dev/null); if [[ $TAG =~ [[:digit:]]+\.[[:digit:]]+ ]]; then export RELEASE_TAG=$TAG; fi
@@ -455,7 +487,7 @@ after_script: rake ci_teardown_cache
 
 ---
 
-branch: {name: OSX-CI, active: yes, mandatory: yes}
+branch: {name: OSX-CI, active: yes}
 language: objective-c
 cache: {directories: $HOME/.ccache}
 osx_image: xcode8.3
@@ -470,14 +502,16 @@ env:
     - CCACHE_COMPRESS=1
     - CCACHE_MAXSIZE=300M
   matrix:
-    - MAKEFILE=1     URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
-    - MAKEFILE=1     URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
-    - XCODE=1        URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
-    - XCODE=1        URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
     - XCODE=1 TVOS=1 URHO3D_LIB_TYPE=STATIC APPLETVOS_DEPLOYMENT_TARGET=10.2 sdk=appletvsimulator
     - XCODE=1 IOS=1  URHO3D_LIB_TYPE=STATIC IPHONEOS_DEPLOYMENT_TARGET=10.3 sdk=iphonesimulator
+    - XCODE=1        URHO3D_LIB_TYPE=STATIC CMAKE_OSX_DEPLOYMENT_TARGET=10.12 SF_DEFAULT=mac:OSX-64bit-STATIC.tar.gz
+    - XCODE=1        URHO3D_LIB_TYPE=SHARED CMAKE_OSX_DEPLOYMENT_TARGET=10.12
+    - MAKEFILE=1     URHO3D_LIB_TYPE=STATIC URHO3D_DEPLOYMENT_TARGET=generic
+    - MAKEFILE=1     URHO3D_LIB_TYPE=SHARED URHO3D_DEPLOYMENT_TARGET=generic
+stage: build
 matrix:
   fast_finish: true
+  include: [stage: housekeep]
 before_script:
   - rake ci_timer
   - export TRAVIS_COMMIT=$TRAVIS_COMMIT~

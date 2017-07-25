@@ -4191,6 +4191,7 @@ void AddPolyhedron(const Polyhedron&, const Color&, bool = true);
 void AddQuad(const Vector3&, float, float, const Color&, bool = true);
 void AddSkeleton(Skeleton, const Color&, bool = true);
 void AddSphere(const Sphere&, const Color&, bool = true);
+void AddSphereSector(const Sphere&, const Quaternion&, float, bool, const Color&, bool = true);
 void AddTriangle(const Vector3&, const Vector3&, const Vector3&, const Color&, bool = true);
 void ApplyAttributes();
 void DrawDebugGeometry(DebugRenderer, bool);
@@ -5236,7 +5237,7 @@ public:
 Font();
 Font(const String&in);
 // Methods:
-IntVector2 GetTotalGlyphOffset(int) const;
+IntVector2 GetTotalGlyphOffset(float) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File);
@@ -5765,6 +5766,7 @@ bool SaveDDS(const String&) const;
 bool SaveJPG(const String&, int) const;
 bool SavePNG(const String&) const;
 bool SaveTGA(const String&) const;
+bool SaveWEBP(const String&, float = 0.0f) const;
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
 void SetPixel(int, int, const Color&);
 void SetPixel(int, int, int, const Color&);
@@ -7935,6 +7937,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 Array<Variant> attributeDefaults;
@@ -7945,6 +7949,8 @@ Array<Variant> attributes;
 String category;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 Vector3 direction;
@@ -10019,6 +10025,8 @@ Vector2 WorldToLocal2D(const Vector2&) const;
 void Yaw(float, TransformSpace = TS_LOCAL);
 
 // Properties:
+/* readonly */
+Array<Node> allChildrenByName;
 bool animationEnabled;
 /* readonly */
 LoadMode asyncLoadMode;
@@ -10038,6 +10046,8 @@ String category;
 uint checksum;
 /* readonly */
 Array<Node> children;
+/* readonly */
+Array<Node> childrenByName;
 /* readonly */
 Array<Component> components;
 /* readonly */
@@ -11519,6 +11529,8 @@ void Define(const Sphere&);
 void Define(const Vector3&, float);
 bool Defined() const;
 float Distance(const Vector3&) const;
+Vector3 GetLocalPoint(float, float) const;
+Vector3 GetPoint(float, float) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
@@ -12399,6 +12411,7 @@ Vector3 GetNormal(const Vector3&) const;
 TerrainPatch GetPatch(int, int) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+Vector3 HeightMapToWorld(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -12646,7 +12659,7 @@ void SetEnabledRecursive(bool);
 void SetFixedHeight(int);
 void SetFixedSize(int, int);
 void SetFixedWidth(int);
-bool SetFont(Font, int);
+bool SetFont(Font, float);
 bool SetFont(const String&, int);
 void SetInterceptNetworkUpdate(const String&, bool);
 void SetLayout(LayoutMode, int = 0, const IntRect& = IntRect ( 0 , 0 , 0 , 0 ));
@@ -12678,9 +12691,9 @@ bool bringToFront;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* readonly */
 IntVector2 childOffset;
 /* readonly */
@@ -12722,7 +12735,7 @@ bool focus;
 FocusMode focusMode;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 int height;
 HorizontalAlignment horizontalAlignment;
 Color hoverColor;
@@ -12769,10 +12782,10 @@ int refs;
 /* readonly */
 UIElement root;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 /* readonly */
 IntVector2 screenPosition;
 bool selected;
@@ -12846,8 +12859,8 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-bool SetFont(Font, int);
-bool SetFont(const String&, int);
+bool SetFont(Font, float);
+bool SetFont(const String&, float);
 void SetInterceptNetworkUpdate(const String&, bool);
 
 // Properties:
@@ -12863,9 +12876,9 @@ bool castShadows;
 /* readonly */
 String category;
 /* readonly */
-Array<IntVector2> charPositions;
+Array<Vector2> charPositions;
 /* readonly */
-Array<IntVector2> charSizes;
+Array<Vector2> charSizes;
 /* writeonly */
 Color color;
 Array<Color> colors;
@@ -12882,7 +12895,7 @@ FaceCameraMode faceCameraMode;
 bool fixedScreenSize;
 /* readonly */
 Font font;
-int fontSize;
+float fontSize;
 /* readonly */
 int height;
 HorizontalAlignment horizontalAlignment;
@@ -12909,10 +12922,10 @@ float opacity;
 /* readonly */
 int refs;
 /* readonly */
-int rowHeight;
+float rowHeight;
 float rowSpacing;
 /* readonly */
-Array<int> rowWidths;
+Array<float> rowWidths;
 float shadowDistance;
 uint shadowMask;
 bool temporary;
@@ -13909,6 +13922,8 @@ int dragBeginDistance;
 float dragBeginInterval;
 UIElement focusElement;
 FontHintLevel fontHintLevel;
+int fontOversampling;
+float fontSubpixelThreshold;
 bool forceAutoHint;
 /* readonly */
 UIElement frontElement;
@@ -14343,6 +14358,7 @@ bool IsNaN() const;
 Vector3 Lerp(const Vector3&, float) const;
 void Normalize();
 Vector3 Normalized() const;
+Vector3 Orthogonalize(const Vector3&) const;
 float ProjectOntoAxis(const Vector3&) const;
 String ToString() const;
 
@@ -15969,6 +15985,7 @@ void ClearDelayedExecute(const String& = String ( ));
 VectorBuffer CompressVectorBuffer(VectorBuffer&);
 float Cos(float);
 uint CountSetBits(uint);
+Object CreateObject(const String&);
 VectorBuffer DecompressVectorBuffer(VectorBuffer&);
 void DelayedExecute(float, bool, const String&, const Array<Variant> = null);
 bool Equals(float, float);

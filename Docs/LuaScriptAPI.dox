@@ -1958,6 +1958,7 @@ Methods:
 - void AddFrustum(const Frustum& frustum, const Color& color, bool depthTest = true)
 - void AddPolyhedron(const Polyhedron& poly, const Color& color, bool depthTest = true)
 - void AddSphere(const Sphere& sphere, const Color& color, bool depthTest = true)
+- void AddSphereSector(const Sphere& sphere, const Quaternion& rotation, float angle, bool drawLines, const Color& color, bool depthTest = true)
 - void AddSkeleton(const Skeleton& skeleton, const Color& color, bool depthTest = true)
 - void AddTriangleMesh(const void* vertexData, unsigned vertexSize, const void* indexData, unsigned indexSize, unsigned indexStart, unsigned indexCount, const Matrix3x4& transform, const Color& color, bool depthTest = true)
 - void AddCircle(const Vector3& center, const Vector3& normal, float radius, const Color& color, int steps = 64, bool depthTest = true)
@@ -2468,7 +2469,7 @@ Methods:
 - void SetScaledGlyphOffset(const Vector2& offset)
 - const IntVector2& GetAbsoluteGlyphOffset() const
 - const Vector2& GetScaledGlyphOffset() const
-- IntVector2 GetTotalGlyphOffset(int pointSize) const
+- IntVector2 GetTotalGlyphOffset(float pointSize) const
 - FontType GetFontType() const
 - bool IsSDFFont() const
 
@@ -2838,6 +2839,7 @@ Methods:
 - bool SaveTGA(const String fileName) const
 - bool SaveJPG(const String fileName, int quality) const
 - bool SaveDDS(const String fileName) const
+- bool SaveWEBP(const String fileName, float compression = 0.0f) const
 - Color GetPixel(int x, int y) const
 - Color GetPixel(int x, int y, int z) const
 - unsigned GetPixelInt(int x, int y) const
@@ -6128,6 +6130,8 @@ Methods:
 - Intersection IsInside(const BoundingBox& box) const
 - Intersection IsInsideFast(const BoundingBox& box) const
 - float Distance(const Vector3& point) const
+- Vector3 GetLocalPoint(float theta, float phi) const
+- Vector3 GetPoint(float theta, float phi) const
 
 Properties:
 
@@ -6463,6 +6467,7 @@ Methods:
 - float GetHeight(const Vector3& worldPosition) const
 - Vector3 GetNormal(const Vector3& worldPosition) const
 - IntVector2 WorldToHeightMap(const Vector3& worldPosition) const
+- Vector3 HeightMapToWorld(const IntVector2& pixelPosition) const
 - SharedArrayPtr<float> GetHeightData() const
 - float GetDrawDistance() const
 - float GetShadowDistance() const
@@ -6551,9 +6556,9 @@ Methods:
 - Text() (GC)
 - Text* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetText(const String text)
 - void SetTextAlignment(HorizontalAlignment align)
 - void SetRowSpacing(float spacing)
@@ -6570,7 +6575,7 @@ Methods:
 - bool GetAutoLocalizable() const
 - void SetAutoLocalizable(bool enable)
 - Font* GetFont() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - float GetRowSpacing() const
@@ -6584,19 +6589,19 @@ Methods:
 - int GetEffectStrokeThickness() const
 - bool GetEffectRoundStroke() const
 - const Color& GetEffectColor() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - void SetEffectDepthBias(float bias)
 - float GetEffectDepthBias() const
 
 Properties:
 
 - Font* font
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - float rowSpacing
@@ -6611,7 +6616,7 @@ Properties:
 - int effectStrokeThickness
 - bool effectRoundStroke
 - Color& effectColor
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 
@@ -6623,9 +6628,9 @@ Methods:
 - Text3D() (GC)
 - Text3D* new()
 - void delete()
-- bool SetFont(const String fontName, int size = DEFAULT_FONT_SIZE)
-- bool SetFont(Font* font, int size = DEFAULT_FONT_SIZE)
-- bool SetFontSize(int size)
+- bool SetFont(const String fontName, float size = DEFAULT_FONT_SIZE)
+- bool SetFont(Font* font, float size = DEFAULT_FONT_SIZE)
+- bool SetFontSize(float size)
 - void SetMaterial(Material* material)
 - void SetText(const String text)
 - void SetAlignment(HorizontalAlignment hAlign, VerticalAlignment vAlign)
@@ -6648,7 +6653,7 @@ Methods:
 - void SetFaceCameraMode(FaceCameraMode mode)
 - Font* GetFont() const
 - Material* GetMaterial() const
-- int GetFontSize() const
+- float GetFontSize() const
 - const String GetText() const
 - HorizontalAlignment GetTextAlignment() const
 - HorizontalAlignment GetHorizontalAlignment() const
@@ -6663,12 +6668,12 @@ Methods:
 - float GetEffectDepthBias() const
 - int GetWidth() const
 - int GetHeight() const
-- int GetRowHeight() const
+- float GetRowHeight() const
 - unsigned GetNumRows() const
 - unsigned GetNumChars() const
-- int GetRowWidth(unsigned index) const
-- IntVector2 GetCharPosition(unsigned index)
-- IntVector2 GetCharSize(unsigned index)
+- float GetRowWidth(unsigned index) const
+- Vector2 GetCharPosition(unsigned index)
+- Vector2 GetCharSize(unsigned index)
 - const Color& GetColor(Corner corner) const
 - float GetOpacity() const
 - bool IsFixedScreenSize() const
@@ -6678,7 +6683,7 @@ Properties:
 
 - Font* font
 - Material* material
-- int fontSize
+- float fontSize
 - String text
 - HorizontalAlignment textAlignment
 - HorizontalAlignment horizontalAlignment
@@ -6694,7 +6699,7 @@ Properties:
 - int width
 - Color& color
 - int height (readonly)
-- int rowHeight (readonly)
+- float rowHeight (readonly)
 - unsigned numRows (readonly)
 - unsigned numChars (readonly)
 - float opacity
@@ -7027,6 +7032,8 @@ Methods:
 - void SetUseMutableGlyphs(bool enable)
 - void SetForceAutoHint(bool enable)
 - void SetFontHintLevel(FontHintLevel level)
+- void SetFontSubpixelThreshold(float threshold)
+- void SetFontOversampling(int limit)
 - void SetScale(float scale)
 - void SetWidth(float width)
 - void SetHeight(float height)
@@ -7053,6 +7060,8 @@ Methods:
 - bool GetUseMutableGlyphs() const
 - bool GetForceAutoHint() const
 - FontHintLevel GetFontHintLevel() const
+- float GetFontSubpixelThreshold() const
+- int GetFontOversampling() const
 - bool HasModalElement() const
 - bool IsDragging() const
 - float GetScale() const
@@ -7077,6 +7086,9 @@ Properties:
 - bool useScreenKeyboard
 - bool useMutableGlyphs
 - bool forceAutoHint
+- FontHintLevel fontHintLevel
+- float fontSubpixelThreshold
+- int fontOversampling
 - bool modalElement (readonly)
 - float scale
 - IntVector2& customSize
@@ -7504,6 +7516,7 @@ Methods:
 - float DotProduct(const Vector3& rhs) const
 - float AbsDotProduct(const Vector3& rhs) const
 - float ProjectOntoAxis(const Vector3& axis) const
+- Vector3 Orthogonalize(const Vector3& axis) const
 - Vector3 CrossProduct(const Vector3& rhs) const
 - Vector3 Abs() const
 - Vector3 Lerp(const Vector3& rhs, float t) const

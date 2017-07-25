@@ -58,4 +58,6 @@ private:
     void HandleSRGB(StringHash eventType, VariantMap& eventData);
     void HandleForceAutoHint(StringHash eventType, VariantMap& eventData);
     void HandleFontHintLevel(StringHash eventType, VariantMap& eventData);
+    void HandleFontSubpixel(StringHash eventType, VariantMap& eventData);
+    void HandleFontOversampling(StringHash eventType, VariantMap& eventData);
 };

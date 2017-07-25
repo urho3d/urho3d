@@ -2234,6 +2234,18 @@ For FreeType fonts, it is possible to adjust the positioning of the font glyphs.
 </font>
 \endcode
 
+The \ref UI "UI" class has various global configuration options for font rendering. The default settings are similar to Windows-style rendering, with crisp characters but uneven spacing. For macOS-style rendering, with accurate spacing but slightly blurrier outlines, call \ref UI::SetFontHintLevel "UI::SetFontHintLevel(FONT_HINT_LEVEL_NONE)". Use the Typography sample to explore these options and find the best configuration for your game.
+
+By default, outline fonts will be hinted (aligned to pixel boundaries), using the font's embedded hints if possible. Call \ref UI::SetForceAutoHint "SetForceAutoHint()" to use FreeType's standard auto-hinter rather than each font's embedded hints.
+
+To adjust hinting, call \ref UI::SetFontHintLevel "SetFontHintLevel()". If the level is set to FONT_HINT_LEVEL_LIGHT, fonts will be aligned to the pixel grid vertically, but not horizontally. At FONT_HINT_LEVEL_NONE, hinting is completely disabled.
+
+Hint levels LIGHT and NONE allow for subpixel glyph positioning, which greatly improves spacing, especially at small font sizes. By default, subpixel positioning is only used at sizes up to 12 points; at larger sizes, each glyph is pixel-aligned. Call \ref UI::SetFontSubpixelThreshold "SetFontSubpixelThreshold" to change this threshold.
+
+When textures aren't pixel-aligned, bilinear texture filtering makes them appear blurry. Therefore, subpixel font textures are oversampled (stretched horizontally) to reduce this blurriness, at the cost of extra memory usage. By default, subpixel fonts use 2x oversampling. Call \ref UI::SetFontOversampling "SetFontOversampling" to change this.
+
+Subpixel positioning only operates horizontally. %Text is always pixel-aligned vertically.
+
 \section UI_Sprites Sprites
 
 Sprites are a special kind of %UI element that allow subpixel (float) positioning and scaling, as well as rotation, while the other elements use integer positioning for pixel-perfect display. Sprites can be used to implement rotating HUD elements such as minimaps or speedometer needles.

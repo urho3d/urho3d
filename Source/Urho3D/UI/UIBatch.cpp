@@ -82,7 +82,7 @@ void UIBatch::SetDefaultColor()
     }
 }
 
-void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
+void UIBatch::AddQuad(float x, float y, float width, float height, int texOffsetX, int texOffsetY, int texWidth, int texHeight)
 {
     unsigned topLeftColor, topRightColor, bottomLeftColor, bottomRightColor;
 
@@ -107,10 +107,10 @@ void UIBatch::AddQuad(int x, int y, int width, int height, int texOffsetX, int t
 
     const IntVector2& screenPos = element_->GetScreenPosition();
 
-    float left = (float)(x + screenPos.x_) - posAdjust.x_;
-    float right = left + (float)width;
-    float top = (float)(y + screenPos.y_) - posAdjust.x_;
-    float bottom = top + (float)height;
+    float left = x + screenPos.x_ - posAdjust.x_;
+    float right = left + width;
+    float top = y + screenPos.y_ - posAdjust.x_;
+    float bottom = top + height;
 
     float leftUV = texOffsetX * invTextureSize_.x_;
     float topUV = texOffsetY * invTextureSize_.y_;
@@ -422,14 +422,14 @@ bool UIBatch::Merge(const UIBatch& batch)
     return true;
 }
 
-unsigned UIBatch::GetInterpolatedColor(int x, int y)
+unsigned UIBatch::GetInterpolatedColor(float x, float y)
 {
     const IntVector2& size = element_->GetSize();
 
     if (size.x_ && size.y_)
     {
-        float cLerpX = Clamp((float)x / (float)size.x_, 0.0f, 1.0f);
-        float cLerpY = Clamp((float)y / (float)size.y_, 0.0f, 1.0f);
+        float cLerpX = Clamp(x / (float)size.x_, 0.0f, 1.0f);
+        float cLerpY = Clamp(y / (float)size.y_, 0.0f, 1.0f);
 
         Color topColor = element_->GetColor(C_TOPLEFT).Lerp(element_->GetColor(C_TOPRIGHT), cLerpX);
         Color bottomColor = element_->GetColor(C_BOTTOMLEFT).Lerp(element_->GetColor(C_BOTTOMRIGHT), cLerpX);
