@@ -675,8 +675,13 @@ void Text::UpdateText(bool onResize)
         // Set minimum and current size according to the text size, but respect fixed width if set
         if (!IsFixedWidth())
         {
-            SetMinWidth(wordWrap_ ? 0 : width);
-            SetWidth(width);
+            if (wordWrap_)
+                SetMinWidth(0);
+            else
+            {
+                SetMinWidth(width);
+                SetWidth(width);
+            }
         }
         SetFixedHeight(height);
 
