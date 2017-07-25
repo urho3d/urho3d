@@ -62,7 +62,7 @@ bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
     const TypeInfo* current = this;
     while (current)
     {
-        if (current == typeInfo)
+        if (current->GetType() == typeInfo->GetType())
             return true;
 
         current = current->GetBaseTypeInfo();
