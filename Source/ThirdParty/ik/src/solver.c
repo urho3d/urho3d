@@ -229,7 +229,7 @@ ik_solver_iterate_tree(ik_solver_t* solver,
 static void
 reset_solved_data_recursive(ik_node_t* node)
 {
-    node->position = node->initial_position;
+    node->position = node->original_position;
     node->rotation = node->initial_rotation;
 
     BSTV_FOR_EACH(&node->children, ik_node_t, guid, child)
@@ -237,7 +237,7 @@ reset_solved_data_recursive(ik_node_t* node)
     BSTV_END_EACH
 }
 void
-ik_solver_reset_solved_data(ik_solver_t* solver)
+ik_solver_reset_to_initial_pose(ik_solver_t* solver)
 {
     if (solver->tree == NULL)
         return;

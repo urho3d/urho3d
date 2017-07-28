@@ -39,35 +39,33 @@ static void RegisterIKSolver(asIScriptEngine* engine)
     engine->RegisterEnumValue("IKAlgorithm", "TWO_BONE", IKSolver::TWO_BONE);
     engine->RegisterEnumValue("IKAlgorithm", "FABRIK", IKSolver::FABRIK);
 
+    engine->RegisterEnum("IKFeature");
+    engine->RegisterEnumValue("IKFeature", "JOINT_ROTATIONS", IKSolver::JOINT_ROTATIONS);
+    engine->RegisterEnumValue("IKFeature", "TARGET_ROTATIONS", IKSolver::TARGET_ROTATIONS);
+    engine->RegisterEnumValue("IKFeature", "UPDATE_ORIGINAL_POSE", IKSolver::UPDATE_ORIGINAL_POSE);
+    engine->RegisterEnumValue("IKFeature", "UPDATE_ACTIVE_POSE", IKSolver::UPDATE_ACTIVE_POSE);
+    engine->RegisterEnumValue("IKFeature", "USE_ORIGINAL_POSE", IKSolver::USE_ORIGINAL_POSE);
+    engine->RegisterEnumValue("IKFeature", "CONSTRAINTS", IKSolver::CONSTRAINTS);
+    engine->RegisterEnumValue("IKFeature", "AUTO_SOLVE", IKSolver::AUTO_SOLVE);
+
     RegisterComponent<IKSolver>(engine, "IKSolver");
     engine->RegisterObjectMethod("IKSolver", "IKAlgorithm get_algorithm() const", asMETHOD(IKSolver, GetAlgorithm), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_algorithm(IKAlgorithm)", asMETHOD(IKSolver, SetAlgorithm), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void SetFeature(IKFeature,bool)", asMETHOD(IKSolver, SetFeature), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "bool GetFeature(IKFeature) const", asMETHOD(IKSolver, GetFeature), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "uint get_maximumIterations() const", asMETHOD(IKSolver, GetMaximumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_maximumIterations(uint)", asMETHOD(IKSolver, SetMaximumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "float get_tolerance() const", asMETHOD(IKSolver, GetTolerance), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_tolerance(float)", asMETHOD(IKSolver, SetTolerance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_boneRotations() const", asMETHOD(IKSolver, BoneRotationsEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_boneRotations(bool)", asMETHOD(IKSolver, EnableBoneRotations), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_constraints() const", asMETHOD(IKSolver, ConstraintsEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_constraints(bool)", asMETHOD(IKSolver, EnableConstraints), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_targetRotation() const", asMETHOD(IKSolver, TargetRotationEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_targetRotation(bool)", asMETHOD(IKSolver, EnableTargetRotation), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_continuousSolving() const", asMETHOD(IKSolver, ContinuousSolvingEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_continuousSolving(bool)", asMETHOD(IKSolver, EnableContinuousSolving), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_autoUpdateInitialPose() const", asMETHOD(IKSolver, AutoUpdateInitialPoseEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_autoUpdateInitialPose(bool)", asMETHOD(IKSolver, EnableAutoUpdateInitialPose), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "bool get_autoSolve() const", asMETHOD(IKSolver, AutoSolveEnabled), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void set_autoSolve(bool)", asMETHOD(IKSolver, EnableAutoSolve), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void RebuildData()", asMETHOD(IKSolver, RebuildData), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void RecalculateSegmentLengths()", asMETHOD(IKSolver, RecalculateSegmentLengths), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void CalculateJointRotations()", asMETHOD(IKSolver, CalculateJointRotations), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void Solve()", asMETHOD(IKSolver, Solve), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplyInitialPoseToScene()", asMETHOD(IKSolver, ApplyInitialPoseToScene), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToInitialPose()", asMETHOD(IKSolver, ApplySceneToInitialPose), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplySolvedPoseToScene()", asMETHOD(IKSolver, ApplySolvedPoseToScene), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToSolvedPose()", asMETHOD(IKSolver, ApplySceneToSolvedPose), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplyInitialPoseToSolvedPose()", asMETHOD(IKSolver, ApplyInitialPoseToSolvedPose), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void ApplyConstraints(Node@+)", asMETHODPR(IKSolver, ApplyConstraints, (Node*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToScene()", asMETHOD(IKSolver, ApplyOriginalPoseToScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToInitialPose()", asMETHOD(IKSolver, ApplySceneToOriginalPose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyActivePoseToScene()", asMETHOD(IKSolver, ApplyActivePoseToScene), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplySceneToActivePose()", asMETHOD(IKSolver, ApplySceneToActivePose), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void ApplyOriginalPoseToActivePose()", asMETHOD(IKSolver, ApplyOriginalPoseToActivePose), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void DrawDebugGeometry(bool)", asMETHODPR(IKSolver, DrawDebugGeometry, (bool), void), asCALL_THISCALL);
 }
 

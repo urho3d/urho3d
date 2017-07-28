@@ -46,7 +46,7 @@ struct ik_node_t
      * be set and retrieved at any time.
      * @note The default value is (0, 0, 0).
      */
-    vec3_t initial_position;
+    vec3_t original_position;
 
     /*!
      * @brief The initial global rotation (in world space).

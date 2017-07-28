@@ -104,15 +104,12 @@ void CreateScene()
     solver_.algorithm = IKAlgorithm::TWO_BONE;
 
     // Disable auto-solving, which means we can call Solve() manually.
-    solver_.autoSolve = false;
+    solver_.SetFeature(IKFeature::AUTO_SOLVE, false);
 
-    // When this is enabled, the solver will use the current positions of the
-    // nodes in the skeleton as its basis every frame. If you disable this, then
-    // the solver will store the initial positions of the nodes once and always
-    // use those positions for calculating solutions.
-    // With animated characters you generally want to continuously update the
-    // initial positions.
-    solver_.autoUpdateInitialPose = true;
+    // Only enable this so the debug draw shows us the pose before solving.
+    // This should NOT be enabled for any other reason (it does nothing and is
+    // a waste of performance).
+    solver_.SetFeature(IKFeature::UPDATE_ORIGINAL_POSE, true);
 
     // Create the camera.
     cameraRotateNode_ = scene_.CreateChild("CameraRotate");

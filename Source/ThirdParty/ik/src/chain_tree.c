@@ -363,8 +363,8 @@ calculate_segment_lengths_in_island(chain_t* island)
         ik_node_t* parent_node =
             *(ik_node_t**)ordered_vector_get_element(&island->nodes, last_idx + 1);
 
-        vec3_t diff = child_node->initial_position;
-        vec3_sub_vec3(diff.f, parent_node->initial_position.f);
+        vec3_t diff = child_node->original_position;
+        vec3_sub_vec3(diff.f, parent_node->original_position.f);
         child_node->segment_length = vec3_length(diff.f);
     }
 
@@ -441,9 +441,9 @@ calculate_delta_rotation_of_each_segment(chain_t* chain)
         ik_node_t* parent_node = *(ik_node_t**)ordered_vector_get_element(&chain->nodes, node_idx + 1);
 
         /* calculate vectors for original and solved segments */
-        vec3_t segment_original = child_node->initial_position;
+        vec3_t segment_original = child_node->original_position;
         vec3_t segment_solved   = child_node->position;
-        vec3_sub_vec3(segment_original.f, parent_node->initial_position.f);
+        vec3_sub_vec3(segment_original.f, parent_node->original_position.f);
         vec3_sub_vec3(segment_solved.f, parent_node->position.f);
 
         vec3_angle(parent_node->rotation.f, segment_original.f, segment_solved.f);
