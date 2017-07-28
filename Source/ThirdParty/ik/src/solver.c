@@ -7,7 +7,7 @@
 #include "ik/solver_FABRIK.h"
 #include "ik/solver_2bone.h"
 #include "ik/solver_1bone.h"
-#include "ik/solver_MSS.h"
+#include "ik/solver_MSD.h"
 #include "ik/solver_jacobian_inverse.h"
 #include "ik/solver_jacobian_transpose.h"
 #include <string.h>
@@ -44,9 +44,9 @@ ik_solver_create(enum solver_algorithm_e algorithm)
         solver_construct = solver_1bone_construct;
         break;
         
-    case SOLVER_MSS_LAPLACE:
-        solver_size = sizeof(mss_t);
-        solver_construct = solver_MSS_construct;
+    case SOLVER_MSD:
+        solver_size = sizeof(msd_t);
+        solver_construct = solver_MSD_construct;
         break;
 
     /*
@@ -182,8 +182,7 @@ ik_solver_rebuild_data(ik_solver_t* solver)
 void
 ik_solver_recalculate_segment_lengths(ik_solver_t* solver)
 {
-    /* TODO: Implement again, take into consideration merged bones */
-    /*calculate_segment_lengths(solver->chain_tree);*/
+    calculate_segment_lengths(&solver->chain_tree);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -191,6 +190,15 @@ int
 ik_solver_solve(ik_solver_t* solver)
 {
     return solver->solve(solver);
+}
+
+/* ------------------------------------------------------------------------- */
+void
+ik_solver_calculate_joint_rotations(ik_solver_t* solver)
+{
+    ORDERED_VECTOR_FOR_EACH(&solver->chain_tree.islands, chain_island_t, island)
+        calculate_global_rotations(&island->root_chain);
+    ORDERED_VECTOR_END_EACH
 }
 
 /* ------------------------------------------------------------------------- */

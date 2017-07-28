@@ -17,10 +17,10 @@ typedef void (*ik_solver_iterate_node_cb_func)(ik_node_t*);
 
 typedef enum solver_algorithm_e
 {
-    SOLVER_FABRIK,
-    SOLVER_TWO_BONE,
     SOLVER_ONE_BONE,
-    SOLVER_MSS_LAPLACE
+    SOLVER_TWO_BONE,
+    SOLVER_FABRIK,
+    SOLVER_MSD
     /* TODO Not implemented
     SOLVER_JACOBIAN_INVERSE,
     SOLVER_JACOBIAN_TRANSPOSE */
@@ -35,17 +35,9 @@ typedef enum solver_flags_e
      */
     SOLVER_EXCLUDE_ROOT                   = 0x01,
 
-    /*!
-     * @brief This is a post-processing step which can optionally be enabled.
-     * Causes the correct global angles to be calculated for each node in the
-     * solved tree. The results can be retrieved from node->solved_rotation.
-     * This should definitely be enabled for skinned models.
-     */
-    SOLVER_CALCULATE_FINAL_ROTATIONS      = 0x02,
+    SOLVER_ENABLE_CONSTRAINTS             = 0x02,
 
-    SOLVER_ENABLE_CONSTRAINTS             = 0x04,
-
-    SOLVER_CALCULATE_TARGET_ROTATIONS     = 0x08
+    SOLVER_CALCULATE_TARGET_ROTATIONS     = 0x04
 } solver_flags_e;
 
 /*!
@@ -176,6 +168,9 @@ ik_solver_recalculate_segment_lengths(ik_solver_t* solver);
  */
 IK_PUBLIC_API int
 ik_solver_solve(ik_solver_t* solver);
+
+IK_PUBLIC_API void
+ik_solver_calculate_joint_rotations(ik_solver_t* solver);
 
 /*!
  * @brief Iterates all nodes in the internal tree, breadth first, and passes

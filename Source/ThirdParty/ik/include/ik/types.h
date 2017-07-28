@@ -12,7 +12,7 @@ typedef struct ik_solver_t ik_solver_t;
 typedef struct fabrik_t fabrik_t;
 typedef struct two_bone_t two_bone_t;
 typedef struct one_bone_t one_bone_t;
-typedef struct mss_t mss_t;
+typedef struct msd_t msd_t;
 
 /* containers */
 typedef struct ordered_vector_t ordered_vector_t;

@@ -74,6 +74,7 @@ IKSolver::IKSolver(Context* context) :
     Component(context),
     solver_(NULL),
     algorithm_(FABRIK),
+    boneRotationsEnabled_(true),
     solverTreeNeedsRebuild_(false),
     continuousSolvingEnabled_(false),
     updateInitialPose_(false),
@@ -107,16 +108,17 @@ void IKSolver::RegisterObject(Context* context)
     context->RegisterFactory<IKSolver>(IK_CATEGORY);
 
     static const char* algorithmNames[] = {
+        "1 Bone",
+        "2 Bone",
         "FABRIK",
-        "2 Bone Trig",
-        "1 Bone Trig",
-        /* not implemented
+        /* not implemented,
+        "MSD (Mass/Spring/Damper)",
         "Jacobian Inverse",
         "Jacobian Transpose",*/
         NULL
     };
 
-    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, SOLVER_FABRIK, AM_DEFAULT);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Bone Rotations", BoneRotationsEnabled, EnableBoneRotations, bool, true, AM_DEFAULT);
@@ -144,7 +146,7 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
         ApplyInitialPoseToScene();
 
     // Initial flags for when there is no solver to destroy
-    uint8_t initialFlags = SOLVER_CALCULATE_FINAL_ROTATIONS;
+    uint8_t initialFlags = 0;
 
     // Destroys the tree and the solver
     if (solver_ != NULL)
@@ -156,9 +158,10 @@ void IKSolver::SetAlgorithm(IKSolver::Algorithm algorithm)
 
     switch (algorithm_)
     {
-        case FABRIK   : solver_ = ik_solver_create(SOLVER_FABRIK);   break;
-        case TWO_BONE : solver_ = ik_solver_create(SOLVER_TWO_BONE); break;
         case ONE_BONE : solver_ = ik_solver_create(SOLVER_ONE_BONE); break;
+        case TWO_BONE : solver_ = ik_solver_create(SOLVER_TWO_BONE); break;
+        case FABRIK   : solver_ = ik_solver_create(SOLVER_FABRIK);   break;
+        /*case MSD      : solver_ = ik_solver_create(SOLVER_MSD);      break;*/
     }
 
     solver_->flags = initialFlags;
@@ -196,15 +199,13 @@ void IKSolver::SetTolerance(float tolerance)
 // ----------------------------------------------------------------------------
 bool IKSolver::BoneRotationsEnabled() const
 {
-    return (solver_->flags & SOLVER_CALCULATE_FINAL_ROTATIONS) != 0;
+    return boneRotationsEnabled_;
 }
 
 // ----------------------------------------------------------------------------
 void IKSolver::EnableBoneRotations(bool enable)
 {
-    solver_->flags &= ~SOLVER_CALCULATE_FINAL_ROTATIONS;
-    if (enable)
-        solver_->flags |= SOLVER_CALCULATE_FINAL_ROTATIONS;
+    boneRotationsEnabled_ = enable;
 }
 
 // ----------------------------------------------------------------------------
@@ -286,14 +287,32 @@ void IKSolver::EnableAutoSolve(bool enable)
 }
 
 // ----------------------------------------------------------------------------
+void IKSolver::RebuildData()
+{
+    ik_solver_rebuild_data(solver_);
+    ik_calculate_rotation_weight_decays(&solver_->chain_tree);
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::RecalculateSegmentLengths()
+{
+    ik_solver_recalculate_segment_lengths(solver_);
+}
+
+// ----------------------------------------------------------------------------
+void IKSolver::CalculateJointRotations()
+{
+    ik_solver_calculate_joint_rotations(solver_);
+}
+
+// ----------------------------------------------------------------------------
 void IKSolver::Solve()
 {
     URHO3D_PROFILE(IKSolve);
 
     if (solverTreeNeedsRebuild_)
     {
-        ik_solver_rebuild_data(solver_);
-        ik_calculate_rotation_weight_decays(&solver_->chain_tree);
+        RebuildData();
         solverTreeNeedsRebuild_ = false;
     }
 
@@ -301,7 +320,7 @@ void IKSolver::Solve()
         ApplySceneToInitialPose();
 
     if (continuousSolvingEnabled_ == false)
-        ResetSolvedPoseToInitialPose();
+        ApplyInitialPoseToSolvedPose();
 
     for (PODVector<IKEffector*>::ConstIterator it = effectorList_.Begin(); it != effectorList_.End(); ++it)
     {
@@ -309,6 +328,9 @@ void IKSolver::Solve()
     }
 
     ik_solver_solve(solver_);
+
+    if (boneRotationsEnabled_)
+        ik_solver_calculate_joint_rotations(solver_);
 
     ApplySolvedPoseToScene();
 }
@@ -362,7 +384,7 @@ void IKSolver::ApplySceneToSolvedPose()
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::ResetSolvedPoseToInitialPose()
+void IKSolver::ApplyInitialPoseToSolvedPose()
 {
     ik_solver_reset_solved_data(solver_);
 }

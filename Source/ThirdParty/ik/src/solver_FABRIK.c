@@ -529,7 +529,7 @@ solver_FABRIK_solve(ik_solver_t* solver)
                 solve_chain_backwards(root_chain, root_position);
         ORDERED_VECTOR_END_EACH
 
-        /* Check if (all effectors are within range */
+        /* Check if all effectors are within range */
         ORDERED_VECTOR_FOR_EACH(&fabrik->effector_nodes_list, ik_node_t*, pnode)
             vec3_t diff = (*pnode)->position;
             vec3_sub_vec3(diff.f, (*pnode)->effector->target_position.f);
@@ -544,13 +544,6 @@ solver_FABRIK_solve(ik_solver_t* solver)
     /* Restore initial rotations to global space again. See above as to why. */
     if (solver->flags & SOLVER_ENABLE_CONSTRAINTS)
         initial_rotation_to_global(solver->tree);
-
-    if (solver->flags & SOLVER_CALCULATE_FINAL_ROTATIONS)
-    {
-        ORDERED_VECTOR_FOR_EACH(&fabrik->chain_tree.islands, chain_island_t, island)
-            calculate_global_rotations(&island->root_chain);
-        ORDERED_VECTOR_END_EACH
-    }
 
     return result;
 }

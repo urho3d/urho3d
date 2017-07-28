@@ -81,7 +81,7 @@ solver_2bone_solve(ik_solver_t* solver)
          *            base
          *
          */
-        a = node_mid->segment_length;
+        a = node_tip->segment_length;
         b = node_mid->segment_length;
         aa = a*a;
         bb = b*b;
@@ -132,13 +132,6 @@ solver_2bone_solve(ik_solver_t* solver)
             vec3_add_vec3(node_tip->position.f, node_mid->position.f);
         }
     ORDERED_VECTOR_END_EACH
-
-    if (solver->flags & SOLVER_CALCULATE_FINAL_ROTATIONS)
-    {
-        ORDERED_VECTOR_FOR_EACH(&solver->chain_tree.islands, chain_island_t, island)
-            calculate_global_rotations(&island->root_chain);
-        ORDERED_VECTOR_END_EACH
-    }
 
     return 0;
 }

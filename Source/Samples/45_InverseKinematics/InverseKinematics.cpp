@@ -139,6 +139,10 @@ void InverseKinematics::CreateScene()
     Node* spine = jackNode_->GetChild("Bip01_Spine", true);
     solver_ = spine->CreateComponent<IKSolver>();
 
+    // Two-bone solver is more efficient and more stable than FABRIK (but only
+    // works for two bones, obviously).
+    solver_->SetAlgorithm(IKSolver::TWO_BONE);
+
     // Disable auto-solving, which means we need to call Solve() manually
     solver_->EnableAutoSolve(false);
 
@@ -148,7 +152,7 @@ void InverseKinematics::CreateScene()
     // use those positions for calculating solutions.
     // With animated characters you generally want to continuously update the
     // initial positions.
-    solver_->EnableUpdatePose(true);
+    solver_->EnableAutoUpdateInitialPose(true);
 
     // Create the camera.
     cameraRotateNode_ = scene_->CreateChild("CameraRotate");

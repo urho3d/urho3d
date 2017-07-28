@@ -47,10 +47,11 @@ public:
 
     enum Algorithm
     {
-        FABRIK,
+        ONE_BONE,
         TWO_BONE,
-        ONE_BONE
+        FABRIK
         /* not implemented yet
+        MSD,
         JACOBIAN_INVERSE,
         JACOBIAN_TRANSPOSE*/
     };
@@ -204,6 +205,10 @@ public:
      */
     void EnableAutoSolve(bool enable);
 
+    void RebuildData();
+    void RecalculateSegmentLengths();
+    void CalculateJointRotations();
+
     /*!
      * @brief Invokes the solver. The solution is applied back to the scene
      * graph automatically.
@@ -227,12 +232,9 @@ public:
      * use the previously calculated tree as a basis for the new solution.
      */
     void ApplySceneToInitialPose();
-
     void ApplySolvedPoseToScene();
-
     void ApplySceneToSolvedPose();
-
-    void ResetSolvedPoseToInitialPose();
+    void ApplyInitialPoseToSolvedPose();
 
     virtual void ApplyConstraints(Node* tree);
 
@@ -270,6 +272,7 @@ private:
     PODVector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
+    bool boneRotationsEnabled_;
     bool solverTreeNeedsRebuild_;
     bool continuousSolvingEnabled_;
     bool updateInitialPose_;

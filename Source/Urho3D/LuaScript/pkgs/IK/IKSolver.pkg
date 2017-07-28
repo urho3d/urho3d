@@ -4,6 +4,8 @@ class IKSolver : public Component
 {
     enum Algorithm
     {
+        ONE_BONE,
+        TWO_BONE,
         FABRIK
     };
 
@@ -35,13 +37,16 @@ class IKSolver : public Component
     bool AutoSolveEnabled() const;
     void EnableAutoSolve(bool enable);
 
+    void RebuildData();
+    void RecalculateSegmentLengths();
+    void CalculateJointRotations();
     void Solve();
 
     void ApplyInitialPoseToScene();
     void ApplySceneToInitialPose();
     void ApplySolvedPoseToScene();
     void ApplySceneToSolvedPose();
-    void ResetSolvedPoseToInitialPose();
+    void ApplyInitialPoseToSolvedPose();
 
     virtual void ApplyConstraints(Node* tree);
 
@@ -51,4 +56,3 @@ class IKSolver : public Component
     tolua_property__get_set unsigned maximumIterations;
     tolua_property__get_set float tolerance;
 };
-

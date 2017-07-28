@@ -99,6 +99,10 @@ void CreateScene()
     Node@ spine = jackNode_.GetChild("Bip01_Spine", true);
     solver_ = spine.CreateComponent("IKSolver");
 
+    // Two-bone solver is more efficient and more stable than FABRIK (but only
+    // works for two bones, obviously).
+    solver_.algorithm = IKAlgorithm::TWO_BONE;
+
     // Disable auto-solving, which means we can call Solve() manually.
     solver_.autoSolve = false;
 
@@ -108,7 +112,7 @@ void CreateScene()
     // use those positions for calculating solutions.
     // With animated characters you generally want to continuously update the
     // initial positions.
-    solver_.updatePose = true;
+    solver_.autoUpdateInitialPose = true;
 
     // Create the camera.
     cameraRotateNode_ = scene_.CreateChild("CameraRotate");
