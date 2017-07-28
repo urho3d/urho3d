@@ -29,7 +29,7 @@
 #   include "ik/types.h"
 #   include <stddef.h>
 
-#   if HAVE_STDINT_H == ON
+#   if IK_HAVE_STDINT_H == ON
 #       include <stdint.h>
 #   else
 #       include "ik/pstdint.h"
