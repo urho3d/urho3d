@@ -443,6 +443,8 @@ void IKSolver::BuildTreeToEffector(const Node* node)
     {
         missingNodes.Push(iterNode);
         iterNode = iterNode->GetParent();
+        if (iterNode == NULL) // The effector is in a different branch of the tree, unrelated to us. Abort.
+            return;
         ikNode = ik_node_find_child(solver_->tree, iterNode->GetID());
     }
     while (missingNodes.Size() > 0)
@@ -505,7 +507,9 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
         IKEffector* effector = static_cast<IKEffector*>(component);
         Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-        assert(ikNode != NULL);
+        if (ikNode == NULL) // The effector is in an unrelated branch of the tree, abort.
+            return;
+
         ik_node_destroy_effector(ikNode);
         effector->SetIKEffector(NULL);
         effectorList_.RemoveSwap(effector);
@@ -518,6 +522,11 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     if (component->GetType() == IKConstraint::GetTypeStatic())
     {
         IKConstraint* constraint = static_cast<IKConstraint*>(component);
+        Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
+        ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
+        if (ikNode == NULL) // The effector is in an unrelated branch of the tree, abort.
+            return;
+
         constraint->SetIKNode(NULL);  // NOTE: Should restore default settings to the node
         constraintList_.RemoveSwap(constraint);
     }
