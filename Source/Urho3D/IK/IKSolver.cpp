@@ -413,7 +413,7 @@ void IKSolver::RebuildTree()
     assert (node_ != NULL);
 
     ik_node_t* ikRoot = CreateIKNode(node_);
-    ik_solver_set_tree(solver_, ikRoot);
+    ik_solver_set_tree(solver_, ikRoot); // Deletes the old tree with all effectors + constraints
 
     PODVector<Node*> effectorNodes;
     node_->GetChildrenWithComponent<IKEffector>(effectorNodes, true);
