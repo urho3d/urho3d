@@ -19,11 +19,16 @@
 # THE SOFTWARE.
 #
 
+include (CheckIncludeFiles)
+
 # Define target name
 set (TARGET_NAME ik)
 
-include (CheckIncludeFiles)
-check_include_files (stdint.h HAVE_STDINT_H)
+check_include_files (stdint.h IK_HAVE_STDINT_H)
+# Need to do this so "0" is actually written to the config.h file instead of nothing
+if (NOT IK_HAVE_STDINT_H)
+    set (IK_HAVE_STDINT_H 0)
+endif ()
 
 # Memory debugging options, non-DEBUG and multi-config generator will set the default to FALSE
 if (CMAKE_BUILD_TYPE STREQUAL Debug)
@@ -31,6 +36,18 @@ if (CMAKE_BUILD_TYPE STREQUAL Debug)
 endif ()
 option (IK_MEMORY_DEBUGGING "Global switch for memory options. Keep track of the number of allocations and de-allocations and prints a report when the program shuts down" ${DEFAULT_MEMORY_DEBUGGING})
 cmake_dependent_option (IK_MEMORY_BACKTRACE "Generate backtraces for every malloc(), making it easy to track down memory leaks" "${DEFAULT_MEMORY_DEBUGGING}" "IK_MEMORY_DEBUGGING AND NOT WEB" FALSE)
+
+# Enable restrict keyword in quaternion and vector operations if not in debug
+set (IK_RESTRICT "")
+if (NOT CMAKE_BUILD_TYPE STREQUAL Debug)
+    foreach (RESTRICT_KEYWORD restrict __restrict __restrict__)
+        check_c_source_compiles ("int test (void *${RESTRICT_KEYWORD} x); int main (void) {return 0;}" IK_HAVE_RESTRICT)
+        if (IK_HAVE_RESTRICT)
+            set (IK_RESTRICT ${RESTRICT_KEYWORD})
+            break ()
+        endif ()
+    endforeach ()
+endif ()
 
 set (IK_REAL float CACHE STRING "Type to use for real numbers")
 option (IK_DOT_OUTPUT "When enabled, the generated chains are dumped to DOT for debug purposes")
