@@ -5730,6 +5730,7 @@ Methods:
 - Node* Instantiate(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(File* source, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - Node* InstantiateXML(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
+- Node* InstantiateJSON(const String fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode = REPLICATED)
 - bool LoadAsync(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsyncXML(File* file, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
 - bool LoadAsync(const String fileName, LoadMode mode = LOAD_SCENE_AND_RESOURCES)
