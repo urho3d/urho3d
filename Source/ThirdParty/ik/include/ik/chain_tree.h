@@ -106,7 +106,7 @@ count_chains_exclude_root(chain_tree_t* chain_tree);
 void
 calculate_global_rotations(chain_t* chain);
 
-#if IK_DOT_OUTPUT == ON
+#ifdef IK_DOT_OUTPUT
 /*!
  * @brief Dumps the chain tree to DOT format.
  * @param[in] root The root node of the user created tree. This is a parameter

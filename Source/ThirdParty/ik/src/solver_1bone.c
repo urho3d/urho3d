@@ -3,6 +3,7 @@
 #include "ik/log.h"
 #include "ik/node.h"
 #include "ik/solver_1bone.h"
+#include <stddef.h>
 #include <assert.h>
 
 /* ------------------------------------------------------------------------- */

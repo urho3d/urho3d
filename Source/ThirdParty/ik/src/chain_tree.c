@@ -306,7 +306,7 @@ rebuild_chain_tree(ik_solver_t* solver)
 {
     bstv_t involved_nodes;
     int involved_nodes_count;
-#if IK_DOT_OUTPUT == ON
+#ifdef IK_DOT_OUTPUT
     char buffer[20];
     static int file_name_counter = 0;
 #endif
@@ -333,7 +333,7 @@ rebuild_chain_tree(ik_solver_t* solver)
     calculate_segment_lengths(&solver->chain_tree);
 
     /* DEBUG: Save chain tree to DOT */
-#if IK_DOT_OUTPUT == ON
+#ifdef IK_DOT_OUTPUT
     sprintf(buffer, "tree%d.dot", file_name_counter++);
     dump_to_dot(solver->tree, solver->chain_tree, buffer);
 #endif
@@ -499,7 +499,7 @@ calculate_global_rotations(chain_t* chain)
 }
 
 /* ------------------------------------------------------------------------- */
-#if IK_DOT_OUTPUT == ON
+#ifdef IK_DOT_OUTPUT
 static void
 dump_chain(ik_chain_t* chain, FILE* fp)
 {

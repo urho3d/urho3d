@@ -4,6 +4,7 @@
 #include "ik/solver_2bone.h"
 #include <assert.h>
 #include <math.h>
+#include <stddef.h>
 
 /* ------------------------------------------------------------------------- */
 int

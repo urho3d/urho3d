@@ -8,7 +8,7 @@
 
 #define BACKTRACE_OMIT_COUNT 2
 
-#if IK_MEMORY_DEBUGGING == ON
+#ifdef IK_MEMORY_DEBUGGING
 static uintptr_t g_allocations = 0;
 static uintptr_t d_deg_allocations = 0;
 static uintptr_t g_ignore_bstv_malloc = 0;
@@ -18,7 +18,7 @@ typedef struct report_info_t
 {
     uintptr_t location;
     uintptr_t size;
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
     int backtrace_size;
     char** backtrace;
 #   endif
@@ -81,7 +81,7 @@ malloc_wrapper(intptr_t size)
 
             /* if (enabled, generate a backtrace so we know where memory leaks
             * occurred */
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             if (!(info->backtrace = get_backtrace(&info->backtrace_size)))
                 fprintf(stderr, "[memory] WARNING: Failed to generate backtrace\n");
 #   endif
@@ -97,7 +97,7 @@ malloc_wrapper(intptr_t size)
                 "The matching call to FREE() will generate a warning saying\n"
                 "something is being freed that was never allocated. This is to\n"
                 "be expected and can be ignored.\n");
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
                 {
                     char** bt;
                     int bt_size, i;
@@ -130,7 +130,7 @@ malloc_wrapper(intptr_t size)
 
     if (info)
     {
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
         if (info->backtrace)
             free(info->backtrace);
 #   endif
@@ -150,7 +150,7 @@ free_wrapper(void* ptr)
         report_info_t* info = (report_info_t*)bstv_erase(&report, (uintptr_t)ptr);
         if (info)
         {
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             if (info->backtrace)
                 free(info->backtrace);
             else
@@ -161,13 +161,13 @@ free_wrapper(void* ptr)
         }
         else
         {
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             char** bt;
             int bt_size, i;
             fprintf(stderr, "  -----------------------------------------\n");
 #   endif
             fprintf(stderr, "  WARNING: Freeing something that was never allocated\n");
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             if ((bt = get_backtrace(&bt_size)))
             {
                 fprintf(stderr, "  backtrace to where free() was called:\n");
@@ -211,7 +211,7 @@ ik_memory_deinit(void)
             printf("  un-freed memory at %p, size %p\n", (void*)info->location, (void*)info->size);
             mutated_string_and_hex_dump((void*)info->location, info->size);
 
-#   if IK_MEMORY_BACKTRACE == ON
+#   ifdef IK_MEMORY_BACKTRACE
             printf("  Backtrace to where malloc() was called:\n");
             {
                 intptr_t i;
