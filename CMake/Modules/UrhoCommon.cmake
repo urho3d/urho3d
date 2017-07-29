@@ -398,6 +398,11 @@ if (URHO3D_CLANG_TOOLS)
     endforeach ()
 endif ()
 
+# Coverity scan does not support PCH
+if ($ENV{COVERITY_SCAN_BRANCH})
+    set (URHO3D_PCH 0)
+endif ()
+
 # Enable testing
 if (URHO3D_TESTING)
     enable_testing ()
@@ -1221,35 +1226,32 @@ macro (enable_pch HEADER_PATHNAME)
                 endif ()
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
+                set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
-                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
-                    file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
-                    # Determine the dependency list
-                    execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
-                    if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
-                        message (FATAL_ERROR "Could not generate dependency list for PCH. There is something wrong with your compiler toolchain. "
-                            "Ensure its bin path is in the PATH environment variable or ensure CMake can find CC/CXX in your build environment.")
+                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new ${ABS_PATH_PCH}.${CONFIG}.pch.rsp)
+                    file (REMOVE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new)
+                    if (NOT ${TARGET_NAME}_PCH_DEPS)
+                        # Determine the dependency list
+                        execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -MTdeps -MM -MF ${ABS_PATH_PCH}.d -o ${ABS_PATH_PCH} ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
+                        if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
+                            message (FATAL_ERROR "Could not generate dependency list for PCH. There is something wrong with your compiler toolchain. "
+                                "Ensure its bin path is in the PATH environment variable or ensure CMake can find CC/CXX in your build environment.")
+                        endif ()
+                        file (STRINGS ${ABS_PATH_PCH}.d ${TARGET_NAME}_PCH_DEPS)
+                        string (REGEX REPLACE "^deps: *| *\\; *" ";" ${TARGET_NAME}_PCH_DEPS ${${TARGET_NAME}_PCH_DEPS})
+                        string (REGEX REPLACE "\\\\ " "\ " ${TARGET_NAME}_PCH_DEPS "${${TARGET_NAME}_PCH_DEPS}")    # Need to stringify the second time to preserve the semicolons
                     endif ()
-                    file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                    string (REGEX REPLACE "^deps: *| *\\; *" ";" DEPS ${DEPS})
-                    string (REGEX REPLACE "\\\\ " "\ " DEPS "${DEPS}")  # Need to stringify the second time to preserve the semicolons
                     # Create the rule that depends on the included headers
                     add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                        COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
+                        COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
                         COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
+                        DEPENDS ${ABS_PATH_PCH}.${CONFIG}.pch.rsp ${${TARGET_NAME}_PCH_DEPS}
                         COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
                 endforeach ()
                 # Using precompiled header file
-                if ($ENV{COVERITY_SCAN_BRANCH})
-                    # Coverity scan does not support PCH so workaround by including the actual header file
-                    set (ABS_PATH_PCH ${ABS_HEADER_PATHNAME})
-                else ()
-                    set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
-                endif ()
                 set (CMAKE_${LANG}_FLAGS "${CMAKE_${LANG}_FLAGS} -include \"${ABS_PATH_PCH}\"")
                 unset (${TARGET_NAME}_HEADER_PATHNAME)
             else ()
