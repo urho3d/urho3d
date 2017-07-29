@@ -1250,6 +1250,7 @@ macro (enable_pch HEADER_PATHNAME)
                         COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
                         DEPENDS ${ABS_PATH_PCH}.${CONFIG}.pch.rsp ${${TARGET_NAME}_PCH_DEPS}
                         COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
+                    add_make_clean_files (${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG})
                 endforeach ()
                 # Using precompiled header file
                 set (CMAKE_${LANG}_FLAGS "${CMAKE_${LANG}_FLAGS} -include \"${ABS_PATH_PCH}\"")
