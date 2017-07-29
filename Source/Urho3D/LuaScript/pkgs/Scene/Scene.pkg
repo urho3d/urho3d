@@ -228,7 +228,7 @@ static Node* SceneInstantiateXML(Scene* scene, const String& fileName, const Vec
 
 static Node* SceneInstantiateJSON(Scene* scene, const String& fileName, const Vector3& position, const Quaternion& rotation, CreateMode mode)
 {
-	File file(scene->GetContext(), fileName, FILE_READ);
-	return file.IsOpen() ? scene->InstantiateJSON(file, position, rotation, mode) : 0;
+    File file(scene->GetContext(), fileName, FILE_READ);
+    return file.IsOpen() ? scene->InstantiateJSON(file, position, rotation, mode) : 0;
 }
 $}
