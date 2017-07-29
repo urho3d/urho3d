@@ -341,7 +341,7 @@ void IKSolver::ApplySceneToActivePose()
 // ----------------------------------------------------------------------------
 void IKSolver::ApplyOriginalPoseToActivePose()
 {
-    ik_solver_reset_to_initial_pose(solver_);
+    ik_solver_reset_to_original_pose(solver_);
 }
 
 // ----------------------------------------------------------------------------

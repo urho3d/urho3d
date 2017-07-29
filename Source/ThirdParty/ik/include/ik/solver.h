@@ -185,7 +185,7 @@ ik_solver_iterate_tree(ik_solver_t* solver,
  * positions and rotations for every node in the tree.
  */
 IK_PUBLIC_API void
-ik_solver_reset_to_initial_pose(ik_solver_t* solver);
+ik_solver_reset_to_original_pose(ik_solver_t* solver);
 
 C_HEADER_END
 
