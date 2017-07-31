@@ -240,7 +240,18 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
     for (XMLElement objectElem = element.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
     {
         SharedPtr<TileMapObject2D> object(new TileMapObject2D());
+        StoreObject(objectElem, object, info);
+        objects_.Push(object);
+    }
 
+    if (element.HasChild("properties"))
+        LoadPropertySet(element.GetChild("properties"));
+
+    return true;
+}
+
+void TmxObjectGroup2D::StoreObject(XMLElement objectElem, SharedPtr<TileMapObject2D> object, const TileMapInfo2D& info, bool isTile)
+{
         if (objectElem.HasAttribute("name"))
             object->name_ = objectElem.GetAttribute("name");
         if (objectElem.HasAttribute("type"))
@@ -294,7 +305,7 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
                 points = polygonElem.GetAttribute("points").Split(' ');
 
                 if (points.Size() <= 1)
-                    continue;
+                    return;
 
                 object->points_.Resize(points.Size());
 
@@ -315,14 +326,6 @@ bool TmxObjectGroup2D::Load(const XMLElement& element, const TileMapInfo2D& info
             object->propertySet_ = new PropertySet2D();
             object->propertySet_->Load(objectElem.GetChild("properties"));
         }
-
-        objects_.Push(object);
-    }
-
-    if (element.HasChild("properties"))
-        LoadPropertySet(element.GetChild("properties"));
-
-    return true;
 }
 
 TileMapObject2D* TmxObjectGroup2D::GetObject(unsigned index) const
@@ -561,18 +564,20 @@ Sprite2D* TmxFile2D::GetTileSprite(int gid) const
     return i->second_;
 }
 
+Vector<SharedPtr<TileMapObject2D> > TmxFile2D::GetTileCollisionShapes(int gid) const
+{
+    Vector<SharedPtr<TileMapObject2D> > tileShapes;
+    HashMap<int, Vector<SharedPtr<TileMapObject2D> > >::ConstIterator i = gidToCollisionShapeMapping_.Find(gid);
+    if (i == gidToCollisionShapeMapping_.End())
+        return tileShapes;
+
+    return i->second_;
+}
+
 PropertySet2D* TmxFile2D::GetTilePropertySet(int gid) const
 {
     HashMap<int, SharedPtr<PropertySet2D> >::ConstIterator i = gidToPropertySetMapping_.Find(gid);
     if (i == gidToPropertySetMapping_.End())
-        return 0;
-    return i->second_;
-}
-
-TmxObjectGroup2D* TmxFile2D::GetCollisionObjectGroup(int gid) const
-{
-    HashMap<int, SharedPtr<TmxObjectGroup2D> >::ConstIterator i = gidToCollisionObjectGroupMapping_.Find(gid);
-    if (i == gidToCollisionObjectGroupMapping_.End())
         return 0;
     return i->second_;
 }
@@ -623,7 +628,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             if (!tsxXMLFile)
                 return false;
 
-            // Add to napping to avoid release
+            // Add to mapping to avoid release
             tsxXMLFiles_[source] = tsxXMLFile;
 
             tileSetElem = tsxXMLFile->GetRoot("tileset");
@@ -634,26 +639,13 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     else
         tileSetElem = element;
 
-    bool isIsometricGrid = tileSetElem.HasChild("grid") && tileSetElem.GetChild("grid").GetAttribute("orientation") == "isometric";
     int tileWidth = tileSetElem.GetInt("tilewidth");
     int tileHeight = tileSetElem.GetInt("tileheight");
     int spacing = tileSetElem.GetInt("spacing");
     int margin = tileSetElem.GetInt("margin");
-    bool isSingleTileSet = false;
     int imageWidth;
     int imageHeight;
-
-    if (isIsometricGrid)
-        URHO3D_LOGWARNING("Tilesets with isometric orientation are not supported yet");
-
-    // Set hot spot at left bottom
-    Vector2 hotSpot(0.0f, 0.0f);
-    if (tileSetElem.HasChild("tileoffset"))
-    {
-        XMLElement offsetElem = tileSetElem.GetChild("tileoffset");
-        hotSpot.x_ += offsetElem.GetFloat("x") / (float)tileWidth;
-        hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
-    }
+    bool isSingleTileSet = false;
 
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     {
@@ -669,7 +661,14 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 return false;
             }
 
-            tileSetTextures_.Push(texture);
+            // Set hot spot at left bottom
+            Vector2 hotSpot(0.0f, 0.0f);
+            if (tileSetElem.HasChild("tileoffset"))
+            {
+                XMLElement offsetElem = tileSetElem.GetChild("tileoffset");
+                hotSpot.x_ += offsetElem.GetFloat("x") / (float)tileWidth;
+                hotSpot.y_ += offsetElem.GetFloat("y") / (float)tileHeight;
+            }
 
             imageWidth = imageElem.GetInt("width");
             imageHeight = imageElem.GetInt("height");
@@ -712,23 +711,28 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 tileImageInfos.Push(info);
             }
         }
+        // Tile collision shape(s)
+        TmxObjectGroup2D objectGroup(this);
+        for (XMLElement collisionElem = tileElem.GetChild("objectgroup"); collisionElem; collisionElem = collisionElem.GetNext("objectgroup"))
+        {
+            Vector<SharedPtr<TileMapObject2D> > objects;
+            for (XMLElement objectElem = collisionElem.GetChild("object"); objectElem; objectElem = objectElem.GetNext("object"))
+            {
+                SharedPtr<TileMapObject2D> object(new TileMapObject2D());
+
+                // Convert Tiled local position (left top) to Urho3D local position (left bottom)
+                objectElem.SetAttribute("y", String(info_.GetMapHeight() / PIXEL_SIZE - (tileHeight - objectElem.GetFloat("y"))));
+
+                objectGroup.StoreObject(objectElem, object, info_, true);
+                objects.Push(object);
+            }
+            gidToCollisionShapeMapping_[gid] = objects;
+        }
         if (tileElem.HasChild("properties"))
         {
             SharedPtr<PropertySet2D> propertySet(new PropertySet2D());
             propertySet->Load(tileElem.GetChild("properties"));
             gidToPropertySetMapping_[gid] = propertySet;
-        }
-        if (tileElem.HasChild("objectgroup"))
-        {
-            if (!isIsometricGrid)
-            {
-                TmxObjectGroup2D* objectGroup = new TmxObjectGroup2D(this);
-                TileMapInfo2D info = info_;
-                info.width_ = tileWidth * PIXEL_SIZE / info.tileWidth_;
-                info.height_ = tileHeight * PIXEL_SIZE / info.tileHeight_;
-                objectGroup->Load(tileElem.GetChild("objectgroup"), info);
-                gidToCollisionObjectGroupMapping_[gid] = SharedPtr<TmxObjectGroup2D>(objectGroup);
-            }
         }
     }
 
@@ -748,6 +752,7 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
                 return false;
             }
         }
+
         SharedPtr<Texture2D> texture(new Texture2D(context_));
         texture->SetMipsToSkip(QUALITY_LOW, 0);
         texture->SetNumLevels(1);
@@ -771,11 +776,10 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
             SharedPtr<Sprite2D> sprite(new Sprite2D(context_));
             sprite->SetTexture(texture);
             sprite->SetRectangle(IntRect(info.x, info.y, info.x + info.imageWidth, info.y +  + info.imageHeight));
-            sprite->SetHotSpot(hotSpot);
+            sprite->SetHotSpot(Vector2::ZERO);
             gidToSpriteMapping_[info.tileGid] = sprite;
         }
         texture->SetData(0, 0, 0, allocator.GetWidth(), allocator.GetHeight(), textureData.Get());
-        tileSetTextures_.Push(texture);
     }
 
     return true;
