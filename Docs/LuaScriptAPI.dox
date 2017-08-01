@@ -2766,8 +2766,6 @@ Methods:
 - void SetRotationDecay(float decay)
 - bool WeightedNlerpEnabled() const
 - void EnableWeightedNlerp(bool enable)
-- bool InheritParentRotationEnabled() const
-- void EnableInheritParentRotation(bool enable)
 
 Properties:
 
@@ -2785,26 +2783,17 @@ Properties:
 
 Methods:
 
-- IKSolver::Algorithm GetAlgorithm() const
-- void SetAlgorithm(IKSolver::Algorithm algorithm)
-- unsigned GetMaximumIterations() const
-- void SetMaximumIterations(unsigned iterations)
-- float GetTolerance() const
-- void SetTolerance(float tolerance)
-- bool BoneRotationsEnabled() const
-- void EnableBoneRotations(bool enable)
-- bool TargetRotationEnabled() const
-- void EnableTargetRotation(bool enable)
-- bool ContinuousSolvingEnabled() const
-- void EnableContinuousSolving(bool enable)
-- bool UpdatePoseEnabled() const
-- void EnableUpdatePose(bool enable)
-- bool AutoSolveEnabled() const
-- void EnableAutoSolve(bool enable)
+- bool GetFeature(IKSolver::Feature feature) const
+- void SetFeature(IKSolver::Feature feature, bool enable)
+- void RebuildData()
+- void RecalculateSegmentLengths()
+- void CalculateJointRotations()
 - void Solve()
-- void ResetToInitialPose()
-- void UpdateInitialPose()
-- void MarkSolverTreeDirty()
+- void ApplyOriginalPoseToScene()
+- void ApplySceneToOriginalPose()
+- void ApplyActivePoseToScene()
+- void ApplySceneToActivePose()
+- void ApplyOriginalPoseToActivePose()
 - void DrawDebugGeometry(bool depthTest)
 
 Properties:
@@ -8018,6 +8007,8 @@ Properties:
 
 ### Algorithm
 
+- int ONE_BONE
+- int TWO_BONE
 - int FABRIK
 
 ### AnimationBlendMode
@@ -8189,6 +8180,16 @@ Properties:
 - int FC_LOOKAT_Y
 - int FC_LOOKAT_MIXED
 - int FC_DIRECTION
+
+### Feature
+
+- int JOINT_ROTATIONS
+- int TARGET_ROTATIONS
+- int UPDATE_ORIGINAL_POSE
+- int UPDATE_ACTIVE_POSE
+- int USE_ORIGINAL_POSE
+- int CONSTRAINTS
+- int AUTO_SOLVE
 
 ### FileMode
 

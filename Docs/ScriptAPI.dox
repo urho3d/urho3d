@@ -1536,11 +1536,6 @@ namespace Urho3D
 - %Max %Layers : int
 - %Draw %Obstacles : bool
 
-### IKConstraint
-- %Stiffness : float
-- %Stretchiness : float
-- %Length %Constraints : Vector2
-
 ### IKEffector
 - %Target %Node : String
 - %Chain %Length : int
@@ -1550,16 +1545,17 @@ namespace Urho3D
 - %Rotation %Weight : float
 - %Rotation %Decay : float
 - %Nlerp %Weight : bool
-- %Inherit %Parent %Rotation : bool
 
 ### IKSolver
 - %Algorithm : int
 - %Max %Iterations : int
 - %Convergence %Tolerance : float
-- %Bone %Rotations : bool
-- %Target %Rotation : bool
-- %Continuous %Solving : bool
-- %Update %Pose : bool
+- %Joint %Rotations : bool
+- %Target %Rotations : bool
+- %Update %Original %Pose : bool
+- %Update %Active %Pose : bool
+- %Use %Original %Pose : bool
+- %Enable %Constraints : bool
 - %Auto %Solve : bool
 
 ### Light
@@ -7673,7 +7669,6 @@ Properties:
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
-- bool inheritParentRotation
 - Node@ node // readonly
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
@@ -7697,7 +7692,13 @@ Properties:
 
 Methods:
 
+- void ApplyActivePoseToScene()
 - void ApplyAttributes()
+- void ApplyOriginalPoseToActivePose()
+- void ApplyOriginalPoseToScene()
+- void ApplySceneToActivePose()
+- void ApplySceneToInitialPose()
+- void CalculateJointRotations()
 - void DrawDebugGeometry(DebugRenderer@, bool)
 - void DrawDebugGeometry(bool)
 - Variant GetAttribute(const String&) const
@@ -7706,6 +7707,7 @@ Methods:
 - float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
+- bool GetFeature(IKFeature) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
@@ -7714,12 +7716,13 @@ Methods:
 - bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
+- void RebuildData()
+- void RecalculateSegmentLengths()
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
 - void RemoveInstanceDefault()
 - void RemoveObjectAnimation()
 - void ResetToDefault()
-- void ResetToInitialPose()
 - bool Save(File@) const
 - bool Save(VectorBuffer&) const
 - bool SaveJSON(JSONValue&) const
@@ -7731,9 +7734,9 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
+- void SetFeature(IKFeature, bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void Solve()
-- void UpdateInitialPose()
 
 Properties:
 
@@ -7742,10 +7745,7 @@ Properties:
 - Variant[] attributeDefaults // readonly
 - AttributeInfo[] attributeInfos // readonly
 - Variant[] attributes
-- bool autoSolve
-- bool boneRotations
 - String category // readonly
-- bool continuousSolving
 - bool enabled
 - bool enabledEffective // readonly
 - uint id // readonly
@@ -7754,12 +7754,10 @@ Properties:
 - uint numAttributes // readonly
 - ObjectAnimation@ objectAnimation
 - int refs // readonly
-- bool targetRotation
 - bool temporary
 - float tolerance
 - StringHash type // readonly
 - String typeName // readonly
-- bool updatePose
 - int weakRefs // readonly
 
 <a name="Class_Image"></a>
@@ -16165,7 +16163,20 @@ Properties:
 
 ### IKAlgorithm
 
+- ONE_BONE
+- TWO_BONE
 - FABRIK
+
+
+### IKFeature
+
+- JOINT_ROTATIONS
+- TARGET_ROTATIONS
+- UPDATE_ORIGINAL_POSE
+- UPDATE_ACTIVE_POSE
+- USE_ORIGINAL_POSE
+- CONSTRAINTS
+- AUTO_SOLVE
 
 
 ### InterpMethod
