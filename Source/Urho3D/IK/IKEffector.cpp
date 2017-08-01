@@ -27,8 +27,11 @@
 #include "../IK/IKEvents.h"
 #include "../IK/IKSolver.h"
 #include "../Scene/SceneEvents.h"
+#include "../IO/Log.h"
 
 #include <ik/effector.h>
+#include <ik/solver.h>
+#include <ik/util.h>
 
 namespace Urho3D
 {
@@ -46,11 +49,13 @@ IKEffector::IKEffector(Context* context) :
     weightedNlerp_(false),
     inheritParentRotation_(false)
 {
+    URHO3D_LOGDEBUG("IKEffector created");
 }
 
 // ----------------------------------------------------------------------------
 IKEffector::~IKEffector()
 {
+    URHO3D_LOGDEBUG("IKEffector destroyed");
 }
 
 // ----------------------------------------------------------------------------
@@ -66,7 +71,6 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Weight", GetRotationWeight, SetRotationWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Decay", GetRotationDecay, SetRotationDecay, float, 0.25, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", WeightedNlerpEnabled, EnableWeightedNlerp, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", InheritParentRotationEnabled, EnableInheritParentRotation, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -185,7 +189,10 @@ void IKEffector::SetRotationWeight(float weight)
 {
     rotationWeight_ = Clamp(weight, 0.0f, 1.0f);
     if (ikEffector_ != NULL)
+    {
         ikEffector_->rotation_weight = rotationWeight_;
+        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -199,7 +206,10 @@ void IKEffector::SetRotationDecay(float decay)
 {
     rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
     if (ikEffector_ != NULL)
+    {
+        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
         ikEffector_->rotation_decay = rotationDecay_;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -217,24 +227,6 @@ void IKEffector::EnableWeightedNlerp(bool enable)
         ikEffector_->flags &= ~EFFECTOR_WEIGHT_NLERP;
         if (enable)
             ikEffector_->flags |= EFFECTOR_WEIGHT_NLERP;
-    }
-}
-
-// ----------------------------------------------------------------------------
-bool IKEffector::InheritParentRotationEnabled() const
-{
-    return inheritParentRotation_;
-}
-
-// ----------------------------------------------------------------------------
-void IKEffector::EnableInheritParentRotation(bool enable)
-{
-    inheritParentRotation_ = enable;
-    if(ikEffector_ != NULL)
-    {
-        ikEffector_->flags &= ~EFFECTOR_INHERIT_PARENT_ROTATION;
-        if (enable)
-            ikEffector_->flags |= EFFECTOR_INHERIT_PARENT_ROTATION;
     }
 }
 

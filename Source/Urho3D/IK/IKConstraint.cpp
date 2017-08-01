@@ -26,6 +26,7 @@
 #include "../Scene/Node.h"
 #include "../Scene/SceneEvents.h"
 
+#include <ik/constraint.h>
 #include <ik/node.h>
 
 namespace Urho3D
@@ -36,6 +37,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKConstraint::IKConstraint(Context* context) :
     Component(context),
+    ikNode_(NULL),
     stiffness_(0.0f),
     stretchiness_(0.0f)
 {
@@ -107,15 +109,23 @@ void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 // ----------------------------------------------------------------------------
 void IKConstraint::SetIKNode(ik_node_t* node)
 {
-    ikNode_ = node;
-    if (node)
+    if (ikNode_ != NULL)
     {
+        ik_node_destroy_constraint(ikNode_);
+    }
+
+    if (node != NULL)
+    {
+        ik_constraint_t* constraint = ik_constraint_create(IK_CONSTRAINT_STIFF);
+        ik_node_attach_constraint(node, constraint);
         /* TODO
         node->stiffness = stiffness_;
         node->stretchiness = stretchiness_;
         node->min_length = lengthConstraints_.x_;
         node->max_length = lengthConstraints_.y_;*/
     }
+
+    ikNode_ = node;
 }
 
 } // namespace Urho3D

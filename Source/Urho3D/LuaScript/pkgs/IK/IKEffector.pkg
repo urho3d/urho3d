@@ -29,9 +29,6 @@ class IKEffector : public Component
     bool WeightedNlerpEnabled() const;
     void EnableWeightedNlerp(bool enable);
 
-    bool InheritParentRotationEnabled() const;
-    void EnableInheritParentRotation(bool enable);
-
     tolua_property__get_set Node* targetNode;
     tolua_property__get_set String targetName;
     tolua_property__get_set Vector3 targetPosition;

@@ -47,10 +47,122 @@ public:
 
     enum Algorithm
     {
+        ONE_BONE = 0,
+        TWO_BONE,
         FABRIK
         /* not implemented yet
+        MSD,
         JACOBIAN_INVERSE,
         JACOBIAN_TRANSPOSE*/
+    };
+
+    enum Feature
+    {
+        /*!
+         * @brief Should be enabled if your model uses skinning or if you are
+         * generally interested in correct joint rotations. Has a minor
+         * performance impact.
+         *
+         * When enabled, final joint rotations are calculated as a post
+         * processing step. If you are using IK on a model with skinning, you will
+         * want to enable this or it will look wrong. If you disable this, then
+         * you will get a slight performance boost (less calculations are required)
+         * but only the node positions are updated. This can be useful for scene
+         * IK (perhaps a chain of platforms, where each platform should retain its
+         * initial world rotation?)
+         */
+        JOINT_ROTATIONS = 0x01,
+
+        /*!
+         * @brief When enabled, the effector will try to match the target's
+         * rotation as well as the effectors position. When disabled, the target
+         * node will reach the effector with any rotation necessary.
+         *
+         * If the target position goes out of range of the effector then the
+         * rotation will no longer be matched. The chain will try to reach out to
+         * reach the target position, even if it means rotating towards it.
+         */
+        TARGET_ROTATIONS = 0x02,
+
+        /*!
+         * When the solver is first initialized, it will copy the positions
+         * and rotations of the current Urho3D scene graph into an internal
+         * structure. This is referred to as the "original pose" and will by
+         * default never change for the duration of the solver's life cycle.
+         * When the solver is destroyed, the original pose is applied back to
+         * Urho3D's scene graph so the nodes are restored to whatever they were
+         * before the solver was created.
+         *
+         * By enabling UPDATE_ORIGINAL_POSE, the original pose will be updated
+         * right before solving to reflect the current Urho3D scene graph. As
+         * a consequence, there will no longer be an original pose to restore
+         * when the solver is destroyed.
+         *
+         * When disabled, the original pose will remain unmodified. The original
+         * pose is set when the solver is first created. You can manually update the
+         * original pose at any time by calling UpdateInitialPose().
+         */
+        UPDATE_ORIGINAL_POSE = 0x04,
+
+        /*!
+         * @brief Should be enabled if you are using IK on an animated model,
+         * along with disabling USE_ORIGINAL_POSE.
+         *
+         * The "active pose" has two purposes: The solver uses it as the
+         * initial tree to derive a solution from, and at the same time uses it
+         * to store the solution into. Thus, the typical solving process is:
+         *   1) The active pose needs to be updated to reflect a preferred
+         *      initial condition (such as the current frame of animation)
+         *   2) Call Solve()
+         *   3) The active pose now holds the solution, so it must be applied
+         *      back to the Urho3D scene graph.
+         *
+         * When enabled, the active pose is updated right before solving to
+         * reflect the current state of the Urho3D scene graph.
+         *
+         * When disabled, the active pose will simply remain as it was since
+         * the last time Solve() was called.
+         *
+         * @note This option conflicts with USE_ORIGINAL_POSE. Make sure to
+         * disable USE_ORIGINAL_POSE if you enable this feature.
+         */
+        UPDATE_ACTIVE_POSE = 0x08,
+
+        /*!
+         * @brief Choose between using the original pose or the active pose as
+         * a basis for a solution.
+         *
+         * When enabled, the solver will copy the original pose
+         * (see UPDATE_ORIGINAL_POSE) into the active pose before solving (and
+         * thus use the original pose as a basis for a solution).
+         *
+         * @note This option conflicts with UPDATE_ACTIVE_POSE. If you enable
+         * this feature, make sure to disable UPDATE_ACTIVE_POSE.
+         *
+         * If both UPDATE_ACTIVE_POSE and USE_ORIGINAL_POSE are disabled, then
+         * the solver will use the previously solved tree as a basis for the new
+         * calculation. The result is a more "continuous" solution that unfolds
+         * over time. This can be useful if you want to simulate chains or
+         * something similar.
+         */
+        USE_ORIGINAL_POSE = 0x10,
+
+        /*!
+         * Due to the somewhat unfortunate performance impacts, the solver
+         * does not enable constraints by default. Enabling constraints causes
+         * the solver's tree to be written to and from Urho3D's scene graph every
+         * iteration, while calling ApplyConstraints(). Disabling constraints means
+         * ApplyConstraints() is never called.
+         */
+        CONSTRAINTS = 0x20,
+
+        /*!
+         * Mostly exists because of the editor. When enabled, the solver
+         * will be invoked automatically for you. If you need to do additional
+         * calculations before being able to set the effector target data, you will
+         * want to disable this and call Solve() manually.
+         */
+        AUTO_SOLVE = 0x40
     };
 
     /// Construct an IK root component.
@@ -64,15 +176,24 @@ public:
     Algorithm GetAlgorithm() const;
 
     /*!
-     * @brief Selects the solver algorithm. Default is FABRIK.
+     * @brief Selects the solver algorithm. Default is FABRIK. Note that this
+     * may not be the most efficient algorithm available. The specialized
+     * solvers will be a lot faster.
      *
      * The currently supported solvers are listed below.
      *   + **FABRIK**: This is a fairly new and highly efficient inverse
      *     kinematic solving algorithm. It requires the least iterations to
      *     reach its goal, it does not suffer from singularities (nearly no
      *     violent snapping about), and it always converges.
+     *   + **2 Bone**: A specialized solver optimized for 2 bone problems (such
+     *     as a human leg)
+     *   + **1 Bone**: A specialized solver optimized for 1 bone problems (such
+     *     as a look-at target, e.g. eyes or a head)
      */
     void SetAlgorithm(Algorithm algorithm);
+
+    bool GetFeature(Feature feature) const;
+    void SetFeature(Feature feature, bool enable);
 
     /// Returns the configured maximum number of iterations.
     unsigned GetMaximumIterations() const;
@@ -111,91 +232,38 @@ public:
      */
     void SetTolerance(float tolerance);
 
-    /// Whether or not rotations should be calculated.
-    bool BoneRotationsEnabled() const;
+    /*!
+     * @brief Updates the solver's internal data structures, which is required
+     * whenever the tree is modified in any way (e.g. adding or removing nodes,
+     * adding or removing effectors, etc.).
+     * @note This gets called  automatically for you in Solve().
+     */
+    void RebuildData();
 
     /*!
-     * @brief When enabled, final joint rotations are calculated as a post
-     * processing step. If you are using IK on a model with skinning, you will
-     * want to enable this or it will look wrong. If you disable this, then
-     * you will get a slight performance boost (less calculations are required)
-     * but only the node positions are updated. This can be useful for scene
-     * IK (perhaps a chain of platforms, where each platform should retain its
-     * initial world rotation?)
+     * @brief Unusual, but if you have a tree with translational motions such
+     * that the distances between nodes changes (perhaps a slider?), you can
+     * call this to recalculate the segment lengths after assigning new
+     * positions to the nodes.
+     * @note This function gets called by RebuildData() and by extension in
+     * Solve().
      */
-    void EnableBoneRotations(bool enable);
-
-    /// Whether or not target rotation is enabled
-    bool TargetRotationEnabled() const;
+    void RecalculateSegmentLengths();
 
     /*!
-     * @brief When enabled, the effector will try to match the target's
-     * rotation as well as the effectors position. When disabled, the target
-     * node will reach the effector with any rotation necessary.
-     *
-     * If the target position goes out of range of the effector then the
-     * rotation will no longer be matched. The chain will try to reach out to
-     * reach the target position, even if it means rotating towards it.
+     * @brief Skinned models require joint rotations to be calculated so
+     * skinning works correctly. This is automatically enabled by default with
+     * the feature flag JOINT_ROTATIONS.
      */
-    void EnableTargetRotation(bool enable);
-
-    /// Whether or not continuous solving is enabled or not.
-    bool ContinuousSolvingEnabled() const;
-
-    /*!
-     * @brief When enabled, the solver will refrain from applying the initial
-     * pose before solving. The result is that it will use the previously
-     * solved tree as a basis for the new calculation instead of using the
-     * initial tree. This can be useful if you want to simulate chains or
-     * something similar. When disabled, the solver will use the initial
-     * positions/rotations which where set when the solver was first created.
-     *
-     * If you call UpdateInitialPose() then the initial tree will be matched to
-     * the current nodes in the scene graph.
-     *
-     * If you call ResetToInitialPose() then you will do the opposite of
-     * UpdateInitialPose() -- the initial pose is applied back to the scene
-     * graph.
-     *
-     * If you enable pose updating with EnableUpdatePose(), then the initial
-     * tree will automatically be matched to the current nodes in the scene
-     * graph.
-     */
-    void EnableContinuousSolving(bool enable);
-
-    /// Whether or not the initial pose is updated for every solution
-    bool UpdatePoseEnabled() const;
-
-    /*!
-     * @brief When enabled, the current Urho3D node positions and rotations in
-     * the scene graph will be copied into the solver's initial tree right
-     * before solving. This should generally be enabled for animated models
-     * so the solver refers to the current frame of animation rather than to
-     * the animation's initial pose.
-     *
-     * When disabled, the initial pose will remain unmodified. The initial pose
-     * is set when the solver is first created. You can manually update the
-     * initial pose at any time by calling UpdateInitialPose().
-     */
-    void EnableUpdatePose(bool enable);
-
-    /// Whether or not the solver should be invoked automatically
-    bool AutoSolveEnabled() const;
-
-    /*!
-     * @brief Mostly exists because of the editor. When enabled, the solver
-     * will be invoked automatically for you. If you need to do additional
-     * calculations before being able to set the effector target data, you will
-     * want to disable this and call Solve() manually.
-     */
-    void EnableAutoSolve(bool enable);
+    void CalculateJointRotations();
 
     /*!
      * @brief Invokes the solver. The solution is applied back to the scene
      * graph automatically.
-     * @note You will want to register to E_SCENEDRAWABLEUPDATEFINISHED and
-     * call this method there. This is right after the animations have been
-     * applied.
+     * @note By default this is called automatically for you if the feature
+     * flag AUTO_SOLVE is set. For more complex IK problems you can disable
+     * that flag and call Solve() in response to E_SCENEDRAWABLEUPDATEFINISHED.
+     * This is right after the animations have been applied.
      */
     void Solve();
 
@@ -203,7 +271,7 @@ public:
      * @brief Causes the initial tree to be applied back to Urho3D's scene
      * graph. This is what gets called when continuous solving is disabled.
      */
-    void ResetToInitialPose();
+    void ApplyOriginalPoseToScene();
 
     /*!
      * @brief Causes the current scene graph data to be copied into the solvers
@@ -211,16 +279,22 @@ public:
      * are using IK on an animated model. If you don't update the initial pose,
      * then the result will be a "continuous solution", where the solver will
      * use the previously calculated tree as a basis for the new solution.
+     *
+     * @note This is
      */
-    void UpdateInitialPose();
-
-    /// Causes the solver tree to be rebuilt before solving the next time.
-    void MarkSolverTreeDirty();
+    void ApplySceneToOriginalPose();
+    void ApplyActivePoseToScene();
+    void ApplySceneToActivePose();
+    void ApplyOriginalPoseToActivePose();
 
     void DrawDebugGeometry(bool depthTest);
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
 private:
+    friend class IKEffector;
+
+    /// Causes the solver tree to be rebuilt before solving the next time. Intended to be used by IKEffector.
+    void MarkSolverTreeDirty();
     /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
     /// Destroys and creates the tree
@@ -243,12 +317,29 @@ private:
     /// Invokes the IK solver
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
+    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor
+    bool GetFeature_JOINT_ROTATIONS() const;
+    bool GetFeature_TARGET_ROTATIONS() const;
+    bool GetFeature_UPDATE_ORIGINAL_POSE() const;
+    bool GetFeature_UPDATE_ACTIVE_POSE() const;
+    bool GetFeature_USE_ORIGINAL_POSE() const;
+    bool GetFeature_CONSTRAINTS() const;
+    bool GetFeature_AUTO_SOLVE() const;
+
+    void SetFeature_JOINT_ROTATIONS(bool enable);
+    void SetFeature_TARGET_ROTATIONS(bool enable);
+    void SetFeature_UPDATE_ORIGINAL_POSE(bool enable);
+    void SetFeature_UPDATE_ACTIVE_POSE(bool enable);
+    void SetFeature_USE_ORIGINAL_POSE(bool enable);
+    void SetFeature_CONSTRAINTS(bool enable);
+    void SetFeature_AUTO_SOLVE(bool enable);
+
     PODVector<IKEffector*> effectorList_;
+    PODVector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
+    unsigned features_;
     bool solverTreeNeedsRebuild_;
-    bool updateInitialPose_;
-    bool autoSolveEnabled_;
 };
 
 } // namespace Urho3D

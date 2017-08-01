@@ -7,9 +7,7 @@
 
 C_HEADER_BEGIN
 
-struct ik_node_t;
-
-enum effector_flags_e
+typedef enum effector_flags_e
 {
     /*!
      * @brief Causes intermediary weight values to rotate the target around the
@@ -17,10 +15,8 @@ enum effector_flags_e
      * appealing if the solved tree diverges a lot from the original tree
      * during weight transitions.
      */
-    EFFECTOR_WEIGHT_NLERP            = 0x01,
-
-    EFFECTOR_INHERIT_PARENT_ROTATION = 0x02
-};
+    EFFECTOR_WEIGHT_NLERP            = 0x01
+} effector_flgs_e;
 
 /*!
  * @brief Specifies how a chain of nodes should be solved. The effector can
@@ -83,14 +79,14 @@ struct ik_effector_t
  * @brief Creates a new effector object. It can be attached to any node in the
  * tree using ik_node_attach_effector().
  */
-IK_PUBLIC_API struct ik_effector_t*
+IK_PUBLIC_API ik_effector_t*
 ik_effector_create(void);
 
 /*!
  * @brief Constructs a previously allocated effector object.
  */
 IK_PUBLIC_API void
-ik_effector_construct(struct ik_effector_t* effector);
+ik_effector_construct(ik_effector_t* effector);
 
 /*!
  * @brief Destroys and frees an effector object. This should **NOT** be called
@@ -98,7 +94,7 @@ ik_effector_construct(struct ik_effector_t* effector);
  * instead.
  */
 IK_PUBLIC_API void
-ik_effector_destroy(struct ik_effector_t* effector);
+ik_effector_destroy(ik_effector_t* effector);
 
 C_HEADER_END
 

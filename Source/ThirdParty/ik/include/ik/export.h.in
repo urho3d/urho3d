@@ -2,59 +2,56 @@
  * Export and visibility amcros
  * ----------------------------------------------------------------
  * Substitution variables:
- *  - PROJECT_NAME          : All-caps variable identifying the
- *                            name of the project being built.
- *  - BUILD_TYPE            : Set to either SHARED or STATIC.
+ *  - IK_LIB_TYPE   : Set to either SHARED or STATIC.
+ *  - IK_PLATFORM   : Set to WINDOWS, OSX, LINUX, ANDROID, or IOS
  * Global definitions (non substitution)
- *  - PROJECT_NAME_BUILDING : Define this if the library is being
- *                            built.
+ *  - IK_BUILDING   : Define this if the library is being built.
  * ------------------------------------------------------------- */
 
 #ifndef IK_EXPORT_H
 #   define IK_EXPORT_H
 
     /* set @BUILD_TYPE@ to SHARED or STATIC */
-#   define IK_@IK_BUILD_TYPE@
+#   define IK_@IK_LIB_TYPE@
+#   define IK_PLATFORM_@IK_PLATFORM@
 
     /* --------------------------------------------------------------
      * define visibility macros
      * --------------------------------------------------------------*/
 
-    /* define platform dependent and build dependent visibility macro helpers */
-#   if defined(IK_SHARED)
-#       if defined(IK_PLATFORM_WINDOWS)
-#           if defined(__GNUC__)
-                /* cygwin visbibility */
-#               define IK_HELPER_API_EXPORT __attribute__ ((dllexport))
-#               define IK_HELPER_API_IMPORT __attribute__ ((dllimport))
-#           else
-                /* msvc visibility */
-#               define IK_HELPER_API_EXPORT __declspec(dllexport)
-#               define IK_HELPER_API_IMPORT __declspec(dllimport)
-                /* disable warnings */
-#               pragma warning(disable: 4996) /* 'strcpy': This function or variable may be unsafe */
-#           endif
-#           define IK_HELPER_API_LOCAL
+#   if !defined(IK_SHARED) && !defined(IK_STATIC)
+#       error Please define IK_SHARED or IK_STATIC.
+#   endif
+
+    /* DLL platforms */
+#   if defined(IK_SHARED) && defined(IK_PLATFORM_WINDOWS)
+#       if defined(__GNUC__)
+            /* cygwin visbibility */
+#           define IK_HELPER_API_EXPORT __attribute__ ((dllexport))
+#           define IK_HELPER_API_IMPORT __attribute__ ((dllimport))
 #       else
-#           if __GNUC__ >= 4
-                /* gcc 4+ visibility */
-#               define IK_HELPER_API_EXPORT __attribute__ ((visibility ("default")))
-#               define IK_HELPER_API_IMPORT __attribute__ ((visibility ("default")))
-#               define IK_HELPER_API_LOCAL  __attribute__ ((visibility ("hidden")))
-#           else
-                /* gcc lower than 4 doesn't have any explicit visibility, everything is exported */
-#               define IK_HELPER_API_EXPORT
-#               define IK_HELPER_API_IMPORT
-#               define IK_HELPER_API_LOCAL
-#           endif
+            /* msvc visibility */
+#           define IK_HELPER_API_EXPORT __declspec(dllexport)
+#           define IK_HELPER_API_IMPORT __declspec(dllimport)
 #       endif
-#   elif defined(IK_STATIC)
-        /* static build */
+#       define IK_HELPER_PRIVATE_API
+
+    /* Other platforms, just assume it's GCC/clang */
+#   elif defined(IK_SHARED) && defined(__GNUC__) && __GNUC__ >= 4
+        /* gcc 4+ visibility */
+#       define IK_HELPER_API_EXPORT __attribute__ ((visibility ("default")))
+#       define IK_HELPER_API_IMPORT __attribute__ ((visibility ("default")))
+#       define IK_HELPER_PRIVATE_API  __attribute__ ((visibility ("hidden")))
+
+    /*
+     * All other cases:
+     *   + gcc lower than 4 doesn't have any explicit visibility, everything is exported
+     *   + static libs don't need visibility macros
+     */
+#   else
 #       define IK_HELPER_API_EXPORT
 #       define IK_HELPER_API_IMPORT
-#       define IK_HELPER_API_LOCAL
-#   else
-#       error Please define IK_SHARED or IK_STATIC
+#       define IK_HELPER_PRIVATE_API
 #   endif
 
     /*
@@ -66,39 +63,14 @@
 #   else
 #       define IK_PUBLIC_API IK_HELPER_API_IMPORT
 #   endif
-
-    /*
-     * define local visibility macro. If we're testing, everything
-     * is visible
-     */
-#   if defined(TESTING)
-#       define IK_LOCAL_API IK_PUBLIC_API
-#   else
-#       define IK_LOCAL_API IK_HELPER_API_LOCAL
-#   endif
-
-    /*
-     * define class member visibility macros. If we're testing, everything
-     * is public
-     */
-#   if defined(TESTING)
-#       define PUBLIC public
-#       define PROTECTED public
-#       define PRIVATE public
-#   else
-#       define PUBLIC public
-#       define PROTECTED protected
-#       define PRIVATE private
-#   endif
+#   define IK_PRIVATE_API IK_HELPER_PRIVATE_API
 
     /* --------------------------------------------------------------
-     * typeof support
+     * Disable MSVC warnings
      * --------------------------------------------------------------*/
 
-#   if defined(__GNUC__)
-#       define TYPEOF(x) __typeof__(x)
-#   else
-#       undef TYPEOF
+#   if defined(IK_PLATFORM_WINDOWS) && !defined(__GNUC__)
+#       pragma warning(disable: 4996) /* 'strcpy': This function or variable may be unsafe */
 #   endif
 
     /* --------------------------------------------------------------
