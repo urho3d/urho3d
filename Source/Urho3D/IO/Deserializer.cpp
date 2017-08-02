@@ -47,6 +47,11 @@ Deserializer::~Deserializer()
 {
 }
 
+unsigned Deserializer::SeekRelative(int delta)
+{
+    return Seek(GetPosition() + delta);
+}
+
 const String& Deserializer::GetName() const
 {
     return String::EMPTY;
