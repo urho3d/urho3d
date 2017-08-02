@@ -2016,9 +2016,11 @@ Methods:
 
 - VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
+- unsigned SeekRelative(int delta)
 - const String GetName() const
 - unsigned GetChecksum()
 - unsigned GetPosition() const
+- unsigned Tell() const
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
@@ -2254,9 +2256,11 @@ Methods:
 - bool IsPackaged() const
 - VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
+- unsigned SeekRelative(int delta)
 - const String GetName() const
 - unsigned GetChecksum()
 - unsigned GetPosition() const
+- unsigned Tell() const
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()
@@ -7590,9 +7594,11 @@ Methods:
 - void* GetModifiableData()
 - VectorBuffer Read(unsigned size)
 - unsigned Seek(unsigned position)
+- unsigned SeekRelative(int delta)
 - const String GetName() const
 - unsigned GetChecksum()
 - unsigned GetPosition() const
+- unsigned Tell() const
 - unsigned GetSize() const
 - bool IsEof() const
 - int ReadInt()

@@ -6636,6 +6636,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -7207,7 +7209,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -7541,6 +7545,8 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
+- uint Tell() const
 
 Properties:
 
@@ -9157,7 +9163,9 @@ Methods:
 - Vector4 ReadVector4()
 - VectorBuffer ReadVectorBuffer(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SendEvent(const String&, VariantMap& = VariantMap ( ))
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)
@@ -15144,7 +15152,9 @@ Methods:
 - VectorBuffer ReadVectorBuffer(uint)
 - void Resize(uint)
 - uint Seek(uint)
+- uint SeekRelative(int)
 - void SetData(Deserializer@, uint)
+- uint Tell() const
 - uint Write(uint8[]@)
 - bool WriteBool(bool)
 - bool WriteBoundingBox(const BoundingBox&)

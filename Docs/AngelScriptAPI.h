@@ -4398,6 +4398,8 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
+uint Tell() const;
 
 // Properties:
 /* readonly */
@@ -5059,7 +5061,9 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
@@ -5476,6 +5480,8 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
+uint Tell() const;
 
 // Properties:
 /* readonly */
@@ -7392,7 +7398,9 @@ Vector3 ReadVector3();
 Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SendEvent(const String&, VariantMap& = VariantMap ( ));
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
@@ -14458,7 +14466,9 @@ Vector4 ReadVector4();
 VectorBuffer ReadVectorBuffer(uint);
 void Resize(uint);
 uint Seek(uint);
+uint SeekRelative(int);
 void SetData(Deserializer, uint);
+uint Tell() const;
 uint Write(Array<uint8>);
 bool WriteBool(bool);
 bool WriteBoundingBox(const BoundingBox&);
