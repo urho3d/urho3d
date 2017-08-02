@@ -13400,6 +13400,7 @@ WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 TileMapLayer2D GetLayer(uint) const;
+Array<TileMapObject2D> GetTileCollisionShapes(int) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
 bool Load(File, bool = false);
