@@ -53,6 +53,13 @@ void TileMapLayer2D::RegisterObject(Context* context)
     context->RegisterFactory<TileMapLayer2D>();
 }
 
+// Transform vector from node-local space to global space
+static Vector2 TransformNode2D(Matrix3x4 transform, Vector2 local)
+{
+    Vector3 transformed = transform * Vector4(local.x_, local.y_, 0.f, 1.f);
+    return Vector2(transformed.x_, transformed.y_);
+}
+
 void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
     if (!debug)
@@ -60,29 +67,65 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
     if (objectGroup_)
     {
+        const Matrix3x4 transform = GetTileMap()->GetNode()->GetTransform();
         for (unsigned i = 0; i < objectGroup_->GetNumObjects(); ++i)
         {
             TileMapObject2D* object = objectGroup_->GetObject(i);
             const Color& color = Color::YELLOW;
+            const Vector2& size = object->GetSize();
+            const TileMapInfo2D& info = tileMap_->GetInfo();
+
 
             switch (object->GetObjectType())
             {
             case OT_RECTANGLE:
                 {
-                    const Vector2& lb = object->GetPosition();
-                    const Vector2& rt = lb + object->GetSize();
+                    Vector<Vector2> points;
 
-                    debug->AddLine(Vector2(lb.x_, lb.y_), Vector2(rt.x_, lb.y_), color, depthTest);
-                    debug->AddLine(Vector2(rt.x_, lb.y_), Vector2(rt.x_, rt.y_), color, depthTest);
-                    debug->AddLine(Vector2(rt.x_, rt.y_), Vector2(lb.x_, rt.y_), color, depthTest);
-                    debug->AddLine(Vector2(lb.x_, rt.y_), Vector2(lb.x_, lb.y_), color, depthTest);
+                    switch (info.orientation_)
+                    {
+                    case O_ORTHOGONAL:
+                    case O_HEXAGONAL:
+                    case O_STAGGERED:
+                        {
+                            points.Push(Vector2::ZERO);
+                            points.Push(Vector2(size.x_, 0.0f));
+                            points.Push(Vector2(size.x_, -size.y_));
+                            points.Push(Vector2(0.0f, -size.y_));
+                            break;
+                        }
+                    case O_ISOMETRIC:
+                        {
+                            float ratio = (info.tileWidth_ / info.tileHeight_) * 0.5f;
+                            points.Push(Vector2::ZERO);
+                            points.Push(Vector2(size.y_ * ratio, size.y_ * 0.5f));
+                            points.Push(Vector2((size.x_ + size.y_) * ratio, (-size.x_ + size.y_) * 0.5f));
+                            points.Push(Vector2(size.x_ * ratio, -size.x_ * 0.5f));
+                            break;
+                        }
+                    }
+
+                    for (unsigned j = 0; j < points.Size(); ++j)
+                        debug->AddLine(TransformNode2D(transform, points[j] + object->GetPosition()),
+                                       TransformNode2D(transform, points[(j + 1) % points.Size()] + object->GetPosition()), color, depthTest);
                 }
                 break;
 
             case OT_ELLIPSE:
                 {
                     const Vector2 halfSize = object->GetSize() * 0.5f;
-                    const Vector2 center = object->GetPosition() + halfSize;
+                    float ratio = (info.tileWidth_ / info.tileHeight_) * 0.5f; // For isometric only
+
+                    Vector2 pivot = object->GetPosition();
+                    if (info.orientation_ == O_ISOMETRIC)
+                    {
+                        pivot += Vector2((halfSize.x_ + halfSize.y_) * ratio, (-halfSize.x_ + halfSize.y_) * 0.5f);
+                    }
+                    else
+                    {
+                        pivot += halfSize;
+                    }
+
                     for (unsigned i = 0; i < 360; i += 30)
                     {
                         unsigned j = i + 30;
@@ -90,7 +133,16 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
                         float y1 = halfSize.y_ * Sin((float)i);
                         float x2 = halfSize.x_ * Cos((float)j);
                         float y2 = halfSize.y_ * Sin((float)j);
-                        debug->AddLine(center + Vector2(x1, y1), center + Vector2(x2, y2), color, depthTest);
+                        Vector2 point1 = Vector2(x1, - y1);
+                        Vector2 point2 = Vector2(x2, - y2);
+
+                        if (info.orientation_ == O_ISOMETRIC)
+                        {
+                            point1 = Vector2((point1.x_ + point1.y_) * ratio, (point1.y_ - point1.x_) * 0.5f);
+                            point2 = Vector2((point2.x_ + point2.y_) * ratio, (point2.y_ - point2.x_) * 0.5f);
+                        }
+
+                        debug->AddLine(TransformNode2D(transform, pivot + point1), TransformNode2D(transform, pivot + point2), color, depthTest);
                     }
                 }
                 break;
@@ -99,10 +151,15 @@ void TileMapLayer2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             case OT_POLYLINE:
                 {
                     for (unsigned j = 0; j < object->GetNumPoints() - 1; ++j)
-                        debug->AddLine(object->GetPoint(j), object->GetPoint(j + 1), color, depthTest);
+                        debug->AddLine(TransformNode2D(transform, object->GetPoint(j)),
+                                       TransformNode2D(transform, object->GetPoint(j + 1)), color, depthTest);
 
                     if (object->GetObjectType() == OT_POLYGON)
-                        debug->AddLine(object->GetPoint(0), object->GetPoint(object->GetNumPoints() - 1), color, depthTest);
+                        debug->AddLine(TransformNode2D(transform, object->GetPoint(0)),
+                                       TransformNode2D(transform, object->GetPoint(object->GetNumPoints() - 1)), color, depthTest);
+                    // Also draw a circle at origin to indicate direction
+                    else
+                        debug->AddCircle(TransformNode2D(transform, object->GetPoint(0)), Vector3::FORWARD, 0.05f, color, 64, depthTest);
                 }
                 break;
 
@@ -274,10 +331,7 @@ Node* TileMapLayer2D::GetObjectNode(unsigned index) const
 
 Node* TileMapLayer2D::GetImageNode() const
 {
-    if (!imageLayer_)
-        return 0;
-
-    if (nodes_.Empty())
+    if (!imageLayer_ || nodes_.Empty())
         return 0;
 
     return nodes_[0];
