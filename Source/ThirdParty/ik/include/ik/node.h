@@ -54,7 +54,7 @@ struct ik_node_t
      * angle computations enabled (SOLVER_CALCULATE_FINAL_ANGLES).
      * @note The default value is the identity quaternion.
      */
-    quat_t initial_rotation;
+    quat_t original_rotation;
 
     /*!
      * @brief After the solver is executed, the solved global (world) position

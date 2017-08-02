@@ -307,8 +307,8 @@ private:
     void DestroyTree();
     /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed
     void RebuildTree();
-    /// Builds a chain of nodes up to the specified node and adds an effector. Thus, the specified node must have an IKEffector attached.
-    void BuildTreeToEffector(const Node* node);
+    /// Builds a chain of nodes up to the node of the specified effector component.
+    bool BuildTreeToEffector(IKEffector* effector);
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);

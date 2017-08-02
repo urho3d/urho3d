@@ -230,7 +230,7 @@ static void
 reset_active_pose_recursive(ik_node_t* node)
 {
     node->position = node->original_position;
-    node->rotation = node->initial_rotation;
+    node->rotation = node->original_rotation;
 
     BSTV_FOR_EACH(&node->children, ik_node_t, guid, child)
         reset_active_pose_recursive(child);

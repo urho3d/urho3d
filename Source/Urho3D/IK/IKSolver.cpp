@@ -269,7 +269,7 @@ void IKSolver::Solve()
 static void ApplyInitialPoseToSceneCallback(ik_node_t* ikNode)
 {
     Node* node = (Node*)ikNode->user_data;
-    node->SetWorldRotation(QuatIK2Urho(&ikNode->initial_rotation));
+    node->SetWorldRotation(QuatIK2Urho(&ikNode->original_rotation));
     node->SetWorldPosition(Vec3IK2Urho(&ikNode->original_position));
 }
 void IKSolver::ApplyOriginalPoseToScene()
@@ -281,7 +281,7 @@ void IKSolver::ApplyOriginalPoseToScene()
 static void ApplySceneToInitialPoseCallback(ik_node_t* ikNode)
 {
     Node* node = (Node*)ikNode->user_data;
-    ikNode->initial_rotation = QuatUrho2IK(node->GetWorldRotation());
+    ikNode->original_rotation = QuatUrho2IK(node->GetWorldRotation());
     ikNode->original_position = Vec3Urho2IK(node->GetWorldPosition());
 }
 void IKSolver::ApplySceneToOriginalPose()
@@ -361,8 +361,10 @@ ik_node_t* IKSolver::CreateIKNode(const Node* node)
 
     // Set initial position/rotation and pass in Node* as user data for later
     ikNode->original_position = Vec3Urho2IK(node->GetWorldPosition());
-    ikNode->initial_rotation = QuatUrho2IK(node->GetWorldRotation());
+    ikNode->original_rotation = QuatUrho2IK(node->GetWorldRotation());
     ikNode->user_data = (void*)node;
+
+    // If the node has an effector, it needs access to the ikNode
 
     // If the node has a constraint, it needs access to the ikNode
     IKConstraint* constraint = node->GetComponent<IKConstraint>();
@@ -380,6 +382,7 @@ void IKSolver::DestroyTree()
 {
     ik_solver_destroy_tree(solver_);
     effectorList_.Clear();
+    constraintList_.Clear();
 }
 
 // ----------------------------------------------------------------------------
@@ -387,39 +390,37 @@ void IKSolver::RebuildTree()
 {
     assert (node_ != NULL);
 
+    DestroyTree();
+
     ik_node_t* ikRoot = CreateIKNode(node_);
-    ik_solver_set_tree(solver_, ikRoot); // Deletes the old tree with all effectors + constraints
+    ik_solver_set_tree(solver_, ikRoot);
 
     PODVector<Node*> effectorNodes;
     node_->GetChildrenWithComponent<IKEffector>(effectorNodes, true);
     for (PODVector<Node*>::ConstIterator it = effectorNodes.Begin(); it != effectorNodes.End(); ++it)
     {
-        BuildTreeToEffector(*it);
+        BuildTreeToEffector((*it)->GetComponent<IKEffector>());
     }
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::BuildTreeToEffector(const Node* node)
+bool IKSolver::BuildTreeToEffector(IKEffector* effector)
 {
-    // Check if the component that was added is an IK effector. If not, then it
-    // does not concern us.
-    IKEffector* effector = static_cast<IKEffector*>(node->GetComponent<IKEffector>());
-    if (effector == NULL || effector->GetType() != IKEffector::GetTypeStatic())
-        return;
-
     // May need to build tree up to the node where this effector was added. Do
     // this by following the chain of parent nodes until we hit a node that
     // exists in the solver's tree. Then iterate backwards again and add each
     // missing node to the solver's tree.
     PODVector<const Node*> missingNodes;
-    const Node* iterNode = node;
-    ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
+    const Node* iterNode = effector->GetNode();
+    ik_node_t* ikNode = ik_node_find_child(solver_->tree, effector->GetNode()->GetID());
     while (ikNode == NULL)
     {
         missingNodes.Push(iterNode);
         iterNode = iterNode->GetParent();
-        if (iterNode == NULL) // The effector is in a different branch of the tree, unrelated to us. Abort.
-            return;
+        if (iterNode == NULL)
+            return false; // The effector is in a different branch of the tree, unrelated to us. Abort.
+        if (iterNode->HasComponent<IKSolver>() && iterNode != node_)
+            return false; // A direct path to the effector is being blocked by another solver
         ikNode = ik_node_find_child(solver_->tree, iterNode->GetID());
     }
     while (missingNodes.Size() > 0)
@@ -441,6 +442,8 @@ void IKSolver::BuildTreeToEffector(const Node* node)
     effectorList_.Push(effector);
 
     MarkChainsNeedUpdating();
+
+    return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -453,7 +456,11 @@ void IKSolver::HandleComponentAdded(StringHash eventType, VariantMap& eventData)
         return;
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
-    BuildTreeToEffector(node);
+
+    // Handle case when the added component is an effector
+    IKEffector* maybeEffector = static_cast<IKEffector*>(node->GetComponent<IKEffector>());
+    if (maybeEffector != NULL && maybeEffector->GetType() == IKEffector::GetTypeStatic())
+        BuildTreeToEffector(maybeEffector);
 
     IKConstraint* constraint = static_cast<IKConstraint*>(node->GetComponent<IKConstraint>());
     if (constraint != NULL)
@@ -475,12 +482,13 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     if (solver_->tree == NULL)
         return;
 
-    // If an effector was removed, the tree will have to be rebuilt.
+    Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
     Component* component = static_cast<Component*>(eventData[P_COMPONENT].GetPtr());
+
+    // If an effector was removed, the tree will have to be rebuilt.
     if (component->GetType() == IKEffector::GetTypeStatic())
     {
         IKEffector* effector = static_cast<IKEffector*>(component);
-        Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
         if (ikNode == NULL) // The effector is in an unrelated branch of the tree, abort.
             return;
@@ -497,9 +505,8 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
     if (component->GetType() == IKConstraint::GetTypeStatic())
     {
         IKConstraint* constraint = static_cast<IKConstraint*>(component);
-        Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
         ik_node_t* ikNode = ik_node_find_child(solver_->tree, node->GetID());
-        if (ikNode == NULL) // The effector is in an unrelated branch of the tree, abort.
+        if (ikNode == NULL) // The constraint is in an unrelated branch of the tree, abort.
             return;
 
         constraint->SetIKNode(NULL);  // NOTE: Should restore default settings to the node
@@ -517,18 +524,24 @@ void IKSolver::HandleNodeAdded(StringHash eventType, VariantMap& eventData)
 
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
 
-    PODVector<Node*> nodes;
-    node->GetChildrenWithComponent<IKEffector>(nodes, true);
-    for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
+    PODVector<IKEffector*> effectors;
+    node->GetComponents<IKEffector>(effectors, true);
+    for (PODVector<IKEffector*>::ConstIterator it = effectors.Begin(); it != effectors.End(); ++it)
     {
-        BuildTreeToEffector(*it);
-        effectorList_.Push((*it)->GetComponent<IKEffector>());
+        // A direct path to the effector may be blocked by another IKSolver.
+        // If this is so, simply ignore this component and continue. The child
+        // solver will take good care of it.
+        if (BuildTreeToEffector(*it) == false)
+            continue;
+
+        effectorList_.Push((*it));
     }
 
-    node->GetChildrenWithComponent<IKConstraint>(nodes, true);
-    for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
+    PODVector<IKConstraint*> constraints;
+    node->GetComponents<IKConstraint>(constraints, true);
+    for (PODVector<IKConstraint*>::ConstIterator it = constraints.Begin(); it != constraints.End(); ++it)
     {
-        constraintList_.Push((*it)->GetComponent<IKConstraint>());
+        constraintList_.Push(*it);
     }
 }
 
@@ -543,20 +556,19 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
     Node* node = static_cast<Node*>(eventData[P_NODE].GetPtr());
 
     // Remove cached IKEffectors from our list
-    PODVector<Node*> nodes;
-    node->GetChildrenWithComponent<IKEffector>(nodes, true);
-    for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
+    PODVector<IKEffector*> effectors;
+    node->GetComponents<IKEffector>(effectors, true);
+    for (PODVector<IKEffector*>::ConstIterator it = effectors.Begin(); it != effectors.End(); ++it)
     {
-        IKEffector* effector = (*it)->GetComponent<IKEffector>();
-        effector->SetIKEffector(NULL);
-        effectorList_.RemoveSwap(effector);
+        (*it)->SetIKEffector(NULL);
+        effectorList_.RemoveSwap(*it);
     }
 
-    node->GetChildrenWithComponent<IKConstraint>(nodes, true);
-    for (PODVector<Node*>::ConstIterator it = nodes.Begin(); it != nodes.End(); ++it)
+    PODVector<IKConstraint*> constraints;
+    node->GetComponents<IKConstraint>(constraints, true);
+    for (PODVector<IKConstraint*>::ConstIterator it = constraints.Begin(); it != constraints.End(); ++it)
     {
-        IKConstraint* constraint = (*it)->GetComponent<IKConstraint>();
-        constraintList_.RemoveSwap(constraint);
+        constraintList_.RemoveSwap(*it);
     }
 
     // Special case, if the node being destroyed is the root node, destroy the

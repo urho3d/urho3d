@@ -494,7 +494,7 @@ calculate_global_rotations(chain_t* chain)
      */
     ORDERED_VECTOR_FOR_EACH(&chain->nodes, ik_node_t*, pnode)
         ik_node_t* node = *pnode;
-        quat_mul_quat(node->rotation.f, node->initial_rotation.f);
+        quat_mul_quat(node->rotation.f, node->original_rotation.f);
     ORDERED_VECTOR_END_EACH
 }
 
