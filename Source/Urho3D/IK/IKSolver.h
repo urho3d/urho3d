@@ -238,7 +238,7 @@ public:
      * adding or removing effectors, etc.).
      * @note This gets called  automatically for you in Solve().
      */
-    void RebuildData();
+    void RebuildChains();
 
     /*!
      * @brief Unusual, but if you have a tree with translational motions such
@@ -294,7 +294,7 @@ private:
     friend class IKEffector;
 
     /// Causes the solver tree to be rebuilt before solving the next time. Intended to be used by IKEffector.
-    void MarkSolverTreeDirty();
+    void MarkChainsNeedUpdating();
     /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
     /// Destroys and creates the tree
@@ -339,7 +339,7 @@ private:
     ik_solver_t* solver_;
     Algorithm algorithm_;
     unsigned features_;
-    bool solverTreeNeedsRebuild_;
+    bool chainsAreDirty_;
 };
 
 } // namespace Urho3D

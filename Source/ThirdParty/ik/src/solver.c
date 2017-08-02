@@ -147,7 +147,7 @@ ik_solver_destroy_tree(ik_solver_t* solver)
 
 /* ------------------------------------------------------------------------- */
 int
-ik_solver_rebuild_data(ik_solver_t* solver)
+ik_solver_rebuild_chain_trees(ik_solver_t* solver)
 {
     /* If the solver has no tree, then there's nothing to do */
     if (solver->tree == NULL)
@@ -172,8 +172,8 @@ ik_solver_rebuild_data(ik_solver_t* solver)
     if (rebuild_chain_tree(solver) < 0)
         return -1;
 
-    if (solver->rebuild_data != NULL)
-        return solver->rebuild_data(solver);
+    if (solver->post_chain_build != NULL)
+        return solver->post_chain_build(solver);
 
     return 0;
 }

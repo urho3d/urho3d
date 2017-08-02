@@ -160,7 +160,7 @@ void IKEffector::SetChainLength(unsigned chainLength)
     if (ikEffector_ != NULL)
     {
         ikEffector_->chain_length = chainLength;
-        solver_->MarkSolverTreeDirty();
+        solver_->MarkChainsNeedUpdating();
     }
 }
 

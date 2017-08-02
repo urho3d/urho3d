@@ -14,7 +14,7 @@ solver_1bone_construct(ik_solver_t* solver)
 
     /* set up derived functions */
     one_bone->destruct = solver_1bone_destruct;
-    one_bone->rebuild_data = solver_1bone_rebuild;
+    one_bone->post_chain_build = solver_1bone_post_chain_build;
     one_bone->solve = solver_1bone_solve;
 
     return 0;
@@ -28,7 +28,7 @@ solver_1bone_destruct(ik_solver_t* solver)
 
 /* ------------------------------------------------------------------------- */
 int
-solver_1bone_rebuild(ik_solver_t* solver)
+solver_1bone_post_chain_build(ik_solver_t* solver)
 {
     /*
      * We need to assert that there really are only chains of length 1 and no

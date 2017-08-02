@@ -10,7 +10,7 @@
 C_HEADER_BEGIN
 
 typedef void (*ik_solver_destruct_func)(ik_solver_t*);
-typedef int (*ik_solver_rebuild_data_func)(ik_solver_t*);
+typedef int (*ik_solver_post_chain_build_func)(ik_solver_t*);
 typedef int (*ik_solver_solve_func)(ik_solver_t*);
 
 typedef void (*ik_solver_iterate_node_cb_func)(ik_node_t*);
@@ -50,7 +50,7 @@ typedef enum solver_flags_e
                                                                       \
     /* Derived structure callbacks */                                 \
     ik_solver_destruct_func             destruct;                     \
-    ik_solver_rebuild_data_func         rebuild_data;                 \
+    ik_solver_post_chain_build_func     post_chain_build;             \
     ik_solver_solve_func                solve;                        \
                                                                       \
     ordered_vector_t                    effector_nodes_list;          \
@@ -149,7 +149,7 @@ ik_solver_destroy_tree(ik_solver_t* solver);
  * you must call this again before calling the solver.
  */
 IK_PUBLIC_API int
-ik_solver_rebuild_data(ik_solver_t* solver);
+ik_solver_rebuild_chain_trees(ik_solver_t* solver);
 
 /*!
  * @brief Unusual, but if you have a tree with translational motions such that

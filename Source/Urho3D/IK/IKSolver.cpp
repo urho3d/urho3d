@@ -44,38 +44,13 @@ namespace Urho3D
 
 extern const char* IK_CATEGORY;
 
-static bool ChildrenHaveEffector(const Node* node)
-{
-    if (node->HasComponent<IKEffector>())
-        return true;
-
-    const Vector<SharedPtr<Node> >& children = node->GetChildren();
-    for (Vector<SharedPtr<Node> >::ConstIterator it = children.Begin(); it != children.End(); ++it)
-    {
-        if (ChildrenHaveEffector(it->Get()))
-            return true;
-    }
-
-    return false;
-}
-
-static void ApplyConstraintsCallback(ik_node_t* ikNode)
-{
-    Node* node = (Node*)ikNode->user_data;
-    IKConstraint* constraint = node->GetComponent<IKConstraint>();
-    if (constraint == NULL)
-        return;
-
-    quat_set_identity(ikNode->rotation.f);
-}
-
 // ----------------------------------------------------------------------------
 IKSolver::IKSolver(Context* context) :
     Component(context),
     solver_(NULL),
     algorithm_(FABRIK),
     features_(AUTO_SOLVE | JOINT_ROTATIONS | UPDATE_ACTIVE_POSE),
-    solverTreeNeedsRebuild_(false)
+    chainsAreDirty_(false)
 {
     context_->RequireIK();
 
@@ -239,9 +214,9 @@ void IKSolver::SetTolerance(float tolerance)
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::RebuildData()
+void IKSolver::RebuildChains()
 {
-    ik_solver_rebuild_data(solver_);
+    ik_solver_rebuild_chain_trees(solver_);
     ik_calculate_rotation_weight_decays(&solver_->chain_tree);
 }
 
@@ -262,10 +237,10 @@ void IKSolver::Solve()
 {
     URHO3D_PROFILE(IKSolve);
 
-    if (solverTreeNeedsRebuild_)
+    if (chainsAreDirty_)
     {
-        RebuildData();
-        solverTreeNeedsRebuild_ = false;
+        RebuildChains();
+        chainsAreDirty_ = false;
     }
 
     if (features_ & UPDATE_ORIGINAL_POSE)
@@ -315,7 +290,7 @@ void IKSolver::ApplySceneToOriginalPose()
 }
 
 // ----------------------------------------------------------------------------
-static void ApplySolvedPoseToSceneCallback(ik_node_t* ikNode)
+static void ApplyActivePoseToSceneCallback(ik_node_t* ikNode)
 {
     Node* node = (Node*)ikNode->user_data;
     node->SetWorldRotation(QuatIK2Urho(&ikNode->rotation));
@@ -323,11 +298,11 @@ static void ApplySolvedPoseToSceneCallback(ik_node_t* ikNode)
 }
 void IKSolver::ApplyActivePoseToScene()
 {
-    ik_solver_iterate_tree(solver_, ApplySolvedPoseToSceneCallback);
+    ik_solver_iterate_tree(solver_, ApplyActivePoseToSceneCallback);
 }
 
 // ----------------------------------------------------------------------------
-static void ApplySceneToSolvedPoseCallback(ik_node_t* ikNode)
+static void ApplySceneToActivePoseCallback(ik_node_t* ikNode)
 {
     Node* node = (Node*)ikNode->user_data;
     ikNode->rotation = QuatUrho2IK(node->GetWorldRotation());
@@ -335,7 +310,7 @@ static void ApplySceneToSolvedPoseCallback(ik_node_t* ikNode)
 }
 void IKSolver::ApplySceneToActivePose()
 {
-    ik_solver_iterate_tree(solver_, ApplySceneToSolvedPoseCallback);
+    ik_solver_iterate_tree(solver_, ApplySceneToActivePoseCallback);
 }
 
 // ----------------------------------------------------------------------------
@@ -345,9 +320,9 @@ void IKSolver::ApplyOriginalPoseToActivePose()
 }
 
 // ----------------------------------------------------------------------------
-void IKSolver::MarkSolverTreeDirty()
+void IKSolver::MarkChainsNeedUpdating()
 {
-    solverTreeNeedsRebuild_ = true;
+    chainsAreDirty_ = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -465,7 +440,7 @@ void IKSolver::BuildTreeToEffector(const Node* node)
     effector->SetIKSolver(this);
     effectorList_.Push(effector);
 
-    MarkSolverTreeDirty();
+    MarkChainsNeedUpdating();
 }
 
 // ----------------------------------------------------------------------------
@@ -515,7 +490,7 @@ void IKSolver::HandleComponentRemoved(StringHash eventType, VariantMap& eventDat
         effectorList_.RemoveSwap(effector);
 
         ApplyOriginalPoseToScene();
-        MarkSolverTreeDirty();
+        MarkChainsNeedUpdating();
     }
 
     // Remove the ikNode* reference the IKConstraint was holding
@@ -595,7 +570,7 @@ void IKSolver::HandleNodeRemoved(StringHash eventType, VariantMap& eventData)
         else
             ik_node_destroy(ikNode);
 
-        MarkSolverTreeDirty();
+        MarkChainsNeedUpdating();
     }
 }
 
