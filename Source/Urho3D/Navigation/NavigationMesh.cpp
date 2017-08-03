@@ -168,29 +168,24 @@ void NavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 
     const dtNavMesh* navMesh = navMesh_;
 
-    for (int z = 0; z < numTilesZ_; ++z)
+    for (int j = 0; j < navMesh->getMaxTiles(); ++j)
     {
-        for (int x = 0; x < numTilesX_; ++x)
-        {
-            for (int i = 0; i < 128; ++i)
-            {
-                const dtMeshTile* tile = navMesh->getTileAt(x, z, i);
-                if (!tile)
-                    continue;
+        const dtMeshTile* tile = navMesh->getTile(j);
+        assert(tile);
+        if (!tile->header)
+            continue;
 
-                for (int i = 0; i < tile->header->polyCount; ++i)
-                {
-                    dtPoly* poly = tile->polys + i;
-                    for (unsigned j = 0; j < poly->vertCount; ++j)
-                    {
-                        debug->AddLine(
-                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
-                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
-                            Color::YELLOW,
-                            depthTest
-                        );
-                    }
-                }
+        for (int i = 0; i < tile->header->polyCount; ++i)
+        {
+            dtPoly* poly = tile->polys + i;
+            for (unsigned j = 0; j < poly->vertCount; ++j)
+            {
+                debug->AddLine(
+                    worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                    worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                    Color::YELLOW,
+                    depthTest
+                );
             }
         }
     }
@@ -327,6 +322,61 @@ void NavigationMesh::SetPadding(const Vector3& padding)
     MarkNetworkUpdate();
 }
 
+bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
+{
+    // Release existing navigation data and zero the bounding box
+    ReleaseNavigationMesh();
+
+    if (!node_)
+        return false;
+
+    if (!node_->GetWorldScale().Equals(Vector3::ONE))
+        URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
+
+    boundingBox_ = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
+    // Expand bounding box by padding
+    boundingBox_.min_ -= padding_;
+    boundingBox_.max_ += padding_;
+
+    maxTiles = NextPowerOfTwo(maxTiles);
+
+    // Calculate number of tiles
+    int gridW = 0, gridH = 0;
+    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
+    numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
+    numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
+
+    // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
+    unsigned tileBits = IntegerLog2(maxTiles);
+    unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+
+    dtNavMeshParams params;
+    rcVcopy(params.orig, &boundingBox_.min_.x_);
+    params.tileWidth = tileEdgeLength;
+    params.tileHeight = tileEdgeLength;
+    params.maxTiles = maxTiles;
+    params.maxPolys = maxPolys;
+
+    navMesh_ = dtAllocNavMesh();
+    if (!navMesh_)
+    {
+        URHO3D_LOGERROR("Could not allocate navigation mesh");
+        return false;
+    }
+
+    if (dtStatusFailed(navMesh_->init(&params)))
+    {
+        URHO3D_LOGERROR("Could not initialize navigation mesh");
+        ReleaseNavigationMesh();
+        return false;
+    }
+
+    URHO3D_LOGDEBUG("Allocated empty navigation mesh with max " + String(maxTiles) + " tiles");
+
+    return true;
+}
+
 bool NavigationMesh::Build()
 {
     URHO3D_PROFILE(BuildNavigationMesh);
@@ -366,14 +416,7 @@ bool NavigationMesh::Build()
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_));
-        unsigned tileBits = 0;
-        unsigned temp = maxTiles;
-        while (temp > 1)
-        {
-            temp >>= 1;
-            ++tileBits;
-        }
-
+        unsigned tileBits = IntegerLog2(maxTiles);
         unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
 
         dtNavMeshParams params;
@@ -398,16 +441,7 @@ bool NavigationMesh::Build()
         }
 
         // Build each tile
-        unsigned numTiles = 0;
-
-        for (int z = 0; z < numTilesZ_; ++z)
-        {
-            for (int x = 0; x < numTilesX_; ++x)
-            {
-                if (BuildTile(geometryList, x, z))
-                    ++numTiles;
-            }
-        }
+        unsigned numTiles = BuildTiles(geometryList, IntVector2::ZERO, GetNumTiles() - IntVector2::ONE);
 
         URHO3D_LOGDEBUG("Built navigation mesh with " + String(numTiles) + " tiles");
 
@@ -452,19 +486,87 @@ bool NavigationMesh::Build(const BoundingBox& boundingBox)
     int ex = Clamp((int)((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
     int ez = Clamp((int)((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
 
-    unsigned numTiles = 0;
-
-    for (int z = sz; z <= ez; ++z)
-    {
-        for (int x = sx; x <= ex; ++x)
-        {
-            if (BuildTile(geometryList, x, z))
-                ++numTiles;
-        }
-    }
+    unsigned numTiles = BuildTiles(geometryList, IntVector2(sx, sz), IntVector2(ex, ez));
 
     URHO3D_LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
     return true;
+}
+
+bool NavigationMesh::Build(const IntVector2& from, const IntVector2& to)
+{
+    URHO3D_PROFILE(BuildPartialNavigationMesh);
+
+    if (!node_)
+        return false;
+
+    if (!navMesh_)
+    {
+        URHO3D_LOGERROR("Navigation mesh must first be built fully before it can be partially rebuilt");
+        return false;
+    }
+
+    if (!node_->GetWorldScale().Equals(Vector3::ONE))
+        URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
+
+    Vector<NavigationGeometryInfo> geometryList;
+    CollectGeometries(geometryList);
+
+    unsigned numTiles = BuildTiles(geometryList, from, to);
+
+    URHO3D_LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
+    return true;
+}
+
+PODVector<unsigned char> NavigationMesh::GetTileData(int x, int z) const
+{
+    VectorBuffer ret;
+    WriteTile(ret, x, z);
+    return ret.GetBuffer();
+}
+
+bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
+{
+    MemoryBuffer buffer(tileData);
+    return ReadTile(buffer);
+}
+
+bool NavigationMesh::HasTile(int x, int z) const
+{
+    if (navMesh_)
+        return !!navMesh_->getTileAt(x, z, 0);
+    return false;
+}
+
+IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
+{
+    const float tileEdgeLength = (float)tileSize_ * cellSize_;
+    const Vector3 localPosition = node_->GetWorldTransform().Inverse() * position - boundingBox_.min_;
+    const Vector2 localPosition2D(localPosition.x_, localPosition.z_);
+    return VectorMin(VectorMax(IntVector2::ZERO, VectorFloorToInt(localPosition2D / tileEdgeLength)), GetNumTiles() - IntVector2::ONE);
+}
+
+bool NavigationMesh::RemoveTile(int x, int z)
+{
+    if (!navMesh_)
+        return false;
+
+    const dtTileRef tileRef = navMesh_->getTileRefAt(x, z, 0);
+    if (!tileRef)
+        return false;
+
+    return !dtStatusFailed(navMesh_->removeTile(tileRef, 0, 0));
+}
+
+void NavigationMesh::RemoveAllTiles()
+{
+    const dtNavMesh* navMesh = navMesh_;
+    for (int i = 0; i < navMesh_->getMaxTiles(); ++i)
+    {
+        const dtMeshTile* tile = navMesh->getTile(i);
+        assert(tile);
+        if (tile->header)
+            navMesh_->removeTile(navMesh_->getTileRef(tile), 0, 0);
+    }
 }
 
 Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents, const dtQueryFilter* filter,
@@ -777,27 +879,10 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
 
     while (!buffer.IsEof())
     {
-        /*int x =*/ buffer.ReadInt();
-        /*int z =*/ buffer.ReadInt();
-        /*dtTileRef tileRef =*/ buffer.ReadUInt();
-        unsigned navDataSize = buffer.ReadUInt();
-
-        unsigned char* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
-        if (!navData)
-        {
-            URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");
-            return;
-        }
-
-        buffer.Read(navData, navDataSize);
-        if (dtStatusFailed(navMesh_->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, 0)))
-        {
-            URHO3D_LOGERROR("Failed to add navigation mesh tile");
-            dtFree(navData);
-            return;
-        }
-        else
+        if (ReadTile(buffer))
             ++numTiles;
+        else
+            return;
     }
 
     URHO3D_LOGDEBUG("Created navigation mesh with " + String(numTiles) + " tiles from serialized data");
@@ -822,20 +907,8 @@ PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const
         const dtNavMesh* navMesh = navMesh_;
 
         for (int z = 0; z < numTilesZ_; ++z)
-        {
             for (int x = 0; x < numTilesX_; ++x)
-            {
-                const dtMeshTile* tile = navMesh->getTileAt(x, z, 0);
-                if (!tile)
-                    continue;
-
-                ret.WriteInt(x);
-                ret.WriteInt(z);
-                ret.WriteUInt(navMesh->getTileRef(tile));
-                ret.WriteUInt((unsigned)tile->dataSize);
-                ret.Write(tile->data, (unsigned)tile->dataSize);
-            }
-        }
+                WriteTile(ret, x, z);
     }
 
     return ret.GetBuffer();
@@ -1141,6 +1214,45 @@ void NavigationMesh::AddTriMeshGeometry(NavBuildData* build, Geometry* geometry,
     }
 }
 
+void NavigationMesh::WriteTile(Serializer& dest, int x, int z) const
+{
+    const dtNavMesh* navMesh = navMesh_;
+    const dtMeshTile* tile = navMesh->getTileAt(x, z, 0);
+    if (!tile)
+        return;
+
+    dest.WriteInt(x);
+    dest.WriteInt(z);
+    dest.WriteUInt(navMesh->getTileRef(tile));
+    dest.WriteUInt((unsigned)tile->dataSize);
+    dest.Write(tile->data, (unsigned)tile->dataSize);
+}
+
+bool NavigationMesh::ReadTile(Deserializer& source)
+{
+    /*int x =*/ source.ReadInt();
+    /*int z =*/ source.ReadInt();
+    /*dtTileRef tileRef =*/ source.ReadUInt();
+    unsigned navDataSize = source.ReadUInt();
+
+    unsigned char* navData = (unsigned char*)dtAlloc(navDataSize, DT_ALLOC_PERM);
+    if (!navData)
+    {
+        URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");
+        return false;
+    }
+
+    source.Read(navData, navDataSize);
+    if (dtStatusFailed(navMesh_->addTile(navData, navDataSize, DT_TILE_FREE_DATA, 0, 0)))
+    {
+        URHO3D_LOGERROR("Failed to add navigation mesh tile");
+        dtFree(navData);
+        return false;
+    }
+
+    return true;
+}
+
 bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z)
 {
     URHO3D_PROFILE(BuildNavigationMeshTile);
@@ -1378,6 +1490,21 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
         SendEvent(E_NAVIGATION_AREA_REBUILT, eventData);
     }
     return true;
+}
+
+unsigned NavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geometryList, const IntVector2& from, const IntVector2& to)
+{
+    unsigned numTiles = 0;
+
+    for (int z = from.y_; z <= to.y_; ++z)
+    {
+        for (int x = from.x_; x <= to.x_; ++x)
+        {
+            if (BuildTile(geometryList, x, z))
+                ++numTiles;
+        }
+    }
+    return numTiles;
 }
 
 bool NavigationMesh::InitializeQuery()

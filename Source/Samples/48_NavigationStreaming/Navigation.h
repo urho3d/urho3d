@@ -146,6 +146,8 @@ private:
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Make Jack follow the Detour path.
     void FollowPath(float timeStep);
+    /// Update navigation mesh.
+    void StreamNavMesh();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
@@ -157,6 +159,15 @@ private:
     Vector3 endPos_;
     /// Jack scene node.
     SharedPtr<Node> jackNode_;
+
+    /// Tile data.
+    HashMap<IntVector2, PODVector<unsigned char>> tileData_;
+    /// Added tiles.
+    HashSet<IntVector2> addedTiles_;
+    /// Navigation area bounding box.
+    BoundingBox sceneBoundingBox_;
+    /// Streaming distance.
+    int streamingDistance_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };

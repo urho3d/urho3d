@@ -238,6 +238,101 @@ void DynamicNavigationMesh::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Draw Obstacles", GetDrawObstacles, SetDrawObstacles, bool, false, AM_DEFAULT);
 }
 
+bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
+{
+    // Release existing navigation data and zero the bounding box
+    ReleaseNavigationMesh();
+
+    if (!node_)
+        return false;
+
+    if (!node_->GetWorldScale().Equals(Vector3::ONE))
+        URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
+
+    boundingBox_ = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
+    // Expand bounding box by padding
+    boundingBox_.min_ -= padding_;
+    boundingBox_.max_ += padding_;
+
+    maxTiles = NextPowerOfTwo(maxTiles);
+
+    // Calculate number of tiles
+    int gridW = 0, gridH = 0;
+    float tileEdgeLength = (float)tileSize_ * cellSize_;
+    rcCalcGridSize(&boundingBox_.min_.x_, &boundingBox_.max_.x_, cellSize_, &gridW, &gridH);
+    numTilesX_ = (gridW + tileSize_ - 1) / tileSize_;
+    numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
+
+    // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
+    unsigned tileBits = IntegerLog2(maxTiles);
+    unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+
+    dtNavMeshParams params;
+    rcVcopy(params.orig, &boundingBox_.min_.x_);
+    params.tileWidth = tileEdgeLength;
+    params.tileHeight = tileEdgeLength;
+    params.maxTiles = maxTiles;
+    params.maxPolys = maxPolys;
+
+    navMesh_ = dtAllocNavMesh();
+    if (!navMesh_)
+    {
+        URHO3D_LOGERROR("Could not allocate navigation mesh");
+        return false;
+    }
+
+    if (dtStatusFailed(navMesh_->init(&params)))
+    {
+        URHO3D_LOGERROR("Could not initialize navigation mesh");
+        ReleaseNavigationMesh();
+        return false;
+    }
+
+    dtTileCacheParams tileCacheParams;
+    memset(&tileCacheParams, 0, sizeof(tileCacheParams));
+    rcVcopy(tileCacheParams.orig, &boundingBox_.min_.x_);
+    tileCacheParams.ch = cellHeight_;
+    tileCacheParams.cs = cellSize_;
+    tileCacheParams.width = tileSize_;
+    tileCacheParams.height = tileSize_;
+    tileCacheParams.maxSimplificationError = edgeMaxError_;
+    tileCacheParams.maxTiles = maxTiles * maxLayers_;
+    tileCacheParams.maxObstacles = maxObstacles_;
+    // Settings from NavigationMesh
+    tileCacheParams.walkableClimb = agentMaxClimb_;
+    tileCacheParams.walkableHeight = agentHeight_;
+    tileCacheParams.walkableRadius = agentRadius_;
+
+    tileCache_ = dtAllocTileCache();
+    if (!tileCache_)
+    {
+        URHO3D_LOGERROR("Could not allocate tile cache");
+        ReleaseNavigationMesh();
+        return false;
+    }
+
+    if (dtStatusFailed(tileCache_->init(&tileCacheParams, allocator_.Get(), compressor_.Get(), meshProcessor_.Get())))
+    {
+        URHO3D_LOGERROR("Could not initialize tile cache");
+        ReleaseNavigationMesh();
+        return false;
+    }
+
+    URHO3D_LOGDEBUG("Allocated empty navigation mesh with max " + String(maxTiles) + " tiles");
+
+    // Scan for obstacles to insert into us
+    PODVector<Node*> obstacles;
+    GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
+    for (unsigned i = 0; i < obstacles.Size(); ++i)
+    {
+        Obstacle* obs = obstacles[i]->GetComponent<Obstacle>();
+        if (obs && obs->IsEnabledEffective())
+            AddObstacle(obs);
+    }
+
+    return true;
+}
+
 bool DynamicNavigationMesh::Build()
 {
     URHO3D_PROFILE(BuildNavigationMesh);
@@ -276,14 +371,7 @@ bool DynamicNavigationMesh::Build()
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
-        unsigned tileBits = 0;
-        unsigned temp = maxTiles;
-        while (temp > 1)
-        {
-            temp >>= 1;
-            ++tileBits;
-        }
-
+        unsigned tileBits = IntegerLog2(maxTiles);
         unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
 
         dtNavMeshParams params;
@@ -356,10 +444,9 @@ bool DynamicNavigationMesh::Build()
                         tiles[i].data = 0x0;
                     }
                 }
+                tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
                 ++numTiles;
             }
-            for (int x = 0; x < numTilesX_; ++x)
-                tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
         }
 
         // For a full build it's necessary to update the nav mesh
@@ -419,45 +506,80 @@ bool DynamicNavigationMesh::Build(const BoundingBox& boundingBox)
     int ex = Clamp((int)((localSpaceBox.max_.x_ - boundingBox_.min_.x_) / tileEdgeLength), 0, numTilesX_ - 1);
     int ez = Clamp((int)((localSpaceBox.max_.z_ - boundingBox_.min_.z_) / tileEdgeLength), 0, numTilesZ_ - 1);
 
-    unsigned numTiles = 0;
-
-    for (int z = sz; z <= ez; ++z)
-    {
-        for (int x = sx; x <= ex; ++x)
-        {
-            dtCompressedTileRef existing[TILECACHE_MAXLAYERS];
-            const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
-            for (int i = 0; i < existingCt; ++i)
-            {
-                unsigned char* data = 0x0;
-                if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, 0)) && data != 0x0)
-                    dtFree(data);
-            }
-
-            TileCacheData tiles[TILECACHE_MAXLAYERS];
-            int layerCt = BuildTile(geometryList, x, z, tiles);
-            for (int i = 0; i < layerCt; ++i)
-            {
-                dtCompressedTileRef tileRef;
-                int status = tileCache_->addTile(tiles[i].data, tiles[i].dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tileRef);
-                if (dtStatusFailed((dtStatus)status))
-                {
-                    dtFree(tiles[i].data);
-                    tiles[i].data = 0x0;
-                }
-                else
-                {
-                    tileCache_->buildNavMeshTile(tileRef, navMesh_);
-                    ++numTiles;
-                }
-            }
-        }
-    }
+    unsigned numTiles = BuildTiles(geometryList, IntVector2(sx, sz), IntVector2(ex, ez));
 
     URHO3D_LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
     return true;
 }
 
+bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
+{
+    URHO3D_PROFILE(BuildPartialNavigationMesh);
+
+    if (!node_)
+        return false;
+
+    if (!navMesh_)
+    {
+        URHO3D_LOGERROR("Navigation mesh must first be built fully before it can be partially rebuilt");
+        return false;
+    }
+
+    if (!node_->GetWorldScale().Equals(Vector3::ONE))
+        URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
+
+    Vector<NavigationGeometryInfo> geometryList;
+    CollectGeometries(geometryList);
+
+    unsigned numTiles = BuildTiles(geometryList, from, to);
+
+    URHO3D_LOGDEBUG("Rebuilt " + String(numTiles) + " tiles of the navigation mesh");
+    return true;
+}
+
+PODVector<unsigned char> DynamicNavigationMesh::GetTileData(int x, int z) const
+{
+    VectorBuffer ret;
+    WriteTiles(ret, x, z);
+    return ret.GetBuffer();
+}
+
+bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
+{
+    MemoryBuffer buffer(tileData);
+    return ReadTiles(buffer);
+}
+
+bool DynamicNavigationMesh::RemoveTile(int x, int z)
+{
+    if (!navMesh_)
+        return false;
+
+    dtCompressedTileRef existing[TILECACHE_MAXLAYERS];
+    const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
+    for (int i = 0; i < existingCt; ++i)
+    {
+        unsigned char* data = 0x0;
+        if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, 0)) && data != 0x0)
+            dtFree(data);
+    }
+
+    return NavigationMesh::RemoveTile(x, z);
+}
+
+void DynamicNavigationMesh::RemoveAllTiles()
+{
+    int numTiles = tileCache_->getTileCount();
+    for (int i = 0; i < numTiles; ++i)
+    {
+        const dtCompressedTile* tile = tileCache_->getTile(i);
+        assert(tile);
+        if (tile->header)
+            tileCache_->removeTile(tileCache_->getTileRef(tile), 0, 0);
+    }
+
+    NavigationMesh::RemoveAllTiles();
+}
 
 void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 {
@@ -468,29 +590,21 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
 
     const dtNavMesh* navMesh = navMesh_;
 
-    for (int z = 0; z < numTilesZ_; ++z)
+    for (int j = 0; j < navMesh->getMaxTiles(); ++j)
     {
-        for (int x = 0; x < numTilesX_; ++x)
-        {
-            // Get the layers from the tile-cache
-            const dtMeshTile* tiles[TILECACHE_MAXLAYERS];
-            int tileCount = navMesh->getTilesAt(x, z, tiles, TILECACHE_MAXLAYERS);
-            for (int i = 0; i < tileCount; ++i)
-            {
-                const dtMeshTile* tile = tiles[i];
-                if (!tile)
-                    continue;
+        const dtMeshTile* tile = navMesh->getTile(j);
+        assert(tile);
+        if (!tile->header)
+            continue;
 
-                for (int i = 0; i < tile->header->polyCount; ++i)
-                {
-                    dtPoly* poly = tile->polys + i;
-                    for (unsigned j = 0; j < poly->vertCount; ++j)
-                    {
-                        debug->AddLine(worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
-                            worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
-                            Color::YELLOW, depthTest);
-                    }
-                }
+        for (int i = 0; i < tile->header->polyCount; ++i)
+        {
+            dtPoly* poly = tile->polys + i;
+            for (unsigned j = 0; j < poly->vertCount; ++j)
+            {
+                debug->AddLine(worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[j] * 3]),
+                    worldTransform * *reinterpret_cast<const Vector3*>(&tile->verts[poly->verts[(j + 1) % poly->vertCount] * 3]),
+                    Color::YELLOW, depthTest);
             }
         }
     }
@@ -596,29 +710,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
         return;
     }
 
-    while (!buffer.IsEof())
-    {
-        dtTileCacheLayerHeader header;
-        buffer.Read(&header, sizeof(dtTileCacheLayerHeader));
-        const int dataSize = buffer.ReadInt();
-        unsigned char* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
-        buffer.Read(data, (unsigned)dataSize);
-
-        if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, 0)))
-        {
-            URHO3D_LOGERROR("Failed to add tile");
-            dtFree(data);
-            return;
-        }
-    }
-
-    for (int x = 0; x < numTilesX_; ++x)
-    {
-        for (int z = 0; z < numTilesZ_; ++z)
-            tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
-    }
-
-    tileCache_->update(0, navMesh_);
+    ReadTiles(buffer);
 }
 
 PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
@@ -637,23 +729,8 @@ PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
         ret.Write(tcParams, sizeof(dtTileCacheParams));
 
         for (int z = 0; z < numTilesZ_; ++z)
-        {
             for (int x = 0; x < numTilesX_; ++x)
-            {
-                dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
-                const int ct = tileCache_->getTilesAt(x, z, tiles, maxLayers_);
-                for (int i = 0; i < ct; ++i)
-                {
-                    const dtCompressedTile* tile = tileCache_->getTileByRef(tiles[i]);
-                    if (!tile || !tile->header || !tile->dataSize)
-                        continue; // Don't write "void-space" tiles
-                    // The header conveniently has the majority of the information required
-                    ret.Write(tile->header, sizeof(dtTileCacheLayerHeader));
-                    ret.WriteInt(tile->dataSize);
-                    ret.Write(tile->data, (unsigned)tile->dataSize);
-                }
-            }
-        }
+                WriteTiles(ret, x, z);
     }
     return ret.GetBuffer();
 }
@@ -663,6 +740,58 @@ void DynamicNavigationMesh::SetMaxLayers(unsigned maxLayers)
     // Set 3 as a minimum due to the tendency of layers to be constructed inside the hollow space of stacked objects
     // That behavior is unlikely to be expected by the end user
     maxLayers_ = Max(3U, Min(maxLayers, TILECACHE_MAXLAYERS));
+}
+
+void DynamicNavigationMesh::WriteTiles(Serializer& dest, int x, int z) const
+{
+    dtCompressedTileRef tiles[TILECACHE_MAXLAYERS];
+    const int ct = tileCache_->getTilesAt(x, z, tiles, maxLayers_);
+    for (int i = 0; i < ct; ++i)
+    {
+        const dtCompressedTile* tile = tileCache_->getTileByRef(tiles[i]);
+        if (!tile || !tile->header || !tile->dataSize)
+            continue; // Don't write "void-space" tiles
+                      // The header conveniently has the majority of the information required
+        dest.Write(tile->header, sizeof(dtTileCacheLayerHeader));
+        dest.WriteInt(tile->dataSize);
+        dest.Write(tile->data, (unsigned)tile->dataSize);
+    }
+}
+
+bool DynamicNavigationMesh::ReadTiles(Deserializer& source)
+{
+    tileQueue_.Clear();
+    while (!source.IsEof())
+    {
+        dtTileCacheLayerHeader header;
+        source.Read(&header, sizeof(dtTileCacheLayerHeader));
+        const int dataSize = source.ReadInt();
+
+        unsigned char* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
+        if (!data)
+        {
+            URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");
+            return false;
+        }
+
+        source.Read(data, (unsigned)dataSize);
+        if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, 0)))
+        {
+            URHO3D_LOGERROR("Failed to add tile");
+            dtFree(data);
+            return false;
+        }
+
+        const IntVector2 tileIdx = IntVector2(header.tx, header.ty);
+        if (tileQueue_.Empty() || tileQueue_.Back() != tileIdx)
+            tileQueue_.Push(tileIdx);
+    }
+
+    for (unsigned i = 0; i < tileQueue_.Size(); ++i)
+        tileCache_->buildNavMeshTilesAt(tileQueue_[i].x_, tileQueue_[i].y_, navMesh_);
+
+    tileCache_->update(0, navMesh_);
+    return true;
 }
 
 int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z, TileCacheData* tiles)
@@ -851,6 +980,46 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
     }
 
     return retCt;
+}
+
+unsigned DynamicNavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geometryList, const IntVector2& from, const IntVector2& to)
+{
+    unsigned numTiles = 0;
+
+    for (int z = from.y_; z <= to.y_; ++z)
+    {
+        for (int x = from.x_; x <= to.x_; ++x)
+        {
+            dtCompressedTileRef existing[TILECACHE_MAXLAYERS];
+            const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
+            for (int i = 0; i < existingCt; ++i)
+            {
+                unsigned char* data = 0x0;
+                if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, 0)) && data != 0x0)
+                    dtFree(data);
+            }
+
+            TileCacheData tiles[TILECACHE_MAXLAYERS];
+            int layerCt = BuildTile(geometryList, x, z, tiles);
+            for (int i = 0; i < layerCt; ++i)
+            {
+                dtCompressedTileRef tileRef;
+                int status = tileCache_->addTile(tiles[i].data, tiles[i].dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tileRef);
+                if (dtStatusFailed((dtStatus)status))
+                {
+                    dtFree(tiles[i].data);
+                    tiles[i].data = 0x0;
+                }
+                else
+                {
+                    tileCache_->buildNavMeshTile(tileRef, navMesh_);
+                    ++numTiles;
+                }
+            }
+        }
+    }
+
+    return numTiles;
 }
 
 PODVector<OffMeshConnection*> DynamicNavigationMesh::CollectOffMeshConnections(const BoundingBox& bounds)

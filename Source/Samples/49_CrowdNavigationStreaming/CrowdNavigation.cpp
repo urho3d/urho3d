@@ -55,6 +55,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(CrowdNavigation)
 
 CrowdNavigation::CrowdNavigation(Context* context) :
     Sample(context),
+    streamingDistance_(2),
     drawDebug_(false)
 {
 }
@@ -97,6 +98,7 @@ void CrowdNavigation::CreateScene()
     StaticModel* planeObject = planeNode->CreateComponent<StaticModel>();
     planeObject->SetModel(cache->GetResource<Model>("Models/Plane.mdl"));
     planeObject->SetMaterial(cache->GetResource<Material>("Materials/StoneTiled.xml"));
+    sceneBoundingBox_.Merge(planeObject->GetWorldBoundingBox());
 
     // Create a Zone component for ambient lighting & fog control
     Node* zoneNode = scene_->CreateChild("Zone");
@@ -131,10 +133,13 @@ void CrowdNavigation::CreateScene()
         boxObject->SetCastShadows(true);
         if (size >= 3.0f)
             boxObject->SetOccluder(true);
+        sceneBoundingBox_.Merge(boxObject->GetWorldBoundingBox());
     }
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh* navMesh = scene_->CreateComponent<DynamicNavigationMesh>();
+    // Use small tiles to test streaming
+    navMesh->SetTileSize(32);
     // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh->SetDrawObstacles(true);
     navMesh->SetDrawOffMeshConnections(true);
@@ -148,10 +153,22 @@ void CrowdNavigation::CreateScene()
     // Add padding to the navigation mesh in Y-direction so that we can add objects on top of the tallest boxes
     // in the scene and still update the mesh correctly
     navMesh->SetPadding(Vector3(0.0f, 10.0f, 0.0f));
-    // Now build the navigation geometry. This will take some time. Note that the navigation mesh will prefer to use
-    // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
-    // it will use renderable geometry instead
-    navMesh->Build();
+    // Allocate the navigation mesh.
+    const int maxTiles = (2 * streamingDistance_ + 1) * (2 * streamingDistance_ + 1);
+    navMesh->Allocate(BoundingBox(Vector3(-10000, -100, -10000), Vector3(10000, 100, 10000)), maxTiles);
+    // Build and cache the navigation geometry.
+    const IntVector2 fromTile = navMesh->GetTileIndex(sceneBoundingBox_.min_);
+    const IntVector2 toTile = navMesh->GetTileIndex(sceneBoundingBox_.max_);
+    for (int z = fromTile.y_; z <= toTile.y_; ++z)
+        for (int x = fromTile.x_; x <= toTile.x_; ++x)
+        {
+            const IntVector2 tileIdx = IntVector2(x, z);
+            navMesh->Build(tileIdx, tileIdx);
+            tileData_[tileIdx] = navMesh->GetTileData(x, z);
+            navMesh->RemoveAllTiles();
+        }
+    // Load some tiles to the navigation mesh
+    StreamNavMesh();
 
     // Create an off-mesh connection to each box to make them climbable (tiny boxes are skipped). A connection is built from 2 nodes.
     // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
@@ -473,6 +490,82 @@ void CrowdNavigation::MoveCamera(float timeStep)
     }
 }
 
+void CrowdNavigation::StreamNavMesh()
+{
+    // Center the navigation mesh at the crowd of jacks
+    Vector3 averageJackPosition;
+    if (Node* jackGroup = scene_->GetChild("Jacks"))
+    {
+        const unsigned numJacks = jackGroup->GetNumChildren();
+        for (unsigned i = 0; i < numJacks; ++i)
+            averageJackPosition += jackGroup->GetChild(i)->GetWorldPosition();
+        averageJackPosition /= (float)numJacks;
+    }
+
+    // Compute currently loaded area
+    DynamicNavigationMesh* navMesh = scene_->GetComponent<DynamicNavigationMesh>();
+    const IntVector2 jackTile = navMesh->GetTileIndex(averageJackPosition);
+    const IntVector2 numTiles = navMesh->GetNumTiles();
+    const IntVector2 beginTile = VectorMax(IntVector2::ZERO, jackTile - IntVector2::ONE * streamingDistance_);
+    const IntVector2 endTile = VectorMin(jackTile + IntVector2::ONE * streamingDistance_, numTiles - IntVector2::ONE);
+
+    // Remove tiles
+    for (HashSet<IntVector2>::Iterator i = addedTiles_.Begin(); i != addedTiles_.End();)
+    {
+        const IntVector2 tileIdx = *i;
+        if (beginTile.x_ <= tileIdx.x_ && tileIdx.x_ <= endTile.x_ && beginTile.y_ <= tileIdx.y_ && tileIdx.y_ <= endTile.y_)
+            ++i;
+        else
+        {
+            navMesh->RemoveTile(tileIdx.x_, tileIdx.y_);
+            i = addedTiles_.Erase(i);
+            // \todo Do something more elegant instead of removing out-of-area agents
+            if (Node* jackGroup = scene_->GetChild("Jacks"))
+            {
+                for (unsigned i = 0; i < jackGroup->GetNumChildren();)
+                {
+                    const IntVector2 jackTile = navMesh->GetTileIndex(jackGroup->GetChild(i)->GetWorldPosition());
+                    if (jackTile == tileIdx)
+                        jackGroup->GetChild(i)->Remove();
+                    else
+                        ++i;
+                }
+            }
+        }
+    }
+
+    // Add tiles
+    bool tilesAdded = false;
+    for (int x = beginTile.x_; x <= endTile.x_; ++x)
+        for (int z = beginTile.y_; z <= endTile.y_; ++z)
+        {
+            if (navMesh->HasTile(x, z))
+                continue;
+
+            const IntVector2 tileIdx(x, z);
+            if (tileData_.Contains(tileIdx))
+            {
+                addedTiles_.Insert(tileIdx);
+                navMesh->AddTile(tileData_[tileIdx]);
+                tilesAdded = true;
+            }
+        }
+
+    // \todo Do something more elegant instead of re-adding obstacles in the user code
+    if (tilesAdded)
+    {
+        for (unsigned i = 0; i < scene_->GetNumChildren(); ++i)
+        {
+            Node* child = scene_->GetChild(i);
+            if (Obstacle* obstacle = child->GetComponent<Obstacle>())
+            {
+                obstacle->SetEnabled(false);
+                obstacle->SetEnabled(true);
+            }
+        }
+    }
+}
+
 void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
@@ -482,6 +575,9 @@ void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Stream data to navmesh
+    StreamNavMesh();
 }
 
 void CrowdNavigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

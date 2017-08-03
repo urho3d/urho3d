@@ -138,6 +138,8 @@ private:
     void SubscribeToEvents();
     /// Read input and moves the camera.
     void MoveCamera(float timeStep);
+    /// Update navigation mesh.
+    void StreamNavMesh();
     /// Set crowd agents target or spawn another jack.
     void SetPathPoint(bool spawning);
     /// Add new obstacle or remove existing obstacle/agent.
@@ -163,6 +165,14 @@ private:
     /// Handle crowd agent formation.
     void HandleCrowdAgentFormation(StringHash eventType, VariantMap& eventData);
 
+    /// Tile data.
+    HashMap<IntVector2, PODVector<unsigned char>> tileData_;
+    /// Added tiles.
+    HashSet<IntVector2> addedTiles_;
+    /// Navigation area bounding box.
+    BoundingBox sceneBoundingBox_;
+    /// Streaming distance.
+    int streamingDistance_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
 };
