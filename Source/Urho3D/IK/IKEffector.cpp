@@ -29,6 +29,7 @@
 #include "../Scene/SceneEvents.h"
 #include "../IO/Log.h"
 
+#include <ik/node.h>
 #include <ik/effector.h>
 #include <ik/solver.h>
 #include <ik/util.h>
@@ -41,7 +42,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKEffector::IKEffector(Context* context) :
     Component(context),
-    ikEffector_(NULL),
+    ikEffectorNode_(NULL),
     chainLength_(0),
     weight_(1.0f),
     rotationWeight_(1.0),
@@ -117,8 +118,8 @@ const Vector3& IKEffector::GetTargetPosition() const
 void IKEffector::SetTargetPosition(const Vector3& targetPosition)
 {
     targetPosition_ = targetPosition;
-    if (ikEffector_ != NULL)
-        ikEffector_->target_position = Vec3Urho2IK(targetPosition);
+    if (ikEffectorNode_ != NULL)
+        ikEffectorNode_->effector->target_position = Vec3Urho2IK(targetPosition);
 }
 
 // ----------------------------------------------------------------------------
@@ -131,8 +132,8 @@ const Quaternion& IKEffector::GetTargetRotation() const
 void IKEffector::SetTargetRotation(const Quaternion& targetRotation)
 {
     targetRotation_ = targetRotation;
-    if (ikEffector_)
-        ikEffector_->target_rotation = QuatUrho2IK(targetRotation);
+    if (ikEffectorNode_)
+        ikEffectorNode_->effector->target_rotation = QuatUrho2IK(targetRotation);
 }
 
 // ----------------------------------------------------------------------------
@@ -157,9 +158,9 @@ unsigned int IKEffector::GetChainLength() const
 void IKEffector::SetChainLength(unsigned chainLength)
 {
     chainLength_ = chainLength;
-    if (ikEffector_ != NULL)
+    if (ikEffectorNode_ != NULL)
     {
-        ikEffector_->chain_length = chainLength;
+        ikEffectorNode_->effector->chain_length = chainLength;
         solver_->MarkChainsNeedUpdating();
     }
 }
@@ -174,8 +175,8 @@ float IKEffector::GetWeight() const
 void IKEffector::SetWeight(float weight)
 {
     weight_ = Clamp(weight, 0.0f, 1.0f);
-    if (ikEffector_ != NULL)
-        ikEffector_->weight = weight_;
+    if (ikEffectorNode_ != NULL)
+        ikEffectorNode_->effector->weight = weight_;
 }
 
 // ----------------------------------------------------------------------------
@@ -188,9 +189,9 @@ float IKEffector::GetRotationWeight() const
 void IKEffector::SetRotationWeight(float weight)
 {
     rotationWeight_ = Clamp(weight, 0.0f, 1.0f);
-    if (ikEffector_ != NULL)
+    if (ikEffectorNode_ != NULL)
     {
-        ikEffector_->rotation_weight = rotationWeight_;
+        ikEffectorNode_->rotation_weight = rotationWeight_;
         ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
     }
 }
@@ -205,10 +206,10 @@ float IKEffector::GetRotationDecay() const
 void IKEffector::SetRotationDecay(float decay)
 {
     rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
-    if (ikEffector_ != NULL)
+    if (ikEffectorNode_ != NULL)
     {
         ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
-        ikEffector_->rotation_decay = rotationDecay_;
+        ikEffectorNode_->effector->rotation_decay = rotationDecay_;
     }
 }
 
@@ -222,11 +223,11 @@ bool IKEffector::WeightedNlerpEnabled() const
 void IKEffector::EnableWeightedNlerp(bool enable)
 {
     weightedNlerp_ = enable;
-    if (ikEffector_ != NULL)
+    if (ikEffectorNode_ != NULL)
     {
-        ikEffector_->flags &= ~EFFECTOR_WEIGHT_NLERP;
+        ikEffectorNode_->effector->flags &= ~EFFECTOR_WEIGHT_NLERP;
         if (enable)
-            ikEffector_->flags |= EFFECTOR_WEIGHT_NLERP;
+            ikEffectorNode_->effector->flags |= EFFECTOR_WEIGHT_NLERP;
     }
 }
 
@@ -308,17 +309,17 @@ void IKEffector::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 }
 
 // ----------------------------------------------------------------------------
-void IKEffector::SetIKEffector(ik_effector_t* effector)
+void IKEffector::SetIKEffectorNode(ik_node_t* effectorNode)
 {
-    ikEffector_ = effector;
-    if (effector)
+    ikEffectorNode_ = effectorNode;
+    if (effectorNode)
     {
-        effector->target_position = Vec3Urho2IK(targetPosition_);
-        effector->target_rotation = QuatUrho2IK(targetRotation_);
-        effector->weight = weight_;
-        effector->rotation_weight = rotationWeight_;
-        effector->rotation_decay = rotationDecay_;
-        effector->chain_length = chainLength_;
+        ikEffectorNode_->effector->target_position = Vec3Urho2IK(targetPosition_);
+        ikEffectorNode_->effector->target_rotation = QuatUrho2IK(targetRotation_);
+        ikEffectorNode_->effector->weight = weight_;
+        ikEffectorNode_->effector->rotation_weight = rotationWeight_;
+        ikEffectorNode_->effector->rotation_decay = rotationDecay_;
+        ikEffectorNode_->effector->chain_length = chainLength_;
         EnableWeightedNlerp(weightedNlerp_);
     }
 }

@@ -23,7 +23,7 @@ class IKSolver : public Component
     bool GetFeature(Feature feature) const;
     void SetFeature(Feature feature, bool enable);
 
-    void RebuildData();
+    void RebuildChainTrees();
     void RecalculateSegmentLengths();
     void CalculateJointRotations();
     void Solve();

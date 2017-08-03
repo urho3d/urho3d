@@ -37,7 +37,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKConstraint::IKConstraint(Context* context) :
     Component(context),
-    ikNode_(NULL),
+    ikConstraintNode_(NULL),
     stiffness_(0.0f),
     stretchiness_(0.0f)
 {
@@ -68,7 +68,7 @@ float IKConstraint::GetStiffness() const
 void IKConstraint::SetStiffness(float stiffness)
 {
     stiffness_ = Clamp(stiffness, 0.0f, 1.0f);
-    if (ikNode_ != NULL)
+    if (ikConstraintNode_ != NULL)
         /* TODO ikNode_->stiffness = stiffness_; */
         ;
 }
@@ -83,7 +83,7 @@ float IKConstraint::GetStretchiness() const
 void IKConstraint::SetStretchiness(float stretchiness)
 {
     stretchiness_ = Clamp(stretchiness, 0.0f, 1.0f);
-    if (ikNode_)
+    if (ikConstraintNode_)
         /* TODO ikNode_->stretchiness = stretchiness_;*/
         ;
 }
@@ -98,7 +98,7 @@ const Vector2& IKConstraint::GetLengthConstraints() const
 void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 {
     lengthConstraints_ = lengthConstraints;
-    if (ikNode_ != NULL)
+    if (ikConstraintNode_ != NULL)
     {
         /* TODO
         ikNode_->min_length = lengthConstraints_.x_;
@@ -107,25 +107,17 @@ void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 }
 
 // ----------------------------------------------------------------------------
-void IKConstraint::SetIKNode(ik_node_t* node)
+void IKConstraint::SetIKConstraintNode(ik_node_t* constraintNode)
 {
-    if (ikNode_ != NULL)
+    ikConstraintNode_ = constraintNode;
+    if (constraintNode != NULL)
     {
-        ik_node_destroy_constraint(ikNode_);
-    }
-
-    if (node != NULL)
-    {
-        ik_constraint_t* constraint = ik_constraint_create(IK_CONSTRAINT_STIFF);
-        ik_node_attach_constraint(node, constraint);
         /* TODO
         node->stiffness = stiffness_;
         node->stretchiness = stretchiness_;
         node->min_length = lengthConstraints_.x_;
         node->max_length = lengthConstraints_.y_;*/
     }
-
-    ikNode_ = node;
 }
 
 } // namespace Urho3D

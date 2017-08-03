@@ -60,9 +60,9 @@ private:
     friend class IKSolver;
 
     /// Intended to be used only by IKSolver
-    void SetIKNode(ik_node_t* effector);
+    void SetIKConstraintNode(ik_node_t* constraintNode);
 
-    ik_node_t* ikNode_;
+    ik_node_t* ikConstraintNode_;
 
     float stiffness_;
     float stretchiness_;

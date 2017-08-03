@@ -57,7 +57,7 @@ static void RegisterIKSolver(asIScriptEngine* engine)
     engine->RegisterObjectMethod("IKSolver", "void set_maximumIterations(uint)", asMETHOD(IKSolver, SetMaximumIterations), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "float get_tolerance() const", asMETHOD(IKSolver, GetTolerance), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void set_tolerance(float)", asMETHOD(IKSolver, SetTolerance), asCALL_THISCALL);
-    engine->RegisterObjectMethod("IKSolver", "void RebuildData()", asMETHOD(IKSolver, RebuildChains), asCALL_THISCALL);
+    engine->RegisterObjectMethod("IKSolver", "void RebuildChainTrees()", asMETHOD(IKSolver, RebuildChainTrees), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void RecalculateSegmentLengths()", asMETHOD(IKSolver, RecalculateSegmentLengths), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void CalculateJointRotations()", asMETHOD(IKSolver, CalculateJointRotations), asCALL_THISCALL);
     engine->RegisterObjectMethod("IKSolver", "void Solve()", asMETHOD(IKSolver, Solve), asCALL_THISCALL);

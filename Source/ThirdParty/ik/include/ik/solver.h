@@ -147,6 +147,10 @@ ik_solver_destroy_tree(ik_solver_t* solver);
  * @note Needs to be called whenever the tree changes in any way. I.e. if you
  * remove nodes or add nodes, or if you remove effectors or add effectors,
  * you must call this again before calling the solver.
+ * @return Returns non-zero if any of the chain trees are invalid for any
+ * reason. If this happens, check the log for error messages.
+ * @warning If this functions fails, the internal structures are in an
+ * undefined state. You cannot solve the tree in this state.
  */
 IK_PUBLIC_API int
 ik_solver_rebuild_chain_trees(ik_solver_t* solver);

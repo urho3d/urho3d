@@ -238,7 +238,7 @@ public:
      * adding or removing effectors, etc.).
      * @note This gets called  automatically for you in Solve().
      */
-    void RebuildChains();
+    void RebuildChainTrees();
 
     /*!
      * @brief Unusual, but if you have a tree with translational motions such
@@ -293,15 +293,20 @@ public:
 private:
     friend class IKEffector;
 
-    /// Causes the solver tree to be rebuilt before solving the next time. Intended to be used by IKEffector.
+    /// Indicates that the internal structures of the IK library need to be updated. See the documentation of ik_solver_rebuild_chain_trees() for more info on when this happens.
     void MarkChainsNeedUpdating();
+    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed)
+    void MarkTreeNeedsRebuild();
+    /// Returns false if calling Solve() would cause the IK library to abort. Urho3D's error handling philosophy is to log an error and continue, not crash.
+    bool IsSolverTreeValid() const;
+
     /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
     /// Destroys and creates the tree
     virtual void OnNodeSet(Node* scene);
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
-    ik_node_t* CreateIKNode(const Node* node);
+    ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);
 
     /// Destroys the solver's tree
     void DestroyTree();
@@ -309,6 +314,14 @@ private:
     void RebuildTree();
     /// Builds a chain of nodes up to the node of the specified effector component.
     bool BuildTreeToEffector(IKEffector* effector);
+    /*!
+     * Checks if the specified component is 1) attached to a node that is below
+     * the one we are attached to and 2) isn't in the subtree of a child solver.
+     * @note This will return false if the component is attached to our root
+     * node, because in that case the solver can't do anything to it, it's in
+     * the hands of a parent solver (if it exists).
+     */
+    bool ComponentIsInOurSubtree(Component* component) const;
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
@@ -339,7 +352,9 @@ private:
     ik_solver_t* solver_;
     Algorithm algorithm_;
     unsigned features_;
-    bool chainsAreDirty_;
+    bool chainTreesNeedUpdating_;
+    bool treeNeedsRebuild;
+    bool solverTreeValid_;
 };
 
 } // namespace Urho3D

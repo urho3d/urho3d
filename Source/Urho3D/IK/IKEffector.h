@@ -160,13 +160,13 @@ private:
     /// Intended to be used only by IKSolver
     void SetIKSolver(IKSolver* solver);
     /// Intended to be used only by IKSolver
-    void SetIKEffector(ik_effector_t* effector);
+    void SetIKEffectorNode(ik_node_t* effector);
     /// Intended to be used by IKSolver. Copies the positions/rotations of the target node into the effector
     void UpdateTargetNodePosition();
 
     WeakPtr<Node> targetNode_;
     WeakPtr<IKSolver> solver_;
-    ik_effector_t* ikEffector_;
+    ik_node_t* ikEffectorNode_;
 
     String targetName_;
     Vector3 targetPosition_;
