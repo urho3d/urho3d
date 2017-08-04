@@ -161,7 +161,7 @@ private:
     SharedPtr<Node> jackNode_;
 
     /// Tile data.
-    HashMap<IntVector2, PODVector<unsigned char>> tileData_;
+    HashMap<IntVector2, PODVector<unsigned char> > tileData_;
     /// Added tiles.
     HashSet<IntVector2> addedTiles_;
     /// Navigation area bounding box.
