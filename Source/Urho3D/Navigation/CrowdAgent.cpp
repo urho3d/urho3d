@@ -28,6 +28,7 @@
 #include "../IO/Log.h"
 #include "../IO/MemoryBuffer.h"
 #include "../Navigation/NavigationEvents.h"
+#include "../Navigation/NavigationMesh.h"
 #include "../Navigation/CrowdAgent.h"
 #include "../Scene/Node.h"
 #include "../Scene/Scene.h"
@@ -93,6 +94,7 @@ CrowdAgent::CrowdAgent(Context* context) :
     previousAgentState_(CA_STATE_WALKING),
     ignoreTransformChanges_(false)
 {
+    SubscribeToEvent(E_NAVIGATION_TILE_ADDED, URHO3D_HANDLER(CrowdAgent, HandleNavigationTileAdded));
 }
 
 CrowdAgent::~CrowdAgent()
@@ -626,7 +628,7 @@ void CrowdAgent::OnMarkedDirty(Node* node)
         {
             Vector3& agentPos = reinterpret_cast<Vector3&>(agent->npos);
             Vector3 nodePos = node->GetWorldPosition();
-            
+
             // Only reset position / state if actually changed
             if (nodePos != agentPos)
             {
@@ -643,6 +645,25 @@ void CrowdAgent::OnMarkedDirty(Node* node)
 const dtCrowdAgent* CrowdAgent::GetDetourCrowdAgent() const
 {
     return IsInCrowd() ? crowdManager_->GetDetourCrowdAgent(agentCrowdId_) : 0;
+}
+
+void CrowdAgent::HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData)
+{
+    if (!crowdManager_)
+        return;
+
+    NavigationMesh* mesh = static_cast<NavigationMesh*>(eventData[NavigationTileAdded::P_MESH].GetPtr());
+    if (crowdManager_->GetNavigationMesh() != mesh)
+        return;
+
+    const IntVector2 tile = eventData[NavigationTileRemoved::P_TILE].GetIntVector2();
+    const IntVector2 agentTile = mesh->GetTileIndex(node_->GetWorldPosition());
+    const BoundingBox boundingBox = mesh->GetTileBoudningBox(agentTile);
+    if (tile == agentTile && IsInCrowd())
+    {
+        RemoveAgentFromCrowd();
+        AddAgentToCrowd();
+    }
 }
 
 }

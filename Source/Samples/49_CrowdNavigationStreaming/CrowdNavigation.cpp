@@ -519,23 +519,10 @@ void CrowdNavigation::StreamNavMesh()
         {
             navMesh->RemoveTile(tileIdx);
             i = addedTiles_.Erase(i);
-            // \todo Do something more elegant instead of removing out-of-area agents
-            if (Node* jackGroup = scene_->GetChild("Jacks"))
-            {
-                for (unsigned i = 0; i < jackGroup->GetNumChildren();)
-                {
-                    const IntVector2 jackTile = navMesh->GetTileIndex(jackGroup->GetChild(i)->GetWorldPosition());
-                    if (jackTile == tileIdx)
-                        jackGroup->GetChild(i)->Remove();
-                    else
-                        ++i;
-                }
-            }
         }
     }
 
     // Add tiles
-    bool tilesAdded = false;
     for (int x = beginTile.x_; x <= endTile.x_; ++x)
         for (int z = beginTile.y_; z <= endTile.y_; ++z)
         {
@@ -544,7 +531,6 @@ void CrowdNavigation::StreamNavMesh()
             {
                 addedTiles_.Insert(tileIdx);
                 navMesh->AddTile(tileData_[tileIdx]);
-                tilesAdded = true;
             }
         }
 }
