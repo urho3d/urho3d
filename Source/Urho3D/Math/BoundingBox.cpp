@@ -196,6 +196,13 @@ Rect BoundingBox::Projected(const Matrix4& projection) const
     return rect;
 }
 
+float BoundingBox::DistanceToPoint(const Vector3& point) const
+{
+    const Vector3 offset = Center() - point;
+    const Vector3 absOffset(Abs(offset.x_), Abs(offset.y_), Abs(offset.z_));
+    return VectorMax(Vector3::ZERO, absOffset - HalfSize()).Length();
+}
+
 Intersection BoundingBox::IsInside(const Sphere& sphere) const
 {
     float distSquared = 0;

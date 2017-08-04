@@ -76,6 +76,8 @@ protected:
     virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Handle navigation mesh tile added.
+    void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 
 private:
     /// Radius of this obstacle.

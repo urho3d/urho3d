@@ -537,26 +537,33 @@ bool DynamicNavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-PODVector<unsigned char> DynamicNavigationMesh::GetTileData(int x, int z) const
+PODVector<unsigned char> DynamicNavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
-    WriteTiles(ret, x, z);
+    WriteTiles(ret, tile.x_, tile.y_);
     return ret.GetBuffer();
+}
+
+bool DynamicNavigationMesh::IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const
+{
+    const BoundingBox tileBoundingBox = GetTileBoudningBox(tile);
+    const Vector3 obstaclePosition = obstacle->GetNode()->GetWorldPosition();
+    return tileBoundingBox.DistanceToPoint(obstaclePosition) < obstacle->GetRadius();
 }
 
 bool DynamicNavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
 {
     MemoryBuffer buffer(tileData);
-    return ReadTiles(buffer);
+    return ReadTiles(buffer, false);
 }
 
-bool DynamicNavigationMesh::RemoveTile(int x, int z)
+void DynamicNavigationMesh::RemoveTile(const IntVector2& tile)
 {
     if (!navMesh_)
-        return false;
+        return;
 
     dtCompressedTileRef existing[TILECACHE_MAXLAYERS];
-    const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
+    const int existingCt = tileCache_->getTilesAt(tile.x_, tile.y_, existing, maxLayers_);
     for (int i = 0; i < existingCt; ++i)
     {
         unsigned char* data = 0x0;
@@ -564,7 +571,7 @@ bool DynamicNavigationMesh::RemoveTile(int x, int z)
             dtFree(data);
     }
 
-    return NavigationMesh::RemoveTile(x, z);
+    NavigationMesh::RemoveTile(tile);
 }
 
 void DynamicNavigationMesh::RemoveAllTiles()
@@ -710,7 +717,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
         return;
     }
 
-    ReadTiles(buffer);
+    ReadTiles(buffer, true);
 }
 
 PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const
@@ -758,7 +765,7 @@ void DynamicNavigationMesh::WriteTiles(Serializer& dest, int x, int z) const
     }
 }
 
-bool DynamicNavigationMesh::ReadTiles(Deserializer& source)
+bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
 {
     tileQueue_.Clear();
     while (!source.IsEof())
@@ -791,6 +798,20 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source)
         tileCache_->buildNavMeshTilesAt(tileQueue_[i].x_, tileQueue_[i].y_, navMesh_);
 
     tileCache_->update(0, navMesh_);
+
+    // Send event
+    if (!silent)
+    {
+        for (unsigned i = 0; i < tileQueue_.Size(); ++i)
+        {
+            using namespace NavigationTileAdded;
+            VariantMap& eventData = GetContext()->GetEventDataMap();
+            eventData[P_NODE] = GetNode();
+            eventData[P_MESH] = this;
+            eventData[P_TILE] = tileQueue_[i];
+            SendEvent(E_NAVIGATION_TILE_ADDED, eventData);
+        }
+    }
     return true;
 }
 
@@ -800,16 +821,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
 
     tileCache_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);
 
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
-
-    BoundingBox tileBoundingBox(Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)x,
-            boundingBox_.min_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)z),
-        Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)(x + 1),
-            boundingBox_.max_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)(z + 1)));
+    const BoundingBox tileBoundingBox = GetTileBoudningBox(IntVector2(x, z));
 
     DynamicNavBuildData build(allocator_.Get());
 

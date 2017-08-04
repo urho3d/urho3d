@@ -517,24 +517,40 @@ bool NavigationMesh::Build(const IntVector2& from, const IntVector2& to)
     return true;
 }
 
-PODVector<unsigned char> NavigationMesh::GetTileData(int x, int z) const
+PODVector<unsigned char> NavigationMesh::GetTileData(const IntVector2& tile) const
 {
     VectorBuffer ret;
-    WriteTile(ret, x, z);
+    WriteTile(ret, tile.x_, tile.y_);
     return ret.GetBuffer();
 }
 
 bool NavigationMesh::AddTile(const PODVector<unsigned char>& tileData)
 {
     MemoryBuffer buffer(tileData);
-    return ReadTile(buffer);
+    return ReadTile(buffer, false);
 }
 
-bool NavigationMesh::HasTile(int x, int z) const
+bool NavigationMesh::HasTile(const IntVector2& tile) const
 {
     if (navMesh_)
-        return !!navMesh_->getTileAt(x, z, 0);
+        return !!navMesh_->getTileAt(tile.x_, tile.y_, 0);
     return false;
+}
+
+BoundingBox NavigationMesh::GetTileBoudningBox(const IntVector2& tile) const
+{
+    const float tileEdgeLength = (float)tileSize_ * cellSize_;
+    return BoundingBox(
+        Vector3(
+            boundingBox_.min_.x_ + tileEdgeLength * (float)tile.x_,
+            boundingBox_.min_.y_,
+            boundingBox_.min_.z_ + tileEdgeLength * (float)tile.y_
+        ),
+        Vector3(
+            boundingBox_.min_.x_ + tileEdgeLength * (float)(tile.x_ + 1),
+            boundingBox_.max_.y_,
+            boundingBox_.min_.z_ + tileEdgeLength * (float)(tile.y_ + 1)
+        ));
 }
 
 IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
@@ -545,16 +561,24 @@ IntVector2 NavigationMesh::GetTileIndex(const Vector3& position) const
     return VectorMin(VectorMax(IntVector2::ZERO, VectorFloorToInt(localPosition2D / tileEdgeLength)), GetNumTiles() - IntVector2::ONE);
 }
 
-bool NavigationMesh::RemoveTile(int x, int z)
+void NavigationMesh::RemoveTile(const IntVector2& tile)
 {
     if (!navMesh_)
-        return false;
+        return;
 
-    const dtTileRef tileRef = navMesh_->getTileRefAt(x, z, 0);
+    const dtTileRef tileRef = navMesh_->getTileRefAt(tile.x_, tile.y_, 0);
     if (!tileRef)
-        return false;
+        return;
 
-    return !dtStatusFailed(navMesh_->removeTile(tileRef, 0, 0));
+    navMesh_->removeTile(tileRef, 0, 0);
+
+    // Send event
+    using namespace NavigationTileRemoved;
+    VariantMap& eventData = GetContext()->GetEventDataMap();
+    eventData[P_NODE] = GetNode();
+    eventData[P_MESH] = this;
+    eventData[P_TILE] = tile;
+    SendEvent(E_NAVIGATION_TILE_REMOVED, eventData);
 }
 
 void NavigationMesh::RemoveAllTiles()
@@ -567,6 +591,13 @@ void NavigationMesh::RemoveAllTiles()
         if (tile->header)
             navMesh_->removeTile(navMesh_->getTileRef(tile), 0, 0);
     }
+
+    // Send event
+    using namespace NavigationAllTilesRemoved;
+    VariantMap& eventData = GetContext()->GetEventDataMap();
+    eventData[P_NODE] = GetNode();
+    eventData[P_MESH] = this;
+    SendEvent(E_NAVIGATION_ALL_TILES_REMOVED, eventData);
 }
 
 Vector3 NavigationMesh::FindNearestPoint(const Vector3& point, const Vector3& extents, const dtQueryFilter* filter,
@@ -879,7 +910,7 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
 
     while (!buffer.IsEof())
     {
-        if (ReadTile(buffer))
+        if (ReadTile(buffer, true))
             ++numTiles;
         else
             return;
@@ -1228,10 +1259,10 @@ void NavigationMesh::WriteTile(Serializer& dest, int x, int z) const
     dest.Write(tile->data, (unsigned)tile->dataSize);
 }
 
-bool NavigationMesh::ReadTile(Deserializer& source)
+bool NavigationMesh::ReadTile(Deserializer& source, bool silent)
 {
-    /*int x =*/ source.ReadInt();
-    /*int z =*/ source.ReadInt();
+    const int x = source.ReadInt();
+    const int z = source.ReadInt();
     /*dtTileRef tileRef =*/ source.ReadUInt();
     unsigned navDataSize = source.ReadUInt();
 
@@ -1250,6 +1281,16 @@ bool NavigationMesh::ReadTile(Deserializer& source)
         return false;
     }
 
+    // Send event
+    if (!silent)
+    {
+        using namespace NavigationTileAdded;
+        VariantMap& eventData = GetContext()->GetEventDataMap();
+        eventData[P_NODE] = GetNode();
+        eventData[P_MESH] = this;
+        eventData[P_TILE] = IntVector2(x, z);
+        SendEvent(E_NAVIGATION_TILE_ADDED, eventData);
+    }
     return true;
 }
 
@@ -1260,18 +1301,7 @@ bool NavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryList, int
     // Remove previous tile (if any)
     navMesh_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);
 
-    float tileEdgeLength = (float)tileSize_ * cellSize_;
-
-    BoundingBox tileBoundingBox(Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)x,
-            boundingBox_.min_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)z
-        ),
-        Vector3(
-            boundingBox_.min_.x_ + tileEdgeLength * (float)(x + 1),
-            boundingBox_.max_.y_,
-            boundingBox_.min_.z_ + tileEdgeLength * (float)(z + 1)
-        ));
+    const BoundingBox tileBoundingBox = GetTileBoudningBox(IntVector2(x, z));
 
     SimpleNavBuildData build;
 

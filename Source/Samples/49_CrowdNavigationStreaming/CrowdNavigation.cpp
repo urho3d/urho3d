@@ -164,7 +164,7 @@ void CrowdNavigation::CreateScene()
         {
             const IntVector2 tileIdx = IntVector2(x, z);
             navMesh->Build(tileIdx, tileIdx);
-            tileData_[tileIdx] = navMesh->GetTileData(x, z);
+            tileData_[tileIdx] = navMesh->GetTileData(tileIdx);
             navMesh->RemoveAllTiles();
         }
     // Load some tiles to the navigation mesh
@@ -517,7 +517,7 @@ void CrowdNavigation::StreamNavMesh()
             ++i;
         else
         {
-            navMesh->RemoveTile(tileIdx.x_, tileIdx.y_);
+            navMesh->RemoveTile(tileIdx);
             i = addedTiles_.Erase(i);
             // \todo Do something more elegant instead of removing out-of-area agents
             if (Node* jackGroup = scene_->GetChild("Jacks"))
@@ -539,31 +539,14 @@ void CrowdNavigation::StreamNavMesh()
     for (int x = beginTile.x_; x <= endTile.x_; ++x)
         for (int z = beginTile.y_; z <= endTile.y_; ++z)
         {
-            if (navMesh->HasTile(x, z))
-                continue;
-
             const IntVector2 tileIdx(x, z);
-            if (tileData_.Contains(tileIdx))
+            if (!navMesh->HasTile(tileIdx) && tileData_.Contains(tileIdx))
             {
                 addedTiles_.Insert(tileIdx);
                 navMesh->AddTile(tileData_[tileIdx]);
                 tilesAdded = true;
             }
         }
-
-    // \todo Do something more elegant instead of re-adding obstacles in the user code
-    if (tilesAdded)
-    {
-        for (unsigned i = 0; i < scene_->GetNumChildren(); ++i)
-        {
-            Node* child = scene_->GetChild(i);
-            if (Obstacle* obstacle = child->GetComponent<Obstacle>())
-            {
-                obstacle->SetEnabled(false);
-                obstacle->SetEnabled(true);
-            }
-        }
-    }
 }
 
 void CrowdNavigation::HandleUpdate(StringHash eventType, VariantMap& eventData)

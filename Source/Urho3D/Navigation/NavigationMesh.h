@@ -143,16 +143,17 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(int x, int z) const;
+    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
     /// Add tile to navigation mesh.
     virtual bool AddTile(const PODVector<unsigned char>& tileData);
     /// Remove tile from navigation mesh.
-    virtual bool RemoveTile(int x, int z);
-    /// Send 
+    virtual void RemoveTile(const IntVector2& tile);
     /// Remove all tiles from navigation mesh.
     virtual void RemoveAllTiles();
     /// Return whether the navigation mesh has tile.
-    bool HasTile(int x, int z) const;
+    bool HasTile(const IntVector2& tile) const;
+    /// Return bounding box of the tile in the node space.
+    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
     /// Return index of the tile at the position.
     IntVector2 GetTileIndex(const Vector3& position) const;
     /// Find the nearest point on the navigation mesh to a given point. Extents specifies how far out from the specified point to check along each axis.
@@ -275,7 +276,7 @@ private:
     /// Write tile data.
     void WriteTile(Serializer& dest, int x, int z) const;
     /// Read tile data to the navigation mesh.
-    bool ReadTile(Deserializer& source);
+    bool ReadTile(Deserializer& source, bool silent);
 
 protected:
     /// Collect geometry from under Navigable components.

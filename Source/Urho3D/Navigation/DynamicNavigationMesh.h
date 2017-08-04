@@ -63,11 +63,13 @@ public:
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
     virtual bool Build(const IntVector2& from, const IntVector2& to);
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(int x, int z) const;
+    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
+    /// Return whether the Obstacle is touching the given tile.
+    bool IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const;
     /// Add tile to navigation mesh.
     virtual bool AddTile(const PODVector<unsigned char>& tileData);
     /// Remove tile from navigation mesh.
-    virtual bool RemoveTile(int x, int z);
+    virtual void RemoveTile(const IntVector2& tile);
     /// Remove all tiles from navigation mesh.
     virtual void RemoveAllTiles();
     /// Visualize the component as debug geometry.
@@ -124,7 +126,7 @@ private:
     /// Write tiles data.
     void WriteTiles(Serializer& dest, int x, int z) const;
     /// Read tiles data to the navigation mesh.
-    bool ReadTiles(Deserializer& source);
+    bool ReadTiles(Deserializer& source, bool silent);
     /// Free the tile cache.
     void ReleaseTileCache();
 
