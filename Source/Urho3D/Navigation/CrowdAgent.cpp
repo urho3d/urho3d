@@ -630,16 +630,7 @@ void CrowdAgent::OnMarkedDirty(Node* node)
             // Only reset position / state if actually changed
             if (nodePos != agentPos)
             {
-                // If position difference is significant, readd to crowd (issue 1695)
-                /// \todo Somewhat arbitrary
-                float diff = (agentPos - nodePos).LengthSquared();
-                if (diff >= 1.0f)
-                {
-                    RemoveAgentFromCrowd();
-                    AddAgentToCrowd();
-                }
-                else
-                    agentPos = nodePos;
+                agentPos = nodePos;
 
                 // If the node has been externally altered, provide the opportunity for DetourCrowd to reevaluate the crowd agent
                 if (agent->state == CA_STATE_INVALID)
