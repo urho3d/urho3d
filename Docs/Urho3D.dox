@@ -34,6 +34,7 @@ For further reference, see:
 \ref Audio "Audio" <br>
 \ref Physics "Physics" <br>
 \ref Navigation "Navigation" <br>
+\ref IK "Inverse Kinematics" <br>
 \ref UI "User interface" <br>
 \ref Urho2D "Urho2D" <br>
 \ref Serialization "Serialization" <br>
