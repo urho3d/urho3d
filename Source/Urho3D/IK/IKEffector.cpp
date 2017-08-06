@@ -47,8 +47,7 @@ IKEffector::IKEffector(Context* context) :
     weight_(1.0f),
     rotationWeight_(1.0),
     rotationDecay_(0.25),
-    weightedNlerp_(false),
-    inheritParentRotation_(false)
+    features_(0)
 {
     URHO3D_LOGDEBUG("IKEffector created");
 }
@@ -71,7 +70,8 @@ void IKEffector::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Weight", GetWeight, SetWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Weight", GetRotationWeight, SetRotationWeight, float, 1.0, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation Decay", GetRotationDecay, SetRotationDecay, float, 0.25, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", WeightedNlerpEnabled, EnableWeightedNlerp, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Nlerp Weight", GetWEIGHT_NLERP, SetWEIGHT_NLERP, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Inherit Parent Rotation", GetINHERIT_PARENT_ROTATION, SetINHERIT_PARENT_ROTATION, bool, false, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -208,27 +208,39 @@ void IKEffector::SetRotationDecay(float decay)
     rotationDecay_ = Clamp(decay, 0.0f, 1.0f);
     if (ikEffectorNode_ != NULL)
     {
-        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
         ikEffectorNode_->effector->rotation_decay = rotationDecay_;
+        ik_calculate_rotation_weight_decays(&solver_->solver_->chain_tree);
     }
 }
 
 // ----------------------------------------------------------------------------
-bool IKEffector::WeightedNlerpEnabled() const
+void IKEffector::SetFeature(Feature feature, bool enable)
 {
-    return weightedNlerp_;
-}
-
-// ----------------------------------------------------------------------------
-void IKEffector::EnableWeightedNlerp(bool enable)
-{
-    weightedNlerp_ = enable;
-    if (ikEffectorNode_ != NULL)
+    switch (feature)
     {
-        ikEffectorNode_->effector->flags &= ~EFFECTOR_WEIGHT_NLERP;
-        if (enable)
-            ikEffectorNode_->effector->flags |= EFFECTOR_WEIGHT_NLERP;
+        case WEIGHT_NLERP:
+        {
+            if (ikEffectorNode_ != NULL)
+            {
+                ikEffectorNode_->effector->flags &= ~EFFECTOR_WEIGHT_NLERP;
+                if (enable)
+                    ikEffectorNode_->effector->flags |= EFFECTOR_WEIGHT_NLERP;
+            }
+        } break;
+
+        case INHERIT_PARENT_ROTATION:
+            break;
     }
+
+    features_ &= ~feature;
+    if (enable)
+        features_ |= feature;
+}
+
+// ----------------------------------------------------------------------------
+bool IKEffector::GetFeature(Feature feature) const
+{
+    return (features_ & feature) != 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -320,7 +332,9 @@ void IKEffector::SetIKEffectorNode(ik_node_t* effectorNode)
         ikEffectorNode_->effector->rotation_weight = rotationWeight_;
         ikEffectorNode_->effector->rotation_decay = rotationDecay_;
         ikEffectorNode_->effector->chain_length = chainLength_;
-        EnableWeightedNlerp(weightedNlerp_);
+
+        if (features_ & WEIGHT_NLERP)
+            ikEffectorNode_->effector->flags |= EFFECTOR_WEIGHT_NLERP;
     }
 }
 
@@ -329,5 +343,29 @@ void IKEffector::SetIKSolver(IKSolver* solver)
 {
     solver_ = solver;
 }
+
+// ----------------------------------------------------------------------------
+// Need these wrapper functions flags of GetFeature/SetFeature can be correctly
+// exposed to the editor
+// ----------------------------------------------------------------------------
+
+#define DEF_FEATURE_GETTER(feature_name)   \
+bool IKEffector::Get##feature_name() const \
+{                                          \
+    return GetFeature(feature_name);       \
+}
+
+#define DEF_FEATURE_SETTER(feature_name)        \
+void IKEffector::Set##feature_name(bool enable) \
+{                                               \
+    SetFeature(feature_name, enable);           \
+}
+
+DEF_FEATURE_GETTER(WEIGHT_NLERP)
+DEF_FEATURE_GETTER(INHERIT_PARENT_ROTATION)
+
+DEF_FEATURE_SETTER(WEIGHT_NLERP)
+DEF_FEATURE_SETTER(INHERIT_PARENT_ROTATION)
+
 
 } // namespace Urho3D

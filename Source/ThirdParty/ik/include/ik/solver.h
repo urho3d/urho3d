@@ -185,6 +185,14 @@ ik_solver_iterate_tree(ik_solver_t* solver,
                        ik_solver_iterate_node_cb_func callback);
 
 /*!
+ * @brief Iterates just the nodes that are being affected by the solver. Useful
+ * for a more optimized write-back of the solution data.
+ */
+IK_PUBLIC_API void
+ik_solver_iterate_chain_tree(ik_solver_t* solver,
+                             ik_solver_iterate_node_cb_func callback);
+
+/*!
  * @brief Sets the solved positions and rotations equal to the original
  * positions and rotations for every node in the tree.
  */

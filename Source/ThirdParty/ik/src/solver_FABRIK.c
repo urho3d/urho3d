@@ -516,7 +516,7 @@ solver_FABRIK_solve(ik_solver_t* solver)
             assert(ordered_vector_count(&root_chain->nodes) > 1);
 
             root_position = (*(ik_node_t**)ordered_vector_get_element(&root_chain->nodes,
-                    ordered_vector_count(&root_chain->nodes) - 1))->original_position;
+                    ordered_vector_count(&root_chain->nodes) - 1))->position;
 
             if (solver->flags & SOLVER_CALCULATE_TARGET_ROTATIONS)
                 solve_chain_forwards_with_target_rotation(root_chain);

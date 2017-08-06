@@ -95,13 +95,13 @@ void IKSolver::RegisterObject(Context* context)
     URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Algorithm", GetAlgorithm, SetAlgorithm, Algorithm, algorithmNames, FABRIK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Iterations", GetMaximumIterations, SetMaximumIterations, unsigned, 20, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Convergence Tolerance", GetTolerance, SetTolerance, float, 0.001, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Joint Rotations", GetFeature_JOINT_ROTATIONS, SetFeature_JOINT_ROTATIONS, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Target Rotations", GetFeature_TARGET_ROTATIONS, SetFeature_TARGET_ROTATIONS, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Original Pose", GetFeature_UPDATE_ORIGINAL_POSE, SetFeature_UPDATE_ORIGINAL_POSE, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Update Active Pose", GetFeature_UPDATE_ACTIVE_POSE, SetFeature_UPDATE_ACTIVE_POSE, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Use Original Pose", GetFeature_USE_ORIGINAL_POSE, SetFeature_USE_ORIGINAL_POSE, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Enable Constraints", GetFeature_CONSTRAINTS, SetFeature_CONSTRAINTS, bool, false, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Auto Solve", GetFeature_AUTO_SOLVE, SetFeature_AUTO_SOLVE, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Joint Rotations", GetJOINT_ROTATIONS, SetJOINT_ROTATIONS, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Target Rotations", GetTARGET_ROTATIONS, SetTARGET_ROTATIONS, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Original Pose", GetUPDATE_ORIGINAL_POSE, SetUPDATE_ORIGINAL_POSE, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Update Active Pose", GetUPDATE_ACTIVE_POSE, SetUPDATE_ACTIVE_POSE, bool, true, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Use Original Pose", GetUSE_ORIGINAL_POSE, SetUSE_ORIGINAL_POSE, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Enable Constraints", GetCONSTRAINTS, SetCONSTRAINTS, bool, false, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Auto Solve", GetAUTO_SOLVE, SetAUTO_SOLVE, bool, true, AM_DEFAULT);
 }
 
 // ----------------------------------------------------------------------------
@@ -810,62 +810,32 @@ void IKSolver::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 // exposed to the editor
 // ----------------------------------------------------------------------------
 
-bool IKSolver::GetFeature_JOINT_ROTATIONS() const
-{
-    return (features_ & JOINT_ROTATIONS);
-}
-bool IKSolver::GetFeature_TARGET_ROTATIONS() const
-{
-    return (features_ & TARGET_ROTATIONS);
-}
-bool IKSolver::GetFeature_UPDATE_ORIGINAL_POSE() const
-{
-    return (features_ & UPDATE_ORIGINAL_POSE);
-}
-bool IKSolver::GetFeature_UPDATE_ACTIVE_POSE() const
-{
-    return (features_ & UPDATE_ACTIVE_POSE);
-}
-bool IKSolver::GetFeature_USE_ORIGINAL_POSE() const
-{
-    return (features_ & USE_ORIGINAL_POSE);
-}
-bool IKSolver::GetFeature_CONSTRAINTS() const
-{
-    return (features_ & CONSTRAINTS);
-}
-bool IKSolver::GetFeature_AUTO_SOLVE() const
-{
-    return (features_ & AUTO_SOLVE);
+#define DEF_FEATURE_GETTER(feature_name) \
+bool IKSolver::Get##feature_name() const \
+{                                        \
+    return GetFeature(feature_name);     \
 }
 
-void IKSolver::SetFeature_JOINT_ROTATIONS(bool enable)
-{
-    SetFeature(JOINT_ROTATIONS, enable);
+#define DEF_FEATURE_SETTER(feature_name)      \
+void IKSolver::Set##feature_name(bool enable) \
+{                                             \
+    SetFeature(feature_name, enable);         \
 }
-void IKSolver::SetFeature_TARGET_ROTATIONS(bool enable)
-{
-    SetFeature(TARGET_ROTATIONS, enable);
-}
-void IKSolver::SetFeature_UPDATE_ORIGINAL_POSE(bool enable)
-{
-    SetFeature(UPDATE_ORIGINAL_POSE, enable);
-}
-void IKSolver::SetFeature_UPDATE_ACTIVE_POSE(bool enable)
-{
-    SetFeature(UPDATE_ACTIVE_POSE, enable);
-}
-void IKSolver::SetFeature_USE_ORIGINAL_POSE(bool enable)
-{
-    SetFeature(USE_ORIGINAL_POSE, enable);
-}
-void IKSolver::SetFeature_CONSTRAINTS(bool enable)
-{
-    SetFeature(CONSTRAINTS, enable);
-}
-void IKSolver::SetFeature_AUTO_SOLVE(bool enable)
-{
-    SetFeature(AUTO_SOLVE, enable);
-}
+
+DEF_FEATURE_GETTER(JOINT_ROTATIONS)
+DEF_FEATURE_GETTER(TARGET_ROTATIONS)
+DEF_FEATURE_GETTER(UPDATE_ORIGINAL_POSE)
+DEF_FEATURE_GETTER(UPDATE_ACTIVE_POSE)
+DEF_FEATURE_GETTER(USE_ORIGINAL_POSE)
+DEF_FEATURE_GETTER(CONSTRAINTS)
+DEF_FEATURE_GETTER(AUTO_SOLVE)
+
+DEF_FEATURE_SETTER(JOINT_ROTATIONS)
+DEF_FEATURE_SETTER(TARGET_ROTATIONS)
+DEF_FEATURE_SETTER(UPDATE_ORIGINAL_POSE)
+DEF_FEATURE_SETTER(UPDATE_ACTIVE_POSE)
+DEF_FEATURE_SETTER(USE_ORIGINAL_POSE)
+DEF_FEATURE_SETTER(CONSTRAINTS)
+DEF_FEATURE_SETTER(AUTO_SOLVE)
 
 } // namespace Urho3D

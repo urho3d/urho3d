@@ -22,21 +22,16 @@
 
 /*
  * TODO
- *  - Add support for manually updating initial pose.
- *  - Lua script bindings crash.
  *  - Optimise.
  *  - Profile.
  *  - Documentation.
- *  - Move log callback into context init function.
- *  - Bug when enabling continuous mode and IKSolver is placed somewhere
- *    on part of the model's bones.
- *  - Possible optimisation: Don't normalise quaternion in quat_mul_quat(),
- *    normalise it manually after multiplying all quaternions.
  *
  * FUTURE
  *  - Support for "stretchiness" with min/max lengths.
  *  - Support for "stiffness" factor, describes how well a bone rotates.
- *  - Apply bullet constraints to joints.
+ *  - Implement constraints.
+ *  - Skip bones when building the tree.
+ *  - Mass/Spring/Damper solver.
  */
 
 namespace Urho3D
