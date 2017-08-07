@@ -31,8 +31,17 @@ class NavigationMesh : public Component
     void SetDetailSampleMaxError(float error);
     void SetPadding(const Vector3& padding);
     void SetAreaCost(unsigned areaID, float cost);
+    bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
     bool Build();
     bool Build(const BoundingBox& boundingBox);
+    bool Build(const IntVector2& from, const IntVector2& to);
+    const PODVector<unsigned char>& GetTileData(const IntVector2& tile) const;
+    bool AddTile(const PODVector<unsigned char>& tileData);
+    void RemoveTile(const IntVector2& tile);
+    void RemoveAllTiles();
+    bool HasTile(const IntVector2& tile) const;
+    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
+    IntVector2 GetTileIndex(const Vector3& position) const;
     void SetPartitionType(NavmeshPartitionType aType);
     void SetDrawOffMeshConnections(bool enable);
     void SetDrawNavAreas(bool enable);
