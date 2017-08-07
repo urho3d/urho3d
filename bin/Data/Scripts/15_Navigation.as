@@ -396,7 +396,6 @@ void UpdateStreaming()
             {
                 addedTiles.Push(tileIdx);
                 navMesh.AddTile(navigationTilesData[tileDataIdx]);
-                Print("Add tile " + tileIdx.ToString());
             }
         }
 }
@@ -406,6 +405,7 @@ void SaveNavigationData()
     NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
     navigationTilesData.Clear();
     navigationTilesIdx.Clear();
+    addedTiles.Clear();
     IntVector2 numTiles = navMesh.numTiles;
     for (int z = 0; z < numTiles.y; ++z)
         for (int x = 0; x < numTiles.x; ++x)

@@ -448,6 +448,7 @@ void Navigation::SaveNavigationData()
 {
     NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
     tileData_.Clear();
+    addedTiles_.Clear();
     const IntVector2 numTiles = navMesh->GetNumTiles();
     for (int z = 0; z < numTiles.y_; ++z)
         for (int x = 0; x <= numTiles.x_; ++x)
