@@ -12,6 +12,12 @@
 Vector3 endPos;
 Array<Vector3> currentPath;
 Node@ jackNode;
+bool useStreaming = false;
+// Used for streaming only
+const int STREAMING_DISTANCE = 2;
+Array<VectorBuffer> navigationTilesData;
+Array<IntVector2> navigationTilesIdx;
+Array<IntVector2> addedTiles;
 
 void Start()
 {
@@ -101,6 +107,8 @@ void CreateScene()
 
     // Create a NavigationMesh component to the scene root
     NavigationMesh@ navMesh = scene_.CreateComponent("NavigationMesh");
+    // Set small tiles to show navigation mesh streaming
+    navMesh.tileSize = 32;
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_.CreateComponent("Navigable");
@@ -111,6 +119,15 @@ void CreateScene()
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
     navMesh.Build();
+    // Save navigation data (used for streaming only).
+    IntVector2 numTiles = navMesh.numTiles;
+    for (int z = 0; z < numTiles.y; ++z)
+        for (int x = 0; x < numTiles.x; ++x)
+        {
+            IntVector2 idx(x, z);
+            navigationTilesData.Push(navMesh.GetTileData(idx));
+            navigationTilesIdx.Push(idx);
+        }
 
     // Create the camera. Limit far clip distance to match the fog
     cameraNode = scene_.CreateChild("Camera");
@@ -140,6 +157,7 @@ void CreateUI()
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to teleport\n"
         "MMB or O key to add or remove obstacles\n"
+        "Tab to toggle navigation mesh streaming\n"
         "Space to toggle debug geometry";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
     // The text has multiple rows. Center them in relation to each other
@@ -341,6 +359,56 @@ void FollowPath(float timeStep)
     }
 }
 
+void SwitchStreaming(bool enabled)
+{
+    NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
+    if (enabled)
+    {
+        int maxTiles = (2 * STREAMING_DISTANCE + 1) * (2 * STREAMING_DISTANCE + 1);
+        BoundingBox boundingBox = navMesh.boundingBox;
+        navMesh.Allocate(boundingBox, maxTiles);
+    }
+    else
+        navMesh.Build();
+}
+
+void StreamNavMesh()
+{
+    NavigationMesh@ navMesh = scene_.GetComponent("NavigationMesh");
+
+    // Center the navigation mesh at the jack
+    IntVector2 jackTile = navMesh.GetTileIndex(jackNode.worldPosition);
+    IntVector2 beginTile = VectorMax(IntVector2(0, 0), jackTile - IntVector2(1, 1) * STREAMING_DISTANCE);
+    IntVector2 endTile = VectorMin(jackTile + IntVector2(1, 1) * STREAMING_DISTANCE, navMesh.numTiles - IntVector2(1, 1));
+
+    // Remove tiles
+    for (uint i = 0; i < addedTiles.length;)
+    {
+        IntVector2 tileIdx = addedTiles[i];
+        if (beginTile.x <= tileIdx.x && tileIdx.x <= endTile.x && beginTile.y <= tileIdx.y && tileIdx.y <= endTile.y)
+            ++i;
+        else
+        {
+            addedTiles.Erase(i);
+            navMesh.RemoveTile(tileIdx);
+        }
+    }
+
+    // Add tiles
+    for (int z = beginTile.y; z <= endTile.y; ++z)
+        for (int x = beginTile.x; x <= endTile.x; ++x)
+        {
+            const IntVector2 tileIdx(x, z);
+            int tileDataIdx = navigationTilesIdx.Find(tileIdx);
+            if (!navMesh.HasTile(tileIdx) && tileDataIdx != -1)
+            {
+                addedTiles.Push(tileIdx);
+                navMesh.AddTile(navigationTilesData[tileDataIdx]);
+                Print("Add tile " + tileIdx.ToString());
+            }
+        }
+}
+
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
@@ -351,6 +419,15 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Make Jack follow the Detour path
     FollowPath(timeStep);
+
+    // Update streaming
+    if (input.keyPress[KEY_TAB])
+    {
+        useStreaming = !useStreaming;
+        SwitchStreaming(useStreaming);
+    }
+    if (useStreaming)
+        StreamNavMesh();
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
