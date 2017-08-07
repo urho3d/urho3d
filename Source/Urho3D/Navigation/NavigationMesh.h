@@ -134,7 +134,7 @@ public:
     void SetPadding(const Vector3& padding);
     /// Set the cost of an area.
     void SetAreaCost(unsigned areaID, float cost);
-    /// Allocate the navigation mesh without building any tiles. Return true if successful.
+    /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
     virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
     /// Rebuild the navigation mesh. Return true if successful.
     virtual bool Build();

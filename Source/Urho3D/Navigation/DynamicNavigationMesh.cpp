@@ -250,10 +250,6 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
         URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
 
     boundingBox_ = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
-    // Expand bounding box by padding
-    boundingBox_.min_ -= padding_;
-    boundingBox_.max_ += padding_;
-
     maxTiles = NextPowerOfTwo(maxTiles);
 
     // Calculate number of tiles
@@ -330,6 +326,14 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
             AddObstacle(obs);
     }
 
+    // Send a notification event to concerned parties that we've been fully rebuilt
+    {
+        using namespace NavigationMeshRebuilt;
+        VariantMap& buildEventParams = GetContext()->GetEventDataMap();
+        buildEventParams[P_NODE] = node_;
+        buildEventParams[P_MESH] = this;
+        SendEvent(E_NAVIGATION_MESH_REBUILT, buildEventParams);
+    }
     return true;
 }
 
@@ -718,6 +722,7 @@ void DynamicNavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>
     }
 
     ReadTiles(buffer, true);
+    // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
 PODVector<unsigned char> DynamicNavigationMesh::GetNavigationDataAttr() const

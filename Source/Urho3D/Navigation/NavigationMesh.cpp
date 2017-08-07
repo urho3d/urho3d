@@ -334,10 +334,6 @@ bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
         URHO3D_LOGWARNING("Navigation mesh root node has scaling. Agent parameters may not work as intended");
 
     boundingBox_ = boundingBox.Transformed(node_->GetWorldTransform().Inverse());
-    // Expand bounding box by padding
-    boundingBox_.min_ -= padding_;
-    boundingBox_.max_ += padding_;
-
     maxTiles = NextPowerOfTwo(maxTiles);
 
     // Calculate number of tiles
@@ -374,6 +370,14 @@ bool NavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned maxTiles)
 
     URHO3D_LOGDEBUG("Allocated empty navigation mesh with max " + String(maxTiles) + " tiles");
 
+    // Send a notification event to concerned parties that we've been fully rebuilt
+    {
+        using namespace NavigationMeshRebuilt;
+        VariantMap& buildEventParams = GetContext()->GetEventDataMap();
+        buildEventParams[P_NODE] = node_;
+        buildEventParams[P_MESH] = this;
+        SendEvent(E_NAVIGATION_MESH_REBUILT, buildEventParams);
+    }
     return true;
 }
 
@@ -917,6 +921,7 @@ void NavigationMesh::SetNavigationDataAttr(const PODVector<unsigned char>& value
     }
 
     URHO3D_LOGDEBUG("Created navigation mesh with " + String(numTiles) + " tiles from serialized data");
+    // \todo Shall we send E_NAVIGATION_MESH_REBUILT here?
 }
 
 PODVector<unsigned char> NavigationMesh::GetNavigationDataAttr() const

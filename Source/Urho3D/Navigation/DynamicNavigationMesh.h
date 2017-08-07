@@ -54,7 +54,7 @@ public:
     /// Register with engine context.
     static void RegisterObject(Context*);
 
-    /// Allocate the navigation mesh without building any tiles. Return true if successful.
+    /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
     virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
     /// Build/rebuild the entire navigation mesh.
     virtual bool Build();
