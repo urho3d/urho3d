@@ -114,15 +114,6 @@ void CreateScene()
     // physics geometry from the scene nodes, as it often is simpler, but if it can not find any (like in this example)
     // it will use renderable geometry instead
     navMesh.Build();
-    // Save navigation data (used for streaming only).
-    IntVector2 numTiles = navMesh.numTiles;
-    for (int z = 0; z < numTiles.y; ++z)
-        for (int x = 0; x < numTiles.x; ++x)
-        {
-            IntVector2 idx(x, z);
-            navigationTilesData.Push(navMesh.GetTileData(idx));
-            navigationTilesIdx.Push(idx);
-        }
 
     // Create an off-mesh connection to each box to make it climbable (tiny boxes are skipped). A connection is built from 2 nodes.
     // Note that OffMeshConnections must be added before building the navMesh, but as we are adding Obstacles next, tiles will be automatically rebuilt.
@@ -433,20 +424,21 @@ void MoveCamera(float timeStep)
     }
 }
 
-void SwitchStreaming(bool enabled)
+void ToggleStreaming(bool enabled)
 {
     DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
     if (enabled)
     {
         int maxTiles = (2 * STREAMING_DISTANCE + 1) * (2 * STREAMING_DISTANCE + 1);
         BoundingBox boundingBox = navMesh.boundingBox;
+        SaveNavigationData();
         navMesh.Allocate(boundingBox, maxTiles);
     }
     else
         navMesh.Build();
 }
 
-void StreamNavMesh()
+void UpdateStreaming()
 {
     DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
 
@@ -493,6 +485,21 @@ void StreamNavMesh()
         }
 }
 
+void SaveNavigationData()
+{
+    DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
+    navigationTilesData.Clear();
+    navigationTilesIdx.Clear();
+    IntVector2 numTiles = navMesh.numTiles;
+    for (int z = 0; z < numTiles.y; ++z)
+        for (int x = 0; x < numTiles.x; ++x)
+        {
+            IntVector2 idx(x, z);
+            navigationTilesData.Push(navMesh.GetTileData(idx));
+            navigationTilesIdx.Push(idx);
+        }
+}
+
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
@@ -505,10 +512,10 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
     if (input.keyPress[KEY_TAB])
     {
         useStreaming = !useStreaming;
-        SwitchStreaming(useStreaming);
+        ToggleStreaming(useStreaming);
     }
     if (useStreaming)
-        StreamNavMesh();
+        UpdateStreaming();
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
