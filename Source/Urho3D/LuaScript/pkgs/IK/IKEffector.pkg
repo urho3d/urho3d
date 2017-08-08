@@ -41,6 +41,6 @@ class IKEffector : public Component
     tolua_property__get_set float rotationWeight;
     tolua_property__get_set float rotationDecay;
 
-    tolua_property__get_set Feature WEIGHT_NLERP;
-    tolua_property__get_set Feature INHERIT_PARENT_ROTATION;
+    tolua_property__get_set bool WEIGHT_NLERP;
+    tolua_property__get_set bool INHERIT_PARENT_ROTATION;
 };

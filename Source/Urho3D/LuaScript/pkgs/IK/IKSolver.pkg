@@ -37,11 +37,11 @@ class IKSolver : public Component
     tolua_property__get_set unsigned maximumIterations;
     tolua_property__get_set float tolerance;
 
-    tolua_property__get_set Feature JOINT_ROTATIONS;
-    tolua_property__get_set Feature TARGET_ROTATIONS;
-    tolua_property__get_set Feature UPDATE_ORIGINAL_POSE;
-    tolua_property__get_set Feature UPDATE_ACTIVE_POSE;
-    tolua_property__get_set Feature USE_ORIGINAL_POSE;
-    tolua_property__get_set Feature CONSTRAINTS;
-    tolua_property__get_set Feature AUTO_SOLVE;
+    tolua_property__get_set bool JOINT_ROTATIONS;
+    tolua_property__get_set bool TARGET_ROTATIONS;
+    tolua_property__get_set bool UPDATE_ORIGINAL_POSE;
+    tolua_property__get_set bool UPDATE_ACTIVE_POSE;
+    tolua_property__get_set bool USE_ORIGINAL_POSE;
+    tolua_property__get_set bool CONSTRAINTS;
+    tolua_property__get_set bool AUTO_SOLVE;
 };

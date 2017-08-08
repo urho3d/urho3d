@@ -146,7 +146,7 @@ public:
      * solution. A value of 1 means to match the target rotation exactly, if
      * possible. A value of 0 means to not match it at all.
      * @note The solver must have target rotation enabled for this to have
-     * any effect. See IKSolver::Featire::TARGET_ROTATIONS.
+     * any effect. See IKSolver::Feature::TARGET_ROTATIONS.
      */
     void SetRotationWeight(float weight);
 
