@@ -2768,8 +2768,6 @@ Methods:
 - void SetRotationWeight(float weight)
 - float GetRotationDecay() const
 - void SetRotationDecay(float decay)
-- bool WeightedNlerpEnabled() const
-- void EnableWeightedNlerp(bool enable)
 
 Properties:
 
@@ -2781,15 +2779,15 @@ Properties:
 - float weight
 - float rotationWeight
 - float rotationDecay
+- bool WEIGHT_NLERP
+- bool INHERIT_PARENT_ROTATION
 
 <a name="Class_IKSolver"></a>
 ### IKSolver : Component
 
 Methods:
 
-- bool GetFeature(IKSolver::Feature feature) const
-- void SetFeature(IKSolver::Feature feature, bool enable)
-- void RebuildData()
+- void RebuildChainTrees()
 - void RecalculateSegmentLengths()
 - void CalculateJointRotations()
 - void Solve()
@@ -2805,6 +2803,13 @@ Properties:
 - IKSolver::Algorithm algorithm
 - unsigned maximumIterations
 - float tolerance
+- bool JOINT_ROTATIONS
+- bool TARGET_ROTATIONS
+- bool UPDATE_ORIGINAL_POSE
+- bool UPDATE_ACTIVE_POSE
+- bool USE_ORIGINAL_POSE
+- bool CONSTRAINTS
+- bool AUTO_SOLVE
 
 <a name="Class_Image"></a>
 ### Image : Resource
@@ -8186,6 +8191,11 @@ Properties:
 - int FC_LOOKAT_Y
 - int FC_LOOKAT_MIXED
 - int FC_DIRECTION
+
+### Feature
+
+- int WEIGHT_NLERP
+- int INHERIT_PARENT_ROTATION
 
 ### Feature
 

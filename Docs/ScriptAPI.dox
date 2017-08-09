@@ -1545,6 +1545,7 @@ namespace Urho3D
 - %Rotation %Weight : float
 - %Rotation %Decay : float
 - %Nlerp %Weight : bool
+- %Inherit %Parent %Rotation : bool
 
 ### IKSolver
 - %Algorithm : int
@@ -2720,7 +2721,6 @@ namespace Urho3D
 <a href="#Class_Geometry"><b>Geometry</b></a>
 <a href="#Class_Graphics"><b>Graphics</b></a>
 <a href="#Class_HttpRequest"><b>HttpRequest</b></a>
-<a href="#Class_IKConstraint"><b>IKConstraint</b></a>
 <a href="#Class_IKEffector"><b>IKEffector</b></a>
 <a href="#Class_IKSolver"><b>IKSolver</b></a>
 <a href="#Class_Image"><b>Image</b></a>
@@ -7564,65 +7564,6 @@ Properties:
 - String verb // readonly
 - int weakRefs // readonly
 
-<a name="Class_IKConstraint"></a>
-
-### IKConstraint
-
-Methods:
-
-- void ApplyAttributes()
-- void DrawDebugGeometry(DebugRenderer@, bool)
-- Variant GetAttribute(const String&) const
-- ValueAnimation@ GetAttributeAnimation(const String&) const
-- float GetAttributeAnimationSpeed(const String&) const
-- float GetAttributeAnimationTime(const String&) const
-- WrapMode GetAttributeAnimationWrapMode(const String&) const
-- Variant GetAttributeDefault(const String&) const
-- bool GetInterceptNetworkUpdate(const String&) const
-- bool HasSubscribedToEvent(Object@, const String&)
-- bool HasSubscribedToEvent(const String&)
-- bool Load(File@, bool = false)
-- bool Load(VectorBuffer&, bool = false)
-- bool LoadJSON(const JSONValue&, bool = false)
-- bool LoadXML(const XMLElement&, bool = false)
-- void MarkNetworkUpdate() const
-- void Remove()
-- void RemoveAttributeAnimation(const String&)
-- void RemoveInstanceDefault()
-- void RemoveObjectAnimation()
-- void ResetToDefault()
-- bool Save(File@) const
-- bool Save(VectorBuffer&) const
-- bool SaveJSON(JSONValue&) const
-- bool SaveXML(XMLElement&) const
-- void SendEvent(const String&, VariantMap& = VariantMap ( ))
-- void SetAnimationTime(float)
-- bool SetAttribute(const String&, const Variant&)
-- void SetAttributeAnimation(const String&, ValueAnimation@, WrapMode = WM_LOOP, float = 1.0f)
-- void SetAttributeAnimationSpeed(const String&, float)
-- void SetAttributeAnimationTime(const String&, float)
-- void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetInterceptNetworkUpdate(const String&, bool)
-
-Properties:
-
-- bool animationEnabled
-- Variant[] attributeDefaults // readonly
-- AttributeInfo[] attributeInfos // readonly
-- Variant[] attributes
-- String category // readonly
-- bool enabled
-- bool enabledEffective // readonly
-- uint id // readonly
-- Node@ node // readonly
-- uint numAttributes // readonly
-- ObjectAnimation@ objectAnimation
-- int refs // readonly
-- bool temporary
-- StringHash type // readonly
-- String typeName // readonly
-- int weakRefs // readonly
-
 <a name="Class_IKEffector"></a>
 
 ### IKEffector
@@ -7690,7 +7631,6 @@ Properties:
 - String typeName // readonly
 - int weakRefs // readonly
 - float weight
-- bool weightedNlerp
 
 <a name="Class_IKSolver"></a>
 
@@ -7713,7 +7653,6 @@ Methods:
 - float GetAttributeAnimationTime(const String&) const
 - WrapMode GetAttributeAnimationWrapMode(const String&) const
 - Variant GetAttributeDefault(const String&) const
-- bool GetFeature(IKFeature) const
 - bool GetInterceptNetworkUpdate(const String&) const
 - bool HasSubscribedToEvent(Object@, const String&)
 - bool HasSubscribedToEvent(const String&)
@@ -7722,7 +7661,7 @@ Methods:
 - bool LoadJSON(const JSONValue&, bool = false)
 - bool LoadXML(const XMLElement&, bool = false)
 - void MarkNetworkUpdate() const
-- void RebuildData()
+- void RebuildChainTrees()
 - void RecalculateSegmentLengths()
 - void Remove()
 - void RemoveAttributeAnimation(const String&)
@@ -7740,12 +7679,18 @@ Methods:
 - void SetAttributeAnimationSpeed(const String&, float)
 - void SetAttributeAnimationTime(const String&, float)
 - void SetAttributeAnimationWrapMode(const String&, WrapMode)
-- void SetFeature(IKFeature, bool)
 - void SetInterceptNetworkUpdate(const String&, bool)
 - void Solve()
 
 Properties:
 
+- bool AUTO_SOLVE
+- bool CONSTRAINTS
+- bool JOINT_ROTATIONS
+- bool TARGET_ROTATIONS
+- bool UPDATE_ACTIVE_POSE
+- bool UPDATE_ORIGINAL_POSE
+- bool USE_ORIGINAL_POSE
 - IKAlgorithm algorithm
 - bool animationEnabled
 - Variant[] attributeDefaults // readonly
@@ -16177,17 +16122,6 @@ Properties:
 - ONE_BONE
 - TWO_BONE
 - FABRIK
-
-
-### IKFeature
-
-- JOINT_ROTATIONS
-- TARGET_ROTATIONS
-- UPDATE_ORIGINAL_POSE
-- UPDATE_ACTIVE_POSE
-- USE_ORIGINAL_POSE
-- CONSTRAINTS
-- AUTO_SOLVE
 
 
 ### InterpMethod

@@ -5512,74 +5512,6 @@ String verb;
 int weakRefs;
 };
 
-class IKConstraint
-{
-public:
-// Methods:
-void ApplyAttributes();
-void DrawDebugGeometry(DebugRenderer, bool);
-Variant GetAttribute(const String&) const;
-ValueAnimation GetAttributeAnimation(const String&) const;
-float GetAttributeAnimationSpeed(const String&) const;
-float GetAttributeAnimationTime(const String&) const;
-WrapMode GetAttributeAnimationWrapMode(const String&) const;
-Variant GetAttributeDefault(const String&) const;
-bool GetInterceptNetworkUpdate(const String&) const;
-bool HasSubscribedToEvent(Object, const String&);
-bool HasSubscribedToEvent(const String&);
-bool Load(File, bool = false);
-bool Load(VectorBuffer&, bool = false);
-bool LoadJSON(const JSONValue&, bool = false);
-bool LoadXML(const XMLElement&, bool = false);
-void MarkNetworkUpdate() const;
-void Remove();
-void RemoveAttributeAnimation(const String&);
-void RemoveInstanceDefault();
-void RemoveObjectAnimation();
-void ResetToDefault();
-bool Save(File) const;
-bool Save(VectorBuffer&) const;
-bool SaveJSON(JSONValue&) const;
-bool SaveXML(XMLElement&) const;
-void SendEvent(const String&, VariantMap& = VariantMap ( ));
-void SetAnimationTime(float);
-bool SetAttribute(const String&, const Variant&);
-void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, float = 1.0f);
-void SetAttributeAnimationSpeed(const String&, float);
-void SetAttributeAnimationTime(const String&, float);
-void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetInterceptNetworkUpdate(const String&, bool);
-
-// Properties:
-bool animationEnabled;
-/* readonly */
-Array<Variant> attributeDefaults;
-/* readonly */
-Array<AttributeInfo> attributeInfos;
-Array<Variant> attributes;
-/* readonly */
-String category;
-bool enabled;
-/* readonly */
-bool enabledEffective;
-/* readonly */
-uint id;
-/* readonly */
-Node node;
-/* readonly */
-uint numAttributes;
-ObjectAnimation objectAnimation;
-/* readonly */
-int refs;
-bool temporary;
-/* readonly */
-StringHash type;
-/* readonly */
-String typeName;
-/* readonly */
-int weakRefs;
-};
-
 class IKEffector
 {
 public:
@@ -5655,7 +5587,6 @@ String typeName;
 /* readonly */
 int weakRefs;
 float weight;
-bool weightedNlerp;
 };
 
 class IKSolver
@@ -5677,7 +5608,6 @@ float GetAttributeAnimationSpeed(const String&) const;
 float GetAttributeAnimationTime(const String&) const;
 WrapMode GetAttributeAnimationWrapMode(const String&) const;
 Variant GetAttributeDefault(const String&) const;
-bool GetFeature(IKFeature) const;
 bool GetInterceptNetworkUpdate(const String&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
@@ -5686,7 +5616,7 @@ bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
 bool LoadXML(const XMLElement&, bool = false);
 void MarkNetworkUpdate() const;
-void RebuildData();
+void RebuildChainTrees();
 void RecalculateSegmentLengths();
 void Remove();
 void RemoveAttributeAnimation(const String&);
@@ -5704,11 +5634,17 @@ void SetAttributeAnimation(const String&, ValueAnimation, WrapMode = WM_LOOP, fl
 void SetAttributeAnimationSpeed(const String&, float);
 void SetAttributeAnimationTime(const String&, float);
 void SetAttributeAnimationWrapMode(const String&, WrapMode);
-void SetFeature(IKFeature, bool);
 void SetInterceptNetworkUpdate(const String&, bool);
 void Solve();
 
 // Properties:
+bool AUTO_SOLVE;
+bool CONSTRAINTS;
+bool JOINT_ROTATIONS;
+bool TARGET_ROTATIONS;
+bool UPDATE_ACTIVE_POSE;
+bool UPDATE_ORIGINAL_POSE;
+bool USE_ORIGINAL_POSE;
 IKAlgorithm algorithm;
 bool animationEnabled;
 /* readonly */
@@ -15620,17 +15556,6 @@ enum IKAlgorithm
 ONE_BONE,
 TWO_BONE,
 FABRIK,
-};
-
-enum IKFeature
-{
-JOINT_ROTATIONS,
-TARGET_ROTATIONS,
-UPDATE_ORIGINAL_POSE,
-UPDATE_ACTIVE_POSE,
-USE_ORIGINAL_POSE,
-CONSTRAINTS,
-AUTO_SOLVE,
 };
 
 enum InterpMethod
