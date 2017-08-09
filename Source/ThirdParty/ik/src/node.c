@@ -25,7 +25,7 @@ ik_node_construct(ik_node_t* node, uint32_t guid)
 {
     memset(node, 0, sizeof *node);
     bstv_construct(&node->children);
-    quat_set_identity(node->initial_rotation.f);
+    quat_set_identity(node->original_rotation.f);
     quat_set_identity(node->rotation.f);
     node->guid = guid;
 }

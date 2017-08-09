@@ -19,7 +19,7 @@ void
 solver_2bone_destruct(ik_solver_t* solver);
 
 int
-solver_2bone_rebuild(ik_solver_t* solver);
+solver_2bone_post_chain_build(ik_solver_t* solver);
 
 int
 solver_2bone_solve(ik_solver_t* solver);

@@ -192,7 +192,9 @@ public:
      */
     void SetAlgorithm(Algorithm algorithm);
 
+    /// Test if a certain feature is enabled (see IKSolver::Feature)
     bool GetFeature(Feature feature) const;
+    /// Enable or disable a certain feature (see IKSolver::Feature)
     void SetFeature(Feature feature, bool enable);
 
     /// Returns the configured maximum number of iterations.
@@ -238,7 +240,7 @@ public:
      * adding or removing effectors, etc.).
      * @note This gets called  automatically for you in Solve().
      */
-    void RebuildData();
+    void RebuildChainTrees();
 
     /*!
      * @brief Unusual, but if you have a tree with translational motions such
@@ -268,23 +270,39 @@ public:
     void Solve();
 
     /*!
-     * @brief Causes the initial tree to be applied back to Urho3D's scene
-     * graph. This is what gets called when continuous solving is disabled.
+     * Copies the original pose into the scene graph. This will reset the pose
+     * to whatever state it had when the IKSolver component was first created,
+     * or, if the original pose was updated since then (for example if
+     * Feature::UPDATE_ORIGINAL_POSE is set), will reset it to that state.
      */
     void ApplyOriginalPoseToScene();
 
     /*!
-     * @brief Causes the current scene graph data to be copied into the solvers
-     * initial pose. This should generally be called before solving if you
-     * are using IK on an animated model. If you don't update the initial pose,
-     * then the result will be a "continuous solution", where the solver will
-     * use the previously calculated tree as a basis for the new solution.
-     *
-     * @note This is
+     * Copies the current scene graph data into the solvers original pose. You
+     * generally won't need to call this, because it gets called for you
+     * automatically if Feature::UPDATE_ORIGINAL_POSE is set.
      */
     void ApplySceneToOriginalPose();
+
+    /*!
+     * Copies the solvers current active pose into the scene graph. You
+     * generally won't need to call this because it gets called for you
+     * automatically in Solve(). This is used to apply the solution back to the
+     * scene graph.
+     */
     void ApplyActivePoseToScene();
+
+    /*!
+     * Copies the current scene graph data into the solvers active pose. You
+     * generally won't need to call this because it gets called for you
+     * automatically if Feature::UPDATE_ACTIVE_POSE is set.
+     */
     void ApplySceneToActivePose();
+
+    /*!
+     * Copies the solvers original pose into the solvers active pose. This is
+     * used in Solve() automatically if Feature::USE_ORIGINAL_POSE is set.
+     */
     void ApplyOriginalPoseToActivePose();
 
     void DrawDebugGeometry(bool depthTest);
@@ -293,22 +311,35 @@ public:
 private:
     friend class IKEffector;
 
-    /// Causes the solver tree to be rebuilt before solving the next time. Intended to be used by IKEffector.
-    void MarkSolverTreeDirty();
+    /// Indicates that the internal structures of the IK library need to be updated. See the documentation of ik_solver_rebuild_chain_trees() for more info on when this happens.
+    void MarkChainsNeedUpdating();
+    /// Indicates that the tree structure has changed in some way and needs updating (nodes added or removed, components added or removed)
+    void MarkTreeNeedsRebuild();
+    /// Returns false if calling Solve() would cause the IK library to abort. Urho3D's error handling philosophy is to log an error and continue, not crash.
+    bool IsSolverTreeValid() const;
+
     /// Subscribe to drawable update finished event here
     virtual void OnSceneSet(Scene* scene);
     /// Destroys and creates the tree
     virtual void OnNodeSet(Node* scene);
 
     /// Creates the ik library node and sets the current rotation/position and user data correctly.
-    ik_node_t* CreateIKNode(const Node* node);
+    ik_node_t* CreateIKNodeFromUrhoNode(const Node* node);
 
     /// Destroys the solver's tree
     void DestroyTree();
     /// Builds the solver's tree to match the scene graph's tree. If a tree already exists, it is first destroyed
     void RebuildTree();
-    /// Builds a chain of nodes up to the specified node and adds an effector. Thus, the specified node must have an IKEffector attached.
-    void BuildTreeToEffector(const Node* node);
+    /// Builds a chain of nodes up to the node of the specified effector component.
+    bool BuildTreeToEffector(IKEffector* effector);
+    /*!
+     * Checks if the specified component is 1) attached to a node that is below
+     * the one we are attached to and 2) isn't in the subtree of a child solver.
+     * @note This will return false if the component is attached to our root
+     * node, because in that case the solver can't do anything to it, it's in
+     * the hands of a parent solver (if it exists).
+     */
+    bool ComponentIsInOurSubtree(Component* component) const;
 
     void HandleComponentAdded(StringHash eventType, VariantMap& eventData);
     void HandleComponentRemoved(StringHash eventType, VariantMap& eventData);
@@ -317,29 +348,33 @@ private:
     /// Invokes the IK solver
     void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData);
 
-    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor
-    bool GetFeature_JOINT_ROTATIONS() const;
-    bool GetFeature_TARGET_ROTATIONS() const;
-    bool GetFeature_UPDATE_ORIGINAL_POSE() const;
-    bool GetFeature_UPDATE_ACTIVE_POSE() const;
-    bool GetFeature_USE_ORIGINAL_POSE() const;
-    bool GetFeature_CONSTRAINTS() const;
-    bool GetFeature_AUTO_SOLVE() const;
+    /// Need these wrapper functions flags of GetFeature/SetFeature can be correctly exposed to the editor and to AngelScript and lua
+public:
+    bool GetJOINT_ROTATIONS() const;
+    bool GetTARGET_ROTATIONS() const;
+    bool GetUPDATE_ORIGINAL_POSE() const;
+    bool GetUPDATE_ACTIVE_POSE() const;
+    bool GetUSE_ORIGINAL_POSE() const;
+    bool GetCONSTRAINTS() const;
+    bool GetAUTO_SOLVE() const;
 
-    void SetFeature_JOINT_ROTATIONS(bool enable);
-    void SetFeature_TARGET_ROTATIONS(bool enable);
-    void SetFeature_UPDATE_ORIGINAL_POSE(bool enable);
-    void SetFeature_UPDATE_ACTIVE_POSE(bool enable);
-    void SetFeature_USE_ORIGINAL_POSE(bool enable);
-    void SetFeature_CONSTRAINTS(bool enable);
-    void SetFeature_AUTO_SOLVE(bool enable);
+    void SetJOINT_ROTATIONS(bool enable);
+    void SetTARGET_ROTATIONS(bool enable);
+    void SetUPDATE_ORIGINAL_POSE(bool enable);
+    void SetUPDATE_ACTIVE_POSE(bool enable);
+    void SetUSE_ORIGINAL_POSE(bool enable);
+    void SetCONSTRAINTS(bool enable);
+    void SetAUTO_SOLVE(bool enable);
 
+private:
     PODVector<IKEffector*> effectorList_;
     PODVector<IKConstraint*> constraintList_;
     ik_solver_t* solver_;
     Algorithm algorithm_;
     unsigned features_;
-    bool solverTreeNeedsRebuild_;
+    bool chainTreesNeedUpdating_;
+    bool treeNeedsRebuild;
+    bool solverTreeValid_;
 };
 
 } // namespace Urho3D

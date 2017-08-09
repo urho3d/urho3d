@@ -11,6 +11,7 @@
 #include "ik/solver_jacobian_inverse.h"
 #include "ik/solver_jacobian_transpose.h"
 #include <string.h>
+#include <assert.h>
 
 static int
 recursively_get_all_effector_nodes(ik_node_t* node, ordered_vector_t* effector_nodes_list);
@@ -147,7 +148,7 @@ ik_solver_destroy_tree(ik_solver_t* solver)
 
 /* ------------------------------------------------------------------------- */
 int
-ik_solver_rebuild_data(ik_solver_t* solver)
+ik_solver_rebuild_chain_trees(ik_solver_t* solver)
 {
     /* If the solver has no tree, then there's nothing to do */
     if (solver->tree == NULL)
@@ -172,8 +173,8 @@ ik_solver_rebuild_data(ik_solver_t* solver)
     if (rebuild_chain_tree(solver) < 0)
         return -1;
 
-    if (solver->rebuild_data != NULL)
-        return solver->rebuild_data(solver);
+    if (solver->post_chain_build != NULL)
+        return solver->post_chain_build(solver);
 
     return 0;
 }
@@ -227,10 +228,48 @@ ik_solver_iterate_tree(ik_solver_t* solver,
 
 /* ------------------------------------------------------------------------- */
 static void
+iterate_chain_tree_recursive(chain_t* chain,
+                             ik_solver_iterate_node_cb_func callback)
+{
+    /*
+     * Iterate the chain tree breadth first. Note that we exclude the base node
+     * in each chain, because otherwise the same node would be passed to the
+     * callback multiple times. The base node is shared by the parent chain's
+     * effector as well as with other chains in the same depth.
+     */
+    int idx = ordered_vector_count(&chain->nodes);
+    assert(idx > 0); // chains must have at least 2 nodes in them
+    while (idx--)
+    {
+        callback(*(ik_node_t**)ordered_vector_get_element(&chain->nodes, idx));
+    }
+
+    ORDERED_VECTOR_FOR_EACH(&chain->children, chain_t, child)
+        iterate_chain_tree_recursive(child, callback);
+    ORDERED_VECTOR_END_EACH
+}
+void ik_solver_iterate_chain_tree(ik_solver_t* solver,
+                                  ik_solver_iterate_node_cb_func callback)
+{
+    ORDERED_VECTOR_FOR_EACH(&solver->chain_tree.islands, chain_island_t, island)
+        /*
+         * The root node is excluded by the recursive function, so we must
+         * do the callback here
+         */
+        int idx = ordered_vector_count(&island->root_chain.nodes) - 1;
+        ik_node_t* root = *(ik_node_t**)ordered_vector_get_element(&island->root_chain.nodes, idx);
+        callback(root);
+
+        iterate_chain_tree_recursive(&island->root_chain, callback);
+    ORDERED_VECTOR_END_EACH
+}
+
+/* ------------------------------------------------------------------------- */
+static void
 reset_active_pose_recursive(ik_node_t* node)
 {
     node->position = node->original_position;
-    node->rotation = node->initial_rotation;
+    node->rotation = node->original_rotation;
 
     BSTV_FOR_EACH(&node->children, ik_node_t, guid, child)
         reset_active_pose_recursive(child);

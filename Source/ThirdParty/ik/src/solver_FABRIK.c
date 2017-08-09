@@ -440,8 +440,8 @@ solve_chain_backwards(chain_t* chain, vec3_t target_position)
 static void
 initial_to_global_recursive(ik_node_t* node, quat_t acc_rot)
 {
-    quat_t rotation = node->initial_rotation;
-    quat_mul_quat(node->initial_rotation.f, acc_rot.f);
+    quat_t rotation = node->original_rotation;
+    quat_mul_quat(node->original_rotation.f, acc_rot.f);
     quat_mul_quat(acc_rot.f, rotation.f);
 
     BSTV_FOR_EACH(&node->children, ik_node_t, guid, child)
@@ -461,8 +461,8 @@ initial_to_local_recursive(ik_node_t* node, quat_t acc_rot)
 {
     quat_t inv_rotation = acc_rot;
     quat_conj(inv_rotation.f);
-    quat_mul_quat(node->initial_rotation.f, inv_rotation.f);
-    quat_mul_quat(acc_rot.f, node->initial_rotation.f);
+    quat_mul_quat(node->original_rotation.f, inv_rotation.f);
+    quat_mul_quat(acc_rot.f, node->original_rotation.f);
 
     BSTV_FOR_EACH(&node->children, ik_node_t, guid, child)
         initial_to_local_recursive(child, acc_rot);
@@ -516,7 +516,7 @@ solver_FABRIK_solve(ik_solver_t* solver)
             assert(ordered_vector_count(&root_chain->nodes) > 1);
 
             root_position = (*(ik_node_t**)ordered_vector_get_element(&root_chain->nodes,
-                    ordered_vector_count(&root_chain->nodes) - 1))->original_position;
+                    ordered_vector_count(&root_chain->nodes) - 1))->position;
 
             if (solver->flags & SOLVER_CALCULATE_TARGET_ROTATIONS)
                 solve_chain_forwards_with_target_rotation(root_chain);

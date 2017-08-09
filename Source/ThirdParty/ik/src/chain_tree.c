@@ -412,8 +412,8 @@ calculate_global_rotations_of_children(chain_t* chain)
     /*
      * Assuming there was more than 1 child chain and assuming we aren't the
      * root node, then the child chains we just iterated must share the same
-     * base node as our tip node. Average the accumulated quaternion and set
-     * this node's correct solved rotation.
+     * base node (which is our tip node). Average the accumulated quaternion
+     * and set this node's correct solved rotation.
      */
     if (average_count > 0 && ordered_vector_count(&chain->nodes) != 0)
     {
@@ -458,15 +458,15 @@ calculate_global_rotations(chain_t* chain)
 
     /*
      * Calculates the "global" (world) angles of each joint and writes them to
-     * each node->solved_rotation slot.
+     * each node->rotation slot.
      *
      * The angle between the original and solved segments are calculated using
      * standard vector math (dot product). The axis of rotation is calculated
      * with the cross product. From this data, a quaternion is constructed,
      * describing this delta rotation. Finally, in order to make the rotations
      * global instead of relative, the delta rotation is multiplied with
-     * node->rotation, which should be a quaternion describing the node's
-     * global rotation in the unsolved tree.
+     * node->original_rotation, which should be a quaternion describing the
+     * node's global rotation in the unsolved tree.
      *
      * The rotation of the base joint in the chain is returned so it can be
      * averaged by parent chains.
@@ -494,7 +494,7 @@ calculate_global_rotations(chain_t* chain)
      */
     ORDERED_VECTOR_FOR_EACH(&chain->nodes, ik_node_t*, pnode)
         ik_node_t* node = *pnode;
-        quat_mul_quat(node->rotation.f, node->initial_rotation.f);
+        quat_mul_quat(node->rotation.f, node->original_rotation.f);
     ORDERED_VECTOR_END_EACH
 }
 

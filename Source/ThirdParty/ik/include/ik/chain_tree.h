@@ -15,7 +15,11 @@ C_HEADER_BEGIN
 
 struct chain_t
 {
-    /* list of ik_node_t* references that belong to this chain */
+    /*
+     * List of ik_node_t* references that belong to this chain.
+     * NOTE: The first node in this list is the effector (i.e. the *end* of the
+     * chain). The nodes are in reverse.
+     */
     ordered_vector_t nodes;
     /* list of chain_t objects */
     ordered_vector_t children;
@@ -26,9 +30,10 @@ struct chain_island_t
     chain_t       root_chain;
 
     /*
-     * List of ik_node_t* objects. This list contains the leaf nodes of IK
+     * List of ik_node_t* objects. This list contains the child nodes of IK
      * effectors, the children of which aren't part of the IK problem but need
      * to be properly updated to match the new transform of the solved tree.
+     * TODO Is this implemented yet?
      */
     ordered_vector_t transform_dependent_nodes;
 };

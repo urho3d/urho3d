@@ -20,10 +20,7 @@ class IKSolver : public Component
         AUTO_SOLVE = 0x40
     };
 
-    bool GetFeature(Feature feature) const;
-    void SetFeature(Feature feature, bool enable);
-
-    void RebuildData();
+    void RebuildChainTrees();
     void RecalculateSegmentLengths();
     void CalculateJointRotations();
     void Solve();
@@ -39,4 +36,12 @@ class IKSolver : public Component
     tolua_property__get_set Algorithm algorithm;
     tolua_property__get_set unsigned maximumIterations;
     tolua_property__get_set float tolerance;
+
+    tolua_property__get_set bool JOINT_ROTATIONS;
+    tolua_property__get_set bool TARGET_ROTATIONS;
+    tolua_property__get_set bool UPDATE_ORIGINAL_POSE;
+    tolua_property__get_set bool UPDATE_ACTIVE_POSE;
+    tolua_property__get_set bool USE_ORIGINAL_POSE;
+    tolua_property__get_set bool CONSTRAINTS;
+    tolua_property__get_set bool AUTO_SOLVE;
 };
