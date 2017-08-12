@@ -742,7 +742,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
     physicsWorld_->SetApplyingTransforms(false);
 }
 
-void RigidBody::UpdateMass(bool calledFromAddBodyToWorld)
+void RigidBody::UpdateMass()
 {
     if (!body_ || !enableMassUpdate_)
         return;
@@ -817,7 +817,7 @@ void RigidBody::UpdateMass(bool calledFromAddBodyToWorld)
     }
 
     // Readd body to world if collision shape was changed (issue #2064)
-    if (!calledFromAddBodyToWorld && inWorld_ && body_->getCollisionShape() != oldCollisionShape && physicsWorld_)
+    if (inWorld_ && body_->getCollisionShape() != oldCollisionShape && physicsWorld_)
     {
         btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
         world->removeRigidBody(body_.Get());
@@ -1000,7 +1000,7 @@ void RigidBody::AddBodyToWorld()
             (*i)->CreateConstraint();
     }
 
-    UpdateMass(true);
+    UpdateMass();
     UpdateGravity();
 
     int flags = body_->getCollisionFlags();
