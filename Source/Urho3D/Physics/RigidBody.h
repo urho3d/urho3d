@@ -230,8 +230,8 @@ public:
 
     /// Apply new world transform after a simulation step. Called internally.
     void ApplyWorldTransform(const Vector3& newWorldPosition, const Quaternion& newWorldRotation);
-    /// Update mass and inertia to the Bullet rigid body.
-    void UpdateMass();
+    /// Update mass and inertia to the Bullet rigid body. Readd body to world if necessary.
+    void UpdateMass(bool calledForAddBodyToWorld = false);
     /// Update gravity parameters to the Bullet rigid body.
     void UpdateGravity();
     /// Set network angular velocity attribute.

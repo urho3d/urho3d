@@ -742,7 +742,7 @@ void RigidBody::ApplyWorldTransform(const Vector3& newWorldPosition, const Quate
     physicsWorld_->SetApplyingTransforms(false);
 }
 
-void RigidBody::UpdateMass()
+void RigidBody::UpdateMass(bool calledFromAddBodyToWorld)
 {
     if (!body_ || !enableMassUpdate_)
         return;
@@ -786,6 +786,8 @@ void RigidBody::UpdateMass()
             !ToQuaternion(childTransform.getRotation()).Equals(Quaternion::IDENTITY))
             useCompound = true;
     }
+
+    btCollisionShape* oldCollisionShape = body_->getCollisionShape();
     body_->setCollisionShape(useCompound ? shiftedCompoundShape_.Get() : shiftedCompoundShape_->getChildShape(0));
 
     // If we have one shape and this is a triangle mesh, we use a custom material callback in order to adjust internal edges
@@ -812,6 +814,16 @@ void RigidBody::UpdateMass()
     {
         for (PODVector<Constraint*>::Iterator i = constraints_.Begin(); i != constraints_.End(); ++i)
             (*i)->ApplyFrames();
+    }
+
+    // Readd body to world if collision shape was changed (issue #2064)
+    if (!calledFromAddBodyToWorld && inWorld_ && body_->getCollisionShape() != oldCollisionShape && physicsWorld_)
+    {
+        btDiscreteDynamicsWorld* world = physicsWorld_->GetWorld();
+        world->removeRigidBody(body_.Get());
+        world->addRigidBody(body_.Get(), (short)collisionLayer_, (short)collisionMask_);
+        readdBody_ = false;
+        hasSimulated_ = false;
     }
 }
 
@@ -988,7 +1000,7 @@ void RigidBody::AddBodyToWorld()
             (*i)->CreateConstraint();
     }
 
-    UpdateMass();
+    UpdateMass(true);
     UpdateGravity();
 
     int flags = body_->getCollisionFlags();
