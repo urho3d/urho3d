@@ -72,6 +72,18 @@ static Vector3 NavigationMeshMoveAlongSurface(const Vector3& start, const Vector
     return ptr->MoveAlongSurface(start, end, extents, maxVisited);
 }
 
+static VectorBuffer NavigationMeshGetTileData(const IntVector2& tile, const NavigationMesh* ptr)
+{
+    VectorBuffer buffer;
+    buffer.SetData(ptr->GetTileData(tile));
+    return buffer;
+}
+
+static bool NavigationMeshAddTile(const VectorBuffer& tileData, NavigationMesh* ptr)
+{
+    return ptr->AddTile(tileData.GetBuffer());
+}
+
 static Vector3 NavigationMeshGetRandomPoint(NavigationMesh* ptr)
 {
     return ptr->GetRandomPoint();
@@ -104,8 +116,17 @@ static Vector3 CrowdManagerRandomPointInCircle(const Vector3& center, float radi
 
 template<class T> static void RegisterNavMeshBase(asIScriptEngine* engine, const char* name)
 {
+    engine->RegisterObjectMethod(name, "bool Allocate(const BoundingBox&in, uint)", asMETHOD(T, Allocate), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build()", asMETHODPR(T, Build, (), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "bool Build(const BoundingBox&in)", asMETHODPR(T, Build, (const BoundingBox&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "bool Build(const IntVector2&, const IntVector2&)", asMETHODPR(T, Build, (const IntVector2&, const IntVector2&), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "VectorBuffer GetTileData(const IntVector2&) const", asFUNCTION(NavigationMeshGetTileData), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "bool AddTile(const VectorBuffer&in) const", asFUNCTION(NavigationMeshAddTile), asCALL_CDECL_OBJLAST);
+    engine->RegisterObjectMethod(name, "void RemoveTile(const IntVector2&)", asMETHOD(T, RemoveTile), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "void RemoveAllTiles()", asMETHOD(T, RemoveAllTiles), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "bool HasTile(const IntVector2&) const", asMETHOD(T, HasTile), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "BoundingBox GetTileBoudningBox(const IntVector2&) const", asMETHOD(T, GetTileBoudningBox), asCALL_THISCALL);
+    engine->RegisterObjectMethod(name, "IntVector2 GetTileIndex(const Vector3&) const", asMETHOD(T, GetTileIndex), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "void SetAreaCost(uint, float)", asMETHOD(T, SetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "float GetAreaCost(uint) const", asMETHOD(T, GetAreaCost), asCALL_THISCALL);
     engine->RegisterObjectMethod(name, "Vector3 FindNearestPoint(const Vector3&in, const Vector3&in extents = Vector3(1.0, 1.0, 1.0))", asFUNCTION(NavigationMeshFindNearestPoint), asCALL_CDECL_OBJLAST);
