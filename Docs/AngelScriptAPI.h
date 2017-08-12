@@ -1075,6 +1075,7 @@ void Define(const Vector3&);
 void Define(const Vector3&, const Vector3&);
 void Define(float, float);
 bool Defined() const;
+float DistanceToPoint(const Vector3&) const;
 Intersection IsInside(const BoundingBox&) const;
 Intersection IsInside(const Sphere&) const;
 Intersection IsInside(const Vector3&) const;
@@ -4872,9 +4873,12 @@ class DynamicNavigationMesh
 {
 public:
 // Methods:
+bool AddTile(const VectorBuffer&) const;
+bool Allocate(const BoundingBox&, uint);
 void ApplyAttributes();
 bool Build();
 bool Build(const BoundingBox&);
+bool Build(const IntVector2&, const IntVector2&);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
@@ -4890,8 +4894,12 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+BoundingBox GetTileBoudningBox(const IntVector2&) const;
+VectorBuffer GetTileData(const IntVector2&) const;
+IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTile(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -4900,9 +4908,11 @@ void MarkNetworkUpdate() const;
 Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
+void RemoveAllTiles();
 void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+void RemoveTile(const IntVector2&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -7544,9 +7554,12 @@ class NavigationMesh
 {
 public:
 // Methods:
+bool AddTile(const VectorBuffer&) const;
+bool Allocate(const BoundingBox&, uint);
 void ApplyAttributes();
 bool Build();
 bool Build(const BoundingBox&);
+bool Build(const IntVector2&, const IntVector2&);
 void DrawDebugGeometry(DebugRenderer, bool);
 void DrawDebugGeometry(bool);
 Vector3 FindNearestPoint(const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
@@ -7562,8 +7575,12 @@ float GetDistanceToWall(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 
 bool GetInterceptNetworkUpdate(const String&) const;
 Vector3 GetRandomPoint();
 Vector3 GetRandomPointInCircle(const Vector3&, float, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
+BoundingBox GetTileBoudningBox(const IntVector2&) const;
+VectorBuffer GetTileData(const IntVector2&) const;
+IntVector2 GetTileIndex(const Vector3&) const;
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+bool HasTile(const IntVector2&) const;
 bool Load(File, bool = false);
 bool Load(VectorBuffer&, bool = false);
 bool LoadJSON(const JSONValue&, bool = false);
@@ -7572,9 +7589,11 @@ void MarkNetworkUpdate() const;
 Vector3 MoveAlongSurface(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ), int = 3);
 Vector3 Raycast(const Vector3&, const Vector3&, const Vector3& = Vector3 ( 1.0 , 1.0 , 1.0 ));
 void Remove();
+void RemoveAllTiles();
 void RemoveAttributeAnimation(const String&);
 void RemoveInstanceDefault();
 void RemoveObjectAnimation();
+void RemoveTile(const IntVector2&);
 void ResetToDefault();
 bool Save(File) const;
 bool Save(VectorBuffer&) const;
@@ -15990,6 +16009,7 @@ VariantType GetVariantTypeFromName(const String&);
 String GetVariantTypeName(VariantType);
 bool HasSubscribedToEvent(Object, const String&);
 bool HasSubscribedToEvent(const String&);
+uint IntegerLog2(uint);
 float InverseLerp(float, float, float);
 bool IsAbsolutePath(const String&);
 bool IsAlpha(uint);
