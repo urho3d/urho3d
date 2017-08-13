@@ -134,10 +134,28 @@ public:
     void SetPadding(const Vector3& padding);
     /// Set the cost of an area.
     void SetAreaCost(unsigned areaID, float cost);
+    /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
+    virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
     /// Rebuild the navigation mesh. Return true if successful.
     virtual bool Build();
     /// Rebuild part of the navigation mesh contained by the world-space bounding box. Return true if successful.
     virtual bool Build(const BoundingBox& boundingBox);
+    /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
+    virtual bool Build(const IntVector2& from, const IntVector2& to);
+    /// Return tile data.
+    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
+    /// Add tile to navigation mesh.
+    virtual bool AddTile(const PODVector<unsigned char>& tileData);
+    /// Remove tile from navigation mesh.
+    virtual void RemoveTile(const IntVector2& tile);
+    /// Remove all tiles from navigation mesh.
+    virtual void RemoveAllTiles();
+    /// Return whether the navigation mesh has tile.
+    bool HasTile(const IntVector2& tile) const;
+    /// Return bounding box of the tile in the node space.
+    BoundingBox GetTileBoudningBox(const IntVector2& tile) const;
+    /// Return index of the tile at the position.
+    IntVector2 GetTileIndex(const Vector3& position) const;
     /// Find the nearest point on the navigation mesh to a given point. Extents specifies how far out from the specified point to check along each axis.
     Vector3 FindNearestPoint
         (const Vector3& point, const Vector3& extents = Vector3::ONE, const dtQueryFilter* filter = 0, dtPolyRef* nearestRef = 0);
@@ -254,18 +272,25 @@ public:
     /// Return whether to draw NavArea components.
     bool GetDrawNavAreas() const { return drawNavAreas_; }
 
+private:
+    /// Write tile data.
+    void WriteTile(Serializer& dest, int x, int z) const;
+    /// Read tile data to the navigation mesh.
+    bool ReadTile(Deserializer& source, bool silent);
+
 protected:
     /// Collect geometry from under Navigable components.
     void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList);
     /// Visit nodes and collect navigable geometry.
-    void
-        CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
+    void CollectGeometries(Vector<NavigationGeometryInfo>& geometryList, Node* node, HashSet<Node*>& processedNodes, bool recursive);
     /// Get geometry data within a bounding box.
     void GetTileGeometry(NavBuildData* build, Vector<NavigationGeometryInfo>& geometryList, BoundingBox& box);
     /// Add a triangle mesh to the geometry data.
     void AddTriMeshGeometry(NavBuildData* build, Geometry* geometry, const Matrix3x4& transform);
     /// Build one tile of the navigation mesh. Return true if successful.
     virtual bool BuildTile(Vector<NavigationGeometryInfo>& geometryList, int x, int z);
+    /// Build tiles in the rectangular area. Return number of built tiles.
+    unsigned BuildTiles(Vector<NavigationGeometryInfo>& geometryList, const IntVector2& from, const IntVector2& to);
     /// Ensure that the navigation mesh query is initialized. Return true if successful.
     bool InitializeQuery();
     /// Release the navigation mesh and the query.

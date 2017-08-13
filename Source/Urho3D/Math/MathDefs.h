@@ -205,6 +205,19 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ++value;
 }
 
+/// Return the largest power of two that is less or equal to the given value.
+inline unsigned IntegerLog2(unsigned value)
+{
+    unsigned ret = 0;
+    while (value > 1)
+    {
+        value >>= 1;
+        ++ret;
+    }
+    return ret;
+
+}
+
 /// Count the number of set bits in a mask.
 inline unsigned CountSetBits(unsigned value)
 {

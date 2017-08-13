@@ -13,6 +13,13 @@
 
 const String INSTRUCTION("instructionText");
 
+bool useStreaming = false;
+// Used for streaming only
+const int STREAMING_DISTANCE = 2;
+Array<VectorBuffer> navigationTilesData;
+Array<IntVector2> navigationTilesIdx;
+Array<IntVector2> addedTiles;
+
 void Start()
 {
     // Execute the common startup for samples
@@ -88,6 +95,8 @@ void CreateScene()
 
     // Create a DynamicNavigationMesh component to the scene root
     DynamicNavigationMesh@ navMesh = scene_.CreateComponent("DynamicNavigationMesh");
+    // Set small tiles to show navigation mesh streaming
+    navMesh.tileSize = 32;
     // Enable drawing debug geometry for obstacles and off-mesh connections
     navMesh.drawObstacles = true;
     navMesh.drawOffMeshConnections = true;
@@ -161,6 +170,7 @@ void CreateUI()
         "LMB to set destination, SHIFT+LMB to spawn a Jack\n"
         "MMB or O key to add obstacles or remove obstacles/agents\n"
         "F5 to save scene, F7 to load\n"
+        "Tab to toggle navigation mesh streaming\n"
         "Space to toggle debug geometry\n"
         "F12 to toggle this instruction text";
     instructionText.SetFont(cache.GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15);
@@ -414,6 +424,82 @@ void MoveCamera(float timeStep)
     }
 }
 
+void ToggleStreaming(bool enabled)
+{
+    DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
+    if (enabled)
+    {
+        int maxTiles = (2 * STREAMING_DISTANCE + 1) * (2 * STREAMING_DISTANCE + 1);
+        BoundingBox boundingBox = navMesh.boundingBox;
+        SaveNavigationData();
+        navMesh.Allocate(boundingBox, maxTiles);
+    }
+    else
+        navMesh.Build();
+}
+
+void UpdateStreaming()
+{
+    DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
+
+    // Center the navigation mesh at the crowd of jacks
+    Vector3 averageJackPosition;
+    Node@ jackGroup = scene_.GetChild("Jacks");
+    if (jackGroup !is null)
+    {
+        for (uint i = 0; i < jackGroup.numChildren; ++i)
+            averageJackPosition += jackGroup.children[i].worldPosition;
+        averageJackPosition /= jackGroup.numChildren;
+    }
+
+    // Compute currently loaded area
+    IntVector2 jackTile = navMesh.GetTileIndex(averageJackPosition);
+    IntVector2 beginTile = VectorMax(IntVector2(0, 0), jackTile - IntVector2(1, 1) * STREAMING_DISTANCE);
+    IntVector2 endTile = VectorMin(jackTile + IntVector2(1, 1) * STREAMING_DISTANCE, navMesh.numTiles - IntVector2(1, 1));
+
+    // Remove tiles
+    for (uint i = 0; i < addedTiles.length;)
+    {
+        IntVector2 tileIdx = addedTiles[i];
+        if (beginTile.x <= tileIdx.x && tileIdx.x <= endTile.x && beginTile.y <= tileIdx.y && tileIdx.y <= endTile.y)
+            ++i;
+        else
+        {
+            addedTiles.Erase(i);
+            navMesh.RemoveTile(tileIdx);
+        }
+    }
+
+    // Add tiles
+    for (int z = beginTile.y; z <= endTile.y; ++z)
+        for (int x = beginTile.x; x <= endTile.x; ++x)
+        {
+            const IntVector2 tileIdx(x, z);
+            int tileDataIdx = navigationTilesIdx.Find(tileIdx);
+            if (!navMesh.HasTile(tileIdx) && tileDataIdx != -1)
+            {
+                addedTiles.Push(tileIdx);
+                navMesh.AddTile(navigationTilesData[tileDataIdx]);
+            }
+        }
+}
+
+void SaveNavigationData()
+{
+    DynamicNavigationMesh@ navMesh = scene_.GetComponent("DynamicNavigationMesh");
+    navigationTilesData.Clear();
+    navigationTilesIdx.Clear();
+    addedTiles.Clear();
+    IntVector2 numTiles = navMesh.numTiles;
+    for (int z = 0; z < numTiles.y; ++z)
+        for (int x = 0; x < numTiles.x; ++x)
+        {
+            IntVector2 idx(x, z);
+            navigationTilesData.Push(navMesh.GetTileData(idx));
+            navigationTilesIdx.Push(idx);
+        }
+}
+
 void HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     // Take the frame time step, which is stored as a float
@@ -421,6 +507,15 @@ void HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Move the camera, scale movement with time step
     MoveCamera(timeStep);
+
+    // Update streaming
+    if (input.keyPress[KEY_TAB])
+    {
+        useStreaming = !useStreaming;
+        ToggleStreaming(useStreaming);
+    }
+    if (useStreaming)
+        UpdateStreaming();
 }
 
 void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

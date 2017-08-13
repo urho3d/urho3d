@@ -246,12 +246,13 @@ bool IKEffector::GetFeature(Feature feature) const
 // ----------------------------------------------------------------------------
 void IKEffector::UpdateTargetNodePosition()
 {
+    if (targetNode_ != NULL || targetName_.Empty())
+        return;
+
+    // Try to find a node with the same name as our target name
+    SetTargetNode(node_->GetScene()->GetChild(targetName_, true));
     if (targetNode_ == NULL)
-    {
-        SetTargetNode(node_->GetScene()->GetChild(targetName_, true));
-        if (targetNode_ == NULL)
-            return;
-    }
+        return;
 
     SetTargetPosition(targetNode_->GetWorldPosition());
     SetTargetRotation(targetNode_->GetWorldRotation());
