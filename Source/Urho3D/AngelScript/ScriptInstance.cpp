@@ -115,7 +115,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
         if (resourcePtr)
             resourcePtr->ReleaseRef();
         const ResourceRef& ref = src.GetResourceRef();
-        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_, GetBasePath()); //TODO: Decide how to handle script instance's relative paths NEL
+        resourcePtr = GetSubsystem<ResourceCache>()->GetResource(ref.type_, ref.name_, GetBasePath()); //TODO: Decide how to handle script instance's relative paths
         if (resourcePtr)
             resourcePtr->AddRef();
     }

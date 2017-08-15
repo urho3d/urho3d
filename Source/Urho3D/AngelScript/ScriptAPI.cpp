@@ -98,7 +98,7 @@ static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, con
 {
     ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
     return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName, ""), className, mode, ptr);
-    //TODO: Decide how relative paths should be handled in this case (with scripting). NEL
+    //TODO: Decide how relative paths should be handled in this case (with scripting).
 }
 
 asIScriptObject* NodeGetScriptObject(Node* ptr)
