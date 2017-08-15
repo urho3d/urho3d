@@ -1706,7 +1706,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             dummyModel->SetNumGeometries(model.meshes_.Size());
             cache->AddManualResource(dummyModel);
         }
-		staticModel->SetModel(cache->GetResource<Model>(modelName));
+        staticModel->SetModel(cache->GetResource<Model>(modelName));
 
         // Set materials if they are known
         for (unsigned j = 0; j < model.meshes_.Size(); ++j)
@@ -1719,7 +1719,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 dummyMat->SetName(matName);
                 cache->AddManualResource(dummyMat);
             }
-			staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
+            staticModel->SetMaterial(j, cache->GetResource<Material>(matName));
         }
     }
 
