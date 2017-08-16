@@ -1234,8 +1234,12 @@ macro (enable_pch HEADER_PATHNAME)
                     execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new ${ABS_PATH_PCH}.${CONFIG}.pch.rsp)
                     file (REMOVE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new)
                     if (NOT ${TARGET_NAME}_PCH_DEPS)
+                        if (NOT CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
+                            # Create a dummy initial PCH file in the Out-of-source build tree to keep CLion happy
+                            execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${ABS_PATH_PCH})
+                        endif ()
                         # Determine the dependency list
-                        execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -MTdeps -MM -MF ${ABS_PATH_PCH}.d -o ${ABS_PATH_PCH} ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
+                        execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -MTdeps -MM -MF ${ABS_PATH_PCH}.d ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
                         if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
                             message (FATAL_ERROR "Could not generate dependency list for PCH. There is something wrong with your compiler toolchain. "
                                 "Ensure its bin path is in the PATH environment variable or ensure CMake can find CC/CXX in your build environment.")
