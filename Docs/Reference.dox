@@ -2139,8 +2139,7 @@ location and  need  to  calculate all of the rotations of the parent joints to
 achieve this.
 
 Examples include: Moving a hand to pick  up  an object, or adjusting a foot so
-it's  always  touching  the  ground, regardless of incline, or even  precisely
-ligning  up  a  large  tentacle  in  order   to   penetrate...   Never   mind.
+it's  always  touching  the  ground, regardless of incline.
 
 \section ikterminology Terminology
 
