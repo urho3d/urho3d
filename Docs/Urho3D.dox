@@ -445,6 +445,7 @@ V1.7
 - Sample content: new Urho3D logo.
 - Sample content: mutant model added to the CharacterDemo.
 - Sample content: Vertex colors in the standard primitive models.
+- Sample content: fix normals / lighting on the cylinder.
 - Sample content: Line primitive models.
 - Sample content: material preview model.
 - Fix broken off-mesh movement for %CrowdAgent.
