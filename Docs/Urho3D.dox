@@ -269,6 +269,7 @@ V1.7
 - Inverse kinematics support.
 - Bullet %RaycastVehicle support.
 - AppleTV platform support.
+- WebAssembly support on the Web platform.
 - IME support on Linux platform.
 - Several font rendering improvements and TypoGraphy sample.
 - WebP image loading support.
@@ -353,7 +354,7 @@ V1.7
 - %Text3D GetHeight() function.
 - %Console auto-completion.
 - %Console text highlighting according to message type.
-- %XMLFile GetOrCreateRoot() function, and %XMLElement GetOrCreateChild(9 function.
+- %XMLFile GetOrCreateRoot() function, and %XMLElement GetOrCreateChild() function.
 - Urho3DPlayer attempts to read CommandLine.txt from resource system on all platforms, if cannot read from filesystem.
 - Improve use of SDL_Init() so that %Context keeps track of initialized SDL subsystems.
 - IES cookie generation in RampGenerator.
