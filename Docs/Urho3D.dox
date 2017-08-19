@@ -378,33 +378,6 @@ V1.7
 - Update to Assimp 3.2.
 - Update to LZ4 1.7.5.
 - Update to Bullet 2.86.1.
-- Documentation: explain how to setup Windows MKLINK privilege.
-- Documentation: add section on scene graph events.
-- Documentation: explain EMSCRIPTEN_WASM build option.
-- Documentation: note on simultaneous network server & client usage.
-- Documentation: update on the define_resource_dirs() macro.
-- Documentation: do not include RapidJSON classes.
-- Documentation: inverse kinematics page.
-- AssetImporter: possibility to export animation without skinned mesh.
-- AssetImporter: $fbx node suppression.
-- AssetImporter: fix animation start/end times when saving multiple animations.
-- AssetImporter: fix incorrect applying of model's root node transform.
-- Editor: do not attempt to parse extensionless files as XML.
-- Editor: draw navigation debug geometry.
-- Editor: prevent unnecessary attribute inspector refresh on resource reload.
-- Editor: allow drag-drop of generic XML files into attribute edit fields.
-- Editor: improved handling of structure attributes.
-- Editor: optimization to avoid updating temporary objects when they are not shown in hierarchy.
-- Editor: optimize update during object spawn.
-- Editor: paint selection.
-- Editor: show origins option.
-- Editor: fix %UI element internal var indexing so that editing user-defined variables works right.
-- Editor: restore window positions on viewport mode switch.
-- Editor: terrain editor.
-- Editor: color wheel for %Text3D.
-- Editor: double size on high DPI display.
-- Editor: fix resource browser node add/removal shown in hierarchy window.
-- Editor: fix resource browser preview camera position.
 - Build system: ensure empty CMAKE_OSX_DEPLOYMENT_TARGET on iOS build.
 - Build system: auto-disable PCH on Android Clang build.
 - Build system: prefer CMake's regex instead of grep.
@@ -441,6 +414,33 @@ V1.7
 - Build system: fix symlinked batch files not being launchable from Windows Explorer.
 - Build system: generate PCH files using naming convention expected by Clion.
 - Build system: generate dummy PCH only in out-of-source build tree.
+- Editor: do not attempt to parse extensionless files as XML.
+- Editor: draw navigation debug geometry.
+- Editor: prevent unnecessary attribute inspector refresh on resource reload.
+- Editor: allow drag-drop of generic XML files into attribute edit fields.
+- Editor: improved handling of structure attributes.
+- Editor: optimization to avoid updating temporary objects when they are not shown in hierarchy.
+- Editor: optimize update during object spawn.
+- Editor: paint selection.
+- Editor: show origins option.
+- Editor: fix %UI element internal var indexing so that editing user-defined variables works right.
+- Editor: restore window positions on viewport mode switch.
+- Editor: terrain editor.
+- Editor: color wheel for %Text3D.
+- Editor: double size on high DPI display.
+- Editor: fix resource browser node add/removal shown in hierarchy window.
+- Editor: fix resource browser preview camera position.
+- AssetImporter: possibility to export animation without skinned mesh.
+- AssetImporter: $fbx node suppression.
+- AssetImporter: fix animation start/end times when saving multiple animations.
+- AssetImporter: fix incorrect applying of model's root node transform.
+- Documentation: explain how to setup Windows MKLINK privilege.
+- Documentation: add section on scene graph events.
+- Documentation: explain EMSCRIPTEN_WASM build option.
+- Documentation: note on simultaneous network server & client usage.
+- Documentation: update on the define_resource_dirs() macro.
+- Documentation: do not include RapidJSON classes.
+- Documentation: inverse kinematics page.
 - Sample content: Kachujin model, used in SkeletalAnimation sample.
 - Sample content: new Urho3D logo.
 - Sample content: mutant model added to the CharacterDemo.
