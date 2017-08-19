@@ -40,6 +40,7 @@
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/View3D.h"
+#include "../UI/UIComponent.h"
 
 #include "../DebugNew.h"
 
@@ -800,6 +801,16 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 
+static void RegisterUIComponent(asIScriptEngine* engine)
+{
+    RegisterComponent<UIComponent>(engine, "UIComponent", true, false);
+    engine->RegisterObjectMethod("UIComponent", "void SetElement(UIElement@+)", asMETHOD(UIComponent, SetElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "UIElement@+ GetElement()", asMETHOD(UIComponent, GetElement), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Material@+ GetMaterial()", asMETHOD(UIComponent, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ GetTexture()", asMETHOD(UIComponent, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "bool IsEnabled() const", asMETHOD(UIComponent, IsEnabled), asCALL_THISCALL);
+}
+
 void RegisterUIAPI(asIScriptEngine* engine)
 {
     RegisterFont(engine);
@@ -825,6 +836,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterFileSelector(engine);
     RegisterToolTip(engine);
     RegisterUI(engine);
+    RegisterUIComponent(engine);
 }
 
 }
