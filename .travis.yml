@@ -136,15 +136,15 @@ matrix:
     - &debug-build-stage
       stage: debug build
       addons: *pulseaudio
-      env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=DEBUG
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=Debug
       script: rake ci && rake ci_timer
     - <<: *debug-build-stage
-      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=DEBUG
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
     - &debug-build-stage-clang
       <<: *debug-build-stage
       compiler: clang
     - <<: *debug-build-stage-clang
-      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=DEBUG
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=Debug
 # TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' stages here
     - stage: lint (to be implemented)
       <<: *base
