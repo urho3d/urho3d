@@ -98,9 +98,8 @@ matrix:
     - <<: *Linux-64bit
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
     - &Linux-64bit-clang
-      <<: *Linux-64bit
       compiler: clang
-      addons: {apt: {packages: *linux_packages}}
+      addons: &pulseaudio {apt: {packages: libpulse-dev}}
       env: LINUX=1 URHO3D_LIB_TYPE=STATIC
     - <<: *Linux-64bit-clang
       env: LINUX=1 URHO3D_LIB_TYPE=SHARED
@@ -134,18 +133,18 @@ matrix:
       env: WIN32=1 URHO3D_LIB_TYPE=STATIC URHO3D_64BIT=0 URHO3D_OPENGL=0
     - <<: *MinGW-32bit
       env: WIN32=1 URHO3D_LIB_TYPE=SHARED URHO3D_64BIT=0 URHO3D_OPENGL=0
-    - stage: debug build
-      <<: *Linux-64bit
-      env: &STATIC-DEBUG LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=DEBUG
-    - stage: debug build
-      <<: *Linux-64bit
-      env: &SHARED-DEBUG LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=DEBUG
-    - stage: debug build
-      <<: *Linux-64bit-clang
-      env: *STATIC-DEBUG
-    - stage: debug build
-      <<: *Linux-64bit-clang
-      env: *SHARED-DEBUG
+    - &debug-build-stage
+      stage: debug build
+      addons: *pulseaudio
+      env: LINUX=1 URHO3D_LIB_TYPE=STATIC CMAKE_BUILD_TYPE=DEBUG
+      script: rake ci && rake ci_timer
+    - <<: *debug-build-stage
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=DEBUG
+    - &debug-build-stage-clang
+      <<: *debug-build-stage
+      compiler: clang
+    - <<: *debug-build-stage-clang
+      env: LINUX=1 URHO3D_LIB_TYPE=SHARED CMAKE_BUILD_TYPE=DEBUG
 # TODO - if/when Travis-CI later supports conditional build stages then move the 'scan' and 'annotate' stages here
     - stage: lint (to be implemented)
       <<: *base
