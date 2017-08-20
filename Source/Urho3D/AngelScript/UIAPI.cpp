@@ -41,6 +41,7 @@
 #include "../UI/UI.h"
 #include "../UI/View3D.h"
 #include "../UI/UIComponent.h"
+#include "../Graphics/Texture2D.h"
 
 #include "../DebugNew.h"
 
