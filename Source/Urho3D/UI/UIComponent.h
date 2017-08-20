@@ -45,16 +45,12 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Set UIElement. Element will be removed from it's parent.
-    void SetElement(UIElement* element);
     /// Get UIElement.
-    UIElement* GetElement() { return element_; }
+    UIElement* GetRoot() { return rootElement_; }
     /// Get material which will be used for rendering UI texture.
     Material* GetMaterial() { return material_; }
     /// Get texture which will be used for rendering UI to.
     Texture2D* GetTexture() { return texture_; }
-    /// Return `true` if component is in a state ready for rendering.
-    bool IsEnabled() const;
 
 protected:
     /// Material that is set to the model.
@@ -64,7 +60,7 @@ protected:
     /// Model that texture will be applied to.
     SharedPtr<StaticModel> model_;
     /// UIElement to be rendered into texture.
-    SharedPtr<UIElement> element_;
+    SharedPtr<UIElement> rootElement_;
     /// UI rendering batches.
     PODVector<UIBatch> batches_;
     /// UI rendering vertex data.
@@ -77,16 +73,12 @@ protected:
     PODVector<float> debugVertexData_;
     /// UI debug geometry vertex buffer.
     SharedPtr<VertexBuffer> debugVertexBuffer_;
+    /// Is StaticModel component created by this component.
+    bool isStaticModelOwned_;
 
     virtual void OnNodeSet(Node* node);
     /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
     void OnElementResized(StringHash eventType, VariantMap& args);
-    /// Set size of texture.
-    bool SetTextureSize(const IntVector2& size);
-    /// Set size of texture.
-    bool SetTextureSize(int width, int height);
-    /// Get viewport that this component belongs to.
-    Viewport* GetViewport() const;
     /// Convert screen position to position on UIElement.
     bool ScreenToUIPosition(IntVector2 screenPos, IntVector2& result);
 

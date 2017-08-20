@@ -450,7 +450,7 @@ void UI::RenderUpdate()
         {
             component->batches_.Clear();
             component->vertexData_.Clear();
-            UIElement* element = component->GetElement();
+            UIElement* element = component->GetRoot();
             const IntVector2& size = element->GetSize();
             const IntVector2& pos = element->GetPosition();
             // Note: the scissors operate on unscaled coordinates. Scissor scaling is only performed during render
@@ -502,7 +502,7 @@ void UI::Render(bool resetRenderTargets)
             SetVertexData(component->debugVertexBuffer_, component->debugVertexData_);
             Render(resetRenderTargets, component->vertexBuffer_, component->batches_, 0, component->batches_.Size(),
                    component->GetTexture()->GetRenderSurface());
-            Render(false, component->debugVertexBuffer_, component->debugDrawBatches_, 0,
+            Render(resetRenderTargets, component->debugVertexBuffer_, component->debugDrawBatches_, 0,
                    component->debugDrawBatches_.Size(), component->GetTexture()->GetRenderSurface());
             component->debugDrawBatches_.Clear();
             component->debugVertexData_.Clear();
@@ -533,7 +533,7 @@ void UI::DebugDraw(UIElement* element)
             for (Vector<WeakPtr<UIComponent> >::Iterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
             {
                 WeakPtr<UIComponent> component = *it;
-                if (component.NotNull() && component->GetElement() == root && component->IsEnabled())
+                if (component.NotNull() && component->GetRoot() == root && component->IsEnabled())
                 {
                     element->GetDebugDrawBatches(component->debugDrawBatches_, component->debugVertexData_, scissor);
                     break;
@@ -761,7 +761,7 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVec
             IntVector2 screenPosition;
             if (component->ScreenToUIPosition(position, screenPosition))
             {
-                result = GetElementAt(component->GetElement(), screenPosition, enabledOnly);
+                result = GetElementAt(component->GetRoot(), screenPosition, enabledOnly);
                 if (result)
                 {
                     if (elementScreenPosition)

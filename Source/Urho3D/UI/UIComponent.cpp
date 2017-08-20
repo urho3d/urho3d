@@ -47,9 +47,23 @@ static int const UICOMPONENT_MAX_TEXTURE_SIZE = 4096;
 
 UIComponent::UIComponent(Context* context)
     : Component(context)
+    , isStaticModelOwned_(false)
 {
     vertexBuffer_ = new VertexBuffer(context_);
     debugVertexBuffer_ = new VertexBuffer(context_);
+    texture_ = context_->CreateObject<Texture2D>();
+
+    rootElement_ = context_->CreateObject<UIElement>();
+    rootElement_->SetTraversalMode(TM_BREADTH_FIRST);
+
+    material_ = context_->CreateObject<Material>();
+    material_->SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/Diff.xml"));
+    material_->SetTexture(TU_DIFFUSE, texture_);
+
+    SubscribeToEvent(rootElement_, E_RESIZED, URHO3D_HANDLER(UIComponent, OnElementResized));
+
+    // Triggers resizing of texture.
+    rootElement_->SetSize(UICOMPONENT_DEFAULT_TEXTURE_SIZE, UICOMPONENT_DEFAULT_TEXTURE_SIZE);
 }
 
 void UIComponent::RegisterObject(Context* context)
@@ -61,76 +75,40 @@ void UIComponent::OnNodeSet(Node* node)
 {
     if (node)
     {
-        if (texture_.Null())
-            SetTextureSize(UICOMPONENT_DEFAULT_TEXTURE_SIZE, UICOMPONENT_DEFAULT_TEXTURE_SIZE);
-
-        if (material_.Null())
-        {
-            material_ = context_->CreateObject<Material>();
-            material_->SetTechnique(0, GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/Diff.xml"));
-            material_->SetTexture(TU_DIFFUSE, texture_);
-        }
-
         model_ = node->GetComponent<StaticModel>();
         if (model_.Null())
+        {
+            isStaticModelOwned_ = true;
             model_ = node->CreateComponent<StaticModel>();
+        }
+        model_->SetMaterial(material_);
     }
     else
     {
-        material_ = 0;
-        texture_ = 0;
+        model_->SetMaterial(0);
+        if (isStaticModelOwned_)
+        {
+            model_->GetNode()->RemoveComponent<StaticModel>();
+            isStaticModelOwned_ = false;
+        }
         model_ = 0;
-        SetElement(0);
     }
-}
 
-void UIComponent::SetElement(UIElement* element)
-{
-    UI* ui = GetSubsystem<UI>();
-    if (element)
-    {
-        // Elements rendered to texture do not belong to normal UI tree. They are treated as top-level elements.
-        element->Remove();
-        element->SetTraversalMode(TM_DEPTH_FIRST);
-        SetTextureSize(element->GetSize());
-        SubscribeToEvent(element, E_RESIZED, URHO3D_HANDLER(UIComponent, OnElementResized));
-        ui->SetRenderToTexture(this, true);
-        if (model_.NotNull())
-            model_->SetMaterial(material_);
-    }
-    else
-    {
-        if (element_.NotNull())
-            element_->SetTraversalMode(TM_BREADTH_FIRST);
-        UnsubscribeFromEvent(E_RESIZED);
-        ui->SetRenderToTexture(this, false);
-        if (model_.NotNull())
-            model_->SetMaterial(0);
-    }
-    element_ = element;
+    GetSubsystem<UI>()->SetRenderToTexture(this, node != 0);
 }
 
 void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)
 {
-    SetTextureSize(args[Resized::P_WIDTH].GetInt(), args[Resized::P_HEIGHT].GetInt());
-}
+    int width = args[Resized::P_WIDTH].GetInt();
+    int height = args[Resized::P_HEIGHT].GetInt();
 
-bool UIComponent::SetTextureSize(const IntVector2& size)
-{
-    return SetTextureSize(size.x_, size.y_);
-}
-
-bool UIComponent::SetTextureSize(int width, int height)
-{
     if (width < UICOMPONENT_MIN_TEXTURE_SIZE || width > UICOMPONENT_MAX_TEXTURE_SIZE ||
         height < UICOMPONENT_MIN_TEXTURE_SIZE || height > UICOMPONENT_MAX_TEXTURE_SIZE)
     {
-        URHO3D_LOGERROR("UIComponent::SetTextureSize() - Attempting to set invalid size, failed");
-        return false;
+        URHO3D_LOGERRORF("UIComponent: Texture size %dx%d is not valid. Width and height should be between %d and %d.",
+                         width, height, UICOMPONENT_MIN_TEXTURE_SIZE, UICOMPONENT_MAX_TEXTURE_SIZE);
+        return;
     }
-
-    if (texture_.Null())
-        texture_ = context_->CreateObject<Texture2D>();
 
     if (texture_->SetSize(width, height, GetSubsystem<Graphics>()->GetRGBAFormat(), TEXTURE_RENDERTARGET))
     {
@@ -139,39 +117,26 @@ bool UIComponent::SetTextureSize(int width, int height)
         texture_->SetAddressMode(COORD_V, ADDRESS_CLAMP);
         texture_->SetNumLevels(1);                                                // No mipmaps
         texture_->GetRenderSurface()->SetUpdateMode(SURFACE_MANUALUPDATE);
-        return true;
     }
-    return false;
-}
-
-Viewport* UIComponent::GetViewport() const
-{
-    if (!GetScene())
-        return 0;
-
-    Renderer* renderer = GetSubsystem<Renderer>();
-    for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
-    {
-        Viewport* viewport = renderer->GetViewport(i);
-        // Find viewport with same scene
-        // TODO: support multiple viewports
-        if (viewport && viewport->GetScene() == GetScene())
-            return viewport;
-    }
-    return 0;
+    else
+        URHO3D_LOGERROR("UIComponent: resizing texture failed.");
 }
 
 bool UIComponent::ScreenToUIPosition(IntVector2 screenPos, IntVector2& result)
 {
-    Viewport* viewport = GetViewport();
-    if (!viewport)
+    Scene* scene = GetScene();
+    if (!scene)
         return false;
 
-    Scene* scene = GetScene();
-    Camera* camera = viewport->GetCamera();
+    Viewport* viewport = scene->GetViewport();
     Octree* octree = scene->GetComponent<Octree>();
 
-    if (!camera || !octree)
+    if (!viewport || !octree)
+        return false;
+
+    Camera* camera = viewport->GetCamera();
+
+    if (!camera)
         return false;
 
     IntRect rect = viewport->GetRect();
@@ -203,16 +168,11 @@ bool UIComponent::ScreenToUIPosition(IntVector2 screenPos, IntVector2& result)
         }
 
         Vector2& uv = queryResult.textureUV_;
-        result = IntVector2(static_cast<int>(uv.x_ * element_->GetWidth()),
-                            static_cast<int>(uv.y_ * element_->GetHeight()));
+        result = IntVector2(static_cast<int>(uv.x_ * rootElement_->GetWidth()),
+                            static_cast<int>(uv.y_ * rootElement_->GetHeight()));
         return true;
     }
     return false;
-}
-
-bool UIComponent::IsEnabled() const
-{
-    return Component::IsEnabled() && model_.NotNull() && texture_.NotNull() && material_.NotNull();;
 }
 
 }

@@ -53,7 +53,8 @@ HelloGUI::HelloGUI(Context* context) :
     uiRoot_(GetSubsystem<UI>()->GetRoot()),
     dragBeginPosition_(IntVector2::ZERO),
     animateCube_(true),
-    renderOnCube_(false)
+    renderOnCube_(false),
+    drawDebug_(false)
 {
 }
 
@@ -119,7 +120,8 @@ void HelloGUI::InitControls()
 
     instructions_ = new Text(context_);
     instructions_->SetStyleAuto();
-    instructions_->SetText("[TAB]   - toggle between rendering on screen or cube.\n[Space] - toggle cube rotation.");
+    instructions_->SetText("[TAB]   - toggle between rendering on screen or cube.\n"
+                           "[Space] - toggle cube rotation.");
     uiRoot_->AddChild(instructions_);
 }
 
@@ -303,19 +305,16 @@ void HelloGUI::Init3DUI()
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-    // Element that accts as root element of UI rendered to texture.
-    textureRoot_ = new UIElement(context_);
-    // Set size of root element. This is size of texture as well.
-    textureRoot_->SetSize(512, 512);
-
     // Node that will get UI rendered on it.
     Node* boxNode = scene_->GetChild("Box");
     // Create a component that sets up UI rendering. It sets material to StaticModel of the node.
     UIComponent* component = boxNode->CreateComponent<UIComponent>();
     // Optionally modify material. Technique is changed so object is visible without any lights.
     component->GetMaterial()->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
-    // Add UI element for rendering. All it's children will be rendered into texture which will be applied to boxNode.
-    component->SetElement(textureRoot_);
+    // Save root element of texture UI for later use.
+    textureRoot_ = component->GetRoot();
+    // Set size of root element. This is size of texture as well.
+    textureRoot_->SetSize(512, 512);
 }
 
 void HelloGUI::HandleUpdate(StringHash, VariantMap& eventData)
@@ -325,14 +324,11 @@ void HelloGUI::HandleUpdate(StringHash, VariantMap& eventData)
     Input* input = GetSubsystem<Input>();
     Node* node = scene_->GetChild("Box");
 
-    static UIElement* current = 0;
-    if (current)
-        GetSubsystem<UI>()->DebugDraw(current);
+    if (current_.NotNull() && drawDebug_)
+        GetSubsystem<UI>()->DebugDraw(current_);
 
     if (input->GetMouseButtonPress(MOUSEB_LEFT))
-    {
-        current = GetSubsystem<UI>()->GetElementAt(input->GetMousePosition());
-    }
+        current_ = GetSubsystem<UI>()->GetElementAt(input->GetMousePosition());
 
     if (input->GetKeyPress(KEY_TAB))
     {
@@ -352,6 +348,9 @@ void HelloGUI::HandleUpdate(StringHash, VariantMap& eventData)
 
     if (input->GetKeyPress(KEY_SPACE))
         animateCube_ = !animateCube_;
+
+    if (input->GetKeyPress(KEY_F2))
+        drawDebug_ = !drawDebug_;
 
     if (animateCube_)
     {
