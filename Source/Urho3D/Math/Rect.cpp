@@ -37,6 +37,40 @@ const Rect Rect::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
 
 const IntRect IntRect::ZERO(0, 0, 0, 0);
 
+void IntRect::Clip(const IntRect& rect)
+{
+    if (rect.left_ > left_)
+        left_ = rect.left_;
+    if (rect.right_ < right_)
+        right_ = rect.right_;
+    if (rect.top_ > top_)
+        top_ = rect.top_;
+    if (rect.bottom_ < bottom_)
+        bottom_ = rect.bottom_;
+
+    if (left_ >= right_ || top_ >= bottom_)
+        *this = IntRect();
+}
+
+void IntRect::Merge(const IntRect& rect)
+{
+    if (Width() <= 0 || Height() <= 0)
+    {
+        *this = rect;
+    }
+    else if (rect.Width() > 0 && rect.Height() > 0)
+    {
+        if (rect.left_ < left_)
+            left_ = rect.left_;
+        if (rect.top_ < top_)
+            top_ = rect.top_;
+        if (rect.right_ > right_)
+            right_ = rect.right_;
+        if (rect.bottom_ > bottom_)
+            bottom_ = rect.bottom_;
+    }
+}
+
 String Rect::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
