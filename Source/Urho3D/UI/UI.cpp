@@ -960,6 +960,7 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
 
     bool scissorTest = true;
     unsigned alphaFormat = Graphics::GetAlphaFormat();
+    RenderSurface* previousSurface = graphics_->GetRenderTarget(0);
     IntVector2 viewSize;
     if (surface)
         viewSize = IntVector2(surface->GetWidth(), surface->GetHeight());
@@ -1068,6 +1069,9 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE,
             (batch.vertexEnd_ - batch.vertexStart_) / UI_VERTEX_SIZE);
     }
+
+    if (surface && !resetRenderTargets)
+        graphics_->SetRenderTarget(0, previousSurface);
 }
 
 void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor)
