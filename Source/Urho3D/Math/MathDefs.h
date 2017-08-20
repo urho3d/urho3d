@@ -205,17 +205,14 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ++value;
 }
 
-/// Return the largest power of two that is less or equal to the given value.
-inline unsigned IntegerLog2(unsigned value)
+/// Return log base two or the MSB position of the given value.
+inline unsigned LogBaseTwo(unsigned value)
 {
+    // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
     unsigned ret = 0;
-    while (value > 1)
-    {
-        value >>= 1;
+    while (value >>= 1)     // Unroll for more speed...
         ++ret;
-    }
     return ret;
-
 }
 
 /// Count the number of set bits in a mask.

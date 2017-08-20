@@ -260,7 +260,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
     numTilesZ_ = (gridH + tileSize_ - 1) / tileSize_;
 
     // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
-    unsigned tileBits = IntegerLog2(maxTiles);
+    unsigned tileBits = LogBaseTwo(maxTiles);
     unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
 
     dtNavMeshParams params;
@@ -375,7 +375,7 @@ bool DynamicNavigationMesh::Build()
 
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
-        unsigned tileBits = IntegerLog2(maxTiles);
+        unsigned tileBits = LogBaseTwo(maxTiles);
         unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
 
         dtNavMeshParams params;

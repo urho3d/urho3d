@@ -344,8 +344,8 @@ task :ci do
   puts; $stdout.flush
   # Using out-of-source build tree when using Travis-CI; 'build_tree' environment variable is already set when on AppVeyor
   ENV['build_tree'] = '../Build' unless ENV['APPVEYOR']
-  # Always use a same build configuration to keep ccache's cache size small; single-config generator needs the option when configuring, while multi-config when building
-  ENV[ENV['XCODE'] ? 'config' : 'CMAKE_BUILD_TYPE'] = 'Release' if ENV['USE_CCACHE']
+  # Always use a same build configuration per build job to keep ccache's cache size small; default to RELEASE unless specifically defined
+  ENV['config'] = 'Release' if ENV['XCODE']
   # Currently we don't have the infra to test run all the platforms; also skip when doing packaging build due to time constraint
   ENV['URHO3D_TESTING'] = '1' if (((ENV['LINUX'] && !ENV['URHO3D_64BIT']) || (ENV['OSX'] && !ENV['IOS'] && !ENV['TVOS']) || ENV['APPVEYOR']) && !ENV['PACKAGE_UPLOAD']) || ENV['WEB']
   # When not explicitly specified then use generic generator
@@ -577,7 +577,7 @@ task :ci_create_mirrors do
   stage = stream[0]['stage'] || 'test'
   # Install Travis CLI Ruby gem to interface with Travis
   system 'gem install travis >/dev/null 2>&1'
-  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; doc['notifications'] = notifications unless doc['notifications']; doc['matrix']['include'].each_with_index { |build, index| stage = build['stage'] || stage; doc['matrix']['include'][index].merge! preset[stage] if preset[stage] } if doc['matrix'] && doc['matrix']['include']; doc_name = '.travis.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml } else doc_name = '.appveyor.yml'; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; end; puts "Creating #{ci_branch} mirror branch..."; alt = system("travis branches --org --no-interactive -r #{ENV['TRAVIS_REPO_SLUG']} |grep ^#{ci_branch}: |grep -cqP 'started|created'") ? '-alt' : nil; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch}:#{ci_branch}#{alt} >/dev/null 2>&1 && git checkout -q - && sleep 5" or abort "Failed to create #{ci_branch} mirror branch" }
+  stream.drop(1).each { |doc| branch = doc.delete('branch'); ci = branch['name']; ci_branch = ENV['RELEASE_TAG'] || (ENV['TRAVIS_BRANCH'] == 'master' && ENV['TRAVIS_PULL_REQUEST'] == 'false') ? ci : (ENV['TRAVIS_PULL_REQUEST'] == 'false' ? "#{ENV['TRAVIS_BRANCH']}-#{ci}" : "PR ##{ENV['TRAVIS_PULL_REQUEST']}-#{ci}"); is_appveyor_ci = branch['appveyor']; next if skip_travis && !is_appveyor_ci; unless (branch['mandatory'] || !head_moved) && ((ci_only && ci_only.map { |i| /#{i}/ =~ ci }.any?) || (!ci_only && (branch['active'] || (scan && /Scan/ =~ ci) || (annotate && /Annotate/ =~ ci)))); system "if git fetch origin #{ci_branch}:#{ci_branch} 2>/dev/null; then git push -qf origin --delete #{ci_branch}; fi"; puts "Skipped creating #{ci_branch} mirror branch due to moving HEAD" if !ci_only && branch['active'] && head_moved; next; end; unless is_appveyor_ci; doc['notifications'] = notifications unless doc['notifications']; doc['matrix']['include'].delete_if { |build| build['condition'] && !ENV[build['condition']] } && doc['matrix']['include'].each_with_index { |build, index| stage = build['stage'] || stage; build['before_script'].flatten! if build['before_script']; doc['matrix']['include'][index].merge! preset[stage] if preset[stage] } if doc['matrix'] && doc['matrix']['include']; doc_name = '.travis.yml'; else doc_name = '.appveyor.yml'; end; File.open("#{doc_name}.new", 'w') { |file| file.write doc.to_yaml }; puts "Creating #{ci_branch} mirror branch..."; alt = system("travis branches --org --no-interactive -r #{ENV['TRAVIS_REPO_SLUG']} |grep ^#{ci_branch}: |grep -cqP 'started|created'") ? '-alt' : nil; system "git checkout -qB #{ci_branch} && rm .appveyor.yml .travis.yml && mv #{doc_name}.new #{doc_name} && git add -A . && git commit -qm \"#{escaped_commit_message}\" && git push -qf -u origin #{ci_branch}:#{ci_branch}#{alt} >/dev/null 2>&1 && git checkout -q - && sleep 5" or abort "Failed to create #{ci_branch} mirror branch" }
   # Push pending commits if any
   system "git push origin #{head}:#{ENV['TRAVIS_BRANCH']} -q >/dev/null 2>&1" or abort "Failed to push pending commits to #{ENV['TRAVIS_BRANCH']}" if head_moved
 end
@@ -693,7 +693,7 @@ task :ci_timer do
 end
 
 # Always call this function last in the multiple conditional check so that the checkpoint message does not being echoed unnecessarily
-def timeup quiet = false, cutoff_time = 40.0
+def timeup quiet = false, cutoff_time = ENV['RELEASE_TAG'] ? 60.0 : 40.0
   unless File.exists?('start_time.log')
     system 'touch start_time.log split_time.log'
     return nil
