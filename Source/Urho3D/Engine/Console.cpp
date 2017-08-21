@@ -376,14 +376,10 @@ void Console::HandleTextFinished(StringHash eventType, VariantMap& eventData)
         // Send the command as an event for script subsystem
         using namespace ConsoleCommand;
 
-#if URHO3D_CXX11
-        SendEvent(E_CONSOLECOMMAND, P_COMMAND, line, P_ID, static_cast<Text*>(interpreters_->GetSelectedItem())->GetText());
-#else
         VariantMap& newEventData = GetEventDataMap();
         newEventData[P_COMMAND] = line;
         newEventData[P_ID] = static_cast<Text*>(interpreters_->GetSelectedItem())->GetText();
         SendEvent(E_CONSOLECOMMAND, newEventData);
-#endif
 
         // Make sure the line isn't the same as the last one
         if (history_.Empty() || line != history_.Back())

@@ -61,12 +61,9 @@ static const int destBlendFuncs[] =
     1       // GL_ONE
 };
 
-#if URHO3D_CXX11
 // Make sure that there are are as many blend functions as we have blend modes.
 static_assert(sizeof(srcBlendFuncs) / sizeof(srcBlendFuncs[0]) == MAX_BLENDMODES, "");
 static_assert(sizeof(destBlendFuncs) / sizeof(destBlendFuncs[0]) == MAX_BLENDMODES, "");
-#endif
-
 
 ParticleEffect2D::ParticleEffect2D(Context* context) :
     Resource(context),
