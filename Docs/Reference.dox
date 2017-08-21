@@ -3785,7 +3785,7 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
 
-- The macro NULL should not be used, 0 is used instead.
+- The macro \c NULL and 0 should not be used for null poitners, \c nullptr is used instead.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3799,6 +3799,26 @@ byte[]     Bytecode, produced by AngelScript serializer
 - Header files are commented using one-line comments beginning with /// to mark them for Doxygen.
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
+
+C++11 code conventions:
+
+- Use \c override wherever possible.
+
+- Prefer inplace member initialization to initializer lists.
+
+- Prefer \c using to \c typedef type declarations.
+
+- Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
+
+- Avoid \c enum \c class to keep Urho API consistent. TODO: This isn't the best decision.
+
+- Avoid \c auto variables unless it increases code readability. For example, \c auto is tolerable for iterators, pairs and long template types.
+  Inspired by https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html
+
+- Prefer \c auto to manual type deduction via \c decltype and \c typename.
+
+- Prefer old style constuctor syntax `Vector3(x, y, z)` to new constructor syntax `Vector3{x, y, z}` unless new syntax increases code readability.
+  Example: `Vector3 vec(x, y, z)` but `node.SetPosition({x, y, z})`
 
 \page ContributionChecklist Contribution checklist
 
