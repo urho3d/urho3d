@@ -45,6 +45,7 @@ class IntRect
 {
     IntRect();
     IntRect(int left, int top, int right, int bottom);
+    IntRect(const IntVector2& min, const IntVector2& max);
     ~IntRect();
 
     bool operator ==(const IntRect& rhs) const;
@@ -53,6 +54,9 @@ class IntRect
     int Width() const;
     int Height() const;
     Intersection IsInside(const IntVector2& point) const;
+
+    void Clip(const IntRect& rect);
+    void Merge(const IntRect& rect);
 
     int left_ @ left;
     int top_ @ top;
