@@ -421,6 +421,10 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_LIB_TYPE STREQUAL MODULE)
     endif ()
 endif ()
 
+if (URHO3D_DATABASE_ODBC)
+    find_package (ODBC REQUIRED)
+endif ()
+
 # Define preprocessor macros (for building the Urho3D library) based on the configured build options
 foreach (OPT
         URHO3D_ANGELSCRIPT
@@ -462,7 +466,6 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
 endif ()
 
 # Platform and compiler specific options
-add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
 if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
     # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
     if (VERIFIED_SUPPORTED_STANDARD)
