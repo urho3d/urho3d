@@ -3815,21 +3815,15 @@ Follow this guideline to keep code style consistent among contributions and cont
 
 - Avoid \c auto unless it increases code readability.
 
-- Prefer \c auto for unreadable, unknown or redundant types. Example:
+- Use \c auto for unreadable, unknown or redundant types. Example:
   \code
   auto iter = variables.Find(name); // long iterator type: HashMap<String, Variant>::Iterator
   for (auto& variable : variables) { } // unreadable long type: HashMap<String, Variant>::KeyValue
   auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
   \endcode
-  Inspired by https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html
+  See https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html and https://google.github.io/styleguide/cppguide.html#auto
 
-- Prefer \c auto to manual type deduction via \c decltype and \c typename.
-
-- Prefer old style constuctor syntax `Vector3(x, y, z)` to new constructor syntax `Vector3{x, y, z}` unless new syntax increases code readability. Example:
-  \code
-  Vector3 vec(x, y, z);
-  node.SetPosition({x, y, z});
-  \endcode
+- Use \c auto instead of manual type deduction via \c decltype and \c typename.
 
 \page ContributionChecklist Contribution checklist
 
