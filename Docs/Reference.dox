@@ -3800,7 +3800,8 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
 
-C++11 code conventions:
+Keep contributions consistent with existing code unless wide scale refactoring is performed.
+Follow this guideline to keep code style consistent among contributions and contributors:
 
 - Use \c override wherever possible.
 
@@ -3810,15 +3811,25 @@ C++11 code conventions:
 
 - Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
 
-- Avoid \c enum \c class to keep Urho API consistent. TODO: This isn't the best decision.
+- Avoid \c enum \c class to keep Urho API consistent. TODO: Perform API-breaking migration to \c enum \c class?
 
-- Avoid \c auto variables unless it increases code readability. For example, \c auto is tolerable for iterators, pairs and long template types.
+- Avoid \c auto unless it increases code readability.
+
+- Prefer \c auto for unreadable, unknown or redundant types. Example:
+  \code
+  auto iter = variables.Find(name); // long iterator type: HashMap<String, Variant>::Iterator
+  for (auto& variable : variables) { } // unreadable long type: HashMap<String, Variant>::KeyValue
+  auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
+  \endcode
   Inspired by https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html
 
 - Prefer \c auto to manual type deduction via \c decltype and \c typename.
 
-- Prefer old style constuctor syntax `Vector3(x, y, z)` to new constructor syntax `Vector3{x, y, z}` unless new syntax increases code readability.
-  Example: `Vector3 vec(x, y, z)` but `node.SetPosition({x, y, z})`
+- Prefer old style constuctor syntax `Vector3(x, y, z)` to new constructor syntax `Vector3{x, y, z}` unless new syntax increases code readability. Example:
+  \code
+  Vector3 vec(x, y, z);
+  node.SetPosition({x, y, z});
+  \endcode
 
 \page ContributionChecklist Contribution checklist
 
@@ -3857,8 +3868,6 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 - When you add a new third-party library, insert its license statement to the LICENSE in the Source\ThirdParty directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
-
-- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
 
 - Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */
