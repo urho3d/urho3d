@@ -35,6 +35,7 @@ Urho3D development, contributions and bugfixes by:
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
 - Stanislav Demyanovich
+- Rainer Deyke
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
