@@ -2991,12 +2991,16 @@ Methods:
 - IntRect* new()
 - IntRect(int left, int top, int right, int bottom) (GC)
 - IntRect* new(int left, int top, int right, int bottom)
+- IntRect(const IntVector2& min, const IntVector2& max) (GC)
+- IntRect* new(const IntVector2& min, const IntVector2& max)
 - void delete()
 - bool operator==(const IntRect& rhs) const
 - IntVector2 Size() const
 - int Width() const
 - int Height() const
 - Intersection IsInside(const IntVector2& point) const
+- void Clip(const IntRect& rect)
+- void Merge(const IntRect& rect)
 
 Properties:
 

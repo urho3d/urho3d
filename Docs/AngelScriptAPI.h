@@ -5907,9 +5907,12 @@ public:
 IntRect();
 IntRect(const IntRect&in);
 IntRect(int, int, int, int);
+IntRect(const IntVector2&in, const IntVector2&in);
 IntRect(int[]&inout);
 // Methods:
+int Clip(const IntRect&);
 Intersection IsInside(const IntVector2&) const;
+int Merge(const IntRect&);
 
 // Properties:
 int bottom;
