@@ -66,6 +66,10 @@ UIComponent::UIComponent(Context* context) :
     rootElement_->SetSize(UICOMPONENT_DEFAULT_TEXTURE_SIZE, UICOMPONENT_DEFAULT_TEXTURE_SIZE);
 }
 
+UIComponent::~UIComponent()
+{
+}
+
 void UIComponent::RegisterObject(Context* context)
 {
     context->RegisterFactory<UIComponent>();

@@ -41,6 +41,8 @@ class URHO3D_API UIComponent : public Component
 public:
     /// Construct.
     UIComponent(Context* context);
+    /// Destruct.
+    virtual ~UIComponent();
     /// Register object factory.
     static void RegisterObject(Context* context);
 
