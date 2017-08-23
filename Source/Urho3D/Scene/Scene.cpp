@@ -1529,23 +1529,6 @@ void Scene::PreloadResourcesJSON(const JSONValue& value)
 #endif
 }
 
-Viewport* Scene::GetViewport(int index)
-{
-    Renderer* renderer = GetSubsystem<Renderer>();
-    for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
-    {
-        Viewport* viewport = renderer->GetViewport(i);
-        if (viewport && viewport->GetScene() == GetScene())
-        {
-            if (index == 0)
-                return viewport;
-            else
-                --index;
-        }
-    }
-    return 0;
-}
-
 void RegisterSceneLibrary(Context* context)
 {
     ValueAnimation::RegisterObject(context);

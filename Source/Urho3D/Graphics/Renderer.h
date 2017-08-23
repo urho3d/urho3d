@@ -43,6 +43,7 @@ class Graphics;
 class RenderPath;
 class RenderSurface;
 class ResourceCache;
+class Scene;
 class Skeleton;
 class OcclusionBuffer;
 class Technique;
@@ -254,6 +255,8 @@ public:
 
     /// Return backbuffer viewport by index.
     Viewport* GetViewport(unsigned index) const;
+    /// Return nth backbuffer viewport associated to a scene. Index 0 returns the first.
+    Viewport* GetViewportForScene(Scene* scene, unsigned index) const;
     /// Return default renderpath.
     RenderPath* GetDefaultRenderPath() const;
     /// Return default non-textured material technique.

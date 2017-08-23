@@ -470,43 +470,59 @@ void UI::RenderUpdate()
     }
 }
 
-void UI::Render(bool resetRenderTargets)
+void UI::Render(bool renderUICommand)
 {
-    // Perform the default render only if not rendered yet
-    if (resetRenderTargets && uiRendered_)
-        return;
-
     URHO3D_PROFILE(RenderUI);
 
     // If the OS cursor is visible, apply its shape now if changed
-    bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
-    if (cursor_ && osCursorVisible)
-        cursor_->ApplyOSCursorShape();
-
-    SetVertexData(vertexBuffer_, vertexData_);
-    SetVertexData(debugVertexBuffer_, debugVertexData_);
-
-    // Render non-modal batches
-    Render(resetRenderTargets, vertexBuffer_, batches_, 0, nonModalBatchSize_);
-    // Render debug draw
-    Render(resetRenderTargets, debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
-    // Render modal batches
-    Render(resetRenderTargets, vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
-    // Render to textures
-    for (Vector<WeakPtr<UIComponent> >::ConstIterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
+    if (!renderUICommand)
     {
-        WeakPtr<UIComponent> component = *it;
-        if (component->IsEnabled())
+        bool osCursorVisible = GetSubsystem<Input>()->IsMouseVisible();
+        if (cursor_ && osCursorVisible)
+            cursor_->ApplyOSCursorShape();
+    }
+
+    // Perform the default backbuffer render only if not rendered yet, or additional renders through RenderUI command
+    if (renderUICommand || !uiRendered_)
+    {
+        SetVertexData(vertexBuffer_, vertexData_);
+        SetVertexData(debugVertexBuffer_, debugVertexData_);
+
+        if (!renderUICommand)
+            graphics_->ResetRenderTargets();
+        // Render non-modal batches
+        Render(vertexBuffer_, batches_, 0, nonModalBatchSize_);
+        // Render debug draw
+        Render(debugVertexBuffer_, debugDrawBatches_, 0, debugDrawBatches_.Size());
+        // Render modal batches
+        Render(vertexBuffer_, batches_, nonModalBatchSize_, batches_.Size());
+    }
+    
+    // Render to UIComponent textures. This is skipped when called from the RENDERUI command
+    if (!renderUICommand)
+    {
+        for (Vector<WeakPtr<UIComponent> >::ConstIterator it = renderToTexture_.Begin(); it != renderToTexture_.End(); it++)
         {
-            SetVertexData(component->vertexBuffer_, component->vertexData_);
-            SetVertexData(component->debugVertexBuffer_, component->debugVertexData_);
-            Render(resetRenderTargets, component->vertexBuffer_, component->batches_, 0, component->batches_.Size(),
-                   component->GetTexture()->GetRenderSurface());
-            Render(resetRenderTargets, component->debugVertexBuffer_, component->debugDrawBatches_, 0,
-                   component->debugDrawBatches_.Size(), component->GetTexture()->GetRenderSurface());
-            component->debugDrawBatches_.Clear();
-            component->debugVertexData_.Clear();
+            WeakPtr<UIComponent> component = *it;
+            if (component->IsEnabled())
+            {
+                SetVertexData(component->vertexBuffer_, component->vertexData_);
+                SetVertexData(component->debugVertexBuffer_, component->debugVertexData_);
+                
+                RenderSurface* surface = component->GetTexture()->GetRenderSurface();
+                graphics_->SetRenderTarget(0, surface);
+                graphics_->SetViewport(IntRect(0, 0, surface->GetWidth(), surface->GetHeight()));
+                graphics_->Clear(Urho3D::CLEAR_COLOR);
+
+                Render(component->vertexBuffer_, component->batches_, 0, component->batches_.Size());
+                Render(component->debugVertexBuffer_, component->debugDrawBatches_, 0, component->debugDrawBatches_.Size());
+                component->debugDrawBatches_.Clear();
+                component->debugVertexData_.Clear();
+            }
         }
+
+        if (renderToTexture_.Size())
+            graphics_->ResetRenderTargets();
     }
 
     // Clear the debug draw batches and data
@@ -946,8 +962,7 @@ void UI::SetVertexData(VertexBuffer* dest, const PODVector<float>& vertexData)
     dest->SetData(&vertexData[0]);
 }
 
-void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart,
-                unsigned batchEnd, RenderSurface* surface)
+void UI::Render(VertexBuffer* buffer, const PODVector<UIBatch>& batches, unsigned batchStart, unsigned batchEnd)
 {
     // Engine does not render when window is closed or device is lost
     assert(graphics_ && graphics_->IsInitialized() && !graphics_->IsDeviceLost());
@@ -955,17 +970,9 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     if (batches.Empty())
         return;
 
-    if (resetRenderTargets)
-        graphics_->ResetRenderTargets();
-
-    bool scissorTest = true;
     unsigned alphaFormat = Graphics::GetAlphaFormat();
-    RenderSurface* previousSurface = graphics_->GetRenderTarget(0);
-    IntVector2 viewSize;
-    if (surface)
-        viewSize = IntVector2(surface->GetWidth(), surface->GetHeight());
-    else
-        viewSize = graphics_->GetViewport().Size();
+    RenderSurface* surface = graphics_->GetRenderTarget(0);
+    IntVector2 viewSize = graphics_->GetViewport().Size();
     Vector2 invScreenSize(1.0f / (float)viewSize.x_, 1.0f / (float)viewSize.y_);
     Vector2 scale(2.0f * invScreenSize.x_, -2.0f * invScreenSize.y_);
     Vector2 offset(-1.0f, 1.0f);
@@ -974,16 +981,10 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     {
 #ifdef URHO3D_OPENGL
         // On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the
-        // same way as a render texture produced on Direct3D. Requires disabling scissor as well. This needs a
-        // proper fix.
+        // same way as a render texture produced on Direct3D.
         offset.y_ = -offset.y_;
         scale.y_ = -scale.y_;
-        scissorTest = false;
 #endif
-        graphics_->SetRenderTarget(0, surface);
-        graphics_->SetViewport(IntRect(0, 0, viewSize.x_, viewSize.y_));
-        if (resetRenderTargets)
-            graphics_->Clear(Urho3D::CLEAR_COLOR);
     }
 
     Matrix4 projection(Matrix4::IDENTITY);
@@ -998,9 +999,9 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
     graphics_->ClearParameterSources();
     graphics_->SetColorWrite(true);
 #ifdef URHO3D_OPENGL
-    // Required due to OpenGL workaround above.
+    // Reverse winding if rendering to texture on OpenGL
     if (surface)
-        graphics_->SetCullMode(CULL_NONE);
+        graphics_->SetCullMode(CULL_CW);
     else
 #endif
         graphics_->SetCullMode(CULL_CCW);
@@ -1063,15 +1064,23 @@ void UI::Render(bool resetRenderTargets, VertexBuffer* buffer, const PODVector<U
         scissor.right_ = (int)(scissor.right_ * uiScale_);
         scissor.bottom_ = (int)(scissor.bottom_ * uiScale_);
 
+        // Flip scissor vertically if using OpenGL texture rendering
+#ifdef URHO3D_OPENGL
+        if (surface)
+        {
+            int top = scissor.top_;
+            int bottom = scissor.bottom_;
+            scissor.top_ = viewSize.y_ - bottom;
+            scissor.bottom_ = viewSize.y_ - top;
+        }
+#endif
+
         graphics_->SetBlendMode(batch.blendMode_);
-        graphics_->SetScissorTest(scissorTest, scissor);
+        graphics_->SetScissorTest(true, scissor);
         graphics_->SetTexture(0, batch.texture_);
         graphics_->Draw(TRIANGLE_LIST, batch.vertexStart_ / UI_VERTEX_SIZE,
             (batch.vertexEnd_ - batch.vertexStart_) / UI_VERTEX_SIZE);
     }
-
-    if (surface && !resetRenderTargets)
-        graphics_->SetRenderTarget(0, previousSurface);
 }
 
 void UI::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, UIElement* element, IntRect currentScissor)

@@ -45,9 +45,9 @@ static int const UICOMPONENT_DEFAULT_TEXTURE_SIZE = 512;
 static int const UICOMPONENT_MIN_TEXTURE_SIZE = 64;
 static int const UICOMPONENT_MAX_TEXTURE_SIZE = 4096;
 
-UIComponent::UIComponent(Context* context)
-    : Component(context)
-    , isStaticModelOwned_(false)
+UIComponent::UIComponent(Context* context) : 
+    Component(context),
+    isStaticModelOwned_(false)
 {
     vertexBuffer_ = new VertexBuffer(context_);
     debugVertexBuffer_ = new VertexBuffer(context_);
@@ -128,7 +128,12 @@ bool UIComponent::ScreenToUIPosition(IntVector2 screenPos, IntVector2& result)
     if (!scene)
         return false;
 
-    Viewport* viewport = scene->GetViewport();
+    Renderer* renderer = GetSubsystem<Renderer>();
+    if (!renderer)
+        return false;
+
+    // \todo Always uses the first viewport, in case there are multiple
+    Viewport* viewport = renderer->GetViewportForScene(scene, 0);
     Octree* octree = scene->GetComponent<Octree>();
 
     if (!viewport || !octree)

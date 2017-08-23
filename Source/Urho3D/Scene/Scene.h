@@ -256,8 +256,6 @@ public:
     void MarkNetworkUpdate(Component* component);
     /// Mark a node dirty in scene replication states. The node does not need to have own replication state yet.
     void MarkReplicationDirty(Node* node);
-    /// Returns viewport assigned to this scene. By default returns first viewport assigned to a scene.
-    Viewport* GetViewport(int index=0);
 
 private:
     /// Handle the logic update event to update the scene, if active.

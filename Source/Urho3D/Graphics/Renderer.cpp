@@ -574,6 +574,23 @@ Viewport* Renderer::GetViewport(unsigned index) const
     return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
 }
 
+Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
+{
+    for (unsigned i = 0; i < viewports_.Size(); ++i)
+    {
+        Viewport* viewport = viewports_[i];
+        if (viewport && viewport->GetScene() == scene)
+        {
+            if (index == 0)
+                return viewport;
+            else
+                --index;
+        }
+    }
+    return 0;
+}
+
+
 RenderPath* Renderer::GetDefaultRenderPath() const
 {
     return defaultRenderPath_;

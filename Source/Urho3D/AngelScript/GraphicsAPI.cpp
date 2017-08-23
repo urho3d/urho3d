@@ -1963,6 +1963,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetDefaultRenderPath(XMLFile@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetVSMShadowParameters(float, float)", asMETHOD(Renderer, SetVSMShadowParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "Viewport@+ GetViewportForScene(Scene@+, uint)", asMETHOD(Renderer, GetViewportForScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "RenderPath@+ get_defaultRenderPath() const", asMETHOD(Renderer, GetDefaultRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultTechnique(Technique@+)", asMETHOD(Renderer, SetDefaultTechnique), asCALL_THISCALL);
