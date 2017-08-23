@@ -415,10 +415,6 @@ public:
     void SetCullMode(CullMode mode, Camera* camera);
     /// Ensure sufficient size of the instancing vertex buffer. Return true if successful.
     bool ResizeInstancingBuffer(unsigned numInstances);
-    /// Save the screen buffer allocation status. Called by View.
-    void SaveScreenBufferAllocations();
-    /// Restore the screen buffer allocation status. Called by View.
-    void RestoreScreenBufferAllocations();
     /// Optimize a light by scissor rectangle.
     void OptimizeLightByScissor(Light* light, Camera* camera);
     /// Optimize a light by marking it to the stencil buffer and setting a stencil test.

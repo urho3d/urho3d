@@ -85,7 +85,7 @@ namespace Urho3D
 
 int DoSystemCommand(const String& commandLine, bool redirectToLog, Context* context)
 {
-#ifdef TVOS
+#if defined(TVOS) || defined(IOS)
     return -1;
 #else
 #if !defined(__EMSCRIPTEN__) && !defined(MINI_URHO)

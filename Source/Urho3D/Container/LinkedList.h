@@ -27,9 +27,7 @@
 #else
 #include <Urho3D/Urho3D.h>
 #endif
-#if URHO3D_CXX11
 #include <initializer_list>
-#endif
 
 namespace Urho3D
 {
@@ -56,7 +54,6 @@ public:
         head_(0)
     {
     }
-#if URHO3D_CXX11
     /// Aggregate initialization constructor.
     LinkedList(const std::initializer_list<T>& list) : LinkedList()
     {
@@ -65,7 +62,6 @@ public:
             Insert(*it);
         }
     }
-#endif
     /// Destruct.
     ~LinkedList()
     {

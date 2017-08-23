@@ -326,10 +326,14 @@ public:
         return Max(GetEffectiveColor().SumRGB(), 0.0f) * attenuation + M_EPSILON;
     }
 
+    /// Set shadow cascade splits attribute.
+    void SetShadowCascadeSplitsAttr(const Vector4& value) { memcpy(shadowCascade_.splits_, value.Data(), sizeof(Vector4)); }
     /// Set ramp texture attribute.
     void SetRampTextureAttr(const ResourceRef& value);
     /// Set shape texture attribute.
     void SetShapeTextureAttr(const ResourceRef& value);
+    /// Return shadow cascade splits attribute.
+    Vector4 GetShadowCascadeSplitsAttr() const { return Vector4(shadowCascade_.splits_); }
     /// Return ramp texture attribute.
     ResourceRef GetRampTextureAttr() const;
     /// Return shape texture attribute.

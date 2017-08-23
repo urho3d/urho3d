@@ -44,6 +44,7 @@ static const float DEFAULT_FOG_START = 250.0f;
 static const float DEFAULT_FOG_END = 1000.0f;
 static const float DEFAULT_FOG_HEIGHT = 0.0f;
 static const float DEFAULT_FOG_HEIGHT_SCALE = 0.5f;
+static const StringHash TAG_MARK_DIRTY = "Mark Dirty";
 
 extern const char* SCENE_CATEGORY;
 
@@ -73,8 +74,10 @@ void Zone::RegisterObject(Context* context)
     context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT)
+        .SetMetadata(TAG_MARK_DIRTY, true);
+    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT)
+        .SetMetadata(TAG_MARK_DIRTY, true);
     URHO3D_ATTRIBUTE("Ambient Color", Color, ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Fog Color", Color, fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Fog Start", float, fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
@@ -84,7 +87,8 @@ void Zone::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Height Fog Mode", bool, heightFog_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT)
+        .SetMetadata(TAG_MARK_DIRTY, true);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
         ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
@@ -97,8 +101,7 @@ void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     Serializable::OnSetAttribute(attr, src);
 
     // If bounding box or priority changes, dirty the drawable as applicable
-    if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
-        attr.offset_ == offsetof(Zone, priority_))
+    if (attr.GetMetadata<bool>(TAG_MARK_DIRTY))
         OnMarkedDirty(node_);
 }
 

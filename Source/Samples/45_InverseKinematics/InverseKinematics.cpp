@@ -50,7 +50,9 @@
 URHO3D_DEFINE_APPLICATION_MAIN(InverseKinematics)
 
 InverseKinematics::InverseKinematics(Context* context) :
-    Sample(context)
+    Sample(context),
+    floorPitch_(0.0f),
+    floorRoll_(0.0f)
 {
 }
 

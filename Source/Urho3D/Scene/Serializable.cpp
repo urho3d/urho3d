@@ -45,10 +45,8 @@ static unsigned RemapAttributeIndex(const Vector<AttributeInfo>* attributes, con
     for (unsigned i = 0; i < attributes->Size(); ++i)
     {
         const AttributeInfo& attr = attributes->At(i);
-        // Compare either the accessor or offset to avoid name string compare
+        // Compare the accessor to avoid name string compare
         if (attr.accessor_.Get() && attr.accessor_.Get() == netAttr.accessor_.Get())
-            return i;
-        else if (!attr.accessor_.Get() && attr.offset_ == netAttr.offset_)
             return i;
     }
 
@@ -74,89 +72,93 @@ void Serializable::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
         return;
     }
 
-    // Calculate the destination address
-    void* dest = attr.ptr_ ? attr.ptr_ : reinterpret_cast<unsigned char*>(this) + attr.offset_;
+    // Attribute must have either pointer or accessor
+    if (!attr.ptr_)
+    {
+        URHO3D_LOGERROR("Attribute without data pointer or accessor in OnSetAttribute()");
+        return;
+    }
 
     switch (attr.type_)
     {
     case VAR_INT:
         // If enum type, use the low 8 bits only
         if (attr.enumNames_)
-            *(reinterpret_cast<unsigned char*>(dest)) = src.GetInt();
+            *(reinterpret_cast<unsigned char*>(attr.ptr_)) = src.GetInt();
         else
-            *(reinterpret_cast<int*>(dest)) = src.GetInt();
+            *(reinterpret_cast<int*>(attr.ptr_)) = src.GetInt();
         break;
 
     case VAR_BOOL:
-        *(reinterpret_cast<bool*>(dest)) = src.GetBool();
+        *(reinterpret_cast<bool*>(attr.ptr_)) = src.GetBool();
         break;
 
     case VAR_FLOAT:
-        *(reinterpret_cast<float*>(dest)) = src.GetFloat();
+        *(reinterpret_cast<float*>(attr.ptr_)) = src.GetFloat();
         break;
 
     case VAR_VECTOR2:
-        *(reinterpret_cast<Vector2*>(dest)) = src.GetVector2();
+        *(reinterpret_cast<Vector2*>(attr.ptr_)) = src.GetVector2();
         break;
 
     case VAR_VECTOR3:
-        *(reinterpret_cast<Vector3*>(dest)) = src.GetVector3();
+        *(reinterpret_cast<Vector3*>(attr.ptr_)) = src.GetVector3();
         break;
 
     case VAR_VECTOR4:
-        *(reinterpret_cast<Vector4*>(dest)) = src.GetVector4();
+        *(reinterpret_cast<Vector4*>(attr.ptr_)) = src.GetVector4();
         break;
 
     case VAR_QUATERNION:
-        *(reinterpret_cast<Quaternion*>(dest)) = src.GetQuaternion();
+        *(reinterpret_cast<Quaternion*>(attr.ptr_)) = src.GetQuaternion();
         break;
 
     case VAR_COLOR:
-        *(reinterpret_cast<Color*>(dest)) = src.GetColor();
+        *(reinterpret_cast<Color*>(attr.ptr_)) = src.GetColor();
         break;
 
     case VAR_STRING:
-        *(reinterpret_cast<String*>(dest)) = src.GetString();
+        *(reinterpret_cast<String*>(attr.ptr_)) = src.GetString();
         break;
 
     case VAR_BUFFER:
-        *(reinterpret_cast<PODVector<unsigned char>*>(dest)) = src.GetBuffer();
+        *(reinterpret_cast<PODVector<unsigned char>*>(attr.ptr_)) = src.GetBuffer();
         break;
 
     case VAR_RESOURCEREF:
-        *(reinterpret_cast<ResourceRef*>(dest)) = src.GetResourceRef();
+        *(reinterpret_cast<ResourceRef*>(attr.ptr_)) = src.GetResourceRef();
         break;
 
     case VAR_RESOURCEREFLIST:
-        *(reinterpret_cast<ResourceRefList*>(dest)) = src.GetResourceRefList();
+        *(reinterpret_cast<ResourceRefList*>(attr.ptr_)) = src.GetResourceRefList();
         break;
 
     case VAR_VARIANTVECTOR:
-        *(reinterpret_cast<VariantVector*>(dest)) = src.GetVariantVector();
+        *(reinterpret_cast<VariantVector*>(attr.ptr_)) = src.GetVariantVector();
         break;
 
     case VAR_STRINGVECTOR:
-        *(reinterpret_cast<StringVector*>(dest)) = src.GetStringVector();
+        *(reinterpret_cast<StringVector*>(attr.ptr_)) = src.GetStringVector();
         break;
 
     case VAR_VARIANTMAP:
-        *(reinterpret_cast<VariantMap*>(dest)) = src.GetVariantMap();
+        *(reinterpret_cast<VariantMap*>(attr.ptr_)) = src.GetVariantMap();
         break;
 
     case VAR_INTRECT:
-        *(reinterpret_cast<IntRect*>(dest)) = src.GetIntRect();
+        *(reinterpret_cast<IntRect*>(attr.ptr_)) = src.GetIntRect();
         break;
 
     case VAR_INTVECTOR2:
-        *(reinterpret_cast<IntVector2*>(dest)) = src.GetIntVector2();
+        *(reinterpret_cast<IntVector2*>(attr.ptr_)) = src.GetIntVector2();
         break;
 
     case VAR_INTVECTOR3:
-        *(reinterpret_cast<IntVector3*>(dest)) = src.GetIntVector3();
+        *(reinterpret_cast<IntVector3*>(attr.ptr_)) = src.GetIntVector3();
         break;
 
     case VAR_DOUBLE:
-        *(reinterpret_cast<double*>(dest)) = src.GetDouble();
+        *(reinterpret_cast<double*>(attr.ptr_)) = src.GetDouble();
         break;
 
     default:
@@ -178,89 +180,93 @@ void Serializable::OnGetAttribute(const AttributeInfo& attr, Variant& dest) cons
         return;
     }
 
-    // Calculate the source address
-    const void* src = attr.ptr_ ? attr.ptr_ : reinterpret_cast<const unsigned char*>(this) + attr.offset_;
+    // Attribute must have either pointer or accessor
+    if (!attr.ptr_)
+    {
+        URHO3D_LOGERROR("Attribute without data pointer or accessor in OnGetAttribute()");
+        return;
+    }
 
     switch (attr.type_)
     {
     case VAR_INT:
         // If enum type, use the low 8 bits only
         if (attr.enumNames_)
-            dest = *(reinterpret_cast<const unsigned char*>(src));
+            dest = *(reinterpret_cast<const unsigned char*>(attr.ptr_));
         else
-            dest = *(reinterpret_cast<const int*>(src));
+            dest = *(reinterpret_cast<const int*>(attr.ptr_));
         break;
 
     case VAR_BOOL:
-        dest = *(reinterpret_cast<const bool*>(src));
+        dest = *(reinterpret_cast<const bool*>(attr.ptr_));
         break;
 
     case VAR_FLOAT:
-        dest = *(reinterpret_cast<const float*>(src));
+        dest = *(reinterpret_cast<const float*>(attr.ptr_));
         break;
 
     case VAR_VECTOR2:
-        dest = *(reinterpret_cast<const Vector2*>(src));
+        dest = *(reinterpret_cast<const Vector2*>(attr.ptr_));
         break;
 
     case VAR_VECTOR3:
-        dest = *(reinterpret_cast<const Vector3*>(src));
+        dest = *(reinterpret_cast<const Vector3*>(attr.ptr_));
         break;
 
     case VAR_VECTOR4:
-        dest = *(reinterpret_cast<const Vector4*>(src));
+        dest = *(reinterpret_cast<const Vector4*>(attr.ptr_));
         break;
 
     case VAR_QUATERNION:
-        dest = *(reinterpret_cast<const Quaternion*>(src));
+        dest = *(reinterpret_cast<const Quaternion*>(attr.ptr_));
         break;
 
     case VAR_COLOR:
-        dest = *(reinterpret_cast<const Color*>(src));
+        dest = *(reinterpret_cast<const Color*>(attr.ptr_));
         break;
 
     case VAR_STRING:
-        dest = *(reinterpret_cast<const String*>(src));
+        dest = *(reinterpret_cast<const String*>(attr.ptr_));
         break;
 
     case VAR_BUFFER:
-        dest = *(reinterpret_cast<const PODVector<unsigned char>*>(src));
+        dest = *(reinterpret_cast<const PODVector<unsigned char>*>(attr.ptr_));
         break;
 
     case VAR_RESOURCEREF:
-        dest = *(reinterpret_cast<const ResourceRef*>(src));
+        dest = *(reinterpret_cast<const ResourceRef*>(attr.ptr_));
         break;
 
     case VAR_RESOURCEREFLIST:
-        dest = *(reinterpret_cast<const ResourceRefList*>(src));
+        dest = *(reinterpret_cast<const ResourceRefList*>(attr.ptr_));
         break;
 
     case VAR_VARIANTVECTOR:
-        dest = *(reinterpret_cast<const VariantVector*>(src));
+        dest = *(reinterpret_cast<const VariantVector*>(attr.ptr_));
         break;
 
     case VAR_STRINGVECTOR:
-        dest = *(reinterpret_cast<const StringVector*>(src));
+        dest = *(reinterpret_cast<const StringVector*>(attr.ptr_));
         break;
 
     case VAR_VARIANTMAP:
-        dest = *(reinterpret_cast<const VariantMap*>(src));
+        dest = *(reinterpret_cast<const VariantMap*>(attr.ptr_));
         break;
 
     case VAR_INTRECT:
-        dest = *(reinterpret_cast<const IntRect*>(src));
+        dest = *(reinterpret_cast<const IntRect*>(attr.ptr_));
         break;
 
     case VAR_INTVECTOR2:
-        dest = *(reinterpret_cast<const IntVector2*>(src));
+        dest = *(reinterpret_cast<const IntVector2*>(attr.ptr_));
         break;
 
     case VAR_INTVECTOR3:
-        dest = *(reinterpret_cast<const IntVector3*>(src));
+        dest = *(reinterpret_cast<const IntVector3*>(attr.ptr_));
         break;
 
     case VAR_DOUBLE:
-        dest = *(reinterpret_cast<const double*>(src));
+        dest = *(reinterpret_cast<const double*>(attr.ptr_));
         break;
 
     default:

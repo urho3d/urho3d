@@ -89,7 +89,7 @@ public:
     /// Remove a subsystem.
     void RemoveSubsystem(StringHash objectType);
     /// Register object attribute.
-    void RegisterAttribute(StringHash objectType, const AttributeInfo& attr);
+    AttributeHandle RegisterAttribute(StringHash objectType, const AttributeInfo& attr);
     /// Remove object attribute.
     void RemoveAttribute(StringHash objectType, const char* name);
     /// Update object attribute's default value.
@@ -116,7 +116,7 @@ public:
     /// Template version of removing a subsystem.
     template <class T> void RemoveSubsystem();
     /// Template version of registering an object attribute.
-    template <class T> void RegisterAttribute(const AttributeInfo& attr);
+    template <class T> AttributeHandle RegisterAttribute(const AttributeInfo& attr);
     /// Template version of removing an object attribute.
     template <class T> void RemoveAttribute(const char* name);
     /// Template version of copying base class attributes to derived class.
@@ -249,7 +249,7 @@ template <class T> void Context::RegisterFactory(const char* category)
 
 template <class T> void Context::RemoveSubsystem() { RemoveSubsystem(T::GetTypeStatic()); }
 
-template <class T> void Context::RegisterAttribute(const AttributeInfo& attr) { RegisterAttribute(T::GetTypeStatic(), attr); }
+template <class T> AttributeHandle Context::RegisterAttribute(const AttributeInfo& attr) { return RegisterAttribute(T::GetTypeStatic(), attr); }
 
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
 
