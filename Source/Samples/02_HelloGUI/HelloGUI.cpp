@@ -24,6 +24,11 @@
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Graphics/Texture2D.h>
+#include <Urho3D/Graphics/Zone.h>
+#include <Urho3D/Graphics/StaticModel.h>
+#include <Urho3D/Graphics/Model.h>
+#include <Urho3D/Graphics/Technique.h>
+#include <Urho3D/Graphics/Octree.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/UI/Button.h>
@@ -34,6 +39,8 @@
 #include <Urho3D/UI/UI.h>
 #include <Urho3D/UI/UIEvents.h>
 #include <Urho3D/UI/Window.h>
+#include <Urho3D/UI/ListView.h>
+#include <Urho3D/UI/UIComponent.h>
 
 #include "HelloGUI.h"
 
@@ -44,7 +51,10 @@ URHO3D_DEFINE_APPLICATION_MAIN(HelloGUI)
 HelloGUI::HelloGUI(Context* context) :
     Sample(context),
     uiRoot_(GetSubsystem<UI>()->GetRoot()),
-    dragBeginPosition_(IntVector2::ZERO)
+    dragBeginPosition_(IntVector2::ZERO),
+    animateCube_(true),
+    renderOnCube_(false),
+    drawDebug_(false)
 {
 }
 
@@ -63,6 +73,9 @@ void HelloGUI::Start()
     // Set the loaded style as default style
     uiRoot_->SetDefaultStyle(style);
 
+    // Initialize Scene
+    InitScene();
+
     // Initialize Window
     InitWindow();
 
@@ -71,6 +84,9 @@ void HelloGUI::Start()
 
     // Create a draggable Fish
     CreateDraggableFish();
+
+    // Create 3D UI rendered on a cube.
+    Init3DUI();
 
     // Set the mouse mode to use in the sample
     Sample::InitMouseMode(MM_FREE);
@@ -101,6 +117,12 @@ void HelloGUI::InitControls()
     checkBox->SetStyleAuto();
     button->SetStyleAuto();
     lineEdit->SetStyleAuto();
+
+    instructions_ = new Text(context_);
+    instructions_->SetStyleAuto();
+    instructions_->SetText("[TAB]   - toggle between rendering on screen or cube.\n"
+                           "[Space] - toggle cube rotation.");
+    uiRoot_->AddChild(instructions_);
 }
 
 void HelloGUI::InitWindow()
@@ -137,8 +159,25 @@ void HelloGUI::InitWindow()
     // Add the title bar to the Window
     window_->AddChild(titleBar);
 
+    // Create a list.
+    ListView* list = window_->CreateChild<ListView>();
+    list->SetSelectOnClickEnd(true);
+    list->SetHighlightMode(HM_ALWAYS);
+    list->SetMinHeight(200);
+
+    for (int i = 0; i < 32; i++)
+    {
+        Text* text = new Text(context_);
+        text->SetStyleAuto();
+        text->SetText(ToString("List item %d", i));
+        text->SetName(ToString("Item %d", i));
+        list->AddItem(text);
+    }
+    window_->AddChild(list);
+
     // Apply styles
     window_->SetStyleAuto();
+    list->SetStyleAuto();
     windowTitle->SetStyleAuto();
     buttonClose->SetStyle("CloseButton");
 
@@ -147,6 +186,44 @@ void HelloGUI::InitWindow()
 
     // Subscribe also to all UI mouse clicks just to see where we have clicked
     SubscribeToEvent(E_UIMOUSECLICK, URHO3D_HANDLER(HelloGUI, HandleControlClicked));
+}
+
+void HelloGUI::InitScene()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    scene_ = new Scene(context_);
+    scene_->CreateComponent<Octree>();
+    Zone* zone = scene_->CreateComponent<Zone>();
+    zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
+    zone->SetFogColor(Color::GRAY);
+    zone->SetFogStart(100.0f);
+    zone->SetFogEnd(300.0f);
+
+    // Create a child scene node (at world origin) and a StaticModel component into it.
+    Node* boxNode = scene_->CreateChild("Box");
+    boxNode->SetScale(Vector3(5.0f, 5.0f, 5.0f));
+    boxNode->SetRotation(Quaternion(90, Vector3::LEFT));
+
+    // Create a box model and hide it initially.
+    StaticModel* boxModel = boxNode->CreateComponent<StaticModel>();
+    boxModel->SetModel(cache->GetResource<Model>("Models/Box.mdl"));
+    boxNode->SetEnabled(false);
+
+    // Create a camera.
+    cameraNode_ = scene_->CreateChild("Camera");
+    cameraNode_->CreateComponent<Camera>();
+
+    // Set an initial position for the camera scene node.
+    cameraNode_->SetPosition(Vector3(0.0f, 0.0f, -10.0f));
+
+    // Set up a viewport so 3D scene can be visible.
+    Renderer* renderer = GetSubsystem<Renderer>();
+    SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
+    renderer->SetViewport(0, viewport);
+
+    // Subscribe to update event and animate cube and handle input.
+    SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(HelloGUI, HandleUpdate));
 }
 
 void HelloGUI::CreateDraggableFish()
@@ -222,4 +299,63 @@ void HelloGUI::HandleControlClicked(StringHash eventType, VariantMap& eventData)
 
     // Update the Window's title text
     windowTitle->SetText("Hello " + name + "!");
+}
+
+void HelloGUI::Init3DUI()
+{
+    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    // Node that will get UI rendered on it.
+    Node* boxNode = scene_->GetChild("Box");
+    // Create a component that sets up UI rendering. It sets material to StaticModel of the node.
+    UIComponent* component = boxNode->CreateComponent<UIComponent>();
+    // Optionally modify material. Technique is changed so object is visible without any lights.
+    component->GetMaterial()->SetTechnique(0, cache->GetResource<Technique>("Techniques/DiffUnlit.xml"));
+    // Save root element of texture UI for later use.
+    textureRoot_ = component->GetRoot();
+    // Set size of root element. This is size of texture as well.
+    textureRoot_->SetSize(512, 512);
+}
+
+void HelloGUI::HandleUpdate(StringHash, VariantMap& eventData)
+{
+    using namespace Update;
+    float timeStep = eventData[P_TIMESTEP].GetFloat();
+    Input* input = GetSubsystem<Input>();
+    Node* node = scene_->GetChild("Box");
+
+    if (current_.NotNull() && drawDebug_)
+        GetSubsystem<UI>()->DebugDraw(current_);
+
+    if (input->GetMouseButtonPress(MOUSEB_LEFT))
+        current_ = GetSubsystem<UI>()->GetElementAt(input->GetMousePosition());
+
+    if (input->GetKeyPress(KEY_TAB))
+    {
+        renderOnCube_ = !renderOnCube_;
+        // Toggle between rendering on screen or to texture.
+        if (renderOnCube_)
+        {
+            node->SetEnabled(true);
+            textureRoot_->AddChild(window_);
+        }
+        else
+        {
+            node->SetEnabled(false);
+            uiRoot_->AddChild(window_);
+        }
+    }
+
+    if (input->GetKeyPress(KEY_SPACE))
+        animateCube_ = !animateCube_;
+
+    if (input->GetKeyPress(KEY_F2))
+        drawDebug_ = !drawDebug_;
+
+    if (animateCube_)
+    {
+        node->Yaw(6.0f * timeStep * 1.5f);
+        node->Roll(-6.0f * timeStep * 1.5f);
+        node->Pitch(-6.0f * timeStep * 1.5f);
+    }
 }

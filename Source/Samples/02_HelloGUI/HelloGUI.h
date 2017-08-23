@@ -62,6 +62,8 @@ protected:
     }
 
 private:
+    /// Create and initialize a Scene.
+    void InitScene();
     /// Create and initialize a Window control.
     void InitWindow();
     /// Create and add various common controls for demonstration purposes.
@@ -78,13 +80,31 @@ private:
     void HandleControlClicked(StringHash eventType, VariantMap& eventData);
     /// Handle close button pressed and released.
     void HandleClosePressed(StringHash eventType, VariantMap& eventData);
+    /// Animate cube.
+    void HandleUpdate(StringHash, VariantMap& eventData);
+    /// Create 3D UI.
+    void Init3DUI();
 
+    /// The Scene.
+    SharedPtr<Scene> scene_;
     /// The Window.
     SharedPtr<Window> window_;
     /// The UI's root UIElement.
     SharedPtr<UIElement> uiRoot_;
     /// Remembered drag begin position.
     IntVector2 dragBeginPosition_;
+    /// Root UI element of texture.
+    SharedPtr<UIElement> textureRoot_;
+    /// UI element with instructions.
+    SharedPtr<Text> instructions_;
+    /// Enable or disable cube rotation.
+    bool animateCube_;
+    /// Enable or disable rendering to texture.
+    bool renderOnCube_;
+    /// Draw debug information of last clicked element.
+    bool drawDebug_;
+    /// Last clicked UI element.
+    WeakPtr<UIElement> current_;
 };
 
 
