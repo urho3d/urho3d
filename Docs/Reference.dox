@@ -3775,15 +3775,15 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
-- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example %DebugRenderer, FreeTypeLibrary, %Graphics.
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example \c %DebugRenderer, \c FreeTypeLibrary, \c %Graphics.
 
-- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
+- Functions are likewise in upper-camelcase. For example \c CreateComponent, \c SetLinearRestThreshold.
 
-- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
+- Variables are in lower-camelcase. Member variables have an underscore appended. For example \c numContacts, \c randomSeed_.
 
-- Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example \c %Vector3::ZERO or \c PASS_SHADOW.
 
-- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
+- Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
 - The macro \c NULL and 0 should not be used for null poitners, \c nullptr is used instead.
 
@@ -3815,10 +3815,10 @@ Follow this guideline to keep code style consistent among contributions and cont
 
 - Avoid \c auto unless it increases code readability.
 
-- Use \c auto for unreadable, unknown or redundant types. Example:
+- Use \c auto for verbose, unknown or redundant types. Example:
   \code
-  auto iter = variables.Find(name); // long iterator type: HashMap<String, Variant>::Iterator
-  for (auto& variable : variables) { } // unreadable long type: HashMap<String, Variant>::KeyValue
+  auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+  for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
   auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
   \endcode
   See https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html and https://google.github.io/styleguide/cppguide.html#auto
