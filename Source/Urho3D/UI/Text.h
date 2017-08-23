@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../UI/UIElement.h"
+#include "../UI/Selectable.h"
 
 namespace Urho3D
 {
@@ -70,9 +70,9 @@ struct GlyphLocation
 };
 
 /// %Text %UI element.
-class URHO3D_API Text : public UIElement
+class URHO3D_API Text : public Selectable
 {
-    URHO3D_OBJECT(Text, UIElement);
+    URHO3D_OBJECT(Text, Selectable);
 
     friend class Text3D;
 
