@@ -53,19 +53,19 @@ public:
     float GetHeight() const { return height_; }
 
     /// Set the height of this obstacle.
-    void SetHeight(float);
+    void SetHeight(float newHeight);
 
     /// Get the blocking radius of this obstacle.
     float GetRadius() const { return radius_; }
 
     /// Set the blocking radius of this obstacle.
-    void SetRadius(float);
+    void SetRadius(float newRadius);
 
     /// Get the internal obstacle ID.
     unsigned GetObstacleID() const { return obstacleId_; }
 
     /// Render debug information.
-    virtual void DrawDebugGeometry(DebugRenderer*, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
     /// Simplified rendering of debug information for script usage.
     void DrawDebugGeometry(bool depthTest);
 
@@ -76,6 +76,8 @@ protected:
     virtual void OnSceneSet(Scene* scene);
     /// Handle node transform being dirtied.
     virtual void OnMarkedDirty(Node* node);
+    /// Handle navigation mesh tile added.
+    void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 
 private:
     /// Radius of this obstacle.

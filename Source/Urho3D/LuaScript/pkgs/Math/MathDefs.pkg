@@ -65,6 +65,7 @@ bool IsPowerOfTwo(unsigned value);
 unsigned NextPowerOfTwo(unsigned value);
 
 unsigned CountSetBits(unsigned value);
+unsigned LogBaseTwo(unsigned value);
 
 unsigned SDBMHash(unsigned hash, unsigned char c);
 float Random();

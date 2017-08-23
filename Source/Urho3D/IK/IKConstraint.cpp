@@ -26,6 +26,7 @@
 #include "../Scene/Node.h"
 #include "../Scene/SceneEvents.h"
 
+#include <ik/constraint.h>
 #include <ik/node.h>
 
 namespace Urho3D
@@ -36,6 +37,7 @@ extern const char* IK_CATEGORY;
 // ----------------------------------------------------------------------------
 IKConstraint::IKConstraint(Context* context) :
     Component(context),
+    ikConstraintNode_(NULL),
     stiffness_(0.0f),
     stretchiness_(0.0f)
 {
@@ -66,7 +68,7 @@ float IKConstraint::GetStiffness() const
 void IKConstraint::SetStiffness(float stiffness)
 {
     stiffness_ = Clamp(stiffness, 0.0f, 1.0f);
-    if (ikNode_ != NULL)
+    if (ikConstraintNode_ != NULL)
         /* TODO ikNode_->stiffness = stiffness_; */
         ;
 }
@@ -81,7 +83,7 @@ float IKConstraint::GetStretchiness() const
 void IKConstraint::SetStretchiness(float stretchiness)
 {
     stretchiness_ = Clamp(stretchiness, 0.0f, 1.0f);
-    if (ikNode_)
+    if (ikConstraintNode_)
         /* TODO ikNode_->stretchiness = stretchiness_;*/
         ;
 }
@@ -96,7 +98,7 @@ const Vector2& IKConstraint::GetLengthConstraints() const
 void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 {
     lengthConstraints_ = lengthConstraints;
-    if (ikNode_ != NULL)
+    if (ikConstraintNode_ != NULL)
     {
         /* TODO
         ikNode_->min_length = lengthConstraints_.x_;
@@ -105,10 +107,10 @@ void IKConstraint::SetLengthConstraints(const Vector2& lengthConstraints)
 }
 
 // ----------------------------------------------------------------------------
-void IKConstraint::SetIKNode(ik_node_t* node)
+void IKConstraint::SetIKConstraintNode(ik_node_t* constraintNode)
 {
-    ikNode_ = node;
-    if (node)
+    ikConstraintNode_ = constraintNode;
+    if (constraintNode != NULL)
     {
         /* TODO
         node->stiffness = stiffness_;

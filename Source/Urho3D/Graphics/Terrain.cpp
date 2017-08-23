@@ -649,6 +649,21 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
     return IntVector2(xPos, numVertices_.y_ - 1 - zPos);
 }
 
+Vector3 Terrain::HeightMapToWorld(const IntVector2& pixelPosition) const
+{
+    if (!node_)
+        return Vector3::ZERO;
+
+    IntVector2 pos(pixelPosition.x_, numVertices_.y_ - 1 - pixelPosition.y_);
+    float xPos = (float)(pos.x_ * spacing_.x_ + patchWorldOrigin_.x_);
+    float zPos = (float)(pos.y_ * spacing_.z_ + patchWorldOrigin_.y_);
+    Vector3 lPos(xPos, 0.0f, zPos);
+    Vector3 wPos = node_->GetWorldTransform() * lPos;
+    wPos.y_ = GetHeight(wPos);
+
+    return wPos;
+}
+
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)
 {
     URHO3D_PROFILE(CreatePatchGeometry);

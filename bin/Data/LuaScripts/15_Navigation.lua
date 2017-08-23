@@ -12,6 +12,11 @@ require "LuaScripts/Utilities/Sample"
 local endPos = nil
 local currentPath = {}
 
+local useStreaming = false
+local streamingDistance = 2
+local navigationTiles = {}
+local addedTiles = {}
+
 function Start()
     -- Execute the common startup for samples
     SampleStart()
@@ -98,6 +103,8 @@ function CreateScene()
 
     -- Create a NavigationMesh component to the scene root
     local navMesh = scene_:CreateComponent("NavigationMesh")
+    -- Set small tiles to show navigation mesh streaming
+    navMesh.tileSize = 32
     -- Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     -- navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_:CreateComponent("Navigable")
@@ -135,6 +142,7 @@ function CreateUI()
     instructionText.text = "Use WASD keys to move, RMB to rotate view\n"..
         "LMB to set destination, SHIFT+LMB to teleport\n"..
         "MMB or O key to add or remove obstacles\n"..
+        "Tab to toggle navigation mesh streaming\n"..
         "Space to toggle debug geometry"
     instructionText:SetFont(cache:GetResource("Font", "Fonts/Anonymous Pro.ttf"), 15)
     -- The text has multiple rows. Center them in relation to each other
@@ -242,7 +250,7 @@ end
 function AddOrRemoveObject()
     -- Raycast and check if we hit a mushroom node. If yes, remove it, if no, create a new one
     local hitPos, hitDrawable = Raycast(250.0)
-    if hitDrawable then
+    if not useStreaming and hitDrawable then
         -- The part of the navigation mesh we must update, which is the world bounding box of the associated
         -- drawable component
         local updateBox = nil
@@ -298,6 +306,61 @@ function Raycast(maxDistance)
     return nil, nil
 end
 
+function ToggleStreaming(enabled)
+    local navMesh = scene_:GetComponent("NavigationMesh")
+    if enabled then
+        local maxTiles = (2 * streamingDistance + 1) * (2 * streamingDistance + 1)
+        local boundingBox = BoundingBox(navMesh.boundingBox)
+        SaveNavigationData()
+        navMesh:Allocate(boundingBox, maxTiles);
+    else
+        navMesh:Build();
+    end
+end
+
+function UpdateStreaming()
+    local navMesh = scene_:GetComponent("NavigationMesh")
+
+    -- Center the navigation mesh at the jack
+    local jackTile = navMesh:GetTileIndex(jackNode.worldPosition)
+    local beginTile = VectorMax(IntVector2(0, 0), jackTile - IntVector2(1, 1) * streamingDistance)
+    local endTile = VectorMin(jackTile + IntVector2(1, 1) * streamingDistance, navMesh.numTiles - IntVector2(1, 1))
+
+    -- Remove tiles
+    local numTiles = navMesh.numTiles
+    for i,tileIdx in pairs(addedTiles) do
+        if not (beginTile.x <= tileIdx.x and tileIdx.x <= endTile.x and beginTile.y <= tileIdx.y and tileIdx.y <= endTile.y) then
+            addedTiles[i] = nil
+            navMesh:RemoveTile(tileIdx)
+        end
+    end
+
+    -- Add tiles
+    for z = beginTile.y, endTile.y do
+        for x = beginTile.x, endTile.x do
+            local i = z * numTiles.x + x
+            if not navMesh:HasTile(IntVector2(x, z)) and navigationTiles[i] then
+                addedTiles[i] = IntVector2(x, z)
+                navMesh:AddTile(navigationTiles[i])
+            end
+        end
+    end
+end
+
+function SaveNavigationData()
+    local navMesh = scene_:GetComponent("NavigationMesh")
+    navigationTiles = {}
+    addedTiles = {}
+    local numTiles = navMesh.numTiles
+
+    for z = 0, numTiles.y - 1 do
+        for x = 0, numTiles.x - 1 do
+            local i = z * numTiles.x + x
+            navigationTiles[i] = navMesh:GetTileData(IntVector2(x, z))
+        end
+    end
+end
+
 function HandleUpdate(eventType, eventData)
     -- Take the frame time step, which is stored as a float
     local timeStep = eventData["TimeStep"]:GetFloat()
@@ -307,6 +370,15 @@ function HandleUpdate(eventType, eventData)
 
     -- Make Jack follow the Detour path
     FollowPath(timeStep)
+
+    -- Update streaming
+    if input:GetKeyPress(KEY_TAB) then
+        useStreaming = not useStreaming
+        ToggleStreaming(useStreaming)
+    end
+    if useStreaming then
+        UpdateStreaming()
+    end
 end
 
 function FollowPath(timeStep)

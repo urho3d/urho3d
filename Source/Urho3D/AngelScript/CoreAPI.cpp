@@ -868,6 +868,19 @@ static CScriptArray* AttributeInfoGetVariantStructureElementNames(AttributeInfo*
     return VectorToArray<String>(variantStructureElementNames, "Array<String>");
 }
 
+static Object* CreateObject(const String& objectType)
+{
+    if (Context* context = GetScriptContext())
+    {
+        if (SharedPtr<Object> object = context->CreateObject(objectType))
+        {
+            object->AddRef();
+            return object;
+        }
+    }
+    return 0;
+}
+
 static void SendEvent(const String& eventType, VariantMap& eventData)
 {
     Object* sender = GetScriptContextEventListenerObject();
@@ -1009,6 +1022,7 @@ void RegisterObject(asIScriptEngine* engine)
 
     RegisterObject<Object>(engine, "Object");
 
+    engine->RegisterGlobalFunction("Object@ CreateObject(const String&in)", asFUNCTION(CreateObject), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SendEvent(const String&in, VariantMap& eventData = VariantMap())", asFUNCTION(SendEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SubscribeToEvent(const String&in, const String&in)", asFUNCTION(SubscribeToEvent), asCALL_CDECL);
     engine->RegisterGlobalFunction("void SubscribeToEvent(Object@+, const String&in, const String&in)", asFUNCTION(SubscribeToSenderEvent), asCALL_CDECL);

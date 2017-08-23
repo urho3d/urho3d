@@ -179,7 +179,6 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     }
 }
 
-#if URHO3D_CXX11
 void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
 {
     SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
@@ -189,7 +188,6 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::f
 {
     SubscribeToEvent(sender, eventType, new EventHandler11Impl(function, userData));
 }
-#endif
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
@@ -315,7 +313,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     {
         group->BeginSendEvent();
 
-        for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+        const unsigned numReceivers = group->receivers_.Size();
+        for (unsigned i = 0; i < numReceivers; ++i)
         {
             Object* receiver = group->receivers_[i];
             // Holes may exist if receivers removed during send
@@ -346,7 +345,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
         if (processed.Empty())
         {
-            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+            const unsigned numReceivers = group->receivers_.Size();
+            for (unsigned i = 0; i < numReceivers; ++i)
             {
                 Object* receiver = group->receivers_[i];
                 if (!receiver)
@@ -365,7 +365,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+            const unsigned numReceivers = group->receivers_.Size();
+            for (unsigned i = 0; i < numReceivers; ++i)
             {
                 Object* receiver = group->receivers_[i];
                 if (!receiver || processed.Contains(receiver))

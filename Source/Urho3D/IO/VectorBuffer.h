@@ -42,7 +42,7 @@ public:
 
     /// Read bytes from the buffer. Return number of bytes actually read.
     virtual unsigned Read(void* dest, unsigned size);
-    /// Set position from the beginning of the buffer.
+    /// Set position from the beginning of the buffer. Return actual new position.
     virtual unsigned Seek(unsigned position);
     /// Write bytes to the buffer. Return number of bytes actually written.
     virtual unsigned Write(const void* data, unsigned size);

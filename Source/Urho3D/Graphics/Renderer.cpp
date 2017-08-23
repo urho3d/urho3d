@@ -1047,8 +1047,9 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
         screenBufferAllocations_[searchKey] = 0;
 
     // Reuse depth-stencil buffers whenever the size matches, instead of allocating new
+    // Unless persistency specified
     unsigned allocations = screenBufferAllocations_[searchKey];
-    if (!depthStencil)
+    if (!depthStencil || persistentKey)
         ++screenBufferAllocations_[searchKey];
 
     if (allocations >= screenBuffers_[searchKey].Size())
@@ -1385,17 +1386,6 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     URHO3D_LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
 }
-
-void Renderer::SaveScreenBufferAllocations()
-{
-    savedScreenBufferAllocations_ = screenBufferAllocations_;
-}
-
-void Renderer::RestoreScreenBufferAllocations()
-{
-    screenBufferAllocations_ = savedScreenBufferAllocations_;
-}
-
 
 void Renderer::OptimizeLightByScissor(Light* light, Camera* camera)
 {

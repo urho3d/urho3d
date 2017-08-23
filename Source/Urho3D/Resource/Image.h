@@ -139,10 +139,12 @@ public:
     bool SavePNG(const String& fileName) const;
     /// Save in TGA format. Return true if successful.
     bool SaveTGA(const String& fileName) const;
-    /// Save in JPG format with compression quality. Return true if successful.
+    /// Save in JPG format with specified quality. Return true if successful.
     bool SaveJPG(const String& fileName, int quality) const;
     /// Save in DDS format. Only uncompressed RGBA images are supported. Return true if successful.
     bool SaveDDS(const String& fileName) const;
+    /// Save in WebP format with minimum (fastest) or specified compression. Return true if successful. Fails always if WebP support is not compiled in.
+    bool SaveWEBP(const String& fileName, float compression = 0.0f) const;
     /// Whether this texture is detected as a cubemap, only relevant for DDS.
     bool IsCubemap() const { return cubemap_; }
     /// Whether this texture has been detected as a volume, only relevant for DDS.

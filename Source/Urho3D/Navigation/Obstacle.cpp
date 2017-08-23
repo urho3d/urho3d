@@ -104,13 +104,17 @@ void Obstacle::OnSceneSet(Scene* scene)
         if (!ownerMesh_)
             ownerMesh_ = node_->GetParentComponent<DynamicNavigationMesh>(true);
         if (ownerMesh_)
+        {
             ownerMesh_->AddObstacle(this);
+            SubscribeToEvent(ownerMesh_, E_NAVIGATION_TILE_ADDED, URHO3D_HANDLER(Obstacle, HandleNavigationTileAdded));
+        }
     }
     else
     {
         if (obstacleId_ > 0 && ownerMesh_)
             ownerMesh_->RemoveObstacle(this);
-        
+
+        UnsubscribeFromEvent(E_NAVIGATION_TILE_ADDED);
         ownerMesh_.Reset();
     }
 }
@@ -133,6 +137,14 @@ void Obstacle::OnMarkedDirty(Node* node)
 
         ownerMesh_->ObstacleChanged(this);
     }
+}
+
+void Obstacle::HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData)
+{
+    // Re-add obstacle if it is intersected with newly added tile
+    const IntVector2 tile = eventData[NavigationTileAdded::P_TILE].GetIntVector2();
+    if (IsEnabledEffective() && ownerMesh_ && ownerMesh_->IsObstacleInTile(this, tile))
+        ownerMesh_->ObstacleChanged(this);
 }
 
 void Obstacle::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
