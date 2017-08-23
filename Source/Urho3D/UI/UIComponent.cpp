@@ -71,6 +71,22 @@ void UIComponent::RegisterObject(Context* context)
     context->RegisterFactory<UIComponent>();
 }
 
+UIElement* UIComponent::GetRoot() const
+{
+    return rootElement_;
+}
+
+Material* UIComponent::GetMaterial() const
+{
+    return material_;
+}
+
+Texture2D* UIComponent::GetTexture() const
+{
+    return texture_;
+}
+
+
 void UIComponent::OnNodeSet(Node* node)
 {
     if (node)

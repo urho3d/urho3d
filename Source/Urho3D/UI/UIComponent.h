@@ -21,9 +21,7 @@
 //
 #pragma once
 
-
 #include "../Scene/Component.h"
-
 
 namespace Urho3D
 {
@@ -39,18 +37,19 @@ class VertexBuffer;
 class URHO3D_API UIComponent : public Component
 {
     URHO3D_OBJECT(UIComponent, Component);
+
 public:
     /// Construct.
     UIComponent(Context* context);
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Get UIElement.
-    UIElement* GetRoot() { return rootElement_; }
-    /// Get material which will be used for rendering UI texture.
-    Material* GetMaterial() { return material_; }
-    /// Get texture which will be used for rendering UI to.
-    Texture2D* GetTexture() { return texture_; }
+    /// Return UIElement.
+    UIElement* GetRoot() const;
+    /// Return material which will be used for rendering UI texture.
+    Material* GetMaterial() const;
+    /// Return texture which will be used for rendering UI to.
+    Texture2D* GetTexture() const;
 
 protected:
     /// Material that is set to the model.
