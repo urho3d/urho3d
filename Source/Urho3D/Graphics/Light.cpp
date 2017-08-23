@@ -61,6 +61,10 @@ static const float DEFAULT_TEMPERATURE = 6590.0f;
 static const float DEFAULT_RADIUS = 0.0f;
 static const float DEFAULT_LENGTH = 0.0f;
 
+static const StringHash TAG_SHADOW_BIAS = "Shadow Bias";
+static const StringHash TAG_SHADOW_CASCADE = "Shadow Cascade";
+static const StringHash TAG_SHADOW_FOCUS = "Shadow Focus";
+
 static const char* typeNames[] =
 {
     "Directional",
@@ -149,17 +153,29 @@ void Light::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Focus To Scene", bool, shadowFocus_.focus_, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Non-uniform View", bool, shadowFocus_.nonUniform_, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Auto-Reduce Size", bool, shadowFocus_.autoSize_, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("CSM Splits", Vector4, shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    URHO3D_ATTRIBUTE("CSM Fade Start", float, shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("CSM Bias Auto Adjust", float, shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Size Quantize", float, shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Normal Offset", float, shadowBias_.normalOffset_, DEFAULT_NORMALOFFSET, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Focus To Scene", bool, shadowFocus_.focus_, true, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_FOCUS, true);
+    URHO3D_ATTRIBUTE("Non-uniform View", bool, shadowFocus_.nonUniform_, true, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_FOCUS, true);
+    URHO3D_ATTRIBUTE("Auto-Reduce Size", bool, shadowFocus_.autoSize_, true, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_FOCUS, true);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("CSM Splits", GetShadowCascadeSplitsAttr, SetShadowCascadeSplitsAttr,
+        Vector4, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_CASCADE, true);
+    URHO3D_ATTRIBUTE("CSM Fade Start", float, shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_CASCADE, true);
+    URHO3D_ATTRIBUTE("CSM Bias Auto Adjust", float, shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_CASCADE, true);
+    URHO3D_ATTRIBUTE("View Size Quantize", float, shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_FOCUS, true);
+    URHO3D_ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_FOCUS, true);
+    URHO3D_ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_BIAS, true);
+    URHO3D_ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_BIAS, true);
+    URHO3D_ATTRIBUTE("Normal Offset", float, shadowBias_.normalOffset_, DEFAULT_NORMALOFFSET, AM_DEFAULT)
+        .SetMetadata(TAG_SHADOW_BIAS, true);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, float, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
@@ -171,13 +187,11 @@ void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
     Serializable::OnSetAttribute(attr, src);
 
     // Validate the bias, cascade & focus parameters
-    if (attr.offset_ >= offsetof(Light, shadowBias_) && attr.offset_ < (offsetof(Light, shadowBias_) + sizeof(BiasParameters)))
+    if (attr.GetMetadata<bool>(TAG_SHADOW_BIAS))
         shadowBias_.Validate();
-    else if (attr.offset_ >= offsetof(Light, shadowCascade_) &&
-             attr.offset_ < (offsetof(Light, shadowCascade_) + sizeof(CascadeParameters)))
+    else if (attr.GetMetadata<bool>(TAG_SHADOW_CASCADE))
         shadowCascade_.Validate();
-    else if (attr.offset_ >= offsetof(Light, shadowFocus_) &&
-             attr.offset_ < (offsetof(Light, shadowFocus_) + sizeof(FocusParameters)))
+    else if (attr.GetMetadata<bool>(TAG_SHADOW_FOCUS))
         shadowFocus_.Validate();
 }
 

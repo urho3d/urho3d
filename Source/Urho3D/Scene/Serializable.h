@@ -347,10 +347,6 @@ public:
 #define URHO3D_COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
 /// Remove attribute by name.
 #define URHO3D_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
-/// Define an attribute that points to a memory offset in the object.
-#define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, offsetof(ClassName, variable), defaultValue, mode))
-/// Define an attribute that points to a memory offset in the object, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
-#define URHO3D_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, offsetof(ClassName, variable), enumNames, defaultValue, mode))
 /// Define an attribute that uses get and set functions.
 #define URHO3D_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, Urho3D::AttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 /// Define an attribute that uses get and set free functions.
@@ -359,6 +355,10 @@ public:
 #define URHO3D_ENUM_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::EnumAttributeAccessorImpl<ClassName, typeName >(&ClassName::getFunction, &ClassName::setFunction), enumNames, defaultValue, mode))
 /// Define an attribute that uses get and set free functions, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
 #define URHO3D_ENUM_ACCESSOR_ATTRIBUTE_FREE(name, getFunction, setFunction, typeName, enumNames, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(name, new Urho3D::EnumAttributeAccessorFreeImpl<ClassName, typeName >(getFunction, setFunction), enumNames, defaultValue, mode))
+/// Define an attribute that is a member of the object.
+#define URHO3D_ATTRIBUTE(name, typeName, variable, defaultValue, mode) URHO3D_ACCESSOR_ATTRIBUTE_FREE(name, [](const ClassName* classPtr) -> typename AttributeTrait<typeName >::ReturnType { return classPtr->variable; }, [](ClassName* classPtr, typename AttributeTrait<typeName >::ParameterType value) { classPtr->variable = value; }, typeName, defaultValue, mode)
+/// Define an attribute that is a member of the object, and uses zero-based enum values, which are mapped to names through an array of C string pointers.
+#define URHO3D_ENUM_ATTRIBUTE(name, variable, enumNames, defaultValue, mode) URHO3D_ENUM_ACCESSOR_ATTRIBUTE_FREE(name, [](const ClassName* classPtr) -> unsigned { return static_cast<unsigned>(classPtr->variable); }, [](ClassName* classPtr, unsigned value) { classPtr->variable = static_cast<decltype(classPtr->variable)>(value); }, unsigned, enumNames, defaultValue, mode)
 /// Define an attribute that uses get and set functions, where the get function returns by value, but the set function uses a reference.
 #define URHO3D_MIXED_ACCESSOR_ATTRIBUTE(name, getFunction, setFunction, typeName, defaultValue, mode) context->RegisterAttribute<ClassName>(Urho3D::AttributeInfo(Urho3D::GetVariantType<typeName >(), name, new Urho3D::AttributeAccessorImpl<ClassName, typeName, Urho3D::MixedAttributeTrait<typeName > >(&ClassName::getFunction, &ClassName::setFunction), defaultValue, mode))
 /// Define an attribute that uses get and set free functions, where the get function returns by value, but the set function uses a reference.

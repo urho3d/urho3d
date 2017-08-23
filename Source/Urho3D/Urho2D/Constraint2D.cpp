@@ -38,6 +38,8 @@ namespace Urho3D
 
 extern const char* URHO2D_CATEGORY;
 
+static const StringHash TAG_MARK_OTHER_BODY_DIRTY = "Mark Other Body Dirty";
+
 Constraint2D::Constraint2D(Context* context) :
     Component(context),
     joint_(0),
@@ -55,14 +57,15 @@ Constraint2D::~Constraint2D()
 void Constraint2D::RegisterObject(Context* context)
 {
     URHO3D_ACCESSOR_ATTRIBUTE("Collide Connected", GetCollideConnected, SetCollideConnected, bool, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID)
+        .SetMetadata(TAG_MARK_OTHER_BODY_DIRTY, true);
 }
 
 void Constraint2D::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
 {
     Serializable::OnSetAttribute(attr, src);
 
-    if (!attr.accessor_ && attr.offset_ == offsetof(Constraint2D, otherBodyNodeID_))
+    if (attr.GetMetadata<bool>(TAG_MARK_OTHER_BODY_DIRTY))
         otherBodyNodeIDDirty_ = true;
 }
 

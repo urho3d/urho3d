@@ -38,6 +38,8 @@ static const float DEFAULT_RADIUS = 1.0f;
 static const unsigned DEFAULT_MASK_FLAG = 1;
 static const unsigned DEFAULT_AREA = 1;
 
+static const StringHash TAG_MARK_END_POINT_DIRTY = "Mark End Point Dirty";
+
 OffMeshConnection::OffMeshConnection(Context* context) :
     Component(context),
     endPointID_(0),
@@ -58,7 +60,8 @@ void OffMeshConnection::RegisterObject(Context* context)
     context->RegisterFactory<OffMeshConnection>(NAVIGATION_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Endpoint NodeID", int, endPointID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ATTRIBUTE("Endpoint NodeID", int, endPointID_, 0, AM_DEFAULT | AM_NODEID)
+        .SetMetadata(TAG_MARK_END_POINT_DIRTY, true);
     URHO3D_ATTRIBUTE("Radius", float, radius_, DEFAULT_RADIUS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Bidirectional", bool, bidirectional_, true, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Flags Mask", unsigned, mask_, DEFAULT_MASK_FLAG, AM_DEFAULT);
@@ -69,7 +72,7 @@ void OffMeshConnection::OnSetAttribute(const AttributeInfo& attr, const Variant&
 {
     Serializable::OnSetAttribute(attr, src);
 
-    if (attr.offset_ == offsetof(OffMeshConnection, endPointID_))
+    if (attr.GetMetadata<bool>(TAG_MARK_END_POINT_DIRTY))
         endPointDirty_ = true;
 }
 
