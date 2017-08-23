@@ -42,7 +42,6 @@
 #include "../Scene/SplinePath.h"
 #include "../Scene/UnknownComponent.h"
 #include "../Scene/ValueAnimation.h"
-#include "../Graphics/Renderer.h"
 
 #include "../DebugNew.h"
 

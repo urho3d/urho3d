@@ -34,7 +34,6 @@ namespace Urho3D
 
 class File;
 class PackageFile;
-class Viewport;
 
 static const unsigned FIRST_REPLICATED_ID = 0x1;
 static const unsigned LAST_REPLICATED_ID = 0xffffff;
