@@ -94,7 +94,10 @@ void UIComponent::OnNodeSet(Node* node)
         model_ = 0;
     }
 
-    GetSubsystem<UI>()->SetRenderToTexture(this, node != 0);
+    UI* ui = GetSubsystem<UI>();
+    // May be null on shutdown
+    if (ui)
+        ui->SetRenderToTexture(this, node != 0);
 }
 
 void UIComponent::OnElementResized(StringHash eventType, VariantMap& args)

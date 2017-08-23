@@ -805,9 +805,9 @@ static void RegisterUI(asIScriptEngine* engine)
 static void RegisterUIComponent(asIScriptEngine* engine)
 {
     RegisterComponent<UIComponent>(engine, "UIComponent", true, false);
-    engine->RegisterObjectMethod("UIComponent", "UIElement@+ GetRoot()", asMETHOD(UIComponent, GetRoot), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Material@+ GetMaterial()", asMETHOD(UIComponent, GetMaterial), asCALL_THISCALL);
-    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ GetTexture()", asMETHOD(UIComponent, GetTexture), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "UIElement@+ get_root()", asMETHOD(UIComponent, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Material@+ get_material()", asMETHOD(UIComponent, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ get_texture()", asMETHOD(UIComponent, GetTexture), asCALL_THISCALL);
 }
 
 void RegisterUIAPI(asIScriptEngine* engine)

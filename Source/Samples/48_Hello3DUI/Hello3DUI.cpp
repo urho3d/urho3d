@@ -173,7 +173,6 @@ void Hello3DUI::InitWindow()
         text->SetName(ToString("Item %d", i));
         list->AddItem(text);
     }
-    window_->AddChild(list);
 
     // Apply styles
     window_->SetStyleAuto();
