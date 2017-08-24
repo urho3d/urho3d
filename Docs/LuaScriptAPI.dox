@@ -209,6 +209,7 @@ namespace Urho3D
 <a href="#Class_ToolTip"><b>ToolTip</b></a>
 <a href="#Class_TouchState"><b>TouchState</b></a>
 <a href="#Class_UI"><b>UI</b></a>
+<a href="#Class_UIComponent"><b>UIComponent</b></a>
 <a href="#Class_UIElement"><b>UIElement</b></a>
 <a href="#Class_ValueAnimation"><b>ValueAnimation</b></a>
 <a href="#Class_Variant"><b>Variant</b></a>
@@ -5312,6 +5313,7 @@ Methods:
 - void ReloadShaders()
 - unsigned GetNumViewports() const
 - Viewport* GetViewport(unsigned index) const
+- Viewport* GetViewportForScene(Scene* scene, unsigned index) const
 - RenderPath* GetDefaultRenderPath() const
 - Technique* GetDefaultTechnique() const
 - bool GetHDRRendering() const
@@ -7105,6 +7107,23 @@ Properties:
 - bool modalElement (readonly)
 - float scale
 - IntVector2& customSize
+
+<a name="Class_UIComponent"></a>
+### UIComponent : Component
+
+Methods:
+
+- UIComponent() (GC)
+- UIComponent* new()
+- UIElement* GetRoot() const
+- Material* GetMaterial() const
+- Texture2D* GetTexture() const
+
+Properties:
+
+- UIElement* root (readonly)
+- Material* material (readonly)
+- Texture2D* texture (readonly)
 
 <a name="Class_UIElement"></a>
 ### UIElement : Animatable
