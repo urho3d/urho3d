@@ -58,7 +58,8 @@ Node::Node(Context* context) :
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
     scale_(Vector3::ONE),
-    worldRotation_(Quaternion::IDENTITY)
+    worldRotation_(Quaternion::IDENTITY),
+    inheritMode_(INHERIT_ALL)
 {
     impl_ = new NodeImpl();
     impl_->owner_ = 0;
@@ -84,6 +85,7 @@ void Node::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Inherit Mode", GetInheritMode, SetInheritMode, unsigned, INHERIT_ALL, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     URHO3D_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
@@ -2071,20 +2073,36 @@ Component* Node::SafeCreateComponent(const String& typeName, StringHash type, Cr
     }
 }
 
+void Node::SetInheritMode(unsigned inheritMode)
+{
+    inheritMode_ = inheritMode;
+    MarkDirty();
+    MarkNetworkUpdate();
+}
+
 void Node::UpdateWorldTransform() const
 {
     Matrix3x4 transform = GetTransform();
 
     // Assume the root node (scene) has identity transform
-    if (parent_ == scene_ || !parent_)
+    if (parent_ == scene_ || !parent_ || inheritMode_ == INHERIT_NONE)
     {
         worldTransform_ = transform;
         worldRotation_ = rotation_;
     }
-    else
+    else if (inheritMode_ == INHERIT_ALL)
     {
         worldTransform_ = parent_->GetWorldTransform() * transform;
         worldRotation_ = parent_->GetWorldRotation() * rotation_;
+    }
+    else // Inherit only some transformations
+    {
+        Vector3 parentPosition = (inheritMode_ & INHERIT_POSITION) ? parent_->GetWorldPosition() : Vector3::ZERO;
+        Quaternion parentRotation = (inheritMode_ & INHERIT_ROTATION) ? parent_->GetWorldRotation() : Quaternion();
+        Vector3 parentScale = (inheritMode_ & INHERIT_SCALE) ? parent_->GetWorldScale() : Vector3::ONE;
+        worldTransform_ = Matrix3x4(parentPosition, parentRotation, parentScale) * transform;
+
+        worldRotation_ = (inheritMode_ & INHERIT_ROTATION) ? parent_->GetWorldRotation() * rotation_ : rotation_;
     }
 
     dirty_ = false;

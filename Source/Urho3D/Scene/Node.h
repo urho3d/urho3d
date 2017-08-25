@@ -52,6 +52,13 @@ enum TransformSpace
     TS_WORLD
 };
 
+// Transformations that will be inherited from parent
+static const unsigned INHERIT_NONE = 0x0;
+static const unsigned INHERIT_POSITION = 0x1;
+static const unsigned INHERIT_ROTATION = 0x2;
+static const unsigned INHERIT_SCALE = 0x4;
+static const unsigned INHERIT_ALL = INHERIT_POSITION | INHERIT_ROTATION | INHERIT_SCALE;
+
 /// Internal implementation structure for less performance-critical Node variables.
 struct URHO3D_API NodeImpl
 {
@@ -253,6 +260,9 @@ public:
         RotateAround(Vector3(point), Quaternion(delta), space);
     }
 
+    /// Set inherit transform mode.
+    void SetInheritMode(unsigned inheritMode);
+
     /// Rotate around the X axis.
     void Pitch(float angle, TransformSpace space = TS_LOCAL);
     /// Rotate around the Y axis.
@@ -396,6 +406,9 @@ public:
 
     /// Return parent space transform matrix.
     Matrix3x4 GetTransform() const { return Matrix3x4(position_, rotation_, scale_); }
+
+    /// Get inherit transform mode.
+    unsigned GetInheritMode() const { return inheritMode_; }
 
     /// Return position in world space.
     Vector3 GetWorldPosition() const
@@ -695,6 +708,8 @@ private:
     Vector<WeakPtr<Component> > listeners_;
     /// Pointer to implementation.
     UniquePtr<NodeImpl> impl_;
+    /// Inherit transform mode.
+    unsigned inheritMode_;
 
 protected:
     /// User variables.
