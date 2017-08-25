@@ -330,7 +330,7 @@ void RaycastVehicle::FixedPostUpdate(float timeStep)
             }
             if (skidInfoCumulative_[i] > 0.05f)
             {
-                skidInfoCumulative_[i] -= 0.002;
+                skidInfoCumulative_[i] -= 0.002f;
             }
         }
         else

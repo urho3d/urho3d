@@ -161,6 +161,15 @@ static void RegisterNode(asIScriptEngine* engine)
     RegisterComponent<DebugRenderer>(engine, "DebugRenderer", true, false);
     engine->RegisterObjectMethod("Component", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(Component, DrawDebugGeometry), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void DrawDebugGeometry(DebugRenderer@+, bool)", asMETHOD(DebugRenderer, DrawDebugGeometry), asCALL_THISCALL);
+
+    engine->RegisterGlobalProperty("const uint INHERIT_NONE", (void*)&INHERIT_NONE);
+    engine->RegisterGlobalProperty("const uint INHERIT_POSITION", (void*)&INHERIT_POSITION);
+    engine->RegisterGlobalProperty("const uint INHERIT_ROTATION", (void*)&INHERIT_ROTATION);
+    engine->RegisterGlobalProperty("const uint INHERIT_SCALE", (void*)&INHERIT_SCALE);
+    engine->RegisterGlobalProperty("const uint INHERIT_ALL", (void*)&INHERIT_ALL);
+
+    engine->RegisterObjectMethod("Node", "void set_inheritMode(uint)", asMETHOD(Node, SetInheritMode), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Node", "uint get_inheritMode() const", asMETHOD(Node, GetInheritMode), asCALL_THISCALL);
 }
 
 static bool SceneLoadXML(File* file, Scene* ptr)
