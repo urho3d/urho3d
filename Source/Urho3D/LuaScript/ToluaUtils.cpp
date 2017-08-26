@@ -407,9 +407,15 @@ void ToluaPushVariant(lua_State* L, const Variant* variant, const char* type)
         break;
 
     case VAR_MATRIX3:
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix3_, "Matrix3");
+        break;
+
     case VAR_MATRIX3X4:
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix3x4_, "Matrix3x4");
+        break;
+
     case VAR_MATRIX4:
-        tolua_pushusertype(L, variant->Get<const VariantValue*>()->ptr_, variant->GetTypeName().CString());
+        tolua_pushusertype(L, variant->Get<const VariantValue*>()->matrix4_, "Matrix4");
         break;
 
     default:
