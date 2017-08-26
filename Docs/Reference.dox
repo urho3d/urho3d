@@ -3785,7 +3785,7 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
-- The macro \c NULL and 0 should not be used for null poitners, \c nullptr is used instead.
+- The macro \c NULL and 0 should not be used for null pointers, \c nullptr is used instead.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
