@@ -67,6 +67,8 @@ static const char* typeNames[] =
     "Rect",
     "IntVector3",
     "Int64",
+    "CustomPtr",
+    "Custom",
     0
 };
 
@@ -122,6 +124,11 @@ Variant& Variant::operator =(const Variant& rhs)
         *value_.matrix4_ = *rhs.value_.matrix4_;
         break;
 
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
+        SetCustomValue(*rhs.GetCustomVariantValue());
+        break;
+
     default:
         memcpy(&value_, &rhs.value_, sizeof(VariantValue));
         break;
@@ -168,7 +175,7 @@ bool Variant::operator ==(const Variant& rhs) const
         return value_.vector4_ == rhs.value_.vector4_;
 
     case VAR_QUATERNION:
-        return value_.quaterion_ == rhs.value_.quaterion_;
+        return value_.quaternion_ == rhs.value_.quaternion_;
 
     case VAR_COLOR:
         return value_.color_ == rhs.value_.color_;
@@ -425,7 +432,7 @@ String Variant::ToString() const
         return value_.vector4_.ToString();
 
     case VAR_QUATERNION:
-        return value_.quaterion_.ToString();
+        return value_.quaternion_.ToString();
 
     case VAR_COLOR:
         return value_.color_.ToString();
@@ -470,6 +477,13 @@ String Variant::ToString() const
     case VAR_RECT:
         return value_.rect_.ToString();
 
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
+        if (const CustomVariantValue* custom = GetCustomVariantValue())
+            return custom->ToString();
+        else
+            return String::EMPTY;
+
     default:
         // VAR_RESOURCEREF, VAR_RESOURCEREFLIST, VAR_VARIANTVECTOR, VAR_STRINGVECTOR, VAR_VARIANTMAP
         // Reference string serialization requires typehash-to-name mapping from the context. Can not support here
@@ -504,7 +518,7 @@ bool Variant::IsZero() const
         return value_.vector4_ == Vector4::ZERO;
 
     case VAR_QUATERNION:
-        return value_.quaterion_ == Quaternion::IDENTITY;
+        return value_.quaternion_ == Quaternion::IDENTITY;
 
     case VAR_COLOR:
         // WHITE is considered empty (i.e. default) color in the Color class definition
@@ -569,6 +583,10 @@ bool Variant::IsZero() const
     case VAR_RECT:
         return value_.rect_ == Rect::ZERO;
 
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
+        return false;
+
     default:
         return true;
     }
@@ -625,6 +643,14 @@ void Variant::SetType(VariantType newType)
         delete value_.matrix4_;
         break;
 
+    case VAR_CUSTOM_HEAP:
+        delete value_.customValueHeap_;
+        break;
+
+    case VAR_CUSTOM_STACK:
+        static_cast<CustomVariantValue&>(value_.customValueStack_).~CustomVariantValue();
+        break;
+
     default:
         break;
     }
@@ -675,6 +701,16 @@ void Variant::SetType(VariantType newType)
 
     case VAR_MATRIX4:
         value_.matrix4_ = new Matrix4();
+        break;
+
+    case VAR_CUSTOM_HEAP:
+        // Will be filled later
+        value_.customValueHeap_ = nullptr;
+        break;
+
+    case VAR_CUSTOM_STACK:
+        // Initialize virtual table with any custom object
+        new (&value_.customValueStack_) CustomVariantValueImpl<void*>(nullptr);
         break;
 
     default:
