@@ -45,8 +45,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -58,23 +56,23 @@ public:
 
     /// Set other rigid body.
     void SetOtherBody(RigidBody2D* body);
+    /// Set other rigid body node ID.
+    void SetOtherBodyNodeIDAttr(unsigned nodeID);
     /// Set collide connected.
     void SetCollideConnected(bool collideConnected);
-    /// Set attached constriant (for gear).
+    /// Set attached constraint (for gear).
     void SetAttachedConstraint(Constraint2D* constraint);
 
     /// Return owner body.
     RigidBody2D* GetOwnerBody() const { return ownerBody_; }
-
     /// Return other body.
     RigidBody2D* GetOtherBody() const { return otherBody_; }
-
+    /// Return other body node ID.
+    unsigned GetOtherBodyNodeID() const { return otherBodyNodeID_; }
     /// Return collide connected.
     bool GetCollideConnected() const { return collideConnected_; }
-
     /// Return attached constraint (for gear).
     Constraint2D* GetAttachedConstraint() const { return attachedConstraint_; }
-
     /// Return Box2D joint.
     b2Joint* GetJoint() const { return joint_; }
 

@@ -138,8 +138,6 @@ public:
     /// Register object factory.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
     virtual void ApplyAttributes();
     /// Handle enabled/disabled state change.
@@ -197,41 +195,43 @@ public:
 
     /// Return Bullet collision shape.
     btCollisionShape* GetCollisionShape() const { return shape_.Get(); }
-
     /// Return the shared geometry data.
     CollisionGeometryData* GetGeometryData() const { return geometry_; }
-
     /// Return physics world.
     PhysicsWorld* GetPhysicsWorld() const { return physicsWorld_; }
-
     /// Return shape type.
     ShapeType GetShapeType() const { return shapeType_; }
-
     /// Return shape size.
     const Vector3& GetSize() const { return size_; }
-
     /// Return offset position.
     const Vector3& GetPosition() const { return position_; }
-
     /// Return offset rotation.
     const Quaternion& GetRotation() const { return rotation_; }
-
     /// Return collision margin.
     float GetMargin() const { return margin_; }
-
+    /// Return custom geometry component ID.
+    unsigned GetCustomGeometryID() const { return customGeometryID_; }
     /// Return triangle mesh / convex hull model.
     Model* GetModel() const { return model_; }
-
     /// Return model LOD level.
     unsigned GetLodLevel() const { return lodLevel_; }
-
     /// Return world-space bounding box.
     BoundingBox GetWorldBoundingBox() const;
 
     /// Update the new collision shape to the RigidBody.
     void NotifyRigidBody(bool updateMass = true);
+    /// Set shape type attribute.
+    void SetShapeTypeAttr(ShapeType type);
+    /// Set size attribute.
+    void SetSizeAttr(const Vector3& value);
     /// Set model attribute.
     void SetModelAttr(const ResourceRef& value);
+    /// Set model LOD level attribute.
+    void SetLodLevelAttr(unsigned value);
+    /// Set collision margin attribute.
+    void SetMarginAttr(float value);
+    /// Set custom geometry component ID attribute.
+    void SetCustomGeometryIDAttr(unsigned componentID);
     /// Return model attribute.
     ResourceRef GetModelAttr() const;
     /// Release the collision shape.

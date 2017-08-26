@@ -42,13 +42,15 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
-    /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Visualize the component as debug geometry.
     virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
 
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
+    /// Set local-space bounding box min.
+    void SetBoundingBoxMin(const Vector3& boxMin);
+    /// Set local-space bounding box max.
+    void SetBoundingBoxMax(const Vector3& boxMax);
     /// Set ambient color
     void SetAmbientColor(const Color& color);
     /// Set fog color.
@@ -75,6 +77,12 @@ public:
     /// Return inverse world transform.
     const Matrix3x4& GetInverseWorldTransform() const;
 
+    /// Return local-space bounding box.
+    const BoundingBox& GetBoundingBox() const { return boundingBox_; }
+    /// Return local-space bounding box min.
+    const Vector3& GetBoundingBoxMin() const { return boundingBox_.min_; }
+    /// Return local-space bounding box max.
+    const Vector3& GetBoundingBoxMax() const { return boundingBox_.max_; }
     /// Return zone's own ambient color, disregarding gradient mode.
     const Color& GetAmbientColor() const { return ambientColor_; }
 
@@ -85,31 +93,22 @@ public:
 
     /// Return fog color.
     const Color& GetFogColor() const { return fogColor_; }
-
     /// Return fog start distance.
     float GetFogStart() const { return fogStart_; }
-
     /// Return fog end distance.
     float GetFogEnd() const { return fogEnd_; }
-
     /// Return fog height distance relative to the scene node's world position.
     float GetFogHeight() const { return fogHeight_; }
-
     /// Return fog height scale.
     float GetFogHeightScale() const { return fogHeightScale_; }
-
     /// Return zone priority.
     int GetPriority() const { return priority_; }
-
     /// Return whether height fog mode is enabled.
     bool GetHeightFog() const { return heightFog_; }
-
     /// Return whether override mode is enabled.
     bool GetOverride() const { return override_; }
-
     /// Return whether ambient gradient mode is enabled.
     bool GetAmbientGradient() const { return ambientGradient_; }
-
     /// Return zone texture.
     Texture* GetZoneTexture() const { return zoneTexture_; }
 

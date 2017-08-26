@@ -84,42 +84,17 @@ void Constraint::RegisterObject(Context* context)
     context->RegisterFactory<Constraint>(PHYSICS_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ENUM_ATTRIBUTE("Constraint Type", constraintType_, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Position", Vector3, position_, Vector3::ZERO, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Rotation", Quaternion, rotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Other Body Position", Vector3, otherPosition_, Vector3::ZERO, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Other Body Rotation", Quaternion, otherRotation_, Quaternion::IDENTITY, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Other Body NodeID", unsigned, otherBodyNodeID_, 0, AM_DEFAULT | AM_NODEID);
+    URHO3D_ENUM_ACCESSOR_ATTRIBUTE("Constraint Type", GetConstraintType, SetConstraintTypeAttr, ConstraintType, typeNames, CONSTRAINT_POINT, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPositionAttr, Vector3, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotationAttr, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Other Body Position", GetOtherPosition, SetOtherPositionAttr, Vector3, Vector3::ZERO, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Other Body Rotation", GetOtherRotation, SetOtherRotationAttr, Quaternion, Quaternion::IDENTITY, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Other Body NodeID", GetOtherBodyNodeID, SetOtherBodyNodeIDAttr, unsigned, 0, AM_DEFAULT | AM_NODEID);
     URHO3D_ACCESSOR_ATTRIBUTE("High Limit", GetHighLimit, SetHighLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Low Limit", GetLowLimit, SetLowLimit, Vector2, Vector2::ZERO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("ERP Parameter", GetERP, SetERP, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("CFM Parameter", GetCFM, SetCFM, float, 0.0f, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Disable Collision", bool, disableCollision_, false, AM_DEFAULT);
-}
-
-void Constraint::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Serializable::OnSetAttribute(attr, src);
-
-    if (!attr.accessor_)
-    {
-        // Convenience for editing static constraints: if not connected to another body, adjust world position to match local
-        // (when deserializing, the proper other body position will be read after own position, so this calculation is safely
-        // overridden and does not accumulate constraint error
-        if (attr.offset_ == offsetof(Constraint, position_) && constraint_ && !otherBody_)
-        {
-            btTransform ownBody = constraint_->getRigidBodyA().getWorldTransform();
-            btVector3 worldPos = ownBody * ToBtVector3(position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass());
-            otherPosition_ = ToVector3(worldPos);
-        }
-
-        // Certain attribute changes require recreation of the constraint
-        if (attr.offset_ == offsetof(Constraint, constraintType_) || attr.offset_ == offsetof(Constraint, otherBodyNodeID_) ||
-            attr.offset_ == offsetof(Constraint, disableCollision_))
-            recreateConstraint_ = true;
-        else
-            framesDirty_ = true;
-    }
+    URHO3D_ACCESSOR_ATTRIBUTE("Disable Collision", GetDisableCollision, SetDisableCollitionAttr, bool, false, AM_DEFAULT);
 }
 
 void Constraint::ApplyAttributes()
@@ -367,6 +342,58 @@ Vector3 Constraint::GetWorldPosition() const
     }
     else
         return Vector3::ZERO;
+}
+
+void Constraint::SetConstraintTypeAttr(ConstraintType type)
+{
+    constraintType_ = type;
+    recreateConstraint_ = true;
+}
+
+void Constraint::SetPositionAttr(const Vector3& position)
+{
+    position_ = position;
+    framesDirty_ = true;
+
+    // Convenience for editing static constraints: if not connected to another body, adjust world position to match local
+    // (when deserializing, the proper other body position will be read after own position, so this calculation is safely
+    // overridden and does not accumulate constraint error
+    if (constraint_ && !otherBody_)
+    {
+        btTransform ownBody = constraint_->getRigidBodyA().getWorldTransform();
+        btVector3 worldPos = ownBody * ToBtVector3(position_ * cachedWorldScale_ - ownBody_->GetCenterOfMass());
+        otherPosition_ = ToVector3(worldPos);
+    }
+}
+
+void Constraint::SetRotationAttr(const Quaternion& rotation)
+{
+    rotation_ = rotation;
+    framesDirty_ = true;
+}
+
+void Constraint::SetOtherPositionAttr(const Vector3& position)
+{
+    otherPosition_ = position;
+    framesDirty_ = true;
+}
+
+void Constraint::SetOtherRotationAttr(const Quaternion& rotation)
+{
+    otherRotation_ = rotation;
+    framesDirty_ = true;
+}
+
+void Constraint::SetOtherBodyNodeIDAttr(unsigned nodeID)
+{
+    otherBodyNodeID_ = nodeID;
+    recreateConstraint_ = true;
+}
+
+void Constraint::SetDisableCollitionAttr(bool value)
+{
+    disableCollision_ = value;
+    recreateConstraint_ = true;
 }
 
 void Constraint::ReleaseConstraint()
