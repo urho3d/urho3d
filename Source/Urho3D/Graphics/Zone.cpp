@@ -73,8 +73,8 @@ void Zone::RegisterObject(Context* context)
     context->RegisterFactory<Zone>(SCENE_CATEGORY);
 
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, true, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Min", Vector3, boundingBox_.min_, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Bounding Box Max", Vector3, boundingBox_.max_, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Min", GetBoundingBoxMin, SetBoundingBoxMin, Vector3, DEFAULT_BOUNDING_BOX_MIN, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Bounding Box Max", GetBoundingBoxMax, SetBoundingBoxMax, Vector3, DEFAULT_BOUNDING_BOX_MAX, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Ambient Color", Color, ambientColor_, DEFAULT_AMBIENT_COLOR, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Fog Color", Color, fogColor_, DEFAULT_FOG_COLOR, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Fog Start", float, fogStart_, DEFAULT_FOG_START, AM_DEFAULT);
@@ -84,22 +84,12 @@ void Zone::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Height Fog Mode", bool, heightFog_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Override Mode", bool, override_, false, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Ambient Gradient", bool, ambientGradient_, false, AM_DEFAULT);
-    URHO3D_ATTRIBUTE("Priority", int, priority_, 0, AM_DEFAULT);
+    URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Zone Texture", GetZoneTextureAttr, SetZoneTextureAttr, ResourceRef,
         ResourceRef(TextureCube::GetTypeStatic()), AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Shadow Mask", int, shadowMask_, DEFAULT_SHADOWMASK, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Zone Mask", GetZoneMask, SetZoneMask, unsigned, DEFAULT_ZONEMASK, AM_DEFAULT);
-}
-
-void Zone::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
-{
-    Serializable::OnSetAttribute(attr, src);
-
-    // If bounding box or priority changes, dirty the drawable as applicable
-    if ((attr.offset_ >= offsetof(Zone, boundingBox_) && attr.offset_ < (offsetof(Zone, boundingBox_) + sizeof(BoundingBox))) ||
-        attr.offset_ == offsetof(Zone, priority_))
-        OnMarkedDirty(node_);
 }
 
 void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
@@ -111,6 +101,20 @@ void Zone::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
 void Zone::SetBoundingBox(const BoundingBox& box)
 {
     boundingBox_ = box;
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
+}
+
+void Zone::SetBoundingBoxMin(const Vector3& boxMin)
+{
+    boundingBox_.min_ = boxMin;
+    OnMarkedDirty(node_);
+    MarkNetworkUpdate();
+}
+
+void Zone::SetBoundingBoxMax(const Vector3& boxMax)
+{
+    boundingBox_.max_ = boxMax;
     OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
@@ -160,6 +164,7 @@ void Zone::SetFogHeightScale(float scale)
 void Zone::SetPriority(int priority)
 {
     priority_ = priority;
+    OnMarkedDirty(node_);
     MarkNetworkUpdate();
 }
 

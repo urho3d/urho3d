@@ -3775,17 +3775,17 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
-- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example %DebugRenderer, FreeTypeLibrary, %Graphics.
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example \c %DebugRenderer, \c FreeTypeLibrary, \c %Graphics.
 
-- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
+- Functions are likewise in upper-camelcase. For example \c CreateComponent, \c SetLinearRestThreshold.
 
-- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
+- Variables are in lower-camelcase. Member variables have an underscore appended. For example \c numContacts, \c randomSeed_.
 
-- Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example \c %Vector3::ZERO or \c PASS_SHADOW.
 
-- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
+- Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
-- The macro NULL should not be used, 0 is used instead.
+- The macro \c NULL and 0 should not be used for null pointers, \c nullptr is used instead.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3799,6 +3799,31 @@ byte[]     Bytecode, produced by AngelScript serializer
 - Header files are commented using one-line comments beginning with /// to mark them for Doxygen.
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
+
+Keep contributions consistent with existing code unless wide scale refactoring is performed.
+Follow this guideline to keep code style consistent among contributions and contributors:
+
+- Use \c override wherever possible.
+
+- Prefer inplace member initialization to initializer lists.
+
+- Prefer \c using to \c typedef type declarations.
+
+- Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
+
+- Avoid \c enum \c class to keep Urho API consistent. TODO: Perform API-breaking migration to \c enum \c class?
+
+- Avoid \c auto unless it increases code readability.
+
+- Use \c auto for verbose, unknown or redundant types. Example:
+  \code
+  auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+  for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
+  auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
+  \endcode
+  See https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html and https://google.github.io/styleguide/cppguide.html#auto
+
+- Use \c auto instead of manual type deduction via \c decltype and \c typename.
 
 \page ContributionChecklist Contribution checklist
 
@@ -3837,8 +3862,6 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 - When you add a new third-party library, insert its license statement to the LICENSE in the Source\ThirdParty directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
-
-- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
 
 - Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */

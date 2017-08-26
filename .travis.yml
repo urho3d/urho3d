@@ -504,7 +504,10 @@ matrix:
 
 branch: {name: OSX-CI, active: yes}
 language: objective-c
-cache: {directories: $HOME/.ccache}
+cache:
+  directories:
+    - $HOME/.ccache
+    - $TRAVIS_BUILD_DIR/CustomCache
 osx_image: xcode8.3
 env:
   global:
@@ -535,9 +538,9 @@ before_script: &before_script
   - if [[ ! $cmake ]]; then brew outdated cmake || brew upgrade cmake; fi
   - export PATH=$(brew info ccache |grep -o '\S*lib\S*'):$PATH
   - if [[ $XCODE ]]; then pushd $(dirname $(xcodebuild -find-executable clang)) && sudo cp -p $(which ccache) . && for compiler in clang clang++; do sudo mv $compiler{,.orig} && sudo ln -sf $(pwd)/clang.orig /usr/local/bin/$compiler && sudo ln -sf ccache $compiler; done && popd && if [[ $IOS ]]; then redundant=AppleTV,Watch; elif [[ $TVOS ]]; then redundant=iPhone,Watch; else redundant=iPhone,AppleTV,Watch; fi && eval sudo rm -rf /Applications/Xcode.app/Contents/Developer/Platforms/{$redundant}{OS,Simulator}.platform; if echo $COMMIT_MESSAGE |egrep -cq '\[(cache clear|xcode 64bit only)\]' || [[ $(ccache -s |grep 'files in cache' |rev |cut -d' ' -f1 |rev) == '0' ]]; then export XCODE_64BIT_ONLY=1; fi; fi
-  - rake ci_setup_cache
+  - rake ci_setup_cache && if [[ -f CustomCache/CMakeCache.txt ]]; then mkdir -p ../Build && cp -p CustomCache/CMakeCache.txt ../Build; fi
 script: rake ci && if [[ $PACKAGE_UPLOAD ]]; then rake ci_package_upload; fi && rake ci_timer
-after_script: rake ci_teardown_cache
+after_script: rake ci_teardown_cache && mkdir -p CustomCache && cp -p ../Build/CMakeCache.txt CustomCache
 matrix:
   fast_finish: true
   include:
@@ -561,12 +564,6 @@ matrix:
     - <<: *package-stage
       env: *macOS-SHARED
     - stage: housekeep
-
-# Below samples are excluded from Xcode/OSX build due to build time constraint
-data:
-  excluded_sample:
-    '#2': [42_PBRMaterials]
-    '#3': [42_PBRMaterials]
 
 ...
 

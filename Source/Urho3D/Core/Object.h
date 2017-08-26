@@ -24,9 +24,7 @@
 
 #include "../Container/LinkedList.h"
 #include "../Core/Variant.h"
-#if URHO3D_CXX11
 #include <functional>
-#endif
 
 namespace Urho3D
 {
@@ -110,12 +108,10 @@ public:
     void SubscribeToEvent(StringHash eventType, EventHandler* handler);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, EventHandler* handler);
-#ifdef URHO3D_CXX11
     /// Subscribe to an event that can be sent by any sender.
     void SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
     /// Subscribe to a specific sender's event.
     void SubscribeToEvent(Object* sender, StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData=0);
-#endif
     /// Unsubscribe from an event.
     void UnsubscribeFromEvent(StringHash eventType);
     /// Unsubscribe from a specific sender's event.
@@ -132,13 +128,11 @@ public:
     void SendEvent(StringHash eventType, VariantMap& eventData);
     /// Return a preallocated map for event data. Used for optimization to avoid constant re-allocation of event data maps.
     VariantMap& GetEventDataMap() const;
-#if URHO3D_CXX11
     /// Send event with variadic parameter pairs to all subscribers. The parameter pairs is a list of paramID and paramValue separated by comma, one pair after another.
     template <typename... Args> void SendEvent(StringHash eventType, Args... args)
     {
         SendEvent(eventType, GetEventDataMap().Populate(args...));
     }
-#endif
 
     /// Return execution context.
     Context* GetContext() const { return context_; }
@@ -318,7 +312,6 @@ private:
     HandlerFunctionPtr function_;
 };
 
-#if URHO3D_CXX11
 /// Template implementation of the event handler invoke helper (std::function instance).
 class EventHandler11Impl : public EventHandler
 {
@@ -347,7 +340,6 @@ private:
     /// Class-specific pointer to handler function.
     std::function<void(StringHash, VariantMap&)> function_;
 };
-#endif
 
 /// Register event names.
 struct URHO3D_API EventNameRegistrar

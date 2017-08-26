@@ -267,7 +267,7 @@ void Text::OnIndentSet()
     charLocationsDirty_ = true;
 }
 
-bool Text::SetFont(const String& fontName, int size)
+bool Text::SetFont(const String& fontName, float size)
 {
     ResourceCache* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Font>(fontName), size);
