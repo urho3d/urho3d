@@ -149,22 +149,36 @@ void Light::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Fade Distance", GetShadowFadeDistance, SetShadowFadeDistance, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Intensity", GetShadowIntensity, SetShadowIntensity, float, 0.0f, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Shadow Resolution", GetShadowResolution, SetShadowResolution, float, 1.0f, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Focus To Scene", GetShadowFocusFlag, SetShadowFocusFlag, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Non-uniform View", GetShadowFocusNonUniform, SetShadowFocusNonUniform, bool, true, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Auto-Reduce Size", GetShadowFocusAutoSize, SetShadowFocusAutoSize, bool, true, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("CSM Splits", GetShadowCascadeSplits, SetShadowCascadeSplits,
-        Vector4, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("CSM Fade Start", GetShadowCascadeFadeStart, SetShadowCascadeFadeStart, float, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("CSM Bias Auto Adjust", GetShadowCascadeBiasAutoAdjust, SetShadowCascadeBiasAutoAdjust, float, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("View Size Quantize", GetShadowFocusQuantize, SetShadowFocusQuantize, float, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("View Size Minimum", GetShadowFocusMinView, SetShadowFocusMinView, float, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Depth Constant Bias", GetShadowConstantBias, SetShadowConstantBias, float, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Depth Slope Bias", GetShadowSlopeScaledBias, SetShadowSlopeScaledBias, float, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
-    URHO3D_ACCESSOR_ATTRIBUTE("Normal Offset", GetShadowNormalOffset, SetShadowNormalOffset, float, DEFAULT_NORMALOFFSET, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Focus To Scene", bool, shadowFocus_.focus_, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Non-uniform View", bool, shadowFocus_.nonUniform_, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Auto-Reduce Size", bool, shadowFocus_.autoSize_, true, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("CSM Splits", Vector4, shadowCascade_.splits_, Vector4(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f), AM_DEFAULT);
+    URHO3D_ATTRIBUTE("CSM Fade Start", float, shadowCascade_.fadeStart_, DEFAULT_SHADOWFADESTART, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("CSM Bias Auto Adjust", float, shadowCascade_.biasAutoAdjust_, DEFAULT_BIASAUTOADJUST, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Size Quantize", float, shadowFocus_.quantize_, DEFAULT_SHADOWQUANTIZE, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("View Size Minimum", float, shadowFocus_.minView_, DEFAULT_SHADOWMINVIEW, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Depth Constant Bias", float, shadowBias_.constantBias_, DEFAULT_CONSTANTBIAS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Depth Slope Bias", float, shadowBias_.slopeScaledBias_, DEFAULT_SLOPESCALEDBIAS, AM_DEFAULT);
+    URHO3D_ATTRIBUTE("Normal Offset", float, shadowBias_.normalOffset_, DEFAULT_NORMALOFFSET, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Near/Farclip Ratio", float, shadowNearFarRatio_, DEFAULT_SHADOWNEARFARRATIO, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Max Extrusion", GetShadowMaxExtrusion, SetShadowMaxExtrusion, float, DEFAULT_SHADOWMAXEXTRUSION, AM_DEFAULT);
     URHO3D_ATTRIBUTE("View Mask", int, viewMask_, DEFAULT_VIEWMASK, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Light Mask", int, lightMask_, DEFAULT_LIGHTMASK, AM_DEFAULT);
+}
+
+void Light::OnSetAttribute(const AttributeInfo& attr, const Variant& src)
+{
+    Serializable::OnSetAttribute(attr, src);
+
+    // Validate the bias, cascade & focus parameters
+    if (attr.offset_ >= offsetof(Light, shadowBias_) && attr.offset_ < (offsetof(Light, shadowBias_) + sizeof(BiasParameters)))
+        shadowBias_.Validate();
+    else if (attr.offset_ >= offsetof(Light, shadowCascade_) &&
+             attr.offset_ < (offsetof(Light, shadowCascade_) + sizeof(CascadeParameters)))
+        shadowCascade_.Validate();
+    else if (attr.offset_ >= offsetof(Light, shadowFocus_) &&
+             attr.offset_ < (offsetof(Light, shadowFocus_) + sizeof(FocusParameters)))
+        shadowFocus_.Validate();
 }
 
 void Light::ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results)
@@ -372,27 +386,6 @@ void Light::SetShadowBias(const BiasParameters& parameters)
     MarkNetworkUpdate();
 }
 
-void Light::SetShadowConstantBias(float constantBias)
-{
-    shadowBias_.constantBias_ = constantBias;
-    shadowBias_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowSlopeScaledBias(float slopeScaledBias)
-{
-    shadowBias_.slopeScaledBias_ = slopeScaledBias;
-    shadowBias_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowNormalOffset(float normalOffset)
-{
-    shadowBias_.normalOffset_ = normalOffset;
-    shadowBias_.Validate();
-    MarkNetworkUpdate();
-}
-
 void Light::SetShadowCascade(const CascadeParameters& parameters)
 {
     shadowCascade_ = parameters;
@@ -400,65 +393,9 @@ void Light::SetShadowCascade(const CascadeParameters& parameters)
     MarkNetworkUpdate();
 }
 
-void Light::SetShadowCascadeSplits(const Vector4& value)
-{
-    memcpy(shadowCascade_.splits_, value.Data(), sizeof(Vector4));
-    shadowCascade_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowCascadeFadeStart(float fadeStart)
-{
-    shadowCascade_.fadeStart_ = fadeStart;
-    shadowCascade_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowCascadeBiasAutoAdjust(float biasAutoAdjust)
-{
-    shadowCascade_.biasAutoAdjust_ = biasAutoAdjust;
-    shadowCascade_.Validate();
-    MarkNetworkUpdate();
-}
-
 void Light::SetShadowFocus(const FocusParameters& parameters)
 {
     shadowFocus_ = parameters;
-    shadowFocus_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowFocusFlag(bool focus)
-{
-    shadowFocus_.focus_ = focus;
-    shadowFocus_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowFocusNonUniform(bool nonUniform)
-{
-    shadowFocus_.nonUniform_ = nonUniform;
-    shadowFocus_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowFocusAutoSize(bool autoSize)
-{
-    shadowFocus_.autoSize_ = autoSize;
-    shadowFocus_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowFocusQuantize(float quantize)
-{
-    shadowFocus_.quantize_ = quantize;
-    shadowFocus_.Validate();
-    MarkNetworkUpdate();
-}
-
-void Light::SetShadowFocusMinView(float minView)
-{
-    shadowFocus_.minView_ = minView;
     shadowFocus_.Validate();
     MarkNetworkUpdate();
 }

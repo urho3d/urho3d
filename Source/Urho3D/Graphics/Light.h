@@ -163,6 +163,8 @@ public:
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
+    /// Handle attribute change.
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
     /// Process octree raycast. May be called from a worker thread.
     virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
@@ -200,32 +202,10 @@ public:
     void SetShadowFadeDistance(float distance);
     /// Set shadow depth bias parameters.
     void SetShadowBias(const BiasParameters& parameters);
-    /// Set shadow constant bias.
-    void SetShadowConstantBias(float constantBias);
-    /// Set shadow slope scaled bias.
-    void SetShadowSlopeScaledBias(float slopeScaledBias);
-    /// Set shadow normal offset multiplier.
-    void SetShadowNormalOffset(float normalOffset);
     /// Set directional light cascaded shadow parameters.
     void SetShadowCascade(const CascadeParameters& parameters);
-    /// Set shadow cascade splits.
-    void SetShadowCascadeSplits(const Vector4& value);
-    /// Set shadow cascade fade start.
-    void SetShadowCascadeFadeStart(float fadeStart);
-    /// Set shadow cascade automatic depth bias adjustment strength.
-    void SetShadowCascadeBiasAutoAdjust(float biasAutoAdjust);
     /// Set shadow map focusing parameters.
     void SetShadowFocus(const FocusParameters& parameters);
-    /// Set shadow focus flag.
-    void SetShadowFocusFlag(bool focus);
-    /// Set shadow non-uniform focus flag.
-    void SetShadowFocusNonUniform(bool nonUniform);
-    /// Set shadow focus auto-size.
-    void SetShadowFocusAutoSize(bool autoSize);
-    /// Set shadow focus quantization.
-    void SetShadowFocusQuantize(float quantize);
-    /// Set shadow focus minimum view size.
-    void SetShadowFocusMinView(float minView);
     /// Set light intensity in shadow between 0.0 - 1.0. 0.0 (the default) gives fully dark shadows.
     void SetShadowIntensity(float intensity);
     /// Set shadow resolution between 0.25 - 1.0. Determines the shadow map to use.
@@ -241,84 +221,90 @@ public:
 
     /// Return light type.
     LightType GetLightType() const { return lightType_; }
+
     /// Return vertex lighting mode.
     bool GetPerVertex() const { return perVertex_; }
+
     /// Return color.
     const Color& GetColor() const { return color_; }
+
     /// Return the temperature of the light in Kelvin.
     float GetTemperature() const { return temperature_; }
+
     /// Return area light mode radius. Works only with PBR shaders.
     float GetRadius() const { return lightRad_; }
+
     /// Return area tube light length. Works only with PBR shaders.
     float GetLength() const { return lightLength_; }
+
     /// Return if light uses temperature and brightness in lumens.
     bool GetUsePhysicalValues() const { return usePhysicalValues_; }
+
     /// Return the color value of the temperature in Kelvin.
     Color GetColorFromTemperature() const;
+
     /// Return specular intensity.
     float GetSpecularIntensity() const { return specularIntensity_; }
+
     /// Return brightness multiplier. Specified in lumens when "use physical values" is enabled.
     float GetBrightness() const { return brightness_; }
+
     /// Return effective color, multiplied by brightness and affected by temperature when "use physical values" is enabled. Alpha is always 1 so that can compare against the default black color to detect a light with no effect.
     Color GetEffectiveColor() const;
+
     /// Return effective specular intensity, multiplied by absolute value of brightness.
     float GetEffectiveSpecularIntensity() const { return specularIntensity_ * Abs(brightness_); }
+
     /// Return range.
     float GetRange() const { return range_; }
+
     /// Return spotlight field of view.
     float GetFov() const { return fov_; }
+
     /// Return spotlight aspect ratio.
     float GetAspectRatio() const { return aspectRatio_; }
+
     /// Return fade start distance.
     float GetFadeDistance() const { return fadeDistance_; }
+
     /// Return shadow fade start distance.
     float GetShadowFadeDistance() const { return shadowFadeDistance_; }
+
     /// Return shadow depth bias parameters.
     const BiasParameters& GetShadowBias() const { return shadowBias_; }
-    /// Return shadow constant bias.
-    float GetShadowConstantBias() const { return shadowBias_.constantBias_; }
-    /// Return shadow slope scaled bias.
-    float GetShadowSlopeScaledBias() const { return shadowBias_.slopeScaledBias_; }
-    /// Return shadow normal offset multiplier.
-    float GetShadowNormalOffset() const { return shadowBias_.normalOffset_; }
+
     /// Return directional light cascaded shadow parameters.
     const CascadeParameters& GetShadowCascade() const { return shadowCascade_; }
-    /// Return shadow cascade splits.
-    Vector4 GetShadowCascadeSplits() const { return Vector4(shadowCascade_.splits_); }
-    /// Return shadow cascade fade start.
-    float GetShadowCascadeFadeStart() const { return shadowCascade_.fadeStart_; }
-    /// Return shadow cascade automatic depth bias adjustment strength.
-    float GetShadowCascadeBiasAutoAdjust() const { return shadowCascade_.biasAutoAdjust_; }
+
     /// Return shadow map focus parameters.
     const FocusParameters& GetShadowFocus() const { return shadowFocus_; }
-    /// Return shadow focus flag.
-    bool GetShadowFocusFlag() const { return shadowFocus_.focus_; }
-    /// Return shadow non-uniform focus flag.
-    bool GetShadowFocusNonUniform() const { return shadowFocus_.nonUniform_; }
-    /// Return shadow focus auto-size.
-    bool GetShadowFocusAutoSize() const { return shadowFocus_.autoSize_; }
-    /// Return shadow focus quantization.
-    float GetShadowFocusQuantize() const { return shadowFocus_.quantize_; }
-    /// Return shadow focus minimum view size.
-    float GetShadowFocusMinView() const { return shadowFocus_.minView_; }
+
     /// Return light intensity in shadow.
     float GetShadowIntensity() const { return shadowIntensity_; }
+
     /// Return shadow resolution.
     float GetShadowResolution() const { return shadowResolution_; }
+
     /// Return shadow camera near/far clip distance ratio.
     float GetShadowNearFarRatio() const { return shadowNearFarRatio_; }
+
     /// Return maximum shadow extrusion distance for directional lights.
     float GetShadowMaxExtrusion() const { return shadowMaxExtrusion_; }
+
     /// Return range attenuation texture.
     Texture* GetRampTexture() const { return rampTexture_; }
+
     /// Return spotlight attenuation texture.
     Texture* GetShapeTexture() const { return shapeTexture_; }
+
     /// Return spotlight frustum.
     Frustum GetFrustum() const;
     /// Return spotlight frustum in the specified view space.
     Frustum GetViewSpaceFrustum(const Matrix3x4& view) const;
+
     /// Return number of shadow map cascade splits for a directional light, considering also graphics API limitations.
     int GetNumShadowSplits() const;
+
     /// Return whether light has negative (darkening) color.
     bool IsNegative() const { return GetEffectiveColor().SumRGB() < 0.0f; }
 
