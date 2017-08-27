@@ -34,11 +34,6 @@
 // Expands to this example's entry-point
 URHO3D_DEFINE_APPLICATION_MAIN(HelloWorld)
 
-HelloWorld::HelloWorld(Context* context) :
-    Sample(context)
-{
-}
-
 void HelloWorld::Start()
 {
     // Execute base class startup
@@ -58,17 +53,17 @@ void HelloWorld::Start()
 
 void HelloWorld::CreateText()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto cache = GetSubsystem<ResourceCache>();
 
     // Construct new Text object
-    SharedPtr<Text> helloText(new Text(context_));
+    auto helloText = MakeShared<Text>(context_);
 
     // Set String to display
     helloText->SetText("Hello World from Urho3D!");
 
     // Set font and text color
     helloText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 30);
-    helloText->SetColor(Color(0.0f, 1.0f, 0.0f));
+    helloText->SetColor({ 0.0f, 1.0f, 0.0f });
 
     // Align Text center-screen
     helloText->SetHorizontalAlignment(HA_CENTER);

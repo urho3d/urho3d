@@ -34,11 +34,11 @@ class HelloWorld : public Sample
     URHO3D_OBJECT(HelloWorld, Sample);
 
 public:
-    /// Construct.
-    HelloWorld(Context* context);
+    /// Inherit constructor.
+    using Sample::Sample;
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    void Start() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
