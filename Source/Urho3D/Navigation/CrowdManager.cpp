@@ -46,16 +46,15 @@ extern const char* NAVIGATION_CATEGORY;
 static const unsigned DEFAULT_MAX_AGENTS = 512;
 static const float DEFAULT_MAX_AGENT_RADIUS = 0.f;
 
-const char* filterTypesStructureElementNames[] =
+static const StringVector filterTypesStructureElementNames =
 {
     "Query Filter Type Count",
     "   Include Flags",
     "   Exclude Flags",
-    "   >AreaCost",
-    0
+    "   >AreaCost"
 };
 
-const char* obstacleAvoidanceTypesStructureElementNames[] =
+static const StringVector obstacleAvoidanceTypesStructureElementNames =
 {
     "Obstacle Avoid. Type Count",
     "   Velocity Bias",
@@ -67,8 +66,7 @@ const char* obstacleAvoidanceTypesStructureElementNames[] =
     "   Grid Size",
     "   Adaptive Divs",
     "   Adaptive Rings",
-    "   Adaptive Depth",
-    0
+    "   Adaptive Depth"
 };
 
 void CrowdAgentUpdateCallback(dtCrowdAgent* ag, float dt)
@@ -104,12 +102,12 @@ void CrowdManager::RegisterObject(Context* context)
     URHO3D_ATTRIBUTE("Max Agents", unsigned, maxAgents_, DEFAULT_MAX_AGENTS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Max Agent Radius", float, maxAgentRadius_, DEFAULT_MAX_AGENT_RADIUS, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Navigation Mesh", unsigned, navigationMeshId_, 0, AM_DEFAULT | AM_COMPONENTID);
-    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
-                                                             VariantVector, Variant::emptyVariantVector,
-                                                             filterTypesStructureElementNames, AM_DEFAULT);
-    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
-                                                             VariantVector, Variant::emptyVariantVector,
-                                                             obstacleAvoidanceTypesStructureElementNames, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Filter Types", GetQueryFilterTypesAttr, SetQueryFilterTypesAttr,
+        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+        .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, filterTypesStructureElementNames);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Obstacle Avoidance Types", GetObstacleAvoidanceTypesAttr, SetObstacleAvoidanceTypesAttr,
+        VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+        .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, obstacleAvoidanceTypesStructureElementNames);
 }
 
 void CrowdManager::ApplyAttributes()
