@@ -3420,10 +3420,10 @@ Properties:
 
 - Variant defaultValue
 - String[]@ enumNames // readonly
+- VariantMap metadata
 - uint mode
 - String name
 - VariantType type
-- String[]@ variantStructureElementNames // readonly
 
 <a name="Class_Audio"></a>
 

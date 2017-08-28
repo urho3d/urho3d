@@ -647,11 +647,10 @@ AttributeInfo(const AttributeInfo&in);
 Variant defaultValue;
 /* readonly */
 Array<String> enumNames;
+VariantMap metadata;
 uint mode;
 String name;
 VariantType type;
-/* readonly */
-Array<String> variantStructureElementNames;
 };
 
 class Audio
