@@ -386,8 +386,14 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_DOUBLE:
         return Variant(ReadDouble());
 
+        // Deserializing custom values is not supported. Return empty
+    case VAR_CUSTOM_HEAP:
+    case VAR_CUSTOM_STACK:
+        ReadUInt();
+        return Variant::EMPTY;
+
     default:
-        return Variant();
+        return Variant::EMPTY;
     }
 }
 

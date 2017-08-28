@@ -30,6 +30,8 @@
 #include "../Math/Rect.h"
 #include "../Math/StringHash.h"
 
+#include <typeinfo>
+
 namespace Urho3D
 {
 
@@ -63,6 +65,9 @@ enum VariantType
     VAR_RECT,
     VAR_INTVECTOR3,
     VAR_INT64,
+    // Add new types here
+    VAR_CUSTOM_HEAP,
+    VAR_CUSTOM_STACK,
     MAX_VAR_TYPES
 };
 
@@ -165,6 +170,115 @@ struct URHO3D_API ResourceRefList
     bool operator !=(const ResourceRefList& rhs) const { return type_ != rhs.type_ || names_ != rhs.names_; }
 };
 
+/// Custom variant value. This type is not abstract to store it in the VariantValue by value.
+class CustomVariantValue
+{
+    // GetValuePtr expects that CustomVariantValue is always convertible to CustomVariantValueImpl<T>.
+    template <class T> friend class CustomVariantValueImpl;
+
+private:
+    /// Construct from type info.
+    CustomVariantValue(const std::type_info& typeInfo) : typeInfo_(typeInfo) {}
+
+public:
+    /// Construct empty.
+    CustomVariantValue() : typeInfo_(typeid(void)) { }
+    /// Destruct.
+    virtual ~CustomVariantValue() { }
+    /// Get the type info.
+    const std::type_info& GetTypeInfo() const { return typeInfo_; }
+    /// Return whether the specified type is stored.
+    template <class T> bool IsType() const { return GetTypeInfo() == typeid(T); }
+    /// Return pointer to value of the specified type. Return null pointer if type does not match.
+    template <class T> T* GetValuePtr();
+    /// Return const pointer to value of the specified type. Return null pointer if type does not match.
+    template <class T> const T* GetValuePtr() const;
+
+    /// Assign value.
+    virtual bool Assign(const CustomVariantValue& rhs) { return false; }
+    /// Clone.
+    virtual CustomVariantValue* Clone() const { return nullptr; }
+    /// Placement clone.
+    virtual void Clone(void* dest) const { }
+    /// Get size.
+    virtual unsigned GetSize() const { return sizeof(CustomVariantValue); }
+
+    /// Compare to another custom value.
+    virtual bool Compare(const CustomVariantValue& rhs) const { (void)rhs; return false; }
+    /// Compare to zero.
+    virtual bool IsZero() const { return false; }
+    /// Convert custom value to string.
+    virtual String ToString() const { return String::EMPTY; }
+
+private:
+    /// Type info.
+    const std::type_info& typeInfo_;
+};
+
+/// Custom variant value type traits. Specialize the template to implement custom type behavior.
+template <class T> struct CustomVariantValueTraits
+{
+    /// Compare types.
+    static bool Compare(const T& lhs, const T& rhs) { (void)lhs, rhs; return false; }
+    /// Check whether the value is zero.
+    static bool IsZero(const T& value) { (void)value; return false; }
+    /// Convert type to string.
+    static String ToString(const T& value) { (void)value; return String::EMPTY; }
+};
+
+/// Custom variant value implementation.
+template <class T> class CustomVariantValueImpl final : public CustomVariantValue
+{
+public:
+    /// This class name.
+    using ClassName = CustomVariantValueImpl<T>;
+    /// Type traits.
+    using Traits = CustomVariantValueTraits<T>;
+    /// Construct from value.
+    CustomVariantValueImpl(const T& value) : CustomVariantValue(typeid(T)), value_(value) {}
+    /// Set value.
+    void SetValue(const T& value) { value_ = value; }
+    /// Get value.
+    T& GetValue() { return value_; }
+    /// Get const value.
+    const T& GetValue() const { return value_; }
+
+    /// Assign value.
+    virtual bool Assign(const CustomVariantValue& rhs) override
+    {
+        if (const T* rhsValue = rhs.GetValuePtr<T>())
+        {
+            SetValue(*rhsValue);
+            return true;
+        }
+        return false;
+    }
+    /// Clone.
+    virtual CustomVariantValue* Clone() const override { return new ClassName(value_); }
+    /// Placement clone.
+    virtual void Clone(void* dest) const override { new (dest) ClassName(value_); }
+    /// Get size.
+    virtual unsigned GetSize() const override { return sizeof(ClassName); }
+
+    /// Compare to another custom value.
+    virtual bool Compare(const CustomVariantValue& rhs) const override
+    {
+        const T* rhsValue = rhs.GetValuePtr<T>();
+        return rhsValue && Traits::Compare(value_, *rhsValue);
+    }
+    /// Compare to zero.
+    virtual bool IsZero() const override { return Traits::IsZero(value_);}
+    /// Convert custom value to string.
+    virtual String ToString() const override { return Traits::ToString(value_); }
+
+private:
+    /// Value.
+    T value_;
+};
+
+/// Make custom variant value.
+template <typename T> CustomVariantValueImpl<T> MakeCustomValue(const T& value) { return CustomVariantValueImpl<T>(value); }
+
 /// Size of variant value. 16 bytes on 32-bit platform, 32 bytes on 64-bit platform.
 static const unsigned VARIANT_VALUE_SIZE = sizeof(void*) * 4;
 
@@ -178,7 +292,7 @@ union VariantValue
     Vector2 vector2_;
     Vector3 vector3_;
     Vector4 vector4_;
-    Quaternion quaterion_;
+    Quaternion quaternion_;
     Color color_;
     String string_;
     PODVector<unsigned char> buffer_;
@@ -198,6 +312,8 @@ union VariantValue
     Rect rect_;
     IntVector3 intVector3_;
     long long int64_;
+    CustomVariantValue* customValueHeap_;
+    CustomVariantValue customValueStack_;
 
     /// Construct uninitialized.
     VariantValue() { }
@@ -402,6 +518,13 @@ public:
         *this = value;
     }
 
+    /// Construct from custom value.
+    template <class T>
+    Variant(const CustomVariantValueImpl<T>& value)
+    {
+        *this = value;
+    }
+
     /// Construct from type and value.
     Variant(const String& type, const String& value)
     {
@@ -504,7 +627,7 @@ public:
     }
 
     /// Assign from a double.
-    Variant& operator = (double rhs)
+    Variant& operator =(double rhs)
     {
         SetType(VAR_DOUBLE);
         value_.double_ = rhs;
@@ -539,7 +662,7 @@ public:
     Variant& operator =(const Quaternion& rhs)
     {
         SetType(VAR_QUATERNION);
-        value_.quaterion_ = rhs;
+        value_.quaternion_ = rhs;
         return *this;
     }
 
@@ -690,6 +813,14 @@ public:
         return *this;
     }
 
+    /// Assign from custom value.
+    template <class T>
+    Variant& operator =(const CustomVariantValueImpl<T>& value)
+    {
+        SetCustomVariantValue(value);
+        return *this;
+    }
+
     /// Test for equality with another variant.
     bool operator ==(const Variant& rhs) const;
 
@@ -735,7 +866,7 @@ public:
     /// Test for equality with a quaternion. To return true, both the type and value must match.
     bool operator ==(const Quaternion& rhs) const
     {
-        return type_ == VAR_QUATERNION ? value_.quaterion_ == rhs : false;
+        return type_ == VAR_QUATERNION ? value_.quaternion_ == rhs : false;
     }
 
     /// Test for equality with a color. To return true, both the type and value must match.
@@ -952,6 +1083,10 @@ public:
     void FromString(VariantType type, const char* value);
     /// Set buffer type from a memory area.
     void SetBuffer(const void* data, unsigned size);
+    /// Set custom value.
+    void SetCustomVariantValue(const CustomVariantValue& value);
+    /// Set custom value.
+    template <class T> void SetCustom(const T& value) { SetCustomVariantValue(MakeCustomValue<T>(value)); }
 
     /// Return int or zero on type mismatch. Floats and doubles are converted.
     int GetInt() const
@@ -1057,7 +1192,7 @@ public:
     /// Return quaternion or identity on type mismatch.
     const Quaternion& GetQuaternion() const
     {
-        return type_ == VAR_QUATERNION ? value_.quaterion_ : Quaternion::IDENTITY;
+        return type_ == VAR_QUATERNION ? value_.quaternion_ : Quaternion::IDENTITY;
     }
 
     /// Return color or default on type mismatch. Vector4 is aliased to Color if necessary.
@@ -1158,6 +1293,43 @@ public:
         return type_ == VAR_MATRIX4 ? *value_.matrix4_ : Matrix4::IDENTITY;
     }
 
+    /// Return pointer to custom variant value.
+    CustomVariantValue* GetCustomVariantValuePtr()
+    {
+        return const_cast<CustomVariantValue*>(const_cast<const Variant*>(this)->GetCustomVariantValuePtr());
+    }
+
+    /// Return const pointer to custom variant value.
+    const CustomVariantValue* GetCustomVariantValuePtr() const
+    {
+        if (type_ == VAR_CUSTOM_HEAP)
+            return value_.customValueHeap_;
+        else if (type_ == VAR_CUSTOM_STACK)
+            return &value_.customValueStack_;
+        else
+            return nullptr;
+    }
+
+    /// Return custom variant value or default-constructed on type mismatch.
+    template <class T> T GetCustom() const
+    {
+        if (const CustomVariantValue* value = GetCustomVariantValuePtr())
+        {
+            if (value->IsType<T>())
+                return *value->GetValuePtr<T>();
+        }
+        return T();
+    }
+
+    /// Return true if specified custom type is stored in the variant.
+    template <class T> bool IsCustomType() const
+    {
+        if (const CustomVariantValue* custom = GetCustomVariantValuePtr())
+            return custom->IsType<T>();
+        else
+            return false;
+    }
+
     /// Return value's type.
     VariantType GetType() const { return type_; }
 
@@ -1170,6 +1342,9 @@ public:
 
     /// Return true when the variant is empty (i.e. not initialized yet).
     bool IsEmpty() const { return type_ == VAR_NONE; }
+
+    /// Return true when the variant stores custom type.
+    bool IsCustom() const { return type_ == VAR_CUSTOM_HEAP || type_ == VAR_CUSTOM_STACK; }
 
     /// Return the value, template version.
     template <class T> T Get() const;
@@ -1188,6 +1363,17 @@ public:
 
     /// Return a pointer to a modifiable variant map or null on type mismatch.
     VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? &value_.variantMap_ : 0; }
+
+    /// Return a pointer to a modifiable custom variant value or null on type mismatch.
+    template <class T> T* GetCustomPtr()
+    {
+        if (const CustomVariantValue* value = GetCustomVariantValuePtr())
+        {
+            if (value->IsType<T>())
+                return value->GetValuePtr<T>();
+        }
+        return nullptr;
+    }
 
     /// Return name for variant type.
     static String GetTypeName(VariantType type);
@@ -1365,5 +1551,26 @@ template <> URHO3D_API Matrix3 Variant::Get<Matrix3>() const;
 template <> URHO3D_API Matrix3x4 Variant::Get<Matrix3x4>() const;
 
 template <> URHO3D_API Matrix4 Variant::Get<Matrix4>() const;
+
+// Implementations
+template <class T> T* CustomVariantValue::GetValuePtr()
+{
+    if (IsType<T>())
+    {
+        auto impl = static_cast<CustomVariantValueImpl<T>*>(this);
+        return &impl->GetValue();
+    }
+    return nullptr;
+}
+
+template <class T> const T* CustomVariantValue::GetValuePtr() const
+{
+    if (IsType<T>())
+    {
+        auto impl = static_cast<const CustomVariantValueImpl<T>*>(this);
+        return &impl->GetValue();
+    }
+    return nullptr;
+}
 
 }
