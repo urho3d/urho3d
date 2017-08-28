@@ -1366,6 +1366,7 @@ From 1.6 to 1.7:
 
 From 1.7 to master:
 - URHO3D_CXX11 define was removed. C++11 mode is unconditionally enabled.
+- URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE and URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE macros were removed. Use attribute metadata instead. Element names shall be stored in StringVector (without trailing zero) instead of const char*[].
 
 */
 
