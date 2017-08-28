@@ -561,7 +561,7 @@ void Console::HandlePostUpdate(StringHash eventType, VariantMap& eventData)
     printing_ = true;
     rowContainer_->DisableLayoutUpdate();
 
-    Text* text = 0;
+    Text* text = nullptr;
     for (unsigned i = 0; i < pendingRows_.Size(); ++i)
     {
         rowContainer_->RemoveItem((unsigned)0);

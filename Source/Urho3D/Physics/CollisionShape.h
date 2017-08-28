@@ -72,7 +72,7 @@ struct TriangleMeshData : public CollisionGeometryData
     /// Construct from a custom geometry.
     TriangleMeshData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
-    ~TriangleMeshData();
+    virtual ~TriangleMeshData() override;
 
     /// Bullet triangle mesh interface.
     UniquePtr<TriangleMeshInterface> meshInterface_;
@@ -90,7 +90,7 @@ struct ConvexData : public CollisionGeometryData
     /// Construct from a custom geometry.
     ConvexData(CustomGeometry* custom);
     /// Destruct. Free geometry data.
-    ~ConvexData();
+    virtual ~ConvexData() override;
 
     /// Build the convex hull from vertices.
     void BuildHull(const PODVector<Vector3>& vertices);
@@ -111,7 +111,7 @@ struct HeightfieldData : public CollisionGeometryData
     /// Construct from a terrain.
     HeightfieldData(Terrain* terrain, unsigned lodLevel);
     /// Destruct. Free geometry data.
-    ~HeightfieldData();
+    virtual ~HeightfieldData() override;
 
     /// Height data. On LOD level 0 the original height data will be used.
     SharedArrayPtr<float> heightData_;
@@ -134,18 +134,18 @@ public:
     /// Construct.
     CollisionShape(Context* context);
     /// Destruct. Free the geometry data and clean up unused data from the geometry data cache.
-    virtual ~CollisionShape();
+    virtual ~CollisionShape() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set as a box.
     void SetBox(const Vector3& size, const Vector3& position = Vector3::ZERO, const Quaternion& rotation = Quaternion::IDENTITY);
@@ -239,11 +239,11 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
     /**
      * Called when instantiating a collision shape that is not one of ShapeType (default no-op).
      *

@@ -86,11 +86,11 @@ public:
     bool RemoveAttribute(const char* name);
 
     /// Select an element/attribute using XPath query.
-    XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = 0) const;
+    XMLElement SelectSingle(const String& query, pugi::xpath_variable_set* variables = nullptr) const;
     /// Select an element/attribute using XPath query.
     XMLElement SelectSinglePrepared(const XPathQuery& query) const;
     /// Select elements/attributes using XPath query.
-    XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = 0) const;
+    XPathResultSet Select(const String& query, pugi::xpath_variable_set* variables = nullptr) const;
     /// Select elements/attributes using XPath query.
     XPathResultSet SelectPrepared(const XPathQuery& query) const;
 

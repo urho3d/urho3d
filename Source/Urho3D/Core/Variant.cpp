@@ -69,7 +69,7 @@ static const char* typeNames[] =
     "Int64",
     "CustomPtr",
     "Custom",
-    0
+    nullptr
 };
 
 static_assert(sizeof(typeNames) / sizeof(const char*) == MAX_VAR_TYPES + 1, "Variant type name array is out-of-date");
@@ -318,7 +318,7 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_VOIDPTR:
         // From string to void pointer not supported, set to null
-        *this = (void*)0;
+        *this = (void*)nullptr;
         break;
 
     case VAR_RESOURCEREF:
@@ -361,7 +361,7 @@ void Variant::FromString(VariantType type, const char* value)
 
     case VAR_PTR:
         // From string to RefCounted pointer not supported, set to null
-        *this = (RefCounted*)0;
+        *this = (RefCounted*)nullptr;
         break;
 
     case VAR_MATRIX3:
@@ -559,7 +559,7 @@ bool Variant::IsZero() const
         return value_.buffer_.Empty();
 
     case VAR_VOIDPTR:
-        return value_.voidPtr_ == 0;
+        return value_.voidPtr_ == nullptr;
 
     case VAR_RESOURCEREF:
         return value_.resourceRef_.name_.Empty();
@@ -594,7 +594,7 @@ bool Variant::IsZero() const
         return value_.intVector3_ == IntVector3::ZERO;
 
     case VAR_PTR:
-        return value_.weakPtr_ == (RefCounted*)0;
+        return value_.weakPtr_ == (RefCounted*)nullptr;
 
     case VAR_MATRIX3:
         return *value_.matrix3_ == Matrix3::IDENTITY;

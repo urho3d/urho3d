@@ -47,17 +47,17 @@ public:
     /// Construct with parameters.
     HttpRequest(const String& url, const String& verb, const Vector<String>& headers, const String& postData);
     /// Destruct. Release the connection object.
-    ~HttpRequest();
+    virtual ~HttpRequest() override;
 
     /// Process the connection in the worker thread until closed.
-    virtual void ThreadFunction();
+    virtual void ThreadFunction() override;
 
     /// Read response data from the HTTP connection and return number of bytes actually read. While the connection is open, will block while trying to read the specified size. To avoid blocking, only read up to as many bytes as GetAvailableSize() returns.
-    virtual unsigned Read(void* dest, unsigned size);
+    virtual unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the stream. Not supported.
-    virtual unsigned Seek(unsigned position);
+    virtual unsigned Seek(unsigned position) override;
     /// Return whether all response data has been read.
-    virtual bool IsEof() const;
+    virtual bool IsEof() const override;
 
     /// Return URL used in the request.
     const String& GetURL() const { return url_; }

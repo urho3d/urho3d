@@ -60,7 +60,7 @@ void TextureCube::Release()
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+                graphics_->SetTexture(i, nullptr);
         }
     }
 
@@ -131,7 +131,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         }
 
         D3D11_MAPPED_SUBRESOURCE mappedData;
-        mappedData.pData = 0;
+        mappedData.pData = nullptr;
 
         HRESULT hr = graphics_->GetImpl()->GetDeviceContext()->Map((ID3D11Resource*)object_.ptr_, subResource, D3D11_MAP_WRITE_DISCARD, 0,
             &mappedData);
@@ -390,8 +390,8 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     textureDesc.Usage = D3D11_USAGE_STAGING;
     textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-    ID3D11Texture2D* stagingTexture = 0;
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, &stagingTexture);
+    ID3D11Texture2D* stagingTexture = nullptr;
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, nullptr, &stagingTexture);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Failed to create staging texture for GetData", hr);
@@ -413,7 +413,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         srcSubResource, &srcBox);
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
-    mappedData.pData = 0;
+    mappedData.pData = nullptr;
     unsigned rowSize = GetRowDataSize(levelWidth);
     unsigned numRows = (unsigned)(IsCompressed() ? (levelHeight + 3) >> 2 : levelHeight);
 
@@ -477,7 +477,7 @@ bool TextureCube::Create()
     if (multiSample_ < 2)
         textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&object_.ptr_);
+    HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, nullptr, (ID3D11Texture2D**)&object_.ptr_);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Failed to create texture", hr);
@@ -494,7 +494,7 @@ bool TextureCube::Create()
         if (levels_ != 1)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, 0, (ID3D11Texture2D**)&resolveTexture_);
+        HRESULT hr = graphics_->GetImpl()->GetDevice()->CreateTexture2D(&textureDesc, nullptr, (ID3D11Texture2D**)&resolveTexture_);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Failed to create resolve texture", hr);

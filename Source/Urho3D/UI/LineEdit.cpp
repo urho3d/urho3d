@@ -42,7 +42,7 @@ extern const char* UI_CATEGORY;
 
 LineEdit::LineEdit(Context* context) :
     BorderImage(context),
-    lastFont_(0),
+    lastFont_(nullptr),
     lastFontSize_(0),
     cursorPosition_(0),
     dragBeginCursor_(M_MAX_UNSIGNED),

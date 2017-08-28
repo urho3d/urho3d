@@ -36,7 +36,7 @@ EventProfiler::EventProfiler(Context* context) :
 {
     // FIXME: Is there a cleaner way?
     delete root_;
-    current_ = root_ = new EventProfilerBlock(0, "RunFrame");
+    current_ = root_ = new EventProfilerBlock(nullptr, "RunFrame");
     delete [] root_->name_;
     root_->name_ = new char[sizeof("RunFrame")];
     memcpy(root_->name_, "RunFrame", sizeof("RunFrame"));

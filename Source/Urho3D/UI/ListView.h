@@ -47,14 +47,14 @@ public:
     /// Construct.
     ListView(Context* context);
     /// Destruct.
-    virtual ~ListView();
+    virtual ~ListView() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
@@ -62,7 +62,7 @@ public:
     /// If index is greater than the total items then the new item is inserted at the end of the list.
     /// In hierarchy mode, if index is greater than the index of last children of the specified parent item then the new item is inserted next to the last children.
     /// And if the index is lesser than the index of the parent item itself then the new item is inserted before the first child item.
-    void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = 0);
+    void InsertItem(unsigned index, UIElement* item, UIElement* parentItem = nullptr);
     /// Remove specific item, starting search at the specified index if provided. In hierarchy mode will also remove any children.
     void RemoveItem(UIElement* item, unsigned index = 0);
     /// Remove item at index. In hierarchy mode will also remove any children.
@@ -152,7 +152,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Update selection effect when selection or focus changes.
     void UpdateSelectionEffect();
 

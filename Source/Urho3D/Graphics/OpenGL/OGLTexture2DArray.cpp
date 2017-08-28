@@ -82,7 +82,7 @@ void Texture2DArray::Release()
             for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             {
                 if (graphics_->GetTexture(i) == this)
-                    graphics_->SetTexture(i, 0);
+                    graphics_->SetTexture(i, nullptr);
             }
 
             glDeleteTextures(1, &object_.name_);
@@ -156,7 +156,7 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     {
         if (wholeLevel)
             glTexImage3D(target_, level, format, width, height, layers_, 0, GetExternalFormat(format_),
-                GetDataType(format_), 0);
+                GetDataType(format_), nullptr);
         glTexSubImage3D(target_, level, x, y, layer, width, height, 1, GetExternalFormat(format_),
             GetDataType(format_), data);
     }
@@ -164,13 +164,13 @@ bool Texture2DArray::SetData(unsigned layer, unsigned level, int x, int y, int w
     {
         if (wholeLevel)
             glCompressedTexImage3D(target_, level, format, width, height, layers_, 0,
-                GetDataSize(width, height, layers_), 0);
+                GetDataSize(width, height, layers_), nullptr);
         glCompressedTexSubImage3D(target_, level, x, y, layer, width, height, 1, format,
             GetDataSize(width, height), data);
     }
 #endif
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 }
 
@@ -405,7 +405,7 @@ bool Texture2DArray::GetData(unsigned layer, unsigned level, void* dest) const
     else
         glGetCompressedTexImage(target_, level, dest);
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 #else
     URHO3D_LOGERROR("Getting texture data not supported");
@@ -445,7 +445,7 @@ bool Texture2DArray::Create()
     if (!IsCompressed())
     {
         glGetError();
-        glTexImage3D(target_, 0, format, width_, height_, layers_, 0, externalFormat, dataType, 0);
+        glTexImage3D(target_, 0, format, width_, height_, layers_, 0, externalFormat, dataType, nullptr);
         if (glGetError())
             success = false;
     }
@@ -477,7 +477,7 @@ bool Texture2DArray::Create()
 
     // Set initial parameters, then unbind the texture
     UpdateParameters();
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
 
     return success;
 #endif

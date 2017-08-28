@@ -41,11 +41,11 @@ public:
     VectorBuffer(Deserializer& source, unsigned size);
 
     /// Read bytes from the buffer. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size);
+    virtual unsigned Read(void* dest, unsigned size) override;
     /// Set position from the beginning of the buffer. Return actual new position.
-    virtual unsigned Seek(unsigned position);
+    virtual unsigned Seek(unsigned position) override;
     /// Write bytes to the buffer. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size);
+    virtual unsigned Write(const void* data, unsigned size) override;
 
     /// Set data from another buffer.
     void SetData(const PODVector<unsigned char>& data);
@@ -59,10 +59,10 @@ public:
     void Resize(unsigned size);
 
     /// Return data.
-    const unsigned char* GetData() const { return size_ ? &buffer_[0] : 0; }
+    const unsigned char* GetData() const { return size_ ? &buffer_[0] : nullptr; }
 
     /// Return non-const data.
-    unsigned char* GetModifiableData() { return size_ ? &buffer_[0] : 0; }
+    unsigned char* GetModifiableData() { return size_ ? &buffer_[0] : nullptr; }
 
     /// Return the buffer.
     const PODVector<unsigned char>& GetBuffer() const { return buffer_; }

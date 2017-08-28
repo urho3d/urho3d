@@ -49,38 +49,38 @@ public:
     /// Constructor.
     DynamicNavigationMesh(Context*);
     /// Destructor.
-    virtual ~DynamicNavigationMesh();
+    virtual ~DynamicNavigationMesh() override;
 
     /// Register with engine context.
     static void RegisterObject(Context*);
 
     /// Allocate the navigation mesh without building any tiles. Bounding box is not padded. Return true if successful.
-    virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles);
+    virtual bool Allocate(const BoundingBox& boundingBox, unsigned maxTiles) override;
     /// Build/rebuild the entire navigation mesh.
-    virtual bool Build();
+    virtual bool Build() override;
     /// Build/rebuild a portion of the navigation mesh.
-    virtual bool Build(const BoundingBox& boundingBox);
+    virtual bool Build(const BoundingBox& boundingBox) override;
     /// Rebuild part of the navigation mesh in the rectangular area. Return true if successful.
-    virtual bool Build(const IntVector2& from, const IntVector2& to);
+    virtual bool Build(const IntVector2& from, const IntVector2& to) override;
     /// Return tile data.
-    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const;
+    virtual PODVector<unsigned char> GetTileData(const IntVector2& tile) const override;
     /// Return whether the Obstacle is touching the given tile.
     bool IsObstacleInTile(Obstacle* obstacle, const IntVector2& tile) const;
     /// Add tile to navigation mesh.
-    virtual bool AddTile(const PODVector<unsigned char>& tileData);
+    virtual bool AddTile(const PODVector<unsigned char>& tileData) override;
     /// Remove tile from navigation mesh.
-    virtual void RemoveTile(const IntVector2& tile);
+    virtual void RemoveTile(const IntVector2& tile) override;
     /// Remove all tiles from navigation mesh.
-    virtual void RemoveAllTiles();
+    virtual void RemoveAllTiles() override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
     /// Add debug geometry to the debug renderer.
     void DrawDebugGeometry(bool depthTest);
 
     /// Set navigation data attribute.
-    virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value);
+    virtual void SetNavigationDataAttr(const PODVector<unsigned char>& value) override;
     /// Return navigation data attribute.
-    virtual PODVector<unsigned char> GetNavigationDataAttr() const;
+    virtual PODVector<unsigned char> GetNavigationDataAttr() const override;
 
     /// Set the maximum number of obstacles allowed.
     void SetMaxObstacles(unsigned maxObstacles) { maxObstacles_ = maxObstacles; }
@@ -102,7 +102,7 @@ protected:
     struct TileCacheData;
 
     /// Subscribe to events when assigned to a scene.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Trigger the tile cache to make updates to the nav mesh if necessary.
     void HandleSceneSubsystemUpdate(StringHash eventType, VariantMap& eventData);
 
@@ -120,7 +120,7 @@ protected:
     /// Off-mesh connections to be rebuilt in the mesh processor.
     PODVector<OffMeshConnection*> CollectOffMeshConnections(const BoundingBox& bounds);
     /// Release the navigation mesh, query, and tile cache.
-    virtual void ReleaseNavigationMesh();
+    virtual void ReleaseNavigationMesh() override;
 
 private:
     /// Write tiles data.

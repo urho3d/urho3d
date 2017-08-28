@@ -76,7 +76,7 @@ static const char* typeNames[] =
     "TriangleMesh",
     "ConvexHull",
     "Terrain",
-    0
+    nullptr
 };
 
 extern const char* PHYSICS_CATEGORY;
@@ -512,7 +512,7 @@ void CollisionShape::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
             world->debugDrawObject(btTransform(ToBtQuaternion(worldRotation), ToBtVector3(worldPosition)), shape_.Get(), bodyActive ?
                 WHITE : GREEN);
 
-            physicsWorld_->SetDebugRenderer(0);
+            physicsWorld_->SetDebugRenderer(nullptr);
         }
     }
 }
@@ -1019,7 +1019,7 @@ btCompoundShape* CollisionShape::GetParentCompoundShape()
     if (!rigidBody_)
         rigidBody_ = GetComponent<RigidBody>();
 
-    return rigidBody_ ? rigidBody_->GetCompoundShape() : 0;
+    return rigidBody_ ? rigidBody_->GetCompoundShape() : nullptr;
 }
 
 void CollisionShape::UpdateShape()
@@ -1190,7 +1190,7 @@ void CollisionShape::UpdateShape()
 btCollisionShape* CollisionShape::UpdateDerivedShape(int shapeType, const Vector3& newWorldScale)
 {
     // To be overridden in derived classes.
-    return 0;
+    return nullptr;
 }
 
 

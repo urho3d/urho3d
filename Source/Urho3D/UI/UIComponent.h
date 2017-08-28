@@ -42,7 +42,7 @@ public:
     /// Construct.
     UIComponent(Context* context);
     /// Destruct.
-    virtual ~UIComponent();
+    virtual ~UIComponent() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -77,7 +77,7 @@ protected:
     /// Is StaticModel component created by this component.
     bool isStaticModelOwned_;
 
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle resizing of element. Setting size of element will automatically resize texture. UIElement size matches size of texture.
     void OnElementResized(StringHash eventType, VariantMap& args);
     /// Convert screen position to position on UIElement.

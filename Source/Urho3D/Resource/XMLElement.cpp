@@ -36,9 +36,9 @@ namespace Urho3D
 const XMLElement XMLElement::EMPTY;
 
 XMLElement::XMLElement() :
-    node_(0),
-    xpathResultSet_(0),
-    xpathNode_(0),
+    node_(nullptr),
+    xpathResultSet_(nullptr),
+    xpathNode_(nullptr),
     xpathResultIndex_(0)
 {
 }
@@ -46,8 +46,8 @@ XMLElement::XMLElement() :
 XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
     file_(file),
     node_(node),
-    xpathResultSet_(0),
-    xpathNode_(0),
+    xpathResultSet_(nullptr),
+    xpathNode_(nullptr),
     xpathResultIndex_(0)
 {
 }
@@ -55,9 +55,9 @@ XMLElement::XMLElement(XMLFile* file, pugi::xml_node_struct* node) :
 XMLElement::XMLElement(XMLFile* file, const XPathResultSet* resultSet, const pugi::xpath_node* xpathNode,
     unsigned xpathResultIndex) :
     file_(file),
-    node_(0),
+    node_(nullptr),
     xpathResultSet_(resultSet),
-    xpathNode_(resultSet ? xpathNode : (xpathNode ? new pugi::xpath_node(*xpathNode) : 0)),
+    xpathNode_(resultSet ? xpathNode : (xpathNode ? new pugi::xpath_node(*xpathNode) : nullptr)),
     xpathResultIndex_(xpathResultIndex)
 {
 }
@@ -66,7 +66,7 @@ XMLElement::XMLElement(const XMLElement& rhs) :
     file_(rhs.file_),
     node_(rhs.node_),
     xpathResultSet_(rhs.xpathResultSet_),
-    xpathNode_(rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(*rhs.xpathNode_) : 0)),
+    xpathNode_(rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(*rhs.xpathNode_) : nullptr)),
     xpathResultIndex_(rhs.xpathResultIndex_)
 {
 }
@@ -77,7 +77,7 @@ XMLElement::~XMLElement()
     if (!xpathResultSet_ && xpathNode_)
     {
         delete xpathNode_;
-        xpathNode_ = 0;
+        xpathNode_ = nullptr;
     }
 }
 
@@ -86,7 +86,7 @@ XMLElement& XMLElement::operator =(const XMLElement& rhs)
     file_ = rhs.file_;
     node_ = rhs.node_;
     xpathResultSet_ = rhs.xpathResultSet_;
-    xpathNode_ = rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(*rhs.xpathNode_) : 0);
+    xpathNode_ = rhs.xpathResultSet_ ? rhs.xpathNode_ : (rhs.xpathNode_ ? new pugi::xpath_node(*rhs.xpathNode_) : nullptr);
     xpathResultIndex_ = rhs.xpathResultIndex_;
     return *this;
 }
@@ -209,7 +209,7 @@ XMLElement XMLElement::SelectSingle(const String& query, pugi::xpath_variable_se
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
     pugi::xpath_node result = node.select_single_node(query.CString(), variables);
-    return XMLElement(file_, 0, &result, 0);
+    return XMLElement(file_, nullptr, &result, 0);
 }
 
 XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query) const
@@ -219,7 +219,7 @@ XMLElement XMLElement::SelectSinglePrepared(const XPathQuery& query) const
 
     const pugi::xml_node& node = xpathNode_ ? xpathNode_->node() : pugi::xml_node(node_);
     pugi::xpath_node result = node.select_single_node(*query.GetXPathQuery());
-    return XMLElement(file_, 0, &result, 0);
+    return XMLElement(file_, nullptr, &result, 0);
 }
 
 XPathResultSet XMLElement::Select(const String& query, pugi::xpath_variable_set* variables) const
@@ -683,7 +683,7 @@ String XMLElement::GetAttribute(const char* name) const
 const char* XMLElement::GetAttributeCString(const char* name) const
 {
     if (!file_ || (!node_ && !xpathNode_))
-        return 0;
+        return nullptr;
 
     // If xpath_node contains just attribute, return it regardless of the specified name
     if (xpathNode_ && xpathNode_->attribute())
@@ -981,13 +981,13 @@ XMLElement XMLElement::NextResult() const
 }
 
 XPathResultSet::XPathResultSet() :
-    resultSet_(0)
+    resultSet_(nullptr)
 {
 }
 
 XPathResultSet::XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet) :
     file_(file),
-    resultSet_(resultSet ? new pugi::xpath_node_set(resultSet->begin(), resultSet->end()) : 0)
+    resultSet_(resultSet ? new pugi::xpath_node_set(resultSet->begin(), resultSet->end()) : nullptr)
 {
     // Sort the node set in forward document order
     if (resultSet_)
@@ -996,20 +996,20 @@ XPathResultSet::XPathResultSet(XMLFile* file, pugi::xpath_node_set* resultSet) :
 
 XPathResultSet::XPathResultSet(const XPathResultSet& rhs) :
     file_(rhs.file_),
-    resultSet_(rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : 0)
+    resultSet_(rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : nullptr)
 {
 }
 
 XPathResultSet::~XPathResultSet()
 {
     delete resultSet_;
-    resultSet_ = 0;
+    resultSet_ = nullptr;
 }
 
 XPathResultSet& XPathResultSet::operator =(const XPathResultSet& rhs)
 {
     file_ = rhs.file_;
-    resultSet_ = rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : 0;
+    resultSet_ = rhs.resultSet_ ? new pugi::xpath_node_set(rhs.resultSet_->begin(), rhs.resultSet_->end()) : nullptr;
     return *this;
 }
 
@@ -1169,7 +1169,7 @@ String XPathQuery::EvaluateToString(XMLElement element) const
     const pugi::xml_node& node = element.GetXPathNode() ? element.GetXPathNode()->node() : pugi::xml_node(element.GetNode());
     String result;
     // First call get the size
-    result.Reserve((unsigned)query_->evaluate_string(0, 0, node));
+    result.Reserve((unsigned)query_->evaluate_string(nullptr, 0, node));
     // Second call get the actual string
     query_->evaluate_string(const_cast<pugi::char_t*>(result.CString()), result.Capacity(), node);
     return result;

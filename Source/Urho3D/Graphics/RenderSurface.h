@@ -41,7 +41,7 @@ public:
     /// Construct with parent texture.
     RenderSurface(Texture* parentTexture);
     /// Destruct.
-    ~RenderSurface();
+    virtual ~RenderSurface() override;
 
     /// Set number of viewports.
     void SetNumViewports(unsigned num);

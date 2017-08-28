@@ -56,7 +56,7 @@ static const char* collisionEventModeNames[] =
     "Never",
     "When Active",
     "Always",
-    0
+    nullptr
 };
 
 extern const char* PHYSICS_CATEGORY;
@@ -172,7 +172,7 @@ void RigidBody::setWorldTransform(const btTransform& worldTrans)
 {
     Quaternion newWorldRotation = ToQuaternion(worldTrans.getRotation());
     Vector3 newWorldPosition = ToVector3(worldTrans.getOrigin()) - newWorldRotation * centerOfMass_;
-    RigidBody* parentRigidBody = 0;
+    RigidBody* parentRigidBody = nullptr;
 
     // It is possible that the RigidBody component has been kept alive via a shared pointer,
     // while its scene node has already been destroyed
@@ -213,7 +213,7 @@ void RigidBody::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         world->debugDrawObject(body_->getWorldTransform(), shiftedCompoundShape_.Get(), IsActive() ? btVector3(1.0f, 1.0f, 1.0f) :
             btVector3(0.0f, 1.0f, 0.0f));
 
-        physicsWorld_->SetDebugRenderer(0);
+        physicsWorld_->SetDebugRenderer(nullptr);
     }
 }
 

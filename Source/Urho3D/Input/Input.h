@@ -75,7 +75,7 @@ struct JoystickState
 {
     /// Construct with defaults.
     JoystickState() :
-        joystick_(0), controller_(0), screenJoystick_(0)
+        joystick_(nullptr), controller_(nullptr), screenJoystick_(nullptr)
     {
     }
 
@@ -85,7 +85,7 @@ struct JoystickState
     void Reset();
 
     /// Return whether is a game controller. Game controllers will use standardized axis and button mappings.
-    bool IsController() const { return controller_ != 0; }
+    bool IsController() const { return controller_ != nullptr; }
 
     /// Return number of buttons.
     unsigned GetNumButtons() const { return buttons_.Size(); }
@@ -145,7 +145,7 @@ public:
     /// Construct.
     Input(Context* context);
     /// Destruct.
-    virtual ~Input();
+    virtual ~Input() override;
 
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();
@@ -187,7 +187,7 @@ public:
      *
      *  This method should only be called in main thread.
      */
-    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+    SDL_JoystickID AddScreenJoystick(XMLFile* layoutFile = nullptr, XMLFile* styleFile = nullptr);
     /// Remove screen joystick by instance ID.
     /** Return true if successful.
      *

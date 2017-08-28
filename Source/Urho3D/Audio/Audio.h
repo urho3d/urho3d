@@ -45,7 +45,7 @@ public:
     /// Construct.
     Audio(Context* context);
     /// Destruct. Terminate the audio thread and free the audio buffer.
-    virtual ~Audio();
+    virtual ~Audio() override;
 
     /// Initialize sound output with specified buffer length and output mode.
     bool SetMode(int bufferLengthMSec, int mixRate, bool stereo, bool interpolation = true);

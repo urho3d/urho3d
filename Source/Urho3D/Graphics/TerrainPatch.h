@@ -40,26 +40,26 @@ public:
     /// Construct.
     TerrainPatch(Context* context);
     /// Destruct.
-    ~TerrainPatch();
+    virtual ~TerrainPatch() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    virtual void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    virtual UpdateGeometryType GetUpdateGeometryType() override;
     /// Return the geometry for a specific LOD level.
-    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level);
+    virtual Geometry* GetLodGeometry(unsigned batchIndex, unsigned level) override;
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles();
+    virtual unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    virtual bool DrawOcclusion(OcclusionBuffer* buffer);
+    virtual bool DrawOcclusion(OcclusionBuffer* buffer) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set owner terrain.
     void SetOwner(Terrain* terrain);
@@ -108,7 +108,7 @@ public:
 
 protected:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
 
 private:
     /// Return a corrected LOD level to ensure stitching can work correctly.

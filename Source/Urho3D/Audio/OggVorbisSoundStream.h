@@ -37,13 +37,13 @@ public:
     /// Construct from an Ogg Vorbis compressed sound.
     OggVorbisSoundStream(const Sound* sound);
     /// Destruct.
-    ~OggVorbisSoundStream();
+    virtual ~OggVorbisSoundStream() override;
 
     /// Seek to sample number. Return true on success.
-    virtual bool Seek(unsigned sample_number);
+    virtual bool Seek(unsigned sample_number) override;
 
     /// Produce sound data into destination. Return number of bytes produced. Called by SoundSource from the mixing thread.
-    virtual unsigned GetData(signed char* dest, unsigned numBytes);
+    virtual unsigned GetData(signed char* dest, unsigned numBytes) override;
 
 protected:
     /// Decoder state.

@@ -39,14 +39,14 @@ public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.
     VertexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
-    virtual ~VertexBuffer();
+    virtual ~VertexBuffer() override;
 
     /// Mark the buffer destroyed on graphics context destruction. May be a no-op depending on the API.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Recreate the buffer and restore data if applicable. May be a no-op depending on the API.
-    virtual void OnDeviceReset();
+    virtual void OnDeviceReset() override;
     /// Release buffer.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);
@@ -88,10 +88,10 @@ public:
     const VertexElement* GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const;
 
     /// Return whether has a specified element semantic.
-    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(semantic, index) != 0; }
+    bool HasElement(VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(semantic, index) != nullptr; }
 
     /// Return whether has an element semantic with specific type.
-    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(type, semantic, index) != 0; }
+    bool HasElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index = 0) const { return GetElement(type, semantic, index) != nullptr; }
 
     /// Return offset of a element within vertex, or M_MAX_UNSIGNED if does not exist.
     unsigned GetElementOffset(VertexElementSemantic semantic, unsigned char index = 0) const { const VertexElement* element = GetElement(semantic, index); return element ? element->offset_ : M_MAX_UNSIGNED; }

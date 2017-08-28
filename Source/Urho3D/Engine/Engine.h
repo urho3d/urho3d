@@ -40,7 +40,7 @@ public:
     /// Construct.
     Engine(Context* context);
     /// Destruct. Free all subsystems.
-    virtual ~Engine();
+    virtual ~Engine() override;
 
     /// Initialize engine using parameters given and show the application window. Return true if successful.
     bool Initialize(const VariantMap& parameters);

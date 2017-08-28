@@ -54,7 +54,7 @@ const char* faceCameraModeNames[] =
     "LookAt Y",
     "LookAt Mixed",
     "Direction",
-    0
+    nullptr
 };
 
 static const StringVector billboardsStructureElementNames =
@@ -358,7 +358,7 @@ Material* BillboardSet::GetMaterial() const
 
 Billboard* BillboardSet::GetBillboard(unsigned index)
 {
-    return index < billboards_.Size() ? &billboards_[index] : (Billboard*)0;
+    return index < billboards_.Size() ? &billboards_[index] : (Billboard*)nullptr;
 }
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)

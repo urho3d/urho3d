@@ -40,9 +40,9 @@ class URHO3D_API MessageBox : public Object
 public:
     /// Construct. If layout file is not given, use the default message box layout. If style file is not given, use the default style file from root UI element.
     MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY,
-        XMLFile* layoutFile = 0, XMLFile* styleFile = 0);
+        XMLFile* layoutFile = nullptr, XMLFile* styleFile = nullptr);
     /// Destruct.
-    virtual ~MessageBox();
+    virtual ~MessageBox() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

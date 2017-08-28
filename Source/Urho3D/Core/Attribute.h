@@ -68,9 +68,9 @@ struct AttributeInfo
     AttributeInfo() :
         type_(VAR_NONE),
         offset_(0),
-        enumNames_(0),
+        enumNames_(nullptr),
         mode_(AM_DEFAULT),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -79,10 +79,10 @@ struct AttributeInfo
         type_(type),
         name_(name),
         offset_((unsigned)offset),
-        enumNames_(0),
+        enumNames_(nullptr),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -94,7 +94,7 @@ struct AttributeInfo
         enumNames_(enumNames),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -103,11 +103,11 @@ struct AttributeInfo
         type_(type),
         name_(name),
         offset_(0),
-        enumNames_(0),
+        enumNames_(nullptr),
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 
@@ -121,7 +121,7 @@ struct AttributeInfo
         accessor_(accessor),
         defaultValue_(defaultValue),
         mode_(mode),
-        ptr_(0)
+        ptr_(nullptr)
     {
     }
 

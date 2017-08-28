@@ -52,8 +52,8 @@ Node::Node(Context* context) :
     enabled_(true),
     enabledPrev_(true),
     networkUpdate_(false),
-    parent_(0),
-    scene_(0),
+    parent_(nullptr),
+    scene_(nullptr),
     id_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
@@ -61,7 +61,7 @@ Node::Node(Context* context) :
     worldRotation_(Quaternion::IDENTITY)
 {
     impl_ = new NodeImpl();
-    impl_->owner_ = 0;
+    impl_->owner_ = nullptr;
 }
 
 Node::~Node()
@@ -916,7 +916,7 @@ Component* Node::CreateComponent(StringHash type, CreateMode mode, unsigned id)
     if (!newComponent)
     {
         URHO3D_LOGERROR("Could not create unknown component type " + type.ToString());
-        return 0;
+        return nullptr;
     }
 
     AddComponent(newComponent, id, mode);
@@ -937,7 +937,7 @@ Component* Node::CloneComponent(Component* component, unsigned id)
     if (!component)
     {
         URHO3D_LOGERROR("Null source component given for CloneComponent");
-        return 0;
+        return nullptr;
     }
 
     return CloneComponent(component, component->GetID() < FIRST_LOCAL_ID ? REPLICATED : LOCAL, id);
@@ -948,14 +948,14 @@ Component* Node::CloneComponent(Component* component, CreateMode mode, unsigned 
     if (!component)
     {
         URHO3D_LOGERROR("Null source component given for CloneComponent");
-        return 0;
+        return nullptr;
     }
 
     Component* cloneComponent = SafeCreateComponent(component->GetTypeName(), component->GetType(), mode, 0);
     if (!cloneComponent)
     {
         URHO3D_LOGERROR("Could not clone component " + component->GetTypeName());
-        return 0;
+        return nullptr;
     }
 
     const Vector<AttributeInfo>* compAttributes = component->GetAttributes();
@@ -1096,7 +1096,7 @@ Node* Node::Clone(CreateMode mode)
     if (this == scene_ || !parent_)
     {
         URHO3D_LOGERROR("Can not clone node without a parent");
-        return 0;
+        return nullptr;
     }
 
     URHO3D_PROFILE(CloneNode);
@@ -1293,7 +1293,7 @@ PODVector<Node*> Node::GetChildrenWithTag(const String& tag, bool recursive) con
 
 Node* Node::GetChild(unsigned index) const
 {
-    return index < children_.Size() ? children_[index].Get() : 0;
+    return index < children_.Size() ? children_[index].Get() : nullptr;
 }
 
 Node* Node::GetChild(const String& name, bool recursive) const
@@ -1321,7 +1321,7 @@ Node* Node::GetChild(StringHash nameHash, bool recursive) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 unsigned Node::GetNumNetworkComponents() const
@@ -1403,7 +1403,7 @@ Component* Node::GetComponent(StringHash type, bool recursive) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
@@ -1420,7 +1420,7 @@ Component* Node::GetParentComponent(StringHash type, bool fullTraversal) const
         else
             break;
     }
-    return 0;
+    return nullptr;
 }
 
 void Node::SetID(unsigned id)
@@ -1436,8 +1436,8 @@ void Node::SetScene(Scene* scene)
 void Node::ResetScene()
 {
     SetID(0);
-    SetScene(0);
-    SetOwner(0);
+    SetScene(nullptr);
+    SetOwner(nullptr);
 }
 
 void Node::SetNetPositionAttr(const Vector3& value)
@@ -1760,7 +1760,7 @@ void Node::PrepareNetworkUpdate()
 void Node::CleanupConnection(Connection* connection)
 {
     if (impl_->owner_ == connection)
-        impl_->owner_ = 0;
+        impl_->owner_ = nullptr;
 
     if (networkState_)
     {
@@ -1931,7 +1931,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             if (!node)
             {
                 URHO3D_LOGERROR("Could not find node by name " + name);
-                return 0;
+                return nullptr;
             }
         }
 
@@ -1944,7 +1944,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
         if (i != names.Size() - 2 || names[i].Front() != '@')
         {
             URHO3D_LOGERROR("Invalid name " + name);
-            return 0;
+            return nullptr;
         }
 
         String componentName = names[i].Substring(1, names[i].Length() - 1);
@@ -1955,7 +1955,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             if (!component)
             {
                 URHO3D_LOGERROR("Could not find component by name " + name);
-                return 0;
+                return nullptr;
             }
 
             outName = names.Back();
@@ -1969,7 +1969,7 @@ Animatable* Node::FindAttributeAnimationTarget(const String& name, String& outNa
             if (index >= components.Size())
             {
                 URHO3D_LOGERROR("Could not find component by name " + name);
-                return 0;
+                return nullptr;
             }
 
             outName = names.Back();
@@ -2110,7 +2110,7 @@ void Node::RemoveChild(Vector<SharedPtr<Node> >::Iterator i)
         scene_->SendEvent(E_NODEREMOVED, eventData);
     }
 
-    child->parent_ = 0;
+    child->parent_ = nullptr;
     child->MarkDirty();
     child->MarkNetworkUpdate();
     if (scene_)
@@ -2240,7 +2240,7 @@ void Node::RemoveComponent(Vector<SharedPtr<Component> >::Iterator i)
     RemoveListener(*i);
     if (scene_)
         scene_->ComponentRemoved(*i);
-    (*i)->SetNode(0);
+    (*i)->SetNode(nullptr);
     components_.Erase(i);
 }
 

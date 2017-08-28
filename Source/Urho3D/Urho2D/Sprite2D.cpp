@@ -192,7 +192,7 @@ bool Sprite2D::GetTextureRectangle(Rect& rect, bool flipX, bool flipY) const
 
 ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)
 {
-    SpriteSheet2D* spriteSheet = 0;
+    SpriteSheet2D* spriteSheet = nullptr;
     if (sprite)
         spriteSheet = sprite->GetSpriteSheet();
 
@@ -206,7 +206,7 @@ ResourceRef Sprite2D::SaveToResourceRef(Sprite2D* sprite)
 Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value)
 {
     if (!object)
-        return 0;
+        return nullptr;
 
     ResourceCache* cache = object->GetSubsystem<ResourceCache>();
 
@@ -218,19 +218,19 @@ Sprite2D* Sprite2D::LoadFromResourceRef(Object* object, const ResourceRef& value
         // value.name_ include sprite sheet name and sprite name.
         Vector<String> names = value.name_.Split('@');
         if (names.Size() != 2)
-            return 0;
+            return nullptr;
 
         const String& spriteSheetName = names[0];
         const String& spriteName = names[1];
 
         SpriteSheet2D* spriteSheet = cache->GetResource<SpriteSheet2D>(spriteSheetName);
         if (!spriteSheet)
-            return 0;
+            return nullptr;
 
         return spriteSheet->GetSprite(spriteName);
     }
 
-    return 0;
+    return nullptr;
 }
 
 }

@@ -152,7 +152,7 @@ const PackageEntry* PackageFile::GetEntry(const String& fileName) const
     }
 #endif
 
-    return 0;
+    return nullptr;
 }
 
 }

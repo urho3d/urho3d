@@ -61,7 +61,7 @@ static void* ThreadFunctionStatic(void* data)
 ThreadID Thread::mainThreadID;
 
 Thread::Thread() :
-    handle_(0),
+    handle_(nullptr),
     shouldRun_(false)
 {
 }
@@ -80,7 +80,7 @@ bool Thread::Run()
 
     shouldRun_ = true;
 #ifdef _WIN32
-    handle_ = CreateThread(0, 0, ThreadFunctionStatic, this, 0, 0);
+    handle_ = CreateThread(nullptr, 0, ThreadFunctionStatic, this, 0, nullptr);
 #else
     handle_ = new pthread_t;
     pthread_attr_t type;
@@ -88,7 +88,7 @@ bool Thread::Run()
     pthread_attr_setdetachstate(&type, PTHREAD_CREATE_JOINABLE);
     pthread_create((pthread_t*)handle_, &type, ThreadFunctionStatic, this);
 #endif
-    return handle_ != 0;
+    return handle_ != nullptr;
 #else
     return false;
 #endif // URHO3D_THREADING
@@ -111,7 +111,7 @@ void Thread::Stop()
         pthread_join(*thread, 0);
     delete thread;
 #endif
-    handle_ = 0;
+    handle_ = nullptr;
 #endif // URHO3D_THREADING
 }
 

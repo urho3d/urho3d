@@ -38,8 +38,8 @@ namespace Spriter
 SpriterInstance::SpriterInstance(Component* owner, SpriterData* spriteData) : 
     owner_(owner),
     spriterData_(spriteData),
-    entity_(0),
-    animation_(0)
+    entity_(nullptr),
+    animation_(nullptr)
 {
 }
 
@@ -47,8 +47,8 @@ SpriterInstance::~SpriterInstance()
 {
     Clear();
 
-    OnSetAnimation(0);
-    OnSetEntity(0);
+    OnSetAnimation(nullptr);
+    OnSetEntity(nullptr);
 }
 
 bool SpriterInstance::SetEntity(int index)
@@ -174,7 +174,7 @@ void SpriterInstance::OnSetEntity(Entity* entity)
     if (entity == this->entity_)
         return;
 
-    OnSetAnimation(0);
+    OnSetAnimation(nullptr);
 
     this->entity_ = entity;
 }
@@ -296,7 +296,7 @@ TimelineKey* SpriterInstance::GetTimelineKey(Ref* ref) const
 
 void SpriterInstance::Clear()
 {
-    mainlineKey_ = 0;
+    mainlineKey_ = nullptr;
 
     if (!timelineKeys_.Empty())
     {

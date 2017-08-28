@@ -42,7 +42,7 @@ public:
     /// Construct.
     Texture(Context* context);
     /// Destruct.
-    virtual ~Texture();
+    virtual ~Texture() override;
 
     /// Set number of requested mip levels. Needs to be called before setting size.
     /** The default value (0) allocates as many mip levels as necessary to reach 1x1 size. Set value 1 to disable mipmapping.

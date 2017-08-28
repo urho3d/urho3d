@@ -37,7 +37,7 @@ struct URHO3D_API LinkedListNode
 {
     /// Construct.
     LinkedListNode() :
-        next_(0)
+        next_(nullptr)
     {
     }
 

@@ -67,20 +67,20 @@ struct DynamicNavigationMesh::TileCacheData
 
 struct TileCompressor : public dtTileCacheCompressor
 {
-    virtual int maxCompressedSize(const int bufferSize)
+    virtual int maxCompressedSize(const int bufferSize) override
     {
         return (int)(bufferSize * 1.05f);
     }
 
     virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
-        unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize)
+        unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize) override
     {
         *compressedSize = LZ4_compress_default((const char*)buffer, (char*)compressed, bufferSize, LZ4_compressBound(bufferSize));
         return DT_SUCCESS;
     }
 
     virtual dtStatus decompress(const unsigned char* compressed, const int compressedSize,
-        unsigned char* buffer, const int maxBufferSize, int* bufferSize)
+        unsigned char* buffer, const int maxBufferSize, int* bufferSize) override
     {
         *bufferSize = LZ4_decompress_safe((const char*)compressed, (char*)buffer, compressedSize, maxBufferSize);
         return *bufferSize < 0 ? DT_FAILURE : DT_SUCCESS;
@@ -101,7 +101,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
     {
     }
 
-    virtual void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags)
+    virtual void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags) override
     {
         // Update poly flags from areas.
         // \todo Assignment of flags from areas?
@@ -167,12 +167,12 @@ struct LinearAllocator : public dtTileCacheAlloc
     int high;
 
     LinearAllocator(const int cap) :
-        buffer(0), capacity(0), top(0), high(0)
+        buffer(nullptr), capacity(0), top(0), high(0)
     {
         resize(cap);
     }
 
-    ~LinearAllocator()
+    virtual ~LinearAllocator() override
     {
         dtFree(buffer);
     }
@@ -185,24 +185,24 @@ struct LinearAllocator : public dtTileCacheAlloc
         capacity = cap;
     }
 
-    virtual void reset()
+    virtual void reset() override
     {
         high = Max(high, top);
         top = 0;
     }
 
-    virtual void* alloc(const int size)
+    virtual void* alloc(const int size) override
     {
         if (!buffer)
-            return 0;
+            return nullptr;
         if (top + size > capacity)
-            return 0;
+            return nullptr;
         unsigned char* mem = &buffer[top];
         top += size;
         return mem;
     }
 
-    virtual void free(void*)
+    virtual void free(void*) override
     {
     }
 };
@@ -210,7 +210,7 @@ struct LinearAllocator : public dtTileCacheAlloc
 
 DynamicNavigationMesh::DynamicNavigationMesh(Context* context) :
     NavigationMesh(context),
-    tileCache_(0),
+    tileCache_(nullptr),
     maxObstacles_(1024),
     maxLayers_(DEFAULT_MAX_LAYERS),
     drawObstacles_(false)
@@ -445,7 +445,7 @@ bool DynamicNavigationMesh::Build()
                     if (dtStatusFailed((dtStatus)status))
                     {
                         dtFree(tiles[i].data);
-                        tiles[i].data = 0x0;
+                        tiles[i].data = nullptr;
                     }
                 }
                 tileCache_->buildNavMeshTilesAt(x, z, navMesh_);
@@ -570,8 +570,8 @@ void DynamicNavigationMesh::RemoveTile(const IntVector2& tile)
     const int existingCt = tileCache_->getTilesAt(tile.x_, tile.y_, existing, maxLayers_);
     for (int i = 0; i < existingCt; ++i)
     {
-        unsigned char* data = 0x0;
-        if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, 0)) && data != 0x0)
+        unsigned char* data = nullptr;
+        if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, nullptr)) && data != nullptr)
             dtFree(data);
     }
 
@@ -586,7 +586,7 @@ void DynamicNavigationMesh::RemoveAllTiles()
         const dtCompressedTile* tile = tileCache_->getTile(i);
         assert(tile);
         if (tile->header)
-            tileCache_->removeTile(tileCache_->getTileRef(tile), 0, 0);
+            tileCache_->removeTile(tileCache_->getTileRef(tile), nullptr, nullptr);
     }
 
     NavigationMesh::RemoveAllTiles();
@@ -787,7 +787,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
         }
 
         source.Read(data, (unsigned)dataSize);
-        if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, 0)))
+        if (dtStatusFailed(tileCache_->addTile(data, dataSize, DT_TILE_FREE_DATA, nullptr)))
         {
             URHO3D_LOGERROR("Failed to add tile");
             dtFree(data);
@@ -824,7 +824,7 @@ int DynamicNavigationMesh::BuildTile(Vector<NavigationGeometryInfo>& geometryLis
 {
     URHO3D_PROFILE(BuildNavigationMeshTile);
 
-    tileCache_->removeTile(navMesh_->getTileRefAt(x, z, 0), 0, 0);
+    tileCache_->removeTile(navMesh_->getTileRefAt(x, z, 0), nullptr, nullptr);
 
     const BoundingBox tileBoundingBox = GetTileBoudningBox(IntVector2(x, z));
 
@@ -1011,8 +1011,8 @@ unsigned DynamicNavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geome
             const int existingCt = tileCache_->getTilesAt(x, z, existing, maxLayers_);
             for (int i = 0; i < existingCt; ++i)
             {
-                unsigned char* data = 0x0;
-                if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, 0)) && data != 0x0)
+                unsigned char* data = nullptr;
+                if (!dtStatusFailed(tileCache_->removeTile(existing[i], &data, nullptr)) && data != nullptr)
                     dtFree(data);
             }
 
@@ -1025,7 +1025,7 @@ unsigned DynamicNavigationMesh::BuildTiles(Vector<NavigationGeometryInfo>& geome
                 if (dtStatusFailed((dtStatus)status))
                 {
                     dtFree(tiles[i].data);
-                    tiles[i].data = 0x0;
+                    tiles[i].data = nullptr;
                 }
                 else
                 {
@@ -1066,7 +1066,7 @@ void DynamicNavigationMesh::ReleaseNavigationMesh()
 void DynamicNavigationMesh::ReleaseTileCache()
 {
     dtFreeTileCache(tileCache_);
-    tileCache_ = 0;
+    tileCache_ = nullptr;
 }
 
 void DynamicNavigationMesh::OnSceneSet(Scene* scene)

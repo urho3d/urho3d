@@ -49,7 +49,7 @@ public:
     /// Construct and open.
     PackageFile(Context* context, const String& fileName, unsigned startOffset = 0);
     /// Destruct.
-    virtual ~PackageFile();
+    virtual ~PackageFile() override;
 
     /// Open the package file. Return true if successful.
     bool Open(const String& fileName, unsigned startOffset = 0);

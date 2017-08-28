@@ -59,14 +59,14 @@ static const char* crowdAgentRequestedTargetTypeNames[] = {
     "None",
     "Position",
     "Velocity",
-    0
+    nullptr
 };
 
 static const char* crowdAgentAvoidanceQualityNames[] = {
     "Low",
     "Medium",
     "High",
-    0
+    nullptr
 };
 
 static const char* crowdAgentPushinessNames[] = {
@@ -74,7 +74,7 @@ static const char* crowdAgentPushinessNames[] = {
     "Medium",
     "High",
     "None",
-    0
+    nullptr
 };
 
 CrowdAgent::CrowdAgent(Context* context) :
@@ -644,7 +644,7 @@ void CrowdAgent::OnMarkedDirty(Node* node)
 
 const dtCrowdAgent* CrowdAgent::GetDetourCrowdAgent() const
 {
-    return IsInCrowd() ? crowdManager_->GetDetourCrowdAgent(agentCrowdId_) : 0;
+    return IsInCrowd() ? crowdManager_->GetDetourCrowdAgent(agentCrowdId_) : nullptr;
 }
 
 void CrowdAgent::HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData)

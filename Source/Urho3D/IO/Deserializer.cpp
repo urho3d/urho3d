@@ -348,7 +348,7 @@ Variant Deserializer::ReadVariant(VariantType type)
     case VAR_VOIDPTR:
     case VAR_PTR:
         ReadUInt();
-        return Variant((void*)0);
+        return Variant((void*)nullptr);
 
     case VAR_RESOURCEREF:
         return Variant(ReadResourceRef());

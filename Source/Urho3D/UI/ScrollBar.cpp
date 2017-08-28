@@ -300,28 +300,28 @@ void ScrollBar::HandleSliderPaged(StringHash eventType, VariantMap& eventData)
 
     // Synthesize hover event to the forward/back buttons
     if (eventData[P_OFFSET].GetInt() < 0)
-        backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), 0, 0, 0);
+        backButton_->OnHover(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO), 0, 0, nullptr);
     else
-        forwardButton_->OnHover(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), 0, 0, 0);
+        forwardButton_->OnHover(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO), 0, 0, nullptr);
 
     // Synthesize click / release events to the buttons
     if (eventData[P_PRESSED].GetBool())
     {
         if (eventData[P_OFFSET].GetInt() < 0)
             backButton_->OnClickBegin(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
+                MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
         else
             forwardButton_->OnClickBegin(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, MOUSEB_LEFT, 0, 0);
+                MOUSEB_LEFT, MOUSEB_LEFT, 0, nullptr);
     }
     else
     {
         if (eventData[P_OFFSET].GetInt() < 0)
             backButton_->OnClickEnd(IntVector2::ZERO, backButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, 0, 0, 0, backButton_);
+                MOUSEB_LEFT, 0, 0, nullptr, backButton_);
         else
             forwardButton_->OnClickEnd(IntVector2::ZERO, forwardButton_->ElementToScreen(IntVector2::ZERO),
-                MOUSEB_LEFT, 0, 0, 0, forwardButton_);
+                MOUSEB_LEFT, 0, 0, nullptr, forwardButton_);
     }
 }
 

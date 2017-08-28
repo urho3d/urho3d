@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintFriction2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintFriction2D();
+    virtual ~ConstraintFriction2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -58,7 +58,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef();
+    virtual b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2FrictionJointDef jointDef_;

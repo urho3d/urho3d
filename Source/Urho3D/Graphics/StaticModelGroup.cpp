@@ -319,7 +319,7 @@ void StaticModelGroup::RemoveAllInstanceNodes()
 
 Node* StaticModelGroup::GetInstanceNode(unsigned index) const
 {
-    return index < instanceNodes_.Size() ? instanceNodes_[index] : (Node*)0;
+    return index < instanceNodes_.Size() ? instanceNodes_[index] : (Node*)nullptr;
 }
 
 void StaticModelGroup::SetNodeIDsAttr(const VariantVector& value)

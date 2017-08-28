@@ -119,12 +119,12 @@ void ConstraintMouse2D::SetDampingRatio(float dampingRatio)
 b2JointDef* ConstraintMouse2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
-        return 0;
+        return nullptr;
 
     b2Body* bodyA = otherBody_->GetBody();
     b2Body* bodyB = ownerBody_->GetBody();
     if (!bodyA || !bodyB)
-        return 0;
+        return nullptr;
 
     jointDef_.bodyA = bodyA;
     jointDef_.bodyB = bodyB;

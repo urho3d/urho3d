@@ -60,12 +60,12 @@ public:
     /// Construct.
     AnimatedSprite2D(Context* context);
     /// Destruct.
-    virtual ~AnimatedSprite2D();
+    virtual ~AnimatedSprite2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
 
     /// Set animation set.
     void SetAnimationSet(AnimationSet2D* animationSet);
@@ -98,9 +98,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Handle update vertices.
-    virtual void UpdateSourceBatches();
+    virtual void UpdateSourceBatches() override;
     /// Handle scene post update.
     void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
     /// Update animation.

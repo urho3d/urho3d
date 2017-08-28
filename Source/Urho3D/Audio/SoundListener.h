@@ -36,7 +36,7 @@ public:
     /// Construct.
     SoundListener(Context* context);
     /// Destruct.
-    virtual ~SoundListener();
+    virtual ~SoundListener() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 };

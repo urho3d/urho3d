@@ -44,13 +44,13 @@ static const char* bodyTypeNames[] =
     "Static",
     "Kinematic",
     "Dynamic",
-    0
+    nullptr
 };
 
 RigidBody2D::RigidBody2D(Context* context) :
     Component(context),
     useFixtureMass_(true),
-    body_(0)
+    body_(nullptr)
 {
     // Make sure the massData members are zero-initialized.
     massData_.mass = 0.0f;
@@ -415,7 +415,7 @@ void RigidBody2D::ReleaseBody()
     }
 
     physicsWorld_->GetWorld()->DestroyBody(body_);
-    body_ = 0;
+    body_ = nullptr;
 }
 
 void RigidBody2D::ApplyWorldTransform()
@@ -425,7 +425,7 @@ void RigidBody2D::ApplyWorldTransform()
 
     // If the rigid body is parented to another rigid body, can not set the transform immediately.
     // In that case store it to PhysicsWorld2D for delayed assignment
-    RigidBody2D* parentRigidBody = 0;
+    RigidBody2D* parentRigidBody = nullptr;
     Node* parent = node_->GetParent();
     if (parent != GetScene() && parent)
         parentRigidBody = parent->GetComponent<RigidBody2D>();

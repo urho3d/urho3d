@@ -36,8 +36,8 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
     AllocatorBlock* newBlock = reinterpret_cast<AllocatorBlock*>(blockPtr);
     newBlock->nodeSize_ = nodeSize;
     newBlock->capacity_ = capacity;
-    newBlock->free_ = 0;
-    newBlock->next_ = 0;
+    newBlock->free_ = nullptr;
+    newBlock->next_ = nullptr;
 
     if (!allocator)
         allocator = newBlock;
@@ -60,7 +60,7 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
     // i == capacity - 1
     {
         AllocatorNode* newNode = reinterpret_cast<AllocatorNode*>(nodePtr);
-        newNode->next_ = 0;
+        newNode->next_ = nullptr;
     }
 
     allocator->free_ = firstNewNode;
@@ -70,7 +70,7 @@ AllocatorBlock* AllocatorReserveBlock(AllocatorBlock* allocator, unsigned nodeSi
 
 AllocatorBlock* AllocatorInitialize(unsigned nodeSize, unsigned initialCapacity)
 {
-    AllocatorBlock* block = AllocatorReserveBlock(0, nodeSize, initialCapacity);
+    AllocatorBlock* block = AllocatorReserveBlock(nullptr, nodeSize, initialCapacity);
     return block;
 }
 
@@ -87,7 +87,7 @@ void AllocatorUninitialize(AllocatorBlock* allocator)
 void* AllocatorReserve(AllocatorBlock* allocator)
 {
     if (!allocator)
-        return 0;
+        return nullptr;
 
     if (!allocator->free_)
     {
@@ -101,7 +101,7 @@ void* AllocatorReserve(AllocatorBlock* allocator)
     AllocatorNode* freeNode = allocator->free_;
     void* ptr = (reinterpret_cast<unsigned char*>(freeNode)) + sizeof(AllocatorNode);
     allocator->free_ = freeNode->next_;
-    freeNode->next_ = 0;
+    freeNode->next_ = nullptr;
 
     return ptr;
 }

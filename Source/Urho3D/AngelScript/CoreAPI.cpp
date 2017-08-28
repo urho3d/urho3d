@@ -385,11 +385,11 @@ static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
     asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
     if (!object)
-        return 0;
+        return nullptr;
 
     asITypeInfo* scriptObjectInterface = object->GetEngine()->GetTypeInfoByName("ScriptObject");
     if (!object->GetObjectType()->Implements(scriptObjectInterface))
-        return 0;
+        return nullptr;
 
     return object;
 }
@@ -869,7 +869,7 @@ static Object* CreateObject(const String& objectType)
             return object;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 static void SendEvent(const String& eventType, VariantMap& eventData)

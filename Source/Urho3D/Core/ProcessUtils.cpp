@@ -162,7 +162,7 @@ static void GetCPUData(struct CpuCoreCount* data)
 #elif !defined(__EMSCRIPTEN__) && !defined(TVOS)
 static void GetCPUData(struct cpu_id_t* data)
 {
-    if (cpu_identify(0, data) < 0)
+    if (cpu_identify(nullptr, data) < 0)
     {
         data->num_logical_cpus = 1;
         data->num_cores = 1;
@@ -187,7 +187,7 @@ void InitFPU()
 void ErrorDialog(const String& title, const String& message)
 {
 #ifndef MINI_URHO
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.CString(), message.CString(), 0);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.CString(), message.CString(), nullptr);
 #endif
 }
 
@@ -230,7 +230,7 @@ void PrintUnicode(const String& str, bool error)
             return;
         WString strW(str);
         DWORD charsWritten;
-        WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, 0);
+        WriteConsoleW(stream, strW.CString(), strW.Length(), &charsWritten, nullptr);
     }
 #else
     fprintf(error ? stderr : stdout, "%s", str.CString());
@@ -377,7 +377,7 @@ String GetConsoleInput()
                     // We have disabled echo, so echo manually
                     wchar_t out = c;
                     DWORD charsWritten;
-                    WriteConsoleW(output, &out, 1, &charsWritten, 0);
+                    WriteConsoleW(output, &out, 1, &charsWritten, nullptr);
                     currentLine.AppendUTF8(c);
                 }
             }
@@ -585,7 +585,7 @@ String GetHostName()
 
 // Disable Windows OS version functionality when compiling mini version for Web, see https://github.com/urho3d/Urho3D/issues/1998
 #if defined(_WIN32) && defined(HAVE_RTL_OSVERSIONINFOW) && !defined(MINI_URHO)
-typedef NTSTATUS (WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+using RtlGetVersionPtr = NTSTATUS (WINAPI *)(PRTL_OSVERSIONINFOW);
 
 static void GetOS(RTL_OSVERSIONINFOW *r)
 {

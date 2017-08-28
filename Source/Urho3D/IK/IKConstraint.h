@@ -42,7 +42,7 @@ public:
     IKConstraint(Context* context);
 
     /// Destructs he IK constraint.
-    virtual ~IKConstraint();
+    virtual ~IKConstraint() override;
 
     /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
