@@ -30,7 +30,7 @@
 
 #ifndef _WIN32
 #include <pthread.h>
-typedef pthread_t ThreadID;
+using ThreadID = pthread_t;
 #else
 using ThreadID = unsigned;
 #endif

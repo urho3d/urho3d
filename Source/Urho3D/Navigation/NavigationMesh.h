@@ -29,7 +29,7 @@
 #include "../Scene/Component.h"
 
 #ifdef DT_POLYREF64
-typedef uint64_t dtPolyRef;
+using dtPolyRef = uint64_t;
 #else
 using dtPolyRef = unsigned int;
 #endif

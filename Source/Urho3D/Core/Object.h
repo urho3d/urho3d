@@ -66,8 +66,8 @@ private:
 
 #define URHO3D_OBJECT(typeName, baseTypeName) \
     public: \
-        typedef typeName ClassName; \
-        typedef baseTypeName BaseClassName; \
+        using ClassName = typeName; \
+        using BaseClassName = baseTypeName; \
         virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
         virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
         virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
