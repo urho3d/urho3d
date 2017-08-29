@@ -68,9 +68,9 @@ private:
     public: \
         using ClassName = typeName; \
         using BaseClassName = baseTypeName; \
-        virtual Urho3D::StringHash GetType() const { return GetTypeInfoStatic()->GetType(); } \
-        virtual const Urho3D::String& GetTypeName() const { return GetTypeInfoStatic()->GetTypeName(); } \
-        virtual const Urho3D::TypeInfo* GetTypeInfo() const { return GetTypeInfoStatic(); } \
+        virtual Urho3D::StringHash GetType() const override { return GetTypeInfoStatic()->GetType(); } \
+        virtual const Urho3D::String& GetTypeName() const override { return GetTypeInfoStatic()->GetTypeName(); } \
+        virtual const Urho3D::TypeInfo* GetTypeInfo() const override { return GetTypeInfoStatic(); } \
         static Urho3D::StringHash GetTypeStatic() { return GetTypeInfoStatic()->GetType(); } \
         static const Urho3D::String& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); } \
         static const Urho3D::TypeInfo* GetTypeInfoStatic() { static const Urho3D::TypeInfo typeInfoStatic(#typeName, BaseClassName::GetTypeInfoStatic()); return &typeInfoStatic; } \
