@@ -3032,7 +3032,9 @@ Methods:
 - IntVector2 operator-() const
 - IntVector2 operator-(const IntVector2& rhs) const
 - IntVector2 operator*(int rhs) const
+- IntVector2 operator*(const IntVector2& rhs) const
 - IntVector2 operator/(int rhs) const
+- IntVector2 operator/(const IntVector2& rhs) const
 - String ToString() const
 - unsigned ToHash() const
 - float Length() const
@@ -3042,6 +3044,11 @@ Properties:
 - int x
 - int y
 - const IntVector2 ZERO
+- const IntVector2 LEFT
+- const IntVector2 RIGHT
+- const IntVector2 UP
+- const IntVector2 DOWN
+- const IntVector2 ONE
 
 <a name="Class_IntVector3"></a>
 ### IntVector3
@@ -3061,7 +3068,9 @@ Methods:
 - IntVector3 operator-() const
 - IntVector3 operator-(const IntVector3& rhs) const
 - IntVector3 operator*(int rhs) const
+- IntVector3 operator*(const IntVector3& rhs) const
 - IntVector3 operator/(int rhs) const
+- IntVector3 operator/(const IntVector3& rhs) const
 - String ToString() const
 - unsigned ToHash() const
 - float Length() const
@@ -7486,7 +7495,6 @@ Methods:
 - Vector2 operator*(float rhs) const
 - Vector2 operator*(const Vector2& rhs) const
 - Vector2 operator/(float rhs) const
-- Vector2 operator/(const Vector2& rhs) const
 - Vector2 operator/(const Vector2& rhs) const
 - void Normalize()
 - float Length() const
