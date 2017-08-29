@@ -184,7 +184,7 @@ public:
         if (i != specificEventReceivers_.End())
         {
             HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Find(eventType);
-            return j != i->second_.End() ? j->second_ : (EventReceiverGroup*)nullptr;
+            return j != i->second_.End() ? j->second_ : nullptr;
         }
         else
             return nullptr;
@@ -194,7 +194,7 @@ public:
     EventReceiverGroup* GetEventReceivers(StringHash eventType)
     {
         HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator i = eventReceivers_.Find(eventType);
-        return i != eventReceivers_.End() ? i->second_ : (EventReceiverGroup*)nullptr;
+        return i != eventReceivers_.End() ? i->second_ : nullptr;
     }
 
 private:

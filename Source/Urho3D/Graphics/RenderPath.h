@@ -259,7 +259,7 @@ public:
     unsigned GetNumCommands() const { return commands_.Size(); }
 
     /// Return command at index, or null if does not exist.
-    RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : (RenderPathCommand*)nullptr; }
+    RenderPathCommand* GetCommand(unsigned index) { return index < commands_.Size() ? &commands_[index] : nullptr; }
 
     /// Return a shader parameter (first appearance in any command.)
     const Variant& GetShaderParameter(const String& name) const;

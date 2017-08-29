@@ -834,9 +834,9 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : faceNormal;
     const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : faceNormal;
 
-    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : (const unsigned char*)nullptr;
-    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : (const unsigned char*)nullptr;
-    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : (const unsigned char*)nullptr;
+    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : nullptr;
+    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : nullptr;
+    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : nullptr;
 
     // Check if face is too much away from the decal normal
     if (decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
@@ -1023,8 +1023,8 @@ void DecalSet::UpdateBuffers()
     geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
     
-    float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : (float*)nullptr;
-    unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : (unsigned short*)nullptr;
+    float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : nullptr;
+    unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : nullptr;
 
     if (vertices && indices)
     {

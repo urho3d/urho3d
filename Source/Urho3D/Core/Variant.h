@@ -1272,7 +1272,7 @@ public:
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
     RefCounted* GetPtr() const
     {
-        return type_ == VAR_PTR ? value_.weakPtr_ : (RefCounted*)nullptr;
+        return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
     /// Return a Matrix3 or identity on type mismatch.

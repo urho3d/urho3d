@@ -224,7 +224,7 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
     }
 
     // Set global (per-frame) shader parameters
-    if (graphics->NeedParameterUpdate(SP_FRAME, (void*)nullptr))
+    if (graphics->NeedParameterUpdate(SP_FRAME, nullptr))
         view->SetGlobalShaderParameters();
 
     // Set camera & viewport shader parameters

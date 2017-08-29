@@ -133,7 +133,7 @@ void Constraint2D::SetOtherBody(RigidBody2D* body)
 
     otherBody_ = body;
 
-    Node* otherNode = body ? body->GetNode() : (Node*)nullptr;
+    Node* otherNode = body ? body->GetNode() : nullptr;
     otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
 
     RecreateJoint();

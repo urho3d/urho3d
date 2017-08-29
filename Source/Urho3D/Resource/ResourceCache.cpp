@@ -799,7 +799,7 @@ String ResourceCache::GetResourceFileName(const String& name) const
 
 ResourceRouter* ResourceCache::GetResourceRouter(unsigned index) const
 {
-    return index < resourceRouters_.Size() ? resourceRouters_[index] : (ResourceRouter*)nullptr;
+    return index < resourceRouters_.Size() ? resourceRouters_[index] : nullptr;
 }
 
 String ResourceCache::GetPreferredResourceDir(const String& path) const

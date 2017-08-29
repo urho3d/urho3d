@@ -1653,7 +1653,7 @@ unsigned UIElement::GetNumChildren(bool recursive) const
 
 UIElement* UIElement::GetChild(unsigned index) const
 {
-    return index < children_.Size() ? children_[index] : (UIElement*)nullptr;
+    return index < children_.Size() ? children_[index] : nullptr;
 }
 
 UIElement* UIElement::GetChild(const String& name, bool recursive) const

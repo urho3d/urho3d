@@ -121,7 +121,7 @@ public:
     void ResetUseTimer();
 
     /// Return highest level depth values.
-    int* GetBuffer() const { return buffers_.Size() ? buffers_[0].data_ : (int*)nullptr; }
+    int* GetBuffer() const { return buffers_.Size() ? buffers_[0].data_ : nullptr; }
 
     /// Return view transform matrix.
     const Matrix3x4& GetView() const { return view_; }

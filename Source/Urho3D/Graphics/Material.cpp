@@ -1205,19 +1205,19 @@ const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 
 Technique* Material::GetTechnique(unsigned index) const
 {
-    return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)nullptr;
+    return index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
 }
 
 Pass* Material::GetPass(unsigned index, const String& passName) const
 {
-    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)nullptr;
+    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
     return tech ? tech->GetPass(passName) : nullptr;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
     HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures_.Find(unit);
-    return i != textures_.End() ? i->second_.Get() : (Texture*)nullptr;
+    return i != textures_.End() ? i->second_.Get() : nullptr;
 }
 
 const Variant& Material::GetShaderParameter(const String& name) const

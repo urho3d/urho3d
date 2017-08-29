@@ -1019,7 +1019,7 @@ void View::ProcessLights()
 
 void View::GetLightBatches()
 {
-    BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassIndex_) ? &batchQueues_[alphaPassIndex_] : (BatchQueue*)nullptr;
+    BatchQueue* alphaQueue = batchQueues_.Contains(alphaPassIndex_) ? &batchQueues_[alphaPassIndex_] : nullptr;
 
     // Build light queues and lit batches
     {
@@ -2074,11 +2074,11 @@ void View::AllocateScreenBuffers()
     int multiSample = renderTarget_ ? renderTarget_->GetMultiSample() : graphics_->GetMultiSample();
     bool autoResolve = renderTarget_ ? renderTarget_->GetAutoResolve() : true;
     substituteRenderTarget_ = needSubstitute ? GetRenderSurfaceFromTexture(renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_,
-        format, multiSample, autoResolve, false, true, sRGB)) : (RenderSurface*)nullptr;
+        format, multiSample, autoResolve, false, true, sRGB)) : nullptr;
     for (unsigned i = 0; i < MAX_VIEWPORT_TEXTURES; ++i)
     {
         viewportTextures_[i] = i < numViewportTextures ? renderer_->GetScreenBuffer(viewSize_.x_, viewSize_.y_, format, multiSample,
-            autoResolve, false, true, sRGB) : (Texture*)nullptr;
+            autoResolve, false, true, sRGB) : nullptr;
     }
     // If using a substitute render target and pingponging, the substitute can act as the second viewport texture
     if (numViewportTextures == 1 && substituteRenderTarget_)
@@ -2849,7 +2849,7 @@ Technique* View::GetTechnique(Drawable* drawable, Material* material)
         }
 
         // If no suitable technique found, fallback to the last
-        return techniques.Size() ? techniques.Back().technique_ : (Technique*)nullptr;
+        return techniques.Size() ? techniques.Back().technique_ : nullptr;
     }
 }
 

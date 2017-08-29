@@ -571,7 +571,7 @@ void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blur
 
 Viewport* Renderer::GetViewport(unsigned index) const
 {
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)nullptr;
+    return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
 
 Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
@@ -1183,7 +1183,7 @@ void Renderer::StorePreparedView(View* view, Camera* camera)
 View* Renderer::GetPreparedView(Camera* camera)
 {
     HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
-    return i != preparedViews_.End() ? i->second_ : (View*)nullptr;
+    return i != preparedViews_.End() ? i->second_ : nullptr;
 }
 
 View* Renderer::GetActualView(View* view)

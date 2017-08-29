@@ -1430,7 +1430,7 @@ static unsigned AnimationControllerGetNumAnimations(AnimationController* control
 static const AnimationControl* AnimationControllerGetAnimation(unsigned index, AnimationController* controller)
 {
     const Vector<AnimationControl>& animations = controller->GetAnimations();
-    return (index < animations.Size()) ? &animations[index] : (const AnimationControl*)nullptr;
+    return (index < animations.Size()) ? &animations[index] : nullptr;
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)

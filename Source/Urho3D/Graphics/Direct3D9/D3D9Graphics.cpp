@@ -2026,7 +2026,7 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
         lastShaderName_ = name;
     }
 
-    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)nullptr;
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : nullptr;
 }
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const

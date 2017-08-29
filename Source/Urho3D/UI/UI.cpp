@@ -883,7 +883,7 @@ UIElement* UI::GetDragElement(unsigned index)
 {
     GetDragElements();
     if (index >= dragElementsConfirmed_.Size())
-        return (UIElement*)nullptr;
+        return nullptr;
 
     return dragElementsConfirmed_[index];
 }

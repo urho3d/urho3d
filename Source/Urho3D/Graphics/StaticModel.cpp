@@ -254,7 +254,7 @@ void StaticModel::SetModel(Model* model)
         SetNumGeometries(model->GetNumGeometries());
         const Vector<Vector<SharedPtr<Geometry> > >& geometries = model->GetGeometries();
         const PODVector<Vector3>& geometryCenters = model->GetGeometryCenters();
-        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : (const Matrix3x4*)nullptr;
+        const Matrix3x4* worldTransform = node_ ? &node_->GetWorldTransform() : nullptr;
         for (unsigned i = 0; i < geometries.Size(); ++i)
         {
             batches_[i].worldTransform_ = worldTransform;
@@ -325,7 +325,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
 
 Material* StaticModel::GetMaterial(unsigned index) const
 {
-    return index < batches_.Size() ? batches_[index].material_ : (Material*)nullptr;
+    return index < batches_.Size() ? batches_[index].material_ : nullptr;
 }
 
 bool StaticModel::IsInside(const Vector3& point) const

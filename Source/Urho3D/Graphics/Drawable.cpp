@@ -52,7 +52,7 @@ SourceBatch::SourceBatch() :
     geometry_(nullptr),
     worldTransform_(&Matrix3x4::IDENTITY),
     numWorldTransforms_(1),
-    instancingData_((void*)nullptr),
+    instancingData_(nullptr),
     geometryType_(GEOM_STATIC)
 {
 }

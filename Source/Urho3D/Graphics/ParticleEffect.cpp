@@ -778,12 +778,12 @@ SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
 
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
-    return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)nullptr;
+    return index < colorFrames_.Size() ? &colorFrames_[index] : nullptr;
 }
 
 const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
 {
-    return index < textureFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)nullptr;
+    return index < textureFrames_.Size() ? &textureFrames_[index] : nullptr;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const

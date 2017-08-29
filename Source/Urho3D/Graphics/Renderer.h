@@ -374,7 +374,7 @@ public:
     TextureCube* GetIndirectionCubeMap() const { return indirectionCubeMap_; }
 
     /// Return the instancing vertex buffer
-    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_ : (VertexBuffer*)nullptr; }
+    VertexBuffer* GetInstancingBuffer() const { return dynamicInstancing_ ? instancingBuffer_.Get() : nullptr; }
 
     /// Return the frame update parameters.
     const FrameInfo& GetFrameInfo() const { return frame_; }

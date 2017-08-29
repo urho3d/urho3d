@@ -646,7 +646,7 @@ Vector3 NavigationMesh::MoveAlongSurface(const Vector3& start, const Vector3& en
     maxVisited = Max(maxVisited, 0);
     PODVector<dtPolyRef> visited((unsigned)maxVisited);
     navMeshQuery_->moveAlongSurface(startRef, &localStart.x_, &localEnd.x_, queryFilter, &resultPos.x_, maxVisited ?
-        &visited[0] : (dtPolyRef*)nullptr, &visitedCount, maxVisited);
+        &visited[0] : nullptr, &visitedCount, maxVisited);
     return transform * resultPos;
 }
 

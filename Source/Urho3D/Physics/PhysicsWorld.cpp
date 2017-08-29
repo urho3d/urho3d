@@ -511,8 +511,8 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, CollisionShape* shap
 
     // If shape is attached in a rigidbody, set its collision group temporarily to 0 to make sure it is not returned in the sweep result
     RigidBody* bodyComp = shape->GetComponent<RigidBody>();
-    btRigidBody* body = bodyComp ? bodyComp->GetBody() : (btRigidBody*)nullptr;
-    btBroadphaseProxy* proxy = body ? body->getBroadphaseProxy() : (btBroadphaseProxy*)nullptr;
+    btRigidBody* body = bodyComp ? bodyComp->GetBody() : nullptr;
+    btBroadphaseProxy* proxy = body ? body->getBroadphaseProxy() : nullptr;
     short group = 0;
     if (proxy)
     {
