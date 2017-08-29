@@ -38,7 +38,7 @@ public:
     /// Set motion parameters: forward movement speed, rotation speed, and movement boundaries.
     void SetParameters(float moveSpeed, float rotateSpeed, const BoundingBox& bounds);
     /// Handle scene update. Called by LogicComponent base class.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
     
     /// Return forward movement speed.
     float GetMoveSpeed() const { return moveSpeed_; }
