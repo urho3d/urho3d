@@ -35,13 +35,13 @@ namespace Urho3D
 
 VertexBuffer::VertexBuffer(Context* context, bool forceHeadless) :
     Object(context),
-    GPUObject(forceHeadless ? (Graphics*)0 : GetSubsystem<Graphics>()),
+    GPUObject(forceHeadless ? nullptr : GetSubsystem<Graphics>()),
     vertexCount_(0),
     elementMask_(0),
     lockState_(LOCK_NONE),
     lockStart_(0),
     lockCount_(0),
-    lockScratchData_(0),
+    lockScratchData_(nullptr),
     shadowed_(false),
     dynamic_(false),
     discardLock_(false)
@@ -130,7 +130,7 @@ const VertexElement* VertexBuffer::GetElement(VertexElementSemantic semantic, un
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElementSemantic semantic, unsigned char index) const
@@ -141,7 +141,7 @@ const VertexElement* VertexBuffer::GetElement(VertexElementType type, VertexElem
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
@@ -152,12 +152,12 @@ const VertexElement* VertexBuffer::GetElement(const PODVector<VertexElement>& el
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 bool VertexBuffer::HasElement(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)
 {
-    return GetElement(elements, type, semantic, index) != 0;
+    return GetElement(elements, type, semantic, index) != nullptr;
 }
 
 unsigned VertexBuffer::GetElementOffset(const PODVector<VertexElement>& elements, VertexElementType type, VertexElementSemantic semantic, unsigned char index)

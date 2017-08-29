@@ -175,7 +175,7 @@ void Chat::UpdateButtons()
     bool serverRunning = network->IsServerRunning();
 
     // Show and hide buttons so that eg. Connect and Disconnect are never shown at the same time
-    sendButton_->SetVisible(serverConnection != 0);
+    sendButton_->SetVisible(serverConnection != nullptr);
     connectButton_->SetVisible(!serverConnection && !serverRunning);
     disconnectButton_->SetVisible(serverConnection || serverRunning);
     startServerButton_->SetVisible(!serverConnection && !serverRunning);
@@ -221,7 +221,7 @@ void Chat::HandleConnect(StringHash eventType, VariantMap& eventData)
     // Connect to server, do not specify a client scene as we are not using scene replication, just messages.
     // At connect time we could also send identity parameters (such as username) in a VariantMap, but in this
     // case we skip it for simplicity
-    network->Connect(address, CHAT_SERVER_PORT, 0);
+    network->Connect(address, CHAT_SERVER_PORT, nullptr);
 
     UpdateButtons();
 }

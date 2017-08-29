@@ -63,7 +63,7 @@ public:
     /// Construct.
     UI(Context* context);
     /// Destruct.
-    virtual ~UI();
+    virtual ~UI() override;
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);
@@ -83,9 +83,9 @@ public:
     /// Debug draw a UI element.
     void DebugDraw(UIElement* element);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
-    SharedPtr<UIElement> LoadLayout(Deserializer& source, XMLFile* styleFile = 0);
+    SharedPtr<UIElement> LoadLayout(Deserializer& source, XMLFile* styleFile = nullptr);
     /// Load a UI layout from an XML file. Optionally specify another XML file for element style. Return the root element.
-    SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = 0);
+    SharedPtr<UIElement> LoadLayout(XMLFile* file, XMLFile* styleFile = nullptr);
     /// Save a UI layout to an XML file. Return true if successful.
     bool SaveLayout(Serializer& dest, UIElement* element);
     /// Set clipboard text.

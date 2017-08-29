@@ -40,12 +40,12 @@ public:
     /// Construct.
     CollisionShape2D(Context* context);
     /// Destruct.
-    virtual ~CollisionShape2D();
+    virtual ~CollisionShape2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
 
     /// Set trigger.
     void SetTrigger(bool trigger);
@@ -100,9 +100,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
     /// Apply Node world scale.
     virtual void ApplyNodeWorldScale() = 0;
 

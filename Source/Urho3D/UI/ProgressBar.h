@@ -39,13 +39,13 @@ public:
     ProgressBar(Context *context);
 
     /// Destruct.
-    virtual ~ProgressBar();
+    virtual ~ProgressBar() override;
 
     /// Register object factory.
     static void RegisterObject(Context *context);
 
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta);
+    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);
@@ -85,7 +85,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement &dest) const;
+    virtual bool FilterImplicitAttributes(XMLElement &dest) const override;
 
     /// Update ProgressBar knob position & size.
     void UpdateProgressBar();

@@ -223,8 +223,8 @@ bool Graphics::gl3Support = false;
 Graphics::Graphics(Context* context_) :
     Object(context_),
     impl_(new GraphicsImpl()),
-    window_(0),
-    externalWindow_(0),
+    window_(nullptr),
+    externalWindow_(nullptr),
     width_(0),
     height_(0),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
@@ -280,7 +280,7 @@ Graphics::~Graphics()
     Close();
 
     delete impl_;
-    impl_ = 0;
+    impl_ = nullptr;
 
     context_->ReleaseSDL();
 }
@@ -659,7 +659,7 @@ bool Graphics::BeginFrame()
 
     // Cleanup textures from previous frame
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        SetTexture(i, 0);
+        SetTexture(i, nullptr);
 
     // Enable color and depth write
     SetColorWrite(true);
@@ -763,7 +763,7 @@ bool Graphics::ResolveToTexture(Texture2D* destination, const IntRect& viewport)
     // Use Direct3D convention with the vertical coordinates ie. 0 is top
     SetTextureForUpdate(destination);
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vpCopy.left_, height_ - vpCopy.bottom_, vpCopy.Width(), vpCopy.Height());
-    SetTexture(0, 0);
+    SetTexture(0, nullptr);
 
     return true;
 }
@@ -1033,7 +1033,7 @@ bool Graphics::SetVertexBuffers(const PODVector<VertexBuffer*>& buffers, unsigne
 
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
     {
-        VertexBuffer* buffer = 0;
+        VertexBuffer* buffer = nullptr;
         if (i < buffers.Size())
             buffer = buffers[i];
         if (buffer != vertexBuffers_[i])
@@ -1078,11 +1078,11 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             else
             {
                 URHO3D_LOGERROR("Failed to compile vertex shader " + vs->GetFullName() + ":\n" + vs->GetCompilerOutput());
-                vs = 0;
+                vs = nullptr;
             }
         }
         else
-            vs = 0;
+            vs = nullptr;
     }
 
     if (ps && !ps->GetGPUObjectName())
@@ -1097,19 +1097,19 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             else
             {
                 URHO3D_LOGERROR("Failed to compile pixel shader " + ps->GetFullName() + ":\n" + ps->GetCompilerOutput());
-                ps = 0;
+                ps = nullptr;
             }
         }
         else
-            ps = 0;
+            ps = nullptr;
     }
 
     if (!vs || !ps)
     {
         glUseProgram(0);
-        vertexShader_ = 0;
-        pixelShader_ = 0;
-        impl_->shaderProgram_ = 0;
+        vertexShader_ = nullptr;
+        pixelShader_ = nullptr;
+        impl_->shaderProgram_ = nullptr;
     }
     else
     {
@@ -1130,7 +1130,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
             else
             {
                 glUseProgram(0);
-                impl_->shaderProgram_ = 0;
+                impl_->shaderProgram_ = nullptr;
             }
         }
         else
@@ -1151,7 +1151,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
                 URHO3D_LOGERROR("Failed to link vertex shader " + vs->GetFullName() + " and pixel shader " + ps->GetFullName() + ":\n" +
                          newProgram->GetLinkerOutput());
                 glUseProgram(0);
-                impl_->shaderProgram_ = 0;
+                impl_->shaderProgram_ = nullptr;
             }
 
             impl_->shaderPrograms_[combination] = newProgram;
@@ -1193,7 +1193,7 @@ void Graphics::SetShaders(ShaderVariation* vs, ShaderVariation* ps)
     else
     {
         impl_->usedVertexAttributes_ = 0;
-        impl_->vertexAttributes_ = 0;
+        impl_->vertexAttributes_ = nullptr;
     }
 
     impl_->vertexBuffersDirty_ = true;
@@ -1664,19 +1664,19 @@ void Graphics::SetTextureParametersDirty()
 void Graphics::ResetRenderTargets()
 {
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        SetRenderTarget(i, (RenderSurface*)0);
-    SetDepthStencil((RenderSurface*)0);
+        SetRenderTarget(i, (RenderSurface*)nullptr);
+    SetDepthStencil((RenderSurface*)nullptr);
     SetViewport(IntRect(0, 0, width_, height_));
 }
 
 void Graphics::ResetRenderTarget(unsigned index)
 {
-    SetRenderTarget(index, (RenderSurface*)0);
+    SetRenderTarget(index, (RenderSurface*)nullptr);
 }
 
 void Graphics::ResetDepthStencil()
 {
-    SetDepthStencil((RenderSurface*)0);
+    SetDepthStencil((RenderSurface*)nullptr);
 }
 
 void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
@@ -1717,7 +1717,7 @@ void Graphics::SetRenderTarget(unsigned index, RenderSurface* renderTarget)
 
 void Graphics::SetRenderTarget(unsigned index, Texture2D* texture)
 {
-    RenderSurface* renderTarget = 0;
+    RenderSurface* renderTarget = nullptr;
     if (texture)
         renderTarget = texture->GetRenderSurface();
 
@@ -1762,7 +1762,7 @@ void Graphics::SetDepthStencil(RenderSurface* depthStencil)
 
 void Graphics::SetDepthStencil(Texture2D* texture)
 {
-    RenderSurface* depthStencil = 0;
+    RenderSurface* depthStencil = nullptr;
     if (texture)
         depthStencil = texture->GetRenderSurface();
 
@@ -2077,7 +2077,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 
 bool Graphics::IsInitialized() const
 {
-    return window_ != 0;
+    return window_ != nullptr;
 }
 
 bool Graphics::GetDither() const
@@ -2093,7 +2093,7 @@ bool Graphics::IsDeviceLost() const
         return true;
 #endif
 
-    return impl_->context_ == 0;
+    return impl_->context_ == nullptr;
 }
 
 PODVector<int> Graphics::GetMultiSampleLevels() const
@@ -2180,18 +2180,18 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
         String fullShaderName = shaderPath_ + name + shaderExtension_;
         // Try to reduce repeated error log prints because of missing shaders
         if (lastShaderName_ == name && !cache->Exists(fullShaderName))
-            return 0;
+            return nullptr;
 
         lastShader_ = cache->GetResource<Shader>(fullShaderName);
         lastShaderName_ = name;
     }
 
-    return lastShader_ ? lastShader_->GetVariation(type, defines) : (ShaderVariation*)0;
+    return lastShader_ ? lastShader_->GetVariation(type, defines) : nullptr;
 }
 
 VertexBuffer* Graphics::GetVertexBuffer(unsigned index) const
 {
-    return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : 0;
+    return index < MAX_VERTEX_STREAMS ? vertexBuffers_[index] : nullptr;
 }
 
 ShaderProgram* Graphics::GetShaderProgram() const
@@ -2220,12 +2220,12 @@ const String& Graphics::GetTextureUnitName(TextureUnit unit)
 
 Texture* Graphics::GetTexture(unsigned index) const
 {
-    return index < MAX_TEXTURE_UNITS ? textures_[index] : 0;
+    return index < MAX_TEXTURE_UNITS ? textures_[index] : nullptr;
 }
 
 RenderSurface* Graphics::GetRenderTarget(unsigned index) const
 {
-    return index < MAX_RENDERTARGETS ? renderTargets_[index] : 0;
+    return index < MAX_RENDERTARGETS ? renderTargets_[index] : nullptr;
 }
 
 IntVector2 Graphics::GetRenderTargetDimensions() const
@@ -2335,7 +2335,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
                     currentFBO = i->second_.fbo_;
                 }
                 BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
-                i->second_.colorAttachments_[j] = 0;
+                i->second_.colorAttachments_[j] = nullptr;
                 // Mark drawbuffer bits to need recalculation
                 i->second_.drawBuffers_ = M_MAX_UNSIGNED;
             }
@@ -2349,7 +2349,7 @@ void Graphics::CleanupRenderSurface(RenderSurface* surface)
             }
             BindDepthAttachment(0, false);
             BindStencilAttachment(0, false);
-            i->second_.depthAttachment_ = 0;
+            i->second_.depthAttachment_ = nullptr;
         }
     }
 
@@ -2369,7 +2369,7 @@ void Graphics::CleanupShaderPrograms(ShaderVariation* variation)
     }
 
     if (vertexShader_ == variation || pixelShader_ == variation)
-        impl_->shaderProgram_ = 0;
+        impl_->shaderProgram_ = nullptr;
 }
 
 ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsigned bindingIndex, unsigned size)
@@ -2435,7 +2435,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
             URHO3D_LOGINFO("OpenGL context lost");
 
         SDL_GL_DeleteContext(impl_->context_);
-        impl_->context_ = 0;
+        impl_->context_ = nullptr;
     }
 
     if (closeWindow)
@@ -2446,7 +2446,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         if (!externalWindow_ || clearGPUObjects)
         {
             SDL_DestroyWindow(window_);
-            window_ = 0;
+            window_ = nullptr;
         }
     }
 }
@@ -2778,7 +2778,7 @@ void Graphics::CheckFeatureSupport()
     if (gl3Support)
     {
         // Work around GLEW failure to check extensions properly from a GL3 context
-        instancingSupport_ = glDrawElementsInstanced != 0 && glVertexAttribDivisor != 0;
+        instancingSupport_ = glDrawElementsInstanced != nullptr && glVertexAttribDivisor != nullptr;
         dxtTextureSupport_ = true;
         anisotropySupport_ = true;
         sRGBSupport_ = true;
@@ -2998,7 +2998,7 @@ void Graphics::PrepareDraw()
                     {
                         SetTextureForUpdate(texture);
                         texture->UpdateParameters();
-                        SetTexture(0, 0);
+                        SetTexture(0, nullptr);
                     }
 
                     if (i->second_.colorAttachments_[j] != renderTargets_[j])
@@ -3021,7 +3021,7 @@ void Graphics::PrepareDraw()
                 if (i->second_.colorAttachments_[j])
                 {
                     BindColorAttachment(j, GL_TEXTURE_2D, 0, false);
-                    i->second_.colorAttachments_[j] = 0;
+                    i->second_.colorAttachments_[j] = nullptr;
                 }
             }
         }
@@ -3043,7 +3043,7 @@ void Graphics::PrepareDraw()
                 {
                     SetTextureForUpdate(texture);
                     texture->UpdateParameters();
-                    SetTexture(0, 0);
+                    SetTexture(0, nullptr);
                 }
 
                 if (i->second_.depthAttachment_ != depthStencil_)
@@ -3069,7 +3069,7 @@ void Graphics::PrepareDraw()
             {
                 BindDepthAttachment(0, false);
                 BindStencilAttachment(0, false);
-                i->second_.depthAttachment_ = 0;
+                i->second_.depthAttachment_ = nullptr;
             }
         }
 
@@ -3203,22 +3203,22 @@ void Graphics::CleanupFramebuffers()
 void Graphics::ResetCachedState()
 {
     for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-        vertexBuffers_[i] = 0;
+        vertexBuffers_[i] = nullptr;
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        textures_[i] = 0;
+        textures_[i] = nullptr;
         impl_->textureTypes_[i] = 0;
     }
 
     for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargets_[i] = 0;
+        renderTargets_[i] = nullptr;
 
-    depthStencil_ = 0;
+    depthStencil_ = nullptr;
     viewport_ = IntRect(0, 0, 0, 0);
-    indexBuffer_ = 0;
-    vertexShader_ = 0;
-    pixelShader_ = 0;
+    indexBuffer_ = nullptr;
+    vertexShader_ = nullptr;
+    pixelShader_ = nullptr;
     blendMode_ = BLEND_REPLACE;
     alphaToCoverage_ = false;
     colorWrite_ = true;
@@ -3240,7 +3240,7 @@ void Graphics::ResetCachedState()
     stencilCompareMask_ = M_MAX_UNSIGNED;
     stencilWriteMask_ = M_MAX_UNSIGNED;
     useClipPlane_ = false;
-    impl_->shaderProgram_ = 0;
+    impl_->shaderProgram_ = nullptr;
     impl_->lastInstanceOffset_ = 0;
     impl_->activeTexture_ = 0;
     impl_->enabledVertexAttributes_ = 0;
@@ -3261,7 +3261,7 @@ void Graphics::ResetCachedState()
     }
 
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
-        impl_->constantBuffers_[i] = 0;
+        impl_->constantBuffers_[i] = nullptr;
     impl_->dirtyConstantBuffers_.Clear();
 }
 

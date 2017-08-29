@@ -61,7 +61,7 @@ DbConnection* Database::Connect(const String& connectionString)
             connectionsPool.Pop();
             if (connection->IsConnected())
                 break;
-            connection = 0;
+            connection = nullptr;
         }
     }
     if (!connection)
@@ -72,7 +72,7 @@ DbConnection* Database::Connect(const String& connectionString)
         return connection;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void Database::Disconnect(DbConnection* connection)

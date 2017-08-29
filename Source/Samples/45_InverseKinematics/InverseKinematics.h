@@ -44,7 +44,7 @@ public:
     InverseKinematics(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    virtual void Start() override;
 
 protected:
     /// Animation controller of Jack.

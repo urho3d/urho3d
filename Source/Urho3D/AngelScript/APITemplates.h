@@ -77,7 +77,7 @@ template <class T> CScriptArray* VectorToArray(const Vector<T>& vector, const ch
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for PODVector to array conversion.
@@ -95,7 +95,7 @@ template <class T> CScriptArray* VectorToArray(const PODVector<T>& vector, const
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for data buffer to array conversion.
@@ -113,7 +113,7 @@ template <class T> CScriptArray* BufferToArray(const T* buffer, unsigned size, c
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for Vector to handle array conversion.
@@ -137,7 +137,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<T*>& vector, c
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for PODVector to handle array conversion.
@@ -161,7 +161,7 @@ template <class T> CScriptArray* VectorToHandleArray(const PODVector<T*>& vector
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for shared pointer Vector to handle array conversion.
@@ -185,7 +185,7 @@ template <class T> CScriptArray* VectorToHandleArray(const Vector<SharedPtr<T> >
         return arr;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 /// Template function for array to Vector conversion.
@@ -540,7 +540,7 @@ static Component* NodeGetComponent(unsigned index, Node* ptr)
     if (index >= components.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return components[index];
@@ -615,7 +615,7 @@ static Node* NodeGetChild(unsigned index, Node* ptr)
     if (index >= children.Size())
     {
         GetActiveASContext()->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return children[index].Get();
@@ -1012,13 +1012,13 @@ static bool UIElementLoadXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 static UIElement* UIElementLoadChildXML(XMLFile* file, XMLFile* styleFile, UIElement* ptr)
 {
     if (!file)
-        return 0;
+        return nullptr;
 
     XMLElement rootElem = file->GetRoot("element");
     if (rootElem)
         return ptr->LoadChildXML(rootElem, styleFile);
     else
-        return 0;
+        return nullptr;
 }
 
 static bool UIElementSaveXML(File* file, const String& indentation, UIElement* ptr)

@@ -41,7 +41,7 @@ static const char* addressModeNames[] =
     "mirror",
     "clamp",
     "border",
-    0
+    nullptr
 };
 
 static const char* filterModeNames[] =
@@ -52,15 +52,15 @@ static const char* filterModeNames[] =
     "anisotropic",
     "nearestanisotropic",
     "default",
-    0
+    nullptr
 };
 
 Texture::Texture(Context* context) :
     ResourceWithMetadata(context),
     GPUObject(GetSubsystem<Graphics>()),
-    shaderResourceView_(0),
-    sampler_(0),
-    resolveTexture_(0),
+    shaderResourceView_(nullptr),
+    sampler_(nullptr),
+    resolveTexture_(nullptr),
     format_(0),
     usage_(TEXTURE_STATIC),
     levels_(0),

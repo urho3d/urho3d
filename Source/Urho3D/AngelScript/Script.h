@@ -61,7 +61,7 @@ public:
     /// Construct.
     Script(Context* context);
     /// Destruct. Release the AngelScript engine.
-    ~Script();
+    virtual ~Script() override;
 
     /// Compile and execute a line of script in immediate mode.
     bool Execute(const String& line);

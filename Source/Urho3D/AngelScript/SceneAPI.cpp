@@ -212,7 +212,7 @@ static bool SceneSaveJSONVectorBuffer(VectorBuffer& buffer, const String& indent
 
 static Node* SceneInstantiate(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->Instantiate(*file, position, rotation, mode) : 0;
+    return file ? ptr->Instantiate(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
@@ -222,12 +222,12 @@ static Node* SceneInstantiateVectorBuffer(VectorBuffer& buffer, const Vector3& p
 
 static Node* SceneInstantiateXML(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->InstantiateXML(*file, position, rotation, mode) : 0;
+    return file ? ptr->InstantiateXML(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateJSON(File* file, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return file ? ptr->InstantiateJSON(*file, position, rotation, mode) : 0;
+    return file ? ptr->InstantiateJSON(*file, position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateXMLVectorBuffer(VectorBuffer& buffer, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
@@ -242,12 +242,12 @@ static Node* SceneInstantiateJSONVectorBuffer(VectorBuffer& buffer, const Vector
 
 static Node* SceneInstantiateXMLFile(XMLFile* xml, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return xml ? ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode) : 0;
+    return xml ? ptr->InstantiateXML(xml->GetRoot(), position, rotation, mode) : nullptr;
 }
 
 static Node* SceneInstantiateJSONFile(JSONFile* json, const Vector3& position, const Quaternion& rotation, CreateMode mode, Scene* ptr)
 {
-    return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : 0;
+    return json ? ptr->InstantiateJSON(json->GetRoot(), position, rotation, mode) : nullptr;
 }
 
 static CScriptArray* SceneGetRequiredPackageFiles(Scene* ptr)

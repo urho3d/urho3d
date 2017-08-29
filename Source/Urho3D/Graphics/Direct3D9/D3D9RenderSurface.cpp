@@ -36,7 +36,7 @@ namespace Urho3D
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    surface_(0),
+    surface_(nullptr),
     updateMode_(SURFACE_UPDATEVISIBLE),
     updateQueued_(false),
     resolveDirty_(false)

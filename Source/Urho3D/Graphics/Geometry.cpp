@@ -192,7 +192,7 @@ void Geometry::Draw(Graphics* graphics)
 
 VertexBuffer* Geometry::GetVertexBuffer(unsigned index) const
 {
-    return index < vertexBuffers_.Size() ? vertexBuffers_[index] : (VertexBuffer*)0;
+    return index < vertexBuffers_.Size() ? vertexBuffers_[index] : nullptr;
 }
 
 unsigned short Geometry::GetBufferHash() const
@@ -228,9 +228,9 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
     }
     else
     {
-        vertexData = 0;
+        vertexData = nullptr;
         vertexSize = 0;
-        elements = 0;
+        elements = nullptr;
     }
 
     if (rawIndexData_)
@@ -250,7 +250,7 @@ void Geometry::GetRawData(const unsigned char*& vertexData, unsigned& vertexSize
         }
         else
         {
-            indexData = 0;
+            indexData = nullptr;
             indexSize = 0;
         }
     }
@@ -273,9 +273,9 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
     }
     else
     {
-        vertexData = 0;
+        vertexData = nullptr;
         vertexSize = 0;
-        elements = 0;
+        elements = nullptr;
     }
 
     if (rawIndexData_)
@@ -295,7 +295,7 @@ void Geometry::GetRawDataShared(SharedArrayPtr<unsigned char>& vertexData, unsig
         }
         else
         {
-            indexData = 0;
+            indexData = nullptr;
             indexSize = 0;
         }
     }
@@ -321,7 +321,7 @@ float Geometry::GetHitDistance(const Ray& ray, Vector3* outNormal, Vector2* outU
         // requested UV output, but no texture data in vertex buffer
         URHO3D_LOGWARNING("Illegal GetHitDistance call: UV return requested on vertex buffer without UV coords");
         *outUV = Vector2::ZERO;
-        outUV = 0;
+        outUV = nullptr;
     }
 
     return indexData ? ray.HitDistance(vertexData, vertexSize, indexData, indexSize, indexStart_, indexCount_, outNormal, outUV,

@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintPulley2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintPulley2D();
+    virtual ~ConstraintPulley2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -69,7 +69,7 @@ public:
 
 private:
     /// Return Joint def.
-    virtual b2JointDef* GetJointDef();
+    virtual b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2PulleyJointDef jointDef_;

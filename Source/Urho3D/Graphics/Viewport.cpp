@@ -41,7 +41,7 @@ Viewport::Viewport(Context* context) :
     rect_(IntRect::ZERO),
     drawDebug_(true)
 {
-    SetRenderPath((RenderPath*)0);
+    SetRenderPath((RenderPath*)nullptr);
 }
 
 Viewport::Viewport(Context* context, Scene* scene, Camera* camera, RenderPath* renderPath) :

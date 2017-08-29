@@ -104,7 +104,7 @@ class URHO3D_API PropertySet2D : public RefCounted
 {
 public:
     PropertySet2D();
-    virtual ~PropertySet2D();
+    virtual ~PropertySet2D() override;
 
     /// Load from XML element.
     void Load(const XMLElement& element);

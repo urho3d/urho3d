@@ -445,11 +445,11 @@ AnimationState* AnimatedModel::AddAnimationState(Animation* animation)
     if (!isMaster_)
     {
         URHO3D_LOGERROR("Can not add animation state to non-master model");
-        return 0;
+        return nullptr;
     }
 
     if (!animation || !skeleton_.GetNumBones())
-        return 0;
+        return nullptr;
 
     // Check for not adding twice
     AnimationState* existing = GetAnimationState(animation);
@@ -662,7 +662,7 @@ AnimationState* AnimatedModel::GetAnimationState(Animation* animation) const
             return *i;
     }
 
-    return 0;
+    return nullptr;
 }
 
 AnimationState* AnimatedModel::GetAnimationState(const String& animationName) const
@@ -683,12 +683,12 @@ AnimationState* AnimatedModel::GetAnimationState(StringHash animationNameHash) c
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 AnimationState* AnimatedModel::GetAnimationState(unsigned index) const
 {
-    return index < animationStates_.Size() ? animationStates_[index].Get() : 0;
+    return index < animationStates_.Size() ? animationStates_[index].Get() : nullptr;
 }
 
 void AnimatedModel::SetSkeleton(const Skeleton& skeleton, bool createBones)
@@ -841,7 +841,7 @@ void AnimatedModel::SetAnimationStatesAttr(const VariantVector& value)
         else
         {
             // If not enough data, just add an empty animation state
-            SharedPtr<AnimationState> newState(new AnimationState(this, 0));
+            SharedPtr<AnimationState> newState(new AnimationState(this, nullptr));
             animationStates_.Push(newState);
         }
     }

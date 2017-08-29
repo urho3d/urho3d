@@ -38,7 +38,7 @@ namespace Urho3D
 
 TileMapLayer2D::TileMapLayer2D(Context* context) :
     Component(context),
-    tmxLayer_(0),
+    tmxLayer_(nullptr),
     drawOrder_(0),
     visible_(true)
 {
@@ -185,9 +185,9 @@ void TileMapLayer2D::Initialize(TileMap2D* tileMap, const TmxLayer2D* tmxLayer)
         nodes_.Clear();
     }
 
-    tileLayer_ = 0;
-    objectGroup_ = 0;
-    imageLayer_ = 0;
+    tileLayer_ = nullptr;
+    objectGroup_ = nullptr;
+    imageLayer_ = nullptr;
 
     tileMap_ = tileMap;
     tmxLayer_ = tmxLayer;
@@ -286,7 +286,7 @@ int TileMapLayer2D::GetHeight() const
 Tile2D* TileMapLayer2D::GetTile(int x, int y) const
 {
     if (!tileLayer_)
-        return 0;
+        return nullptr;
 
     return tileLayer_->GetTile(x, y);
 }
@@ -294,10 +294,10 @@ Tile2D* TileMapLayer2D::GetTile(int x, int y) const
 Node* TileMapLayer2D::GetTileNode(int x, int y) const
 {
     if (!tileLayer_)
-        return 0;
+        return nullptr;
 
     if (x < 0 || x >= tileLayer_->GetWidth() || y < 0 || y >= tileLayer_->GetHeight())
-        return 0;
+        return nullptr;
 
     return nodes_[y * tileLayer_->GetWidth() + x];
 }
@@ -313,7 +313,7 @@ unsigned TileMapLayer2D::GetNumObjects() const
 TileMapObject2D* TileMapLayer2D::GetObject(unsigned index) const
 {
     if (!objectGroup_)
-        return 0;
+        return nullptr;
 
     return objectGroup_->GetObject(index);
 }
@@ -321,10 +321,10 @@ TileMapObject2D* TileMapLayer2D::GetObject(unsigned index) const
 Node* TileMapLayer2D::GetObjectNode(unsigned index) const
 {
     if (!objectGroup_)
-        return 0;
+        return nullptr;
 
     if (index >= nodes_.Size())
-        return 0;
+        return nullptr;
 
     return nodes_[index];
 }
@@ -332,7 +332,7 @@ Node* TileMapLayer2D::GetObjectNode(unsigned index) const
 Node* TileMapLayer2D::GetImageNode() const
 {
     if (!imageLayer_ || nodes_.Empty())
-        return 0;
+        return nullptr;
 
     return nodes_[0];
 }

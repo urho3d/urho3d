@@ -247,7 +247,7 @@ bool Network::StartServer(unsigned short port)
 
     URHO3D_PROFILE(StartServer);
 
-    if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != 0)
+    if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != nullptr)
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
         return true;
@@ -418,7 +418,7 @@ Connection* Network::GetConnection(kNet::MessageConnection* connection) const
         if (i != clientConnections_.End())
             return i->second_;
         else
-            return 0;
+            return nullptr;
     }
 }
 

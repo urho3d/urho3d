@@ -247,14 +247,14 @@ public:
     /// Construct a null weak pointer.
     WeakPtr() :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 
     /// Construct a null weak pointer.
     WeakPtr(std::nullptr_t) :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 
@@ -517,7 +517,7 @@ template <class T, class U> WeakPtr<T> DynamicCast(const WeakPtr<U>& ptr)
 template<class T> inline void CheckedDelete(T* x)
 {
     // intentionally complex - simplification causes regressions
-    typedef char type_must_be_complete[sizeof(T) ? 1 : -1];
+    using type_must_be_complete = char[sizeof(T) ? 1 : -1];
     (void) sizeof(type_must_be_complete);
     delete x;
 }

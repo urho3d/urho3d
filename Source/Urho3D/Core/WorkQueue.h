@@ -82,7 +82,7 @@ public:
     /// Construct.
     WorkQueue(Context* context);
     /// Destruct.
-    ~WorkQueue();
+    virtual ~WorkQueue() override;
 
     /// Create worker threads. Can only be called once.
     void CreateThreads(unsigned numThreads);

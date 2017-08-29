@@ -40,7 +40,7 @@ static const char* valueTypeNames[] =
     "String",
     "Array",
     "Object",
-    0
+    nullptr
 };
 
 static const char* numberTypeNames[] =
@@ -49,7 +49,7 @@ static const char* numberTypeNames[] =
     "Int",
     "Unsigned",
     "Real",
-    0
+    nullptr
 };
 
 const JSONValue JSONValue::EMPTY;

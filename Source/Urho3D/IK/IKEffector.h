@@ -65,7 +65,7 @@ public:
     IKEffector(Context* context);
 
     /// Destructs he IK effector.
-    virtual ~IKEffector();
+    virtual ~IKEffector() override;
 
     /// Registers this class as an object factory.
     static void RegisterObject(Context* context);
@@ -166,7 +166,7 @@ public:
     void SetRotationDecay(float decay);
 
     void DrawDebugGeometry(bool depthTest);
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
 private:
     friend class IKSolver;

@@ -47,7 +47,7 @@ static const char* typeNames[] =
     "Hinge",
     "Slider",
     "ConeTwist",
-    0
+    nullptr
 };
 
 extern const char* PHYSICS_CATEGORY;
@@ -167,7 +167,7 @@ void Constraint::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         physicsWorld_->SetDebugRenderer(debug);
         physicsWorld_->SetDebugDepthTest(depthTest);
         physicsWorld_->GetWorld()->debugDrawConstraint(constraint_.Get());
-        physicsWorld_->SetDebugRenderer(0);
+        physicsWorld_->SetDebugRenderer(nullptr);
     }
 }
 
@@ -191,7 +191,7 @@ void Constraint::SetOtherBody(RigidBody* body)
         otherBody_ = body;
 
         // Update the connected body attribute
-        Node* otherNode = otherBody_ ? otherBody_->GetNode() : 0;
+        Node* otherNode = otherBody_ ? otherBody_->GetNode() : nullptr;
         otherBodyNodeID_ = otherNode ? otherNode->GetID() : 0;
 
         CreateConstraint();
@@ -489,8 +489,8 @@ void Constraint::CreateConstraint()
     ReleaseConstraint();
 
     ownBody_ = GetComponent<RigidBody>();
-    btRigidBody* ownBody = ownBody_ ? ownBody_->GetBody() : 0;
-    btRigidBody* otherBody = otherBody_ ? otherBody_->GetBody() : 0;
+    btRigidBody* ownBody = ownBody_ ? ownBody_->GetBody() : nullptr;
+    btRigidBody* otherBody = otherBody_ ? otherBody_->GetBody() : nullptr;
 
     // If no physics world available now mark for retry later
     if (!physicsWorld_ || !ownBody)

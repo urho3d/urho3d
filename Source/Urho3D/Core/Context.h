@@ -71,7 +71,7 @@ public:
     /// Construct.
     Context();
     /// Destruct.
-    ~Context();
+    virtual ~Context() override;
 
     /// Create an object by type. Return pointer to it or null if no factory found.
     template <class T> inline SharedPtr<T> CreateObject()
@@ -164,14 +164,14 @@ public:
     const Vector<AttributeInfo>* GetAttributes(StringHash type) const
     {
         HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = attributes_.Find(type);
-        return i != attributes_.End() ? &i->second_ : 0;
+        return i != attributes_.End() ? &i->second_ : nullptr;
     }
 
     /// Return network replication attribute descriptions for an object type, or null if none defined.
     const Vector<AttributeInfo>* GetNetworkAttributes(StringHash type) const
     {
         HashMap<StringHash, Vector<AttributeInfo> >::ConstIterator i = networkAttributes_.Find(type);
-        return i != networkAttributes_.End() ? &i->second_ : 0;
+        return i != networkAttributes_.End() ? &i->second_ : nullptr;
     }
 
     /// Return all registered attributes.
@@ -184,17 +184,17 @@ public:
         if (i != specificEventReceivers_.End())
         {
             HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator j = i->second_.Find(eventType);
-            return j != i->second_.End() ? j->second_ : (EventReceiverGroup*)0;
+            return j != i->second_.End() ? j->second_ : nullptr;
         }
         else
-            return 0;
+            return nullptr;
     }
 
     /// Return event receivers for an event type, or null if they do not exist.
     EventReceiverGroup* GetEventReceivers(StringHash eventType)
     {
         HashMap<StringHash, SharedPtr<EventReceiverGroup> >::Iterator i = eventReceivers_.Find(eventType);
-        return i != eventReceivers_.End() ? i->second_ : (EventReceiverGroup*)0;
+        return i != eventReceivers_.End() ? i->second_ : nullptr;
     }
 
 private:

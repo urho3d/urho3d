@@ -219,7 +219,7 @@ bool AnimationController::Stop(const String& name, float fadeOutTime)
         MarkNetworkUpdate();
     }
 
-    return index != M_MAX_UNSIGNED || state != 0;
+    return index != M_MAX_UNSIGNED || state != nullptr;
 }
 
 void AnimationController::StopLayer(unsigned char layer, float fadeOutTime)
@@ -491,7 +491,7 @@ unsigned char AnimationController::GetLayer(const String& name) const
 Bone* AnimationController::GetStartBone(const String& name) const
 {
     AnimationState* state = GetAnimationState(name);
-    return state ? state->GetStartBone() : 0;
+    return state ? state->GetStartBone() : nullptr;
 }
 
 const String& AnimationController::GetStartBoneName(const String& name) const
@@ -590,7 +590,7 @@ AnimationState* AnimationController::GetAnimationState(StringHash nameHash) cons
             return *i;
     }
 
-    return 0;
+    return nullptr;
 }
 
 void AnimationController::SetAnimationsAttr(const VariantVector& value)
@@ -668,7 +668,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
                 state->SetStartBone(model->GetSkeleton().GetBone(boneHash));
         }
         else
-            state->SetStartBone(0);
+            state->SetStartBone(nullptr);
         if (ctrl & CTRL_AUTOFADE)
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
@@ -739,7 +739,7 @@ void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
         else
         {
             // If not enough data, just add an empty animation state
-            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), 0));
+            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), nullptr));
             nodeAnimationStates_.Push(newState);
         }
     }
@@ -849,7 +849,7 @@ void AnimationController::OnSceneSet(Scene* scene)
 AnimationState* AnimationController::AddAnimationState(Animation* animation)
 {
     if (!animation)
-        return 0;
+        return nullptr;
 
     // Model mode
     AnimatedModel* model = GetComponent<AnimatedModel>();

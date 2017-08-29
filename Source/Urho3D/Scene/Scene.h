@@ -94,22 +94,22 @@ public:
     /// Construct.
     Scene(Context* context);
     /// Destruct.
-    virtual ~Scene();
+    virtual ~Scene() override;
     /// Register object factory. Node must be registered first.
     static void RegisterObject(Context* context);
 
     /// Load from binary data. Removes all existing child nodes and components first. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false);
+    virtual bool Load(Deserializer& source, bool setInstanceDefault = false) override;
     /// Save to binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const;
+    virtual bool Save(Serializer& dest) const override;
     /// Load from XML data. Removes all existing child nodes and components first. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
     /// Load from JSON data. Removes all existing child nodes and components first. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
     /// Mark for attribute check on the next network update.
-    virtual void MarkNetworkUpdate();
+    virtual void MarkNetworkUpdate() override;
     /// Add a replication state that is tracking this scene.
-    virtual void AddReplicationState(NodeReplicationState* state);
+    virtual void AddReplicationState(NodeReplicationState* state) override;
 
     /// Load from an XML file. Return true if successful.
     bool LoadXML(Deserializer& source);

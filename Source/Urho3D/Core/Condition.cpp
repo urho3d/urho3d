@@ -36,15 +36,15 @@ namespace Urho3D
 #ifdef _WIN32
 
 Condition::Condition() :
-    event_(0)
+    event_(nullptr)
 {
-    event_ = CreateEvent(0, FALSE, FALSE, 0);
+    event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 
 Condition::~Condition()
 {
     CloseHandle((HANDLE)event_);
-    event_ = 0;
+    event_ = nullptr;
 }
 
 void Condition::Set()

@@ -75,13 +75,13 @@ class Variant;
 class VectorBuffer;
 
 /// Vector of variants.
-typedef Vector<Variant> VariantVector;
+using VariantVector = Vector<Variant>;
 
 /// Vector of strings.
-typedef Vector<String> StringVector;
+using StringVector = Vector<String>;
 
 /// Map of variants.
-typedef HashMap<StringHash, Variant> VariantMap;
+using VariantMap = HashMap<StringHash, Variant>;
 
 /// Typed resource reference.
 struct URHO3D_API ResourceRef
@@ -1218,7 +1218,7 @@ public:
         else if (type_ == VAR_PTR)
             return value_.weakPtr_;
         else
-            return 0;
+            return nullptr;
     }
 
     /// Return a resource reference or empty on type mismatch.
@@ -1272,7 +1272,7 @@ public:
     /// Return a RefCounted pointer or null on type mismatch. Will return null if holding a void pointer, as it can not be safely verified that the object is a RefCounted.
     RefCounted* GetPtr() const
     {
-        return type_ == VAR_PTR ? value_.weakPtr_ : (RefCounted*)0;
+        return type_ == VAR_PTR ? value_.weakPtr_ : nullptr;
     }
 
     /// Return a Matrix3 or identity on type mismatch.
@@ -1352,17 +1352,17 @@ public:
     /// Return a pointer to a modifiable buffer or null on type mismatch.
     PODVector<unsigned char>* GetBufferPtr()
     {
-        return type_ == VAR_BUFFER ? &value_.buffer_ : 0;
+        return type_ == VAR_BUFFER ? &value_.buffer_ : nullptr;
     }
 
     /// Return a pointer to a modifiable variant vector or null on type mismatch.
-    VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? &value_.variantVector_ : 0; }
+    VariantVector* GetVariantVectorPtr() { return type_ == VAR_VARIANTVECTOR ? &value_.variantVector_ : nullptr; }
 
     /// Return a pointer to a modifiable string vector or null on type mismatch.
-    StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? &value_.stringVector_ : 0; }
+    StringVector* GetStringVectorPtr() { return type_ == VAR_STRINGVECTOR ? &value_.stringVector_ : nullptr; }
 
     /// Return a pointer to a modifiable variant map or null on type mismatch.
-    VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? &value_.variantMap_ : 0; }
+    VariantMap* GetVariantMapPtr() { return type_ == VAR_VARIANTMAP ? &value_.variantMap_ : nullptr; }
 
     /// Return a pointer to a modifiable custom variant value or null on type mismatch.
     template <class T> T* GetCustomPtr()

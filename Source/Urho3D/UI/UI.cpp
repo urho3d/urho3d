@@ -354,7 +354,7 @@ void UI::Update(float timeStep)
                     dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons,
                         qualifiers_, cursor_);
                 else
-                    dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons, 0, 0);
+                    dragElement->OnDragBegin(dragElement->ScreenToElement(beginSendPos), beginSendPos, dragData->dragButtons, 0, nullptr);
 
                 SendDragOrHoverEvent(E_DRAGBEGIN, dragElement, beginSendPos, IntVector2::ZERO, dragData);
             }
@@ -378,7 +378,7 @@ void UI::Update(float timeStep)
         IntVector2 touchPos = touch->position_;
         touchPos.x_ = (int)(touchPos.x_ / uiScale_);
         touchPos.y_ = (int)(touchPos.y_ / uiScale_);
-        ProcessHover(touchPos, TOUCHID_MASK(touch->touchID_), 0, 0);
+        ProcessHover(touchPos, TOUCHID_MASK(touch->touchID_), 0, nullptr);
     }
 
     // End hovers that expired without refreshing
@@ -460,7 +460,7 @@ void UI::RenderUpdate()
             // UIElement does not have anything to show. Insert dummy batch that will clear the texture.
             if (component->batches_.Empty())
             {
-                UIBatch batch(element, BLEND_REPLACE, scissor, 0, &component->vertexData_);
+                UIBatch batch(element, BLEND_REPLACE, scissor, nullptr, &component->vertexData_);
                 batch.SetColor(Color::BLACK);
                 batch.AddQuad(scissor.left_, scissor.top_, scissor.right_, scissor.bottom_, 0, 0);
                 component->batches_.Push(batch);
@@ -757,7 +757,7 @@ IntVector2 UI::GetCursorPosition() const
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVector2* elementScreenPosition)
 {
-    UIElement* result = 0;
+    UIElement* result = nullptr;
 
     if (HasModalElement())
         result = GetElementAt(rootModalElement_, position, enabledOnly);
@@ -795,7 +795,7 @@ UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly, IntVec
 
 UIElement* UI::GetElementAt(const IntVector2& position, bool enabledOnly)
 {
-    return GetElementAt(position, enabledOnly, 0);
+    return GetElementAt(position, enabledOnly, nullptr);
 }
 
 UIElement* UI::GetElementAt(UIElement* root, const IntVector2& position, bool enabledOnly)
@@ -806,10 +806,10 @@ UIElement* UI::GetElementAt(UIElement* root, const IntVector2& position, bool en
 
     // If position is out of bounds of root element return null.
     if (position.x_ < rootPos.x_ || position.x_ > rootPos.x_ + rootSize.x_)
-        return 0;
+        return nullptr;
 
     if (position.y_ < rootPos.y_ || position.y_ > rootPos.y_ + rootSize.y_)
-        return 0;
+        return nullptr;
 
     // If UI is smaller than the screen, wrap if necessary
     if (rootSize.x_ > 0 && rootSize.y_ > 0)
@@ -820,7 +820,7 @@ UIElement* UI::GetElementAt(UIElement* root, const IntVector2& position, bool en
             positionCopy.y_ = rootPos.y_ + ((positionCopy.y_ - rootPos.y_) % rootSize.y_);
     }
 
-    UIElement* result = 0;
+    UIElement* result = nullptr;
     GetElementAt(result, root, positionCopy, enabledOnly);
     return result;
 }
@@ -834,7 +834,7 @@ UIElement* UI::GetFrontElement() const
 {
     const Vector<SharedPtr<UIElement> >& rootChildren = rootElement_->GetChildren();
     int maxPriority = M_MIN_INT;
-    UIElement* front = 0;
+    UIElement* front = nullptr;
 
     for (unsigned i = 0; i < rootChildren.Size(); ++i)
     {
@@ -883,7 +883,7 @@ UIElement* UI::GetDragElement(unsigned index)
 {
     GetDragElements();
     if (index >= dragElementsConfirmed_.Size())
-        return (UIElement*)0;
+        return nullptr;
 
     return dragElementsConfirmed_[index];
 }
@@ -1294,7 +1294,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualif
                 // Begin hover event
                 if (!hoveredElements_.Contains(element))
                 {
-                    SendDragOrHoverEvent(E_HOVERBEGIN, element, cursorPos, IntVector2::ZERO, 0);
+                    SendDragOrHoverEvent(E_HOVERBEGIN, element, cursorPos, IntVector2::ZERO, nullptr);
                     // Exit if element is destroyed by the event handling
                     if (!element)
                         return;
@@ -1339,7 +1339,7 @@ void UI::ProcessHover(const IntVector2& windowCursorPos, int buttons, int qualif
             // Begin hover event
             if (!hoveredElements_.Contains(element))
             {
-                SendDragOrHoverEvent(E_HOVERBEGIN, element, cursorPos, IntVector2::ZERO, 0);
+                SendDragOrHoverEvent(E_HOVERBEGIN, element, cursorPos, IntVector2::ZERO, nullptr);
                 // Exit if element is destroyed by the event handling
                 if (!element)
                     return;
@@ -1374,7 +1374,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
 
             // Handle click
             element->OnClickBegin(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
-            SendClickEvent(E_UIMOUSECLICK, 0, element, cursorPos, button, buttons, qualifiers);
+            SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
             // Fire double click event if element matches and is in time
             if (doubleClickElement_ && element == doubleClickElement_ &&
@@ -1382,7 +1382,7 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
             {
                 element->OnDoubleClick(element->ScreenToElement(cursorPos), cursorPos, button, buttons, qualifiers, cursor);
                 doubleClickElement_.Reset();
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, 0, element, cursorPos, button, buttons, qualifiers);
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
             }
             else
             {
@@ -1419,11 +1419,11 @@ void UI::ProcessClickBegin(const IntVector2& windowCursorPos, int button, int bu
         {
             // If clicked over no element, or a disabled element, lose focus (but not if there is a modal element)
             if (!HasModalElement())
-                SetFocusElement(0);
-            SendClickEvent(E_UIMOUSECLICK, 0, element, cursorPos, button, buttons, qualifiers);
+                SetFocusElement(nullptr);
+            SendClickEvent(E_UIMOUSECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
 
             if (clickTimer_.GetMSec(true) < (unsigned)(doubleClickInterval_ * 1000) && lastMouseButtons_ == buttons)
-                SendClickEvent(E_UIMOUSEDOUBLECLICK, 0, element, cursorPos, button, buttons, qualifiers);
+                SendClickEvent(E_UIMOUSEDOUBLECLICK, nullptr, element, cursorPos, button, buttons, qualifiers);
         }
 
         lastMouseButtons_ = buttons;
@@ -1795,11 +1795,11 @@ void UI::HandleTouchBegin(StringHash eventType, VariantMap& eventData)
 
     if (element)
     {
-        ProcessClickBegin(pos, touchId, touchDragElements_[element], 0, 0, true);
+        ProcessClickBegin(pos, touchId, touchDragElements_[element], 0, nullptr, true);
         touchDragElements_[element] |= touchId;
     }
     else
-        ProcessClickBegin(pos, touchId, touchId, 0, 0, true);
+        ProcessClickBegin(pos, touchId, touchId, 0, nullptr, true);
 }
 
 void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
@@ -1827,9 +1827,9 @@ void UI::HandleTouchEnd(StringHash eventType, VariantMap& eventData)
     }
 
     if (element && element->IsEnabled())
-        element->OnHover(element->ScreenToElement(pos), pos, 0, 0, 0);
+        element->OnHover(element->ScreenToElement(pos), pos, 0, 0, nullptr);
 
-    ProcessClickEnd(pos, touchId, 0, 0, 0, true);
+    ProcessClickEnd(pos, touchId, 0, 0, nullptr, true);
 }
 
 void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
@@ -1846,7 +1846,7 @@ void UI::HandleTouchMove(StringHash eventType, VariantMap& eventData)
 
     int touchId = TOUCHID_MASK(eventData[P_TOUCHID].GetInt());
 
-    ProcessMove(pos, deltaPos, touchId, 0, 0, true);
+    ProcessMove(pos, deltaPos, touchId, 0, nullptr, true);
 }
 
 void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
@@ -1871,7 +1871,7 @@ void UI::HandleKeyDown(StringHash eventType, VariantMap& eventData)
         UIElement* element = rootModalElement_->GetChild(rootModalElement_->GetNumChildren() - 1);
         if (element->GetVars().Contains(VAR_ORIGIN))
             // If it is a popup, dismiss by defocusing it
-            SetFocusElement(0);
+            SetFocusElement(nullptr);
         else
         {
             // If it is a modal window, by resetting its modal flag

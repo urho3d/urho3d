@@ -61,7 +61,7 @@ struct URHO3D_API PhysicsRaycastResult
 {
     /// Construct with defaults.
     PhysicsRaycastResult() :
-        body_(0)
+        body_(nullptr)
     {
     }
 
@@ -101,8 +101,8 @@ struct ManifoldPair
 {
     /// Construct with defaults.
     ManifoldPair() :
-        manifold_(0),
-        flippedManifold_(0)
+        manifold_(nullptr),
+        flippedManifold_(nullptr)
     {
     }
 
@@ -116,7 +116,7 @@ struct ManifoldPair
 struct PhysicsWorldConfig
 {
     PhysicsWorldConfig() :
-        collisionConfig_(0)
+        collisionConfig_(nullptr)
     {
     }
 
@@ -138,30 +138,30 @@ public:
     /// Construct.
     PhysicsWorld(Context* scontext);
     /// Destruct.
-    virtual ~PhysicsWorld();
+    virtual ~PhysicsWorld() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Check if an AABB is visible for debug drawing.
-    virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax);
+    virtual bool isVisible(const btVector3& aabbMin, const btVector3& aabbMax) override;
     /// Draw a physics debug line.
-    virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
+    virtual void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;
     /// Log warning from the physics engine.
-    virtual void reportErrorWarning(const char* warningString);
+    virtual void reportErrorWarning(const char* warningString) override;
     /// Draw a physics debug contact point. Not implemented.
     virtual void drawContactPoint
-        (const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color);
+        (const btVector3& pointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color) override;
     /// Draw physics debug 3D text. Not implemented.
-    virtual void draw3dText(const btVector3& location, const char* textString);
+    virtual void draw3dText(const btVector3& location, const char* textString) override;
 
     /// Set debug draw flags.
-    virtual void setDebugMode(int debugMode) { debugMode_ = debugMode; }
+    virtual void setDebugMode(int debugMode) override { debugMode_ = debugMode; }
 
     /// Return debug draw flags.
-    virtual int getDebugMode() const { return debugMode_; }
+    virtual int getDebugMode() const override { return debugMode_; }
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Step the simulation forward.
     void Update(float timeStep);
@@ -286,7 +286,7 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
 
 private:
     /// Handle the scene subsystem update event, step simulation here.

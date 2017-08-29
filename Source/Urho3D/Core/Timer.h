@@ -83,7 +83,7 @@ public:
     /// Construct.
     Time(Context* context);
     /// Destruct. Reset the low-resolution timer period if set.
-    virtual ~Time();
+    virtual ~Time() override;
 
     /// Begin new frame, with (last) frame duration in seconds and send frame start event.
     void BeginFrame(float timeStep);

@@ -39,14 +39,14 @@ public:
     /// Construct. Optionally force headless (no GPU-side buffer) operation.
     IndexBuffer(Context* context, bool forceHeadless = false);
     /// Destruct.
-    virtual ~IndexBuffer();
+    virtual ~IndexBuffer() override;
 
     /// Mark the buffer destroyed on graphics context destruction. May be a no-op depending on the API.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Recreate the buffer and restore data if applicable. May be a no-op depending on the API.
-    virtual void OnDeviceReset();
+    virtual void OnDeviceReset() override;
     /// Release buffer.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Enable shadowing in CPU memory. Shadowing is forced on if the graphics subsystem does not exist.
     void SetShadowed(bool enable);

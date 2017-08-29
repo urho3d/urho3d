@@ -449,7 +449,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
-    Material* currMaterial = 0;
+    Material* currMaterial = nullptr;
     unsigned iStart = 0;
     unsigned iCount = 0;
     unsigned vStart = 0;

@@ -75,7 +75,7 @@ void TextureCube::Release()
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+                graphics_->SetTexture(i, nullptr);
         }
     }
 
@@ -146,7 +146,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
         flags |= D3DLOCK_DISCARD;
 
     HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->LockRect((D3DCUBEMAP_FACES)face, level, &d3dLockedRect,
-        (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
+        (flags & D3DLOCK_DISCARD) ? nullptr : &d3dRect, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -435,7 +435,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     d3dRect.right = levelWidth;
     d3dRect.bottom = levelHeight;
 
-    IDirect3DSurface9* offscreenSurface = 0;
+    IDirect3DSurface9* offscreenSurface = nullptr;
     // Need to use a offscreen surface & GetRenderTargetData() for rendertargets
     if (renderSurfaces_[face])
     {
@@ -446,7 +446,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         }
 
         // If multisampled, must copy the surface of the resolve texture instead of the multisampled surface
-        IDirect3DSurface9* resolveSurface = 0;
+        IDirect3DSurface9* resolveSurface = nullptr;
         if (multiSample_ > 1)
         {
             HRESULT hr = ((IDirect3DCubeTexture9*)object_.ptr_)->GetCubeMapSurface((D3DCUBEMAP_FACES)face, 0,
@@ -460,7 +460,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         }
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
-        HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
+        HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_, D3DPOOL_SYSTEMMEM, &offscreenSurface, nullptr);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
@@ -620,7 +620,7 @@ bool TextureCube::Create()
         (D3DFORMAT)format_,
         (D3DPOOL)pool,
         (IDirect3DCubeTexture9**)&object_.ptr_,
-        0);
+        nullptr);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not create cube texture", hr);
@@ -645,7 +645,7 @@ bool TextureCube::Create()
                     0,
                     FALSE,
                     (IDirect3DSurface9**)&renderSurfaces_[i]->surface_,
-                    0);
+                    nullptr);
                 if (FAILED(hr))
                 {
                     URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);

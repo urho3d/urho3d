@@ -41,9 +41,9 @@ namespace Urho3D
 template <class T> class Vector : public VectorBase
 {
 public:
-    typedef T ValueType;
-    typedef RandomAccessIterator<T> Iterator;
-    typedef RandomAccessConstIterator<T> ConstIterator;
+    using ValueType = T;
+    using Iterator = RandomAccessIterator<T>;
+    using ConstIterator = RandomAccessConstIterator<T>;
 
     /// Construct empty.
     Vector()
@@ -577,9 +577,9 @@ private:
 template <class T> class PODVector : public VectorBase
 {
 public:
-    typedef T ValueType;
-    typedef RandomAccessIterator<T> Iterator;
-    typedef RandomAccessConstIterator<T> ConstIterator;
+    using ValueType = T;
+    using Iterator = RandomAccessIterator<T>;
+    using ConstIterator = RandomAccessConstIterator<T>;
 
     /// Construct empty.
     PODVector()
@@ -952,7 +952,7 @@ public:
 
         if (newCapacity != capacity_)
         {
-            unsigned char* newBuffer = 0;
+            unsigned char* newBuffer = nullptr;
             capacity_ = newCapacity;
 
             if (capacity_)

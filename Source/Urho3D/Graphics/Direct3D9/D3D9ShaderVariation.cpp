@@ -133,7 +133,7 @@ bool ShaderVariation::Create()
     byteCode_.Clear();
     byteCode_.Reserve(0);
 
-    return object_.ptr_ != 0;
+    return object_.ptr_ != nullptr;
 }
 
 void ShaderVariation::Release()
@@ -145,12 +145,12 @@ void ShaderVariation::Release()
         if (type_ == VS)
         {
             if (graphics_->GetVertexShader() == this)
-                graphics_->SetShaders(0, 0);
+                graphics_->SetShaders(nullptr, nullptr);
         }
         else
         {
             if (graphics_->GetPixelShader() == this)
-                graphics_->SetShaders(0, 0);
+                graphics_->SetShaders(nullptr, nullptr);
         }
     }
 
@@ -243,8 +243,8 @@ bool ShaderVariation::Compile()
     Vector<String> defines = defines_.Split(' ');
 
     // Set the entrypoint, profile and flags according to the shader being compiled
-    const char* entryPoint = 0;
-    const char* profile = 0;
+    const char* entryPoint = nullptr;
+    const char* profile = nullptr;
     unsigned flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
 
     if (type_ == VS)
@@ -293,15 +293,15 @@ bool ShaderVariation::Compile()
     }
 
     D3D_SHADER_MACRO endMacro;
-    endMacro.Name = 0;
-    endMacro.Definition = 0;
+    endMacro.Name = nullptr;
+    endMacro.Definition = nullptr;
     macros.Push(endMacro);
 
     // Compile using D3DCompile
-    ID3DBlob* shaderCode = 0;
-    ID3DBlob* errorMsgs = 0;
+    ID3DBlob* shaderCode = nullptr;
+    ID3DBlob* errorMsgs = nullptr;
 
-    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), 0,
+    HRESULT hr = D3DCompile(sourceCode.CString(), sourceCode.Length(), owner_->GetName().CString(), &macros.Front(), nullptr,
         entryPoint, profile, flags, 0, &shaderCode, &errorMsgs);
     if (FAILED(hr))
     {
@@ -330,7 +330,7 @@ bool ShaderVariation::Compile()
 
 void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
 {
-    MOJOSHADER_parseData const* parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, 0, 0, 0, 0, 0, 0, 0);
+    MOJOSHADER_parseData const* parseData = MOJOSHADER_parse("bytecode", bufData, bufSize, nullptr, 0, nullptr, 0, nullptr, nullptr, nullptr);
 
     for (int i = 0; i < parseData->symbol_count; i++)
     {

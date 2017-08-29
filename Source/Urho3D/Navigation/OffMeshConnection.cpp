@@ -78,7 +78,7 @@ void OffMeshConnection::ApplyAttributes()
     if (endPointDirty_)
     {
         Scene* scene = GetScene();
-        endPoint_ = scene ? scene->GetNode(endPointID_) : (Node*)0;
+        endPoint_ = scene ? scene->GetNode(endPointID_) : nullptr;
         endPointDirty_ = false;
     }
 }

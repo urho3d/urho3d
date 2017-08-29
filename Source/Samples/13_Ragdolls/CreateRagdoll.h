@@ -38,7 +38,7 @@ public:
     
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     
 private:
     /// Handle scene node's physics collision.

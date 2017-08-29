@@ -38,8 +38,8 @@ struct RaycastVehicleData
 {
     RaycastVehicleData()
     {
-        vehicleRayCaster_ = 0;
-        vehicle_ = 0;
+        vehicleRayCaster_ = nullptr;
+        vehicle_ = nullptr;
         added_ = false;
     }
 
@@ -49,7 +49,7 @@ struct RaycastVehicleData
         {
             delete vehicleRayCaster_;
         }
-        vehicleRayCaster_ = 0;
+        vehicleRayCaster_ = nullptr;
         if (vehicle_)
         {
             if (physWorld_ && added_)
@@ -61,7 +61,7 @@ struct RaycastVehicleData
             }
             delete vehicle_;
         }
-        vehicle_ = 0;
+        vehicle_ = nullptr;
     }
 
     btRaycastVehicle* Get()
