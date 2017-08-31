@@ -320,8 +320,7 @@ void CollisionShape2D::OnMarkedDirty(Node* node)
 
     cachedWorldScale_ = newWorldScale;
 
-    if (fixture_)
-        ApplyNodeWorldScale();
+    ApplyNodeWorldScale();
 }
 
 }
