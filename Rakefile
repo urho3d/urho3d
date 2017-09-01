@@ -353,7 +353,9 @@ task :ci do
   # LuaJIT on MinGW build is not possible on Travis-CI with Ubuntu 14.04 LTS still as its GCC cross-compiler does not have native exception handling
   # LuaJIT on Web platform is not possible
   jit = (ENV['WIN32'] && ENV['TRAVIS']) || ENV['WEB'] ? '' : 'JIT=1 URHO3D_LUAJIT_AMALG='
+  system "cp -rp #{ENV['HOME']}/initial-build-tree #{ENV['build_tree']}" if ENV['OSX'] && ENV['CI'] && File.exist?("#{ENV['HOME']}/initial-build-tree/CMakeCache.txt")
   system "rake cmake #{generator} URHO3D_LUA#{jit}=1 URHO3D_DATABASE_SQLITE=1 URHO3D_EXTRAS=1" or abort 'Failed to configure Urho3D library build'
+  system "cp -rp #{ENV['build_tree']}/* #{ENV['HOME']}/initial-build-tree && rm -rf #{ENV['HOME']}/initial-build-tree/{bin,include}" if ENV['OSX'] && ENV['CI']
   next if timeup    # Measure the CMake configuration overhead
   if ENV['AVD'] && !ENV['PACKAGE_UPLOAD']   # Skip APK test run when packaging
     # Prepare a new AVD in another process to avoid busy waiting
@@ -381,7 +383,7 @@ task :ci do
   # Skip scaffolding test when time up or packaging for iOS, tvOS, and Web platform
   unless ENV['CI'] && (ENV['IOS'] || ENV['TVOS'] || ENV['WEB']) && ENV['PACKAGE_UPLOAD'] || ENV['XCODE_64BIT_ONLY'] || timeup
     # Staged-install Urho3D SDK when on Travis-CI; normal install when on AppVeyor
-    ENV['DESTDIR'] = ENV['HOME'] || Dir.home unless ENV['APPVEYOR']
+    ENV['DESTDIR'] = ENV['HOME'] unless ENV['APPVEYOR']
     if !wait_for_block("Installing Urho3D SDK to #{ENV['DESTDIR'] ? "#{ENV['DESTDIR']}/usr/local" : 'default system-wide location'}...") { Thread.current[:subcommand_to_kill] = 'xcodebuild'; system "rake make target=install >#{ENV['OS'] ? 'nul' : '/dev/null'}" }
       abort 'Failed to install Urho3D SDK' unless File.exists?('already_timeup.log')
       $stderr.puts "Skipped the rest of the CI processes due to insufficient time"
@@ -635,7 +637,6 @@ task :ci_package_upload do
      end
     system "#{!ENV['OS'] && (ENV['URHO3D_64BIT'] || ENV['RPI'] || ENV['ARM']) ? 'setarch i686' : ''} rake make target=package" or abort 'Failed to make binary package'
   end
-  next if timeup
   # Determine the upload location
   puts "Uploading artifacts...\n\n"; $stdout.flush
   setup_digital_keys
