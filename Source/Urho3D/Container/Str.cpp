@@ -942,7 +942,7 @@ void String::EncodeUTF8(char*& dest, unsigned unicodeChar)
 
 unsigned String::DecodeUTF8(const char*& src)
 {
-    if (src == 0)
+    if (src == nullptr)
         return 0;
 
     unsigned char char1 = *src++;
@@ -1011,7 +1011,7 @@ void String::EncodeUTF16(wchar_t*& dest, unsigned unicodeChar)
 
 unsigned String::DecodeUTF16(const wchar_t*& src)
 {
-    if (src == 0)
+    if (src == nullptr)
         return 0;
     
     unsigned short word1 = *src++;
@@ -1236,13 +1236,13 @@ void String::Replace(unsigned pos, unsigned length, const char* srcStart, unsign
 
 WString::WString() :
     length_(0),
-    buffer_(0)
+    buffer_(nullptr)
 {
 }
 
 WString::WString(const String& str) :
     length_(0),
-    buffer_(0)
+    buffer_(nullptr)
 {
 #ifdef _WIN32
     unsigned neededSize = 0;
@@ -1282,7 +1282,7 @@ void WString::Resize(unsigned newLength)
     if (!newLength)
     {
         delete[] buffer_;
-        buffer_ = 0;
+        buffer_ = nullptr;
         length_ = 0;
     }
     else

@@ -97,7 +97,7 @@ void Typography::Start()
         "FONT_HINT_LEVEL_NONE",
         "FONT_HINT_LEVEL_LIGHT",
         "FONT_HINT_LEVEL_NORMAL",
-        NULL
+        nullptr
     };
     CreateMenu("UI::SetFontHintLevel", levels, URHO3D_HANDLER(Typography, HandleFontHintLevel))
         ->SetSelection(ui->GetFontHintLevel());
@@ -112,7 +112,7 @@ void Typography::Start()
         "15",
         "18",
         "21",
-        NULL
+        nullptr
     };
     CreateMenu("UI::SetFontSubpixelThreshold", thresholds, URHO3D_HANDLER(Typography, HandleFontSubpixel))
         ->SetSelection(ui->GetFontSubpixelThreshold() / 3);
@@ -127,7 +127,7 @@ void Typography::Start()
         "6",
         "7",
         "8",
-        NULL
+        nullptr
     };
     CreateMenu("UI::SetFontOversampling", limits, URHO3D_HANDLER(Typography, HandleFontOversampling))
         ->SetSelection(ui->GetFontOversampling() - 1);

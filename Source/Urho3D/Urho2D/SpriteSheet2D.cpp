@@ -119,7 +119,7 @@ Sprite2D* SpriteSheet2D::GetSprite(const String& name) const
 {
     HashMap<String, SharedPtr<Sprite2D> >::ConstIterator i = spriteMapping_.Find(name);
     if (i == spriteMapping_.End())
-        return 0;
+        return nullptr;
 
     return i->second_;
 }

@@ -36,6 +36,7 @@ class Renderer
 
     unsigned GetNumViewports() const;
     Viewport* GetViewport(unsigned index) const;
+    Viewport* GetViewportForScene(Scene* scene, unsigned index) const;
     RenderPath* GetDefaultRenderPath() const;
     Technique* GetDefaultTechnique() const;
     bool GetHDRRendering() const;

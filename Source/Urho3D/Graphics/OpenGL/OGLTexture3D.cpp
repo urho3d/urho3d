@@ -73,7 +73,7 @@ void Texture3D::Release()
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+                graphics_->SetTexture(i, nullptr);
         }
 
         glDeleteTextures(1, &object_.name_);
@@ -149,7 +149,7 @@ bool Texture3D::SetData(unsigned level, int x, int y, int z, int width, int heig
     }
 #endif
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 }
 
@@ -326,7 +326,7 @@ bool Texture3D::GetData(unsigned level, void* dest) const
     else
         glGetCompressedTexImage(target_, level, dest);
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 #else
     URHO3D_LOGERROR("Getting texture data not supported");
@@ -366,7 +366,7 @@ bool Texture3D::Create()
     if (!IsCompressed())
     {
         glGetError();
-        glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, 0);
+        glTexImage3D(target_, 0, format, width_, height_, depth_, 0, externalFormat, dataType, nullptr);
         if (glGetError())
         {
             URHO3D_LOGERROR("Failed to create texture");
@@ -381,7 +381,7 @@ bool Texture3D::Create()
 
     // Set initial parameters, then unbind the texture
     UpdateParameters();
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
 
     return success;
 #endif

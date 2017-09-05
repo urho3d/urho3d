@@ -43,7 +43,7 @@ public:
     }
 
     /// Process work items until stopped.
-    virtual void ThreadFunction()
+    virtual void ThreadFunction() override
     {
         // Init FPU state first
         InitFPU();
@@ -386,10 +386,10 @@ void WorkQueue::ReturnToPool(SharedPtr<WorkItem>& item)
         // be safe to do here as the completed event has
         // already been handled and this is part of the
         // internal pool.
-        item->start_ = 0;
-        item->end_ = 0;
-        item->aux_ = 0;
-        item->workFunction_ = 0;
+        item->start_ = nullptr;
+        item->end_ = nullptr;
+        item->aux_ = nullptr;
+        item->workFunction_ = nullptr;
         item->priority_ = M_MAX_UNSIGNED;
         item->sendEvent_ = false;
         item->completed_ = false;

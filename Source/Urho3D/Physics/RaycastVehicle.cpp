@@ -38,8 +38,8 @@ struct RaycastVehicleData
 {
     RaycastVehicleData()
     {
-        vehicleRayCaster_ = 0;
-        vehicle_ = 0;
+        vehicleRayCaster_ = nullptr;
+        vehicle_ = nullptr;
         added_ = false;
     }
 
@@ -49,7 +49,7 @@ struct RaycastVehicleData
         {
             delete vehicleRayCaster_;
         }
-        vehicleRayCaster_ = 0;
+        vehicleRayCaster_ = nullptr;
         if (vehicle_)
         {
             if (physWorld_ && added_)
@@ -61,7 +61,7 @@ struct RaycastVehicleData
             }
             delete vehicle_;
         }
-        vehicle_ = 0;
+        vehicle_ = nullptr;
     }
 
     btRaycastVehicle* Get()
@@ -129,7 +129,7 @@ struct RaycastVehicleData
     bool added_;
 };
 
-RaycastVehicle::RaycastVehicle(Context* context) : 
+RaycastVehicle::RaycastVehicle(Context* context) :
     LogicComponent(context)
 {
     // fixed update() for inputs and post update() to sync wheels for rendering
@@ -147,7 +147,7 @@ RaycastVehicle::~RaycastVehicle()
     wheelNodes_.Clear();
 }
 
-const char* wheelElementNames[] =
+static const StringVector wheelElementNames =
 {
     "Number of wheels",
     "   Wheel node id",
@@ -170,16 +170,14 @@ const char* wheelElementNames[] =
     "   Friction slip",
     "   Roll influence",
     "   Engine force",
-    "   Brake",
-    0
+    "   Brake"
 };
 
 void RaycastVehicle::RegisterObject(Context* context)
 {
     context->RegisterFactory<RaycastVehicle>();
-    URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr,
-            VariantVector, Variant::emptyVariantVector,
-            wheelElementNames, AM_DEFAULT);
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Wheel data", GetWheelDataAttr, SetWheelDataAttr, VariantVector, Variant::emptyVariantVector, AM_DEFAULT)
+        .SetMetadata(AttributeMetadata::P_VECTOR_STRUCT_ELEMENTS, wheelElementNames);
     URHO3D_ATTRIBUTE("Maximum side slip threshold", float, maxSideSlipSpeed_, 4.0f, AM_DEFAULT);
     URHO3D_ATTRIBUTE("RPM for wheel motors in air (0=calculate)", float, inAirRPM_, 0.0f, AM_DEFAULT);
 }

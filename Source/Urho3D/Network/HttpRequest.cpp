@@ -110,7 +110,7 @@ void HttpRequest::ThreadFunction()
 
     // Initiate the connection. This may block due to DNS query
     /// \todo SSL mode will not actually work unless Civetweb's SSL mode is initialized with an external SSL DLL
-    mg_connection* connection = 0;
+    mg_connection* connection = nullptr;
     if (postData_.Empty())
     {
         connection = mg_download(host.CString(), port, protocol.Compare("https", false) ? 0 : 1, errorBuffer, sizeof(errorBuffer),

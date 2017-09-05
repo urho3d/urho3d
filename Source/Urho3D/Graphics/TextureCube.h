@@ -41,20 +41,20 @@ public:
     /// Construct.
     TextureCube(Context* context);
     /// Destruct.
-    virtual ~TextureCube();
+    virtual ~TextureCube() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source);
+    virtual bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad();
+    virtual bool EndLoad() override;
     /// Mark the GPU resource destroyed on context destruction.
-    virtual void OnDeviceLost();
+    virtual void OnDeviceLost() override;
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset();
+    virtual void OnDeviceReset() override;
     /// Release the texture.
-    virtual void Release();
+    virtual void Release() override;
 
     /// Set size, format, usage and multisampling parameter for rendertargets. Note that cube textures always use autoresolve when multisampled due to lacking support (on all APIs) to multisample them in a shader. Return true if successful.
     bool SetSize(int size, unsigned format, TextureUsage usage = TEXTURE_STATIC, int multiSample = 1);
@@ -75,7 +75,7 @@ public:
 
 protected:
     /// Create the GPU texture.
-    virtual bool Create();
+    virtual bool Create() override;
 
 private:
     /// Handle render surface update event.

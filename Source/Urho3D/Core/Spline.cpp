@@ -34,7 +34,7 @@ const char* interpolationModeNames[] =
     "Catmull-Rom",
     "Linear",
     "Catmull-Rom Full",
-    0
+    nullptr
 };
 
 Spline::Spline() :

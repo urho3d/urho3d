@@ -177,7 +177,7 @@ bool OcclusionBuffer::AddTriangles(const Matrix3x4& model, const void* vertexDat
     batch.model_ = model;
     batch.vertexData_ = vertexData;
     batch.vertexSize_ = vertexSize;
-    batch.indexData_ = 0;
+    batch.indexData_ = nullptr;
     batch.indexSize_ = 0;
     batch.drawStart_ = vertexStart;
     batch.drawCount_ = vertexCount;

@@ -78,7 +78,7 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
     Initialize(box);
 
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-        children_[i] = 0;
+        children_[i] = nullptr;
 }
 
 Octant::~Octant()
@@ -132,7 +132,7 @@ void Octant::DeleteChild(unsigned index)
 {
     assert(index < NUM_OCTANTS);
     delete children_[index];
-    children_[index] = 0;
+    children_[index] = nullptr;
 }
 
 void Octant::InsertDrawable(Drawable* drawable)
@@ -195,11 +195,11 @@ bool Octant::CheckDrawableFit(const BoundingBox& box) const
 
 void Octant::ResetRoot()
 {
-    root_ = 0;
+    root_ = nullptr;
 
     // The whole octree is being destroyed, just detach the drawables
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
-        (*i)->SetOctant(0);
+        (*i)->SetOctant(nullptr);
 
     for (unsigned i = 0; i < NUM_OCTANTS; ++i)
     {
@@ -314,7 +314,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
 
 Octree::Octree(Context* context) :
     Component(context),
-    Octant(BoundingBox(-DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), 0, 0, this),
+    Octant(BoundingBox(-DEFAULT_OCTREE_SIZE, DEFAULT_OCTREE_SIZE), 0, nullptr, this),
     numLevels_(DEFAULT_OCTREE_LEVELS)
 {
     // If the engine is running headless, subscribe to RenderUpdate events for manually updating the octree
@@ -598,7 +598,7 @@ void Octree::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     FrameInfo frame;
     frame.frameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     frame.timeStep_ = eventData[P_TIMESTEP].GetFloat();
-    frame.camera_ = 0;
+    frame.camera_ = nullptr;
 
     Update(frame);
 }

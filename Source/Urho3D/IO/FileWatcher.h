@@ -42,10 +42,10 @@ public:
     /// Construct.
     FileWatcher(Context* context);
     /// Destruct.
-    virtual ~FileWatcher();
+    virtual ~FileWatcher() override;
 
     /// Directory watching loop.
-    virtual void ThreadFunction();
+    virtual void ThreadFunction() override;
 
     /// Start watching a directory. Return true if successful.
     bool StartWatching(const String& pathName, bool watchSubDirs);

@@ -48,7 +48,7 @@ RefCounted::~RefCounted()
     if (!refCount_->weakRefs_)
         delete refCount_;
 
-    refCount_ = 0;
+    refCount_ = nullptr;
 }
 
 void RefCounted::AddRef()

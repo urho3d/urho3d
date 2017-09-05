@@ -40,6 +40,8 @@
 #include "../UI/ToolTip.h"
 #include "../UI/UI.h"
 #include "../UI/View3D.h"
+#include "../UI/UIComponent.h"
+#include "../Graphics/Texture2D.h"
 
 #include "../DebugNew.h"
 
@@ -376,7 +378,7 @@ static void RegisterText(asIScriptEngine* engine)
     engine->RegisterEnumValue("TextEffect", "TE_STROKE", TE_STROKE);
 
     RegisterUIElement<Text>(engine, "Text");
-    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, int)", asMETHODPR(Text, SetFont, (const String&, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Text", "bool SetFont(const String&in, float)", asMETHODPR(Text, SetFont, (const String&, float), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "bool SetFont(Font@+, float)", asMETHODPR(Text, SetFont, (Font*, float), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void SetSelection(uint, uint arg1 = M_MAX_UNSIGNED)", asMETHOD(Text, SetSelection), asCALL_THISCALL);
     engine->RegisterObjectMethod("Text", "void ClearSelection()", asMETHOD(Text, ClearSelection), asCALL_THISCALL);
@@ -662,7 +664,7 @@ static UIElement* UILoadLayoutFromFile(File* file, UI* ptr)
         return root.Get();
     }
     else
-        return 0;
+        return nullptr;
 }
 
 static UIElement* UILoadLayoutFromVectorBuffer(VectorBuffer& buffer, UI* ptr)
@@ -683,7 +685,7 @@ static UIElement* UILoadLayoutFromFileWithStyle(File* file, XMLFile* styleFile, 
         return root.Get();
     }
     else
-        return 0;
+        return nullptr;
 }
 
 static UIElement* UILoadLayoutFromVectorBufferWithStyle(VectorBuffer& buffer, XMLFile* styleFile, UI* ptr)
@@ -800,6 +802,14 @@ static void RegisterUI(asIScriptEngine* engine)
     engine->RegisterGlobalFunction("UI@+ get_ui()", asFUNCTION(GetUI), asCALL_CDECL);
 }
 
+static void RegisterUIComponent(asIScriptEngine* engine)
+{
+    RegisterComponent<UIComponent>(engine, "UIComponent", true, false);
+    engine->RegisterObjectMethod("UIComponent", "UIElement@+ get_root()", asMETHOD(UIComponent, GetRoot), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Material@+ get_material()", asMETHOD(UIComponent, GetMaterial), asCALL_THISCALL);
+    engine->RegisterObjectMethod("UIComponent", "Texture2D@+ get_texture()", asMETHOD(UIComponent, GetTexture), asCALL_THISCALL);
+}
+
 void RegisterUIAPI(asIScriptEngine* engine)
 {
     RegisterFont(engine);
@@ -825,6 +835,7 @@ void RegisterUIAPI(asIScriptEngine* engine)
     RegisterFileSelector(engine);
     RegisterToolTip(engine);
     RegisterUI(engine);
+    RegisterUIComponent(engine);
 }
 
 }

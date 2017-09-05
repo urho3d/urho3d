@@ -81,31 +81,32 @@ function CreateScene()
 
     -- We need to attach two inverse kinematic effectors to Jack's feet to
     -- control the grounding.
-    leftFoot_  = jackNode_:GetChild("Bip01_L_Foot", true);
-    rightFoot_ = jackNode_:GetChild("Bip01_R_Foot", true);
+    leftFoot_  = jackNode_:GetChild("Bip01_L_Foot", true)
+    rightFoot_ = jackNode_:GetChild("Bip01_R_Foot", true)
     leftEffector_  = leftFoot_:CreateComponent("IKEffector")
     rightEffector_ = rightFoot_:CreateComponent("IKEffector")
     -- Control 2 segments up to the hips
-    leftEffector_.chainLength = 2;
-    rightEffector_.chainLength = 2;
+    leftEffector_.chainLength = 2
+    rightEffector_.chainLength = 2
 
     -- For the effectors to work, an IKSolver needs to be attached to one of
     -- the parent nodes. Typically, you want to place the solver as close as
     -- possible to the effectors for optimal performance. Since in this case
     -- we're solving the legs only, we can place the solver at the spine.
-    local spine = jackNode_:GetChild("Bip01_Spine", true);
-    solver_ = spine:CreateComponent("IKSolver");
+    local spine = jackNode_:GetChild("Bip01_Spine", true)
+    solver_ = spine:CreateComponent("IKSolver")
+
+    -- Two-bone solver is more efficient and more stable than FABRIK (but only
+    -- works for two bones, obviously).
+    solver_.algorithm = IKSolver.TWO_BONE
 
     -- Disable auto-solving, which means we can call Solve() manually.
-    solver_:EnableAutoSolve(false);
+    solver_.AUTO_SOLVE = false
 
-    -- When this is enabled, the solver will use the current positions of the
-    -- nodes in the skeleton as its basis every frame. If you disable this, then
-    -- the solver will store the initial positions of the nodes once and always
-    -- use those positions for calculating solutions.
-    -- With animated characters you generally want to continuously update the
-    -- initial positions.
-    solver_:EnableUpdatePose(true);
+    -- Only enable this so the debug draw shows us the pose before solving.
+    -- This should NOT be enabled for any other reason (it does nothing and is
+    -- a waste of performance).
+    solver_.UPDATE_ORIGINAL_POSE = true
 
     -- Create the camera.
     cameraRotateNode_ = scene_:CreateChild("CameraRotate")

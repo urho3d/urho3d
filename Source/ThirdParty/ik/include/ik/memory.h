@@ -3,7 +3,7 @@
 
 #include "ik/config.h"
 
-#if IK_MEMORY_DEBUGGING == ON
+#ifdef IK_MEMORY_DEBUGGING
 #   define MALLOC malloc_wrapper
 #   define FREE   free_wrapper
 #else
@@ -33,7 +33,7 @@ ik_memory_init(void);
 IK_PUBLIC_API uintptr_t
 ik_memory_deinit(void);
 
-#if IK_MEMORY_DEBUGGING == ON
+#ifdef IK_MEMORY_DEBUGGING
 /*!
  * @brief Does the same thing as a normal call to malloc(), but does some
  * additional work to monitor and track down memory leaks.

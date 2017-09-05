@@ -2127,6 +2127,288 @@ CrowdAgents' handle navigation areas differently. The CrowdManager can contains 
 
 See the 39_CrowdNavigation sample application for an example on how to use CrowdAgents and the CrowdManager.
 
+
+\page IK Inverse Kinematics
+
+\section ikoverview Overview
+
+IK  (Inverse kinematics)  can  be  useful  in  many  situations  ranging  from
+procedural animation to small adjustments of animation. Simply put, IK is used
+when  you want to position the tips of a hierarchichal structure  at  a  known
+location and  need  to  calculate all of the rotations of the parent joints to
+achieve this.
+
+Examples include: Moving a hand to pick  up  an object, or adjusting a foot so
+it's  always  touching  the  ground, regardless of incline.
+
+\section ikterminology Terminology
+
+It is helpful to know some of  the terminology used when talking about inverse
+kinematics, so you can better understand what's being said.
+
+  - The upper-most node in a solver's tree is known as the \a base \a node or \a root \a node.
+  - Nodes which need to be moved to a specific target location (example: The hand of a human) are called an \a end \a effector.
+  - Joints from which multiple children branch off from are called a \a sub-base \a node.
+  - IK solvers work most efficiently on single "strings" of nodes, which are referred to as \a chains.
+  - The entire structure (in the case of a human with two hands) is called a \a chain \a tree.
+
+\section ikendeffectors End Effectors
+
+Effectors are used to set the target position and rotation of a  node. You can
+create one by attaching the IKEffector component to a node.
+
+\code{.cpp}
+Node* handNode = modelNode->GetChild("Hand.R", true);
+
+IKEffector* effector = handNode->CreateComponent<IKEffector>();  // C++
+IKEffector@ effector = handNode.CreateComponent("IKEffector");   // AngelScript
+local effector = handNode:CreateComponent("IKEffector")          -- Lua
+\endcode
+
+You can then give the effector a target position (for example, the position of
+an apple) using  IKEffector::SetTargetPosition or you can tell the effector to
+automatically track  the  position  of  a node with IKEffector::SetTargetNode.
+
+\code{.cpp}
+effector->SetTargetPosition(appleNode->GetWorldPosition());  // C++
+effector.targetPosition = appleNode.worldPosition;           // AngelScript
+effector.targetPosition = appleNode.worldPosition            -- Lua
+\endcode
+
+If enabled, you  can also tell the effector to try and match a target rotation
+using IKEffector::SetTargetRotation. This is useful if  you  want your hand to
+point  in  a particular direction in relation to the apple (this feature needs
+to be enabled in the solver, which is discussed futher below).
+
+The target position and rotation are both set in global space.
+
+Another    important    parameter    is    the    \a    chain    \a    length,
+IKEffector::SetChainLength.  A  chain  length of 1 means a single  segment  or
+"bone" is affected. Arms and legs typically use a value of 2 (because you only
+want  to  solve for the arm and not the entire body). The default value is  0,
+which   means  all  nodes  right  down  to  the  base   node   are   affected.
+
+\code{.cpp}
+effector->SetChainLength(2); // Humans have two bones in their arms
+effector.chainLength = 2;    // AngelScript
+effector.chainLength = 2     -- Lua
+\endcode
+
+Effectors have  a  \a  weight parameter (use IKEffector::SetWeight) indicating
+how  much influence they have on the tree to be solved. You can  make  use  of
+this to smoothly transition in and out of IK solutions.  This will be required
+for when your character begins  picking  up an object and you want to smoothly
+switch from animation to IK.
+
+\code{.cpp}
+effector->SetWeight(SomeSplineFunction());  // C++
+effector.weight = SomeSplineFunction();     // AngelScript
+effector.weight = SomeSplineFunction();     -- Lua
+\endcode
+
+If you've played around with the weight parameter, you may  have  noticed that
+it causes a \a linear interpolation of the target  position. This can look bad
+on  organic  creatures,  especially when the solved tree is far apart from the
+original tree.  You  might consider enabling \a nlerp, which causes the weight
+to rotate around the next sub-base  joint.  This  feature  can be enabled with
+IKEffector::SetFeature.
+
+\code{.cpp}
+effector->SetFeature(IKEffector::WEIGHT_NLERP, true);  // C++
+effector.WEIGHT_NLERP = true;                          // AngelScript
+effector.WEIGHT_NLERP = true                           -- Lua
+\endcode
+
+Note that the script  bindings  work  a little differently in this regard. The
+features can be enabled/disabled directly on the effector object as attributes
+rather than  having  to  call  SetFeature. This is for convenience (but may be
+changed in the future due to script API inconsistency).
+
+\section iksolvers Solvers
+
+Solvers  are  responsible  for  calculating  a solution based on the  attached
+effectors and their settings.
+
+Note that solvers will \a only ever affect  nodes  that  are in their subtree.
+This means  that if you attach an IKEffector to a node that is a parent of the
+IKSolver node, then the solver will ignore this effector.
+
+You can create a solver by attaching an IKSolver component to a node:
+
+\code{.cpp}
+IKSolver* solver = modelNode->CreateComponent<IKSolver>();  // C++
+IKSolver@ solver = modelNode.CreateComponent("IKSolver");   // AngelScript
+local solver = modelNode:CreateComponent("IKSolver")        -- Lua
+\endcode
+
+The first thing  you'll  want to do is select the appropriate algorithm. As of
+this writing, there are  3  algorithms  to  choose from, and you should favour
+them in the order listed here.
+
+  - ONE_BONE: A specialized solver designed to point an object at a target position (such as eyes, heads, etc.)
+  - TWO_BONE: A specialized solver that calculates a direct solution using trigonometry, specifically for two-bone structures (arms, legs)
+  - FABRIK: A generic solver capable of solving anything you can throw at it. It uses an iterative algorithm and is thus a bit slower than the two specialized algorithms. Should be used for structures with 3 or more bones, or structures with multiple end effectors.
+
+You can set the algorithm using:
+
+\code{.cpp}
+solver->SetAlgorithm(IKSolver::FABRIK);  // C++
+solver.algorithm = IKAlgorithm::FABRIK;  // AngelScript
+solver.algorithm = IKSolver.FABRIK       -- Lua
+\endcode
+
+If  you chose an iterative algorithm, then you might also want  to  tweak  the
+maximum number of iterations  and the tolerance. FABRIK converges very quickly
+and works well with  20  or  less  iterations. Sometimes you can even get away
+with just 5 iterations. The tolerance  specifies  the  maximum distance an end
+effector is allowed to be from its target. Obviously, the smaller  you set the
+tolerance,  the more iterations will be required.  Good  starting  values  for
+tolerance  are about 100th the size of the chain you're solving (e.g. if  your
+chain is 2 units long, then set the tolerance to 0.02).
+
+\code{.cpp}
+solver->SetMaximumIterations(20); // Good starting value for FABRIK
+solver->SetTolerance(0.02);       // Good value is 100th of your chain length.
+
+solver.maximumIterations = 20;    // AngelScript
+solver.tolerance = 0.02;
+
+solver.maximumIterations = 20     -- Lua
+solver.tolerance = 0.02
+\endcode
+
+Note that these settings do nothing if you have selected a direct solver (such
+as TWO_BONE or ONE_BONE).
+
+\section iksolverfeatures Solver Features
+
+There are a number of features that can be enabled/disabled on the solver, all
+of  which  can  be  toggled  by  using  IKSolver::SetFeature  and checked with
+IKSolver::GetFeature.   You   can   always  look  at  the   documentation   of
+IKSolver::Feature for a detailed description of each feature.
+
+\subsection iksolverautosolve AUTO_SOLVE
+
+By default, the solver will be in \a  auto  \a  solve mode. This means that it
+will  automatically  perform  its  calculations   for   you   in  response  to
+E_SCENEDRAWABLEUPDATEFINISHED. All  you  have  to do is create your effectors,
+set  their  target  positions,  and let the solver handle the  rest.  You  can
+override this behaviour by disabling the AUTO_SOLVE feature, in which case you
+will have to call  IKSolver::Solve manually for it to do anything. This may be
+desired if you want to "hook in" right between when the animation has updated,
+but before inverse kinematics is calculated.
+
+\code{.cpp}
+solver->SetFeature(IKSolver::AUTO_SOLVE, false);  // C++
+solver.AUTO_SOLVE = false;                        // AngelScript
+solver.AUTO_SOLVE = false                         -- Lua
+\endcode
+
+And here's how you manually invoke the solver.
+
+\code{.cpp}
+// C++
+void MyLogic::Setup()
+{
+    SubscribeToEvent(GetScene(), E_SCENEDRAWABLEUPDATEFINISHED, URHO3D_HANDLER(MyLogic, HandleSceneDrawableUpdateFinished));
+}
+void MyLogic::HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
+{
+    GetComponent<IKSolver>()->Solve();
+}
+
+// AngelScript
+void Setup()
+{
+    SubscribeToEvent("SceneDrawableUpdateFinished", "HandleSceneDrawableUpdateFinished")
+}
+void HandleSceneDrawableUpdateFinished(StringHash eventType, VariantMap& eventData)
+{
+    GetComponent("IKSolver").Solve()
+}
+
+// Lua
+function Setup()
+    SubscribeToEvent("SceneDrawableUpdateFinished", "HandleSceneDrawableUpdateFinished")
+end
+function HandleSceneDrawableUpdateFinished(eventType, eventData)
+    GetComponent("IKSolver"):Solve()
+end
+\endcode
+
+\subsection iksolverjointrotations IKSolver::JOINT_ROTATIONS
+
+\code{.cpp}
+solver->SetFeature(IKSolver::JOINT_ROTATIONS, false);  // C++
+solver.JOINT_ROTATIONS = false;                        // AngelScript
+solver.JOINT_ROTATIONS = false                         -- Lua
+\endcode
+
+This is should be enabled if you are using IK on skinned models (or  otherwise
+node structures that  need rotations). If you don't care about node rotations,
+you   can   disable   this   feature   and  get  a  small  performance  boost.
+
+When disabled, all nodes will simply keep their  original  orientation  in the
+world, only their positions will change.
+
+The solver calculates  joint  rotations  after  the  solution has converged by
+comparing the solved tree with the original tree as a  way  to  compute  delta
+angles.  These  are  then  multiplied by the original rotations to obtain  the
+final joint rotations.
+
+\subsection iksolvertargetrotations TARGET_ROTATIONS
+
+\code{.cpp}
+solver->SetFeature(IKSolver::TARGET_ROTATIONS, false);  // C++
+solver.TARGET_ROTATIONS = false;                        // AngelScript
+solver.TARGET_ROTATIONS = false                         -- Lua
+\endcode
+
+Enabling   this   will   cause   the  orientation   of   the   effector   node
+(IKEffector::SetTargetRotation)  to  be  considered during solving. This means
+that the effector node will try to match the rotation of the target as best as
+possible. If the target is out of reach or just within reach, the  chain  will
+reach out and start to ignore  the  target  rotation in favour of reaching its
+target.
+
+Disabling this feature causes IKEffector::SetTargetRotation to have no effect.
+
+\subsection iksolvertrees UPDATE_ORIGINAL_POSE, UPDATE_ACTIVE_POSE, and USE_ORIGINAL_POSE
+
+These options can be quite confusing to understand.
+
+The solver actually stores \a two  \a trees, not one. There is an \a active \a
+tree, which is kind of like the "workbench". The  solver  uses the active tree
+for its initial condition but also writes the solution  back  into  the active
+tree (i.e. the tree is solved in-place, rather than cloning).
+
+Then  there  is the \a original \a tree, which is set once during creation and
+then never changed (at least not by default).
+
+You can control which tree the solver should use for its initial condition. If
+you   enable   USE_ORIGINAL_POSE,  then  the  solver  will  first   copy   all
+positions/rotations  from  the original  tree  into  the  active  tree  before
+solving. Thus,  the  solution  will  tend  to  "snap  back"  into its original
+configuration if it can.
+
+If you disable USE_ORIGINAL_POSE, then  the  solver  will  use the active tree
+instead. The active tree will contain whatever pose was solved last. Thus, the
+solution will tend to be more "continuous".
+
+Very important: Note that the active tree is NOT updated  by Urho3D unless you
+enable  UPDATE_ACTIVE_POSE (this is enabled by default). If UPDATE_ACTIVE_POSE
+is disabled, then any nodes that have moved outside of IKSolver's control will
+effectively be \a ignored.  Thus,  if  your model is animated, you very likely
+want this enabled.
+
+UPDATE_ORIGINAL_POSE  isn't   really  required,  but  is  here  for  debugging
+purposes. You can update the original  pose either by enabling this feature or
+by explicitely calling IKSolver::ApplySceneToOriginalPose.
+
+\subsection iksolverconstraints CONSTRAINTS
+
+This feature is not yet implemented and is planned for a future release.
+
 \page UI User interface
 
 Urho3D implements a simple, hierarchical user interface system based on rectangular elements. The elements provided are:
@@ -3493,17 +3775,17 @@ byte[]     Bytecode, produced by AngelScript serializer
 
 - Indents use 4 spaces instead of tabs. Indents on empty lines should not be kept.
 
-- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example %DebugRenderer, FreeTypeLibrary, %Graphics.
+- Class and struct names are in camelcase beginning with an uppercase letter. They should be nouns. For example \c %DebugRenderer, \c FreeTypeLibrary, \c %Graphics.
 
-- Functions are likewise in upper-camelcase. For example CreateComponent, SetLinearRestThreshold.
+- Functions are likewise in upper-camelcase. For example \c CreateComponent, \c SetLinearRestThreshold.
 
-- Variables are in lower-camelcase. Member variables have an underscore appended. For example numContacts, randomSeed_.
+- Variables are in lower-camelcase. Member variables have an underscore appended. For example \c numContacts, \c randomSeed_.
 
-- Constants and enumerations are in uppercase. For example %Vector3::ZERO or PASS_SHADOW.
+- Constants and enumerations are in uppercase. For example \c %Vector3::ZERO or \c PASS_SHADOW.
 
-- Pointers and references append the * or & symbol to the type without a space in between. For example Drawable* drawable, %Serializer& dest.
+- Pointers and references append the * or & symbol to the type without a space in between. For example \c Drawable* drawable, \c %Serializer& dest.
 
-- The macro NULL should not be used, 0 is used instead.
+- The macro \c NULL and 0 should not be used for null pointers, \c nullptr is used instead.
 
 - Class definitions proceed in the following order:
   - public constructors and the destructor
@@ -3517,6 +3799,31 @@ byte[]     Bytecode, produced by AngelScript serializer
 - Header files are commented using one-line comments beginning with /// to mark them for Doxygen.
 
 - Inline functions are defined inside the class definitions where possible, without using the inline keyword.
+
+Keep contributions consistent with existing code unless wide scale refactoring is performed.
+Follow this guideline to keep code style consistent among contributions and contributors:
+
+- Use \c override wherever possible.
+
+- Prefer inplace member initialization to initializer lists.
+
+- Prefer \c using to \c typedef type declarations.
+
+- Prefer range-based \c for to old style \c for unless index or iterator is used by itself.
+
+- Avoid \c enum \c class to keep Urho API consistent. TODO: Perform API-breaking migration to \c enum \c class?
+
+- Avoid \c auto unless it increases code readability.
+
+- Use \c auto for verbose, unknown or redundant types. Example:
+  \code
+  auto iter = variables.Find(name); // verbose iterator type: HashMap<String, Variant>::Iterator
+  for (auto& variable : variables) { } // verbose pair type: HashMap<String, Variant>::KeyValue
+  auto model = MakeShared<Model>(context_); // type is already mentioned in the expression: SharedPtr<Model>
+  \endcode
+  See https://clang.llvm.org/extra/clang-tidy/checks/modernize-use-auto.html and https://google.github.io/styleguide/cppguide.html#auto
+
+- Use \c auto instead of manual type deduction via \c decltype and \c typename.
 
 \page ContributionChecklist Contribution checklist
 
@@ -3555,8 +3862,6 @@ Third, there are requirements for new code that come from Urho3D striving to be 
 - When you add a new third-party library, insert its license statement to the LICENSE in the Source\ThirdParty directory. Only libraries with permissive licenses such as BSD/MIT/zlib are accepted, because complying for example with the LGPL is difficult on mobile platforms, and would leave the application in a legal grey area.
 
 - Prefer small and well-focused libraries for the Urho3D runtime. For example we use stb_image instead of FreeImage to load images, as it's assumed that the application developer can control the data and do offline conversion to supported formats as necessary.
-
-- For libraries that would be mandatorily part of the Urho3D build (not switchable off via CMake options), use of C++11 features is not yet acceptable. The same applies to your own code.
 
 - Third-party libraries should not leak C++ exceptions or use of STL containers into the Urho3D public API. Do a wrapping for example on the subsystem level if necessary.
 */

@@ -80,18 +80,18 @@ public:
     /// Construct.
     CrowdAgent(Context* context);
     /// Destruct.
-    virtual ~CrowdAgent();
+    virtual ~CrowdAgent() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
     /// Draw debug geometry.
     void DrawDebugGeometry(bool depthTest);
     /// Draw debug feelers.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Submit a new target position request for this agent.
     void SetTargetPosition(const Vector3& position);
@@ -181,13 +181,15 @@ protected:
     /// Handle crowd agent being updated. It is called by CrowdManager::Update() via callback.
     virtual void OnCrowdUpdate(dtCrowdAgent* ag, float dt);
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
     /// Handle node being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// \todo Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
     /// Get internal Detour crowd agent.
     const dtCrowdAgent* GetDetourCrowdAgent() const;
+    /// Handle navigation mesh tile added.
+    void HandleNavigationTileAdded(StringHash eventType, VariantMap& eventData);
 
 private:
     /// Update Detour crowd agent parameter.

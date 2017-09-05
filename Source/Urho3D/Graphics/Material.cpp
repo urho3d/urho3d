@@ -69,7 +69,7 @@ static const char* textureUnitNames[] =
     "depth",
     "light",
     "zone",
-    0
+    nullptr
 #else
     "lightramp",
     "lightshape",
@@ -83,7 +83,7 @@ const char* cullModeNames[] =
     "none",
     "ccw",
     "cw",
-    0
+    nullptr
 };
 
 static const char* fillModeNames[] =
@@ -91,7 +91,7 @@ static const char* fillModeNames[] =
     "solid",
     "wireframe",
     "point",
-    0
+    nullptr
 };
 
 TextureUnit ParseTextureUnitName(String name)
@@ -136,12 +136,12 @@ StringHash ParseTextureTypeName(String name)
     else if (name == "texturearray")
         return Texture2DArray::GetTypeStatic();
 
-    return 0;
+    return nullptr;
 }
 
 StringHash ParseTextureTypeXml(ResourceCache* cache, String filename)
 {
-    StringHash type = 0;
+    StringHash type = nullptr;
     if (!cache)
         return type;
 
@@ -1205,19 +1205,19 @@ const TechniqueEntry& Material::GetTechniqueEntry(unsigned index) const
 
 Technique* Material::GetTechnique(unsigned index) const
 {
-    return index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
+    return index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
 }
 
 Pass* Material::GetPass(unsigned index, const String& passName) const
 {
-    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : (Technique*)0;
-    return tech ? tech->GetPass(passName) : 0;
+    Technique* tech = index < techniques_.Size() ? techniques_[index].technique_ : nullptr;
+    return tech ? tech->GetPass(passName) : nullptr;
 }
 
 Texture* Material::GetTexture(TextureUnit unit) const
 {
     HashMap<TextureUnit, SharedPtr<Texture> >::ConstIterator i = textures_.Find(unit);
-    return i != textures_.End() ? i->second_.Get() : (Texture*)0;
+    return i != textures_.End() ? i->second_.Get() : nullptr;
 }
 
 const Variant& Material::GetShaderParameter(const String& name) const
@@ -1229,19 +1229,19 @@ const Variant& Material::GetShaderParameter(const String& name) const
 ValueAnimation* Material::GetShaderParameterAnimation(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? 0 : info->GetAnimation();
+    return info == nullptr ? nullptr : info->GetAnimation();
 }
 
 WrapMode Material::GetShaderParameterAnimationWrapMode(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? WM_LOOP : info->GetWrapMode();
+    return info == nullptr ? WM_LOOP : info->GetWrapMode();
 }
 
 float Material::GetShaderParameterAnimationSpeed(const String& name) const
 {
     ShaderParameterAnimationInfo* info = GetShaderParameterAnimationInfo(name);
-    return info == 0 ? 0 : info->GetSpeed();
+    return info == nullptr ? 0 : info->GetSpeed();
 }
 
 Scene* Material::GetScene() const
@@ -1335,7 +1335,7 @@ ShaderParameterAnimationInfo* Material::GetShaderParameterAnimationInfo(const St
     StringHash nameHash(name);
     HashMap<StringHash, SharedPtr<ShaderParameterAnimationInfo> >::ConstIterator i = shaderParameterAnimationInfos_.Find(nameHash);
     if (i == shaderParameterAnimationInfos_.End())
-        return 0;
+        return nullptr;
     return i->second_;
 }
 
@@ -1380,7 +1380,7 @@ void Material::HandleAttributeAnimationUpdate(StringHash eventType, VariantMap& 
 
     // Remove finished animations
     for (unsigned i = 0; i < finishedNames.Size(); ++i)
-        SetShaderParameterAnimation(finishedNames[i], 0);
+        SetShaderParameterAnimation(finishedNames[i], nullptr);
 }
 
 void Material::ApplyShaderDefines(unsigned index)

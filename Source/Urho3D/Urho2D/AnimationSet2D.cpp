@@ -219,7 +219,7 @@ Sprite2D* AnimationSet2D::GetSpriterFileSprite(int folderId, int fileId) const
     if (i != spriterFileSprites_.End())
         return i->second_;
 
-    return 0;
+    return nullptr;
 }
 
 #ifdef URHO3D_SPINE

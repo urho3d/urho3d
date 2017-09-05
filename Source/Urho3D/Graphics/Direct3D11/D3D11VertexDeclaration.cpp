@@ -46,7 +46,7 @@ static const DXGI_FORMAT d3dElementFormats[] =
 };
 
 VertexDeclaration::VertexDeclaration(Graphics* graphics, ShaderVariation* vertexShader, VertexBuffer** vertexBuffers) :
-    inputLayout_(0)
+    inputLayout_(nullptr)
 {
     PODVector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
     unsigned prevBufferDescs = 0;

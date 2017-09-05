@@ -321,7 +321,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     if ((animatedModel && !skinned_) || (!animatedModel && skinned_))
     {
         RemoveAllDecals();
-        skinned_ = animatedModel != 0;
+        skinned_ = animatedModel != nullptr;
         bufferDirty_ = true;
     }
 
@@ -336,7 +336,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     {
         Skeleton& skeleton = animatedModel->GetSkeleton();
         unsigned numBones = skeleton.GetNumBones();
-        Bone* bestBone = 0;
+        Bone* bestBone = nullptr;
         float bestSize = 0.0f;
 
         for (unsigned i = 0; i < numBones; ++i)
@@ -704,10 +704,10 @@ void DecalSet::GetFaces(Vector<PODVector<DecalVertex> >& faces, Drawable* target
     if (!geometry || geometry->GetPrimitiveType() != TRIANGLE_LIST)
         return;
 
-    const unsigned char* positionData = 0;
-    const unsigned char* normalData = 0;
-    const unsigned char* skinningData = 0;
-    const unsigned char* indexData = 0;
+    const unsigned char* positionData = nullptr;
+    const unsigned char* normalData = nullptr;
+    const unsigned char* skinningData = nullptr;
+    const unsigned char* indexData = nullptr;
     unsigned positionStride = 0;
     unsigned normalStride = 0;
     unsigned skinningStride = 0;
@@ -814,8 +814,8 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     unsigned positionStride, unsigned normalStride, unsigned skinningStride, const Frustum& frustum, const Vector3& decalNormal,
     float normalCutoff)
 {
-    bool hasNormals = normalData != 0;
-    bool hasSkinning = skinned_ && skinningData != 0;
+    bool hasNormals = normalData != nullptr;
+    bool hasSkinning = skinned_ && skinningData != nullptr;
 
     const Vector3& v0 = *((const Vector3*)(&positionData[i0 * positionStride]));
     const Vector3& v1 = *((const Vector3*)(&positionData[i1 * positionStride]));
@@ -834,9 +834,9 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     const Vector3& n1 = hasNormals ? *((const Vector3*)(&normalData[i1 * normalStride])) : faceNormal;
     const Vector3& n2 = hasNormals ? *((const Vector3*)(&normalData[i2 * normalStride])) : faceNormal;
 
-    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : (const unsigned char*)0;
-    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : (const unsigned char*)0;
-    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : (const unsigned char*)0;
+    const unsigned char* s0 = hasSkinning ? &skinningData[i0 * skinningStride] : nullptr;
+    const unsigned char* s1 = hasSkinning ? &skinningData[i1 * skinningStride] : nullptr;
+    const unsigned char* s2 = hasSkinning ? &skinningData[i2 * skinningStride] : nullptr;
 
     // Check if face is too much away from the decal normal
     if (decalNormal.DotProduct((n0 + n1 + n2) / 3.0f) < normalCutoff)
@@ -898,7 +898,7 @@ bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blen
     {
         if (blendWeights[i] > 0.0f)
         {
-            Bone* bone = 0;
+            Bone* bone = nullptr;
             if (geometrySkinMatrices.Empty())
                 bone = animatedModel->GetSkeleton().GetBone(blendIndices[i]);
             else if (blendIndices[i] < geometryBoneMappings[batchIndex].Size())
@@ -1023,8 +1023,8 @@ void DecalSet::UpdateBuffers()
     geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
     
-    float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : (float*)0;
-    unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : (unsigned short*)0;
+    float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : nullptr;
+    unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : nullptr;
 
     if (vertices && indices)
     {

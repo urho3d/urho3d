@@ -73,7 +73,7 @@ public:
     }
 
     /// Destruct.
-    ~ShaderProgram()
+    virtual ~ShaderProgram() override
     {
     }
 

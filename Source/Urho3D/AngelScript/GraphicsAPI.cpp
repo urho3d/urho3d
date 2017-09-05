@@ -240,7 +240,7 @@ static RenderTargetInfo* RenderPathGetRenderTarget(unsigned index, RenderPath* p
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return &ptr->renderTargets_[index];
@@ -253,7 +253,7 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return &ptr->commands_[index];
@@ -1035,7 +1035,7 @@ static AnimationKeyFrame* AnimationTrackGetKeyFrame(unsigned index, AnimationTra
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return ptr->GetKeyFrame(index);
@@ -1063,7 +1063,7 @@ static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* ptr
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return ptr->GetTrigger(index);
@@ -1430,7 +1430,7 @@ static unsigned AnimationControllerGetNumAnimations(AnimationController* control
 static const AnimationControl* AnimationControllerGetAnimation(unsigned index, AnimationController* controller)
 {
     const Vector<AnimationControl>& animations = controller->GetAnimations();
-    return (index < animations.Size()) ? &animations[index] : (const AnimationControl*)0;
+    return (index < animations.Size()) ? &animations[index] : nullptr;
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)
@@ -1963,6 +1963,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetDefaultRenderPath(XMLFile@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetVSMShadowParameters(float, float)", asMETHOD(Renderer, SetVSMShadowParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "Viewport@+ GetViewportForScene(Scene@+, uint)", asMETHOD(Renderer, GetViewportForScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "RenderPath@+ get_defaultRenderPath() const", asMETHOD(Renderer, GetDefaultRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultTechnique(Technique@+)", asMETHOD(Renderer, SetDefaultTechnique), asCALL_THISCALL);
@@ -2037,7 +2038,7 @@ static DebugRenderer* GetDebugRenderer()
     if (scene)
         return scene->GetComponent<DebugRenderer>();
     else
-        return 0;
+        return nullptr;
 }
 
 static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
@@ -2159,7 +2160,7 @@ static Octree* SceneGetOctree(Scene* ptr)
 static Octree* GetOctree()
 {
     Scene* scene = GetScriptContextScene();
-    return scene ? scene->GetComponent<Octree>() : 0;
+    return scene ? scene->GetComponent<Octree>() : nullptr;
 }
 
 static void RegisterOctree(asIScriptEngine* engine)

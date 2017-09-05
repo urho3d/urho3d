@@ -61,7 +61,7 @@ using namespace Urho3D;
 struct OutModel
 {
     OutModel() :
-        rootBone_(0),
+        rootBone_(nullptr),
         totalVertices_(0),
         totalIndices_(0)
     {
@@ -144,8 +144,8 @@ const char *transformSuffix[TransformationComp_MAXIMUM] =
 static const unsigned MAX_CHANNELS = 4;
 
 SharedPtr<Context> context_(new Context());
-const aiScene* scene_ = 0;
-aiNode* rootNode_ = 0;
+const aiScene* scene_ = nullptr;
+aiNode* rootNode_ = nullptr;
 String inputName_;
 String resourcePath_;
 String outPath_;
@@ -193,10 +193,10 @@ void CollectMeshes(OutModel& model, aiNode* node);
 void CollectBones(OutModel& model, bool animationOnly = false);
 void CollectBonesFinal(PODVector<aiNode*>& dest, const HashSet<aiNode*>& necessary, aiNode* node);
 void MoveToBindPose(OutModel& model, aiNode* current);
-void CollectAnimations(OutModel* model = 0);
+void CollectAnimations(OutModel* model = nullptr);
 void BuildBoneCollisionInfo(OutModel& model);
 void BuildAndSaveModel(OutModel& model);
-void BuildAndSaveAnimations(OutModel* model = 0);
+void BuildAndSaveAnimations(OutModel* model = nullptr);
 
 void ExportScene(const String& outName, bool asPrefab);
 void CollectSceneModels(OutScene& scene, aiNode* node);
@@ -527,7 +527,7 @@ void Run(const Vector<String>& arguments)
             aiSetImportPropertyInteger(aiprops, AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, 0);                //**false, default = true;
             aiSetImportPropertyInteger(aiprops, AI_CONFIG_IMPORT_FBX_OPTIMIZE_EMPTY_ANIMATION_CURVES, 1);//default = true;
 
-            scene_ = aiImportFileExWithProperties(GetNativePath(inFile).CString(), flags, NULL, aiprops);
+            scene_ = aiImportFileExWithProperties(GetNativePath(inFile).CString(), flags, nullptr, aiprops);
 
             // prevent processing animation suppression, both cannot work simultaneously
             suppressFbxPivotNodes_ = false;
@@ -744,7 +744,7 @@ void CollectBones(OutModel& model, bool animationOnly)
         aiMesh* mesh = model.meshes_[i];
         aiNode* meshNode = model.meshNodes_[i];
         aiNode* meshParentNode = meshNode->mParent;
-        aiNode* rootNode = 0;
+        aiNode* rootNode = nullptr;
 
         for (unsigned j = 0; j < mesh->mNumBones; ++j)
         {
@@ -1307,7 +1307,7 @@ void BuildAndSaveAnimations(OutModel* model)
         {
             aiNodeAnim* channel = anim->mChannels[j];
             String channelName = FromAIString(channel->mNodeName);
-            aiNode* boneNode = 0;
+            aiNode* boneNode = nullptr;
 
             if (model)
             {
@@ -1331,7 +1331,7 @@ void BuildAndSaveAnimations(OutModel* model)
 
                     // every first $fbx animation channel for a bone will consolidate other $fbx animation to a single channel
                     // skip subsequent $fbx animation channel for the same bone
-                    if (outAnim->GetTrack(channelName) != NULL)
+                    if (outAnim->GetTrack(channelName) != nullptr)
                         continue;
 
                     boneIndex = GetPivotlessBoneIndex(*model, channelName);
@@ -1674,7 +1674,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
 
     HashMap<aiNode*, Node*> nodeMapping;
 
-    Node* outRootNode = 0;
+    Node* outRootNode = nullptr;
     if (asPrefab)
         outRootNode = CreateSceneNode(outScene, rootNode_, nodeMapping);
     else
@@ -2181,7 +2181,7 @@ aiBone* GetMeshBone(OutModel& model, const String& boneName)
                 return bone;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 Matrix3x4 GetOffsetMatrix(OutModel& model, const String& boneName)
@@ -2529,7 +2529,7 @@ PODVector<VertexElement> GetVertexElements(aiMesh* mesh, bool isSkinned)
 aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
 {
     if (!rootNode)
-        return 0;
+        return nullptr;
     if (!name.Compare(rootNode->mName.data, caseSensitive))
         return rootNode;
     for (unsigned i = 0; i < rootNode->mNumChildren; ++i)
@@ -2538,7 +2538,7 @@ aiNode* GetNode(const String& name, aiNode* rootNode, bool caseSensitive)
         if (found)
             return found;
     }
-    return 0;
+    return nullptr;
 }
 
 aiMatrix4x4 GetDerivedTransform(aiNode* node, aiNode* rootNode, bool rootInclusive)

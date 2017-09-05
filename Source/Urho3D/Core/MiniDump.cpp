@@ -64,11 +64,11 @@ URHO3D_API int WriteMiniDump(const char* applicationName, void* exceptionPointer
     String miniDumpDir = GetMiniDumpDir();
     String miniDumpName = miniDumpDir + String(applicationName) + "_" + dateTimeStr + ".dmp";
 
-    CreateDirectoryW(WString(miniDumpDir).CString(), 0);
+    CreateDirectoryW(WString(miniDumpDir).CString(), nullptr);
     HANDLE file = CreateFileW(WString(miniDumpName).CString(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ,
-        0, CREATE_ALWAYS, 0, 0);
+        nullptr, CREATE_ALWAYS, 0, nullptr);
 
-    BOOL success = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file, MiniDumpWithDataSegs, &info, 0, 0);
+    BOOL success = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file, MiniDumpWithDataSegs, &info, nullptr, nullptr);
     CloseHandle(file);
 
     if (success)

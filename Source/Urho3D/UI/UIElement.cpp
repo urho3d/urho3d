@@ -45,7 +45,7 @@ const char* horizontalAlignments[] =
     "Center",
     "Right",
     "Custom",
-    0
+    nullptr
 };
 
 const char* verticalAlignments[] =
@@ -54,7 +54,7 @@ const char* verticalAlignments[] =
     "Center",
     "Bottom",
     "Custom",
-    0
+    nullptr
 };
 
 static const char* focusModes[] =
@@ -63,7 +63,7 @@ static const char* focusModes[] =
     "ResetFocus",
     "Focusable",
     "FocusableDefocusable",
-    0
+    nullptr
 };
 
 static const char* dragDropModes[] =
@@ -72,7 +72,7 @@ static const char* dragDropModes[] =
     "Source",
     "Target",
     "SourceAndTarget",
-    0
+    nullptr
 };
 
 static const char* layoutModes[] =
@@ -80,7 +80,7 @@ static const char* layoutModes[] =
     "Free",
     "Horizontal",
     "Vertical",
-    0
+    nullptr
 };
 
 extern const char* UI_CATEGORY;
@@ -94,7 +94,7 @@ XPathQuery UIElement::styleXPathQuery_("/elements/element[@type=$typeName]", "ty
 
 UIElement::UIElement(Context* context) :
     Animatable(context),
-    parent_(0),
+    parent_(nullptr),
     clipBorder_(IntRect::ZERO),
     priority_(0),
     bringToFront_(false),
@@ -215,7 +215,7 @@ void UIElement::ApplyAttributes()
 
 bool UIElement::LoadXML(const XMLElement& source, bool setInstanceDefault)
 {
-    return LoadXML(source, 0, setInstanceDefault);
+    return LoadXML(source, nullptr, setInstanceDefault);
 }
 
 bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setInstanceDefault)
@@ -265,7 +265,7 @@ bool UIElement::LoadXML(const XMLElement& source, XMLFile* styleFile, bool setIn
         if (typeName.Empty())
             typeName = "UIElement";
         unsigned index = childElem.HasAttribute("index") ? childElem.GetUInt("index") : M_MAX_UNSIGNED;
-        UIElement* child = 0;
+        UIElement* child = nullptr;
 
         if (!internalElem)
             child = CreateChild(typeName, String::EMPTY, index);
@@ -310,7 +310,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
     if (internalElem)
     {
         URHO3D_LOGERROR("Loading internal child element is not supported");
-        return 0;
+        return nullptr;
     }
 
     String typeName = childElem.GetAttribute("type");
@@ -326,7 +326,7 @@ UIElement* UIElement::LoadChildXML(const XMLElement& childElem, XMLFile* styleFi
         if (!child->LoadXML(childElem, styleFile, setInstanceDefault))
         {
             RemoveChild(child, index);
-            return 0;
+            return nullptr;
         }
     }
 
@@ -393,7 +393,7 @@ void UIElement::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertex
 
 void UIElement::GetDebugDrawBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
-    UIBatch batch(this, BLEND_ALPHA, currentScissor, 0, &vertexData);
+    UIBatch batch(this, BLEND_ALPHA, currentScissor, nullptr, &vertexData);
 
     int horizontalThickness = 1;
     int verticalThickness = 1;
@@ -990,7 +990,7 @@ void UIElement::SetFocus(bool enable)
     else
     {
         if (ui->GetFocusElement() == this)
-            ui->SetFocusElement(0);
+            ui->SetFocusElement(nullptr);
     }
 }
 
@@ -1317,7 +1317,7 @@ UIElement* UIElement::CreateChild(StringHash type, const String& name, unsigned 
     if (!newElement)
     {
         URHO3D_LOGERROR("Could not create unknown UI element type " + type.ToString());
-        return 0;
+        return nullptr;
     }
 
     if (!name.Empty())
@@ -1389,7 +1389,7 @@ void UIElement::RemoveChild(UIElement* element, unsigned index)
         if (children_[i] == element)
         {
             // Send change event if not already being destroyed
-            UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
+            UIElement* sender = Refs() > 0 ? GetElementEventSender() : nullptr;
             if (sender)
             {
                 using namespace ElementRemoved;
@@ -1416,7 +1416,7 @@ void UIElement::RemoveChildAtIndex(unsigned index)
         return;
 
     // Send change event if not already being destroyed
-    UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
+    UIElement* sender = Refs() > 0 ? GetElementEventSender() : nullptr;
     if (sender)
     {
         using namespace ElementRemoved;
@@ -1437,7 +1437,7 @@ void UIElement::RemoveChildAtIndex(unsigned index)
 void UIElement::RemoveAllChildren()
 {
     UIElement* root = GetRoot();
-    UIElement* sender = Refs() > 0 ? GetElementEventSender() : 0;
+    UIElement* sender = Refs() > 0 ? GetElementEventSender() : nullptr;
 
     for (Vector<SharedPtr<UIElement> >::Iterator i = children_.Begin(); i < children_.End();)
     {
@@ -1617,7 +1617,7 @@ XMLFile* UIElement::GetDefaultStyle(bool recursiveUp) const
                 return element->defaultStyle_;
             element = element->parent_;
         }
-        return 0;
+        return nullptr;
     }
     else
         return defaultStyle_;
@@ -1653,7 +1653,7 @@ unsigned UIElement::GetNumChildren(bool recursive) const
 
 UIElement* UIElement::GetChild(unsigned index) const
 {
-    return index < children_.Size() ? children_[index] : (UIElement*)0;
+    return index < children_.Size() ? children_[index] : nullptr;
 }
 
 UIElement* UIElement::GetChild(const String& name, bool recursive) const
@@ -1671,7 +1671,7 @@ UIElement* UIElement::GetChild(const String& name, bool recursive) const
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 UIElement* UIElement::GetChild(const StringHash& key, const Variant& value, bool recursive) const
@@ -1690,14 +1690,14 @@ UIElement* UIElement::GetChild(const StringHash& key, const Variant& value, bool
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 UIElement* UIElement::GetRoot() const
 {
     UIElement* root = parent_;
     if (!root)
-        return 0;
+        return nullptr;
     while (root->GetParent())
         root = root->GetParent();
     return root;
@@ -1928,7 +1928,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
             if (names[i].Front() != '#')
             {
                 URHO3D_LOGERROR("Invalid name " + name);
-                return 0;
+                return nullptr;
             }
 
             String name = names[i].Substring(1, names[i].Length() - 1);
@@ -1946,7 +1946,7 @@ Animatable* UIElement::FindAttributeAnimationTarget(const String& name, String& 
             if (!element)
             {
                 URHO3D_LOGERROR("Could not find element by name " + name);
-                return 0;
+                return nullptr;
             }
         }
 
@@ -2244,7 +2244,7 @@ IntVector2 UIElement::GetLayoutChildPosition(UIElement* child)
 
 void UIElement::Detach()
 {
-    parent_ = 0;
+    parent_ = nullptr;
     MarkDirty();
 }
 

@@ -129,7 +129,6 @@ set (CMAKE_EXE_LINKER_FLAGS "${INDIRECT_DEPS_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKE
 
 # Define all supported build options
 include (CMakeDependentOption)
-option (URHO3D_C++11 "Enable C++11 standard")
 cmake_dependent_option (IOS "Setup build for iOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (TVOS "Setup build for tvOS platform" FALSE "XCODE" FALSE)
 cmake_dependent_option (URHO3D_64BIT "Enable 64-bit build, the default is set based on the native ABI of the chosen compiler toolchain" "${NATIVE_64BIT}" "NOT MSVC AND NOT ANDROID AND NOT (ARM AND NOT IOS) AND NOT WEB AND NOT POWERPC" "${NATIVE_64BIT}")     # Intentionally only enable the option for iOS but not for tvOS as the latter is 64-bit only
@@ -375,7 +374,6 @@ if (URHO3D_CLANG_TOOLS OR URHO3D_BINDINGS)
 endif ()
 if (URHO3D_CLANG_TOOLS)
     # Require C++11 standard and no precompiled-header
-    set (URHO3D_C++11 1)
     set (URHO3D_PCH 0)
     set (URHO3D_LIB_TYPE SHARED)
     # Set build options that would maximise the AST of Urho3D library
@@ -398,6 +396,11 @@ if (URHO3D_CLANG_TOOLS)
     endforeach ()
 endif ()
 
+# Coverity scan does not support PCH
+if ($ENV{COVERITY_SCAN_BRANCH})
+    set (URHO3D_PCH 0)
+endif ()
+
 # Enable testing
 if (URHO3D_TESTING)
     enable_testing ()
@@ -418,15 +421,8 @@ if (NOT URHO3D_LIB_TYPE STREQUAL SHARED AND NOT URHO3D_LIB_TYPE STREQUAL MODULE)
     endif ()
 endif ()
 
-# Force C++11 standard (required by the generic bindings generation) if using AngelScript on Web and 64-bit ARM platforms
-if (URHO3D_ANGELSCRIPT AND (EMSCRIPTEN OR (ARM AND URHO3D_64BIT)))
-    set (URHO3D_C++11 1)
-endif ()
-
-# Force C++11 standard (required by nanodbc library) if using ODBC
 if (URHO3D_DATABASE_ODBC)
     find_package (ODBC REQUIRED)
-    set (URHO3D_C++11 1)
 endif ()
 
 # Define preprocessor macros (for building the Urho3D library) based on the configured build options
@@ -470,30 +466,27 @@ if (WIN32 AND NOT CMAKE_PROJECT_NAME MATCHES ^Urho3D-ExternalProject-)
 endif ()
 
 # Platform and compiler specific options
-if (URHO3D_C++11)
-    add_definitions (-DURHO3D_CXX11)   # Note the define is NOT 'URHO3D_C++11'!
-    if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
-        # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
-        if (VERIFIED_SUPPORTED_STANDARD)
-            set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${VERIFIED_SUPPORTED_STANDARD}")
-        else ()
-            foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
-                execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
-                if (GCC_EXIT_CODE EQUAL 0)
-                    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
-                    set (VERIFIED_SUPPORTED_STANDARD ${STANDARD} CACHE INTERNAL "GNU extension of C++11 standard that is verified to be supported by the chosen compiler")
-                    break ()
-                endif ()
-            endforeach ()
-            if (NOT GCC_EXIT_CODE EQUAL 0)
-                message (FATAL_ERROR "Your GCC version ${CMAKE_CXX_COMPILER_VERSION} is too old to enable C++11 standard")
+if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    # Use gnu++11/gnu++0x instead of c++11/c++0x as the latter does not work as expected when cross compiling
+    if (VERIFIED_SUPPORTED_STANDARD)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${VERIFIED_SUPPORTED_STANDARD}")
+    else ()
+        foreach (STANDARD gnu++11 gnu++0x)  # Fallback to gnu++0x on older GCC version
+            execute_process (COMMAND ${CMAKE_COMMAND} -E echo COMMAND ${CMAKE_CXX_COMPILER} -std=${STANDARD} -E - RESULT_VARIABLE GCC_EXIT_CODE OUTPUT_QUIET ERROR_QUIET)
+            if (GCC_EXIT_CODE EQUAL 0)
+                set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=${STANDARD}")
+                set (VERIFIED_SUPPORTED_STANDARD ${STANDARD} CACHE INTERNAL "GNU extension of C++11 standard that is verified to be supported by the chosen compiler")
+                break ()
             endif ()
+        endforeach ()
+        if (NOT GCC_EXIT_CODE EQUAL 0)
+            message (FATAL_ERROR "Your GCC version ${CMAKE_CXX_COMPILER_VERSION} is too old to enable C++11 standard")
         endif ()
-    elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    elseif (MSVC80)
-        message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
     endif ()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif (MSVC80)
+    message (FATAL_ERROR "Your MSVC version is too told to enable C++11 standard")
 endif ()
 if (APPLE)
     if (IOS)
@@ -1034,7 +1027,7 @@ macro (define_resource_dirs)
             list (APPEND RESOURCE_PAKS ${RESOURCE_${DIR}_PATHNAME})
             if (EMSCRIPTEN AND NOT EMSCRIPTEN_SHARE_DATA)
                 # Set the custom EMCC_OPTION property to preload the *.pak individually
-                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "@/${NAME}.pak --use-preload-cache")
+                set_source_files_properties (${RESOURCE_${DIR}_PATHNAME} PROPERTIES EMCC_OPTION preload-file EMCC_FILE_ALIAS "${NAME}.pak")
             endif ()
         endforeach ()
         set_property (SOURCE ${RESOURCE_PAKS} PROPERTY GENERATED TRUE)
@@ -1200,7 +1193,7 @@ macro (enable_pch HEADER_PATHNAME)
                 get_directory_property (COMPILE_DEFINITIONS COMPILE_DEFINITIONS)
                 get_directory_property (INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
                 get_target_property (TYPE ${TARGET_NAME} TYPE)
-                if (TYPE MATCHES SHARED)
+                if (TYPE MATCHES SHARED|MODULE)
                     list (APPEND COMPILE_DEFINITIONS ${TARGET_NAME}_EXPORTS)
                     if (LANG STREQUAL CXX)
                         _test_compiler_hidden_visibility ()
@@ -1221,35 +1214,37 @@ macro (enable_pch HEADER_PATHNAME)
                 endif ()
                 # Make sure the precompiled headers are not stale by creating custom rules to re-compile the header as necessary
                 file (MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PCH_FILENAME})
+                set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
                 foreach (CONFIG ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})   # These two vars are mutually exclusive
                     # Generate *.rsp containing configuration specific compiler flags
                     string (TOUPPER ${CONFIG} UPPERCASE_CONFIG)
-                    file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
-                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp)
-                    file (REMOVE ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp.new)
-                    # Determine the dependency list
-                    execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -MTdeps -MM -o ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
-                    if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
-                        message (FATAL_ERROR "Could not generate dependency list for PCH. There is something wrong with your compiler toolchain. "
-                            "Ensure its bin path is in the PATH environment variable or ensure CMake can find CC/CXX in your build environment.")
+                    file (WRITE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new "${COMPILE_DEFINITIONS} ${SYSROOT_FLAGS} ${CLANG_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS} ${CMAKE_${LANG}_FLAGS_${UPPERCASE_CONFIG}} ${COMPILER_HIDDEN_VISIBILITY_FLAGS} ${COMPILER_HIDDEN_INLINE_VISIBILITY_FLAGS} ${PIC_FLAGS} ${INCLUDE_DIRECTORIES} -c -x ${LANG_H}")
+                    execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new ${ABS_PATH_PCH}.${CONFIG}.pch.rsp)
+                    file (REMOVE ${ABS_PATH_PCH}.${CONFIG}.pch.rsp.new)
+                    if (NOT ${TARGET_NAME}_PCH_DEPS)
+                        if (NOT CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
+                            # Create a dummy initial PCH file in the Out-of-source build tree to keep CLion happy
+                            execute_process (COMMAND ${CMAKE_COMMAND} -E touch ${ABS_PATH_PCH})
+                        endif ()
+                        # Determine the dependency list
+                        execute_process (COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -MTdeps -MM -MF ${ABS_PATH_PCH}.d ${ABS_HEADER_PATHNAME} RESULT_VARIABLE ${LANG}_COMPILER_EXIT_CODE)
+                        if (NOT ${LANG}_COMPILER_EXIT_CODE EQUAL 0)
+                            message (FATAL_ERROR "Could not generate dependency list for PCH. There is something wrong with your compiler toolchain. "
+                                "Ensure its bin path is in the PATH environment variable or ensure CMake can find CC/CXX in your build environment.")
+                        endif ()
+                        file (STRINGS ${ABS_PATH_PCH}.d ${TARGET_NAME}_PCH_DEPS)
+                        string (REGEX REPLACE "^deps: *| *\\; *" ";" ${TARGET_NAME}_PCH_DEPS ${${TARGET_NAME}_PCH_DEPS})
+                        string (REGEX REPLACE "\\\\ " "\ " ${TARGET_NAME}_PCH_DEPS "${${TARGET_NAME}_PCH_DEPS}")    # Need to stringify the second time to preserve the semicolons
                     endif ()
-                    file (STRINGS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.deps DEPS)
-                    string (REGEX REPLACE "^deps: *| *\\; *" ";" DEPS ${DEPS})
-                    string (REGEX REPLACE "\\\\ " "\ " DEPS "${DEPS}")  # Need to stringify the second time to preserve the semicolons
                     # Create the rule that depends on the included headers
                     add_custom_command (OUTPUT ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                        COMMAND ${CMAKE_${LANG}_COMPILER} @${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
+                        COMMAND ${CMAKE_${LANG}_COMPILER} @${ABS_PATH_PCH}.${CONFIG}.pch.rsp -o ${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG} ${ABS_HEADER_PATHNAME}
                         COMMAND ${CMAKE_COMMAND} -E touch ${HEADER_FILENAME}.${CONFIG}.pch.trigger
-                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME}.${CONFIG}.pch.rsp ${DEPS}
+                        DEPENDS ${ABS_PATH_PCH}.${CONFIG}.pch.rsp ${${TARGET_NAME}_PCH_DEPS}
                         COMMENT "Precompiling header file '${HEADER_FILENAME}' for ${CONFIG} configuration")
+                    add_make_clean_files (${PCH_FILENAME}/${PCH_FILENAME}.${CONFIG})
                 endforeach ()
                 # Using precompiled header file
-                if ($ENV{COVERITY_SCAN_BRANCH})
-                    # Coverity scan does not support PCH so workaround by including the actual header file
-                    set (ABS_PATH_PCH ${ABS_HEADER_PATHNAME})
-                else ()
-                    set (ABS_PATH_PCH ${CMAKE_CURRENT_BINARY_DIR}/${HEADER_FILENAME})
-                endif ()
                 set (CMAKE_${LANG}_FLAGS "${CMAKE_${LANG}_FLAGS} -include \"${ABS_PATH_PCH}\"")
                 unset (${TARGET_NAME}_HEADER_PATHNAME)
             else ()
@@ -1776,13 +1771,13 @@ macro (_setup_target)
                 list (APPEND LINK_FLAGS "-s ALLOW_MEMORY_GROWTH=1")
             endif ()
             if (EMSCRIPTEN_SHARE_DATA)      # MODULE lib type always have this variable enabled
-                list (APPEND LINK_FLAGS "--pre-js ${CMAKE_BINARY_DIR}/Source/pak-loader.js")
+                list (APPEND LINK_FLAGS "--pre-js \"${CMAKE_BINARY_DIR}/Source/pak-loader.js\"")
             endif ()
             if (URHO3D_TESTING)
                 list (APPEND LINK_FLAGS --emrun)
             else ()
                 # If not using EMRUN then we need to include the emrun_prejs.js manually in order to process the request parameters as app's arguments correctly
-                list (APPEND LINK_FLAGS "--pre-js ${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js")
+                list (APPEND LINK_FLAGS "--pre-js \"${EMSCRIPTEN_ROOT_PATH}/src/emrun_prejs.js\"")
             endif ()
         endif ()
         # These flags are here instead of in the CMAKE_(EXE|MODULE)_LINKER_FLAGS so that they do not interfere with the auto-detection logic during initial configuration
@@ -1818,16 +1813,23 @@ macro (_setup_target)
             if (EMCC_OPTION)
                 unset (EMCC_FILE_ALIAS)
                 unset (EMCC_EXCLUDE_FILE)
+                unset (USE_PRELOAD_CACHE)
                 if (EMCC_OPTION STREQUAL embed-file OR EMCC_OPTION STREQUAL preload-file)
                     get_property (EMCC_FILE_ALIAS SOURCE ${FILE} PROPERTY EMCC_FILE_ALIAS)
+                    if (EMCC_FILE_ALIAS)
+                        set (EMCC_FILE_ALIAS "@\"${EMCC_FILE_ALIAS}\"")
+                    endif ()
                     get_property (EMCC_EXCLUDE_FILE SOURCE ${FILE} PROPERTY EMCC_EXCLUDE_FILE)
                     if (EMCC_EXCLUDE_FILE)
-                        set (EMCC_EXCLUDE_FILE " --exclude-file ${EMCC_EXCLUDE_FILE}")
+                        set (EMCC_EXCLUDE_FILE " --exclude-file \"${EMCC_EXCLUDE_FILE}\"")
                     else ()
                         list (APPEND LINK_DEPENDS ${FILE})
                     endif ()
+                    if (EMCC_OPTION STREQUAL preload-file)
+                        set (USE_PRELOAD_CACHE " --use-preload-cache")
+                    endif ()
                 endif ()
-                list (APPEND LINK_FLAGS "--${EMCC_OPTION} ${FILE}${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}")
+                list (APPEND LINK_FLAGS "--${EMCC_OPTION} \"${FILE}\"${EMCC_FILE_ALIAS}${EMCC_EXCLUDE_FILE}${USE_PRELOAD_CACHE}")
             endif ()
         endforeach ()
         # If it is a self-executable shell-file then change the file permission of the output file accordingly

@@ -34,6 +34,7 @@ For further reference, see:
 \ref Audio "Audio" <br>
 \ref Physics "Physics" <br>
 \ref Navigation "Navigation" <br>
+\ref IK "Inverse Kinematics" <br>
 \ref UI "User interface" <br>
 \ref Urho2D "Urho2D" <br>
 \ref Serialization "Serialization" <br>
@@ -80,6 +81,7 @@ Urho3D development, contributions and bugfixes by:
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
 - Stanislav Demyanovich
+- Rainer Deyke
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
@@ -228,7 +230,7 @@ Urho3D uses the following third-party libraries:
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.5 (https://www.libsdl.org)
-- SQLite 3.18.0 (https://www.sqlite.org)
+- SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (https://nothings.org)
 - stb_image_write 1.02 (https://nothings.org)
@@ -262,6 +264,263 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 \page History History
+
+V1.7
+
+- Inverse kinematics support.
+- Bullet %RaycastVehicle support.
+- AppleTV platform support.
+- WebAssembly support on the Web platform.
+- IME support on Linux platform.
+- Several font rendering improvements and TypoGraphy sample.
+- WebP image loading support.
+- Sparse navigation meshes and navmesh streaming support.
+- AutoRemove bool removed. Replaced with more general AutoRemoveMode mechanism.
+- Free functions supported in attribute accessors.
+- %IntVector3 class.
+- %EnumAttributeAccessorImpl is now compatible with enum classes.
+- Use default continuous physics & substepping values for Box2D world.
+- Node-specific 2D physics collision events.
+- Improved Box2D joint handling.
+- Use GetDerivedComponent() when getting %PhysicsWorld2D to allow subclassing it. %PhysicsWorld2D members no longer private also for this reason.
+- ApplyLinearImpulseToCenter() function in %RigidBody2D.
+- Additional info exposed in 2D physics events.
+- %CollisionShape2D scale allowed to be signed.
+- Refactor %PhysicsWorld2D contact info.
+- %ParticleEmitter2D can be made to stop / restart emitting.
+- CSV and base64 encoding options when loading TMX files.
+- Several tilemap / TMX file improvements.
+- Improved convex hull debug draw.
+- Bool & int shader parameters on D3D11 / OpenGL.
+- Maximum extrusion distance for directional light shadows.
+- %Shader compilation defines added to materials.
+- %Shader compilation defines added to renderpath commands.
+- %Shader compilation define exclusion mechanism in %Pass.
+- Multisampled rendertargets.
+- Mipmapped rendertargets.
+- Alpha-to-coverage can be enabled in pass or material. Requires D3D11 or OpenGL.
+- Line antialiasing support.
+- Optional soft particles support.
+- Improve VSM shadows by moving z/w divide to pixel shader.
+- Anisotropic-nearest filtering mode, when supported.
+- Optional per-texture max anisotropy setting.
+- Physical light values support.
+- Area light support.
+- Multisample option for VSM shadows.
+- %Shader cache location is configurable, and defaults to a user-writable directory.
+- %Renderer events for screen buffer allocation & global shader parameters having been set.
+- %Renderer event for all views having been rendered.
+- %DecalSet optionally sizes vertex & index buffer only based on use.
+- New face camera mode in %BillboardSet & %Text3D.
+- Support defining neighbor terrains to avoid LOD discontinuities.
+- %AnimationController internal control structures can be accessed as part of its public API.
+- %AnimationController can be queried if any animation is playing on a layer.
+- Allow to get animation tracks by index.
+- Custom projection matrix support.
+- Implement GetMultiSampleLevels() on OpenGL.
+- Monitor and refresh rate options for %Graphics::SetMode().
+- Allow unclamped morph weights.
+- Static helper function for calculating %VertexBuffer element offsets.
+- %Model metadata support.
+- PBR improvements.
+- Clean up PBR shaders & techniques; do not require tangents in PBR shaders unless using normal mappings.
+- Possibility to set mouse mode or visibility before %Input class initialization.
+- Mouse centering / position setting moved to %Input public API.
+- Seek method for audio streams.
+- Anchors and pivots can optionally be specified for %UI elements.
+- %ProgressBar %UI element added.
+- %UI root element custom size support.
+- %UIElement child XML loading returns created child instead of success bool.
+- Add delta parameter to %UI element resize event.
+- SDF font supersampling.
+- FontType enum exposed to public API.
+- NAVIGATIONPUSHINESS_NONE mode in %CrowdAgent.
+- %NavArea solid debug geometry.
+- To/from string conversions in %JSONValueType / %JSONNumberType.
+- Add function to test for %Rect / %Rect intersection.
+- Resize overloads in %Vector / %PODVector.
+- Remove ineffective static %TypeInfo checking functions.
+- %Node & %UIElement child query function overloads that return a collection.
+- %Node IsChildOf() function.
+- Temporary parameter added to %Node CreateChild() function.
+- %Sprite2D can define its draw & texture rectangles.
+- %UniquePtr class.
+- Several math API functions added.
+- Stable random generator added.
+- Add FloatToRawIntBits function.
+- %Variant can hold %Rect objects.
+- %Variant can hold 64-bit integers.
+- Mipmap manipulation support in %Image.
+- %Image class SaveDDS() function.
+- %Text3D GetHeight() function.
+- %Console auto-completion.
+- %Console text highlighting according to message type.
+- %XMLFile GetOrCreateRoot() function, and %XMLElement GetOrCreateChild() function.
+- Urho3DPlayer attempts to read CommandLine.txt from resource system on all platforms, if cannot read from filesystem.
+- Improve use of SDL_Init() so that %Context keeps track of initialized SDL subsystems.
+- IES cookie generation in RampGenerator.
+- %AbstractFile as a parent class for those that implement both %Serializer & %Deserializer.
+- Allow specifying child node by name in attribute animation paths.
+- Functions to get rotation axis & angle in %Quaternion.
+- Improved AngelScript API dump.
+- Consts exposed to AngelScript API.
+- OS query functions added to ProcessUtils.
+- Add resource to cache before sending background load event.
+- Prevent sending event to subscribers added during event handling.
+- Prevent rendering of unnecessary shadow maps.
+- Prevent rendering of deferred light volumes which would be masked out due to lightmask being only 8-bit in deferred rendering.
+- Move "cold" parts of %Node into %NodeImpl class to improve performance.
+- Populate rapidjson value before adding to parent.
+- Update to AngelScript 2.31.2.
+- Update to FreeType 2.7.1.
+- Update to SQLite 3.18.0.
+- Update to LibCpuId 0.4.0.
+- Update to Box2D 2.3.2.
+- Update to Assimp 3.2.
+- Update to LZ4 1.7.5.
+- Update to Bullet 2.86.1.
+- Build system: ensure empty CMAKE_OSX_DEPLOYMENT_TARGET on iOS build.
+- Build system: auto-disable PCH on Android Clang build.
+- Build system: prefer CMake's regex instead of grep.
+- Build system: turn off PCH on bad ccache version.
+- Build system: Bash on Ubuntu on Windows -support.
+- Build system: work around MinGW 6.1.0 linking issue.
+- Build system: MinGW 6.1.0+ fix (narrowing conversion / internal compiler error.)
+- Build system: consider MinGW as multilib compiler.
+- Build system: make URHO3D_64BIT option applicable on MinGW.
+- Build system: use absolute output path for MinGW sysroot auto-detection.
+- Build system: fix Wayland build.
+- Build system: autodetect availability of clock_gettime() on Apple platforms.
+- Build system: fix package metadata for RPI & ARM platforms.
+- Build system: fix Urho3DAll.h generation in non out-of-source build.
+- Build system: avoid special chars in paths in MRI script passed to ar utility (Web build.)
+- Build system: Always use export header for auto-discovering build options.
+- Build system: use -O2 option for MinGW release build
+- Build system: add option to control how to share resources on web platform.
+- Build system: check availability of native compiler toolchain.
+- Build system: remove older CMake constructs that are no longer necessary.
+- Build system: new Android toolchain.
+- Build system: several Web build related improvements.
+- Build system: MODULE library type support option for Web build.
+- Build system: disable exception handling codegen for Web DEBUG build.
+- Build system: remove unused options from define_source_files() macro.
+- Build system: Prevent resource symlink creation during resource packaging.
+- Build system: Skip try_compile test when not appropriate (iOS debug build.)
+- Build system: use no_weak_imports linker flag.
+- Build system: workaround struct redefinition on newer MinGW.
+- Build system: search for DirectX path both rooted & non-rooted.
+- Build system: make clean for MinGW / Android / Web platforms.
+- Build system: enable multi-threaded compilation in Visual Studio.
+- Build system: fix mklink test when current path is not sources dir.
+- Build system: fix symlinked batch files not being launchable from Windows Explorer.
+- Build system: generate PCH files using naming convention expected by Clion.
+- Build system: generate dummy PCH only in out-of-source build tree.
+- Editor: do not attempt to parse extensionless files as XML.
+- Editor: draw navigation debug geometry.
+- Editor: prevent unnecessary attribute inspector refresh on resource reload.
+- Editor: allow drag-drop of generic XML files into attribute edit fields.
+- Editor: improved handling of structure attributes.
+- Editor: optimization to avoid updating temporary objects when they are not shown in hierarchy.
+- Editor: optimize update during object spawn.
+- Editor: paint selection.
+- Editor: show origins option.
+- Editor: fix %UI element internal var indexing so that editing user-defined variables works right.
+- Editor: restore window positions on viewport mode switch.
+- Editor: terrain editor.
+- Editor: color wheel for %Text3D.
+- Editor: double size on high DPI display.
+- Editor: fix resource browser node add/removal shown in hierarchy window.
+- Editor: fix resource browser preview camera position.
+- AssetImporter: possibility to export animation without skinned mesh.
+- AssetImporter: $fbx node suppression.
+- AssetImporter: fix animation start/end times when saving multiple animations.
+- AssetImporter: fix incorrect applying of model's root node transform.
+- Documentation: explain how to setup Windows MKLINK privilege.
+- Documentation: add section on scene graph events.
+- Documentation: explain EMSCRIPTEN_WASM build option.
+- Documentation: note on simultaneous network server & client usage.
+- Documentation: update on the define_resource_dirs() macro.
+- Documentation: do not include RapidJSON classes.
+- Documentation: inverse kinematics page.
+- Sample content: Kachujin model, used in SkeletalAnimation sample.
+- Sample content: new Urho3D logo.
+- Sample content: mutant model added to the CharacterDemo.
+- Sample content: Vertex colors in the standard primitive models.
+- Sample content: fix normals / lighting on the cylinder.
+- Sample content: Line primitive models.
+- Sample content: material preview model.
+- Fix broken off-mesh movement for %CrowdAgent.
+- Fix Bullet assert / crash when collision shape was changed from compound to non-compound.
+- Fix unintended update of wordwrapping text's width.
+- Fix uninitialized fields in %FontFaceBitmap.
+- Fix recreation of %CollisionChain2D shape.
+- Fix positioning of borderless window (if not filling the whole monitor.)
+- Fix %RigidBody2D not returning to original transform.
+- Fix copypaste error in %SpriteSheet2D load code.
+- Fix out-of-bounds text buffer access when compiling an AngelScript module.
+- Fix VariantMap to %JSONValue and back conversion.
+- Fix handling /./ in executable path in SanitateResourceName().
+- Fix crash if script object constructor throws.
+- Fix incorrect optimization in %UIElement::GetElementAt().
+- Fix potential crash when erasing sibling nodes during component destructor.
+- Fix blend modes for 2D particles.
+- Fix use of asGetActiveContext() in template code, as it could leak undesirably to user application and cause undefined symbol.
+- Fix jumping %Slider knob.
+- Fix AngelScript temp variable corruption and problem with handle-reference argument.
+- Fix %Constraint2D body connection serialization (other body nodeID.)
+- Fix instancing in vegetation shader.
+- Fix SDL keyboard input on RPI platform.
+- Fix fixed size billboard not properly realculating size in all cases.
+- Fix multisample quality handling on D3D11.
+- Fix %Text3D batches beyond the first not showing correctly.
+- Fix input scaling for high DPI displays.
+- Fix differentiation of alpha & RGBA textures in text shader.
+- Fix crash in usedGlyphs mode.
+- Fix zero sized %UI root element causing divide by zero.
+- Fix various missing script API functions.
+- Fix terrain UV coordinates generation.
+- Fix shader define update when %Text3D changes its rendering between SDF / non-SDF.
+- Fix erroneous fadeout of other %AnimationController animations, if playback of new animation failed.
+- Fix nearest filter mode not using mipmaps on OpenGOL.
+- Fix skinning matrix pointers changing erroneously after late creation of bones.
+- Fix %BillboardSet 16 bit indices limitation.
+- Fix %CrowdAgents getting erroneously included in navmesh geometry.
+- Fix calculation of %UI element combined screen rect.
+- Fix world space tangent for billboards.
+- Fix %ValueAnimation's time range not getting expanded by adding event frames.
+- Fix %ValueAnimation removal during event handling causing crash.
+- Fix word wrap text char positions.
+- Fix %WorkQueue item insertion; insert last if no other option possible.
+- Fix unnecessary mouse centering in screen mode change handling.
+- Fix unsafe removal of event receivers.
+- Fix string corruption in SQLite queries.
+- Fix error in skybox HLSL shader when instancing is forced on.
+- Fix erroneous reuse of backbuffer depth buffer when multisampling.
+- Fix uninitialized memory in %Material.
+- Fix out of bounds array access when material quality is higher than high.
+- Fix shadow-related shader function signatures on GLES.
+- Fix shaky water shader on GLES.
+- Fix memory leak in AngelScript Dictionary.
+- Fix weight fade erroneously affecting animation after weight was set manually.
+- Fix LookAt mixed rotation mode.
+- Fix skydome GLSL shader.
+- Fix depth bias not getting cloned in %Material::Clone().
+- Fix %CrowdAgent removal to be safe during reposition event.
+- Fix keeping track of %RigidBody2D constraints.
+- Fix double shader parameters passed from e.g. Lua, convert to float.
+- Fix navigation system obstacles not observing their scene node movement and updating themselves.
+- Fix self-insertion in %Vector.
+- Fix slowed down navigation agent when scene node dirtied during reposition event.
+- Fix slope-scale bias adjustment on OpenGL.
+- Fix incorrect hashing of rasterizer states on D3D11.
+- Fix %AnimationController animation search differentiating slash and backslash when it shouldn't.
+- Fix %LineEdit text & cursor not being centered by default.
+- Fix potential flipped normals in physics collisions (double manifold issue.)
+- Fix undefined __cpu_model symbol in shared lib on GCC.
+- Fix cache datatype for URHO3D_LIB_TYPE
+- Fix Android black screenshot (use RGBA format.)
+- Fix missing network update if node is added to the scene late.
+- Fix crash when setting model resource to drawable component that is not attached to a scene node.
 
 V1.6
 
@@ -1080,7 +1339,7 @@ From 1.5 to 1.6:
 - Build system - the inclusion of Urho3D-CMake-common.cmake module into downstream project's CMakeLists.txt would implicitly instruct CMake to find all the required software packages, including Urho3D library. There is no need now for downstream's CMakeLists.txt to call "find_package (Urho3D)" explicitly, to avoid the Urho3D library from being searched twice. The enhanced FindUrho3D.cmake module now auto-discovers the build options used when building Urho3D library and reapply them to downstream projects. There is no need for users to remember and to supply the same set of build options when performing the initial configuration/generation of the downstream project's build tree.
 - Build system - the Urho3DAll.h header file is now auto-generated for downstream project that needs it. It is not a good practice though to use this "convenience header" as it would slow down the build process unnecessarily.
 
-From 1.6 to master:
+From 1.6 to 1.7:
 
 - SoundSource autoremove boolean was replaced with AutoRemoveMode enum, which allows removing either the component or owner node. Also used by ParticleEmitter.
 - Getting camera projection matrix has changed. Use GetProjection() to get the API-independent matrix, and GetGPUProjection() to get the matrix converted to be usable as a shader parameter. On D3D these are the same.
@@ -1104,6 +1363,11 @@ From 1.6 to master:
 - Build system - the "Urho3D-CMake-common.cmake" file is now renamed to "UrhoCommon.cmake".
 - Build system - downstream project is now responsible to add the HTML shell-file by calling the add_html_shell() macro or by passing "HTML_SHELL" option when calling the define_resource_dirs() in order to generate the HTML output when targeting Web platform, i.e. the build system defaults to JS output now, except when URHO3D_TESTING build option is set. When URHO3D_TESTING is set then it is assumed the output should be test runnable by using emrun, therefore the build system will automatically add the default HTML shell-file if none has been added yet.
 - Build system - when targeting macOS platform, the build tree will be configured to only target x86_64 arch by default as we are phasing out 32-bit mode. Use the URHO3D_UNIVERSAL build option, if you still want the universal binary build.
+
+From 1.7 to master:
+- URHO3D_CXX11 define was removed. C++11 mode is unconditionally enabled.
+- URHO3D_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE and URHO3D_MIXED_ACCESSOR_VARIANT_VECTOR_STRUCTURE_ATTRIBUTE macros were removed. Use attribute metadata instead. Element names shall be stored in StringVector (without trailing zero) instead of const char*[].
+
 */
 
 }

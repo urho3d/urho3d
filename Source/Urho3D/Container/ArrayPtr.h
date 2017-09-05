@@ -37,7 +37,7 @@ public:
     /// Construct a null shared array pointer.
     SharedArrayPtr() :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 
@@ -234,7 +234,7 @@ public:
     /// Construct a null weak array pointer.
     WeakArrayPtr() :
         ptr_(0),
-        refCount_(0)
+        refCount_(nullptr)
     {
     }
 

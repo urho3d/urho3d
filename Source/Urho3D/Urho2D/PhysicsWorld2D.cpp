@@ -51,7 +51,7 @@ PhysicsWorld2D::PhysicsWorld2D(Context* context) :
     gravity_(DEFAULT_GRAVITY),
     velocityIterations_(DEFAULT_VELOCITY_ITERATIONS),
     positionIterations_(DEFAULT_POSITION_ITERATIONS),
-    debugRenderer_(0),
+    debugRenderer_(nullptr),
     physicsStepping_(false),
     applyingTransforms_(false),
     updateEnabled_(true)
@@ -104,7 +104,7 @@ void PhysicsWorld2D::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
         debugRenderer_ = debug;
         debugDepthTest_ = depthTest;
         world_->DrawDebugData();
-        debugRenderer_ = 0;
+        debugRenderer_ = nullptr;
     }
 }
 
@@ -470,7 +470,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -521,7 +521,7 @@ public:
     }
 
     // Called for each fixture found in the query.
-    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction)
+    virtual float32 ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float32 fraction) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -558,7 +558,7 @@ private:
 void PhysicsWorld2D::RaycastSingle(PhysicsRaycastResult2D& result, const Vector2& startPoint, const Vector2& endPoint,
     unsigned collisionMask)
 {
-    result.body_ = 0;
+    result.body_ = nullptr;
 
     SingleRayCastCallback callback(result, startPoint, collisionMask);
     world_->RayCast(&callback, ToB2Vec2(startPoint), ToB2Vec2(endPoint));
@@ -572,12 +572,12 @@ public:
     PointQueryCallback(const b2Vec2& point, unsigned collisionMask) :
         point_(point),
         collisionMask_(collisionMask),
-        rigidBody_(0)
+        rigidBody_(nullptr)
     {
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    virtual bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())
@@ -634,7 +634,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned col
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 // Aabb query callback class.
@@ -649,7 +649,7 @@ public:
     }
 
     // Called for each fixture found in the query AABB.
-    virtual bool ReportFixture(b2Fixture* fixture)
+    virtual bool ReportFixture(b2Fixture* fixture) override
     {
         // Ignore sensor
         if (fixture->IsSensor())

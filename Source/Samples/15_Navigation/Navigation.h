@@ -50,11 +50,11 @@ public:
     Navigation(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    virtual void Start() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
-    virtual String GetScreenJoystickPatchString() const { return
+    virtual String GetScreenJoystickPatchString() const override { return
         "<patch>"
         "    <add sel=\"/element\">"
         "        <element type=\"Button\">"
@@ -146,6 +146,12 @@ private:
     bool Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable);
     /// Make Jack follow the Detour path.
     void FollowPath(float timeStep);
+    /// Toggle navigation mesh streaming.
+    void ToggleStreaming(bool enabled);
+    /// Update navigation mesh streaming.
+    void UpdateStreaming();
+    /// Save navigation data for streaming.
+    void SaveNavigationData();
     /// Handle the logic update event.
     void HandleUpdate(StringHash eventType, VariantMap& eventData);
     /// Handle the post-render update event.
@@ -159,4 +165,12 @@ private:
     SharedPtr<Node> jackNode_;
     /// Flag for drawing debug geometry.
     bool drawDebug_;
+    /// Flag for using navigation mesh streaming.
+    bool useStreaming_;
+    /// Streaming distance.
+    int streamingDistance_;
+    /// Tile data.
+    HashMap<IntVector2, PODVector<unsigned char> > tileData_;
+    /// Added tiles.
+    HashSet<IntVector2> addedTiles_;
 };

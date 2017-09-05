@@ -48,7 +48,9 @@ URHO3D_DEFINE_APPLICATION_MAIN(Navigation)
 
 Navigation::Navigation(Context* context) :
     Sample(context),
-    drawDebug_(false)
+    drawDebug_(false),
+    useStreaming_(false),
+    streamingDistance_(2)
 {
 }
 
@@ -141,6 +143,8 @@ void Navigation::CreateScene()
 
     // Create a NavigationMesh component to the scene root
     NavigationMesh* navMesh = scene_->CreateComponent<NavigationMesh>();
+    // Set small tiles to show navigation mesh streaming
+    navMesh->SetTileSize(32);
     // Create a Navigable component to the scene root. This tags all of the geometry in the scene as being part of the
     // navigation mesh. By default this is recursive, but the recursion could be turned off from Navigable
     scene_->CreateComponent<Navigable>();
@@ -185,6 +189,7 @@ void Navigation::CreateUI()
         "Use WASD keys to move, RMB to rotate view\n"
         "LMB to set destination, SHIFT+LMB to teleport\n"
         "MMB or O key to add or remove obstacles\n"
+        "Tab to toggle navigation mesh streaming\n"
         "Space to toggle debug geometry"
     );
     instructionText->SetFont(cache->GetResource<Font>("Fonts/Anonymous Pro.ttf"), 15);
@@ -299,7 +304,7 @@ void Navigation::AddOrRemoveObject()
     Vector3 hitPos;
     Drawable* hitDrawable;
 
-    if (Raycast(250.0f, hitPos, hitDrawable))
+    if (!useStreaming_ && Raycast(250.0f, hitPos, hitDrawable))
     {
         // The part of the navigation mesh we must update, which is the world bounding box of the associated
         // drawable component
@@ -343,7 +348,7 @@ Node* Navigation::CreateMushroom(const Vector3& pos)
 
 bool Navigation::Raycast(float maxDistance, Vector3& hitPos, Drawable*& hitDrawable)
 {
-    hitDrawable = 0;
+    hitDrawable = nullptr;
 
     UI* ui = GetSubsystem<UI>();
     IntVector2 pos = ui->GetCursorPosition();
@@ -390,6 +395,69 @@ void Navigation::FollowPath(float timeStep)
     }
 }
 
+void Navigation::ToggleStreaming(bool enabled)
+{
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+    if (enabled)
+    {
+        int maxTiles = (2 * streamingDistance_ + 1) * (2 * streamingDistance_ + 1);
+        BoundingBox boundingBox = navMesh->GetBoundingBox();
+        SaveNavigationData();
+        navMesh->Allocate(boundingBox, maxTiles);
+    }
+    else
+        navMesh->Build();
+}
+
+void Navigation::UpdateStreaming()
+{
+    // Center the navigation mesh at the jack
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+    const IntVector2 jackTile = navMesh->GetTileIndex(jackNode_->GetWorldPosition());
+    const IntVector2 numTiles = navMesh->GetNumTiles();
+    const IntVector2 beginTile = VectorMax(IntVector2::ZERO, jackTile - IntVector2::ONE * streamingDistance_);
+    const IntVector2 endTile = VectorMin(jackTile + IntVector2::ONE * streamingDistance_, numTiles - IntVector2::ONE);
+
+    // Remove tiles
+    for (HashSet<IntVector2>::Iterator i = addedTiles_.Begin(); i != addedTiles_.End();)
+    {
+        const IntVector2 tileIdx = *i;
+        if (beginTile.x_ <= tileIdx.x_ && tileIdx.x_ <= endTile.x_ && beginTile.y_ <= tileIdx.y_ && tileIdx.y_ <= endTile.y_)
+            ++i;
+        else
+        {
+            navMesh->RemoveTile(tileIdx);
+            i = addedTiles_.Erase(i);
+        }
+    }
+
+    // Add tiles
+    for (int z = beginTile.y_; z <= endTile.y_; ++z)
+        for (int x = beginTile.x_; x <= endTile.x_; ++x)
+        {
+            const IntVector2 tileIdx(x, z);
+            if (!navMesh->HasTile(tileIdx) && tileData_.Contains(tileIdx))
+            {
+                addedTiles_.Insert(tileIdx);
+                navMesh->AddTile(tileData_[tileIdx]);
+            }
+        }
+}
+
+void Navigation::SaveNavigationData()
+{
+    NavigationMesh* navMesh = scene_->GetComponent<NavigationMesh>();
+    tileData_.Clear();
+    addedTiles_.Clear();
+    const IntVector2 numTiles = navMesh->GetNumTiles();
+    for (int z = 0; z < numTiles.y_; ++z)
+        for (int x = 0; x <= numTiles.x_; ++x)
+        {
+            const IntVector2 tileIdx = IntVector2(x, z);
+            tileData_[tileIdx] = navMesh->GetTileData(tileIdx);
+        }
+}
+
 void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
     using namespace Update;
@@ -402,6 +470,16 @@ void Navigation::HandleUpdate(StringHash eventType, VariantMap& eventData)
 
     // Make Jack follow the Detour path
     FollowPath(timeStep);
+
+    // Update streaming
+    Input* input = GetSubsystem<Input>();
+    if (input->GetKeyPress(KEY_TAB))
+    {
+        useStreaming_ = !useStreaming_;
+        ToggleStreaming(useStreaming_);
+    }
+    if (useStreaming_)
+        UpdateStreaming();
 }
 
 void Navigation::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)

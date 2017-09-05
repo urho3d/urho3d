@@ -75,18 +75,18 @@ public:
     /// Construct.
     Renderer2D(Context* context);
     /// Destruct.
-    ~Renderer2D();
+    virtual ~Renderer2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    virtual void UpdateBatches(const FrameInfo& frame) override;
     /// Prepare geometry for rendering. Called from a worker thread if possible (no GPU update.)
-    virtual void UpdateGeometry(const FrameInfo& frame);
+    virtual void UpdateGeometry(const FrameInfo& frame) override;
     /// Return whether a geometry update is necessary, and if it can happen in a worker thread.
-    virtual UpdateGeometryType GetUpdateGeometryType();
+    virtual UpdateGeometryType GetUpdateGeometryType() override;
 
     /// Add Drawable2D.
     void AddDrawable(Drawable2D* drawable);
@@ -100,7 +100,7 @@ public:
 
 private:
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
     /// Create material by texture and blend mode.
     SharedPtr<Material> CreateMaterial(Texture2D* texture, BlendMode blendMode);
     /// Handle view update begin event. Determine Drawable2D's and their batches here.

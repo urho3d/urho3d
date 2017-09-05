@@ -261,10 +261,10 @@ struct SpatialTimelineKey : TimelineKey
     SpatialInfo info_;
 
     SpatialTimelineKey(Timeline* timeline);
-    virtual ~SpatialTimelineKey();
+    virtual ~SpatialTimelineKey() override;
 
-    virtual bool Load(const pugi::xml_node& node);
-    virtual void Interpolate(const TimelineKey& other, float t);
+    virtual bool Load(const pugi::xml_node& node) override;
+    virtual void Interpolate(const TimelineKey& other, float t) override;
     SpatialTimelineKey& operator=(const SpatialTimelineKey& rhs);
 };
 
@@ -275,12 +275,12 @@ struct BoneTimelineKey : SpatialTimelineKey
     float width_;
 
     BoneTimelineKey(Timeline* timeline);
-    virtual ~BoneTimelineKey();
+    virtual ~BoneTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const { return BONE; }
-    virtual TimelineKey* Clone() const;
-    virtual bool Load(const pugi::xml_node& node);
-    virtual void Interpolate(const TimelineKey& other, float t);
+    virtual ObjectType GetObjectType() const override { return BONE; }
+    virtual TimelineKey* Clone() const override;
+    virtual bool Load(const pugi::xml_node& node) override;
+    virtual void Interpolate(const TimelineKey& other, float t) override;
     BoneTimelineKey& operator=(const BoneTimelineKey& rhs);
 };
 
@@ -297,12 +297,12 @@ struct SpriteTimelineKey : SpatialTimelineKey
     int zIndex_;
 
     SpriteTimelineKey(Timeline* timeline);
-    virtual ~SpriteTimelineKey();
+    virtual ~SpriteTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const { return SPRITE; }
-    virtual TimelineKey* Clone() const;
-    virtual bool Load(const pugi::xml_node& node);
-    virtual void Interpolate(const TimelineKey& other, float t);
+    virtual ObjectType GetObjectType() const override { return SPRITE; }
+    virtual TimelineKey* Clone() const override;
+    virtual bool Load(const pugi::xml_node& node) override;
+    virtual void Interpolate(const TimelineKey& other, float t) override;
     SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
 };
 

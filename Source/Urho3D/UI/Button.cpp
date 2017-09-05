@@ -144,8 +144,8 @@ void Button::OnKey(int key, int buttons, int qualifiers)
     if (HasFocus() && (key == KEY_RETURN || key == KEY_RETURN2 || key == KEY_KP_ENTER || key == KEY_SPACE))
     {
         // Simulate LMB click
-        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0);
-        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, 0, 0);
+        OnClickBegin(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr);
+        OnClickEnd(IntVector2(), IntVector2(), MOUSEB_LEFT, 0, 0, nullptr, nullptr);
     }
 }
 

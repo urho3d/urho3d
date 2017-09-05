@@ -39,7 +39,7 @@ public:
     /// Construct.
     DbConnection(Context* context, const String& connectionString);
     /// Destruct.
-    ~DbConnection();
+    virtual ~DbConnection() override;
     /// Finalize all prepared statements, close all BLOB handles, and finish all sqlite3_backup objects
     void Finalize();
 

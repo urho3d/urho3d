@@ -743,7 +743,7 @@ unsigned Model::GetNumGeometryLodLevels(unsigned index) const
 Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 {
     if (index >= geometries_.Size() || geometries_[index].Empty())
-        return 0;
+        return nullptr;
 
     if (lodLevel >= geometries_[index].Size())
         lodLevel = geometries_[index].Size() - 1;
@@ -753,7 +753,7 @@ Geometry* Model::GetGeometry(unsigned index, unsigned lodLevel) const
 
 const ModelMorph* Model::GetMorph(unsigned index) const
 {
-    return index < morphs_.Size() ? &morphs_[index] : 0;
+    return index < morphs_.Size() ? &morphs_[index] : nullptr;
 }
 
 const ModelMorph* Model::GetMorph(const String& name) const
@@ -769,7 +769,7 @@ const ModelMorph* Model::GetMorph(StringHash nameHash) const
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 unsigned Model::GetMorphRangeStart(unsigned bufferIndex) const

@@ -71,7 +71,7 @@ void Texture2D::Release()
         for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
         {
             if (graphics_->GetTexture(i) == this)
-                graphics_->SetTexture(i, 0);
+                graphics_->SetTexture(i, nullptr);
         }
     }
 
@@ -138,7 +138,7 @@ bool Texture2D::SetData(unsigned level, int x, int y, int width, int height, con
     if (level == 0 && x == 0 && y == 0 && width == levelWidth && height == levelHeight && usage_ > TEXTURE_STATIC)
         flags |= D3DLOCK_DISCARD;
 
-    HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? 0 : &d3dRect, flags);
+    HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->LockRect(level, &d3dLockedRect, (flags & D3DLOCK_DISCARD) ? nullptr : &d3dRect, flags);
     if (FAILED(hr))
     {
         URHO3D_LOGD3DERROR("Could not lock texture", hr);
@@ -367,7 +367,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
     d3dRect.right = levelWidth;
     d3dRect.bottom = levelHeight;
 
-    IDirect3DSurface9* offscreenSurface = 0;
+    IDirect3DSurface9* offscreenSurface = nullptr;
     // Need to use a offscreen surface & GetRenderTargetData() for rendertargets
     if (renderSurface_)
     {
@@ -378,7 +378,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
         }
 
         // If multisampled, must copy the surface of the resolve texture instead of the multisampled surface
-        IDirect3DSurface9* resolveSurface = 0;
+        IDirect3DSurface9* resolveSurface = nullptr;
         if (multiSample_ > 1)
         {
             HRESULT hr = ((IDirect3DTexture9*)object_.ptr_)->GetSurfaceLevel(0, (IDirect3DSurface9**)&resolveSurface);
@@ -392,7 +392,7 @@ bool Texture2D::GetData(unsigned level, void* dest) const
 
         IDirect3DDevice9* device = graphics_->GetImpl()->GetDevice();
         HRESULT hr = device->CreateOffscreenPlainSurface((UINT)width_, (UINT)height_, (D3DFORMAT)format_,
-            D3DPOOL_SYSTEMMEM, &offscreenSurface, 0);
+            D3DPOOL_SYSTEMMEM, &offscreenSurface, nullptr);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not create surface for getting rendertarget data", hr);
@@ -570,7 +570,7 @@ bool Texture2D::Create()
             0,
             FALSE,
             (IDirect3DSurface9**)&renderSurface_->surface_,
-            0);
+            nullptr);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not create depth-stencil surface", hr);
@@ -590,7 +590,7 @@ bool Texture2D::Create()
             (D3DFORMAT)format_,
             (D3DPOOL)pool,
             (IDirect3DTexture9**)&object_,
-            0);
+            nullptr);
         if (FAILED(hr))
         {
             URHO3D_LOGD3DERROR("Could not create texture", hr);
@@ -611,7 +611,7 @@ bool Texture2D::Create()
                 0,
                 FALSE,
                 (IDirect3DSurface9**)&renderSurface_->surface_,
-                0);
+                nullptr);
             if (FAILED(hr))
             {
                 URHO3D_LOGD3DERROR("Could not create multisampled rendertarget surface", hr);

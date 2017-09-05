@@ -43,7 +43,7 @@ public:
     /// Construct.
     SmoothedTransform(Context* context);
     /// Destruct.
-    ~SmoothedTransform();
+    virtual ~SmoothedTransform() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -74,7 +74,7 @@ public:
 
 protected:
     /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node);
+    virtual void OnNodeSet(Node* node) override;
 
 private:
     /// Handle smoothing update event.

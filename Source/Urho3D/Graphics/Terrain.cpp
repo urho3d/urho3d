@@ -172,14 +172,14 @@ void Terrain::ApplyAttributes()
     if (neighborsDirty_)
     {
         Scene* scene = GetScene();
-        Node* north = scene ? scene->GetNode(northID_) : (Node*)0;
-        Node* south = scene ? scene->GetNode(southID_) : (Node*)0;
-        Node* west = scene ? scene->GetNode(westID_) : (Node*)0;
-        Node* east = scene ? scene->GetNode(eastID_) : (Node*)0;
-        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : (Terrain*)0;
+        Node* north = scene ? scene->GetNode(northID_) : nullptr;
+        Node* south = scene ? scene->GetNode(southID_) : nullptr;
+        Node* west = scene ? scene->GetNode(westID_) : nullptr;
+        Node* east = scene ? scene->GetNode(eastID_) : nullptr;
+        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : nullptr;
+        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : nullptr;
+        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : nullptr;
+        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : nullptr;
         SetNeighbors(northTerrain, southTerrain, westTerrain, eastTerrain);
         neighborsDirty_ = false;
     }
@@ -543,13 +543,13 @@ Material* Terrain::GetMaterial() const
 
 TerrainPatch* Terrain::GetPatch(unsigned index) const
 {
-    return index < patches_.Size() ? patches_[index] : (TerrainPatch*)0;
+    return index < patches_.Size() ? patches_[index] : nullptr;
 }
 
 TerrainPatch* Terrain::GetPatch(int x, int z) const
 {
     if (x < 0 || x >= numPatches_.x_ || z < 0 || z >= numPatches_.y_)
-        return 0;
+        return nullptr;
     else
         return GetPatch((unsigned)(z * numPatches_.x_ + x));
 }

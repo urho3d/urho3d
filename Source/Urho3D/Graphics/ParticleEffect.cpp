@@ -42,7 +42,7 @@ static const char* emitterTypeNames[] =
 {
     "Sphere",
     "Box",
-    0
+    nullptr
 };
 
 static const Vector2 DEFAULT_PARTICLE_SIZE(0.1f, 0.1f);
@@ -778,12 +778,12 @@ SharedPtr<ParticleEffect> ParticleEffect::Clone(const String& cloneName) const
 
 const ColorFrame* ParticleEffect::GetColorFrame(unsigned index) const
 {
-    return index < colorFrames_.Size() ? &colorFrames_[index] : (ColorFrame*)0;
+    return index < colorFrames_.Size() ? &colorFrames_[index] : nullptr;
 }
 
 const TextureFrame* ParticleEffect::GetTextureFrame(unsigned index) const
 {
-    return index < textureFrames_.Size() ? &textureFrames_[index] : (TextureFrame*)0;
+    return index < textureFrames_.Size() ? &textureFrames_[index] : nullptr;
 }
 
 Vector3 ParticleEffect::GetRandomDirection() const

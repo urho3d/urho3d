@@ -205,6 +205,16 @@ inline unsigned NextPowerOfTwo(unsigned value)
     return ++value;
 }
 
+/// Return log base two or the MSB position of the given value.
+inline unsigned LogBaseTwo(unsigned value)
+{
+    // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
+    unsigned ret = 0;
+    while (value >>= 1)     // Unroll for more speed...
+        ++ret;
+    return ret;
+}
+
 /// Count the number of set bits in a mask.
 inline unsigned CountSetBits(unsigned value)
 {
