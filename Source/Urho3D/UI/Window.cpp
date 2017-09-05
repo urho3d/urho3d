@@ -157,7 +157,8 @@ void Window::OnDragMove(const IntVector2& position, const IntVector2& screenPosi
 
     const IntVector2& position_ = GetPosition();
     const IntVector2& size_ = GetSize();
-    const IntVector2& minSize_ = GetMinSize();
+    // Use GetEffectiveMinSize() instead of GetMinSize() to prevent windows moving once the effective minimum size is reached
+    const IntVector2& minSize_ = GetEffectiveMinSize();
     const IntVector2& maxSize_ = GetMaxSize();
 
     switch (dragMode_)
