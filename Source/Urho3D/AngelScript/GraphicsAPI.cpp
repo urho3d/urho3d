@@ -240,7 +240,7 @@ static RenderTargetInfo* RenderPathGetRenderTarget(unsigned index, RenderPath* p
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return &ptr->renderTargets_[index];
@@ -253,7 +253,7 @@ static RenderPathCommand* RenderPathGetCommand(unsigned index, RenderPath* ptr)
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return &ptr->commands_[index];
@@ -1035,7 +1035,7 @@ static AnimationKeyFrame* AnimationTrackGetKeyFrame(unsigned index, AnimationTra
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return ptr->GetKeyFrame(index);
@@ -1063,7 +1063,7 @@ static AnimationTriggerPoint* AnimationGetTrigger(unsigned index, Animation* ptr
         asIScriptContext* context = asGetActiveContext();
         if (context)
             context->SetException("Index out of bounds");
-        return 0;
+        return nullptr;
     }
     else
         return ptr->GetTrigger(index);
@@ -1430,7 +1430,7 @@ static unsigned AnimationControllerGetNumAnimations(AnimationController* control
 static const AnimationControl* AnimationControllerGetAnimation(unsigned index, AnimationController* controller)
 {
     const Vector<AnimationControl>& animations = controller->GetAnimations();
-    return (index < animations.Size()) ? &animations[index] : (const AnimationControl*)0;
+    return (index < animations.Size()) ? &animations[index] : nullptr;
 }
 
 static void RegisterAnimationController(asIScriptEngine* engine)
@@ -1788,6 +1788,7 @@ static void RegisterTerrain(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetPatch(int, int) const", asMETHODPR(Terrain, GetPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "TerrainPatch@+ GetNeighborPatch(int, int) const", asMETHODPR(Terrain, GetNeighborPatch, (int, int) const, TerrainPatch*), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "IntVector2 WorldToHeightMap(const Vector3&in) const", asMETHOD(Terrain, WorldToHeightMap), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Terrain", "Vector3 HeightMapToWorld(const IntVector2&in) const", asMETHOD(Terrain, HeightMapToWorld), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void SetNeighbors(Terrain@+, Terrain@+, Terrain@+, Terrain@+)", asMETHOD(Terrain, SetNeighbors), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "void set_material(Material@+)", asMETHOD(Terrain, SetMaterial), asCALL_THISCALL);
     engine->RegisterObjectMethod("Terrain", "Material@+ get_material() const", asMETHOD(Terrain, GetMaterial), asCALL_THISCALL);
@@ -1962,6 +1963,7 @@ static void RegisterRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("Renderer", "Viewport@+ get_viewports(uint) const", asMETHOD(Renderer, GetViewport), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetDefaultRenderPath(XMLFile@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (XMLFile*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void SetVSMShadowParameters(float, float)", asMETHOD(Renderer, SetVSMShadowParameters), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Renderer", "Viewport@+ GetViewportForScene(Scene@+, uint)", asMETHOD(Renderer, GetViewportForScene), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultRenderPath(RenderPath@+)", asMETHODPR(Renderer, SetDefaultRenderPath, (RenderPath*), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "RenderPath@+ get_defaultRenderPath() const", asMETHOD(Renderer, GetDefaultRenderPath), asCALL_THISCALL);
     engine->RegisterObjectMethod("Renderer", "void set_defaultTechnique(Technique@+)", asMETHOD(Renderer, SetDefaultTechnique), asCALL_THISCALL);
@@ -2036,7 +2038,7 @@ static DebugRenderer* GetDebugRenderer()
     if (scene)
         return scene->GetComponent<DebugRenderer>();
     else
-        return 0;
+        return nullptr;
 }
 
 static DebugRenderer* SceneGetDebugRenderer(Scene* ptr)
@@ -2056,6 +2058,7 @@ static void RegisterDebugRenderer(asIScriptEngine* engine)
     engine->RegisterObjectMethod("DebugRenderer", "void AddFrustum(const Frustum&in, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddFrustum), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddPolyhedron(const Polyhedron&in, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddPolyhedron), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddSphere(const Sphere&in, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSphere), asCALL_THISCALL);
+    engine->RegisterObjectMethod("DebugRenderer", "void AddSphereSector(const Sphere&in, const Quaternion&in, float, bool, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSphereSector), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddSkeleton(Skeleton@+, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddSkeleton), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddCircle(const Vector3&in, const Vector3&in, float, const Color&in, int steps = 64, bool depthTest = true)", asMETHOD(DebugRenderer, AddCircle), asCALL_THISCALL);
     engine->RegisterObjectMethod("DebugRenderer", "void AddCross(const Vector3&in, float size, const Color&in, bool depthTest = true)", asMETHOD(DebugRenderer, AddCross), asCALL_THISCALL);
@@ -2157,7 +2160,7 @@ static Octree* SceneGetOctree(Scene* ptr)
 static Octree* GetOctree()
 {
     Scene* scene = GetScriptContextScene();
-    return scene ? scene->GetComponent<Octree>() : 0;
+    return scene ? scene->GetComponent<Octree>() : nullptr;
 }
 
 static void RegisterOctree(asIScriptEngine* engine)

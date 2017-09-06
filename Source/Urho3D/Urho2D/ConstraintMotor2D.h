@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintMotor2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintMotor2D();
+    virtual ~ConstraintMotor2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -68,7 +68,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef();
+    virtual b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2MotorJointDef jointDef_;

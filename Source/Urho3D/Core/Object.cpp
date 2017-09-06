@@ -87,8 +87,8 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
 {
     // Make a copy of the context pointer in case the object is destroyed during event handler invocation
     Context* context = context_;
-    EventHandler* specific = 0;
-    EventHandler* nonSpecific = 0;
+    EventHandler* specific = nullptr;
+    EventHandler* nonSpecific = nullptr;
 
     EventHandler* handler = eventHandlers_.First();
     while (handler)
@@ -111,7 +111,7 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
     {
         context->SetEventHandler(specific);
         specific->Invoke(eventData);
-        context->SetEventHandler(0);
+        context->SetEventHandler(nullptr);
         return;
     }
 
@@ -119,7 +119,7 @@ void Object::OnEvent(Object* sender, StringHash eventType, VariantMap& eventData
     {
         context->SetEventHandler(nonSpecific);
         nonSpecific->Invoke(eventData);
-        context->SetEventHandler(0);
+        context->SetEventHandler(nullptr);
     }
 }
 
@@ -138,10 +138,10 @@ void Object::SubscribeToEvent(StringHash eventType, EventHandler* handler)
     if (!handler)
         return;
 
-    handler->SetSenderAndEventType(0, eventType);
+    handler->SetSenderAndEventType(nullptr, eventType);
     // Remove old event handler first
     EventHandler* previous;
-    EventHandler* oldHandler = FindSpecificEventHandler(0, eventType, &previous);
+    EventHandler* oldHandler = FindSpecificEventHandler(nullptr, eventType, &previous);
     if (oldHandler)
     {
         eventHandlers_.Erase(oldHandler, previous);
@@ -179,7 +179,6 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, EventHandler
     }
 }
 
-#if URHO3D_CXX11
 void Object::SubscribeToEvent(StringHash eventType, const std::function<void(StringHash, VariantMap&)>& function, void* userData/*=0*/)
 {
     SubscribeToEvent(eventType, new EventHandler11Impl(function, userData));
@@ -189,7 +188,6 @@ void Object::SubscribeToEvent(Object* sender, StringHash eventType, const std::f
 {
     SubscribeToEvent(sender, eventType, new EventHandler11Impl(function, userData));
 }
-#endif
 
 void Object::UnsubscribeFromEvent(StringHash eventType)
 {
@@ -264,7 +262,7 @@ void Object::UnsubscribeFromAllEvents()
 void Object::UnsubscribeFromAllEventsExcept(const PODVector<StringHash>& exceptions, bool onlyUserData)
 {
     EventHandler* handler = eventHandlers_.First();
-    EventHandler* previous = 0;
+    EventHandler* previous = nullptr;
 
     while (handler)
     {
@@ -315,7 +313,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
     {
         group->BeginSendEvent();
 
-        for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+        const unsigned numReceivers = group->receivers_.Size();
+        for (unsigned i = 0; i < numReceivers; ++i)
         {
             Object* receiver = group->receivers_[i];
             // Holes may exist if receivers removed during send
@@ -346,7 +345,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
 
         if (processed.Empty())
         {
-            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+            const unsigned numReceivers = group->receivers_.Size();
+            for (unsigned i = 0; i < numReceivers; ++i)
             {
                 Object* receiver = group->receivers_[i];
                 if (!receiver)
@@ -365,7 +365,8 @@ void Object::SendEvent(StringHash eventType, VariantMap& eventData)
         else
         {
             // If there were specific receivers, check that the event is not sent doubly to them
-            for (unsigned i = 0; i < group->receivers_.Size(); ++i)
+            const unsigned numReceivers = group->receivers_.Size();
+            for (unsigned i = 0; i < numReceivers; ++i)
             {
                 Object* receiver = group->receivers_[i];
                 if (!receiver || processed.Contains(receiver))
@@ -425,7 +426,7 @@ EventHandler* Object::GetEventHandler() const
 
 bool Object::HasSubscribedToEvent(StringHash eventType) const
 {
-    return FindEventHandler(eventType) != 0;
+    return FindEventHandler(eventType) != nullptr;
 }
 
 bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
@@ -433,7 +434,7 @@ bool Object::HasSubscribedToEvent(Object* sender, StringHash eventType) const
     if (!sender)
         return false;
     else
-        return FindSpecificEventHandler(sender, eventType) != 0;
+        return FindSpecificEventHandler(sender, eventType) != nullptr;
 }
 
 const String& Object::GetCategory() const
@@ -452,7 +453,7 @@ EventHandler* Object::FindEventHandler(StringHash eventType, EventHandler** prev
 {
     EventHandler* handler = eventHandlers_.First();
     if (previous)
-        *previous = 0;
+        *previous = nullptr;
 
     while (handler)
     {
@@ -463,14 +464,14 @@ EventHandler* Object::FindEventHandler(StringHash eventType, EventHandler** prev
         handler = eventHandlers_.Next(handler);
     }
 
-    return 0;
+    return nullptr;
 }
 
 EventHandler* Object::FindSpecificEventHandler(Object* sender, EventHandler** previous) const
 {
     EventHandler* handler = eventHandlers_.First();
     if (previous)
-        *previous = 0;
+        *previous = nullptr;
 
     while (handler)
     {
@@ -481,14 +482,14 @@ EventHandler* Object::FindSpecificEventHandler(Object* sender, EventHandler** pr
         handler = eventHandlers_.Next(handler);
     }
 
-    return 0;
+    return nullptr;
 }
 
 EventHandler* Object::FindSpecificEventHandler(Object* sender, StringHash eventType, EventHandler** previous) const
 {
     EventHandler* handler = eventHandlers_.First();
     if (previous)
-        *previous = 0;
+        *previous = nullptr;
 
     while (handler)
     {
@@ -499,13 +500,13 @@ EventHandler* Object::FindSpecificEventHandler(Object* sender, StringHash eventT
         handler = eventHandlers_.Next(handler);
     }
 
-    return 0;
+    return nullptr;
 }
 
 void Object::RemoveEventSender(Object* sender)
 {
     EventHandler* handler = eventHandlers_.First();
-    EventHandler* previous = 0;
+    EventHandler* previous = nullptr;
 
     while (handler)
     {

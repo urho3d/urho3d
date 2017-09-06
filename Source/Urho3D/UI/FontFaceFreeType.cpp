@@ -32,6 +32,8 @@
 #include "../UI/FontFaceFreeType.h"
 #include "../UI/UI.h"
 
+#include <assert.h>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_TRUETYPE_TABLES_H
@@ -62,7 +64,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~FreeTypeLibrary()
+    virtual ~FreeTypeLibrary() override
     {
         FT_Done_FreeType(library_);
     }
@@ -76,7 +78,7 @@ private:
 
 FontFaceFreeType::FontFaceFreeType(Font* font) :
     FontFace(font),
-    face_(0),
+    face_(nullptr),
     loadMode_(FT_LOAD_DEFAULT),
     hasMutableGlyph_(false)
 {
@@ -87,7 +89,7 @@ FontFaceFreeType::~FontFaceFreeType()
     if (face_)
     {
         FT_Done_Face((FT_Face)face_);
-        face_ = 0;
+        face_ = nullptr;
     }
 }
 
@@ -104,7 +106,12 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     freeType_ = freeType;
 
     UI* ui = font_->GetSubsystem<UI>();
-    int maxTextureSize = ui->GetMaxFontTextureSize();
+    const int maxTextureSize = ui->GetMaxFontTextureSize();
+    const FontHintLevel hintLevel = ui->GetFontHintLevel();
+    const float subpixelThreshold = ui->GetFontSubpixelThreshold();
+
+    subpixel_ = (hintLevel <= FONT_HINT_LEVEL_LIGHT) && (pointSize <= subpixelThreshold);
+    oversampling_ = subpixel_ ? ui->GetFontOversampling() : 1;
 
     FT_Face face;
     FT_Error error;
@@ -128,7 +135,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         URHO3D_LOGERROR("Could not create font face");
         return false;
     }
-    error = FT_Set_Char_Size(face, 0, pointSize * 64, FONT_DPI, FONT_DPI);
+    error = FT_Set_Char_Size(face, 0, pointSize * 64, oversampling_ * FONT_DPI, FONT_DPI);
     if (error)
     {
         FT_Done_Face(face);
@@ -226,7 +233,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
         // are 29354 glyphs in msyh.ttf
         FT_ULong tagKern = FT_MAKE_TAG('k', 'e', 'r', 'n');
         FT_ULong kerningTableSize = 0;
-        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, 0, &kerningTableSize);
+        FT_Error error = FT_Load_Sfnt_Table(face, tagKern, 0, nullptr, &kerningTableSize);
         if (error)
         {
             URHO3D_LOGERROR("Could not get kerning table length");
@@ -262,14 +269,17 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
                     // Skip searchRange, entrySelector and rangeShift
                     deserializer.Seek((unsigned)(deserializer.GetPosition() + 3 * sizeof(unsigned short)));
 
+                    // x_scale is a 16.16 fixed-point value that converts font units -> 26.6 pixels (oversampled!)
+                    float xScale = face->size->metrics.x_scale / float(1 << 22) / oversampling_;
+
                     for (unsigned j = 0; j < numKerningPairs; ++j)
                     {
                         unsigned leftIndex = deserializer.ReadUShort();
                         unsigned rightIndex = deserializer.ReadUShort();
-                        short amount = FixedToFloat(deserializer.ReadShort());
+                        float amount = deserializer.ReadShort() * xScale;
 
-                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex] : 0;
-                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex] : 0;
+                        unsigned leftCharCode = leftIndex < numGlyphs ? charCodes[leftIndex + 1] : 0;
+                        unsigned rightCharCode = rightIndex < numGlyphs ? charCodes[rightIndex + 1] : 0;
                         if (leftCharCode != 0 && rightCharCode != 0)
                         {
                             unsigned value = (leftCharCode << 16) + rightCharCode;
@@ -291,7 +301,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     if (!hasMutableGlyph_)
     {
         FT_Done_Face(face);
-        face_ = 0;
+        face_ = nullptr;
     }
 
     return true;
@@ -318,7 +328,7 @@ const FontGlyph* FontFaceFreeType::GetGlyph(unsigned c)
         }
     }
 
-    return 0;
+    return nullptr;
 }
 
 bool FontFaceFreeType::SetupNextTexture(int textureWidth, int textureHeight)
@@ -340,6 +350,65 @@ bool FontFaceFreeType::SetupNextTexture(int textureWidth, int textureHeight)
     return true;
 }
 
+void FontFaceFreeType::BoxFilter(unsigned char* dest, size_t destSize, const unsigned char* src, size_t srcSize)
+{
+    const int filterSize = oversampling_;
+
+    assert(filterSize > 0);
+    assert(destSize == srcSize + filterSize - 1);
+
+    if (filterSize == 1)
+    {
+        memcpy(dest, src, srcSize);
+        return;
+    }
+
+    // "accumulator" holds the total value of filterSize samples. We add one sample
+    // and remove one sample per step (with special cases for left and right edges).
+    int accumulator = 0;
+
+    // The divide might make these inner loops slow. If so, some possible optimizations:
+    // a) Turn it into a fixed-point multiply-and-shift rather than an integer divide;
+    // b) Make this function a template, with the filter size a compile-time constant.
+
+    int i = 0;
+
+    if (srcSize < filterSize)
+    {
+        for (; i < srcSize; ++i)
+        {
+            accumulator += src[i];
+            dest[i] = accumulator / filterSize;
+        }
+
+        for (; i < filterSize; ++i)
+        {
+            dest[i] = accumulator / filterSize;
+        }
+    }
+    else
+    {
+        for ( ; i < filterSize; ++i)
+        {
+            accumulator += src[i];
+            dest[i] = accumulator / filterSize;
+        }
+
+        for (; i < srcSize; ++i)
+        {
+            accumulator += src[i];
+            accumulator -= src[i - filterSize];
+            dest[i] = accumulator / filterSize;
+        }
+    }
+
+    for (; i < srcSize + filterSize - 1; ++i)
+    {
+        accumulator -= src[i - filterSize];
+        dest[i] = accumulator / filterSize;
+    }
+}
+
 bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
 {
     if (!face_)
@@ -354,6 +423,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     {
         const char* family = face->family_name ? face->family_name : "NULL";
         URHO3D_LOGERRORF("FT_Load_Char failed (family: %s, char code: %u)", family, charCode);
+        fontGlyph.texWidth_ = 0;
+        fontGlyph.texHeight_ = 0;
         fontGlyph.width_ = 0;
         fontGlyph.height_ = 0;
         fontGlyph.offsetX_ = 0;
@@ -364,15 +435,14 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     else
     {
         // Note: position within texture will be filled later
-        fontGlyph.width_ = slot->bitmap.width;
+        fontGlyph.texWidth_ = slot->bitmap.width + oversampling_ - 1;
+        fontGlyph.texHeight_ = slot->bitmap.rows;
+        fontGlyph.width_ = slot->bitmap.width + oversampling_ - 1;
         fontGlyph.height_ = slot->bitmap.rows;
-        fontGlyph.offsetX_ = slot->bitmap_left;
-        fontGlyph.offsetY_ = ascender_ - slot->bitmap_top;
+        fontGlyph.offsetX_ = slot->bitmap_left - (oversampling_ - 1) / 2.0f;
+        fontGlyph.offsetY_ = floorf(ascender_ + 0.5f) - slot->bitmap_top;
 
-        UI* ui = font_->GetSubsystem<UI>();
-        FontHintLevel level = ui->GetFontHintLevel();
-        bool subpixel = ui->GetSubpixelGlyphPositions();
-        if (level <= FONT_HINT_LEVEL_LIGHT && subpixel && slot->linearHoriAdvance)
+        if (subpixel_ && slot->linearHoriAdvance)
         {
             // linearHoriAdvance is stored in 16.16 fixed point, not the usual 26.6
             fontGlyph.advanceX_ = slot->linearHoriAdvance / 65536.0;
@@ -380,14 +450,18 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         else
         {
             // Round to nearest pixel (only necessary when hinting is disabled)
-            fontGlyph.advanceX_ = floor(FixedToFloat(slot->metrics.horiAdvance) + 0.5f);
+            fontGlyph.advanceX_ = floorf(FixedToFloat(slot->metrics.horiAdvance) + 0.5f);
         }
+
+        fontGlyph.width_ /= oversampling_;
+        fontGlyph.offsetX_ /= oversampling_;
+        fontGlyph.advanceX_ /= oversampling_;
     }
 
     int x = 0, y = 0;
-    if (fontGlyph.width_ > 0 && fontGlyph.height_ > 0)
+    if (fontGlyph.texWidth_ > 0 && fontGlyph.texHeight_ > 0)
     {
-        if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+        if (!allocator_.Allocate(fontGlyph.texWidth_ + 1, fontGlyph.texHeight_ + 1, x, y))
         {
             if (image)
             {
@@ -403,7 +477,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
                 return false;
             }
 
-            if (!allocator_.Allocate(fontGlyph.width_ + 1, fontGlyph.height_ + 1, x, y))
+            if (!allocator_.Allocate(fontGlyph.texWidth_ + 1, fontGlyph.texHeight_ + 1, x, y))
             {
                 URHO3D_LOGWARNINGF("FontFaceFreeType::LoadCharGlyph: failed to position char code %u in blank page", charCode);
                 return false;
@@ -413,7 +487,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         fontGlyph.x_ = (short)x;
         fontGlyph.y_ = (short)y;
 
-        unsigned char* dest = 0;
+        unsigned char* dest = nullptr;
         unsigned pitch = 0;
         if (image)
         {
@@ -424,8 +498,8 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
         else
         {
             fontGlyph.page_ = textures_.Size() - 1;
-            dest = new unsigned char[fontGlyph.width_ * fontGlyph.height_];
-            pitch = (unsigned)fontGlyph.width_;
+            dest = new unsigned char[fontGlyph.texWidth_ * fontGlyph.texHeight_];
+            pitch = (unsigned)fontGlyph.texWidth_;
         }
 
         if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
@@ -433,8 +507,9 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             for (unsigned y = 0; y < (unsigned)slot->bitmap.rows; ++y)
             {
                 unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
-                unsigned char* rowDest = dest + y * pitch;
+                unsigned char* rowDest = dest + (oversampling_ - 1)/2 + y * pitch;
 
+                // Don't do any oversampling, just unpack the bits directly.
                 for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
                     rowDest[x] = (unsigned char)((src[x >> 3] & (0x80 >> (x & 7))) ? 255 : 0);
             }
@@ -445,15 +520,13 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
             {
                 unsigned char* src = slot->bitmap.buffer + slot->bitmap.pitch * y;
                 unsigned char* rowDest = dest + y * pitch;
-
-                for (unsigned x = 0; x < (unsigned)slot->bitmap.width; ++x)
-                    rowDest[x] = src[x];
+                BoxFilter(rowDest, fontGlyph.texWidth_, src, slot->bitmap.width);
             }
         }
 
         if (!image)
         {
-            textures_.Back()->SetData(0, fontGlyph.x_, fontGlyph.y_, fontGlyph.width_, fontGlyph.height_, dest);
+            textures_.Back()->SetData(0, fontGlyph.x_, fontGlyph.y_, fontGlyph.texWidth_, fontGlyph.texHeight_, dest);
             delete[] dest;
         }
     }

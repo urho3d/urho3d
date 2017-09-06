@@ -1,4 +1,4 @@
-<technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NOUV PBR IBL" psdefines="PBR IBL">
+<technique vs="PBRLitSolid" ps="PBRLitSolid" vsdefines="NOUV" psdefines="PBR IBL">
     <pass name="base" />
     <pass name="light" depthtest="equal" depthwrite="false" blend="add" />
     <pass name="prepass" psdefines="PREPASS" />

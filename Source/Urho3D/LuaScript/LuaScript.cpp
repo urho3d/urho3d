@@ -82,7 +82,7 @@ namespace Urho3D
 
 LuaScript::LuaScript(Context* context) :
     Object(context),
-    luaState_(0),
+    luaState_(nullptr),
     executeConsoleCommands_(false)
 {
     RegisterLuaScriptLibrary(context_);
@@ -148,8 +148,8 @@ LuaScript::~LuaScript()
     functionNameToFunctionMap_.Clear();
 
     lua_State* luaState = luaState_;
-    luaState_ = 0;
-    coroutineUpdate_ = 0;
+    luaState_ = nullptr;
+    coroutineUpdate_ = nullptr;
 
     if (luaState)
         lua_close(luaState);
@@ -159,14 +159,14 @@ void LuaScript::AddEventHandler(const String& eventName, int index)
 {
     LuaFunction* function = GetFunction(index);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScript::AddEventHandler(const String& eventName, const String& functionName)
 {
     LuaFunction* function = GetFunction(functionName);
     if (function)
-        eventInvoker_->AddEventHandler(0, eventName, function);
+        eventInvoker_->AddEventHandler(nullptr, eventName, function);
 }
 
 void LuaScript::AddEventHandler(Object* sender, const String& eventName, int index)
@@ -386,11 +386,11 @@ void LuaScript::ReplacePrint()
     static const struct luaL_reg reg[] =
     {
         {"print", &LuaScript::Print},
-        {NULL, NULL}
+        {nullptr, nullptr}
     };
 
     lua_getglobal(luaState_, "_G");
-    luaL_register(luaState_, NULL, reg);
+    luaL_register(luaState_, nullptr, reg);
     lua_pop(luaState_, 1);
 }
 
@@ -425,11 +425,11 @@ int LuaScript::Print(lua_State* L)
 LuaFunction* LuaScript::GetFunction(int index)
 {
     if (!lua_isfunction(luaState_, index))
-        return 0;
+        return nullptr;
 
     const void* functionPointer = lua_topointer(luaState_, index);
     if (!functionPointer)
-        return 0;
+        return nullptr;
 
     HashMap<const void*, SharedPtr<LuaFunction> >::Iterator i = functionPointerToFunctionMap_.Find(functionPointer);
     if (i != functionPointerToFunctionMap_.End())
@@ -444,7 +444,7 @@ LuaFunction* LuaScript::GetFunction(int index)
 LuaFunction* LuaScript::GetFunction(const String& functionName, bool silentIfNotFound)
 {
     if (!luaState_)
-        return 0;
+        return nullptr;
 
     HashMap<String, SharedPtr<LuaFunction> >::Iterator i = functionNameToFunctionMap_.Find(functionName);
     if (i != functionNameToFunctionMap_.End())

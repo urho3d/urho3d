@@ -280,7 +280,7 @@ void Graphics::RemoveGPUObject(GPUObject* object)
 void* Graphics::ReserveScratchBuffer(unsigned size)
 {
     if (!size)
-        return 0;
+        return nullptr;
 
     if (size > maxScratchBufferRequest_)
         maxScratchBufferRequest_ = size;
@@ -344,7 +344,7 @@ void Graphics::CleanupScratchBuffers()
     {
         if (!i->reserved_ && i->size_ > maxScratchBufferRequest_ * 2 && i->size_ >= 1024 * 1024)
         {
-            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : 0;
+            i->data_ = maxScratchBufferRequest_ > 0 ? new unsigned char[maxScratchBufferRequest_] : nullptr;
             i->size_ = maxScratchBufferRequest_;
 
             URHO3D_LOGDEBUG("Resized scratch buffer to size " + String(maxScratchBufferRequest_));

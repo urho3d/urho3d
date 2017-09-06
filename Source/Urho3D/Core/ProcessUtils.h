@@ -59,7 +59,7 @@ URHO3D_API const Vector<String>& ParseArguments(int argc, char** argv);
 URHO3D_API const Vector<String>& GetArguments();
 /// Read input from the console window. Return empty if no input.
 URHO3D_API String GetConsoleInput();
-/// Return the runtime platform identifier.
+/// Return the runtime platform identifier, or (?) if not identified.
 URHO3D_API String GetPlatform();
 /// Return the number of physical CPU cores.
 URHO3D_API unsigned GetNumPhysicalCPUs();
@@ -69,12 +69,12 @@ URHO3D_API unsigned GetNumLogicalCPUs();
 URHO3D_API void SetMiniDumpDir(const String& pathName);
 /// Return minidump write location.
 URHO3D_API String GetMiniDumpDir();
-/// Return the total amount of useable memory. 
+/// Return the total amount of usable memory in bytes.
 URHO3D_API unsigned long long GetTotalMemory(); 
-/// Return the name of the currently logged in user. 
+/// Return the name of the currently logged in user, or (?) if not identified.
 URHO3D_API String GetLoginName(); 
 /// Return the name of the running machine. 
 URHO3D_API String GetHostName();
-/// Return the version of the currently running OS. 
+/// Return the version of the currently running OS, or (?) if not identified.
 URHO3D_API String GetOSVersion(); 
 }

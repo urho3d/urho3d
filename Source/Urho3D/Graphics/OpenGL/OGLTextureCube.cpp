@@ -85,7 +85,7 @@ void TextureCube::Release()
             for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
             {
                 if (graphics_->GetTexture(i) == this)
-                    graphics_->SetTexture(i, 0);
+                    graphics_->SetTexture(i, nullptr);
             }
 
             glDeleteTextures(1, &object_.name_);
@@ -171,7 +171,7 @@ bool TextureCube::SetData(CubeMapFace face, unsigned level, int x, int y, int wi
                 GetDataSize(width, height), data);
     }
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 }
 
@@ -409,7 +409,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
     else
         glGetCompressedTexImage((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face), level, dest);
 
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
     return true;
 #else
     // Special case on GLES: if the texture is a rendertarget, can make it current and use glReadPixels()
@@ -472,7 +472,7 @@ bool TextureCube::Create()
         glGetError();
         for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width_, height_, 0, externalFormat, dataType, 0);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width_, height_, 0, externalFormat, dataType, nullptr);
             if (glGetError())
                 success = false;
         }
@@ -507,7 +507,7 @@ bool TextureCube::Create()
 
     // Set initial parameters, then unbind the texture
     UpdateParameters();
-    graphics_->SetTexture(0, 0);
+    graphics_->SetTexture(0, nullptr);
 
     return success;
 }

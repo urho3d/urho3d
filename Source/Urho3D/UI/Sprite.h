@@ -37,22 +37,22 @@ public:
     /// Construct.
     Sprite(Context* context);
     /// Destruct.
-    virtual ~Sprite();
+    virtual ~Sprite() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Return whether is visible and inside a scissor rectangle and should be rendered.
-    virtual bool IsWithinScissor(const IntRect& currentScissor);
+    virtual bool IsWithinScissor(const IntRect& currentScissor) override;
     /// Update and return screen position.
-    virtual const IntVector2& GetScreenPosition() const;
+    virtual const IntVector2& GetScreenPosition() const override;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor);
+    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to position change.
-    virtual void OnPositionSet(const IntVector2& newPosition);
+    virtual void OnPositionSet(const IntVector2& newPosition) override;
     /// Convert screen coordinates to element coordinates.
-    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition);
+    virtual IntVector2 ScreenToElement(const IntVector2& screenPosition) override;
     /// Convert element coordinates to screen coordinates.
-    virtual IntVector2 ElementToScreen(const IntVector2& position);
+    virtual IntVector2 ElementToScreen(const IntVector2& position) override;
 
     /// Set floating point position.
     void SetPosition(const Vector2& position);

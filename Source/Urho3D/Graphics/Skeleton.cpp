@@ -154,7 +154,7 @@ Bone* Skeleton::GetRootBone()
 
 Bone* Skeleton::GetBone(unsigned index)
 {
-    return index < bones_.Size() ? &bones_[index] : (Bone*)0;
+    return index < bones_.Size() ? &bones_[index] : nullptr;
 }
 
 Bone* Skeleton::GetBone(const String& name)
@@ -175,7 +175,7 @@ Bone* Skeleton::GetBone(StringHash nameHash)
             return &(*i);
     }
 
-    return 0;
+    return nullptr;
 }
 
 }

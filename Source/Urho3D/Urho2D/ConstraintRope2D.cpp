@@ -98,12 +98,12 @@ void ConstraintRope2D::SetMaxLength(float maxLength)
 b2JointDef* ConstraintRope2D::GetJointDef()
 {
     if (!ownerBody_ || !otherBody_)
-        return 0;
+        return nullptr;
 
     b2Body* bodyA = ownerBody_->GetBody();
     b2Body* bodyB = otherBody_->GetBody();
     if (!bodyA || !bodyB)
-        return 0;
+        return nullptr;
 
     InitializeJointDef(&jointDef_);
     jointDef_.localAnchorA = ToB2Vec2(ownerBodyAnchor_);

@@ -19,6 +19,7 @@ class Vector3
     Vector3 operator * (const Vector3& rhs) const;
     Vector3 operator / (float rhs) const;
     Vector3 operator / (const Vector3& rhs) const;
+
     void Normalize();
     float Length() const;
     float LengthSquared() const;
@@ -62,7 +63,9 @@ class IntVector3
     IntVector3 operator - () const;
     IntVector3 operator - (const IntVector3& rhs) const;
     IntVector3 operator * (int rhs) const;
+    IntVector3 operator * (const IntVector3& rhs) const;
     IntVector3 operator / (int rhs) const;
+    IntVector3 operator / (const IntVector3& rhs) const;
 
     String ToString() const;
     unsigned ToHash() const;

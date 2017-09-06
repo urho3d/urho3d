@@ -44,18 +44,18 @@ public:
     /// Construct and open in either server or client mode.
     NamedPipe(Context* context, const String& pipeName, bool isServer);
     /// Destruct and close.
-    virtual ~NamedPipe();
+    virtual ~NamedPipe() override;
 
     /// Read bytes from the pipe without blocking if there is less data available. Return number of bytes actually read.
-    virtual unsigned Read(void* dest, unsigned size);
+    virtual unsigned Read(void* dest, unsigned size) override;
     /// Set position. No-op for pipes.
-    virtual unsigned Seek(unsigned position);
+    virtual unsigned Seek(unsigned position) override;
     /// Write bytes to the pipe. Return number of bytes actually written.
-    virtual unsigned Write(const void* data, unsigned size);
+    virtual unsigned Write(const void* data, unsigned size) override;
     /// Return whether pipe has no data available.
-    virtual bool IsEof() const;
+    virtual bool IsEof() const override;
     /// Return the pipe name.
-    virtual const String& GetName() const { return pipeName_; }
+    virtual const String& GetName() const override { return pipeName_; }
 
     /// Open the pipe in either server or client mode. If already open, the existing pipe is closed. For a client end to open successfully the server end must already to be open. Return true if successful.
     bool Open(const String& pipeName, bool isServer);

@@ -50,7 +50,7 @@ void HashBase::ResetPtrs()
     unsigned numBuckets = NumBuckets();
     HashNodeBase** ptrs = Ptrs();
     for (unsigned i = 0; i < numBuckets; ++i)
-        ptrs[i] = 0;
+        ptrs[i] = nullptr;
 }
 
 }

@@ -45,14 +45,14 @@ public:
     /// Copy construct.
     AttributeAnimationInfo(const AttributeAnimationInfo& other);
     /// Destruct.
-    ~AttributeAnimationInfo();
+    virtual ~AttributeAnimationInfo() override;
 
     /// Return attribute information.
     const AttributeInfo& GetAttributeInfo() const { return attributeInfo_; }
 
 protected:
     /// Apply new animation value to the target object. Called by Update().
-    virtual void ApplyValue(const Variant& newValue);
+    virtual void ApplyValue(const Variant& newValue) override;
 
 private:
     /// Attribute information.
@@ -68,18 +68,18 @@ public:
     /// Construct.
     Animatable(Context* context);
     /// Destruct.
-    virtual ~Animatable();
+    virtual ~Animatable() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load from XML data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false);
+    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const;
+    virtual bool SaveXML(XMLElement& dest) const override;
     /// Load from JSON data. When setInstanceDefault is set to true, after setting the attribute value, store the value as instance's default value. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false);
+    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const;
+    virtual bool SaveJSON(JSONValue& dest) const override;
 
     /// Set automatic update of animation, default true.
     void SetAnimationEnabled(bool enable);

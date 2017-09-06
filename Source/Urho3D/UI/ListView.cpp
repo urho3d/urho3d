@@ -41,7 +41,7 @@ static const char* highlightModes[] =
     "Never",
     "Focus",
     "Always",
-    0
+    nullptr
 };
 
 static const StringHash expandedHash("Expanded");

@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintPrismatic2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintPrismatic2D();
+    virtual ~ConstraintPrismatic2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -83,7 +83,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef();
+    virtual b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2PrismaticJointDef jointDef_;

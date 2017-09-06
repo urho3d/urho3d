@@ -537,7 +537,7 @@ void Urho2DConstraints::HandleMouseButtonUp(StringHash eventType, VariantMap& ev
         staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
 
         pickedNode->RemoveComponent<ConstraintMouse2D>(); // Remove temporary constraint
-        pickedNode = NULL;
+        pickedNode = nullptr;
     }
     UnsubscribeFromEvent(E_MOUSEMOVE);
     UnsubscribeFromEvent(E_MOUSEBUTTONUP);
@@ -607,7 +607,7 @@ void Urho2DConstraints::HandleTouchEnd3(StringHash eventType, VariantMap& eventD
         staticSprite->SetColor(Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
 
         pickedNode->RemoveComponent<ConstraintMouse2D>(); // Remove temporary constraint
-        pickedNode = NULL;
+        pickedNode = nullptr;
     }
     UnsubscribeFromEvent(E_TOUCHMOVE);
     UnsubscribeFromEvent(E_TOUCHEND);

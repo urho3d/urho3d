@@ -75,7 +75,7 @@ bool CompareHeaderFiles(const HeaderFile& lhs, const HeaderFile& rhs)
 void ExtractPropertyInfo(const String& functionName, const String& declaration, Vector<PropertyInfo>& propertyInfos)
 {
     String propertyName = functionName.Substring(4);
-    PropertyInfo* info = 0;
+    PropertyInfo* info = nullptr;
     for (unsigned k = 0; k < propertyInfos.Size(); ++k)
     {
         if (propertyInfos[k].name_ == propertyName)

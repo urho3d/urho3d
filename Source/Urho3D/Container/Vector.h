@@ -27,9 +27,7 @@
 #include <cassert>
 #include <cstring>
 #include <new>
-#if URHO3D_CXX11
 #include <initializer_list>
-#endif
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -43,9 +41,9 @@ namespace Urho3D
 template <class T> class Vector : public VectorBase
 {
 public:
-    typedef T ValueType;
-    typedef RandomAccessIterator<T> Iterator;
-    typedef RandomAccessConstIterator<T> ConstIterator;
+    using ValueType = T;
+    using Iterator = RandomAccessIterator<T>;
+    using ConstIterator = RandomAccessConstIterator<T>;
 
     /// Construct empty.
     Vector()
@@ -77,7 +75,6 @@ public:
     {
         *this = vector;
     }
-#if URHO3D_CXX11
     /// Aggregate initialization constructor.
     Vector(const std::initializer_list<T>& list) : Vector()
     {
@@ -86,7 +83,6 @@ public:
             Push(*it);
         }
     }
-#endif
     /// Destruct.
     ~Vector()
     {
@@ -581,9 +577,9 @@ private:
 template <class T> class PODVector : public VectorBase
 {
 public:
-    typedef T ValueType;
-    typedef RandomAccessIterator<T> Iterator;
-    typedef RandomAccessConstIterator<T> ConstIterator;
+    using ValueType = T;
+    using Iterator = RandomAccessIterator<T>;
+    using ConstIterator = RandomAccessConstIterator<T>;
 
     /// Construct empty.
     PODVector()
@@ -616,7 +612,6 @@ public:
     {
         *this = vector;
     }
-#if URHO3D_CXX11
     /// Aggregate initialization constructor.
     PODVector(const std::initializer_list<T>& list) : PODVector()
     {
@@ -625,7 +620,6 @@ public:
             Push(*it);
         }
     }
-#endif
     /// Destruct.
     ~PODVector()
     {
@@ -958,7 +952,7 @@ public:
 
         if (newCapacity != capacity_)
         {
-            unsigned char* newBuffer = 0;
+            unsigned char* newBuffer = nullptr;
             capacity_ = newCapacity;
 
             if (capacity_)

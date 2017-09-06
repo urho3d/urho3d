@@ -38,14 +38,14 @@ public:
     /// Construct.
     Zone(Context* context);
     /// Destruct.
-    virtual ~Zone();
+    virtual ~Zone() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest);
+    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set local-space bounding box. Will be used as an oriented bounding box to test whether objects or the camera are inside.
     void SetBoundingBox(const BoundingBox& box);
@@ -122,11 +122,11 @@ public:
 
 protected:
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
     /// Handle removal from octree.
-    virtual void OnRemoveFromOctree();
+    virtual void OnRemoveFromOctree() override;
     /// Recalculate the ambient gradient colors from neighbor zones. Not safe to call from worker threads due to octree query.
     void UpdateAmbientGradient();
     /// Clear zone reference from drawables inside the bounding box.

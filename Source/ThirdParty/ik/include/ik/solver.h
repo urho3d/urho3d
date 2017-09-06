@@ -2,33 +2,31 @@
 #define IK_SOLVER_H
 
 #include "ik/config.h"
+#include "ik/chain_tree.h"
 #include "ik/ordered_vector.h"
-#include "ik/vec3.h"
 #include "ik/quat.h"
+#include "ik/vec3.h"
 
 C_HEADER_BEGIN
 
-struct ik_effector_t;
-struct ik_node_t;
-struct ik_solver_t;
+typedef void (*ik_solver_destruct_func)(ik_solver_t*);
+typedef int (*ik_solver_post_chain_build_func)(ik_solver_t*);
+typedef int (*ik_solver_solve_func)(ik_solver_t*);
 
-typedef void (*ik_solver_destroy_func)(struct ik_solver_t*);
-typedef int (*ik_solver_rebuild_data_func)(struct ik_solver_t*);
-typedef void (*ik_solver_recalculate_segment_lengths_func)(struct ik_solver_t*);
-typedef int (*ik_solver_solve_func)(struct ik_solver_t*);
+typedef void (*ik_solver_iterate_node_cb_func)(ik_node_t*);
 
-typedef void (*ik_solver_apply_constraint_cb_func)(struct ik_node_t*);
-typedef void (*ik_solver_apply_result_cb_func)(struct ik_node_t*);
-
-enum solver_algorithm_e
+typedef enum solver_algorithm_e
 {
-    SOLVER_FABRIK
+    SOLVER_ONE_BONE,
+    SOLVER_TWO_BONE,
+    SOLVER_FABRIK,
+    SOLVER_MSD
     /* TODO Not implemented
     SOLVER_JACOBIAN_INVERSE,
     SOLVER_JACOBIAN_TRANSPOSE */
-};
+} solver_algorithm_e;
 
-enum solver_flags_e
+typedef enum solver_flags_e
 {
     /*!
      * @brief Causes the root node in the tree to be excluded from the list of
@@ -37,59 +35,29 @@ enum solver_flags_e
      */
     SOLVER_EXCLUDE_ROOT                   = 0x01,
 
-    /*!
-     * @brief This is a post-processing step which can optionally be enabled.
-     * Causes the correct global angles to be calculated for each node in the
-     * solved tree. The results can be retrieved from node->solved_rotation.
-     * This should definitely be enabled for skinned models.
-     */
-    SOLVER_CALCULATE_FINAL_ROTATIONS      = 0x02,
+    SOLVER_ENABLE_CONSTRAINTS             = 0x02,
 
-    /* (not yet implemented)
-     * Calculate node angles for each iteration, which may be useful in the
-     * solver->apply_constraint callback function.
-     */
-    SOLVER_CALCULATE_CONSTRAINT_ROTATIONS = 0x04,
-
-    SOLVER_CALCULATE_TARGET_ROTATIONS     = 0x08,
-
-    /*!
-     * @brief The solver will not reset the solved data to its initial state
-     * before solving. The result is a more "continuous" or "ongoing" solution
-     * to the tree, because it will use the previous solved tree as a bases for
-     * solving the next tree.
-     */
-    SOLVER_SKIP_RESET                     = 0x10,
-
-    /*!
-     * @brief The solver will not call the solver->apply_result callback
-     * function after solving. The results are still calculated. This is useful
-     * if you wish to delay the point at which the solved data is applied. You
-     * can later call ik_solver_iterate_tree() to initiate calls to the
-     * callback function.
-     */
-    SOLVER_SKIP_APPLY                     = 0x20
-};
+    SOLVER_CALCULATE_TARGET_ROTATIONS     = 0x04
+} solver_flags_e;
 
 /*!
- * @brief This is a base struct for all solvers.
+ * @brief This is a base for all solvers.
  */
-#define SOLVER_DATA_HEAD                                             \
-    ik_solver_apply_constraint_cb_func apply_constraint;             \
-    ik_solver_apply_result_cb_func     apply_result;                 \
-                                                                     \
-    int32_t                            max_iterations;               \
-    float                              tolerance;                    \
-    uint8_t                            flags;                        \
-                                                                     \
-    /* Derived structure callbacks */                                \
-    ik_solver_destroy_func             destroy;                      \
-    ik_solver_rebuild_data_func        rebuild_data;                 \
-    ik_solver_recalculate_segment_lengths_func recalculate_segment_lengths; \
-    ik_solver_solve_func               solve;                        \
-                                                                     \
-    struct ordered_vector_t            effector_nodes_list;          \
-    struct ik_node_t*                  tree;
+#define SOLVER_DATA_HEAD                                              \
+    int32_t                             max_iterations;               \
+    float                               tolerance;                    \
+    uint8_t                             flags;                        \
+                                                                      \
+    /* Derived structure callbacks */                                 \
+    ik_solver_destruct_func             destruct;                     \
+    ik_solver_post_chain_build_func     post_chain_build;             \
+    ik_solver_solve_func                solve;                        \
+                                                                      \
+    ordered_vector_t                    effector_nodes_list;          \
+    ik_node_t*                          tree;                         \
+    /* list of ik_chain_tree_t objects (allocated in-place) */        \
+    chain_tree_t                        chain_tree;
+
 struct ik_solver_t
 {
     SOLVER_DATA_HEAD
@@ -138,15 +106,15 @@ struct ik_solver_t
  * @param[in] algorithm The algorithm to use. Currently, only FABRIK is
  * supported.
  */
-IK_PUBLIC_API struct ik_solver_t*
-ik_solver_create(enum solver_algorithm_e algorithm);
+IK_PUBLIC_API ik_solver_t*
+ik_solver_create(solver_algorithm_e algorithm);
 
 /*!
  * @brief Destroys the solver and all nodes/effectors that are part of the
  * solver. Any pointers to tree nodes are invalid after this function returns.
  */
 IK_PUBLIC_API void
-ik_solver_destroy(struct ik_solver_t* solver);
+ik_solver_destroy(ik_solver_t* solver);
 
 /*!
  * @brief Sets the tree to solve. The solver takes ownership of the tree, so
@@ -155,7 +123,7 @@ ik_solver_destroy(struct ik_solver_t* solver);
  * solver already has a tree, then said tree will be destroyed.
  */
 IK_PUBLIC_API void
-ik_solver_set_tree(struct ik_solver_t* solver, struct ik_node_t* root);
+ik_solver_set_tree(ik_solver_t* solver, ik_node_t* root);
 
 /*!
  * @brief The solver releases any references to a previously set tree and
@@ -163,15 +131,15 @@ ik_solver_set_tree(struct ik_solver_t* solver, struct ik_node_t* root);
  * tree (e.g. solve or rebuild) will have no effect until a new tree is set.
  * @return If the solver has no tree then NULL is returned.
  */
-IK_PUBLIC_API struct ik_node_t*
-ik_solver_unlink_tree(struct ik_solver_t* solver);
+IK_PUBLIC_API ik_node_t*
+ik_solver_unlink_tree(ik_solver_t* solver);
 
 /*!
  * @brief The solver releases any references to a previously set tree and
  * destroys it.
  */
 IK_PUBLIC_API void
-ik_solver_destroy_tree(struct ik_solver_t* solver);
+ik_solver_destroy_tree(ik_solver_t* solver);
 
 /*!
  * @brief Causes the set tree to be processed into more optimal data structures
@@ -179,9 +147,13 @@ ik_solver_destroy_tree(struct ik_solver_t* solver);
  * @note Needs to be called whenever the tree changes in any way. I.e. if you
  * remove nodes or add nodes, or if you remove effectors or add effectors,
  * you must call this again before calling the solver.
+ * @return Returns non-zero if any of the chain trees are invalid for any
+ * reason. If this happens, check the log for error messages.
+ * @warning If this functions fails, the internal structures are in an
+ * undefined state. You cannot solve the tree in this state.
  */
 IK_PUBLIC_API int
-ik_solver_rebuild_data(struct ik_solver_t* solver);
+ik_solver_rebuild_chain_trees(ik_solver_t* solver);
 
 /*!
  * @brief Unusual, but if you have a tree with translational motions such that
@@ -191,7 +163,7 @@ ik_solver_rebuild_data(struct ik_solver_t* solver);
  * @note This function gets called by ik_solver_rebuild_data().
  */
 IK_PUBLIC_API void
-ik_solver_recalculate_segment_lengths(struct ik_solver_t* solver);
+ik_solver_recalculate_segment_lengths(ik_solver_t* solver);
 
 /*!
  * @brief Solves the IK problem. The node solutions will be provided via a
@@ -199,27 +171,33 @@ ik_solver_recalculate_segment_lengths(struct ik_solver_t* solver);
  * solver->apply_result.
  */
 IK_PUBLIC_API int
-ik_solver_solve(struct ik_solver_t* solver);
+ik_solver_solve(ik_solver_t* solver);
+
+IK_PUBLIC_API void
+ik_solver_calculate_joint_rotations(ik_solver_t* solver);
 
 /*!
- * @brief Iterates all nodes in the internal tree, breadth first, and calls the
- * solver->apply_result callback function for every node.
- *
- * This gets called automatically for you by ik_solver_solve() if
- * SOLVER_SKIP_APPLY is **not** set. This function could also be used to reset
- * your own scene graph to its initial state by reading the node->position and
- * node->rotation properties.
+ * @brief Iterates all nodes in the internal tree, breadth first, and passes
+ * each node to the specified callback function.
  */
 IK_PUBLIC_API void
-ik_solver_iterate_tree(struct ik_solver_t* solver);
+ik_solver_iterate_tree(ik_solver_t* solver,
+                       ik_solver_iterate_node_cb_func callback);
+
+/*!
+ * @brief Iterates just the nodes that are being affected by the solver. Useful
+ * for a more optimized write-back of the solution data.
+ */
+IK_PUBLIC_API void
+ik_solver_iterate_chain_tree(ik_solver_t* solver,
+                             ik_solver_iterate_node_cb_func callback);
 
 /*!
  * @brief Sets the solved positions and rotations equal to the original
- * positions and rotations for every node in the tree. The solver will call
- * this automatically if SOLVER_SKIP_RESET is **not** set.
+ * positions and rotations for every node in the tree.
  */
 IK_PUBLIC_API void
-ik_solver_reset_solved_data(struct ik_solver_t* solver);
+ik_solver_reset_to_original_pose(ik_solver_t* solver);
 
 C_HEADER_END
 

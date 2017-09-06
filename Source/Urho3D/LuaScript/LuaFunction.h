@@ -25,7 +25,7 @@
 #include "../Container/RefCounted.h"
 
 struct lua_State;
-typedef int (*lua_CFunction) (lua_State *L);
+using lua_CFunction = int (*) (lua_State *L);
 
 namespace Urho3D
 {
@@ -43,12 +43,12 @@ public:
     /// Construct from a C function.
     LuaFunction(lua_State* L, lua_CFunction func);
     /// Destruct.
-    ~LuaFunction();
+    virtual ~LuaFunction() override;
 
     /// Check that function is valid.
     bool IsValid() const;
     /// Begin function call. When a script object is given then pass it as self argument (first parameter) to the function call.
-    bool BeginCall(const LuaScriptInstance* instance = 0);
+    bool BeginCall(const LuaScriptInstance* instance = nullptr);
     /// End call and actually execute the function. The return values, if any, are still left in the stack when this call returns.
     bool EndCall(int numReturns = 0);
     /// Push int to stack.
@@ -89,7 +89,7 @@ public:
     }
 
     /// Push variant to stack.
-    void PushVariant(const Variant& variant, const char* asType = 0);
+    void PushVariant(const Variant& variant, const char* asType = nullptr);
     /// Push Lua table to stack. When the specified table is not found then a nil is pushed instead.
     void PushLuaTable(const char* tableName);
     /// Push Lua table to stack. When the specified table is not found then a nil is pushed instead.

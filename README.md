@@ -34,6 +34,8 @@ Urho3D development, contributions and bugfixes by:
 - Pete Chown
 - Christian Clavet
 - Sebastian Delatorre (primitivewaste)
+- Stanislav Demyanovich
+- Rainer Deyke
 - Josh Engebretson
 - Simon Flores
 - Manuel Freiberger
@@ -64,6 +66,7 @@ Urho3D development, contributions and bugfixes by:
 - Nathanial Lydick
 - Xavier Maupeu
 - Iain Merrick
+- Justin Miller
 - Jonne Nauha
 - Huy Nguyen
 - Paul Noome
@@ -190,13 +193,14 @@ Urho3D uses the following third-party libraries:
 - rapidjson 1.1.0 (https://github.com/miloyip/rapidjson)
 - Recast/Detour (https://github.com/memononen/recastnavigation)
 - SDL 2.0.5 (https://www.libsdl.org)
-- SQLite 3.18.0 (https://www.sqlite.org)
+- SQLite 3.20.1 (https://www.sqlite.org)
 - StanHull (https://codesuppository.blogspot.com/2006/03/john-ratcliffs-code-suppository-blog.html)
 - stb_image 2.12 (https://nothings.org)
 - stb_image_write 1.02 (https://nothings.org)
 - stb_rect_pack 0.08 (https://nothings.org)
 - stb_vorbis 1.09 (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
+- WebP (https://chromium.googlesource.com/webm/libwebp)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.

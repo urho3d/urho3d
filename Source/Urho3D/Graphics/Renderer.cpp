@@ -268,8 +268,8 @@ inline PODVector<VertexElement> CreateInstancingBufferElements(unsigned numExtra
 Renderer::Renderer(Context* context) :
     Object(context),
     defaultZone_(new Zone(context)),
-    shadowMapFilterInstance_(0),
-    shadowMapFilter_(0),
+    shadowMapFilterInstance_(nullptr),
+    shadowMapFilter_(nullptr),
     textureAnisotropy_(4),
     textureFilterMode_(FILTER_TRILINEAR),
     textureQuality_(QUALITY_HIGH),
@@ -440,7 +440,7 @@ void Renderer::SetShadowQuality(ShadowQuality quality)
         if (quality == SHADOWQUALITY_BLUR_VSM)
             SetShadowMapFilter(this, static_cast<ShadowMapFilter>(&Renderer::BlurShadowMap));
         else
-            SetShadowMapFilter(0, 0);
+            SetShadowMapFilter(nullptr, nullptr);
 
         ResetShadowMaps();
     }
@@ -571,8 +571,25 @@ void Renderer::ApplyShadowMapFilter(View* view, Texture2D* shadowMap, float blur
 
 Viewport* Renderer::GetViewport(unsigned index) const
 {
-    return index < viewports_.Size() ? viewports_[index] : (Viewport*)0;
+    return index < viewports_.Size() ? viewports_[index] : nullptr;
 }
+
+Viewport* Renderer::GetViewportForScene(Scene* scene, unsigned index) const
+{
+    for (unsigned i = 0; i < viewports_.Size(); ++i)
+    {
+        Viewport* viewport = viewports_[i];
+        if (viewport && viewport->GetScene() == scene)
+        {
+            if (index == 0)
+                return viewport;
+            else
+                --index;
+        }
+    }
+    return nullptr;
+}
+
 
 RenderPath* Renderer::GetDefaultRenderPath() const
 {
@@ -677,7 +694,7 @@ void Renderer::Update(float timeStep)
     // Set up the frameinfo structure for this frame
     frame_.frameNumber_ = GetSubsystem<Time>()->GetFrameNumber();
     frame_.timeStep_ = timeStep;
-    frame_.camera_ = 0;
+    frame_.camera_ = nullptr;
     numShadowCameras_ = 0;
     numOcclusionBuffers_ = 0;
     updatedOctrees_.Clear();
@@ -689,7 +706,7 @@ void Renderer::Update(float timeStep)
     // Queue update of the main viewports. Use reverse order, as rendering order is also reverse
     // to render auxiliary views before dependent main views
     for (unsigned i = viewports_.Size() - 1; i < viewports_.Size(); --i)
-        QueueViewport(0, viewports_[i]);
+        QueueViewport(nullptr, viewports_[i]);
 
     // Update main viewports. This may queue further views
     unsigned numMainViewports = queuedViewports_.Size();
@@ -843,7 +860,7 @@ Geometry* Renderer::GetLightGeometry(Light* light)
         return pointLightGeometry_;
     }
 
-    return 0;
+    return nullptr;
 }
 
 Geometry* Renderer::GetQuadGeometry()
@@ -923,7 +940,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
                 return shadowMaps_[searchKey][allocated];
             }
             else if ((int)allocated >= maxShadowMaps_)
-                return 0;
+                return nullptr;
         }
     }
 
@@ -953,7 +970,7 @@ Texture2D* Renderer::GetShadowMap(Light* light, Camera* camera, unsigned viewWid
     }
 
     if (!shadowMapFormat)
-        return 0;
+        return nullptr;
 
     SharedPtr<Texture2D> newShadowMap(new Texture2D(context_));
     int retries = 3;
@@ -1047,8 +1064,9 @@ Texture* Renderer::GetScreenBuffer(int width, int height, unsigned format, int m
         screenBufferAllocations_[searchKey] = 0;
 
     // Reuse depth-stencil buffers whenever the size matches, instead of allocating new
+    // Unless persistency specified
     unsigned allocations = screenBufferAllocations_[searchKey];
-    if (!depthStencil)
+    if (!depthStencil || persistentKey)
         ++screenBufferAllocations_[searchKey];
 
     if (allocations >= screenBuffers_[searchKey].Size())
@@ -1109,7 +1127,7 @@ RenderSurface* Renderer::GetDepthStencil(int width, int height, int multiSample,
     // (when using OpenGL Graphics will allocate right size surfaces on demand to emulate Direct3D9)
     if (width == graphics_->GetWidth() && height == graphics_->GetHeight() && multiSample == 1 &&
         graphics_->GetMultiSample() == multiSample)
-        return 0;
+        return nullptr;
     else
     {
         return static_cast<Texture2D*>(GetScreenBuffer(width, height, Graphics::GetDepthStencilFormat(), multiSample, autoResolve,
@@ -1165,7 +1183,7 @@ void Renderer::StorePreparedView(View* view, Camera* camera)
 View* Renderer::GetPreparedView(Camera* camera)
 {
     HashMap<Camera*, WeakPtr<View> >::Iterator i = preparedViews_.Find(camera);
-    return i != preparedViews_.End() ? i->second_ : (View*)0;
+    return i != preparedViews_.End() ? i->second_ : nullptr;
 }
 
 View* Renderer::GetActualView(View* view)
@@ -1210,8 +1228,8 @@ void Renderer::SetBatchShaders(Batch& batch, Technique* tech, bool allowShadows,
             if (!lightQueue)
             {
                 // Do not log error, as it would result in a lot of spam
-                batch.vertexShader_ = 0;
-                batch.pixelShader_ = 0;
+                batch.vertexShader_ = nullptr;
+                batch.pixelShader_ = nullptr;
                 return;
             }
 
@@ -1385,17 +1403,6 @@ bool Renderer::ResizeInstancingBuffer(unsigned numInstances)
     URHO3D_LOGDEBUG("Resized instancing buffer to " + String(newSize));
     return true;
 }
-
-void Renderer::SaveScreenBufferAllocations()
-{
-    savedScreenBufferAllocations_ = screenBufferAllocations_;
-}
-
-void Renderer::RestoreScreenBufferAllocations()
-{
-    screenBufferAllocations_ = savedScreenBufferAllocations_;
-}
-
 
 void Renderer::OptimizeLightByScissor(Light* light, Camera* camera)
 {

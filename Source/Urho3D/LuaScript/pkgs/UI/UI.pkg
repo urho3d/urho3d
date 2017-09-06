@@ -31,7 +31,8 @@ class UI : public Object
     void SetUseMutableGlyphs(bool enable);
     void SetForceAutoHint(bool enable);
     void SetFontHintLevel(FontHintLevel level);
-    void SetSubpixelGlyphPositions(bool enable);
+    void SetFontSubpixelThreshold(float threshold);
+    void SetFontOversampling(int limit);
     void SetScale(float scale);
     void SetWidth(float width);
     void SetHeight(float height);
@@ -60,7 +61,8 @@ class UI : public Object
     bool GetUseMutableGlyphs() const;
     bool GetForceAutoHint() const;
     FontHintLevel GetFontHintLevel() const;
-    bool GetSubpixelGlyphPositions() const;
+    float GetFontSubpixelThreshold() const;
+    int GetFontOversampling() const;
     bool HasModalElement() const;
     bool IsDragging() const;
     float GetScale() const;
@@ -85,7 +87,8 @@ class UI : public Object
     tolua_property__get_set bool useMutableGlyphs;
     tolua_property__get_set bool forceAutoHint;
     tolua_property__get_set FontHintLevel fontHintLevel;
-    tolua_property__get_set bool subpixelGlyphPositions;
+    tolua_property__get_set float fontSubpixelThreshold;
+    tolua_property__get_set int fontOversampling;
     tolua_readonly tolua_property__has_set bool modalElement;
     tolua_property__get_set float scale;
     tolua_property__get_set IntVector2& customSize;

@@ -21,7 +21,7 @@ void VS(float4 iPos : POSITION,
     #if defined(LIGHTMAP) || defined(AO)
         float2 iTexCoord2 : TEXCOORD1,
     #endif
-    #if (defined(NORMALMAP)|| defined(IBL) || defined(TRAILFACECAM) || defined(TRAILBONE)) && !defined(BILLBOARD) && !defined(DIRBILLBOARD)
+    #if (defined(NORMALMAP) || defined(TRAILFACECAM) || defined(TRAILBONE)) && !defined(BILLBOARD) && !defined(DIRBILLBOARD)
         float4 iTangent : TANGENT,
     #endif
     #ifdef SKINNED
@@ -34,11 +34,11 @@ void VS(float4 iPos : POSITION,
     #if defined(BILLBOARD) || defined(DIRBILLBOARD)
         float2 iSize : TEXCOORD1,
     #endif
-    #if defined(NORMALMAP) || defined(IBL)
+    #ifndef NORMALMAP
+        out float2 oTexCoord : TEXCOORD0,
+    #else
         out float4 oTexCoord : TEXCOORD0,
         out float4 oTangent : TEXCOORD3,
-    #else
-        out float2 oTexCoord : TEXCOORD0,
     #endif
     out float3 oNormal : TEXCOORD1,
     out float4 oWorldPos : TEXCOORD2,
@@ -89,7 +89,7 @@ void VS(float4 iPos : POSITION,
         oColor = iColor;
     #endif
 
-    #if defined(NORMALMAP) || defined(IBL)
+    #if defined(NORMALMAP)
         const float4 tangent = GetWorldTangent(modelMatrix);
         const float3 bitangent = cross(tangent.xyz, oNormal) * tangent.w;
         oTexCoord = float4(GetTexCoord(iTexCoord), bitangent.xy);
@@ -140,11 +140,11 @@ void VS(float4 iPos : POSITION,
 }
 
 void PS(
-    #if defined(NORMALMAP) || defined(IBL)
+    #ifndef NORMALMAP
+        float2 iTexCoord : TEXCOORD0,
+    #else
         float4 iTexCoord : TEXCOORD0,
         float4 iTangent : TEXCOORD3,
-    #else
-        float2 iTexCoord : TEXCOORD0,
     #endif
     float3 iNormal : TEXCOORD1,
     float4 iWorldPos : TEXCOORD2,
@@ -226,7 +226,7 @@ void PS(
     diffColor.rgb = diffColor.rgb - diffColor.rgb * metalness; // Modulate down the diffuse
 
     // Get normal
-    #if defined(NORMALMAP) || defined(IBL)
+    #if defined(NORMALMAP)
         const float3 tangent = normalize(iTangent.xyz);
         const float3 bitangent = normalize(float3(iTexCoord.zw, iTangent.w));
         const float3x3 tbn = float3x3(tangent, bitangent, iNormal);
@@ -322,7 +322,7 @@ void PS(
         float3 cubeColor = iVertexLight.rgb;
 
         #ifdef IBL
-            const float3 iblColor = ImageBasedLighting(reflection, tangent, bitangent, normal, toCamera, diffColor, specColor, roughness, cubeColor);
+            const float3 iblColor = ImageBasedLighting(reflection, normal, toCamera, diffColor, specColor, roughness, cubeColor);
             const float gamma = 0;
             finalColor += iblColor;
         #endif

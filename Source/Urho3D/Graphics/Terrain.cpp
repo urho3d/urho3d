@@ -172,14 +172,14 @@ void Terrain::ApplyAttributes()
     if (neighborsDirty_)
     {
         Scene* scene = GetScene();
-        Node* north = scene ? scene->GetNode(northID_) : (Node*)0;
-        Node* south = scene ? scene->GetNode(southID_) : (Node*)0;
-        Node* west = scene ? scene->GetNode(westID_) : (Node*)0;
-        Node* east = scene ? scene->GetNode(eastID_) : (Node*)0;
-        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : (Terrain*)0;
-        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : (Terrain*)0;
+        Node* north = scene ? scene->GetNode(northID_) : nullptr;
+        Node* south = scene ? scene->GetNode(southID_) : nullptr;
+        Node* west = scene ? scene->GetNode(westID_) : nullptr;
+        Node* east = scene ? scene->GetNode(eastID_) : nullptr;
+        Terrain* northTerrain = north ? north->GetComponent<Terrain>() : nullptr;
+        Terrain* southTerrain = south ? south->GetComponent<Terrain>() : nullptr;
+        Terrain* westTerrain = west ? west->GetComponent<Terrain>() : nullptr;
+        Terrain* eastTerrain = east ? east->GetComponent<Terrain>() : nullptr;
         SetNeighbors(northTerrain, southTerrain, westTerrain, eastTerrain);
         neighborsDirty_ = false;
     }
@@ -543,13 +543,13 @@ Material* Terrain::GetMaterial() const
 
 TerrainPatch* Terrain::GetPatch(unsigned index) const
 {
-    return index < patches_.Size() ? patches_[index] : (TerrainPatch*)0;
+    return index < patches_.Size() ? patches_[index] : nullptr;
 }
 
 TerrainPatch* Terrain::GetPatch(int x, int z) const
 {
     if (x < 0 || x >= numPatches_.x_ || z < 0 || z >= numPatches_.y_)
-        return 0;
+        return nullptr;
     else
         return GetPatch((unsigned)(z * numPatches_.x_ + x));
 }
@@ -647,6 +647,21 @@ IntVector2 Terrain::WorldToHeightMap(const Vector3& worldPosition) const
     zPos = Clamp(zPos, 0, numVertices_.y_ - 1);
 
     return IntVector2(xPos, numVertices_.y_ - 1 - zPos);
+}
+
+Vector3 Terrain::HeightMapToWorld(const IntVector2& pixelPosition) const
+{
+    if (!node_)
+        return Vector3::ZERO;
+
+    IntVector2 pos(pixelPosition.x_, numVertices_.y_ - 1 - pixelPosition.y_);
+    float xPos = (float)(pos.x_ * spacing_.x_ + patchWorldOrigin_.x_);
+    float zPos = (float)(pos.y_ * spacing_.z_ + patchWorldOrigin_.y_);
+    Vector3 lPos(xPos, 0.0f, zPos);
+    Vector3 wPos = node_->GetWorldTransform() * lPos;
+    wPos.y_ = GetHeight(wPos);
+
+    return wPos;
 }
 
 void Terrain::CreatePatchGeometry(TerrainPatch* patch)

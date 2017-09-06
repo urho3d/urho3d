@@ -52,7 +52,7 @@ struct Batch
     /// Construct with defaults.
     Batch() :
         isBase_(false),
-        lightQueue_(0)
+        lightQueue_(nullptr)
     {
     }
 
@@ -66,7 +66,7 @@ struct Batch
         worldTransform_(rhs.worldTransform_),
         numWorldTransforms_(rhs.numWorldTransforms_),
         instancingData_(rhs.instancingData_),
-        lightQueue_(0),
+        lightQueue_(nullptr),
         geometryType_(rhs.geometryType_)
     {
     }

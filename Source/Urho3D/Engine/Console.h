@@ -47,7 +47,7 @@ public:
     /// Construct.
     Console(Context* context);
     /// Destruct.
-    ~Console();
+    virtual ~Console() override;
 
     /// Set UI elements' style from an XML file.
     void SetDefaultStyle(XMLFile* style);

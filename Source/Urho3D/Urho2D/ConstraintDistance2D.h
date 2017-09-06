@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintDistance2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintDistance2D();
+    virtual ~ConstraintDistance2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -68,7 +68,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef();
+    virtual b2JointDef* GetJointDef() override;
 
     b2DistanceJointDef jointDef_;
     /// Owner body anchor.

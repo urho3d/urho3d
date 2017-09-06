@@ -73,7 +73,7 @@ template <class T> class Allocator
 public:
     /// Construct.
     Allocator(unsigned initialCapacity = 0) :
-        allocator_(0)
+        allocator_(nullptr)
     {
         if (initialCapacity)
             allocator_ = AllocatorInitialize((unsigned)sizeof(T), initialCapacity);

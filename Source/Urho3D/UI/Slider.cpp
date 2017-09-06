@@ -37,7 +37,7 @@ const char* orientations[] =
 {
     "Horizontal",
     "Vertical",
-    0
+    nullptr
 };
 
 extern const char* UI_CATEGORY;

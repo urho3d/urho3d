@@ -36,20 +36,20 @@ public:
     /// Construct.
     StaticModelGroup(Context* context);
     /// Destruct.
-    virtual ~StaticModelGroup();
+    virtual ~StaticModelGroup() override;
     /// Register object factory. StaticModel must be registered first.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Process octree raycast. May be called from a worker thread.
-    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results);
+    virtual void ProcessRayQuery(const RayOctreeQuery& query, PODVector<RayQueryResult>& results) override;
     /// Calculate distance and prepare batches for rendering. May be called from worker thread(s), possibly re-entrantly.
-    virtual void UpdateBatches(const FrameInfo& frame);
+    virtual void UpdateBatches(const FrameInfo& frame) override;
     /// Return number of occlusion geometry triangles.
-    virtual unsigned GetNumOccluderTriangles();
+    virtual unsigned GetNumOccluderTriangles() override;
     /// Draw to occlusion buffer. Return true if did not run out of triangles.
-    virtual bool DrawOcclusion(OcclusionBuffer* buffer);
+    virtual bool DrawOcclusion(OcclusionBuffer* buffer) override;
 
     /// Add an instance scene node. It does not need any drawable components of its own.
     void AddInstanceNode(Node* node);
@@ -72,9 +72,9 @@ public:
 
 protected:
     /// Handle scene node enabled status changing.
-    virtual void OnNodeSetEnabled(Node* node);
+    virtual void OnNodeSetEnabled(Node* node) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate();
+    virtual void OnWorldBoundingBoxUpdate() override;
 
 private:
     /// Ensure proper size of world transforms when nodes are added/removed. Also mark node IDs dirty.

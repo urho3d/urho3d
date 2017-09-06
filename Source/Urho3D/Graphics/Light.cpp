@@ -66,7 +66,7 @@ static const char* typeNames[] =
     "Directional",
     "Spot",
     "Point",
-    0
+    nullptr
 };
 
 void BiasParameters::Validate()
@@ -95,7 +95,7 @@ Light::Light(Context* context) :
     shadowBias_(BiasParameters(DEFAULT_CONSTANTBIAS, DEFAULT_SLOPESCALEDBIAS)),
     shadowCascade_(CascadeParameters(DEFAULT_SHADOWSPLIT, 0.0f, 0.0f, 0.0f, DEFAULT_SHADOWFADESTART)),
     shadowFocus_(FocusParameters(true, true, true, DEFAULT_SHADOWQUANTIZE, DEFAULT_SHADOWMINVIEW)),
-    lightQueue_(0),
+    lightQueue_(nullptr),
     temperature_(DEFAULT_TEMPERATURE),
     lightRad_(DEFAULT_RADIUS),
     lightLength_(DEFAULT_LENGTH),

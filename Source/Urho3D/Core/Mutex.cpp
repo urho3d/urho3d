@@ -48,7 +48,7 @@ Mutex::~Mutex()
     CRITICAL_SECTION* cs = (CRITICAL_SECTION*)handle_;
     DeleteCriticalSection(cs);
     delete cs;
-    handle_ = 0;
+    handle_ = nullptr;
 }
 
 void Mutex::Acquire()

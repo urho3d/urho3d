@@ -36,8 +36,8 @@ namespace Urho3D
 
 RenderSurface::RenderSurface(Texture* parentTexture) :
     parentTexture_(parentTexture),
-    renderTargetView_(0),
-    readOnlyView_(0),
+    renderTargetView_(nullptr),
+    readOnlyView_(nullptr),
     updateMode_(SURFACE_UPDATEVISIBLE),
     updateQueued_(false)
 {

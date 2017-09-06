@@ -39,35 +39,35 @@ public:
     /// Construct.
     LineEdit(Context* context);
     /// Destruct.
-    virtual ~LineEdit();
+    virtual ~LineEdit() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Perform UI element update.
-    virtual void Update(float timeStep);
+    virtual void Update(float timeStep) override;
     /// React to mouse click begin.
     virtual void OnClickBegin
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse doubleclick.
     virtual void OnDoubleClick
-        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor);
+        (const IntVector2& position, const IntVector2& screenPosition, int button, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse drag begin.
     virtual void
-        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor);
+        OnDragBegin(const IntVector2& position, const IntVector2& screenPosition, int buttons, int qualifiers, Cursor* cursor) override;
     /// React to mouse drag motion.
     virtual void OnDragMove
         (const IntVector2& position, const IntVector2& screenPosition, const IntVector2& deltaPos, int buttons, int qualifiers,
-            Cursor* cursor);
+            Cursor* cursor) override;
     /// React to drag and drop test. Return true to signal that the drop is acceptable.
-    virtual bool OnDragDropTest(UIElement* source);
+    virtual bool OnDragDropTest(UIElement* source) override;
     /// React to drag and drop finish. Return true to signal that the drop was accepted.
-    virtual bool OnDragDropFinish(UIElement* source);
+    virtual bool OnDragDropFinish(UIElement* source) override;
     /// React to a key press.
-    virtual void OnKey(int key, int buttons, int qualifiers);
+    virtual void OnKey(int key, int buttons, int qualifiers) override;
     /// React to text input event.
-    virtual void OnTextInput(const String& text);
+    virtual void OnTextInput(const String& text) override;
 
     /// Set text.
     void SetText(const String& text);
@@ -118,7 +118,7 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const;
+    virtual bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Update displayed text.
     void UpdateText();
     /// Update cursor position and restart cursor blinking.

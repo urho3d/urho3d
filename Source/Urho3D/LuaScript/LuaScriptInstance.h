@@ -63,45 +63,45 @@ public:
     /// Construct.
     LuaScriptInstance(Context* context);
     /// Destruct.
-    ~LuaScriptInstance();
+    virtual ~LuaScriptInstance() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
+    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Handle attribute read access.
-    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const;
+    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const override;
 
     /// Return attribute descriptions, or null if none defined.
-    virtual const Vector<AttributeInfo>* GetAttributes() const { return &attributeInfos_; }
+    virtual const Vector<AttributeInfo>* GetAttributes() const override { return &attributeInfos_; }
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes();
+    virtual void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+    virtual void OnSetEnabled() override;
 
     /// Add a scripted event handler by function.
-    virtual void AddEventHandler(const String& eventName, int functionIndex);
+    virtual void AddEventHandler(const String& eventName, int functionIndex) override;
     /// Add a scripted event handler by function name.
-    virtual void AddEventHandler(const String& eventName, const String& functionName);
+    virtual void AddEventHandler(const String& eventName, const String& functionName) override;
     /// Add a scripted event handler by function for a specific sender.
-    virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex);
+    virtual void AddEventHandler(Object* sender, const String& eventName, int functionIndex) override;
     /// Add a scripted event handler by function name for a specific sender.
-    virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName);
+    virtual void AddEventHandler(Object* sender, const String& eventName, const String& functionName) override;
     /// Remove a scripted event handler.
-    virtual void RemoveEventHandler(const String& eventName);
+    virtual void RemoveEventHandler(const String& eventName) override;
     /// Remove a scripted event handler for a specific sender.
-    virtual void RemoveEventHandler(Object* sender, const String& eventName);
+    virtual void RemoveEventHandler(Object* sender, const String& eventName) override;
     /// Remove all scripted event handlers for a specific sender.
-    virtual void RemoveEventHandlers(Object* sender);
+    virtual void RemoveEventHandlers(Object* sender) override;
     /// Remove all scripted event handlers.
-    virtual void RemoveAllEventHandlers();
+    virtual void RemoveAllEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    virtual void RemoveEventHandlersExcept(const Vector<String>& exceptionNames);
+    virtual void RemoveEventHandlersExcept(const Vector<String>& exceptionNames) override;
     /// Return whether has subscribed to an event.
-    virtual bool HasEventHandler(const String& eventName) const;
+    virtual bool HasEventHandler(const String& eventName) const override;
     /// Return whether has subscribed to a specific sender's event.
-    virtual bool HasEventHandler(Object* sender, const String& eventName) const;
+    virtual bool HasEventHandler(Object* sender, const String& eventName) const override;
 
     /// Create script object. Return true if successful.
     bool CreateObject(const String& scriptObjectType);
@@ -139,9 +139,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene);
+    virtual void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node);
+    virtual void OnMarkedDirty(Node* node) override;
 
 private:
     /// Find script object attributes.

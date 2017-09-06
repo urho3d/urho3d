@@ -64,7 +64,7 @@ void VertexBuffer::Release()
             for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
             {
                 if (graphics_->GetVertexBuffer(i) == this)
-                    graphics_->SetVertexBuffer(0);
+                    graphics_->SetVertexBuffer(nullptr);
             }
 
             graphics_->SetVBO(0);
@@ -164,23 +164,23 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
     if (lockState_ != LOCK_NONE)
     {
         URHO3D_LOGERROR("Vertex buffer already locked");
-        return 0;
+        return nullptr;
     }
 
     if (!vertexSize_)
     {
         URHO3D_LOGERROR("Vertex elements not defined, can not lock vertex buffer");
-        return 0;
+        return nullptr;
     }
 
     if (start + count > vertexCount_)
     {
         URHO3D_LOGERROR("Illegal range for locking vertex buffer");
-        return 0;
+        return nullptr;
     }
 
     if (!count)
-        return 0;
+        return nullptr;
 
     lockStart_ = start;
     lockCount_ = count;
@@ -198,7 +198,7 @@ void* VertexBuffer::Lock(unsigned start, unsigned count, bool discard)
         return lockScratchData_;
     }
     else
-        return 0;
+        return nullptr;
 }
 
 void VertexBuffer::Unlock()
@@ -214,7 +214,7 @@ void VertexBuffer::Unlock()
         SetDataRange(lockScratchData_, lockStart_, lockCount_, discardLock_);
         if (graphics_)
             graphics_->FreeScratchBuffer(lockScratchData_);
-        lockScratchData_ = 0;
+        lockScratchData_ = nullptr;
         lockState_ = LOCK_NONE;
         break;
 
@@ -248,7 +248,7 @@ bool VertexBuffer::Create()
         }
 
         graphics_->SetVBO(object_.name_);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, 0, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount_ * vertexSize_, nullptr, dynamic_ ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
     }
 
     return true;
@@ -265,7 +265,7 @@ bool VertexBuffer::UpdateToGPU()
 void* VertexBuffer::MapBuffer(unsigned start, unsigned count, bool discard)
 {
     // Never called on OpenGL
-    return 0;
+    return nullptr;
 }
 
 void VertexBuffer::UnmapBuffer()

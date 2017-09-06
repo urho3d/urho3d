@@ -23,6 +23,7 @@
 @echo off
 
 :: Determine source tree and build tree
+setlocal
 set "SOURCE=%~dp0"
 set "SOURCE=%SOURCE:~0,-1%"
 set "BUILD="
@@ -37,7 +38,6 @@ if "%BUILD%" == "" if exist "%cd%\CMakeCache.txt" (set "BUILD=%cd%") else (echo 
 :: Detect CMake toolchains directory if it is not provided explicitly
 if "%TOOLCHAINS%" == "" set "TOOLCHAINS=%SOURCE%\CMake\Toolchains"
 if not exist "%TOOLCHAINS%" if exist "%URHO3D_HOME%\share\CMake\Toolchains" set "TOOLCHAINS=%URHO3D_HOME%\share\CMake\Toolchains"
-:: BEWARE that the TOOLCHAINS variable leaks to caller's environment!
 
 :: Default to native generator and toolchain if none is specified explicitly
 set "OPTS="

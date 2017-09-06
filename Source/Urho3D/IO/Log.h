@@ -78,7 +78,7 @@ public:
     /// Construct.
     Log(Context* context);
     /// Destruct. Close the log file if open.
-    virtual ~Log();
+    virtual ~Log() override;
 
     /// Open the log file.
     void Open(const String& fileName);

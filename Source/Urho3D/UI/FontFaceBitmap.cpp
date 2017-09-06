@@ -133,8 +133,8 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         FontGlyph glyph;
         glyph.x_ = (short)charElem.GetInt("x");
         glyph.y_ = (short)charElem.GetInt("y");
-        glyph.width_ = (short)charElem.GetInt("width");
-        glyph.height_ = (short)charElem.GetInt("height");
+        glyph.width_ = glyph.texWidth_ = (short)charElem.GetInt("width");
+        glyph.height_ = glyph.texHeight_ = (short)charElem.GetInt("height");
         glyph.offsetX_ = (short)charElem.GetInt("xoffset");
         glyph.offsetY_ = (short)charElem.GetInt("yoffset");
         glyph.advanceX_ = (short)charElem.GetInt("xadvance");

@@ -30,9 +30,9 @@
 
 #ifndef _WIN32
 #include <pthread.h>
-typedef pthread_t ThreadID;
+using ThreadID = pthread_t;
 #else
-typedef unsigned ThreadID;
+using ThreadID = unsigned;
 #endif
 
 namespace Urho3D
@@ -58,7 +58,7 @@ public:
     void SetPriority(int priority);
 
     /// Return whether thread exists.
-    bool IsStarted() const { return handle_ != 0; }
+    bool IsStarted() const { return handle_ != nullptr; }
 
     /// Set the current thread as the main thread.
     static void SetMainThread();

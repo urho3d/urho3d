@@ -43,14 +43,18 @@ struct URHO3D_API FontGlyph
     short x_;
     /// Y position in texture.
     short y_;
-    /// Width.
-    short width_;
-    /// Height.
-    short height_;
+    /// Width in texture.
+    short texWidth_;
+    /// Height in texture.
+    short texHeight_;
+    /// Width on screen.
+    float width_;
+    /// Height on screen.
+    float height_;
     /// Glyph X offset from origin.
-    short offsetX_;
+    float offsetX_;
     /// Glyph Y offset from origin.
-    short offsetY_;
+    float offsetY_;
     /// Horizontal advance.
     float advanceX_;
     /// Texture page. M_MAX_UNSIGNED if not yet resident on any texture.
@@ -68,7 +72,7 @@ public:
     /// Construct.
     FontFace(Font* font);
     /// Destruct.
-    ~FontFace();
+    virtual ~FontFace() override;
 
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;

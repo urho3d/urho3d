@@ -118,7 +118,7 @@ public:
     /// Construct.
     View(Context* context);
     /// Destruct.
-    virtual ~View();
+    virtual ~View() override;
 
     /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, Viewport* viewport);
