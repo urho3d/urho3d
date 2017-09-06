@@ -911,7 +911,9 @@ bool SceneSmartDuplicateNode()
 
 bool ViewCloser()
 {
-    return (viewCloser = true);
+    LocateNodesAndComponents(selectedNodes, selectedComponents);
+    
+    return true;
 }
 
 

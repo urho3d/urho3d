@@ -37,8 +37,6 @@ void UpdateEditorSettingsDialog()
     CheckBox@ limitRotationToggle = settingsDialog.GetChild("LimitRotationToggle", true);
     limitRotationToggle.checked = limitRotation;
 
-    CheckBox@ mouseWheelCameraPositionToggle = settingsDialog.GetChild("MouseWheelCameraPositionToggle", true);
-    mouseWheelCameraPositionToggle.checked = mouseWheelCameraPosition;
 
     DropDownList@ mouseOrbitEdit = settingsDialog.GetChild("MouseOrbitEdit", true);
     mouseOrbitEdit.selection = mouseOrbitMode;
@@ -51,9 +49,6 @@ void UpdateEditorSettingsDialog()
 
     DropDownList@ newNodeModeEdit = settingsDialog.GetChild("NewNodeModeEdit", true);
     newNodeModeEdit.selection = newNodeMode;
-
-    LineEdit@ distanceEdit = settingsDialog.GetChild("DistanceEdit", true);
-    distanceEdit.text = String(newNodeDistance);
 
     LineEdit@ moveStepEdit = settingsDialog.GetChild("MoveStepEdit", true);
     moveStepEdit.text = String(moveStep);
@@ -139,13 +134,10 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextChanged", "EditCameraSpeed");
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
-        SubscribeToEvent(mouseWheelCameraPositionToggle, "Toggled", "EditMouseWheelCameraPosition");
         SubscribeToEvent(middleMousePanToggle, "Toggled", "EditMiddleMousePan");
         SubscribeToEvent(mouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
         SubscribeToEvent(hotKeysModeEdit, "ItemSelected", "EditHotKeyMode");
         SubscribeToEvent(newNodeModeEdit, "ItemSelected", "EditNewNodeMode");
-        SubscribeToEvent(distanceEdit, "TextChanged", "EditNewNodeDistance");
-        SubscribeToEvent(distanceEdit, "TextFinished", "EditNewNodeDistance");
         SubscribeToEvent(moveStepEdit, "TextChanged", "EditMoveStep");
         SubscribeToEvent(moveStepEdit, "TextFinished", "EditMoveStep");
         SubscribeToEvent(rotateStepEdit, "TextChanged", "EditRotateStep");
@@ -250,12 +242,6 @@ void EditLimitRotation(StringHash eventType, VariantMap& eventData)
     limitRotation = edit.checked;
 }
 
-void EditMouseWheelCameraPosition(StringHash eventType, VariantMap& eventData)
-{
-    CheckBox@ edit = eventData["Element"].GetPtr();
-    mouseWheelCameraPosition = edit.checked;
-}
-
 void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
@@ -279,14 +265,6 @@ void EditNewNodeMode(StringHash eventType, VariantMap& eventData)
 {
     DropDownList@ edit = eventData["Element"].GetPtr();
     newNodeMode = edit.selection;
-}
-
-void EditNewNodeDistance(StringHash eventType, VariantMap& eventData)
-{
-    LineEdit@ edit = eventData["Element"].GetPtr();
-    newNodeDistance = Max(edit.text.ToFloat(), 0.0);
-    if (eventType == StringHash("TextFinished"))
-        edit.text = String(newNodeDistance);
 }
 
 void EditMoveStep(StringHash eventType, VariantMap& eventData)

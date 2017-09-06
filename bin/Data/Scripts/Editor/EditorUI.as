@@ -428,7 +428,11 @@ void CreateMenuBar()
         //else if (hotKeyMode == HOT_KEYS_MODE_BLENDER)
         //    popup.AddChild(CreateMenuItem("Toggle update", @ToggleSceneUpdate, KEY_P, QUAL_CTRL));
 
-        if (hotKeyMode == HOTKEYS_MODE_BLENDER)
+        if (hotKeyMode == HOTKEYS_MODE_STANDARD)
+        {
+            popup.AddChild(CreateMenuItem("View closer", @ViewCloser, KEY_F));
+        }
+        else if (hotKeyMode == HOTKEYS_MODE_BLENDER)
         {
              popup.AddChild(CreateMenuItem("Move to layer", @ShowLayerMover, KEY_M));
              popup.AddChild(CreateMenuItem("Smart Duplicate", @SceneSmartDuplicateNode, KEY_D, QUAL_ALT));
@@ -1014,6 +1018,8 @@ Text@ CreateAccelKeyText(int accelKey, int accelQual)
         text = "F12";
     else if (accelKey == SHOW_POPUP_INDICATOR)
         text = ">";
+    else if (accelKey == KEY_KP_PERIOD)
+        text = "NumPad .";
     else
         text.AppendUTF8(accelKey);
     if (accelQual & QUAL_ALT > 0)
@@ -1346,44 +1352,51 @@ void HandleHotKeysBlender( VariantMap& eventData)
         screenshot.SavePNG(screenshotDir + "/Screenshot_" +
                 time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
     }
+    // In Blender, HOME key is for locating the selected objects by pan and
+    // the PERIOD key of keypad is for moving the camera to focus the selected.
+    // Here we ignore the difference.
+    else if ((key == KEY_HOME || key == KEY_KP_PERIOD) && ui.focusElement is null)
+    {
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+        {
+            LocateNodesAndComponents(selectedNodes, selectedComponents);
+        }
+    }
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
-        cameraNode.direction = Vector3(0, 0, viewDirection);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(0.0, 0.0, cameraNode.position.length * viewDirection);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(0, 0, viewDirection));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
-
-    else if (key == KEY_KP_3 && ui.focusElement is null) // Side view
+    else if ((key == KEY_KP_3 || key == KEY_KP_9) && ui.focusElement is null) // Side view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
-        cameraNode.direction = Vector3(-viewDirection, 0, 0);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(cameraNode.position.length * -viewDirection, 0.0, 0.0);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(-viewDirection, 0, 0));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
-
     else if (key == KEY_KP_7 && ui.focusElement is null) // Top view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
-        cameraNode.direction = Vector3(0, -viewDirection, 0);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(0.0, cameraNode.position.length * -viewDirection, 0.0);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(0, -viewDirection, 0));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
     else if (key == KEY_KP_5 && ui.focusElement is null)
     {
-        activeViewport.camera.zoom = 1;
         activeViewport.ToggleOrthographic();
     }
     else if (key == '4' && ui.focusElement is null)
@@ -1434,53 +1447,26 @@ void HandleHotKeysBlender( VariantMap& eventData)
                 SceneResetRotation();
             else if (key == KEY_S)
                 SceneResetScale();
-            else if (key == KEY_F)
-            {
-                 Vector3 center = Vector3(0,0,0);
-
-                 if (selectedNodes.length > 0)
-                    center = SelectedNodesCenterPoint();
-
-                 cameraNode.LookAt(center);
-                 ReacquireCameraYawPitch();
-            }
          }
          else if (eventData["Qualifiers"].GetInt() != QUAL_CTRL) // set transformations
          {
-                if (key == KEY_G)
-                {
-                    editMode = EDIT_MOVE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+            if (key == KEY_G)
+            {
+                editMode = EDIT_MOVE;
+                axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
 
-                }
-                else if (key == KEY_R)
-                {
-                    editMode = EDIT_ROTATE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+            }
+            else if (key == KEY_R)
+            {
+                editMode = EDIT_ROTATE;
+                axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
 
-                }
-                else if (key == KEY_S)
-                {
-                    editMode = EDIT_SCALE;
-                    axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
-                }
-                else if (key == KEY_F)
-                {
-                    if (camera.orthographic)
-                    {
-                        viewCloser = true;
-                    }
-                    else
-                    {
-                        Vector3 center = Vector3(0,0,0);
-
-                        if (selectedNodes.length > 0)
-                            center = SelectedNodesCenterPoint();
-
-                        cameraNode.LookAt(center);
-                        ReacquireCameraYawPitch();
-                    }
-                }
+            }
+            else if (key == KEY_S)
+            {
+                editMode = EDIT_SCALE;
+                axisMode = AxisMode(axisMode ^ AXIS_LOCAL);
+            }
          }
     }
 
@@ -1539,42 +1525,46 @@ void HandleHotKeysStandard(VariantMap& eventData)
         screenshot.SavePNG(screenshotDir + "/Screenshot_" +
                 time.timeStamp.Replaced(':', '_').Replaced('.', '_').Replaced(' ', '_') + ".png");
     }
+    else if ((key == KEY_HOME || key == KEY_F) && ui.focusElement is null)
+    {
+        if (selectedNodes.length > 0 || selectedComponents.length > 0)
+        {
+            LocateNodesAndComponents(selectedNodes, selectedComponents);
+        }
+    }
     else if (key == KEY_KP_1 && ui.focusElement is null) // Front view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(0.0, 0.0, pos.length * viewDirection);
-        cameraNode.direction = Vector3(0, 0, viewDirection);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(0.0, 0.0, cameraNode.position.length * viewDirection);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(0, 0, viewDirection));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
-
-    else if (key == KEY_KP_3 && ui.focusElement is null) // Side view
+    else if ((key == KEY_KP_3 || key == KEY_KP_9) && ui.focusElement is null) // Side view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(pos.length * -viewDirection, 0.0, 0.0);
-        cameraNode.direction = Vector3(-viewDirection, 0, 0);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(cameraNode.position.length * -viewDirection, 0.0, 0.0);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(-viewDirection, 0, 0));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
-
     else if (key == KEY_KP_7 && ui.focusElement is null) // Top view
     {
-        Vector3 center = Vector3(0,0,0);
-        if (selectedNodes.length > 0 || selectedComponents.length > 0)
-            center = SelectedNodesCenterPoint();
+        cameraSmoothInterpolate.Finish();
 
-        Vector3 pos = cameraNode.worldPosition - center;
-        cameraNode.worldPosition = center - Vector3(0.0, pos.length * -viewDirection, 0.0);
-        cameraNode.direction = Vector3(0, -viewDirection, 0);
-        ReacquireCameraYawPitch();
+        Vector3 pos = -Vector3(0.0, cameraNode.position.length * -viewDirection, 0.0);
+        Quaternion rot = Quaternion(Vector3::FORWARD, Vector3(0, -viewDirection, 0));
+
+        cameraSmoothInterpolate.SetCameraNodePosition(cameraNode.position, pos);
+        cameraSmoothInterpolate.SetCameraNodeRotation(cameraNode.rotation, rot);
+        cameraSmoothInterpolate.Start(0.5f);
     }
-
     else if (key == KEY_KP_5 && ui.focusElement is null)
     {
         activeViewport.ToggleOrthographic();
