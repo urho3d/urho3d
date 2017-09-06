@@ -46,7 +46,7 @@ DropDownList::DropDownList(Context* context) :
 {
     focusMode_ = FM_FOCUSABLE_DEFOCUSABLE;
 
-    Window* window = new Window(context_);
+    auto* window = new Window(context_);
     window->SetInternal(true);
     SetPopup(window);
 
@@ -57,7 +57,7 @@ DropDownList::DropDownList(Context* context) :
     popup_->AddChild(listView_);
     placeholder_ = CreateChild<UIElement>("DDL_Placeholder");
     placeholder_->SetInternal(true);
-    Text* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
+    auto* text = placeholder_->CreateChild<Text>("DDL_Placeholder_Text");
     text->SetInternal(true);
     text->SetVisible(false);
 

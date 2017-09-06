@@ -1657,7 +1657,7 @@ void Graphics::SetTextureParametersDirty()
 
     for (PODVector<GPUObject*>::Iterator i = gpuObjects_.Begin(); i != gpuObjects_.End(); ++i)
     {
-        Texture* texture = dynamic_cast<Texture*>(*i);
+        auto* texture = dynamic_cast<Texture*>(*i);
         if (texture)
             texture->SetParametersDirty();
     }
@@ -2177,7 +2177,7 @@ ShaderVariation* Graphics::GetShader(ShaderType type, const char* name, const ch
 {
     if (lastShaderName_ != name || !lastShader_)
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
 
         String fullShaderName = shaderPath_ + name + shaderExtension_;
         // Try to reduce repeated error log prints because of missing shaders

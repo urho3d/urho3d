@@ -82,7 +82,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
         return result;
     }
 
-    unsigned numCols = (unsigned)sqlite3_column_count(pStmt);
+    auto numCols = (unsigned)sqlite3_column_count(pStmt);
     result.columns_.Resize(numCols);
     for (unsigned i = 0; i < numCols; ++i)
         result.columns_[i] = sqlite3_column_name(pStmt, i);

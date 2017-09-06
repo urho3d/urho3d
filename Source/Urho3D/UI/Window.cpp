@@ -281,7 +281,7 @@ void Window::SetResizeBorder(const IntRect& rect)
 
 void Window::SetModal(bool modal)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;

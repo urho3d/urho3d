@@ -278,7 +278,7 @@ public:
     /// Insert a list at position.
     void Insert(const Iterator& dest, const List<T>& list)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         ConstIterator it = list.Begin();
         ConstIterator end = list.End();
         while (it != end)
@@ -288,7 +288,7 @@ public:
     /// Insert elements by iterators.
     void Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         ConstIterator it = start;
         while (it != end)
             InsertNode(destNode, *it++);
@@ -297,7 +297,7 @@ public:
     /// Insert elements.
     void Insert(const Iterator& dest, const T* start, const T* end)
     {
-        Node* destNode = static_cast<Node*>(dest.ptr_);
+        auto* destNode = static_cast<Node*>(dest.ptr_);
         const T* ptr = start;
         while (ptr != end)
             InsertNode(destNode, *ptr++);
@@ -464,7 +464,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -472,7 +472,7 @@ private:
     /// Reserve a node with initial value.
     Node* ReserveNode(const T& value)
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(value);
         return newNode;
     }

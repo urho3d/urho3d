@@ -201,7 +201,7 @@ unsigned HttpRequest::Read(void* dest, unsigned size)
 #ifdef URHO3D_THREADING
     mutex_.Acquire();
 
-    unsigned char* destPtr = (unsigned char*)dest;
+    auto* destPtr = (unsigned char*)dest;
     unsigned sizeLeft = size;
     unsigned totalRead = 0;
 

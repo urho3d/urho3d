@@ -84,7 +84,7 @@ bool Texture2D::BeginLoad(Deserializer& source)
         loadImage_->PrecalculateLevels();
 
     // Load the optional parameters file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     loadParameters_ = cache->GetTempResource<XMLFile>(xmlName, false);
 
@@ -185,7 +185,7 @@ void Texture2D::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& even
 {
     if (renderSurface_ && (renderSurface_->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface_->IsUpdateQueued()))
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         if (renderer)
             renderer->QueueRenderSurface(renderSurface_);
         renderSurface_->ResetUpdateQueued();

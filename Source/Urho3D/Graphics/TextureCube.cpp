@@ -86,7 +86,7 @@ void TextureCube::RegisterObject(Context* context)
 
 bool TextureCube::BeginLoad(Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)
@@ -142,10 +142,10 @@ bool TextureCube::BeginLoad(Deserializer& source)
         }
         else
         {
-        
+
             CubeMapLayout layout =
                 (CubeMapLayout)GetStringListIndex(imageElem.GetAttribute("layout").CString(), cubeMapLayoutNames, CML_HORIZONTAL);
-            
+
             switch (layout)
             {
             case CML_HORIZONTAL:
@@ -324,7 +324,7 @@ SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
         return SharedPtr<Image>();
     }
 
-    Image* rawImage = new Image(context_);
+    auto* rawImage = new Image(context_);
     if (format_ == Graphics::GetRGBAFormat())
         rawImage->SetSize(width_, height_, 4);
     else if (format_ == Graphics::GetRGBFormat())
@@ -338,7 +338,7 @@ SharedPtr<Image> TextureCube::GetImage(CubeMapFace face) const
 
 void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& eventData)
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
 
     for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
     {

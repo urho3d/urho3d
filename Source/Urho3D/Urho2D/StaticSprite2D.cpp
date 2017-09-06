@@ -254,7 +254,7 @@ ResourceRef StaticSprite2D::GetSpriteAttr() const
 
 void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetCustomMaterial(cache->GetResource<Material>(value.name_));
 }
 

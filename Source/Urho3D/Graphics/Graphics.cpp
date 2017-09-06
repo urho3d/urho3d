@@ -181,7 +181,7 @@ PODVector<IntVector3> Graphics::GetResolutions(int monitor) const
     PODVector<IntVector3> ret;
     // Emscripten is not able to return a valid list
 #ifndef __EMSCRIPTEN__
-    unsigned numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
+    auto numModes = (unsigned)SDL_GetNumDisplayModes(monitor);
 
     for (unsigned i = 0; i < numModes; ++i)
     {

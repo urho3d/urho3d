@@ -203,7 +203,7 @@ void Script::DumpAPI(DumpMode mode, const String& sourceTree)
     {
         Log::WriteRaw("namespace Urho3D\n{\n\n/**\n");
 
-        FileSystem* fileSystem = GetSubsystem<FileSystem>();
+        auto* fileSystem = GetSubsystem<FileSystem>();
         Vector<String> headerFileNames;
         String path = AddTrailingSlash(sourceTree);
         if (!path.Empty())

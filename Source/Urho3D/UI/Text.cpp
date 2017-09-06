@@ -111,7 +111,7 @@ void Text::ApplyAttributes()
     // Localize now if attributes were loaded out-of-order
     if (autoLocalizable_ && stringId_.Length())
     {
-        Localization* l10n = GetSubsystem<Localization>();
+        auto* l10n = GetSubsystem<Localization>();
         text_ = l10n->Get(stringId_);
     }
 
@@ -218,7 +218,7 @@ void Text::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData,
                 int thickness = Min(strokeThickness_, fontSize_);
                 int samples = thickness * thickness + (thickness % 2 == 0 ? 4 : 3);
                 float angle = 360.f / samples;
-                float floatThickness = (float)thickness;
+                auto floatThickness = (float)thickness;
                 for (int i = 0; i < samples; ++i)
                 {
                     float x = Cos(angle * i) * floatThickness;
@@ -269,7 +269,7 @@ void Text::OnIndentSet()
 
 bool Text::SetFont(const String& fontName, float size)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     return SetFont(cache->GetResource<Font>(fontName), size);
 }
 
@@ -312,7 +312,7 @@ void Text::SetText(const String& text)
     if (autoLocalizable_)
     {
         stringId_ = text;
-        Localization* l10n = GetSubsystem<Localization>();
+        auto* l10n = GetSubsystem<Localization>();
         text_ = l10n->Get(stringId_);
     }
     else
@@ -360,7 +360,7 @@ void Text::SetAutoLocalizable(bool enable)
         if (enable)
         {
             stringId_ = text_;
-            Localization* l10n = GetSubsystem<Localization>();
+            auto* l10n = GetSubsystem<Localization>();
             text_ = l10n->Get(stringId_);
             SubscribeToEvent(E_CHANGELANGUAGE, URHO3D_HANDLER(Text, HandleChangeLanguage));
         }
@@ -378,7 +378,7 @@ void Text::SetAutoLocalizable(bool enable)
 
 void Text::HandleChangeLanguage(StringHash eventType, VariantMap& eventData)
 {
-    Localization* l10n = GetSubsystem<Localization>();
+    auto* l10n = GetSubsystem<Localization>();
     text_ = l10n->Get(stringId_);
     DecodeToUnicode();
     ValidateSelection();
@@ -469,7 +469,7 @@ Vector2 Text::GetCharSize(unsigned index)
 
 void Text::SetFontAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     font_ = cache->GetResource<Font>(value.name_);
 }
 
@@ -527,7 +527,7 @@ void Text::UpdateText(bool onResize)
         int width = 0;
         int height = 0;
         int rowWidth = 0;
-        int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+        auto rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
 
         // First see if the text must be split up
         if (!wordWrap_)
@@ -711,7 +711,7 @@ void Text::UpdateCharLocations()
         return;
     fontFace_ = face;
 
-    int rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
+    auto rowHeight = (int)(rowSpacing_ * rowHeight_ + 0.5f);
 
     // Store position & size of each character, and locations per texture page
     unsigned numChars = unicodeText_.Size();

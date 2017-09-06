@@ -139,7 +139,7 @@ void Decal::AddVertex(const DecalVertex& vertex)
         }
     }
 
-    unsigned short newIndex = (unsigned short)vertices_.Size();
+    auto newIndex = (unsigned short)vertices_.Size();
     vertices_.Push(vertex);
     indices_.Push(newIndex);
 }
@@ -317,7 +317,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     }
 
     // Check for animated target and switch into skinned/static mode if necessary
-    AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
+    auto* animatedModel = dynamic_cast<AnimatedModel*>(target);
     if ((animatedModel && !skinned_) || (!animatedModel && skinned_))
     {
         RemoveAllDecals();
@@ -519,7 +519,7 @@ Material* DecalSet::GetMaterial() const
 
 void DecalSet::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
@@ -861,9 +861,9 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
     }
     else
     {
-        const float* bw0 = (const float*)s0;
-        const float* bw1 = (const float*)s1;
-        const float* bw2 = (const float*)s2;
+        const auto* bw0 = (const float*)s0;
+        const auto* bw1 = (const float*)s1;
+        const auto* bw2 = (const float*)s2;
         const unsigned char* bi0 = s0 + sizeof(float) * 4;
         const unsigned char* bi1 = s1 + sizeof(float) * 4;
         const unsigned char* bi2 = s2 + sizeof(float) * 4;
@@ -886,7 +886,7 @@ void DecalSet::GetFace(Vector<PODVector<DecalVertex> >& faces, Drawable* target,
 bool DecalSet::GetBones(Drawable* target, unsigned batchIndex, const float* blendWeights, const unsigned char* blendIndices,
     unsigned char* newBlendIndices)
 {
-    AnimatedModel* animatedModel = dynamic_cast<AnimatedModel*>(target);
+    auto* animatedModel = dynamic_cast<AnimatedModel*>(target);
     if (!animatedModel)
         return false;
 
@@ -1015,14 +1015,14 @@ void DecalSet::UpdateBuffers()
     unsigned newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
     unsigned newVBSize = optimizeBufferSize_ ? numVertices_ : maxVertices_;
     unsigned newIBSize = optimizeBufferSize_ ? numIndices_ : maxIndices_;
-    
+
     if (vertexBuffer_->GetElementMask() != newElementMask || vertexBuffer_->GetVertexCount() != newVBSize)
         vertexBuffer_->SetSize(newVBSize, newElementMask);
     if (indexBuffer_->GetIndexCount() != newIBSize)
         indexBuffer_->SetSize(newIBSize, false);
     geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
-    
+
     float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : nullptr;
     unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : nullptr;
 

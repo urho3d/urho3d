@@ -42,7 +42,7 @@ static const unsigned CLIPMASK_Z_NEG = 0x20;
 
 void DrawOcclusionBatchWork(const WorkItem* item, unsigned threadIndex)
 {
-    OcclusionBuffer* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
+    auto* buffer = reinterpret_cast<OcclusionBuffer*>(item->aux_);
     OcclusionBatch& batch = *reinterpret_cast<OcclusionBatch*>(item->start_);
     buffer->DrawBatch(batch, threadIndex);
 }
@@ -217,7 +217,7 @@ void OcclusionBuffer::DrawTriangles()
     else if (buffers_.Size() > 1)
     {
         // Threaded
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
 
         for (Vector<OcclusionBatch>::Iterator i = batches_.Begin(); i != batches_.End(); ++i)
         {
@@ -506,7 +506,7 @@ void OcclusionBuffer::DrawBatch(const OcclusionBatch& batch, unsigned threadInde
     }
     else
     {
-        const unsigned char* srcData = (const unsigned char*)batch.vertexData_;
+        const auto* srcData = (const unsigned char*)batch.vertexData_;
 
         // 16-bit indices
         if (batch.indexSize_ == sizeof(unsigned short))
@@ -881,9 +881,9 @@ void OcclusionBuffer::DrawTriangle2D(const Vector3* vertices, bool clockwise, un
         }
     }
 
-    int topY = (int)vertices[top].y_;
-    int middleY = (int)vertices[middle].y_;
-    int bottomY = (int)vertices[bottom].y_;
+    auto topY = (int)vertices[top].y_;
+    auto middleY = (int)vertices[middle].y_;
+    auto bottomY = (int)vertices[bottom].y_;
 
     // Check for degenerate triangle
     if (topY == bottomY)
@@ -1025,7 +1025,7 @@ void OcclusionBuffer::ClearBuffer(unsigned threadIndex)
 
     int* dest = buffers_[threadIndex].data_;
     int count = width_ * height_;
-    int fillValue = (int)OCCLUSION_Z_SCALE;
+    auto fillValue = (int)OCCLUSION_Z_SCALE;
 
     while (count--)
         *dest++ = fillValue;

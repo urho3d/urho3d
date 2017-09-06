@@ -685,7 +685,7 @@ void ExportAnimation(const String& outName, bool animationOnly)
     if (!noAnimations_)
     {
         // Most fbx animation files contain only a skeleton and no skinned mesh.
-        // Assume the scene node contains the model's bone definition and, 
+        // Assume the scene node contains the model's bone definition and,
         // transfer the info to the model.
         if (suppressFbxPivotNodes_ && model.bones_.Size() == 0)
             CollectSceneNodesAsBones(model, rootNode_);
@@ -1131,7 +1131,7 @@ void BuildAndSaveModel(OutModel& model)
         if (model.bones_.Size())
             GetBlendData(model, mesh, model.meshNodes_[i], boneMappings, blendIndices, blendWeights);
 
-        float* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
+        auto* dest = (float*)((unsigned char*)vertexData + startVertexOffset * vb->GetVertexSize());
         for (unsigned j = 0; j < mesh->mNumVertices; ++j)
             WriteVertex(dest, mesh, j, isSkinned, box, vertexTransform, normalTransform, blendIndices, blendWeights);
 
@@ -1257,7 +1257,7 @@ void BuildAndSaveAnimations(OutModel* model)
     {
         aiAnimation* anim = animations[i];
 
-        float duration = (float)anim->mDuration;
+        auto duration = (float)anim->mDuration;
         String animName = FromAIString(anim->mName);
         String animOutName;
 
@@ -1275,7 +1275,7 @@ void BuildAndSaveAnimations(OutModel* model)
         else
             animOutName = outPath_ + GetFileName(outName_) + "_" + SanitateAssetName(animName) + ".ani";
 
-        float ticksPerSecond = (float)anim->mTicksPerSecond;
+        auto ticksPerSecond = (float)anim->mTicksPerSecond;
         // If ticks per second not specified, it's probably a .X file. In this case use the default tick rate
         if (ticksPerSecond < M_EPSILON)
             ticksPerSecond = defaultTicksPerSecond_;
@@ -1655,7 +1655,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         if (createZone_)
         {
             Node* zoneNode = outScene->CreateChild("Zone", localIDs_ ? LOCAL : REPLICATED);
-            Zone* zone = zoneNode->CreateComponent<Zone>();
+            auto* zone = zoneNode->CreateComponent<Zone>();
             zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.f));
             zone->SetAmbientColor(Color(0.25f, 0.25f, 0.25f));
 
@@ -1663,14 +1663,14 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             if (!scene_->HasLights())
             {
                 Node* lightNode = outScene->CreateChild("GlobalLight", localIDs_ ? LOCAL : REPLICATED);
-                Light* light = lightNode->CreateComponent<Light>();
+                auto* light = lightNode->CreateComponent<Light>();
                 light->SetLightType(LIGHT_DIRECTIONAL);
                 lightNode->SetRotation(Quaternion(60.0f, 30.0f, 0.0f));
             }
         }
     }
 
-    ResourceCache* cache = context_->GetSubsystem<ResourceCache>();
+    auto* cache = context_->GetSubsystem<ResourceCache>();
 
     HashMap<aiNode*, Node*> nodeMapping;
 
@@ -1701,7 +1701,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
         String modelName = (useSubdirs_ ? "Models/" : "") + GetFileNameAndExtension(model.outName_);
         if (!cache->Exists(modelName))
         {
-            Model* dummyModel = new Model(context_);
+            auto* dummyModel = new Model(context_);
             dummyModel->SetName(modelName);
             dummyModel->SetNumGeometries(model.meshes_.Size());
             cache->AddManualResource(dummyModel);
@@ -1715,7 +1715,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
             // Create a dummy material so that the reference can be stored
             if (!cache->Exists(matName))
             {
-                Material* dummyMat = new Material(context_);
+                auto* dummyMat = new Material(context_);
                 dummyMat->SetName(matName);
                 cache->AddManualResource(dummyMat);
             }
@@ -1745,7 +1745,7 @@ void BuildAndSaveScene(OutScene& scene, bool asPrefab)
                 outNode->SetDirection(lightAdjustDirection);
             }
 
-            Light* outLight = outNode->CreateComponent<Light>();
+            auto* outLight = outNode->CreateComponent<Light>();
             outLight->SetColor(Color(light->mColorDiffuse.r, light->mColorDiffuse.g, light->mColorDiffuse.b));
 
             switch (light->mType)
@@ -1955,7 +1955,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
         shadowCullElem.SetString("value", "none");
     }
 
-    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    auto* fileSystem = context_->GetSubsystem<FileSystem>();
 
     String outFileName = resourcePath_ + (useSubdirs_ ? "Materials/" : "" ) + matName + ".xml";
     if (noOverwriteMaterial_ && fileSystem->FileExists(outFileName))
@@ -1974,7 +1974,7 @@ void BuildAndSaveMaterial(aiMaterial* material, HashSet<String>& usedTextures)
 
 void CopyTextures(const HashSet<String>& usedTextures, const String& sourcePath)
 {
-    FileSystem* fileSystem = context_->GetSubsystem<FileSystem>();
+    auto* fileSystem = context_->GetSubsystem<FileSystem>();
 
     if (useSubdirs_)
         fileSystem->CreateDir(resourcePath_ + "Textures");
@@ -2451,7 +2451,7 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
             mesh->mColors[i][index].a).ToUInt();
         ++dest;
     }
-    
+
     for (unsigned i = 0; i < mesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
     {
         Vector3 texCoord = ToVector3(mesh->mTextureCoords[i][index]);
@@ -2484,8 +2484,8 @@ void WriteVertex(float*& dest, aiMesh* mesh, unsigned index, bool isSkinned, Bou
             else
                 *dest++ = 0.0f;
         }
-    
-        unsigned char* destBytes = (unsigned char*)dest;
+
+        auto* destBytes = (unsigned char*)dest;
         ++dest;
         for (unsigned i = 0; i < 4; ++i)
         {
@@ -2665,7 +2665,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     unsigned int poskeyFrames = channel->mNumPositionKeys;
     unsigned int rotkeyFrames = channel->mNumRotationKeys;
     unsigned int scalekeyFrames = channel->mNumScalingKeys;
-    
+
     // Get max key frames
     for (unsigned i = 0; i < TransformationComp_MAXIMUM; ++i)
     {
@@ -2685,7 +2685,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     // Resize and init vector key array
     if (poskeyFrames > channel->mNumPositionKeys)
     {
-        aiVectorKey* newKeys  = new aiVectorKey[poskeyFrames];
+        auto* newKeys  = new aiVectorKey[poskeyFrames];
         for (unsigned i = 0; i < poskeyFrames; ++i)
         {
             if (i < channel->mNumPositionKeys )
@@ -2699,7 +2699,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     }
     if (rotkeyFrames > channel->mNumRotationKeys)
     {
-        aiQuatKey* newKeys  = new aiQuatKey[rotkeyFrames];
+        auto* newKeys  = new aiQuatKey[rotkeyFrames];
         for (unsigned i = 0; i < rotkeyFrames; ++i)
         {
             if (i < channel->mNumRotationKeys)
@@ -2713,7 +2713,7 @@ void ExpandAnimatedChannelKeys(aiAnimation* anim, unsigned mainChannel, int *cha
     }
     if (scalekeyFrames > channel->mNumScalingKeys)
     {
-        aiVectorKey* newKeys  = new aiVectorKey[scalekeyFrames];
+        auto* newKeys  = new aiVectorKey[scalekeyFrames];
         for (unsigned i = 0; i < scalekeyFrames; ++i)
         {
             if ( i < channel->mNumScalingKeys)
@@ -2778,7 +2778,7 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
             finalTransform = finalTransform * chain[j];
 
         // New bone node
-        aiNode *pnode = new aiNode;
+        auto*pnode = new aiNode;
         pnode->mName = model.bones_[i]->mName;
         pnode->mTransformation = finalTransform * model.bones_[i]->mTransformation;
 

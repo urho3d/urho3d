@@ -227,7 +227,7 @@ const Matrix3x4& Sprite::GetTransform() const
 
         if (parent_)
         {
-            Sprite* parentSprite = dynamic_cast<Sprite*>(parent_);
+            auto* parentSprite = dynamic_cast<Sprite*>(parent_);
             if (parentSprite)
                 parentTransform = parentSprite->GetTransform();
             else
@@ -285,7 +285,7 @@ const Matrix3x4& Sprite::GetTransform() const
 
 void Sprite::SetTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetTexture(cache->GetResource<Texture2D>(value.name_));
 }
 

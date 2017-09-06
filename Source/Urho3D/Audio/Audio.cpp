@@ -271,7 +271,7 @@ float Audio::GetSoundSourceMasterGain(StringHash typeHash) const
 
 void SDLAudioCallback(void* userdata, Uint8* stream, int len)
 {
-    Audio* audio = static_cast<Audio*>(userdata);
+    auto* audio = static_cast<Audio*>(userdata);
     {
         MutexLock Lock(audio->GetMutex());
         audio->MixOutput(stream, len / audio->GetSampleSize() / Audio::SAMPLE_SIZE_MUL);
@@ -318,7 +318,7 @@ void Audio::MixOutput(void* dest, unsigned samples)
         while (clipSamples--)
             *destPtr++ = (float)Clamp(*clipPtr++, -32768, 32767) / 32768.0f;
 #else
-        short* destPtr = (short*)dest;
+        auto* destPtr = (short*)dest;
         while (clipSamples--)
             *destPtr++ = (short)Clamp(*clipPtr++, -32768, 32767);
 #endif

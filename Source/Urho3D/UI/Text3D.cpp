@@ -540,13 +540,13 @@ void Text3D::MarkTextDirty()
 
 void Text3D::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
 void Text3D::SetFontAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     text_.font_ = cache->GetResource<Font>(value.name_);
 }
 
@@ -639,7 +639,7 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
     {
         if (!geometries_[i])
         {
-            Geometry* geometry = new Geometry(context_);
+            auto* geometry = new Geometry(context_);
             geometry->SetVertexBuffer(0, vertexBuffer_);
             batches_[i].geometry_ = geometries_[i] = geometry;
         }
@@ -649,8 +649,8 @@ void Text3D::UpdateTextMaterials(bool forceUpdate)
             // If material not defined, create a reasonable default from scratch
             if (!material_)
             {
-                Material* material = new Material(context_);
-                Technique* tech = new Technique(context_);
+                auto* material = new Material(context_);
+                auto* tech = new Technique(context_);
                 Pass* pass = tech->CreatePass("alpha");
                 pass->SetVertexShader("Text");
                 pass->SetPixelShader("Text");

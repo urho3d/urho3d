@@ -98,7 +98,7 @@ TextureUnit ParseTextureUnitName(String name)
 {
     name = name.ToLower().Trimmed();
 
-    TextureUnit unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
+    auto unit = (TextureUnit)GetStringListIndex(name.CString(), textureUnitNames, MAX_TEXTURE_UNITS);
     if (unit == MAX_TEXTURE_UNITS)
     {
         // Check also for shorthand names
@@ -231,7 +231,7 @@ void Material::RegisterObject(Context* context)
 bool Material::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load the material, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -266,7 +266,7 @@ bool Material::BeginLoad(Deserializer& source)
 bool Material::EndLoad()
 {
     // In headless mode, do not actually load the material, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -299,7 +299,7 @@ bool Material::BeginLoadXML(Deserializer& source)
         // and request them to also be loaded. Can not do anything else at this point
         if (GetAsyncLoadState() == ASYNC_LOADING)
         {
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             XMLElement rootElem = loadXMLFile_->GetRoot();
             XMLElement techniqueElem = rootElem.GetChild("technique");
             while (techniqueElem)
@@ -358,7 +358,7 @@ bool Material::BeginLoadJSON(Deserializer& source)
         // and request them to also be loaded. Can not do anything else at this point
         if (GetAsyncLoadState() == ASYNC_LOADING)
         {
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             const JSONValue& rootVal = loadJSONFile_->GetRoot();
 
             JSONArray techniqueArray = rootVal.Get("techniques").GetArray();
@@ -424,7 +424,7 @@ bool Material::Load(const XMLElement& source)
         return false;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     XMLElement shaderElem = source.GetChild("shader");
     if (shaderElem)
@@ -438,7 +438,7 @@ bool Material::Load(const XMLElement& source)
 
     while (techniqueElem)
     {
-        Technique* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
+        auto* tech = cache->GetResource<Technique>(techniqueElem.GetAttribute("name"));
         if (tech)
         {
             TechniqueEntry newTechnique;
@@ -575,7 +575,7 @@ bool Material::Load(const JSONValue& source)
         return false;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     const JSONValue& shaderVal = source.Get("shader");
     if (!shaderVal.IsNull())
@@ -592,7 +592,7 @@ bool Material::Load(const JSONValue& source)
     for (unsigned i = 0; i < techniquesArray.Size(); i++)
     {
         const JSONValue& techVal = techniquesArray[i];
-        Technique* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
+        auto* tech = cache->GetResource<Technique>(techVal.Get("name").GetString());
         if (tech)
         {
             TechniqueEntry newTechnique;
@@ -1273,7 +1273,7 @@ void Material::ResetToDefaults()
     pixelShaderDefines_.Clear();
 
     SetNumTechniques(1);
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     SetTechnique(0, renderer ? renderer->GetDefaultTechnique() :
         GetSubsystem<ResourceCache>()->GetResource<Technique>("Techniques/NoTexture.xml"));
 

@@ -98,14 +98,14 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     Context* context = font_->GetContext();
 
     // Create & initialize FreeType library if it does not exist yet
-    FreeTypeLibrary* freeType = font_->GetSubsystem<FreeTypeLibrary>();
+    auto* freeType = font_->GetSubsystem<FreeTypeLibrary>();
     if (!freeType)
         context->RegisterSubsystem(freeType = new FreeTypeLibrary(context));
 
     // Ensure the FreeType library is kept alive as long as TTF font resources exist
     freeType_ = freeType;
 
-    UI* ui = font_->GetSubsystem<UI>();
+    auto* ui = font_->GetSubsystem<UI>();
     const int maxTextureSize = ui->GetMaxFontTextureSize();
     const FontHintLevel hintLevel = ui->GetFontHintLevel();
     const float subpixelThreshold = ui->GetFontSubpixelThreshold();
@@ -145,7 +145,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
 
     face_ = face;
 
-    unsigned numGlyphs = (unsigned)face->num_glyphs;
+    auto numGlyphs = (unsigned)face->num_glyphs;
     URHO3D_LOGDEBUGF("Font face %s (%fpt) has %d glyphs", GetFileName(font_->GetName()).CString(), pointSize, numGlyphs);
 
     PODVector<unsigned> charCodes(numGlyphs + 1, 0);
@@ -184,7 +184,7 @@ bool FontFaceFreeType::Load(const unsigned char* fontData, unsigned fontDataSize
     pointSize_ = pointSize;
 
     // Check if the font's OS/2 info gives different (larger) values for ascender & descender
-    TT_OS2* os2Info = (TT_OS2*)FT_Get_Sfnt_Table(face, ft_sfnt_os2);
+    auto* os2Info = (TT_OS2*)FT_Get_Sfnt_Table(face, ft_sfnt_os2);
     if (os2Info)
     {
         float descender = FixedToFloat(face->size->metrics.descender);
@@ -414,7 +414,7 @@ bool FontFaceFreeType::LoadCharGlyph(unsigned charCode, Image* image)
     if (!face_)
         return false;
 
-    FT_Face face = (FT_Face)face_;
+    auto face = (FT_Face)face_;
     FT_GlyphSlot slot = face->glyph;
 
     FontGlyph fontGlyph;

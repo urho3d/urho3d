@@ -71,7 +71,7 @@ void Mutex::Release()
 Mutex::Mutex() :
     handle_(new pthread_mutex_t)
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
+    auto* mutex = (pthread_mutex_t*)handle_;
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -80,7 +80,7 @@ Mutex::Mutex() :
 
 Mutex::~Mutex()
 {
-    pthread_mutex_t* mutex = (pthread_mutex_t*)handle_;
+    auto* mutex = (pthread_mutex_t*)handle_;
     pthread_mutex_destroy(mutex);
     delete mutex;
     handle_ = 0;

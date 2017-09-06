@@ -743,7 +743,7 @@ void RigidBody::UpdateMass()
     principal.setOrigin(btVector3(0.0f, 0.0f, 0.0f));
 
     // Calculate center of mass shift from all the collision shapes
-    unsigned numShapes = (unsigned)compoundShape_->getNumChildShapes();
+    auto numShapes = (unsigned)compoundShape_->getNumChildShapes();
     if (numShapes)
     {
         PODVector<float> masses(numShapes);

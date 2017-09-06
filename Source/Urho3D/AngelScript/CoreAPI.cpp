@@ -383,7 +383,7 @@ static CScriptArray* VariantGetStringVector(Variant* ptr)
 
 static asIScriptObject* VariantGetScriptObject(Variant* ptr)
 {
-    asIScriptObject* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
+    auto* object = static_cast<asIScriptObject*>(ptr->GetVoidPtr());
     if (!object)
         return nullptr;
 

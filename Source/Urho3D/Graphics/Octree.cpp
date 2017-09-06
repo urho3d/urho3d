@@ -51,8 +51,8 @@ extern const char* SUBSYSTEM_CATEGORY;
 void UpdateDrawablesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    auto** start = reinterpret_cast<Drawable**>(item->start_);
+    auto** end = reinterpret_cast<Drawable**>(item->end_);
 
     while (start != end)
     {
@@ -246,7 +246,7 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
         query.TestDrawables(start, end, inside);
     }
@@ -266,7 +266,7 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -293,7 +293,7 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
 
     if (drawables_.Size())
     {
-        Drawable** start = const_cast<Drawable**>(&drawables_[0]);
+        auto** start = const_cast<Drawable**>(&drawables_[0]);
         Drawable** end = start + drawables_.Size();
 
         while (start != end)
@@ -381,7 +381,7 @@ void Octree::Update(const FrameInfo& frame)
         // Perform updates in worker threads. Notify the scene that a threaded update is going on and components
         // (for example physics objects) should not perform non-threadsafe work when marked dirty
         Scene* scene = GetScene();
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
         scene->BeginThreadedUpdate();
 
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
@@ -575,7 +575,7 @@ void Octree::CancelUpdate(Drawable* drawable)
 
 void Octree::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     DrawDebugGeometry(debug, depthTest);
 }
 

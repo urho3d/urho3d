@@ -473,7 +473,7 @@ void RibbonTrail::UpdateBufferSize()
     }
 
     // Indices do not change for a given tail generator capacity
-    unsigned short* dest = (unsigned short*)indexBuffer_->Lock(0, ((numPoints_ - 1) * indexPerSegment), true);
+    auto* dest = (unsigned short*)indexBuffer_->Lock(0, ((numPoints_ - 1) * indexPerSegment), true);
     if (!dest)
         return;
 
@@ -570,7 +570,7 @@ void RibbonTrail::UpdateVertexBuffer(const FrameInfo& frame)
     bufferDirty_ = false;
     forceUpdate_ = false;
 
-    float* dest = (float*)vertexBuffer_->Lock(0, (numPoints_ - 1) * vertexPerSegment, true);
+    auto* dest = (float*)vertexBuffer_->Lock(0, (numPoints_ - 1) * vertexPerSegment, true);
     if (!dest)
         return;
 
@@ -853,7 +853,7 @@ void RibbonTrail::SetTrailType(TrailType type)
 
 void RibbonTrail::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
     Commit();
 }

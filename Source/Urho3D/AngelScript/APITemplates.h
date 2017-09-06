@@ -380,14 +380,14 @@ template <class T> void RegisterObject(asIScriptEngine* engine, const char* clas
 
 template <class T> T* ConstructObject()
 {
-    T* object = new T(GetScriptContext());
+    auto* object = new T(GetScriptContext());
     object->AddRef();
     return object;
 }
 
 template <class T> T* ConstructNamedObject(const String& name)
 {
-    T* object = new T(GetScriptContext());
+    auto* object = new T(GetScriptContext());
     object->AddRef();
     object->SetName(name);
     return object;

@@ -169,9 +169,9 @@ public:
 
 void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
-    View* view = reinterpret_cast<View*>(item->aux_);
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    auto* view = reinterpret_cast<View*>(item->aux_);
+    auto** start = reinterpret_cast<Drawable**>(item->start_);
+    auto** end = reinterpret_cast<Drawable**>(item->end_);
     OcclusionBuffer* buffer = view->occlusionBuffer_;
     const Matrix3x4& viewMatrix = view->cullCamera_->GetView();
     Vector3 viewZ = Vector3(viewMatrix.m20_, viewMatrix.m21_, viewMatrix.m22_);
@@ -227,7 +227,7 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
             }
             else if (drawable->GetDrawableFlags() & DRAWABLE_LIGHT)
             {
-                Light* light = static_cast<Light*>(drawable);
+                auto* light = static_cast<Light*>(drawable);
                 // Skip lights with zero brightness or black color
                 if (!light->GetEffectiveColor().Equals(Color::BLACK))
                     result.lights_.Push(light);
@@ -238,8 +238,8 @@ void CheckVisibilityWork(const WorkItem* item, unsigned threadIndex)
 
 void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
 {
-    View* view = reinterpret_cast<View*>(item->aux_);
-    LightQueryResult* query = reinterpret_cast<LightQueryResult*>(item->start_);
+    auto* view = reinterpret_cast<View*>(item->aux_);
+    auto* query = reinterpret_cast<LightQueryResult*>(item->start_);
 
     view->ProcessLight(*query, threadIndex);
 }
@@ -247,8 +247,8 @@ void ProcessLightWork(const WorkItem* item, unsigned threadIndex)
 void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
 {
     const FrameInfo& frame = *(reinterpret_cast<FrameInfo*>(item->aux_));
-    Drawable** start = reinterpret_cast<Drawable**>(item->start_);
-    Drawable** end = reinterpret_cast<Drawable**>(item->end_);
+    auto** start = reinterpret_cast<Drawable**>(item->start_);
+    auto** end = reinterpret_cast<Drawable**>(item->end_);
 
     while (start != end)
     {
@@ -261,28 +261,28 @@ void UpdateDrawableGeometriesWork(const WorkItem* item, unsigned threadIndex)
 
 void SortBatchQueueFrontToBackWork(const WorkItem* item, unsigned threadIndex)
 {
-    BatchQueue* queue = reinterpret_cast<BatchQueue*>(item->start_);
+    auto* queue = reinterpret_cast<BatchQueue*>(item->start_);
 
     queue->SortFrontToBack();
 }
 
 void SortBatchQueueBackToFrontWork(const WorkItem* item, unsigned threadIndex)
 {
-    BatchQueue* queue = reinterpret_cast<BatchQueue*>(item->start_);
+    auto* queue = reinterpret_cast<BatchQueue*>(item->start_);
 
     queue->SortBackToFront();
 }
 
 void SortLightQueueWork(const WorkItem* item, unsigned threadIndex)
 {
-    LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
+    auto* start = reinterpret_cast<LightBatchQueue*>(item->start_);
     start->litBaseBatches_.SortFrontToBack();
     start->litBatches_.SortFrontToBack();
 }
 
 void SortShadowQueueWork(const WorkItem* item, unsigned threadIndex)
 {
-    LightBatchQueue* start = reinterpret_cast<LightBatchQueue*>(item->start_);
+    auto* start = reinterpret_cast<LightBatchQueue*>(item->start_);
     for (unsigned i = 0; i < start->shadowSplits_.Size(); ++i)
         start->shadowSplits_[i].shadowBatches_.SortFrontToBack();
 }
@@ -646,7 +646,7 @@ void View::Render()
     // Draw the associated debug geometry now if enabled
     if (drawDebug_ && octree_ && camera_)
     {
-        DebugRenderer* debug = octree_->GetComponent<DebugRenderer>();
+        auto* debug = octree_->GetComponent<DebugRenderer>();
         if (debug && debug->IsEnabledEffective() && debug->HasContent())
         {
             // If used resolve from backbuffer, blit first to the backbuffer to ensure correct depth buffer on OpenGL
@@ -786,8 +786,8 @@ void View::SetCommandShaderParameters(const RenderPathCommand& command)
 
 void View::SetGBufferShaderParameters(const IntVector2& texSize, const IntRect& viewRect)
 {
-    float texWidth = (float)texSize.x_;
-    float texHeight = (float)texSize.y_;
+    auto texWidth = (float)texSize.x_;
+    auto texHeight = (float)texSize.y_;
     float widthRange = 0.5f * viewRect.Width() / texWidth;
     float heightRange = 0.5f * viewRect.Height() / texHeight;
 
@@ -813,7 +813,7 @@ void View::GetDrawables()
 
     URHO3D_PROFILE(GetDrawables);
 
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    auto* queue = GetSubsystem<WorkQueue>();
     PODVector<Drawable*>& tempDrawables = tempDrawables_[0];
 
     // Get zones and occluders first
@@ -835,7 +835,7 @@ void View::GetDrawables()
 
         if (flags & DRAWABLE_ZONE)
         {
-            Zone* zone = static_cast<Zone*>(drawable);
+            auto* zone = static_cast<Zone*>(drawable);
             zones_.Push(zone);
             int priority = zone->GetPriority();
             if (priority > highestZonePriority_)
@@ -996,7 +996,7 @@ void View::ProcessLights()
     // Process lit geometries and shadow casters for each light
     URHO3D_PROFILE(ProcessLights);
 
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    auto* queue = GetSubsystem<WorkQueue>();
     lightQueryResults_.Resize(lights_.Size());
 
     for (unsigned i = 0; i < lightQueryResults_.Size(); ++i)
@@ -1036,7 +1036,7 @@ void View::GetLightBatches()
 
         lightQueues_.Resize(numLightQueues);
         maxLightsDrawables_.Clear();
-        unsigned maxSortedInstances = (unsigned)renderer_->GetMaxSortedInstances();
+        auto maxSortedInstances = (unsigned)renderer_->GetMaxSortedInstances();
 
         for (Vector<LightQueryResult>::Iterator i = lightQueryResults_.Begin(); i != lightQueryResults_.End(); ++i)
         {
@@ -1305,7 +1305,7 @@ void View::UpdateGeometries()
 
     URHO3D_PROFILE(SortAndUpdateGeometry);
 
-    WorkQueue* queue = GetSubsystem<WorkQueue>();
+    auto* queue = GetSubsystem<WorkQueue>();
 
     // Sort batches
     {
@@ -1890,8 +1890,8 @@ void View::RenderQuad(RenderPathCommand& command)
 
         String invSizeName = rtInfo.name_ + "InvSize";
         String offsetsName = rtInfo.name_ + "Offsets";
-        float width = (float)renderTargets_[nameHash]->GetWidth();
-        float height = (float)renderTargets_[nameHash]->GetHeight();
+        auto width = (float)renderTargets_[nameHash]->GetWidth();
+        auto height = (float)renderTargets_[nameHash]->GetHeight();
 
         const Vector2& pixelUVOffset = Graphics::GetPixelUVOffset();
         graphics_->SetShaderParameter(invSizeName, Vector2(1.0f / width, 1.0f / height));
@@ -2105,8 +2105,8 @@ void View::AllocateScreenBuffers()
             height = (float)viewSize_.y_ * height;
         }
 
-        int intWidth = (int)(width + 0.5f);
-        int intHeight = (int)(height + 0.5f);
+        auto intWidth = (int)(width + 0.5f);
+        auto intHeight = (int)(height + 0.5f);
 
         // If the rendertarget is persistent, key it with a hash derived from the RT name and the view's pointer
         renderTargets_[rtInfo.name_] =
@@ -2509,8 +2509,8 @@ bool View::IsShadowCasterVisible(Drawable* drawable, BoundingBox lightViewBox, C
 
 IntRect View::GetShadowMapViewport(Light* light, unsigned splitIndex, Texture2D* shadowMap)
 {
-    unsigned width = (unsigned)shadowMap->GetWidth();
-    unsigned height = (unsigned)shadowMap->GetHeight();
+    auto width = (unsigned)shadowMap->GetWidth();
+    auto height = (unsigned)shadowMap->GetHeight();
 
     switch (light->GetLightType())
     {
@@ -2688,7 +2688,7 @@ void View::FinalizeShadowCamera(Camera* shadowCamera, Light* light, const IntRec
     const BoundingBox& shadowCasterBox)
 {
     const FocusParameters& parameters = light->GetShadowFocus();
-    float shadowMapWidth = (float)(shadowViewport.Width());
+    auto shadowMapWidth = (float)(shadowViewport.Width());
     LightType type = light->GetLightType();
 
     if (type == LIGHT_DIRECTIONAL)
@@ -2740,7 +2740,7 @@ void View::QuantizeDirLightShadowCamera(Camera* shadowCamera, Light* light, cons
 {
     Node* shadowCameraNode = shadowCamera->GetNode();
     const FocusParameters& parameters = light->GetShadowFocus();
-    float shadowMapWidth = (float)(shadowViewport.Width());
+    auto shadowMapWidth = (float)(shadowViewport.Width());
 
     float minX = viewBox.min_.x_;
     float minY = viewBox.min_.y_;
@@ -2865,14 +2865,14 @@ void View::CheckMaterialForAuxView(Material* material)
             // Have to check cube & 2D textures separately
             if (texture->GetType() == Texture2D::GetTypeStatic())
             {
-                Texture2D* tex2D = static_cast<Texture2D*>(texture);
+                auto* tex2D = static_cast<Texture2D*>(texture);
                 RenderSurface* target = tex2D->GetRenderSurface();
                 if (target && target->GetUpdateMode() == SURFACE_UPDATEVISIBLE)
                     target->QueueUpdate();
             }
             else if (texture->GetType() == TextureCube::GetTypeStatic())
             {
-                TextureCube* texCube = static_cast<TextureCube*>(texture);
+                auto* texCube = static_cast<TextureCube*>(texture);
                 for (unsigned j = 0; j < MAX_CUBEMAP_FACES; ++j)
                 {
                     RenderSurface* target = texCube->GetRenderSurface((CubeMapFace)j);
@@ -3177,9 +3177,9 @@ RenderSurface* View::GetRenderSurfaceFromTexture(Texture* texture, CubeMapFace f
 void View::SendViewEvent(StringHash eventType)
 {
     using namespace BeginViewRender;
-    
+
     VariantMap& eventData = GetEventDataMap();
-    
+
     eventData[P_VIEW] = this;
     eventData[P_SURFACE] = renderTarget_;
     eventData[P_TEXTURE] = (renderTarget_ ? renderTarget_->GetParentTexture() : nullptr);
@@ -3197,7 +3197,7 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
         return renderTargets_[nameHash];
 
     // Then the resource system
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Check existing resources first. This does not load resources, so we can afford to guess the resource type wrong
     // without having to rely on the file extension

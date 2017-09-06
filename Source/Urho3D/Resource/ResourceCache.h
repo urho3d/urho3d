@@ -286,7 +286,7 @@ template <class T> bool ResourceCache::BackgroundLoadResource(const String& name
 
 template <class T> void ResourceCache::GetResources(PODVector<T*>& result) const
 {
-    PODVector<Resource*>& resources = reinterpret_cast<PODVector<Resource*>&>(result);
+    auto& resources = reinterpret_cast<PODVector<Resource*>&>(result);
     StringHash type = T::GetTypeStatic();
     GetResources(resources, type);
 

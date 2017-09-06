@@ -58,7 +58,7 @@ class ScriptResourceRouter : public ResourceRouter
             String replaced = ReplaceExtension(name, ".asc");
             // Note: ResourceCache prevents recursive calls to the resource routers so this is OK, the nested Exists()
             // check does not go through the router again
-            ResourceCache* cache = GetSubsystem<ResourceCache>();
+            auto* cache = GetSubsystem<ResourceCache>();
             if (!cache->Exists(name) && cache->Exists(replaced))
                 name = replaced;
         }
@@ -145,7 +145,7 @@ Script::Script(Context* context) :
     SetExecuteConsoleCommands(true);
 
     // Create and register resource router for checking for compiled AngelScript files
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
     {
         router_ = new ScriptResourceRouter(context_);
@@ -170,7 +170,7 @@ Script::~Script()
         scriptEngine_ = nullptr;
     }
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     if (cache)
         cache->RemoveResourceRouter(router_);
 }

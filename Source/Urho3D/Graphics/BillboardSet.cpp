@@ -363,7 +363,7 @@ Billboard* BillboardSet::GetBillboard(unsigned index)
 
 void BillboardSet::SetMaterialAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetMaterial(cache->GetResource<Material>(value.name_));
 }
 
@@ -539,7 +539,7 @@ void BillboardSet::UpdateBufferSize()
 
     if (!largeIndices)
     {
-        unsigned short* dest = (unsigned short*)destPtr;
+        auto* dest = (unsigned short*)destPtr;
         unsigned short vertexIndex = 0;
         while (numBillboards--)
         {
@@ -556,7 +556,7 @@ void BillboardSet::UpdateBufferSize()
     }
     else
     {
-        unsigned* dest = (unsigned*)destPtr;
+        auto* dest = (unsigned*)destPtr;
         unsigned vertexIndex = 0;
         while (numBillboards--)
         {
@@ -635,7 +635,7 @@ void BillboardSet::UpdateVertexBuffer(const FrameInfo& frame)
         previousOffset_ = (worldPos - frame.camera_->GetNode()->GetWorldPosition());
     }
 
-    float* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
+    auto* dest = (float*)vertexBuffer_->Lock(0, enabledBillboards * 4, true);
     if (!dest)
         return;
 

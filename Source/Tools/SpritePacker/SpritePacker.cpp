@@ -121,7 +121,7 @@ void Run(Vector<String>& arguments)
     SharedPtr<Context> context(new Context());
     context->RegisterSubsystem(new FileSystem(context));
     context->RegisterSubsystem(new Log(context));
-    FileSystem* fileSystem = context->GetSubsystem<FileSystem>();
+    auto* fileSystem = context->GetSubsystem<FileSystem>();
 
     Vector<String> inputFiles;
     String outputFile;
@@ -276,7 +276,7 @@ void Run(Vector<String>& arguments)
         }
 
         // load rectangles
-        stbrp_rect* packerRects = new stbrp_rect[packerInfos.Size()];
+        auto* packerRects = new stbrp_rect[packerInfos.Size()];
         for (unsigned i = 0; i < packerInfos.Size(); ++i)
         {
             PackerInfo* packerInfo = packerInfos[i];

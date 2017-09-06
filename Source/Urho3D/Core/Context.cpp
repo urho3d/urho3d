@@ -456,7 +456,7 @@ void Context::BeginSendEvent(Object* sender, StringHash eventType)
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->BeginBlock(eventType);
     }
@@ -472,7 +472,7 @@ void Context::EndSendEvent()
 #ifdef URHO3D_PROFILING
     if (EventProfiler::IsActive())
     {
-        EventProfiler* eventProfiler = GetSubsystem<EventProfiler>();
+        auto* eventProfiler = GetSubsystem<EventProfiler>();
         if (eventProfiler)
             eventProfiler->EndBlock();
     }

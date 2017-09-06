@@ -60,8 +60,8 @@ void UIDrag::Start()
 
 void UIDrag::CreateGUI()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     UIElement* root = ui->GetRoot();
     // Load the style sheet from xml
@@ -69,7 +69,7 @@ void UIDrag::CreateGUI()
 
     for (int i=0; i < 10; i++)
     {
-        Button* b = new Button(context_);
+        auto* b = new Button(context_);
         root->AddChild(b);
         // Reference a style from the style sheet loaded earlier:
         b->SetStyle("Button");
@@ -85,7 +85,7 @@ void UIDrag::CreateGUI()
         SubscribeToEvent(b, E_DRAGEND, URHO3D_HANDLER(UIDrag, HandleDragEnd));
 
         {
-            Text* t = new Text(context_);
+            auto* t = new Text(context_);
             b->AddChild(t);
             t->SetStyle("Text");
             t->SetHorizontalAlignment(HA_CENTER);
@@ -94,7 +94,7 @@ void UIDrag::CreateGUI()
         }
 
         {
-            Text* t = new Text(context_);
+            auto* t = new Text(context_);
             b->AddChild(t);
             t->SetStyle("Text");
             t->SetName("Event Touch");
@@ -103,7 +103,7 @@ void UIDrag::CreateGUI()
         }
 
         {
-            Text* t = new Text(context_);
+            auto* t = new Text(context_);
             b->AddChild(t);
             t->SetStyle("Text");
             t->SetName("Num Touch");
@@ -114,7 +114,7 @@ void UIDrag::CreateGUI()
 
     for (int i = 0; i < 10; i++)
     {
-        Text* t = new Text(context_);
+        auto* t = new Text(context_);
         root->AddChild(t);
         t->SetStyle("Text");
         t->SetName("Touch "+ String(i));
@@ -124,11 +124,11 @@ void UIDrag::CreateGUI()
 
 void UIDrag::CreateInstructions()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
-    UI* ui = GetSubsystem<UI>();
+    auto* cache = GetSubsystem<ResourceCache>();
+    auto* ui = GetSubsystem<UI>();
 
     // Construct new Text object, set string to display and font to use
-    Text* instructionText = ui->GetRoot()->CreateChild<Text>();
+    auto* instructionText = ui->GetRoot()->CreateChild<Text>();
     instructionText->SetText("Drag on the buttons to move them around.\n"
                              "Touch input allows also multi-drag.\n"
                              "Press SPACE to show/hide tagged UI elements.");
@@ -149,7 +149,7 @@ void UIDrag::SubscribeToEvents()
 void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
-    Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
+    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
 
     int lx = eventData[P_X].GetInt();
     int ly = eventData[P_Y].GetInt();
@@ -171,7 +171,7 @@ void UIDrag::HandleDragBegin(StringHash eventType, VariantMap& eventData)
 void UIDrag::HandleDragMove(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
-    Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
+    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
     int buttons = eventData[P_BUTTONS].GetInt();
     IntVector2 d = element->GetVar("DELTA").GetIntVector2();
     int X = eventData[P_X].GetInt() + d.x_;
@@ -188,7 +188,7 @@ void UIDrag::HandleDragMove(StringHash eventType, VariantMap& eventData)
 void UIDrag::HandleDragCancel(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
-    Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
+    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
     IntVector2 P = element->GetVar("START").GetIntVector2();
     element->SetPosition(P);
 }
@@ -196,15 +196,15 @@ void UIDrag::HandleDragCancel(StringHash eventType, VariantMap& eventData)
 void UIDrag::HandleDragEnd(StringHash eventType, VariantMap& eventData)
 {
     using namespace DragBegin;
-    Button* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
+    auto* element = (Button*)eventData[P_ELEMENT].GetVoidPtr();
 }
 
 void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     UIElement* root = ui->GetRoot();
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     unsigned n = input->GetNumTouches();
     for (unsigned i = 0; i < n; i++)
@@ -225,7 +225,7 @@ void UIDrag::HandleUpdate(StringHash eventType, VariantMap& eventData)
         Text* t = (Text*)root->GetChild("Touch " + String(i));
         t->SetVisible(false);
     }
-    
+
     if (input->GetKeyPress(KEY_SPACE))
     {
         PODVector<UIElement*> elements;

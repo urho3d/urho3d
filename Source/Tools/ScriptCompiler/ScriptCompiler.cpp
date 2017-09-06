@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     #endif
     }
 
-    Log* log = context->GetSubsystem<Log>();
+    auto* log = context->GetSubsystem<Log>();
     // Register Log subsystem manually if compiled without logging support
     if (!log)
     {
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
         String path, file, extension;
         SplitPath(outputFile, path, file, extension);
 
-        ResourceCache* cache = context->GetSubsystem<ResourceCache>();
+        auto* cache = context->GetSubsystem<ResourceCache>();
 
         // Add resource path to be able to resolve includes
         if (arguments.Size() > 1)

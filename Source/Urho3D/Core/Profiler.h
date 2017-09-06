@@ -128,7 +128,7 @@ public:
                 return *i;
         }
 
-        ProfilerBlock* newBlock = new ProfilerBlock(this, name);
+        auto* newBlock = new ProfilerBlock(this, name);
         children_.Push(newBlock);
 
         return newBlock;

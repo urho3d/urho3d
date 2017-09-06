@@ -90,7 +90,7 @@ public:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize((unsigned)sizeof(T));
-        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T();
 
         return newObject;
@@ -101,7 +101,7 @@ public:
     {
         if (!allocator_)
             allocator_ = AllocatorInitialize((unsigned)sizeof(T));
-        T* newObject = static_cast<T*>(AllocatorReserve(allocator_));
+        auto* newObject = static_cast<T*>(AllocatorReserve(allocator_));
         new(newObject) T(object);
 
         return newObject;

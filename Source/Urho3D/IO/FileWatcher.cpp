@@ -284,14 +284,14 @@ void FileWatcher::ThreadFunction()
     while (shouldRun_)
     {
         int i = 0;
-        int length = (int)read(watchHandle_, buffer, sizeof(buffer));
+        auto length = (int)read(watchHandle_, buffer, sizeof(buffer));
 
         if (length < 0)
             return;
 
         while (i < length)
         {
-            inotify_event* event = (inotify_event*)&buffer[i];
+            auto* event = (inotify_event*)&buffer[i];
 
             if (event->len > 0)
             {
@@ -335,7 +335,7 @@ bool FileWatcher::GetNextChange(String& dest)
 {
     MutexLock lock(changesMutex_);
 
-    unsigned delayMsec = (unsigned)(delay_ * 1000.0f);
+    auto delayMsec = (unsigned)(delay_ * 1000.0f);
 
     if (changes_.Empty())
         return false;

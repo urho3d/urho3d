@@ -212,7 +212,7 @@ void ScriptFile::AddEventHandler(Object* sender, StringHash eventType, const Str
 
 void ScriptFile::RemoveEventHandler(StringHash eventType)
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::Iterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
     {
@@ -225,7 +225,7 @@ void ScriptFile::RemoveEventHandler(StringHash eventType)
 
 void ScriptFile::RemoveEventHandler(Object* sender, StringHash eventType)
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::Iterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
     {
@@ -237,7 +237,7 @@ void ScriptFile::RemoveEventHandler(Object* sender, StringHash eventType)
 
 void ScriptFile::RemoveEventHandlers(Object* sender)
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::Iterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
     {
@@ -249,7 +249,7 @@ void ScriptFile::RemoveEventHandlers(Object* sender)
 
 void ScriptFile::RemoveEventHandlers()
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::Iterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
     {
@@ -261,7 +261,7 @@ void ScriptFile::RemoveEventHandlers()
 
 void ScriptFile::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions)
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::Iterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
     {
@@ -273,7 +273,7 @@ void ScriptFile::RemoveEventHandlersExcept(const PODVector<StringHash>& exceptio
 
 bool ScriptFile::HasEventHandler(StringHash eventType) const
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
         return i->second_->HasSubscribedToEvent(eventType);
@@ -283,7 +283,7 @@ bool ScriptFile::HasEventHandler(StringHash eventType) const
 
 bool ScriptFile::HasEventHandler(Object* sender, StringHash eventType) const
 {
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
     HashMap<asIScriptObject*, SharedPtr<ScriptEventInvoker> >::ConstIterator i = eventInvokers_.Find(receiver);
     if (i != eventInvokers_.End())
         return i->second_->HasSubscribedToEvent(sender, eventType);
@@ -541,7 +541,7 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 {
     String declaration = "void " + handlerName + "(StringHash, VariantMap&)";
     asIScriptFunction* function = nullptr;
-    asIScriptObject* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
+    auto* receiver = static_cast<asIScriptObject*>(asGetActiveContext()->GetThisPointer());
 
     if (receiver)
         function = GetMethod(receiver, declaration);
@@ -587,7 +587,7 @@ void ScriptFile::AddEventHandlerInternal(Object* sender, StringHash eventType, c
 
 bool ScriptFile::AddScriptSection(asIScriptEngine* engine, Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     unsigned dataSize = source.GetSize();
     SharedArrayPtr<char> buffer(new char[dataSize]);
@@ -857,7 +857,7 @@ void ScriptFile::ReleaseModule()
         compiled_ = false;
         SetMemoryUse(0);
 
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         if (cache)
             cache->ResetDependencies(this);
     }
@@ -935,7 +935,7 @@ void ScriptEventInvoker::HandleScriptEvent(StringHash eventType, VariantMap& eve
     if (!file_->IsCompiled())
         return;
 
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
+    auto* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
 
     if (object_ && !IsObjectAlive())
     {

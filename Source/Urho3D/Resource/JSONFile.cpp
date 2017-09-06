@@ -227,7 +227,7 @@ bool JSONFile::Save(Serializer& dest, const String& indendation) const
     writer.SetIndent(!indendation.Empty() ? indendation.Front() : '\0', indendation.Length());
 
     document.Accept(writer);
-    unsigned size = (unsigned)buffer.GetSize();
+    auto size = (unsigned)buffer.GetSize();
     return dest.Write(buffer.GetString(), size) == size;
 }
 

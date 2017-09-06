@@ -338,7 +338,7 @@ void PhysicsWorld2D::Update(float timeStep)
 
 void PhysicsWorld2D::DrawDebugGeometry()
 {
-    DebugRenderer* debug = GetComponent<DebugRenderer>();
+    auto* debug = GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, false);
 }
@@ -622,7 +622,7 @@ RigidBody2D* PhysicsWorld2D::GetRigidBody(const Vector2& point, unsigned collisi
 
 RigidBody2D* PhysicsWorld2D::GetRigidBody(int screenX, int screenY, unsigned collisionMask)
 {
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     for (unsigned i = 0; i < renderer->GetNumViewports(); ++i)
     {
         Viewport* viewport = renderer->GetViewport(i);

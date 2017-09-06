@@ -83,7 +83,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
     unsigned pages = commonElem.GetUInt("pages");
     textures_.Reserve(pages);
 
-    ResourceCache* resourceCache = font_->GetSubsystem<ResourceCache>();
+    auto* resourceCache = font_->GetSubsystem<ResourceCache>();
     String fontPath = GetPath(font_->GetName());
     unsigned totalTextureSize = 0;
 
@@ -153,7 +153,7 @@ bool FontFaceBitmap::Load(const unsigned char* fontData, unsigned fontDataSize, 
         {
             int first = kerningElem.GetInt("first");
             int second = kerningElem.GetInt("second");
-            unsigned value = (unsigned)((first << 16) + second);
+            auto value = (unsigned)((first << 16) + second);
             kerningMapping_[value] = (short)kerningElem.GetInt("amount");
 
             kerningElem = kerningElem.GetNext("kerning");
@@ -283,7 +283,7 @@ bool FontFaceBitmap::Save(Serializer& dest, int pointSize, const String& indenta
 
     // Construct the path to store the texture
     String pathName;
-    File* file = dynamic_cast<File*>(&dest);
+    auto* file = dynamic_cast<File*>(&dest);
     if (file)
         // If serialize to file, use the file's path
         pathName = GetPath(file->GetName());

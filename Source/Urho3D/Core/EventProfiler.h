@@ -43,12 +43,12 @@ public:
     {
         for (PODVector<ProfilerBlock*>::Iterator i = children_.Begin(); i != children_.End(); ++i)
         {
-            EventProfilerBlock* eventProfilerBlock = static_cast<EventProfilerBlock*>(*i);
+            auto* eventProfilerBlock = static_cast<EventProfilerBlock*>(*i);
             if (eventProfilerBlock->eventID_ == eventID)
                 return eventProfilerBlock;
         }
 
-        EventProfilerBlock* newBlock = new EventProfilerBlock(this, eventID);
+        auto* newBlock = new EventProfilerBlock(this, eventID);
         children_.Push(newBlock);
 
         return newBlock;

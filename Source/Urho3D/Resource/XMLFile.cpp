@@ -103,7 +103,7 @@ bool XMLFile::BeginLoad(Deserializer& source)
     if (!inherit.Empty())
     {
         // The existence of this attribute indicates this is an RFC 5261 patch file
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         // If being async loaded, GetResource() is not safe, so use GetTempResource() instead
         XMLFile* inheritedXMLFile = GetAsyncLoadState() == ASYNC_DONE ? cache->GetResource<XMLFile>(inherit) :
             cache->GetTempResource<XMLFile>(inherit);

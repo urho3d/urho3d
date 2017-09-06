@@ -289,7 +289,7 @@ float Ray::HitDistance(const void* vertexData, unsigned vertexStride, const void
     unsigned indexStart, unsigned indexCount, Vector3* outNormal, Vector2* outUV, unsigned uvOffset) const
 {
     float nearest = M_INFINITY;
-    const unsigned char* vertices = (const unsigned char*)vertexData;
+    const auto* vertices = (const unsigned char*)vertexData;
     Vector3 barycentric;
     Vector3* outBary = outUV ? &barycentric : nullptr;
 
@@ -406,7 +406,7 @@ bool Ray::InsideGeometry(const void* vertexData, unsigned vertexSize, const void
 {
     float currentFrontFace = M_INFINITY;
     float currentBackFace = M_INFINITY;
-    const unsigned char* vertices = (const unsigned char*)vertexData;
+    const auto* vertices = (const unsigned char*)vertexData;
 
     // 16-bit indices
     if (indexSize == sizeof(unsigned short))

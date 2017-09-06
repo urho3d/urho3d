@@ -261,7 +261,7 @@ void IKEffector::UpdateTargetNodePosition()
 // ----------------------------------------------------------------------------
 void IKEffector::DrawDebugGeometry(bool depthTest)
 {
-    DebugRenderer* debug = GetScene()->GetComponent<DebugRenderer>();
+    auto* debug = GetScene()->GetComponent<DebugRenderer>();
     if (debug)
         DrawDebugGeometry(debug, depthTest);
 }

@@ -107,7 +107,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
     {
         // The component / node to which the ID refers to may not be in the scene yet, and furthermore the ID must go through the
         // SceneResolver first. Delay searching for the object to ApplyAttributes
-        AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+        auto* attrPtr = const_cast<AttributeInfo*>(&attr);
         idAttributes_[attrPtr] = src.GetUInt();
     }
     else if (attr.type_ == VAR_RESOURCEREF && attr.ptr_)
@@ -151,7 +151,7 @@ void ScriptInstance::OnSetAttribute(const AttributeInfo& attr, const Variant& sr
 
 void ScriptInstance::OnGetAttribute(const AttributeInfo& attr, Variant& dest) const
 {
-    AttributeInfo* attrPtr = const_cast<AttributeInfo*>(&attr);
+    auto* attrPtr = const_cast<AttributeInfo*>(&attr);
 
     // Get ID's for node / component handle attributes
     if (attr.mode_ & (AM_NODEID | AM_COMPONENTID))
@@ -442,7 +442,7 @@ bool ScriptInstance::HasMethod(const String& declaration) const
 
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
 }
 
@@ -930,7 +930,7 @@ void ScriptInstance::HandleScriptEvent(StringHash eventType, VariantMap& eventDa
     if (!IsEnabledEffective() || !scriptFile_ || !scriptObject_)
         return;
 
-    asIScriptFunction* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
+    auto* method = static_cast<asIScriptFunction*>(GetEventHandler()->GetUserData());
 
     VariantVector parameters;
     if (method->GetParamCount() > 0)
@@ -1006,7 +1006,7 @@ ScriptEventListener* GetScriptContextEventListener()
     asIScriptContext* context = asGetActiveContext();
     if (context)
     {
-        asIScriptObject* object = static_cast<asIScriptObject*>(context->GetThisPointer());
+        auto* object = static_cast<asIScriptObject*>(context->GetThisPointer());
         if (object && object->GetUserData())
             return GetScriptContextInstance();
         else

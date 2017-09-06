@@ -66,14 +66,14 @@ bool CompressStream(Serializer& dest, Deserializer& src)
         return true;
     }
 
-    unsigned maxDestSize = (unsigned)LZ4_compressBound(srcSize);
+    auto maxDestSize = (unsigned)LZ4_compressBound(srcSize);
     SharedArrayPtr<unsigned char> srcBuffer(new unsigned char[srcSize]);
     SharedArrayPtr<unsigned char> destBuffer(new unsigned char[maxDestSize]);
 
     if (src.Read(srcBuffer, srcSize) != srcSize)
         return false;
 
-    unsigned destSize = (unsigned)LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0);
+    auto destSize = (unsigned)LZ4_compress_HC((const char*)srcBuffer.Get(), (char*)destBuffer.Get(), srcSize, LZ4_compressBound(srcSize), 0);
     bool success = true;
     success &= dest.WriteUInt(srcSize);
     success &= dest.WriteUInt(destSize);

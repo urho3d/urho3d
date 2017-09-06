@@ -56,8 +56,8 @@ void ConstantBuffer::SetVector3ArrayParameter(unsigned offset, unsigned rows, co
     if (offset + rows * 4 * sizeof(float) > size_)
         return; // Would overflow the buffer
 
-    float* dest = (float*)&shadowData_[offset];
-    const float* src = (const float*)data;
+    auto* dest = (float*)&shadowData_[offset];
+    const auto* src = (const float*)data;
 
     while (rows--)
     {

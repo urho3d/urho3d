@@ -359,7 +359,7 @@ ParticleEffect* ParticleEmitter::GetEffect() const
 
 void ParticleEmitter::SetEffectAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetEffect(cache->GetResource<ParticleEffect>(value.name_));
 }
 

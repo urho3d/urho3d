@@ -212,7 +212,7 @@ unsigned File::Read(void* dest, unsigned size)
     if (compressed_)
     {
         unsigned sizeLeft = size;
-        unsigned char* destPtr = (unsigned char*)dest;
+        auto* destPtr = (unsigned char*)dest;
 
         while (sizeLeft)
         {
@@ -432,8 +432,8 @@ bool File::OpenInternal(const String& fileName, FileMode mode, bool fromPackage)
     compressed_ = false;
     readSyncNeeded_ = false;
     writeSyncNeeded_ = false;
-    
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem && !fileSystem->CheckAccess(GetPath(fileName)))
     {
         URHO3D_LOGERRORF("Access denied to %s", fileName.CString());

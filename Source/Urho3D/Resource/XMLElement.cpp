@@ -778,7 +778,7 @@ bool XMLElement::GetBuffer(const String& name, void* dest, unsigned size) const
     if (size < bytes.Size())
         return false;
 
-    unsigned char* destBytes = (unsigned char*)dest;
+    auto* destBytes = (unsigned char*)dest;
     for (unsigned i = 0; i < bytes.Size(); ++i)
         destBytes[i] = (unsigned char)ToInt(bytes[i]);
     return true;

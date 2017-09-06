@@ -977,7 +977,7 @@ void UIElement::SetFocus(bool enable)
     if (focusMode_ < FM_FOCUSABLE || !IsVisibleEffective())
         enable = false;
 
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;
@@ -1001,7 +1001,7 @@ void UIElement::SetSelected(bool enable)
 
 void UIElement::SetVisible(bool enable)
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     // Can be null at exit time; no-op in that case
     if (!ui)
         return;
@@ -1159,7 +1159,7 @@ void UIElement::UpdateLayout()
             if (!children_[i]->IsVisible())
                 continue;
             positions.Push(baseIndentWidth);
-            unsigned indent = (unsigned)children_[i]->GetIndentWidth();
+            auto indent = (unsigned)children_[i]->GetIndentWidth();
             sizes.Push(children_[i]->GetWidth() + indent);
             minSizes.Push(children_[i]->GetEffectiveMinSize().x_ + indent);
             maxSizes.Push(children_[i]->GetMaxWidth() + indent);
@@ -1582,7 +1582,7 @@ float UIElement::GetDerivedOpacity() const
 
 bool UIElement::HasFocus() const
 {
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     return ui ? ui->GetFocusElement() == this : false;
 }
 
@@ -1887,7 +1887,7 @@ void UIElement::GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& bat
 
 UIElement* UIElement::GetElementEventSender() const
 {
-    UIElement* element = const_cast<UIElement*>(this);
+    auto* element = const_cast<UIElement*>(this);
     if (elementEventSender_)
         return element;
 
@@ -2143,7 +2143,7 @@ void UIElement::CalculateLayout(PODVector<int>& positions, PODVector<int>& sizes
     // Initial pass
     for (unsigned i = 0; i < numChildren; ++i)
     {
-        int targetSize = (int)(targetChildSize * flexScales[i]);
+        auto targetSize = (int)(targetChildSize * flexScales[i]);
         if (remainder)
         {
             acc += add;

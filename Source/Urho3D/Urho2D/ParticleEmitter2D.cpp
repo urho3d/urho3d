@@ -151,7 +151,7 @@ Sprite2D* ParticleEmitter2D::GetSprite() const
 
 void ParticleEmitter2D::SetParticleEffectAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetEffect(cache->GetResource<ParticleEffect2D>(value.name_));
 }
 

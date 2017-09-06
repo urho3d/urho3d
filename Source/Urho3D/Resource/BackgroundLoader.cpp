@@ -267,7 +267,7 @@ void BackgroundLoader::FinishBackgroundLoading(BackgroundLoadItem& item)
 #ifdef URHO3D_PROFILING
         String profileBlockName("Finish" + resource->GetTypeName());
 
-        Profiler* profiler = owner_->GetSubsystem<Profiler>();
+        auto* profiler = owner_->GetSubsystem<Profiler>();
         if (profiler)
             profiler->BeginBlock(profileBlockName.CString());
 #endif

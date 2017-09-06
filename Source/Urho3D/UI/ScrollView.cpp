@@ -558,8 +558,8 @@ void ScrollView::HandleTouchMove(StringHash eventType, VariantMap& eventData)
     {
         scrollTouchDown_ = true;
         // Take new scrolling speed if it's faster than the current accumulated value
-        float dX = (float)-eventData[P_DX].GetInt();
-        float dY = (float)-eventData[P_DY].GetInt();
+        auto dX = (float)-eventData[P_DX].GetInt();
+        auto dY = (float)-eventData[P_DY].GetInt();
 
         if (Abs(dX) > Abs(touchScrollSpeed_.x_))
             touchScrollSpeed_.x_ = dX;

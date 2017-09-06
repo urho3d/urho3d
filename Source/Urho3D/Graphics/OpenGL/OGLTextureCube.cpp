@@ -59,7 +59,7 @@ void TextureCube::OnDeviceReset()
     if (!object_.name_ || dataPending_)
     {
         // If has a resource file, reload through the resource cache. Otherwise just recreate.
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         if (cache->Exists(GetName()))
             dataLost_ = !cache->ReloadResource(this);
 
@@ -196,7 +196,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
     SharedPtr<Image> mipImage;
     unsigned memoryUse = 0;
     int quality = QUALITY_HIGH;
-    Renderer* renderer = GetSubsystem<Renderer>();
+    auto* renderer = GetSubsystem<Renderer>();
     if (renderer)
         quality = renderer->GetTextureQuality();
 
@@ -349,7 +349,7 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
             }
             else
             {
-                unsigned char* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
+                auto* rgbaData = new unsigned char[level.width_ * level.height_ * 4];
                 level.Decompress(rgbaData);
                 SetData(face, i, 0, 0, level.width_, level.height_, rgbaData);
                 memoryUse += level.width_ * level.height_ * 4;
@@ -398,7 +398,7 @@ bool TextureCube::GetData(CubeMapFace face, unsigned level, void* dest) const
         URHO3D_LOGERROR("Can not get data from multisampled texture without autoresolve");
         return false;
     }
-    
+
     if (resolveDirty_)
         graphics_->ResolveToTexture(const_cast<TextureCube*>(this));
 
@@ -448,7 +448,7 @@ bool TextureCube::Create()
         autoResolve_ = false;
     }
 #endif
-    
+
     glGenTextures(1, &object_.name_);
 
     // Ensure that our texture is bound to OpenGL texture unit 0

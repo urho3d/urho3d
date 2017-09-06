@@ -47,7 +47,7 @@ void Touch::UpdateTouches(Controls& controls) // Called from HandleUpdate
 {
     zoom_ = false; // reset bool
 
-    Input* input = GetSubsystem<Input>();
+    auto* input = GetSubsystem<Input>();
 
     // Zoom in/out
     if (input->GetNumTouches() == 2)

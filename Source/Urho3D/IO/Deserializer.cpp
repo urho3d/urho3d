@@ -303,7 +303,7 @@ ResourceRefList Deserializer::ReadResourceRefList()
 
 Variant Deserializer::ReadVariant()
 {
-    VariantType type = (VariantType)ReadUByte();
+    auto type = (VariantType)ReadUByte();
     return ReadVariant(type);
 }
 

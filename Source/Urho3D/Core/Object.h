@@ -309,7 +309,7 @@ public:
     /// Invoke event handler function.
     void Invoke(VariantMap& eventData) override
     {
-        T* receiver = static_cast<T*>(receiver_);
+        auto* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
     }
 

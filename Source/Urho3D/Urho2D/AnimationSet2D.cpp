@@ -79,7 +79,7 @@ void _spAtlasPage_disposeTexture(spAtlasPage* self)
 char* _spUtil_readFile(const char* path, int* length)
 {
     using namespace Urho3D;
-    
+
     if (!currentAnimationSet)
         return 0;
 
@@ -93,7 +93,7 @@ char* _spUtil_readFile(const char* path, int* length)
     char* data = MALLOC(char, size + 1);
     file->Read(data, size);
     data[size] = '\0';
-    
+
     file.Reset();
     *length = size;
 
@@ -305,7 +305,7 @@ bool AnimationSet2D::BeginLoadSpriter(Deserializer& source)
 
     // Check has sprite sheet
     String parentPath = GetParentPath(GetName());
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     spriteSheetFilePath_ = parentPath + GetFileName(GetName()) + ".xml";
     hasSpriteSheet_ = cache->Exists(spriteSheetFilePath_);
@@ -352,8 +352,8 @@ bool AnimationSet2D::EndLoadSpriter()
 {
     if (!spriterData_)
         return false;
-    
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+
+    auto* cache = GetSubsystem<ResourceCache>();
     if (hasSpriteSheet_)
     {
         spriteSheet_ = cache->GetResource<SpriteSheet2D>(spriteSheetFilePath_);
@@ -492,7 +492,7 @@ bool AnimationSet2D::EndLoadSpriter()
             texture->SetMipsToSkip(QUALITY_LOW, 0);
             texture->SetNumLevels(1);
 
-            SpriteInfo& info = spriteInfos[0];        
+            SpriteInfo& info = spriteInfos[0];
             texture->SetData(info.image_, true);
 
             sprite_ = new Sprite2D(context_);

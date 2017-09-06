@@ -219,7 +219,7 @@ bool Zone::IsInside(const Vector3& point) const
 
 void Zone::SetZoneTextureAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     zoneTexture_ = static_cast<Texture*>(cache->GetResource(value.type_, value.name_));
 }
 
@@ -340,7 +340,7 @@ void Zone::ClearDrawablesZone()
                 drawable->SetZone(nullptr);
             else if (drawableFlags & DRAWABLE_ZONE)
             {
-                Zone* zone = static_cast<Zone*>(drawable);
+                auto* zone = static_cast<Zone*>(drawable);
                 zone->lastAmbientStartZone_.Reset();
                 zone->lastAmbientEndZone_.Reset();
             }

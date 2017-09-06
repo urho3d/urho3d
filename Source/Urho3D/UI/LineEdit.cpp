@@ -191,13 +191,13 @@ bool LineEdit::OnDragDropFinish(UIElement* source)
         StringHash sourceType = source->GetType();
         if (sourceType == LineEdit::GetTypeStatic())
         {
-            LineEdit* sourceLineEdit = static_cast<LineEdit*>(source);
+            auto* sourceLineEdit = static_cast<LineEdit*>(source);
             SetText(sourceLineEdit->GetText());
             return true;
         }
         else if (sourceType == Text::GetTypeStatic())
         {
-            Text* sourceText = static_cast<Text*>(source);
+            auto* sourceText = static_cast<Text*>(source);
             SetText(sourceText->GetText());
             return true;
         }

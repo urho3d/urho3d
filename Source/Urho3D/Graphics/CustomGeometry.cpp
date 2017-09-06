@@ -351,7 +351,7 @@ void CustomGeometry::Commit()
 
     if (totalVertices)
     {
-        unsigned char* dest = (unsigned char*)vertexBuffer_->Lock(0, totalVertices, true);
+        auto* dest = (unsigned char*)vertexBuffer_->Lock(0, totalVertices, true);
         if (dest)
         {
             unsigned vertexStart = 0;
@@ -484,7 +484,7 @@ void CustomGeometry::SetGeometryDataAttr(const PODVector<unsigned char>& value)
 
 void CustomGeometry::SetMaterialsAttr(const ResourceRefList& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
         SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }

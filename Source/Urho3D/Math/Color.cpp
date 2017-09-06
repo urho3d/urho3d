@@ -33,10 +33,10 @@ namespace Urho3D
 
 unsigned Color::ToUInt() const
 {
-    unsigned r = (unsigned)Clamp(((int)(r_ * 255.0f)), 0, 255);
-    unsigned g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
-    unsigned b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
-    unsigned a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
+    auto r = (unsigned)Clamp(((int)(r_ * 255.0f)), 0, 255);
+    auto g = (unsigned)Clamp(((int)(g_ * 255.0f)), 0, 255);
+    auto b = (unsigned)Clamp(((int)(b_ * 255.0f)), 0, 255);
+    auto a = (unsigned)Clamp(((int)(a_ * 255.0f)), 0, 255);
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 

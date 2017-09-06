@@ -63,7 +63,7 @@ void Texture3D::RegisterObject(Context* context)
 
 bool Texture3D::BeginLoad(Deserializer& source)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // In headless mode, do not actually load the texture, just return success
     if (!graphics_)

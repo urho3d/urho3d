@@ -235,28 +235,28 @@ public:
     /// Insert an element by iterator.
     Iterator Insert(const Iterator& dest, const T& value)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         return InsertElements(pos, &value, &value + 1);
     }
 
     /// Insert a vector by iterator.
     Iterator Insert(const Iterator& dest, const Vector<T>& vector)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         return InsertElements(pos, vector.Begin(), vector.End());
     }
 
     /// Insert a vector partially by iterators.
     Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         return InsertElements(pos, start, end);
     }
 
     /// Insert elements.
     Iterator Insert(const Iterator& dest, const T* start, const T* end)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         return InsertElements(pos, start, end);
     }
 
@@ -297,7 +297,7 @@ public:
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
-        unsigned pos = (unsigned)(it - Begin());
+        auto pos = (unsigned)(it - Begin());
         if (pos >= size_)
             return End();
         Erase(pos);
@@ -308,10 +308,10 @@ public:
     /// Erase a range by iterators. Return iterator to the next element.
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
-        unsigned pos = (unsigned)(start - Begin());
+        auto pos = (unsigned)(start - Begin());
         if (pos >= size_)
             return End();
-        unsigned length = (unsigned)(end - start);
+        auto length = (unsigned)(end - start);
         Erase(pos, length);
 
         return Begin() + pos;
@@ -512,7 +512,7 @@ private:
 
         if (pos > size_)
             pos = size_;
-        unsigned length = (unsigned)(end - start);
+        auto length = (unsigned)(end - start);
         Vector<T> tempBuffer;
         Resize(size_ + length, 0, tempBuffer);
         MoveRange(pos + length, pos, size_ - pos - length);
@@ -782,7 +782,7 @@ public:
     /// Insert an element by iterator.
     Iterator Insert(const Iterator& dest, const T& value)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         if (pos > size_)
             pos = size_;
         Insert(pos, value);
@@ -793,7 +793,7 @@ public:
     /// Insert a vector by iterator.
     Iterator Insert(const Iterator& dest, const PODVector<T>& vector)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         if (pos > size_)
             pos = size_;
         Insert(pos, vector);
@@ -804,10 +804,10 @@ public:
     /// Insert a vector partially by iterators.
     Iterator Insert(const Iterator& dest, const ConstIterator& start, const ConstIterator& end)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         if (pos > size_)
             pos = size_;
-        unsigned length = (unsigned)(end - start);
+        auto length = (unsigned)(end - start);
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
         CopyElements(Buffer() + pos, &(*start), length);
@@ -818,10 +818,10 @@ public:
     /// Insert elements.
     Iterator Insert(const Iterator& dest, const T* start, const T* end)
     {
-        unsigned pos = (unsigned)(dest - Begin());
+        auto pos = (unsigned)(dest - Begin());
         if (pos > size_)
             pos = size_;
-        unsigned length = (unsigned)(end - start);
+        auto length = (unsigned)(end - start);
         Resize(size_ + length);
         MoveRange(pos + length, pos, size_ - pos - length);
 
@@ -846,7 +846,7 @@ public:
     /// Erase an element by iterator. Return iterator to the next element.
     Iterator Erase(const Iterator& it)
     {
-        unsigned pos = (unsigned)(it - Begin());
+        auto pos = (unsigned)(it - Begin());
         if (pos >= size_)
             return End();
         Erase(pos);
@@ -857,10 +857,10 @@ public:
     /// Erase a range by iterators. Return iterator to the next element.
     Iterator Erase(const Iterator& start, const Iterator& end)
     {
-        unsigned pos = (unsigned)(start - Begin());
+        auto pos = (unsigned)(start - Begin());
         if (pos >= size_)
             return End();
-        unsigned length = (unsigned)(end - start);
+        auto length = (unsigned)(end - start);
         Erase(pos, length);
 
         return Begin() + pos;

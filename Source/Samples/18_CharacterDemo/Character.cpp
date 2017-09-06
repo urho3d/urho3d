@@ -63,8 +63,8 @@ void Character::Start()
 void Character::FixedUpdate(float timeStep)
 {
     /// \todo Could cache the components for faster access instead of finding them each frame
-    RigidBody* body = GetComponent<RigidBody>();
-    AnimationController* animCtrl = node_->GetComponent<AnimationController>(true);
+    auto* body = GetComponent<RigidBody>();
+    auto* animCtrl = node_->GetComponent<AnimationController>(true);
 
     // Update the in air timer. Reset if grounded
     if (!onGround_)

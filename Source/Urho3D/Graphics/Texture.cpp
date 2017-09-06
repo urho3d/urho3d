@@ -214,7 +214,7 @@ void Texture::SetParameters(const XMLElement& element)
             String coord = paramElem.GetAttributeLower("coord");
             if (coord.Length() >= 1)
             {
-                TextureCoordinate coordIndex = (TextureCoordinate)(coord[0] - 'u');
+                auto coordIndex = (TextureCoordinate)(coord[0] - 'u');
                 String mode = paramElem.GetAttributeLower("mode");
                 SetAddressMode(coordIndex, (TextureAddressMode)GetStringListIndex(mode.CString(), addressModeNames, ADDRESS_WRAP));
             }
@@ -297,7 +297,7 @@ unsigned Texture::CheckMaxLevels(int width, int height, int depth, unsigned requ
 
 void Texture::CheckTextureBudget(StringHash type)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     unsigned long long textureBudget = cache->GetMemoryBudget(type);
     unsigned long long textureUse = cache->GetMemoryUse(type);
     if (!textureBudget)

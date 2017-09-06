@@ -420,13 +420,13 @@ public:
         if (!ptrs_ || !it.ptr_)
             return End();
 
-        Node* node = static_cast<Node*>(it.ptr_);
+        auto* node = static_cast<Node*>(it.ptr_);
         Node* next = node->Next();
 
         unsigned hashKey = Hash(node->pair_.first_);
 
         Node* previous = 0;
-        Node* current = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* current = static_cast<Node*>(Ptrs()[hashKey]);
         while (current && current != node)
         {
             previous = current;
@@ -470,7 +470,7 @@ public:
         if (!numKeys)
             return;
 
-        Node** ptrs = new Node* [numKeys];
+        auto** ptrs = new Node* [numKeys];
         Node* ptr = Head();
 
         for (unsigned i = 0; i < numKeys; ++i)
@@ -616,7 +616,7 @@ private:
     /// Find a node from the buckets. Do not call if the buckets have not been allocated.
     Node* FindNode(const T& key, unsigned hashKey) const
     {
-        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -632,7 +632,7 @@ private:
     {
         previous = 0;
 
-        Node* node = static_cast<Node*>(Ptrs()[hashKey]);
+        auto* node = static_cast<Node*>(Ptrs()[hashKey]);
         while (node)
         {
             if (node->pair_.first_ == key)
@@ -730,7 +730,7 @@ private:
     /// Reserve a node.
     Node* ReserveNode()
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node();
         return newNode;
     }
@@ -738,7 +738,7 @@ private:
     /// Reserve a node with specified key and value.
     Node* ReserveNode(const T& key, const U& value)
     {
-        Node* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
+        auto* newNode = static_cast<Node*>(AllocatorReserve(allocator_));
         new(newNode) Node(key, value);
         return newNode;
     }
@@ -755,7 +755,7 @@ private:
     {
         for (Iterator i = Begin(); i != End(); ++i)
         {
-            Node* node = static_cast<Node*>(i.ptr_);
+            auto* node = static_cast<Node*>(i.ptr_);
             unsigned hashKey = Hash(i->first_);
             node->down_ = Ptrs()[hashKey];
             Ptrs()[hashKey] = node;

@@ -401,7 +401,7 @@ unsigned FileSystem::SystemCommandAsync(const String& commandLine)
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemCommand* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
+        auto* cmd = new AsyncSystemCommand(nextAsyncExecID_, commandLine);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }
@@ -422,7 +422,7 @@ unsigned FileSystem::SystemRunAsync(const String& fileName, const Vector<String>
     if (allowedPaths_.Empty())
     {
         unsigned requestID = nextAsyncExecID_;
-        AsyncSystemRun* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
+        auto* cmd = new AsyncSystemRun(nextAsyncExecID_, fileName, arguments);
         asyncExecQueue_.Push(cmd);
         return requestID;
     }

@@ -59,7 +59,7 @@ void LuaScriptEventInvoker::AddEventHandler(Object* sender, const StringHash& ev
 
 void LuaScriptEventInvoker::HandleLuaScriptEvent(StringHash eventType, VariantMap& eventData)
 {
-    LuaFunction* function = static_cast<LuaFunction*>(GetEventHandler()->GetUserData());
+    auto* function = static_cast<LuaFunction*>(GetEventHandler()->GetUserData());
     if (!function)
         return;
 

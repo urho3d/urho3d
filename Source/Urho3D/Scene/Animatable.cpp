@@ -58,7 +58,7 @@ AttributeAnimationInfo::~AttributeAnimationInfo()
 
 void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
 {
-    Animatable* animatable = static_cast<Animatable*>(target_.Get());
+    auto* animatable = static_cast<Animatable*>(target_.Get());
     if (animatable)
     {
         animatable->OnSetAttribute(attributeInfo_, newValue);
@@ -460,7 +460,7 @@ void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
 {
     if (!value.name_.Empty())
     {
-        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        auto* cache = GetSubsystem<ResourceCache>();
         SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_));
     }
 }

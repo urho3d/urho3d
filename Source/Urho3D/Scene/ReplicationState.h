@@ -68,7 +68,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) == 0)
             {
                 data_[byteIndex] |= bit;
@@ -83,7 +83,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             if ((data_[byteIndex] & bit) != 0)
             {
                 data_[byteIndex] &= ~bit;
@@ -105,7 +105,7 @@ struct URHO3D_API DirtyBits
         if (index < MAX_NETWORK_ATTRIBUTES)
         {
             unsigned byteIndex = index >> 3;
-            unsigned bit = (unsigned)(1 << (index & 7));
+            auto bit = (unsigned)(1 << (index & 7));
             return (data_[byteIndex] & bit) != 0;
         }
         else

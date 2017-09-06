@@ -49,7 +49,7 @@ static DWORD WINAPI ThreadFunctionStatic(void* data)
 
 static void* ThreadFunctionStatic(void* data)
 {
-    Thread* thread = static_cast<Thread*>(data);
+    auto* thread = static_cast<Thread*>(data);
     thread->ThreadFunction();
     pthread_exit((void*)0);
     return 0;
@@ -106,7 +106,7 @@ void Thread::Stop()
     WaitForSingleObject((HANDLE)handle_, INFINITE);
     CloseHandle((HANDLE)handle_);
 #else
-    pthread_t* thread = (pthread_t*)handle_;
+    auto* thread = (pthread_t*)handle_;
     if (thread)
         pthread_join(*thread, 0);
     delete thread;
@@ -122,7 +122,7 @@ void Thread::SetPriority(int priority)
     if (handle_)
         SetThreadPriority((HANDLE)handle_, priority);
 #elif defined(__linux__) && !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-    pthread_t* thread = (pthread_t*)handle_;
+    auto* thread = (pthread_t*)handle_;
     if (thread)
         pthread_setschedprio(*thread, priority);
 #endif

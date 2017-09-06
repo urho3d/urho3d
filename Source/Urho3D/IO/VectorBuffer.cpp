@@ -54,7 +54,7 @@ unsigned VectorBuffer::Read(void* dest, unsigned size)
         return 0;
 
     unsigned char* srcPtr = &buffer_[position_];
-    unsigned char* destPtr = (unsigned char*)dest;
+    auto* destPtr = (unsigned char*)dest;
     position_ += size;
 
     unsigned copySize = size;
@@ -97,7 +97,7 @@ unsigned VectorBuffer::Write(const void* data, unsigned size)
         buffer_.Resize(size_);
     }
 
-    unsigned char* srcPtr = (unsigned char*)data;
+    auto* srcPtr = (unsigned char*)data;
     unsigned char* destPtr = &buffer_[position_];
     position_ += size;
 

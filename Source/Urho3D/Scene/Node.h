@@ -735,7 +735,7 @@ template <class T> T* Node::GetDerivedComponent(bool recursive) const
 {
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             return component;
     }
@@ -777,7 +777,7 @@ template <class T> void Node::GetDerivedComponents(PODVector<T*>& dest, bool rec
 
     for (Vector<SharedPtr<Component> >::ConstIterator i = components_.Begin(); i != components_.End(); ++i)
     {
-        T* component = dynamic_cast<T*>(i->Get());
+        auto* component = dynamic_cast<T*>(i->Get());
         if (component)
             dest.Push(component);
     }

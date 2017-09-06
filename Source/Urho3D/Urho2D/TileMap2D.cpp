@@ -100,7 +100,7 @@ void TileMap2D::DrawDebugGeometry()
     if (!scene)
         return;
 
-    DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+    auto* debug = scene->GetComponent<DebugRenderer>();
     if (!debug)
         return;
 
@@ -137,7 +137,7 @@ void TileMap2D::SetTmxFile(TmxFile2D* tmxFile)
 
         Node* layerNode(rootNode_->CreateTemporaryChild(tmxLayer->GetName(), LOCAL));
 
-        TileMapLayer2D* layer = layerNode->CreateComponent<TileMapLayer2D>();
+        auto* layer = layerNode->CreateComponent<TileMapLayer2D>();
         layer->Initialize(this, tmxLayer);
         layer->SetDrawOrder(i * 10);
 
@@ -170,7 +170,7 @@ bool TileMap2D::PositionToTileIndex(int& x, int& y, const Vector2& position) con
 
 void TileMap2D::SetTmxFileAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetTmxFile(cache->GetResource<TmxFile2D>(value.name_));
 }
 

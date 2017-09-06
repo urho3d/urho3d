@@ -74,7 +74,7 @@ struct RaycastVehicleData
         int rightIndex = 0;
         int upIndex = 1;
         int forwardIndex = 2;
-        PhysicsWorld* pPhysWorld = scene->GetComponent<PhysicsWorld>();
+        auto* pPhysWorld = scene->GetComponent<PhysicsWorld>();
         btDynamicsWorld* pbtDynWorld = pPhysWorld->GetWorld();
         if (!pbtDynWorld)
             return;

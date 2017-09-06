@@ -76,7 +76,7 @@ void Font::RegisterObject(Context* context)
 bool Font::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load, just return success
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return true;
 
@@ -139,7 +139,7 @@ void Font::SetScaledGlyphOffset(const Vector2& offset)
 FontFace* Font::GetFace(float pointSize)
 {
     // In headless mode, always return null
-    Graphics* graphics = GetSubsystem<Graphics>();
+    auto* graphics = GetSubsystem<Graphics>();
     if (!graphics)
         return nullptr;
 
@@ -191,7 +191,7 @@ void Font::ReleaseFaces()
 
 void Font::LoadParameters()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
     SharedPtr<XMLFile> xml = cache->GetTempResource<XMLFile>(xmlName, false);
     if (!xml)

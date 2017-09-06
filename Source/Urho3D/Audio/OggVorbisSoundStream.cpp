@@ -52,7 +52,7 @@ OggVorbisSoundStream::~OggVorbisSoundStream()
     // Close decoder
     if (decoder_)
     {
-        stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+        auto* vorbis = static_cast<stb_vorbis*>(decoder_);
 
         stb_vorbis_close(vorbis);
         decoder_ = nullptr;
@@ -63,9 +63,9 @@ bool OggVorbisSoundStream::Seek(unsigned sample_number)
 {
     if (!decoder_)
         return false;
-    
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
-    
+
+    auto* vorbis = static_cast<stb_vorbis*>(decoder_);
+
     return stb_vorbis_seek(vorbis, sample_number) == 1;
 }
 
@@ -74,10 +74,10 @@ unsigned OggVorbisSoundStream::GetData(signed char* dest, unsigned numBytes)
     if (!decoder_)
         return 0;
 
-    stb_vorbis* vorbis = static_cast<stb_vorbis*>(decoder_);
+    auto* vorbis = static_cast<stb_vorbis*>(decoder_);
 
     unsigned channels = stereo_ ? 2 : 1;
-    unsigned outSamples = (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1);
+    auto outSamples = (unsigned)stb_vorbis_get_samples_short_interleaved(vorbis, channels, (short*)dest, numBytes >> 1);
     unsigned outBytes = (outSamples * channels) << 1;
 
     // Rewind and retry if is looping and produced less output than should have

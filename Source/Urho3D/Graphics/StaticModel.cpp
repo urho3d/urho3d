@@ -307,7 +307,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
     if (useFileName.Trimmed().Empty() && model_)
         useFileName = ReplaceExtension(model_->GetName(), ".txt");
 
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SharedPtr<File> file = cache->GetFile(useFileName, false);
     if (!file)
         return;
@@ -315,7 +315,7 @@ void StaticModel::ApplyMaterialList(const String& fileName)
     unsigned index = 0;
     while (!file->IsEof() && index < batches_.Size())
     {
-        Material* material = cache->GetResource<Material>(file->ReadLine());
+        auto* material = cache->GetResource<Material>(file->ReadLine());
         if (material)
             SetMaterial(index, material);
 
@@ -374,13 +374,13 @@ void StaticModel::SetNumGeometries(unsigned num)
 
 void StaticModel::SetModelAttr(const ResourceRef& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     SetModel(cache->GetResource<Model>(value.name_));
 }
 
 void StaticModel::SetMaterialsAttr(const ResourceRefList& value)
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     for (unsigned i = 0; i < value.names_.Size(); ++i)
         SetMaterial(i, cache->GetResource<Material>(value.names_[i]));
 }

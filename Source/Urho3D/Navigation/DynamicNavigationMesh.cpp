@@ -261,7 +261,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
 
     // Calculate max number of polygons, 22 bits available to identify both tile & polygon within tile
     unsigned tileBits = LogBaseTwo(maxTiles);
-    unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+    auto maxPolys = (unsigned)(1 << (22 - tileBits));
 
     dtNavMeshParams params;
     rcVcopy(params.orig, &boundingBox_.min_.x_);
@@ -321,7 +321,7 @@ bool DynamicNavigationMesh::Allocate(const BoundingBox& boundingBox, unsigned ma
     GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
     for (unsigned i = 0; i < obstacles.Size(); ++i)
     {
-        Obstacle* obs = obstacles[i]->GetComponent<Obstacle>();
+        auto* obs = obstacles[i]->GetComponent<Obstacle>();
         if (obs && obs->IsEnabledEffective())
             AddObstacle(obs);
     }
@@ -376,7 +376,7 @@ bool DynamicNavigationMesh::Build()
         // Calculate max. number of tiles and polygons, 22 bits available to identify both tile & polygon within tile
         unsigned maxTiles = NextPowerOfTwo((unsigned)(numTilesX_ * numTilesZ_)) * maxLayers_;
         unsigned tileBits = LogBaseTwo(maxTiles);
-        unsigned maxPolys = (unsigned)(1 << (22 - tileBits));
+        auto maxPolys = (unsigned)(1 << (22 - tileBits));
 
         dtNavMeshParams params;
         rcVcopy(params.orig, &boundingBox_.min_.x_);
@@ -473,7 +473,7 @@ bool DynamicNavigationMesh::Build()
         GetScene()->GetChildrenWithComponent<Obstacle>(obstacles, true);
         for (unsigned i = 0; i < obstacles.Size(); ++i)
         {
-            Obstacle* obs = obstacles[i]->GetComponent<Obstacle>();
+            auto* obs = obstacles[i]->GetComponent<Obstacle>();
             if (obs && obs->IsEnabledEffective())
                 AddObstacle(obs);
         }
@@ -630,7 +630,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<Obstacle>(obstacles, true);
             for (unsigned i = 0; i < obstacles.Size(); ++i)
             {
-                Obstacle* obstacle = obstacles[i]->GetComponent<Obstacle>();
+                auto* obstacle = obstacles[i]->GetComponent<Obstacle>();
                 if (obstacle && obstacle->IsEnabledEffective())
                     obstacle->DrawDebugGeometry(debug, depthTest);
             }
@@ -643,7 +643,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<OffMeshConnection>(connections, true);
             for (unsigned i = 0; i < connections.Size(); ++i)
             {
-                OffMeshConnection* connection = connections[i]->GetComponent<OffMeshConnection>();
+                auto* connection = connections[i]->GetComponent<OffMeshConnection>();
                 if (connection && connection->IsEnabledEffective())
                     connection->DrawDebugGeometry(debug, depthTest);
             }
@@ -656,7 +656,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(DebugRenderer* debug, bool depthTe
             scene->GetChildrenWithComponent<NavArea>(areas, true);
             for (unsigned i = 0; i < areas.Size(); ++i)
             {
-                NavArea* area = areas[i]->GetComponent<NavArea>();
+                auto* area = areas[i]->GetComponent<NavArea>();
                 if (area && area->IsEnabledEffective())
                     area->DrawDebugGeometry(debug, depthTest);
             }
@@ -669,7 +669,7 @@ void DynamicNavigationMesh::DrawDebugGeometry(bool depthTest)
     Scene* scene = GetScene();
     if (scene)
     {
-        DebugRenderer* debug = scene->GetComponent<DebugRenderer>();
+        auto* debug = scene->GetComponent<DebugRenderer>();
         if (debug)
             DrawDebugGeometry(debug, depthTest);
     }
@@ -779,7 +779,7 @@ bool DynamicNavigationMesh::ReadTiles(Deserializer& source, bool silent)
         source.Read(&header, sizeof(dtTileCacheLayerHeader));
         const int dataSize = source.ReadInt();
 
-        unsigned char* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
+        auto* data = (unsigned char*)dtAlloc(dataSize, DT_ALLOC_PERM);
         if (!data)
         {
             URHO3D_LOGERROR("Could not allocate data for navigation mesh tile");

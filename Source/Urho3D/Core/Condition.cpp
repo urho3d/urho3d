@@ -69,8 +69,8 @@ Condition::Condition() :
 
 Condition::~Condition()
 {
-    pthread_cond_t* cond = (pthread_cond_t*)event_;
-    pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
+    auto* cond = (pthread_cond_t*)event_;
+    auto* mutex = (pthread_mutex_t*)mutex_;
 
     pthread_cond_destroy(cond);
     pthread_mutex_destroy(mutex);
@@ -87,8 +87,8 @@ void Condition::Set()
 
 void Condition::Wait()
 {
-    pthread_cond_t* cond = (pthread_cond_t*)event_;
-    pthread_mutex_t* mutex = (pthread_mutex_t*)mutex_;
+    auto* cond = (pthread_cond_t*)event_;
+    auto* mutex = (pthread_mutex_t*)mutex_;
 
     pthread_mutex_lock(mutex);
     pthread_cond_wait(cond, mutex);

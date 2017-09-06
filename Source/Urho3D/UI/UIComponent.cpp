@@ -145,8 +145,8 @@ protected:
 };
 
 UIComponent::UIComponent(Context* context)
-    : Component(context)
-    , viewportIndex_(0)
+    : Component(context),
+    viewportIndex_(0)
 {
     texture_ = context_->CreateObject<Texture2D>();
     texture_->SetFilterMode(FILTER_BILINEAR);
@@ -242,7 +242,7 @@ void UIComponent::SetViewportIndex(unsigned int index)
     viewportIndex_ = index;
     if (Scene* scene = GetScene())
     {
-        Renderer* renderer = GetSubsystem<Renderer>();
+        auto* renderer = GetSubsystem<Renderer>();
         Viewport* viewport = renderer->GetViewportForScene(scene, index);
         rootElement_->SetViewport(viewport);
     }

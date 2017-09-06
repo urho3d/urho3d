@@ -191,7 +191,7 @@ void Component::PrepareNetworkUpdate()
             for (PODVector<ReplicationState*>::Iterator j = networkState_->replicationStates_.Begin();
                  j != networkState_->replicationStates_.End(); ++j)
             {
-                ComponentReplicationState* compState = static_cast<ComponentReplicationState*>(*j);
+                auto* compState = static_cast<ComponentReplicationState*>(*j);
                 compState->dirtyAttributes_.Set(i);
 
                 // Add component's parent node to the dirty set if not added yet

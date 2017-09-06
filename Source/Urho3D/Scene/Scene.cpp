@@ -149,7 +149,7 @@ bool Scene::Save(Serializer& dest) const
         return false;
     }
 
-    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    auto* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
         URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
@@ -269,7 +269,7 @@ bool Scene::SaveXML(Serializer& dest, const String& indentation) const
     if (!SaveXML(rootElem))
         return false;
 
-    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    auto* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
         URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
@@ -291,7 +291,7 @@ bool Scene::SaveJSON(Serializer& dest, const String& indentation) const
     if (!SaveJSON(rootVal))
         return false;
 
-    Deserializer* ptr = dynamic_cast<Deserializer*>(&dest);
+    auto* ptr = dynamic_cast<Deserializer*>(&dest);
     if (ptr)
         URHO3D_LOGINFO("Saving scene to " + ptr->GetName());
 
@@ -1156,7 +1156,7 @@ void Scene::MarkReplicationDirty(Node* node)
         for (PODVector<ReplicationState*>::Iterator i = networkState_->replicationStates_.Begin();
              i != networkState_->replicationStates_.End(); ++i)
         {
-            NodeReplicationState* nodeState = static_cast<NodeReplicationState*>(*i);
+            auto* nodeState = static_cast<NodeReplicationState*>(*i);
             nodeState->sceneState_->dirtyNodes_.Insert(id);
         }
     }
@@ -1177,7 +1177,7 @@ void Scene::HandleResourceBackgroundLoaded(StringHash eventType, VariantMap& eve
 
     if (asyncLoading_)
     {
-        Resource* resource = static_cast<Resource*>(eventData[P_RESOURCE].GetPtr());
+        auto* resource = static_cast<Resource*>(eventData[P_RESOURCE].GetPtr());
         if (asyncProgress_.resources_.Contains(resource->GetNameHash()))
         {
             asyncProgress_.resources_.Erase(resource->GetNameHash());
@@ -1281,7 +1281,7 @@ void Scene::FinishLoading(Deserializer* source)
 
 void Scene::FinishSaving(Serializer* dest) const
 {
-    Deserializer* ptr = dynamic_cast<Deserializer*>(dest);
+    auto* ptr = dynamic_cast<Deserializer*>(dest);
     if (ptr)
     {
         fileName_ = ptr->GetName();
@@ -1293,7 +1293,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
 {
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Read node ID (not needed)
     /*unsigned nodeID = */file->ReadUInt();
@@ -1369,7 +1369,7 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
 {
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Node or Scene attributes do not include any resources; therefore skip to the components
     XMLElement compElem = element.GetChild("component");
@@ -1449,7 +1449,7 @@ void Scene::PreloadResourcesJSON(const JSONValue& value)
 {
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Node or Scene attributes do not include any resources; therefore skip to the components
     JSONArray componentArray = value.Get("components").GetArray();

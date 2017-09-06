@@ -45,7 +45,7 @@ bool Resource::Load(Deserializer& source)
 #ifdef URHO3D_PROFILING
     String profileBlockName("Load" + GetTypeName());
 
-    Profiler* profiler = GetSubsystem<Profiler>();
+    auto* profiler = GetSubsystem<Profiler>();
     if (profiler)
         profiler->BeginBlock(profileBlockName.CString());
 #endif

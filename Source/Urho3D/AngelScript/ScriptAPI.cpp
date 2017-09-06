@@ -69,7 +69,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             asIScriptObject* object = instance->GetScriptObject();
             if (!object)
             {
@@ -79,7 +79,7 @@ static asIScriptObject* NodeCreateScriptObjectWithFile(ScriptFile* file, const S
         }
     }
     // Then create a new component if not found
-    ScriptInstance* instance = ptr->CreateComponent<ScriptInstance>(mode);
+    auto* instance = ptr->CreateComponent<ScriptInstance>(mode);
     instance->CreateObject(file, className);
     return instance->GetScriptObject();
 }
@@ -96,7 +96,7 @@ static void RegisterScriptFile(asIScriptEngine* engine)
 
 static asIScriptObject* NodeCreateScriptObject(const String& scriptFileName, const String& className, CreateMode mode, Node* ptr)
 {
-    ResourceCache* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
+    auto* cache = GetScriptContext()->GetSubsystem<ResourceCache>();
     return NodeCreateScriptObjectWithFile(cache->GetResource<ScriptFile>(scriptFileName), className, mode, ptr);
 }
 
@@ -108,7 +108,7 @@ asIScriptObject* NodeGetScriptObject(Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             asIScriptObject* object = instance->GetScriptObject();
             if (object)
                 return object;
@@ -125,7 +125,7 @@ asIScriptObject* NodeGetNamedScriptObject(const String& className, Node* ptr)
     {
         if ((*i)->GetType() == ScriptInstance::GetTypeStatic())
         {
-            ScriptInstance* instance = static_cast<ScriptInstance*>(i->Get());
+            auto* instance = static_cast<ScriptInstance*>(i->Get());
             if (instance->IsA(className))
             {
                 asIScriptObject* object = instance->GetScriptObject();

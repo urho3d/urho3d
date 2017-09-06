@@ -166,7 +166,7 @@ bool Animation::BeginLoad(Deserializer& source)
     }
 
     // Optionally read triggers from an XML file
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
     String xmlName = ReplaceExtension(GetName(), ".xml");
 
     SharedPtr<XMLFile> file(cache->GetTempResource<XMLFile>(xmlName, false));
@@ -256,7 +256,7 @@ bool Animation::Save(Serializer& dest) const
     // If triggers have been defined, write an XML file for them
     if (!triggers_.Empty() || HasMetadata())
     {
-        File* destFile = dynamic_cast<File*>(&dest);
+        auto* destFile = dynamic_cast<File*>(&dest);
         if (destFile)
         {
             String xmlName = ReplaceExtension(destFile->GetName(), ".xml");

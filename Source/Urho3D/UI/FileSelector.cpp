@@ -109,11 +109,11 @@ FileSelector::FileSelector(Context* context) :
     Vector<String> defaultFilters;
     defaultFilters.Push("*.*");
     SetFilters(defaultFilters, 0);
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
     SetPath(fileSystem->GetCurrentDir());
 
     // Focus the fileselector's filelist initially when created, and bring to front
-    UI* ui = GetSubsystem<UI>();
+    auto* ui = GetSubsystem<UI>();
     ui->GetRoot()->AddChild(window_);
     ui->SetFocusElement(fileList_);
     window_->SetModal(true);
@@ -192,7 +192,7 @@ void FileSelector::SetButtonTexts(const String& okText, const String& cancelText
 
 void FileSelector::SetPath(const String& path)
 {
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
     if (fileSystem->DirExists(path))
     {
         path_ = AddTrailingSlash(path);
@@ -223,7 +223,7 @@ void FileSelector::SetFilters(const Vector<String>& filters, unsigned defaultInd
     filterList_->RemoveAllItems();
     for (unsigned i = 0; i < filters_.Size(); ++i)
     {
-        Text* filterText = new Text(context_);
+        auto* filterText = new Text(context_);
         filterList_->AddItem(filterText);
         filterText->SetText(filters_[i]);
         filterText->SetStyle("FileSelectorFilterText");
@@ -265,7 +265,7 @@ const String& FileSelector::GetFileName() const
 
 const String& FileSelector::GetFilter() const
 {
-    Text* selectedFilter = static_cast<Text*>(filterList_->GetSelectedItem());
+    auto* selectedFilter = static_cast<Text*>(filterList_->GetSelectedItem());
     if (selectedFilter)
         return selectedFilter->GetText();
     else
@@ -286,7 +286,7 @@ void FileSelector::SetLineEditText(LineEdit* edit, const String& text)
 
 void FileSelector::RefreshFiles()
 {
-    FileSystem* fileSystem = GetSubsystem<FileSystem>();
+    auto* fileSystem = GetSubsystem<FileSystem>();
 
     ignoreEvents_ = true;
 
@@ -329,7 +329,7 @@ void FileSelector::RefreshFiles()
         else
             displayName = fileEntries_[i].name_;
 
-        Text* entryText = new Text(context_);
+        auto* entryText = new Text(context_);
         fileList_->AddItem(entryText);
         entryText->SetText(displayName);
         entryText->SetStyle("FileSelectorListText");

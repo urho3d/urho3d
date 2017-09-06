@@ -67,7 +67,7 @@ Renderer2D::Renderer2D(Context* context) :
 {
     material_->SetName("Urho2D");
 
-    Technique* tech = new Technique(context_);
+    auto* tech = new Technique(context_);
     Pass* pass = tech->CreatePass("alpha");
     pass->SetVertexShader("Urho2D");
     pass->SetPixelShader("Urho2D");
@@ -92,8 +92,8 @@ void Renderer2D::RegisterObject(Context* context)
 
 static inline bool CompareRayQueryResults(RayQueryResult& lr, RayQueryResult& rr)
 {
-    Drawable2D* lhs = static_cast<Drawable2D*>(lr.drawable_);
-    Drawable2D* rhs = static_cast<Drawable2D*>(rr.drawable_);
+    auto* lhs = static_cast<Drawable2D*>(lr.drawable_);
+    auto* rhs = static_cast<Drawable2D*>(rr.drawable_);
     if (lhs->GetLayer() != rhs->GetLayer())
         return lhs->GetLayer() > rhs->GetLayer();
 
@@ -149,7 +149,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
             unsigned quadCount = indexCount / 6;
             if (largeIndices)
             {
-                unsigned* dest = reinterpret_cast<unsigned*>(buffer);
+                auto* dest = reinterpret_cast<unsigned*>(buffer);
                 for (unsigned i = 0; i < quadCount; ++i)
                 {
                     unsigned base = i * 4;
@@ -164,7 +164,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
             }
             else
             {
-                unsigned short* dest = reinterpret_cast<unsigned short*>(buffer);
+                auto* dest = reinterpret_cast<unsigned short*>(buffer);
                 for (unsigned i = 0; i < quadCount; ++i)
                 {
                     unsigned base = i * 4;
@@ -199,7 +199,7 @@ void Renderer2D::UpdateGeometry(const FrameInfo& frame)
 
         if (vertexCount)
         {
-            Vertex2D* dest = reinterpret_cast<Vertex2D*>(vertexBuffer->Lock(0, vertexCount, true));
+            auto* dest = reinterpret_cast<Vertex2D*>(vertexBuffer->Lock(0, vertexCount, true));
             if (dest)
             {
                 const PODVector<const SourceBatch2D*>& sourceBatches = viewBatchInfo.sourceBatches_;
@@ -307,9 +307,9 @@ SharedPtr<Material> Renderer2D::CreateMaterial(Texture2D* texture, BlendMode ble
 
 void CheckDrawableVisibilityWork(const WorkItem* item, unsigned threadIndex)
 {
-    Renderer2D* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
-    Drawable2D** start = reinterpret_cast<Drawable2D**>(item->start_);
-    Drawable2D** end = reinterpret_cast<Drawable2D**>(item->end_);
+    auto* renderer = reinterpret_cast<Renderer2D*>(item->aux_);
+    auto** start = reinterpret_cast<Drawable2D**>(item->start_);
+    auto** end = reinterpret_cast<Drawable2D**>(item->end_);
 
     while (start != end)
     {
@@ -331,7 +331,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
 
     URHO3D_PROFILE(UpdateRenderer2D);
 
-    Camera* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
+    auto* camera = static_cast<Camera*>(eventData[P_CAMERA].GetPtr());
     frustum_ = camera->GetFrustum();
     viewMask_ = camera->GetViewMask();
 
@@ -339,7 +339,7 @@ void Renderer2D::HandleBeginViewUpdate(StringHash eventType, VariantMap& eventDa
     {
         URHO3D_PROFILE(CheckDrawableVisibility);
 
-        WorkQueue* queue = GetSubsystem<WorkQueue>();
+        auto* queue = GetSubsystem<WorkQueue>();
         int numWorkItems = queue->GetNumThreads() + 1; // Worker threads + main thread
         int drawablesPerItem = drawables_.Size() / numWorkItems;
 
@@ -394,7 +394,7 @@ void Renderer2D::GetDrawables(PODVector<Drawable2D*>& dest, Node* node)
     const Vector<SharedPtr<Component> >& components = node->GetComponents();
     for (Vector<SharedPtr<Component> >::ConstIterator i = components.Begin(); i != components.End(); ++i)
     {
-        Drawable2D* drawable = dynamic_cast<Drawable2D*>(i->Get());
+        auto* drawable = dynamic_cast<Drawable2D*>(i->Get());
         if (drawable && drawable->IsEnabled())
             dest.Push(drawable);
     }
@@ -445,7 +445,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
         Vector3 worldPos = sourceBatch->owner_->GetNode()->GetWorldPosition();
         sourceBatch->distance_ = camera->GetDistance(worldPos);
     }
-    
+
     Sort(sourceBatches.Begin(), sourceBatches.End(), CompareSourceBatch2Ds);
 
     viewBatchInfo.batchCount_ = 0;
@@ -491,7 +491,7 @@ void Renderer2D::UpdateViewBatchInfo(ViewBatchInfo2D& viewBatchInfo, Camera* cam
     viewBatchInfo.batchUpdatedFrameNumber_ = frame_.frameNumber_;
 }
 
-void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material, 
+void Renderer2D::AddViewBatch(ViewBatchInfo2D& viewBatchInfo, Material* material,
     unsigned indexStart, unsigned indexCount, unsigned vertexStart, unsigned vertexCount, float distance)
 {
     if (!material || indexCount == 0 || vertexCount == 0)

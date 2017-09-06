@@ -104,7 +104,7 @@ void RigidBody2D::OnSetEnabled()
 
 void RigidBody2D::SetBodyType(BodyType2D type)
 {
-    b2BodyType bodyType = (b2BodyType)type;
+    auto bodyType = (b2BodyType)type;
     if (body_)
     {
         body_->SetType(bodyType);

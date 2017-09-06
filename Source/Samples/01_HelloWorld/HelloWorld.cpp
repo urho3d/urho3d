@@ -58,7 +58,7 @@ void HelloWorld::Start()
 
 void HelloWorld::CreateText()
 {
-    ResourceCache* cache = GetSubsystem<ResourceCache>();
+    auto* cache = GetSubsystem<ResourceCache>();
 
     // Construct new Text object
     SharedPtr<Text> helloText(new Text(context_));

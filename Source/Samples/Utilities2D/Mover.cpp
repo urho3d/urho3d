@@ -87,7 +87,7 @@ void Mover::Update(float timeStep)
     // Handle Orc states (idle/wounded/fighting)
     if (node_->GetName() == "Orc")
     {
-        AnimatedSprite2D* animatedSprite = node_->GetComponent<AnimatedSprite2D>();
+        auto* animatedSprite = node_->GetComponent<AnimatedSprite2D>();
         String anim = "run";
 
         // Handle wounded state
