@@ -41,7 +41,7 @@ public:
     /// Construct from LuaScriptInstance.
     LuaScriptEventInvoker(LuaScriptInstance* instance);
     /// Destruct.
-    virtual ~LuaScriptEventInvoker() override;
+    ~LuaScriptEventInvoker() override;
 
     /// Add a scripted event handler.
     void AddEventHandler(Object* sender, const StringHash& eventType, LuaFunction* function);

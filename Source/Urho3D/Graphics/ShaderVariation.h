@@ -81,12 +81,12 @@ public:
     /// Construct.
     ShaderVariation(Shader* owner, ShaderType type);
     /// Destruct.
-    virtual ~ShaderVariation() override;
+    ~ShaderVariation() override;
 
     /// Mark the GPU resource destroyed on graphics context destruction.
-    virtual void OnDeviceLost() override;
+    void OnDeviceLost() override;
     /// Release the shader.
-    virtual void Release() override;
+    void Release() override;
 
     /// Compile the shader. Return true if successful.
     bool Create();

@@ -39,16 +39,16 @@ public:
     /// Construct.
     RaycastVehicle(Urho3D::Context* context);
     /// Destruct.
-    virtual ~RaycastVehicle() override;
+    ~RaycastVehicle() override;
 
     /// Register object factory and attributes.
     static void RegisterObject(Context* context);
-    
+
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Perform post-load after deserialization. Acquire the components from the scene nodes.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
 
     /// Add a wheel. All parameters are relative to RigidBody / node.
     void AddWheel(Node* wheelNode, Vector3 wheelDirection, Vector3 wheelAxle, float restLength, float wheelRadius, bool frontWheel);
@@ -95,11 +95,11 @@ public:
     /// Init the vehicle component after creation
     void Init();
     /// Perform fixed step pre-update.
-    virtual void FixedUpdate(float timeStep) override;
+    void FixedUpdate(float timeStep) override;
     /// Perform fixed step post-update.
-    virtual void FixedPostUpdate(float timeStep) override;
+    void FixedPostUpdate(float timeStep) override;
     /// Perform variable step post-update.
-    virtual void PostUpdate(float timeStep) override;
+    void PostUpdate(float timeStep) override;
 
     /// Get wheel position relative to RigidBody.
     Vector3 GetWheelPosition(int wheel);

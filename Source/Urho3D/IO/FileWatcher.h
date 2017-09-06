@@ -42,10 +42,10 @@ public:
     /// Construct.
     FileWatcher(Context* context);
     /// Destruct.
-    virtual ~FileWatcher() override;
+    ~FileWatcher() override;
 
     /// Directory watching loop.
-    virtual void ThreadFunction() override;
+    void ThreadFunction() override;
 
     /// Start watching a directory. Return true if successful.
     bool StartWatching(const String& pathName, bool watchSubDirs);
@@ -91,7 +91,7 @@ private:
     int watchHandle_;
 
 #elif defined(__APPLE__) && !defined(IOS) && !defined(TVOS)
-    
+
     /// Flag indicating whether the running OS supports individual file watching.
     bool supported_;
     /// Pointer to internal MacFileWatcher delegate.

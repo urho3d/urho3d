@@ -38,20 +38,20 @@ public:
     /// Construct.
     DropDownList(Context* context);
     /// Destruct.
-    virtual ~DropDownList() override;
+    ~DropDownList() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Return UI rendering batches.
-    virtual void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
+    void GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor) override;
     /// React to the popup being shown.
-    virtual void OnShowPopup() override;
+    void OnShowPopup() override;
     /// React to the popup being hidden.
-    virtual void OnHidePopup() override;
+    void OnHidePopup() override;
     /// React to editable status change.
-    virtual void OnSetEditable() override;
+    void OnSetEditable() override;
 
     /// Add item to the end of the list.
     void AddItem(UIElement* item);
@@ -98,9 +98,9 @@ public:
 
 protected:
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterImplicitAttributes(XMLElement& dest) const override;
+    bool FilterImplicitAttributes(XMLElement& dest) const override;
     /// Filter implicit attributes in serialization process.
-    virtual bool FilterPopupImplicitAttributes(XMLElement& dest) const override;
+    bool FilterPopupImplicitAttributes(XMLElement& dest) const override;
 
     /// Listview element.
     SharedPtr<ListView> listView_;

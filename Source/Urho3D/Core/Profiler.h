@@ -177,7 +177,7 @@ public:
     /// Construct.
     Profiler(Context* context);
     /// Destruct.
-    virtual ~Profiler() override;
+    ~Profiler() override;
 
     /// Begin timing a profiling block.
     void BeginBlock(const char* name)

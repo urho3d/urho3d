@@ -44,7 +44,7 @@ public:
     /// Construct.
     UIComponent(Context* context);
     /// Destruct.
-    virtual ~UIComponent() override;
+    ~UIComponent() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

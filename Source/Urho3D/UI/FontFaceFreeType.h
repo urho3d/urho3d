@@ -37,15 +37,15 @@ public:
     /// Construct.
     FontFaceFreeType(Font* font);
     /// Destruct.
-    virtual ~FontFaceFreeType() override;
+    ~FontFaceFreeType() override;
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
+    bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) override;
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
-    virtual const FontGlyph* GetGlyph(unsigned c) override;
+    const FontGlyph* GetGlyph(unsigned c) override;
 
     /// Return if font face uses mutable glyphs.
-    virtual bool HasMutableGlyphs() const override { return hasMutableGlyph_; }
+    bool HasMutableGlyphs() const override { return hasMutableGlyph_; }
 
 private:
     /// Setup next texture.

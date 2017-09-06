@@ -43,7 +43,7 @@ public:
     /// Construct with one empty vertex buffer.
     Geometry(Context* context);
     /// Destruct.
-    virtual ~Geometry() override;
+    ~Geometry() override;
 
     /// Set number of vertex buffers.
     bool SetNumVertexBuffers(unsigned num);

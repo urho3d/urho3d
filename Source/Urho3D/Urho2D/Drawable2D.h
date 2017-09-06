@@ -28,7 +28,7 @@
 namespace Urho3D
 {
 
-class Drawable2D; 
+class Drawable2D;
 class Renderer2D;
 class Texture2D;
 class VertexBuffer;
@@ -74,12 +74,12 @@ public:
     /// Construct.
     Drawable2D(Context* context);
     /// Destruct.
-    virtual ~Drawable2D() override;
+    ~Drawable2D() override;
     /// Register object factory. Drawable must be registered first.
     static void RegisterObject(Context* context);
 
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Set layer.
     void SetLayer(int layer);
@@ -97,9 +97,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
     /// Handle draw order changed.
     virtual void OnDrawOrderChanged() = 0;
     /// Update source batches.

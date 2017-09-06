@@ -36,7 +36,7 @@ public:
     /// Construct.
     NetworkPriority(Context* context);
     /// Destruct.
-    virtual ~NetworkPriority() override;
+    ~NetworkPriority() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

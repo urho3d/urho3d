@@ -83,9 +83,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Point.
     Vector3 point_;
@@ -104,9 +104,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Sphere.
     Sphere sphere_;
@@ -125,9 +125,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Bounding box.
     BoundingBox box_;
@@ -146,9 +146,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 
     /// Frustum.
     Frustum frustum_;
@@ -266,9 +266,9 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override;
+    Intersection TestOctant(const BoundingBox& box, bool inside) override;
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override;
 };
 
 }

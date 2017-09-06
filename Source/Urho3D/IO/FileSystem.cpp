@@ -245,7 +245,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemCommand(commandLine_, false, nullptr);
         completed_ = true;
@@ -270,7 +270,7 @@ public:
     }
 
     /// The function to run in the thread.
-    virtual void ThreadFunction() override
+    void ThreadFunction() override
     {
         exitCode_ = DoSystemRun(fileName_, arguments_);
         completed_ = true;

@@ -145,7 +145,7 @@ public:
     /// Construct.
     Input(Context* context);
     /// Destruct.
-    virtual ~Input() override;
+    ~Input() override;
 
     /// Poll for window messages. Called by HandleBeginFrame().
     void Update();

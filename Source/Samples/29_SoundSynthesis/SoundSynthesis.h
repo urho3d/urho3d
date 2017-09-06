@@ -44,13 +44,13 @@ public:
     SoundSynthesis(Context* context);
 
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual void Setup() override;
+    void Setup() override;
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start() override;
+    void Start() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
-    virtual String GetScreenJoystickPatchString() const override { return
+    String GetScreenJoystickPatchString() const override { return
         "<patch>"
         "    <add sel=\"/element/element[./attribute[@name='Name' and @value='Button2']]\">"
         "        <attribute name=\"Is Visible\" value=\"false\" />"

@@ -51,14 +51,14 @@ public:
     /// Construct.
     AnimationSet2D(Context* context);
     /// Destruct.
-    virtual ~AnimationSet2D() override;
-    /// Register object factory. 
+    ~AnimationSet2D() override;
+    /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
 
     /// Get number of animations.
     unsigned GetNumAnimations() const;
@@ -66,7 +66,7 @@ public:
     String GetAnimation(unsigned index) const;
     /// Check has animation.
     bool HasAnimation(const String& animation) const;
-    
+
     /// Return sprite.
     Sprite2D* GetSprite() const;
 
@@ -95,10 +95,10 @@ private:
     bool EndLoadSpriter();
     /// Dispose all data.
     void Dispose();
-    
+
     /// Spine sprite.
     SharedPtr<Sprite2D> sprite_;
-    
+
 #ifdef URHO3D_SPINE
     /// Spine json data.
     SharedArrayPtr<char> jsonData_;
@@ -107,7 +107,7 @@ private:
     /// Spine atlas.
     spAtlas* atlas_;
 #endif
-    
+
     /// Spriter data.
     UniquePtr<Spriter::SpriterData> spriterData_;
     /// Has sprite sheet.

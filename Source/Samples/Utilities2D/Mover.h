@@ -43,7 +43,7 @@ public:
     static void RegisterObject(Context* context);
 
     /// Handle scene update. Called by LogicComponent base class.
-    virtual void Update(float timeStep);
+    void Update(float timeStep) override;
     /// Return path attribute.
     PODVector<unsigned char> GetPathAttr() const;
     /// Set path attribute.

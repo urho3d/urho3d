@@ -50,7 +50,7 @@ class ScriptResourceRouter : public ResourceRouter
     }
 
     /// Check if request is for an AngelScript file and reroute to compiled version if necessary (.as file not available)
-    virtual void Route(String& name, ResourceRequest requestType) override
+    void Route(String& name, ResourceRequest requestType) override
     {
         String extension = GetExtension(name);
         if (extension == ".as")

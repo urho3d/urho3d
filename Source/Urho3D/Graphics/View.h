@@ -118,7 +118,7 @@ public:
     /// Construct.
     View(Context* context);
     /// Destruct.
-    virtual ~View() override;
+    ~View() override;
 
     /// Define with rendertarget and viewport. Return true if successful.
     bool Define(RenderSurface* renderTarget, Viewport* viewport);
@@ -146,7 +146,7 @@ public:
 
     /// Return information of the frame being rendered.
     const FrameInfo& GetFrameInfo() const { return frame_; }
-    
+
     /// Return the rendertarget. 0 if using the backbuffer.
     RenderSurface* GetRenderTarget() const { return renderTarget_; }
 
@@ -155,10 +155,10 @@ public:
 
     /// Return view rectangle.
     const IntRect& GetViewRect() const { return viewRect_; }
-    
+
     /// Return view dimensions.
     const IntVector2& GetViewSize() const { return viewSize_; }
-    
+
     /// Return geometry objects.
     const PODVector<Drawable*>& GetGeometries() const { return geometries_; }
 

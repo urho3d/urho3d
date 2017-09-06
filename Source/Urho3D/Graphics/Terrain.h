@@ -43,14 +43,14 @@ public:
     /// Construct.
     Terrain(Context* context);
     /// Destruct.
-    virtual ~Terrain() override;
+    ~Terrain() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Set patch quads per side. Must be a power of two.
     void SetPatchSize(int size);

@@ -180,7 +180,7 @@ public:
     /// Construct.
     Renderer(Context* context);
     /// Destruct.
-    virtual ~Renderer() override;
+    ~Renderer() override;
 
     /// Set number of backbuffer viewports to render.
     void SetNumViewports(unsigned num);

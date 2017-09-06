@@ -100,7 +100,7 @@ public:
     /// Construct.
     DebugRenderer(Context* context);
     /// Destruct.
-    virtual ~DebugRenderer() override;
+    ~DebugRenderer() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

@@ -64,7 +64,7 @@ public:
     }
 
     /// Destruct.
-    virtual ~FreeTypeLibrary() override
+    ~FreeTypeLibrary() override
     {
         FT_Done_FreeType(library_);
     }

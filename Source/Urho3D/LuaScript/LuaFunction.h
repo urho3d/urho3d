@@ -43,7 +43,7 @@ public:
     /// Construct from a C function.
     LuaFunction(lua_State* L, lua_CFunction func);
     /// Destruct.
-    virtual ~LuaFunction() override;
+    ~LuaFunction() override;
 
     /// Check that function is valid.
     bool IsValid() const;

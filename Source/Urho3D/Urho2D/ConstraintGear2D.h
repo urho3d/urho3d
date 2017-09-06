@@ -36,7 +36,7 @@ public:
     /// Construct.
     ConstraintGear2D(Context* context);
     /// Destruct.
-    virtual ~ConstraintGear2D() override;
+    ~ConstraintGear2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
@@ -58,7 +58,7 @@ public:
 
 private:
     /// Return joint def.
-    virtual b2JointDef* GetJointDef() override;
+    b2JointDef* GetJointDef() override;
 
     /// Box2D joint def.
     b2GearJointDef jointDef_;

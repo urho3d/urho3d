@@ -63,41 +63,41 @@ public:
     /// Construct.
     ScriptInstance(Context* context);
     /// Destruct.
-    virtual ~ScriptInstance() override;
+    ~ScriptInstance() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Handle attribute write access.
-    virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
+    void OnSetAttribute(const AttributeInfo& attr, const Variant& src) override;
     /// Handle attribute read access.
-    virtual void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const override;
+    void OnGetAttribute(const AttributeInfo& attr, Variant& dest) const override;
 
     /// Return attribute descriptions, or null if none defined.
-    virtual const Vector<AttributeInfo>* GetAttributes() const override { return &attributeInfos_; }
+    const Vector<AttributeInfo>* GetAttributes() const override { return &attributeInfos_; }
 
     /// Apply attribute changes that can not be applied immediately. Called after scene load or a network update.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled() override;
+    void OnSetEnabled() override;
 
     /// Add a scripted event handler.
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName) override;
+    void AddEventHandler(StringHash eventType, const String& handlerName) override;
     /// Add a scripted event handler for a specific sender.
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) override;
+    void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) override;
     /// Remove a scripted event handler.
-    virtual void RemoveEventHandler(StringHash eventType) override;
+    void RemoveEventHandler(StringHash eventType) override;
     /// Remove a scripted event handler for a specific sender.
-    virtual void RemoveEventHandler(Object* sender, StringHash eventType) override;
+    void RemoveEventHandler(Object* sender, StringHash eventType) override;
     /// Remove all scripted event handlers for a specific sender.
-    virtual void RemoveEventHandlers(Object* sender) override;
+    void RemoveEventHandlers(Object* sender) override;
     /// Remove all scripted event handlers.
-    virtual void RemoveEventHandlers() override;
+    void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
-    virtual bool HasEventHandler(StringHash eventType) const override;
+    bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
-    virtual bool HasEventHandler(Object* sender, StringHash eventType) const override;
+    bool HasEventHandler(Object* sender, StringHash eventType) const override;
 
     /// Create object of certain class from the script file. Return true if successful.
     bool CreateObject(ScriptFile* scriptFile, const String& className);
@@ -148,9 +148,9 @@ public:
 
 protected:
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
 
 private:
     /// (Re)create the script object and check for supported methods if successfully created.

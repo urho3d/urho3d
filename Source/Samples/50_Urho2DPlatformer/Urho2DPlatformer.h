@@ -47,10 +47,10 @@ public:
     Urho2DPlatformer(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start();
+    void Start() override;
     /// Setup before engine initialization. Modifies the engine parameters.
-    virtual void Setup();
-    
+    void Setup() override;
+
 private:
     /// Construct the scene content.
     void CreateScene();

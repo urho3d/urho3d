@@ -49,12 +49,12 @@ public:
     /// Construct.
     Camera(Context* context);
     /// Destruct.
-    virtual ~Camera() override;
+    ~Camera() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set near clip distance.
     void SetNearClip(float nearClip);
@@ -95,7 +95,7 @@ public:
     /// Set vertical flipping mode. Called internally by View to resolve OpenGL / Direct3D9 rendertarget sampling differences.
     void SetFlipVertical(bool enable);
     /// Set custom projection matrix, which should be specified in D3D convention with depth range 0 - 1. Disables auto aspect ratio.
-    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection. 
+    /** Change any of the standard view parameters (FOV, far clip, zoom etc.) to revert to the standard projection.
         Note that the custom projection is not serialized or replicated through the network.
      */
     void SetProjection(const Matrix4& projection);
@@ -212,9 +212,9 @@ public:
 
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
+    void OnNodeSet(Node* node) override;
     /// Handle node transform being dirtied.
-    virtual void OnMarkedDirty(Node* node) override;
+    void OnMarkedDirty(Node* node) override;
 
 private:
     /// Recalculate projection matrix.

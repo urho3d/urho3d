@@ -43,14 +43,14 @@ public:
     static void RegisterObject(Context* context);
 
     /// Handle update. Called by LogicComponent base class.
-    virtual void Update(float timeStep) override;
+    void Update(float timeStep) override;
 
     /// Handle player state/behavior when wounded.
     void HandleWoundedState(float timeStep);
-    
+
     /// Handle death of the player.
     void HandleDeath();
-    
+
     /// Flag when player is wounded.
     bool wounded_;
     /// Flag when player is dead.

@@ -210,7 +210,7 @@ struct Timeline
 };
 
 /// Curve type.
-enum CurveType 
+enum CurveType
 {
     INSTANT = 0,
     LINEAR,
@@ -261,10 +261,10 @@ struct SpatialTimelineKey : TimelineKey
     SpatialInfo info_;
 
     SpatialTimelineKey(Timeline* timeline);
-    virtual ~SpatialTimelineKey() override;
+    ~SpatialTimelineKey() override;
 
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     SpatialTimelineKey& operator=(const SpatialTimelineKey& rhs);
 };
 
@@ -275,12 +275,13 @@ struct BoneTimelineKey : SpatialTimelineKey
     float width_;
 
     BoneTimelineKey(Timeline* timeline);
-    virtual ~BoneTimelineKey() override;
+    ~BoneTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const override { return BONE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    ObjectType GetObjectType() const override { return BONE; }
+
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     BoneTimelineKey& operator=(const BoneTimelineKey& rhs);
 };
 
@@ -297,12 +298,13 @@ struct SpriteTimelineKey : SpatialTimelineKey
     int zIndex_;
 
     SpriteTimelineKey(Timeline* timeline);
-    virtual ~SpriteTimelineKey() override;
+    ~SpriteTimelineKey() override;
 
-    virtual ObjectType GetObjectType() const override { return SPRITE; }
-    virtual TimelineKey* Clone() const override;
-    virtual bool Load(const pugi::xml_node& node) override;
-    virtual void Interpolate(const TimelineKey& other, float t) override;
+    ObjectType GetObjectType() const override { return SPRITE; }
+
+    TimelineKey* Clone() const override;
+    bool Load(const pugi::xml_node& node) override;
+    void Interpolate(const TimelineKey& other, float t) override;
     SpriteTimelineKey& operator=(const SpriteTimelineKey& rhs);
 };
 

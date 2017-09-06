@@ -97,12 +97,12 @@ public:
     /// Construct.
     NavigationMesh(Context* context);
     /// Destruct.
-    virtual ~NavigationMesh() override;
+    ~NavigationMesh() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tile size.
     void SetTileSize(int size);

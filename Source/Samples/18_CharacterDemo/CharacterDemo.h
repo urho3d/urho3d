@@ -51,14 +51,14 @@ public:
     /// Construct.
     CharacterDemo(Context* context);
     /// Destruct.
-    virtual ~CharacterDemo() override;
+    ~CharacterDemo() override;
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start() override;
+    void Start() override;
 
 protected:
     /// Return XML patch instructions for screen joystick layout for a specific sample app, if any.
-    virtual String GetScreenJoystickPatchString() const override { return
+    String GetScreenJoystickPatchString() const override { return
         "<patch>"
         "    <add sel=\"/element\">"
         "        <element type=\"Button\">"

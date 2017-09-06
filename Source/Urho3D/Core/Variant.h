@@ -244,7 +244,7 @@ public:
     const T& GetValue() const { return value_; }
 
     /// Assign value.
-    virtual bool Assign(const CustomVariantValue& rhs) override
+    bool Assign(const CustomVariantValue& rhs) override
     {
         if (const T* rhsValue = rhs.GetValuePtr<T>())
         {
@@ -254,22 +254,22 @@ public:
         return false;
     }
     /// Clone.
-    virtual CustomVariantValue* Clone() const override { return new ClassName(value_); }
+    CustomVariantValue* Clone() const override { return new ClassName(value_); }
     /// Placement clone.
-    virtual void Clone(void* dest) const override { new (dest) ClassName(value_); }
+    void Clone(void* dest) const override { new (dest) ClassName(value_); }
     /// Get size.
-    virtual unsigned GetSize() const override { return sizeof(ClassName); }
+    unsigned GetSize() const override { return sizeof(ClassName); }
 
     /// Compare to another custom value.
-    virtual bool Compare(const CustomVariantValue& rhs) const override
+    bool Compare(const CustomVariantValue& rhs) const override
     {
         const T* rhsValue = rhs.GetValuePtr<T>();
         return rhsValue && Traits::Compare(value_, *rhsValue);
     }
     /// Compare to zero.
-    virtual bool IsZero() const override { return Traits::IsZero(value_);}
+    bool IsZero() const override { return Traits::IsZero(value_);}
     /// Convert custom value to string.
-    virtual String ToString() const override { return Traits::ToString(value_); }
+    String ToString() const override { return Traits::ToString(value_); }
 
 private:
     /// Value.

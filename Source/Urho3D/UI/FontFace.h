@@ -72,7 +72,7 @@ public:
     /// Construct.
     FontFace(Font* font);
     /// Destruct.
-    virtual ~FontFace() override;
+    ~FontFace() override;
 
     /// Load font face.
     virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize) = 0;

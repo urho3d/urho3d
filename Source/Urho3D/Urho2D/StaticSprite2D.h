@@ -38,7 +38,7 @@ public:
     /// Construct.
     StaticSprite2D(Context* context);
     /// Destruct.
-    virtual ~StaticSprite2D() override;
+    ~StaticSprite2D() override;
     /// Register object factory. Drawable2D must be registered first.
     static void RegisterObject(Context* context);
 
@@ -123,13 +123,13 @@ public:
 protected:
 
     /// Handle scene being assigned.
-    virtual void OnSceneSet(Scene* scene) override;
+    void OnSceneSet(Scene* scene) override;
     /// Recalculate the world-space bounding box.
-    virtual void OnWorldBoundingBoxUpdate() override;
+    void OnWorldBoundingBoxUpdate() override;
     /// Handle draw order changed.
-    virtual void OnDrawOrderChanged() override;
+    void OnDrawOrderChanged() override;
     /// Update source batches.
-    virtual void UpdateSourceBatches() override;
+    void UpdateSourceBatches() override;
     /// Update material.
     void UpdateMaterial();
     /// Update drawRect.

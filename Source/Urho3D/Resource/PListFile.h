@@ -145,12 +145,12 @@ public:
     /// Construct.
     PListFile(Context* context);
     /// Destruct.
-    virtual ~PListFile() override;
+    ~PListFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
 
     /// Return root.
     const PListValueMap& GetRoot() const { return root_; }

@@ -217,7 +217,7 @@ public:
     /// Construct.
     RenderPath();
     /// Destruct.
-    virtual ~RenderPath() override;
+    ~RenderPath() override;
 
     /// Clone the rendering path.
     SharedPtr<RenderPath> Clone();

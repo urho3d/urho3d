@@ -39,16 +39,16 @@ public:
     /// Construct.
     ScrollBar(Context* context);
     /// Destruct.
-    virtual ~ScrollBar() override;
+    ~ScrollBar() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Apply attribute changes that can not be applied immediately.
-    virtual void ApplyAttributes() override;
+    void ApplyAttributes() override;
     /// React to resize.
-    virtual void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
+    void OnResize(const IntVector2& newSize, const IntVector2& delta) override;
     /// React to editable status change.
-    virtual void OnSetEditable() override;
+    void OnSetEditable() override;
 
     /// Set orientation type.
     void SetOrientation(Orientation orientation);

@@ -115,14 +115,14 @@ public:
     /// Construct.
     Animation(Context* context);
     /// Destruct.
-    virtual ~Animation() override;
+    ~Animation() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
 
     /// Set animation name.
     void SetAnimationName(const String& name);

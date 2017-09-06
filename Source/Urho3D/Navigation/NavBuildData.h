@@ -89,7 +89,7 @@ struct SimpleNavBuildData : public NavBuildData
     /// Constructor.
     SimpleNavBuildData();
     /// Descturctor.
-    virtual ~SimpleNavBuildData() override;
+    ~SimpleNavBuildData() override;
 
     /// Recast contour set.
     rcContourSet* contourSet_;
@@ -104,7 +104,7 @@ struct DynamicNavBuildData : public NavBuildData
     /// Constructor.
     DynamicNavBuildData(dtTileCacheAlloc* alloc);
     /// Destructor.
-    virtual ~DynamicNavBuildData() override;
+    ~DynamicNavBuildData() override;
 
     /// TileCache specific recast contour set.
     dtTileCacheContourSet* contourSet_;

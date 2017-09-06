@@ -67,19 +67,19 @@ struct DynamicNavigationMesh::TileCacheData
 
 struct TileCompressor : public dtTileCacheCompressor
 {
-    virtual int maxCompressedSize(const int bufferSize) override
+    int maxCompressedSize(const int bufferSize) override
     {
         return (int)(bufferSize * 1.05f);
     }
 
-    virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
+    dtStatus compress(const unsigned char* buffer, const int bufferSize,
         unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize) override
     {
         *compressedSize = LZ4_compress_default((const char*)buffer, (char*)compressed, bufferSize, LZ4_compressBound(bufferSize));
         return DT_SUCCESS;
     }
 
-    virtual dtStatus decompress(const unsigned char* compressed, const int compressedSize,
+    dtStatus decompress(const unsigned char* compressed, const int compressedSize,
         unsigned char* buffer, const int maxBufferSize, int* bufferSize) override
     {
         *bufferSize = LZ4_decompress_safe((const char*)compressed, (char*)buffer, compressedSize, maxBufferSize);
@@ -101,7 +101,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
     {
     }
 
-    virtual void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags) override
+    void process(struct dtNavMeshCreateParams* params, unsigned char* polyAreas, unsigned short* polyFlags) override
     {
         // Update poly flags from areas.
         // \todo Assignment of flags from areas?
@@ -172,7 +172,7 @@ struct LinearAllocator : public dtTileCacheAlloc
         resize(cap);
     }
 
-    virtual ~LinearAllocator() override
+    ~LinearAllocator() override
     {
         dtFree(buffer);
     }
@@ -185,13 +185,13 @@ struct LinearAllocator : public dtTileCacheAlloc
         capacity = cap;
     }
 
-    virtual void reset() override
+    void reset() override
     {
         high = Max(high, top);
         top = 0;
     }
 
-    virtual void* alloc(const int size) override
+    void* alloc(const int size) override
     {
         if (!buffer)
             return nullptr;
@@ -202,7 +202,7 @@ struct LinearAllocator : public dtTileCacheAlloc
         return mem;
     }
 
-    virtual void free(void*) override
+    void free(void*) override
     {
     }
 };

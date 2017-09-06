@@ -45,7 +45,7 @@ public:
     /// Construct.
     Pass(const String& passName);
     /// Destruct.
-    virtual ~Pass() override;
+    ~Pass() override;
 
     /// Set blend mode.
     void SetBlendMode(BlendMode mode);
@@ -119,7 +119,7 @@ public:
 
     /// Return pixel shader defines.
     const String& GetPixelShaderDefines() const { return pixelShaderDefines_; }
-    
+
     /// Return vertex shader define excludes.
     const String& GetVertexShaderDefineExcludes() const { return vertexShaderDefineExcludes_; }
 
@@ -195,12 +195,12 @@ public:
     /// Construct.
     Technique(Context* context);
     /// Destruct.
-    virtual ~Technique() override;
+    ~Technique() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
 
     /// Set whether requires desktop level hardware.
     void SetIsDesktop(bool enable);

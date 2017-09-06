@@ -51,33 +51,33 @@ public:
     /// Construct.
     ScriptFile(Context* context);
     /// Destruct.
-    virtual ~ScriptFile() override;
+    ~ScriptFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Finish resource loading. Always called from the main thread. Return true if successful.
-    virtual bool EndLoad() override;
+    bool EndLoad() override;
 
     /// Add a scripted event handler.
-    virtual void AddEventHandler(StringHash eventType, const String& handlerName) override;
+    void AddEventHandler(StringHash eventType, const String& handlerName) override;
     /// Add a scripted event handler for a specific sender.
-    virtual void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) override;
+    void AddEventHandler(Object* sender, StringHash eventType, const String& handlerName) override;
     /// Remove a scripted event handler.
-    virtual void RemoveEventHandler(StringHash eventType) override;
+    void RemoveEventHandler(StringHash eventType) override;
     /// Remove a scripted event handler for a specific sender.
-    virtual void RemoveEventHandler(Object* sender, StringHash eventType) override;
+    void RemoveEventHandler(Object* sender, StringHash eventType) override;
     /// Remove all scripted event handlers for a specific sender.
-    virtual void RemoveEventHandlers(Object* sender) override;
+    void RemoveEventHandlers(Object* sender) override;
     /// Remove all scripted event handlers.
-    virtual void RemoveEventHandlers() override;
+    void RemoveEventHandlers() override;
     /// Remove all scripted event handlers, except those listed.
-    virtual void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
+    void RemoveEventHandlersExcept(const PODVector<StringHash>& exceptions) override;
     /// Return whether has subscribed to an event.
-    virtual bool HasEventHandler(StringHash eventType) const override;
+    bool HasEventHandler(StringHash eventType) const override;
     /// Return whether has subscribed to a specific sender's event.
-    virtual bool HasEventHandler(Object* sender, StringHash eventType) const override;
+    bool HasEventHandler(Object* sender, StringHash eventType) const override;
 
     /// Query for a function by declaration and execute if found.
     bool Execute(const String& declaration, const VariantVector& parameters = Variant::emptyVariantVector, bool unprepare = true);
@@ -160,7 +160,7 @@ public:
     /// Constructor, will create the asILockableSharedBool if a ScriptObject is passed in.
     ScriptEventInvoker(ScriptFile* file, asIScriptObject* object = nullptr);
     /// Destructor, release the ref it we still hold it.
-    virtual ~ScriptEventInvoker() override;
+    ~ScriptEventInvoker() override;
 
     /// Get the asIScriptObject to call the method on, can be null.
     asIScriptObject* GetObject() const { return object_; }

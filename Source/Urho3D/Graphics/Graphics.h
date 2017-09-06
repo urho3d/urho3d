@@ -86,7 +86,7 @@ public:
     /// Construct.
     Graphics(Context* context);
     /// Destruct. Release the Direct3D11 device and close the window.
-    virtual ~Graphics();
+    ~Graphics() override;
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);

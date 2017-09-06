@@ -49,7 +49,7 @@ public:
     PBRMaterials(Context* context);
 
     /// Setup after engine initialization and before running the main loop.
-    virtual void Start() override;
+    void Start() override;
 
 private:
     /// Construct the scene content.
@@ -72,7 +72,7 @@ private:
     void HandleMetallicSliderChanged(StringHash eventType, VariantMap& eventData);
     /// Handle the ambient HDR scale slider drag event.
     void HandleAmbientSliderChanged(StringHash eventType, VariantMap& eventData);
-    
+
     /// Dynamic material.
     Material* dynamicMaterial_;
     /// Roughness label.

@@ -47,7 +47,7 @@ public:
     /// Construct.
     FileSystem(Context* context);
     /// Destruct.
-    virtual ~FileSystem() override;
+    ~FileSystem() override;
 
     /// Set the current working directory.
     bool SetCurrentDir(const String& pathName);

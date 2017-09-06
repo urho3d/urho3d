@@ -39,12 +39,12 @@ public:
     /// Construct.
     ConstantBuffer(Context* context);
     /// Destruct.
-    virtual ~ConstantBuffer() override;
+    ~ConstantBuffer() override;
 
     /// Recreate the GPU resource and restore data if applicable.
-    virtual void OnDeviceReset() override;
+    void OnDeviceReset() override;
     /// Release the buffer.
-    virtual void Release() override;
+    void Release() override;
 
     /// Set size and create GPU-side buffer. Return true on success.
     bool SetSize(unsigned size);

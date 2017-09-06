@@ -57,10 +57,10 @@ public:
     BackgroundLoader(ResourceCache* owner);
 
     /// Destruct. Forcibly clear the load queue.
-    virtual ~BackgroundLoader() override;
+    ~BackgroundLoader() override;
 
     /// Resource background loading loop.
-    virtual void ThreadFunction() override;
+    void ThreadFunction() override;
 
     /// Queue loading of a resource. The name must be sanitated to ensure consistent format. Return true if queued (not a duplicate and resource was a known type).
     bool QueueResource(StringHash type, const String& name, bool sendEventOnFailure, Resource* caller);

@@ -38,26 +38,26 @@ public:
     static void RegisterObject(Context* context);
 
     /// Return type of the stored component.
-    virtual StringHash GetType() const override { return typeHash_; }
+    StringHash GetType() const override { return typeHash_; }
 
     /// Return type name of the stored component.
-    virtual const String& GetTypeName() const override { return typeName_; }
+    const String& GetTypeName() const override { return typeName_; }
 
     /// Return attribute descriptions, or null if none defined.
-    virtual const Vector<AttributeInfo>* GetAttributes() const override { return &xmlAttributeInfos_; }
+    const Vector<AttributeInfo>* GetAttributes() const override { return &xmlAttributeInfos_; }
 
     /// Load from binary data. Return true if successful.
-    virtual bool Load(Deserializer& source, bool setInstanceDefault = false) override;
+    bool Load(Deserializer& source, bool setInstanceDefault = false) override;
     /// Load from XML data. Return true if successful.
-    virtual bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
+    bool LoadXML(const XMLElement& source, bool setInstanceDefault = false) override;
     /// Load from JSON data. Return true if successful.
-    virtual bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
+    bool LoadJSON(const JSONValue& source, bool setInstanceDefault = false) override;
     /// Save as binary data. Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
     /// Save as XML data. Return true if successful.
-    virtual bool SaveXML(XMLElement& dest) const override;
+    bool SaveXML(XMLElement& dest) const override;
     /// Save as JSON data. Return true if successful.
-    virtual bool SaveJSON(JSONValue& dest) const override;
+    bool SaveJSON(JSONValue& dest) const override;
 
     /// Initialize the type name. Called by Node when loading.
     void SetTypeName(const String& typeName);

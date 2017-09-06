@@ -46,14 +46,14 @@ public:
     /// Construct.
     XMLFile(Context* context);
     /// Destruct.
-    virtual ~XMLFile() override;
+    ~XMLFile() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Load resource from stream. May be called from a worker thread. Return true if successful.
-    virtual bool BeginLoad(Deserializer& source) override;
+    bool BeginLoad(Deserializer& source) override;
     /// Save resource with default indentation (one tab). Return true if successful.
-    virtual bool Save(Serializer& dest) const override;
+    bool Save(Serializer& dest) const override;
     /// Save resource with user-defined indentation. Return true if successful.
     bool Save(Serializer& dest, const String& indentation) const;
 

@@ -79,7 +79,7 @@ public:
     {
     }
 
-    virtual ~PackerInfo() override {}
+    ~PackerInfo() override {}
 };
 
 void Help()

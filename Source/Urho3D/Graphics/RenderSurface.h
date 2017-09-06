@@ -41,7 +41,7 @@ public:
     /// Construct with parent texture.
     RenderSurface(Texture* parentTexture);
     /// Destruct.
-    virtual ~RenderSurface() override;
+    ~RenderSurface() override;
 
     /// Set number of viewports.
     void SetNumViewports(unsigned num);
@@ -64,10 +64,10 @@ public:
 
     /// Return width.
     int GetWidth() const;
-    
+
     /// Return height.
     int GetHeight() const;
-    
+
     /// Return usage.
     TextureUsage GetUsage() const;
 
@@ -94,7 +94,7 @@ public:
 
     /// Return whether manual update queued. Called internally.
     bool IsUpdateQueued() const { return updateQueued_; }
-    
+
     /// Reset update queued flag. Called internally.
     void ResetUpdateQueued();
 

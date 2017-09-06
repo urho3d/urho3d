@@ -86,7 +86,7 @@ public:
     /// Construct.
     ResourceCache(Context* context);
     /// Destruct. Free all resources.
-    virtual ~ResourceCache() override;
+    ~ResourceCache() override;
 
     /// Add a resource load directory. Optional priority parameter which will control search order.
     bool AddResourceDir(const String& pathName, unsigned priority = PRIORITY_LAST);

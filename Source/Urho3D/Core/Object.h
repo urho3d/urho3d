@@ -84,7 +84,7 @@ public:
     /// Construct.
     Object(Context* context);
     /// Destruct. Clean up self from event sender & receiver structures.
-    virtual ~Object() override;
+    ~Object() override;
 
     /// Return type hash.
     virtual StringHash GetType() const = 0;
@@ -238,7 +238,7 @@ public:
     }
 
     /// Create an object of the specific type.
-    virtual SharedPtr<Object> CreateObject() override { return SharedPtr<Object>(new T(context_)); }
+    SharedPtr<Object> CreateObject() override { return SharedPtr<Object>(new T(context_)); }
 };
 
 /// Internal helper class for invoking event handler functions.
@@ -307,14 +307,14 @@ public:
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData) override
+    void Invoke(VariantMap& eventData) override
     {
         T* receiver = static_cast<T*>(receiver_);
         (receiver->*function_)(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const override
+    EventHandler* Clone() const override
     {
         return new EventHandlerImpl(static_cast<T*>(receiver_), function_, userData_);
     }
@@ -337,13 +337,13 @@ public:
     }
 
     /// Invoke event handler function.
-    virtual void Invoke(VariantMap& eventData) override
+    void Invoke(VariantMap& eventData) override
     {
         function_(eventType_, eventData);
     }
 
     /// Return a unique copy of the event handler.
-    virtual EventHandler* Clone() const override
+    EventHandler* Clone() const override
     {
         return new EventHandler11Impl(function_, userData_);
     }

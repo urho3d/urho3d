@@ -71,7 +71,7 @@ public:
     /// Construct.
     Context();
     /// Destruct.
-    virtual ~Context() override;
+    ~Context() override;
 
     /// Create an object by type. Return pointer to it or null if no factory found.
     template <class T> inline SharedPtr<T> CreateObject()

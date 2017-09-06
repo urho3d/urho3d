@@ -77,7 +77,7 @@ public:
     }
 
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override
     {
         while (start != end)
         {
@@ -105,7 +105,7 @@ public:
     }
 
     /// Intersection test for drawables.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override
     {
         while (start != end)
         {
@@ -135,7 +135,7 @@ public:
     }
 
     /// Intersection test for an octant.
-    virtual Intersection TestOctant(const BoundingBox& box, bool inside) override
+    Intersection TestOctant(const BoundingBox& box, bool inside) override
     {
         if (inside)
             return buffer_->IsVisible(box) ? INSIDE : OUTSIDE;
@@ -149,7 +149,7 @@ public:
     }
 
     /// Intersection test for drawables. Note: drawable occlusion is performed later in worker threads.
-    virtual void TestDrawables(Drawable** start, Drawable** end, bool inside) override
+    void TestDrawables(Drawable** start, Drawable** end, bool inside) override
     {
         while (start != end)
         {

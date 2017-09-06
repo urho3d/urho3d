@@ -42,7 +42,7 @@ public:
     MessageBox(Context* context, const String& messageString = String::EMPTY, const String& titleString = String::EMPTY,
         XMLFile* layoutFile = nullptr, XMLFile* styleFile = nullptr);
     /// Destruct.
-    virtual ~MessageBox() override;
+    ~MessageBox() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 

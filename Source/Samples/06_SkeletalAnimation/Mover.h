@@ -30,23 +30,23 @@ using namespace Urho3D;
 class Mover : public LogicComponent
 {
     URHO3D_OBJECT(Mover, LogicComponent);
-    
+
 public:
     /// Construct.
     Mover(Context* context);
-    
+
     /// Set motion parameters: forward movement speed, rotation speed, and movement boundaries.
     void SetParameters(float moveSpeed, float rotateSpeed, const BoundingBox& bounds);
     /// Handle scene update. Called by LogicComponent base class.
-    virtual void Update(float timeStep) override;
-    
+    void Update(float timeStep) override;
+
     /// Return forward movement speed.
     float GetMoveSpeed() const { return moveSpeed_; }
     /// Return rotation speed.
     float GetRotationSpeed() const { return rotationSpeed_; }
     /// Return movement boundaries.
     const BoundingBox& GetBounds() const { return bounds_; }
-    
+
 private:
     /// Forward movement speed.
     float moveSpeed_;

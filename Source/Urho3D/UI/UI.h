@@ -63,7 +63,7 @@ public:
     /// Construct.
     UI(Context* context);
     /// Destruct.
-    virtual ~UI() override;
+    ~UI() override;
 
     /// Set cursor UI element.
     void SetCursor(Cursor* cursor);

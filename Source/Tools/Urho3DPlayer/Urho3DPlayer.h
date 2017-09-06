@@ -36,11 +36,11 @@ public:
     Urho3DPlayer(Context* context);
 
     /// Setup before engine initialization. Verify that a script file has been specified.
-    virtual void Setup() override;
+    void Setup() override;
     /// Setup after engine initialization. Load the script and execute its start function.
-    virtual void Start() override;
+    void Start() override;
     /// Cleanup after the main loop. Run the script's stop function if it exists.
-    virtual void Stop() override;
+    void Stop() override;
 
 private:
     /// Handle reload start of the script file.
@@ -56,7 +56,7 @@ private:
     String scriptFileName_;
     /// Flag whether CommandLine.txt was already successfully read.
     bool commandLineRead_;
-    
+
 #ifdef URHO3D_ANGELSCRIPT
     /// Script file.
     SharedPtr<ScriptFile> scriptFile_;

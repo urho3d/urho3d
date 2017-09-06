@@ -40,12 +40,12 @@ public:
     /// Construct.
     TileMap2D(Context* context);
     /// Destruct.
-    virtual ~TileMap2D() override;
+    ~TileMap2D() override;
     /// Register object factory.
     static void RegisterObject(Context* context);
 
     /// Visualize the component as debug geometry.
-    virtual void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
+    void DrawDebugGeometry(DebugRenderer* debug, bool depthTest) override;
 
     /// Set tmx file.
     void SetTmxFile(TmxFile2D* tmxFile);

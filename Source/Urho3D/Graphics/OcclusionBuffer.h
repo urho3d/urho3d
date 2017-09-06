@@ -94,7 +94,7 @@ public:
     /// Construct.
     OcclusionBuffer(Context* context);
     /// Destruct.
-    virtual ~OcclusionBuffer() override;
+    ~OcclusionBuffer() override;
 
     /// Set occlusion buffer size and whether to reserve multiple buffers for threading optimization.
     bool SetSize(int width, int height, bool threaded);

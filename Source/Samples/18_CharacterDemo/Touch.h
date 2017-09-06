@@ -52,7 +52,7 @@ public:
     /// Construct.
     Touch(Context* context, float touchSensitivity);
     /// Destruct.
-    ~Touch();
+    ~Touch() override;
 
     /// Update touch controls for the current frame.
     void UpdateTouches(Controls& controls);

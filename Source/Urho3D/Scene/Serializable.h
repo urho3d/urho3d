@@ -49,7 +49,7 @@ public:
     /// Construct.
     Serializable(Context* context);
     /// Destruct.
-    virtual ~Serializable() override;
+    ~Serializable() override;
 
     /// Handle attribute write access. Default implementation writes to the variable at offset, or invokes the set accessor.
     virtual void OnSetAttribute(const AttributeInfo& attr, const Variant& src);
@@ -153,7 +153,7 @@ public:
     VariantAttributeAccessorImpl(TGetFunction getFunction, TSetFunction setFunction) : getFunction_(getFunction), setFunction_(setFunction) { }
 
     /// Invoke getter function.
-    virtual void Get(const Serializable* ptr, Variant& value) const override
+    void Get(const Serializable* ptr, Variant& value) const override
     {
         assert(ptr);
         const auto classPtr = static_cast<const TClassType*>(ptr);
@@ -161,7 +161,7 @@ public:
     }
 
     /// Invoke setter function.
-    virtual void Set(Serializable* ptr, const Variant& value) override
+    void Set(Serializable* ptr, const Variant& value) override
     {
         assert(ptr);
         auto classPtr = static_cast<TClassType*>(ptr);

@@ -31,15 +31,15 @@ using namespace Urho3D;
 class CreateRagdoll : public Component
 {
     URHO3D_OBJECT(CreateRagdoll, Component);
-    
+
 public:
     /// Construct.
     CreateRagdoll(Context* context);
-    
+
 protected:
     /// Handle node being assigned.
-    virtual void OnNodeSet(Node* node) override;
-    
+    void OnNodeSet(Node* node) override;
+
 private:
     /// Handle scene node's physics collision.
     void HandleNodeCollision(StringHash eventType, VariantMap& eventData);
