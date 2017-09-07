@@ -33,6 +33,7 @@
 #include "../Scene/Scene.h"
 
 #include <Bullet/BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
+#include <Bullet/BulletDynamics/ConstraintSolver/btFixedConstraint.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btHingeConstraint.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btSliderConstraint.h>
@@ -47,6 +48,7 @@ static const char* typeNames[] =
     "Hinge",
     "Slider",
     "ConeTwist",
+    "Fixed",
     nullptr
 };
 
@@ -433,6 +435,16 @@ void Constraint::ApplyFrames()
         }
         break;
 
+    case D6_SPRING_2_CONSTRAINT_TYPE: // Bullet do not use FIXED_CONSTRAINT_TYPE
+    case FIXED_CONSTRAINT_TYPE: // If this will be fixed
+        {
+            btFixedConstraint* fixedConstraint = static_cast<btFixedConstraint*>(constraint_.Get());
+            btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
+            fixedConstraint->setFrames(ownFrame, otherFrame);
+        }
+        break;
+
     default:
         break;
     }
@@ -536,6 +548,14 @@ void Constraint::CreateConstraint()
             btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
             btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
             constraint_ = new btConeTwistConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
+        }
+        break;
+
+    case CONSTRAINT_FIXED:
+        {
+            btTransform ownFrame(ToBtQuaternion(rotation_), ToBtVector3(ownBodyScaledPosition));
+            btTransform otherFrame(ToBtQuaternion(otherRotation_), ToBtVector3(otherBodyScaledPosition));
+            constraint_ = new btFixedConstraint(*ownBody, *otherBody, ownFrame, otherFrame);
         }
         break;
 

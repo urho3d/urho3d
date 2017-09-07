@@ -5,7 +5,8 @@ enum ConstraintType
     CONSTRAINT_POINT = 0,
     CONSTRAINT_HINGE,
     CONSTRAINT_SLIDER,
-    CONSTRAINT_CONETWIST
+    CONSTRAINT_CONETWIST,
+    CONSTRAINT_FIXED
 };
 
 class Constraint : public Component
