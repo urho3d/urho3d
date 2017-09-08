@@ -52,6 +52,13 @@ String IntRect::ToString() const
 }
 
 template<typename T>
+void BaseRect<T>::Clear()
+{
+    min_ = BaseVector2<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
+    max_ = BaseVector2<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::min());
+}
+
+template<typename T>
 void BaseRect<T>::Clip(const BaseRect<T>& rect)
 {
     if (rect.min_.x_ > min_.x_)
@@ -68,6 +75,86 @@ void BaseRect<T>::Clip(const BaseRect<T>& rect)
         min_ = BaseVector2<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
         max_ = BaseVector2<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::min());
     }
+}
+
+template<typename T>
+Intersection BaseRect<T>::IsInside(const BaseVector2<T>& point) const
+{
+    if (point.x_ < min_.x_ || point.y_ < min_.y_ || point.x_ > max_.x_ || point.y_ > max_.y_)
+        return OUTSIDE;
+    else
+        return INSIDE;
+}
+
+template<typename T>
+void BaseRect<T>::Merge(const BaseRect& rect)
+{
+    if (rect.min_.x_ < min_.x_)
+        min_.x_ = rect.min_.x_;
+    if (rect.min_.y_ < min_.y_)
+        min_.y_ = rect.min_.y_;
+    if (rect.max_.x_ > max_.x_)
+        max_.x_ = rect.max_.x_;
+    if (rect.max_.y_ > max_.y_)
+        max_.y_ = rect.max_.y_;
+}
+
+
+/*
+ * Behavior of IntRect and Rect was not consistent. Template specializations below maintain old behavior of IntRect.
+ * Ideally code should be fixed and specializations below should be removed.
+ */
+
+template<>
+Intersection IntRect::IsInside(const IntVector2& point) const
+{
+    if (point.x_ < left_ || point.y_ < top_ || point.x_ >= right_ || point.y_ >= bottom_)
+        return OUTSIDE;
+    else
+        return INSIDE;
+};
+
+template<>
+void IntRect::Clip(const IntRect& rect)
+{
+    if (rect.left_ > left_)
+        left_ = rect.left_;
+    if (rect.right_ < right_)
+        right_ = rect.right_;
+    if (rect.top_ > top_)
+        top_ = rect.top_;
+    if (rect.bottom_ < bottom_)
+        bottom_ = rect.bottom_;
+
+    if (left_ >= right_ || top_ >= bottom_)
+        *this = IntRect();
+}
+
+template<>
+void IntRect::Merge(const IntRect& rect)
+{
+    if (Width() <= 0 || Height() <= 0)
+    {
+        *this = rect;
+    }
+    else if (rect.Width() > 0 && rect.Height() > 0)
+    {
+        if (rect.left_ < left_)
+            left_ = rect.left_;
+        if (rect.top_ < top_)
+            top_ = rect.top_;
+        if (rect.right_ > right_)
+            right_ = rect.right_;
+        if (rect.bottom_ > bottom_)
+            bottom_ = rect.bottom_;
+    }
+}
+
+template<>
+void IntRect::Clear()
+{
+    min_ = IntVector2(0, 0);
+    max_ = IntVector2(0, 0);
 }
 
 }

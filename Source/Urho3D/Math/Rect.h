@@ -35,10 +35,9 @@ class URHO3D_API BaseRect
 {
 public:
     /// Construct an undefined rect.
-    BaseRect() :
-        min_(std::numeric_limits<T>::max(), std::numeric_limits<T>::max()),
-        max_(std::numeric_limits<T>::min(), std::numeric_limits<T>::min())
+    BaseRect()
     {
+        Clear();
     }
 
     /// Construct from minimum and maximum vectors.
@@ -126,24 +125,10 @@ public:
     }
 
     /// Merge a rect.
-    void Merge(const BaseRect& rect)
-    {
-        if (rect.min_.x_ < min_.x_)
-            min_.x_ = rect.min_.x_;
-        if (rect.min_.y_ < min_.y_)
-            min_.y_ = rect.min_.y_;
-        if (rect.max_.x_ > max_.x_)
-            max_.x_ = rect.max_.x_;
-        if (rect.max_.y_ > max_.y_)
-            max_.y_ = rect.max_.y_;
-    }
+    void Merge(const BaseRect& rect);
 
     /// Clear to undefined state.
-    void Clear()
-    {
-        min_ = BaseVector2<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
-        max_ = BaseVector2<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::min());
-    }
+    void Clear();
 
     /// Clip with another rect.
     void Clip(const BaseRect& rect);
@@ -173,13 +158,7 @@ public:
     bool Equals(const BaseRect& rhs) const { return min_.Equals(rhs.min_) && max_.Equals(rhs.max_); }
 
     /// Test whether a point is inside.
-    Intersection IsInside(const BaseVector2<T>& point) const
-    {
-        if (point.x_ < min_.x_ || point.y_ < min_.y_ || point.x_ > max_.x_ || point.y_ > max_.y_)
-            return OUTSIDE;
-        else
-            return INSIDE;
-    }
+    Intersection IsInside(const BaseVector2<T>& point) const;
 
     /// Test if another rect is inside, outside or intersects.
     Intersection IsInside(const BaseRect& rect) const
