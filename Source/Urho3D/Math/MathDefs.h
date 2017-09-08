@@ -292,6 +292,11 @@ inline float HalfToFloat(unsigned short value)
 /// Calculate both sine and cosine, with angle in degrees.
 URHO3D_API void SinCos(float angle, float& sin, float& cos);
 
+/// Selects floating point type of appropriate size for numeric types.
+template <typename T> struct ScalarTypeSelector { typedef float Type; };
+template <> struct ScalarTypeSelector<int64_t>  { typedef double Type; };
+template <> struct ScalarTypeSelector<double> { typedef double Type; };
+
 }
 
 #ifdef _MSC_VER
