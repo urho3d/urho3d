@@ -96,13 +96,13 @@ public:
     BaseVector2 operator -(const BaseVector2& rhs) const { return BaseVector2(x_ - rhs.x_, y_ - rhs.y_); }
 
     /// Multiply with a scalar.
-    BaseVector2 operator *(T rhs) const { return BaseVector2(x_ * rhs, y_ * rhs); }
+    BaseVector2 operator *(float rhs) const { return BaseVector2(x_ * rhs, y_ * rhs); }
 
     /// Multiply with a vector.
     BaseVector2 operator *(const BaseVector2& rhs) const { return BaseVector2(x_ * rhs.x_, y_ * rhs.y_); }
 
     /// Divide by a scalar.
-    BaseVector2 operator /(T rhs) const { return BaseVector2(x_ / rhs, y_ / rhs); }
+    BaseVector2 operator /(float rhs) const { return BaseVector2(x_ / rhs, y_ / rhs); }
 
     /// Divide by a vector.
     BaseVector2 operator /(const BaseVector2& rhs) const { return BaseVector2(x_ / rhs.x_, y_ / rhs.y_); }
@@ -124,7 +124,7 @@ public:
     }
 
     /// Multiply-assign a scalar.
-    BaseVector2& operator *=(T rhs)
+    BaseVector2& operator *=(float rhs)
     {
         x_ *= rhs;
         y_ *= rhs;
@@ -140,9 +140,9 @@ public:
     }
 
     /// Divide-assign a scalar.
-    BaseVector2& operator /=(T rhs)
+    BaseVector2& operator /=(float rhs)
     {
-        T invRhs = typename ScalarTypeSelector<T>::Type(1.0) / rhs;
+        float invRhs = 1.0f / rhs;
         x_ *= invRhs;
         y_ *= invRhs;
         return *this;
@@ -162,7 +162,7 @@ public:
         T lenSquared = LengthSquared();
         if (!Urho3D::Equals(lenSquared, (T)1) && lenSquared > (T)0)
         {
-            T invLen = typename ScalarTypeSelector<T>::Type(1.0) / sqrtf(lenSquared);
+            float invLen = 1.0f / sqrtf(lenSquared);
             x_ *= invLen;
             y_ *= invLen;
         }
@@ -190,7 +190,7 @@ public:
     BaseVector2 Abs() const { return BaseVector2(Urho3D::Abs(x_), Urho3D::Abs(y_)); }
 
     /// Linear interpolation with another vector.
-    BaseVector2 Lerp(const BaseVector2& rhs, T t) const { return *this * (typename ScalarTypeSelector<T>::Type(1.0) - t) + rhs * t; }
+    BaseVector2 Lerp(const BaseVector2& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
 
     /// Test for equality with another vector with epsilon.
     bool Equals(const BaseVector2& rhs) const { return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_); }
@@ -204,7 +204,7 @@ public:
         T lenSquared = LengthSquared();
         if (!Urho3D::Equals(lenSquared, (T)1) && lenSquared > 0)
         {
-            T invLen = typename ScalarTypeSelector<T>::Type(1.0) / sqrtf(lenSquared);
+            float invLen = 1.0f / sqrtf(lenSquared);
             return *this * invLen;
         }
         else
@@ -246,10 +246,10 @@ template class URHO3D_API BaseVector2<float>;
 template class URHO3D_API BaseVector2<int>;
 
 /// Multiply Vector2 with a scalar
-template<typename T> inline BaseVector2<T> operator *(T lhs, const BaseVector2<T>& rhs) { return rhs * lhs; }
+template<typename T> inline BaseVector2<T> operator *(float lhs, const BaseVector2<T>& rhs) { return rhs * lhs; }
 
 /// Multiply-asign Vector2 with a scalar
-template<typename T> inline BaseVector2<T> operator *=(T lhs, const BaseVector2<T>& rhs) { return rhs * lhs; }
+template<typename T> inline BaseVector2<T> operator *=(float lhs, const BaseVector2<T>& rhs) { return rhs * lhs; }
 
 /// Per-component linear interpolation between two 2-vectors.
 template<typename T> inline BaseVector2<T> VectorLerp(const BaseVector2<T>& lhs, const BaseVector2<T>& rhs, const BaseVector2<T>& t) { return lhs + (rhs - lhs) * t; }

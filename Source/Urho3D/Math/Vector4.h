@@ -106,13 +106,13 @@ public:
     BaseVector4 operator -(const BaseVector4& rhs) const { return BaseVector4(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_, w_ - rhs.w_); }
 
     /// Multiply with a scalar.
-    BaseVector4 operator *(T rhs) const { return BaseVector4(x_ * rhs, y_ * rhs, z_ * rhs, w_ * rhs); }
+    BaseVector4 operator *(float rhs) const { return BaseVector4(x_ * rhs, y_ * rhs, z_ * rhs, w_ * rhs); }
 
     /// Multiply with a vector.
     BaseVector4 operator *(const BaseVector4& rhs) const { return BaseVector4(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_, w_ * rhs.w_); }
 
     /// Divide by a scalar.
-    BaseVector4 operator /(T rhs) const { return BaseVector4(x_ / rhs, y_ / rhs, z_ / rhs, w_ / rhs); }
+    BaseVector4 operator /(float rhs) const { return BaseVector4(x_ / rhs, y_ / rhs, z_ / rhs, w_ / rhs); }
 
     /// Divide by a vector.
     BaseVector4 operator /(const BaseVector4& rhs) const { return BaseVector4(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_, w_ / rhs.w_); }
@@ -138,7 +138,7 @@ public:
     }
 
     /// Multiply-assign a scalar.
-    BaseVector4& operator *=(T rhs)
+    BaseVector4& operator *=(float rhs)
     {
         x_ *= rhs;
         y_ *= rhs;
@@ -158,9 +158,9 @@ public:
     }
 
     /// Divide-assign a scalar.
-    BaseVector4& operator /=(T rhs)
+    BaseVector4& operator /=(float rhs)
     {
-        T invRhs = (T)(typename ScalarTypeSelector<T>::Type(1.0) / rhs);
+        float invRhs = 1.0f / rhs;
         x_ *= invRhs;
         y_ *= invRhs;
         z_ *= invRhs;
@@ -194,7 +194,7 @@ public:
     BaseVector4 Abs() const { return BaseVector4(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_), Urho3D::Abs(w_)); }
 
     /// Linear interpolation with another vector.
-    BaseVector4 Lerp(const BaseVector4& rhs, T t) const { return *this * (typename ScalarTypeSelector<T>::Type(1.0) - t) + rhs * t; }
+    BaseVector4 Lerp(const BaseVector4& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
 
     /// Test for equality with another vector with epsilon.
     bool Equals(const BaseVector4& rhs) const
@@ -233,7 +233,7 @@ template class URHO3D_API BaseVector4<float>;
 template class URHO3D_API BaseVector4<int>;
 
 /// Multiply Vector4 with a scalar.
-template<typename T> inline BaseVector4<T> operator *(T lhs, const BaseVector4<T>& rhs) { return rhs * lhs; }
+template<typename T> inline BaseVector4<T> operator *(float lhs, const BaseVector4<T>& rhs) { return rhs * lhs; }
 
 /// Per-component linear interpolation between two 4-vectors.
 template<typename T> inline BaseVector4<T> VectorLerp(const BaseVector4<T>& lhs, const BaseVector4<T>& rhs, const BaseVector4<T>& t) { return lhs + (rhs - lhs) * t; }

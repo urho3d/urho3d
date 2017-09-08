@@ -66,9 +66,9 @@ class IntVector3
     IntVector3 operator + (const IntVector3& rhs) const;
     IntVector3 operator - () const;
     IntVector3 operator - (const IntVector3& rhs) const;
-    IntVector3 operator * (int rhs) const;
+    IntVector3 operator * (float rhs) const;
     IntVector3 operator * (const IntVector3& rhs) const;
-    IntVector3 operator / (int rhs) const;
+    IntVector3 operator / (float rhs) const;
     IntVector3 operator / (const IntVector3& rhs) const;
 
     void Normalize();
