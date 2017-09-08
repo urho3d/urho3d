@@ -44,6 +44,9 @@ void UpdateEditorSettingsDialog()
     CheckBox@ middleMousePanToggle = settingsDialog.GetChild("MiddleMousePanToggle", true);
     middleMousePanToggle.checked = mmbPanMode;
 
+    CheckBox@ rotateAroundSelectToggle = settingsDialog.GetChild("RotateAroundSelectionToggle", true);
+    rotateAroundSelectToggle.checked = rotateAroundSelect;
+
     DropDownList@ hotKeysModeEdit = settingsDialog.GetChild("HotKeysModeEdit", true);
     hotKeysModeEdit.selection = hotKeyMode;
 
@@ -135,6 +138,7 @@ void UpdateEditorSettingsDialog()
         SubscribeToEvent(speedEdit, "TextFinished", "EditCameraSpeed");
         SubscribeToEvent(limitRotationToggle, "Toggled", "EditLimitRotation");
         SubscribeToEvent(middleMousePanToggle, "Toggled", "EditMiddleMousePan");
+        SubscribeToEvent(rotateAroundSelectToggle, "Toggled", "EditRotateAroundSelect");
         SubscribeToEvent(mouseOrbitEdit, "ItemSelected", "EditMouseOrbitMode");
         SubscribeToEvent(hotKeysModeEdit, "ItemSelected", "EditHotKeyMode");
         SubscribeToEvent(newNodeModeEdit, "ItemSelected", "EditNewNodeMode");
@@ -251,6 +255,11 @@ void EditMouseOrbitMode(StringHash eventType, VariantMap& eventData)
 void EditMiddleMousePan(StringHash eventType, VariantMap& eventData)
 {
     mmbPanMode = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
+}
+
+void EditRotateAroundSelect(StringHash eventType, VariantMap& eventData)
+{
+    rotateAroundSelect = cast<CheckBox>(eventData["Element"].GetPtr()).checked;
 }
 
 void EditHotKeyMode(StringHash eventType, VariantMap& eventData)

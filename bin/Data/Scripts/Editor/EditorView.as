@@ -415,6 +415,7 @@ enum MouseOrbitMode
 bool toggledMouseLock = false;
 int mouseOrbitMode = ORBIT_RELATIVE;
 bool mmbPanMode = false;
+bool rotateAroundSelect = false;
 
 enum NewNodeMode
 {
@@ -1572,6 +1573,29 @@ void CameraRotateAroundCenter(Quaternion rot)
     cameraNode.worldPosition = oldPos;
 }
 
+void CameraRotateAroundSelect(Quaternion rot)
+{
+    cameraSmoothInterpolate.Stop();
+    
+    cameraNode.rotation = rot;
+
+    Vector3 dir = cameraNode.direction;
+    dir.Normalize();
+
+    float dist = cameraNode.position.length;
+
+    cameraNode.position = -dir * dist;
+
+    Vector3 centerPoint;
+    if ((selectedNodes.length > 0 || selectedComponents.length > 0))
+        centerPoint = SelectedNodesCenterPoint();
+    else
+        centerPoint = lastSelectedNodesCenterPoint;
+
+    // legacy way, camera look-at will jump to the selection
+    cameraLookAtNode.worldPosition = centerPoint;
+}
+
 void CameraZoom(float zoom)
 {
     cameraSmoothInterpolate.Stop();
@@ -1711,7 +1735,10 @@ void HandleStandardUserInput(float timeStep)
                 
                 if (input.mouseButtonDown[MOUSEB_MIDDLE]) // Rotate around the camera center
                 {
-                    CameraRotateAroundLookAt(rot);
+                    if (rotateAroundSelect)
+                        CameraRotateAroundSelect(rot);
+                    else
+                        CameraRotateAroundLookAt(rot);
                     
                     orbiting = true;
                 }
@@ -1910,7 +1937,11 @@ void HandleBlenderUserInput(float timeStep)
                 }
                 else if (input.mouseButtonDown[MOUSEB_MIDDLE])
                 {
-                    CameraRotateAroundLookAt(rot);
+                    if (rotateAroundSelect)
+                        CameraRotateAroundSelect(rot);
+                    else
+                        CameraRotateAroundLookAt(rot);
+                    
                     orbiting = true;
                 }
             }
