@@ -22,26 +22,28 @@
 
 #pragma once
 
+#include <type_traits>
 #include "../Math/Vector3.h"
 
 namespace Urho3D
 {
 
 /// Four-dimensional vector.
-class URHO3D_API Vector4
+template<typename T>
+class URHO3D_API BaseVector4
 {
 public:
     /// Construct a zero vector.
-    Vector4() :
-        x_(0.0f),
-        y_(0.0f),
-        z_(0.0f),
-        w_(0.0f)
+    BaseVector4() :
+        x_(0),
+        y_(0),
+        z_(0),
+        w_(0)
     {
     }
 
     /// Copy-construct from another vector.
-    Vector4(const Vector4& vector) :
+    BaseVector4(const BaseVector4& vector) :
         x_(vector.x_),
         y_(vector.y_),
         z_(vector.z_),
@@ -50,7 +52,7 @@ public:
     }
 
     /// Construct from a 3-dimensional vector and the W coordinate.
-    Vector4(const Vector3& vector, float w) :
+    BaseVector4(const Vector3& vector, T w) :
         x_(vector.x_),
         y_(vector.y_),
         z_(vector.z_),
@@ -59,7 +61,7 @@ public:
     }
 
     /// Construct from coordinates.
-    Vector4(float x, float y, float z, float w) :
+    BaseVector4(T x, T y, T z, T w) :
         x_(x),
         y_(y),
         z_(z),
@@ -67,17 +69,19 @@ public:
     {
     }
 
-    /// Construct from a float array.
-    explicit Vector4(const float* data) :
+    /// Construct from a number array.
+    template<typename T2>
+    explicit BaseVector4(const T2* data) :
         x_(data[0]),
         y_(data[1]),
         z_(data[2]),
         w_(data[3])
     {
+        static_assert(std::is_arithmetic<T>::value, "Parameter must be array of arithmetic type.");
     }
 
     /// Assign from another vector.
-    Vector4& operator =(const Vector4& rhs)
+    BaseVector4& operator =(const BaseVector4& rhs)
     {
         x_ = rhs.x_;
         y_ = rhs.y_;
@@ -87,34 +91,34 @@ public:
     }
 
     /// Test for equality with another vector without epsilon.
-    bool operator ==(const Vector4& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && w_ == rhs.w_; }
+    bool operator ==(const BaseVector4& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && w_ == rhs.w_; }
 
     /// Test for inequality with another vector without epsilon.
-    bool operator !=(const Vector4& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_ || w_ != rhs.w_; }
+    bool operator !=(const BaseVector4& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_ || w_ != rhs.w_; }
 
     /// Add a vector.
-    Vector4 operator +(const Vector4& rhs) const { return Vector4(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_, w_ + rhs.w_); }
+    BaseVector4 operator +(const BaseVector4& rhs) const { return BaseVector4(x_ + rhs.x_, y_ + rhs.y_, z_ + rhs.z_, w_ + rhs.w_); }
 
     /// Return negation.
-    Vector4 operator -() const { return Vector4(-x_, -y_, -z_, -w_); }
+    BaseVector4 operator -() const { return BaseVector4(-x_, -y_, -z_, -w_); }
 
     /// Subtract a vector.
-    Vector4 operator -(const Vector4& rhs) const { return Vector4(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_, w_ - rhs.w_); }
+    BaseVector4 operator -(const BaseVector4& rhs) const { return BaseVector4(x_ - rhs.x_, y_ - rhs.y_, z_ - rhs.z_, w_ - rhs.w_); }
 
     /// Multiply with a scalar.
-    Vector4 operator *(float rhs) const { return Vector4(x_ * rhs, y_ * rhs, z_ * rhs, w_ * rhs); }
+    BaseVector4 operator *(T rhs) const { return BaseVector4(x_ * rhs, y_ * rhs, z_ * rhs, w_ * rhs); }
 
     /// Multiply with a vector.
-    Vector4 operator *(const Vector4& rhs) const { return Vector4(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_, w_ * rhs.w_); }
+    BaseVector4 operator *(const BaseVector4& rhs) const { return BaseVector4(x_ * rhs.x_, y_ * rhs.y_, z_ * rhs.z_, w_ * rhs.w_); }
 
     /// Divide by a scalar.
-    Vector4 operator /(float rhs) const { return Vector4(x_ / rhs, y_ / rhs, z_ / rhs, w_ / rhs); }
+    BaseVector4 operator /(T rhs) const { return BaseVector4(x_ / rhs, y_ / rhs, z_ / rhs, w_ / rhs); }
 
     /// Divide by a vector.
-    Vector4 operator /(const Vector4& rhs) const { return Vector4(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_, w_ / rhs.w_); }
+    BaseVector4 operator /(const BaseVector4& rhs) const { return BaseVector4(x_ / rhs.x_, y_ / rhs.y_, z_ / rhs.z_, w_ / rhs.w_); }
 
     /// Add-assign a vector.
-    Vector4& operator +=(const Vector4& rhs)
+    BaseVector4& operator +=(const BaseVector4& rhs)
     {
         x_ += rhs.x_;
         y_ += rhs.y_;
@@ -124,7 +128,7 @@ public:
     }
 
     /// Subtract-assign a vector.
-    Vector4& operator -=(const Vector4& rhs)
+    BaseVector4& operator -=(const BaseVector4& rhs)
     {
         x_ -= rhs.x_;
         y_ -= rhs.y_;
@@ -134,7 +138,7 @@ public:
     }
 
     /// Multiply-assign a scalar.
-    Vector4& operator *=(float rhs)
+    BaseVector4& operator *=(T rhs)
     {
         x_ *= rhs;
         y_ *= rhs;
@@ -144,7 +148,7 @@ public:
     }
 
     /// Multiply-assign a vector.
-    Vector4& operator *=(const Vector4& rhs)
+    BaseVector4& operator *=(const BaseVector4& rhs)
     {
         x_ *= rhs.x_;
         y_ *= rhs.y_;
@@ -154,9 +158,9 @@ public:
     }
 
     /// Divide-assign a scalar.
-    Vector4& operator /=(float rhs)
+    BaseVector4& operator /=(T rhs)
     {
-        float invRhs = 1.0f / rhs;
+        T invRhs = (T)(typename ScalarTypeSelector<T>::Type(1.0) / rhs);
         x_ *= invRhs;
         y_ *= invRhs;
         z_ *= invRhs;
@@ -165,7 +169,7 @@ public:
     }
 
     /// Divide-assign a vector.
-    Vector4& operator /=(const Vector4& rhs)
+    BaseVector4& operator /=(const BaseVector4& rhs)
     {
         x_ /= rhs.x_;
         y_ /= rhs.y_;
@@ -175,25 +179,25 @@ public:
     }
 
     /// Calculate dot product.
-    float DotProduct(const Vector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
+    T DotProduct(const BaseVector4& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_ + w_ * rhs.w_; }
 
     /// Calculate absolute dot product.
-    float AbsDotProduct(const Vector4& rhs) const
+    T AbsDotProduct(const BaseVector4& rhs) const
     {
         return Urho3D::Abs(x_ * rhs.x_) + Urho3D::Abs(y_ * rhs.y_) + Urho3D::Abs(z_ * rhs.z_) + Urho3D::Abs(w_ * rhs.w_);
     }
 
     /// Project vector onto axis.
-    float ProjectOntoAxis(const Vector3& axis) const { return DotProduct(Vector4(axis.Normalized(), 0.0f)); }
+    T ProjectOntoAxis(const Vector3& axis) const { return DotProduct(BaseVector4(axis.Normalized(), 0.0f)); }
 
     /// Return absolute vector.
-    Vector4 Abs() const { return Vector4(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_), Urho3D::Abs(w_)); }
+    BaseVector4 Abs() const { return BaseVector4(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_), Urho3D::Abs(w_)); }
 
     /// Linear interpolation with another vector.
-    Vector4 Lerp(const Vector4& rhs, float t) const { return *this * (1.0f - t) + rhs * t; }
+    BaseVector4 Lerp(const BaseVector4& rhs, T t) const { return *this * (typename ScalarTypeSelector<T>::Type(1.0) - t) + rhs * t; }
 
     /// Test for equality with another vector with epsilon.
-    bool Equals(const Vector4& rhs) const
+    bool Equals(const BaseVector4& rhs) const
     {
         return Urho3D::Equals(x_, rhs.x_) && Urho3D::Equals(y_, rhs.y_) && Urho3D::Equals(z_, rhs.z_) && Urho3D::Equals(w_, rhs.w_);
     }
@@ -201,46 +205,52 @@ public:
     /// Return whether is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_) || Urho3D::IsNaN(z_) || Urho3D::IsNaN(w_); }
 
-    /// Return float data.
-    const float* Data() const { return &x_; }
+    /// Return number data.
+    const T* Data() const { return &x_; }
 
     /// Return as string.
     String ToString() const;
 
     /// X coordinate.
-    float x_;
+    T x_;
     /// Y coordinate.
-    float y_;
+    T y_;
     /// Z coordinate.
-    float z_;
+    T z_;
     /// W coordinate.
-    float w_;
+    T w_;
 
     /// Zero vector.
-    static const Vector4 ZERO;
+    static const BaseVector4 ZERO;
     /// (1,1,1) vector.
-    static const Vector4 ONE;
+    static const BaseVector4 ONE;
 };
 
+typedef BaseVector4<float> Vector4;
+typedef BaseVector4<int> IntVector4;
+
+template class URHO3D_API BaseVector4<float>;
+template class URHO3D_API BaseVector4<int>;
+
 /// Multiply Vector4 with a scalar.
-inline Vector4 operator *(float lhs, const Vector4& rhs) { return rhs * lhs; }
+template<typename T> inline BaseVector4<T> operator *(T lhs, const BaseVector4<T>& rhs) { return rhs * lhs; }
 
 /// Per-component linear interpolation between two 4-vectors.
-inline Vector4 VectorLerp(const Vector4& lhs, const Vector4& rhs, const Vector4& t) { return lhs + (rhs - lhs) * t; }
+template<typename T> inline BaseVector4<T> VectorLerp(const BaseVector4<T>& lhs, const BaseVector4<T>& rhs, const BaseVector4<T>& t) { return lhs + (rhs - lhs) * t; }
 
 /// Per-component min of two 4-vectors.
-inline Vector4 VectorMin(const Vector4& lhs, const Vector4& rhs) { return Vector4(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_), Min(lhs.z_, rhs.z_), Min(lhs.w_, rhs.w_)); }
+template<typename T> inline BaseVector4<T> VectorMin(const BaseVector4<T>& lhs, const BaseVector4<T>& rhs) { return BaseVector4<T>(Min(lhs.x_, rhs.x_), Min(lhs.y_, rhs.y_), Min(lhs.z_, rhs.z_), Min(lhs.w_, rhs.w_)); }
 
 /// Per-component max of two 4-vectors.
-inline Vector4 VectorMax(const Vector4& lhs, const Vector4& rhs) { return Vector4(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_), Max(lhs.z_, rhs.z_), Max(lhs.w_, rhs.w_)); }
+template<typename T> inline BaseVector4<T> VectorMax(const BaseVector4<T>& lhs, const BaseVector4<T>& rhs) { return BaseVector4<T>(Max(lhs.x_, rhs.x_), Max(lhs.y_, rhs.y_), Max(lhs.z_, rhs.z_), Max(lhs.w_, rhs.w_)); }
 
 /// Per-component floor of 4-vector.
-inline Vector4 VectorFloor(const Vector4& vec) { return Vector4(Floor(vec.x_), Floor(vec.y_), Floor(vec.z_), Floor(vec.w_)); }
+template<typename T> inline BaseVector4<T> VectorFloor(const BaseVector4<T>& vec) { return BaseVector4<T>(Floor(vec.x_), Floor(vec.y_), Floor(vec.z_), Floor(vec.w_)); }
 
 /// Per-component round of 4-vector.
-inline Vector4 VectorRound(const Vector4& vec) { return Vector4(Round(vec.x_), Round(vec.y_), Round(vec.z_), Round(vec.w_)); }
+template<typename T> inline BaseVector4<T> VectorRound(const BaseVector4<T>& vec) { return BaseVector4<T>(Round(vec.x_), Round(vec.y_), Round(vec.z_), Round(vec.w_)); }
 
 /// Per-component ceil of 4-vector.
-inline Vector4 VectorCeil(const Vector4& vec) { return Vector4(Ceil(vec.x_), Ceil(vec.y_), Ceil(vec.z_), Ceil(vec.w_)); }
+template<typename T> inline BaseVector4<T> VectorCeil(const BaseVector4<T>& vec) { return BaseVector4<T>(Ceil(vec.x_), Ceil(vec.y_), Ceil(vec.z_), Ceil(vec.w_)); }
 
 }

@@ -34,7 +34,6 @@ class Color;
 class IntRect;
 class Quaternion;
 class Rect;
-class Vector4;
 
 /// Abstract stream for writing.
 class URHO3D_API Serializer

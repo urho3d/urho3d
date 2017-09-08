@@ -31,13 +31,22 @@
 namespace Urho3D
 {
 
-const Vector4 Vector4::ZERO;
-const Vector4 Vector4::ONE(1.0f, 1.0f, 1.0f, 1.0f);
+template<typename T> const BaseVector4<T> BaseVector4<T>::ZERO;
+template<typename T> const BaseVector4<T> BaseVector4<T>::ONE(1, 1, 1, 1);
 
+template<>
 String Vector4::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
     sprintf(tempBuffer, "%g %g %g %g", x_, y_, z_, w_);
+    return String(tempBuffer);
+}
+
+template<>
+String IntVector4::ToString() const
+{
+    char tempBuffer[CONVERSION_BUFFER_LENGTH];
+    sprintf(tempBuffer, "%d %d %d %d", x_, y_, z_, w_);
     return String(tempBuffer);
 }
 
