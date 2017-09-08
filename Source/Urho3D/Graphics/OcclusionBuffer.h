@@ -34,7 +34,6 @@ namespace Urho3D
 class BoundingBox;
 class Camera;
 class IndexBuffer;
-class IntRect;
 class VertexBuffer;
 struct Edge;
 struct Gradients;

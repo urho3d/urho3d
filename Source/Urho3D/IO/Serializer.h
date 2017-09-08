@@ -31,9 +31,7 @@ namespace Urho3D
 {
 
 class Color;
-class IntRect;
 class Quaternion;
-class Rect;
 
 /// Abstract stream for writing.
 class URHO3D_API Serializer

@@ -31,46 +31,11 @@
 namespace Urho3D
 {
 
-const Rect Rect::FULL(-1.0f, -1.0f, 1.0f, 1.0f);
-const Rect Rect::POSITIVE(0.0f, 0.0f, 1.0f, 1.0f);
-const Rect Rect::ZERO(0.0f, 0.0f, 0.0f, 0.0f);
+template<typename T> const BaseRect<T> BaseRect<T>::FULL(-1, -1, 1, 1);
+template<typename T> const BaseRect<T> BaseRect<T>::POSITIVE(0, 0, 1, 1);
+template<typename T> const BaseRect<T> BaseRect<T>::ZERO(0, 0, 0, 0);
 
-const IntRect IntRect::ZERO(0, 0, 0, 0);
-
-void IntRect::Clip(const IntRect& rect)
-{
-    if (rect.left_ > left_)
-        left_ = rect.left_;
-    if (rect.right_ < right_)
-        right_ = rect.right_;
-    if (rect.top_ > top_)
-        top_ = rect.top_;
-    if (rect.bottom_ < bottom_)
-        bottom_ = rect.bottom_;
-
-    if (left_ >= right_ || top_ >= bottom_)
-        *this = IntRect();
-}
-
-void IntRect::Merge(const IntRect& rect)
-{
-    if (Width() <= 0 || Height() <= 0)
-    {
-        *this = rect;
-    }
-    else if (rect.Width() > 0 && rect.Height() > 0)
-    {
-        if (rect.left_ < left_)
-            left_ = rect.left_;
-        if (rect.top_ < top_)
-            top_ = rect.top_;
-        if (rect.right_ > right_)
-            right_ = rect.right_;
-        if (rect.bottom_ > bottom_)
-            bottom_ = rect.bottom_;
-    }
-}
-
+template<>
 String Rect::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
@@ -78,14 +43,16 @@ String Rect::ToString() const
     return String(tempBuffer);
 }
 
+template<>
 String IntRect::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
-    sprintf(tempBuffer, "%d %d %d %d", left_, top_, right_, bottom_);
+    sprintf(tempBuffer, "%d %d %d %d", min_.x_, min_.y_, max_.x_, max_.y_);
     return String(tempBuffer);
 }
 
-void Rect::Clip(const Rect& rect)
+template<typename T>
+void BaseRect<T>::Clip(const BaseRect<T>& rect)
 {
     if (rect.min_.x_ > min_.x_)
         min_.x_ = rect.min_.x_;
@@ -98,8 +65,8 @@ void Rect::Clip(const Rect& rect)
 
     if (min_.x_ > max_.x_ || min_.y_ > max_.y_)
     {
-        min_ = Vector2(M_INFINITY, M_INFINITY);
-        max_ = Vector2(-M_INFINITY, -M_INFINITY);
+        min_ = BaseVector2<T>(std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
+        max_ = BaseVector2<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::min());
     }
 }
 
