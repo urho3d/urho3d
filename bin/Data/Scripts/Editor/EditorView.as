@@ -630,7 +630,8 @@ class CameraSmoothInterpolate
     }
 }
 
-CameraSmoothInterpolate cameraSmoothInterpolate;
+
+CameraSmoothInterpolate cameraSmoothInterpolate; // Camera smooth interpolation control
 
 void SetRenderPath(const String&in newRenderPathName)
 {
@@ -1528,16 +1529,22 @@ void ReleaseMouseLock()
 
 void CameraPan(Vector3 trans)
 {
+    cameraSmoothInterpolate.Stop();
+
     cameraLookAtNode.Translate(trans);
 }
 
 void CameraMoveForward(Vector3 trans)
 {
+    cameraSmoothInterpolate.Stop();
+    
     cameraNode.Translate(trans, TS_PARENT);
 }
 
 void CameraRotateAroundLookAt(Quaternion rot)
 {
+    cameraSmoothInterpolate.Stop();
+    
     cameraNode.rotation = rot;
 
     Vector3 dir = cameraNode.direction;
@@ -1550,6 +1557,8 @@ void CameraRotateAroundLookAt(Quaternion rot)
 
 void CameraRotateAroundCenter(Quaternion rot)
 {
+    cameraSmoothInterpolate.Stop();
+
     cameraNode.rotation = rot;
     
     Vector3 oldPos = cameraNode.worldPosition;
@@ -1561,6 +1570,13 @@ void CameraRotateAroundCenter(Quaternion rot)
 
     cameraLookAtNode.worldPosition = cameraNode.worldPosition + dir * dist;
     cameraNode.worldPosition = oldPos;
+}
+
+void CameraZoom(float zoom)
+{
+    cameraSmoothInterpolate.Stop();
+
+    camera.zoom = Clamp(zoom, .1, 30);
 }
 
 void HandleStandardUserInput(float timeStep)
@@ -1641,7 +1657,8 @@ void HandleStandardUserInput(float timeStep)
         else
         {
             float zoom = camera.zoom + input.mouseMoveWheel * speedMultiplier * factor;
-            camera.zoom = Clamp(zoom, .1, 30);
+            
+            CameraZoom(zoom);
         }
     }
 
@@ -1839,7 +1856,8 @@ void HandleBlenderUserInput(float timeStep)
             else
             {
                 float zoom = camera.zoom + input.mouseMoveWheel * speedMultiplier * 0.5f;
-                camera.zoom = Clamp(zoom, .1, 30);
+                
+                CameraZoom(zoom);
             }
         }
     }
