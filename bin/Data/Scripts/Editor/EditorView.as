@@ -2518,6 +2518,12 @@ void MergeNodeBoundingBox(BoundingBox &inout box, Array<Component@>&inout visite
     if (node is null || node is editorScene)
         return;
 
+    // if node has no component, merge its world position
+    if (node.numComponents == 0)
+    {
+        box.Merge(node.worldPosition);
+    }
+
     // Merge components bounding box of this node
     for (uint i = 0; i < node.numComponents; ++i)
     {
@@ -2538,14 +2544,18 @@ void MergeComponentBoundingBox(BoundingBox &inout box, Array<Component@>&inout v
         return;
 
     Drawable@ drawable = cast<Drawable>(component);
-    if (drawable is null)
-        return;
 
     // Merge drawable component's bounding box. Skip skybox, as its box is very large, as well as lights
     if (drawable !is null && cast<Skybox>(drawable) is null && cast<Light>(drawable) is null)
+    {
         box.Merge(drawable.worldBoundingBox);
-    else if (drawable.node !is editorScene)
-        box.Merge(drawable.node.worldPosition);
+        visitedComponents.Push(component);
+        return;
+    }
+    
+    // If the component is not a drawable, merge the world position of its node
+    if (component.node !is editorScene)
+        box.Merge(component.node.worldPosition);
 
     visitedComponents.Push(component);
 }
