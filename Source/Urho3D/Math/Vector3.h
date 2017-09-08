@@ -274,14 +274,7 @@ public:
     String ToString() const;
 
     /// Return hash value for HashSet & HashMap.
-    unsigned ToHash() const
-    {
-        unsigned hash = 37;
-        hash = 37 + (x_ * hash);
-        hash = 37 + (y_ * hash);
-        hash = 37 + (z_ * hash);
-        return hash;
-    }
+    unsigned ToHash() const;
 
     /// X coordinate.
     T x_;

@@ -56,4 +56,26 @@ String IntVector3::ToString() const
     return String(tempBuffer);
 }
 
+template<typename T>
+unsigned BaseVector3<T>::ToHash() const
+{
+    const auto prime = 16777619;
+    unsigned hash = prime;
+    hash = prime + (x_ * hash);
+    hash = prime + (y_ * hash);
+    hash = prime + (z_ * hash);
+    return hash;
+}
+
+// Old hashing function behavior for float vector in order to maintain backwards compatibility.
+template<>
+unsigned Vector3::ToHash() const
+{
+    unsigned hash = 37;
+    hash = 37 * hash + FloatToRawIntBits(x_);
+    hash = 37 * hash + FloatToRawIntBits(y_);
+    hash = 37 * hash + FloatToRawIntBits(z_);
+    return hash;
+}
+
 }
