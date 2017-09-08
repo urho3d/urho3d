@@ -32,10 +32,8 @@ namespace Urho3D
 
 class Color;
 class IntRect;
-class IntVector3;
 class Quaternion;
 class Rect;
-class Vector3;
 class Vector4;
 
 /// Abstract stream for writing.

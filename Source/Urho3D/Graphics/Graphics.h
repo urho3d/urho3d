@@ -53,7 +53,6 @@ class Texture;
 class Texture2D;
 class Texture2DArray;
 class TextureCube;
-class Vector3;
 class Vector4;
 class VertexBuffer;
 class VertexDeclaration;
