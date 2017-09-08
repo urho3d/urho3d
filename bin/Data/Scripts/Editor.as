@@ -208,7 +208,7 @@ void LoadConfig()
         if (cameraElem.HasAttribute("viewportmode")) viewportMode = cameraElem.GetUInt("viewportmode");
         if (cameraElem.HasAttribute("mouseorbitmode")) mouseOrbitMode = cameraElem.GetInt("mouseorbitmode");
         if (cameraElem.HasAttribute("mmbpan")) mmbPanMode = cameraElem.GetBool("mmbpan");
-        if (cameraElem.HasAttribute("mmbpan")) rotateAroundSelect = cameraElem.GetBool("rotatearoundselect");
+        if (cameraElem.HasAttribute("rotatearoundselect")) rotateAroundSelect = cameraElem.GetBool("rotatearoundselect");
         
         UpdateViewParameters();
     }
