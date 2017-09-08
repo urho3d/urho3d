@@ -23,6 +23,8 @@ class Rect
     Vector2 Center() const;
     Vector2 Size() const;
     Vector2 HalfSize() const;
+    float Width() const;
+    float Height() const;
     bool Equals(const Rect& rhs) const;
     Intersection IsInside(const Vector2& point) const;
     Intersection IsInside(const Rect& rect) const;
@@ -32,6 +34,11 @@ class Rect
 
     Vector2 min_ @ min;
     Vector2 max_ @ max;
+    float left_ @ left;
+    float top_ @ top;
+    float right_ @ right;
+    float bottom_ @ bottom;
+
     static const Rect FULL;
     static const Rect POSITIVE;
     static const Rect ZERO;
@@ -39,33 +46,56 @@ class Rect
     tolua_readonly tolua_property__no_prefix Vector2 center;
     tolua_readonly tolua_property__no_prefix Vector2 size;
     tolua_readonly tolua_property__no_prefix Vector2 halfSize;
+    tolua_readonly tolua_property__no_prefix float width;
+    tolua_readonly tolua_property__no_prefix float height;
 };
 
 class IntRect
 {
     IntRect();
-    IntRect(int left, int top, int right, int bottom);
+    IntRect(const IntRect& rect);
     IntRect(const IntVector2& min, const IntVector2& max);
+    IntRect(int left, int top, int right, int bottom);
+    IntRect(const IntVector4& vector);
     ~IntRect();
 
     bool operator ==(const IntRect& rhs) const;
 
+    void Define(const IntRect& rect);
+    void Define(const IntVector2& min, const IntVector2& max);
+    void Define(const IntVector2& point);
+    void Merge(const IntVector2& point);
+    void Merge(const IntRect& rect);
+    void Clear();
+    void Clip(const IntRect& rect);
+
+    bool Defined() const;
+    IntVector2 Center() const;
     IntVector2 Size() const;
+    IntVector2 HalfSize() const;
     int Width() const;
     int Height() const;
+    bool Equals(const IntRect& rhs) const;
     Intersection IsInside(const IntVector2& point) const;
+    Intersection IsInside(const IntRect& rect) const;
+    IntVector4 ToVector4() const;
 
-    void Clip(const IntRect& rect);
-    void Merge(const IntRect& rect);
+    String ToString() const;
 
+    IntVector2 min_ @ min;
+    IntVector2 max_ @ max;
     int left_ @ left;
     int top_ @ top;
     int right_ @ right;
     int bottom_ @ bottom;
 
+    static const IntRect FULL;
+    static const IntRect POSITIVE;
     static const IntRect ZERO;
 
+    tolua_readonly tolua_property__no_prefix IntVector2 center;
     tolua_readonly tolua_property__no_prefix IntVector2 size;
+    tolua_readonly tolua_property__no_prefix IntVector2 halfSize;
     tolua_readonly tolua_property__no_prefix int width;
     tolua_readonly tolua_property__no_prefix int height;
 };

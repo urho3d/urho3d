@@ -46,8 +46,9 @@ class Vector2
 class IntVector2
 {
     IntVector2();
+    IntVector2(const Vector2& vector);
+    IntVector2(const IntVector2& vector);
     IntVector2(int x, int y);
-    IntVector2(const IntVector2& rhs);
     ~IntVector2();
 
     bool operator ==(const IntVector2& rhs) const;
@@ -59,9 +60,20 @@ class IntVector2
     IntVector2 operator / (int rhs) const;
     IntVector2 operator / (const IntVector2& rhs) const;
 
+    void Normalize();
+    int Length() const;
+    int LengthSquared() const;
+    int DotProduct(const IntVector2& rhs) const;
+    int AbsDotProduct(const IntVector2& rhs) const;
+    int ProjectOntoAxis(const IntVector2& axis) const;
+    int Angle(const IntVector2& rhs) const;
+    IntVector2 Abs() const;
+    IntVector2 Lerp(const IntVector2& rhs, int t) const;
+    bool Equals(const IntVector2& rhs) const;
+    bool IsNaN() const;
+    IntVector2 Normalized() const;
+
     String ToString() const;
-    unsigned ToHash() const;
-    float Length() const;
 
     int x_ @ x;
     int y_ @ y;
@@ -80,10 +92,16 @@ Vector2 VectorMax(const Vector2& lhs, const Vector2& rhs);
 Vector2 VectorFloor(const Vector2& vec);
 Vector2 VectorRound(const Vector2& vec);
 Vector2 VectorCeil(const Vector2& vec);
+
+IntVector2 VectorLerp(const IntVector2& lhs, const IntVector2& rhs, const IntVector2& t);
+IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs);
+IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs);
+IntVector2 VectorFloor(const IntVector2& vec);
+IntVector2 VectorRound(const IntVector2& vec);
+IntVector2 VectorCeil(const IntVector2& vec);
+
 IntVector2 VectorFloorToInt(const Vector2& vec);
 IntVector2 VectorRoundToInt(const Vector2& vec);
 IntVector2 VectorCeilToInt(const Vector2& vec);
-IntVector2 VectorMin(const IntVector2& lhs, const IntVector2& rhs);
-IntVector2 VectorMax(const IntVector2& lhs, const IntVector2& rhs);
 float StableRandom(const Vector2& seed);
 float StableRandom(float seed);
