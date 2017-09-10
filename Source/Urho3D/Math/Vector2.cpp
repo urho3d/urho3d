@@ -31,20 +31,14 @@
 namespace Urho3D
 {
 
-const Vector2 Vector2::ZERO;
-const Vector2 Vector2::LEFT(-1.0f, 0.0f);
-const Vector2 Vector2::RIGHT(1.0f, 0.0f);
-const Vector2 Vector2::UP(0.0f, 1.0f);
-const Vector2 Vector2::DOWN(0.0f, -1.0f);
-const Vector2 Vector2::ONE(1.0f, 1.0f);
+template<typename T> const BaseVector2<T> BaseVector2<T>::ZERO;
+template<typename T> const BaseVector2<T> BaseVector2<T>::LEFT(-1, 0);
+template<typename T> const BaseVector2<T> BaseVector2<T>::RIGHT(1, 0);
+template<typename T> const BaseVector2<T> BaseVector2<T>::UP(0, 1);
+template<typename T> const BaseVector2<T> BaseVector2<T>::DOWN(0, -1);
+template<typename T> const BaseVector2<T> BaseVector2<T>::ONE(1, 1);
 
-const IntVector2 IntVector2::ZERO;
-const IntVector2 IntVector2::LEFT(-1, 0);
-const IntVector2 IntVector2::RIGHT(1, 0);
-const IntVector2 IntVector2::UP(0, 1);
-const IntVector2 IntVector2::DOWN(0, -1);
-const IntVector2 IntVector2::ONE(1, 1);
-
+template<>
 String Vector2::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
@@ -52,6 +46,7 @@ String Vector2::ToString() const
     return String(tempBuffer);
 }
 
+template<>
 String IntVector2::ToString() const
 {
     char tempBuffer[CONVERSION_BUFFER_LENGTH];
