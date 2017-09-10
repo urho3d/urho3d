@@ -83,8 +83,8 @@ struct FrameBufferObject
         readBuffers_(M_MAX_UNSIGNED),
         drawBuffers_(M_MAX_UNSIGNED)
     {
-        for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-            colorAttachments_[i] = nullptr;
+        for (auto& colorAttachment : colorAttachments_)
+            colorAttachment = nullptr;
     }
 
     /// Frame buffer handle.

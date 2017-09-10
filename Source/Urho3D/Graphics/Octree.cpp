@@ -77,8 +77,8 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
 {
     Initialize(box);
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
-        children_[i] = nullptr;
+    for (auto& i : children_)
+        i = nullptr;
 }
 
 Octant::~Octant()
@@ -201,10 +201,10 @@ void Octant::ResetRoot()
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto& i : children_)
     {
-        if (children_[i])
-            children_[i]->ResetRoot();
+        if (i)
+            i->ResetRoot();
     }
 }
 
@@ -214,10 +214,10 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
 
-        for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+        for (auto& i : children_)
         {
-            if (children_[i])
-                children_[i]->DrawDebugGeometry(debug, depthTest);
+            if (i)
+                i->DrawDebugGeometry(debug, depthTest);
         }
     }
 }
@@ -251,10 +251,10 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
         query.TestDrawables(start, end, inside);
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto i : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query, inside);
+        if (i)
+            i->GetDrawablesInternal(query, inside);
     }
 }
 
@@ -278,10 +278,10 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto i : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesInternal(query);
+        if (i)
+            i->GetDrawablesInternal(query);
     }
 }
 
@@ -305,10 +305,10 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         }
     }
 
-    for (unsigned i = 0; i < NUM_OCTANTS; ++i)
+    for (auto i : children_)
     {
-        if (children_[i])
-            children_[i]->GetDrawablesOnlyInternal(query, drawables);
+        if (i)
+            i->GetDrawablesOnlyInternal(query, drawables);
     }
 }
 

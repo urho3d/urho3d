@@ -47,10 +47,10 @@ void TextureCube::OnDeviceLost()
 {
     GPUObject::OnDeviceLost();
 
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    for (auto& renderSurface : renderSurfaces_)
     {
-        if (renderSurfaces_[i])
-            renderSurfaces_[i]->OnDeviceLost();
+        if (renderSurface)
+            renderSurface->OnDeviceLost();
     }
 }
 
@@ -91,10 +91,10 @@ void TextureCube::Release()
             glDeleteTextures(1, &object_.name_);
         }
 
-        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+        for (auto& renderSurface : renderSurfaces_)
         {
-            if (renderSurfaces_[i])
-                renderSurfaces_[i]->Release();
+            if (renderSurface)
+                renderSurface->Release();
         }
 
         object_.name_ = 0;
@@ -360,8 +360,8 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
     faceMemoryUse_[face] = memoryUse;
     unsigned totalMemoryUse = sizeof(TextureCube);
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-        totalMemoryUse += faceMemoryUse_[i];
+    for (unsigned int i : faceMemoryUse_)
+        totalMemoryUse += i;
     SetMemoryUse(totalMemoryUse);
     return true;
 }
@@ -462,8 +462,8 @@ bool TextureCube::Create()
     // If multisample, create renderbuffers for each face
     if (multiSample_ > 1)
     {
-        for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-            renderSurfaces_[i]->CreateRenderBuffer(width_, height_, format, multiSample_);
+        for (auto& renderSurface : renderSurfaces_)
+            renderSurface->CreateRenderBuffer(width_, height_, format, multiSample_);
     }
 
     bool success = true;

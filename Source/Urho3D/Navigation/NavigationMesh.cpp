@@ -1170,8 +1170,8 @@ void NavigationMesh::GetTileGeometry(NavBuildData* build, Vector<NavigationGeome
                             4, 0, 3, 4, 3, 7, 1, 0, 4, 1, 4, 5
                         };
 
-                        for (unsigned j = 0; j < 36; ++j)
-                            build->indices_.Push(indices[j] + destVertexStart);
+                        for (unsigned int indice : indices)
+                            build->indices_.Push(indice + destVertexStart);
                     }
                     break;
 

@@ -138,9 +138,9 @@ void Vehicle::ApplyAttributes()
     auto* vehicle = node_->GetOrCreateComponent<RaycastVehicle>();
     if (emittersCreated)
         return;
-    for (int i = 0; i < 4; i++)
+    for (const auto& connectionPoint : connectionPoints_)
     {
-        CreateEmitter(connectionPoints_[i]);
+        CreateEmitter(connectionPoint);
     }
     emittersCreated = true;
 }

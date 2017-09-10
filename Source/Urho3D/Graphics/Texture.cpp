@@ -78,8 +78,8 @@ Texture::Texture(Context* context) :
     resolveDirty_(false),
     levelsDirty_(false)
 {
-    for (int i = 0; i < MAX_COORDS; ++i)
-        addressMode_[i] = ADDRESS_WRAP;
+    for (auto& i : addressMode_)
+        i = ADDRESS_WRAP;
     for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
         mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }

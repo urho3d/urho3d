@@ -176,16 +176,16 @@ void Frustum::DefineSplit(const Matrix4& projection, float near, float far)
 
 void Frustum::Transform(const Matrix3& transform)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
-        vertices_[i] = transform * vertices_[i];
+    for (auto& vertice : vertices_)
+        vertice = transform * vertice;
 
     UpdatePlanes();
 }
 
 void Frustum::Transform(const Matrix3x4& transform)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_VERTICES; ++i)
-        vertices_[i] = transform * vertices_[i];
+    for (auto& vertice : vertices_)
+        vertice = transform * vertice;
 
     UpdatePlanes();
 }
@@ -238,10 +238,10 @@ void Frustum::UpdatePlanes()
     // Check if we ended up with inverted planes (reflected transform) and flip in that case
     if (planes_[PLANE_NEAR].Distance(vertices_[5]) < 0.0f)
     {
-        for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+        for (auto& plane : planes_)
         {
-            planes_[i].normal_ = -planes_[i].normal_;
-            planes_[i].d_ = -planes_[i].d_;
+            plane.normal_ = -plane.normal_;
+            plane.d_ = -plane.d_;
         }
     }
 

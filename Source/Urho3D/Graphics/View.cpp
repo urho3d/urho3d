@@ -1921,9 +1921,9 @@ bool View::IsNecessary(const RenderPathCommand& command)
 
 bool View::CheckViewportRead(const RenderPathCommand& command)
 {
-    for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
+    for (const auto& textureName : command.textureNames_)
     {
-        if (!command.textureNames_[i].Empty() && !command.textureNames_[i].Compare("viewport", false))
+        if (!textureName.Empty() && !textureName.Compare("viewport", false))
             return true;
     }
 

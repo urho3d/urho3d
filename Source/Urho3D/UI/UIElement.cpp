@@ -866,8 +866,8 @@ void UIElement::SetClipBorder(const IntRect& rect)
 
 void UIElement::SetColor(const Color& color)
 {
-    for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
-        color_[i] = color;
+    for (auto& i : color_)
+        i = color;
     colorGradient_ = false;
     derivedColorDirty_ = true;
 }

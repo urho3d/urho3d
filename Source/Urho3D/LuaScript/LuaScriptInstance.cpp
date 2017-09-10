@@ -73,8 +73,8 @@ LuaScriptInstance::LuaScriptInstance(Context* context) :
 
     eventInvoker_ = new LuaScriptEventInvoker(this);
 
-    for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = nullptr;
+    for (auto& scriptObjectMethod : scriptObjectMethods_)
+        scriptObjectMethod = nullptr;
 }
 
 LuaScriptInstance::~LuaScriptInstance()
@@ -750,8 +750,8 @@ void LuaScriptInstance::ReleaseObject()
         function->EndCall();
     }
 
-    for (int i = 0; i < MAX_LUA_SCRIPT_OBJECT_METHODS; ++i)
-        scriptObjectMethods_[i] = nullptr;
+    for (auto& scriptObjectMethod : scriptObjectMethods_)
+        scriptObjectMethod = nullptr;
 }
 
 LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionName) const

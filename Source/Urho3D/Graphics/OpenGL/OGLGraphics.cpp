@@ -2881,9 +2881,9 @@ void Graphics::PrepareDraw()
         bool noFbo = !depthStencil_;
         if (noFbo)
         {
-            for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
+            for (auto& renderTarget : renderTargets_)
             {
-                if (renderTargets_[i])
+                if (renderTarget)
                 {
                     noFbo = false;
                     break;
@@ -3204,8 +3204,8 @@ void Graphics::CleanupFramebuffers()
 
 void Graphics::ResetCachedState()
 {
-    for (unsigned i = 0; i < MAX_VERTEX_STREAMS; ++i)
-        vertexBuffers_[i] = nullptr;
+    for (auto& vertexBuffer : vertexBuffers_)
+        vertexBuffer = nullptr;
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
@@ -3213,8 +3213,8 @@ void Graphics::ResetCachedState()
         impl_->textureTypes_[i] = 0;
     }
 
-    for (unsigned i = 0; i < MAX_RENDERTARGETS; ++i)
-        renderTargets_[i] = nullptr;
+    for (auto& renderTarget : renderTargets_)
+        renderTarget = nullptr;
 
     depthStencil_ = nullptr;
     viewport_ = IntRect(0, 0, 0, 0);
@@ -3262,8 +3262,8 @@ void Graphics::ResetCachedState()
         SetDepthWrite(true);
     }
 
-    for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS * 2; ++i)
-        impl_->constantBuffers_[i] = nullptr;
+    for (auto& constantBuffer : impl_->constantBuffers_)
+        constantBuffer = nullptr;
     impl_->dirtyConstantBuffers_.Clear();
 }
 

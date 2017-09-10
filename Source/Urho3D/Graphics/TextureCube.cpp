@@ -70,8 +70,8 @@ TextureCube::TextureCube(Context* context) :
     addressMode_[COORD_V] = ADDRESS_CLAMP;
     addressMode_[COORD_W] = ADDRESS_CLAMP;
 
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
-        faceMemoryUse_[i] = 0;
+    for (unsigned int& i : faceMemoryUse_)
+        i = 0;
 }
 
 TextureCube::~TextureCube()
@@ -340,13 +340,13 @@ void TextureCube::HandleRenderSurfaceUpdate(StringHash eventType, VariantMap& ev
 {
     auto* renderer = GetSubsystem<Renderer>();
 
-    for (unsigned i = 0; i < MAX_CUBEMAP_FACES; ++i)
+    for (auto& renderSurface : renderSurfaces_)
     {
-        if (renderSurfaces_[i] && (renderSurfaces_[i]->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurfaces_[i]->IsUpdateQueued()))
+        if (renderSurface && (renderSurface->GetUpdateMode() == SURFACE_UPDATEALWAYS || renderSurface->IsUpdateQueued()))
         {
             if (renderer)
-                renderer->QueueRenderSurface(renderSurfaces_[i]);
-            renderSurfaces_[i]->ResetUpdateQueued();
+                renderer->QueueRenderSurface(renderSurface);
+            renderSurface->ResetUpdateQueued();
         }
     }
 }

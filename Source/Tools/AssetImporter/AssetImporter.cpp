@@ -2774,8 +2774,8 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
 
         // Calculate chained transform
         aiMatrix4x4 finalTransform;
-        for (unsigned j = 0; j < TransformationComp_MAXIMUM; ++j)
-            finalTransform = finalTransform * chain[j];
+        for (const auto& j : chain)
+            finalTransform = finalTransform * j;
 
         // New bone node
         auto*pnode = new aiNode;

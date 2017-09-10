@@ -400,7 +400,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
     }
 
     // Clip the acquired faces against all frustum planes
-    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
+    for (const auto& plane : decalFrustum.planes_)
     {
         for (unsigned j = 0; j < faces.Size(); ++j)
         {
@@ -408,7 +408,7 @@ bool DecalSet::AddDecal(Drawable* target, const Vector3& worldPosition, const Qu
             if (face.Empty())
                 continue;
 
-            ClipPolygon(tempFace, face, decalFrustum.planes_[i], skinned_);
+            ClipPolygon(tempFace, face, plane, skinned_);
             face = tempFace;
         }
     }
@@ -553,10 +553,10 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
             i->tangent_ = buffer.ReadVector4();
             if (skinned_)
             {
-                for (unsigned j = 0; j < 4; ++j)
-                    i->blendWeights_[j] = buffer.ReadFloat();
-                for (unsigned j = 0; j < 4; ++j)
-                    i->blendIndices_[j] = buffer.ReadUByte();
+                for (float& blendWeight : i->blendWeights_)
+                    blendWeight = buffer.ReadFloat();
+                for (unsigned char& blendIndice : i->blendIndices_)
+                    blendIndice = buffer.ReadUByte();
             }
         }
 
@@ -623,10 +623,10 @@ PODVector<unsigned char> DecalSet::GetDecalsAttr() const
             ret.WriteVector4(j->tangent_);
             if (skinned_)
             {
-                for (unsigned k = 0; k < 4; ++k)
-                    ret.WriteFloat(j->blendWeights_[k]);
-                for (unsigned k = 0; k < 4; ++k)
-                    ret.WriteUByte(j->blendIndices_[k]);
+                for (float blendWeight : j->blendWeights_)
+                    ret.WriteFloat(blendWeight);
+                for (unsigned char blendIndice : j->blendIndices_)
+                    ret.WriteUByte(blendIndice);
             }
         }
 

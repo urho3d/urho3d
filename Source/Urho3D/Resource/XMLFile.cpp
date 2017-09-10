@@ -199,9 +199,9 @@ void XMLFile::Patch(XMLElement patchElement)
 {
     pugi::xml_node root = pugi::xml_node(patchElement.GetNode());
 
-    for (pugi::xml_node::iterator patch = root.begin(); patch != root.end(); patch++)
+    for (auto& patch : root)
     {
-        pugi::xml_attribute sel = patch->attribute("sel");
+        pugi::xml_attribute sel = patch.attribute("sel");
         if (sel.empty())
         {
             URHO3D_LOGERROR("XML Patch failed due to node not having a sel attribute.");
@@ -216,11 +216,11 @@ void XMLFile::Patch(XMLElement patchElement)
             continue;
         }
 
-        if (strcmp(patch->name(), "add") == 0)
-            PatchAdd(*patch, original);
-        else if (strcmp(patch->name(), "replace") == 0)
-            PatchReplace(*patch, original);
-        else if (strcmp(patch->name(), "remove") == 0)
+        if (strcmp(patch.name(), "add") == 0)
+            PatchAdd(patch, original);
+        else if (strcmp(patch.name(), "replace") == 0)
+            PatchReplace(patch, original);
+        else if (strcmp(patch.name(), "remove") == 0)
             PatchRemove(original);
         else
             URHO3D_LOGERROR("XMLFiles used for patching should only use 'add', 'replace' or 'remove' elements.");

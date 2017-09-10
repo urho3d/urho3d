@@ -209,8 +209,8 @@ void Polyhedron::Clip(const Plane& plane)
 
 void Polyhedron::Clip(const Frustum& frustum)
 {
-    for (unsigned i = 0; i < NUM_FRUSTUM_PLANES; ++i)
-        Clip(frustum.planes_[i]);
+    for (const auto& plane : frustum.planes_)
+        Clip(plane);
 }
 
 void Polyhedron::Clip(const BoundingBox& box)

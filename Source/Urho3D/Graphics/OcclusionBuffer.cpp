@@ -357,8 +357,8 @@ bool OcclusionBuffer::IsVisible(const BoundingBox& worldSpaceBox) const
     vertices[7] = ModelTransform(viewProj_, worldSpaceBox.max_);
 
     // Apply a far clip relative bias
-    for (unsigned i = 0; i < 8; ++i)
-        vertices[i].z_ -= OCCLUSION_RELATIVE_BIAS;
+    for (auto& vertice : vertices)
+        vertice.z_ -= OCCLUSION_RELATIVE_BIAS;
 
     // Transform to screen space. If any of the corners cross the near plane, assume visible
     float minX, maxX, minY, maxY, minZ;

@@ -615,8 +615,8 @@ void ScriptInstance::ReleaseObject()
 
 void ScriptInstance::ClearScriptMethods()
 {
-    for (unsigned i = 0; i < MAX_SCRIPT_METHODS; ++i)
-        methods_[i] = nullptr;
+    for (auto& method : methods_)
+        method = nullptr;
 
     delayedCalls_.Clear();
 }
