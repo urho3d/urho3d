@@ -32,7 +32,7 @@
 #include "../UI/FontFaceFreeType.h"
 #include "../UI/UI.h"
 
-#include <assert.h>
+#include <cassert>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

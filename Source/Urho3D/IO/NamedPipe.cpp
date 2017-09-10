@@ -31,7 +31,7 @@
 #else
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <signal.h>
+#include <csignal>
 #include <unistd.h>
 #endif
 

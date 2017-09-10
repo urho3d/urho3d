@@ -62,7 +62,7 @@
 #include "../UI/View3D.h"
 #include "../UI/UIComponent.h"
 
-#include <assert.h>
+#include <cassert>
 #include <SDL/SDL.h>
 
 #include "../DebugNew.h"

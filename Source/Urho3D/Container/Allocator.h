@@ -28,7 +28,7 @@
 #include <Urho3D/Urho3D.h>
 #endif
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace Urho3D
 {

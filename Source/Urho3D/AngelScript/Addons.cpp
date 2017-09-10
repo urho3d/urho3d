@@ -26,7 +26,7 @@
 
 #include <cstring>
 #include <new>
-#include <stdio.h>
+#include <cstdio>
 
 // Adapted from Angelscript's scriptarray & scriptstdstring add-ons, but with garbage collection disabled
 namespace Urho3D

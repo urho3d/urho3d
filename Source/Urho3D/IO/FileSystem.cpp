@@ -55,7 +55,7 @@
 #include <sys/utime.h>
 #else
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
 #include <utime.h>
 #include <sys/wait.h>

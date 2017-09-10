@@ -28,7 +28,7 @@
 #include "../Resource/PListFile.h"
 #include "../Resource/XMLFile.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "../DebugNew.h"
 
