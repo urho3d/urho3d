@@ -2596,6 +2596,9 @@ void LocateComponents(Array<Component@> components)
 
 void LocateNodesAndComponents(Array<Node@> nodes, Array<Component@> components)
 {
+    if (nodes.length == 0 && components.length == 0)
+        return;
+        
     // Calculate bounding box of all nodes
     BoundingBox box;
     Array<Component@> visitedComponents;
