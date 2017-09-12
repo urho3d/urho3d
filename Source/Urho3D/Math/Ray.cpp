@@ -153,10 +153,9 @@ float Ray::HitDistance(const Frustum& frustum, bool solidInside) const
     float minInside = M_INFINITY;
     bool allInside = true;
 
-    for (const auto& i : frustum.planes_)
+    for (const auto& plane : frustum.planes_)
     {
-        const Plane& plane = i;
-        float distance = HitDistance(i);
+        float distance = HitDistance(plane);
 
         if (plane.Distance(origin_) < 0.0f)
         {

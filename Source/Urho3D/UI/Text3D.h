@@ -170,7 +170,7 @@ public:
     String GetTextAttr() const;
 
     /// Get color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return text_.color_[0]; }
+    const Color& GetColorAttr() const { return text_.colors_[0]; }
 
 protected:
     /// Handle node being assigned.

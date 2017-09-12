@@ -177,10 +177,10 @@ void UIElement::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Priority", GetPriority, SetPriority, int, 0, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Opacity", GetOpacity, SetOpacity, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Color", GetColorAttr, SetColor, Color, Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Left Color", Color, color_[0], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Top Right Color", Color, color_[1], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Left Color", Color, color_[2], Color::WHITE, AM_FILE);
-    URHO3D_ATTRIBUTE("Bottom Right Color", Color, color_[3], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Left Color", Color, colors_[0], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Top Right Color", Color, colors_[1], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Left Color", Color, colors_[2], Color::WHITE, AM_FILE);
+    URHO3D_ATTRIBUTE("Bottom Right Color", Color, colors_[3], Color::WHITE, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Enabled", IsEnabled, SetEnabled, bool, false, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Editable", IsEditable, SetEditable, bool, true, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Is Selected", IsSelected, SetSelected, bool, false, AM_FILE);
@@ -208,7 +208,7 @@ void UIElement::ApplyAttributes()
 
     for (unsigned i = 1; i < MAX_UIELEMENT_CORNERS; ++i)
     {
-        if (color_[i] != color_[0])
+        if (colors_[i] != colors_[0])
             colorGradient_ = true;
     }
 }
@@ -866,21 +866,21 @@ void UIElement::SetClipBorder(const IntRect& rect)
 
 void UIElement::SetColor(const Color& color)
 {
-    for (auto& i : color_)
-        i = color;
+    for (auto& cornerColor : colors_)
+        cornerColor = color;
     colorGradient_ = false;
     derivedColorDirty_ = true;
 }
 
 void UIElement::SetColor(Corner corner, const Color& color)
 {
-    color_[corner] = color;
+    colors_[corner] = color;
     colorGradient_ = false;
     derivedColorDirty_ = true;
 
     for (unsigned i = 0; i < MAX_UIELEMENT_CORNERS; ++i)
     {
-        if (i != corner && color_[i] != color_[corner])
+        if (i != corner && colors_[i] != colors_[corner])
             colorGradient_ = true;
     }
 }
@@ -1719,7 +1719,7 @@ const Color& UIElement::GetDerivedColor() const
 {
     if (derivedColorDirty_)
     {
-        derivedColor_ = color_[C_TOPLEFT];
+        derivedColor_ = colors_[C_TOPLEFT];
         derivedColor_.a_ *= GetDerivedOpacity();
         derivedColorDirty_ = false;
     }

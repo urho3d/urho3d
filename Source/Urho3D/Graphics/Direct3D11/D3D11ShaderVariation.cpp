@@ -146,7 +146,7 @@ void ShaderVariation::Release()
     compilerOutput_.Clear();
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+        useTextureUnits_[i] = false;
     for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
         constantBufferSizes_[i] = 0;
     parameters_.Clear();
@@ -214,7 +214,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
 
         if (reg < MAX_TEXTURE_UNITS)
-            useTextureUnit_[reg] = true;
+            useTextureUnits_[reg] = true;
     }
 
     unsigned byteCodeSize = file->ReadUInt();
@@ -335,7 +335,7 @@ bool ShaderVariation::Compile()
 
     URHO3D_SAFE_RELEASE(shaderCode);
     URHO3D_SAFE_RELEASE(errorMsgs);
-    
+
     return !byteCode_.Empty();
 }
 
@@ -380,7 +380,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
         if (resourceDesc.Type == D3D_SIT_CBUFFER)
             cbRegisterMap[resourceName] = resourceDesc.BindPoint;
         else if (resourceDesc.Type == D3D_SIT_SAMPLER && resourceDesc.BindPoint < MAX_TEXTURE_UNITS)
-            useTextureUnit_[resourceDesc.BindPoint] = true;
+            useTextureUnits_[resourceDesc.BindPoint] = true;
     }
 
     for (unsigned i = 0; i < shaderDesc.ConstantBuffers; ++i)
@@ -453,13 +453,13 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     unsigned usedTextureUnits = 0;
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
     file->WriteUInt(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
             file->WriteUByte((unsigned char)i);

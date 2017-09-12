@@ -89,7 +89,7 @@ public:
     TextureFilterMode GetFilterMode() const { return filterMode_; }
 
     /// Return addressing mode by texture coordinate.
-    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressMode_[coord]; }
+    TextureAddressMode GetAddressMode(TextureCoordinate coord) const { return addressModes_[coord]; }
 
     /// Return texture max. anisotropy level. Value 0 means to use the default value from Renderer.
     unsigned GetAnisotropy() const { return anisotropy_; }
@@ -225,7 +225,7 @@ protected:
     /// Filtering mode.
     TextureFilterMode filterMode_;
     /// Addressing mode.
-    TextureAddressMode addressMode_[MAX_COORDS];
+    TextureAddressMode addressModes_[MAX_COORDS];
     /// Texture anisotropy level.
     unsigned anisotropy_;
     /// Mip levels to skip when loading per texture quality setting.

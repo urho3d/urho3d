@@ -59,7 +59,7 @@ public:
     bool HasParameter(StringHash param) const;
 
     /// Return whether uses a texture unit.
-    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnits_[unit]; }
 
     /// Return the info for a shader parameter, or null if does not exist.
     const ShaderParameter* GetParameter(StringHash param) const;
@@ -94,7 +94,7 @@ private:
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> shaderParameters_;
     /// Texture unit use.
-    bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS];
     /// Vertex attributes.
     HashMap<Pair<unsigned char, unsigned char>, unsigned> vertexAttributes_;
     /// Used vertex attribute location bitmask.

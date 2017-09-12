@@ -78,8 +78,8 @@ Texture::Texture(Context* context) :
     resolveDirty_(false),
     levelsDirty_(false)
 {
-    for (auto& i : addressMode_)
-        i = ADDRESS_WRAP;
+    for (auto& addressMode : addressModes_)
+        addressMode = ADDRESS_WRAP;
     for (int i = 0; i < MAX_TEXTURE_QUALITY_LEVELS; ++i)
         mipsToSkip_[i] = (unsigned)(MAX_TEXTURE_QUALITY_LEVELS - 1 - i);
 }
@@ -104,7 +104,7 @@ void Texture::SetFilterMode(TextureFilterMode mode)
 
 void Texture::SetAddressMode(TextureCoordinate coord, TextureAddressMode mode)
 {
-    addressMode_[coord] = mode;
+    addressModes_[coord] = mode;
     parametersDirty_ = true;
 }
 

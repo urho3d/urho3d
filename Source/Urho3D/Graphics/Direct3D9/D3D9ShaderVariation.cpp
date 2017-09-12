@@ -159,7 +159,7 @@ void ShaderVariation::Release()
     compilerOutput_.Clear();
 
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
-        useTextureUnit_[i] = false;
+        useTextureUnits_[i] = false;
     parameters_.Clear();
 }
 
@@ -214,7 +214,7 @@ bool ShaderVariation::LoadByteCode(const String& binaryShaderName)
         unsigned reg = file->ReadUByte();
 
         if (reg < MAX_TEXTURE_UNITS)
-            useTextureUnit_[reg] = true;
+            useTextureUnits_[reg] = true;
     }
 
     unsigned byteCodeSize = file->ReadUInt();
@@ -350,7 +350,7 @@ void ShaderVariation::ParseParameters(unsigned char* bufData, unsigned bufSize)
             if (reg < MAX_TEXTURE_UNITS)
             {
                 if (name != "AlbedoBuffer" && name != "NormalBuffer" && name != "DepthBuffer" && name != "LightBuffer")
-                    useTextureUnit_[reg] = true;
+                    useTextureUnits_[reg] = true;
             }
         }
         else
@@ -405,13 +405,13 @@ void ShaderVariation::SaveByteCode(const String& binaryShaderName)
     unsigned usedTextureUnits = 0;
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
             ++usedTextureUnits;
     }
     file->WriteUInt(usedTextureUnits);
     for (unsigned i = 0; i < MAX_TEXTURE_UNITS; ++i)
     {
-        if (useTextureUnit_[i])
+        if (useTextureUnits_[i])
         {
             file->WriteString(graphics_->GetTextureUnitName((TextureUnit)i));
             file->WriteUByte((unsigned char)i);

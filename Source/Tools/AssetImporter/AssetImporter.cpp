@@ -2759,7 +2759,7 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
 {
     // Init
     model.pivotlessBones_.Clear();
-    aiMatrix4x4 chain[TransformationComp_MAXIMUM];
+    aiMatrix4x4 chains[TransformationComp_MAXIMUM];
 
     for (unsigned i = 0; i < model.bones_.Size(); ++i)
     {
@@ -2769,13 +2769,13 @@ void CreatePivotlessFbxBoneStruct(OutModel &model)
         if (mainBoneName.Find("$AssimpFbx$") != String::NPOS)
             continue;
 
-        std::fill_n(chain, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
-        FillChainTransforms(model, &chain[0], mainBoneName);
+        std::fill_n(chains, static_cast<unsigned int>(TransformationComp_MAXIMUM), aiMatrix4x4());
+        FillChainTransforms(model, &chains[0], mainBoneName);
 
         // Calculate chained transform
         aiMatrix4x4 finalTransform;
-        for (const auto& j : chain)
-            finalTransform = finalTransform * j;
+        for (const auto& chain : chains)
+            finalTransform = finalTransform * chain;
 
         // New bone node
         auto*pnode = new aiNode;

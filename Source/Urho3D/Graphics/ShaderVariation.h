@@ -111,7 +111,7 @@ public:
     bool HasParameter(StringHash param) const { return parameters_.Contains(param); }
 
     /// Return whether uses a texture unit (only for pixel shaders.) Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
-    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnit_[unit]; }
+    bool HasTextureUnit(TextureUnit unit) const { return useTextureUnits_[unit]; }
 
     /// Return all parameter definitions. Not applicable on OpenGL, where this information is contained in ShaderProgram instead.
     const HashMap<StringHash, ShaderParameter>& GetParameters() const { return parameters_; }
@@ -158,7 +158,7 @@ private:
     /// Shader parameters.
     HashMap<StringHash, ShaderParameter> parameters_;
     /// Texture unit use flags.
-    bool useTextureUnit_[MAX_TEXTURE_UNITS];
+    bool useTextureUnits_[MAX_TEXTURE_UNITS];
     /// Constant buffer sizes. 0 if a constant buffer slot is not in use.
     unsigned constantBufferSizes_[MAX_SHADER_PARAMETER_GROUPS];
     /// Shader bytecode. Needed for inspecting the input signature and parameters. Not used on OpenGL.

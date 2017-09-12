@@ -65,8 +65,8 @@ ShaderProgram::ShaderProgram(Graphics* graphics, ShaderVariation* vertexShader, 
     usedVertexAttributes_(0),
     frameNumber_(0)
 {
-    for (bool& i : useTextureUnit_)
-        i = false;
+    for (bool& useTextureUnit : useTextureUnits_)
+        useTextureUnit = false;
     for (auto& parameterSource : parameterSources_)
         parameterSource = (const void*)M_MAX_UNSIGNED;
 }
@@ -107,8 +107,8 @@ void ShaderProgram::Release()
         vertexAttributes_.Clear();
         usedVertexAttributes_ = 0;
 
-        for (bool& i : useTextureUnit_)
-            i = false;
+        for (bool& useTextureUnit : useTextureUnits_)
+            useTextureUnit = false;
         for (unsigned i = 0; i < MAX_SHADER_PARAMETER_GROUPS; ++i)
             constantBuffers_[i].Reset();
     }
@@ -311,7 +311,7 @@ bool ShaderProgram::Link()
 
             if (unit < MAX_TEXTURE_UNITS)
             {
-                useTextureUnit_[unit] = true;
+                useTextureUnits_[unit] = true;
                 glUniform1iv(location, 1, reinterpret_cast<int*>(&unit));
             }
         }

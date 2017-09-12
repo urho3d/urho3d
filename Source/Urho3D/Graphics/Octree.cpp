@@ -77,8 +77,8 @@ Octant::Octant(const BoundingBox& box, unsigned level, Octant* parent, Octree* r
 {
     Initialize(box);
 
-    for (auto& i : children_)
-        i = nullptr;
+    for (auto& child : children_)
+        child = nullptr;
 }
 
 Octant::~Octant()
@@ -201,10 +201,10 @@ void Octant::ResetRoot()
     for (PODVector<Drawable*>::Iterator i = drawables_.Begin(); i != drawables_.End(); ++i)
         (*i)->SetOctant(nullptr);
 
-    for (auto& i : children_)
+    for (auto& child : children_)
     {
-        if (i)
-            i->ResetRoot();
+        if (child)
+            child->ResetRoot();
     }
 }
 
@@ -214,10 +214,10 @@ void Octant::DrawDebugGeometry(DebugRenderer* debug, bool depthTest)
     {
         debug->AddBoundingBox(worldBoundingBox_, Color(0.25f, 0.25f, 0.25f), depthTest);
 
-        for (auto& i : children_)
+        for (auto& child : children_)
         {
-            if (i)
-                i->DrawDebugGeometry(debug, depthTest);
+            if (child)
+                child->DrawDebugGeometry(debug, depthTest);
         }
     }
 }
@@ -251,10 +251,10 @@ void Octant::GetDrawablesInternal(OctreeQuery& query, bool inside) const
         query.TestDrawables(start, end, inside);
     }
 
-    for (auto i : children_)
+    for (auto child : children_)
     {
-        if (i)
-            i->GetDrawablesInternal(query, inside);
+        if (child)
+            child->GetDrawablesInternal(query, inside);
     }
 }
 
@@ -278,10 +278,10 @@ void Octant::GetDrawablesInternal(RayOctreeQuery& query) const
         }
     }
 
-    for (auto i : children_)
+    for (auto child : children_)
     {
-        if (i)
-            i->GetDrawablesInternal(query);
+        if (child)
+            child->GetDrawablesInternal(query);
     }
 }
 
@@ -305,10 +305,10 @@ void Octant::GetDrawablesOnlyInternal(RayOctreeQuery& query, PODVector<Drawable*
         }
     }
 
-    for (auto i : children_)
+    for (auto child : children_)
     {
-        if (i)
-            i->GetDrawablesOnlyInternal(query, drawables);
+        if (child)
+            child->GetDrawablesOnlyInternal(query, drawables);
     }
 }
 

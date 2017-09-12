@@ -468,7 +468,7 @@ public:
     const IntRect& GetClipBorder() const { return clipBorder_; }
 
     /// Return corner color.
-    const Color& GetColor(Corner corner) const { return color_[corner]; }
+    const Color& GetColor(Corner corner) const { return colors_[corner]; }
 
     /// Return priority.
     int GetPriority() const { return priority_; }
@@ -627,7 +627,7 @@ public:
     void GetBatchesWithOffset(IntVector2& offset, PODVector<UIBatch>& batches, PODVector<float>& vertexData, IntRect currentScissor);
 
     /// Return color attribute. Uses just the top-left color.
-    const Color& GetColorAttr() const { return color_[0]; }
+    const Color& GetColorAttr() const { return colors_[0]; }
 
     /// Return traversal mode for rendering.
     TraversalMode GetTraversalMode() const { return traversalMode_; }
@@ -673,7 +673,7 @@ protected:
     /// Child element clipping border.
     IntRect clipBorder_;
     /// Colors.
-    Color color_[MAX_UIELEMENT_CORNERS];
+    Color colors_[MAX_UIELEMENT_CORNERS];
     /// User variables.
     VariantMap vars_;
     /// Priority.

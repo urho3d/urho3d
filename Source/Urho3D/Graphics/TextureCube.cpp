@@ -66,12 +66,12 @@ TextureCube::TextureCube(Context* context) :
 #endif
 
     // Default to clamp mode addressing
-    addressMode_[COORD_U] = ADDRESS_CLAMP;
-    addressMode_[COORD_V] = ADDRESS_CLAMP;
-    addressMode_[COORD_W] = ADDRESS_CLAMP;
+    addressModes_[COORD_U] = ADDRESS_CLAMP;
+    addressModes_[COORD_V] = ADDRESS_CLAMP;
+    addressModes_[COORD_W] = ADDRESS_CLAMP;
 
-    for (unsigned int& i : faceMemoryUse_)
-        i = 0;
+    for (unsigned& memoryUse : faceMemoryUse_)
+        memoryUse = 0;
 }
 
 TextureCube::~TextureCube()

@@ -555,8 +555,8 @@ void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
             {
                 for (float& blendWeight : i->blendWeights_)
                     blendWeight = buffer.ReadFloat();
-                for (unsigned char& blendIndice : i->blendIndices_)
-                    blendIndice = buffer.ReadUByte();
+                for (unsigned char& blendIndex : i->blendIndices_)
+                    blendIndex = buffer.ReadUByte();
             }
         }
 
@@ -625,8 +625,8 @@ PODVector<unsigned char> DecalSet::GetDecalsAttr() const
             {
                 for (float blendWeight : j->blendWeights_)
                     ret.WriteFloat(blendWeight);
-                for (unsigned char blendIndice : j->blendIndices_)
-                    ret.WriteUByte(blendIndice);
+                for (unsigned char blendIndex : j->blendIndices_)
+                    ret.WriteUByte(blendIndex);
             }
         }
 

@@ -360,8 +360,8 @@ bool TextureCube::SetData(CubeMapFace face, Image* image, bool useAlpha)
 
     faceMemoryUse_[face] = memoryUse;
     unsigned totalMemoryUse = sizeof(TextureCube);
-    for (unsigned int i : faceMemoryUse_)
-        totalMemoryUse += i;
+    for (unsigned memoryUse : faceMemoryUse_)
+        totalMemoryUse += memoryUse;
     SetMemoryUse(totalMemoryUse);
     return true;
 }
