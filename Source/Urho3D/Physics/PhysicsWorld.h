@@ -126,6 +126,9 @@ struct PhysicsWorldConfig
 
 static const float DEFAULT_MAX_NETWORK_ANGULAR_VELOCITY = 100.0f;
 
+/// Cache of collision geometry data.
+using CollisionGeometryDataCache = HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >;
+
 /// Physics simulation world component. Should be added only to the root scene node.
 class URHO3D_API PhysicsWorld : public Component, public btIDebugDraw
 {
@@ -267,10 +270,13 @@ public:
     void CleanupGeometryCache();
 
     /// Return trimesh collision geometry cache.
-    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetTriMeshCache() { return triMeshCache_; }
+    CollisionGeometryDataCache& GetTriMeshCache() { return triMeshCache_; }
 
     /// Return convex collision geometry cache.
-    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >& GetConvexCache() { return convexCache_; }
+    CollisionGeometryDataCache& GetConvexCache() { return convexCache_; }
+
+    /// Return GImpact trimesh collision geometry cache.
+    CollisionGeometryDataCache& GetGImpactTrimeshCache() { return gimpactTrimeshCache_; }
 
     /// Set node dirtying to be disregarded.
     void SetApplyingTransforms(bool enable) { applyingTransforms_ = enable; }
@@ -323,9 +329,11 @@ private:
     /// Delayed (parented) world transform assignments.
     HashMap<RigidBody*, DelayedWorldTransform> delayedWorldTransforms_;
     /// Cache for trimesh geometry data by model and LOD level.
-    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > triMeshCache_;
+    CollisionGeometryDataCache triMeshCache_;
     /// Cache for convex geometry data by model and LOD level.
-    HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> > convexCache_;
+    CollisionGeometryDataCache convexCache_;
+    /// Cache for GImpact trimesh geometry data by model and LOD level.
+    CollisionGeometryDataCache gimpactTrimeshCache_;
     /// Preallocated event data map for physics collision events.
     VariantMap physicsCollisionData_;
     /// Preallocated event data map for node collision events.
