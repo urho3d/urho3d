@@ -7,8 +7,8 @@ class Button : public BorderImage
     
     void SetPressedOffset(const IntVector2& offset);
     void SetPressedOffset(int x, int y);
-	void SetDisabledOffset(const IntVector2& offset);
-	void SetDisabledOffset(int x, int y);
+    void SetDisabledOffset(const IntVector2& offset);
+    void SetDisabledOffset(int x, int y);
     void SetPressedChildOffset(const IntVector2& offset);
     void SetPressedChildOffset(int x, int y);
     void SetRepeat(float delay, float rate);
@@ -23,7 +23,7 @@ class Button : public BorderImage
     bool IsPressed() const;
     
     tolua_property__get_set IntVector2& pressedOffset;
-	tolua_property__get_set IntVector2& disabledOffset;
+    tolua_property__get_set IntVector2& disabledOffset;
     tolua_property__get_set IntVector2& pressedChildOffset;
     tolua_property__get_set float repeatDelay;
     tolua_property__get_set float repeatRate;

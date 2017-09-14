@@ -38,7 +38,7 @@ extern const char* UI_CATEGORY;
 Button::Button(Context* context) :
     BorderImage(context),
     pressedOffset_(IntVector2::ZERO),
-	disabledOffset_(IntVector2::ZERO),
+    disabledOffset_(IntVector2::ZERO),
     pressedChildOffset_(IntVector2::ZERO),
     repeatDelay_(1.0f),
     repeatRate_(0.0f),
@@ -61,7 +61,7 @@ void Button::RegisterObject(Context* context)
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Is Enabled", true);
     URHO3D_UPDATE_ATTRIBUTE_DEFAULT_VALUE("Focus Mode", FM_FOCUSABLE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Image Offset", GetPressedOffset, SetPressedOffset, IntVector2, IntVector2::ZERO, AM_FILE);
-	URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("Disabled Image Offset", GetDisabledOffset, SetDisabledOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Pressed Child Offset", GetPressedChildOffset, SetPressedChildOffset, IntVector2, IntVector2::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Repeat Delay", GetRepeatDelay, SetRepeatDelay, float, 1.0f, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Repeat Rate", GetRepeatRate, SetRepeatRate, float, 0.0f, AM_FILE);
@@ -92,18 +92,18 @@ void Button::Update(float timeStep)
 void Button::GetBatches(PODVector<UIBatch>& batches, PODVector<float>& vertexData, const IntRect& currentScissor)
 {
     IntVector2 offset(IntVector2::ZERO);
-	if (enabled_)
-	{
-		if (hovering_ || HasFocus())
-			offset += hoverOffset_;
-		if (pressed_ || selected_)
-			offset += pressedOffset_;
-	}
-	else
-	{
-		offset += disabledOffset_;
-	}
-
+    if (enabled_)
+    {
+        if (hovering_ || HasFocus())
+            offset += hoverOffset_;
+        if (pressed_ || selected_)
+            offset += pressedOffset_;
+    }
+    else
+    {
+        offset += disabledOffset_;
+    }
+    
     BorderImage::GetBatches(batches, vertexData, currentScissor, offset);
 }
 
