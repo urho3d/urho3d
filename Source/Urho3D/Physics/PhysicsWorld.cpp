@@ -44,6 +44,7 @@
 #include <Bullet/BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 #include <Bullet/BulletCollision/CollisionShapes/btBoxShape.h>
 #include <Bullet/BulletCollision/CollisionShapes/btSphereShape.h>
+#include <Bullet/BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 #include <Bullet/BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <Bullet/BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
@@ -88,6 +89,26 @@ static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisio
     return true;
 }
 
+void RemoveCachedGeometryImpl(CollisionGeometryDataCache& triMeshCache_, Model* model)
+{
+    for (auto i = triMeshCache_.Begin(); i != triMeshCache_.End();)
+    {
+        auto current = i++;
+        if (current->first_.first_ == model)
+            triMeshCache_.Erase(current);
+    }
+}
+
+void CleanupGeometryCacheImpl(CollisionGeometryDataCache& triMeshCache_)
+{
+    for (auto i = triMeshCache_.Begin(); i != triMeshCache_.End();)
+    {
+        auto current = i++;
+        if (current->second_.Refs() == 1)
+            triMeshCache_.Erase(current);
+    }
+}
+
 /// Callback for physics world queries.
 struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
 {
@@ -117,7 +138,6 @@ struct PhysicsQueryCallback : public btCollisionWorld::ContactResultCallback
     unsigned collisionMask_;
 };
 
-
 PhysicsWorld::PhysicsWorld(Context* context) :
     Component(context),
     collisionConfiguration_(nullptr),
@@ -141,6 +161,8 @@ PhysicsWorld::PhysicsWorld(Context* context) :
         collisionConfiguration_ = new btDefaultCollisionConfiguration();
 
     collisionDispatcher_ = new btCollisionDispatcher(collisionConfiguration_);
+    btGImpactCollisionAlgorithm::registerAlgorithm(static_cast<btCollisionDispatcher*>(collisionDispatcher_.Get()));
+
     broadphase_ = new btDbvtBroadphase();
     solver_ = new btSequentialImpulseConstraintSolver();
     world_ = new btDiscreteDynamicsWorld(collisionDispatcher_.Get(), broadphase_.Get(), solver_.Get(), collisionConfiguration_);
@@ -153,7 +175,6 @@ PhysicsWorld::PhysicsWorld(Context* context) :
     world_->setInternalTickCallback(InternalTickCallback, static_cast<void*>(this), false);
     world_->setSynchronizeAllMotionStates(true);
 }
-
 
 PhysicsWorld::~PhysicsWorld()
 {
@@ -591,20 +612,9 @@ void PhysicsWorld::ConvexCast(PhysicsRaycastResult& result, btCollisionShape* sh
 
 void PhysicsWorld::RemoveCachedGeometry(Model* model)
 {
-    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
-         i != triMeshCache_.End();)
-    {
-        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
-        if (current->first_.first_ == model)
-            triMeshCache_.Erase(current);
-    }
-    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
-         i != convexCache_.End();)
-    {
-        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
-        if (current->first_.first_ == model)
-            convexCache_.Erase(current);
-    }
+    RemoveCachedGeometryImpl(triMeshCache_, model);
+    RemoveCachedGeometryImpl(convexCache_, model);
+    RemoveCachedGeometryImpl(gimpactTrimeshCache_, model);
 }
 
 void PhysicsWorld::GetRigidBodies(PODVector<RigidBody*>& result, const Sphere& sphere, unsigned collisionMask)
@@ -760,20 +770,9 @@ void PhysicsWorld::SetDebugDepthTest(bool enable)
 void PhysicsWorld::CleanupGeometryCache()
 {
     // Remove cached shapes whose only reference is the cache itself
-    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = triMeshCache_.Begin();
-         i != triMeshCache_.End();)
-    {
-        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
-        if (current->second_.Refs() == 1)
-            triMeshCache_.Erase(current);
-    }
-    for (HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator i = convexCache_.Begin();
-         i != convexCache_.End();)
-    {
-        HashMap<Pair<Model*, unsigned>, SharedPtr<CollisionGeometryData> >::Iterator current = i++;
-        if (current->second_.Refs() == 1)
-            convexCache_.Erase(current);
-    }
+    CleanupGeometryCacheImpl(triMeshCache_);
+    CleanupGeometryCacheImpl(convexCache_);
+    CleanupGeometryCacheImpl(gimpactTrimeshCache_);
 }
 
 void PhysicsWorld::OnSceneSet(Scene* scene)
