@@ -89,23 +89,23 @@ static bool CustomMaterialCombinerCallback(btManifoldPoint& cp, const btCollisio
     return true;
 }
 
-void RemoveCachedGeometryImpl(CollisionGeometryDataCache& triMeshCache_, Model* model)
+void RemoveCachedGeometryImpl(CollisionGeometryDataCache& cache, Model* model)
 {
-    for (auto i = triMeshCache_.Begin(); i != triMeshCache_.End();)
+    for (auto i = cache.Begin(); i != cache.End();)
     {
         auto current = i++;
         if (current->first_.first_ == model)
-            triMeshCache_.Erase(current);
+            cache.Erase(current);
     }
 }
 
-void CleanupGeometryCacheImpl(CollisionGeometryDataCache& triMeshCache_)
+void CleanupGeometryCacheImpl(CollisionGeometryDataCache& cache)
 {
-    for (auto i = triMeshCache_.Begin(); i != triMeshCache_.End();)
+    for (auto i = cache.Begin(); i != cache.End();)
     {
         auto current = i++;
         if (current->second_.Refs() == 1)
-            triMeshCache_.Erase(current);
+            cache.Erase(current);
     }
 }
 
