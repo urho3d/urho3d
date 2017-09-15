@@ -202,44 +202,48 @@ namespace Urho3D
 
 	bool MultiLineEdit::OnDragDropTest(UIElement* source)
 	{
-		if (source && editable_)
-		{
-			if (source->GetVars().Contains(VAR_ML_DRAGDROPCONTENT))
-				return true;
-			StringHash sourceType = source->GetType();
-			return sourceType == MultiLineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
-		}
+		//if (source && editable_)
+		//{
+		//	if (source->GetVars().Contains(VAR_ML_DRAGDROPCONTENT))
+		//		return true;
+		//	StringHash sourceType = source->GetType();
+		//	return sourceType == MultiLineEdit::GetTypeStatic() || sourceType == Text::GetTypeStatic();
+		//}
 
-		return false;
+		//return false;
+
+		return true;
 	}
 
 	bool MultiLineEdit::OnDragDropFinish(UIElement* source)
 	{
-		if (source && editable_)
-		{
-			// If the UI element in question has a drag-and-drop content string defined, use it instead of element text
-			if (source->GetVars().Contains(VAR_ML_DRAGDROPCONTENT))
-			{
-				SetText(source->GetVar(VAR_ML_DRAGDROPCONTENT).GetString());
-				return true;
-			}
+		//if (source && editable_)
+		//{
+		//	// If the UI element in question has a drag-and-drop content string defined, use it instead of element text
+		//	if (source->GetVars().Contains(VAR_ML_DRAGDROPCONTENT))
+		//	{
+		//		SetText(source->GetVar(VAR_ML_DRAGDROPCONTENT).GetString());
+		//		return true;
+		//	}
 
-			StringHash sourceType = source->GetType();
-			if (sourceType == MultiLineEdit::GetTypeStatic())
-			{
-				MultiLineEdit* sourceMultiLineEdit = static_cast<MultiLineEdit*>(source);
-				SetText(sourceMultiLineEdit->GetText());
-				return true;
-			}
-			else if (sourceType == Text::GetTypeStatic())
-			{
-				Text* sourceText = static_cast<Text*>(source);
-				SetText(sourceText->GetText());
-				return true;
-			}
-		}
+		//	StringHash sourceType = source->GetType();
+		//	if (sourceType == MultiLineEdit::GetTypeStatic())
+		//	{
+		//		MultiLineEdit* sourceMultiLineEdit = static_cast<MultiLineEdit*>(source);
+		//		SetText(sourceMultiLineEdit->GetText());
+		//		return true;
+		//	}
+		//	else if (sourceType == Text::GetTypeStatic())
+		//	{
+		//		Text* sourceText = static_cast<Text*>(source);
+		//		SetText(sourceText->GetText());
+		//		return true;
+		//	}
+		//}
 
-		return false;
+		//return false;
+
+		return true;
 	}
 
 	void MultiLineEdit::OnKey(int key, int buttons, int qualifiers)
